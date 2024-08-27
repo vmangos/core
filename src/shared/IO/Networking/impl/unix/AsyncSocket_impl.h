@@ -12,26 +12,26 @@
 #include "Errors.h"
 
 template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
     if (state & SocketStateFlags::READ_PENDING_SET)
     {
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
         return;
     }
 
     if (state & SocketStateFlags::SHUTDOWN_PENDING)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         return;
     }
 
     if (state & SocketStateFlags::READ_PRESENT)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
         return;
     }
 
@@ -39,7 +39,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Read(...) with size 0");
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), 0); // technically not an error, we are just done with the buffer
         return;
     }
 
@@ -49,7 +49,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
         sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[ERROR] Read(...) -> ::recv() returned 0, which means the socket is half-closed.");
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         StopPendingTransactionsAndForceClose();
         return;
     }
@@ -58,7 +58,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
         if (errno != EWOULDBLOCK)
         {
             m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-            callback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, errno));
+            callback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, errno), 0);
             return;
         }
         alreadyRead = 0; // Would block, so we need to queue it for later
@@ -66,11 +66,79 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     if (alreadyRead == size)
     { // oh wow, we already have the whole buffer, no need to set up variables
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), alreadyRead);
         return;
     }
 
     m_readDstBuffer = target + alreadyRead;
+    m_readDstBufferSize = size;
+    m_readDstBufferBytesLeft = size - alreadyRead;
+    m_readCallback = callback;
+
+    m_atomicState.fetch_xor(SocketStateFlags::READ_PRESENT | SocketStateFlags::READ_PENDING_SET); // set PRESENT and unset PENDING_SET
+}
+
+template<typename SocketType>
+void IO::Networking::AsyncSocket<SocketType>::ReadSome(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
+{
+    int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
+    if (state & SocketStateFlags::READ_PENDING_SET)
+    {
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
+        return;
+    }
+
+    if (state & SocketStateFlags::SHUTDOWN_PENDING)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
+        return;
+    }
+
+    if (state & SocketStateFlags::READ_PRESENT)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
+        return;
+    }
+
+    if (size == 0)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Read(...) with size 0");
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), 0); // technically not an error, we are just done with the buffer
+        return;
+    }
+
+    // Check if there is already something for us buffered in memory
+    int alreadyRead = ::recv(m_socket._nativeSocket, target, size, 0);
+    if (alreadyRead == 0)
+    {
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[ERROR] Read(...) -> ::recv() returned 0, which means the socket is half-closed.");
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
+        StopPendingTransactionsAndForceClose();
+        return;
+    }
+    else if (alreadyRead == -1)
+    {
+        if (errno != EWOULDBLOCK)
+        {
+            m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+            callback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, errno), 0);
+            return;
+        }
+        alreadyRead = 0; // Would block, so we need to queue it for later
+    }
+    if (alreadyRead != 0)
+    { // oh wow, we already have "some" buffer, no need to set up variables
+        m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), alreadyRead);
+        return;
+    }
+
+    m_readDstBuffer = target + alreadyRead;
+    m_readDstBufferSize = 0; // 0 means ReadSome(), only one ::recv call
     m_readDstBufferBytesLeft = size - alreadyRead;
     m_readCallback = callback;
 
@@ -232,7 +300,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
     char const* ptr = reinterpret_cast<char const*>(source.get());
     if (size == 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Read(...) with size 0");
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
         m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
@@ -324,13 +392,17 @@ void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingRead()
     m_readDstBufferBytesLeft -= newWrittenBytes;
     m_readDstBuffer += newWrittenBytes;
 
-    if (m_readDstBufferBytesLeft == 0)
+    bool isReadSome = m_readDstBufferSize == 0; // if we have readSome we only want to execute one ::recv() call
+
+    if (m_readDstBufferBytesLeft == 0 || isReadSome)
     { // we are done with this buffer
         m_readDstBuffer = nullptr;
 
         auto tmpCallback = std::move(m_readCallback);
         m_atomicState.fetch_and(~(SocketStateFlags::READ_PENDING_LOAD | SocketStateFlags::READ_PRESENT));
-        tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
+
+        std::size_t transferSize = isReadSome ? newWrittenBytes : m_readDstBufferSize;
+        tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), transferSize);
     }
     else
     {
@@ -467,7 +539,7 @@ void IO::Networking::AsyncSocket<SocketType>::StopPendingTransactionsAndForceClo
         m_readDstBuffer = nullptr;
         m_readDstBufferBytesLeft = 0;
         m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
-        tmpReadCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
+        tmpReadCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
     }
 
     if (state & SocketStateFlags::CONTEXT_PRESENT)

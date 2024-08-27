@@ -20,6 +20,19 @@
 INSTANTIATE_SINGLETON_2(Config, Config::Lock);
 INSTANTIATE_CLASS_MUTEX(Config, std::shared_timed_mutex);
 
+static bool IsLineEndChar(char chr)
+{
+    switch (chr)
+    {
+        case '\0':
+        case '\n':
+        case '\r':
+            return true;
+    }
+
+    return false;
+}
+
 bool Config::LoadFromFile(std::string const& filename)
 {
     m_fileName = filename;
@@ -52,19 +65,6 @@ enum LineReadStage
     STAGE_FIND_VALUE,
     STAGE_READ_VALUE
 };
-
-static bool IsLineEndChar(char chr)
-{
-    switch (chr)
-    {
-        case '\0':
-        case '\n':
-        case '\r':
-            return true;
-    }
-
-    return false;
-}
 
 bool Config::ProcessLine(char const* line)
 {
@@ -152,7 +152,12 @@ bool Config::ProcessLine(char const* line)
     return true;
 }
 
-bool Config::GetValueHelper(char const* name, std::string &result)
+std::string Config::GetFilename() const
+{
+    return m_fileName;
+}
+
+bool Config::GetValueHelper(char const* name, std::string &result) const
 {
     std::shared_lock<std::shared_timed_mutex> guard(m_configLock);
 
@@ -164,32 +169,39 @@ bool Config::GetValueHelper(char const* name, std::string &result)
     return true;
 }
 
-std::string Config::GetStringDefault(char const* name, char const* def)
+bool Config::IsSet(char const* name) const
+{
+    std::string val; // we are not interested in the value
+    return GetValueHelper(name, val);
+}
+
+std::string Config::GetStringDefault(char const* name, char const* def) const
 {
     std::string val;
     return GetValueHelper(name, val) ? val.c_str() : def;
 }
 
-bool Config::GetBoolDefault(char const* name, bool def)
+bool Config::GetBoolDefault(char const* name, bool def) const
 {
     std::string val;
     if (!GetValueHelper(name, val))
         return def;
 
-    char const* str = val.c_str();
-    return strcmp(str, "true") == 0 || strcmp(str, "TRUE") == 0 ||
-           strcmp(str, "yes") == 0 || strcmp(str, "YES") == 0 ||
-           strcmp(str, "1") == 0;
+    return val == "true"
+        || val == "TRUE"
+        || val == "yes"
+        || val == "YES"
+        || val == "1";
 }
 
-int32 Config::GetIntDefault(char const* name, int32 def)
+int32 Config::GetIntDefault(char const* name, int32 def) const
 {
     std::string val;
-    return GetValueHelper(name, val) ? atoi(val.c_str()) : def;
+    return GetValueHelper(name, val) ? std::stoi(val) : def;
 }
 
-float Config::GetFloatDefault(char const* name, float def)
+float Config::GetFloatDefault(char const* name, float def) const
 {
     std::string val;
-    return GetValueHelper(name, val) ? (float)atof(val.c_str()) : def;
+    return GetValueHelper(name, val) ? std::stof(val) : def;
 }

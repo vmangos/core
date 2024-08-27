@@ -38,6 +38,7 @@
 #include "IO/Filesystem/FileSystem.h"
 #include "ClientPatchCache.h"
 #include "IO/Networking/Utils.h"
+#include "Utils/ArrayDeleter.h"
 
 #include <ace/INET_Addr.h>
 
@@ -241,7 +242,7 @@ void AuthSocket::DoRecvIncomingData()
     std::shared_ptr<eAuthCmd> cmd = std::make_shared<eAuthCmd>();
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DoRecvIncomingData() Reading... Ready for next opcode");
-    Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd](IO::NetworkError const& error) -> void
+    Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd](IO::NetworkError const& error, size_t) -> void
     {
         if (error)
         {
@@ -350,7 +351,7 @@ void AuthSocket::_HandleLogonChallenge()
     std::shared_ptr<sAuthLogonChallengeHeader> header = std::make_shared<sAuthLogonChallengeHeader>();
 
     // Read the header first, to get the length of the remaining packet
-    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](IO::NetworkError const& error) -> void
+    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](IO::NetworkError const& error, size_t) -> void
     {
         if (error)
         {
@@ -372,7 +373,7 @@ void AuthSocket::_HandleLogonChallenge()
 
         // Read the remaining of the packet
         std::shared_ptr<sAuthLogonChallengeBody> body = std::make_shared<sAuthLogonChallengeBody>();
-        self->Read((char*)body.get(), actualBodySize, [self, header, body](IO::NetworkError const& error)
+        self->Read((char*)body.get(), actualBodySize, [self, header, body](IO::NetworkError const& error, size_t)
         {
             if (error)
             {
@@ -621,7 +622,7 @@ void AuthSocket::_HandleLogonProof()
         expectedSize = sizeof(sAuthLogonProof_C_Pre_1_11_0);
     }
 
-    Read((char*) lp.get(), expectedSize, [self = shared_from_this(), lp](IO::NetworkError const& error)
+    Read((char*) lp.get(), expectedSize, [self = shared_from_this(), lp](IO::NetworkError const& error, size_t)
     {
         if (error)
         {
@@ -640,7 +641,7 @@ void AuthSocket::_HandleLogonProof()
             }
 
             std::shared_ptr<PINData> pinData(new PINData());
-            self->Read((char*) pinData.get(), sizeof(PINData), [self, lp, pinData](IO::NetworkError const& error)
+            self->Read((char*) pinData.get(), sizeof(PINData), [self, lp, pinData](IO::NetworkError const& error, size_t)
             {
                 self->_HandleLogonProof__PostRecv(lp, pinData);
             });
@@ -952,7 +953,7 @@ void AuthSocket::_HandleReconnectChallenge()
 
     // Read the header first, to get the length of the remaining packet
     std::shared_ptr<sAuthLogonChallengeHeader> header = std::make_shared<sAuthLogonChallengeHeader>();
-    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](IO::NetworkError const& error)
+    Read((char*)header.get(), sizeof(sAuthLogonChallengeHeader), [self = shared_from_this(), header](IO::NetworkError const& error, size_t)
     {
         if (error)
         {
@@ -974,7 +975,7 @@ void AuthSocket::_HandleReconnectChallenge()
 
         // Read the remaining of the packet
         std::shared_ptr<sAuthLogonChallengeBody> body = std::make_shared<sAuthLogonChallengeBody>();
-        self->Read((char*)body.get(), actualBodySize, [self, header, body](IO::NetworkError const& error)
+        self->Read((char*)body.get(), actualBodySize, [self, header, body](IO::NetworkError const& error, size_t)
         {
             if (error)
             {
@@ -1062,7 +1063,7 @@ void AuthSocket::_HandleReconnectProof()
 
     // Read the packet
     std::shared_ptr<sAuthReconnectProof_C> lp(new sAuthReconnectProof_C());
-    Read((char*) lp.get(), sizeof(sAuthReconnectProof_C), [self = shared_from_this(), lp](IO::NetworkError const& error)
+    Read((char*) lp.get(), sizeof(sAuthReconnectProof_C), [self = shared_from_this(), lp](IO::NetworkError const& error, size_t)
     {
         if (error)
         {
@@ -1461,15 +1462,6 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk)
         self->RepeatInternalXferLoop(std::move(rawChunk));
     });
 }
-
-template< typename T >
-struct array_deleter
-{
-    void operator ()(T const * p)
-    {
-        delete[] p;
-    }
-};
 
 void AuthSocket::InitAndHandOverControlToPatchHandler()
 {

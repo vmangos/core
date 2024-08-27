@@ -26,22 +26,23 @@
 
 class Config
 {
-public:
+ public:
     using Lock = MaNGOS::ClassLevelLockable<Config, std::shared_timed_mutex>;
 
     bool LoadFromFile(std::string const& filename);
     bool Reload();
 
-    std::string GetStringDefault(char const* name, char const* def);
-    bool GetBoolDefault(char const* name, bool def = false);
-    int32 GetIntDefault(char const* name, int32 def);
-    float GetFloatDefault(char const* name, float def);
+    bool IsSet(char const* name) const;
 
-    std::string GetFilename() const { return m_fileName; }
-    bool GetValueHelper(char const* name, std::string &result);
-    size_t GetSettingsCount() const { return m_configMap.size(); }
+    std::string GetStringDefault(char const* name, char const* def) const;
+    bool GetBoolDefault(char const* name, bool def) const;
+    int32 GetIntDefault(char const* name, int32 def) const;
+    float GetFloatDefault(char const* name, float def) const;
 
-private:
+    std::string GetFilename() const;
+    bool GetValueHelper(char const* name, std::string& result) const;
+
+ private:
     friend class MaNGOS::Singleton<Config, Lock>;
 
     bool ProcessLine(char const* line);
@@ -50,7 +51,7 @@ private:
     std::unordered_map<std::string, std::string> m_configMap;
 
     using LockType = std::shared_timed_mutex;
-    LockType m_configLock;
+    mutable LockType m_configLock;
 };
 
 #define sConfig (MaNGOS::Singleton<Config, Config::Lock>::Instance())

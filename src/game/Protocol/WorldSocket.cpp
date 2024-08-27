@@ -84,7 +84,7 @@ void WorldSocket::DoRecvIncomingData()
 {
     std::shared_ptr<ClientPktHeader> header = std::make_shared<ClientPktHeader>();
 
-    Read((char*)header.get(), sizeof(ClientPktHeader), [self = shared_from_this(), header](IO::NetworkError const& error) -> void
+    Read((char*)header.get(), sizeof(ClientPktHeader), [self = shared_from_this(), header](IO::NetworkError const& error, std::size_t) -> void
     {
         if (error)
         {
@@ -118,7 +118,7 @@ void WorldSocket::DoRecvIncomingData()
             // Cannot move std::unique_ptr into function capture, so it's wrapped into std::shared_ptr
             std::shared_ptr<std::unique_ptr<WorldPacket>> packetTmpSharedPtr(new std::unique_ptr<WorldPacket>(new WorldPacket(header->cmd, remainingPacketSize)));
             (*packetTmpSharedPtr)->resize(remainingPacketSize);
-            self->Read((char*)((*packetTmpSharedPtr)->contents()), (*packetTmpSharedPtr)->size(), [self, packetTmpSharedPtr](IO::NetworkError const& error) -> void
+            self->Read((char*)((*packetTmpSharedPtr)->contents()), (*packetTmpSharedPtr)->size(), [self, packetTmpSharedPtr](IO::NetworkError const& error, std::size_t) -> void
             {
                 if (error)
                 {

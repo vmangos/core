@@ -44,7 +44,8 @@ namespace IO { namespace Networking {
 
             /// Keep in mind to keep the source buffer in scope of the callback, otherwise random memory might get overwritten
             /// Most of the time this is not an issue, since you want to process the incoming buffer
-            void Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&)> const& callback);
+            void Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback);
+            void ReadSome(char* target, std::size_t maxSize, std::function<void(IO::NetworkError const&, size_t)> const& callback);
             void ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback);
 
             /// The callback is invoked in the IO thread
@@ -98,7 +99,7 @@ namespace IO { namespace Networking {
             std::function<void(IO::NetworkError)> m_contextCallback = nullptr; // <-- Callback into user code
 
             // Read = the target buffer to write the network stream to
-            std::function<void(IO::NetworkError)> m_readCallback = nullptr; // <-- Callback into user code
+            std::function<void(IO::NetworkError const&, size_t)> m_readCallback = nullptr; // <-- Callback into user code
 
             // Write = the source buffer from where to read to be able to write to the network stream
             std::function<void(IO::NetworkError)> m_writeCallback = nullptr; // <-- Callback into user code
@@ -118,6 +119,7 @@ namespace IO { namespace Networking {
             void StopPendingTransactionsAndForceClose();
 
             char* m_readDstBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_readDstBufferBytesLeft for space
+            std::size_t m_readDstBufferSize = 0; // will be 0 if ReadSome(), otherwise the original buffer size
             std::size_t m_readDstBufferBytesLeft = 0;
             char const* m_writeSrcBuffer = nullptr; // this ptr will move along the buffer as its filled, check m_writeSrcBufferBytesLeft for space
             std::size_t m_writeSrcBufferBytesLeft = 0;
@@ -166,7 +168,7 @@ void IO::Networking::AsyncSocket<SocketType>::ReadSkip(std::size_t skipSize, std
 {
     std::shared_ptr<std::vector<uint8_t>> skipBuffer(new std::vector<uint8_t>());
     skipBuffer->resize(skipSize);
-    Read((char*)skipBuffer->data(), skipSize, [skipBuffer, callback](IO::NetworkError const& error)
+    Read((char*)skipBuffer->data(), skipSize, [skipBuffer, callback](IO::NetworkError const& error, size_t)
     {
         // KEEP skipBuffer in scope!
         // Do not remove skipBuffer before Read() is done, since we are transferring into it via async IO
