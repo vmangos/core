@@ -262,10 +262,6 @@ inline char* mangos_strdup(char const* source)
 #  define M_PI_F        float(M_PI)
 #endif
 
-#ifndef countof
-#define countof(array) (sizeof(array) / sizeof((array)[0]))
-#endif
-
-#define BATCHING_INTERVAL 400
+#define BATCHING_INTERVAL 400 // TODO, why is this here? What is "Spell.*Delay" in the config used for then?
 
 #endif
