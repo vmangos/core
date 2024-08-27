@@ -105,9 +105,8 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
         }
     });
 
-    m_atomicState.fetch_or(SocketStateFlags::READ_PRESENT);
-
     DWORD flags = 0;
+    m_atomicState.fetch_xor(SocketStateFlags::READ_PRESENT | SocketStateFlags::READ_PENDING_SET); // set PRESENT and unset PENDING_SET
     int errorCode = ::WSARecv(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
     if (errorCode)
     {
@@ -117,12 +116,11 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
             auto tmpCallback = std::move(m_readCallback);
             m_currentReadTask.Reset();
-            m_atomicState.fetch_and(~(SocketStateFlags::READ_PENDING_SET | SocketStateFlags::READ_PRESENT));
+            m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err), 0);
             return;
         }
     }
-    m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
 }
 
 void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
@@ -187,9 +185,8 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
         tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), bytesProcessed);
     });
 
-    m_atomicState.fetch_or(SocketStateFlags::READ_PRESENT);
-
     DWORD flags = 0;
+    m_atomicState.fetch_xor(SocketStateFlags::READ_PRESENT | SocketStateFlags::READ_PENDING_SET); // set PRESENT and unset PENDING_SET
     int errorCode = ::WSARecv(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
     if (errorCode)
     {
@@ -199,12 +196,11 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
             auto tmpCallback = std::move(m_readCallback);
             m_currentReadTask.Reset();
-            m_atomicState.fetch_and(~(SocketStateFlags::READ_PENDING_SET | SocketStateFlags::READ_PRESENT));
+            m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err), 0);
             return;
         }
     }
-    m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
 }
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
@@ -283,9 +279,8 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<std::vector<uint8_t> con
         tmpCallback(errorResult);
     });
 
-    m_atomicState.fetch_or(SocketStateFlags::WRITE_PRESENT);
-
     DWORD flags = 0;
+    m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
     int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
     if (errorCode)
     {
@@ -296,12 +291,11 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<std::vector<uint8_t> con
             auto tmpCallback = std::move(m_writeCallback);
             m_writeSrcBufferDummyHolder_u8Vector = nullptr;
             m_currentWriteTask.Reset();
-            m_atomicState.fetch_and(~(SocketStateFlags::WRITE_PENDING_SET | SocketStateFlags::WRITE_PRESENT));
+            m_atomicState.fetch_and(~SocketStateFlags::WRITE_PRESENT);
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
         }
     }
-    m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
 }
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
@@ -380,9 +374,8 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<ByteBuffer const> const&
         tmpCallback(errorResult);
     });
 
-    m_atomicState.fetch_or(SocketStateFlags::WRITE_PRESENT);
-
     DWORD flags = 0;
+    m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
     int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
     if (errorCode)
     {
@@ -393,12 +386,11 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<ByteBuffer const> const&
             auto tmpCallback = std::move(m_writeCallback);
             m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
             m_currentWriteTask.Reset();
-            m_atomicState.fetch_and(~(SocketStateFlags::WRITE_PENDING_SET | SocketStateFlags::WRITE_PRESENT));
+            m_atomicState.fetch_and(~SocketStateFlags::WRITE_PRESENT);
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
         }
     }
-    m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
 }
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
@@ -477,9 +469,8 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<uint8_t const> const& so
         tmpCallback(errorResult);
     });
 
-    m_atomicState.fetch_or(SocketStateFlags::WRITE_PRESENT);
-
     DWORD flags = 0;
+    m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
     int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
     if (errorCode)
     {
@@ -490,12 +481,11 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<uint8_t const> const& so
             auto tmpCallback = std::move(m_writeCallback);
             m_writeSrcBufferDummyHolder_rawArray = nullptr;
             m_currentWriteTask.Reset();
-            m_atomicState.fetch_and(~(SocketStateFlags::WRITE_PENDING_SET | SocketStateFlags::WRITE_PRESENT));
+            m_atomicState.fetch_and(~SocketStateFlags::WRITE_PRESENT);
             tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, err));
             return;
         }
     }
-    m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
 }
 
 void IO::Networking::AsyncSocket::CloseSocket()
