@@ -1,5 +1,4 @@
-#ifndef MANGOS_IO_NETWORKING_UNIX_ASYNCSOCKET_IMPL_H
-#define MANGOS_IO_NETWORKING_UNIX_ASYNCSOCKET_IMPL_H
+#include "AsyncSocket.h"
 
 #if defined(__linux__)
 #include <sys/epoll.h>
@@ -11,8 +10,7 @@
 #include "IO/SystemErrorToString.h"
 #include "Errors.h"
 
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
+void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
     if (state & SocketStateFlags::READ_PENDING_SET)
@@ -37,7 +35,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
 
     if (size == 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Read(...) with size 0");
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket::Read(...) with size 0");
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), 0); // technically not an error, we are just done with the buffer
         return;
@@ -78,8 +76,7 @@ void IO::Networking::AsyncSocket<SocketType>::Read(char* target, std::size_t siz
     m_atomicState.fetch_xor(SocketStateFlags::READ_PRESENT | SocketStateFlags::READ_PENDING_SET); // set PRESENT and unset PENDING_SET
 }
 
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::ReadSome(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
+void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
     if (state & SocketStateFlags::READ_PENDING_SET)
@@ -104,7 +101,7 @@ void IO::Networking::AsyncSocket<SocketType>::ReadSome(char* target, std::size_t
 
     if (size == 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Read(...) with size 0");
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket::Read(...) with size 0");
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError), 0); // technically not an error, we are just done with the buffer
         return;
@@ -147,8 +144,7 @@ void IO::Networking::AsyncSocket<SocketType>::ReadSome(char* target, std::size_t
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
 /// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
     if (state & SocketStateFlags::WRITE_PENDING_SET)
@@ -175,7 +171,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
     char const* ptr = reinterpret_cast<char const*>(source->data());
     if (size == 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket::Write(...) with size 0");
         m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
@@ -210,8 +206,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<std::vector<
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
 /// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
     if (state & SocketStateFlags::WRITE_PENDING_SET)
@@ -238,7 +233,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
     char const* ptr = reinterpret_cast<char const*>(source->contents());
     if (size == 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket::Write(...) with size 0");
         m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
@@ -273,8 +268,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<ByteBuffer c
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
 /// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket::Write(std::shared_ptr<uint8_t const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
     if (state & SocketStateFlags::WRITE_PENDING_SET)
@@ -300,7 +294,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
     char const* ptr = reinterpret_cast<char const*>(source.get());
     if (size == 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket<SocketType>::Write(...) with size 0");
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket::Write(...) with size 0");
         m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
         return;
@@ -333,8 +327,7 @@ void IO::Networking::AsyncSocket<SocketType>::Write(std::shared_ptr<uint8_t cons
     m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
 }
 
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::CloseSocket()
+void IO::Networking::AsyncSocket::CloseSocket()
 {
     // set SHUTDOWN_PENDING flag, and check if there was already a previous one
     if (m_atomicState.fetch_or(SocketStateFlags::SHUTDOWN_PENDING) & SocketStateFlags::SHUTDOWN_PENDING)
@@ -344,8 +337,7 @@ void IO::Networking::AsyncSocket<SocketType>::CloseSocket()
     ::close(m_socket._nativeSocket); // will silently remove from this Socket from the epoll set
 }
 
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingRead()
+void IO::Networking::AsyncSocket::PerformNonBlockingRead()
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_LOAD);
     if (state & SocketStateFlags::READ_PENDING_LOAD)
@@ -410,8 +402,7 @@ void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingRead()
     }
 }
 
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingWrite()
+void IO::Networking::AsyncSocket::PerformNonBlockingWrite()
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_LOAD);
 
@@ -478,8 +469,7 @@ void IO::Networking::AsyncSocket<SocketType>::PerformNonBlockingWrite()
     }
 }
 
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::PerformContextSwitch()
+void IO::Networking::AsyncSocket::PerformContextSwitch()
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::CONTEXT_PENDING_LOAD);
 
@@ -499,8 +489,7 @@ void IO::Networking::AsyncSocket<SocketType>::PerformContextSwitch()
     tmpCallback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
 }
 
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::StopPendingTransactionsAndForceClose()
+void IO::Networking::AsyncSocket::StopPendingTransactionsAndForceClose()
 {
     CloseSocket(); // this guarantees SHUTDOWN_PENDING to be set
 
@@ -550,8 +539,7 @@ void IO::Networking::AsyncSocket<SocketType>::StopPendingTransactionsAndForceClo
     }
 }
 
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(IO::NetworkError)> const& callback)
+void IO::Networking::AsyncSocket::EnterIoContext(std::function<void(IO::NetworkError)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::CONTEXT_PENDING_SET);
     if (state & SocketStateFlags::CONTEXT_PENDING_SET)
@@ -580,8 +568,7 @@ void IO::Networking::AsyncSocket<SocketType>::EnterIoContext(std::function<void(
     m_ctx->PostForImmediateInvocation(this);
 }
 
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::OnIoEvent(uint32_t event)
+void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
 {
     int const CALLBACK_EVENT_FLAG =
 #if defined(__linux__)
@@ -659,8 +646,7 @@ void IO::Networking::AsyncSocket<SocketType>::OnIoEvent(uint32_t event)
 #endif
 }
 
-template<typename SocketType>
-IO::NetworkError IO::Networking::AsyncSocket<SocketType>::SetNativeSocketOption_NoDelay(bool doNoDelay)
+IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_NoDelay(bool doNoDelay)
 {
     MANGOS_ASSERT(!IsClosing());
 
@@ -671,8 +657,7 @@ IO::NetworkError IO::Networking::AsyncSocket<SocketType>::SetNativeSocketOption_
     return IO::NetworkError(IO::NetworkError::ErrorType::NoError);
 }
 
-template<typename SocketType>
-IO::NetworkError IO::Networking::AsyncSocket<SocketType>::SetNativeSocketOption_SystemOutgoingSendBuffer(int bytes)
+IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_SystemOutgoingSendBuffer(int bytes)
 {
     MANGOS_ASSERT(!IsClosing());
     MANGOS_ASSERT(bytes > 1); // although a buffer of size 1 is already pretty low...
@@ -683,5 +668,3 @@ IO::NetworkError IO::Networking::AsyncSocket<SocketType>::SetNativeSocketOption_
 
     return IO::NetworkError(IO::NetworkError::ErrorType::NoError);
 }
-
-#endif //MANGOS_IO_NETWORKING_UNIX_ASYNCSOCKET_IMPL_H

@@ -9,25 +9,18 @@
 #include <functional>
 #include <atomic>
 #include "ByteBuffer.h"
-#include "Errors.h"
 #include "IO/Context/IoContext.h"
 #include "IO/Networking/NetworkError.h"
 #include "IO/Networking/SocketDescriptor.h"
 #include "IO/Context/AsyncIoOperation.h"
 
 namespace IO { namespace Networking {
-    template<typename SocketType>
-    class AsyncSocketListener;
-
-    // this socket is different in that it does not block on reads
-    template<typename SocketType>
-    class AsyncSocket : public std::enable_shared_from_this<SocketType>
+    /// You have to keep the instance alive while a transaction is running. Use [self = shared_from_this()] on every callback!
+    class AsyncSocket
 #if defined(__linux__) || defined(__APPLE__)
-            , public IO::SystemIoEventReceiver
+           : public IO::SystemIoEventReceiver
 #endif
     {
-        friend class AsyncSocketListener<SocketType>;
-
         public:
             explicit AsyncSocket(IO::IoContext* ctx, SocketDescriptor socketDescriptor) : m_ctx(ctx), m_socket(std::move(socketDescriptor)) {}
             ~AsyncSocket() noexcept(false); // this destructor will throw if there is a pending transaction
@@ -44,6 +37,7 @@ namespace IO { namespace Networking {
 
             /// Keep in mind to keep the source buffer in scope of the callback, otherwise random memory might get overwritten
             /// Most of the time this is not an issue, since you want to process the incoming buffer
+            /// You have to keep the pointer alive until the callback is called. Use [self = shared_from_this()]
             void Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback);
             void ReadSome(char* target, std::size_t maxSize, std::function<void(IO::NetworkError const&, size_t)> const& callback);
             void ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback);
@@ -53,10 +47,13 @@ namespace IO { namespace Networking {
             void EnterIoContext(std::function<void(IO::NetworkError)> const& callback);
 
             /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
+            /// You have to keep the pointer alive until the callback is called. Use [self = shared_from_this()]
             void Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
             /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
+            /// You have to keep the pointer alive until the callback is called. Use [self = shared_from_this()]
             void Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
             /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
+            /// You have to keep the pointer alive until the callback is called. Use [self = shared_from_this()]
             void Write(std::shared_ptr<uint8 const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback);
 
             void CloseSocket();
@@ -126,64 +123,5 @@ namespace IO { namespace Networking {
 #endif
     };
 }} // namespace IO::Networking
-
-template<typename SocketType>
-IO::Networking::AsyncSocket<SocketType>::~AsyncSocket() noexcept(false)
-{
-    sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
-    CloseSocket();
-
-//#ifdef DEBUG
-    // Logic behind these checks:
-    // If the destructor is called, there should be no more std::shared_ptr<> references to this object
-    // Every Read(...) or Write(...) should use `shared_from_this()` if this is not the case, one of the following checks will fail
-    int state = m_atomicState.load(std::memory_order::memory_order_relaxed);
-    MANGOS_ASSERT(!(state & SocketStateFlags::CONTEXT_PRESENT));
-    MANGOS_ASSERT(!(state & SocketStateFlags::WRITE_PRESENT));
-    MANGOS_ASSERT(!(state & SocketStateFlags::READ_PRESENT));
-//#endif // _DEBUG
-}
-
-template<typename SocketType>
-bool IO::Networking::AsyncSocket<SocketType>::IsClosing() const
-{
-    bool isClosing = m_atomicState.load(std::memory_order::memory_order_relaxed) & SHUTDOWN_PENDING;
-    return isClosing;
-}
-
-template<typename SocketType>
-IO::Networking::IpEndpoint const& IO::Networking::AsyncSocket<SocketType>::GetRemoteEndpoint() const
-{
-    return m_socket.m_peerEndpoint;
-}
-
-template<typename SocketType>
-std::string IO::Networking::AsyncSocket<SocketType>::GetRemoteIpString() const
-{
-    return GetRemoteEndpoint().ip.toString(); // Just gets the IP part e.g. "192.168.13.37"
-}
-
-template<typename SocketType>
-void IO::Networking::AsyncSocket<SocketType>::ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback)
-{
-    std::shared_ptr<std::vector<uint8_t>> skipBuffer(new std::vector<uint8_t>());
-    skipBuffer->resize(skipSize);
-    Read((char*)skipBuffer->data(), skipSize, [skipBuffer, callback](IO::NetworkError const& error, size_t)
-    {
-        // KEEP skipBuffer in scope!
-        // Do not remove skipBuffer before Read() is done, since we are transferring into it via async IO
-        // and since we are using a raw pointer, the Task has no knowledge about the lifetime of the std::vector
-        skipBuffer->clear();
-        callback(error);
-    });
-}
-
-#if defined(WIN32)
-#include "./impl/windows/AsyncSocket_impl.h"
-#elif defined(__linux__) || defined(__APPLE__)
-#include "./impl/unix/AsyncSocket_impl.h"
-#else
-#error "IO::Networking not supported on your platform"
-#endif
 
 #endif //MANGOS_IO_NETWORKING_ASYNCSOCKET_H

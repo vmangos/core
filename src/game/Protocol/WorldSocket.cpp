@@ -65,7 +65,7 @@ struct ServerPktHeader
 #endif
 
 WorldSocket::WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor)
-    : IO::Networking::AsyncSocket<WorldSocket>(ctx, socketDescriptor),
+    : IO::Networking::AsyncSocket(ctx, socketDescriptor),
       m_lastPingTime(std::chrono::system_clock::time_point::min()),
       m_overSpeedPings(0),
       m_Session(nullptr),
@@ -127,7 +127,7 @@ void WorldSocket::DoRecvIncomingData()
                     return;
                 }
 
-                // by std::moving the content of the shared_ptr, we will seperate the unique_ptr out of the shared_ptr.
+                // by std::moving the content of the shared_ptr, we will separate the unique_ptr out of the shared_ptr.
                 if (self->_HandleCompleteReceivedPacket(std::move(*packetTmpSharedPtr)) == HandlerResult::Okay)
                     self->DoRecvIncomingData();
             });

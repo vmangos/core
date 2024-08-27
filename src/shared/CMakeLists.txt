@@ -115,6 +115,9 @@ set (shared_SRCS
     IO/Networking/Internal.cpp
     IO/Networking/AsyncServerListener.h
     IO/Networking/AsyncSocket.h
+    IO/Networking/AsyncSocket.cpp
+    IO/Networking/AsyncSocket_posix.cpp
+    IO/Networking/AsyncSocket_windows.cpp
     IO/Networking/NetworkError.h
     IO/Networking/NetworkError.cpp
     IO/Networking/SocketDescriptor.h
@@ -162,6 +165,7 @@ if(WIN32) # For window build: Exclude Unix/MacOS files
     IO/Utils_Unix.h
     IO/Context/IoContext_unix.cpp
     IO/Context/IoContext_macos.cpp
+    IO/Networking/AsyncSocket_posix.cpp
     IO/Timer/impl/unix/AsyncSystemTimer.cpp
     IO/Timer/impl/unix/TimerHandle.cpp
     IO/Filesystem/impl/unix/FileSystem.cpp
@@ -185,6 +189,7 @@ else()
     revision.h
     migrations_list.h
     IO/Context/IoContext_windows.cpp
+    IO/Networking/AsyncSocket_windows.cpp
     IO/Timer/impl/windows/AsyncSystemTimer.cpp
     IO/Timer/impl/windows/TimerHandle.cpp
     IO/Filesystem/impl/windows/FileSystem.cpp

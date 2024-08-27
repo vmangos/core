@@ -55,7 +55,7 @@ enum LockFlag
 struct sAuthLogonProof_C;
 
 // Handle login commands
-class AuthSocket : public IO::Networking::AsyncSocket<AuthSocket>
+class AuthSocket : public std::enable_shared_from_this<AuthSocket>, private IO::Networking::AsyncSocket
 {
     public:
         explicit AuthSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& clientAddress);

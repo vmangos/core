@@ -34,7 +34,7 @@ static std::string const NEWLINE = "\r\n";
 static std::string const PROMPT = "mangos>";
 
 RASocket::RASocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor)
-  : IO::Networking::AsyncSocket<RASocket>(ctx, socketDescriptor),
+  : IO::Networking::AsyncSocket(ctx, socketDescriptor),
     m_connectionState(ConnectionState::FreshConnection),
     m_atLeastOnePacketWasReceived(false),
     m_accountId(0),
