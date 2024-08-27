@@ -65,10 +65,6 @@
 #include <csignal>
 #include <cassert>
 
-#if defined(__sun__)
-#include <ieeefp.h> // finite() on Solaris
-#endif
-
 #include <set>
 #include <list>
 #include <string>
