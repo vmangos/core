@@ -64,8 +64,6 @@ Tokenizer::Tokenizer(std::string const& src, char const sep, uint32 vectorReserv
     }
 }
 
-static ACE_Time_Value g_SystemTickTime = ACE_OS::gettimeofday();
-
 uint32 WorldTimer::m_iTime = 0;
 uint32 WorldTimer::m_iPrevTime = 0;
 
@@ -78,7 +76,7 @@ uint32 WorldTimer::tick()
     m_iPrevTime = m_iTime;
 
     //get the new one and don't forget to persist current system time in m_SystemTickTime
-    m_iTime = WorldTimer::getMSTime_internal();
+    m_iTime = WorldTimer::getMSTime();
 
     //return tick diff
     return getMSTimeDiff(m_iPrevTime, m_iTime);
@@ -86,22 +84,9 @@ uint32 WorldTimer::tick()
 
 uint32 WorldTimer::getMSTime()
 {
-    return getMSTime_internal();
-}
+    using namespace std::chrono;
 
-uint32 WorldTimer::getMSTime_internal()
-{
-    //get current time
-    ACE_Time_Value const currTime = ACE_OS::gettimeofday();
-    //calculate time diff between two world ticks
-    //special case: curr_time < old_time - we suppose that our time has not ticked at all
-    //this should be constant value otherwise it is possible that our time can start ticking backwards until next world tick!!!
-    uint64 diff = 0;
-    (currTime - g_SystemTickTime).msec(diff);
-
-    //lets calculate current world time
-    uint32 iRes = uint32(diff % UI64LIT(0x00000000FFFFFFFF));
-    return iRes;
+    return static_cast<uint32>(duration_cast<milliseconds>(steady_clock::now().time_since_epoch() - GetApplicationStartTime().time_since_epoch()).count());
 }
 
 //////////////////////////////////////////////////////////////////////////
