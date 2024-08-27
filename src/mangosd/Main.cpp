@@ -34,7 +34,7 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include <ace/Version.h>
-#include <ace/Get_Opt.h>
+#include "ArgparserForServer.h"
 
 #ifdef WIN32
 #include "ServiceWin32.h"
@@ -59,127 +59,58 @@ DatabaseType LogsDatabase;                                  // Accessor to the l
 
 uint32 realmID;                                             // Id of the realm
 
-// Print out the usage string for this program on the console.
-void usage(const char *prog)
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Usage: \n %s [<options>]\n"
-        "    -v, --version            print version and exist\n\r"
-        "    -c config_file           use config_file as configuration file\n\r"
-        #ifdef WIN32
-        "    Running as service functions:\n\r"
-        "    -s run                   run as service\n\r"
-        "    -s install               install service\n\r"
-        "    -s uninstall             uninstall service\n\r"
-        #else
-        "    Running as daemon functions:\n\r"
-        "    -s run                   run as daemon\n\r"
-        "    -s stop                  stop daemon\n\r"
-        #endif
-        ,prog);
-}
-
 char const* g_mainLogFileName = "Server.log";
 
 // Launch the mangos server
 extern int main(int argc, char **argv)
 {
-    // Command line parsing
-    char const* cfg_file = _MANGOSD_CONFIG;
-    char const *options = ":c:s:";
-
-    ACE_Get_Opt cmd_opts(argc, argv, options);
-    cmd_opts.long_option("version", 'v');
-
-    char serviceDaemonMode = '\0';
-
-    int option;
-    while ((option = cmd_opts()) != EOF)
+    ServerStartupArguments args;
     {
-        switch (option)
-        {
-            case 'c':
-                cfg_file = cmd_opts.opt_arg();
-                break;
-            case 'v':
-                printf("Core revision: %s\n", _FULLVERSION);
-                return 0;
-            case 's':
-            {
-                const char *mode = cmd_opts.opt_arg();
+        // parseResult is std::expected, where the error is the return code, that might be present when invalid args or "--help" is given
+        auto parseResult = ParseServerStartupArguments(argc, argv);
+        if (!parseResult)
+            return parseResult.error();
 
-                if (!strcmp(mode, "run"))
-                    serviceDaemonMode = 'r';
-#ifdef WIN32
-                else if (!strcmp(mode, "install"))
-                    serviceDaemonMode = 'i';
-                else if (!strcmp(mode, "uninstall"))
-                    serviceDaemonMode = 'u';
-#else
-                else if (!strcmp(mode, "stop"))
-                    serviceDaemonMode = 's';
-#endif
-                else
-                {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
-                    usage(argv[0]);
-                    Log::WaitBeforeContinueIfNeed();
-                    return 1;
-                }
-                break;
-            }
-            case ':':
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
-                usage(argv[0]);
-                Log::WaitBeforeContinueIfNeed();
-                return 1;
-            default:
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: bad format of commandline arguments");
-                usage(argv[0]);
-                Log::WaitBeforeContinueIfNeed();
-                return 1;
-        }
+        args = parseResult.value();
     }
 
-#ifdef WIN32                                                // windows service command need execute before config read
-    switch (serviceDaemonMode)
-    {
-        case 'i':
-            if (WinServiceInstall())
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Installing service");
-            return 1;
-        case 'u':
-            if (WinServiceUninstall())
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Uninstalling service");
-            return 1;
-        case 'r':
-            WinServiceRun();
-            break;
-    }
-#endif
+    if (args.configFilePath.empty())
+        args.configFilePath = _MANGOSD_CONFIG;
 
-    if (!sConfig.SetSource(cfg_file))
+    if (!sConfig.LoadFromFile(args.configFilePath)) // must be done before (linux) service init
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find configuration file %s.", cfg_file);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find or parse configuration file %s", args.configFilePath.c_str());
         Log::WaitBeforeContinueIfNeed();
-        return 1;
+        return EXIT_FAILURE;
     }
 
-    // Reads config for file names so needs to be after we set the config.
-    sLog.OpenWorldLogFiles();
-
-#ifndef WIN32                                               // posix daemon commands need apply after config read
-    switch (serviceDaemonMode)
+    switch (args.inputServiceMode)
     {
-    case 'r':
+        case ServiceDaemonAction::NotSet:
+            break;
+#ifdef WIN32
+            // windows service command need execute before config read
+        case ServiceDaemonAction::Install:
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Installing service...");
+            return WinServiceInstall() ? EXIT_SUCCESS : EXIT_FAILURE;
+        case ServiceDaemonAction::Uninstall:
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Uninstalling service...");
+            return WinServiceUninstall() ? EXIT_SUCCESS : EXIT_FAILURE;
+        case ServiceDaemonAction::Start:
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Starting service...");
+            return WinServiceRun() ? EXIT_SUCCESS : EXIT_FAILURE;
+#else
+            // posix daemon commands need apply after config read
+    case ServiceDaemonAction::Start:
         startDaemon();
         break;
-    case 's':
+    case ServiceDaemonAction::Stop:
         stopDaemon();
         break;
-    }
 #endif
+    }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [world-daemon]", _FULLVERSION);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [realm-daemon]", _FULLVERSION);
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "<Ctrl-C> to stop." );
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "\n\n"
         "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"
@@ -194,10 +125,7 @@ extern int main(int argc, char **argv)
         "        MM  MMM http://getmangos.com\n"
         "        MMMMMM\n\n");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "VMaNGOS : https://github.com/vmangos");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s.", cfg_file);
-
-#define STR(s) #s
-#define XSTR(s) STR(s)
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s", sConfig.GetFilename().c_str());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Alloc library: " MANGOS_ALLOC_LIB "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core Revision: " _FULLVERSION);

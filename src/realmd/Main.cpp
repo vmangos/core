@@ -37,8 +37,8 @@
 #include "migrations_list.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
+#include "ArgparserForServer.h"
 
-#include <ace/Get_Opt.h>
 #include "IO/Networking/AsyncServerListener.h"
 #include "IO/Timer/AsyncSystemTimer.h"
 #include "IO/Multithreading/CreateThread.h"
@@ -73,135 +73,67 @@ char const* g_mainLogFileName = "Realmd.log";   // Log file path for sLog
 volatile bool stopEvent = false;                // Setting it to true stops the server
 DatabaseType LoginDatabase;                     // Accessor to the realm server database
 
-// Print out the usage string for this program on the console.
-void usage(char const* prog)
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Usage: \n %s [<options>]\n"
-        "    -v, --version            print version and exist\n\r"
-        "    -c config_file           use config_file as configuration file\n\r"
-        #ifdef WIN32
-        "    Running as service functions:\n\r"
-        "    -s run                   run as service\n\r"
-        "    -s install               install service\n\r"
-        "    -s uninstall             uninstall service\n\r"
-        #else
-        "    Running as daemon functions:\n\r"
-        "    -s run                   run as daemon\n\r"
-        "    -s stop                  stop daemon\n\r"
-        #endif
-        ,prog);
-}
-
 // Launch the realm server
 extern int main(int argc, char** argv)
 {
-    // Command line parsing
-    char const* cfg_file = _REALMD_CONFIG;
-
-    char const* options = ":c:s:";
-
-    ACE_Get_Opt cmd_opts(argc, argv, options);
-    cmd_opts.long_option("version", 'v');
-
-    char serviceDaemonMode = '\0';
-
-    int option;
-    while ((option = cmd_opts()) != EOF)
+    ServerStartupArguments args;
     {
-        switch (option)
-        {
-            case 'c':
-                cfg_file = cmd_opts.opt_arg();
-                break;
-            case 'v':
-                printf("Core revion: %s\n", _FULLVERSION);
-                return 0;
+        // parseResult is std::expected, where the error is the return code, that might be present when invalid args or "--help" is given
+        auto parseResult = ParseServerStartupArguments(argc, argv);
+        if (!parseResult)
+            return parseResult.error();
 
-            case 's':
-            {
-                char const* mode = cmd_opts.opt_arg();
-
-                if (!strcmp(mode, "run"))
-                    serviceDaemonMode = 'r';
-#ifdef WIN32
-                else if (!strcmp(mode, "install"))
-                    serviceDaemonMode = 'i';
-                else if (!strcmp(mode, "uninstall"))
-                    serviceDaemonMode = 'u';
-#else
-                else if (!strcmp(mode, "stop"))
-                    serviceDaemonMode = 's';
-#endif
-                else
-                {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
-                    usage(argv[0]);
-                    Log::WaitBeforeContinueIfNeed();
-                    return 1;
-                }
-                break;
-            }
-            case ':':
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
-                usage(argv[0]);
-                Log::WaitBeforeContinueIfNeed();
-                return 1;
-            default:
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: bad format of commandline arguments");
-                usage(argv[0]);
-                Log::WaitBeforeContinueIfNeed();
-                return 1;
-        }
+        args = parseResult.value();
     }
 
-#ifdef WIN32    // windows service command need execute before config read
-    switch (serviceDaemonMode)
-    {
-        case 'i':
-            if (WinServiceInstall())
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Installing service");
-            return 1;
-        case 'u':
-            if (WinServiceUninstall())
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Uninstalling service");
-            return 1;
-        case 'r':
-            WinServiceRun();
-            break;
-    }
-#endif
+    if (args.configFilePath.empty())
+        args.configFilePath = _REALMD_CONFIG;
 
-    if (!sConfig.SetSource(cfg_file))
+    if (!sConfig.LoadFromFile(args.configFilePath)) // must be done before (linux) service init
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find configuration file %s.", cfg_file);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find or parse configuration file %s", args.configFilePath.c_str());
         Log::WaitBeforeContinueIfNeed();
-        return 1;
+        return EXIT_FAILURE;
     }
 
-#ifndef WIN32   // posix daemon commands need apply after config read
-    switch (serviceDaemonMode)
+    switch (args.inputServiceMode)
     {
-        case 'r':
-            startDaemon();
-            break;
-        case 's':
-            stopDaemon();
-            break;
-    }
+    case ServiceDaemonAction::NotSet:
+        break;
+#ifdef WIN32
+    // windows service command need execute before config read
+    case ServiceDaemonAction::Install:
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Installing service...");
+        return WinServiceInstall() ? EXIT_SUCCESS : EXIT_FAILURE;
+    case ServiceDaemonAction::Uninstall:
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Uninstalling service...");
+        return WinServiceUninstall() ? EXIT_SUCCESS : EXIT_FAILURE;
+    case ServiceDaemonAction::Start:
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Starting service...");
+        return WinServiceRun() ? EXIT_SUCCESS : EXIT_FAILURE;
+#else
+    // posix daemon commands need apply after config read
+    case ServiceDaemonAction::Start:
+        startDaemon();
+        break;
+    case ServiceDaemonAction::Stop:
+        stopDaemon();
+        break;
 #endif
+    }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [realm-daemon]", _FULLVERSION);
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "<Ctrl-C> to stop.\n");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s.", cfg_file);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s.", sConfig.GetFilename().c_str());
 
     // Check the version of the configuration file
     uint32 confVersion = sConfig.GetIntDefault("ConfVersion", 0);
     if (confVersion < _REALMDCONFVERSION)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "*****************************************************************************");
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, " WARNING: Your realmd.conf version indicates your conf file is out of date!");
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "          Please check for updates, as your current default values may cause");
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "          strange behavior.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, " WARNING: Your realmd.conf version indicates your conf file is out of date!  ");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "          Please check for updates, as your current default values may cause ");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "          strange behavior.                                                  ");
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "*****************************************************************************");
         Log::WaitBeforeContinueIfNeed();
     }
@@ -338,7 +270,7 @@ extern int main(int argc, char** argv)
 
         bool Prio = sConfig.GetBoolDefault("ProcessPriority", false);
 
-     // if(Prio && (m_ServiceStatus == -1)/* need set to default process priority class in service mode*/)
+        // if(Prio && (m_ServiceStatus == -1)/* need set to default process priority class in service mode*/)
         if(Prio)
         {
             if (::SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
@@ -411,9 +343,9 @@ void OnSignal(int s)
             stopEvent = true;
             break;
 #ifdef _WIN32
-            case SIGBREAK:
-                stopEvent = true;
-                break;
+        case SIGBREAK:
+            stopEvent = true;
+            break;
 #endif
     }
 

@@ -70,6 +70,7 @@ set (shared_SRCS
     Database/SQLStorageImpl.h
     Multithreading/Messager.h
     SRP6/SRP6.h
+    nonstd/expected.hpp
     nonstd/optional.hpp
     ByteBuffer.cpp
     Common.cpp
@@ -136,6 +137,8 @@ set (shared_SRCS
     IO/Filesystem/impl/windows/FileHandle.cpp
     IO/Filesystem/impl/unix/FileSystem.cpp
     IO/Filesystem/impl/unix/FileHandle.cpp
+    ArgparserForServer.h
+    ArgparserForServer.cpp
 )
 
 if(USE_LIBCURL)
