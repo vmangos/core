@@ -128,13 +128,12 @@ typedef off_t ACE_OFF_T;
 
 #endif
 
-#define UI64FMTD ACE_UINT64_FORMAT_SPECIFIER
-#define UI64LIT(N) ACE_UINT64_LITERAL(N)
+#include <cinttypes>
 
-#define SI64FMTD ACE_INT64_FORMAT_SPECIFIER
-#define SI64LIT(N) ACE_INT64_LITERAL(N)
+#define UI64FMTD "%" PRIu64
+#define SI64FMTD "%" PRId64
 
-#define SIZEFMTD ACE_SIZE_T_FORMAT_SPECIFIER
+#define SIZEFMTD "%zu"
 
 inline float finiteAlways(float f) { return std::isfinite(f) ? f : 0.0f; }
 
