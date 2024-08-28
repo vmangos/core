@@ -2528,6 +2528,10 @@ bool Map::ScriptCommand_StartScriptOnZone(ScriptInfo const& script, WorldObject*
         if (itr.getSource()->GetCachedZoneId() == script.startScriptOnZone.zoneId)
         {
             ScriptsStart(sGenericScripts, script.startScriptOnZone.scriptId, itr.getSource()->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+
+            if (script.startScriptOnZone.withPets)
+                if (Pet* pPet = itr.getSource()->GetPet())
+                    ScriptsStart(sGenericScripts, script.startScriptOnZone.scriptId, pPet->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
         }
     }
 

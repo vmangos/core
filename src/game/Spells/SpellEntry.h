@@ -900,7 +900,11 @@ class SpellEntry
 
         bool IsDeathPersistentSpell() const
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             return HasAttribute(SPELL_ATTR_EX3_ALLOW_AURA_WHILE_DEAD);
+#else
+            return HasAttribute(SPELL_ATTR_ALLOW_CAST_WHILE_DEAD);
+#endif
         }
 
         bool IsNonCombatSpell() const

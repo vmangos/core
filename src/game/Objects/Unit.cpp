@@ -267,7 +267,16 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
                     if (!IsCharmerOrOwnerPlayerOrPlayerItself() && static_cast<Creature const*>(this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
                         OnLeaveCombat();
                     else
+                    {
+                        // World of Warcraft Client Patch 1.6.1 (2005-08-02)
+                        // - Spell casting is no longer interrupted when leaving combat. 
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
+                        if (IsNonMeleeSpellCasted(false))
+                            InterruptNonMeleeSpells(false);
+#endif
+
                         ClearInCombat();
+                    }
                 }
             }
         }
@@ -2711,6 +2720,18 @@ float Unit::GetUnitBlockChance() const
 
     if (Player const* pPlayer = ToPlayer())
     {
+        // Test results from classic:
+        // Sheath State Unarmed - Can't Block
+        // Sheath State Melee - Can Block
+        // Sheath State Ranged - Can Block
+        // Parry and Dodge don't have any sheath state restrictions.
+        // https://warcraft.wiki.gg/wiki/Patch_2.1.0_(undocumented_changes)
+        // "You can now block attacks while your shield is in the sheathed position."
+        // "Previously, Warriors, Shamans and Paladins were vulnerable while using"
+        // "instant-cast abilities that caused their shield to momentarily appear on their back."
+        if (pPlayer->GetSheath() == SHEATH_STATE_UNARMED)
+            return 0.0f;
+
         if (pPlayer->CanBlock() && pPlayer->CanUseEquippedWeapon(OFF_ATTACK))
         {
             Item* tmpitem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
