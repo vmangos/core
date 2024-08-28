@@ -201,7 +201,7 @@ typedef struct AuthHandler
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
 // Accept the connection and set the s random value for SRP6 // TODO where is this SRP6 done?
-AuthSocket::AuthSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor) : IO::Networking::AsyncSocket<AuthSocket>(ctx, socketDescriptor)
+AuthSocket::AuthSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor) : IO::Networking::AsyncSocket(ctx, socketDescriptor)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", GetRemoteIpString().c_str());
 }

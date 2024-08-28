@@ -20,17 +20,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef MANGOS_GAME_SERVER_WORLDSOCKET_H
+#define MANGOS_GAME_SERVER_WORLDSOCKET_H
+
 #include "IO/Networking/AsyncSocket.h"
 #include "Auth/AuthCrypt.h"
 #include "Auth/BigNumber.h"
 #include "WorldPacket.h"
-
-#ifndef MANGOS_GAME_SERVER_WORLDSOCKET_H
-#define MANGOS_GAME_SERVER_WORLDSOCKET_H
+#include "WorldSession.h"
 
 class WorldSocketMgr;
 
-class WorldSocket : public IO::Networking::AsyncSocket<WorldSocket>
+class WorldSocket : public std::enable_shared_from_this<WorldSocket>, private IO::Networking::AsyncSocket
 {
     friend WorldSocketMgr;
 
@@ -112,6 +113,11 @@ public:
     {
         m_Session = nullptr;
     }
+
+    // Making functions inherited from AsyncSocket public
+    using AsyncSocket::GetRemoteIpString;
+    using AsyncSocket::IsClosing;
+    using AsyncSocket::CloseSocket;
 };
 
 #endif // MANGOS_GAME_SERVER_WORLDSOCKET_H

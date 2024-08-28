@@ -26,7 +26,7 @@
 #include <string>
 
 /// Remote Administration socket
-class RASocket : public IO::Networking::AsyncSocket<RASocket>
+class RASocket : public std::enable_shared_from_this<RASocket>, private IO::Networking::AsyncSocket
 {
  public:
     RASocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor);
