@@ -2720,6 +2720,15 @@ float Unit::GetUnitBlockChance() const
 
     if (Player const* pPlayer = ToPlayer())
     {
+        // This is not reproducable on classic, but it's possible they allowed behavior from tbc to stay.
+        // If anyone finds video proof from vanilla of blocking while shield is sheathed we can revert.
+        // https://warcraft.wiki.gg/wiki/Patch_2.1.0_(undocumented_changes)
+        // "You can now block attacks while your shield is in the sheathed position."
+        // "Previously, Warriors, Shamans and Paladins were vulnerable while using"
+        // "instant-cast abilities that caused their shield to momentarily appear on their back."
+        if (pPlayer->GetSheath() != SHEATH_STATE_MELEE)
+            return 0.0f;
+
         if (pPlayer->CanBlock() && pPlayer->CanUseEquippedWeapon(OFF_ATTACK))
         {
             Item* tmpitem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
