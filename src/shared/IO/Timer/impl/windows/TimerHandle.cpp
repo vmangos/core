@@ -1,7 +1,7 @@
 #include "../../TimerHandle.h"
 #include "../../AsyncSystemTimer.h"
 #include "Log.h"
-
+#include <Windows.h>
 
 IO::Timer::TimerHandle::TimerHandle(IO::Timer::AsyncSystemTimer *systemTimer, std::function<void()> callbackFunction)
         : m_asyncSystemTimer{systemTimer}, m_callback{std::move(callbackFunction)}

@@ -33,7 +33,6 @@
 #include "revision.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
-#include <ace/Version.h>
 #include "ArgparserForServer.h"
 
 #ifdef WIN32
@@ -62,6 +61,7 @@ uint32 realmID;                                             // Id of the realm
 char const* g_mainLogFileName = "Server.log";
 
 // Launch the mangos server
+#undef main // TODO Remove me when ACE is removed
 extern int main(int argc, char **argv)
 {
     ServerStartupArguments args;
@@ -110,7 +110,7 @@ extern int main(int argc, char **argv)
 #endif
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [realm-daemon]", _FULLVERSION);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [world-daemon]", _FULLVERSION);
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "<Ctrl-C> to stop." );
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "\n\n"
         "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"
@@ -136,8 +136,6 @@ extern int main(int argc, char **argv)
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Minimal required version [OpenSSL 0.9.8k]");
     }
-
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using ACE: %s", ACE_VERSION);
 
     // Set progress bars show mode
     BarGoLink::SetOutputState(sConfig.GetBoolDefault("ShowProgressBars", true));

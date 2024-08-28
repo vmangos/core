@@ -24,6 +24,7 @@
 #include "Common.h"
 #include "Log.h"
 #include <cstring>
+#include <Windows.h>
 #include <winsvc.h>
 
 #if !defined(WINADVAPI)
@@ -36,7 +37,7 @@
 
 
 #ifdef main
-#undef main
+#undef main // TODO Remove me when ACE is removed
 #endif
 
 extern int main(int argc, char** argv);

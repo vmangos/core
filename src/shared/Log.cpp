@@ -24,13 +24,15 @@
 #include "Policies/SingletonImp.h"
 #include "Config/Config.h"
 #include "Util.h"
-#include "ByteBuffer.h"
 #include "ProgressBar.h"
 
-#include <stdarg.h>
+#include <cstdarg>
 #include <iostream>
+#include <thread>
 
-#include "ace/OS_NS_unistd.h"
+#if PLATFORM == PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
 
 INSTANTIATE_SINGLETON_1(Log);
 
@@ -477,7 +479,7 @@ void Log::WaitBeforeContinueIfNeed()
         for (int i = 0; i < mode; ++i)
         {
             bar.step();
-            ACE_OS::sleep(1);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
 }

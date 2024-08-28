@@ -23,10 +23,11 @@
 #include "Timer.h"
 #include "Log.h"
 #include "Errors.h"
+
+#include "IO/Networking/IpAddress.h"
+
 #include "utf8cpp/utf8.h"
 #include "mersennetwister/MersenneTwister.h"
-
-#include <ace/OS_NS_arpa_inet.h>
 
 thread_local MTRand mtRand;
 
@@ -339,15 +340,14 @@ std::string TimeToTimestampStr(time_t t)
     return std::string(buf);
 }
 
-// Check if the string is a valid ip address representation
-bool IsIPAddress(char const* ipaddress)
+/// Check if the string is a valid ip address representation
+bool IsIPAddress(char const* ipAddressString)
 {
-    if(!ipaddress)
+    if (!ipAddressString)
         return false;
 
-    // Let the big boys do it.
-    // Drawback: all valid ip address formats are recognized e.g.: 12.23,121234,0xABCD)
-    return ACE_OS::inet_addr(ipaddress) != INADDR_NONE;
+    auto result = IO::Networking::IpAddress::TryParseFromString(ipAddressString);
+    return result.has_value();
 }
 
 // create PID file

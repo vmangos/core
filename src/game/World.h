@@ -35,6 +35,7 @@
 #include "WorldPacket.h"
 #include "Multithreading/Messager.h"
 #include "LFGQueue.h"
+#include "LockedQueue.h"
 
 #include <map>
 #include <set>
