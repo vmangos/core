@@ -12,6 +12,7 @@ namespace IO { namespace Networking
     public:
         enum class Type { IPv4, IPv6 };
 
+        static IpAddress FromIpv4Uint32(uint32_t ip);
         static nonstd::optional<IpAddress> TryParseFromString(std::string const& ipAddressString);
 
         /// IPv4 Format: 255.255.255.255
@@ -21,8 +22,7 @@ namespace IO { namespace Networking
         Type getType() const;
 
         uint32_t _getInternalIPv4ReprAsUint32() const;
-
-    private:
+     private:
         struct
         {
             Type type = Type::IPv4;

@@ -1,6 +1,19 @@
 #include <sstream>
 #include "IpAddress.h"
 
+IO::Networking::IpAddress IO::Networking::IpAddress::FromIpv4Uint32(uint32_t ip)
+{
+    IpAddress result;
+    result.m_address.type = Type::IPv4;
+    result.m_address.ipv4 = {
+        uint8_t((ip >> (3*8)) & 0xFF),
+        uint8_t((ip >> (2*8)) & 0xFF),
+        uint8_t((ip >> (1*8)) & 0xFF),
+        uint8_t((ip >> (0*8)) & 0xFF),
+    };
+    return result;
+}
+
 nonstd::optional<IO::Networking::IpAddress> IO::Networking::IpAddress::TryParseFromString(std::string const& ipAddressString)
 {
     IpAddress result;
@@ -20,9 +33,10 @@ nonstd::optional<IO::Networking::IpAddress> IO::Networking::IpAddress::TryParseF
             const char* tmpStartPtr = tmpLastEndPtr;
             tmpLastEndPtr = fixEndPtr;
 
+            // Parse number
             int64_t segment = std::strtoll(tmpStartPtr, const_cast<char **>(&tmpLastEndPtr), 10);
             if (segment < 0 || segment > 255)
-                return nonstd::nullopt;
+                return nonstd::nullopt; // invalid number range, only [0..255] is valid
 
             if (i != (result.m_address.ipv4.size() - 1))
             { // We should not be at the end, and the next character should be a dot
@@ -128,4 +142,3 @@ uint32_t IO::Networking::IpAddress::_getInternalIPv4ReprAsUint32() const
          | (m_address.ipv4[2] << (1*8))
          | (m_address.ipv4[3] << (0*8));
 }
-

@@ -264,12 +264,9 @@ int Master::Run()
 
     if (sConfig.GetBoolDefault("SOAP.Enabled", false))
     {
-        soap_thread = IO::Multithreading::CreateThreadPtr("SOAP", []()
-        {
-            MaNGOSsoapRunnable runnable;
-            runnable.setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
-            runnable.run();
-        });
+        std::string soapBindIp = sConfig.GetStringDefault("SOAP.IP", "127.0.0.1");
+        uint16 soapBindPort = sConfig.GetIntDefault("SOAP.Port", 7878);
+        soap_thread = StartSoapThread(soapBindIp, soapBindPort);
     }
 
     // Start up freeze catcher thread
