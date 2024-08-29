@@ -16314,7 +16314,7 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
                     ++slot;
                 }
 
-                if (questStatusData.m_rewarded)
+                if (questStatusData.m_rewarded && SatisfyQuestSkill(pQuest, false))
                 {
                     questStatusData.m_reward_choice = fields[13].GetUInt32();
                     LearnQuestRewardedSpells(pQuest); // learn rewarded spell if unknown
