@@ -9,6 +9,7 @@
 #include <ws2tcpip.h>
 #elif defined(__linux__) || defined(__APPLE__)
 #include <netdb.h>
+#include <unistd.h>
 #endif
 
 std::string IO::Networking::DNS::GetOwnHostname()

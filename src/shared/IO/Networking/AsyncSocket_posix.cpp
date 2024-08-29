@@ -7,6 +7,7 @@
 #include <sys/epoll.h>
 #elif defined(__APPLE__)
 #include <sys/event.h>
+#include <unistd.h>
 #endif
 #include <netinet/in.h>
 #include <netinet/tcp.h>

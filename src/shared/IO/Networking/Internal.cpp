@@ -1,7 +1,7 @@
 #include "Errors.h"
 #include "./Internal.h"
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__APPLE__)
 #include <arpa/inet.h>
 #endif
 
