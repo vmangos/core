@@ -751,7 +751,7 @@ bool instance_naxxramas::IsEncounterInProgress() const
 
 void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 {
-    ASSERT(this)
+    ASSERT(this);
 
     bool sameStateAsLast = false;
     if (uiType < MAX_ENCOUNTER)

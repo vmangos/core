@@ -1,6 +1,10 @@
 #include "Errors.h"
 #include "./Internal.h"
 
+#if defined(__linux__)
+#include <arpa/inet.h>
+#endif
+
 /// Converts a native IN_ADDR to a IO::Networking::IpAddress
 IO::Networking::IpAddress IO::Networking::Internal::inet_ntop(in_addr const* nativeAddress)
 {

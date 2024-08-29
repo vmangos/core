@@ -539,7 +539,7 @@ void Master::_OnSignal(int s)
 
             // Log crash stack
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Received SIGSEGV");
-            PRINT_STACK_TRACE(32);
+            MaNGOS::Errors::PrintStacktrace();
 
             if (anticrashOptions & ANTICRASH_GENERATE_COREDUMP)
                 CreateCrashDump();

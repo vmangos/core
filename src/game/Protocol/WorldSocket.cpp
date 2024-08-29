@@ -34,7 +34,6 @@
 #include "Database/SqlPreparedStatement.h"
 #include "Database/DatabaseEnv.h"
 #include "DBCStores.h"
-#include "ace/OS_NS_netdb.h"
 #include "IO/Networking/DNS.h"
 #include "WorldSocketMgr.h"
 

@@ -1,4 +1,7 @@
 #include "AsyncSocket.h"
+#include "IO/SystemErrorToString.h"
+#include "Errors.h"
+#include "Log.h"
 
 #if defined(__linux__)
 #include <sys/epoll.h>
@@ -7,8 +10,6 @@
 #endif
 #include <netinet/tcp.h>
 #include <thread>
-#include "IO/SystemErrorToString.h"
-#include "Errors.h"
 
 void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
 {

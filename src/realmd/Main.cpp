@@ -30,6 +30,7 @@
 
 #include "Config/Config.h"
 #include "Log.h"
+#include "Errors.h"
 #include "AuthSocket.h"
 #include "SystemConfig.h"
 #include "revision.h"

@@ -56,6 +56,7 @@
 #include "Anticheat.h"
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
+#include "Errors.h"
 
 //#define DEBUG_DEBUFF_LIMIT
 
@@ -10093,7 +10094,7 @@ void Unit::CleanupDeletedAuras()
             // - Pet::AddObjectToRemoveList
             // Seen happening with spells like [Health Funnel], [Tainted Blood]
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Crash/Auras] Deleting aura holder %u in use (%s)", iter->GetId(), GetObjectGuid().GetString().c_str());
-            PRINT_STACK_TRACE(32);
+            MaNGOS::Errors::PrintStacktrace();
         }
         else
             delete iter;
@@ -10106,7 +10107,7 @@ void Unit::CleanupDeletedAuras()
         if (iter->IsInUse())
         {
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Crash/Auras] Deleting aura %u in use (%s)", iter->GetId(), GetObjectGuid().GetString().c_str());
-            PRINT_STACK_TRACE(32);
+            MaNGOS::Errors::PrintStacktrace();
         }
         else
             delete iter;
