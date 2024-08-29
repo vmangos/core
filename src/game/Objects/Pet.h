@@ -24,7 +24,6 @@
 
 #include "Common.h"
 #include "Creature.h"
-#include "Errors.h"
 
 enum PetType
 {

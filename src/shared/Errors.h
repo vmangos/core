@@ -22,53 +22,37 @@
 #ifndef MANGOSSERVER_ERRORS_H
 #define MANGOSSERVER_ERRORS_H
 
-#include "Common.h"
-#include "backward.hpp"
-#include "Log.h"
+namespace MaNGOS { namespace Errors
+{
+    /// Prints a stack trace to std::cout and will then terminate the program
+    [[noreturn]]
+    void PrintStacktraceAndThrow(char const* filename, int line, char const* functionName, char const* failedExpression, char const* message = nullptr);
 
-// For some reason the first time you call it, it doesn't work, so lets do it twice.
-#define PRINT_STACK_TRACE(a) \
-{ \
-    backward::StackTrace st; st.load_here(0); \
-    backward::TraceResolver tr; tr.load_stacktrace(st); \
-} \
-{ \
-    backward::StackTrace st; st.load_here(a); \
-    backward::TraceResolver tr; tr.load_stacktrace(st); \
-    for (size_t i = 0; i < st.size(); ++i) \
-    { \
-        backward::ResolvedTrace trace = tr.resolve(st[i]); \
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "#%u %s %s [%u]", i, trace.object_filename.c_str(), trace.object_function.c_str(), trace.addr); \
-    } \
-} \
+    /// Prints a stack trace to std::cout
+    void PrintStacktrace();
 
-// Normal assert.
-#define WPError(CONDITION) \
-if (!(CONDITION)) \
-{ \
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s:%i: Error: Assertion in %s failed: %s", \
-        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION)); \
-    PRINT_STACK_TRACE(32); \
-    throw std::runtime_error(STRINGIZE(CONDITION)); \
-    assert(STRINGIZE(CONDITION) && 0); \
-}
+    /// Prints a stack trace to std::cout
+    void PrintStacktrace(int skipFrames, int maxFrames);
+}} // namespace MaNGOS::Errors
 
-// Just warn.
-#define WPWarning(CONDITION) \
-if (!(CONDITION)) \
-{ \
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s:%i: Warning: Assertion in %s failed: %s",\
-        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION)); \
-    PRINT_STACK_TRACE(32); \
-}
+#define MANGOS_ERROR_STRING_ESCAPE(a) #a
 
-#define MANGOS_ASSERT WPError
-#define ASSERT MANGOS_ASSERT
+#define MANGOS_ERROR_ASSERT_1(condition)
+#define MANGOS_ERROR_ASSERT_2(condition, message) do { if (!(condition)) { MaNGOS::Errors::PrintStacktraceAndThrow(__FILE__, __LINE__, __FUNCTION__, MANGOS_ERROR_STRING_ESCAPE(condition), message); } } while(0)
+
+#define MANGOS_ERROR_ASSERT_GET_IMPL(_1, _2, NAME, ...) NAME
+
+/// <example>
+/// MANGOS_ASSERT(abc == 2); // will throw if abc is not 2
+/// </example>
+#define MANGOS_ASSERT(condition) do { if (!(condition)) { MaNGOS::Errors::PrintStacktraceAndThrow(__FILE__, __LINE__, __FUNCTION__, MANGOS_ERROR_STRING_ESCAPE(condition)); } } while(0)
 
 #ifdef MANGOS_DEBUG
 #define MANGOS_DEBUG_ASSERT(x) MANGOS_ASSERT(x)
 #else
 #define MANGOS_DEBUG_ASSERT(x)
 #endif
+
+#define ASSERT MANGOS_ASSERT
 
 #endif

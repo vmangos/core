@@ -29,7 +29,6 @@
 #include "Database/DatabaseEnv.h"
 #include "Config/Config.h"
 #include "Log.h"
-#include "Errors.h"
 #include "RealmList.h"
 #include "AuthSocket.h"
 #include "AuthCodes.h"
@@ -39,6 +38,7 @@
 #include "ClientPatchCache.h"
 #include "IO/Networking/Utils.h"
 #include "Utils/ArrayDeleter.h"
+#include "Errors.h"
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"

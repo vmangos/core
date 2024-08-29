@@ -16,12 +16,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 # Glob only and not recurse, there are other libs for that
-set (shared_SRCS 
-    backward.hpp
+set (shared_SRCS
     ByteBuffer.h
     Common.h
     EnumFlag.h
     Errors.h
+    Errors.cpp
     LockedQueue.h
     Log.h
     migrations_list.h
@@ -256,5 +256,7 @@ endif(UNIX)
 if(MINGW)
   target_link_libraries(shared ${ACE_LIBRARIES} -lws2_32)
 endif()
+
+target_link_libraries(shared cpptrace::cpptrace)
 
 SET_TARGET_PROPERTIES (shared PROPERTIES FOLDER "Game Libs")

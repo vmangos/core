@@ -34,7 +34,6 @@
 #include "Auth/BigNumber.h"
 #include "AccountData.h"
 #include "LockedQueue.h"
-#include "Errors.h"
 
 struct ItemPrototype;
 struct AuctionEntry;

@@ -36,7 +36,6 @@
 #include "GameObjectDefines.h"
 #include "SpellMgr.h"
 #include "HonorMgr.h"
-#include "Errors.h"
 
 #include <string>
 #include <vector>

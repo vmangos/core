@@ -1,4 +1,5 @@
 #include "AsyncSocket.h"
+#include "Log.h"
 
 IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_NoDelay(bool doNoDelay)
 {
