@@ -16,7 +16,10 @@
 #include "IO/SystemErrorToString.h"
 
 #if defined(__linux__)
+#include <sys/socket.h>
 #include <sys/epoll.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #elif defined(__APPLE__)
 #include <sys/event.h>
 #endif

@@ -8,6 +8,7 @@
 #elif defined(__APPLE__)
 #include <sys/event.h>
 #endif
+#include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <thread>
 

@@ -2,6 +2,7 @@
 #include "Log.h"
 #include "IO/SystemErrorToString.h"
 #include <sys/param.h>
+#include <sys/stat.h>
 
 IO::Filesystem::FileHandle::~FileHandle()
 {

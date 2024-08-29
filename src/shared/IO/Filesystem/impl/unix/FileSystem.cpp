@@ -2,9 +2,10 @@
 #include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
 #include "IO/SystemErrorToString.h"
-#include <climits>
 #include <unistd.h>
 #include <dirent.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 /// This function will open a file in read shared and binary mode
 /// You have to check the resulting pointer for nullptr!

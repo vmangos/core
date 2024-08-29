@@ -2,6 +2,8 @@
 
 #if defined(WIN32)
 #include <Windows.h>
+#else
+#include <unistd.h>
 #endif
 
 uint64_t IO::Utils::GetCurrentProcessId()

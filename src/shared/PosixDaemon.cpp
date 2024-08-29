@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <sys/stat.h>
 
 pid_t parent_pid = 0, sid = 0;
 
@@ -69,7 +70,7 @@ void startDaemon(uint32_t timeout)
         exit(EXIT_FAILURE);
     }
 
-    umask(0);
+    ::umask(0);
 
     sid = setsid();
 
