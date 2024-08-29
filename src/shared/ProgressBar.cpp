@@ -20,6 +20,7 @@
  */
 
 #include <cstdio>
+#include <limits>
 
 #include "ProgressBar.h"
 #include "Errors.h"
