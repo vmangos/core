@@ -103,6 +103,8 @@ set (shared_SRCS
     Multithreading/Messager.cpp
     SRP6/SRP6.cpp
     IO/Context/IoContext.h
+    IO/Utils.h
+    IO/Utils.cpp
     IO/Utils_Unix.h
     IO/Context/IoContext_macos.cpp
     IO/Context/IoContext_unix.cpp

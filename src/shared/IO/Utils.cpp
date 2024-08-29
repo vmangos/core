@@ -1,0 +1,14 @@
+#include "Utils.h"
+
+#if defined(WIN32)
+#include <Windows.h>
+#endif
+
+uint64_t IO::Utils::GetCurrentProcessId()
+{
+#ifdef WIN32
+    return ::GetCurrentProcessId();
+#else
+    return ::getpid();
+#endif
+}
