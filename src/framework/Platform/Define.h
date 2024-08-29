@@ -56,8 +56,6 @@
 #  endif //ACE_BYTE_ORDER
 #endif //MANGOS_ENDIAN
 
-#define MANGOS_PATH_MAX PATH_MAX                            // ace/os_include/os_limits.h -> ace/Basic_Types.h
-
 #if PLATFORM == PLATFORM_WINDOWS
 #  ifndef DECLSPEC_NORETURN
 #    define DECLSPEC_NORETURN __declspec(noreturn)

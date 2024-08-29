@@ -75,7 +75,6 @@ volatile bool stopEvent = false;                // Setting it to true stops the 
 DatabaseType LoginDatabase;                     // Accessor to the realm server database
 
 // Launch the realm server
-#undef main // TODO Remove me when ACE is removed
 extern int main(int argc, char** argv)
 {
     ServerStartupArguments args;
