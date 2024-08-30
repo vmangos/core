@@ -17,6 +17,7 @@
 
 set(EXECUTABLE_NAME realmd)
 set(EXECUTABLE_SRCS
+  AuthPackets.h
   AuthCodes.h
   AuthSocket.h
   RealmList.h

@@ -142,7 +142,8 @@ set (shared_SRCS
     IO/Filesystem/impl/unix/FileHandle.cpp
     ArgparserForServer.h
     ArgparserForServer.cpp
-    Utils/ArrayDeleter.h
+    Memory/ArrayDeleter.h
+    Memory/NoDeleter.h
 )
 
 if(USE_LIBCURL)

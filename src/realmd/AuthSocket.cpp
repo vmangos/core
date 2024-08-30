@@ -37,7 +37,7 @@
 #include "IO/Filesystem/FileSystem.h"
 #include "ClientPatchCache.h"
 #include "IO/Networking/Utils.h"
-#include "Utils/ArrayDeleter.h"
+#include "Memory/NoDeleter.h"
 #include "Errors.h"
 
 #ifdef USE_SENDGRID
@@ -55,141 +55,6 @@ enum AccountFlags
     ACCOUNT_FLAG_TRIAL      = 0x00000008,
     ACCOUNT_FLAG_PROPASS    = 0x00800000,
 };
-
-enum SecurityFlags : uint8_t
-{
-    SECURITY_FLAG_NONE          = 0x00,
-    SECURITY_FLAG_PIN           = 0x01, // pin was added in 1.11.0
-    SECURITY_FLAG_UNK           = 0x02,
-    SECURITY_FLAG_AUTHENTICATOR = 0x04, // authenticator was added in 2.4.3
-};
-
-// GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some paltform
-#if defined( __GNUC__ )
-#pragma pack(1)
-#else
-#pragma pack(push,1)
-#endif
-
-# define AUTH_LOGON_MAX_NAME 16
-
-struct sAuthLogonChallengeHeader
-{
-    uint8   error;
-    uint16  size;
-};
-
-struct sAuthLogonChallengeBody
-{
-    uint8   gamename[4];
-    uint8   version1;
-    uint8   version2;
-    uint8   version3;
-    uint16  build;
-    uint8   platform[4];
-    uint8   os[4];
-    uint8   country[4];
-    uint32  timezone_bias;
-    uint32  ip;
-    uint8   username_len;
-    uint8   username[AUTH_LOGON_MAX_NAME + 1];
-};
-
-//typedef sAuthLogonChallenge_C sAuthReconnectChallenge_C;
-/*
-typedef struct
-{
-    uint8   cmd;
-    uint8   error;
-    uint8   unk2;
-    uint8   B[32];
-    uint8   g_len;
-    uint8   g[1];
-    uint8   N_len;
-    uint8   N[32];
-    uint8   s[32];
-    uint8   unk3[16];
-} sAuthLogonChallenge_S;
-*/
-
-struct sAuthLogonProof_C_Pre_1_11_0
-{
-    uint8   A[32];
-    uint8   M1[20];
-    uint8   crc_hash[20];
-    uint8   number_of_keys;
-};
-
-struct sAuthLogonProof_C : public sAuthLogonProof_C_Pre_1_11_0
-{
-    uint8   securityFlags; // 0x00-0x04 // See enum SecurityFlags
-};
-/*
-typedef struct
-{
-    uint16  unk1;
-    uint32  unk2;
-    uint8   unk3[4];
-    uint16  unk4[20];
-}  sAuthLogonProofKey_C;
-*/
-typedef struct AUTH_LOGON_PROOF_S_BUILD_8089
-{
-    uint8   cmd;
-    uint8   error;
-    uint8   M2[20];
-    uint32  accountFlags;                                   // see enum AccountFlags
-    uint32  surveyId;                                       // SurveyId
-    uint16  loginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
-} sAuthLogonProof_S_BUILD_8089;
-
-typedef struct AUTH_LOGON_PROOF_S_BUILD_6299
-{
-    uint8   cmd;
-    uint8   error;
-    uint8   M2[20];
-    uint32  surveyId;                                       // SurveyId
-    uint16  loginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
-} sAuthLogonProof_S_BUILD_6299;
-
-typedef struct AUTH_LOGON_PROOF_S
-{
-    uint8   cmd;
-    uint8   error;
-    uint8   M2[20];
-    uint32  surveyId;                                       // SurveyId
-} sAuthLogonProof_S;
-
-typedef struct AUTH_RECONNECT_PROOF_C
-{
-    uint8   R1[16];
-    uint8   R2[20];
-    uint8   R3[20];
-    uint8   number_of_keys;
-} sAuthReconnectProof_C;
-
-typedef struct XFER_INIT
-{
-    uint8 cmd;                    // XFER_INITIATE
-    uint8 fileNameLen;            // strlen(fileName);
-    uint8 fileName[5];            // fileName[fileNameLen]
-    uint64 file_size;             // file size (bytes)
-    uint8 md5[MD5_DIGEST_LENGTH]; // MD5
-} XFER_INIT;
-
-typedef struct XFER_DATA_CHUNK
-{
-    uint8  cmd;        // this must be CMD_XFER_DATA
-    uint16 data_size;
-    uint8  data[4096]; // 4096 - page size on most arch // TODO: Is this a client limitation?
-} XferChunk;
-
-// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some paltform
-#if defined( __GNUC__ )
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
 
 typedef struct AuthHandler
 {
@@ -258,7 +123,7 @@ void AuthSocket::DoRecvIncomingData()
             { CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
             { CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
             { CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
-            //{ CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
+            { CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
             { CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
         };
 
@@ -305,7 +170,7 @@ std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Sha1Hash sha)
 
     if (m_build < 6299)  // before version 2.0.3 (exclusive)
     {
-        sAuthLogonProof_S proof;
+        AUTH_LOGON_PROOF_S proof{};
         memcpy(proof.M2, sha.GetDigest(), 20);
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
@@ -315,7 +180,7 @@ std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Sha1Hash sha)
     }
     else if (m_build < 8089) // before version 2.4.0 (exclusive)
     {
-        sAuthLogonProof_S_BUILD_6299 proof;
+        AUTH_LOGON_PROOF_S_BUILD_6299 proof{};
         memcpy(proof.M2, sha.GetDigest(), 20);
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
@@ -326,7 +191,7 @@ std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Sha1Hash sha)
     }
     else
     {
-        sAuthLogonProof_S_BUILD_8089 proof;
+        AUTH_LOGON_PROOF_S_BUILD_8089 proof{};
         memcpy(proof.M2, sha.GetDigest(), 20);
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
@@ -616,7 +481,7 @@ void AuthSocket::_HandleLogonProof()
     std::shared_ptr<sAuthLogonProof_C> lp = std::make_shared<sAuthLogonProof_C>();
     size_t expectedSize = sizeof(sAuthLogonProof_C);
     if (m_build < 5428) { // Pin support was added in 1.11.0, so if an older client connects, we need to skip those fields
-        lp->securityFlags = 0;
+        lp->securityFlags = SECURITY_FLAG_NONE;
         expectedSize = sizeof(sAuthLogonProof_C_Pre_1_11_0);
     }
 
@@ -690,8 +555,8 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
     else
     {
         Md5HashDigest md5Hash = sRealmdPatchCache.GetOrCalculateHash(m_pendingPatchFile);
-        std::string wowClientPathFileName = "Patch"; // It seems like "Patch" is the only accepted name by the client
-        MANGOS_ASSERT(wowClientPathFileName.size() <= 255); // Filename must fit inside a byte
+        std::string wowClientPathType = "Patch"; // Must be patch "Patch"
+        MANGOS_ASSERT(wowClientPathType.size() <= 255); // Filename must fit inside a byte
 
         std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
 
@@ -700,11 +565,13 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
         *pkt << (uint8) WOW_FAIL_VERSION_UPDATE;
 
         // packet 2 - XFER_INIT
-        *pkt << (uint8) CMD_XFER_INITIATE;
-        *pkt << (uint8) wowClientPathFileName.size();
-        pkt->append(wowClientPathFileName.c_str(), wowClientPathFileName.size()); // we cant use the std::string overload of ->append(...), because it would +1 the size with null-terminator
-        *pkt << (uint64) m_pendingPatchFile->GetTotalFileSize();
-        pkt->append(md5Hash.digest);
+        XFER_INIT initPkt{};
+        initPkt.cmd = CMD_XFER_INITIATE;
+        initPkt.fileTypeNameLength = wowClientPathType.size();
+        memcpy(initPkt.fileTypeName, wowClientPathType.c_str(), wowClientPathType.size());
+        initPkt.fileSize = m_pendingPatchFile->GetTotalFileSize();
+        memcpy(initPkt.md5, md5Hash.digest.data(), md5Hash.digest.size());
+        pkt->append(&initPkt, 1);
 
         // Set right status
         m_status = STATUS_PATCH;
@@ -1060,8 +927,8 @@ void AuthSocket::_HandleReconnectProof()
     m_status = STATUS_INVALID;
 
     // Read the packet
-    std::shared_ptr<sAuthReconnectProof_C> lp(new sAuthReconnectProof_C());
-    Read((char*) lp.get(), sizeof(sAuthReconnectProof_C), [self = shared_from_this(), lp](IO::NetworkError const& error, size_t)
+    std::shared_ptr<AUTH_RECONNECT_PROOF_C> lp(new AUTH_RECONNECT_PROOF_C());
+    Read((char*) lp.get(), sizeof(AUTH_RECONNECT_PROOF_C), [self = shared_from_this(), lp](IO::NetworkError const& error, size_t)
     {
         if (error)
         {
@@ -1283,48 +1150,45 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
 void AuthSocket::_HandleXferAccept()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferAccept");
+
+    if (!m_pendingPatchFile)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?", m_safelogin.c_str());
+        return;
+    }
+
     InitAndHandOverControlToPatchHandler();
 }
 
-/*
-// Resume patch transfer
+// Resume transfer.
+// This function is called when the user disconnected during transfer and already has a `wow-patch.mpq.partial`.
+// The client may not be closed, this only works if the client is not closed.
 void AuthSocket::_HandleXferResume()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferResume");
 
-    if(recv_len() < 9)
-        return false;
-
-    recv_skip(1);
-
-    uint64 start_pos;
-    recv((char *)&start_pos, 8);
-
-    if(m_patch == ACE_INVALID_HANDLE)
+    if (!m_pendingPatchFile)
     {
-        close_connection();
-        return false;
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?", m_safelogin.c_str());
+        return;
     }
 
-    ACE_OFF_T file_size = ACE_OS::filesize(m_patch);
-
-    if(file_size == -1 || start_pos >= (uint64)file_size)
+    auto startPosPtr = std::make_shared<int64>();
+    Read(reinterpret_cast<char*>(startPosPtr.get()), sizeof(int64), [self = shared_from_this(), startPosPtr](IO::NetworkError const& error, std::size_t)
     {
-        close_connection();
-        return false;
-    }
+        int64 startPos = *startPosPtr;
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[XFER] User '%s' wants to resume download at byte %llu", self->m_safelogin.c_str(), startPos);
 
-    if(ACE_OS::lseek(m_patch, start_pos, SEEK_SET) == -1)
-    {
-        close_connection();
-        return false;
-    }
+        if (startPos >= self->m_pendingPatchFile->GetTotalFileSize() || startPos < 0)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[XFER] User '%s' tried to resume download outside file bounds", self->m_safelogin.c_str());
+            return;
+        }
 
-    InitAndHandOverControlToPatchHandler();
-
-    return true;
+        self->m_pendingPatchFile->Seek(IO::Filesystem::SeekDirection::Start, startPos);
+        self->InitAndHandOverControlToPatchHandler();
+    });
 }
- */
 
 // Cancel patch transfer
 void AuthSocket::_HandleXferCancel()
@@ -1438,11 +1302,12 @@ uint32 AuthSocket::GenerateTotpPin(std::string const& secret, int interval)
     return pin;
 }
 
-void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk)
+/// Will Read() a chunk from m_pendingPatchFile into dataChunkHolder->data
+/// This function will recursion call itself when the the sending callback is invoked
+void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<XFER_DATA_CHUNK> const& chunk)
 {
-    XFER_DATA_CHUNK* chunk = (XFER_DATA_CHUNK*)(rawChunk.get());
-
-    uint64_t actualReadAmount = m_pendingPatchFile->ReadSync((uint8_t*)&(chunk->data), sizeof(chunk->data));
+    // Will the `chunk->data` array with actual data from the file
+    uint64_t actualReadAmount = m_pendingPatchFile->ReadSync(&(chunk->data[0]), sizeof(chunk->data));
     if (actualReadAmount == 0)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[XFER]: Done");
@@ -1450,29 +1315,28 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk)
     }
     chunk->data_size = (uint16_t) actualReadAmount;
 
-    Write(rawChunk, sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount, [self = shared_from_this(), rawChunk](IO::NetworkError const& error)
+    // This `fakeSharedPtr` is a bit hacky, we cannot simply Write() a XFER_DATA_CHUNK pointer.
+    // This is why we convert it to an uint8 pointer without a deallocator.
+    std::shared_ptr<uint8 const> fakeSharedPtr((uint8_t const*)chunk.get(), MaNGOS::Memory::no_deleter<uint8>());
+    Write(fakeSharedPtr, sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount, [self = shared_from_this(), chunk](IO::NetworkError const& error)
     {
         if (error)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[XFER]: Write(...) failed: %s", error.ToString().c_str());
             return;
         }
-        self->RepeatInternalXferLoop(std::move(rawChunk));
+        self->RepeatInternalXferLoop(chunk); // Do it again, until everything is transferred
     });
 }
 
 void AuthSocket::InitAndHandOverControlToPatchHandler()
 {
-    if (!m_pendingPatchFile)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?");
-        return;
-    }
+    MANGOS_ASSERT(m_pendingPatchFile);
 
-    std::shared_ptr<uint8_t> rawChunk = std::shared_ptr<uint8_t>(new uint8_t[sizeof(XFER_DATA_CHUNK)], array_deleter<uint8_t>());
-    ((XFER_DATA_CHUNK*)(rawChunk.get()))->cmd = CMD_XFER_DATA;
+    std::shared_ptr<XFER_DATA_CHUNK> rawChunk(new XFER_DATA_CHUNK());
+    rawChunk->cmd = CMD_XFER_DATA;
 
-    RepeatInternalXferLoop(std::move(rawChunk));
+    RepeatInternalXferLoop(rawChunk);
 }
 
 void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)

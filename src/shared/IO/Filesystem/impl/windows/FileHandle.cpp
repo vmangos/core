@@ -1,9 +1,21 @@
 #include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
+#include "Errors.h"
 
 IO::Filesystem::FileHandle::~FileHandle()
 {
     ::CloseHandle(m_nativeFileHandle);
+}
+
+void IO::Filesystem::FileHandle::Seek(IO::Filesystem::SeekDirection direction, int64_t offset)
+{
+    DWORD nativeDirection = direction == SeekDirection::Start   ? FILE_BEGIN
+                          : direction == SeekDirection::Current ? FILE_CURRENT
+                                                                : FILE_END;
+
+    LARGE_INTEGER distanceToMove;
+    distanceToMove.QuadPart = offset;
+    MANGOS_ASSERT(::SetFilePointerEx(m_nativeFileHandle, distanceToMove, nullptr, nativeDirection));
 }
 
 uint64_t IO::Filesystem::FileHandle::GetTotalFileSize() const
