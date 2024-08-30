@@ -1465,7 +1465,7 @@ void AuthSocket::InitAndHandOverControlToPatchHandler()
 {
     if (!m_pendingPatchFile)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?");
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?", m_safelogin.c_str());
         return;
     }
 
