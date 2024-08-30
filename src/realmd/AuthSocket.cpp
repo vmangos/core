@@ -37,7 +37,7 @@
 #include "IO/Filesystem/FileSystem.h"
 #include "ClientPatchCache.h"
 #include "IO/Networking/Utils.h"
-#include "Utils/ArrayDeleter.h"
+#include "Memory/ArrayDeleter.h"
 #include "Errors.h"
 
 #ifdef USE_SENDGRID
@@ -1469,7 +1469,7 @@ void AuthSocket::InitAndHandOverControlToPatchHandler()
         return;
     }
 
-    std::shared_ptr<uint8_t> rawChunk = std::shared_ptr<uint8_t>(new uint8_t[sizeof(XFER_DATA_CHUNK)], array_deleter<uint8_t>());
+    std::shared_ptr<uint8_t> rawChunk = std::shared_ptr<uint8_t>(new uint8_t[sizeof(XFER_DATA_CHUNK)], MaNGOS::Memory::array_deleter<uint8_t>());
     ((XFER_DATA_CHUNK*)(rawChunk.get()))->cmd = CMD_XFER_DATA;
 
     RepeatInternalXferLoop(std::move(rawChunk));

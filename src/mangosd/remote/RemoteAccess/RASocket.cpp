@@ -24,7 +24,7 @@
 #include "AccountMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"
-#include "Utils/ArrayDeleter.h"
+#include "Memory/ArrayDeleter.h"
 
 #include <utility>
 #include <vector>
@@ -257,7 +257,7 @@ void RASocket::HandleInput_Authenticated(std::string const& line)
 
 void RASocket::SendAndDisconnect(std::string const& message)
 {
-    std::shared_ptr<uint8_t> rawMessage = std::shared_ptr<uint8_t>(new uint8_t[message.size()], array_deleter<uint8_t>());
+    std::shared_ptr<uint8_t> rawMessage(new uint8_t[message.size()], MaNGOS::Memory::array_deleter<uint8_t>());
     memcpy(rawMessage.get(), message.c_str(), message.size());
     Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
     {
@@ -268,7 +268,7 @@ void RASocket::SendAndDisconnect(std::string const& message)
 
 void RASocket::SendAndRecvNextInput(std::string const& message)
 {
-    std::shared_ptr<uint8_t> rawMessage = std::shared_ptr<uint8_t>(new uint8_t[message.size()], array_deleter<uint8_t>());
+    std::shared_ptr<uint8_t> rawMessage(new uint8_t[message.size()], MaNGOS::Memory::array_deleter<uint8_t>());
     memcpy(rawMessage.get(), message.c_str(), message.size());
     Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
     {
