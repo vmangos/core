@@ -9,6 +9,16 @@
 
 namespace IO { namespace Filesystem {
 
+    enum class SeekDirection
+    {
+        /// Seek from start of the file (allows positive numbers)
+        Start,
+        /// Seek from current position (allows negative and positive numbers)
+        Current,
+        /// Seek from current position (allows negative numbers)
+        End,
+    };
+
     class FileHandle
     {
     public:
@@ -17,6 +27,8 @@ namespace IO { namespace Filesystem {
         FileHandle& operator=(FileHandle const&) = delete;
         FileHandle(FileHandle&&) = delete;
         FileHandle& operator=(FileHandle&&) = delete;
+
+        void Seek(SeekDirection direction, int64_t offset);
 
         [[nodiscard]]
         uint64_t GetTotalFileSize() const;

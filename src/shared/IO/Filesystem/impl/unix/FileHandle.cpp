@@ -1,12 +1,23 @@
 #include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
 #include "IO/SystemErrorToString.h"
+#include "Errors.h"
+
 #include <sys/stat.h>
 #include <unistd.h>
 
 IO::Filesystem::FileHandle::~FileHandle()
 {
     ::close(m_nativeFileHandle);
+}
+
+void IO::Filesystem::FileHandle::Seek(IO::Filesystem::SeekDirection direction, int64_t offset)
+{
+    int nativeDirection = direction == SeekDirection::Start   ? SEEK_SET
+                        : direction == SeekDirection::Current ? SEEK_CUR
+                                                              : SEEK_END;
+
+    MANGOS_ASSERT(::lseek64(m_nativeFileHandle, offset, nativeDirection) != -1);
 }
 
 uint64_t IO::Filesystem::FileHandle::GetTotalFileSize() const
