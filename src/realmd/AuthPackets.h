@@ -36,7 +36,7 @@ struct sAuthLogonChallengeBody
 
 //typedef sAuthLogonChallenge_C sAuthReconnectChallenge_C;
 /*
-typedef struct
+struct sAuthLogonChallenge_S
 {
     uint8   cmd;
     uint8   error;
@@ -48,7 +48,7 @@ typedef struct
     uint8   N[32];
     uint8   s[32];
     uint8   unk3[16];
-} sAuthLogonChallenge_S;
+};
 */
 
 struct sAuthLogonProof_C_Pre_1_11_0
@@ -79,15 +79,16 @@ struct PINData
 };
 
 /*
-typedef struct
+struct sAuthLogonProofKey_C
 {
     uint16  unk1;
     uint32  unk2;
     uint8   unk3[4];
     uint16  unk4[20];
-}  sAuthLogonProofKey_C;
+};
 */
-typedef struct AUTH_LOGON_PROOF_S_BUILD_8089
+
+struct AUTH_LOGON_PROOF_S_BUILD_8089
 {
     uint8   cmd;
     uint8   error;
@@ -95,48 +96,48 @@ typedef struct AUTH_LOGON_PROOF_S_BUILD_8089
     uint32  accountFlags;                                   // see enum AccountFlags
     uint32  surveyId;                                       // SurveyId
     uint16  loginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
-} sAuthLogonProof_S_BUILD_8089;
+};
 
-typedef struct AUTH_LOGON_PROOF_S_BUILD_6299
+struct AUTH_LOGON_PROOF_S_BUILD_6299
 {
     uint8   cmd;
     uint8   error;
     uint8   M2[20];
     uint32  surveyId;                                       // SurveyId
     uint16  loginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
-} sAuthLogonProof_S_BUILD_6299;
+};
 
-typedef struct AUTH_LOGON_PROOF_S
+struct AUTH_LOGON_PROOF_S
 {
     uint8   cmd;
     uint8   error;
     uint8   M2[20];
     uint32  surveyId;                                       // SurveyId
-} sAuthLogonProof_S;
+};
 
-typedef struct AUTH_RECONNECT_PROOF_C
+struct AUTH_RECONNECT_PROOF_C
 {
     uint8   R1[16];
     uint8   R2[20];
     uint8   R3[20];
     uint8   number_of_keys;
-} sAuthReconnectProof_C;
+};
 
-typedef struct XFER_INIT
+struct XFER_INIT
 {
     uint8 cmd;                    // XFER_INITIATE
     uint8 fileTypeNameLength;     // strlen(fileTypeName); // size without '\0'
     uint8 fileTypeName[5];        // fileName[fileTypeNameLength] // As of 1.12 it can only be "Patch" or "Survey" // currently hardcoded to 5, because we only want to "Patch"
     uint64 fileSize;              // file size (bytes)
     uint8 md5[16];                // MD5 of the file, so the client can verify if downloaded correctly or if present patch is correct
-} XFER_INIT;
+};
 
-typedef struct XFER_DATA_CHUNK
+struct XFER_DATA_CHUNK
 {
     uint8  cmd;        // this must be CMD_XFER_DATA
     uint16 data_size;
     uint8  data[4096]; // 4096 - page size on most arch // TODO: Is this a client limitation?
-} XferChunk;
+};
 
 namespace
 {

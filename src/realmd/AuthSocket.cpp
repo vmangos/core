@@ -170,7 +170,7 @@ std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Sha1Hash sha)
 
     if (m_build < 6299)  // before version 2.0.3 (exclusive)
     {
-        sAuthLogonProof_S proof;
+        AUTH_LOGON_PROOF_S proof{};
         memcpy(proof.M2, sha.GetDigest(), 20);
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
@@ -180,7 +180,7 @@ std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Sha1Hash sha)
     }
     else if (m_build < 8089) // before version 2.4.0 (exclusive)
     {
-        sAuthLogonProof_S_BUILD_6299 proof;
+        AUTH_LOGON_PROOF_S_BUILD_6299 proof{};
         memcpy(proof.M2, sha.GetDigest(), 20);
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
@@ -191,7 +191,7 @@ std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Sha1Hash sha)
     }
     else
     {
-        sAuthLogonProof_S_BUILD_8089 proof;
+        AUTH_LOGON_PROOF_S_BUILD_8089 proof{};
         memcpy(proof.M2, sha.GetDigest(), 20);
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
@@ -925,8 +925,8 @@ void AuthSocket::_HandleReconnectProof()
     m_status = STATUS_INVALID;
 
     // Read the packet
-    std::shared_ptr<sAuthReconnectProof_C> lp(new sAuthReconnectProof_C());
-    Read((char*) lp.get(), sizeof(sAuthReconnectProof_C), [self = shared_from_this(), lp](IO::NetworkError const& error, size_t)
+    std::shared_ptr<AUTH_RECONNECT_PROOF_C> lp(new AUTH_RECONNECT_PROOF_C());
+    Read((char*) lp.get(), sizeof(AUTH_RECONNECT_PROOF_C), [self = shared_from_this(), lp](IO::NetworkError const& error, size_t)
     {
         if (error)
         {
