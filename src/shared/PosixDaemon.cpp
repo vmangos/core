@@ -21,13 +21,14 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
+#include <sys/stat.h>
 
 pid_t parent_pid = 0, sid = 0;
 
 void daemonSignal(int s)
 {
-
-    if (getpid() != parent_pid)
+    if (::getpid() != parent_pid)
     {
         return;
     }
@@ -47,7 +48,7 @@ void daemonSignal(int s)
 
 void startDaemon(uint32_t timeout)
 {
-    parent_pid = getpid();
+    parent_pid = ::getpid();
     pid_t pid;
 
     signal(SIGUSR1, daemonSignal);
@@ -69,7 +70,7 @@ void startDaemon(uint32_t timeout)
         exit(EXIT_FAILURE);
     }
 
-    umask(0);
+    ::umask(0);
 
     sid = setsid();
 

@@ -61,7 +61,6 @@ uint32 realmID;                                             // Id of the realm
 char const* g_mainLogFileName = "Server.log";
 
 // Launch the mangos server
-#undef main // TODO Remove me when ACE is removed
 extern int main(int argc, char **argv)
 {
     ServerStartupArguments args;

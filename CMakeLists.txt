@@ -61,7 +61,6 @@ endif()
 
 if(USE_LIBCURL)
   find_package(CURL REQUIRED)
-  #add_definitions(-D_HAS_AUTO_PTR_ETC) # for VS2017 ACE support, won't do any harm to other compilers
   #set(CMAKE_CXX_STANDARD 17)
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
 endif()
@@ -161,19 +160,6 @@ set(CMAKE_INSTALL_RPATH ${LIBS_DIR})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 # Find needed packages and if necessery abort if something important is missing
-unset(ACE_INCLUDE_DIR CACHE)
-unset(ACE_LIBRARIES CACHE)
-unset(ACE_LIBRARIES_DIR CACHE)
-unset(ACE_INCLUDE_DIR)
-unset(ACE_LIBRARIES)
-unset(ACE_LIBRARIES_DIR)
-
-find_package(ACE)
-if(NOT ACE_FOUND)
-  message(FATAL_ERROR
-    "This project requires ACE installed. Please download the ACE Micro Release Kit from http://download.dre.vanderbilt.edu/ and install it. If this script didn't find ACE and it was correctly installed please set ACE_ROOT to the correct path."
-  )
-endif()
 
 if(NOT USE_STD_MALLOC)
   unset(TBB_INCLUDE_DIRS            CACHE)

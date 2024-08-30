@@ -22,15 +22,28 @@
 #ifndef MANGOS_DEFINE_H
 #define MANGOS_DEFINE_H
 
-#include <sys/types.h>
-
-#include <ace/Basic_Types.h>
-#include <ace/Default_Constants.h>
-#include <ace/OS_NS_dlfcn.h>
-#include <ace/ACE_export.h>
+#include "Platform/CompilerDefs.h"
 #include <cstdint>
 
-#include "Platform/CompilerDefs.h"
+#if PLATFORM == PLATFORM_WINDOWS
+// Unfortunately, every library (e.g. MySQL, G3D) includes <Windows.h> in their **HEADER**
+// and will break parts of the code, since Windows adds so many marcos and stuff.
+// So if we can't beat them, join them!
+// We include Windows.h first and remove all the conflicting definitions after.
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <WinSock2.h>
+// Now we need to remove all the stuff that comes included with Windows headers and will most probably cause errors...
+#undef WIN32_LEAN_AND_MEAN
+#undef NOMINMAX
+#undef ERROR
+#undef IGNORE
+#endif // WINDOWS
 
 #define MANGOS_LITTLEENDIAN 0
 #define MANGOS_BIGENDIAN    1
@@ -42,8 +55,6 @@
 #    define MANGOS_ENDIAN MANGOS_LITTLEENDIAN
 #  endif //ACE_BYTE_ORDER
 #endif //MANGOS_ENDIAN
-
-#define MANGOS_PATH_MAX PATH_MAX                            // ace/os_include/os_limits.h -> ace/Basic_Types.h
 
 #if PLATFORM == PLATFORM_WINDOWS
 #  ifndef DECLSPEC_NORETURN

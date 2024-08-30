@@ -15,10 +15,17 @@
 #include "IO/Networking/Internal.h"
 #include "IO/SystemErrorToString.h"
 
+#if defined(__linux__) || defined(__APPLE__)
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
 #if defined(__linux__)
 #include <sys/epoll.h>
 #elif defined(__APPLE__)
 #include <sys/event.h>
+#include <unistd.h>
 #endif
 
 template<typename TClientSocket>

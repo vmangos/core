@@ -1,7 +1,8 @@
 #include "IO/Filesystem/FileHandle.h"
 #include "Log.h"
 #include "IO/SystemErrorToString.h"
-#include <sys/param.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 IO::Filesystem::FileHandle::~FileHandle()
 {

@@ -24,10 +24,17 @@
 #include "Log.h"
 #include "Errors.h"
 
+#include "IO/Utils.h"
 #include "IO/Networking/IpAddress.h"
 
 #include "utf8cpp/utf8.h"
 #include "mersennetwister/MersenneTwister.h"
+
+#include <cstdarg>
+
+#if PLATFORM == PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
 
 thread_local MTRand mtRand;
 
@@ -357,11 +364,7 @@ uint32 CreatePIDFile(std::string const& filename)
     if (pid_file == nullptr)
         return 0;
 
-#ifdef WIN32
-    DWORD pid = GetCurrentProcessId();
-#else
-    pid_t pid = getpid();
-#endif
+    int pid = IO::Utils::GetCurrentProcessId();
 
     fprintf(pid_file, "%lu", pid);
     fclose(pid_file);
@@ -453,7 +456,7 @@ bool utf8ToConsole(std::string const& utf8str, std::string& conStr)
     conStr.resize(wstr.size());
     CharToOemBuffW(&wstr[0], &conStr[0], wstr.size());
 #else
-    // not implemented yet
+    // On Linux/MacOS, typically no conversion is needed for UTF-8 strings
     conStr = utf8str;
 #endif
 
@@ -469,7 +472,7 @@ bool consoleToUtf8(std::string const& conStr, std::string& utf8str)
 
     return WStrToUtf8(wstr, utf8str);
 #else
-    // not implemented yet
+    // On Linux/MacOS, typically no conversion is needed for UTF-8 strings
     utf8str = conStr;
     return true;
 #endif

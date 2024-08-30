@@ -103,6 +103,8 @@ set (shared_SRCS
     Multithreading/Messager.cpp
     SRP6/SRP6.cpp
     IO/Context/IoContext.h
+    IO/Utils.h
+    IO/Utils.cpp
     IO/Utils_Unix.h
     IO/Context/IoContext_macos.cpp
     IO/Context/IoContext_unix.cpp
@@ -253,8 +255,8 @@ if(UNIX)
   target_link_libraries(shared ${ACE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 endif(UNIX)
 
-if(MINGW)
-  target_link_libraries(shared ${ACE_LIBRARIES} -lws2_32)
+if(WIN32)
+  target_link_libraries(shared ws2_32 mswsock)
 endif()
 
 target_link_libraries(shared cpptrace::cpptrace)
