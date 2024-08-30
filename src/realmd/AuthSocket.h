@@ -34,12 +34,7 @@
 #include "IO/Networking/AsyncSocket.h"
 #include "IO/Timer/TimerHandle.h"
 #include "IO/Filesystem/FileHandle.h"
-
-struct PINData
-{
-    uint8 salt[16];
-    uint8 hash[20];
-};
+#include "AuthPackets.h"
 
 enum LockFlag
 {

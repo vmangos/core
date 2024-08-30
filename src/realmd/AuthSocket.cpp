@@ -56,141 +56,6 @@ enum AccountFlags
     ACCOUNT_FLAG_PROPASS    = 0x00800000,
 };
 
-enum SecurityFlags : uint8_t
-{
-    SECURITY_FLAG_NONE          = 0x00,
-    SECURITY_FLAG_PIN           = 0x01, // pin was added in 1.11.0
-    SECURITY_FLAG_UNK           = 0x02,
-    SECURITY_FLAG_AUTHENTICATOR = 0x04, // authenticator was added in 2.4.3
-};
-
-// GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some paltform
-#if defined( __GNUC__ )
-#pragma pack(1)
-#else
-#pragma pack(push,1)
-#endif
-
-# define AUTH_LOGON_MAX_NAME 16
-
-struct sAuthLogonChallengeHeader
-{
-    uint8   error;
-    uint16  size;
-};
-
-struct sAuthLogonChallengeBody
-{
-    uint8   gamename[4];
-    uint8   version1;
-    uint8   version2;
-    uint8   version3;
-    uint16  build;
-    uint8   platform[4];
-    uint8   os[4];
-    uint8   country[4];
-    uint32  timezone_bias;
-    uint32  ip;
-    uint8   username_len;
-    uint8   username[AUTH_LOGON_MAX_NAME + 1];
-};
-
-//typedef sAuthLogonChallenge_C sAuthReconnectChallenge_C;
-/*
-typedef struct
-{
-    uint8   cmd;
-    uint8   error;
-    uint8   unk2;
-    uint8   B[32];
-    uint8   g_len;
-    uint8   g[1];
-    uint8   N_len;
-    uint8   N[32];
-    uint8   s[32];
-    uint8   unk3[16];
-} sAuthLogonChallenge_S;
-*/
-
-struct sAuthLogonProof_C_Pre_1_11_0
-{
-    uint8   A[32];
-    uint8   M1[20];
-    uint8   crc_hash[20];
-    uint8   number_of_keys;
-};
-
-struct sAuthLogonProof_C : public sAuthLogonProof_C_Pre_1_11_0
-{
-    uint8   securityFlags; // 0x00-0x04 // See enum SecurityFlags
-};
-/*
-typedef struct
-{
-    uint16  unk1;
-    uint32  unk2;
-    uint8   unk3[4];
-    uint16  unk4[20];
-}  sAuthLogonProofKey_C;
-*/
-typedef struct AUTH_LOGON_PROOF_S_BUILD_8089
-{
-    uint8   cmd;
-    uint8   error;
-    uint8   M2[20];
-    uint32  accountFlags;                                   // see enum AccountFlags
-    uint32  surveyId;                                       // SurveyId
-    uint16  loginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
-} sAuthLogonProof_S_BUILD_8089;
-
-typedef struct AUTH_LOGON_PROOF_S_BUILD_6299
-{
-    uint8   cmd;
-    uint8   error;
-    uint8   M2[20];
-    uint32  surveyId;                                       // SurveyId
-    uint16  loginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
-} sAuthLogonProof_S_BUILD_6299;
-
-typedef struct AUTH_LOGON_PROOF_S
-{
-    uint8   cmd;
-    uint8   error;
-    uint8   M2[20];
-    uint32  surveyId;                                       // SurveyId
-} sAuthLogonProof_S;
-
-typedef struct AUTH_RECONNECT_PROOF_C
-{
-    uint8   R1[16];
-    uint8   R2[20];
-    uint8   R3[20];
-    uint8   number_of_keys;
-} sAuthReconnectProof_C;
-
-typedef struct XFER_INIT
-{
-    uint8 cmd;                    // XFER_INITIATE
-    uint8 fileNameLen;            // strlen(fileName);
-    uint8 fileName[5];            // fileName[fileNameLen]
-    uint64 file_size;             // file size (bytes)
-    uint8 md5[MD5_DIGEST_LENGTH]; // MD5
-} XFER_INIT;
-
-typedef struct XFER_DATA_CHUNK
-{
-    uint8  cmd;        // this must be CMD_XFER_DATA
-    uint16 data_size;
-    uint8  data[4096]; // 4096 - page size on most arch // TODO: Is this a client limitation?
-} XferChunk;
-
-// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some paltform
-#if defined( __GNUC__ )
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
-
 typedef struct AuthHandler
 {
     eAuthCmd cmd;
@@ -616,7 +481,7 @@ void AuthSocket::_HandleLogonProof()
     std::shared_ptr<sAuthLogonProof_C> lp = std::make_shared<sAuthLogonProof_C>();
     size_t expectedSize = sizeof(sAuthLogonProof_C);
     if (m_build < 5428) { // Pin support was added in 1.11.0, so if an older client connects, we need to skip those fields
-        lp->securityFlags = 0;
+        lp->securityFlags = SECURITY_FLAG_NONE;
         expectedSize = sizeof(sAuthLogonProof_C_Pre_1_11_0);
     }
 
@@ -1457,7 +1322,7 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk)
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[XFER]: Write(...) failed: %s", error.ToString().c_str());
             return;
         }
-        self->RepeatInternalXferLoop(std::move(rawChunk));
+        self->RepeatInternalXferLoop(chunk); // Do it again, until everything is transferred
     });
 }
 
@@ -1473,6 +1338,7 @@ void AuthSocket::InitAndHandOverControlToPatchHandler()
     ((XFER_DATA_CHUNK*)(rawChunk.get()))->cmd = CMD_XFER_DATA;
 
     RepeatInternalXferLoop(std::move(rawChunk));
+    RepeatInternalXferLoop(rawChunk);
 }
 
 void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
