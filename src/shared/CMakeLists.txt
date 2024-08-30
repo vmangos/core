@@ -135,6 +135,7 @@ set (shared_SRCS
     IO/Timer/impl/unix/TimerHandle.cpp
     IO/Timer/AsyncSystemTimer.h
     IO/Filesystem/FileSystem.h
+    IO/Filesystem/FileSystem.cpp
     IO/Filesystem/FileHandle.h
     IO/Filesystem/impl/windows/FileSystem.cpp
     IO/Filesystem/impl/windows/FileHandle.cpp

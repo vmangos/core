@@ -20,6 +20,29 @@
 
 #include <type_traits>
 
+/* Example usage:
+
+// In header
+enum class MyCoolFlags
+{
+    None   = 0,
+    FlagA  = (1 << 0),
+    FlagB  = (1 << 0),
+    FlagC  = (1 << 0),
+    FlagD  = (1 << 0),
+    FlagE  = (1 << 0),
+};
+DEFINE_ENUM_FLAG(MyCoolFlags);
+
+// In CPP file
+void MyCoolFunction(EnumFlag<MyCoolFlags> flags)
+{
+    if (flags.HasFlag(MyCoolFlags::FlagA))
+        // Do something
+}
+
+ */
+
 template<typename T>
 constexpr bool IsEnumFlag(T) { return false; }
 
