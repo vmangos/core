@@ -143,6 +143,7 @@ set (shared_SRCS
     ArgparserForServer.h
     ArgparserForServer.cpp
     Memory/ArrayDeleter.h
+    Memory/NoDeleter.h
 )
 
 if(USE_LIBCURL)
