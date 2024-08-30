@@ -565,11 +565,13 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
         *pkt << (uint8) WOW_FAIL_VERSION_UPDATE;
 
         // packet 2 - XFER_INIT
-        *pkt << (uint8) CMD_XFER_INITIATE;
-        *pkt << (uint8) wowClientPathType.size();
-        pkt->append(wowClientPathType.c_str(), wowClientPathType.size()); // we cant use the std::string overload of ->append(...), because it would +1 the size with null-terminator
-        *pkt << (uint64) m_pendingPatchFile->GetTotalFileSize();
-        pkt->append(md5Hash.digest);
+        XFER_INIT initPkt{};
+        initPkt.cmd = CMD_XFER_INITIATE;
+        initPkt.fileTypeNameLength = wowClientPathType.size();
+        memcpy(initPkt.fileTypeName, wowClientPathType.c_str(), wowClientPathType.size());
+        initPkt.fileSize = m_pendingPatchFile->GetTotalFileSize();
+        memcpy(initPkt.md5, md5Hash.digest.data(), md5Hash.digest.size());
+        pkt->append(&initPkt, 1);
 
         // Set right status
         m_status = STATUS_PATCH;
