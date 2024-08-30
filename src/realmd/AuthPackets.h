@@ -125,10 +125,10 @@ typedef struct AUTH_RECONNECT_PROOF_C
 typedef struct XFER_INIT
 {
     uint8 cmd;                    // XFER_INITIATE
-    uint8 fileNameLen;            // strlen(fileName);
-    uint8 fileName[5];            // fileName[fileNameLen]
-    uint64 file_size;             // file size (bytes)
-    uint8 md5[16];                // MD5
+    uint8 fileTypeNameLength;     // strlen(fileTypeName); // size without '\0'
+    uint8 fileTypeName[5];        // fileName[fileTypeNameLength] // As of 1.12 it can only be "Patch" or "Survey" // currently hardcoded to 5, because we only want to "Patch"
+    uint64 fileSize;              // file size (bytes)
+    uint8 md5[16];                // MD5 of the file, so the client can verify if downloaded correctly or if present patch is correct
 } XFER_INIT;
 
 typedef struct XFER_DATA_CHUNK

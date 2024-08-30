@@ -123,7 +123,7 @@ void AuthSocket::DoRecvIncomingData()
             { CMD_AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof },
             { CMD_REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList },
             { CMD_XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept },
-            //{ CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
+            { CMD_XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume },
             { CMD_XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel }
         };
 
@@ -555,8 +555,8 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
     else
     {
         Md5HashDigest md5Hash = sRealmdPatchCache.GetOrCalculateHash(m_pendingPatchFile);
-        std::string wowClientPathFileName = "Patch"; // It seems like "Patch" is the only accepted name by the client
-        MANGOS_ASSERT(wowClientPathFileName.size() <= 255); // Filename must fit inside a byte
+        std::string wowClientPathType = "Patch"; // Must be patch "Patch"
+        MANGOS_ASSERT(wowClientPathType.size() <= 255); // Filename must fit inside a byte
 
         std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
 
@@ -566,8 +566,8 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
 
         // packet 2 - XFER_INIT
         *pkt << (uint8) CMD_XFER_INITIATE;
-        *pkt << (uint8) wowClientPathFileName.size();
-        pkt->append(wowClientPathFileName.c_str(), wowClientPathFileName.size()); // we cant use the std::string overload of ->append(...), because it would +1 the size with null-terminator
+        *pkt << (uint8) wowClientPathType.size();
+        pkt->append(wowClientPathType.c_str(), wowClientPathType.size()); // we cant use the std::string overload of ->append(...), because it would +1 the size with null-terminator
         *pkt << (uint64) m_pendingPatchFile->GetTotalFileSize();
         pkt->append(md5Hash.digest);
 
@@ -1148,48 +1148,45 @@ void AuthSocket::LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt)
 void AuthSocket::_HandleXferAccept()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferAccept");
+
+    if (!m_pendingPatchFile)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?", m_safelogin.c_str());
+        return;
+    }
+
     InitAndHandOverControlToPatchHandler();
 }
 
-/*
-// Resume patch transfer
+// Resume transfer.
+// This function is called when the user disconnected during transfer and already has a `wow-patch.mpq.partial`.
+// The client may not be closed, this only works if the client is not closed.
 void AuthSocket::_HandleXferResume()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Entering _HandleXferResume");
 
-    if(recv_len() < 9)
-        return false;
-
-    recv_skip(1);
-
-    uint64 start_pos;
-    recv((char *)&start_pos, 8);
-
-    if(m_patch == ACE_INVALID_HANDLE)
+    if (!m_pendingPatchFile)
     {
-        close_connection();
-        return false;
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?", m_safelogin.c_str());
+        return;
     }
 
-    ACE_OFF_T file_size = ACE_OS::filesize(m_patch);
-
-    if(file_size == -1 || start_pos >= (uint64)file_size)
+    auto startPosPtr = std::make_shared<int64>();
+    Read(reinterpret_cast<char*>(startPosPtr.get()), sizeof(int64), [self = shared_from_this(), startPosPtr](IO::NetworkError const& error, std::size_t)
     {
-        close_connection();
-        return false;
-    }
+        int64 startPos = *startPosPtr;
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[XFER] User '%s' wants to resume download at byte %llu", self->m_safelogin.c_str(), startPos);
 
-    if(ACE_OS::lseek(m_patch, start_pos, SEEK_SET) == -1)
-    {
-        close_connection();
-        return false;
-    }
+        if (startPos >= self->m_pendingPatchFile->GetTotalFileSize() || startPos < 0)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[XFER] User '%s' tried to resume download outside file bounds", self->m_safelogin.c_str());
+            return;
+        }
 
-    InitAndHandOverControlToPatchHandler();
-
-    return true;
+        self->m_pendingPatchFile->Seek(IO::Filesystem::SeekDirection::Start, startPos);
+        self->InitAndHandOverControlToPatchHandler();
+    });
 }
- */
 
 // Cancel patch transfer
 void AuthSocket::_HandleXferCancel()
@@ -1332,11 +1329,7 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<XFER_DATA_CHUNK> const& 
 
 void AuthSocket::InitAndHandOverControlToPatchHandler()
 {
-    if (!m_pendingPatchFile)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "User '%s' tried to get patch file, but there is no patch file defined?", m_safelogin.c_str());
-        return;
-    }
+    MANGOS_ASSERT(m_pendingPatchFile);
 
     std::shared_ptr<XFER_DATA_CHUNK> rawChunk(new XFER_DATA_CHUNK());
     rawChunk->cmd = CMD_XFER_DATA;
