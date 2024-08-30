@@ -37,7 +37,7 @@
 #include "IO/Filesystem/FileSystem.h"
 #include "ClientPatchCache.h"
 #include "IO/Networking/Utils.h"
-#include "Memory/ArrayDeleter.h"
+#include "Memory/NoDeleter.h"
 #include "Errors.h"
 
 #ifdef USE_SENDGRID
@@ -1303,11 +1303,12 @@ uint32 AuthSocket::GenerateTotpPin(std::string const& secret, int interval)
     return pin;
 }
 
-void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk)
+/// Will Read() a chunk from m_pendingPatchFile into dataChunkHolder->data
+/// This function will recursion call itself when the the sending callback is invoked
+void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<XFER_DATA_CHUNK> const& chunk)
 {
-    XFER_DATA_CHUNK* chunk = (XFER_DATA_CHUNK*)(rawChunk.get());
-
-    uint64_t actualReadAmount = m_pendingPatchFile->ReadSync((uint8_t*)&(chunk->data), sizeof(chunk->data));
+    // Will the `chunk->data` array with actual data from the file
+    uint64_t actualReadAmount = m_pendingPatchFile->ReadSync(&(chunk->data[0]), sizeof(chunk->data));
     if (actualReadAmount == 0)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[XFER]: Done");
@@ -1315,7 +1316,10 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk)
     }
     chunk->data_size = (uint16_t) actualReadAmount;
 
-    Write(rawChunk, sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount, [self = shared_from_this(), rawChunk](IO::NetworkError const& error)
+    // This `fakeSharedPtr` is a bit hacky, we cannot simply Write() a XFER_DATA_CHUNK pointer.
+    // This is why we convert it to an uint8 pointer without a deallocator.
+    std::shared_ptr<uint8 const> fakeSharedPtr((uint8_t const*)chunk.get(), MaNGOS::Memory::no_deleter<uint8>());
+    Write(fakeSharedPtr, sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount, [self = shared_from_this(), chunk](IO::NetworkError const& error)
     {
         if (error)
         {
@@ -1334,10 +1338,9 @@ void AuthSocket::InitAndHandOverControlToPatchHandler()
         return;
     }
 
-    std::shared_ptr<uint8_t> rawChunk = std::shared_ptr<uint8_t>(new uint8_t[sizeof(XFER_DATA_CHUNK)], MaNGOS::Memory::array_deleter<uint8_t>());
-    ((XFER_DATA_CHUNK*)(rawChunk.get()))->cmd = CMD_XFER_DATA;
+    std::shared_ptr<XFER_DATA_CHUNK> rawChunk(new XFER_DATA_CHUNK());
+    rawChunk->cmd = CMD_XFER_DATA;
 
-    RepeatInternalXferLoop(std::move(rawChunk));
     RepeatInternalXferLoop(rawChunk);
 }
 

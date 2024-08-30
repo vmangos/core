@@ -139,7 +139,7 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, private IO::
         void InitAndHandOverControlToPatchHandler();
         std::unique_ptr<IO::Filesystem::FileHandleReadonly> m_pendingPatchFile = nullptr;
 
-        void RepeatInternalXferLoop(std::shared_ptr<uint8_t> rawChunk);
+        void RepeatInternalXferLoop(std::shared_ptr<XFER_DATA_CHUNK> const& chunkSharedPtr);
 };
 
 #endif
