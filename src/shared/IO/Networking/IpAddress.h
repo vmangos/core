@@ -13,6 +13,9 @@ namespace IO { namespace Networking
         enum class Type { IPv4, IPv6 };
 
         static IpAddress FromIpv4Uint32(uint32_t ip);
+
+        /// IPv4 Format: 255.255.255.255
+        /// IPv6 Format: [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]
         static nonstd::optional<IpAddress> TryParseFromString(std::string const& ipAddressString);
 
         /// IPv4 Format: 255.255.255.255
@@ -28,7 +31,7 @@ namespace IO { namespace Networking
             Type type = Type::IPv4;
             union
             {
-                std::array<uint8_t,  4> ipv4; // index[0] is leftmost element in string representation
+                uint32_t                ipv4;
                 std::array<uint16_t, 8> ipv6; // index[0] is leftmost element in string representation
             };
         } m_address;
