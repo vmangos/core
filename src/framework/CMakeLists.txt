@@ -36,6 +36,7 @@ set(framework_SRCS
   Policies/Singleton.h
   Policies/SingletonImp.h
   Policies/ThreadingModel.h
+  Policies/NoCopyNoMove.h
   Utilities/ByteConverter.h
   Utilities/EventProcessor.h
   Utilities/EventMap.h

@@ -16,40 +16,39 @@
 #ifndef MANGOS_THREAD_SPECIFIC_PTR_H_
 #define MANGOS_THREAD_SPECIFIC_PTR_H_
 
+#include "Policies/NoCopyNoMove.h"
+
 #include <map>
 #include <memory>
 
 namespace MaNGOS
 {
-    extern thread_local std::map<void* /* class instance */, void* /* thread specific object */> thread_specific_ptr_data;
+    struct ThreadSpecificHolder
+    {
+        ~ThreadSpecificHolder();
+        std::map<void* /* class instance */, void* /* thread specific object */> thread_specific_ptr_data;
+    };
+
+    extern thread_local ThreadSpecificHolder gtl_ThreadSpecificPtrHolder;
 
     /// This class is the same as `boost::thread_specific_ptr` or `ACE_TSS`
     /// Since you cant use `thread_local` on a non static class member,
     /// this class allows you to have thread specific storage on instances bases.
     /// Meaning instanceA and instanceB on the same thread, have a different object attached to it.
     template<typename T>
-    class ThreadSpecificPtr
+    class ThreadSpecificPtr : public MaNGOS::Policies::NoCopyNoMove
     {
     public:
-        // not copy, not movable
-        ThreadSpecificPtr(const ThreadSpecificPtr&) = delete;
-        ThreadSpecificPtr& operator=(const ThreadSpecificPtr&) = delete;
-        ThreadSpecificPtr(ThreadSpecificPtr&&) = delete;
-        ThreadSpecificPtr& operator=(ThreadSpecificPtr&&) = delete;
-
         ThreadSpecificPtr() = default;
-        ~ThreadSpecificPtr()
-        {
-            reset();
 
-            // Finally, remove the class instance from the map
-            thread_specific_ptr_data.erase(this);
-        }
+        // Important: We cannot `this->reset()` our pointer, because the holder might already be deallocated when ThreadSpecificPtr<T> was used in a global context
+        // We have to trust that the user cleaned up everything (otherwise an ASSERT() in `ThreadSpecificHolder` will fail)
+        ~ThreadSpecificPtr() = default;
 
         T* get() const
         {
-            auto it = thread_specific_ptr_data.find(const_cast<void*>(static_cast<const void*>(this)));
-            if (it != thread_specific_ptr_data.end())
+            auto it = gtl_ThreadSpecificPtrHolder.thread_specific_ptr_data.find(const_cast<void*>(static_cast<const void*>(this)));
+            if (it != gtl_ThreadSpecificPtrHolder.thread_specific_ptr_data.end())
                 return static_cast<T*>(it->second);
             return nullptr;
         }
@@ -68,8 +67,8 @@ namespace MaNGOS
         /// Releases the pointer. You have ownership and have to delete it!
         T* release()
         {
-            auto it = thread_specific_ptr_data.find(this);
-            if (it == thread_specific_ptr_data.end())
+            auto it = gtl_ThreadSpecificPtrHolder.thread_specific_ptr_data.find(this);
+            if (it == gtl_ThreadSpecificPtrHolder.thread_specific_ptr_data.end())
                 return nullptr;
 
             T* ptr = static_cast<T*>(it->second);
@@ -80,10 +79,17 @@ namespace MaNGOS
         /// This function will delete the exising pointer
         void reset(T* new_value = nullptr)
         {
-            auto it = thread_specific_ptr_data.find(this);
-            if (it != thread_specific_ptr_data.end() && it->second != nullptr)
-                delete static_cast<T*>(it->second);
-            thread_specific_ptr_data[this] = new_value;
+            auto it = gtl_ThreadSpecificPtrHolder.thread_specific_ptr_data.find(this);
+            if (it != gtl_ThreadSpecificPtrHolder.thread_specific_ptr_data.end())
+            {
+                if (it->second != nullptr)
+                    delete static_cast<T*>(it->second);
+                it->second = new_value;
+            }
+            else
+            {
+                gtl_ThreadSpecificPtrHolder.thread_specific_ptr_data.insert(it, std::make_pair((void*)this, (void*)new_value));
+            }
         }
     };
 }
