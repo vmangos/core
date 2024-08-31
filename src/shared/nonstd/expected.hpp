@@ -82,7 +82,7 @@
 #elif (defined(__GNUC__) && __GNUC__ < 8 && !defined(__clang__))
 #ifndef TL_GCC_LESS_8_TRIVIALLY_COPY_CONSTRUCTIBLE_MUTEX
 #define TL_GCC_LESS_8_TRIVIALLY_COPY_CONSTRUCTIBLE_MUTEX
-namespace nostd {
+namespace nonstd {
 namespace detail {
 template <class T>
 struct is_trivially_copy_constructible
@@ -92,11 +92,11 @@ template <class T, class A>
 struct is_trivially_copy_constructible<std::vector<T, A>> : std::false_type {};
 #endif
 } // namespace detail
-} // namespace nostd
+} // namespace nonstd
 #endif
 
 #define TL_EXPECTED_IS_TRIVIALLY_COPY_CONSTRUCTIBLE(T)                         \
-  nostd::detail::is_trivially_copy_constructible<T>
+  nonstd::detail::is_trivially_copy_constructible<T>
 #define TL_EXPECTED_IS_TRIVIALLY_COPY_ASSIGNABLE(T)                            \
   std::is_trivially_copy_assignable<T>
 #define TL_EXPECTED_IS_TRIVIALLY_DESTRUCTIBLE(T)                               \
@@ -127,7 +127,7 @@ struct is_trivially_copy_constructible<std::vector<T, A>> : std::false_type {};
 #define TL_EXPECTED_11_CONSTEXPR constexpr
 #endif
 
-namespace nostd {
+namespace nonstd {
 template <class T, class E> class expected;
 
 #ifndef TL_MONOSTATE_INPLACE_MUTEX
@@ -389,7 +389,7 @@ struct is_nothrow_swappable
 #endif
 #endif
 
-// Trait for checking if a type is a nostd::expected
+// Trait for checking if a type is a nonstd::expected
 template <class T> struct is_expected_impl : std::false_type {};
 template <class T, class E>
 struct is_expected_impl<expected<T, E>> : std::true_type {};
@@ -2440,6 +2440,6 @@ void swap(expected<T, E> &lhs,
           expected<T, E> &rhs) noexcept(noexcept(lhs.swap(rhs))) {
   lhs.swap(rhs);
 }
-} // namespace nostd
+} // namespace nonstd
 
 #endif
