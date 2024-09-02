@@ -8,6 +8,7 @@ IO::Networking::IpAddress IO::Networking::IpAddress::FromIpv4Uint32(uint32_t ip)
     IpAddress result;
     result.m_address.type = Type::IPv4;
     result.m_address.ipv4 = ip;
+    result.UpdateCachedString();
     return result;
 }
 
@@ -58,19 +59,33 @@ nonstd::optional<IO::Networking::IpAddress> IO::Networking::IpAddress::TryParseF
         // TODO: Implement me. Keep in mind all the IPv6 truncation possibilities
         return nonstd::nullopt;
     }
+
+    result.UpdateCachedString();
+
     return result;
+}
+
+IO::Networking::IpAddress::Type IO::Networking::IpAddress::getType() const
+{
+    return m_address.type;
+}
+
+uint32_t IO::Networking::IpAddress::_getInternalIPv4ReprAsUint32() const
+{
+    MANGOS_ASSERT(m_address.type == Type::IPv4);
+    return m_address.ipv4;
 }
 
 /// IPv4 Format: 255.255.255.255
 /// IPv6 Format: [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]
-std::string IO::Networking::IpAddress::toString() const
+void IO::Networking::IpAddress::UpdateCachedString()
 {
     if (m_address.type == Type::IPv4)
     {
-        return std::to_string((m_address.ipv4 >> (3*8)) & 0xFF) + "." +
-               std::to_string((m_address.ipv4 >> (2*8)) & 0xFF) + "." +
-               std::to_string((m_address.ipv4 >> (1*8)) & 0xFF) + "." +
-               std::to_string((m_address.ipv4 >> (0*8)) & 0xFF);
+        m_cachedToString = std::to_string((m_address.ipv4 >> (3*8)) & 0xFF) + "." +
+                           std::to_string((m_address.ipv4 >> (2*8)) & 0xFF) + "." +
+                           std::to_string((m_address.ipv4 >> (1*8)) & 0xFF) + "." +
+                           std::to_string((m_address.ipv4 >> (0*8)) & 0xFF);
     }
     else
     {
@@ -126,17 +141,6 @@ std::string IO::Networking::IpAddress::toString() const
             }
         }
         result << ']';
-        return result.str();
+        m_cachedToString = result.str();
     }
-}
-
-IO::Networking::IpAddress::Type IO::Networking::IpAddress::getType() const
-{
-    return m_address.type;
-}
-
-uint32_t IO::Networking::IpAddress::_getInternalIPv4ReprAsUint32() const
-{
-    MANGOS_ASSERT(m_address.type == Type::IPv4);
-    return m_address.ipv4;
 }

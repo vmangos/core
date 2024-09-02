@@ -3,6 +3,7 @@
 
 #include <string>
 #include <array>
+#include <utility>
 #include "nonstd/optional.hpp"
 
 namespace IO { namespace Networking
@@ -20,7 +21,7 @@ namespace IO { namespace Networking
 
         /// IPv4 Format: 255.255.255.255
         /// IPv6 Format: [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]
-        std::string toString() const;
+        std::string const& toString() const { return m_cachedToString; }
 
         Type getType() const;
 
@@ -35,6 +36,10 @@ namespace IO { namespace Networking
                 std::array<uint16_t, 8> ipv6; // index[0] is leftmost element in string representation
             };
         } m_address;
+
+        // Since IPs are used in a lot of logging, we just cache the result, so it is not re-created all the time
+        void UpdateCachedString();
+        std::string m_cachedToString;
     };
 
     class IpEndpoint
@@ -45,7 +50,10 @@ namespace IO { namespace Networking
 
     public:
         IpEndpoint() : ip{}, port{0} {}
-        IpEndpoint(IO::Networking::IpAddress ip, uint16_t port) : ip{ip}, port{port} {}
+        IpEndpoint(IO::Networking::IpAddress ip, uint16_t port) : ip{std::move(ip)}, port{port} {}
+
+        /// IPv4 Format: 255.255.255.255:1337
+        /// IPv6 Format: [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]:1337
         std::string toString() const
         {
             return ip.toString() + ':' + std::to_string(port);

@@ -26,15 +26,17 @@
 #include <string>
 
 /// Remote Administration socket
-class RASocket : public std::enable_shared_from_this<RASocket>, private IO::Networking::AsyncSocket
+class RASocket final : public std::enable_shared_from_this<RASocket>
 {
  public:
-    RASocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor);
+    RASocket(IO::Networking::AsyncSocket socket);
     virtual ~RASocket();
 
-    void Start() override;
+    void Start();
 
  private:
+    IO::Networking::AsyncSocket m_socket;
+
     enum class ConnectionState
     {
         FreshConnection,

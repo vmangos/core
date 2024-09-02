@@ -427,7 +427,7 @@ bool WorldSession::Update(PacketFilter& updater)
             return false;
         }
 
-        // Cleanup socket pointer if need
+        // Cleanup socket pointer if needed
         if (m_socket && m_socket->IsClosing())
         {
             m_socket->FinalizeSession();

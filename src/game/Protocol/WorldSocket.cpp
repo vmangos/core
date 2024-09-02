@@ -63,27 +63,27 @@ struct ServerPktHeader
 #pragma pack(pop)
 #endif
 
-WorldSocket::WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor)
-    : IO::Networking::AsyncSocket(ctx, socketDescriptor),
+WorldSocket::WorldSocket(IO::Networking::AsyncSocket socket)
+    : m_socket(std::move(socket)),
       m_lastPingTime(std::chrono::system_clock::time_point::min()),
       m_overSpeedPings(0),
       m_Session(nullptr),
       m_authSeed(static_cast<uint32>(rand32()))
 {
     m_sendQueueIsRunning.clear(); // there is no atomic_flag::constructor on windows to initialize it with false by default (and if left out, linux is uninitialized and will fail randomly)
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", GetRemoteIpString().c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", m_socket.GetRemoteIpString().c_str());
 }
 
 WorldSocket::~WorldSocket()
 {
-
+    m_socket.CloseSocket();
 }
 
 void WorldSocket::DoRecvIncomingData()
 {
     std::shared_ptr<ClientPktHeader> header = std::make_shared<ClientPktHeader>();
 
-    Read((char*)header.get(), sizeof(ClientPktHeader), [self = shared_from_this(), header](IO::NetworkError const& error, std::size_t) -> void
+    m_socket.Read((char*)header.get(), sizeof(ClientPktHeader), [self = shared_from_this(), header](IO::NetworkError const& error, std::size_t) -> void
     {
         if (error)
         {
@@ -117,7 +117,7 @@ void WorldSocket::DoRecvIncomingData()
             // Cannot move std::unique_ptr into function capture, so it's wrapped into std::shared_ptr
             std::shared_ptr<std::unique_ptr<WorldPacket>> packetTmpSharedPtr(new std::unique_ptr<WorldPacket>(new WorldPacket(header->cmd, remainingPacketSize)));
             (*packetTmpSharedPtr)->resize(remainingPacketSize);
-            self->Read((char*)((*packetTmpSharedPtr)->contents()), (*packetTmpSharedPtr)->size(), [self, packetTmpSharedPtr](IO::NetworkError const& error, std::size_t) -> void
+            self->m_socket.Read((char*)((*packetTmpSharedPtr)->contents()), (*packetTmpSharedPtr)->size(), [self, packetTmpSharedPtr](IO::NetworkError const& error, std::size_t) -> void
             {
                 if (error)
                 {
@@ -496,11 +496,6 @@ WorldSocket::HandlerResult WorldSocket::_HandlePing(WorldPacket& recvPacket)
     return HandlerResult::Okay;
 }
 
-void WorldSocket::Start()
-{
-    sWorldSocketMgr.OnNewClientConnected(shared_from_this());
-}
-
 void WorldSocket::SendInitialPacketAndStartRecvLoop()
 {
     // Send startup packet.
@@ -533,7 +528,7 @@ void WorldSocket::SendPacket(WorldPacket packet)
     if (m_sendQueueIsRunning.test_and_set())
         return; // already running
 
-    EnterIoContext([self = shared_from_this()](IO::NetworkError error)
+    m_socket.EnterIoContext([self = shared_from_this()](IO::NetworkError error)
     {
         self->HandleResultOfAsyncWrite(error, std::make_shared<ByteBuffer>());
     });
@@ -580,7 +575,7 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
             alreadyAllocatedBuffer->append(packet.contents(), packet.size());
     }
 
-    Write(alreadyAllocatedBuffer, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error)
+    m_socket.Write(alreadyAllocatedBuffer, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error)
     {
         self->HandleResultOfAsyncWrite(error, alreadyAllocatedBuffer);
     });

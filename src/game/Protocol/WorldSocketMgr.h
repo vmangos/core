@@ -27,7 +27,7 @@
 #include <memory>
 #include "Policies/Singleton.h"
 #include "IO/Context/IoContext.h"
-#include "IO/Networking/AsyncServerListener.h"
+#include "IO/Networking/AsyncSocketAcceptor.h"
 
 class WorldSocket;
 
@@ -47,10 +47,13 @@ public:
     /// Will return true start was okay
     bool StartWorldNetworking(IO::IoContext* ioCtx, WorldSocketMgrOptions const& options);
     void StopWorldNetworking();
-    void OnNewClientConnected(std::shared_ptr<WorldSocket> const& socket);
+    void OnNewClientConnected(IO::Networking::SocketDescriptor socketDescriptor);
 
 private:
-    std::unique_ptr<IO::Networking::AsyncServerListener<WorldSocket>> m_listener{nullptr};
+    IO::IoContext* GetLestUsedIoContext();
+
+    IO::IoContext* m_ioContext{nullptr};
+    std::unique_ptr<IO::Networking::AsyncSocketAcceptor> m_listener{nullptr};
     WorldSocketMgrOptions m_settings{};
 };
 

@@ -23,22 +23,27 @@
 #include "WorldSocketMgr.h"
 #include "WorldSocket.h"
 #include "Policies/SingletonImp.h"
-#include "IO/Networking/AsyncServerListener.h"
+#include "IO/Networking/AsyncSocketAcceptor.h"
 #include "IO/Multithreading/CreateThread.h"
 
 INSTANTIATE_SINGLETON_1(WorldSocketMgr);
 
 bool WorldSocketMgr::StartWorldNetworking(IO::IoContext* ioCtx, WorldSocketMgrOptions const& options)
 {
+    m_ioContext = ioCtx;
     m_settings = options;
 
     // Launch the listening network socket
-    m_listener = IO::Networking::AsyncServerListener<WorldSocket>::CreateAndBindServer(ioCtx, options.bindIp, options.bindPort);
+    m_listener = IO::Networking::AsyncSocketAcceptor::CreateAndBindServer(ioCtx, options.bindIp, options.bindPort);
     if (m_listener == nullptr)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to start WorldSocket network");
         return false;
     }
+    m_listener->AutoAcceptSocketsUntilClose([this](IO::Networking::SocketDescriptor socketDescriptor)
+    {
+        this->OnNewClientConnected(std::move(socketDescriptor));
+    });
 
     return true;
 }
@@ -50,25 +55,38 @@ void WorldSocketMgr::StopWorldNetworking()
     m_listener = nullptr;
 }
 
-void WorldSocketMgr::OnNewClientConnected(std::shared_ptr<WorldSocket> const& socket)
+void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socketDescriptor)
 {
+    // Attach descriptor to AsyncSocket and configure it before attaching it to the WorldSocket
+    IO::IoContext* ioContext = GetLestUsedIoContext();
+    IO::Networking::AsyncSocket socket(ioContext, std::move(socketDescriptor));
+
     if (m_settings.socketOutByteBufferSize >= 0)
     {
-        IO::NetworkError error = socket->SetNativeSocketOption_SystemOutgoingSendBuffer(m_settings.socketOutByteBufferSize);
+        IO::NetworkError error = socket.SetNativeSocketOption_SystemOutgoingSendBuffer(m_settings.socketOutByteBufferSize);
         if (error)
         { // We don't close the socket, since its basically just a "warning" I guess.
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set SystemOutgoingSendBuffer option on socket for IP %s Error: %s", socket->GetRemoteIpString().c_str(), error.ToString().c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set SystemOutgoingSendBuffer option on socket for IP %s Error: %s", socket.GetRemoteIpString().c_str(), error.ToString().c_str());
         }
     }
 
     if (m_settings.doExplicitTcpNoDelay) // Set TCP_NODELAY.
     {
-        IO::NetworkError error = socket->SetNativeSocketOption_NoDelay(true);
+        IO::NetworkError error = socket.SetNativeSocketOption_NoDelay(true);
         if (error)
         { // We don't close the socket, since its basically just a "warning" I guess.
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set NoDelay option on socket for IP %s Error: %s", socket->GetRemoteIpString().c_str(), error.ToString().c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set NoDelay option on socket for IP %s Error: %s", socket.GetRemoteIpString().c_str(), error.ToString().c_str());
         }
     }
 
-    socket->SendInitialPacketAndStartRecvLoop();
+    auto worldSocket = std::make_shared<WorldSocket>(std::move(socket));
+    worldSocket->SendInitialPacketAndStartRecvLoop();
+}
+
+IO::IoContext* WorldSocketMgr::GetLestUsedIoContext()
+{
+    // TODO: Currently the main shared ioCtx is used
+    //  but we could do a thread affinity here, just like TrinityCore does it
+    //  see `Trinity::SocketMgr::SelectThreadWithMinConnections()`
+    return m_ioContext;
 }

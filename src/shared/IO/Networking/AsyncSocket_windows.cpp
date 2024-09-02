@@ -4,7 +4,7 @@
 IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_NoDelay(bool doNoDelay)
 {
     int optionValue = doNoDelay ? 1 : 0;
-    int result = ::setsockopt(m_socket._nativeSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&optionValue, sizeof(optionValue));
+    int result = ::setsockopt(m_descriptor.GetNativeSocket(), IPPROTO_TCP, TCP_NODELAY, (char*)&optionValue, sizeof(optionValue));
     if (result != 0)
         return IO::NetworkError(NetworkError::ErrorType::InternalError, ::WSAGetLastError());
     return IO::NetworkError(NetworkError::ErrorType::NoError);
@@ -13,7 +13,7 @@ IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_NoDelay(bool
 IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_SystemOutgoingSendBuffer(int bytes)
 {
     int optionValue = bytes;
-    int result = ::setsockopt(m_socket._nativeSocket, SOL_SOCKET, SO_SNDBUF, (char*)&optionValue, sizeof(optionValue));
+    int result = ::setsockopt(m_descriptor.GetNativeSocket(), SOL_SOCKET, SO_SNDBUF, (char*)&optionValue, sizeof(optionValue));
     if (result != 0)
         return IO::NetworkError(NetworkError::ErrorType::InternalError, ::WSAGetLastError());
     return IO::NetworkError(NetworkError::ErrorType::NoError);
@@ -82,7 +82,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
 
             int const bufferCount = 1;
             DWORD flags = 0;
-            int errorCode = ::WSARecv(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, &(m_currentReadTask), nullptr);
+            int errorCode = ::WSARecv(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, &flags, &(m_currentReadTask), nullptr);
             if (errorCode)
             {
                 int err = WSAGetLastError();
@@ -108,7 +108,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
 
     DWORD flags = 0;
     m_atomicState.fetch_xor(SocketStateFlags::READ_PRESENT | SocketStateFlags::READ_PENDING_SET); // set PRESENT and unset PENDING_SET
-    int errorCode = ::WSARecv(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
+    int errorCode = ::WSARecv(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
     if (errorCode)
     {
         int err = WSAGetLastError();
@@ -188,7 +188,7 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
 
     DWORD flags = 0;
     m_atomicState.fetch_xor(SocketStateFlags::READ_PRESENT | SocketStateFlags::READ_PENDING_SET); // set PRESENT and unset PENDING_SET
-    int errorCode = ::WSARecv(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
+    int errorCode = ::WSARecv(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
     if (errorCode)
     {
         int err = WSAGetLastError();
@@ -282,7 +282,7 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<std::vector<uint8_t> con
 
     DWORD flags = 0;
     m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
-    int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
+    int errorCode = ::WSASend(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
     if (errorCode)
     {
         int err = WSAGetLastError();
@@ -377,7 +377,7 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<ByteBuffer const> const&
 
     DWORD flags = 0;
     m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
-    int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
+    int errorCode = ::WSASend(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
     if (errorCode)
     {
         int err = WSAGetLastError();
@@ -472,7 +472,7 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<uint8_t const> const& so
 
     DWORD flags = 0;
     m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
-    int errorCode = ::WSASend(m_socket._nativeSocket, bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
+    int errorCode = ::WSASend(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
     if (errorCode)
     {
         int err = WSAGetLastError();
@@ -496,7 +496,7 @@ void IO::Networking::AsyncSocket::CloseSocket()
         return; // there was already a ::close()
 
     sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "CloseSocket(): Disconnect request");
-    ::closesocket(m_socket._nativeSocket); // will interrupt and fail all pending IOCP events and post them to the queue
+    m_descriptor.CloseSocket(); // will interrupt and fail all pending IOCP events and post them to the queue
 }
 
 /// The callback is invoked in the IO thread
@@ -536,4 +536,15 @@ void IO::Networking::AsyncSocket::EnterIoContext(std::function<void(IO::NetworkE
     m_atomicState.fetch_xor(SocketStateFlags::CONTEXT_PRESENT | SocketStateFlags::CONTEXT_PENDING_SET); // set PRESENT and unset PENDING_SET
 
     m_ctx->PostOperationForImmediateInvocation(&m_currentContextTask);
+}
+
+IO::Networking::AsyncSocket::AsyncSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor socketDescriptor)
+    : m_ctx(ctx), m_descriptor(std::move(socketDescriptor))
+{
+    // Attach our acceptor socket to our completion port
+    if (::CreateIoCompletionPort((HANDLE) m_descriptor.GetNativeSocket(), m_ctx->GetWindowsCompletionPort(), (u_long)0, 0) != m_ctx->GetWindowsCompletionPort())
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(accept, ...) Error: %u", WSAGetLastError());
+        return;
+    }
 }

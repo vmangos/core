@@ -33,8 +33,8 @@
 static std::string const NEWLINE = "\r\n";
 static std::string const PROMPT = "mangos>";
 
-RASocket::RASocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor)
-  : IO::Networking::AsyncSocket(ctx, socketDescriptor),
+RASocket::RASocket(IO::Networking::AsyncSocket socket)
+  : m_socket(std::move(socket)),
     m_connectionState(ConnectionState::FreshConnection),
     m_atLeastOnePacketWasReceived(false),
     m_accountId(0),
@@ -52,12 +52,12 @@ RASocket::RASocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& s
 
 RASocket::~RASocket()
 {
-    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s] Connection was closed", GetRemoteIpString().c_str());
+    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s] Connection was closed", m_socket.GetRemoteIpString().c_str());
 }
 
 void RASocket::Start()
 {
-    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s] Incoming RA connection", GetRemoteIpString().c_str());
+    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s] Incoming RA connection", m_socket.GetRemoteIpString().c_str());
 
     std::string welcomeMessage;
     welcomeMessage += sWorld.GetMotd(); // <-- technically, we should replace all '\n' in MOTD with NEWLINE
@@ -80,7 +80,7 @@ void RASocket::DoRecvIncomingData()
         m_pendingInputBuffer.erase(0, newLinePos + NEWLINE.size());
 
         if (line.size() == 4095) // Exact length match of the terminal limit. Maybe the user tries to execute a really long command.
-            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] A default telnet terminal only allows 4096 characters per line. This command could be executed incorrectly!", GetRemoteIpString().c_str());
+            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] A default telnet terminal only allows 4096 characters per line. This command could be executed incorrectly!", m_socket.GetRemoteIpString().c_str());
 
         HandleInput(line); // This function must ensure that DoRecvIncomingData() is executed when done
         return;
@@ -88,17 +88,17 @@ void RASocket::DoRecvIncomingData()
 
     if (m_connectionState != ConnectionState::Authenticated && m_pendingInputBuffer.size() > MAX_INPUT_BUFFER_SIZE_WHILE_UNAUTHENTICATED)
     {
-        sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Unauthenticated connection had too large buffer", GetRemoteIpString().c_str());
+        sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Unauthenticated connection had too large buffer", m_socket.GetRemoteIpString().c_str());
         return; // implicit socket close
     }
 
     // we need more data to process this message
     std::shared_ptr<std::vector<char>> recvBuffer(new std::vector<char>(1024));
-    ReadSome(recvBuffer->data(), recvBuffer->size(), [self = shared_from_this(), recvBuffer](IO::NetworkError const& error, std::size_t amountRead)
+    m_socket.ReadSome(recvBuffer->data(), recvBuffer->size(), [self = shared_from_this(), recvBuffer](IO::NetworkError const& error, std::size_t amountRead)
     {
         if (error)
         {
-            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Connection had error: %s", self->GetRemoteIpString().c_str(), error.ToString().c_str());
+            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Connection had error: %s", self->m_socket.GetRemoteIpString().c_str(), error.ToString().c_str());
             return; // implicit socket close
         }
 
@@ -110,7 +110,7 @@ void RASocket::DoRecvIncomingData()
             {
                 // We got a telnet protocol packet, most likely the terminal wants us to tell the capabilities it has, but we are not really interested in it
                 std::vector<uint8> const endOfNegotiationResponse = { 0xFF, 0xF0 };
-                self->Write(std::make_shared<std::vector<uint8>>(endOfNegotiationResponse), [self](IO::NetworkError const& error) { self->DoRecvIncomingData(); });
+                self->m_socket.Write(std::make_shared<std::vector<uint8>>(endOfNegotiationResponse), [self](IO::NetworkError const& error) { self->DoRecvIncomingData(); });
                 return;
             }
         }
@@ -162,7 +162,7 @@ void RASocket::HandleInput_GotUsername(std::string const& line)
         m_accountId = sAccountMgr.GetId(m_username);
         if (!m_accountId)
         {
-            sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s] Account '%s' does not exist", GetRemoteIpString().c_str(), m_username.c_str());
+            sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s] Account '%s' does not exist", m_socket.GetRemoteIpString().c_str(), m_username.c_str());
             loginSuccessful = false;
         }
     }
@@ -171,7 +171,7 @@ void RASocket::HandleInput_GotUsername(std::string const& line)
     {
         if (!sAccountMgr.CheckPassword(m_accountId, line))
         {
-            sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Wrong password for account %s", GetRemoteIpString().c_str(), m_username.c_str());
+            sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Wrong password for account %s", m_socket.GetRemoteIpString().c_str(), m_username.c_str());
             loginSuccessful = false;
         }
     }
@@ -182,7 +182,7 @@ void RASocket::HandleInput_GotUsername(std::string const& line)
 
         if (m_accountLevel < minRequiredAccLevel)
         {
-            sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Account %s has no privilege for RA", GetRemoteIpString().c_str(), m_username.c_str());
+            sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Account %s has no privilege for RA", m_socket.GetRemoteIpString().c_str(), m_username.c_str());
             loginSuccessful = false;
         }
         else
@@ -195,14 +195,14 @@ void RASocket::HandleInput_GotUsername(std::string const& line)
 
     if (loginSuccessful)
     {
-        sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Account %s has logged in", GetRemoteIpString().c_str(), m_username.c_str());
+        sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Account %s has logged in", m_socket.GetRemoteIpString().c_str(), m_username.c_str());
         m_connectionState = ConnectionState::Authenticated;
         SendAndRecvNextInput("+Logged in." + NEWLINE + " " + PROMPT);
     }
     else
     {
         SendAndDisconnect("-Authentication failed. Verify username, password and required accountLevel." + NEWLINE);
-        sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Account %s has failed to log in", GetRemoteIpString().c_str(), m_username.c_str());
+        sLog.Out(LOG_RA, LOG_LVL_MINIMAL,"[%s] Account %s has failed to log in", m_socket.GetRemoteIpString().c_str(), m_username.c_str());
     }
 }
 
@@ -214,7 +214,7 @@ void RASocket::HandleInput_Authenticated(std::string const& line)
         return;
     }
 
-    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s/%s] Received command: %s", GetRemoteIpString().c_str(), m_username.c_str(), line.c_str());
+    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "[%s/%s] Received command: %s", m_socket.GetRemoteIpString().c_str(), m_username.c_str(), line.c_str());
 
     // handle quit, exit and logout commands to terminate connection
     if (line == "quit" || line == "exit" || line == "logout")
@@ -259,10 +259,10 @@ void RASocket::SendAndDisconnect(std::string const& message)
 {
     std::shared_ptr<uint8_t> rawMessage(new uint8_t[message.size()], MaNGOS::Memory::array_deleter<uint8_t>());
     memcpy(rawMessage.get(), message.c_str(), message.size());
-    Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
+    m_socket.Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
     {
         if (error)
-            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Sending message failed: %s", self->GetRemoteIpString().c_str(), error.ToString().c_str());
+            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Sending message failed: %s", self->m_socket.GetRemoteIpString().c_str(), error.ToString().c_str());
     });
 }
 
@@ -270,11 +270,11 @@ void RASocket::SendAndRecvNextInput(std::string const& message)
 {
     std::shared_ptr<uint8_t> rawMessage(new uint8_t[message.size()], MaNGOS::Memory::array_deleter<uint8_t>());
     memcpy(rawMessage.get(), message.c_str(), message.size());
-    Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
+    m_socket.Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
     {
         if (error)
         {
-            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Sending message failed: %s", self->GetRemoteIpString().c_str(), error.ToString().c_str());
+            sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Sending message failed: %s", self->m_socket.GetRemoteIpString().c_str(), error.ToString().c_str());
             return;
         }
         self->DoRecvIncomingData();

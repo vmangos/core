@@ -113,7 +113,8 @@ set (shared_SRCS
     IO/SystemErrorToString.cpp
     IO/Networking/Internal.h
     IO/Networking/Internal.cpp
-    IO/Networking/AsyncServerListener.h
+    IO/Networking/AsyncSocketAcceptor.h
+    IO/Networking/AsyncSocketAcceptor_windows.cpp
     IO/Networking/AsyncSocket.h
     IO/Networking/AsyncSocket.cpp
     IO/Networking/AsyncSocket_posix.cpp
@@ -121,6 +122,7 @@ set (shared_SRCS
     IO/Networking/NetworkError.h
     IO/Networking/NetworkError.cpp
     IO/Networking/SocketDescriptor.h
+    IO/Networking/SocketDescriptor.cpp
     IO/Networking/Utils.h
     IO/Networking/Utils.cpp
     IO/Networking/IpAddress.h
