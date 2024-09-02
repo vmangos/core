@@ -106,6 +106,7 @@ set (shared_SRCS
     IO/Utils.h
     IO/Utils.cpp
     IO/Utils_Unix.h
+    IO/SmartBuffer.h
     IO/Context/IoContext_macos.cpp
     IO/Context/IoContext_unix.cpp
     IO/Context/IoContext_windows.cpp

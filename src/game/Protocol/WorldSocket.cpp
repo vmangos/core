@@ -571,11 +571,11 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
         m_Crypt.EncryptSend(reinterpret_cast<uint8*>(&header), sizeof(header)); // in vanilla versions of the game only the header is encrypted
 
         alreadyAllocatedBuffer->append(header.data(), header.headerSize());
-        if (packet.size() > 0)
+        if (!packet.empty())
             alreadyAllocatedBuffer->append(packet.contents(), packet.size());
     }
 
-    m_socket.Write(alreadyAllocatedBuffer, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error)
+    m_socket.Write({ alreadyAllocatedBuffer /* dont move */ }, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error)
     {
         self->HandleResultOfAsyncWrite(error, alreadyAllocatedBuffer);
     });

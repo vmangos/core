@@ -3,23 +3,13 @@
 #include "Errors.h"
 #include "IpAddress.h"
 
-/*
-IO::Networking::AsyncSocket::AsyncSocket(IO::Networking::AsyncSocket&& other) noexcept
-    : m_ctx(other.m_ctx), m_descriptor(std::move(other.m_descriptor)), m_atomicState(other.m_atomicState.load())
-{
-    other.m_atomicState.exchange(SocketStateFlags::WAS_MOVED_NO_DTOR);
-}
- */
-
 IO::Networking::AsyncSocket::AsyncSocket(AsyncSocket&& other) noexcept
     : m_ctx(other.m_ctx),
     m_descriptor(std::move(other.m_descriptor)),
     m_contextCallback(std::move(other.m_contextCallback)),
     m_readCallback(std::move(other.m_readCallback)),
     m_writeCallback(std::move(other.m_writeCallback)),
-    m_writeSrcBufferDummyHolder_ByteBuffer(std::move(other.m_writeSrcBufferDummyHolder_ByteBuffer)),
-    m_writeSrcBufferDummyHolder_u8Vector(std::move(other.m_writeSrcBufferDummyHolder_u8Vector)),
-    m_writeSrcBufferDummyHolder_rawArray(std::move(other.m_writeSrcBufferDummyHolder_rawArray)),
+    m_writeSrc(std::move(other.m_writeSrc)),
     m_currentContextTask(std::move(other.m_currentContextTask)),
     m_currentWriteTask(std::move(other.m_currentWriteTask)),
     m_currentReadTask(std::move(other.m_currentReadTask))

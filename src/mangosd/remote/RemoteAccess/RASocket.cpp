@@ -109,8 +109,8 @@ void RASocket::DoRecvIncomingData()
             if (amountRead >= 1 && (static_cast<uint8>(recvBuffer->at(0)) == 0xFF))
             {
                 // We got a telnet protocol packet, most likely the terminal wants us to tell the capabilities it has, but we are not really interested in it
-                std::vector<uint8> const endOfNegotiationResponse = { 0xFF, 0xF0 };
-                self->m_socket.Write(std::make_shared<std::vector<uint8>>(endOfNegotiationResponse), [self](IO::NetworkError const& error) { self->DoRecvIncomingData(); });
+                std::vector<uint8> endOfNegotiationResponse = { 0xFF, 0xF0 };
+                self->m_socket.Write(std::move(endOfNegotiationResponse), [self](IO::NetworkError const& error) { self->DoRecvIncomingData(); });
                 return;
             }
         }
@@ -259,7 +259,7 @@ void RASocket::SendAndDisconnect(std::string const& message)
 {
     std::shared_ptr<uint8_t> rawMessage(new uint8_t[message.size()], MaNGOS::Memory::array_deleter<uint8_t>());
     memcpy(rawMessage.get(), message.c_str(), message.size());
-    m_socket.Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
+    m_socket.Write({ rawMessage, message.size() }, [self = shared_from_this()](IO::NetworkError const& error)
     {
         if (error)
             sLog.Out(LOG_RA, LOG_LVL_ERROR, "[%s] Sending message failed: %s", self->m_socket.GetRemoteIpString().c_str(), error.ToString().c_str());
@@ -270,7 +270,7 @@ void RASocket::SendAndRecvNextInput(std::string const& message)
 {
     std::shared_ptr<uint8_t> rawMessage(new uint8_t[message.size()], MaNGOS::Memory::array_deleter<uint8_t>());
     memcpy(rawMessage.get(), message.c_str(), message.size());
-    m_socket.Write(rawMessage, message.size(), [self = shared_from_this()](IO::NetworkError const& error)
+    m_socket.Write({ rawMessage, message.size() }, [self = shared_from_this()](IO::NetworkError const& error)
     {
         if (error)
         {

@@ -8,6 +8,7 @@
 #include "Policies/ObjectConstructorTraits.h"
 #include "ByteBuffer.h"
 #include "IO/NativeAliases.h"
+#include "IO/SmartBuffer.h"
 
 #include <memory>
 #include <utility>
@@ -29,8 +30,7 @@ namespace IO { namespace Networking {
         public:
             explicit AsyncSocket(IO::IoContext* ctx, SocketDescriptor socketDescriptor);
             AsyncSocket(AsyncSocket&& other) noexcept;
-        AsyncSocket(NoCopyButAllowMove&& move, IoContext* ctx, SocketDescriptor const& descriptor, std::atomic<int> const& atomicState, std::function<void(IO::NetworkError)> const& contextCallback, std::function<void(IO::NetworkError const&, size_t)> const& readCallback, std::function<void(IO::NetworkError)> const& writeCallback, std::shared_ptr<ByteBuffer const> const& writeSrcBufferDummyHolderByteBuffer, std::shared_ptr<std::vector<uint8_t> const> const& writeSrcBufferDummyHolderU8Vector, std::shared_ptr<uint8_t const> const& writeSrcBufferDummyHolderRawArray, IocpOperationTask const& currentContextTask, IocpOperationTask const& currentWriteTask, IocpOperationTask const& currentReadTask);
-        ~AsyncSocket(); // this destructor will throw if there is a pending transaction
+            ~AsyncSocket(); // this destructor will throw if there is a pending transaction
 
             IO::NetworkError SetNativeSocketOption_NoDelay(bool doNoDelay);
             IO::NetworkError SetNativeSocketOption_SystemOutgoingSendBuffer(int bytes);
@@ -46,18 +46,8 @@ namespace IO { namespace Networking {
             /// Useful for computational expensive operations (e.g. packing and encryption), that should be avoided in the main loop
             void EnterIoContext(std::function<void(IO::NetworkError)> const& callback);
 
-            /// TODO replace me with
-            // void Write(IO::Networking::SmartBuffer<T> buffer, std::function<void(IO::NetworkError const&)> const& callback);
-
-            /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
-            /// You have to keep the pointer alive until the callback is called. Use [self = shared_from_this()]
-            void Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
-            /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
-            /// You have to keep the pointer alive until the callback is called. Use [self = shared_from_this()]
-            void Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback);
-            /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered! (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
-            /// You have to keep the pointer alive until the callback is called. Use [self = shared_from_this()]
-            void Write(std::shared_ptr<uint8 const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback);
+            /// Warning: Using this function will NOT copy the buffer content, dont overwrite it unless callback is triggered!
+            void Write(IO::ReadableBuffer const& source, std::function<void(IO::NetworkError const&)> const& callback);
 
             void CloseSocket();
             bool IsClosing() const;
@@ -73,9 +63,6 @@ namespace IO { namespace Networking {
             {
                 return GetRemoteEndpoint().ip.toString();
             }
-
-        public:
-            void ResetNativeSocket(IO::Native::SocketHandle handle);
 
         private:
 #if defined(__linux__) || defined(__APPLE__)
@@ -120,9 +107,7 @@ namespace IO { namespace Networking {
 
             // Write = the source buffer from where to read to be able to write to the network stream
             std::function<void(IO::NetworkError)> m_writeCallback = nullptr; // <-- Callback into user code
-            std::shared_ptr<ByteBuffer const> m_writeSrcBufferDummyHolder_ByteBuffer = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
-            std::shared_ptr<std::vector<uint8_t> const> m_writeSrcBufferDummyHolder_u8Vector = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
-            std::shared_ptr<uint8_t const> m_writeSrcBufferDummyHolder_rawArray = nullptr; // Optional. To keep the shared_ptr for the lifetime of the transfer
+            IO::ReadableBuffer m_writeSrc{};
 
 #if defined(WIN32)
             IocpOperationTask m_currentContextTask; // <-- Internal tasks / callback to internal networking code

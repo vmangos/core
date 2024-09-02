@@ -57,7 +57,7 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, MaNGOS::Poli
 
         void DoRecvIncomingData();
         std::shared_ptr<ByteBuffer> GenerateLogonProofResponse(Sha1Hash sha);
-        void LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt);
+        void LoadRealmlistAndWriteIntoBuffer(ByteBuffer& pkt);
         bool VerifyPinData(uint32 pin, PINData const& clientData);
         uint32 GenerateTotpPin(std::string const& secret, int interval);
 

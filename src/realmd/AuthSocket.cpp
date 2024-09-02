@@ -329,7 +329,7 @@ void AuthSocket::_HandleLogonChallenge()
                         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", self->m_login.c_str(), self->GetRemoteIpString().c_str());
                         *pkt << (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
 
-                        self->m_socket.Write(pkt, [self](IO::NetworkError const& error) {
+                        self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error) {
                             if (error)
                                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write() Error: %s", error.ToString().c_str());
                             else
@@ -464,7 +464,7 @@ void AuthSocket::_HandleLogonChallenge()
                 }
             }
 
-            self->m_socket.Write(pkt, [self](IO::NetworkError const& error)
+            self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
             {
                 if (error)
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write() Error: %s", error.ToString().c_str());
@@ -545,7 +545,7 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
         *pkt << (uint8) WOW_FAIL_VERSION_INVALID;
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] %u is not a valid client version!", m_build);
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Patch %s not found", tmp);
-        m_socket.Write(pkt, [self = shared_from_this(), pkt](IO::NetworkError const& error)
+        m_socket.Write(std::move(pkt), [self = shared_from_this(), pkt](IO::NetworkError const& error)
         {
             if (error)
             {
@@ -580,7 +580,7 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
         // Set right status
         m_status = STATUS_PATCH;
 
-        m_socket.Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
+        m_socket.Write(std::move(pkt), [self = shared_from_this()](IO::NetworkError const& error)
         {
             self->DoRecvIncomingData();
         });
@@ -658,7 +658,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
             *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
             *pkt << (uint8) WOW_FAIL_VERSION_INVALID;
-            m_socket.Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
+            m_socket.Write(std::move(pkt), [self = shared_from_this()](IO::NetworkError const& error)
             {
                 self->DoRecvIncomingData();
             });
@@ -687,7 +687,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
                 std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
                 *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
                 *pkt << (uint8) WOW_FAIL_DB_BUSY;
-                m_socket.Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
+                m_socket.Write(std::move(pkt), [self = shared_from_this()](IO::NetworkError const& error)
                 {
                     self->DoRecvIncomingData();
                 });
@@ -721,7 +721,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
             *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
             *pkt << (uint8) WOW_FAIL_PARENTCONTROL;
-            m_socket.Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
+            m_socket.Write(std::move(pkt), [self = shared_from_this()](IO::NetworkError const& error)
             {
                 self->DoRecvIncomingData();
             });
@@ -751,7 +751,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         std::shared_ptr<ByteBuffer> pkt = GenerateLogonProofResponse(sha);
         m_status = STATUS_AUTHED;
 
-        m_socket.Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
+        m_socket.Write(std::move(pkt), [self = shared_from_this()](IO::NetworkError const& error)
         {
             self->DoRecvIncomingData();
         });
@@ -807,7 +807,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             *pkt << (uint8) 0;
             *pkt << (uint8) 0;
         }
-        m_socket.Write(pkt, [self = shared_from_this()](IO::NetworkError const& error)
+        m_socket.Write(std::move(pkt), [self = shared_from_this()](IO::NetworkError const& error)
         {
             self->DoRecvIncomingData();
         });
@@ -916,7 +916,7 @@ void AuthSocket::_HandleReconnectChallenge()
             self->m_reconnectProof.SetRand(16 * 8);
             pkt->append(self->m_reconnectProof.AsByteArray(16));        // 16 bytes random
             pkt->append(VersionChallenge.data(), VersionChallenge.size());
-            self->m_socket.Write(pkt, [self](IO::NetworkError const& error)
+            self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
             {
                 self->DoRecvIncomingData();
             });
@@ -968,7 +968,7 @@ void AuthSocket::_HandleReconnectProof()
             std::shared_ptr<ByteBuffer> pkt = std::make_shared<ByteBuffer>();
             *pkt << uint8(CMD_AUTH_RECONNECT_PROOF);
             *pkt << uint8(WOW_SUCCESS);
-            self->m_socket.Write(pkt, [self](IO::NetworkError const& error)
+            self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
             {
                 self->DoRecvIncomingData();
             });
@@ -1026,7 +1026,7 @@ void AuthSocket::_HandleRealmList()
         *pkt << (uint16)realmlistBuffer.size();
         pkt->append(realmlistBuffer);
 
-        self->m_socket.Write(pkt, [self](IO::NetworkError const& error)
+        self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
         {
             self->DoRecvIncomingData();
         });
@@ -1322,7 +1322,7 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<XFER_DATA_CHUNK> const& 
     // This `fakeSharedPtr` is a bit hacky, we cannot simply Write() a XFER_DATA_CHUNK pointer.
     // This is why we convert it to an uint8 pointer without a deallocator.
     std::shared_ptr<uint8 const> fakeSharedPtr((uint8_t const*)chunk.get(), MaNGOS::Memory::no_deleter<uint8>());
-    m_socket.Write(fakeSharedPtr, sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount, [self = shared_from_this(), chunk](IO::NetworkError const& error)
+    m_socket.Write({ fakeSharedPtr, sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount }, [self = shared_from_this(), chunk](IO::NetworkError const& error)
     {
         if (error)
         {
