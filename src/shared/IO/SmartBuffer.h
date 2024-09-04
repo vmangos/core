@@ -17,13 +17,13 @@ namespace IO
         ReadableBuffer(std::shared_ptr<ByteBuffer const> const& source)
             : m_ptr(source->contents()), m_size(source->size()), m_type(BufferType::ByteBuffer)
         {
-            new(&m_buffer.ByteBuffer) std::shared_ptr<ByteBuffer const>(source);
+            new(&m_buffer.ByteBufferRef) std::shared_ptr<ByteBuffer const>(source);
         }
 
         ReadableBuffer(std::shared_ptr<ByteBuffer>&& source)
             : m_ptr(source->contents()), m_size(source->size()), m_type(BufferType::ByteBuffer)
         {
-            new(&m_buffer.ByteBuffer) std::shared_ptr<ByteBuffer const>(std::move(source));
+            new(&m_buffer.ByteBufferRef) std::shared_ptr<ByteBuffer const>(std::move(source));
         }
 
         ReadableBuffer(std::shared_ptr<std::vector<uint8> const> const& source)
@@ -99,7 +99,7 @@ namespace IO
             switch (m_type)
             {
                 case BufferType::ByteBuffer:
-                    m_buffer.ByteBuffer.~shared_ptr();
+                    m_buffer.ByteBufferRef.~shared_ptr();
                     break;
                 case BufferType::VectorU8:
                     m_buffer.VectorU8.~shared_ptr();
@@ -133,7 +133,7 @@ namespace IO
             switch (m_type)
             {
                 case BufferType::ByteBuffer:
-                    new(&m_buffer.ByteBuffer) std::shared_ptr<ByteBuffer const>(other.m_buffer.ByteBuffer);
+                    new(&m_buffer.ByteBufferRef) std::shared_ptr<ByteBuffer const>(other.m_buffer.ByteBufferRef);
                     break;
                 case BufferType::VectorU8:
                     new(&m_buffer.VectorU8) std::shared_ptr<std::vector<uint8> const>(other.m_buffer.VectorU8);
@@ -164,7 +164,7 @@ namespace IO
             switch (m_type)
             {
                 case BufferType::ByteBuffer:
-                    new(&m_buffer.ByteBuffer) std::shared_ptr<ByteBuffer const>(other.m_buffer.ByteBuffer);
+                    new(&m_buffer.ByteBufferRef) std::shared_ptr<ByteBuffer const>(other.m_buffer.ByteBufferRef);
                     break;
                 case BufferType::VectorU8:
                     new(&m_buffer.VectorU8) std::shared_ptr<std::vector<uint8> const>(other.m_buffer.VectorU8);
@@ -192,7 +192,7 @@ namespace IO
             switch (m_type)
             {
                 case BufferType::ByteBuffer:
-                    new(&m_buffer.ByteBuffer) std::shared_ptr<ByteBuffer const>(std::move(other.m_buffer.ByteBuffer));
+                    new(&m_buffer.ByteBufferRef) std::shared_ptr<ByteBuffer const>(std::move(other.m_buffer.ByteBufferRef));
                     break;
                 case BufferType::VectorU8:
                     new(&m_buffer.VectorU8) std::shared_ptr<std::vector<uint8> const>(std::move(other.m_buffer.VectorU8));
@@ -220,7 +220,7 @@ namespace IO
             switch (m_type)
             {
                 case BufferType::ByteBuffer:
-                    new(&m_buffer.ByteBuffer) std::shared_ptr<ByteBuffer const>(std::move(other.m_buffer.ByteBuffer));
+                    new(&m_buffer.ByteBufferRef) std::shared_ptr<ByteBuffer const>(std::move(other.m_buffer.ByteBufferRef));
                     break;
                 case BufferType::VectorU8:
                     new(&m_buffer.VectorU8) std::shared_ptr<std::vector<uint8> const>(std::move(other.m_buffer.VectorU8));
@@ -263,7 +263,7 @@ namespace IO
 
         union BufferUnion
         {
-            std::shared_ptr<ByteBuffer const> ByteBuffer;
+            std::shared_ptr<ByteBuffer const> ByteBufferRef;
             std::shared_ptr<std::vector<uint8> const> VectorU8;
             std::shared_ptr<std::vector<int8> const> VectorS8;
             std::shared_ptr<std::vector<char> const> VectorN8;
