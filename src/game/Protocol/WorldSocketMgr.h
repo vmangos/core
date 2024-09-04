@@ -50,7 +50,7 @@ public:
     void OnNewClientConnected(IO::Networking::SocketDescriptor socketDescriptor);
 
 private:
-    IO::IoContext* GetLestUsedIoContext();
+    IO::IoContext* GetLeastUsedIoContext();
 
     IO::IoContext* m_ioContext{nullptr};
     std::unique_ptr<IO::Networking::AsyncSocketAcceptor> m_listener{nullptr};

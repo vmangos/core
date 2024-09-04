@@ -58,7 +58,7 @@ void WorldSocketMgr::StopWorldNetworking()
 void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socketDescriptor)
 {
     // Attach descriptor to AsyncSocket and configure it before attaching it to the WorldSocket
-    IO::IoContext* ioContext = GetLestUsedIoContext();
+    IO::IoContext* ioContext = GetLeastUsedIoContext();
     IO::Networking::AsyncSocket socket(ioContext, std::move(socketDescriptor));
 
     if (m_settings.socketOutByteBufferSize >= 0)
@@ -82,10 +82,10 @@ void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socke
     std::make_shared<WorldSocket>(std::move(socket))->Start();
 }
 
-IO::IoContext* WorldSocketMgr::GetLestUsedIoContext()
+IO::IoContext* WorldSocketMgr::GetLeastUsedIoContext()
 {
     // TODO: Currently the main shared ioCtx is used
-    //  but we could do a thread affinity here, just like TrinityCore does it
-    //  see `Trinity::SocketMgr::SelectThreadWithMinConnections()`
+    //  but we could do a thread affinity here, just like TrinityCore does it.
+    //  See `Trinity::SocketMgr::SelectThreadWithMinConnections()`
     return m_ioContext;
 }
