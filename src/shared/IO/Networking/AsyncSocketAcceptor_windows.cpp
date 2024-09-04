@@ -85,7 +85,7 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
 
 void IO::Networking::AsyncSocketAcceptor::AutoAcceptSocketsUntilClose(std::function<void(IO::Networking::SocketDescriptor socketDescriptor)> const& onNewSocket)
 {
-    AcceptOne( [onNewSocket, this](nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> acceptResult)
+    AcceptOne([onNewSocket, this](nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> acceptResult)
     {
         if (!acceptResult.has_value())
         {

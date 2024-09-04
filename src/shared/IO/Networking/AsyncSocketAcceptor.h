@@ -45,11 +45,11 @@ namespace IO { namespace Networking {
             IO::IoContext* m_ctx;
             bool m_wasClosed;
 
-            std::function<void(IO::Networking::SocketDescriptor socketDescriptor)> m_onNewSocketCallback = nullptr;
-
     #if defined(WIN32)
+            void AcceptOne(std::function<void(nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> acceptResult)> const& afterAccept);
             IocpOperationTask m_currentAcceptTask;
     #elif defined(__linux__) || defined(__APPLE__)
+            std::function<void(IO::Networking::SocketDescriptor socketDescriptor)> m_onNewSocketCallback = nullptr;
             void OnNewClientToAcceptAvailable(); // a new socket on ::accept() is available
     #endif
 

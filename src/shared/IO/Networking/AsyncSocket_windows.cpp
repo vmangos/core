@@ -1,6 +1,16 @@
 #include "AsyncSocket.h"
 #include "Log.h"
 
+IO::NetworkError IO::Networking::AsyncSocket::InitializeAndFixMemoryLocation()
+{
+    int state = m_atomicState.fetch_or(SocketStateFlags::IS_INITIALIZED);
+    MANGOS_ASSERT(!(state & SocketStateFlags::IS_INITIALIZED)); // can be only performed once
+
+    // There is nothing to do on windows (using IOCP), since we are referencing this socket for each transfer individually
+
+    return IO::NetworkError(NetworkError::ErrorType::NoError);
+}
+
 IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_NoDelay(bool doNoDelay)
 {
     int optionValue = doNoDelay ? 1 : 0;
