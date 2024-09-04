@@ -38,7 +38,7 @@ void IO::Networking::Internal::CloseSocket(IO::Native::SocketHandle nativeSocket
 #if defined(WIN32)
     ::closesocket(nativeSocket);
 #elif defined(__linux__) || defined(__APPLE__)
-    ::close(nativeSocket)
+    ::close(nativeSocket);
 #else
     #error "Unsupported platform"
 #endif
