@@ -10,6 +10,10 @@ namespace IO
 {
     /// A "SmartBuffer" which stores a reference to a std::shared_ptr<> and
     /// exposes the `size` and `pointer` to the data in an unified interface
+    ///
+    /// Since this ReadableBuffer is intended to be used on AsyncSocket, the size and pointer of the buffer is cached.
+    /// Do not modify the buffer that this is holding.
+    /// Create a new ReadableBuffer for each transfer.
     class ReadableBuffer
     {
     public:
