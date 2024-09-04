@@ -580,3 +580,14 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
         self->HandleResultOfAsyncWrite(error, alreadyAllocatedBuffer);
     });
 }
+
+void WorldSocket::Start()
+{
+    if (IO::NetworkError initError = m_socket.InitializeAndFixMemoryLocation())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] Failed to initialize WorldSocket %s", GetRemoteIpString().c_str(), initError.ToString().c_str());
+        return; // implicit close()
+    }
+
+    SendInitialPacketAndStartRecvLoop();
+}

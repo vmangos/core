@@ -98,6 +98,9 @@ private:
     std::atomic_flag m_sendQueueIsRunning;
 
     IO::Networking::AsyncSocket m_socket;
+
+    void Start();
+
 public:
     explicit WorldSocket(IO::Networking::AsyncSocket socket);
     ~WorldSocket();

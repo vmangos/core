@@ -79,8 +79,7 @@ void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socke
         }
     }
 
-    auto worldSocket = std::make_shared<WorldSocket>(std::move(socket));
-    worldSocket->SendInitialPacketAndStartRecvLoop();
+    std::make_shared<WorldSocket>(std::move(socket))->Start();
 }
 
 IO::IoContext* WorldSocketMgr::GetLestUsedIoContext()

@@ -106,7 +106,6 @@ set (shared_SRCS
     IO/Utils.h
     IO/Utils.cpp
     IO/Utils_Unix.h
-    IO/SmartBuffer.h
     IO/Context/IoContext_macos.cpp
     IO/Context/IoContext_unix.cpp
     IO/Context/IoContext_windows.cpp
@@ -114,12 +113,13 @@ set (shared_SRCS
     IO/SystemErrorToString.cpp
     IO/Networking/Internal.h
     IO/Networking/Internal.cpp
-    IO/Networking/AsyncSocketAcceptor.h
-    IO/Networking/AsyncSocketAcceptor_windows.cpp
     IO/Networking/AsyncSocket.h
     IO/Networking/AsyncSocket.cpp
     IO/Networking/AsyncSocket_posix.cpp
     IO/Networking/AsyncSocket_windows.cpp
+    IO/Networking/AsyncSocketAcceptor.h
+    IO/Networking/AsyncSocketAcceptor_posix.cpp
+    IO/Networking/AsyncSocketAcceptor_windows.cpp
     IO/Networking/NetworkError.h
     IO/Networking/NetworkError.cpp
     IO/Networking/SocketDescriptor.h
@@ -170,6 +170,7 @@ if(WIN32) # For window build: Exclude Unix/MacOS files
     IO/Context/IoContext_unix.cpp
     IO/Context/IoContext_macos.cpp
     IO/Networking/AsyncSocket_posix.cpp
+    IO/Networking/AsyncSocketAcceptor_posix.cpp
     IO/Timer/impl/unix/AsyncSystemTimer.cpp
     IO/Timer/impl/unix/TimerHandle.cpp
     IO/Filesystem/impl/unix/FileSystem.cpp
@@ -194,6 +195,7 @@ else()
     migrations_list.h
     IO/Context/IoContext_windows.cpp
     IO/Networking/AsyncSocket_windows.cpp
+    IO/Networking/AsyncSocketAcceptor_windows.cpp
     IO/Timer/impl/windows/AsyncSystemTimer.cpp
     IO/Timer/impl/windows/TimerHandle.cpp
     IO/Filesystem/impl/windows/FileSystem.cpp

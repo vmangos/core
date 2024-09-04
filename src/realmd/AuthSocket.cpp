@@ -75,6 +75,12 @@ AuthSocket::AuthSocket(IO::Networking::AsyncSocket socket) : m_socket(std::move(
 
 void AuthSocket::Start()
 {
+    if (IO::NetworkError initError = m_socket.InitializeAndFixMemoryLocation())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] Failed to initialize AuthSocket %s", GetRemoteIpString().c_str(), initError.ToString().c_str());
+        return; // implicit close()
+    }
+
     if (int secs = sConfig.GetIntDefault("MaxSessionDuration", 300))
     {
         this->m_sessionDurationTimeout = sAsyncSystemTimer.ScheduleFunctionOnce(std::chrono::seconds(secs), [this]()

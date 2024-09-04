@@ -3,17 +3,26 @@
 #include "Errors.h"
 #include "IpAddress.h"
 
-IO::Networking::AsyncSocket::AsyncSocket(AsyncSocket&& other) noexcept
-    : m_ctx(other.m_ctx),
+IO::Networking::AsyncSocket::AsyncSocket(AsyncSocket&& other) noexcept :
+    m_ctx(other.m_ctx),
     m_descriptor(std::move(other.m_descriptor)),
     m_contextCallback(std::move(other.m_contextCallback)),
     m_readCallback(std::move(other.m_readCallback)),
     m_writeCallback(std::move(other.m_writeCallback)),
     m_writeSrc(std::move(other.m_writeSrc)),
+#if defined(WIN32)
     m_currentContextTask(std::move(other.m_currentContextTask)),
     m_currentWriteTask(std::move(other.m_currentWriteTask)),
     m_currentReadTask(std::move(other.m_currentReadTask))
+#elif defined(__linux__) || defined(__APPLE__)
+    m_readDstBuffer(other.m_readDstBuffer),
+    m_readDstBufferSize(other.m_readDstBufferSize),
+    m_readDstBufferBytesLeft(other.m_readDstBufferBytesLeft),
+    m_writeSrcAlreadyTransferred(other.m_writeSrcAlreadyTransferred)
+#endif
 {
+    MANGOS_DEBUG_ASSERT(!(m_atomicState.load(std::memory_order_relaxed) & SocketStateFlags::IS_INITIALIZED)); // dont allow std::move() if memory address is fixed
+
     m_atomicState.exchange(other.m_atomicState);
     other.m_atomicState.exchange(SocketStateFlags::WAS_MOVED_NO_DTOR);
 }

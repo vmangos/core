@@ -22,6 +22,8 @@ IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_SystemOutgoi
 void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
+    MANGOS_DEBUG_ASSERT(state & SocketStateFlags::IS_INITIALIZED);
+
     if (state & SocketStateFlags::READ_PENDING_SET)
     {
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
@@ -127,6 +129,8 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
 void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
+    MANGOS_DEBUG_ASSERT(state & SocketStateFlags::IS_INITIALIZED);
+
     if (state & SocketStateFlags::READ_PENDING_SET)
     {
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
@@ -212,6 +216,8 @@ void IO::Networking::AsyncSocket::Write(IO::ReadableBuffer const& source, std::f
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NETWORK] You are about to send a very large message (%llu bytes). The Windows Kernel will happily accept that. Split the Write(...) calls next time!", source.GetSize());
 
     int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
+    MANGOS_DEBUG_ASSERT(state & SocketStateFlags::IS_INITIALIZED);
+
     if (state & SocketStateFlags::WRITE_PENDING_SET)
     {
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
@@ -314,6 +320,8 @@ void IO::Networking::AsyncSocket::CloseSocket()
 void IO::Networking::AsyncSocket::EnterIoContext(std::function<void(IO::NetworkError)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::CONTEXT_PENDING_SET);
+    MANGOS_DEBUG_ASSERT(state & SocketStateFlags::IS_INITIALIZED);
+
     if (state & SocketStateFlags::CONTEXT_PENDING_SET)
     {
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));

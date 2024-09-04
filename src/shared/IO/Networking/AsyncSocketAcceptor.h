@@ -31,31 +31,28 @@ namespace IO { namespace Networking {
             static std::unique_ptr<AsyncSocketAcceptor> CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port);
             void ClosePortAndStopAcceptingNewConnections();
 
-
-            void AcceptOne(std::function<void(nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> acceptResult)> const& afterAccept);
-
             /// Automatically accepts all incoming connections until this Acceptor is StoppedAndClosed
             void AutoAcceptSocketsUntilClose(std::function<void(IO::Networking::SocketDescriptor socketDescriptor)> const& onNewSocket);
     #if defined(__linux__) || defined(__APPLE__)
-            void OnIoEvent(uint32_t event) final; // used for ::accept
+            void OnIoEvent(uint32_t event); // used for ::accept
     #endif
 
         private:
+            explicit AsyncSocketAcceptor(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
+                : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket), m_wasClosed(false) {}
+
             IO::Native::SocketHandle m_acceptorNativeSocket;
             IO::IoContext* m_ctx;
             bool m_wasClosed;
 
-    #if defined(WIN32)
-            explicit AsyncSocketAcceptor(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
-                    : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket), m_wasClosed(false) {}
+            std::function<void(IO::Networking::SocketDescriptor socketDescriptor)> m_onNewSocketCallback = nullptr;
 
+    #if defined(WIN32)
             IocpOperationTask m_currentAcceptTask;
     #elif defined(__linux__) || defined(__APPLE__)
-            void OnNewClientToAcceptAvailable();
-
-            explicit AsyncServerListener(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
-                    : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket) {}
+            void OnNewClientToAcceptAvailable(); // a new socket on ::accept() is available
     #endif
+
     };
 }} // namespace IO::Networking
 
