@@ -8,6 +8,8 @@
 
 namespace IO
 {
+    /// A "SmartBuffer" which stores a reference to a std::shared_ptr<> and
+    /// exposes the `size` and `pointer` to the data in an unified interface
     class ReadableBuffer
     {
     public:
