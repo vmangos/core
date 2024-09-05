@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 #endif
 
-/// Converts a native IN_ADDR to a IO::Networking::IpAddress
+/// Converts a native `IN_ADDR` to a `IO::Networking::IpAddress`
 IO::Networking::IpAddress IO::Networking::Internal::inet_ntop(in_addr const* nativeAddress)
 {
 #if defined(WIN32)
@@ -39,6 +39,22 @@ void IO::Networking::Internal::CloseSocket(IO::Native::SocketHandle nativeSocket
     ::closesocket(nativeSocket);
 #elif defined(__linux__) || defined(__APPLE__)
     ::close(nativeSocket);
+#else
+    #error "Unsupported platform"
+#endif
+}
+
+// Converts a `IO::Networking::IpAddress` to a native `IN_ADDR`
+void IO::Networking::Internal::inet_pton(IO::Networking::IpAddress const& ipAddress, in_addr* out_dest)
+{
+    MANGOS_ASSERT(ipAddress.getType() == IpAddress::Type::IPv4);
+
+#if defined(WIN32)
+    // We cant use `inet_pton`, because it's not supported on WinXP.
+    // But this method would basically just take the iternal representation and store it in a union anyways ¯\_(ツ)_/¯
+    out_dest->s_addr = ::htonl(ipAddress._getInternalIPv4ReprAsUint32());
+#elif defined(__linux__) || defined(__APPLE__)
+    MANGOS_ASSERT(::inet_pton(AF_INET, ipAddress.toString().c_str(), out_dest) == 1);
 #else
     #error "Unsupported platform"
 #endif
