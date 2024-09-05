@@ -17,7 +17,7 @@ void IO::Filesystem::FileHandle::Seek(IO::Filesystem::SeekDirection direction, i
                         : direction == SeekDirection::Current ? SEEK_CUR
                                                               : SEEK_END;
 
-    MANGOS_ASSERT(::lseek64(m_nativeFileHandle, offset, nativeDirection) != -1);
+    MANGOS_ASSERT(::lseek(m_nativeFileHandle, offset, nativeDirection) != -1);
 }
 
 uint64_t IO::Filesystem::FileHandle::GetTotalFileSize() const
