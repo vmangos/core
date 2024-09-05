@@ -5,8 +5,8 @@
 It is used in MaNGOS to print the stack trace on failure.  
 
 ## Source
-Commit: https://github.com/jeremy-rifkin/cpptrace/commit/0742b42dadaac62436cb226a7d084738a8f82d1a  
-Date: 2024-08-21T13:47:23Z
+Commit: https://github.com/jeremy-rifkin/cpptrace/commit/0d89be4fbed1c6bf5c81dc024ca9cec489f7e1d4  
+Date: 2024-09-05T03:32:00Z
 
 ## Copied files
 ```
