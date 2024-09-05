@@ -16,7 +16,7 @@
 #ifndef MANGOS_THREAD_SPECIFIC_PTR_H_
 #define MANGOS_THREAD_SPECIFIC_PTR_H_
 
-#include "Policies/NoCopyNoMove.h"
+#include "Policies/ObjectConstructorTraits.h"
 
 #include <map>
 #include <memory>

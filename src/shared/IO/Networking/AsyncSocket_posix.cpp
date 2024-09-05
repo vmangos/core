@@ -13,9 +13,50 @@
 #include <netinet/tcp.h>
 #include <thread>
 
+IO::Networking::AsyncSocket::AsyncSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor socketDescriptor)
+    : m_ctx(ctx), m_descriptor(std::move(socketDescriptor))
+{
+}
+
+IO::NetworkError IO::Networking::AsyncSocket::InitializeAndFixMemoryLocation()
+{
+    int state = m_atomicState.fetch_or(SocketStateFlags::IS_INITIALIZED);
+    MANGOS_ASSERT(!(state & SocketStateFlags::IS_INITIALIZED)); // can be only performed once
+
+#if defined(__linux__)
+    ::epoll_event event;
+    event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLRDHUP | EPOLLET;
+    event.data.ptr = this;
+    if (::epoll_ctl(m_ctx->GetUnixEpollDescriptor(), EPOLL_CTL_ADD, m_descriptor.GetNativeSocket(), &event) == -1)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] OnNewClientToAcceptAvailable -> ::epoll_ctl(...) Error: %s", SystemErrorToCString(errno));
+        return IO::NetworkError(NetworkError::ErrorType::InternalError, errno);
+    }
+#elif defined(__APPLE__)
+    struct kevent addedEvents[2];
+
+    // EVFILT_READ (epoll: EPOLLIN)
+    EV_SET(&addedEvents[0], m_descriptor.GetNativeSocket(), EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, this);
+
+    // EVFILT_WRITE (epoll: EPOLLOUT)
+    EV_SET(&addedEvents[1], m_descriptor.GetNativeSocket(), EVFILT_WRITE, EV_ADD | EV_CLEAR, 0, 0, this);
+
+    if (::kevent(m_ctx->GetKqueueDescriptor(), addedEvents, 2, nullptr, 0, nullptr) == -1)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] AsyncSocket -> ::kevent(...) Error: %s", SystemErrorToCString(errno));
+        return IO::NetworkError(NetworkError::ErrorType::InternalError, errno);
+    }
+#else
+    #error "Unsupported"
+#endif
+    return IO::NetworkError(NetworkError::ErrorType::NoError);
+}
+
 void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
+    MANGOS_DEBUG_ASSERT(state & SocketStateFlags::IS_INITIALIZED);
+
     if (state & SocketStateFlags::READ_PENDING_SET)
     {
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
@@ -45,7 +86,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
     }
 
     // Check if there is already something for us buffered in memory
-    int alreadyRead = ::recv(m_socket._nativeSocket, target, size, 0);
+    ssize_t alreadyRead = ::recv(m_descriptor.GetNativeSocket(), target, size, 0);
     if (alreadyRead == 0)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
@@ -82,6 +123,8 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
 void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::function<void(IO::NetworkError const&, std::size_t)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::READ_PENDING_SET);
+    MANGOS_DEBUG_ASSERT(state & SocketStateFlags::IS_INITIALIZED);
+
     if (state & SocketStateFlags::READ_PENDING_SET)
     {
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed), 0);
@@ -111,7 +154,7 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
     }
 
     // Check if there is already something for us buffered in memory
-    int alreadyRead = ::recv(m_socket._nativeSocket, target, size, 0);
+    ssize_t alreadyRead = ::recv(m_descriptor.GetNativeSocket(), target, size, 0);
     if (alreadyRead == 0)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
@@ -147,9 +190,11 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
 
 /// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
 /// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
-void IO::Networking::AsyncSocket::Write(std::shared_ptr<std::vector<uint8_t> const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
+void IO::Networking::AsyncSocket::Write(IO::ReadableBuffer const& source, std::function<void(IO::NetworkError const&)> const& callback)
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
+    MANGOS_DEBUG_ASSERT(state & SocketStateFlags::IS_INITIALIZED);
+
     if (state & SocketStateFlags::WRITE_PENDING_SET)
     {
         callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
@@ -170,9 +215,7 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<std::vector<uint8_t> con
         return;
     }
 
-    std::size_t size = source->size();
-    char const* ptr = reinterpret_cast<char const*>(source->data());
-    if (size == 0)
+    if (source.GetSize() == 0)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket::Write(...) with size 0");
         m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
@@ -181,7 +224,7 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<std::vector<uint8_t> con
     }
 
     // Check if we can write into memory buffer
-    int alreadySent = ::send(m_socket._nativeSocket, ptr, size, 0);
+    ssize_t alreadySent = ::send(m_descriptor.GetNativeSocket(), source.GetPtr(), source.GetSize(), 0);
     if (alreadySent == -1)
     {
         if (errno != EWOULDBLOCK)
@@ -192,139 +235,14 @@ void IO::Networking::AsyncSocket::Write(std::shared_ptr<std::vector<uint8_t> con
         }
         alreadySent = 0; // Would block, so we need to queue it for later
     }
-    if (alreadySent == size)
+    if (alreadySent == source.GetSize())
     { // oh wow, we already sent the whole buffer, no need to set up variables
         m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
         callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
         return;
     }
 
-    m_writeSrcBufferDummyHolder_u8Vector = source;
-    m_writeSrcBuffer = ptr + alreadySent;
-    m_writeSrcBufferBytesLeft = size - alreadySent;
-    m_writeCallback = callback;
-
-    m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
-}
-
-/// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
-/// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
-void IO::Networking::AsyncSocket::Write(std::shared_ptr<ByteBuffer const> const& source, std::function<void(IO::NetworkError const&)> const& callback)
-{
-    int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
-    if (state & SocketStateFlags::WRITE_PENDING_SET)
-    {
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
-        return;
-    }
-
-    if (state & SocketStateFlags::SHUTDOWN_PENDING)
-    {
-        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
-        return;
-    }
-
-    if (state & SocketStateFlags::WRITE_PRESENT)
-    {
-        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
-        return;
-    }
-
-    std::size_t size = source->size();
-    char const* ptr = reinterpret_cast<char const*>(source->contents());
-    if (size == 0)
-    {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket::Write(...) with size 0");
-        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
-        return;
-    }
-
-    // Check if we can write into memory buffer
-    int alreadySent = ::send(m_socket._nativeSocket, ptr, size, 0);
-    if (alreadySent == -1)
-    {
-        if (errno != EWOULDBLOCK)
-        {
-            m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-            callback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, errno));
-            return;
-        }
-        alreadySent = 0; // Would block, so we need to queue it for later
-    }
-    if (alreadySent == size)
-    { // oh wow, we already sent the whole buffer, no need to set up variables
-        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
-        return;
-    }
-
-    m_writeSrcBufferDummyHolder_ByteBuffer = source;
-    m_writeSrcBuffer = ptr + alreadySent;
-    m_writeSrcBufferBytesLeft = size - alreadySent;
-    m_writeCallback = callback;
-
-    m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
-}
-
-/// Warning: Using this function will NOT copy the buffer, dont overwrite it unless callback is triggered!
-/// (but a reference to the smart_ptr will be held throughout the transfer, so you dont need to)
-void IO::Networking::AsyncSocket::Write(std::shared_ptr<uint8_t const> const& source, uint64_t size, std::function<void(IO::NetworkError const&)> const& callback)
-{
-    int state = m_atomicState.fetch_or(SocketStateFlags::WRITE_PENDING_SET);
-    if (state & SocketStateFlags::WRITE_PENDING_SET)
-    {
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
-        return;
-    }
-
-    if (state & SocketStateFlags::SHUTDOWN_PENDING)
-    {
-        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
-        return;
-    }
-
-    if (state & SocketStateFlags::WRITE_PRESENT)
-    {
-        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::OnlyOneTransferPerDirectionAllowed));
-        return;
-    }
-
-    char const* ptr = reinterpret_cast<char const*>(source.get());
-    if (size == 0)
-    {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ERROR: Tried to IO::Networking::AsyncSocket::Write(...) with size 0");
-        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError)); // technically not an error, we are just done with the buffer
-        return;
-    }
-
-    // Check if we can write into memory buffer
-    int alreadySent = ::send(m_socket._nativeSocket, ptr, size, 0);
-    if (alreadySent == -1)
-    {
-        if (errno != EWOULDBLOCK)
-        {
-            m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-            callback(IO::NetworkError(IO::NetworkError::ErrorType::InternalError, errno));
-            return;
-        }
-        alreadySent = 0; // Would block, so we need to queue it for later
-    }
-    if (alreadySent == size)
-    { // oh wow, we already sent the whole buffer, no need to set up variables
-        m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_SET);
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::NoError));
-        return;
-    }
-
-    m_writeSrcBufferDummyHolder_rawArray = source;
-    m_writeSrcBuffer = ptr + alreadySent;
-    m_writeSrcBufferBytesLeft = size - alreadySent;
+    m_writeSrc = source;
     m_writeCallback = callback;
 
     m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
@@ -337,7 +255,7 @@ void IO::Networking::AsyncSocket::CloseSocket()
         return; // there was already a ::close()
 
     sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "CloseSocket(): Disconnect request");
-    ::close(m_socket._nativeSocket); // will silently remove from this Socket from the epoll set
+    m_descriptor.CloseSocket(); // will silently remove from this socket from the epoll/kqueue set
 }
 
 void IO::Networking::AsyncSocket::PerformNonBlockingRead()
@@ -369,7 +287,7 @@ void IO::Networking::AsyncSocket::PerformNonBlockingRead()
         return; // We are not allowed to react to it
     }
 
-    int newWrittenBytes = ::recv(m_socket._nativeSocket, m_readDstBuffer, m_readDstBufferBytesLeft, 0);
+    ssize_t newWrittenBytes = ::recv(m_descriptor.GetNativeSocket(), m_readDstBuffer, m_readDstBufferBytesLeft, 0);
     if (newWrittenBytes == 0)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_LOAD);
@@ -435,7 +353,7 @@ void IO::Networking::AsyncSocket::PerformNonBlockingWrite()
         return; // We are not allowed to react to it
     }
 
-    int newSentBytes = ::send(m_socket._nativeSocket, m_writeSrcBuffer, m_writeSrcBufferBytesLeft, 0);
+    ssize_t newSentBytes = ::send(m_descriptor.GetNativeSocket(), (m_writeSrc.GetPtr() + m_writeSrcAlreadyTransferred), (m_writeSrc.GetSize() - m_writeSrcAlreadyTransferred), 0);
     if (newSentBytes == 0)
     {
         sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[Performance] Unnecessary call to PerformNonBlockingWrite()");
@@ -452,15 +370,11 @@ void IO::Networking::AsyncSocket::PerformNonBlockingWrite()
         return;
     }
 
-    m_writeSrcBufferBytesLeft -= newSentBytes;
-    m_writeSrcBuffer += newSentBytes;
+    m_writeSrcAlreadyTransferred += newSentBytes;
 
-    if (m_writeSrcBufferBytesLeft == 0)
+    if (m_writeSrcAlreadyTransferred == m_writeSrc.GetSize())
     { // we are done with this buffer
-        m_writeSrcBuffer = nullptr;
-        m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
-        m_writeSrcBufferDummyHolder_u8Vector = nullptr;
-        m_writeSrcBufferDummyHolder_rawArray = nullptr;
+        m_writeSrc = nullptr;
 
         auto tmpCallback = std::move(m_writeCallback);
         m_atomicState.fetch_and(~(SocketStateFlags::WRITE_PENDING_LOAD | SocketStateFlags::WRITE_PRESENT));
@@ -516,11 +430,7 @@ void IO::Networking::AsyncSocket::StopPendingTransactionsAndForceClose()
     if (state & SocketStateFlags::WRITE_PRESENT)
     {
         auto tmpWriteCallback = std::move(m_writeCallback);
-        m_writeSrcBuffer = nullptr;
-        m_writeSrcBufferDummyHolder_ByteBuffer = nullptr;
-        m_writeSrcBufferDummyHolder_u8Vector = nullptr;
-        m_writeSrcBufferDummyHolder_rawArray = nullptr;
-        m_writeSrcBufferBytesLeft = 0;
+        m_writeSrc = nullptr;
         m_atomicState.fetch_and(~SocketStateFlags::WRITE_PRESENT);
         tmpWriteCallback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed));
     }
@@ -599,7 +509,7 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
     }
     else if (event & EPOLLRDHUP)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "EPOLLRDHUP -> Going to disconnect.");
+        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "EPOLLRDHUP -> Going to disconnect.");
         StopPendingTransactionsAndForceClose();
     }
     else
@@ -654,7 +564,7 @@ IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_NoDelay(bool
     MANGOS_ASSERT(!IsClosing());
 
     int optionValue = doNoDelay ? 1 : 0;
-    if (::setsockopt(m_socket._nativeSocket, IPPROTO_TCP, TCP_NODELAY, (char*) &optionValue, sizeof(optionValue)) != 0)
+    if (::setsockopt(m_descriptor.GetNativeSocket(), IPPROTO_TCP, TCP_NODELAY, (char*) &optionValue, sizeof(optionValue)) != 0)
         return IO::NetworkError::FromSystemError(errno);
 
     return IO::NetworkError(IO::NetworkError::ErrorType::NoError);
@@ -663,10 +573,10 @@ IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_NoDelay(bool
 IO::NetworkError IO::Networking::AsyncSocket::SetNativeSocketOption_SystemOutgoingSendBuffer(int bytes)
 {
     MANGOS_ASSERT(!IsClosing());
-    MANGOS_ASSERT(bytes > 1); // although a buffer of size 1 is already pretty low...
+    MANGOS_ASSERT(bytes >= 1); // although a buffer of size 1 is already pretty low...
 
     int optionValue = bytes;
-    if (::setsockopt(m_socket._nativeSocket, SOL_SOCKET, SO_SNDBUF, (char*) &optionValue, sizeof(optionValue)) != 0)
+    if (::setsockopt(m_descriptor.GetNativeSocket(), SOL_SOCKET, SO_SNDBUF, (char*) &optionValue, sizeof(optionValue)) != 0)
         return IO::NetworkError::FromSystemError(errno);
 
     return IO::NetworkError(IO::NetworkError::ErrorType::NoError);

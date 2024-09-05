@@ -24,7 +24,7 @@ void printUsage(char const* thisExecutableName)
 #endif
 }
 
-nostd::expected<ServerStartupArguments, int /* exit value */> ParseServerStartupArguments(int /*MUTABLE*/ argc, char** /*MUTABLE*/ argv) // we are changing the meaning of argc and argv
+nonstd::expected<ServerStartupArguments, int /* exit value */> ParseServerStartupArguments(int /*MUTABLE*/ argc, char** /*MUTABLE*/ argv) // we are changing the meaning of argc and argv
 {
     char const* thisExecutableName = argv[0];
     argv++; // skip the first argument, since it's just the executable name
@@ -45,12 +45,12 @@ nostd::expected<ServerStartupArguments, int /* exit value */> ParseServerStartup
         if (part == "-h" || part == "--help")
         {
             printUsage(thisExecutableName);
-            return nostd::make_unexpected(EXIT_SUCCESS); // explicitly printing help is okay
+            return nonstd::make_unexpected(EXIT_SUCCESS); // explicitly printing help is okay
         }
         else if (part == "-v" || part == "--version")
         {
             printf("Core revision: %s\n", _FULLVERSION);
-            return nostd::make_unexpected(EXIT_SUCCESS); // explicitly printing version is okay
+            return nonstd::make_unexpected(EXIT_SUCCESS); // explicitly printing version is okay
         }
         else if (part == "-c" || part == "--config")
         {
@@ -58,7 +58,7 @@ nostd::expected<ServerStartupArguments, int /* exit value */> ParseServerStartup
             {
                 printf("Error: Config filename required\n");
                 printUsage(thisExecutableName);
-                return nostd::make_unexpected(EXIT_FAILURE);
+                return nonstd::make_unexpected(EXIT_FAILURE);
             }
 
             std::string nextPart = std::string(*argv);
@@ -73,7 +73,7 @@ nostd::expected<ServerStartupArguments, int /* exit value */> ParseServerStartup
             {
                 printf("Error: Config filename required\n");
                 printUsage(thisExecutableName);
-                return nostd::make_unexpected(EXIT_FAILURE);
+                return nonstd::make_unexpected(EXIT_FAILURE);
             }
 
             std::string nextPart = std::string(*argv);
@@ -103,14 +103,14 @@ nostd::expected<ServerStartupArguments, int /* exit value */> ParseServerStartup
             {
                 printf("Error: Unknown service mode\n");
                 printUsage(thisExecutableName);
-                return nostd::make_unexpected(EXIT_FAILURE);
+                return nonstd::make_unexpected(EXIT_FAILURE);
             }
         }
         else
         {
             printf("Error: Unknown argument provided '%s'\n", part.c_str());
             printUsage(thisExecutableName);
-            return nostd::make_unexpected(EXIT_FAILURE);
+            return nonstd::make_unexpected(EXIT_FAILURE);
         }
     }
 

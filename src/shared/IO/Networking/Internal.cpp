@@ -1,7 +1,12 @@
-#include "Errors.h"
 #include "./Internal.h"
 
-#if defined(__linux__) || defined(__APPLE__)
+#include "Errors.h"
+
+#if defined(WIN32)
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#elif defined(__linux__) || defined(__APPLE__)
+#include <unistd.h>
 #include <arpa/inet.h>
 #endif
 
@@ -17,11 +22,24 @@ IO::Networking::IpAddress IO::Networking::Internal::inet_ntop(in_addr const* nat
         snprintf(ipv4AddressString, MAX_IPV4_LENGTH, "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
     }
     auto ipAddress = IO::Networking::IpAddress::TryParseFromString(ipv4AddressString);
-#else
+#elif defined(__linux__) || defined(__APPLE__)
     char ipv4AddressString[INET_ADDRSTRLEN];
     ::inet_ntop(AF_INET, nativeAddress, ipv4AddressString, INET_ADDRSTRLEN);
     auto ipAddress = IO::Networking::IpAddress::TryParseFromString(ipv4AddressString);
+#else
+    #error "Unsupported platform"
 #endif
     MANGOS_ASSERT(ipAddress.has_value()); // this should never fail, since we got a valid IP from IN_ADDR
     return ipAddress.value();
+}
+
+void IO::Networking::Internal::CloseSocket(IO::Native::SocketHandle nativeSocket)
+{
+#if defined(WIN32)
+    ::closesocket(nativeSocket);
+#elif defined(__linux__) || defined(__APPLE__)
+    ::close(nativeSocket);
+#else
+    #error "Unsupported platform"
+#endif
 }

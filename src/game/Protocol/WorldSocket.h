@@ -31,7 +31,7 @@
 
 class WorldSocketMgr;
 
-class WorldSocket : public std::enable_shared_from_this<WorldSocket>, private IO::Networking::AsyncSocket
+class WorldSocket final : public std::enable_shared_from_this<WorldSocket>
 {
     friend WorldSocketMgr;
 
@@ -97,15 +97,17 @@ private:
     std::queue<WorldPacket> m_sendQueue;
     std::atomic_flag m_sendQueueIsRunning;
 
+    IO::Networking::AsyncSocket m_socket;
+
+    void Start();
+
 public:
-    explicit WorldSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& socketDescriptor);
+    explicit WorldSocket(IO::Networking::AsyncSocket socket);
     ~WorldSocket();
     WorldSocket(WorldSocket const&) = delete;
     WorldSocket& operator=(WorldSocket const&) = delete;
     WorldSocket(WorldSocket&&) = delete;
     WorldSocket& operator=(WorldSocket&&) = delete;
-
-    void Start() final;
 
     void SendPacket(WorldPacket packet);
 
@@ -114,10 +116,10 @@ public:
         m_Session = nullptr;
     }
 
-    // Making functions inherited from AsyncSocket public
-    using AsyncSocket::GetRemoteIpString;
-    using AsyncSocket::IsClosing;
-    using AsyncSocket::CloseSocket;
+    // ----- Exposing `m_socket` features -----
+    std::string const& GetRemoteIpString() const { return m_socket.GetRemoteIpString(); }
+    bool IsClosing() const { return m_socket.IsClosing(); }
+    void CloseSocket() { m_socket.CloseSocket(); }
 };
 
 #endif // MANGOS_GAME_SERVER_WORLDSOCKET_H

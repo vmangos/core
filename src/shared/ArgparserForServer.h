@@ -23,6 +23,6 @@ struct ServerStartupArguments
 };
 
 /// Returns a parsed ServerStartupArguments or exit value
-nostd::expected<ServerStartupArguments, int /* exit value */> ParseServerStartupArguments(int argc, char** argv);
+nonstd::expected<ServerStartupArguments, int /* exit value */> ParseServerStartupArguments(int argc, char** argv);
 
 #endif // MANGOS_ARGPARSERFORSERVER_H

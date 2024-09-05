@@ -1,9 +1,38 @@
 #include "AsyncSocket.h"
 #include "Log.h"
 #include "Errors.h"
+#include "IpAddress.h"
 
-IO::Networking::AsyncSocket::~AsyncSocket() noexcept(false)
+IO::Networking::AsyncSocket::AsyncSocket(AsyncSocket&& other) noexcept :
+    m_ctx(other.m_ctx),
+    m_descriptor(std::move(other.m_descriptor)),
+    m_contextCallback(std::move(other.m_contextCallback)),
+    m_readCallback(std::move(other.m_readCallback)),
+    m_writeCallback(std::move(other.m_writeCallback)),
+    m_writeSrc(std::move(other.m_writeSrc)),
+#if defined(WIN32)
+    m_currentContextTask(std::move(other.m_currentContextTask)),
+    m_currentWriteTask(std::move(other.m_currentWriteTask)),
+    m_currentReadTask(std::move(other.m_currentReadTask))
+#elif defined(__linux__) || defined(__APPLE__)
+    m_readDstBuffer(other.m_readDstBuffer),
+    m_readDstBufferSize(other.m_readDstBufferSize),
+    m_readDstBufferBytesLeft(other.m_readDstBufferBytesLeft),
+    m_writeSrcAlreadyTransferred(other.m_writeSrcAlreadyTransferred)
+#endif
 {
+    MANGOS_DEBUG_ASSERT(!(m_atomicState.load(std::memory_order_relaxed) & SocketStateFlags::IS_INITIALIZED)); // dont allow std::move() if memory address is fixed
+
+    m_atomicState.exchange(other.m_atomicState);
+    other.m_atomicState.exchange(SocketStateFlags::WAS_MOVED_NO_DTOR);
+}
+
+IO::Networking::AsyncSocket::~AsyncSocket()
+{
+    int state = m_atomicState.load(std::memory_order::memory_order_relaxed);
+    if (state & SocketStateFlags::WAS_MOVED_NO_DTOR)
+        return; // Ignore destructor
+
     sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
     CloseSocket();
 
@@ -11,7 +40,6 @@ IO::Networking::AsyncSocket::~AsyncSocket() noexcept(false)
     // Logic behind these checks:
     // If the destructor is called, there should be no more std::shared_ptr<> references to this object
     // Every Read(...) or Write(...) should use `shared_from_this()` if this is not the case, one of the following checks will fail
-    int state = m_atomicState.load(std::memory_order::memory_order_relaxed);
     MANGOS_ASSERT(!(state & SocketStateFlags::CONTEXT_PRESENT));
     MANGOS_ASSERT(!(state & SocketStateFlags::WRITE_PRESENT));
     MANGOS_ASSERT(!(state & SocketStateFlags::READ_PRESENT));
@@ -22,16 +50,6 @@ bool IO::Networking::AsyncSocket::IsClosing() const
 {
     bool isClosing = m_atomicState.load(std::memory_order::memory_order_relaxed) & SHUTDOWN_PENDING;
     return isClosing;
-}
-
-IO::Networking::IpEndpoint const& IO::Networking::AsyncSocket::GetRemoteEndpoint() const
-{
-    return m_socket.m_peerEndpoint;
-}
-
-std::string IO::Networking::AsyncSocket::GetRemoteIpString() const
-{
-    return GetRemoteEndpoint().ip.toString(); // Just gets the IP part e.g. "192.168.13.37"
 }
 
 void IO::Networking::AsyncSocket::ReadSkip(std::size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback)

@@ -40,7 +40,7 @@
 #include <openssl/crypto.h>
 #include "ArgparserForServer.h"
 
-#include "IO/Networking/AsyncServerListener.h"
+#include "IO/Networking/AsyncSocketAcceptor.h"
 #include "IO/Timer/AsyncSystemTimer.h"
 #include "IO/Multithreading/CreateThread.h"
 
@@ -51,6 +51,7 @@
 
 #ifdef WIN32
 #include "ServiceWin32.h"
+
 char serviceName[] = "realmd";
 char serviceLongName[] = "MaNGOS realmd service";
 char serviceDescription[] = "Massive Network Game Object Server";
@@ -226,13 +227,19 @@ extern int main(int argc, char** argv)
     }
 
     // Launch the listening network socket
-    std::unique_ptr<IO::Networking::AsyncServerListener<AuthSocket>> listener = IO::Networking::AsyncServerListener<AuthSocket>::CreateAndBindServer(ioCtx.get(), bindIp, bindPort);
+    std::unique_ptr<IO::Networking::AsyncSocketAcceptor> listener = IO::Networking::AsyncSocketAcceptor::CreateAndBindServer(ioCtx.get(), bindIp, bindPort);
     if (listener == nullptr)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS realmd can not bind to %s:%d  -  Is the port already in use?", bindIp.c_str(), bindPort);
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
+
+    listener->AutoAcceptSocketsUntilClose([ctx = ioCtx.get()](IO::Networking::SocketDescriptor socketDescriptor)
+    {
+        // Create a socket and attach it to our global ioCtx
+        std::make_shared<AuthSocket>(std::move(IO::Networking::AsyncSocket(ctx, std::move(socketDescriptor))))->Start();
+    });
 
     // Catch termination signals
     HookSignals();

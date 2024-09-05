@@ -45,7 +45,7 @@
 #include "WorldSocketMgr.h"
 #include "IO/Context/IoContext.h"
 #include "IO/Multithreading/CreateThread.h"
-#include "IO/Networking/AsyncServerListener.h"
+#include "IO/Networking/AsyncSocketAcceptor.h"
 #include "IO/Timer/AsyncSystemTimer.h"
 
 #include "revision.h"
@@ -99,18 +99,22 @@ void freezeDetector(uint32 _delaytime)
     //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Anti-freeze thread exiting without problems.");
 }
 
-std::unique_ptr<IO::Networking::AsyncServerListener<RASocket>> SetupRemoteAccessServer(IO::IoContext* ioCtx)
+std::unique_ptr<IO::Networking::AsyncSocketAcceptor> SetupRemoteAccessServer(IO::IoContext* ioCtx)
 {
     std::string raBindIp = sConfig.GetStringDefault("Ra.IP", "0.0.0.0");
     uint16 raBindPort = sConfig.GetIntDefault("Ra.Port", 3443);
 
-    std::unique_ptr<IO::Networking::AsyncServerListener<RASocket>> raServer = IO::Networking::AsyncServerListener<RASocket>::CreateAndBindServer(ioCtx, raBindIp, raBindPort);
+    std::unique_ptr<IO::Networking::AsyncSocketAcceptor> raServer = IO::Networking::AsyncSocketAcceptor::CreateAndBindServer(ioCtx, raBindIp, raBindPort);
     if (!raServer)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raBindPort, raBindIp.c_str());
         return nullptr;
     }
-
+    raServer->AutoAcceptSocketsUntilClose([ioCtx](IO::Networking::SocketDescriptor socketDescriptor)
+    {
+        // Create a socket and attach it to our global ioCtx
+        std::make_shared<RASocket>(std::move(IO::Networking::AsyncSocket(ioCtx, std::move(socketDescriptor))))->Start();
+    });
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting Remote access listener on %s:%d", raBindIp.c_str(), raBindPort);
 
     return raServer;
@@ -207,7 +211,7 @@ int Master::Run()
         cliThread = IO::Multithreading::CreateThreadPtr("CLI", CliRunnable());
     }
 
-    std::unique_ptr<IO::Networking::AsyncServerListener<RASocket>> remoteAccessServer = nullptr;
+    std::unique_ptr<IO::Networking::AsyncSocketAcceptor> remoteAccessServer = nullptr;
     if (sConfig.GetBoolDefault("Ra.Enable", false))
         remoteAccessServer = SetupRemoteAccessServer(ioCtx);
 

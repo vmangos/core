@@ -50,7 +50,7 @@ namespace MaNGOS { namespace Errors
 #ifdef MANGOS_DEBUG
 #define MANGOS_DEBUG_ASSERT(x) MANGOS_ASSERT(x)
 #else
-#define MANGOS_DEBUG_ASSERT(x)
+#define MANGOS_DEBUG_ASSERT(x) do {} while(0)
 #endif
 
 #define ASSERT MANGOS_ASSERT

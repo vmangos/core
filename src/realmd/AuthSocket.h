@@ -19,10 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-// \addtogroup realmd
-// @{
-// \file
-
 #ifndef _AUTHSOCKET_H
 #define _AUTHSOCKET_H
 
@@ -34,6 +30,7 @@
 #include "IO/Networking/AsyncSocket.h"
 #include "IO/Timer/TimerHandle.h"
 #include "IO/Filesystem/FileHandle.h"
+#include "Policies/ObjectConstructorTraits.h"
 #include "AuthPackets.h"
 
 enum LockFlag
@@ -49,18 +46,18 @@ enum LockFlag
 
 struct sAuthLogonProof_C;
 
-// Handle login commands
-class AuthSocket : public std::enable_shared_from_this<AuthSocket>, private IO::Networking::AsyncSocket
+/// Handle login commands
+class AuthSocket : public std::enable_shared_from_this<AuthSocket>, MaNGOS::Policies::NoCopyNoMove
 {
     public:
-        explicit AuthSocket(IO::IoContext* ctx, IO::Networking::SocketDescriptor const& clientAddress);
+        explicit AuthSocket(IO::Networking::AsyncSocket socket);
         ~AuthSocket();
 
-        void Start() final;
+        void Start();
 
         void DoRecvIncomingData();
         std::shared_ptr<ByteBuffer> GenerateLogonProofResponse(Sha1Hash sha);
-        void LoadRealmlistAndWriteIntoBuffer(ByteBuffer &pkt);
+        void LoadRealmlistAndWriteIntoBuffer(ByteBuffer& pkt);
         bool VerifyPinData(uint32 pin, PINData const& clientData);
         uint32 GenerateTotpPin(std::string const& secret, int interval);
 
@@ -77,7 +74,13 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, private IO::
         void _HandleXferResume();
         void _HandleXferCancel();
 
+        /// Returns the IP of the peer e.g. "192.168.13.37"
+        std::string GetRemoteIpString() const;
+        void CloseSocket();
+
     private:
+        IO::Networking::AsyncSocket m_socket;
+
         enum eStatus
         {
             STATUS_CHALLENGE,
@@ -143,4 +146,3 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, private IO::
 };
 
 #endif
-// @}
