@@ -121,6 +121,8 @@ set (shared_SRCS
     IO/Networking/AsyncSocketAcceptor.h
     IO/Networking/AsyncSocketAcceptor_posix.cpp
     IO/Networking/AsyncSocketAcceptor_windows.cpp
+    IO/Networking/SocketConnector.h
+    IO/Networking/SocketConnector.cpp
     IO/Networking/NetworkError.h
     IO/Networking/NetworkError.cpp
     IO/Networking/SocketDescriptor.h

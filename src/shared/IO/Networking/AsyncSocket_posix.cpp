@@ -527,7 +527,7 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
         {
             int error = 0;
             socklen_t errlen = sizeof(error);
-            if (::getsockopt(m_socket._nativeSocket, SOL_SOCKET, SO_ERROR, (void*)&error, &errlen) == 0)
+            if (::getsockopt(m_descriptor.GetNativeSocket(), SOL_SOCKET, SO_ERROR, (void*)&error, &errlen) == 0)
             {
                 sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "kqueue reported socket exception: Error: %s", SystemErrorToCString(error));
 

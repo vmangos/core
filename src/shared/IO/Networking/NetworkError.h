@@ -10,9 +10,10 @@ namespace IO
         enum class ErrorType : int
         {
             NoError,
-            InternalError,
+            InternalError, // see m_additionalOsErrorCode
             SocketClosed,
             OnlyOneTransferPerDirectionAllowed,
+            Timeout,
         };
     public:
         explicit constexpr NetworkError(ErrorType errorType) : NetworkError(errorType, 0) {};
