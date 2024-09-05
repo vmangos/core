@@ -404,6 +404,7 @@ class ChatHandler
         bool HandleReloadCreatureCommand(char* args);
         bool HandleReloadGameObjectCommand(char* args);
         bool HandleReloadInstanceBuffRemoval(char* args);
+        bool HandleReloadInstancePlayerImmunity(char* args);
         bool HandleReloadPetitions(char* args);
         // Channel
         bool HandleChannelJoinCommand(char*);

@@ -56,6 +56,7 @@
 #include "world/world_event_wareffort.h"
 #include "CreatureGroups.h"
 #include "Geometry.h"
+#include "PlayerImmunityMgr.h"
 
 Map::~Map()
 {
@@ -432,6 +433,9 @@ bool Map::Add(Player* player)
 
     // Remove any buffs defined in instance_aura_removal for the new map
     sAuraRemovalMgr.PlayerEnterMap(i_id, player);
+
+    // Apply player immunities defined in instance_player_immunity for the new map
+    sPlayerImmunityMgr.PlayerEnterMap(i_id, player);
 
     player->SetSplineDonePending(false);
     player->GetSession()->ClearIncomingPacketsByType(PACKET_PROCESS_MOVEMENT);

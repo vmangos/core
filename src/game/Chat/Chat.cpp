@@ -898,6 +898,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "ip_banned",                   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadIPBanList,                      "", nullptr },
         { "account_banned",              SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadAccountBanList,                 "", nullptr },
         { "instance_buff_removal",       SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadInstanceBuffRemoval,            "", nullptr },
+        { "instance_player_immunity",    SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadInstancePlayerImmunity,         "", nullptr },
         { "petitions",                   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadPetitions,                      "", nullptr },
         { nullptr,                       0,                 false, nullptr,                                                  "", nullptr }
     };

@@ -41,6 +41,7 @@
 #include "SpellModMgr.h"
 #include "CreatureGroups.h"
 #include "HardcodedEvents.h"
+#include "PlayerImmunityMgr.h"
 
 bool ChatHandler::HandleAnnounceCommand(char* args)
 {
@@ -1871,6 +1872,13 @@ bool ChatHandler::HandleReloadInstanceBuffRemoval(char*)
 {
     sAuraRemovalMgr.LoadFromDB();
     SendSysMessage(">> Table `instance_buff_removal` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadInstancePlayerImmunity(char*)
+{
+    sPlayerImmunityMgr.LoadFromDB();
+    SendSysMessage(">> Table `instance_player_immunity` reloaded.");
     return true;
 }
 
