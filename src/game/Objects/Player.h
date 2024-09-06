@@ -1421,9 +1421,7 @@ class Player final: public Unit
         void _LoadQuestStatus(std::unique_ptr<QueryResult> result);
         void _LoadGroup(std::unique_ptr<QueryResult> result);
         void _LoadSkills(std::unique_ptr<QueryResult> result);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         void _LoadForgottenSkills(std::unique_ptr<QueryResult> result);
-#endif
         void LoadSkillsFromFields();
         void _LoadSpells(std::unique_ptr<QueryResult> result);
         bool _LoadHomeBind(std::unique_ptr<QueryResult> result);
@@ -1752,9 +1750,8 @@ class Player final: public Unit
         void UpdateOldRidingSkillToNew(bool hasEpicMount);
         void UpdateSkillsForLevel(bool maximize = false);
         SkillStatusMap mSkillStatus;
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        std::unordered_map<uint16, uint16> m_mForgottenSkills;
-#endif
+    protected:
+        std::map<uint32, uint32> m_forgottenSkills;
     public:
         uint32 GetFreePrimaryProfessionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS2); }
         void SetFreePrimaryProfessions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2, profs); }
