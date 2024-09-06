@@ -1328,7 +1328,7 @@ void AuthSocket::RepeatInternalXferLoop(std::shared_ptr<XFER_DATA_CHUNK> const& 
     // This `fakeSharedPtr` is a bit hacky, we cannot simply Write() a XFER_DATA_CHUNK pointer.
     // This is why we convert it to an uint8 pointer without a deallocator.
     std::shared_ptr<uint8 const> fakeSharedPtr((uint8_t const*)chunk.get(), MaNGOS::Memory::no_deleter<uint8>());
-    m_socket.Write({ fakeSharedPtr, sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount }, [self = shared_from_this(), chunk](IO::NetworkError const& error)
+    m_socket.Write({ fakeSharedPtr, size_t(sizeof(chunk->cmd) + sizeof(chunk->data_size) + actualReadAmount) }, [self = shared_from_this(), chunk](IO::NetworkError const& error)
     {
         if (error)
         {
