@@ -378,12 +378,12 @@ bool SpellAuraHolder::CanBeRefreshedBy(SpellAuraHolder* other) const
         return false;
     if (other->GetCasterGuid() != GetCasterGuid())
         return false;
-    // Meme ID/Effet de sort
+    // Must be the same Spell Effect ID
     if (other->GetId() != GetId())
         return false;
-    if (m_spellProto->StackAmount) // Se stack
+    if (m_spellProto->StackAmount) // Has stacks
         return false;
-    if (m_spellProto->procCharges) // Ou a des charges (fix bug visuel)
+    if (m_spellProto->procCharges) // Or has charges (fixes a visual bug)
         return false;
     return true;
 }
@@ -908,7 +908,7 @@ void PersistentAreaAura::Update(uint32 diff)
 
 void Aura::ApplyModifier(bool apply, bool Real, bool skipCheckExclusive)
 {
-    // Dans Unit::RemoveAura, ApplyModifier est toujours appelle.
+    // ApplyModifier is always called from Unit::RemoveAura
     if (IsApplied() == apply)
         return;
     AuraType aura = m_modifier.m_auraname;
@@ -2988,7 +2988,7 @@ void Aura::HandleChannelDeathItem(bool apply, bool Real)
         Unit* caster = GetCaster();
         if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
             return;
-        // Demonistes : un seul fragment d'ame si on caste "Brulure de l'ombre" et "Siphon d'ame" sur une cible.
+        // Warlocks: Only add one soul fragment if they cast Shadowburn and Drain Soul on a single target
         if (spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK)
             if (victim->HasAuraTypeByCaster(SPELL_AURA_CHANNEL_DEATH_ITEM, caster->GetObjectGuid()))
                 return;
@@ -3387,7 +3387,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
     if (!target)
         return;
 
-    // not charm yourself
+    // Can't charm yourself
     if (GetCasterGuid() == target->GetObjectGuid())
         return;
 
@@ -4268,7 +4268,7 @@ void Aura::HandleModMechanicImmunityMask(bool apply, bool /*Real*/)
     // check implemented in Unit::IsImmuneToSpell and Unit::IsImmuneToSpellEffect
 }
 
-//this method is called whenever we add / remove aura which gives m_target some imunity to some spell effect
+//this method is called whenever we add / remove aura which gives m_target some immunity to some spell effect
 void Aura::HandleAuraModEffectImmunity(bool apply, bool /*Real*/)
 {
     Unit* target = GetTarget();
@@ -4384,7 +4384,7 @@ void Aura::HandleAuraModDispelImmunity(bool apply, bool Real)
     if (!Real)
         return;
 
-    if (GetId() == 20594) // Forme de pierre
+    if (GetId() == 20594) // Stoneform
     {
         GetTarget()->ApplySpellDispelImmunity(GetSpellProto(), DISPEL_DISEASE, apply);
         GetTarget()->ApplySpellDispelImmunity(GetSpellProto(), DISPEL_POISON, apply);
@@ -6427,9 +6427,9 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             }
             if (target->GetPower(power) == 0)
             {
-                if (spellProto->Id == 21056) //Marque de Kazzak
+                if (spellProto->Id == 21056) // Mark of Kazzak
                 {
-                    // Explose quand y'a plus de mana a drainer
+                    // Explodes when unable to drain mana
                     target->CastSpell(target, 21058, true);
                     GetHolder()->SetAuraDuration(0);
                 }
@@ -6591,7 +6591,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
         }
         case SPELL_AURA_MOD_REGEN:
         {
-            // Eating anim
+            // Eating animation
             if (spellProto->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
                 target->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
             break;
@@ -6608,12 +6608,12 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             if (spellProto->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
             {
-                // eating anim
+                // Eating animation
                 target->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
             }
             else if (GetId() == 20577)
             {
-                // cannibalize anim
+                // Cannibalize animation
                 target->HandleEmoteCommand(EMOTE_STATE_CANNIBALIZE);
             }
 
@@ -6911,8 +6911,7 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
     m_isRemovedOnShapeLost = m_casterGuid == m_target->GetObjectGuid() && m_spellProto->IsRemovedOnShapeLostSpell();
 
     // Exceptions
-    // Attaques circulaires
-    if (m_spellProto->Id == 12292)
+    if (m_spellProto->Id == 12292) // Sweeping Strikes
         m_isRemovedOnShapeLost = false;
 
     Unit* unitCaster = caster && caster->isType(TYPEMASK_UNIT) ? (Unit*)caster : nullptr;
@@ -6923,8 +6922,8 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
     if (m_maxDuration == -1 || (m_isPassive && (spellproto->DurationIndex == 0 || !spellproto->SpellVisual)))
         m_permanent = true;
 
-    // Fix de l'affichage dans le journal de combat des buffs tres cours.
-    // Exemple: immunite des trinket PvP.
+    // Fixes how very short duration buffs are displayed in the combat log
+    // For example: Crowd-control immunity from PvP Trinket.
     else if (m_maxDuration < 200)
     {
         m_duration = 300;
@@ -7488,7 +7487,7 @@ SpellAuraHolder::~SpellAuraHolder()
 
 void SpellAuraHolder::Update(uint32 diff)
 {
-    // Battements de coeur : 2 fonctionnements.
+    // Heartbeats for 2 different cases
     // PvP
     if (_heartBeatRandValue)
     {
@@ -8360,7 +8359,7 @@ void Aura::CalculatePeriodic(Player* modOwner, bool create)
     }
 }
 
-// Battements de coeur (chance de briser les CC)
+// Heartbeats (chance to break crowd-control effects)
 void SpellAuraHolder::CalculateHeartBeat(Unit* caster, Unit* target)
 {
     if (_pveHeartBeatData)
@@ -8371,15 +8370,16 @@ void SpellAuraHolder::CalculateHeartBeat(Unit* caster, Unit* target)
 
     _heartBeatRandValue = 0;
 
-    // Ni les sorts permanents, ni les sorts positifs ne sont affectes.
+    // Permanent effects, ni les sorts positifs are not affected.
     // Check si positif fait dans Aura::Aura car ici le dernier Aura ajoute n'est pas encore dans 'm_auras'
     if (!m_permanent && m_maxDuration > 10000)
     {
         if (m_spellProto->HasAttribute(SPELL_ATTR_HEARTBEAT_RESIST)
-                // Exception pour la coiffe de controle gnome/Heaume-fusee gobelin
-                || m_spellProto->Id == 13181 || m_spellProto->Id == 13327)
+                // Resist for Gnomish Mind Control Cap/Goblin Rocket Helmet
+                || m_spellProto->Id == 13181 // Gnomish Mind Control Cap
+                || m_spellProto->Id == 13327) // Reckless Charge
         {
-            // Pour les joueurs
+            // Only update the random value if a player is involved
             if (target->GetCharmerOrOwnerPlayerOrPlayerItself())
                 _heartBeatRandValue = rand_norm_f() * 100.0f;
         }
@@ -8416,10 +8416,11 @@ void Aura::HandleAuraAuraSpell(bool apply, bool real)
 }
 
 
-// Auras exclusifs
+// Exclusive Auras
 /*
-Sorts d'exemple:
-11364 (+50), 21849 (+15)
+Example spells:
+Resistance (ID 11364) (+50)
+Gift of the Wild (ID 21849) (+15)
 */
 
 bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, AuraType auraname)
@@ -8532,7 +8533,7 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
             break;
     }
 
-    // La bouffe
+    // Food
     if (spellproto->AttributesEx2 & SPELL_ATTR_EX2_RETAIN_ITEM_CAST)
         return false;
 
@@ -8558,7 +8559,7 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
             if (spellproto->SpellFamilyName == SPELLFAMILY_MAGE)
                 return false;
             return true;
-        case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE: // A gere autrement (exlusif par rapport a la resistance)
+        case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE: // Special case for Resistance
             return false;
         case SPELL_AURA_MOD_HEALING_PCT:                                // Mortal Strike / Wound Poison / Aimed Shot / Furious Attacks
             // Healing taken debuffs
@@ -8660,7 +8661,7 @@ void Aura::ExclusiveAuraUnapply()
 {
     Unit* target = GetTarget();
     ASSERT(target);
-    // On restaure le precedent plus grand aura.
+    // Restore the strongest aura that was previously applied
     if (Aura* mostImportant = target->GetMostImportantAuraAfter(this, this))
     {
         if (mostImportant->IsInUse())
