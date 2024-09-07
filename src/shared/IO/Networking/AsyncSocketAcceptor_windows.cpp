@@ -51,14 +51,14 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     SOCKET listenNativeSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (listenNativeSocket == INVALID_SOCKET)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::socket(listen, ...) Error: %u", WSAGetLastError());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::socket(listen, ...) Error: %u", ::WSAGetLastError());
         return nullptr;
     }
 
     // Attach our listener socket to our completion port
     if (::CreateIoCompletionPort((HANDLE) listenNativeSocket, ctx->GetWindowsCompletionPort(), (u_long) 0, 0) != ctx->GetWindowsCompletionPort())
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(listen, ...) Error: %u", WSAGetLastError());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(listen, ...) Error: %u", ::WSAGetLastError());
         return nullptr;
     }
 
@@ -68,14 +68,14 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     m_serverAddress.sin_port = ::htons(port);
     if (::bind(listenNativeSocket, (struct sockaddr*)(&m_serverAddress), sizeof(m_serverAddress)) != 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::bind(...) Error: %u", WSAGetLastError());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::bind(...) Error: %u", ::WSAGetLastError());
         return nullptr;
     }
 
     int const acceptBacklogCount = 50; // the number of connection requests that are queued in the kernel until this process calls "accept"
     if (::listen(listenNativeSocket, acceptBacklogCount) != 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::listen(...) Error: %u", WSAGetLastError());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::listen(...) Error: %u", ::WSAGetLastError());
         return nullptr;
     }
 
@@ -89,7 +89,7 @@ void IO::Networking::AsyncSocketAcceptor::AutoAcceptSocketsUntilClose(std::funct
     {
         if (!acceptResult.has_value())
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "AcceptOne Error: %u", WSAGetLastError());
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "AcceptOne Error: %u", ::WSAGetLastError());
             return;
         }
 
@@ -103,7 +103,7 @@ void IO::Networking::AsyncSocketAcceptor::AcceptOne(std::function<void(nonstd::e
     SOCKET nativePeerSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); // <-- will be filled when callback is called
     if (nativePeerSocket == INVALID_SOCKET)
     {
-        afterAccept(nonstd::make_unexpected(IO::NetworkError(NetworkError::ErrorType::InternalError, WSAGetLastError())));
+        afterAccept(nonstd::make_unexpected(IO::NetworkError(NetworkError::ErrorType::InternalError, ::WSAGetLastError())));
         return;
     }
 
@@ -142,7 +142,7 @@ void IO::Networking::AsyncSocketAcceptor::AcceptOne(std::function<void(nonstd::e
         }
 
         // we got a real error
-        localAfterAccept(nonstd::make_unexpected(IO::NetworkError(NetworkError::ErrorType::InternalError, WSAGetLastError())));
+        localAfterAccept(nonstd::make_unexpected(IO::NetworkError(NetworkError::ErrorType::InternalError, ::WSAGetLastError())));
     });
 
     DWORD bytesWritten = 0;

@@ -97,7 +97,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
             int errorCode = ::WSARecv(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, &flags, &(m_currentReadTask), nullptr);
             if (errorCode)
             {
-                int err = WSAGetLastError();
+                int err = ::WSAGetLastError();
                 if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
                 {
                     sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
@@ -123,7 +123,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
     int errorCode = ::WSARecv(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
     if (errorCode)
     {
-        int err = WSAGetLastError();
+        int err = ::WSAGetLastError();
         if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
@@ -205,7 +205,7 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
     int errorCode = ::WSARecv(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, &flags, &m_currentReadTask, nullptr);
     if (errorCode)
     {
-        int err = WSAGetLastError();
+        int err = ::WSAGetLastError();
         if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
@@ -301,7 +301,7 @@ void IO::Networking::AsyncSocket::Write(IO::ReadableBuffer const& source, std::f
     int errorCode = ::WSASend(m_descriptor.GetNativeSocket(), bufferCtx->buffers, bufferCount, nullptr, flags, &m_currentWriteTask, nullptr);
     if (errorCode)
     {
-        int err = WSAGetLastError();
+        int err = ::WSAGetLastError();
         if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
@@ -372,7 +372,7 @@ IO::Networking::AsyncSocket::AsyncSocket(IO::IoContext* ctx, IO::Networking::Soc
     // Attach our acceptor socket to our completion port
     if (::CreateIoCompletionPort((HANDLE) m_descriptor.GetNativeSocket(), m_ctx->GetWindowsCompletionPort(), (u_long)0, 0) != m_ctx->GetWindowsCompletionPort())
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(accept, ...) Error: %u", WSAGetLastError());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(accept, ...) Error: %u", ::WSAGetLastError());
         return;
     }
 }
