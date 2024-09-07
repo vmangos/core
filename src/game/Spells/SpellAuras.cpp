@@ -8430,68 +8430,66 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
     if (spellproto->Effect[eff] == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
         return false;
 
-    // Exceptions - se stack avec tout.
+    // Exceptions - These stack with everything.
     switch (spellproto->Id)
     {
-        // Terres foudroyees et Zanza
-        case 10693:
-        case 10691: // +25 spirit
-        case 10668:
-        case 10671: // +25 stamina
-        case 10667:
-        case 10670: // +25 strength
-        case 10669:
-        case 10672: // +25 agility
-        case 10692:
-        case 10690: // +25 intellect
-        case 24382:             // Buff zanza
-        // Alcohol
-        case 25804:
-        case 20875:
-        case 25722:
-        case 25037:
-        case 22789:
-        case 22790:
-        case 6114:
-        case 5020:
-        case 5021:
-        case 23179: // Proc for "The Untamed Blade" (+300 strength) devrait se cumuler avec TOUT : ID 23179
-        case 20007: //le proc Crois� devrait se cumuler avec TOUT : ID 20007
-        case 20572: //Le racial Orc (ID 20572)
-        case 17038: //l'Eau des Tombe-Hiver (ID 17038)
-        case 16329: // Juju Might (ID 16329)
-        case 25891: //le buff du Bijou Choc de Terre (ID : 25891)
+        // Blasted lands item buffs
+        case 10693: // Spiritual Domination
+        case 10691: // Spiritual Domination
+        case 10668: // Spirit of Boar
+        case 10671: // Spirit of Boar
+        case 10667: // Rage of Ages
+        case 10670: // Rage of Ages
+        case 10669: // Strike of the Scorpok
+        case 10672: // Strike of the Scorpok
+        case 10692: // Infallible Mind
+        case 10690: // Infallible Mind
+        case 24382: // Spirit of Zanza
+        // Alcohols
+        case 25804: // Rumsey Rum Black Label
+        case 20875: // Rumsey Rum
+        case 25722: // Rumsey Rum Dark
+        case 25037: // Rumsey Rum Light
+        case 22789: // Gordok Green Grog
+        case 22790: // Kreeg's Stout Beatdown
+        case 6114:  // Raptor Punch
+        case 5020:  // Stormstout
+        case 5021:  // Trog Ale
+        case 23179: // Taint of Shadow
+        case 20007: // Holy Strength
+        case 20572: // Blood Fury
+        case 17038: // Winterfall Firewater
+        case 16329: // Juju Might
+        case 25891: // Earthstrike
         case 18264: // Headmaster's Charge
-        case 12022: // Chapeau pirate
-        case 22817: // PA HT Nord
-        // Aura de precision (hunt)
-        case 19506:
-        case 20905:
-        case 20906:
-        case 18262: // Elemental Sharpening Stone (+2% crit)
-        case 24932: // Leader of the pack
-        case 24907: // aura S�l�nien
-        case 22888: // Buff Onyxia
-                    // Rallying Cry of the Dragonslayer?
-        case 15366: // Buff Felwood
-        case 22820: // HT +3% crit sorts
+        case 12022: // Admiral's Hat
+        case 22817: // Fengus' Ferocity
+        case 19506: // Trueshot Aura
+        case 20905: // Trueshot Aura
+        case 20906: // Trueshot Aura
+        case 18262: // Call Bloodshot
+        case 24932: // Leader of the Pack
+        case 24907: // Moonkin Aura
+        case 22888: // Rallying Cry of the Dragonslayer
+        case 15366: // Songflower Serenade
+        case 22820: // Slip'kik's Savvy
         case 17628: // Supreme Power
-        case 22730: // +10 Intellect
-        case 18141: // +10 Spirit
-        case 18125: // +10 Strength
-        case 18192: // +10 Agility
-        case 18191: // +10 Stamina
-        case 25661: // +25 Stamina
-        case 24427: // Diamond Flask
-        case 17528: // Mighty Rage Potion
+        case 22730: // Increased Intellect
+        case 18141: // Blessed Sunfruit Juice
+        case 18125: // Blessed Sunfruit
+        case 18192: // Increased Agility
+        case 18191: // Increased Stamina
+        case 25661: // Increased Stamina
+        case 24427: // Toasty
+        case 17528: // Mighty Rage
         case 23697: // Alterac Spring Water
         // Love is in the Air buffs
-        case 27664:
-        case 27665:
-        case 27666:
-        case 27669:
-        case 27670:
-        case 27671:
+        case 27664: // Stormwind Gift of Friendship
+        case 27665: // Ironforge Gift of Friendship
+        case 27666: // Darnassus Gift of Friendship
+        case 27669: // Orgrimmar Gift of Friendship
+        case 27670: // Thunder Bluff Gift of Friendship
+        case 27671: // Undercity Gift of Friendship
             return false;
 
         case 17538: // Elixir of the Mongoose, devrait se stack avec TOUT.
