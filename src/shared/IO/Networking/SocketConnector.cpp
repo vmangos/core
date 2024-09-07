@@ -21,8 +21,6 @@
     #include <unistd.h>
 #endif
 
-
-
 nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> IO::Networking::SocketConnector::ConnectBlocking(IO::Networking::IpEndpoint const& target, std::chrono::milliseconds timeoutMs)
 {
     IO::Native::SocketHandle nativeSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -75,7 +73,7 @@ nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> IO::Network
     FD_SET(nativeSocket, &selectFileDescriptors);
 
     // wait for some kind response
-    int selectStatus = ::select(nativeSocket + 1, &selectFileDescriptors, &selectFileDescriptors, &selectFileDescriptors, &tv);
+    int selectStatus = ::select((int)(nativeSocket + 1), &selectFileDescriptors, &selectFileDescriptors, &selectFileDescriptors, &tv);
     if (selectStatus == -1)
     { // ::select internal error
         int lastError = GetNetworkError();

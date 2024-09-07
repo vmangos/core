@@ -51,7 +51,7 @@ void IO::Networking::Internal::inet_pton(IO::Networking::IpAddress const& ipAddr
 
 #if defined(WIN32)
     // We cant use `inet_pton`, because it's not supported on WinXP.
-    // But this method would basically just take the iternal representation and store it in a union anyways ¯\_(ツ)_/¯
+    // But this method would basically just take the internal representation and store it in a union anyways ¯\_(ツ)_/¯
     out_dest->s_addr = ::htonl(ipAddress._getInternalIPv4ReprAsUint32());
 #elif defined(__linux__) || defined(__APPLE__)
     MANGOS_ASSERT(::inet_pton(AF_INET, ipAddress.toString().c_str(), out_dest) == 1);
