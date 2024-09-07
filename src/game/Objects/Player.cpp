@@ -16329,7 +16329,7 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
                     ++slot;
                 }
 
-                if (questStatusData.m_rewarded && SatisfyQuestSkill(pQuest, false))
+                if (questStatusData.m_rewarded)
                 {
                     questStatusData.m_reward_choice = fields[13].GetUInt32();
                     LearnQuestRewardedSpells(pQuest); // learn rewarded spell if unknown
@@ -19777,7 +19777,7 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
 
     // Prevent learning profession specializations, because unlearning and re-learning a profession doesn't automatically re-add the specialization
     uint32 learned_0 = spellInfo->EffectTriggerSpell[EFFECT_INDEX_0];
-    if (sSpellMgr.GetSpellRank(learned_0) > 1)
+    if (sSpellMgr.IsPrimaryProfessionSpell(learned_0))
         return;
 
     CastSpell(this, spellId, true);
