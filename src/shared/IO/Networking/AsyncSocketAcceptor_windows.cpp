@@ -155,7 +155,7 @@ void IO::Networking::AsyncSocketAcceptor::AcceptOne(std::function<void(nonstd::e
     );
     if (!booleanOkay)
     {
-        int lastError = WSAGetLastError();
+        int lastError = ::WSAGetLastError();
         if (lastError != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
             m_currentAcceptTask.Reset();
