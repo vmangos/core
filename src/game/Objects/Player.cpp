@@ -20295,9 +20295,6 @@ uint32 Player::SelectResurrectionSpellId() const
                 case 20765:
                     spellId = 20761;
                     break;        // rank 5
-                case 27239:
-                    spellId = 27240;
-                    break;        // rank 6
                 default:
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unhandled spell %u: S.Resurrection", dummyAura->GetId());
                     continue;
