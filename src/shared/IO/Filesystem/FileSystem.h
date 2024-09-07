@@ -8,6 +8,13 @@
 #include "FileHandle.h"
 
 namespace IO { namespace Filesystem {
+    enum class FileOpenFlags
+    {
+        None                = 0,
+        HintSequentialRead  = (1 << 0), // Hint to the OS, that the file will be read sequentially. (The OS will read ahead and preload the file into memory)
+    };
+    DEFINE_ENUM_FLAG(FileOpenFlags);
+
     enum class OutputFilePath
     {
         JustFileName,
@@ -18,7 +25,7 @@ namespace IO { namespace Filesystem {
     /// You have to check the resulting pointer for nullptr!
     /// If the file does not exists or you dont have permission to open it the ptr will be null
     [[nodiscard("You need to use the file handle, otherwise the file will close immediately again")]]
-    std::unique_ptr<IO::Filesystem::FileHandleReadonly> TryOpenFileReadonly(std::string const& filePath);
+    std::unique_ptr<IO::Filesystem::FileHandleReadonly> TryOpenFileReadonly(std::string const& filePath, EnumFlag<FileOpenFlags> flags = IO::Filesystem::FileOpenFlags::None);
 
     /// Will convert a partial path like "./data/myCoolFile.txt" to a complete absolute path like "/home/user/data/myCoolFile.txt"
     [[nodiscard]]
