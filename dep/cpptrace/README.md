@@ -16,3 +16,13 @@ src/*
 CMakeLists.txt
 LICENSE.txt
 ```
+
+## Manual changes
+Changed `cmake_minimum_required` to `3.12`.
+```diff
+--- a/dep/cpptrace/CMakeLists.txt
++++ b/dep/cpptrace/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.14)
++cmake_minimum_required(VERSION 3.12)
+```
