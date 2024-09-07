@@ -28,7 +28,7 @@ namespace IO { namespace Networking {
         public:
             ~AsyncSocketAcceptor(); // this destructor will throw if ClosePortAndStopAcceptingNewConnections was not called
 
-            static std::unique_ptr<AsyncSocketAcceptor> CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port);
+            static std::unique_ptr<AsyncSocketAcceptor> CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIpStr, uint16_t port);
             void ClosePortAndStopAcceptingNewConnections();
 
             /// Automatically accepts all incoming connections until this Acceptor is StoppedAndClosed

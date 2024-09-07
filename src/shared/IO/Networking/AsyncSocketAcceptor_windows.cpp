@@ -32,8 +32,15 @@ void IO::Networking::AsyncSocketAcceptor::ClosePortAndStopAcceptingNewConnection
         std::this_thread::yield(); // I think it's fine to "busy" wait here instead of adding complex .wait() logic to the hot `StartAcceptOperation` code.
 }
 
-std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocketAcceptor::CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port)
+std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocketAcceptor::CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIpStr, uint16_t port)
 {
+    nonstd::optional<IpAddress> maybeBindIp = IpAddress::TryParseFromString(bindIpStr);
+    if (!maybeBindIp.has_value())
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Fail to parse IP '%s'", bindIpStr.c_str());
+        return nullptr;
+    }
+
     int errorCode;
 
     // TODO <static> check if WSA was already initialized
@@ -62,9 +69,9 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
         return nullptr;
     }
 
-    sockaddr_in m_serverAddress;
+    sockaddr_in m_serverAddress{};
     m_serverAddress.sin_family = AF_INET;
-    m_serverAddress.sin_addr.s_addr = ::inet_addr(bindIp.c_str());
+    IO::Networking::Internal::inet_pton(maybeBindIp.value(), &(m_serverAddress.sin_addr));
     m_serverAddress.sin_port = ::htons(port);
     if (::bind(listenNativeSocket, (struct sockaddr*)(&m_serverAddress), sizeof(m_serverAddress)) != 0)
     {
