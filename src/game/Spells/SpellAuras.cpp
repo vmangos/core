@@ -8435,17 +8435,17 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
     {
         // Terres foudroyees et Zanza
         case 10693:
-        case 10691: // +25 esprit
+        case 10691: // +25 spirit
         case 10668:
-        case 10671: // +25 endu
+        case 10671: // +25 stamina
         case 10667:
-        case 10670: // +25 force
+        case 10670: // +25 strength
         case 10669:
-        case 10672: // +25 agi
+        case 10672: // +25 agility
         case 10692:
-        case 10690: // +25 intel
+        case 10690: // +25 intellect
         case 24382:             // Buff zanza
-        // Alcools
+        // Alcohol
         case 25804:
         case 20875:
         case 25722:
@@ -8455,32 +8455,33 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case 6114:
         case 5020:
         case 5021:
-        case 23179: //le proc de l'�p�e de Razorgore (+300 force) devrait se cumuler avec TOUT : ID 23179
+        case 23179: // Proc for "The Untamed Blade" (+300 strength) devrait se cumuler avec TOUT : ID 23179
         case 20007: //le proc Crois� devrait se cumuler avec TOUT : ID 20007
         case 20572: //Le racial Orc (ID 20572)
         case 17038: //l'Eau des Tombe-Hiver (ID 17038)
-        case 16329: //le Juju's Might (ID 16329)
+        case 16329: // Juju Might (ID 16329)
         case 25891: //le buff du Bijou Choc de Terre (ID : 25891)
-        case 18264: // Charge du maitre (baton epique scholo)
+        case 18264: // Headmaster's Charge
         case 12022: // Chapeau pirate
         case 22817: // PA HT Nord
         // Aura de precision (hunt)
         case 19506:
         case 20905:
         case 20906:
-        case 18262: // Pierre � Aiguiser El�mentaire (+2% crit)
-        case 24932: // chef de la Meute
+        case 18262: // Elemental Sharpening Stone (+2% crit)
+        case 24932: // Leader of the pack
         case 24907: // aura S�l�nien
         case 22888: // Buff Onyxia
+                    // Rallying Cry of the Dragonslayer?
         case 15366: // Buff Felwood
         case 22820: // HT +3% crit sorts
         case 17628: // Supreme Power
-        case 22730: // Bouffe +10 Intell
-        case 18141: // Bouffe +10 Esprit
-        case 18125: // Bouffe +10 Force
-        case 18192: // Bouffe +10 Agility
-        case 18191: // Bouffe +10 Endu
-        case 25661: // Bouffe +25 Endu
+        case 22730: // +10 Intellect
+        case 18141: // +10 Spirit
+        case 18125: // +10 Strength
+        case 18192: // +10 Agility
+        case 18191: // +10 Stamina
+        case 25661: // +25 Stamina
         case 24427: // Diamond Flask
         case 17528: // Mighty Rage Potion
         case 23697: // Alterac Spring Water
@@ -8493,7 +8494,7 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case 27671:
             return false;
 
-        case 17538: // Le +crit du buff de l'Elixir de la Mangouste 17538, devrait se stack avec TOUT.
+        case 17538: // Elixir of the Mongoose, devrait se stack avec TOUT.
             return (eff == EFFECT_INDEX_0);
     }
     switch (spellproto->SpellFamilyName)
