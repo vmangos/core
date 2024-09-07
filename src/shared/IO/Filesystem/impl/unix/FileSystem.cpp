@@ -10,7 +10,7 @@
 /// This function will open a file in read shared and binary mode
 /// You have to check the resulting pointer for nullptr!
 /// If the file does not exists or you dont have permission to open it the ptr will be null
-std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::TryOpenFileReadonly(std::string const& filePath, EnumFlag<FileOpenFlags> flags)
+std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::TryOpenFileReadonly(std::string const& filePath)
 {
     int nativeFlags = O_RDONLY;
     IO::Native::FileHandle fileHandle = ::open(filePath.c_str(), nativeFlags);
@@ -19,36 +19,6 @@ std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::TryOpenFileR
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to open file. Error %s on file: %s", SystemErrorToCString(errno), filePath.c_str());
         return nullptr;
     }
-
-#if defined(__linux__)
-    // Tell Kernel: we might need the file in the near future, please preload it into mem
-    if (::posix_fadvise(fileHandle, 0, 0, POSIX_FADV_WILLNEED) != 0)
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to set WILLNEED hint for file");
-
-    if (flags.HasFlag(FileOpenFlags::HintSequentialRead))
-    {
-        // Tell Kernel: to preallocate and load memory pages while reading
-        if (::posix_fadvise(fileHandle, 0, 0, POSIX_FADV_SEQUENTIAL) != 0)
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to set SEQUENTIAL hint for file");
-    }
-#elif defined(__APPLE__)
-    { // Tell Kernel: we might need the file in the near future, please preload it into mem
-        struct radvisory radv;
-        radv.ra_offset = 0; // 0 = start of file
-        radv.ra_count = 0;  // 0 = means read whole file if possible
-        if (::fcntl(fileHandle, F_RDADVISE, &radv) == -1)
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to set RDADVISE hint for file");
-    }
-
-    if (flags.HasFlag(FileOpenFlags::HintSequentialRead))
-    {
-        // Tell Kernel: to preallocate and load memory pages while reading
-        if (::fcntl(fileHandle, F_RDAHEAD, 1) == -1)
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to set SEQUENTIAL hint for file");
-    }
-#else
-#warning "IO::Filesystem::TryOpenFileReadonly(...) hints are not supported on your platform"
-#endif
 
     return std::unique_ptr<FileHandleReadonly>(new FileHandleReadonly(filePath, fileHandle));
 }
