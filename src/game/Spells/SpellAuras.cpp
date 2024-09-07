@@ -8370,8 +8370,8 @@ void SpellAuraHolder::CalculateHeartBeat(Unit* caster, Unit* target)
 
     _heartBeatRandValue = 0;
 
-    // Permanent effects, ni les sorts positifs are not affected.
-    // Check si positif fait dans Aura::Aura car ici le dernier Aura ajoute n'est pas encore dans 'm_auras'
+    // Permanent effects and positive spells don't have resist heartbeats.
+    // The aura is checked for being positive in Aura::Aura rather than here since the last-added Aura is not yet in m_auras
     if (!m_permanent && m_maxDuration > 10000)
     {
         if (m_spellProto->HasAttribute(SPELL_ATTR_HEARTBEAT_RESIST)
@@ -8383,7 +8383,7 @@ void SpellAuraHolder::CalculateHeartBeat(Unit* caster, Unit* target)
             if (target->GetCharmerOrOwnerPlayerOrPlayerItself())
                 _heartBeatRandValue = rand_norm_f() * 100.0f;
         }
-        // En PvE. Ne concerne pas certains sorts avec DR (fear geres avec dmg par exemple).
+        // For PvE/effects on NPCs. Doesn't affect certain spells with DR (For example: Fear being dispelled by damage).
         if (caster && target->GetTypeId() == TYPEID_UNIT && m_spellProto->IsPvEHeartBeat())
         {
             _pveHeartBeatData = new HeartBeatData;
