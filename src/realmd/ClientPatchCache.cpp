@@ -24,7 +24,7 @@ void ClientPatchCache::LoadPatchesInfo()
 
     for (const std::string& filePath : IO::Filesystem::GetAllFilesInFolder(fullFolderPath, IO::Filesystem::OutputFilePath::FullFilePath))
     {
-        auto fileHandle = IO::Filesystem::TryOpenFileReadonly(filePath);
+        auto fileHandle = IO::Filesystem::TryOpenFileReadonly(filePath, IO::Filesystem::FileOpenFlags::HintSequentialRead);
         if (fileHandle)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[PatchCache] Calculate hash of %s", filePath.c_str());
