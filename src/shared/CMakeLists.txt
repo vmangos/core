@@ -186,8 +186,6 @@ if(WIN32) # For window build: Exclude Unix/MacOS files
       WheatyExceptionReport.h
     )
   endif()
-  
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
 else()
   list(REMOVE_ITEM shared_SRCS
     WheatyExceptionReport.cpp
@@ -244,7 +242,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/dep/include
   ${CMAKE_SOURCE_DIR}/src/framework
   ${CMAKE_BINARY_DIR}
-  ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
 )
@@ -261,7 +258,7 @@ add_library(shared STATIC
 
 if(UNIX)
   find_package(Threads)
-  target_link_libraries(shared ${ACE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(shared ${CMAKE_THREAD_LIBS_INIT})
 endif(UNIX)
 
 if(WIN32)
