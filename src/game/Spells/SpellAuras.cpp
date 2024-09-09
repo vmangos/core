@@ -262,7 +262,7 @@ Aura::Aura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBas
     m_spellmod(nullptr), m_periodicTimer(0), m_periodicTick(0), m_removeMode(AURA_REMOVE_BY_DEFAULT),
     m_effIndex(eff), m_positive(false), m_isPeriodic(false), m_isAreaAura(false),
     m_isPersistent(false), m_in_use(0), m_spellAuraHolder(holder),
-// NOSTALRIUS: auras exclusifs
+// NOSTALRIUS: Exclusive auras
     m_applied(false)
 {
     MANGOS_ASSERT(target);
@@ -331,7 +331,7 @@ void Aura::Refresh(Unit* caster, Unit* target, SpellAuraHolder* pRefreshWithHold
             case SPELL_AURA_MOD_STAT:
             case SPELL_AURA_MOD_PERCENT_STAT:
             case SPELL_AURA_MOD_INCREASE_HEALTH:
-            case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT: // Exemple : 27038
+            case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT: // Example: 27038
                 lockStats = true;
                 break;
         }
@@ -915,7 +915,7 @@ void Aura::ApplyModifier(bool apply, bool Real, bool skipCheckExclusive)
 
     GetHolder()->SetInUse(true);
     SetInUse(true);
-    // NOSTALRIUS: Auras exclusifs.
+    // NOSTALRIUS: Exclusive auras.
     if (apply && !skipCheckExclusive && IsExclusive() && !ExclusiveAuraCanApply())
     {
         GetHolder()->SetInUse(false);
@@ -1461,7 +1461,9 @@ void Aura::TriggerSpell()
                 break;
             case 8892:  // Goblin Rocket Boots
             case 13141: // Gnomish Rocket Boots
-                // 20 ticks, et une chance sur 5 d'exploser.
+                // FIXME: Confirm that the chance for rocket boots to explode in retail is actually meant to be 1% per-tick or 1/5 overall
+                // Given 20 ticks (the effect lasts for 20 seconds), this formula approximates a 1/5 chance (actually ~18.209%) that the boots will explode at some point
+                // 20 * 5 - 1 = 99 therefore 1% chance per-tick
                 if (urand(0, 20 * 5 - 1) != 0)
                     return;
                 break;
@@ -2075,18 +2077,18 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 target->CastSpell(target, 28240, true, nullptr, this);
                 return;
             }
-            case 24324: // Ivina < Nostalrius > : Hakkar
+            case 24324:  // Ivina < Nostalrius > : Hakkar's Blood Siphon
             {
-                target->RemoveAurasDueToSpell(24321);
+                target->RemoveAurasDueToSpell(24321); // Poisonous Blood
                 return;
             }
-            case 28059: // Thaddius positive charge, removing aplify effect on remove
+            case 28059: // Thaddius positive charge, removing amplify effect on remove
             {
                 if (target->HasAura(29659))
                     target->RemoveAurasDueToSpell(29659);
                 break;
             }
-            case 28084: // Thaddius negative charge, removing aplify effect on remove
+            case 28084: // Thaddius negative charge, removing amplify effect on remove
             {
                 if (target->HasAura(29660))
                     target->RemoveAurasDueToSpell(29660);
@@ -8332,7 +8334,7 @@ void Aura::CalculatePeriodic(Player* modOwner, bool create)
         modOwner->ApplySpellMod(GetId(), SPELLMOD_ACTIVATION_TIME, m_modifier.periodictime);
     }
 
-    // Totem griffes de pierre
+    // Stoneclaw Totem
     if (GetSpellProto()->SpellVisual == 0 && GetSpellProto()->SpellIconID == 689)
         return;
 
