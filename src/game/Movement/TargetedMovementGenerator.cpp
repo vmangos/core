@@ -95,7 +95,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     // prevent redundant micro-movement for pets, other followers.
     else if (!i_target->IsMoving() && owner.movespline->Finalized() && i_target->IsWithinDistInMap(&owner, 1.4f * m_fOffset))
     {
-        owner.GetPosition(x, y, z);
+        return;
     }
     else
     {
