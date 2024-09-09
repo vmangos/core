@@ -952,6 +952,7 @@ bool Aura::CanProcFrom(SpellEntry const* spell, uint32 EventProcEx, uint32 procE
     uint64 mask = sSpellMgr.GetSpellAffectMask(GetId(), GetEffIndex());
 
     // Nostalrius: c'est la moindre des choses d'utiliser un peu 'spell_proc_event' non ?
+    // [Google translated] Nostalrius: it's the least we can do to use 'spell_proc_event' a little bit, right?
     if (!mask)
         if (SpellProcEventEntry const* entry = sSpellMgr.GetSpellProcEvent(GetId()))
             mask = entry->spellFamilyMask[GetEffIndex()];
@@ -7378,11 +7379,10 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
     {
         case SPELLFAMILY_SHAMAN:
         {
-            // Nostalrius : Pas de marche sur l'eau + loup fantome.
-            if (apply && GetSpellProto()->Id == 2645)
+            if (apply && GetSpellProto()->Id == 2645) // Check for Ghost Wolf
                 if (Unit* pCaster = GetCaster())
-                    if (Aura* aura = pCaster->GetAura(546, EFFECT_INDEX_0))
-                        pCaster->RemoveAura(aura);
+                    if (Aura* aura = pCaster->GetAura(546, EFFECT_INDEX_0)) // If the shaman already has Water Walking
+                        pCaster->RemoveAura(aura); // Remove Water Walking
             break;
         }
         case SPELLFAMILY_MAGE:
@@ -8495,7 +8495,7 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case 27671: // Undercity Gift of Friendship
             return false;
 
-        case 17538: // Elixir of the Mongoose, devrait se stack avec TOUT.
+        case 17538: // Elixir of the Mongoose, should stack with EVERYTHING
             return (eff == EFFECT_INDEX_0);
     }
     switch (spellproto->SpellFamilyName)
