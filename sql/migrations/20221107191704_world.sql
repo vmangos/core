@@ -208,17 +208,17 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6089 AN
 UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6090 AND `id` = 0;
 UPDATE `gossip_menu_option` SET `condition_id` = 11054 WHERE `menu_id` = 6091 AND `id` = 0;
 
--- Correct specialisations teaching artisan of profession
-UPDATE `spell_chain` SET `prev_spell` = 3538, `rank` = 4 WHERE `spell_id` = 9787; -- Correct for Weaponsmithing
-UPDATE `spell_chain` SET `prev_spell` = 3538, `rank` = 4 WHERE `spell_id` = 9788; -- Correct for Armorsmithing
-UPDATE`spell_chain` SET `prev_spell` = 3811, `rank` = 4 WHERE `spell_id` = 10656; -- Correct for Dragonscale leatherworking
-UPDATE `spell_chain` SET `prev_spell` = 3811, `rank` = 4 WHERE `spell_id` = 10658; -- Correct for Elemental leatherworking
-UPDATE `spell_chain` SET `prev_spell` = 3811, `rank` = 4 WHERE `spell_id` = 10660; -- Correct for Tribal leatherworking
-UPDATE `spell_chain` SET `prev_spell` = 4038, `rank` = 4 WHERE `spell_id` = 20219; -- Correct for Gnomish engineering
-UPDATE `spell_chain` SET `prev_spell` = 4038, `rank` = 4 WHERE `spell_id` = 20222; -- Correct for Goblin engineering
-UPDATE `spell_chain` SET `rank` = 5 WHERE `spell_id` = 17039; -- Correct for Swordsmithing
-UPDATE `spell_chain` SET `rank` = 5 WHERE `spell_id` = 17040; -- Correct for Hammersmithing
-UPDATE `spell_chain` SET `rank` = 5 WHERE `spell_id` = 17041; -- Correct for Axesmithing
+-- Correct specialisations teaching artisan of profession by removing specialisation from profession spell chain (incorrect implementation according to SkillLineAbility)
+DELETE FROM `spell_chain` WHERE `spell_id` = 9787; -- Correct for Weaponsmithing
+DELETE FROM `spell_chain` WHERE `spell_id` = 9788; -- Correct for Armorsmithing
+DELETE FROM `spell_chain` WHERE `spell_id` = 10656; -- Correct for Dragonscale leatherworking
+DELETE FROM `spell_chain` WHERE `spell_id` = 10658; -- Correct for Elemental leatherworking
+DELETE FROM `spell_chain` WHERE `spell_id` = 10660; -- Correct for Tribal leatherworking
+DELETE FROM `spell_chain` WHERE `spell_id` = 20219; -- Correct for Gnomish engineering
+DELETE FROM `spell_chain` WHERE `spell_id` = 20222; -- Correct for Goblin engineering
+DELETE FROM `spell_chain` WHERE `spell_id` = 17039; -- Correct for Swordsmithing
+DELETE FROM `spell_chain` WHERE `spell_id` = 17040; -- Correct for Hammersmithing
+DELETE FROM `spell_chain` WHERE `spell_id` = 17041; -- Correct for Axesmithing
 
 -- End of migration.
 END IF;
