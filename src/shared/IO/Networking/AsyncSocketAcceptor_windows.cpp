@@ -17,6 +17,9 @@
 #include <WinSock2.h>
 #include <MSWSock.h> // TODO: Currently just needed for ::AcceptEx, maybe its better if we get this func-ptr at runtime, just like Microsoft recommends it
 
+IO::Networking::AsyncSocketAcceptor::AsyncSocketAcceptor(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
+    : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket), m_wasClosed(false) {}
+
 IO::Networking::AsyncSocketAcceptor::~AsyncSocketAcceptor()
 {
     MANGOS_ASSERT(m_wasClosed);
@@ -96,7 +99,8 @@ void IO::Networking::AsyncSocketAcceptor::AutoAcceptSocketsUntilClose(std::funct
     {
         if (!acceptResult.has_value())
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "AcceptOne Error: %u", ::WSAGetLastError());
+            if (!m_wasClosed)
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "AcceptOne Error: %s", acceptResult.error().ToString().c_str());
             return;
         }
 

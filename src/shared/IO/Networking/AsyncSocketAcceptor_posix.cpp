@@ -28,6 +28,9 @@
 #include <string>
 #include <chrono>
 
+IO::Networking::AsyncSocketAcceptor::AsyncSocketAcceptor(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
+    : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket), m_wasClosed(false), m_onNewSocketCallback{nullptr} {}
+
 std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocketAcceptor::CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIpStr, uint16_t port)
 {
     nonstd::optional<IpAddress> maybeBindIp = IpAddress::TryParseFromString(bindIpStr);
@@ -68,7 +71,8 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
         return nullptr;
     }
 
-    auto server = std::unique_ptr<AsyncSocketAcceptor>(new AsyncSocketAcceptor(ctx, listenNativeSocket));
+    auto x = new AsyncSocketAcceptor(ctx, listenNativeSocket);
+    auto server = std::unique_ptr<AsyncSocketAcceptor>(x);
 
     // Add server socket to event queue (needed for ::accept(..))
 #if defined(__linux__)
