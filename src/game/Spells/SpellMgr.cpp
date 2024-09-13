@@ -1349,6 +1349,10 @@ bool SpellMgr::IsPrimaryProfessionSpell(uint32 spellId)
 
     uint32 skill = spellInfo->EffectMiscValue[EFFECT_INDEX_1];
 
+    // Profession specialisations are trade skills but don't have a learn skill effect associated with them
+    if (!skill)
+        return true;
+    
     return IsPrimaryProfessionSkill(skill);
 }
 
