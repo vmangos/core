@@ -14,7 +14,7 @@ namespace IO
     /// Since this ReadableBuffer is intended to be used on AsyncSocket, the size and pointer of the buffer is cached.
     /// Do not modify the buffer that this is holding.
     /// Create a new ReadableBuffer for each transfer.
-    class ReadableBuffer
+    class ReadableBuffer // replace me with C++17 std::variant
     {
     public:
         ReadableBuffer() : m_ptr(nullptr), m_size(0), m_type(BufferType::Unset) {}
