@@ -146,6 +146,8 @@ set (shared_SRCS
     IO/Filesystem/impl/windows/FileHandle.cpp
     IO/Filesystem/impl/unix/FileSystem.cpp
     IO/Filesystem/impl/unix/FileHandle.cpp
+    ProxyProtocol/ProxyV2Reader.h
+    ProxyProtocol/ProxyV2Reader.cpp
     ArgparserForServer.h
     ArgparserForServer.cpp
     Memory/ArrayDeleter.h

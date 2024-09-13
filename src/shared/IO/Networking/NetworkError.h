@@ -14,6 +14,7 @@ namespace IO
             SocketClosed,
             OnlyOneTransferPerDirectionAllowed,
             Timeout,
+            InvalidProtocolBehavior,
         };
     public:
         explicit constexpr NetworkError(ErrorType errorType) : NetworkError(errorType, 0) {};

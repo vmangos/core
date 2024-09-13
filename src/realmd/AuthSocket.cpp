@@ -41,6 +41,7 @@
 #include "IO/Networking/AsyncSocket.h"
 #include "IO/Timer/AsyncSystemTimer.h"
 #include "IO/Filesystem/FileSystem.h"
+#include "ProxyProtocol/ProxyV2Reader.h"
 
 #ifdef USE_SENDGRID
 #include "MailerService.h"
@@ -81,16 +82,26 @@ void AuthSocket::Start()
         return; // implicit close()
     }
 
-    if (int secs = sConfig.GetIntDefault("MaxSessionDuration", 300))
+    ProxyProtocol::ReadProxyV2Handshake(&m_socket, [self = shared_from_this()](nonstd::expected<IO::Networking::IpAddress, IO::NetworkError> const& maybeIp)
     {
-        this->m_sessionDurationTimeout = sAsyncSystemTimer.ScheduleFunctionOnce(std::chrono::seconds(secs), [this]()
+        if (!maybeIp.has_value())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%s] Connection has reached MaxSessionDuration. Closing socket...", GetRemoteIpString().c_str());
-            // It's correct that we capture _this_ and not a shared_ptr, since the timer will be canceled in destructor
-            this->CloseSocket();
-        });
-    }
-    DoRecvIncomingData();
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%s] Error %s", self->GetRemoteIpString().c_str(), maybeIp.error().ToString().c_str());
+            return;
+        }
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "RealIP: %s", maybeIp.value().toString().c_str());
+
+        if (int secs = sConfig.GetIntDefault("MaxSessionDuration", 300))
+        {
+            self->m_sessionDurationTimeout = sAsyncSystemTimer.ScheduleFunctionOnce(std::chrono::seconds(secs), [self]()
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%s] Connection has reached MaxSessionDuration. Closing socket...", self->GetRemoteIpString().c_str());
+                // It's correct that we capture _this_ and not a shared_ptr, since the timer will be canceled in destructor
+                self->CloseSocket();
+            });
+        }
+        self->DoRecvIncomingData();
+    });
 }
 
 AuthSocket::~AuthSocket()
