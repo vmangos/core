@@ -229,7 +229,8 @@ struct SpellLearnSkillNode
 {
     uint16 skill;
     uint16 step;
-    SpellEffects effect;
+    uint16 value;                                           // 0  - max skill value for player level
+    uint16 maxvalue;                                        // 0  - max skill value for player level
 };
 
 typedef std::map<uint32, SpellLearnSkillNode> SpellLearnSkillMap;
