@@ -33,7 +33,7 @@ IO::Networking::AsyncSocket::~AsyncSocket()
     if (state & SocketStateFlags::WAS_MOVED_NO_DTOR)
         return; // Ignore destructor
 
-    sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "Destructor called ~AsyncSocket: No references left");
+    sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "Destructor called ~AsyncSocket: No references left");
     CloseSocket();
 
 //#ifdef DEBUG

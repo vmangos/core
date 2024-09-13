@@ -90,7 +90,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
     if (alreadyRead == 0)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[ERROR] Read(...) -> ::recv() returned 0, which means the socket is half-closed.");
+        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "Read(...) -> ::recv() returned 0, which means the socket is half-closed.");
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         StopPendingTransactionsAndForceClose();
         return;
@@ -158,7 +158,7 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
     if (alreadyRead == 0)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[ERROR] Read(...) -> ::recv() returned 0, which means the socket is half-closed.");
+        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "Read(...) -> ::recv() returned 0, which means the socket is half-closed.");
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         StopPendingTransactionsAndForceClose();
         return;
@@ -291,13 +291,13 @@ void IO::Networking::AsyncSocket::PerformNonBlockingRead()
     if (newWrittenBytes == 0)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_LOAD);
-        sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[ERROR] ::recv() returned 0, which means the socket is half-closed.");
+        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "::recv() returned 0, which means the socket is half-closed.");
         StopPendingTransactionsAndForceClose();
         return;
     }
     if (newWrittenBytes < 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::recv on client failed: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::recv on client failed: %s", SystemErrorToCString(errno));
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_LOAD);
         return;
     }

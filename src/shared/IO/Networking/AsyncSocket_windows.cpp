@@ -78,7 +78,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
         uint64_t bytesProcessed = m_currentReadTask.InternalHigh;
         if (bytesProcessed == 0)
         { // 0 means the socket is already closed on the other side
-            sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Empty response -> Going to disconnect.");
+            sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "Empty response -> Going to disconnect.");
             CloseSocket();
             auto tmpCallback = std::move(m_readCallback);
             m_currentReadTask.Reset();
@@ -185,7 +185,7 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
         uint64_t bytesProcessed = m_currentReadTask.InternalHigh;
         if (bytesProcessed == 0)
         { // 0 means the socket is already closed on the other side
-            sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "Empty response -> Going to disconnect.");
+            sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "Empty response -> Going to disconnect.");
             CloseSocket();
             auto tmpCallback = std::move(m_readCallback);
             m_currentReadTask.Reset();
