@@ -19761,8 +19761,8 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
         return;
 
     // Prevent learning profession specializations, because unlearning and re-learning a profession doesn't automatically re-add the specialization
-    uint32 learned_0 = spellInfo->EffectTriggerSpell[EFFECT_INDEX_0];
-    if (sSpellMgr.IsPrimaryProfessionSpell(learned_0))
+    SpellEntry const* learned_0 = sSpellMgr.GetSpellEntry(spellInfo->EffectTriggerSpell[EFFECT_INDEX_0]);
+    if (learned_0->Effect[EFFECT_INDEX_1] != SPELL_EFFECT_SKILL)
         return;
     
     CastSpell(this, spellId, true);
