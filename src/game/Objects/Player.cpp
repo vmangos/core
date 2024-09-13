@@ -19763,11 +19763,8 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
     // Prevent learning profession specializations, because unlearning and re-learning a profession doesn't automatically re-add the specialization
     uint32 learned_0 = spellInfo->EffectTriggerSpell[EFFECT_INDEX_0];
     if (sSpellMgr.IsPrimaryProfessionSpell(learned_0))
-        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Spell teaching prevented via IsPrimaryProfessionSpell");
         return;
-    if (learned_0 == 10656)
-        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Spell teaching prevented via case matching");
-        return;    
+    
     CastSpell(this, spellId, true);
 }
 
