@@ -4,6 +4,7 @@
 #include <string>
 #include <array>
 #include <utility>
+#include <cstdint>
 #include "nonstd/optional.hpp"
 
 namespace IO { namespace Networking
