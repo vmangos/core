@@ -8424,163 +8424,92 @@ Sorts d'exemple:
 
 bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, AuraType auraname)
 {
-    // Flametongue Totem / Totem of Wrath / Strength of Earth Totem / Fel Intelligence / Leader of the Pack
-    // Moonkin Aura / Mana Spring Totem / Tree of Life Aura / Improved Devotion Aura / Improved Icy Talons / Trueshot Aura
-    // Improved Moonkin Form / Sanctified Retribution Aura / Blood Pact
-    if (spellproto->Effect[eff] == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
-        return false;
-
-    // Exceptions - se stack avec tout.
+    // In vanilla, very few spells show exclusive behavior. Grouped spells usually cancel each other unless one has an additional effect 
     switch (spellproto->Id)
     {
-        // Terres foudroyees et Zanza
-        case 10693:
-        case 10691: // +25 esprit
-        case 10668:
-        case 10671: // +25 endu
-        case 10667:
-        case 10670: // +25 force
-        case 10669:
-        case 10672: // +25 agi
-        case 10692:
-        case 10690: // +25 intel
-        case 24382:             // Buff zanza
-        // Alcools
-        case 25804:
-        case 20875:
-        case 25722:
-        case 25037:
-        case 22789:
-        case 22790:
-        case 6114:
-        case 5020:
-        case 5021:
-        case 23179: //le proc de l'�p�e de Razorgore (+300 force) devrait se cumuler avec TOUT : ID 23179
-        case 20007: //le proc Crois� devrait se cumuler avec TOUT : ID 20007
-        case 20572: //Le racial Orc (ID 20572)
-        case 17038: //l'Eau des Tombe-Hiver (ID 17038)
-        case 16329: //le Juju's Might (ID 16329)
-        case 25891: //le buff du Bijou Choc de Terre (ID : 25891)
-        case 18264: // Charge du maitre (baton epique scholo)
-        case 12022: // Chapeau pirate
-        case 22817: // PA HT Nord
-        // Aura de precision (hunt)
-        case 19506:
-        case 20905:
-        case 20906:
-        case 18262: // Pierre � Aiguiser El�mentaire (+2% crit)
-        case 24932: // chef de la Meute
-        case 24907: // aura S�l�nien
-        case 22888: // Buff Onyxia
-        case 15366: // Buff Felwood
-        case 22820: // HT +3% crit sorts
-        case 17628: // Supreme Power
-        case 22730: // Bouffe +10 Intell
-        case 18141: // Bouffe +10 Esprit
-        case 18125: // Bouffe +10 Force
-        case 18192: // Bouffe +10 Agility
-        case 18191: // Bouffe +10 Endu
-        case 25661: // Bouffe +25 Endu
-        case 24427: // Diamond Flask
-        case 17528: // Mighty Rage Potion
-        case 23697: // Alterac Spring Water
-        // Love is in the Air buffs
-        case 27664:
-        case 27665:
-        case 27666:
-        case 27669:
-        case 27670:
-        case 27671:
-            return false;
-
-        case 17538: // Le +crit du buff de l'Elixir de la Mangouste 17538, devrait se stack avec TOUT.
-            return (eff == EFFECT_INDEX_0);
+        // Spells that give two effects. Reason for the existence of this whole thing:
+        case 17537: // Elixir of Brute Force stam + str
+        case 17535: // Elixir of the Sages int + spi
+        case 8212:  // Elixir of Giant Growth str + size mod
+        case 17538: // Elixir of the Mongoose agi + phys crit
+        // Spells that give one effect, and can exclude or be excluded by the spells above:
+        // Stamina
+        case 1243:
+        case 8099:
+        case 8100:
+        case 1244:
+        case 8101:
+        case 12178:
+        case 1245:
+        case 2791:
+        case 10937:
+        case 10938:
+        case 21562:
+        case 21564:
+        // Strength
+        case 2367:
+        case 8118:
+        case 3164:
+        case 8119:
+        case 8120:
+        case 12179:
+        case 11405:
+        case 16323:
+        // Intellect
+        case 1459:
+        case 8096:
+        case 1460:
+        case 8097:
+        case 8098:
+        case 1461:
+        case 12176:
+        case 10156:
+        case 11396:
+        case 16327:
+        case 16876:
+        case 10157:
+        case 23028:
+        // Spirit
+        case 8113:
+        case 8114:
+        case 12177:
+        case 14752:
+        case 14818:
+        case 15231:
+        case 14819:
+        case 27841:
+        case 27681:
+        // Agility
+        case 2374:
+        case 8115:
+        case 3160:
+        case 8116:
+        case 8117:
+        case 11328:
+        case 12174:
+        case 11334:
+            return true;
     }
-    switch (spellproto->SpellFamilyName)
-    {
-        case SPELLFAMILY_WARLOCK:
-            // Blood Pact
-            if (spellproto->IsFitToFamilyMask<CF_WARLOCK_IMP_BUFFS>())
-                return false;
-            break;
-        case SPELLFAMILY_SHAMAN:
-            // Strength of Earth (ID 8076, 8162, 8163, 10441, 25362)
-            if (spellproto->IsFitToFamilyMask<CF_SHAMAN_STRENGTH_OF_EARTH>())
-                return false;
-            break;
-        case SPELLFAMILY_WARRIOR:
-            // Battle Shout (ID 6673, 5242, 6192, 11549, 11550, 11551, 25289)
-            if (spellproto->IsFitToFamilyMask<CF_WARRIOR_BATTLE_SHOUT>())
-                return false;
-            break;
-        case SPELLFAMILY_PALADIN:
-            // Blessing of Might (ID 19740, 19834, 19835, 19836, 19837, 19838, 25291, 25782, 25916)
-            if (spellproto->IsFitToFamilyMask<CF_PALADIN_BLESSING_OF_MIGHT, CF_PALADIN_BLESSINGS>())
-                return false;
-            break;
-        case SPELLFAMILY_HUNTER:
-            // Aspect of the Hawk
-            if (spellproto->IsFitToFamilyMask<CF_HUNTER_ASPECT_OF_THE_HAWK>())
-                return false;
-            break;
-        case SPELLFAMILY_DRUID:
+
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
-            // World of Warcraft Client Patch 1.8.0 (2005-10-11)
-            // - Multiple Druids casting Hurricane will no longer stack the slowdown effect
-            if (spellproto->IsFitToFamilyMask<CF_DRUID_HURRICANE>())
-                return false;
-#endif
-            break;
-    }
-
-    // La bouffe
-    if (spellproto->AttributesEx2 & SPELL_ATTR_EX2_RETAIN_ITEM_CAST)
+    // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+    // Multiple Druids casting Hurricane will no longer stack the slowdown effect.
+    if (spellproto->IsFitToFamilyMask<CF_DRUID_HURRICANE>())
         return false;
+#endif
 
     switch (auraname)
     {
-        //case SPELL_AURA_PERIODIC_DAMAGE:
-        //case SPELL_AURA_DUMMY:
-        //    return false;
-        case SPELL_AURA_MOD_HEALING_DONE:                               // Demonic Pact
-        case SPELL_AURA_MOD_DAMAGE_DONE:                                // Demonic Pact
-        case SPELL_AURA_MOD_ATTACK_POWER_PCT:                           // Abomination's Might / Unleashed Rage
-        case SPELL_AURA_MOD_RANGED_ATTACK_POWER_PCT:
-        case SPELL_AURA_MOD_ATTACK_POWER:                               // (Greater) Blessing of Might / Battle Shout
-        case SPELL_AURA_MOD_RANGED_ATTACK_POWER:
-        case SPELL_AURA_MOD_POWER_REGEN:                                // (Greater) Blessing of Wisdom
-        case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:                       // Glyph of Salvation / Pain Suppression / Safeguard ?
-        case SPELL_AURA_MOD_STAT:
-        case SPELL_AURA_WATER_BREATHING:
+        case SPELL_AURA_WATER_BREATHING: // Permanent water breathing disables undead extended water breathing racial
             return true;
-        case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
-            return true;
-        case SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE:                 // Winter's Chill / Improved Scorch
-            if (spellproto->SpellFamilyName == SPELLFAMILY_MAGE)
-                return false;
-            return true;
-        case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE: // A gere autrement (exlusif par rapport a la resistance)
-            return false;
-        case SPELL_AURA_MOD_HEALING_PCT:                                // Mortal Strike / Wound Poison / Aimed Shot / Furious Attacks
-            // Healing taken debuffs
+        case SPELL_AURA_MOD_MELEE_HASTE: // Attack speed reductions (Thunderclap, Thunderfury, Hurricane if running patch +1.8)
+        case SPELL_AURA_MOD_DECREASE_SPEED: // All movement speed slows don't stack with each other (Effect points negative despite saying "decrease speed")
+        case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK: // Cast speed reductions (Curse of tongues, mind numbing poison)
+        case SPELL_AURA_MOD_HEALING_PCT: // Mortal Strike + Hex of Weakness doesn't stack https://www.wowhead.com/classic/spell=19285/hex-of-weakness#comments:id=3124997
             if (spellproto->EffectBasePoints[eff] < 0)
-                return false;
-            return true;
-        case SPELL_AURA_MOD_RESISTANCE_PCT:
-            // Ancestral Healing / Inspiration
-            if (spellproto->SpellFamilyName == SPELLFAMILY_SHAMAN ||
-                    spellproto->SpellFamilyName == SPELLFAMILY_PRIEST)
-                return false;
-            return true;
-        case SPELL_AURA_MOD_MELEE_HASTE:
-        case SPELL_AURA_MOD_DECREASE_SPEED:
-            // Attack and movement speed reduction
-            if (spellproto->EffectBasePoints[eff] >= 0)
-                return false;
-            return true;
-        default:
-            return false;
+                return true;
     }
+    return false;
 }
 
 void Aura::ComputeExclusive()
