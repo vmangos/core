@@ -2,7 +2,6 @@
 #define MANGOS_IO_NETWORKING_DNS_H
 
 #include <vector>
-#include <experimental/vector>
 #include "./IpAddress.h"
 
 namespace IO { namespace Networking { namespace DNS
