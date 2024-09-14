@@ -3782,10 +3782,12 @@ void Spell::EffectLearnSkill(SpellEffectIndex effIdx)
 
     uint16 skillid = uint16(m_spellInfo->EffectMiscValue[effIdx]);
     uint16 step = uint16(damage);
-    target->SetSkillStep(skillid, step);
+    uint16 current = std::max(uint16(1), target->GetSkillValuePure(skillid));
+    uint16 max = (step * 75);
+    target->SetSkill(skillid, current, max, step);
 
     if (SpellCaster const* caster = GetCastingObject())
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Spell: %s teaches %s skill %u (to step %u)", caster->GetGuidStr().c_str(), target->GetGuidStr().c_str(), skillid, step);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Spell: %s has learned skill %u (to maxlevel %u) from %s", target->GetGuidStr().c_str(), skillid, max, caster->GetGuidStr().c_str());
 }
 
 void Spell::EffectAddHonor(SpellEffectIndex /*effIdx*/)
