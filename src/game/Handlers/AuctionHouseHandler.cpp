@@ -329,6 +329,13 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 
     Item *it = pl->GetItemByGuid(itemGuid);
 
+    // Modification - trading in loot for two hours.
+    if (it->GetLootingTime())
+    {
+        SendAuctionCommandResult(nullptr, AUCTION_STARTED, AUCTION_ERR_INVENTORY, EQUIP_ERR_ITEM_NOT_FOUND);
+        return;
+    }
+
     // do not allow to sell already auctioned items
     if (sAuctionMgr.GetAItem(itemGuid.GetCounter()))
     {

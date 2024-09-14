@@ -3032,3 +3032,11 @@ DynamicRespawn.AffectLevelBelow         = 0
 DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
 
+###################################################################################################################
+#    Modification - trading in loot for two hours.
+#
+#    TradingRaidLoot.Time - in secounds
+#        Default: 7200
+###################################################################################################################
+
+TradingRaidLoot.Time = 7200
