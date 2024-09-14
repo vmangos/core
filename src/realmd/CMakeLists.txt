@@ -33,8 +33,6 @@ if(WIN32)
   list(APPEND EXECUTABLE_SRCS
     realmd.rc
   )
-  
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
 endif()
 
 include_directories(
@@ -43,7 +41,6 @@ include_directories(
   ${CMAKE_BINARY_DIR}
   ${CMAKE_BINARY_DIR}/src/shared
   ${MYSQL_INCLUDE_DIR}
-  ${ACE_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
 )
 
@@ -60,7 +57,6 @@ add_executable(${EXECUTABLE_NAME}
 target_link_libraries(${EXECUTABLE_NAME}
   shared
   framework
-  ${ACE_LIBRARIES}
 )
 
 if(WIN32)

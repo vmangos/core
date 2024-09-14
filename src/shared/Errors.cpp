@@ -2,21 +2,31 @@
 #include "Log.h"
 
 #include <cpptrace/cpptrace.hpp>
-#include <iostream>
 
 void MaNGOS::Errors::PrintStacktrace()
 {
-    cpptrace::generate_trace().print(std::cout); // There is also .print_with_snippets() but its a bit overloaded
-    std::cout.flush();
+    PrintStacktrace(1, 64);
 }
 
 void MaNGOS::Errors::PrintStacktrace(int skipFrames, int maxFrames)
 {
-    cpptrace::generate_trace(
+    cpptrace::stacktrace st = cpptrace::generate_trace(
         std::size_t(skipFrames) + 1, // we want to skip our own frame
         std::size_t(maxFrames)
-    ).print(std::cout); // There is also .print_with_snippets() but its a bit overloaded
-    std::cout.flush();
+    );
+
+    for (size_t i = 0; i < st.frames.size(); ++i)
+    {
+        cpptrace::stacktrace_frame const& trace = st.frames[i];
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL,
+            "#%u [0x%" PRIXPTR "] %s %s:%u",
+            i,
+            trace.object_address,
+            trace.symbol.c_str(),
+            trace.filename.c_str(),
+            trace.line
+        );
+    }
 }
 
 [[noreturn]]

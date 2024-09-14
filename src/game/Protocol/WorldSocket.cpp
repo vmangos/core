@@ -87,8 +87,11 @@ void WorldSocket::DoRecvIncomingData()
     {
         if (error)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "WorldSocket::DoRecvIncomingData: IoError: %s", error.ToString().c_str());
-            self->CloseSocket(); // This call to CloseSocket is actually necessary for once, so that others can see that this socket is not useable anymore
+            if (error.GetErrorType() != IO::NetworkError::ErrorType::SocketClosed || !self->IsClosing())
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "WorldSocket::DoRecvIncomingData: IoError: %s", error.ToString().c_str());
+                self->CloseSocket(); // This call to CloseSocket is actually necessary for once, so that others can see that this socket is not usable anymore
+            }
             return;
         }
 

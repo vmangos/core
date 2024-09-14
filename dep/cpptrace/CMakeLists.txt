@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.12)
 
 include(cmake/PreventInSourceBuilds.cmake)
 
@@ -116,7 +116,15 @@ if(
   )
 )
   # Attempt to auto-config
-  if(UNIX)
+  if(APPLE AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"))
+    if(HAS_EXECINFO)
+      set(CPPTRACE_UNWIND_WITH_EXECINFO On)
+      message(STATUS "Cpptrace auto config: Using execinfo.h for unwinding")
+    else()
+      set(CPPTRACE_UNWIND_WITH_NOTHING On)
+      message(FATAL_ERROR "Cpptrace auto config: No unwinding back-end seems to be supported, stack tracing will not work. To compile anyway set CPPTRACE_UNWIND_WITH_NOTHING.")
+    endif()
+  elseif(UNIX)
     if(HAS_UNWIND)
       set(CPPTRACE_UNWIND_WITH_UNWIND On)
       message(STATUS "Cpptrace auto config: Using libgcc unwind for unwinding")
@@ -406,50 +414,36 @@ if(CPPTRACE_GET_SYMBOLS_WITH_LIBDWARF)
       find_package(zstd)
     else()
       cmake_policy(SET CMP0074 NEW)
+      set(ZSTD_BUILD_PROGRAMS OFF)
+      set(ZSTD_BUILD_CONTRIB OFF)
+      set(ZSTD_BUILD_TESTS OFF)
+      set(ZSTD_BUILD_STATIC ON)
+      set(ZSTD_BUILD_SHARED OFF)
+      set(ZSTD_LEGACY_SUPPORT OFF)
       FetchContent_Declare(
           zstd
-          GIT_REPOSITORY ${CPPTRACE_ZSTD_REPO}
-          GIT_TAG ${CPPTRACE_ZSTD_TAG}
-          GIT_SHALLOW ${CPPTRACE_ZSTD_SHALLOW}
+          URL "${CPPTRACE_ZSTD_URL}"
+          DOWNLOAD_EXTRACT_TIMESTAMP TRUE
           SOURCE_SUBDIR build/cmake
       )
-      # FetchContent_MakeAvailable(zstd)
-      FetchContent_GetProperties(zstd)
-      if(NOT zstd_POPULATED)
-        FetchContent_Populate(zstd)
-        set(ZSTD_BUILD_PROGRAMS OFF)
-        set(ZSTD_BUILD_CONTRIB OFF)
-        set(ZSTD_BUILD_TESTS OFF)
-        set(ZSTD_BUILD_STATIC ON)
-        set(ZSTD_BUILD_SHARED OFF)
-        set(ZSTD_LEGACY_SUPPORT OFF)
-        add_subdirectory("${zstd_SOURCE_DIR}/build/cmake" "${zstd_BINARY_DIR}")
-      endif()
+      FetchContent_MakeAvailable(zstd)
     endif()
     # Libdwarf itself
     set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-    # set(PIC_ALWAYS TRUE)
-    # set(BUILD_DWARFDUMP FALSE)
+    set(PIC_ALWAYS TRUE)
+    set(BUILD_DWARFDUMP FALSE)
     FetchContent_Declare(
       libdwarf
       GIT_REPOSITORY ${CPPTRACE_LIBDWARF_REPO}
       GIT_TAG ${CPPTRACE_LIBDWARF_TAG}
       GIT_SHALLOW ${CPPTRACE_LIBDWARF_SHALLOW}
     )
-    # FetchContent_MakeAvailable(libdwarf)
-    FetchContent_GetProperties(libdwarf)
-    if(NOT libdwarf_POPULATED)
-      set(PIC_ALWAYS TRUE)
-      set(BUILD_DWARFDUMP FALSE)
-      # set(ENABLE_DECOMPRESSION FALSE)
-      FetchContent_Populate(libdwarf)
-      add_subdirectory("${libdwarf_SOURCE_DIR}" "${libdwarf_BINARY_DIR}")
-      target_include_directories(
-        dwarf
-        PRIVATE
-        ${zstd_SOURCE_DIR}/lib
-      )
-    endif()
+    FetchContent_MakeAvailable(libdwarf)
+    target_include_directories(
+      dwarf
+      PRIVATE
+      ${zstd_SOURCE_DIR}/lib
+    )
   endif()
   if(CPPTRACE_CONAN)
     target_link_libraries(${target_name} PRIVATE libdwarf::libdwarf)

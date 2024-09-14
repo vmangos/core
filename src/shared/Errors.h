@@ -28,19 +28,15 @@ namespace MaNGOS { namespace Errors
     [[noreturn]]
     void PrintStacktraceAndThrow(char const* filename, int line, char const* functionName, char const* failedExpression, char const* message = nullptr);
 
-    /// Prints a stack trace to std::cout
+    /// Prints a stack trace to `sLog.(LOG_BASIC,LOG_LVL_MINIMAL, ...)`
     void PrintStacktrace();
 
-    /// Prints a stack trace to std::cout
+    /// Prints a stack trace to `sLog.(LOG_BASIC,LOG_LVL_MINIMAL, ...)`
     void PrintStacktrace(int skipFrames, int maxFrames);
 }} // namespace MaNGOS::Errors
 
+/// Just a macro that converse a raw string to a quoted "string"
 #define MANGOS_ERROR_STRING_ESCAPE(a) #a
-
-#define MANGOS_ERROR_ASSERT_1(condition)
-#define MANGOS_ERROR_ASSERT_2(condition, message) do { if (!(condition)) { MaNGOS::Errors::PrintStacktraceAndThrow(__FILE__, __LINE__, __FUNCTION__, MANGOS_ERROR_STRING_ESCAPE(condition), message); } } while(0)
-
-#define MANGOS_ERROR_ASSERT_GET_IMPL(_1, _2, NAME, ...) NAME
 
 /// <example>
 /// MANGOS_ASSERT(abc == 2); // will throw if abc is not 2

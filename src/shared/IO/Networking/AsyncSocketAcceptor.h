@@ -28,7 +28,7 @@ namespace IO { namespace Networking {
         public:
             ~AsyncSocketAcceptor(); // this destructor will throw if ClosePortAndStopAcceptingNewConnections was not called
 
-            static std::unique_ptr<AsyncSocketAcceptor> CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIp, uint16_t port);
+            static std::unique_ptr<AsyncSocketAcceptor> CreateAndBindServer(IO::IoContext* ctx, std::string const& bindIpStr, uint16_t port);
             void ClosePortAndStopAcceptingNewConnections();
 
             /// Automatically accepts all incoming connections until this Acceptor is StoppedAndClosed
@@ -38,8 +38,7 @@ namespace IO { namespace Networking {
     #endif
 
         private:
-            explicit AsyncSocketAcceptor(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
-                : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket), m_wasClosed(false) {}
+            explicit AsyncSocketAcceptor(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket);
 
             IO::Native::SocketHandle m_acceptorNativeSocket;
             IO::IoContext* m_ctx;
@@ -49,7 +48,7 @@ namespace IO { namespace Networking {
             void AcceptOne(std::function<void(nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> acceptResult)> const& afterAccept);
             IocpOperationTask m_currentAcceptTask;
     #elif defined(__linux__) || defined(__APPLE__)
-            std::function<void(IO::Networking::SocketDescriptor socketDescriptor)> m_onNewSocketCallback = nullptr;
+            std::function<void(IO::Networking::SocketDescriptor socketDescriptor)> m_onNewSocketCallback;
             void OnNewClientToAcceptAvailable(); // a new socket on ::accept() is available
     #endif
 

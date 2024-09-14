@@ -9,21 +9,15 @@
 /// This function will open a file in read shared and binary mode
 /// You have to check the resulting pointer for nullptr!
 /// If the file does not exists or you dont have permission to open it the ptr will be null
-std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::TryOpenFileReadonly(std::string const& filePath, EnumFlag<FileOpenFlags> flags)
+std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::TryOpenFileReadonly(std::string const& filePath)
 {
-    DWORD nativeFlags = FILE_ATTRIBUTE_NORMAL;
-    if (flags.HasFlag(FileOpenFlags::HintSequentialRead))
-    {
-        nativeFlags |= FILE_FLAG_SEQUENTIAL_SCAN;
-    }
-
     HANDLE nativeFileHandle = CreateFileA(
             filePath.c_str(),
             GENERIC_READ,
             FILE_SHARE_READ,       // Share mode: allow other processes to read
             nullptr,               // Security attributes
             OPEN_EXISTING,         // Open exising file. Fail if it does not exist
-            nativeFlags,
+            FILE_ATTRIBUTE_NORMAL, // Normal open, without any special flags
             nullptr                // Template file handle (would be used when creating a new file and copy the attributes)
     );
 

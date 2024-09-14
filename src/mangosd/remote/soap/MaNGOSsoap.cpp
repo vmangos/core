@@ -46,7 +46,7 @@ void SoapThreadBody(struct soap* soap)
         soap_serve(soap); // handle soap request
     }
 
-    sLog.Out(LOG_RA, LOG_LVL_ERROR, "MaNGOSsoap: Stopping...");
+    sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "MaNGOSsoap: Stopping...");
     soap_end(soap);
     soap_done(soap);
     soap_destroy(soap);

@@ -50,6 +50,9 @@ namespace IO { namespace Networking {
             void ReadSome(char* target, size_t maxSize, std::function<void(IO::NetworkError const&, size_t)> const& callback);
             void ReadSkip(size_t skipSize, std::function<void(IO::NetworkError const&)> const& callback);
 
+            // Read() takes a `char*` while Write() uses a smart pointer to prevent accidental use-after-free.
+            // It's easy to forget to keep the buffer in scope. (without this precaution, Write() could also take a `char*`)
+
             /// Warning: Using this function will NOT copy the buffer content, dont overwrite it unless callback is triggered!
             void Write(IO::ReadableBuffer const& source, std::function<void(IO::NetworkError const&)> const& callback);
 
