@@ -25,6 +25,7 @@ install(
   COMPONENT ${package_name}-development
   INCLUDES #
   DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  ARCHIVE DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
 # create config file that points to targets file
