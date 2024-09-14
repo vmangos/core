@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <chrono>
 #include <string>
+#include <functional>
 
 namespace IO { namespace Networking {
 
