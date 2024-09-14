@@ -274,8 +274,8 @@ bool ChatHandler::HandleWorldTestCommand(char *args)
         return false;
     }
     PSendSysMessage("My worldmask is 0x%x. My target worldmask is 0x%x.", me->GetWorldMask(), target->GetWorldMask());
-    PSendSysMessage("I see the target ? %s", me->CanSeeInWorld(target) ? "oui" : "non");
-    PSendSysMessage("My target sees me ? %s", target->CanSeeInWorld(me) ? "oui" : "non");
+    PSendSysMessage("I see the target ? %s", me->CanSeeInWorld(target) ? "yes" : "no");
+    PSendSysMessage("My target sees me ? %s", target->CanSeeInWorld(me) ? "yes" : "no");
     return true;
 }
 

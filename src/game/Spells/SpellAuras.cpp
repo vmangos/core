@@ -1747,6 +1747,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
+                    case 11920:                             // Net Guard
+                    {
+                        if (Creature* pCaster = ToCreature(GetCaster()))
+                            pCaster->GetThreatManager().modifyThreatPercent(target, -50);
+                        return;
+                    }
                     case 12623:                             // Suppression
                     {
                         if (Creature* pCreature = target->ToCreature())

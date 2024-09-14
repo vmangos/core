@@ -10333,8 +10333,10 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
         return EQUIP_ERR_ALREADY_LOOTED;
 
     // you cannot unequip main hand weapon while disarmed
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     if (IsMainHandPos(pos) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
         return EQUIP_ERR_NOT_WHILE_DISARMED;
+#endif
 
     // do not allow unequipping gear except weapons, offhands, projectiles, relics in combat
     if (!pProto->CanChangeEquipStateInCombat())
@@ -20295,9 +20297,6 @@ uint32 Player::SelectResurrectionSpellId() const
                 case 20765:
                     spellId = 20761;
                     break;        // rank 5
-                case 27239:
-                    spellId = 27240;
-                    break;        // rank 6
                 default:
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unhandled spell %u: S.Resurrection", dummyAura->GetId());
                     continue;
