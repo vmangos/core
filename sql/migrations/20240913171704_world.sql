@@ -3,9 +3,9 @@ delimiter ??
 CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
-SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20221107191704');
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20240913171704');
 IF v=0 THEN
-INSERT INTO `migrations` VALUES ('20221107191704');
+INSERT INTO `migrations` VALUES ('20240913171704');
 -- Add your query below.
 
 UPDATE `gameobject_template` SET `flags` = 0, `data0` = 14 WHERE `entry` = 177226; -- Enables object gossip for Book "Soothsaying for Dummies" 
