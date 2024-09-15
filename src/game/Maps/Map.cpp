@@ -2863,11 +2863,7 @@ void Map::SendObjectUpdates()
     _processingSendObjUpdates = true;
 
     // Compute maximum number of threads
-//#define FORCE_OLD_THREADCOUNT
-#ifndef FORCE_OLD_THREADCOUNT
-    int threads = m_objectThreads ? m_objectThreads->size() +1 : 1;
-#else
-    int threads = 1;
+    uint32 threads = 1;
     if (IsContinent())
     {
         threads = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS);
@@ -2878,7 +2874,6 @@ void Map::SendObjectUpdates()
         _objUpdatesThreads = 1;
     if (threads < _objUpdatesThreads)
         _objUpdatesThreads = threads;
-#endif
     if (threads > objectsCount)
         threads = objectsCount;
 
@@ -2921,19 +2916,11 @@ void Map::SendObjectUpdates()
             delete updaters[i];
     }
 
-    if (job.valid())
-        job.wait();
-    for (int i = 0; i < threads; i++)
-        i_objectsToClientUpdate.erase(t[step * i], t[counters[i]]);
-#endif
-
-#ifdef FORCE_OLD_THREADCOUNT
     // If we timeout, use more threads !
     if (!i_objectsToClientUpdate.empty())
         ++_objUpdatesThreads;
     else
         --_objUpdatesThreads;
-#endif
 
     _processingSendObjUpdates = false;
     delete[] updaters;
@@ -2941,7 +2928,7 @@ void Map::SendObjectUpdates()
 #ifdef MAP_SENDOBJECTUPDATES_PROFILE
     uint32 diff = WorldTimer::getMSTimeDiffToNow(now);
     if (diff > 50)
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "SendObjectUpdates in %04u ms [%u threads. %3u/%3u]", diff, threads, objectsCount - i_objectsToClientUpdate.size(), objectsCount);
+        sLog.outString("SendObjectUpdates in %04u ms [%u threads. %3u/%3u]", diff, threads, objectsCount - i_objectsToClientUpdate.size(), objectsCount);
 #endif
 }
 

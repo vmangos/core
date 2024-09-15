@@ -182,6 +182,7 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
 
         void ScheduleInstanceSwitch(Player* player, uint16 newInstance);
         void SwitchPlayersInstances();
+        void CreateNewInstancesForPlayers();
 
         void ScheduleFarTeleport(Player* player, ScheduledTeleportData* data);
         void ExecuteDelayedPlayerTeleports();
@@ -241,7 +242,6 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         std::map<Player*, uint16 /* new instance */> m_scheduledInstanceSwitches[LAST_CONTINENT_ID]; // 2 continents
 
         // Handle creation of new maps for teleport while continents are being updated.
-        void CreateNewInstancesForPlayers();
         std::unordered_set<Player*> m_scheduledNewInstancesForPlayers;
 
         ACE_Thread_Mutex m_scheduledFarTeleportsLock;

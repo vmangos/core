@@ -24,7 +24,7 @@
 
 #include "Common.h"
 #include "Policies/Singleton.h"
-
+#include "ace/Thread_Mutex.h"
 #include <unordered_set>
 
 class Warden;

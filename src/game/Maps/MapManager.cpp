@@ -257,7 +257,7 @@ void MapManager::CreateNewInstancesForPlayers()
 {
     do
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        ACE_Based::Thread::Sleep(20);
         std::unordered_set<Player*> players;
         std::swap(players, m_scheduledNewInstancesForPlayers);
 
@@ -338,6 +338,19 @@ public:
     uint32 diff;
 };
 
+class NewInstanceAsyncCreator : public ACE_Based::Runnable
+{
+public:
+    NewInstanceAsyncCreator()
+    {
+    }
+
+    virtual void run()
+    {
+        sMapMgr.CreateNewInstancesForPlayers();
+    }
+};
+
 void MapManager::Update(uint32 diff)
 {
     i_timer.Update(diff);
@@ -386,7 +399,7 @@ void MapManager::Update(uint32 diff)
             continentsUpdaters.push_back(task);
         }
     }
-    std::thread instanceCreationThread = std::thread(&MapManager::CreateNewInstancesForPlayers, this);
+    ACE_Based::Thread* instanceCreationThread = new ACE_Based::Thread(new NewInstanceAsyncCreator());
     i_maxContinentThread = continentsIdx;
     i_continentUpdateFinished = new volatile bool[i_maxContinentThread];
     for (int i = 0; i < i_maxContinentThread; ++i)
@@ -419,8 +432,11 @@ void MapManager::Update(uint32 diff)
     i_continentUpdateFinished = nullptr;
     asyncMapUpdating = false;
 
-    if (instanceCreationThread.joinable())
-        instanceCreationThread.join();
+    if (instanceCreationThread)
+    {
+        instanceCreationThread->wait();
+        delete instanceCreationThread;
+    }
 
     // Execute far teleports after all map updates have finished
     ExecuteDelayedPlayerTeleports();

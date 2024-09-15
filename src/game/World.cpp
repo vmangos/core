@@ -180,9 +180,8 @@ World::~World()
 
     if (m_asyncPacketsThread)
     {
-        if (m_asyncPacketsThread->joinable())
-            m_asyncPacketsThread->join();
-        m_asyncPacketsThread.reset(nullptr);
+        m_asyncPacketsThread->wait();
+        delete m_asyncPacketsThread;
     }
 
     //TODO free addSessQueue
@@ -200,8 +199,8 @@ void World::Shutdown()
     if (m_lfgQueueThread)
         m_lfgQueueThread->wait();
       
-    if (m_asyncPacketsThread && m_asyncPacketsThread->joinable())
-        m_asyncPacketsThread->join();
+    if (m_asyncPacketsThread)
+        m_asyncPacketsThread->wait();
     
     sAnticheatMgr->StopWardenUpdateThread();
 }
@@ -1271,6 +1270,19 @@ public:
     }
 };
 
+class AsyncPacketsWorkerThread : public ACE_Based::Runnable
+{
+public:
+    AsyncPacketsWorkerThread()
+    {
+    }
+
+    virtual void run()
+    {
+        sWorld.ProcessAsyncPackets();
+    }
+};
+
 char const* World::GetPatchName() const
 {
     switch(GetWowPatch())
@@ -1886,7 +1898,7 @@ void World::SetInitialWorldSettings()
                                               std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
     m_lfgQueueThread = new ACE_Based::Thread(new LFGQueueWorkerThread());
     m_charDbWorkerThread = new ACE_Based::Thread(new CharactersDatabaseWorkerThread());
-    m_asyncPacketsThread.reset(new std::thread(&World::ProcessAsyncPackets, this));
+    m_asyncPacketsThread = new ACE_Based::Thread(new AsyncPacketsWorkerThread());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "==========================================================");
@@ -1952,7 +1964,7 @@ void World::ProcessAsyncPackets()
     {
         do
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            ACE_Based::Thread::Sleep(20);
         } while (!m_canProcessAsyncPackets);
 
         for (auto const& itr : m_sessions)

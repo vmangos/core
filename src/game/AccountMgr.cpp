@@ -238,7 +238,7 @@ bool AccountMgr::HasTrialRestrictions(uint32 accountId)
 bool AccountMgr::GetName(uint32 accountId, std::string &name)
 {
     {
-        std::shared_lock<std::shared_timed_mutex> guard(m_accountPersistentDataMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_accountPersistentDataMutex);
         auto itr = m_accountPersistentData.find(accountId);
         if (itr != m_accountPersistentData.end() && !itr->second.m_email.empty())
         {
@@ -374,7 +374,7 @@ void AccountMgr::LoadIPBanList(std::unique_ptr<QueryResult> result, bool silent)
         ipBanned.emplace(std::make_pair(fields[0].GetString(), unbandate));
     } while (result->NextRow());
 
-    std::lock_guard<std::shared_timed_mutex> lock(m_ipBannedMutex);
+    ACE_Guard<ACE_Thread_Mutex> lock(m_ipBannedMutex);
     std::swap(ipBanned, m_ipBanned);
 
     if (!silent)
@@ -427,7 +427,7 @@ void AccountMgr::LoadAccountBanList(bool silent)
 
 bool AccountMgr::IsIPBanned(std::string const& ip) const
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_ipBannedMutex);
+    ACE_Guard<ACE_Thread_Mutex> lock(m_ipBannedMutex);
     std::map<std::string, uint32>::const_iterator it = m_ipBanned.find(ip);
     return !(it == m_ipBanned.end() || it->second < time(nullptr));
 }
@@ -548,14 +548,14 @@ bool AccountPersistentData::CanMail(uint32 targetAccount)
 AccountPersistentData& AccountMgr::GetAccountPersistentData(uint32 accountId)
 {
     {
-        std::shared_lock<std::shared_timed_mutex> guard(m_accountPersistentDataMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_accountPersistentDataMutex);
         auto itr = m_accountPersistentData.find(accountId);
         if (itr != m_accountPersistentData.end())
             return itr->second;
     }
     
     {
-        std::lock_guard<std::shared_timed_mutex> guard(m_accountPersistentDataMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_accountPersistentDataMutex);
         return m_accountPersistentData[accountId];
     }
 }

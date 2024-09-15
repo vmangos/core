@@ -22,7 +22,6 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 #include "World.h"
-#include <shared_mutex>
 
 class Guild;
 class ObjectGuid;

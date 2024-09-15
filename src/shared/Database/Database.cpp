@@ -185,8 +185,8 @@ bool Database::Initialize(char const* infoString, int nConns /*= 1*/, int nWorke
         return false;
 
     m_numAsyncWorkers = nWorkers;
-    m_threadsBodies   = new SqlDelayThread*[m_numAsyncWorkers];
-    m_delayThreads    = new ACE_Based::Thread*[m_numAsyncWorkers];
+    m_threadsBodies.resize(m_numAsyncWorkers);
+    m_delayThreads.resize(m_numAsyncWorkers);
     m_serialDelayQueue = new SqlQueue*[m_numAsyncWorkers];
     for (int i = 0; i < nWorkers; ++i)
         if (!InitDelayThread(i, infoString))
@@ -228,9 +228,9 @@ bool Database::InitDelayThread(int i, std::string const& infoString)
     SqlConnection* threadConnection = CreateConnection();
     if(!threadConnection->Initialize(infoString.c_str()))
         return false;
-    m_threadsBodies[i] = new SqlDelayThread(this, threadConnection, i);
-    m_threadsBodies[i]->incReference();
-    m_delayThreads[i] = new ACE_Based::Thread(m_threadsBodies[i]);
+    m_threadsBodies[i] = std::make_shared<SqlDelayThread*>(new SqlDelayThread(this, threadConnection, i));
+    (*m_threadsBodies[i])->incReference();
+    m_delayThreads[i] = new ACE_Based::Thread(*m_threadsBodies[i]);
 
     m_serialDelayQueue[i] = new SqlQueue();
 
@@ -239,21 +239,19 @@ bool Database::InitDelayThread(int i, std::string const& infoString)
 
 void Database::HaltDelayThread()
 {
-    if (!m_delayThreads || !m_threadsBodies)
+    if (m_delayThreads.empty() || m_threadsBodies.empty())
         return;
 
     for (uint32 i = 0; i < m_numAsyncWorkers; ++i)
     {
-        m_threadsBodies[i]->Stop();
+        (*m_threadsBodies[i])->Stop();
         m_delayThreads[i]->wait();
         delete m_delayThreads[i];
-        m_threadsBodies[i]->decReference();
+        (*m_threadsBodies[i])->decReference();
     }
-    delete[] m_threadsBodies;
-    delete[] m_delayThreads;
     delete[] m_serialDelayQueue;
-    m_delayThreads = nullptr;
-    m_threadsBodies = nullptr;
+    m_delayThreads.clear();
+    m_threadsBodies.clear();
     m_serialDelayQueue = nullptr;
     m_numAsyncWorkers = 0;
 }

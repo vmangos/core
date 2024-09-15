@@ -596,7 +596,18 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
         bool GetWalkRandomPosition(GenericTransport* t, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags = 0xF) const;
         bool GetSwimRandomPosition(float& x, float& y, float& z, float radius, GridMapLiquidData& liquid_status, bool randomRange = true) const;
         VMAP::ModelInstance* FindCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
-        GameObjectModel const* FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
+
+        GameObjectModel const* FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2)
+        {
+            ASSERT(MaNGOS::IsValidMapCoord(x1, y1, z1));
+            ASSERT(MaNGOS::IsValidMapCoord(x2, y2, z2));
+            Vector3 const pos1 = Vector3(x1, y1, z1);
+            Vector3 const pos2 = Vector3(x2, y2, z2);
+            _dynamicTree_lock.acquire_read();
+            GameObjectModel const* r = _dynamicTree.getObjectHit(pos1, pos2);
+            _dynamicTree_lock.release();
+            return r;
+        }
 
         void Balance() { _dynamicTree.balance(); }
         void RemoveGameObjectModel(GameObjectModel const& model)

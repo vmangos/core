@@ -40,7 +40,6 @@
 #include <string>
 #include <vector>
 #include <functional>
-#include <shared_mutex>
 
 struct Mail;
 struct ItemPrototype;
@@ -2613,7 +2612,7 @@ class Player final: public Unit
         bool m_InstanceValid;
         // permanent binds and solo binds
         BoundInstancesMap m_boundInstances;
-        mutable std::mutex m_boundInstancesMutex;
+        mutable ACE_Thread_Mutex m_boundInstancesMutex;
         InstancePlayerBind* GetBoundInstance(uint32 mapid);
         BoundInstancesMap& GetBoundInstances() { return m_boundInstances; }
         void UnbindInstance(uint32 mapid, bool unload = false);

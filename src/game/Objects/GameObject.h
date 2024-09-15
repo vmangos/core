@@ -30,7 +30,6 @@
 #include "Database/DatabaseEnv.h"
 #include <ace/Thread_Mutex.h>
 #include "Util.h"
-#include <shared_mutex>
 
 class Unit;
 class GameObjectAI;

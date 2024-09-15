@@ -212,8 +212,8 @@ void WorldSession::SendMovementPacket(WorldPacket const* packet)
         SendPacketImpl(packet);
         return;
     }
-        
-    std::lock_guard<std::mutex> guard(m_movementPacketCompressorMutex);
+    
+    ACE_Guard<ACE_Thread_Mutex> guard(m_movementPacketCompressorMutex);
     if (m_movementPacketCompressor.CanAddPacket(*packet))
         m_movementPacketCompressor.AddPacket(*packet);
     else

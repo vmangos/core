@@ -960,6 +960,8 @@ class World
         Messager<World>& GetMessager() { return m_messager; }
 
         LFGQueue& GetLFGQueue() { return m_lfgQueue; }
+
+        void ProcessAsyncPackets();
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -1026,9 +1028,8 @@ class World
         ACE_Based::Thread* m_lfgQueueThread;
 
         // This thread handles packets while the world sessions update is not running
-        std::unique_ptr<std::thread> m_asyncPacketsThread;
+        ACE_Based::Thread* m_asyncPacketsThread;
         bool m_canProcessAsyncPackets;
-        void ProcessAsyncPackets();
 
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;

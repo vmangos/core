@@ -29,13 +29,8 @@
 #include "Common.h"
 #include "Threading.h"
 
-<<<<<<< HEAD
 // Heartbeat thread for the World
-class WorldRunnable
-=======
-/// Heartbeat thread for the World
 class WorldRunnable : public ACE_Based::Runnable
->>>>>>> ace2
 {
     public:
         void run();

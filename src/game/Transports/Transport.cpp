@@ -202,7 +202,7 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 
 void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
 {
-    std::lock_guard<std::mutex> lock(m_passengerMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
     if (m_passengers.insert(passenger).second)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Unit %s boarded transport %s.", passenger->GetName(), GetName());
@@ -225,7 +225,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
 {
     bool erased = false;
 
-    std::lock_guard<std::mutex> lock(m_passengerMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
     if (m_passengerTeleportItr != m_passengers.end())
     {
         PassengerSet::iterator itr = m_passengers.find(passenger);
@@ -435,7 +435,7 @@ void GenericTransport::UpdatePosition(float x, float y, float z, float o)
 
 void GenericTransport::UpdatePassengerPositions()
 {
-    std::lock_guard<std::mutex> lock(m_passengerMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
     for (const auto passenger : m_passengers)
         UpdatePassengerPosition(passenger);
 }

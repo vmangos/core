@@ -37,9 +37,9 @@
 #include "InstanceData.h"
 #include "ProgressBar.h"
 
-typedef MaNGOS::ClassLevelLockable<MapPersistentStateManager, std::mutex> MapPersistanceStateManagerLock;
+typedef MaNGOS::ClassLevelLockable<MapPersistentStateManager, ACE_Recursive_Thread_Mutex> MapPersistanceStateManagerLock;
 INSTANTIATE_SINGLETON_2(MapPersistentStateManager, MapPersistanceStateManagerLock);
-INSTANTIATE_CLASS_MUTEX(MapPersistentStateManager, std::mutex);
+INSTANTIATE_CLASS_MUTEX(MapPersistentStateManager, ACE_Recursive_Thread_Mutex);
 
 
 static uint32 resetEventTypeDelay[MAX_RESET_EVENT_TYPE] = { 0,                      // not used
