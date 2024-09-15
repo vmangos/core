@@ -1045,6 +1045,18 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Initial loyalty level for newly tamed pets
 #        Default: 1
 #
+#    PetTrainingCostFactor
+#        Cost factor for pet ability training
+#        Default: 1.0
+#
+#    PetHappinessLossFactor
+#        Factor for loosing happiness over time
+#        Default: 1.0
+#
+#    PetUntrainCostFactor
+#        Cost factor for resetting pet skills
+#        Default: 1.0
+#
 #    PlayerCommands
 #        Should player chat be parsed for GM commands
 #        Default: 1 (parse commands)
@@ -1148,6 +1160,9 @@ MassMailer.SendPerTick = 10
 Mail.ReturnedMail.PerTick = 5
 PetUnsummonAtMount = 0
 PetDefaultLoyalty = 1
+PetTrainingCostFactor = 1.0
+PetHappinessLossFactor = 1.0
+PetUntrainCostFactor = 1.0
 PlayerCommands = 1
 Event.Announce = 0
 AutoBroadcast.Timer = 1800000

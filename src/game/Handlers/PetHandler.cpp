@@ -456,8 +456,9 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
     }
 
     uint32 cost = pet->GetResetTalentsCost();
+    uint32 realCost = static_cast<uint32>(cost * sWorld.getConfig(CONFIG_FLOAT_PET_UNTRAIN_COST_FACTOR));
 
-    if (GetPlayer()->GetMoney() < cost)
+    if (GetPlayer()->GetMoney() < realCost)
     {
         GetPlayer()->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
         return;
@@ -482,7 +483,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
 
     pet->m_resetTalentsTime = time(nullptr);
     pet->m_resetTalentsCost = cost;
-    GetPlayer()->ModifyMoney(-(int32)cost);
+    GetPlayer()->ModifyMoney(-(int32)realCost);
 
     GetPlayer()->PetSpellInitialize();
 }

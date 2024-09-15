@@ -8838,7 +8838,7 @@ void Player::SendPetSkillWipeConfirm() const
 
     WorldPacket data(SMSG_PET_UNLEARN_CONFIRM, (8 + 4));
     data << ObjectGuid(pet->GetObjectGuid());
-    data << uint32(pet->GetResetTalentsCost());
+    data << static_cast<uint32>(pet->GetResetTalentsCost() * sWorld.getConfig(CONFIG_FLOAT_PET_UNTRAIN_COST_FACTOR));
     GetSession()->SendPacket(&data);
 #endif
 }

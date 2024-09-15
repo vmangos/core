@@ -787,7 +787,7 @@ void Pet::LooseHappiness()
     int32 addvalue = (140 >> GetLoyaltyLevel()) * 125;      //value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 7.5 secs)
     if (IsInCombat())                                       //we know in combat happiness fades faster, multiplier guess
         addvalue = int32(addvalue * 1.5);
-    ModifyPower(POWER_HAPPINESS, -addvalue);
+    ModifyPower(POWER_HAPPINESS, static_cast<int32>(-addvalue * sWorld.getConfig(CONFIG_FLOAT_PET_HAPPINESS_LOSS_FACTOR)));
 }
 
 void Pet::ModifyLoyalty(int32 addvalue)

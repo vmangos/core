@@ -809,6 +809,9 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,      "PetUnsummonAtMount", false);
     setConfigMinMax(CONFIG_UINT32_PET_DEFAULT_LOYALTY, "PetDefaultLoyalty", 1, 1, 6);
+    setConfigMin(CONFIG_FLOAT_PET_TRAINING_COST_FACTOR, "PetTrainingCostFactor", 1.f, 0.f);
+    setConfigMin(CONFIG_FLOAT_PET_HAPPINESS_LOSS_FACTOR, "PetHappinessLossFactor", 1.f, 0.f);
+    setConfigMin(CONFIG_FLOAT_PET_UNTRAIN_COST_FACTOR, "PetUntrainCostFactor", 1.f, 0.f);
 
     setConfig(CONFIG_UINT32_ANTIFLOOD_SANCTION,       "Antiflood.Sanction", CHEAT_ACTION_KICK);
 

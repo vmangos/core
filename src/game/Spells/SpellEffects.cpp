@@ -4138,7 +4138,7 @@ void Spell::EffectLearnPetSpell(SpellEffectIndex effIdx)
     if (!pet->CanLearnPetSpell(pLearnSpell->Id))
         return;
 
-    pet->SetTP(pet->m_TrainingPoints - pet->GetTPForSpell(pLearnSpell->Id));
+    pet->SetTP(pet->m_TrainingPoints - static_cast<int32>(sWorld.getConfig(CONFIG_FLOAT_PET_TRAINING_COST_FACTOR) * pet->GetTPForSpell(pLearnSpell->Id)));
     pet->LearnSpell(pLearnSpell->Id);
 
     pet->SavePetToDB(PET_SAVE_AS_CURRENT);
