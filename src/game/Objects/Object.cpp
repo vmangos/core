@@ -639,8 +639,9 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
     }
     if (isType(TYPEMASK_GAMEOBJECT))
     {
-        std::unique_lock<std::mutex> lock(target->m_visibleGobjsQuestAct_lock);
+        target->m_visibleGobjsQuestAct_lock.acquire();
         target->m_visibleGobjQuestActivated[GetObjectGuid()] = IsActivateToQuest;
+        target->m_visibleGobjsQuestAct_lock.release();
     }
 
     MANGOS_ASSERT(updateMask && updateMask->GetCount() == m_valuesCount);

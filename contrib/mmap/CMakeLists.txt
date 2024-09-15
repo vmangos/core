@@ -28,7 +28,6 @@ include_directories(
     ../../src/shared
     ../../src/game
     ../../src/game/vmap
-    ../../src/game/Maps
     ../../src/game/Commands
     ../../dep/include/g3dlite
     ../../src/framework

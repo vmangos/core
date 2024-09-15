@@ -20,8 +20,9 @@
 #define MANGOS_MESSAGER_H
 
 #include <vector>
-#include <mutex>
 #include <functional>
+#include "ace/Thread_Mutex.h"
+#include "ace/Guard_T.h"
 
 template <class T>
 class Messager
@@ -29,14 +30,14 @@ class Messager
     public:
         void AddMessage(const std::function<void(T*)>& message)
         {
-            std::lock_guard<std::mutex> guard(m_messageMutex);
+            ACE_Guard<ACE_Thread_Mutex> guard(m_messageMutex);
             m_messageVector.push_back(message);
         }
         void Execute(T* object)
         {
             std::vector<std::function<void(T*)>> messageVectorCopy;
             {
-                std::lock_guard<std::mutex> guard(m_messageMutex);
+                ACE_Guard<ACE_Thread_Mutex> guard(m_messageMutex);
                 std::swap(m_messageVector, messageVectorCopy);
             }
             for (auto& message : messageVectorCopy)
@@ -46,7 +47,7 @@ class Messager
         }
     private:
         std::vector<std::function<void(T*)>> m_messageVector;
-        std::mutex m_messageMutex;  
+        ACE_Thread_Mutex m_messageMutex;
 };
 
 #endif

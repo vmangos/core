@@ -604,7 +604,7 @@ namespace MMAP
             ModelInstance& instance = models[i];
 
             // model instances exist in tree even though there are instances of that model in this tile
-            std::shared_ptr<WorldModel> worldModel = instance.getWorldModel();
+            WorldModel* worldModel = instance.getWorldModel();
             if (!worldModel)
                 continue;
 
@@ -731,7 +731,7 @@ namespace MMAP
             ModelInstance instance = models[i];
 
             // model instances exist in tree even though there are instances of that model in this tile
-            std::shared_ptr<WorldModel> worldModel = instance.getWorldModel();
+            WorldModel* worldModel = instance.getWorldModel();
             if (!worldModel)
                 continue;
 

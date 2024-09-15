@@ -19,12 +19,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-// \addtogroup mangosd
-// @{
-// \file
+/// \addtogroup mangosd
+/// @{
+/// \file
 
-#ifndef _RASOCKET_H
-#define _RASOCKET_H
+#ifndef _OFFLINE_CHAT_SOCKET_H
+#define _OFFLINE_CHAT_SOCKET_H
 
 #include "Common.h"
 #include <ace/Synch_Traits.h>
@@ -34,66 +34,64 @@
 #include <ace/Thread_Mutex.h>
 #include <ace/Semaphore.h>
 
-#define RA_BUFF_SIZE 8192
+#define OFFCHAT_BUFF_SIZE 8192
 
-
-// Remote Administration socket
-typedef ACE_Svc_Handler < ACE_SOCK_STREAM, ACE_NULL_SYNCH> RAHandler;
-class RASocket: protected RAHandler
+enum OfflineChatSpecialCommands
 {
+    OFFLINE_CHAT_GET_MESSAGES       = -2,
+    OFFLINE_CHAT_GM_COMMAND         = -1,
+};
+
+/// Remote Administration socket
+typedef ACE_Svc_Handler < ACE_SOCK_STREAM, ACE_NULL_SYNCH> OfflineChatHandler;
+class OfflineChatSocket: protected OfflineChatHandler
+{
+    ACE_Semaphore pendingCommands;
     public:
-        ACE_Semaphore pendingCommands;
-        typedef ACE_Acceptor<RASocket, ACE_SOCK_ACCEPTOR > Acceptor;
-        friend class ACE_Acceptor<RASocket, ACE_SOCK_ACCEPTOR >;
+        typedef ACE_Acceptor<OfflineChatSocket, ACE_SOCK_ACCEPTOR > Acceptor;
+        friend class ACE_Acceptor<OfflineChatSocket, ACE_SOCK_ACCEPTOR >;
 
         int sendf(const char*);
 
     protected:
-        // things called by ACE framework.
-        RASocket(void);
-        virtual ~RASocket(void);
+        /// things called by ACE framework.
+        OfflineChatSocket(void);
+        virtual ~OfflineChatSocket(void);
 
-        // Called on open ,the void* is the acceptor.
+        /// Called on open ,the void* is the acceptor.
         virtual int open (void *);
 
-        // Called on failures inside of the acceptor, don't call from your code.
+        /// Called on failures inside of the acceptor, don't call from your code.
         virtual int close (int);
 
-        // Called when we can read from the socket.
+        /// Called when we can read from the socket.
         virtual int handle_input (ACE_HANDLE = ACE_INVALID_HANDLE);
 
-        // Called when the socket can write.
+        /// Called when the socket can write.
         virtual int handle_output (ACE_HANDLE = ACE_INVALID_HANDLE);
 
-        // Called when connection is closed or error happens.
+        /// Called when connection is closed or error happens.
         virtual int handle_close (ACE_HANDLE = ACE_INVALID_HANDLE,
             ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
 
     private:
         bool outActive;
 
-        char inputBuffer[RA_BUFF_SIZE];
+        char inputBuffer[OFFCHAT_BUFF_SIZE];
         uint32 inputBufferLen;
 
         ACE_Thread_Mutex outBufferLock;
-        char outputBuffer[RA_BUFF_SIZE];
+        char outputBuffer[OFFCHAT_BUFF_SIZE];
         uint32 outputBufferLen;
 
         uint32 accId;
         AccountTypes accAccessLevel;
-        bool bSecure;                                       // kick on wrong pass, non exist. user OR user with no priv
-                                                            // will protect from DOS, bruteforce attacks
-        bool bStricted;                                     // not allow execute console only commands (SEC_CONSOLE) remotly
-        AccountTypes iMinLevel;
         enum
         {
-            NONE,                                           // initial value
-            LG,                                             // only login was entered
-            OK,                                             // both login and pass were given, they were correct and user has enough priv.
+            NONE,                                           //initial value
+            LG,                                             //only login was entered
+            OK,                                             //both login and pass were given, they were correct and user has enough priv.
         }stage;
-
-        static void zprint(void* callbackArg, const char * szText );
-        static void commandFinished(void* callbackArg, bool success);
 };
 #endif
-// @}
+/// @}

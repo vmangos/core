@@ -42,7 +42,7 @@ static uint16 holetab_v[4] = { 0x000F, 0x00F0, 0x0F00, 0xF000 };
 
 GridMap::GridMap(): m_gridIntHeightMultiplier(0)
 {
-   // m_flags = 0;
+    m_flags = 0;
 
     // Area data
     m_gridArea = 0;
@@ -1214,9 +1214,9 @@ float TerrainInfo::GetWaterLevel(float x, float y, float z, float* pGround /*= n
 }
 
 //////////////////////////////////////////////////////////////////////////
-typedef MaNGOS::ClassLevelLockable<TerrainManager, std::mutex> TerrainManagerLock;
+typedef MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex> TerrainManagerLock;
 INSTANTIATE_SINGLETON_2(TerrainManager, TerrainManagerLock);
-INSTANTIATE_CLASS_MUTEX(TerrainManager, std::mutex);
+INSTANTIATE_CLASS_MUTEX(TerrainManager, ACE_Thread_Mutex);
 
 TerrainManager::TerrainManager()
 {

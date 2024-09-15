@@ -24,6 +24,7 @@
 
 #include "Common.h"
 
+#include "ace/Thread_Mutex.h"
 #include "LockedQueue.h"
 #include <queue>
 #include "DatabaseCallback.h"
@@ -97,19 +98,15 @@ class SqlResultQueue;                                       // queue for thread 
 class SqlQueryHolder;                                       // groups several async quries
 class SqlQueryHolderEx;                                     // points to a holder, added to the delay thread
 
-class ThreadPool;
-
-class SqlResultQueue : public LockedQueue<MaNGOS::IQueryCallback* , std::mutex>
+class SqlResultQueue : public ACE_Based::LockedQueue<MaNGOS::IQueryCallback* , ACE_Thread_Mutex>
 {
     public:
-        SqlResultQueue();
-        ~SqlResultQueue();
+        SqlResultQueue() : numUnsafeQueries(0) {}
         void CancelAll();
         void Update(uint32 maxTime);
-        typedef LockedQueue<MaNGOS::IQueryCallback*, std::mutex> CallbackQueue;
+        typedef ACE_Based::LockedQueue<MaNGOS::IQueryCallback*, ACE_Thread_Mutex> CallbackQueue;
         CallbackQueue _threadUnsafeWaitingQueries;
         uint32 numUnsafeQueries;
-        std::unique_ptr<ThreadPool> m_callbackThreads;
 };
 
 class SqlQuery : public SqlOperation

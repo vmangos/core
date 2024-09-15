@@ -656,7 +656,7 @@ void Warden::Update()
         std::vector<WorldPacket> packetQueue;
 
         {
-            std::lock_guard<std::mutex> lock(m_packetQueueMutex);
+            ACE_Guard<ACE_Thread_Mutex> lock(m_packetQueueMutex);
             std::swap(packetQueue, m_packetQueue);
         }
 

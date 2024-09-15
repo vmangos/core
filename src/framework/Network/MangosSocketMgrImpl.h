@@ -8,6 +8,7 @@
 #include <ace/TP_Reactor.h>
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/Guard_T.h>
+#include <ace/Atomic_Op.h>
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_types.h>
@@ -16,7 +17,6 @@
 #include <ace/SOCK_Acceptor.h>
 
 #include <set>
-#include <atomic>
 
 #include "Log.h"
 #include "Common.h"
@@ -121,12 +121,12 @@ public:
 
     long Connections()
     {
-        return m_Connections;
+        return static_cast<long>(m_Connections.value());
     }
 
     int AddSocket(SocketType* sock)
     {
-        std::unique_lock<std::mutex> lock(m_NewSockets_Lock);
+        ACE_GUARD_RETURN(ACE_Thread_Mutex, Guard, m_NewSockets_Lock, -1);
 
         ++m_Connections;
         sock->AddReference();
@@ -144,7 +144,7 @@ public:
 protected:
     void AddNewSockets()
     {
-        std::unique_lock<std::mutex> lock(m_NewSockets_Lock);
+        ACE_GUARD(ACE_Thread_Mutex, Guard, m_NewSockets_Lock);
 
         if (m_NewSockets.empty())
             return;
@@ -210,7 +210,7 @@ protected:
     }
 
 private:
-    using AtomicInt = std::atomic<int>;
+    typedef ACE_Atomic_Op<ACE_SYNCH_MUTEX, int> AtomicInt;
     typedef std::set<SocketType*> SocketSet;
 
     ACE_Reactor* m_Reactor;
@@ -221,7 +221,7 @@ private:
     SocketSet m_Sockets;
 
     SocketSet m_NewSockets;
-    std::mutex m_NewSockets_Lock;
+    ACE_Thread_Mutex m_NewSockets_Lock;
 };
 
 template <typename SocketType>

@@ -67,7 +67,7 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& /*recv_data*/)
     _player->ScheduleRepopAtGraveyard();
 }
 
-class WhoListClientQueryTask
+class WhoListClientQueryTask: public AsyncTask
 {
 public:
     uint32 accountId;
@@ -75,7 +75,7 @@ public:
     uint32 zoneIds[10];                                     // 10 is client limit
     std::wstring str[4];                                    // 4 is client limit
     std::wstring wplayerName, wguildName;
-    void operator()()
+    void run()
     {
         WorldSession* sess = sWorld.FindSession(accountId);
         if (!sess)
@@ -230,68 +230,68 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recv_data)
     if (ReceivedWhoRequest())
         return;
 
-    WhoListClientQueryTask task;
-    task.accountId = GetAccountId();
+    WhoListClientQueryTask* task = new WhoListClientQueryTask();
+    task->accountId = GetAccountId();
     std::string playerName, guildName;
 
-    recv_data >> task.levelMin;                                // maximal player level, default 0
-    recv_data >> task.levelMax;                                // minimal player level, default 100 (MAX_LEVEL)
+    recv_data >> task->levelMin;                               // maximal player level, default 0
+    recv_data >> task->levelMax;                               // minimal player level, default 100 (MAX_LEVEL)
     recv_data >> playerName;                                   // player name, case sensitive...
     recv_data >> guildName;                                    // guild name, case sensitive...
-    recv_data >> task.raceMask;                                // race mask
-    recv_data >> task.classMask;                               // class mask
-    recv_data >> task.zonesCount;                              // zones count, client limit=10 (2.0.10)
+    recv_data >> task->raceMask;                               // race mask
+    recv_data >> task->classMask;                              // class mask
+    recv_data >> task->zonesCount;                             // zones count, client limit=10 (2.0.10)
 
-    if (task.zonesCount > 10)
+    if (task->zonesCount > 10)
     {
-        // delete task;
+        delete task;
         return;                                                // can't be received from real client or broken packet
     }
-    for (uint32 i = 0; i < task.zonesCount; ++i)
+    for (uint32 i = 0; i < task->zonesCount; ++i)
     {
         uint32 temp;
         recv_data >> temp;                                     // zone id, 0 if zone is unknown...
-        task.zoneIds[i] = temp;
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Zone %u: %u", i, task.zoneIds[i]);
+        task->zoneIds[i] = temp;
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Zone %u: %u", i, task->zoneIds[i]);
     }
 
-    recv_data >> task.strCount;                                // user entered strings count, client limit=4 (checked on 2.0.10)
+    recv_data >> task->strCount;                                // user entered strings count, client limit=4 (checked on 2.0.10)
 
-    if (task.strCount > 4)
+    if (task->strCount > 4)
     {
-        // delete task;
+        delete task;
         return;                                                // can't be received from real client or broken packet
     }
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Minlvl %u, maxlvl %u, name %s, guild %s, racemask %u, classmask %u, zones %u, strings %u", task.levelMin, task.levelMax, playerName.c_str(), guildName.c_str(), task.raceMask, task.classMask, task.zonesCount, task.strCount);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Minlvl %u, maxlvl %u, name %s, guild %s, racemask %u, classmask %u, zones %u, strings %u", task->levelMin, task->levelMax, playerName.c_str(), guildName.c_str(), task->raceMask, task->classMask, task->zonesCount, task->strCount);
 
-    for (uint32 i = 0; i < task.strCount; ++i)
+    for (uint32 i = 0; i < task->strCount; ++i)
     {
         std::string temp;
         recv_data >> temp;                                     // user entered string, it used as universal search pattern(guild+player name)?
 
-        if (!Utf8toWStr(temp, task.str[i]))
+        if (!Utf8toWStr(temp, task->str[i]))
             continue;
 
-        wstrToLower(task.str[i]);
+        wstrToLower(task->str[i]);
 
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "String %u: %s", i, temp.c_str());
     }
 
-    if (!(Utf8toWStr(playerName, task.wplayerName) && Utf8toWStr(guildName, task.wguildName)))
+    if (!(Utf8toWStr(playerName, task->wplayerName) && Utf8toWStr(guildName, task->wguildName)))
     {
-        // delete task;
+        delete task;
         return;
     }
-    wstrToLower(task.wplayerName);
-    wstrToLower(task.wguildName);
+    wstrToLower(task->wplayerName);
+    wstrToLower(task->wguildName);
 
     // client send in case not set max level value 100 but mangos support 255 max level,
     // update it to show GMs with characters after 100 level
-    if (task.levelMax >= MAX_LEVEL)
-        task.levelMax = PLAYER_STRONG_MAX_LEVEL;
+    if (task->levelMax >= MAX_LEVEL)
+        task->levelMax = PLAYER_STRONG_MAX_LEVEL;
 
     SetReceivedWhoRequest(true);
-    sWorld.AddAsyncTask(std::move(task));
+    sWorld.AddAsyncTask(task);
 }
 
 void WorldSession::HandleLFGOpcode(WorldPacket& recv_data)
@@ -1315,7 +1315,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
         return;
     }
 
-    std::lock_guard<std::mutex> lock(m_warden->m_packetQueueMutex);
+    ACE_Guard<ACE_Thread_Mutex> lock(m_warden->m_packetQueueMutex);
     m_warden->m_packetQueue.emplace_back(std::move(recv_data));
 #endif
 }

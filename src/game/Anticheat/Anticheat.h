@@ -76,8 +76,20 @@ public:
 #ifdef USE_ANTICHEAT
 #include "WardenAnticheat/Warden.hpp"
 #include "MovementAnticheat/MovementAnticheat.h"
-#include <mutex>
-#include <thread>
+
+#include "ace/Thread_Mutex.h"
+#include "ace/Guard_T.h"
+
+class AnticheatManager;
+
+class AnticheatManagerWorker : public ACE_Based::Runnable
+{
+public:
+    AnticheatManagerWorker(AnticheatManager* manager) : m_manager(manager) {};
+    virtual void run();
+    AnticheatManager* m_manager;
+};
+
 #else
 class Warden
 {
@@ -132,6 +144,7 @@ class AnticheatManager
 {
 public:
 #ifdef USE_ANTICHEAT
+    friend class AnticheatManagerWorker;
     ~AnticheatManager();
     void LoadAnticheatData();
 
@@ -152,8 +165,8 @@ private:
     std::vector<Warden*> m_wardenSessions;
     std::vector<Warden*> m_wardenSessionsToAdd;
     std::vector<Warden*> m_wardenSessionsToRemove;
-    std::mutex m_wardenSessionsMutex;
-    std::thread m_wardenUpdateThread;
+    ACE_Thread_Mutex m_wardenSessionsMutex;
+    ACE_Based::Thread* m_wardenUpdateThread = nullptr;
 #else
     void LoadAnticheatData() {}
 

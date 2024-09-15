@@ -28,7 +28,6 @@
  */
 
 #include "Platform/Define.h"
-#include <mutex>
 
 namespace MaNGOS
 {
@@ -40,63 +39,115 @@ namespace MaNGOS
             GeneralLock(MUTEX &m)
                 : i_mutex(m)
             {
+                i_mutex.acquire();
             }
 
             ~GeneralLock()
             {
+                i_mutex.release();
             }
 
-            GeneralLock(const GeneralLock &) = delete;
-            GeneralLock& operator=(const GeneralLock &) = delete;
         private:
 
+            GeneralLock(const GeneralLock &);
+            GeneralLock& operator=(const GeneralLock &);
             MUTEX &i_mutex;
-            std::unique_lock<MUTEX> m_lock{i_mutex};
-
     };
 
     template<class T>
     class SingleThreaded
     {
-    public:
+        public:
 
-        struct Lock                                     // empty object
-        {
-            Lock() = default;
+            struct Lock                                     // empty object
+            {
+                Lock()
+                {
+                }
+                Lock(const T&)
+                {
+                }
 
-            Lock(const T&) { }
+                Lock(const SingleThreaded<T>&)              // for single threaded we ignore this
+                {
+                }
+            };
+    };
 
-            Lock(const SingleThreaded<T>&) { }          // for single threaded we ignore this
-        };
+    template<class T, class MUTEX>
+    class ObjectLevelLockable
+    {
+        public:
+
+            ObjectLevelLockable()
+                : i_mtx()
+            {
+            }
+
+            friend class Lock;
+
+            class Lock
+            {
+                public:
+
+                    Lock(ObjectLevelLockable<T, MUTEX> &host)
+                        : i_lock(host.i_mtx)
+                    {
+                    }
+
+                private:
+
+                    GeneralLock<MUTEX> i_lock;
+            };
+
+        private:
+
+            // prevent the compiler creating a copy construct
+            ObjectLevelLockable(const ObjectLevelLockable<T, MUTEX>&);
+            ObjectLevelLockable<T, MUTEX>& operator=(const ObjectLevelLockable<T, MUTEX>&);
+
+            MUTEX i_mtx;
     };
 
     template<class T, class MUTEX>
     class ClassLevelLockable
     {
-    public:
-
-        ClassLevelLockable()
-        {
-        }
-
-        friend class Lock;
-
-        class Lock
-        {
         public:
 
-            Lock(const T& /*host*/) { }
+            ClassLevelLockable()
+            {
+            }
 
-            Lock(const ClassLevelLockable<T, MUTEX> &) { }
+            friend class Lock;
 
-            Lock() = default;
+            class Lock
+            {
+                public:
+
+                    Lock(const T& /*host*/)
+                    {
+                        ClassLevelLockable<T, MUTEX>::si_mtx.acquire();
+                    }
+
+                    Lock(const ClassLevelLockable<T, MUTEX> &)
+                    {
+                        ClassLevelLockable<T, MUTEX>::si_mtx.acquire();
+                    }
+
+                    Lock()
+                    {
+                        ClassLevelLockable<T, MUTEX>::si_mtx.acquire();
+                    }
+
+                    ~Lock()
+                    {
+                        ClassLevelLockable<T, MUTEX>::si_mtx.release();
+                    }
+            };
+
         private:
-            std::unique_lock<MUTEX> m_lock{si_mtx};
-        };
 
-    private:
-
-        static MUTEX si_mtx;
+            static MUTEX si_mtx;
     };
 
 }

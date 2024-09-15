@@ -157,9 +157,9 @@ void Camera::UpdateVisibilityForOwner()
     if (!m_source->FindMap())
         return;
 
-    std::shared_lock<std::shared_timed_mutex> lock(GetOwner()->m_visibleGUIDs_lock);
+    GetOwner()->m_visibleGUIDs_lock.acquire_read();
     MaNGOS::VisibleNotifier notifier(*this); // Will copy m_clientGUIDs
-    lock.unlock();
+    GetOwner()->m_visibleGUIDs_lock.release();
     Cell::VisitAllObjects(m_source, notifier, m_source->GetMap()->GetVisibilityDistance());
     notifier.Notify();
 }
