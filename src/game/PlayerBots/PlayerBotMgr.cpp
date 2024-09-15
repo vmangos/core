@@ -1485,6 +1485,8 @@ bool HandlePartyBotUseGObjectHelper(Player* pTarget, GameObject* pGo)
 
 bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
 {
+    HandleGameObjectSelectCommand(args);
+
     Player* pPlayer = GetSession()->GetPlayer();
     Player* pTarget = GetSelectedPlayer();
 
