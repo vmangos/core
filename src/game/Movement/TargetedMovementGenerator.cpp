@@ -18,7 +18,6 @@
 
 #include "ByteBuffer.h"
 #include "TargetedMovementGenerator.h"
-#include "Errors.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Player.h"
@@ -96,7 +95,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     // prevent redundant micro-movement for pets, other followers.
     else if (!i_target->IsMoving() && owner.movespline->Finalized() && i_target->IsWithinDistInMap(&owner, 1.4f * m_fOffset))
     {
-        owner.GetPosition(x, y, z);
+        return;
     }
     else
     {
@@ -161,15 +160,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH))
         m_bReachable = true;
 
-    // Enforce stricter checking inside dungeons
-    if (m_bReachable && owner.GetMap() && owner.GetMap()->IsDungeon())
-    {
-        // Check dest coords to ensure reachability
-        G3D::Vector3 dest = path.getActualEndPosition();
-        if (!owner.CanReachWithMeleeAutoAttackAtPosition(i_target.getTarget(), dest[0], dest[1], dest[2]))
-            m_bReachable = false;
-    }
-
     m_bRecalculateTravel = false;
     if (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && !transport && owner.HasDistanceCasterMovement())
         if (path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
@@ -179,13 +169,11 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
             return;
         }
 
-    // Try to prevent redundant micro-moves
-    float pathLength = path.Length();
-    if (pathLength < 0.4f ||
-            (pathLength < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
-            (pathType & PATHFIND_NOPATH && !petFollowing) ||
-            (pathType & PATHFIND_INCOMPLETE && !owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH) && !petFollowing) ||
-            (!petFollowing && !m_bReachable && !(owner.IsPlayer() && owner.HasUnitState(UNIT_STAT_FOLLOW))))
+    // Prevent redundant moves
+    if ((path.Length() < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
+        (!petFollowing && pathType & PATHFIND_NOPATH) ||
+        (!petFollowing && pathType & PATHFIND_INCOMPLETE && !owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH)) ||
+        (!petFollowing && !m_bReachable && !(owner.IsPlayer() && owner.HasUnitState(UNIT_STAT_FOLLOW))))
     {
         if (!losChecked)
             losResult = owner.IsWithinLOSInMap(i_target.getTarget());
@@ -346,7 +334,7 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             }
             else
             {
-                float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget()) - 0.5f;
+                float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget());
                 bool targetMoved = false;
                 G3D::Vector3 dest(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ);
                 if (GenericTransport* ownerTransport = owner.GetTransport())
@@ -360,12 +348,12 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
                     targetMoved = true;
 
                 if (!targetMoved)
-                    targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.5f);
+                    targetMoved = (dest.x != i_target->GetPositionX() || dest.y != i_target->GetPositionY() || dest.z != i_target->GetPositionZ());
 
                 // Chase movement may be interrupted
                 if (!targetMoved)
                     if (owner.movespline->Finalized())
-                        targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, allowed_dist - owner.GetObjectBoundingRadius());
+                        targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, allowed_dist, SizeFactor::None);
 
                 if (targetMoved)
                 {

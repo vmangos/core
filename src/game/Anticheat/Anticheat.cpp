@@ -169,7 +169,7 @@ void AnticheatManager::RemoveWardenSessionInternal(Warden* warden)
         if (m_wardenSessions[i] == warden)
         {
             m_wardenSessions[i] = nullptr;
-            break;;
+            break;
         }
     }
 

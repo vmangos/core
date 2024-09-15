@@ -5,6 +5,7 @@
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "PlayerBotAI.h"
+#include "BattleGroundDefines.h"
 
 #include <vector>
 #include <memory>
@@ -38,7 +39,6 @@ struct PlayerBotEntry
     bool isChatBot; // bot des joueurs en discussion via le site.
     bool customBot; // Enabled even if PlayerBot system disabled (AutoTesting system for example)
     bool requestRemoval;
-    std::vector<uint16> m_pendingResponses;
     std::unique_ptr<PlayerBotAI> ai;
 
     PlayerBotEntry(uint64 guid, uint32 account, uint32 chance_): playerGUID(guid), accountId(account), chance(chance_), state(PB_STATE_OFFLINE), isChatBot(false), customBot(false), requestRemoval(false), ai(nullptr)
@@ -87,6 +87,9 @@ class PlayerBotMgr
         bool AddRandomBot();
         bool DeleteRandomBot();
 
+        void AddBattleBot(BattleGroundQueueTypeId queueType, Team botTeam, uint32 botLevel, bool temporary);
+        void DeleteBattleBots();
+
         void DeleteAll();
         void AddAllBots();
 
@@ -111,6 +114,7 @@ class PlayerBotMgr
         uint32 m_lastUpdate;
         uint32 m_totalChance;
         uint32 m_maxAccountId;
+        time_t m_lastBattleBotQueueUpdate;
 
         std::map<uint32 /*pl guid*/, std::shared_ptr<PlayerBotEntry>> m_bots;
         std::map<uint32 /*account*/, uint32> m_tempBots;
@@ -123,6 +127,7 @@ class PlayerBotMgr
         bool m_confAllowSaving;
         bool m_confDebug;
         bool m_confEnableRandomBots;
+        bool m_confBattleBotAutoJoin;
 };
 
 #define sPlayerBotMgr MaNGOS::Singleton<PlayerBotMgr>::Instance()

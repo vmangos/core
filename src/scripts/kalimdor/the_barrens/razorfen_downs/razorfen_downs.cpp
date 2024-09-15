@@ -35,14 +35,15 @@ EndContentData */
 enum
 {
     QUEST_EXTINGUISHING_THE_IDOL = 3525,
-    SAY_BELNISTRASZ_READY = -1129005,
-    SAY_BELNISTRASZ_START_RIT = -1129006,
-    SAY_BELNISTRASZ_AGGRO_1 = -1129007,
-    SAY_BELNISTRASZ_AGGRO_2 = -1129008,
-    SAY_BELNISTRASZ_3_MIN = -1129009,
-    SAY_BELNISTRASZ_2_MIN = -1129010,
-    SAY_BELNISTRASZ_1_MIN = -1129011,
-    SAY_BELNISTRASZ_FINISH = -1129012,
+
+    SAY_BELNISTRASZ_READY     = 4493,
+    SAY_BELNISTRASZ_START_RIT = 4501,
+    SAY_BELNISTRASZ_AGGRO_1   = 9008,
+    SAY_BELNISTRASZ_AGGRO_2   = 9007,
+    SAY_BELNISTRASZ_3_MIN     = 4504,
+    SAY_BELNISTRASZ_2_MIN     = 4505,
+    SAY_BELNISTRASZ_1_MIN     = 4506,
+    SAY_BELNISTRASZ_FINISH    = 4507,
 
     NPC_IDOL_ROOM_SPAWNER = 8611,
     NPC_WITHERED_BATTLE_BOAR = 7333,
@@ -325,6 +326,6 @@ void AddSC_razorfen_downs()
 
     newscript = new Script;
     newscript->Name = "go_gong";
-    newscript->pGOHello =           &GOHello_go_gong;
+    newscript->pGOHello = &GOHello_go_gong;
     newscript->RegisterSelf();
 }

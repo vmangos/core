@@ -41,6 +41,7 @@
  // VMAPS
 #include "VMapFactory.h"
 #include "ModelInstance.h"
+#include "GameObjectModel.h"
  // MMAPS
 #include "MoveMap.h"                                        // for mmap manager
 #include "PathFinder.h"                                     // for mmap commands
@@ -141,14 +142,14 @@ bool ChatHandler::HandleSpellInfosCommand(char *args)
     PSendSysMessage("MaxTargetLevel%u:DmgClass%u:rangeIndex%u", pSpell->MaxTargetLevel, pSpell->DmgClass, pSpell->rangeIndex);
     PSendSysMessage("procChance%u:procFlags0x%x:procCharges%u", pSpell->procChance, pSpell->procFlags, pSpell->procCharges);
     PSendSysMessage("InterruptFlags0x%x:AuraInterruptFlags0x%x:PreventionType%x:spellLevel%u", pSpell->InterruptFlags, pSpell->AuraInterruptFlags, pSpell->PreventionType, pSpell->spellLevel);
-    PSendSysMessage("SpellSpecific%u:Binaire%s:spellPriority%u:Positive%u", Spells::GetSpellSpecific(pSpell->Id), pSpell->IsBinary() ? "OUI" : "NON", pSpell->spellPriority, pSpell->IsPositiveSpell());
-    PSendSysMessage("RecoveryTime%u:CategoryRecoveryTime%u:PvEHeartBeat%s", pSpell->RecoveryTime, pSpell->CategoryRecoveryTime, pSpell->IsPvEHeartBeat() ? "OUI" : "NON");
+    PSendSysMessage("SpellSpecific%u:Binaire%s:spellPriority%u:Positive%u", Spells::GetSpellSpecific(pSpell->Id), pSpell->IsBinary() ? "YES" : "NO", pSpell->spellPriority, pSpell->IsPositiveSpell());
+    PSendSysMessage("RecoveryTime%u:CategoryRecoveryTime%u:PvEHeartBeat%s", pSpell->RecoveryTime, pSpell->CategoryRecoveryTime, pSpell->IsPvEHeartBeat() ? "YES" : "NO");
     return true;
 }
 
 bool ChatHandler::HandleSpellSearchCommand(char *args)
 {
-    if (!args)
+    if (!*args)
         return false;
 
     uint32 familyName = 0;
@@ -158,7 +159,7 @@ bool ChatHandler::HandleSpellSearchCommand(char *args)
     if (!familyFlags)
         return false;
     PSendSysMessage("* Results for SpellFamilyName %u and SpellFamilyFlags & 0x%x", familyName, familyFlags);
-    LocaleConstant loc = GetSessionDbcLocale();
+    LocaleConstant const loc = GetSessionDbcLocale();
     SpellEntry const* pSpell = nullptr;
     for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); ++id)
     {
@@ -224,9 +225,7 @@ bool ChatHandler::HandleDebugSendNextChannelSpellVisualCommand(char *args)
     if (uiPlayId == -1)
     {
         m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-        WorldPacket data(MSG_CHANNEL_UPDATE, (4));
-        data << uint32(0);
-        m_session->GetPlayer()->SendDirectMessage(&data);
+        m_session->GetPlayer()->SendChannelUpdate(0);
         PSendSysMessage("Sending channel stop");
         return true;
     }
@@ -275,9 +274,7 @@ bool ChatHandler::HandleSendSpellChannelVisualCommand(char *args)
     else if (!uiPlayId)
     {
         m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-        WorldPacket data(MSG_CHANNEL_UPDATE, (4));
-        data << uint32(0);
-        m_session->GetPlayer()->SendDirectMessage(&data);
+        m_session->GetPlayer()->SendChannelUpdate(0);
         PSendSysMessage("Sending channel stop");
         return true;
     }
@@ -1657,9 +1654,17 @@ bool ChatHandler::HandleDebugLoSCommand(char*)
     VMAP::ModelInstance* spawn = m_session->GetPlayer()->GetMap()->FindCollisionModel(x0, y0, z0, x1, y1, z1);
 
     if (!spawn)
-        SendSysMessage("* No collision found.");
+        SendSysMessage("* No collision with static objects found.");
     else
-        PSendSysMessage("* Collision at '%s' [%f %f %f]", spawn->name.c_str(), spawn->iPos.x, spawn->iPos.y, spawn->iPos.z);
+        PSendSysMessage("* Collision with static object at '%s' [%f %f %f]", spawn->name.c_str(), spawn->iPos.x, spawn->iPos.y, spawn->iPos.z);
+
+    GameObjectModel const* dynObj = m_session->GetPlayer()->GetMap()->FindDynamicObjectCollisionModel(x0, y0, z0, x1, y1, z1);
+
+    if (!dynObj)
+        SendSysMessage("* No collision with dynamic objects found.");
+    else
+        PSendSysMessage("* Collision with dynamic object at '%s' [%f %f %f]", dynObj->name.c_str(), dynObj->getPosition().x, dynObj->getPosition().y, dynObj->getPosition().z);
+
     return true;
 }
 
@@ -1846,7 +1851,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
     if (checkItem)
         lootChances[checkItem] = 0;
 
-    uint32 const MAX_TIME = 30;
+    uint32 constexpr MAX_TIME = 30;
     auto startTime = time(nullptr);
 
     for (uint32 i = 0; i < simCount; ++i)
@@ -1911,7 +1916,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
 bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, uint32 simCount)
 {
     std::map<uint32, uint32> lootChances;
-    uint32 const MAX_TIME = 30;
+    uint32 constexpr MAX_TIME = 30;
     auto startTime = time(nullptr);
 
     ItemPrototype const* proto = sObjectMgr.GetItemPrototype(lootid);
@@ -2042,14 +2047,14 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 
 bool ChatHandler::HandleVideoTurn(char*)
 {
-    float const radiusBegin = 40.0f;
-    float const radiusEnd = 10.0f;
-    float const zBegin = 30.0f;
-    float const zEnd = 10.0f;
-    float const angleBegin = 0.0f;
-    float const angleEnd = 10 * M_PI_F;
-    float const moveSpeed = 30.0f;
-    std::list<Creature*> targets;
+    float constexpr radiusBegin = 40.0f;
+    float constexpr radiusEnd = 10.0f;
+    float constexpr zBegin = 30.0f;
+    float constexpr zEnd = 10.0f;
+    float constexpr angleBegin = 0.0f;
+    float constexpr angleEnd = 10 * M_PI_F;
+    float constexpr moveSpeed = 30.0f;
+
     Unit* selection = GetSelectedUnit();
     if (!selection)
     {
@@ -2078,10 +2083,10 @@ bool ChatHandler::HandleVideoTurn(char*)
 
 bool ChatHandler::HandleDebugExp(char*)
 {
-    float const moveDist = 80.0f;
-    float const searchCreaturesRange = 60.0f;
-    float const retournementRayon = 2.0f;
-    float const moveSpeed = 6.0f;
+    float constexpr moveDist = 80.0f;
+    float constexpr searchCreaturesRange = 60.0f;
+    float constexpr retournementRayon = 2.0f;
+    float constexpr moveSpeed = 6.0f;
     std::list<Creature*> targets;
     Unit* selection = GetSelectedUnit();
     if (!selection)
@@ -2531,8 +2536,6 @@ bool ChatHandler::HandleMmapConnection(char* args)
     return true;
 }
 
-typedef std::list<Creature*> MmapTestUnitList;
-
 bool ChatHandler::HandleMmapTestArea(char* args)
 {
     float radius = 40.0f;
@@ -2591,21 +2594,13 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
     if (GenericTransport* transport = player->GetTransport())
     {
         if (!MMAP::MMapFactory::createOrGetMMapManager()->GetGONavMesh(transport->GetDisplayId()))
-        {
-            PSendSysMessage("NavMesh not loaded for current map.");
-            return true;
-        }
+            PSendSysMessage("NavMesh not loaded for current transport.");
     }
     else
     {
         if (!MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(m_session->GetPlayer()->GetMapId()))
-        {
             PSendSysMessage("NavMesh not loaded for current map.");
-            return true;
-        }
     }
-
-    PSendSysMessage("mmap path:");
 
     // units
     Unit* target = GetSelectedUnit();
@@ -2637,12 +2632,13 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
     PSendSysMessage("Building %s", useStraightPath ? "StraightPath" : "SmoothPath");
     PSendSysMessage("length %i (dist %f) type %u", pointPath.size(), path.Length(), path.getPathType());
 
-    for (auto& i : pointPath)
+    for (uint32 i = 0; i < pointPath.size(); ++i)
     {
         if (transport)
-            transport->CalculatePassengerPosition(i.x, i.y, i.z);
-        if (Creature* wp = player->SummonCreature(VISUAL_WAYPOINT, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN, 18000))
+            transport->CalculatePassengerPosition(pointPath[i].x, pointPath[i].y, pointPath[i].z);
+        if (Creature* wp = player->SummonCreature(VISUAL_WAYPOINT, pointPath[i].x, pointPath[i].y, pointPath[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 18000))
         {
+            wp->SetLevel(i + 1);
             wp->SetFly(true);
             if (transport)
             {
@@ -2891,6 +2887,41 @@ bool ChatHandler::HandleDebugUnitBytes2Command(char *args)
         return false;
 
     target->SetByteValue(UNIT_FIELD_BYTES_2, offset, value);
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugGetPrevPlayTimeCommand(char* args)
+{
+    Player* player = GetSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Account %s has been previously played for %s", player->GetSession()->GetUsername().c_str(), secsToTimeString(player->GetSession()->GetPreviousPlayedTime()).c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugSetPrevPlayTimeCommand(char* args)
+{
+    Player* player = GetSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 seconds;
+    if (!ExtractUInt32(&args, seconds))
+        return false;
+
+    player->GetSession()->SetPreviousPlayedTime(seconds);
+    PSendSysMessage("Previous played time of account %s has been set to %s", player->GetSession()->GetUsername().c_str(), secsToTimeString(seconds).c_str());
 
     return true;
 }

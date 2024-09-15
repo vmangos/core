@@ -24,7 +24,7 @@ ConfVersion=2010100901
 #
 #	   HonorDir
 #		     Folder to store HCR files. These are logs of weekly honor calculation.
-#		     By default logs are stored in the current directory of the running program.	                    
+#		     By default logs are stored in the current directory of the running program.
 #
 #    LoginDatabase.Info
 #    WorldDatabase.Info
@@ -55,8 +55,9 @@ ConfVersion=2010100901
 #        Amount of async threads (with dedicated connection) which will be used for async SELECT, executes, and transactions.
 #        Default: 1 async worker
 #
-#    MaxPingTime
-#        Settings for maximum database-ping interval (minutes between pings)
+#    Database.AliveCheckInternal - in seconds
+#        The interval in seconds to check the reachability of the database
+#        Default: 600 (10 min)
 #
 #    WorldServerPort
 #        Port on which the server will listen
@@ -85,7 +86,7 @@ CharacterDatabase.WorkerThreads = 1
 LogsDatabase.Info               = "127.0.0.1;3306;mangos;mangos;logs"
 LogsDatabase.Connections        = 1
 LogsDatabase.WorkerThreads      = 1
-MaxPingTime = 30
+Database.AliveCheckInternal     = 600
 WorldServerPort = 8085
 BindIP = "0.0.0.0"
 
@@ -102,10 +103,18 @@ BindIP = "0.0.0.0"
 #        Default: 1 (HIGH)
 #                 0 (Normal)
 #
-#    Compression
-#        Compression level for update packages sent to client (1..9)
+#    Compression.Level
+#        Compression level for update packets sent to client (1..9)
 #        Default: 1 (speed)
 #                 9 (best compression)
+#
+#    Compression.Update.Size
+#        Maxmimum size of update object packets allowed to be sent uncompressed.
+#        Default: 128
+#
+#    Compression.Movement.Count
+#        Amount of movement packets that need to be sent to a session within 10 seconds before compression is enabled.
+#        Default: 300
 #
 #    PlayerLimit
 #        Initial realm capacity. Excluding Mods, GM's and Admins
@@ -242,7 +251,9 @@ BindIP = "0.0.0.0"
 
 UseProcessors = 0
 ProcessPriority = 1
-Compression = 1
+Compression.Level = 1
+Compression.Update.Size = 128
+Compression.Movement.Count = 300
 PlayerLimit = 100
 PlayerHardLimit = 0
 LoginQueue.GracePeriodSecs = 0
@@ -377,7 +388,7 @@ Anticrash.Rearm.Timer = 60000
 #    PvP.DishonorableKills
 #        Whether to give dishonorable kills to players who kill civilians.
 #        Default: 1
-#  
+#
 #    PvP.CityProtector
 #        Whether to assign City Protector titles on honor update or not.
 #        Default: 0
@@ -515,6 +526,11 @@ DebuffLimit = 0
 #    LogFile.Anticheat
 #        Log file for anticheat check results
 #        Default: "Anticheat.log"
+#                 "" - Empty name disable creating log file
+#
+#    LogFile.Scripts
+#        Log file for script errors and debug info
+#        Default: "Scripts.log"
 #                 "" - Empty name disable creating log file
 #
 #    LogFile.Chat
@@ -655,6 +671,7 @@ LogFilter_Honor = 1
 LogFile.Timestamp = 0
 LogFile.Basic = "Server.log"
 LogFile.Anticheat = "Anticheat.log"
+LogFile.Scripts = "Scripts.log"
 LogFile.Chat = "Chat.log"
 LogFile.Bg = "Bg.log"
 LogFile.Char = "Char.log"
@@ -810,6 +827,26 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 10 (client limitation)
 #                The number must be between 1 and 10
 #
+#    LimitPlayTime
+#        Keep track of how long player accounts have been online, and limit loot and experience after that.
+#        After 3 hours looted gold and experience gains are cut in half. After 5 hours they are prevented.
+#        This feature was only used on Chinese realms.
+#        Default: 0 (Disabled)
+#                 1 (Enabled)
+#
+#    RestrictUnverifiedAccounts
+#        Treat accounts with an unverified email as trial accounts, which are not allowed to do the following:
+#        - Join a guild
+#        - Whisper someone who has not added you to their friends list
+#        - Trade
+#        - Talk in General, Trade or LocalDefense channels
+#        - Level above level 20
+#        - Receive mail other than from Game Masters
+#        - Have more then 10 gold
+#        - May not level higher than 100 in your two main professions, or 150 in secondary professions
+#        Default: 0 (Disabled)
+#                 1 (Enabled)
+#
 #    SkipCinematics
 #        Disable in-game intro cinematic on first login of character (allows to prevent buggy intro when using custom start location)
 #        Default: 0 - show intro for each new character
@@ -837,6 +874,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #    MinHonorKills
 #        Min kills that players must obtain to enter in weekly honor calculation
 #        Default: 0 (auto select based on patch)
+#
+#    RpDecay
+#        Determines the percentage of rank points (RP) decay per week
+#        If set to 0 there will be no decay
+#        Default: 0.2 (20%)
 #
 #    MaintenanceDay
 #        The day of the week on which server maintenance is performed ( currently used for Honor distribution )
@@ -901,6 +943,10 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 1800000 (miliseconds, i.e 30 minutes)
 #                 0 (instance maps are kept in memory until they are reset)
 #
+#    Instance.PerHourLimit
+#        How many instances players can enter per hour per account.
+#        Default: 5
+#
 #    Item.InstantSaveQuality
 #        Save character inventory instantly on receiving item of this quality or higher.
 #        Default: 6 - Artifact
@@ -928,7 +974,7 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #                 1 (allowed)
 #
 #    Group.OfflineLeaderDelay
-#        A grace period for an offline group leader to reconnect before tranfering leadership to the next suitable member of the group (in secs) 
+#        A grace period for an offline group leader to reconnect before tranfering leadership to the next suitable member of the group (in secs)
 #        Default: 300 (5 minutes)
 #                   0 (Do not transfer group leadership)
 #
@@ -1058,12 +1104,15 @@ WorldAvailable = 1
 CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10
+LimitPlayTime = 0
+RestrictUnverifiedAccounts = 0
 SkipCinematics = 0
 ShowHealthValues = 0
 MaxPlayerLevel = 60
 StartPlayerLevel = 1
 StartPlayerMoney = 0
 MinHonorKills = 0
+RpDecay = 0.2
 MaintenanceDay = 3
 InstantLogout = 1
 ForceLogoutDelay = 0
@@ -1077,6 +1126,7 @@ Instance.IgnoreLevel = 0
 Instance.IgnoreRaid = 0
 Instance.ResetTimeHour = 4
 Instance.UnloadDelay = 1800000
+Instance.PerHourLimit = 5
 Item.InstantSaveQuality = 6
 Item.PreventDataMining = 1
 Quests.LowLevelHideDiff = 4
@@ -1375,7 +1425,7 @@ GuidReserveSize.GameObject = 1000
 #        Minimum level to /yell in chat
 #        Default: 0
 #
-#    YellRange.LinearScale.MaxLevel 
+#    YellRange.LinearScale.MaxLevel
 #    YellRange.QuadraticScale.MaxLevel
 #        Limit yell range based on level
 #        Default: 0
@@ -1737,18 +1787,13 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.NoFallTime.Enable
-#        Description: Check for players that walking in the air.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.NoFallTime.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Description: Check for consecutive movements with falling flag but no fall time.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.NoFallTime.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     5
+#        Default:     1
 #
 #    Anticheat.NoFallTime.Penalty
 #        Description: Action to take upon failing this check.
@@ -1764,6 +1809,32 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     1
 #
 #    Anticheat.BadFallReset.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     11 - Log, Report to GM, Kick
+#
+#    Anticheat.BadFallStop.Enable
+#        Description: Check for falling flag being removed without sending land opcode.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.BadFallStop.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.BadFallStop.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     11 - Log, Report to GM, Kick
+#
+#    Anticheat.BadMoveStart.Enable
+#        Description: Check for starting movement with wrong opcode.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.BadMoveStart.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.BadMoveStart.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
@@ -2083,12 +2154,17 @@ Anticheat.FlyHack.Reject = 1
 Anticheat.FlyHack.Threshold = 3
 Anticheat.FlyHack.Penalty = 11
 Anticheat.NoFallTime.Enable = 1
-Anticheat.NoFallTime.Reject = 1
-Anticheat.NoFallTime.Threshold = 5
+Anticheat.NoFallTime.Threshold = 1
 Anticheat.NoFallTime.Penalty = 11
 Anticheat.BadFallReset.Enable = 1
 Anticheat.BadFallReset.Threshold = 1
 Anticheat.BadFallReset.Penalty = 11
+Anticheat.BadFallStop.Enable = 1
+Anticheat.BadFallStop.Threshold = 1
+Anticheat.BadFallStop.Penalty = 11
+Anticheat.BadMoveStart.Enable = 1
+Anticheat.BadMoveStart.Threshold = 1
+Anticheat.BadMoveStart.Penalty = 11
 Anticheat.Teleport.Enable = 1
 Anticheat.Teleport.Reject = 1
 Anticheat.Teleport.Distance = 40.0
@@ -2457,6 +2533,11 @@ Visibility.ForceActiveObjects      = 1
 #         Default: 1 (enabled)
 #                  0 (disabled)
 #
+#    DurabilityLoss.Enable
+#         Description: Enable durability loss
+#         Default: 1 (enabled)
+#                  0 (disabled)
+#
 #    DurabilityLossChance.Damage
 #         Chance to lose durability on an equipped item when taking or dealing damage
 #         Default: 0.5
@@ -2549,10 +2630,8 @@ SkillChance.SkinningSteps = 0
 SkillFail.Loot.Fishing = 0
 SkillFail.Gain.Fishing = 0
 SkillFail.Possible.FishingPool = 1
+DurabilityLoss.Enable = 1
 DurabilityLossChance.Damage = 0.5
-DurabilityLossChance.Absorb = 0.5
-DurabilityLossChance.Parry  = 0.05
-DurabilityLossChance.Block  = 0.05
 Death.SicknessLevel = 11
 Death.CorpseReclaimDelay.PvP = 1
 Death.CorpseReclaimDelay.PvE = 1
@@ -2641,15 +2720,20 @@ Alterac.InitMaxPlayers = 0
 ###################################################################################################################
 # OUTDOOR PVP CONFIG
 #
-#    OutdoorPvp.SIEnabled               #Enable Silithus Outdoor pvp
-#    OutdoorPvp.EPEnabled               #Enable Eastern Plaguelands Outdoor pvp
+#    OutdoorPvP.SI.Enable
+#        Enable Silithus Outdoor PvP
+#        Default: 1 (enable)
+#                 0 (disable)
+#
+#    OutdoorPvP.EP.Enable
+#        Enable Eastern Plaguelands Outdoor PvP
 #        Default: 1 (enable)
 #                 0 (disable)
 #
 ###################################################################################################################
 
-OutdoorPvp.SIEnabled = 1
-OutdoorPvp.EPEnabled = 1
+OutdoorPvP.SI.Enable = 1
+OutdoorPvP.EP.Enable = 1
 
 ###################################################################################################################
 # MEETING STONE LFG CONFIG
@@ -2903,6 +2987,11 @@ AHBot.itemcount = 50
 #                 0 (normal starting items)
 #                 2 (premade gear template)
 #
+#    BattleBot.AutoJoin
+#        Adds enough battlebots for battleground to start when a player queues.
+#        Default: 0 - off
+#                 1 - on
+#
 ###################################################################################################################
 RandomBot.Enable = 0
 RandomBot.MinBots = 0
@@ -2920,14 +3009,7 @@ PartyBot.AutoEquip = 1
 PartyBot.RandomGearLevelDifference = 10
 
 BattleBot.AutoEquip = 1
-
-###################################################################################################################
-#    Database-based chat
-###################################################################################################################
-OfflineChat.Enable = 0
-OfflineChat.Port   = 3444
-OfflineChat.IP     = 0.0.0.0
-OfflineChat.Password= "p8zqkt"
+BattleBot.AutoJoin = 0
 
 ###################################################################################################################
 #    Mail flooding mitigation

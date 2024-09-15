@@ -28,14 +28,15 @@
 #include "Language.h"
 #include "WorldPacket.h"
 #include "Chat.h"
+#include "World.h"
 
 
 BattleGroundAV::BattleGroundAV()
 {
     m_startMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
-    m_startMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_AV_START_ONE_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_AV_START_HALF_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_AV_HAS_BEGUN;
+    m_startMessageIds[BG_STARTING_EVENT_SECOND] = BCT_BG_AV_START_ONE_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = BCT_BG_AV_START_HALF_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = BCT_BG_AV_HAS_BEGUN;
 }
 
 BattleGroundAV::~BattleGroundAV()
@@ -912,6 +913,7 @@ void BattleGroundAV::StartingEventCloseDoors()
 void BattleGroundAV::StartingEventOpenDoors()
 {
     OpenDoorEvent(BG_EVENT_DOOR);
+    SpawnEvent(BG_EVENT_GHOST_GATE, 0, false, true);
 }
 
 void BattleGroundAV::AddPlayer(Player* player)
@@ -959,16 +961,25 @@ void BattleGroundAV::EndBattleGround(Team winner)
             RewardHonorToTeam(uint32(GetBonusHonorFromKill(towersSurvived[i] * BG_AV_KILL_SURVIVING_TOWER) * GetHonorModifier()), team[i]);
         }
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: EndbattleGround: bgteam: %u towers:%u honor:%u rep:%u", i, towersSurvived[i], GetBonusHonorFromKill(towersSurvived[i] * BG_AV_KILL_SURVIVING_TOWER), towersSurvived[i] * BG_AV_REP_SURVIVING_TOWER);
-        if (gravesOwned[i])
+        
+        // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+        // - Alterac Valley now correctly rewards honor for owning graveyards at
+        //   the end of the game.
+        if (sWorld.GetWowPatch() >= WOW_PATCH_107)
         {
-            RewardReputationToTeam(faction[i], gravesOwned[i] * m_repOwnedGrave, team[i]);
-            RewardHonorToTeam(uint32(GetBonusHonorFromKill(gravesOwned[i] * BG_AV_KILL_SURVIVING_GRAVE) * GetHonorModifier()), team[i]);
+            if (gravesOwned[i])
+            {
+                RewardReputationToTeam(faction[i], gravesOwned[i] * m_repOwnedGrave, team[i]);
+                RewardHonorToTeam(uint32(GetBonusHonorFromKill(gravesOwned[i] * BG_AV_KILL_SURVIVING_GRAVE) * GetHonorModifier()), team[i]);
+            }
         }
+
         if (minesOwned[i])
         {
             RewardReputationToTeam(faction[i], minesOwned[i] * m_repOwnedMine, team[i]);
             RewardHonorToTeam(uint32(GetBonusHonorFromKill(minesOwned[i] * BG_AV_KILL_SURVIVING_MINE)  * GetHonorModifier()), team[i]);
         }
+
         // captain survived?:
         if (!IsActiveEvent(BG_AV_NodeEventCaptainDead_A + GetTeamIndexByTeamId(team[i]), 0))
         {
@@ -993,24 +1004,32 @@ void BattleGroundAV::RemovePlayer(Player* /*player*/, ObjectGuid /*guid*/)
 {
 }
 
-void BattleGroundAV::HandleAreaTrigger(Player* source, uint32 trigger)
+bool BattleGroundAV::HandleAreaTrigger(Player* source, uint32 trigger)
 {
-    // this is wrong way to implement these things. On official it done by gameobject spell cast.
     switch (trigger)
     {
-        case 95:
-        case 2608:
-            if (source->GetTeam() != ALLIANCE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_ALLIANCE_USE);
-            else
+        case 2608: // Alterac Valley - Alliance Exit
+            // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+            // - Characters that use the Battlemaster to enter a Battleground will
+            //   now port back to that Battlemaster when they leave the Battleground
+            //   for any reason.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            if (source->GetTeam() == ALLIANCE)
+            {
                 source->LeaveBattleground();
-            break;
-        case 2606:
-            if (source->GetTeam() != HORDE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_HORDE_USE);
-            else
+                return true;
+            }
+#endif
+            return false;
+        case 2606: // Alterac Valley - Horde Exit
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            if (source->GetTeam() == HORDE)
+            {
                 source->LeaveBattleground();
-            break;
+                return true;
+            }
+#endif
+            return false;
         case 3326:
         case 3327:
         case 3328:
@@ -1018,12 +1037,13 @@ void BattleGroundAV::HandleAreaTrigger(Player* source, uint32 trigger)
         case 3330:
         case 3331:
             //source->Unmount();
-            break;
+            return true;
         default:
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
 //            source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
+    return false;
 }
 
 void BattleGroundAV::UpdatePlayerScore(Player* source, uint32 type, uint32 value)
@@ -1180,8 +1200,8 @@ void BattleGroundAV::PopulateMineNode(uint8 mine, BattleGroundAVTeamIndex teamId
     }
 }
 
-/// will spawn and despawn creatures around a node
-/// more a wrapper around spawnevent cause graveyards are special
+// will spawn and despawn creatures around a node
+// more a wrapper around spawnevent cause graveyards are special
 void BattleGroundAV::PopulateNode(BG_AV_Nodes node)
 {
     ASSERT(node < BG_AV_NODES_MAX);
@@ -1260,7 +1280,7 @@ void BattleGroundAV::PopulateNode(BG_AV_Nodes node)
 }
 
 
-/// called when using a banner
+// called when using a banner
 void BattleGroundAV::EventPlayerClickedOnFlag(Player* source, GameObject* targetGo)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
@@ -1613,6 +1633,9 @@ void BattleGroundAV::Reset()
     m_activeEvents[BG_AV_LIEUTENANT_A]        = 0;
     m_activeEvents[BG_AV_LIEUTENANT_H]        = 0;
 
+    // ghost gates spawned at beginning
+    m_activeEvents[BG_EVENT_GHOST_GATE] = 0;
+
     for (BG_AV_Nodes i = BG_AV_NODES_DUNBALDAR_SOUTH; i <= BG_AV_NODES_FROSTWOLF_WTOWER; ++i)  // towers
         m_activeEvents[BG_AV_COMMANDER_A_MORTIMER + i - BG_AV_NODES_DUNBALDAR_SOUTH] = 0; // Commanders are alive
 
@@ -1630,7 +1653,6 @@ void BattleGroundAV::Reset()
 
     /** Initialize challenge objectives */
     initializeChallengeInvocationGoals();
-
 }
 
 

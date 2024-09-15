@@ -34,6 +34,8 @@ enum CheatType
     CHEAT_TYPE_FLY_HACK_SWIM,
     CHEAT_TYPE_NO_FALL_TIME,
     CHEAT_TYPE_BAD_FALL_RESET,
+    CHEAT_TYPE_BAD_FALL_STOP,
+    CHEAT_TYPE_BAD_MOVE_START,
     CHEAT_TYPE_TELEPORT,
     CHEAT_TYPE_TELEPORT_TRANSPORT,
     CHEAT_TYPE_FAKE_TRANSPORT,
@@ -99,12 +101,15 @@ class MovementAnticheat
         void ResetBottingStats();
         void CheckBotting(uint16 opcode, MovementInfo const& movementInfo);
         bool CheckTeleport(MovementInfo const& movementInfo) const;
-        bool IsTeleportAllowed(MovementInfo const& movementInfo) const;
+        bool IsTeleportAllowed3D(MovementInfo const& movementInfo) const;
+        bool IsInTransportArea() const;
         bool CheckForbiddenArea(MovementInfo const& movementInfo) const;
         bool CheckMultiJump(uint16 opcode);
         bool CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const;
         bool CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode);
         bool CheckFallReset(MovementInfo const& movementInfo) const;
+        bool CheckFallStop(MovementInfo const& movementInfo, uint16 opcode);
+        bool CheckMoveStart(MovementInfo const& movementInfo, uint16 opcode);
         bool CheckFakeTransport(MovementInfo const& movementInfo);
         bool CheckTeleportToTransport(MovementInfo const& movementInfo) const;
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);

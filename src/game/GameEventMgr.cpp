@@ -165,7 +165,7 @@ bool GameEventMgr::IsEnabled(uint16 event_id)
 void GameEventMgr::LoadFromDB()
 {
     {
-        QueryResult* result = WorldDatabase.Query("SELECT MAX(entry) FROM game_event");
+        std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT MAX(entry) FROM game_event");
         if (!result)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Table game_event is empty.");
@@ -176,12 +176,11 @@ void GameEventMgr::LoadFromDB()
         Field* fields = result->Fetch();
 
         uint32 max_event_id = fields[0].GetUInt16();
-        delete result;
 
         mGameEvent.resize(max_event_id + 1);
     }
 
-    QueryResult* result = WorldDatabase.Query("SELECT entry,UNIX_TIMESTAMP(start_time),UNIX_TIMESTAMP(end_time),occurence,length,holiday,description,hardcoded,disabled,patch_min,patch_max FROM game_event");
+    std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT entry,UNIX_TIMESTAMP(start_time),UNIX_TIMESTAMP(end_time),occurence,length,holiday,description,hardcoded,disabled,patch_min,patch_max FROM game_event");
     if (!result)
     {
         mGameEvent.clear();
@@ -254,7 +253,6 @@ void GameEventMgr::LoadFromDB()
             }
         }
         while (result->NextRow());
-        delete result;
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u game events", count);
@@ -349,7 +347,6 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        delete result;
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creatures in game events", count);
@@ -428,7 +425,6 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        delete result;
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u gameobjects in game events", count);
@@ -496,13 +492,13 @@ void GameEventMgr::LoadFromDB()
             newData.spell_id_start = fields[5].GetUInt32();
             newData.spell_id_end = fields[6].GetUInt32();
 
-            if (newData.equipment_id && !sObjectMgr.GetEquipmentInfo(newData.equipment_id))
+            if (newData.equipment_id && !sObjectMgr.GetEquipmentTemplate(newData.equipment_id))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `game_event_creature_data` have creature (Guid: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", guid, newData.equipment_id);
                 newData.equipment_id = 0;
             }
 
-            if (newData.entry_id && !ObjectMgr::GetCreatureTemplate(newData.entry_id))
+            if (newData.entry_id && !sObjectMgr.GetCreatureTemplate(newData.entry_id))
             {
                 if (!sObjectMgr.IsExistingCreatureId(newData.entry_id))
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `game_event_creature_data` have creature (Guid: %u) with event time entry %u not found in table `creature_template`, set to no 0.", guid, newData.entry_id);
@@ -528,7 +524,6 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        delete result;
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u creature reactions at game events", count);
@@ -589,7 +584,6 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        delete result;
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u quest additions in game events", count);
@@ -657,7 +651,7 @@ void GameEventMgr::LoadFromDB()
                 continue;
             }
 
-            if (!ObjectMgr::GetCreatureTemplate(mail.senderEntry))
+            if (!sObjectMgr.GetCreatureTemplate(mail.senderEntry))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `game_event_mail` have nonexistent sender creature entry (%u) for game event %i that invalid not include any player races, ignoring.", mail.senderEntry, event_id);
                 continue;
@@ -670,7 +664,6 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        delete result;
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u start/end game event mails", count);
@@ -683,7 +676,7 @@ uint32 GameEventMgr::Initialize()                           // return the next e
 
     ActiveEvents activeAtShutdown;
 
-    if (QueryResult* result = CharacterDatabase.Query("SELECT event FROM game_event_status"))
+    if (std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT event FROM game_event_status"))
     {
         do
         {
@@ -692,7 +685,6 @@ uint32 GameEventMgr::Initialize()                           // return the next e
             activeAtShutdown.insert(event_id);
         }
         while (result->NextRow());
-        delete result;
 
         CharacterDatabase.Execute("TRUNCATE game_event_status");
     }

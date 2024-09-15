@@ -48,9 +48,9 @@ private:
 
 public:
     // windows module
-    WardenModule(std::string const &binary, std::string const &key, std::string const &cr);
+    WardenModule(std::string const& binary, std::string const& key, std::string const& cr);
 
-    WardenModule(WardenModule &&other) = default;
+    WardenModule(WardenModule&& other) = default;
 
     // true when this module is for windows (otherwise it is for Mac x86)
     bool Windows() const;
@@ -72,6 +72,9 @@ public:
 
     // mapping of scan function to the numerical value of the opcode
     uint8_t opcodes[ScanTypeCount];
+
+    // invalid opcode value that signifies scans are over
+    uint8 scanTerminator;
 
     // pregenerated challenge, responses, and encryption keys for this module
     std::vector<ChallengeResponseEntry> crk;

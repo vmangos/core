@@ -33,7 +33,7 @@ char const ChrClassesEntryfmt[]="nxxixssssssssxxix";
 #else
 char const ChrClassesEntryfmt[] = "nxxixssssssssxxi";
 #endif
-char const ChrRacesEntryfmt[]="niixiixxiixxixixissssssssxxxx";
+char const ChrRacesEntryfmt[]="niixiixxiiiiixixissssssssxxxx";
 char const ChatChannelsEntryfmt[]="nixssssssssxxxxxxxxxx";                 // ChatChannelsEntryfmt, index not used (more compact store)
 char const CinematicSequencesEntryfmt[]="nxxxxxxxxx";
 char const CreatureDisplayInfofmt[]="nixifxxxxxxx";
@@ -76,6 +76,7 @@ char const SpellItemEnchantmentfmt[]="niiiiiixxxiiissssssssxii";
 char const SpellRadiusfmt[]="nfxx";
 char const SpellRangefmt[]="nffxxxxxxxxxxxxxxxxxxx";
 char const SpellShapeshiftfmt[]="nxssssssssxiix";
+char const SpellVisualfmt[] = "niiiiiiiiiiiiiii";
 char const StableSlotPricesfmt[] = "ni";
 char const TalentEntryfmt[]="niiiiiiiixxxxixxixxxi";
 char const TalentTabEntryfmt[]="nxxxxxxxxxxxiix";

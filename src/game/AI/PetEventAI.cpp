@@ -116,18 +116,6 @@ void PetEventAI::AttackStart(Unit* pWho)
     } 
 }
 
-void PetEventAI::AttackedBy(Unit* pAttacker)
-{
-    if (!m_creature->GetVictim())
-        AttackStart(pAttacker);
-
-    if (Creature* pOwner = ToCreature(m_creature->GetCharmerOrOwner()))
-    {
-        pOwner->AddThreat(pAttacker);
-        pOwner->SetInCombatWith(pAttacker);
-    }
-}
-
 Unit* PetEventAI::FindTargetForAttack() const
 {
     if (Unit* pTaunter = m_creature->GetTauntTarget())

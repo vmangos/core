@@ -199,7 +199,6 @@ enum
     SAY_TWIGGY_FRAY    = 2318,  
     SAY_TWIGGY_DOWN    = 2355,  
     SAY_TWIGGY_OVER    = 2320,  
-    SAY_QUEST_TURN_IN  = 2354, // TODO: implement Klannoc Macleod (id: 6236) yells after quest was turned in: Hail $n!  New Champion of The Affray!
 
     NPC_TWIGGY = 6248,
     NPC_BIG_WILL = 6238,
@@ -267,7 +266,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
             return true;
         }
 
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "npc_twiggy_flathead event already in progress, need to wait.");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "npc_twiggy_flathead event already in progress, need to wait.");
         return false;
     }
 
@@ -278,7 +277,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
             Creature* pCreature = m_creature->SummonCreature(NPC_AFFRAY_CHALLENGER, AffrayChallengerLoc[i][0], AffrayChallengerLoc[i][1], AffrayChallengerLoc[i][2], AffrayChallengerLoc[i][3], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
             if (!pCreature)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "npc_twiggy_flathead event cannot summon challenger as expected.");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "npc_twiggy_flathead event cannot summon challenger as expected.");
                 continue;
             }
 
@@ -650,7 +649,8 @@ struct npc_mission_possible_but_not_probableAI : ScriptedAI
                 return;
         }
 
-        DoCastSpellIfCan(m_creature, spellId);
+        if (spellId)
+            DoCastSpellIfCan(m_creature, spellId);
     }
 };
 

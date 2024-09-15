@@ -157,13 +157,13 @@ class Channel
     };
 
         Channel(std::string const& name);
-        std::string GetName() const { return m_name; }
+        std::string const& GetName() const { return m_name; }
         uint32 GetChannelId() const { return m_channelId; }
         bool IsConstant() const { return m_channelId != 0; }
         bool IsAnnounce() const { return m_announce; }
         bool IsLevelRestricted() const { return m_levelRestricted; }
         bool IsLFG() const { return GetFlags() & CHANNEL_FLAG_LFG; }
-        std::string GetPassword() const { return m_password; }
+        std::string const& GetPassword() const { return m_password; }
         void SetPassword(std::string const& npassword) { m_password = npassword; }
         void SetAnnounce(bool nannounce) { m_announce = nannounce; }
         uint32 GetNumPlayers() const { return m_players.size(); }

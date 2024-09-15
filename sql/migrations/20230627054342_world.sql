@@ -1,0 +1,273 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20230627054342');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20230627054342');
+-- Add your query below.
+
+
+SET @OGUID = 38736;
+SET @PTEMPLATE = 3735;
+
+-- Hillsbrad Foothills
+DELETE FROM `gameobject` WHERE `guid` IN (96, 502, 536, 543, 553, 554, 559, 581, 618, 622, 649, 676, 698, 706, 708, 713, 722, 724, 725, 20803, 20804, 20805, 20819, 20821, 20823, 20826, 20827, 20857, 20877, 20879, 20915, 21221, 21222, 21223, 21224, 21225, 21226, 21228, 21229, 21230, 21231, 21232, 21234, 21236, 21238, 21241, 21242, 21243, 21244, 21245, 21246, 21247, 21260, 21261, 21262, 21264, 21268, 21269, 29977, 47366, 47367, 47368, 47371, 47375, 47379, 47380, 47381, 47383, 47384, 47385, 47387, 47390, 47392, 47397, 47400, 47401, 47405, 47406, 47516, 47520, 47521, 47522, 47523, 47524, 47525, 50327, 50328, 50329);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (96, 502, 536, 543, 553, 554, 559, 581, 618, 622, 649, 676, 698, 706, 708, 713, 722, 724, 725, 20803, 20804, 20805, 20819, 20821, 20823, 20826, 20827, 20857, 20877, 20879, 20915, 21221, 21222, 21223, 21224, 21225, 21226, 21228, 21229, 21230, 21231, 21232, 21234, 21236, 21238, 21241, 21242, 21243, 21244, 21245, 21246, 21247, 21260, 21261, 21262, 21264, 21268, 21269, 29977, 47366, 47367, 47368, 47371, 47375, 47379, 47380, 47381, 47383, 47384, 47385, 47387, 47390, 47392, 47397, 47400, 47401, 47405, 47406, 47516, 47520, 47521, 47522, 47523, 47524, 47525, 50327, 50328, 50329);
+DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (96, 502, 536, 543, 553, 554, 559, 581, 618, 622, 649, 676, 698, 706, 708, 713, 722, 724, 725, 20803, 20804, 20805, 20819, 20821, 20823, 20826, 20827, 20857, 20877, 20879, 20915, 21221, 21222, 21223, 21224, 21225, 21226, 21228, 21229, 21230, 21231, 21232, 21234, 21236, 21238, 21241, 21242, 21243, 21244, 21245, 21246, 21247, 21260, 21261, 21262, 21264, 21268, 21269, 29977, 47366, 47367, 47368, 47371, 47375, 47379, 47380, 47381, 47383, 47384, 47385, 47387, 47390, 47392, 47397, 47400, 47401, 47405, 47406, 47516, 47520, 47521, 47522, 47523, 47524, 47525, 50327, 50328, 50329));
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 180657, 0, -1474.17, -1098.55, 0, 2.93215, 0, 0, 0.994522, 0.104528, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+2, 180657, 0, -1428.6, -1035.49, 0, -1.09956, 0, 0, 0.522499, -0.85264, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+3, 180657, 0, -1376.06, -1012.95, 0, 0.122173, 0, 0, 0.061049, 0.998135, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+4, 180657, 0, -1304.26, -991.073, 0, 0.558505, 0, 0, 0.275637, 0.961262, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+5, 180657, 0, -1263.25, -908.322, 0, 1.5708, 0, 0, 0.707107, 0.707107, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+6, 180657, 0, -1199.8, -833.747, 0, 2.46091, 0, 0, 0.942641, 0.333807, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+7, 180657, 0, -1176.62, 161.262, 0, -2.09439, 0, 0, 0.866025, -0.5, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+8, 180657, 0, -1169.1, -796.219, 0, 4.71239, 0, 0, 0.707107, -0.707107, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+9, 180657, 0, -1108.14, -216.96, 0, 2.07694, 0, 0, 0.861629, 0.507538, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+10, 180657, 0, -1107.49, -147.94, 0, -2.75762, 0, 0, 0.981627, -0.190809, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+11, 180657, 0, -1102.51, -83.557, 0, 0.069813, 0, 0, 0.034899, 0.999391, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+12, 180657, 0, -1101.77, -285.447, 0, 0.959931, 0, 0, 0.461749, 0.887011, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+13, 180657, 0, -1093.24, -33.4709, 0, -0.139626, 0, 0, 0.069756, -0.997564, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+14, 180657, 0, -1088.09, -773.98, 0, 2.37365, 0, 0, 0.927184, 0.374607, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+15, 180657, 0, -1068.16, -336.681, 0, 1.90241, 0, 0, 0.814116, 0.580703, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+16, 180657, 0, -1056.71, 288.538, 0, -2.93215, 0, 0, 0.994522, -0.104529, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+17, 180657, 0, -1037.98, -736.12, 0, -1.65806, 0, 0, 0.737277, -0.67559, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+18, 180657, 0, -1032.62, -405.506, 0, -0.174533, 0, 0, 0.087156, -0.996195, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+19, 180657, 0, -991.793, -708.385, 0, -2.75762, 0, 0, 0.981627, -0.190809, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+20, 180657, 0, -985.492, 335.767, 0, -1.36136, 0, 0, 0.629321, -0.777146, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+21, 180657, 0, -948.823, -523.381, 0, -1.62316, 0, 0, 0.725374, -0.688354, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+22, 180657, 0, -933.148, -568.908, 0, -0.05236, 0, 0, 0.026177, -0.999657, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+23, 180657, 0, -931.71, -554.852, 0, 2.84489, 0, 0, 0.989016, 0.147809, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+24, 180657, 0, -896.287, -696.348, 0, -2.68781, 0, 0, 0.97437, -0.224951, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+25, 180662, 0, -1474.17, -1098.55, 0, 2.93215, 0, 0, 0.994522, 0.104528, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+26, 180662, 0, -1428.6, -1035.49, 0, -1.09956, 0, 0, 0.522499, -0.85264, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+27, 180662, 0, -1376.06, -1012.95, 0, 0.122173, 0, 0, 0.061049, 0.998135, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+28, 180662, 0, -1304.26, -991.073, 0, 0.558505, 0, 0, 0.275637, 0.961262, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+29, 180662, 0, -1263.25, -908.322, 0, 1.5708, 0, 0, 0.707107, 0.707107, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+30, 180662, 0, -1199.8, -833.747, 0, 2.46091, 0, 0, 0.942641, 0.333807, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+31, 180662, 0, -1176.62, 161.262, 0, -2.09439, 0, 0, 0.866025, -0.5, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+32, 180662, 0, -1169.1, -796.219, 0, 4.71239, 0, 0, 0.707107, -0.707107, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+33, 180662, 0, -1108.14, -216.96, 0, 2.07694, 0, 0, 0.861629, 0.507538, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+34, 180662, 0, -1107.49, -147.94, 0, -2.75762, 0, 0, 0.981627, -0.190809, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+35, 180662, 0, -1102.51, -83.557, 0, 0.069813, 0, 0, 0.034899, 0.999391, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+36, 180662, 0, -1101.77, -285.447, 0, 0.959931, 0, 0, 0.461749, 0.887011, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+37, 180662, 0, -1093.24, -33.4709, 0, -0.139626, 0, 0, 0.069756, -0.997564, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+38, 180662, 0, -1088.09, -773.98, 0, 2.37365, 0, 0, 0.927184, 0.374607, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+39, 180662, 0, -1068.16, -336.681, 0, 1.90241, 0, 0, 0.814116, 0.580703, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+40, 180662, 0, -1056.71, 288.538, 0, -2.93215, 0, 0, 0.994522, -0.104529, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+41, 180662, 0, -1037.98, -736.12, 0, -1.65806, 0, 0, 0.737277, -0.67559, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+42, 180662, 0, -1032.62, -405.506, 0, -0.174533, 0, 0, 0.087156, -0.996195, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+43, 180662, 0, -991.793, -708.385, 0, -2.75762, 0, 0, 0.981627, -0.190809, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+44, 180662, 0, -985.492, 335.767, 0, -1.36136, 0, 0, 0.629321, -0.777146, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+45, 180662, 0, -948.823, -523.381, 0, -1.62316, 0, 0, 0.725374, -0.688354, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+46, 180662, 0, -933.148, -568.908, 0, -0.05236, 0, 0, 0.026177, -0.999657, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+47, 180662, 0, -931.71, -554.852, 0, 2.84489, 0, 0, 0.989016, 0.147809, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+48, 180662, 0, -896.287, -696.348, 0, -2.68781, 0, 0, 0.97437, -0.224951, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+49, 180664, 0, -1474.17, -1098.55, 0, 2.93215, 0, 0, 0.994522, 0.104528, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+50, 180664, 0, -1428.6, -1035.49, 0, -1.09956, 0, 0, 0.522499, -0.85264, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+51, 180664, 0, -1376.06, -1012.95, 0, 0.122173, 0, 0, 0.061049, 0.998135, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+52, 180664, 0, -1304.26, -991.073, 0, 0.558505, 0, 0, 0.275637, 0.961262, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+53, 180664, 0, -1263.25, -908.322, 0, 1.5708, 0, 0, 0.707107, 0.707107, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+54, 180664, 0, -1199.8, -833.747, 0, 2.46091, 0, 0, 0.942641, 0.333807, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+55, 180664, 0, -1176.62, 161.262, 0, -2.09439, 0, 0, 0.866025, -0.5, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+56, 180664, 0, -1169.1, -796.219, 0, 4.71239, 0, 0, 0.707107, -0.707107, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+57, 180664, 0, -1108.14, -216.96, 0, 2.07694, 0, 0, 0.861629, 0.507538, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+58, 180664, 0, -1107.49, -147.94, 0, -2.75762, 0, 0, 0.981627, -0.190809, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+59, 180664, 0, -1102.51, -83.557, 0, 0.069813, 0, 0, 0.034899, 0.999391, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+60, 180664, 0, -1101.77, -285.447, 0, 0.959931, 0, 0, 0.461749, 0.887011, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+61, 180664, 0, -1093.24, -33.4709, 0, -0.139626, 0, 0, 0.069756, -0.997564, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+62, 180664, 0, -1088.09, -773.98, 0, 2.37365, 0, 0, 0.927184, 0.374607, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+63, 180664, 0, -1068.16, -336.681, 0, 1.90241, 0, 0, 0.814116, 0.580703, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+64, 180664, 0, -1056.71, 288.538, 0, -2.93215, 0, 0, 0.994522, -0.104529, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+65, 180664, 0, -1037.98, -736.12, 0, -1.65806, 0, 0, 0.737277, -0.67559, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+66, 180664, 0, -1032.62, -405.506, 0, -0.174533, 0, 0, 0.087156, -0.996195, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+67, 180664, 0, -991.793, -708.385, 0, -2.75762, 0, 0, 0.981627, -0.190809, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+68, 180664, 0, -985.492, 335.767, 0, -1.36136, 0, 0, 0.629321, -0.777146, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+69, 180664, 0, -948.823, -523.381, 0, -1.62316, 0, 0, 0.725374, -0.688354, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+70, 180664, 0, -933.148, -568.908, 0, -0.05236, 0, 0, 0.026177, -0.999657, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+71, 180664, 0, -931.71, -554.852, 0, 2.84489, 0, 0, 0.989016, 0.147809, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+72, 180664, 0, -896.287, -696.348, 0, -2.68781, 0, 0, 0.97437, -0.224951, 180, 180, 100, 1, 0, 0, 7, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+2, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+3, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+4, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+5, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+6, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+7, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+8, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+9, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+10, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+11, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+12, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+13, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+14, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+15, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+16, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+17, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+18, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+19, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+20, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+21, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+22, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+23, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@PTEMPLATE+24, 1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+2, @PTEMPLATE+2, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+3, @PTEMPLATE+3, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+4, @PTEMPLATE+4, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+5, @PTEMPLATE+5, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+6, @PTEMPLATE+6, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+7, @PTEMPLATE+7, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+8, @PTEMPLATE+8, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+9, @PTEMPLATE+9, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+10, @PTEMPLATE+10, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+11, @PTEMPLATE+11, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+12, @PTEMPLATE+12, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+13, @PTEMPLATE+13, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+14, @PTEMPLATE+14, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+15, @PTEMPLATE+15, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+16, @PTEMPLATE+16, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+17, @PTEMPLATE+17, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+18, @PTEMPLATE+18, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+19, @PTEMPLATE+19, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+20, @PTEMPLATE+20, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+21, @PTEMPLATE+21, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+22, @PTEMPLATE+22, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+23, @PTEMPLATE+23, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+24, @PTEMPLATE+24, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+25, @PTEMPLATE+1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+26, @PTEMPLATE+2, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+27, @PTEMPLATE+3, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+28, @PTEMPLATE+4, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+29, @PTEMPLATE+5, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+30, @PTEMPLATE+6, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+31, @PTEMPLATE+7, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+32, @PTEMPLATE+8, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+33, @PTEMPLATE+9, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+34, @PTEMPLATE+10, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+35, @PTEMPLATE+11, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+36, @PTEMPLATE+12, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+37, @PTEMPLATE+13, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+38, @PTEMPLATE+14, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+39, @PTEMPLATE+15, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+40, @PTEMPLATE+16, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+41, @PTEMPLATE+17, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+42, @PTEMPLATE+18, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+43, @PTEMPLATE+19, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+44, @PTEMPLATE+20, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+45, @PTEMPLATE+21, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+46, @PTEMPLATE+22, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+47, @PTEMPLATE+23, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+48, @PTEMPLATE+24, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+49, @PTEMPLATE+1, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+50, @PTEMPLATE+2, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+51, @PTEMPLATE+3, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+52, @PTEMPLATE+4, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+53, @PTEMPLATE+5, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+54, @PTEMPLATE+6, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+55, @PTEMPLATE+7, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+56, @PTEMPLATE+8, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+57, @PTEMPLATE+9, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+58, @PTEMPLATE+10, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+59, @PTEMPLATE+11, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+60, @PTEMPLATE+12, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+61, @PTEMPLATE+13, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+62, @PTEMPLATE+14, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+63, @PTEMPLATE+15, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+64, @PTEMPLATE+16, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+65, @PTEMPLATE+17, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+66, @PTEMPLATE+18, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+67, @PTEMPLATE+19, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+68, @PTEMPLATE+20, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+69, @PTEMPLATE+21, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+70, @PTEMPLATE+22, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+71, @PTEMPLATE+23, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10),
+(@OGUID+72, @PTEMPLATE+24, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 7, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+25, 10, 'Hillsbrad Foothills - Firefin Snapper School / Floating Wreckage / Oily Blackmouth School (Master Pool)', 0, 0, 7, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+2, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+3, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+4, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+5, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+6, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+7, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+8, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+9, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+10, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+11, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+12, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+13, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+14, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+15, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+16, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+17, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+18, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+19, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+20, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+21, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+22, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+23, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0),
+(@PTEMPLATE+24, @PTEMPLATE+25, 0, 'Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills', 0);
+
+UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = "Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180657);
+UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180662);
+UPDATE `pool_gameobject` SET `chance` = 40 WHERE `description` = "Firefin Snapper School / Floating Wreckage / Oily Blackmouth School - Hillsbrad Foothills" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 180664);
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+73, 180663, 0, -806.863, -715.487, 5.63574, 2.58309, 0, 0, 0.961262, 0.275637, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+74, 180663, 0, -686.795, -735.617, 6.30554, -2.25148, 0, 0, 0.902585, -0.430511, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+75, 180663, 0, -619.02, -769.87, 6.30652, -3.00197, 0, 0, 0.997564, -0.069756, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+76, 180663, 0, -507.251, -929.455, 29.6017, -0.820305, 0, 0, 0.398749, -0.91706, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+77, 180663, 0, -468.827, -955.067, 29.6017, 2.37365, 0, 0, 0.927184, 0.374607, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+78, 180663, 0, -437.862, -1020.62, 33.553, 0.383972, 0, 0, 0.190809, 0.981627, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+79, 180663, 0, -355.982, -1094.87, 34.9602, 2.00713, 0, 0, 0.843391, 0.5373, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+80, 180663, 0, -328.036, -878.957, 54.3358, 1.78024, 0, 0, 0.777146, 0.62932, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+81, 180663, 0, -286.699, -906.524, 54.3358, 2.61799, 0, 0, 0.965926, 0.258819, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+82, 180663, 0, -281.086, -860.915, 54.3358, -1.3439, 0, 0, 0.622515, -0.782608, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+83, 180663, 0, -246.458, -870.301, 54.3358, -2.96706, 0, 0, 0.996195, -0.087156, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+84, 180663, 0, -232.452, -1103.82, 37.0876, -0.872665, 0, 0, 0.422618, -0.906308, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+85, 180663, 0, -161.079, -1124.2, 37.0966, 2.23402, 0, 0, 0.898794, 0.438371, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+86, 180663, 0, -35.5541, -1115.41, 37.0966, 2.58309, 0, 0, 0.961262, 0.275637, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+87, 180663, 0, 42.8876, -1124.48, 37.0966, 1.39626, 0, 0, 0.642788, 0.766044, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+88, 180663, 0, 116.688, -1161.05, 37.0966, -2.54818, 0, 0, 0.956305, -0.292372, 180, 180, 100, 1, 0, 0, 7, 10),
+(@OGUID+89, 180663, 0, 185.368, -1213.63, 37.0966, 2.67035, 0, 0, 0.97237, 0.233445, 180, 180, 100, 1, 0, 0, 7, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+26, 6, 'Sagefish School - Hillsbrad Foothills', 7, 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
+(@OGUID+73, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+74, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+75, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+76, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+77, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+78, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+79, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+80, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+81, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+82, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+83, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+84, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+85, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+86, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+87, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+88, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10),
+(@OGUID+89, @PTEMPLATE+26, 'Sagefish School - Hillsbrad Foothills', 7, 10);
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;

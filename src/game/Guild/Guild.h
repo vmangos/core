@@ -35,7 +35,7 @@ enum
     GUILD_NOTE_MAX_LENGTH       = 31,
     GUILD_INFO_MAX_LENGTH       = 500,
     GUILD_MOTD_MAX_LENGTH       = 128,
-    GUILD_ROSTER_MAX_LENGTH     = 0x8000, // max packet size accepted by client
+    GUILD_ROSTER_MAX_LENGTH     = 0x8000 - 4, // max packet size accepted by client - packet header size
 };
 
 enum GuildDefaultRanks
@@ -247,10 +247,10 @@ class Guild
         uint32 GetMemberSize() const { return members.size(); }
         uint32 GetAccountsNumber();
 
-        bool LoadGuildFromDB(QueryResult* guildDataResult);
+        bool LoadGuildFromDB(const std::unique_ptr<QueryResult>& guildDataResult);
         bool CheckGuildStructure();
-        bool LoadRanksFromDB(QueryResult* guildRanksResult);
-        bool LoadMembersFromDB(QueryResult* guildMembersResult);
+        bool LoadRanksFromDB(const std::unique_ptr<QueryResult>& guildRanksResult);
+        bool LoadMembersFromDB(const std::unique_ptr<QueryResult>& guildMembersResult);
 
         void BroadcastToGuild(WorldSession* session, char const* msg, uint32 language = LANG_UNIVERSAL);
         void BroadcastToOfficers(WorldSession* session, char const* msg, uint32 language = LANG_UNIVERSAL);
@@ -339,9 +339,7 @@ class Guild
         MemberList members;
 
         /** These are actually ordered lists. The first element is the oldest entry.*/
-        typedef std::list<GuildEventLogEntry> GuildEventLog;
-        GuildEventLog m_GuildEventLog;
-
+        std::list<GuildEventLogEntry> m_GuildEventLog;
         uint32 m_GuildEventLogNextGuid;
 
     private:

@@ -36,7 +36,7 @@
 
 INSTANTIATE_SINGLETON_1(WeatherMgr);
 
-/// Weather sound defines ( only for 1.12 )
+// Weather sound defines ( only for 1.12 )
 enum WeatherSounds
 {
     WEATHER_NOSOUND                = 0,
@@ -51,7 +51,7 @@ enum WeatherSounds
     WEATHER_SANDSTORMHEAVY         = 8558
 };
 
-/// Create the Weather object
+// Create the Weather object
 Weather::Weather(uint32 zone, WeatherZoneChances const* weatherChances) :
     m_zone(zone),
     m_type(WEATHER_TYPE_FINE),
@@ -63,19 +63,19 @@ Weather::Weather(uint32 zone, WeatherZoneChances const* weatherChances) :
     DETAIL_FILTER_LOG(LOG_FILTER_WEATHER, "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (m_timer.GetInterval() / (MINUTE * IN_MILLISECONDS)));
 }
 
-/// Launch a weather update
+// Launch a weather update
 bool Weather::Update(uint32 diff, Map const* _map)
 {
     m_timer.Update(diff);
 
-    ///- If the timer has passed, ReGenerate the weather
+    // If the timer has passed, ReGenerate the weather
     if (m_timer.Passed())
     {
         m_timer.Reset();
         // update only if Regenerate has changed the weather
         if (ReGenerate())
         {
-            ///- Weather will be removed if not updated (no players in zone anymore)
+            // Weather will be removed if not updated (no players in zone anymore)
             if (!SendWeatherForPlayersInZone(_map))
                 return false;
         }
@@ -83,7 +83,7 @@ bool Weather::Update(uint32 diff, Map const* _map)
     return true;
 }
 
-/// Calculate the new weather, returns true if and only if the weather changed
+// Calculate the new weather, returns true if and only if the weather changed
 bool Weather::ReGenerate()
 {
     if (m_isPermanentWeather)
@@ -101,11 +101,11 @@ bool Weather::ReGenerate()
         return old_type != m_type || old_grade != m_grade;
     }
 
-    /// Weather statistics:
-    ///- 30% - no change
-    ///- 30% - weather gets better (if not fine) or change weather type
-    ///- 30% - weather worsens (if not fine)
-    ///- 10% - radical change (if not fine)
+    // Weather statistics:
+    // 30% - no change
+    // 30% - weather gets better (if not fine) or change weather type
+    // 30% - weather worsens (if not fine)
+    // 10% - radical change (if not fine)
     uint32 u = urand(0, 99);
 
     if (u < 30)
@@ -141,10 +141,10 @@ bool Weather::ReGenerate()
 
     if (m_type != WEATHER_TYPE_FINE)
     {
-        /// Radical change:
-        ///- if light -> heavy
-        ///- if medium -> change weather type
-        ///- if heavy -> 50% light, 50% change weather type
+        // Radical change:
+        // if light -> heavy
+        // if medium -> change weather type
+        // if heavy -> 50% light, 50% change weather type
 
         if (m_grade < 0.33333334f)
         {
@@ -183,11 +183,11 @@ bool Weather::ReGenerate()
     else
         m_type = WEATHER_TYPE_FINE;
 
-    /// New weather statistics (if not fine):
-    ///- 85% light
-    ///- 7% medium
-    ///- 7% heavy
-    /// If fine 100% sun (no fog)
+    // New weather statistics (if not fine):
+    // 85% light
+    // 7% medium
+    // 7% heavy
+    // If fine 100% sun (no fog)
 
     if (m_type == WEATHER_TYPE_FINE)
         m_grade = 0.0f;
@@ -213,6 +213,7 @@ void Weather::SendWeatherUpdateToPlayer(Player* player)
 {
     NormalizeGrade();
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     WorldPacket data(SMSG_WEATHER, 4 + 4 + 4 + 1);
     data << uint32(m_type);
     data << float(m_grade);
@@ -220,6 +221,7 @@ void Weather::SendWeatherUpdateToPlayer(Player* player)
     data << uint8(0);           // 1 = instant change, 0 = smooth change
 
     player->GetSession()->SendPacket(&data);
+#endif
 }
 
 // Send the new weather to all players in the zone
@@ -227,17 +229,19 @@ bool Weather::SendWeatherForPlayersInZone(Map const* _map)
 {
     NormalizeGrade();
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     WorldPacket data(SMSG_WEATHER, 4 + 4 + 4 + 1);
     data << uint32(m_type);
     data << float(m_grade);
     data << uint32(GetSound()); // 1.12 soundid
     data << uint8(0);           // 1 = instant change, 0 = smooth change
 
-    ///- Send the weather packet to all players in this zone
+    // Send the weather packet to all players in this zone
     if (!_map->SendToPlayersInZone(&data, m_zone))
         return false;
+#endif
 
-    ///- Log the event
+    // Log the event
     LogWeatherState(GetWeatherState());
 
     return true;
@@ -350,14 +354,14 @@ WeatherSystem::WeatherSystem(Map const* _map) : m_map(_map)
 
 WeatherSystem::~WeatherSystem()
 {
-    ///- Empty the WeatherMap
+    // Empty the WeatherMap
     for (const auto& weather : m_weathers)
         delete weather.second;
 
     m_weathers.clear();
 }
 
-/// Find or Create a Weather object by the given zoneid
+// Find or Create a Weather object by the given zoneid
 Weather* WeatherSystem::FindOrCreateWeather(uint32 zoneId)
 {
     WeatherMap::const_iterator itr = m_weathers.find(zoneId);
@@ -370,13 +374,13 @@ Weather* WeatherSystem::FindOrCreateWeather(uint32 zoneId)
     return w;
 }
 
-/// Update Weathers for the different zones
+// Update Weathers for the different zones
 void WeatherSystem::UpdateWeathers(uint32 diff)
 {
-    ///- Send an update signal to Weather objects
+    // Send an update signal to Weather objects
     for (WeatherMap::iterator itr = m_weathers.begin(); itr != m_weathers.end();)
     {
-        ///- and remove Weather objects for zones with no player
+        // and remove Weather objects for zones with no player
         // As interval > WorldTick
         if (!itr->second->Update(diff, m_map))
         {
@@ -388,7 +392,7 @@ void WeatherSystem::UpdateWeathers(uint32 diff)
     }
 }
 
-/// Get the sound number associated with the current weather
+// Get the sound number associated with the current weather
 uint32 Weather::GetSound()
 {
     uint32 sound;
@@ -432,7 +436,7 @@ uint32 Weather::GetSound()
     return sound;
 }
 
-/// Load Weather chanced from table game_weather
+// Load Weather chanced from table game_weather
 void WeatherMgr::LoadWeatherZoneChances()
 {
     uint32 count = 0;

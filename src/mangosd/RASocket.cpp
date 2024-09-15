@@ -34,7 +34,7 @@
 #include "Language.h"
 #include "ObjectMgr.h"
 
-/// RASocket constructor
+// RASocket constructor
 RASocket::RASocket()
 :RAHandler(),
 pendingCommands(0, USYNC_THREAD, "pendingCommands"),
@@ -43,21 +43,21 @@ inputBufferLen(0),
 outputBufferLen(0),
 stage(NONE)
 {
-    ///- Get the config parameters
+    // Get the config parameters
     bSecure = sConfig.GetBoolDefault( "RA.Secure", true );
     bStricted = sConfig.GetBoolDefault( "RA.Stricted", false );
     iMinLevel = AccountTypes(sConfig.GetIntDefault( "RA.MinLevel", SEC_ADMINISTRATOR ));
     reference_counting_policy ().value (ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 }
 
-/// RASocket destructor
+// RASocket destructor
 RASocket::~RASocket()
 {
     peer().close();
     sLog.Out(LOG_RA, LOG_LVL_MINIMAL, "Connection was closed.");
 }
 
-/// Accept an incoming connection
+// Accept an incoming connection
 int RASocket::open(void* )
 {
     if (reactor ()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK) == -1)
@@ -77,7 +77,7 @@ int RASocket::open(void* )
 
     sLog.Out(LOG_RA, LOG_LVL_BASIC, "Incoming connection from %s.",remote_addr.get_host_addr());
 
-    ///- print Motd
+    // print Motd
     sendf(sWorld.GetMotd());
     sendf("\r\n");
     sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_USER));
@@ -147,7 +147,7 @@ int RASocket::handle_output (ACE_HANDLE)
     return 0;
 }
 
-/// Read data from the network
+// Read data from the network
 int RASocket::handle_input(ACE_HANDLE)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "RASocket::handle_input");
@@ -165,7 +165,7 @@ int RASocket::handle_input(ACE_HANDLE)
         return -1;
     }
 
-    ///- Discard data after line break or line feed
+    // Discard data after line break or line feed
     bool gotenter=false;
     for(; readBytes > 0 ; --readBytes)
     {
@@ -184,14 +184,14 @@ int RASocket::handle_input(ACE_HANDLE)
         inputBufferLen=0;
         switch(stage)
         {
-            /// <ul> <li> If the input is '<username>'
+            // <ul> <li> If the input is '<username>'
             case NONE:
             {
                 std::string szLogin=inputBuffer;
 
                 accId = sAccountMgr.GetId(szLogin);
 
-                ///- If the user is not found, deny access
+                // If the user is not found, deny access
                 if(!accId)
                 {
                     sendf("-No such user.\r\n");
@@ -208,7 +208,7 @@ int RASocket::handle_input(ACE_HANDLE)
 
                 accAccessLevel = sAccountMgr.GetSecurity(accId);
 
-                ///- if gmlevel is too low, deny access
+                // - if gmlevel is too low, deny access
                 if (accAccessLevel < iMinLevel)
                 {
                     sendf("-Not enough privileges.\r\n");
@@ -223,7 +223,7 @@ int RASocket::handle_input(ACE_HANDLE)
                     break;
                 }
 
-                ///- allow by remotely connected admin use console level commands dependent from config setting
+                // - allow by remotely connected admin use console level commands dependent from config setting
                 if (accAccessLevel >= SEC_ADMINISTRATOR && !bStricted)
                     accAccessLevel = SEC_CONSOLE;
 
@@ -231,7 +231,7 @@ int RASocket::handle_input(ACE_HANDLE)
                 sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_PASS));
                 break;
             }
-            ///<li> If the input is '<password>' (and the user already gave his username)
+            // <li> If the input is '<password>' (and the user already gave his username)
             case LG:
             {                                               //login+pass ok
                 std::string pw = inputBuffer;
@@ -246,7 +246,7 @@ int RASocket::handle_input(ACE_HANDLE)
                 }
                 else
                 {
-                    ///- Else deny access
+                    // Else deny access
                     sendf("-Wrong pass.\r\n");
                     sLog.Out(LOG_RA, LOG_LVL_BASIC, "User account %u has failed to log in.", accId);
                     if(bSecure)
@@ -259,7 +259,7 @@ int RASocket::handle_input(ACE_HANDLE)
                 }
                 break;
             }
-            ///<li> If user is logged, parse and execute the command
+            // <li> If user is logged, parse and execute the command
             case OK:
                 if (strlen(inputBuffer))
                 {
@@ -276,7 +276,7 @@ int RASocket::handle_input(ACE_HANDLE)
                 else
                     sendf("mangos>");
                 break;
-            ///</ul>
+            // </ul>
         };
 
     }
@@ -284,7 +284,7 @@ int RASocket::handle_input(ACE_HANDLE)
     return 0;
 }
 
-/// Output function
+// Output function
 void RASocket::zprint(void* callbackArg, const char * szText )
 {
     if( !szText )

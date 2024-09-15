@@ -54,14 +54,13 @@ bool ChatHandler::HandleListObjectCommand(char* args)
     if (!ExtractOptUInt32(&args, count, 10))
         return false;
 
-    QueryResult* result;
+    std::unique_ptr<QueryResult> result;
 
     uint32 obj_count = 0;
     result = WorldDatabase.PQuery("SELECT COUNT(`guid`) FROM `gameobject` WHERE `id`='%u'", go_id);
     if (result)
     {
         obj_count = (*result)[0].GetUInt32();
-        delete result;
     }
 
     if (m_session)
@@ -91,8 +90,6 @@ bool ChatHandler::HandleListObjectCommand(char* args)
                 PSendSysMessage(LANG_GO_LIST_CONSOLE, guid, PrepareStringNpcOrGoSpawnInformation<GameObject>(guid).c_str(), gInfo->name, x, y, z, mapid);
         }
         while (result->NextRow());
-
-        delete result;
     }
 
     PSendSysMessage(LANG_COMMAND_LISTOBJMESSAGE, go_id, obj_count);
@@ -113,7 +110,7 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
         return false;
     }
 
-    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(cr_id);
+    CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(cr_id);
     if (!cInfo)
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, cr_id);
@@ -125,14 +122,13 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
     if (!ExtractOptUInt32(&args, count, 10))
         return false;
 
-    QueryResult* result;
+    std::unique_ptr<QueryResult> result;
 
     uint32 cr_count = 0;
     result = WorldDatabase.PQuery("SELECT COUNT(`guid`) FROM `creature` WHERE `id`='%u'", cr_id);
     if (result)
     {
         cr_count = (*result)[0].GetUInt32();
-        delete result;
     }
 
     if (m_session)
@@ -157,13 +153,11 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
             int mapid = fields[4].GetUInt16();
 
             if (m_session)
-                PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), guid, cInfo->name, x, y, z, mapid);
+                PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), guid, cInfo->name.c_str(), x, y, z, mapid);
             else
-                PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), cInfo->name, x, y, z, mapid);
+                PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), cInfo->name.c_str(), x, y, z, mapid);
         }
         while (result->NextRow());
-
-        delete result;
     }
 
     PSendSysMessage(LANG_COMMAND_LISTCREATUREMESSAGE, cr_id, cr_count);
@@ -621,9 +615,10 @@ bool ChatHandler::HandleLookupCreatureCommand(char* args)
 
     uint32 counter = 0;
 
-    for (uint32 id = 0; id < sCreatureStorage.GetMaxEntry(); ++id)
+    for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
     {
-        CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo> (id);
+        uint32 id = itr.first;
+        CreatureInfo const* cInfo = itr.second.get();
         if (!cInfo)
             continue;
 
@@ -728,9 +723,10 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
         if (!modelId)
             break;
 
-        for (uint32 creature_id = 0; creature_id < sCreatureStorage.GetMaxEntry(); ++creature_id)
+        for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
         {
-            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creature_id);
+            uint32 creature_id = itr.first;
+            CreatureInfo const* cInfo = itr.second.get();
             if (!cInfo)
                 continue;
 
@@ -754,7 +750,7 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
                                     creatureCounter++;
                                     if (fileExport)
                                         toExport << creature_id << ", /* " << cInfo->name << " */\n";
-                                    PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, creature_id, creature_id, cInfo->name);
+                                    PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, creature_id, creature_id, cInfo->name.c_str());
                                 }
                             }
                             foundModelCounter++;
@@ -1003,12 +999,12 @@ bool ChatHandler::HandleLookupPlayerIpCommand(char* args)
     if (!ExtractOptUInt32(&args, limit, 100))
         return false;
 
-    QueryResult* result = nullptr;
+    std::unique_ptr<QueryResult> result = nullptr;
     std::string ip = ipStr;
     LoginDatabase.escape_string(ip);
     result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `last_ip` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), ip.c_str());
 
-    return LookupPlayerSearchCommand(result, &limit);
+    return LookupPlayerSearchCommand(std::move(result), &limit);
 }
 
 bool ChatHandler::HandleLookupPlayerAccountCommand(char* args)
@@ -1027,9 +1023,9 @@ bool ChatHandler::HandleLookupPlayerAccountCommand(char* args)
 
     LoginDatabase.escape_string(account);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `username` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), account.c_str());
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `username` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), account.c_str());
 
-    return LookupPlayerSearchCommand(result, &limit);
+    return LookupPlayerSearchCommand(std::move(result), &limit);
 }
 
 bool ChatHandler::HandleLookupPlayerEmailCommand(char* args)
@@ -1045,9 +1041,9 @@ bool ChatHandler::HandleLookupPlayerEmailCommand(char* args)
     std::string email = emailStr;
     LoginDatabase.escape_string(email);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `email` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), email.c_str());
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `email` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), email.c_str());
 
-    return LookupPlayerSearchCommand(result, &limit);
+    return LookupPlayerSearchCommand(std::move(result), &limit);
 }
 
 bool ChatHandler::HandleLookupPlayerNameCommand(char* args)
@@ -1082,16 +1078,14 @@ bool ChatHandler::HandleLookupPlayerCharacterCommand(char* args)
     if (!ExtractOptUInt32(&args, limit, 100))
         return false;
 
-    QueryResult* result = nullptr;
+    std::unique_ptr<QueryResult> result;
     std::string normalizedName = nameStr;
-    if (normalizePlayerName(normalizedName))
-        if (PlayerCacheData const* data = sObjectMgr.GetPlayerDataByName(normalizedName))
-            if (result = LoginDatabase.PQuery("SELECT `id`, `last_ip` FROM `account` WHERE `id` = %u", data->uiAccount))
-            {
-                Field* fields = result->Fetch();
+    if (normalizePlayerName(normalizedName)) {
+        if (PlayerCacheData const* data = sObjectMgr.GetPlayerDataByName(normalizedName)) {
+            if (std::unique_ptr<QueryResult> resultByAccountId = LoginDatabase.PQuery("SELECT `id`, `last_ip` FROM `account` WHERE `id` = %u", data->uiAccount)) {
+                Field* fields = resultByAccountId->Fetch();
                 uint32 id = fields[0].GetInt32();
                 std::string ip = fields[1].GetCppString();
-                delete result;
 
                 AccountTypes security = sAccountMgr.GetSecurity(id);
                 if (GetAccessLevel() < security || (GetAccessLevel() < SEC_ADMINISTRATOR && security > SEC_PLAYER))
@@ -1100,11 +1094,13 @@ bool ChatHandler::HandleLookupPlayerCharacterCommand(char* args)
                 LoginDatabase.escape_string(ip);
                 result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `last_ip` = '%s'", ip.c_str());
             }
+        }
+    }
 
-    return LookupPlayerSearchCommand(result, &limit);
+    return LookupPlayerSearchCommand(std::move(result), &limit);
 }
 
-bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, uint32* limit)
+bool ChatHandler::LookupPlayerSearchCommand(std::unique_ptr<QueryResult> result, uint32* limit)
 {
     if (!result)
     {
@@ -1138,7 +1134,6 @@ bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, uint32* limit)
 
         ++count;
     } while (result->NextRow());
-    delete result;
 
     CharacterDatabase.DelayQueryHolder(&PlayerSearchHandler::HandlePlayerAccountSearchResult, holder, 0);
     return true;
@@ -1525,6 +1520,34 @@ bool ChatHandler::HandleLookupEventCommand(char* args)
 
     if (counter == 0)
         SendSysMessage(LANG_NOEVENTFOUND);
+
+    return true;
+}
+
+bool ChatHandler::HandleListClickToMoveCommand(char* args)
+{
+    std::multimap<uint32, Player*> levelSortedList;
+    HashMapHolder<Player>::MapType const& plist = sObjectAccessor.GetPlayers();
+    for (auto const& itr : plist)
+    {
+        if (!itr.second->IsInWorld())
+            continue;
+
+        if (itr.second->GetSession()->HasUsedClickToMove())
+            levelSortedList.insert(std::make_pair(itr.second->GetLevel(), itr.second));
+    }
+
+    if (levelSortedList.empty())
+    {
+        SendSysMessage("No players found.");
+        return true;
+    }
+
+    SendSysMessage("Listing players using click to move:");
+    for (auto const& itr : levelSortedList)
+    {
+        PSendSysMessage("- Name %s IP %s Level %s", GetNameLink(itr.second).c_str(), playerLink(itr.second->GetSession()->GetRemoteAddress()).c_str(), playerLink(std::to_string(itr.first)).c_str());
+    }
 
     return true;
 }

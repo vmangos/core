@@ -250,6 +250,40 @@ enum WarEffortEventStage
     WAR_EFFORT_STAGE_COMPLETE       = 12
 };
 
+inline char const* WarEffortStageToString(uint32 stage)
+{
+    switch (stage)
+    {
+        case WAR_EFFORT_STAGE_COLLECTION:
+            return "Collection of Materials";
+        case WAR_EFFORT_STAGE_READY:
+            return "Material Collection Ready";
+        case WAR_EFFORT_STAGE_MOVE_1:
+            return "Moving to Silithus Day 1";
+        case WAR_EFFORT_STAGE_MOVE_2:
+            return "Moving to Silithus Day 2";
+        case WAR_EFFORT_STAGE_MOVE_3:
+            return "Moving to Silithus Day 3";
+        case WAR_EFFORT_STAGE_MOVE_4:
+            return "Moving to Silithus Day 4";
+        case WAR_EFFORT_STAGE_MOVE_5:
+            return "Moving to Silithus Day 5";
+        case WAR_EFFORT_STAGE_GONG_WAIT:
+            return "Waiting for Gong to be Rung";
+        case WAR_EFFORT_STAGE_GONG_RUNG:
+            return "Gong has been Rung";
+        case WAR_EFFORT_STAGE_BATTLE:
+            return "Battle at Gate";
+        case WAR_EFFORT_STAGE_CH_ATTACK:
+            return "Cenarion Hold Attack";
+        case WAR_EFFORT_STAGE_FINALBATTLE:
+            return "Final Battle";
+        case WAR_EFFORT_STAGE_COMPLETE:
+            return "Completed";
+    }
+    return "UNKNOWN";
+}
+
 enum WarEffortEnums
 {
     WAR_EFFORT_COLLECTION_TRANSITION_TIME   = 10 * MINUTE,  // 10 minutes between the event ending and starting the transition (what is the blizzlike thing here?)

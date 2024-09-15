@@ -188,13 +188,13 @@ void SpellModMgr::LoadSpellMods()
 
     // 2 : Table spell_effect_mod
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading spell effect mods ...");
-    result.reset(WorldDatabase.Query(
+    result = WorldDatabase.Query(
                  "SELECT Id, EffectIndex, Effect, EffectApplyAuraName, EffectMechanic, EffectImplicitTargetA, EffectImplicitTargetB, "
                  "EffectRadiusIndex, EffectItemType, EffectMiscValue, EffectTriggerSpell, "
                  "EffectDieSides, EffectBaseDice, EffectBasePoints, EffectAmplitude, EffectChainTarget, " // Int
                  "EffectDicePerLevel, EffectRealPointsPerLevel, EffectPointsPerComboPoint, EffectMultipleValue " // Float
                  "FROM spell_effect_mod"
-                ));
+                );
     total_count = 0;
 
     if (!result)

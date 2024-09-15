@@ -364,15 +364,15 @@ class SpellMgr
             return rule;
         }
 
-        // Fin Spell Groups - ameliorations Nostalrius.
-        // Gestion de "Un sort plus puissant est deja actif"
-        bool ListMorePowerfullSpells(uint32 spellId, std::list<uint32>&) const;
-        bool ListLessPowerfullSpells(uint32 spellId, std::list<uint32>&) const;
+        // End of Spell Groups - Nostalrius improvements.
+        // Handling for "A more powerful spell is already active"
+        bool ListMorePowerfulSpells(uint32 spellId, std::vector<uint32>&) const;
+        bool ListLessPowerfulSpells(uint32 spellId, std::vector<uint32>&) const;
         /**
          * Assumes that both spells are in the given group.
          * Returns true if $powerfullSpell is actually the most powerfull spell.
          */
-        bool IsMorePowerfullSpell(uint32 powerfullSpell, uint32 otherSpell, SpellGroup group) const
+        bool IsMorePowerfulSpell(uint32 powerfullSpell, uint32 otherSpell, SpellGroup group) const
         {
             // The most powerfull spell appears after less powerfull spells in the list.
             for (const auto& itr : mSpellGroupSpell)

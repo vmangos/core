@@ -197,11 +197,11 @@ bool ChatHandler::HandleSetViewCommand(char* /*args*/)
     return true;
 }
 
-/// Display the list of GMs
+// Display the list of GMs
 bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 {
-    ///- Get the accounts with GM Level >0
-    QueryResult* result = LoginDatabase.PQuery("SELECT `username`, `account_access`.`gmlevel` FROM `account`, `account_access` "
+    // Get the accounts with GM Level >0
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `username`, `account_access`.`gmlevel` FROM `account`, `account_access` "
         "WHERE `account_access`.`id` = `account`.`id` AND `account_access`.`gmlevel` > 0 AND `RealmID`=%u", realmID);
     if (result)
     {
@@ -210,7 +210,7 @@ bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
         SendSysMessage(LANG_GMLIST_HEADER);
         SendSysMessage("========================");
 
-        ///- Circle through them. Display username and GM level
+        // Circle through them. Display username and GM level
         do
         {
             Field* fields = result->Fetch();
@@ -218,7 +218,6 @@ bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
         } while (result->NextRow());
 
         PSendSysMessage("========================");
-        delete result;
     }
     else
         PSendSysMessage(LANG_GMLIST_EMPTY);
@@ -227,7 +226,7 @@ bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 
 bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
 {
-    std::list< std::pair<std::string, bool> > names;
+    std::vector< std::pair<std::string, bool> > names;
 
     {
         HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
@@ -254,29 +253,6 @@ bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
     else
         SendSysMessage(LANG_GMS_NOT_LOGGED);
 
-    return true;
-}
-
-bool ChatHandler::HandleGMFlyCommand(char* args)
-{
-    bool value;
-    if (!ExtractOnOff(&args, value))
-    {
-        SendSysMessage(LANG_USE_BOL);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    Player* target = GetSelectedPlayer();
-    if (!target)
-        target = m_session->GetPlayer();
-
-    target->SetFly(value);
-
-    if (value)
-        SendSysMessage("WARNING: Do not jump or flying mode will be removed.");
-
-    PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, GetNameLink(target).c_str(), args);
     return true;
 }
 
@@ -902,8 +878,7 @@ bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
 
     // extract items
     typedef std::pair<uint32, uint32> ItemPair;
-    typedef std::list< ItemPair > ItemPairs;
-    ItemPairs items;
+    std::vector<ItemPair> items;
 
     // get from tail next item str
     while (char* itemStr = ExtractArg(&args))
@@ -1025,7 +1000,7 @@ bool ChatHandler::HandleSendMassItemsCommand(char* args)
 
 bool ChatHandler::HandleSendMoneyHelper(MailDraft& draft, char* args)
 {
-    /// format: "subject text" "mail text" money
+    // format: "subject text" "mail text" money
 
     char* msgSubject = ExtractQuotedArg(&args);
     if (!msgSubject)
@@ -1050,7 +1025,7 @@ bool ChatHandler::HandleSendMoneyHelper(MailDraft& draft, char* args)
 
 bool ChatHandler::HandleSendMoneyCommand(char* args)
 {
-    /// format: name "subject text" "mail text" money
+    // format: name "subject text" "mail text" money
 
     Player* receiver;
     ObjectGuid receiver_guid;
@@ -1076,7 +1051,7 @@ bool ChatHandler::HandleSendMoneyCommand(char* args)
 
 bool ChatHandler::HandleSendMassMoneyCommand(char* args)
 {
-    /// format: raceMask "subject text" "mail text" money
+    // format: raceMask "subject text" "mail text" money
 
     uint32 raceMask = 0;
     char const* name = nullptr;
@@ -1129,21 +1104,21 @@ bool ChatHandler::HandleSendMailCommand(char* args)
     return true;
 }
 
-/// Send a message to a player in game
+// Send a message to a player in game
 bool ChatHandler::HandleSendMessageCommand(char* args)
 {
-    ///- Find the player
+    // Find the player
     Player* rPlayer;
     if (!ExtractPlayerTarget(&args, &rPlayer))
         return false;
 
-    ///- message
+    // message
     if (!*args)
         return false;
 
     WorldSession* rPlayerSession = rPlayer->GetSession();
 
-    ///- Check that he is not logging out.
+    // Check that he is not logging out.
     if (rPlayerSession->IsLogingOut())
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -1151,8 +1126,8 @@ bool ChatHandler::HandleSendMessageCommand(char* args)
         return false;
     }
 
-    ///- Send the message
-    //Use SendAreaTriggerMessage for fastest delivery.
+    // Send the message
+    // Use SendAreaTriggerMessage for fastest delivery.
     rPlayerSession->SendAreaTriggerMessage("%s", args);
     rPlayerSession->SendAreaTriggerMessage("|cffff0000[Message from administrator]:|r");
 
@@ -1203,9 +1178,9 @@ bool ChatHandler::HandlePoolSpawnsCommand(char* args)
     for (const auto itr : crSpawns)
         if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<Creature>(itr))
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr))
-                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
+                if (CreatureInfo const* info = sObjectMgr.GetCreatureTemplate(data->creature_id[0]))
                     PSendSysMessage(LANG_CREATURE_LIST_CHAT, itr, PrepareStringNpcOrGoSpawnInformation<Creature>(itr).c_str(),
-                                    itr, info->name, data->position.x, data->position.y, data->position.z, data->position.mapId);
+                                    itr, info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId);
 
     SpawnedPoolObjects const& goSpawns = spawns.GetSpawnedGameobjects();
     for (const auto itr : goSpawns)
@@ -1258,15 +1233,15 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
         {
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr.guid))
             {
-                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
+                if (CreatureInfo const* info = sObjectMgr.GetCreatureTemplate(data->creature_id[0]))
                 {
                     char const* active = crSpawns && crSpawns->find(itr.guid) != crSpawns->end() ? active_str.c_str() : "";
                     if (m_session)
                         PSendSysMessage(LANG_POOL_CHANCE_CREATURE_LIST_CHAT, itr.guid, PrepareStringNpcOrGoSpawnInformation<Creature>(itr.guid).c_str(),
-                                        itr.guid, info->name, data->position.x, data->position.y, data->position.z, data->position.mapId, itr.chance, active);
+                                        itr.guid, info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId, itr.chance, active);
                     else
                         PSendSysMessage(LANG_POOL_CHANCE_CREATURE_LIST_CONSOLE, itr.guid, PrepareStringNpcOrGoSpawnInformation<Creature>(itr.guid).c_str(),
-                                        info->name, data->position.x, data->position.y, data->position.z, data->position.mapId, itr.chance, active);
+                                        info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId, itr.chance, active);
                 }
             }
         }
@@ -1280,15 +1255,15 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
         {
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr.guid))
             {
-                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
+                if (CreatureInfo const* info = sObjectMgr.GetCreatureTemplate(data->creature_id[0]))
                 {
                     char const* active = crSpawns && crSpawns->find(itr.guid) != crSpawns->end() ? active_str.c_str() : "";
                     if (m_session)
                         PSendSysMessage(LANG_POOL_CREATURE_LIST_CHAT, itr.guid, PrepareStringNpcOrGoSpawnInformation<Creature>(itr.guid).c_str(),
-                                        itr.guid, info->name, data->position.x, data->position.y, data->position.z, data->position.mapId, active);
+                                        itr.guid, info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId, active);
                     else
                         PSendSysMessage(LANG_POOL_CREATURE_LIST_CONSOLE, itr.guid, PrepareStringNpcOrGoSpawnInformation<Creature>(itr.guid).c_str(),
-                                        info->name, data->position.x, data->position.y, data->position.z, data->position.mapId, active);
+                                        info->name.c_str(), data->position.x, data->position.y, data->position.z, data->position.mapId, active);
                 }
             }
         }

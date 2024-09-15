@@ -381,11 +381,30 @@ void MovementPacketSender::SendMovementFlagChangeToObservers(Unit* unit, Movemen
 
 void MovementPacketSender::SendMovementFlagChangeToAll(Unit* unit, MovementFlags mFlag, bool apply)
 {
+
     uint16 opcode;
     switch (mFlag)
     {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+
+    #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         case MOVEFLAG_ROOT:             opcode = apply ? SMSG_SPLINE_MOVE_ROOT              : SMSG_SPLINE_MOVE_UNROOT; break;
+    #else
+        case MOVEFLAG_ROOT:
+        {
+            if (apply)
+            {
+                WorldPacket data(MSG_MOVE_ROOT, 64);
+                data << unit->GetPackGUID();
+                data << unit->m_movementInfo;
+                unit->SendMovementMessageToSet(std::move(data), true);
+                return;
+            }
+            else
+                opcode = SMSG_SPLINE_MOVE_UNROOT;
+            break;
+        }
+    #endif
         case MOVEFLAG_WATERWALKING:     opcode = apply ? SMSG_SPLINE_MOVE_WATER_WALK        : SMSG_SPLINE_MOVE_LAND_WALK; break;
         case MOVEFLAG_SAFE_FALL:        opcode = apply ? SMSG_SPLINE_MOVE_FEATHER_FALL      : SMSG_SPLINE_MOVE_NORMAL_FALL; break;
         case MOVEFLAG_HOVER:            opcode = apply ? SMSG_SPLINE_MOVE_SET_HOVER         : SMSG_SPLINE_MOVE_UNSET_HOVER; break;
@@ -405,6 +424,20 @@ void MovementPacketSender::SendMovementFlagChangeToAll(Unit* unit, MovementFlags
     data << unit->GetPackGUID();
 #else
     WorldPacket data(opcode, 64);
+    data << unit->GetGUID();
+    data << unit->m_movementInfo;
+#endif
+
+    unit->SendMovementMessageToSet(std::move(data), true);
+}
+
+void MovementPacketSender::SendToggleRunWalkToAll(Unit* unit, bool run)
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    WorldPacket data(run ? SMSG_SPLINE_MOVE_SET_RUN_MODE : SMSG_SPLINE_MOVE_SET_WALK_MODE, 9);
+    data << unit->GetPackGUID();
+#else
+    WorldPacket data(run ? MSG_MOVE_SET_RUN_MODE : MSG_MOVE_SET_WALK_MODE, 64);
     data << unit->GetGUID();
     data << unit->m_movementInfo;
 #endif

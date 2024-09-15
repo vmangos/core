@@ -82,7 +82,10 @@ public:
     }
 
     virtual void OnPacketReceived(WorldPacket const* packet) override;
-    virtual void SendFakePacket(uint16 opcode) override;
+    void SendBattlefieldPortPacket();
+    void SendBattlemasterJoinPacket(uint8 battlegroundId);
+    void SendAreaTriggerPacket(uint32 areaTriggerId);
+    void ActivateNearbyAreaTrigger();
 
     void AutoAssignRole();
     void PopulateSpellData();
@@ -94,6 +97,7 @@ public:
     void EquipPremadeGearTemplate();
     void EquipRandomGearInEmptySlots();
     void AutoEquipGear(uint32 option);
+    void LearnRandomTalents();
     
     uint8 GetAttackersInRangeCount(float range) const;
     Unit* SelectAttackerDifferentFrom(Unit const* pExcept) const;
@@ -119,11 +123,15 @@ public:
 
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     virtual bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
-    bool IsWearingShield() const;
+    bool IsWearingShield(Player* pPlayer) const;
+    bool IsInDuel() const;
+    CombatBotRoles GetRole() const;
 
     void EquipOrUseNewItem();
     void AddItemToInventory(uint32 itemId, uint32 count = 1);
     void AddHunterAmmo();
+    uint8 GetHighestHonorRankFromEquippedItems() const;
+    void UpdateVisualHonorRankBasedOnItems();
 
     bool SummonShamanTotems();
     SpellCastResult CastWeaponBuff(SpellEntry const* pSpellEntry, EquipmentSlots slot);
@@ -183,12 +191,12 @@ public:
     {
         switch (playerClass)
         {
-        case CLASS_WARRIOR:
-        case CLASS_PALADIN:
-        case CLASS_ROGUE:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            return true;
+            case CLASS_WARRIOR:
+            case CLASS_PALADIN:
+            case CLASS_ROGUE:
+            case CLASS_SHAMAN:
+            case CLASS_DRUID:
+                return true;
         }
         return false;
     }
@@ -270,9 +278,9 @@ public:
     }
 
     SpellEntry const* m_resurrectionSpell = nullptr;
-    std::vector<SpellEntry const*> spellListTaunt;
-    std::set<SpellEntry const*, HealAuraCompare> spellListPeriodicHeal;
-    std::set<SpellEntry const*, HealSpellCompare> spellListDirectHeal;
+    std::vector<SpellEntry const*> m_spellListTaunt;
+    std::set<SpellEntry const*, HealAuraCompare> m_spellListPeriodicHeal;
+    std::set<SpellEntry const*, HealSpellCompare> m_spellListDirectHeal;
     union
     {
         struct
@@ -375,6 +383,7 @@ public:
             SpellEntry const* pDivineSpirit;
             SpellEntry const* pPrayerofSpirit;
             SpellEntry const* pPrayerofFortitude;
+            SpellEntry const* pPrayerofShadowProtection;
             SpellEntry const* pInnerFire;
             SpellEntry const* pShadowProtection;
             SpellEntry const* pPowerWordShield;
@@ -546,6 +555,7 @@ public:
     bool m_initialized = false;
     bool m_isBuffing = false;
     bool m_receivedBgInvite = false;
+    uint8 m_visualHonorRank = 0;
     CombatBotRoles m_role = ROLE_INVALID;
 };
 

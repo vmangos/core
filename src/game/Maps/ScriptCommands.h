@@ -81,7 +81,7 @@ enum eScriptCommand
                                                             // datalong3 = unique_limit
                                                             // datalong4 = unique_distance
                                                             // dataint = eSummonCreatureFlags
-                                                            // dataint2 = script_id
+                                                            // dataint2 = generic_script_id
                                                             // dataint3 = attack_target (see enum ScriptTarget)
                                                             // dataint4 = despawn_type (see enum TempSummonType)
                                                             // x/y/z/o = coordinates
@@ -175,7 +175,7 @@ enum eScriptCommand
                                                             // datalong2 = data
                                                             // datalong3 = eSetInstData64Options
     SCRIPT_COMMAND_START_SCRIPT             = 39,           // source = Map
-                                                            // datalong1-4 = generic_script id
+                                                            // datalong1-4 = generic_script_id
                                                             // dataint1-4 = chance (total cant be above 100)
     SCRIPT_COMMAND_REMOVE_ITEM              = 40,           // source = Player (from provided source or target)
                                                             // datalong = item_id
@@ -271,7 +271,7 @@ enum eScriptCommand
                                                             // datalong2 = (bool) always_replace
                                                             // datalong3 = param1
     SCRIPT_COMMAND_START_SCRIPT_FOR_ALL     = 68,           // source = WorldObject
-                                                            // datalong = script_id
+                                                            // datalong = generic_script_id
                                                             // datalong2 = eStartScriptForAllOptions
                                                             // datalong3 = object_entry
                                                             // datalong4 = search_radius
@@ -328,11 +328,15 @@ enum eScriptCommand
     SCRIPT_COMMAND_PLAY_CUSTOM_ANIM         = 89,           // source = GameObject
                                                             // datalong = anim_id
     SCRIPT_COMMAND_START_SCRIPT_ON_GROUP    = 90,           // source = Unit
-                                                            // datalong1-4 = generic_script id
+                                                            // datalong1-4 = generic_script_id
                                                             // dataint1-4 = chance (total cant be above 100)
     SCRIPT_COMMAND_LOAD_CREATURE_SPAWN      = 91,           // source = Map
                                                             // datalong = db_guid
                                                             // datalong2 = (bool) with_group
+    SCRIPT_COMMAND_START_SCRIPT_ON_ZONE     = 92,           // source = Map
+                                                            // datalong = generic_script_id
+                                                            // datalong2 = zone_id
+                                                            // datalong3 = (bool) with_pets
 
     SCRIPT_COMMAND_MAX,
 
@@ -1066,6 +1070,13 @@ struct ScriptInfo
             uint32 dbGuid;                                  // datalong
             uint32 withGroup;                               // datalong2
         } loadCreature;
+
+        struct                                              // SCRIPT_COMMAND_START_SCRIPT_ON_ZONE (92)
+        {
+            uint32 scriptId;                                // datalong
+            uint32 zoneId;                                  // datalong2
+            uint32 withPets;                                // datalong3
+        } startScriptOnZone;
 
         struct
         {

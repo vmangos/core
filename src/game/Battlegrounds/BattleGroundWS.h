@@ -49,8 +49,8 @@ enum BG_WS_SpellId
 
 enum BG_WS_WorldStates
 {
-    BG_WS_FLAG_UNK_ALLIANCE       = 1545,
-    BG_WS_FLAG_UNK_HORDE          = 1546,
+    BG_WS_FLAG_TAKEN_ALLIANCE     = 1545, // Alliance Flag has been taken by the Horde
+    BG_WS_FLAG_TAKEN_HORDE        = 1546, // Horde Flag has been taken by the Alliance
 //    FLAG_UNK                      = 1547,
     BG_WS_FLAG_CAPTURES_ALLIANCE  = 1581,
     BG_WS_FLAG_CAPTURES_HORDE     = 1582,
@@ -148,7 +148,7 @@ class BattleGroundWS : public BattleGround
         virtual void EventPlayerCapturedFlag(Player* source);
 
         void RemovePlayer(Player* player, ObjectGuid guid);
-        void HandleAreaTrigger(Player* source, uint32 trigger);
+        bool HandleAreaTrigger(Player* source, uint32 trigger);
         void HandleKillPlayer(Player* pVictim, Player* pKiller);
         bool SetupBattleGround();
         virtual void Reset();

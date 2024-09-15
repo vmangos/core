@@ -80,7 +80,32 @@ static constexpr struct ClientOffsets
     uint32 WardenModule;
     uint32 OfsWardenSysInfo;
     uint32 OfsWardenWinSysInfo;
+
+    // Click to move
+    uint32 ClickToMovePosition;
 } Offsets[] = {
+    {
+        5302,
+        0x2F5CE0,
+        0x22D230, 0x22E2F0, 0x22DF60, 0x2393F0,
+        0x226A0,
+        0xC213E4,
+        0xC9470C,
+        0xBB4E98, 0x38A0, 0x0, 0xA8,
+        0xC8E64C, 0x228, 0x08,
+        0xBF3A94
+    },
+    {
+        5464,
+        0x2FAE20,
+        0x23F410, 0x240460, 0x2400D0, 0x24B560,
+        0x2BDF0,
+        0xC6F4CC,
+        0xCE4BD0,
+        0xC02F48, 0x38A8, 0x0, 0xA8,
+        0xCDCB8C, 0x228, 0x08,
+        0xC41B44
+    },
     {
         5875,
         0x303BF0,
@@ -89,7 +114,8 @@ static constexpr struct ClientOffsets
         0xC7B2A4,
         0xCF0BC8,
         0xC0ED38, 0x38A8, 0x0, 0xA8,
-        0xCE897C, 0x228, 0x08
+        0xCE897C, 0x228, 0x08,
+        0xC4D890
     },
     {
         6005,
@@ -99,7 +125,8 @@ static constexpr struct ClientOffsets
         0xC7B2A4,
         0xCF0BC8,
         0xC0ED38, 0x38A8, 0x0, 0xA8,
-        0xCE897C, 0x228, 0x08
+        0xCE897C, 0x228, 0x08,
+        0xC4D890
     },
     {
         6141,
@@ -109,16 +136,17 @@ static constexpr struct ClientOffsets
         0xC7F9C4,
         0xCF52E8,
         0xC133E0, 0x38A8, 0x0, 0xA8,
-        0xCED09C, 0x228, 0x08
+        0xCED09C, 0x228, 0x08,
+        0xC51FB0
     }
 };
 
 // TODO: Identify drivers for other hypervisors and add detections for them too
 static constexpr struct
 {
-    const char *Name;
-    const char *Driver;
-    const char *DeviceName;
+    char const* Name;
+    char const* Driver;
+    char const* DeviceName;
 } Hypervisors[] =
 {
     { "VirtualBox", "VBoxGuest", "\\Device\\VBoxGuest"},
@@ -165,7 +193,7 @@ enum WorldEnables
     Prohibited = (TerrainDoodadCollisionVisuals|CrappyBatches|ZoneBoundaryVisuals|BSPRender|ShowQuery|TerrainDoodadAABoxVisuals|Unknown6737F9|Unknown673820),
 };
 
-const ClientOffsets* GetClientOffets(uint32 build)
+ClientOffsets const* GetClientOffets(uint32 build)
 {
     static auto constexpr offset_count = sizeof(Offsets) / sizeof(Offsets[0]);
 
@@ -174,56 +202,6 @@ const ClientOffsets* GetClientOffets(uint32 build)
             return &Offsets[i];
 
     return nullptr;
-}
-
-// returns ScanFlag mask for those builds which we have offsets
-ScanFlags GetScanFlagsByAvailableOffsets()
-{
-    uint32 result = None;
-
-    auto offset_count = sizeof(Offsets) / sizeof(Offsets[0]);
-
-    for (auto i = 0; i < offset_count; ++i)
-    {
-        switch (Offsets[i].Build)
-        {
-        case CLIENT_BUILD_1_2_4:
-            result |= WinBuild4222;
-            break;
-        case CLIENT_BUILD_1_3_1:
-            result |= WinBuild4297;
-            break;
-        case CLIENT_BUILD_1_4_2:
-            result |= WinBuild4375;
-            break;
-        case CLIENT_BUILD_1_5_1:
-            result |= WinBuild4449;
-            break;
-        case CLIENT_BUILD_1_6_1:
-            result |= WinBuild4544;
-            break;
-        case CLIENT_BUILD_1_7_1:
-            result |= WinBuild4695;
-            break;
-        case CLIENT_BUILD_1_8_4:
-            result |= WinBuild4878;
-            break;
-        case CLIENT_BUILD_1_9_4:
-            result |= WinBuild5086;
-            break;
-        case CLIENT_BUILD_1_10_2:
-            result |= WinBuild5302;
-            break;
-        case CLIENT_BUILD_1_11_2:
-            result |= WinBuild5464;
-            break;
-        case CLIENT_BUILD_1_12_1:
-            result |= WinBuild5875 | WinBuild6005 | WinBuild6141;
-            break;
-        }
-    }
-
-    return static_cast<ScanFlags>(result);
 }
 
 std::string ArchitectureString(uint16 arch)
@@ -308,7 +286,7 @@ std::string CPUTypeAndRevision(uint32 cpuType, uint16 revision)
 
 // this function assumes that the given code begins with a valid instruction.  in other words, that
 // it does not begin in random data or in the middle of an instruction.
-void DeobfuscateAsm(std::vector<std::uint8_t> &code)
+void DeobfuscateAsm(std::vector<std::uint8_t>& code)
 {
 #define LSTRIP(c, l) do { if (c.size() <= l) { c.clear(); return; } else { c.erase(c.begin(), c.begin()+l); } } while(false)
 
@@ -404,7 +382,7 @@ void DeobfuscateAsm(std::vector<std::uint8_t> &code)
                 return;
             }
 
-            const unsigned int len = *reinterpret_cast<unsigned int *>(&code[1]) + 5;
+            const unsigned int len = *reinterpret_cast<unsigned int*>(&code[1]) + 5;
 
             LSTRIP(code, len);
             continue;
@@ -432,7 +410,7 @@ void DeobfuscateAsm(std::vector<std::uint8_t> &code)
             {
                 if (code[i] == 0xE9)
                 {
-                    secondJumpTarget = *reinterpret_cast<unsigned int *>(&code[i + 1]) + 5;
+                    secondJumpTarget = *reinterpret_cast<unsigned int*>(&code[i + 1]) + 5;
                     break;
                 }
                 else if (code[i] == 0xEB)
@@ -472,7 +450,7 @@ void DeobfuscateAsm(std::vector<std::uint8_t> &code)
 }
 
 // returns true when the given hook code is suspicious
-bool ValidateEndSceneHook(const std::vector<uint8> &code)
+bool ValidateEndSceneHook(std::vector<uint8> const& code)
 {
     auto copy = code;
 
@@ -503,14 +481,12 @@ bool ValidateEndSceneHook(const std::vector<uint8> &code)
 
 void WardenWin::LoadScriptedScans()
 {
-    auto offset_flags = GetScanFlagsByAvailableOffsets();
-
     // sys info locate phase 2
     auto const wardenSysInfo2 = std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
@@ -518,13 +494,13 @@ void WardenWin::LoadScriptedScans()
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_sysInfo.dwOemId + offsets->OfsWardenWinSysInfo
-             << static_cast<uint8>(sizeof(wardenWin->_sysInfo));
+             << wardenWin->m_sysInfo.dwOemId + offsets->OfsWardenWinSysInfo
+             << static_cast<uint8>(sizeof(wardenWin->m_sysInfo));
     },
     // checker
-    [](const Warden *warden, ByteBuffer &buff)
+    [](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         auto const result = buff.read<uint8>();
 
@@ -535,38 +511,38 @@ void WardenWin::LoadScriptedScans()
             return true;
         }
 
-        buff.read(reinterpret_cast<uint8 *>(&wardenWin->_sysInfo), sizeof(wardenWin->_sysInfo));
+        buff.read(reinterpret_cast<uint8*>(&wardenWin->m_sysInfo), sizeof(wardenWin->m_sysInfo));
 
         // for classic, tbc, and wotlk, the architecute should never be anything other than x86 (0)
-        if (!!wardenWin->_sysInfo.wProcessorArchitecture)
+        if (!!wardenWin->m_sysInfo.wProcessorArchitecture)
         {
             sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Incorrect architecture reported (%u)",
-                wardenWin->_sysInfo.wProcessorArchitecture);
+                wardenWin->m_sysInfo.wProcessorArchitecture);
 
             return true;
         }
 
         // for classic, tbc, and wotlk, the cpu type should never be anything other than i386, i486, or pentium (i586)
-        if (wardenWin->_sysInfo.dwProcessorType != 386 &&
-            wardenWin->_sysInfo.dwProcessorType != 486 &&
-            wardenWin->_sysInfo.dwProcessorType != 586)
+        if (wardenWin->m_sysInfo.dwProcessorType != 386 &&
+            wardenWin->m_sysInfo.dwProcessorType != 486 &&
+            wardenWin->m_sysInfo.dwProcessorType != 586)
         {
             sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Incorrect processor type: %u",
-                wardenWin->_sysInfo.dwProcessorType);
+                wardenWin->m_sysInfo.dwProcessorType);
 
             return true;
         }
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(WIN_SYSTEM_INFO),
-        "Sysinfo locate", None);
+        "Sysinfo locate", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     // sys info locate phase 1
     auto const wardenSysInfo1 = std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
@@ -574,13 +550,13 @@ void WardenWin::LoadScriptedScans()
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_wardenAddress + offsets->OfsWardenSysInfo
-             << static_cast<uint8>(sizeof(wardenWin->_sysInfo.dwOemId));
+             << wardenWin->m_wardenAddress + offsets->OfsWardenSysInfo
+             << static_cast<uint8>(sizeof(wardenWin->m_sysInfo.dwOemId));
     },
     // checker
-    [wardenSysInfo2](const Warden *warden, ByteBuffer &buff)
+    [wardenSysInfo2](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         auto const result = buff.read<uint8>();
 
@@ -592,21 +568,21 @@ void WardenWin::LoadScriptedScans()
         }
 
         // borrow this memory temporarily
-        wardenWin->_sysInfo.dwOemId = buff.read<uint32>();
+        wardenWin->m_sysInfo.dwOemId = buff.read<uint32>();
 
         // immediately third second stage
         wardenWin->EnqueueScans({ wardenSysInfo2 });
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-        "Intermediate sysinfo locate", None);
+        "Intermediate sysinfo locate", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     // find warden module
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
@@ -615,12 +591,12 @@ void WardenWin::LoadScriptedScans()
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
              << offsets->WardenModule
-             << static_cast<uint8>(sizeof(wardenWin->_wardenAddress));
+             << static_cast<uint8>(sizeof(wardenWin->m_wardenAddress));
     },
     // checker
-    [wardenSysInfo1](const Warden *warden, ByteBuffer &buff)
+    [wardenSysInfo1](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         auto const result = buff.read<uint8>();
 
@@ -631,20 +607,20 @@ void WardenWin::LoadScriptedScans()
             return true;
         }
 
-        wardenWin->_wardenAddress = buff.read<uint32>();
+        wardenWin->m_wardenAddress = buff.read<uint32>();
 
         // immediately enqueue second stage
         wardenWin->EnqueueScans({ wardenSysInfo1 });
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-        "Warden locate", InitialLogin|offset_flags));
+        "Warden locate", ScanFlags::OffsetsInitialized | ScanFlags::InitialLogin, 0, UINT16_MAX));
 
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
@@ -653,11 +629,11 @@ void WardenWin::LoadScriptedScans()
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
              << offsets->WorldEnables
-             << static_cast<uint8>(sizeof(wardenWin->_wardenAddress));
+             << static_cast<uint8>(sizeof(wardenWin->m_wardenAddress));
     },
-    [](const Warden *warden, ByteBuffer &buff)
+    [](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         auto const result = buff.read<uint8>();
 
@@ -681,14 +657,14 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
-    sizeof(uint32), "CWorld::enables hack", offset_flags));
+    sizeof(uint32), "CWorld::enables hack", ScanFlags::OffsetsInitialized, 0, UINT16_MAX));
 
     // read game time and last hardware action time together
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
@@ -708,9 +684,9 @@ void WardenWin::LoadScriptedScans()
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[CHECK_TIMING_VALUES] ^ wardenWin->GetXor());
     },
     // checker
-    [](const Warden *warden, ByteBuffer &buff)
+    [](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         if (!!buff.read<uint8>())
         {
@@ -741,26 +717,26 @@ void WardenWin::LoadScriptedScans()
             return true;
         }
 
-        wardenWin->_lastClientTime = currentTime;
-        wardenWin->_lastHardwareActionTime = lastHardwareAction;
-        wardenWin->_lastTimeCheckServer = WorldTimer::getMSTime();
+        wardenWin->m_lastClientTime = currentTime;
+        wardenWin->m_lastHardwareActionTime = lastHardwareAction;
+        wardenWin->m_lastTimeCheckServer = WorldTimer::getMSTime();
 
         return false;
-    }, 11, 10, "Anti-AFK hack", offset_flags));
+    }, 11, 10, "Anti-AFK hack", ScanFlags::OffsetsInitialized, 0, UINT16_MAX));
 
     // check for hypervisors
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         MANGOS_ASSERT(strings.size() + HypervisorCount < 0xFF);
 
-        auto const winWarden = reinterpret_cast<const WardenWin *>(warden);
+        auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
         auto const opcode = static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_DRIVER_BY_NAME] ^ winWarden->GetXor());
 
         for (auto i = 0u; i < HypervisorCount; ++i)
         {
-            auto const &hypervisor = Hypervisors[i];
+            auto const& hypervisor = Hypervisors[i];
 
             strings.emplace_back(hypervisor.Driver);
 
@@ -768,7 +744,7 @@ void WardenWin::LoadScriptedScans()
 
             scan << opcode << seed;
 
-            HMACSHA1 hash(reinterpret_cast<const uint8 *>(&seed), sizeof(seed));
+            HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
             hash.UpdateData(hypervisor.DeviceName);
             hash.Finalize();
 
@@ -777,11 +753,11 @@ void WardenWin::LoadScriptedScans()
         }
     },
     // checker
-    [](const Warden *warden, ByteBuffer &buff)
+    [](Warden const* warden, ByteBuffer& buff)
     {
-        auto const winWarden = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const winWarden = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
-        winWarden->_hypervisors = "";
+        winWarden->m_hypervisors = "";
 
         for (auto i = 0u; i < HypervisorCount; ++i)
         {
@@ -790,7 +766,7 @@ void WardenWin::LoadScriptedScans()
             if (!found)
                 continue;
 
-            winWarden->_hypervisors += Hypervisors[i].Name;
+            winWarden->m_hypervisors += Hypervisors[i].Name;
         }
 
         // always return false because there is nothing necessary wrong with using a hypervisor
@@ -800,11 +776,11 @@ void WardenWin::LoadScriptedScans()
     (sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint8)) * HypervisorCount + 21,
     sizeof(uint8) * HypervisorCount,
     "Hypervisor check",
-    WinAllBuild|InitialLogin));
+    ScanFlags::InitialLogin, 0, UINT16_MAX));
 
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &strings, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
         auto const seed = static_cast<uint32>(rand32());
 
@@ -822,7 +798,7 @@ void WardenWin::LoadScriptedScans()
 
         static_assert(sizeof(pattern) <= 0xFF, "pattern length must fit into 8 bits");
 
-        HMACSHA1 hash(reinterpret_cast<const uint8 *>(&seed), sizeof(seed));
+        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
         hash.UpdateData(&pattern[0], sizeof(pattern));
         hash.Finalize();
 
@@ -831,7 +807,7 @@ void WardenWin::LoadScriptedScans()
         scan << warden->GetModule()->memoryRead << static_cast<uint8>(sizeof(pattern));
     },
     // checker
-    [] (const Warden *warden, ByteBuffer &buff)
+    [] (Warden const* warden, ByteBuffer& buff)
     {
         auto const found = buff.read<uint8>() == WindowsCodeScan::PatternFound;
 
@@ -839,29 +815,29 @@ void WardenWin::LoadScriptedScans()
         return !found;
     }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint32) + sizeof(uint8), sizeof(uint8),
     "Warden Memory Read check",
-    WinAllBuild));
+    ScanFlags::None, 0, UINT16_MAX));
 
     // end scene hook check 1
     static constexpr uint8 endSceneReadSize = 16u;
     auto const endSceneHookCheck1 = std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
 
         // if we have not found EndScene, do nothing
-        if (!wardenWin->_endSceneFound)
+        if (!wardenWin->m_endSceneFound)
             return;
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress
+             << wardenWin->m_endSceneAddress
              << endSceneReadSize;
     },
     // checker
-    [](const Warden *warden, ByteBuffer &buff)
+    [](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         auto const result = buff.read<uint8>();
 
@@ -879,16 +855,16 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + endSceneReadSize,
-    "EndScene hook check stage 1", WinAllBuild);
+    "EndScene hook check stage 1", ScanFlags::None, 0, UINT16_MAX);
 
     sWardenScanMgr.AddWindowsScan(endSceneHookCheck1);
 
     // end scene locate phase 4
     auto const endSceneLocate4 = std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
@@ -896,13 +872,13 @@ void WardenWin::LoadScriptedScans()
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress + offsets->OfsDevice4
+             << wardenWin->m_endSceneAddress + offsets->OfsDevice4
              << static_cast<uint8>(sizeof(uint32));
     },
     // checker
-    [endSceneHookCheck1](const Warden *warden, ByteBuffer &buff)
+    [endSceneHookCheck1](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         auto const result = buff.read<uint8>();
 
@@ -913,22 +889,22 @@ void WardenWin::LoadScriptedScans()
             return true;
         }
 
-        wardenWin->_endSceneAddress = buff.read<uint32>();
-        wardenWin->_endSceneFound = true;
+        wardenWin->m_endSceneAddress = buff.read<uint32>();
+        wardenWin->m_endSceneFound = true;
 
         // immediately request hook check
         wardenWin->EnqueueScans({ endSceneHookCheck1 });
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 4", None);
+    "EndScene locate stage 4", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     // end scene locate phase 3
     auto const endSceneLocate3 = std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
@@ -936,13 +912,13 @@ void WardenWin::LoadScriptedScans()
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress + offsets->OfsDevice3
+             << wardenWin->m_endSceneAddress + offsets->OfsDevice3
              << static_cast<uint8>(sizeof(uint32));
     },
     // checker
-    [endSceneLocate4](const Warden *warden, ByteBuffer &buff)
+    [endSceneLocate4](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         auto const result = buff.read<uint8>();
 
@@ -953,21 +929,21 @@ void WardenWin::LoadScriptedScans()
             return true;
         }
 
-        wardenWin->_endSceneAddress = buff.read<uint32>();
+        wardenWin->m_endSceneAddress = buff.read<uint32>();
 
         // immediately request fourth stage
         wardenWin->EnqueueScans({ endSceneLocate4 });
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 3", None);
+    "EndScene locate stage 3", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     // end scene locate phase 2
     auto const endSceneLocate2 = std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
@@ -975,13 +951,13 @@ void WardenWin::LoadScriptedScans()
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress + offsets->OfsDevice2
+             << wardenWin->m_endSceneAddress + offsets->OfsDevice2
              << static_cast<uint8>(sizeof(uint32));
     },
     // checker
-    [endSceneLocate3](const Warden *warden, ByteBuffer &buff)
+    [endSceneLocate3](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         auto const result = buff.read<uint8>();
 
@@ -992,20 +968,20 @@ void WardenWin::LoadScriptedScans()
             return true;
         }
 
-        wardenWin->_endSceneAddress = buff.read<uint32>();
+        wardenWin->m_endSceneAddress = buff.read<uint32>();
 
         // immediately request third stage
         wardenWin->EnqueueScans({ endSceneLocate3 });
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 2", None);
+    "EndScene locate stage 2", ScanFlags::OffsetsInitialized, 0, UINT16_MAX);
 
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
     // builder
-    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
-        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
         if (!offsets)
@@ -1017,9 +993,9 @@ void WardenWin::LoadScriptedScans()
              << static_cast<uint8>(sizeof(uint32));
     },
     // checker
-    [endSceneLocate2](const Warden *warden, ByteBuffer &buff)
+    [endSceneLocate2](Warden const* warden, ByteBuffer& buff)
     {
-        auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
         auto const result = buff.read<uint8>();
 
@@ -1030,10 +1006,10 @@ void WardenWin::LoadScriptedScans()
             return true;
         }
 
-        buff.read(reinterpret_cast<uint8 *>(&wardenWin->_endSceneAddress), sizeof(wardenWin->_endSceneAddress));
+        buff.read(reinterpret_cast<uint8*>(&wardenWin->m_endSceneAddress), sizeof(wardenWin->m_endSceneAddress));
 
         // if for some reason we get nullptr, abort
-        if (!wardenWin->_endSceneAddress)
+        if (!wardenWin->m_endSceneAddress)
         {
             sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "g_theGxDevicePtr is nullptr");
             return true;
@@ -1046,27 +1022,74 @@ void WardenWin::LoadScriptedScans()
     },
     sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
     sizeof(uint8) + sizeof(uint32),
-    "EndScene locate stage 1", InitialLogin|offset_flags));
+    "EndScene locate stage 1", ScanFlags::OffsetsInitialized | ScanFlags::InitialLogin, 0, UINT16_MAX));
 
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsModuleScan>("prxdrvpe.dll",
     // checker
-    Scan::CheckT([](const Warden *warden, ByteBuffer &buff)
+    Scan::CheckT([](Warden const* warden, ByteBuffer& buff)
     {
         if (buff.read<uint8>() == WindowsModuleScan::ModuleFound)
         {
-            auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
-            wardenWin->_proxifierFound = true;
+            auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
+            wardenWin->m_proxifierFound = true;
 
             sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Proxifier found");
         }
 
         return false;
-    }), "Proxifier check", WinAllBuild | InitialLogin));
+    }), "Proxifier check", ScanFlags::OffsetsInitialized | ScanFlags::InitialLogin, 0, UINT16_MAX));
+
+    // click to move enabled check
+    sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
+        // builder
+        [](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
+    {
+        // no need to scan multiple times
+        if (warden->HasUsedClickToMove())
+            return;
+
+        auto const wardenWin = reinterpret_cast<WardenWin const*>(warden);
+        auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
+
+        if (!offsets)
+            return;
+
+        scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
+            << static_cast<uint8>(0)
+            << offsets->ClickToMovePosition
+            << static_cast<uint8>(sizeof(float) * 3);
+    },
+        // checker
+        [](Warden const* warden, ByteBuffer& buff)
+    {
+        auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
+
+        auto const result = buff.read<uint8>();
+
+        if (!!result)
+        {
+            sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Failed to read click to move position!");
+            return true;
+        }
+
+        float positionX = buff.read<float>();
+        float positionY = buff.read<float>();
+        float positionZ = buff.read<float>();
+        if (positionX || positionY || positionZ)
+            warden->SetHasUsedClickToMove();
+
+        return false;
+    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
+       sizeof(uint8) + sizeof(float) + sizeof(float) + sizeof(float),
+        "Click To Move Position", ScanFlags::OffsetsInitialized, 0, UINT16_MAX));
+
+    // maiev string hashing
+    sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsStringHashScan>());
 }
 
-void WardenWin::BuildLuaInit(const std::string &module, bool fastcall, uint32 offset, ByteBuffer &out) const
+void WardenWin::BuildLuaInit(std::string const& module, bool fastcall, uint32 offset, ByteBuffer& out) const
 {
-    const uint16 len = 1 + 1 + 1 + module.length() + 4 + 1;
+    uint16 const len = 1 + 1 + 1 + module.length() + 4 + 1;
 
     out = ByteBuffer(1 + 2 + 4 + len);
 
@@ -1090,10 +1113,10 @@ void WardenWin::BuildLuaInit(const std::string &module, bool fastcall, uint32 of
     out.wpos(oldwpos);
 }
 
-void WardenWin::BuildFileHashInit(const std::string &module, bool asyncparam, uint32 openOffset,
-    uint32 sizeOffset, uint32 readOffset, uint32 closeOffset, ByteBuffer &out) const
+void WardenWin::BuildFileHashInit(std::string const& module, bool asyncparam, uint32 openOffset,
+    uint32 sizeOffset, uint32 readOffset, uint32 closeOffset, ByteBuffer& out) const
 {
-    const uint16 len = 1 + 1 + 1 + 1 + module.length() + 4 + 4 + 4 + 4;
+    uint16 const len = 1 + 1 + 1 + 1 + module.length() + 4 + 4 + 4 + 4;
 
     out = ByteBuffer(1 + 2 + 4 + len);
 
@@ -1120,9 +1143,9 @@ void WardenWin::BuildFileHashInit(const std::string &module, bool asyncparam, ui
     out.wpos(oldwpos);
 }
 
-void WardenWin::BuildTimingInit(const std::string &module, uint32 offset, bool set, ByteBuffer &out) const
+void WardenWin::BuildTimingInit(std::string const& module, uint32 offset, bool set, ByteBuffer& out) const
 {
-    const uint16 len = 1 + 1 + 1 + module.length() + 4 + 1;
+    uint16 const len = 1 + 1 + 1 + module.length() + 4 + 1;
 
     out = ByteBuffer(1 + 2 + 4 + len);
 
@@ -1145,16 +1168,16 @@ void WardenWin::BuildTimingInit(const std::string &module, uint32 offset, bool s
     out.wpos(oldwpos);
 }
 
-WardenWin::WardenWin(WorldSession *session, const BigNumber &K) :
-    _wardenAddress(0), Warden(session, sWardenModuleMgr.GetWindowsModule(), K),
-    _lastClientTime(0), _lastHardwareActionTime(0), _lastTimeCheckServer(0), _sysInfoSaved(false),
-    _proxifierFound(false), _hypervisors(""), _endSceneFound(false), _endSceneAddress(0)
+WardenWin::WardenWin(WorldSession* session, BigNumber const& K) :
+    m_wardenAddress(0), Warden(session, sWardenModuleMgr.GetWindowsModule(), K),
+    m_lastClientTime(0), m_lastHardwareActionTime(0), m_lastTimeCheckServer(0), m_sysInfoSaved(false),
+    m_proxifierFound(false), m_hypervisors(""), m_endSceneFound(false), m_endSceneAddress(0), m_offsetsInitialized(false)
 {
-    memset(&_sysInfo, 0, sizeof(_sysInfo));
+    memset(&m_sysInfo, 0, sizeof(m_sysInfo));
 }
 
 // read the dx9 EndScene binary code to look for bad stuff
-void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
+void WardenWin::ValidateEndScene(std::vector<uint8> const& code)
 {
     auto p = &code[0];
 
@@ -1174,18 +1197,18 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
     // JMP hook
     else if (*p == 0xE9)
     {
-        auto const dest = *reinterpret_cast<const uint32 *>(p + 1);
+        auto const dest = *reinterpret_cast<uint32 const*>(p + 1);
 
-        auto const absoluteDest = _endSceneAddress + nopCount + dest + 5;
+        auto const absoluteDest = m_endSceneAddress + nopCount + dest + 5;
         sLog.OutWarden(this, LOG_LVL_BASIC, "Detected JMP EndScene hook.  NOP count = %d.",
             nopCount);
 
         // request a custom scan just to check the JMP destination
         EnqueueScans({ std::make_shared<WindowsMemoryScan>(absoluteDest, codeRequestLength,
         // checker
-        [](const Warden *warden, ByteBuffer &buff)
+        [](Warden const* warden, ByteBuffer& buff)
         {
-            auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
+            auto const wardenWin = const_cast<WardenWin*>(reinterpret_cast<WardenWin const*>(warden));
 
             auto const result = buff.read<uint8>();
 
@@ -1203,111 +1226,82 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
                 sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Suspicious EndScene.  Probable bot.");
 
             return false;
-        }, "EndScene hook validate scan", None) });
+        }, "EndScene hook validate scan", ScanFlags::None, 0, UINT16_MAX) });
     }
 }
 
-uint32 WardenWin::GetScanFlags() const
+ScanFlags WardenWin::GetScanFlags() const
 {
-    auto const game_build = m_clientBuild;
+    ScanFlags scanFlags = ScanFlags::Windows;
 
-    constexpr int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
-    // for some reason these arrays are null terminated
-    auto constexpr num_accepted_versions = (sizeof(accepted_versions) / sizeof(accepted_versions[0])) - 1;
+    if (m_maiev)
+        scanFlags = scanFlags | ScanFlags::Maiev;
 
-    bool found = false;
-    for (auto i = 0; i < num_accepted_versions; ++i)
-    {
-        if (accepted_versions[i] == game_build)
-        {
-            found = true;
-            break;
-        }
-    }
+    if (m_offsetsInitialized)
+        scanFlags = scanFlags | ScanFlags::OffsetsInitialized;
 
-    if (!found)
-    {
-        sLog.OutWarden(this, LOG_LVL_BASIC, "Invalid client build %u.  Kicking.", m_clientBuild);
-        KickSession();
-        return ScanFlags::None;
-    }
-
-    // at this point we know the game build is accepted
-
-    switch (m_clientBuild)
-    {
-        case 4222:
-            return ScanFlags::WinBuild4222;
-        case 4297:
-            return ScanFlags::WinBuild4297;
-        case 4375:
-            return ScanFlags::WinBuild4375;
-        case 4499:
-            return ScanFlags::WinBuild4449;
-        case 4544:
-            return ScanFlags::WinBuild4544;
-        case 4695:
-            return ScanFlags::WinBuild4695;
-        case 4878:
-            return ScanFlags::WinBuild4878;
-        case 5086:
-            return ScanFlags::WinBuild5086;
-        case 5302:
-            return ScanFlags::WinBuild5302;
-        case 5464:
-            return ScanFlags::WinBuild5464;
-        case 5875:
-            return ScanFlags::WinBuild5875;
-        case 6005:
-            return ScanFlags::WinBuild6005;
-        case 6141:
-            return ScanFlags::WinBuild6141;
-    }
-
-    return ScanFlags::None;
+    return scanFlags;
 }
 
 void WardenWin::InitializeClient()
 {
-    if (auto const offsets = GetClientOffets(m_clientBuild))
+    if (m_module)
     {
-        // initialize lua
-        ByteBuffer lua;
-        BuildLuaInit("", true, offsets->GetText, lua);
+        // should never call this while still using maiev
+        MANGOS_ASSERT(!m_maiev);
 
-        // initialize SFile*
-        ByteBuffer file;
-        BuildFileHashInit("", true, offsets->Open, offsets->Size, offsets->Read, offsets->Close, file);
+        if (auto const offsets = GetClientOffets(m_clientBuild))
+        {
+            // initialize lua
+            ByteBuffer lua;
+            BuildLuaInit("", true, offsets->GetText, lua);
 
-        // initialize timing check
-        ByteBuffer timing;
-        BuildTimingInit("", offsets->TickCount, true, timing);
+            // initialize SFile*
+            ByteBuffer file;
+            BuildFileHashInit("", true, offsets->Open, offsets->Size, offsets->Read, offsets->Close, file);
 
-        ByteBuffer pkt(lua.wpos() + file.wpos() + timing.wpos());
+            // initialize timing check
+            ByteBuffer timing;
+            BuildTimingInit("", offsets->TickCount, true, timing);
 
-        pkt.append(lua);
-        pkt.append(file);
-        pkt.append(timing);
+            ByteBuffer pkt(lua.wpos() + file.wpos() + timing.wpos());
 
-        SendPacket(pkt);
+            pkt.append(lua);
+            pkt.append(file);
+            pkt.append(timing);
+
+            SendPacket(pkt);
+
+            m_offsetsInitialized = true;
+            sLog.OutWarden(this, LOG_LVL_DEBUG, "Initialized module offsets.");
+        }
     }
 
-    _initialized = true;
+    m_initialized = true;
 }
 
 void WardenWin::Update()
 {
     Warden::Update();
 
-    if (!_initialized)
+    if (!m_initialized)
+    {
+        if (m_maiev && !TimeoutClockStarted())
+        {
+            RequestScans(SelectScans(ScanFlags::Maiev));
+
+            if (!m_module)
+                BeginScanClock();
+        }
         return;
+    }
 
     // 'lpMaximumApplicationAddress' should never be zero if the structure has been read
-    if (!_sysInfoSaved && !!_sysInfo.lpMaximumApplicationAddress)
+    if (!m_sysInfoSaved && !!m_sysInfo.lpMaximumApplicationAddress)
     {
         auto activeProcCount = 0;
-        for (auto i = 0; i < 8 * sizeof(_sysInfo.dwActiveProcessorMask); ++i)
-            if (!!(_sysInfo.dwActiveProcessorMask & (1 << i)))
+        for (auto i = 0; i < 8 * sizeof(m_sysInfo.dwActiveProcessorMask); ++i)
+            if (!!(m_sysInfo.dwActiveProcessorMask & (1 << i)))
                 ++activeProcCount;
 
         LogsDatabase.BeginTransaction();
@@ -1322,23 +1316,23 @@ void WardenWin::Update()
         stmt.addUInt32(m_accountId);
         stmt.addString(m_sessionIP);
         stmt.addUInt32(realmID);
-        stmt.addString(ArchitectureString(_sysInfo.wProcessorArchitecture));
-        stmt.addString(CPUTypeAndRevision(_sysInfo.dwProcessorType, _sysInfo.wProcessorRevision));
+        stmt.addString(ArchitectureString(m_sysInfo.wProcessorArchitecture));
+        stmt.addString(CPUTypeAndRevision(m_sysInfo.dwProcessorType, m_sysInfo.wProcessorRevision));
         stmt.addUInt32(activeProcCount);
-        stmt.addUInt32(_sysInfo.dwNumberOfProcessors);
-        stmt.addUInt32(_sysInfo.dwPageSize);
+        stmt.addUInt32(m_sysInfo.dwNumberOfProcessors);
+        stmt.addUInt32(m_sysInfo.dwPageSize);
         stmt.Execute();
 
         LogsDatabase.CommitTransaction();
 
         //_session->CleanupFingerprintHistory();
 
-        _sysInfoSaved = true;
+        m_sysInfoSaved = true;
 
         // at this point if we have the character enum packet, it is okay to send
-        if (!_charEnum.empty())
+        if (!m_charEnum.empty())
         {
-            sWorld.GetMessager().AddMessage([pkt = std::move(_charEnum), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
+            sWorld.GetMessager().AddMessage([pkt = std::move(m_charEnum), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
             {
                 if (WorldSession* session = world->FindSession(accountId))
                 {
@@ -1346,15 +1340,15 @@ void WardenWin::Update()
                         session->SendPacket(&pkt);
                 }
             });
-            _charEnum.clear();
+            m_charEnum.clear();
         }
     }
 }
 
-void WardenWin::SetCharEnumPacket(WorldPacket &&packet)
+void WardenWin::SetCharEnumPacket(WorldPacket&& packet)
 {
     // if we have already recorded system information, send the packet immediately.  otherwise delay
-    if (_sysInfoSaved)
+    if (m_sysInfoSaved)
     {
         sWorld.GetMessager().AddMessage([pkt = std::move(packet), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
         {
@@ -1366,53 +1360,53 @@ void WardenWin::SetCharEnumPacket(WorldPacket &&packet)
         });
     }
     else
-        _charEnum = std::move(packet);
+        m_charEnum = std::move(packet);
 }
 
 void WardenWin::GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
     std::string& endscene, std::string& proxifier) const
 {
-    if (!!_lastTimeCheckServer)
+    if (!!m_lastTimeCheckServer)
     {
         std::stringstream s;
-        s << "Last hardware action: " << _lastHardwareActionTime
-            << " client time: " << _lastClientTime
-            << " idle time: " << (_lastClientTime - _lastHardwareActionTime) / 1000
-            << " seconds info age: " << WorldTimer::getMSTimeDiffToNow(_lastTimeCheckServer) / 1000
+        s << "Last hardware action: " << m_lastHardwareActionTime
+            << " client time: " << m_lastClientTime
+            << " idle time: " << (m_lastClientTime - m_lastHardwareActionTime) / 1000
+            << " seconds info age: " << WorldTimer::getMSTimeDiffToNow(m_lastTimeCheckServer) / 1000
             << " seconds";
         clock = s.str();
     }
 
     // 'lpMaximumApplicationAddress' should never be zero if the structure has been read
-    if (!!_sysInfo.lpMaximumApplicationAddress)
+    if (!!m_sysInfo.lpMaximumApplicationAddress)
     {
         std::stringstream s;
 
-        s << "Architecture: " << ArchitectureString(_sysInfo.wProcessorArchitecture)
-            << " CPU Type: " << CPUTypeAndRevision(_sysInfo.dwProcessorType, _sysInfo.wProcessorRevision)
-            << " Page Size: 0x" << std::hex << std::uppercase << _sysInfo.dwPageSize << std::dec;
+        s << "Architecture: " << ArchitectureString(m_sysInfo.wProcessorArchitecture)
+            << " CPU Type: " << CPUTypeAndRevision(m_sysInfo.dwProcessorType, m_sysInfo.wProcessorRevision)
+            << " Page Size: 0x" << std::hex << std::uppercase << m_sysInfo.dwPageSize << std::dec;
 
         auto activeProcCount = 0;
-        for (auto i = 0; i < 8*sizeof(_sysInfo.dwActiveProcessorMask); ++i)
-            if (!!(_sysInfo.dwActiveProcessorMask & (1 << i)))
+        for (auto i = 0; i < 8*sizeof(m_sysInfo.dwActiveProcessorMask); ++i)
+            if (!!(m_sysInfo.dwActiveProcessorMask & (1 << i)))
                 ++activeProcCount;
 
         s << " Active CPUs: " << activeProcCount;
-        s << " Total CPUs: " << _sysInfo.dwNumberOfProcessors;
+        s << " Total CPUs: " << m_sysInfo.dwNumberOfProcessors;
 
         fingerprint = s.str();
     }
 
-    if (_hypervisors.length() > 0)
-        hypervisors = "Hypervisor(s) found: " + _hypervisors;
+    if (m_hypervisors.length() > 0)
+        hypervisors = "Hypervisor(s) found: " + m_hypervisors;
 
-    if (_endSceneFound)
+    if (m_endSceneFound)
     {
         std::stringstream s;
-        s << "EndScene: 0x" << std::hex << _endSceneAddress;
+        s << "EndScene: 0x" << std::hex << m_endSceneAddress;
         endscene = s.str();
     }
 
-    if (_proxifierFound)
+    if (m_proxifierFound)
         proxifier = "Proxifier is running";
 }

@@ -100,6 +100,7 @@ public:
     void HandlePacket(WorldPacket&) {}
     virtual void Update() {}
     virtual void GetPlayerInfo(std::string&, std::string&, std::string&, std::string&, std::string&) const {}
+    bool HasUsedClickToMove() const { return false; }
 };
 
 class MovementAnticheat

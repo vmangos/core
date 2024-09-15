@@ -25,6 +25,7 @@
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "ObjectGuid.h"
+#include <shared_mutex>
 
 class SocialMgr;
 class PlayerSocial;
@@ -78,7 +79,7 @@ struct FriendInfo
 typedef std::map<uint32, FriendInfo> PlayerSocialMap;
 typedef std::map<uint32, PlayerSocial> SocialMap;
 
-/// Results of friend related commands
+// Results of friend related commands
 enum FriendsResult
 {
     FRIEND_DB_ERROR         = 0x00,                         // ERR_FRIEND_NOT_FOUND
@@ -153,7 +154,7 @@ class SocialMgr
         void SendFriendStatus(MasterPlayer* player, FriendsResult result, ObjectGuid friend_guid, bool broadcast);
         void BroadcastToFriendListers(MasterPlayer* player, WorldPacket* packet);
         // Loading
-        PlayerSocial* LoadFromDB(QueryResult* result, ObjectGuid guid);
+        PlayerSocial* LoadFromDB(std::unique_ptr<QueryResult> result, ObjectGuid guid);
     private:
         SocialMap m_socialMap;
 

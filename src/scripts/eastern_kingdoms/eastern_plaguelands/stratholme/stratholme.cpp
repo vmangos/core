@@ -305,7 +305,7 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
     uint32 uiUpdateTimer;
-    std::list<uint64> acolyte;
+    ObjectGuidSet m_acolytes;
 
     void Reset() override {}
 
@@ -336,17 +336,17 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
 
         uiUpdateTimer = 2000;
 
-        if (acolyte.empty())
+        if (m_acolytes.empty())
         {
             std::list<Creature*> creatures;
             std::list<Creature*>::iterator itr;
             GetCreatureListWithEntryInGrid(creatures, m_creature, 10399, 50.0f);
             for (itr = creatures.begin(); itr != creatures.end(); ++itr)
-                acolyte.push_back((*itr)->GetGUID());
+                m_acolytes.insert((*itr)->GetObjectGuid());
             return;
         }
 
-        for (const auto& guid : acolyte)
+        for (const auto& guid : m_acolytes)
             if (Creature *pCreature = m_pInstance->instance->GetCreature(guid))
                 if (pCreature && pCreature->IsAlive())
                     return;

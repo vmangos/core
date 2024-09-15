@@ -87,7 +87,7 @@ Pet::~Pet()
 
 void Pet::AddToWorld()
 {
-    ///- Register the pet for guid lookup
+    // Register the pet for guid lookup
     if (!IsInWorld())
         GetMap()->InsertObject<Pet>(GetObjectGuid(), this);
 
@@ -107,11 +107,11 @@ void Pet::AddToWorld()
 
 void Pet::RemoveFromWorld()
 {
-    ///- Remove the pet from the accessor
+    // Remove the pet from the accessor
     if (IsInWorld())
         GetMap()->EraseObject<Pet>(GetObjectGuid());
 
-    ///- Don't call the function for Creature, normal mobs + totems go in a different storage
+    // Don't call the function for Creature, normal mobs + totems go in a different storage
     Unit::RemoveFromWorld();
 }
 
@@ -176,7 +176,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
         return false;
     }
 
-    CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(petEntry);
+    CreatureInfo const* creatureInfo = sObjectMgr.GetCreatureTemplate(petEntry);
     if (!creatureInfo)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet entry %u does not exist but used at pet load (owner: %s).", petEntry, owner->GetGuidStr().c_str());
@@ -202,7 +202,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
     PetType pet_type = PetType(m_pTmpCache->petType);
     if (pet_type == HUNTER_PET)
     {
-        if (!creatureInfo->isTameable())
+        if (!creatureInfo->IsTameable())
         {
             m_pTmpCache = nullptr;
             m_loading = false;
@@ -472,8 +472,8 @@ void Pet::SavePetToDB(PetSaveMode mode)
         if (!bInCache)
             m_pTmpCache = new CharacterPetCache;
 
-        uint32 curhealth = GetHealth();
-        uint32 curmana = GetPower(POWER_MANA);
+        uint32 const curhealth = GetHealth();
+        uint32 const curmana = GetPower(POWER_MANA);
 
         // stable and not in slot saves
         if ((mode != PET_SAVE_AS_CURRENT && getPetType() != HUNTER_PET) ||
@@ -485,10 +485,6 @@ void Pet::SavePetToDB(PetSaveMode mode)
         _SaveSpells();
         _SaveSpellCooldowns();
         _SaveAuras();
-
-        uint32 loyalty = 1;
-        if (getPetType() != HUNTER_PET)
-            loyalty = GetLoyaltyLevel();
 
         // remove current data
         static SqlStatementID delPet ;
@@ -1284,6 +1280,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
         setPetType(MINI_PET);
         return true;
     }
+
     SetDisplayId(creature->GetDisplayId());
     SetNativeDisplayId(creature->GetNativeDisplayId());
     SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
@@ -1293,11 +1290,6 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
     SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(creature->GetLevel()));
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-
-    if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->pet_family))
-        SetName(cFamily->Name[sWorld.GetDefaultDbcLocale()]);
-    else
-        SetName(creature->GetNameForLocaleIdx(sObjectMgr.GetDBCLocaleIndex()));
 
     m_loyaltyPoints = 1000;
     if (cinfo->type == CREATURE_TYPE_BEAST)
@@ -1320,7 +1312,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     return true;
 }
 
-bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
+bool Pet::InitStatsForLevel(uint32 petlevel, Unit const* owner)
 {
     CreatureInfo const* cinfo = GetCreatureInfo();
     MANGOS_ASSERT(cinfo);
@@ -1468,7 +1460,6 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             {
                 SetCreateHealth(pInfo->health * healthMod);
                 SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(pInfo->armor));
-                //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attack_power));
 
                 for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
                     SetCreateStat(Stats(i),  float(pInfo->stats[i]));
@@ -1495,7 +1486,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
 
-            SetUInt32Value(UNIT_FIELD_FLAGS, cinfo->unit_flags);
+            ToggleUnitFlagsFromStaticFlags();
 
             CreatureClassLevelStats const* pCLS = GetClassLevelStats();
             SetCreateHealth(pCLS->health * cinfo->health_multiplier * healthMod);
@@ -1573,7 +1564,7 @@ uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemLevel) const
 
 void Pet::_LoadSpellCooldowns()
 {
-    //QueryResult* result = CharacterDatabase.PQuery("SELECT spell,time FROM pet_spell_cooldown WHERE guid = '%u'",m_charmInfo->GetPetNumber());
+    //std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT spell,time FROM pet_spell_cooldown WHERE guid = '%u'",m_charmInfo->GetPetNumber());
 
     if (m_pTmpCache)
     {
@@ -1667,7 +1658,7 @@ void Pet::_SaveSpellCooldowns()
 
 void Pet::_LoadSpells()
 {
-    //QueryResult* result = CharacterDatabase.PQuery("SELECT spell,active FROM pet_spell WHERE guid = '%u'",m_charmInfo->GetPetNumber());
+    //std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT spell,active FROM pet_spell WHERE guid = '%u'",m_charmInfo->GetPetNumber());
 
     if (m_pTmpCache)
     {
@@ -1744,7 +1735,7 @@ void Pet::_LoadAuras(uint32 timediff)
     for (int i = UNIT_FIELD_AURA; i <= UNIT_FIELD_AURASTATE; ++i)
         SetUInt32Value(i, 0);
 
-    //QueryResult* result = CharacterDatabase.PQuery("SELECT caster_guid, item_guid, spell, stacks, charges, base_points0, base_points1, base_points2, periodic_time0, periodic_time1, periodic_time2, max_duration, duration, effect_index_mask FROM pet_aura WHERE guid = '%u'",m_charmInfo->GetPetNumber());
+    //std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT caster_guid, item_guid, spell, stacks, charges, base_points0, base_points1, base_points2, periodic_time0, periodic_time1, periodic_time2, max_duration, duration, effect_index_mask FROM pet_aura WHERE guid = '%u'",m_charmInfo->GetPetNumber());
     if (m_pTmpCache)
     {
         for (const auto& it : m_pTmpCache->auras)
@@ -2240,25 +2231,58 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
     }
 }
 
-bool Pet::IsPermanentPetFor(Player* owner) const
+bool Pet::IsPermanentPetFor(Player const* owner) const
 {
     switch (getPetType())
     {
-    case SUMMON_PET:
-        switch (owner->GetClass())
-        {
-            // oddly enough, Mage's Water Elemental is still treated as temporary pet with Glyph of Eternal Water
-            // i.e. does not unsummon at mounting, gets dismissed at teleport etc.
-            case CLASS_WARLOCK:
-                return GetCreatureInfo()->type == CREATURE_TYPE_DEMON;
-            default:
-                return false;
-        }
-    case HUNTER_PET:
-        return true;
-    default:
-        return false;
+        case SUMMON_PET:
+            switch (owner->GetClass())
+            {
+                // oddly enough, Mage's Water Elemental is still treated as temporary pet with Glyph of Eternal Water
+                // i.e. does not unsummon at mounting, gets dismissed at teleport etc.
+                case CLASS_WARLOCK:
+                    return GetCreatureInfo()->type == CREATURE_TYPE_DEMON;
+                default:
+                    return false;
+            }
+        case HUNTER_PET:
+            return true;
+        default:
+            return false;
     }
+}
+
+void Pet::InitializeDefaultName()
+{
+    switch (getPetType())
+    {
+        case SUMMON_PET:
+        case HUNTER_PET:
+        {
+            if (GetOwnerGuid().IsPlayer())
+            {
+                if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(GetCreatureInfo()->pet_family))
+                {
+                    SetName(cFamily->Name[sWorld.GetDefaultDbcLocale()]);
+                    break;
+                }
+            }
+            // no break
+        }
+        default:
+        {
+            SetName(Creature::GetNameForLocaleIdx(sObjectMgr.GetDBCLocaleIndex()));
+            break;
+        }
+    }
+}
+
+char const* Pet::GetNameForLocaleIdx(int32 locale_idx) const
+{
+    if (GetOwnerGuid().IsPlayer() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET))
+        return GetName();
+
+    return Creature::GetNameForLocaleIdx(locale_idx);
 }
 
 bool Pet::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 pet_number)

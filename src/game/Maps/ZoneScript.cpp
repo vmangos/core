@@ -30,9 +30,9 @@
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp):
-    m_capturePointGUID(0), m_capturePoint(nullptr), m_maxValue(0), m_minValue(0), m_maxSpeed(0),
-    m_value(0), m_team(TEAM_NEUTRAL), m_oldState(OBJECTIVESTATE_NEUTRAL),
-    m_state(OBJECTIVESTATE_NEUTRAL), m_neutralValuePct(0), m_valuePct(50), m_factDiff(0), m_PvP(pvp)
+    m_capturePointGUID(0), m_capturePoint(nullptr), m_maxValue(0.0f), m_minValue(0.0f), m_maxSpeed(0.0f),
+    m_value(0.0f), m_team(TEAM_NEUTRAL), m_oldState(OBJECTIVESTATE_NEUTRAL),
+    m_state(OBJECTIVESTATE_NEUTRAL), m_neutralValuePct(0), m_valuePct(0), m_factDiff(0), m_PvP(pvp)
 {
 }
 
@@ -50,12 +50,17 @@ bool OPvPCapturePoint::HandlePlayerEnter(Player* plr)
         /* IMPORTANT!
         EP_UI_TOWER_SLIDER_POS: Should always be sent last and only when the value (m_valuePct) has been updated.
                                 
-            Alliance [100] <---------[50]---------> [0] Horde
+            ------------------------------------------------------------
+                              (m_minValue)(-m_minValue)
+                  (m_maxValue)     [240]    [-240]     (-m_maxValue)
+            Alliance [1200]<=========|===[0]===|=========>[-1200] Horde
+                              Blue       Grey      Red
+            ------------------------------------------------------------
             
             The Client does auto handle the direction indicator:
-            If the previous value was 50 and the new value 51 , the indicator points to the left (Alliance).
-            If the previous value was 50 and the new value 49 , the indicator points to the right (Horde).
-            If the previous value was 50 and the new value 50 , the indicator gets deleted (Possibly if the number of horde players and alliance players are the same, or Slider is at 0/100).
+            If the previous value was 0 and the new value 1 , the indicator points to the left (Alliance).
+            If the previous value was 0 and the new value -1 , the indicator points to the right (Horde).
+            If the previous value was 0 and the new value 0 , the indicator gets deleted (Possibly if the number of horde players and alliance players are the same, or Slider is at 0/100).
             If any other UI element gets updated (SendUpdateWorldState) after the Slider it gets also deleted.
             The reason for this is client-specific and has nothing to do with the core.
         */
@@ -325,7 +330,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     for (auto const& player : players)
     {
-        if (player->IsOutdoorPvPActive() && !IsInsideObjective(player))
+        if (player->IsInWorld() && player->IsOutdoorPvPActive() && !IsInsideObjective(player))
         {
             if (m_activePlayers[player->GetTeamId()].insert(player->GetObjectGuid()).second)
                 HandlePlayerEnter(player);
@@ -338,10 +343,9 @@ bool OPvPCapturePoint::Update(uint32 diff)
     uint32 Challenger = 0;
     float maxDiff = m_maxSpeed * diff;
 
-    if (fact_diff < 0)
+    if (fact_diff < 0.0f)
     {
-        // Horde is in majority, but it's already Horde-controlled -> no change.
-        if (m_state == OBJECTIVESTATE_HORDE && m_value <= -m_maxValue)
+        if (m_value <= -m_maxValue)
             return false;
 
         if (fact_diff < -maxDiff)
@@ -349,10 +353,9 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
         Challenger = HORDE;
     }
-    else
+    else if (fact_diff > 0.0f)
     {
-        // Alliance is in majority, but it's already Alliance-controlled -> no change.
-        if (m_state == OBJECTIVESTATE_ALLIANCE && m_value >= m_maxValue)
+        if (m_value >= m_maxValue)
             return false;
 
         if (fact_diff > maxDiff)
@@ -360,47 +363,67 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
         Challenger = ALLIANCE;
     }
+    else // 0.0f?
+    {
+        Challenger = TEAM_NONE;
+    }
 
     uint32 OldValuePct = m_valuePct;
     uint32 OldFactDiff = m_factDiff;
-    float oldValue = m_value;
     TeamId oldTeam = m_team;
 
     m_oldState = m_state;
 
     m_value += fact_diff;
 
-    if (m_value < -m_minValue) // Red.
+    /*  The Slider
+    ------------------------------------------------------------
+                      (m_minValue)(-m_minValue)
+          (m_maxValue)     [240]    [-240]     (-m_maxValue)
+    Alliance [1200]<=========|===[0]===|=========>[-1200] Horde
+                      Blue       Grey      Red
+    ------------------------------------------------------------*/
+
+    // RED
+    if (m_value <= -m_minValue) // m_value is in the red bar, between -240 (-m_minValue) and -1200 (-m_maxValue).
     {
-        if (m_value < -m_maxValue)
+        if (m_value <= -m_maxValue) // m_value at max red -1200 (-m_maxValue).
+        {
             m_value = -m_maxValue;
-        m_state = OBJECTIVESTATE_HORDE;
+            m_state = OBJECTIVESTATE_HORDE;
+        }
+        else // m_value is below max red -1200 (-m_maxValue).
+        {
+            m_state = OBJECTIVESTATE_HORDE_PROGRESSING;
+        }
+
         m_team = TEAM_HORDE;
     }
-    else if (m_value > m_minValue) // Blue.
+    // BLUE
+    else if (m_value >= m_minValue) // m_value is in the blue bar, between 240 (m_minValue) and 1200 (m_maxValue).
     {
-        if (m_value > m_maxValue)
+        if (m_value >= m_maxValue) // m_value at max blue 1200 (m_maxValue).
+        {
             m_value = m_maxValue;
-        m_state = OBJECTIVESTATE_ALLIANCE;
+            m_state = OBJECTIVESTATE_ALLIANCE;
+        }
+        else // m_value is below max blue 1200 (-m_maxValue).
+        {
+            m_state = OBJECTIVESTATE_ALLIANCE_PROGRESSING;
+        }
+
         m_team = TEAM_ALLIANCE;
     }
-    else if (oldValue * m_value <= 0) // Grey, go through mid point.
+    // GREY
+    else if (m_value > -m_minValue && m_value < m_minValue) // m_value higher than -240 (begin of the red bar) and lower than 240 (begin of the blue bar).
     {
-        // If challenger is ally, then N->A challenge.
         if (Challenger == ALLIANCE)
-            m_state = OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE;
-        // If challenger is horde, then N->H challenge.
+            m_state = OBJECTIVESTATE_ALLIANCE_CONTESTED;
         else if (Challenger == HORDE)
-            m_state = OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
-        m_team = TEAM_NEUTRAL;
-    }
-    else // Grey, did not go through mid point.
-    {
-        // Old phase and current are on the same side, so one team challenges the other.
-        if (Challenger == ALLIANCE && (m_oldState == OBJECTIVESTATE_HORDE || m_oldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE))
-            m_state = OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE;
-        else if (Challenger == HORDE && (m_oldState == OBJECTIVESTATE_ALLIANCE || m_oldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE))
-            m_state = OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE;
+            m_state = OBJECTIVESTATE_HORDE_CONTESTED;
+        else // TEAM_NONE
+            m_state = OBJECTIVESTATE_NEUTRAL;
+
         m_team = TEAM_NEUTRAL;
     }
 
@@ -429,27 +452,6 @@ void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
             if (Player* pPlayer = GetMap()->GetPlayer(guid))
                 pPlayer->SendUpdateWorldState(field, value);
     }
-}
-
-void OPvPCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
-{
-    uint32 team;
-    switch (m_state)
-    {
-        case OBJECTIVESTATE_ALLIANCE:
-            team = 0;
-            break;
-        case OBJECTIVESTATE_HORDE:
-            team = 1;
-            break;
-        default:
-            return;
-    }
-
-    // Send to all players present in the area.
-    for (auto const& guid : m_activePlayers[team])
-        if (Player* pPlayer = GetMap()->GetPlayer(guid))
-            pPlayer->KilledMonsterCredit(id, guid);
 }
 
 void OutdoorPvP::HandleKill(Player* killer, Unit* killed)
@@ -586,7 +588,7 @@ void ZoneScript::Update(uint32 diff)
 
 void ZoneScript::OnPlayerEnter(Player* plr)
 {
-    m_players[plr->GetTeamId()].insert(plr);
+    m_players[plr->GetTeamId()].insert(plr->GetObjectGuid());
 }
 
 void ZoneScript::OnPlayerLeave(Player* plr)
@@ -594,23 +596,25 @@ void ZoneScript::OnPlayerLeave(Player* plr)
     // Remove the world state information from the player (we can't keep everyone up to date, so leave out those who are not in the concerning zones).
     if (!plr->GetSession()->PlayerLogout())
         SendRemoveWorldStates(plr);
-    m_players[plr->GetTeamId()].erase(plr);
+    m_players[plr->GetTeamId()].erase(plr->GetObjectGuid());
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %s left a ZoneScript zone", plr->GetName());
 }
 
 void ZoneScript::SendUpdateWorldState(uint32 field, uint32 value)
 {
     for (auto const& playerPerTeam : m_players)
-        for (PlayerSet::iterator itr = playerPerTeam.begin(); itr != playerPerTeam.end(); ++itr)
-            (*itr)->SendUpdateWorldState(field, value);
+        for (auto const& guid : playerPerTeam)
+            if (Player* pPlayer = GetMap()->GetPlayer(guid))
+                pPlayer->SendUpdateWorldState(field, value);
 }
 
 void ZoneScript::BroadcastPacket(WorldPacket& data) const
 {
     // This is faster than sWorld.SendZoneMessage.
     for (auto const& playerPerTeam : m_players)
-        for (PlayerSet::const_iterator itr = playerPerTeam.begin(); itr != playerPerTeam.end(); ++itr)
-            (*itr)->GetSession()->SendPacket(&data);
+        for (auto const& guid : playerPerTeam)
+            if (Player* pPlayer = GetMap()->GetPlayer(guid))
+                pPlayer->GetSession()->SendPacket(&data);
 }
 
 void ZoneScript::RegisterZone(uint32 zoneId)
@@ -620,17 +624,23 @@ void ZoneScript::RegisterZone(uint32 zoneId)
 
 bool ZoneScript::HasPlayer(Player* plr) const
 {
-    return m_players[plr->GetTeamId()].find(plr) != m_players[plr->GetTeamId()].end();
+    return m_players[plr->GetTeamId()].find(plr->GetObjectGuid()) != m_players[plr->GetTeamId()].end();
 }
 
 void ZoneScript::TeamCastSpell(TeamId team, int32 spellId)
 {
     if (spellId > 0)
-        for (auto const itr : m_players[team])
-            itr->CastSpell(itr, (uint32)spellId, true);
+    {
+        for (auto const& guid : m_players[team])
+            if (Player* pPlayer = GetMap()->GetPlayer(guid))
+                pPlayer->CastSpell(pPlayer, (uint32)spellId, true);
+    }
     else
-        for (auto const itr : m_players[team])
-            itr->RemoveAurasDueToSpell((uint32) - spellId); // By stack?
+    {
+        for (auto const& guid : m_players[team])
+            if (Player* pPlayer = GetMap()->GetPlayer(guid))
+                pPlayer->RemoveAurasDueToSpell((uint32)-spellId); // By stack?
+    }
 }
 
 void ZoneScript::TeamApplyBuff(TeamId team, uint32 spellId, uint32 spellId2)

@@ -5,6 +5,7 @@
 
 class Unit;
 class Creature;
+class SpellCaster;
 class GameObject;
 class ObjectGuid;
 
@@ -18,6 +19,7 @@ class GameObjectAI
         virtual void UpdateAI(uint32 const /*uiDiff*/) {}
         virtual void SetData(uint32 /*id*/, uint32 /*value*/) {}
         virtual bool OnUse(Unit* /*user*/) { return false; }
+        virtual bool OnActivateBySpell(SpellCaster* caster, uint32 spellId, uint32 action) { return false; }
 
         // Called when the gameobject summon successfully a creature
         virtual void JustSummoned(Creature*) {}

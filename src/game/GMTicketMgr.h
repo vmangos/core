@@ -21,6 +21,7 @@
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
 #include <string>
+#include <memory>
 
 class Player;
 class ChatHandler;
@@ -168,7 +169,7 @@ private:
     bool m_completed = false;
     GMTicketEscalationStatus m_escalatedStatus;
     bool m_viewed = false;
-    bool m_needResponse = false; /// @todo find out the use of this, and then store it in DB
+    bool m_needResponse = false; // @todo find out the use of this, and then store it in DB
     bool m_needMoreHelp = false;
     uint8 m_securityNeeded = 0;
     TicketType m_ticketType;
@@ -262,11 +263,9 @@ public:
 
     void SendTicket(WorldSession* session, GmTicket* ticket) const;
     void ReloadTicket(uint32 ticketId);
-    void ReloadTicketCallback(QueryResult* holder);
+    void ReloadTicketCallback(std::unique_ptr<QueryResult> result);
 
 protected:
-    void _RemoveTicket(uint32 ticketId, int64 source = -1, bool permanently = false);
-
     GmTicketList _ticketList;
 
     bool   _status;

@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup world The World
-/// @{
-/// \file
+// \addtogroup world The World
+// @{
+// \file
 
 #ifndef __WORLD_H
 #define __WORLD_H
@@ -77,7 +77,7 @@ enum ShutdownExitCode
     RESTART_EXIT_CODE  = 2,
 };
 
-/// Timers for different object refresh rates
+// Timers for different object refresh rates
 enum WorldTimers
 {
     WUPDATE_AUCTIONS    = 0,
@@ -89,10 +89,12 @@ enum WorldTimers
     WUPDATE_COUNT       = 6
 };
 
-/// Configuration elements
+// Configuration elements
 enum eConfigUInt32Values
 {
-    CONFIG_UINT32_COMPRESSION = 0,
+    CONFIG_UINT32_COMPRESSION_LEVEL = 0,
+    CONFIG_UINT32_COMPRESSION_UPDATE_SIZE,
+    CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT,
     CONFIG_UINT32_LOGIN_QUEUE_GRACE_PERIOD_SECS,
     CONFIG_UINT32_CHARACTER_SCREEN_MAX_IDLE_TIME,
     CONFIG_UINT32_PLAYER_HARD_LIMIT,
@@ -196,6 +198,7 @@ enum eConfigUInt32Values
     CONFIG_UINT32_MIN_HONOR_KILLS,
     CONFIG_UINT32_INSTANCE_RESET_TIME_HOUR,
     CONFIG_UINT32_INSTANCE_UNLOAD_DELAY,
+    CONFIG_UINT32_INSTANCE_PER_HOUR_LIMIT,
     CONFIG_UINT32_MAX_SPELL_CASTS_IN_CHAIN,
     CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL,
     CONFIG_UINT32_MIN_PETITION_SIGNS,
@@ -300,6 +303,10 @@ enum eConfigUInt32Values
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_PENALTY,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_THRESHOLD,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_MOVE_START_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_BAD_MOVE_START_PENALTY,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_THRESHOLD,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_PENALTY,
     CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_THRESHOLD,
@@ -362,7 +369,7 @@ enum
     ANTICRASH_OPTION_FLAGS_THROW_SIGSEGV= (ANTICRASH_OPTION_CRASH_INSTANCES|ANTICRASH_OPTION_CRASH_CONTINENTS),
 };
 
-/// Configuration elements
+// Configuration elements
 enum eConfigInt32Values
 {
     CONFIG_INT32_DEATH_SICKNESS_LEVEL = 0,
@@ -372,7 +379,7 @@ enum eConfigInt32Values
     CONFIG_INT32_VALUE_COUNT
 };
 
-/// Server config
+// Server config
 enum eConfigFloatValues
 {
     CONFIG_FLOAT_RATE_HEALTH = 0,
@@ -448,10 +455,11 @@ enum eConfigFloatValues
     CONFIG_FLOAT_RATE_XP_PERSONAL_MAX,
     CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE,
     CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE,
+    CONFIG_FLOAT_RP_DECAY,
     CONFIG_FLOAT_VALUE_COUNT
 };
 
-/// Configuration elements
+// Configuration elements
 enum eConfigBoolValues
 {
     CONFIG_BOOL_GRID_UNLOAD = 0,
@@ -569,8 +577,9 @@ enum eConfigBoolValues
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_REJECT,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED,
-    CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_RESET_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_FALL_STOP_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_BAD_MOVE_START_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_REJECT,
     CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED,
@@ -604,10 +613,13 @@ enum eConfigBoolValues
     CONFIG_BOOL_WORLD_AVAILABLE,
     CONFIG_BOOL_GM_CHEAT_GOD,
     CONFIG_BOOL_LFG_MATCHMAKING,
+    CONFIG_BOOL_LIMIT_PLAY_TIME,
+    CONFIG_BOOL_RESTRICT_UNVERIFIED_ACCOUNTS,
+    CONFIG_BOOL_DURABILITY_LOSS_ENABLE,
     CONFIG_BOOL_VALUE_COUNT
 };
 
-/// Type of server
+// Type of server
 enum RealmType
 {
     REALM_TYPE_NORMAL = 0,
@@ -692,7 +704,7 @@ struct PlayerTransactionData
     TransactionPart parts[2];
 };
 
-/// Storage class for commands issued for delayed execution
+// Storage class for commands issued for delayed execution
 struct CliCommandHolder
 {
     typedef void Print(void*, char const*);
@@ -716,7 +728,15 @@ struct CliCommandHolder
     ~CliCommandHolder() { delete[] m_command; }
 };
 
-/// The World
+struct AccountPlayHistory
+{
+    time_t logoutTime;
+    time_t playedTime; // reset after 5 hours offline time
+};
+
+class ThreadPool;
+
+// The World
 class World
 {
     public:
@@ -731,31 +751,31 @@ class World
         WorldSession* FindSession(uint32 id) const;
         void AddSession(WorldSession* s);
         bool RemoveSession(uint32 id);
-        /// Get the number of current active sessions
+        // Get the number of current active sessions
         void UpdateMaxSessionCounters();
         uint32 GetActiveAndQueuedSessionCount() const { return m_sessions.size(); }
         uint32 GetActiveSessionCount() const { return m_sessions.size() - m_QueuedSessions.size(); }
         uint32 GetQueuedSessionCount() const { return m_QueuedSessions.size(); }
-        /// Get the maximum number of parallel sessions on the server since last reboot
+        // Get the maximum number of parallel sessions on the server since last reboot
         uint32 GetMaxQueuedSessionCount() const { return m_maxQueuedSessionCount; }
         uint32 GetMaxActiveSessionCount() const { return m_maxActiveSessionCount; }
 
-        /// Get the active session server limit (or security level limitations)
+        // Get the active session server limit (or security level limitations)
         uint32 GetPlayerAmountLimit() const { return m_playerLimit >= 0 ? m_playerLimit : 0; }
         AccountTypes GetPlayerSecurityLimit() const { return m_playerLimit <= 0 ? AccountTypes(-m_playerLimit) : SEC_PLAYER; }
 
-        /// Set the active session server limit (or security level limitation)
+        // Set the active session server limit (or security level limitation)
         void SetPlayerLimit(int32 limit, bool needUpdate = false);
 
-        //player Queue
+        // player Queue
         typedef std::list<WorldSession*> Queue;
         void AddQueuedSession(WorldSession*);
         bool RemoveQueuedSession(WorldSession* session);
-        int32 GetQueuedSessionPos(WorldSession*);
+        uint32 GetQueuedSessionPos(WorldSession*);
 
-        /// Set a new Message of the Day
+        // Set a new Message of the Day
         void SetMotd(std::string const& motd) { m_motd = motd; }
-        /// Get the current Message of the Day
+        // Get the current Message of the Day
         char const* GetMotd() const { return m_motd.c_str(); }
 
         // Get current server's WoW Patch
@@ -764,19 +784,19 @@ class World
 
         LocaleConstant GetDefaultDbcLocale() const { return m_defaultDbcLocale; }
 
-        /// Get the path where data (dbc, maps) are stored on disk
+        // Get the path where data (dbc, maps) are stored on disk
         std::string GetDataPath() const { return m_dataPath; }
 
-        /// Get the path where honor logs are stored on disk
+        // Get the path where honor logs are stored on disk
         std::string GetHonorPath() const { return m_honorPath; }
 
-        /// When server started?
+        // When server started?
         time_t const& GetStartTime() const { return m_startTime; }
-        /// What time is it?
+        // What time is it?
         time_t const& GetGameTime() const { return m_gameTime; }
-        /// What day is it?
+        // What day is it?
         uint32 const& GetGameDay() const { return m_gameDay; }
-        /// Uptime (in secs)
+        // Uptime (in secs)
         uint32 GetUptime() const { return uint32(m_gameTime - m_startTime); }
 
         tm *GetLocalTimeByTime(time_t now) const { return localtime(&now); }
@@ -789,7 +809,7 @@ class World
             return m_gameDay - ((date->tm_wday - mDay  + 7) % 7);
         }
 
-        /// Get the maximum skill level a player can reach
+        // Get the maximum skill level a player can reach
         uint16 GetConfigMaxSkillValue() const
         {
             uint32 lvl = getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
@@ -800,9 +820,10 @@ class World
         void LoadConfigSettings(bool reload = false);
 
         void SendWorldText(int32 string_id, ...);
+        void SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel, uint32 queueType, ...);
         void SendBroadcastTextToWorld(uint32 textId);
 
-         // Only for GMs with ticket notification ON
+        // Only for GMs with ticket notification ON
         void SendGMTicketText(int32 string_id, ...);
         void SendGMTicketText(char const* text);
         void SendGMText(int32 string_id, ...);
@@ -812,7 +833,7 @@ class World
         void SendZoneText(uint32 zone, char const* text, WorldSession* self = 0, uint32 team = 0);
         void SendServerMessage(ServerMessageType type, char const* text = "", Player* player = nullptr);
 
-        /// Are we in the middle of a shutdown?
+        // Are we in the middle of a shutdown?
         bool IsShutdowning() const { return m_ShutdownTimer > 0; }
         void ShutdownServ(uint32 time, uint32 options, uint8 exitcode);
         void ShutdownCancel();
@@ -825,27 +846,27 @@ class World
 
         void UpdateSessions(uint32 diff);
 
-        /// Get a server configuration element (see #eConfigFloatValues)
+        // Get a server configuration element (see #eConfigFloatValues)
         void setConfig(eConfigFloatValues index,float value) { m_configFloatValues[index]=value; }
-        /// Get a server configuration element (see #eConfigFloatValues)
+        // Get a server configuration element (see #eConfigFloatValues)
         float getConfig(eConfigFloatValues rate) const { return m_configFloatValues[rate]; }
 
-        /// Set a server configuration element (see #eConfigUInt32Values)
+        // Set a server configuration element (see #eConfigUInt32Values)
         void setConfig(eConfigUInt32Values index, uint32 value) { m_configUint32Values[index]=value; }
-        /// Get a server configuration element (see #eConfigUInt32Values)
+        // Get a server configuration element (see #eConfigUInt32Values)
         uint32 getConfig(eConfigUInt32Values index) const { return m_configUint32Values[index]; }
 
-        /// Set a server configuration element (see #eConfigInt32Values)
+        // Set a server configuration element (see #eConfigInt32Values)
         void setConfig(eConfigInt32Values index, int32 value) { m_configInt32Values[index]=value; }
-        /// Get a server configuration element (see #eConfigInt32Values)
+        // Get a server configuration element (see #eConfigInt32Values)
         int32 getConfig(eConfigInt32Values index) const { return m_configInt32Values[index]; }
 
-        /// Set a server configuration element (see #eConfigBoolValues)
+        // Set a server configuration element (see #eConfigBoolValues)
         void setConfig(eConfigBoolValues index, bool value) { m_configBoolValues[index]=value; }
-        /// Get a server configuration element (see #eConfigBoolValues)
+        // Get a server configuration element (see #eConfigBoolValues)
         bool getConfig(eConfigBoolValues index) const { return m_configBoolValues[index]; }
 
-        /// Are we on a "Player versus Player" server?
+        // Are we on a "Player versus Player" server?
         bool IsPvPRealm() { return (getConfig(CONFIG_UINT32_GAME_TYPE) == REALM_TYPE_PVP || getConfig(CONFIG_UINT32_GAME_TYPE) == REALM_TYPE_RPPVP || getConfig(CONFIG_UINT32_GAME_TYPE) == REALM_TYPE_FFA_PVP); }
         bool IsFFAPvPRealm() { return getConfig(CONFIG_UINT32_GAME_TYPE) == REALM_TYPE_FFA_PVP; }
 
@@ -876,7 +897,7 @@ class World
         void UpdateResultQueue();
         void InitResultQueue();
 
-        void UpdateRealmCharCount(uint32 accid);
+        void UpdateRealmCharCount(uint32 accountId);
 
         LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if (m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
 
@@ -942,7 +963,7 @@ class World
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
-        void _UpdateRealmCharCount(QueryResult* resultCharCount, uint32 accountId);
+        void _UpdateRealmCharCount(std::unique_ptr<QueryResult> resultCharCount, uint32 accountId);
 
     private:
         void setConfig(eConfigUInt32Values index, char const* fieldname, uint32 defvalue);
@@ -977,7 +998,7 @@ class World
 
         SessionMap m_sessions;
         SessionSet m_disconnectedSessions;
-        std::map<uint32 /*accountId*/, time_t /*last logout*/> m_accountsLastLogout;
+        std::map<uint32 /*accountId*/, AccountPlayHistory> m_accountsPlayHistory;
         bool CanSkipQueue(WorldSession const* session);
 
         uint32 m_maxActiveSessionCount;
@@ -1003,6 +1024,11 @@ class World
         // Housing this here but logically it is completely asynchronous - TODO: Separate this and unify with BG queue
         LFGQueue m_lfgQueue;
         ACE_Based::Thread* m_lfgQueueThread;
+
+        // This thread handles packets while the world sessions update is not running
+        std::unique_ptr<std::thread> m_asyncPacketsThread;
+        bool m_canProcessAsyncPackets;
+        void ProcessAsyncPackets();
 
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;
@@ -1047,4 +1073,4 @@ extern uint32 realmID;
 
 #define sWorld MaNGOS::Singleton<World>::Instance()
 #endif
-/// @}
+// @}

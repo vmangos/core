@@ -46,6 +46,7 @@ set (shared_SRCS
     Config/Config.h
     Config/ConfigEnv.h
     Database/Database.h
+    Database/DatabaseCallback.h
     Database/DatabaseEnv.h
     Database/DatabaseImpl.h
     Database/DatabaseMysql.h

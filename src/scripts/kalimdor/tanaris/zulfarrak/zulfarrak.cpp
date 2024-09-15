@@ -44,9 +44,9 @@ enum blyAndCrewFactions
 
 enum blySays
 {
-    SAY_1       = -1209002, // What? How dare you say that to me?!?
-    SAY_2       = -1209003, // After all we've been through? Well, I didn't like you anyway!!
-    SAY_WEEGLI  = -1209004, // I'm out of here!
+    SAY_1       = 3882,
+    SAY_2       = 3884,
+    SAY_WEEGLI  = 3811
 };
 
 enum blySpells
@@ -266,9 +266,9 @@ enum weegliSpells
 
 enum weegliSays
 {
-    SAY_WEEGLI_OHNO      = -1209000,
-    SAY_WEEGLI_OK_I_GO   = -1209001,
-    SAY_CHIEF_UKORZ_DOOR = -1209004
+    SAY_WEEGLI_OHNO      = 3744,
+    SAY_WEEGLI_OK_I_GO   = 3785,
+    SAY_CHIEF_UKORZ_DOOR = 6067
 };
 
 #define GOSSIP_WEEGLI               "Will you blow up that door now?"
@@ -435,7 +435,6 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
 
     void OnScriptEventHappened(uint32 /*uiEvent*/ = 0, uint32 /*uiData*/ = 0, WorldObject* /*pInvoker*/ = 0) override
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "OnScriptEventHappened de npc_weegli_blastfuse : Destruction porte");
         DestroyDoor();
     }
 

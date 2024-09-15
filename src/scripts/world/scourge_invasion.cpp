@@ -1178,13 +1178,13 @@ bool GossipHello_npc_argent_emissary(Player* pPlayer, Creature* pCreature)
     uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
     // Send to client
-    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
-    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
-    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS);
-    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES);
-    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS);
-    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_TANARIS, REMAINING_TANARIS);
-    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_WINTERSPRING, REMAINING_WINTERSPRING);
+    pPlayer->SendUpdateWorldState(WS_SI_BATTLES_WON, VICTORIES);
+    pPlayer->SendUpdateWorldState(WS_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
+    pPlayer->SendUpdateWorldState(WS_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS);
+    pPlayer->SendUpdateWorldState(WS_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES);
+    pPlayer->SendUpdateWorldState(WS_SI_PLAGUELANDS_REMAINING, REMAINING_EASTERN_PLAGUELANDS);
+    pPlayer->SendUpdateWorldState(WS_SI_TANARIS_REMAINING, REMAINING_TANARIS);
+    pPlayer->SendUpdateWorldState(WS_SI_WINTERSPRING_REMAINING, REMAINING_WINTERSPRING);
 
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BCT_ARGENT_EMISSARY_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BCT_ARGENT_EMISSARY_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
@@ -1264,7 +1264,7 @@ struct PallidHorrorAI : public ScriptedAI
         time_t timeToNextAttack = next_attack - now;
         uint32 index = m_creature->GetZoneId() == ZONEID_UNDERCITY ? VARIABLE_SI_UNDERCITY_TIME : VARIABLE_SI_STORMWIND_TIME;
         sObjectMgr.SetSavedVariable(index, now + CITY_ATTACK_TIMER, true);
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] The Scourge has been defeated in %s, next attack starting in %d minutes", m_creature->GetZoneId() == ZONEID_UNDERCITY ? "Undercity" : "Stormwind", uint32(timeToNextAttack / 60));
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "[Scourge Invasion Event] The Scourge has been defeated in %s, next attack starting in %d minutes", m_creature->GetZoneId() == ZONEID_UNDERCITY ? "Undercity" : "Stormwind", uint32(timeToNextAttack / 60));
     }
 
     void SummonedCreatureJustDied(Creature* unit) override

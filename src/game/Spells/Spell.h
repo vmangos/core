@@ -37,8 +37,6 @@
 
 #include <memory>
 
-#define MAX_SPELL_ID 40000
-
 class WorldSession;
 class WorldPacket;
 class DynamicObj;
@@ -253,6 +251,7 @@ class Spell
         void EffectSummon(SpellEffectIndex effIdx);
         void EffectLearnSpell(SpellEffectIndex effIdx);
         void EffectDispel(SpellEffectIndex effIdx);
+        void EffectLanguage(SpellEffectIndex effIdx);
         void EffectDualWield(SpellEffectIndex effIdx);
         void EffectPickPocket(SpellEffectIndex effIdx);
         void EffectAddFarsight(SpellEffectIndex effIdx);
@@ -392,9 +391,10 @@ class Spell
         void SendSpellCooldown();
         void SendLogExecute();
         void SendInterrupted(uint8 result);
+        void SendAllTargetsMiss();
         void SendChannelUpdate(uint32 time, bool interrupted = false);
         void SendChannelStart(uint32 duration);
-        void SendResurrectRequest(Player* target);
+        void SendResurrectRequest(Player* target, bool sickness);
 
         void HandleEffects(Unit* pUnitTarget,Item *pItemTarget,GameObject* pGOTarget,SpellEffectIndex i, float DamageMultiplier = 1.0);
         void HandleThreatSpells();
@@ -439,6 +439,7 @@ class Spell
         Unit* GetAffectiveCaster() const { return m_originalCasterGUID ? m_originalCaster : m_casterUnit; }
         // m_originalCasterGUID can store GO guid, and in this case this is visual caster
         SpellCaster* GetCastingObject() const;
+        ObjectGuid GetOriginalCasterGuid() const { return m_originalCasterGUID; }
 
         uint32 GetPowerCost() const { return m_powerCost; }
 
@@ -529,6 +530,9 @@ class Spell
         typedef std::list<SpellAuraHolder*> SpellAuraHolderList;
         SpellAuraHolderList m_channeledHolders;             // aura holders of spell on targets for channeled spells. process in sync with spell
         SpellAuraHolderList::iterator m_channeledUpdateIterator; // maintain an iterator to the current update element so we can handle removal of multiple auras
+        uint32 m_channeledVisualKit = 0;                    // id from SpellVisualKit.dbc that needs to be sent in SMSG_PLAY_SPELL_VISUAL periodically
+        uint32 m_channeledVisualTimer = 0;                  // timer for sending the visual kit
+        void InitializeChanneledVisualTimer();
 
         // These vars are used in both delayed spell system and modified immediate spell system
         bool m_referencedFromCurrentSpell = false;          // mark as references to prevent deleted and access by dead pointers
@@ -605,6 +609,8 @@ class Spell
         };
         bool m_destroyed = false;
 
+        SpellCastResult CheckScriptTargeting(SpellEffectIndex effIndex, uint32 chainTargets, float radius, uint32 targetMode, UnitList& tempUnitList);
+
 #ifndef USE_STANDARD_MALLOC
         typedef tbb::concurrent_vector<TargetInfo>     TargetList;
         typedef tbb::concurrent_vector<GOTargetInfo>   GOTargetList;
@@ -638,9 +644,8 @@ class Spell
         // -------------------------------------------
 
         //List For Triggered Spells
-        typedef std::list<SpellEntry const*> SpellInfoList;
-        SpellInfoList m_TriggerSpells;                      // casted by caster to same targets settings in m_targets at success finish of current spell
-        SpellInfoList m_preCastSpells;                      // casted by caster to each target at spell hit before spell effects apply
+        std::vector<SpellEntry const*> m_TriggerSpells;                      // casted by caster to same targets settings in m_targets at success finish of current spell
+        std::vector<SpellEntry const*> m_preCastSpells;                      // casted by caster to each target at spell hit before spell effects apply
 
         uint32 m_spellState = SPELL_STATE_NULL;
         uint32 m_timer = 0;
@@ -783,12 +788,15 @@ class SpellEvent : public BasicEvent
 class ChannelResetEvent : public BasicEvent
 {
     public:
-        ChannelResetEvent(Unit* _caster) : caster(_caster) {}
+        ChannelResetEvent(Unit* caster) : m_caster(caster)
+        {
+            caster->AddUnitState(UNIT_STAT_PENDING_CHANNEL_RESET);
+        }
         ~ChannelResetEvent() override {}
 
         bool Execute(uint64 e_time, uint32 p_time) override;
         void Abort(uint64 e_time) override;
     protected:
-        Unit* caster;
+        Unit* m_caster;
 };
 #endif

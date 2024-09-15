@@ -44,7 +44,7 @@
 //From Extractor
 #include "wdtfile.h"
 #include "dbcfile.h"
-#include "mpq_libmpq04.h"
+#include "libmpq/mpq_libmpq.h"
 
 #include "vmapexport.h"
 
@@ -68,7 +68,7 @@ uint32 map_count;
 char output_path[128] = ".";
 char input_path[1024] = ".";
 bool hasInputPathParam = false;
-bool preciseVectorData = false;
+bool preciseVectorData = true;
 std::unordered_map<std::string, WMODoodadData> WmoDoodads;
 
 // Constants
@@ -348,7 +348,7 @@ bool processArgv(int argc, char** argv)
 {
     bool result = true;
     hasInputPathParam = false;
-    preciseVectorData = false;
+    preciseVectorData = true;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -389,8 +389,8 @@ bool processArgv(int argc, char** argv)
     {
         printf("Extract for %s.\n", szRawVMAPMagic);
         printf("%s [-?][-s][-l][-d <path>]\n", argv[0]);
-        printf("   -s : (default) small size (data size optimization), ~500MB less vmap data.\n");
-        printf("   -l : large size, ~500MB more vmap data. (might contain more details)\n");
+        printf("   -s : small size (data size optimization), ~500MB less vmap data.\n");
+        printf("   -l : (default) large size, ~500MB more vmap data. (might contain more details)\n");
         printf("   -d <path>: Path to the vector data source folder.\n");
         printf("   -? : This message.\n");
     }

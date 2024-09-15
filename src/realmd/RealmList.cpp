@@ -30,6 +30,7 @@
 #include "Log.h"
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
+#include <ace/INET_Addr.h>
 
 INSTANTIATE_SINGLETON_1( RealmList );
 
@@ -74,28 +75,28 @@ RealmList& sRealmList
     return realmlist;
 }
 
-/// Load the realm list from the database
+// Load the realm list from the database
 void RealmList::Initialize(uint32 updateInterval)
 {
     m_UpdateInterval = updateInterval;
 
     LoadAllowedClients();
 
-    ///- Get the content of the realmlist table in the database
+    // Get the content of the realmlist table in the database
     UpdateRealms(true);
 }
 
-void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const std::string& builds)
+void RealmList::UpdateRealm(uint32 realmId, std::string const& name, std::string const& address, std::string const& localAddress, std::string const& localSubnetMask, uint32 port, uint8 icon, RealmFlags realmFlags, uint8 timeZone, AccountTypes allowedSecurityLevel, float population, std::string const& builds)
 {
-    ///- Create new if not exist or update existed
+    // Create new if not exist or update existed
     Realm& realm = m_realms[name];
 
-    realm.m_ID       = ID;
+    realm.id         = realmId;
     realm.icon       = icon;
-    realm.realmflags = realmflags;
-    realm.timezone   = timezone;
+    realm.realmFlags = realmFlags;
+    realm.timeZone   = timeZone;
     realm.allowedSecurityLevel = allowedSecurityLevel;
-    realm.populationLevel      = popu;
+    realm.populationLevel      = population;
 
     Tokens tokens = StrSplit(builds, " ");
     Tokens::iterator iter;
@@ -103,10 +104,10 @@ void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::stri
     for (iter = tokens.begin(); iter != tokens.end(); ++iter)
     {
         uint32 build = atol((*iter).c_str());
-        realm.realmbuilds.insert(build);
+        realm.realmBuilds.insert(build);
     }
 
-    uint16 first_build = !realm.realmbuilds.empty() ? *realm.realmbuilds.begin() : 0;
+    uint16 first_build = !realm.realmBuilds.empty() ? *realm.realmBuilds.begin() : 0;
 
     realm.realmBuildInfo.build = first_build;
     realm.realmBuildInfo.majorVersion = 0;
@@ -119,10 +120,23 @@ void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::stri
             if (bInfo->build == first_build)
                 realm.realmBuildInfo = *bInfo;
 
-    ///- Append port to IP address.
+    // Append port to IP address.
     std::ostringstream ss;
     ss << address << ":" << port;
-    realm.address   = ss.str();
+    realm.address = ss.str();
+
+    // Same for the local address.
+    ss.str("");
+    ss.clear();
+    ss << localAddress << ":" << port;
+    realm.localAddress = ss.str();
+
+    // Subnet mask does not need port.
+    ACE_INET_Addr subnetAddress;
+    if (subnetAddress.set("0", localSubnetMask.c_str()) == -1)
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to parse local subnet mask for realm id %u!", realmId);
+    else
+        realm.localSubnetMask = subnetAddress.get_ip_address();
 }
 
 void RealmList::UpdateIfNeed()
@@ -144,23 +158,32 @@ void RealmList::UpdateRealms(bool init)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Updating realm list...");
 
-    QueryResult *result = LoginDatabase.Query(
-        //       0     1       2          3       4       5             6
-        "SELECT `id`, `name`, `address`, `port`, `icon`, `realmflags`, `timezone`, "
-        // 7                      8             9
-        "`allowedSecurityLevel`, `population`, `realmbuilds` FROM `realmlist` "
+    std::unique_ptr<QueryResult> result = LoginDatabase.Query(
+        //       0     1       2          3               4                  5       6
+        "SELECT `id`, `name`, `address`, `localAddress`, `localSubnetMask`, `port`, `icon`, "
+        // 7            8           9                       10            11
+        "`realmflags`, `timezone`, `allowedSecurityLevel`, `population`, `realmbuilds` FROM `realmlist` "
         "WHERE (`realmflags` & 1) = 0 ORDER BY `name`");
 
-    ///- Circle through results and add them to the realm map
+    // Circle through results and add them to the realm map
     if(result)
     {
         do
         {
             Field *fields = result->Fetch();
 
-            uint8 allowedSecurityLevel = fields[7].GetUInt8();
-
-            uint8 realmflags = fields[5].GetUInt8();
+            uint32 id = fields[0].GetUInt32();
+            std::string name = fields[1].GetCppString();
+            std::string address = fields[2].GetCppString();
+            std::string localAddress = fields[3].GetCppString();
+            std::string localSubnetMask = fields[4].GetCppString();
+            uint32 port = fields[5].GetUInt32();
+            uint8 icon = fields[6].GetUInt8();
+            uint8 realmflags = fields[7].GetUInt8();
+            uint8 timezone = fields[8].GetUInt8();
+            uint8 allowedSecurityLevel = fields[9].GetUInt8();
+            float population = fields[10].GetFloat();
+            std::string realmBuilds = fields[11].GetCppString();
 
             if (realmflags & ~(REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD))
             {
@@ -169,15 +192,13 @@ void RealmList::UpdateRealms(bool init)
             }
 
             UpdateRealm(
-                fields[0].GetUInt32(), fields[1].GetCppString(),fields[2].GetCppString(),fields[3].GetUInt32(),
-                fields[4].GetUInt8(), RealmFlags(realmflags), fields[6].GetUInt8(),
+                id, name, address, localAddress, localSubnetMask, port, icon, RealmFlags(realmflags), timezone, 
                 (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR),
-                fields[8].GetFloat(), fields[9].GetCppString());
+                population, realmBuilds);
 
             if(init)
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Added realm \"%s\"", fields[1].GetString());
         } while( result->NextRow() );
-        delete result;
     }
 }
 
@@ -185,7 +206,7 @@ void RealmList::LoadAllowedClients()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Loading allowed clients...");
 
-    QueryResult *result = LoginDatabase.Query(
+    std::unique_ptr<QueryResult> result = LoginDatabase.Query(
         //       0                 1               2                 3                 4        5     6           7
         "SELECT `major_version`, `minor_version`, `bugfix_version`, `hotfix_version`, `build`, `os`, `platform`, `integrity_hash` "
         "FROM `allowed_clients`");
@@ -222,6 +243,5 @@ void RealmList::LoadAllowedClients()
             ExpectedRealmdClientBuilds.push_back(buildInfo);
 
         } while (result->NextRow());
-        delete result;
     }
 }

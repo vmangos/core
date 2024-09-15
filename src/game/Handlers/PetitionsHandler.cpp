@@ -75,6 +75,12 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
     if (!pCreature->IsTabardDesigner())
         return;
 
+    if (HasTrialRestrictions())
+    {
+        SendNotification(LANG_RESTRICTED_ACCOUNT);
+        return;
+    }
+
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
@@ -289,6 +295,12 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
         return;
     }
 
+    if (HasTrialRestrictions())
+    {
+        SendNotification(LANG_RESTRICTED_ACCOUNT);
+        return;
+    }
+
     // not let enemies sign guild charter
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GUILD) &&
             GetPlayer()->GetTeam() != petition->GetTeam())
@@ -407,6 +419,12 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
         return;
     }
 
+    if (player->GetSession()->HasTrialRestrictions())
+    {
+        SendNotification(LANG_RESTRICTED_ACCOUNT);
+        return;
+    }
+
     Item *charter = _player->GetItemByGuid(itemGuid);
     if (!charter)
         return;
@@ -423,10 +441,10 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OFFER PETITION: petition %u to %s", petitionGuid, playerGuid.GetString().c_str());
 
-    /// Get petition signs count
+    // Get petition signs count
     uint8 signs = petition->GetSignatureCount();
 
-    /// Send response
+    // Send response
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << ObjectGuid(itemGuid);                           // item guid
     data << ObjectGuid(_player->GetObjectGuid());           // owner guid
@@ -457,7 +475,13 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
         return;
     }
 
-    /// Collect petition info data
+    if (HasTrialRestrictions())
+    {
+        SendNotification(LANG_RESTRICTED_ACCOUNT);
+        return;
+    }
+
+    // Collect petition info data
     if (_player->GetGuildId())
     {
         WorldPacket data(SMSG_TURN_IN_PETITION_RESULTS, 4);

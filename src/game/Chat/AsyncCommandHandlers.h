@@ -39,32 +39,40 @@ enum
 
 struct PInfoData
 {
-    uint8 race, class_;
-    uint32 accId = 0;
-    uint32 money = 0;
-    uint32 mail_gold_inbox = 0;
-    uint32 mail_gold_outbox = 0;
-    uint32 total_player_time = 0;
-    uint32 level = 0;
-    uint32 latency = 0;
-    uint32 security_flag = 0;
-    LocaleConstant loc = LOCALE_enUS;
-    ObjectGuid target_guid;
-    uint32 m_accountId;
-    bool online = false;
+    // GM who used the command
+    // needed for callback since command is async
+    uint32 m_ownAccountId = 0;
 
-    bool hasAccount = false;
-    std::string two_factor_enabled;
-    std::string username;
-    std::string last_ip;
-    AccountTypes security = SEC_PLAYER;
-    std::string last_login;
-    std::string target_name;
-    std::string warden_clock;
-    std::string warden_fingerprint;
-    std::string warden_hypervisors;
-    std::string warden_endscene;
-    std::string warden_proxifier;
+    // Character data
+    ObjectGuid m_targetGuid;
+    std::string m_targetName;
+    uint8 m_race = 0;
+    uint8 m_class = 0;
+    uint32 m_level = 0;
+    uint32 m_money = 0;
+    uint32 m_mailGoldInbox = 0;
+    uint32 m_mailGoldOutbox = 0;
+    uint32 m_totalPlayedTime = 0;
+    uint32 m_latency = 0;
+    bool m_online = false;
+
+    // Account data
+    uint32 m_accountId = 0;
+    std::string m_username;
+    LocaleConstant m_locale = LOCALE_enUS;
+    AccountTypes m_security = SEC_PLAYER;
+    uint32 m_securityFlag = 0;
+    std::string m_lastIp;
+    std::string m_lastLogin;
+    bool m_hasAccount = false;
+
+    // Warden data
+    std::string m_wardenClock;
+    std::string m_wardenFingerprint;
+    std::string m_wardenHypervisors;
+    std::string m_wardenEndscene;
+    std::string m_wardenProxifier;
+    bool m_hasUsedClickToMove = false;
 };
 
 class WorldSession;
@@ -78,27 +86,27 @@ class PInfoHandler
 {
 public:
     static void HandlePInfoCommand(WorldSession* session, Player* target, ObjectGuid& target_guid, std::string& name);
-    static void HandlePlayerLookupResult(QueryResult* result, PInfoData *data);
+    static void HandlePlayerLookupResult(std::unique_ptr<QueryResult> result, PInfoData* data);
     static void HandleDataAfterPlayerLookup(PInfoData *data);
-    static void HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder, PInfoData *data);
+    static void HandleDelayedMoneyQuery(std::unique_ptr<QueryResult>, SqlQueryHolder* holder, PInfoData* data);
     // Not thread safe. Must be handled in unsafe callback
-    static void HandleAccountInfoResult(QueryResult* result, PInfoData *data);
+    static void HandleAccountInfoResult(std::unique_ptr<QueryResult> result, PInfoData* data);
     static void HandleResponse(WorldSession* session, PInfoData *data);
 };
 
 class PlayerSearchHandler
 {
 public:
-    static void HandlePlayerAccountSearchResult(QueryResult*, SqlQueryHolder *holder, int);
-    static void HandlePlayerCharacterLookupResult(QueryResult* result, uint32 accountId, uint32 limit);
-    static void ShowPlayerListHelper(QueryResult* result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title);
+    static void HandlePlayerAccountSearchResult(std::unique_ptr<QueryResult>, SqlQueryHolder *holder, int);
+    static void HandlePlayerCharacterLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit);
+    static void ShowPlayerListHelper(std::unique_ptr<QueryResult> result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title);
 };
 
 class AccountSearchHandler
 {
 public:
-    static void HandleAccountLookupResult(QueryResult* result, uint32 accountId, uint32 limit);
-    static void ShowAccountListHelper(QueryResult* result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title);
+    static void HandleAccountLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit);
+    static void ShowAccountListHelper(std::unique_ptr<QueryResult> result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title);
 };
 
 class PlayerGoldRemovalHandler
@@ -106,7 +114,7 @@ class PlayerGoldRemovalHandler
 public:
     // Handle the initial gold lookup for offline player, and perform the removal
     // @not thread safe, must be called from an async unsafe DB callback
-    static void HandleGoldLookupResult(QueryResult* result, uint32 accountId, uint32 removeAmount);
+    static void HandleGoldLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 removeAmount);
 };
 
 typedef std::map<uint32, std::pair<uint32, std::string>> PlayerSearchAccountMap;
@@ -144,13 +152,15 @@ private:
 class PlayerCharacterLookupDisplayTask : public AsyncTask
 {
 public:
-    PlayerCharacterLookupDisplayTask(QueryResult* result, uint32 accountId, uint32 limit)
-        : query(result), accountId(accountId), limit(limit) {}
+    PlayerCharacterLookupDisplayTask(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
+        : unsafeResult(std::make_shared<std::unique_ptr<QueryResult>>(std::move(result))), accountId(accountId), limit(limit) {}
 
     void run() override;
 
 private:
-    QueryResult* query;
+    // Somehow this class is not moveable when cased to a std::function<void()> (See usage of this function)
+    // so we wrap the result into a shared_ptr to still ensure memory "safety"
+    std::shared_ptr<std::unique_ptr<QueryResult>> unsafeResult; // will be deleted and set to nullptr when operator()
     uint32 accountId;
     uint32 limit;
 };
@@ -158,13 +168,15 @@ private:
 class AccountSearchDisplayTask : public AsyncTask
 {
 public:
-    AccountSearchDisplayTask(QueryResult* result, uint32 accountId, uint32 limit)
-        : query(result), accountId(accountId), limit(limit) {}
+    AccountSearchDisplayTask(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
+        : unsafeResult(std::make_shared<std::unique_ptr<QueryResult>>(std::move(result))), accountId(accountId), limit(limit) {}
 
     void run() override;
 
 private:
-    QueryResult* query;
+    // Somehow this class is not moveable when cased to a std::function<void()> (See usage of this function)
+    // so we wrap the result into a shared_ptr to still ensure memory "safety"
+    std::shared_ptr<std::unique_ptr<QueryResult>> unsafeResult; // will be deleted and set to nullptr when operator()
     uint32 accountId;
     uint32 limit;
 };

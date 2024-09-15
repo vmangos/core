@@ -1235,20 +1235,20 @@ void ScourgeInvasionEvent::UpdateWorldState()
         if (!pl->IsInWorld())
             continue;
 
-        pl->SendUpdateWorldState(WORLDSTATE_AZSHARA, REMAINING_AZSHARA > 0 ? 1 : 0);
-        pl->SendUpdateWorldState(WORLDSTATE_BLASTED_LANDS, REMAINING_BLASTED_LANDS > 0 ? 1 : 0);
-        pl->SendUpdateWorldState(WORLDSTATE_BURNING_STEPPES, REMAINING_BURNING_STEPPES > 0 ? 1 : 0);
-        pl->SendUpdateWorldState(WORLDSTATE_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS > 0 ? 1 : 0);
-        pl->SendUpdateWorldState(WORLDSTATE_TANARIS, REMAINING_TANARIS > 0 ? 1 : 0);
-        pl->SendUpdateWorldState(WORLDSTATE_WINTERSPRING, REMAINING_WINTERSPRING > 0 ? 1 : 0);
+        pl->SendUpdateWorldState(WS_SI_AZSHARA_INVADED, REMAINING_AZSHARA > 0 ? 1 : 0);
+        pl->SendUpdateWorldState(WS_SI_BLASTED_LANDS_INVADED, REMAINING_BLASTED_LANDS > 0 ? 1 : 0);
+        pl->SendUpdateWorldState(WS_SI_BURNING_STEPPES_INVADED, REMAINING_BURNING_STEPPES > 0 ? 1 : 0);
+        pl->SendUpdateWorldState(WS_SI_EASTERN_PLAGUELANDS_INVADED, REMAINING_EASTERN_PLAGUELANDS > 0 ? 1 : 0);
+        pl->SendUpdateWorldState(WS_SI_TANARIS_INVADED, REMAINING_TANARIS > 0 ? 1 : 0);
+        pl->SendUpdateWorldState(WS_SI_WINTERSPRING_INVADED, REMAINING_WINTERSPRING > 0 ? 1 : 0);
 
-        pl->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
-        pl->SendUpdateWorldState(WORLDSTATE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
-        pl->SendUpdateWorldState(WORLDSTATE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS);
-        pl->SendUpdateWorldState(WORLDSTATE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES);
-        pl->SendUpdateWorldState(WORLDSTATE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS);
-        pl->SendUpdateWorldState(WORLDSTATE_SI_TANARIS, REMAINING_TANARIS);
-        pl->SendUpdateWorldState(WORLDSTATE_SI_WINTERSPRING, REMAINING_WINTERSPRING);
+        pl->SendUpdateWorldState(WS_SI_BATTLES_WON, VICTORIES);
+        pl->SendUpdateWorldState(WS_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
+        pl->SendUpdateWorldState(WS_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS);
+        pl->SendUpdateWorldState(WS_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES);
+        pl->SendUpdateWorldState(WS_SI_PLAGUELANDS_REMAINING, REMAINING_EASTERN_PLAGUELANDS);
+        pl->SendUpdateWorldState(WS_SI_TANARIS_REMAINING, REMAINING_TANARIS);
+        pl->SendUpdateWorldState(WS_SI_WINTERSPRING_REMAINING, REMAINING_WINTERSPRING);
     }
 }
 
@@ -1478,7 +1478,7 @@ void WarEffortEvent::UpdateWarEffortCollection(uint32 now)
     }
 
     // Collection is over - should there be a world announcement...?
-    if (completedObjectives == objectiveGoal)
+    if (completedObjectives >= objectiveGoal)
     {
         stage = WAR_EFFORT_STAGE_READY;
         UpdateStageTransitionTime();
@@ -1651,7 +1651,7 @@ void WarEffortEvent::DisableAndStopEvent(uint16 event_id)
 void WarEffortEvent::UpdateHiveColossusEvents()
 {
     uint32 colossusMask = sObjectMgr.GetSavedVariable(VAR_WE_HIVE_REWARD, 0);
-    std::list<WarEffortGameEvents> events;
+    std::vector<WarEffortGameEvents> events;
 
     if (colossusMask & WAR_EFFORT_ASHI_REWARD)
         events.push_back(EVENT_WAR_EFFORT_BATTLE_ASHI);
@@ -1667,6 +1667,218 @@ void WarEffortEvent::UpdateHiveColossusEvents()
         if (!sGameEventMgr.IsActiveEvent(event))
             sGameEventMgr.StartEvent(event, true);
     }
+}
+
+bool ChatHandler::HandleWarEffortInfoCommand(char* args)
+{
+    sGameEventMgr.Update();
+
+    uint32 stage = sObjectMgr.GetSavedVariable(VAR_WE_STAGE, WAR_EFFORT_STAGE_COLLECTION);
+    PSendSysMessage("Stage: %s (%u)", WarEffortStageToString(stage), stage);
+
+    uint32 lastStageTransitionTime = sObjectMgr.GetSavedVariable(VAR_WE_STAGE_TRANSITION_TIME, 0);
+    PSendSysMessage("Last Transition Time: %s (%u)", TimeToTimestampStr(lastStageTransitionTime).c_str(), lastStageTransitionTime);
+
+    uint32 gongRingTime = sObjectMgr.GetSavedVariable(VAR_WE_GONG_TIME, 0);
+    PSendSysMessage("Gong Ring Time: %s (%u)", TimeToTimestampStr(gongRingTime).c_str(), gongRingTime);
+
+    switch (stage)
+    {
+        case WAR_EFFORT_STAGE_COLLECTION:
+        {
+            uint32 lastAutoCompleteTime = sObjectMgr.GetSavedVariable(VAR_WE_AUTOCOMPLETE_TIME, 0);
+            PSendSysMessage("Last Auto Complete Time: %s (%u)", TimeToTimestampStr(lastAutoCompleteTime).c_str(), lastAutoCompleteTime);
+
+            uint32 nextAutoCompleteIn = sWorld.getConfig(CONFIG_UINT32_WAR_EFFORT_AUTOCOMPLETE_PERIOD) - (time(nullptr) - lastAutoCompleteTime);
+            PSendSysMessage("Next Auto Complete In: %s", secsToTimeString(nextAutoCompleteIn).c_str());
+
+            uint32 remainingResources = 0;
+
+            // Check all totals. If we're at the limit, start the moving.
+            for (int i = 0; i < NUM_SHARED_OBJECTIVES; ++i)
+            {
+                WarEffortStockInfo info;
+                if (GetWarEffortStockInfo(SharedObjectives[i].itemId, info, TEAM_ALLIANCE))
+                {
+                    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(SharedObjectives[i].itemId);
+
+                    if (info.count < info.required)
+                    {
+                        ++remainingResources;
+                        PSendSysMessage("Alliance %s: %u / %u", GetItemLink(pProto).c_str(), info.count, info.required);
+                    }
+                }
+
+                if (GetWarEffortStockInfo(SharedObjectives[i].itemId, info, TEAM_HORDE))
+                {
+                    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(SharedObjectives[i].itemId);
+
+                    if (info.count < info.required)
+                    {
+                        ++remainingResources;
+                        PSendSysMessage("Horde %s: %u / %u", GetItemLink(pProto).c_str(), info.count, info.required);
+                    }
+                }
+            }
+
+            for (int i = 0; i < NUM_FACTION_OBJECTIVES; ++i)
+            {
+                WarEffortStockInfo info;
+                if (GetWarEffortStockInfo(AllianceObjectives[i].itemId, info))
+                {
+                    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(AllianceObjectives[i].itemId);
+
+                    if (info.count < info.required)
+                    {
+                        ++remainingResources;
+                        PSendSysMessage("Alliance %s: %u / %u", GetItemLink(pProto).c_str(), info.count, info.required);
+                    }
+                }
+
+                if (GetWarEffortStockInfo(HordeObjectives[i].itemId, info))
+                {
+                    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(HordeObjectives[i].itemId);
+
+                    if (info.count < info.required)
+                    {
+                        ++remainingResources;
+                        PSendSysMessage("Horde %s: %u / %u", GetItemLink(pProto).c_str(), info.count, info.required);
+                    }
+                }
+            }
+
+            PSendSysMessage("Total Remaining Resources: %u", remainingResources);
+
+            break;
+        }
+        case WAR_EFFORT_STAGE_MOVE_1:
+        case WAR_EFFORT_STAGE_MOVE_2:
+        case WAR_EFFORT_STAGE_MOVE_3:
+        case WAR_EFFORT_STAGE_MOVE_4:
+        case WAR_EFFORT_STAGE_MOVE_5:
+        {
+            uint32 nextAutoCompleteIn = WAR_EFFORT_MOVE_TRANSITION_TIME - (time(nullptr) - lastStageTransitionTime);
+            PSendSysMessage("Next Transition In: %s", secsToTimeString(nextAutoCompleteIn).c_str());
+            break;
+        }
+        case WAR_EFFORT_STAGE_BATTLE:
+        {
+            uint32 nextTransitionIn = WAR_EFFORT_CH_ATTACK_TIME - (time(nullptr) - lastStageTransitionTime);
+            PSendSysMessage("Next Transition In: %s", secsToTimeString(nextTransitionIn).c_str());
+            break;
+        }
+        case WAR_EFFORT_STAGE_CH_ATTACK:
+        {
+            uint32 nextTransitionIn = WAR_EFFORT_FINAL_BATTLE_TIME - (time(nullptr) - lastStageTransitionTime);
+            PSendSysMessage("Next Transition In: %s", secsToTimeString(nextTransitionIn).c_str());
+            break;
+        }
+        case WAR_EFFORT_STAGE_FINALBATTLE:
+        {
+            uint32 nextTransitionIn = WAR_EFFORT_GONG_DURATION - (time(nullptr) - gongRingTime);
+            PSendSysMessage("Next Transition In: %s", secsToTimeString(nextTransitionIn).c_str());
+            break;
+        }
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleWarEffortSetGongTimeCommand(char* args)
+{
+    uint32 gongTime;
+    if (!ExtractUInt32(&args, gongTime))
+        return false;
+
+    sObjectMgr.SetSavedVariable(VAR_WE_GONG_TIME, gongTime, true);
+    PSendSysMessage("War effort gong ring time set to '%s' (%u).", TimeToTimestampStr(gongTime).c_str(), gongTime);
+    sGameEventMgr.Update();
+
+    return true;
+}
+
+bool ChatHandler::HandleWarEffortSetStageCommand(char* args)
+{
+    uint32 stage;
+    if (!ExtractUInt32(&args, stage))
+        return false;
+
+    sObjectMgr.SetSavedVariable(VAR_WE_STAGE, stage, true);
+    sObjectMgr.SetSavedVariable(VAR_WE_STAGE_TRANSITION_TIME, time(nullptr), true);
+    PSendSysMessage("War effort stage set to '%s' (%u).", WarEffortStageToString(stage), stage);
+    sGameEventMgr.Update();
+
+    return true;
+}
+
+bool ChatHandler::HandleWarEffortGetResource(char* args)
+{
+    uint32 resourceId = 0;
+    uint32 team;
+
+    if (!ExtractUInt32(&args, resourceId))
+        return false;
+
+    if (!ExtractUInt32(&args, team))
+        team = 0;
+
+    if (team > 1)
+        return false;
+
+    auto PrintResources = [this](WarEffortStockInfo &info)
+    {
+        double Progress = (double)info.count / (double)info.required;
+        PSendSysMessage("\"%s\" [%u] Current [%u] Required [%u] Completed: %.03f", info.proto->Name1, info.proto->ItemId, info.count, info.required, Progress);
+    };
+
+    WarEffortStockInfo info;
+    if (!GetWarEffortStockInfo(resourceId, info, TeamId(team)))
+    {
+        PSendSysMessage("Error: resource with id \"%d\" not found", resourceId);
+        return false;
+    }
+
+    PrintResources(info);
+
+    return true;
+}
+
+bool ChatHandler::HandleWarEffortSetResource(char* args)
+{
+    uint32 resourceId = 0;
+    uint32 resourceAmount = 0;
+    uint32 team = 0;
+
+    if (!ExtractUInt32(&args, resourceId))
+    {
+        PSendSysMessage("Usage example .wareffortset 3575 1245");
+        return false;
+    }
+
+    if (!ExtractUInt32(&args, resourceAmount))
+    {
+        PSendSysMessage("Usage example .wareffortset 3575 1245");
+        return false;
+    }
+
+    if (!ExtractUInt32(&args, team))
+        team = 0;
+
+    if (team > 1)
+        return false;
+
+    WarEffortStockInfo info;
+    if (!GetWarEffortStockInfo(resourceId, info, TeamId(team)))
+    {
+        PSendSysMessage("Error: resource with id \"%d\" not found", resourceId);
+        return false;
+    }
+
+    uint32 PreviousResourceCount = info.count;
+    sObjectMgr.SetSavedVariable(info.currentVar, resourceAmount, true);
+    double Progress = (double)resourceAmount / (double)info.required;
+    PSendSysMessage("\"%s\" Previous count [%u] New count [%u] Completed: %.03f", info.proto->Name1, PreviousResourceCount, resourceAmount, Progress);
+    return true;
 }
 
 /*

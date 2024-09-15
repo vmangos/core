@@ -36,9 +36,10 @@ class SqlDelayThread : public ACE_Based::Runnable
     typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
 
     private:
-        SqlQueue m_sqlQueue;                                ///< Queue of SQL statements
-        Database* m_dbEngine;                               ///< Pointer to used Database engine
-        SqlConnection* m_dbConnection;                     ///< Pointer to DB connection
+        SqlQueue m_sqlQueue;                                // Queue of SQL statements
+        Database *m_dbEngine;                               // Pointer to used Database engine
+        SqlQueue m_serialDelayQueue;
+        SqlConnection *m_dbConnection;                      // Pointer to DB connection
         volatile bool m_running;
 
         int m_workerId;
@@ -50,10 +51,10 @@ class SqlDelayThread : public ACE_Based::Runnable
         SqlDelayThread(Database* db, SqlConnection* conn, int workerId);
         ~SqlDelayThread() override;
 
-        ///< Put sql statement to delay queue
+        // Put sql statement to delay queue
         bool Delay(SqlOperation* sql) { m_sqlQueue.add(sql); return true; }
 
-        virtual void Stop();                                ///< Stop event
-        void run() override;                                 ///< Main Thread loop
+        virtual void Stop();                                // Stop event
+        void run() override;                                // Main Thread loop
 };
 #endif                                                      //__SQLDELAYTHREAD_H

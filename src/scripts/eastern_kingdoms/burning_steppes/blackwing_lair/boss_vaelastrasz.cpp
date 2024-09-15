@@ -26,7 +26,6 @@ EndScriptData */
 
 enum
 {
-    // Last found data : HP : 3,331,000 (+20% = 3997200). Damage: 5,930 - 6,807. Armor: 4,691.
     NPC_VAELASTRAZ              = 13020,
     NPC_LORD_NEFARIAN_VAEL      = 10162,
 
@@ -67,12 +66,8 @@ enum
     SPELL_BURNING_ADRENALINE4   = 24701, // -75% threat : easy mode ???
     // See the heal of Kazzak
 
-    // TO FIX : The chain effect
-    // DB : spell_effect_mod.effectChainTarget = 25;
-    // Cleave attack that hits for 2k. This is a chain cleave, so if positioning is poor it can chain to the entire raid, even to behind him. It is critical that nobody be within approximately 10 yards of the main tank for this reason. Offtanks should be generating threat far enough from the MT to avoid chaining the cleave, but close enough to slide into place when BA hits the MT.
-    SPELL_CLEAVE                = 22540, // 22540 Chain Cleave hardcoded via the BD (Ustaag) // 19983 // 20684  ? // Chain cleave is most likely named something different and contains a dummy effect
-    // change spell.cpp "//FIXME: This very like horrible hack and wrong for most spells"
-    // Find out which creatures use both spells in the DB?
+    // This is a chain cleave, so if positioning is poor it can chain to the entire raid, even to behind him. It is critical that nobody be within approximately 10 yards of the main tank for this reason. Offtanks should be generating threat far enough from the MT to avoid chaining the cleave, but close enough to slide into place when BA hits the MT.
+    SPELL_CLEAVE                = 19983,
 
     SPELL_BANISHEMENT_OF_SCALE  = 16404,
     SPELL_NEFARIUS_CORRUPTION   = 23642,

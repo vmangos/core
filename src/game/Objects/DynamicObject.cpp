@@ -39,7 +39,7 @@ DynamicObject::DynamicObject() : WorldObject(), m_spellId(0), m_effIndex(EFFECT_
 
 void DynamicObject::AddToWorld()
 {
-    ///- Register the dynamicObject for guid lookup
+    // Register the dynamicObject for guid lookup
     if (!IsInWorld())
         GetMap()->InsertObject<DynamicObject>(GetObjectGuid(), this);
 
@@ -48,7 +48,7 @@ void DynamicObject::AddToWorld()
 
 void DynamicObject::RemoveFromWorld()
 {
-    ///- Remove the dynamicObject from the accessor
+    // Remove the dynamicObject from the accessor
     if (IsInWorld())
     {
         GetMap()->EraseObject<DynamicObject>(GetObjectGuid());
@@ -156,6 +156,11 @@ Unit* DynamicObject::GetUnitCaster() const
 
     // can be not found in some cases
     return nullptr;
+}
+
+Player* DynamicObject::GetAffectingPlayer() const
+{
+    return ::ToPlayer(GetUnitCaster());
 }
 
 uint32 DynamicObject::GetFactionTemplateId() const

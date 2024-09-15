@@ -175,7 +175,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_AURA:
         {
-            return target->ToUnit()->HasAura(m_value1, SpellEffectIndex(m_value2));
+            if (m_value2 < EFFECT_INDEX_0)
+                return target->ToUnit()->HasAura(m_value1);
+            else
+                return target->ToUnit()->HasAura(m_value1, SpellEffectIndex(m_value2));
         }
         case CONDITION_ITEM:
         {
@@ -499,9 +502,18 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             return target->ToUnit()->IsInCombat();
         }
-        case CONDITION_IS_HOSTILE_TO:
+        case CONDITION_REACTION:
         {
-            return target->IsHostileTo(source);
+            switch (m_value2)
+            {
+                case 0:
+                    return target->GetReactionTo(source) == m_value1;
+                case 1:
+                    return target->GetReactionTo(source) >= m_value1;
+                case 2:
+                    return target->GetReactionTo(source) <= m_value1;
+            }
+            return false;
         }
         case CONDITION_IS_IN_GROUP:
         {
@@ -590,7 +602,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             struct tm* timeinfo;
             timeinfo = localtime(&rawtime);
 
-            return (timeinfo->tm_hour >= m_value1) && (timeinfo->tm_min >= m_value2) && (timeinfo->tm_hour <= m_value3) && (timeinfo->tm_min <= m_value4);
+            return (timeinfo->tm_hour >= m_value1) &&
+                   ((timeinfo->tm_hour > m_value1) || (timeinfo->tm_min >= m_value2)) &&
+                   (timeinfo->tm_hour <= m_value3) &&
+                   ((timeinfo->tm_hour < m_value3) || (timeinfo->tm_min <= m_value4));
         }
         case CONDITION_DISTANCE_TO_POSITION:
         {
@@ -1207,6 +1222,21 @@ bool ConditionEntry::IsValid()
             m_value1 = GetIndexOfUpdateFieldForCurrentBuild(m_value1);
             break;
         }
+        case CONDITION_REACTION:
+        {
+            if (m_value1 < MIN_REPUTATION_RANK || m_value1 >= MAX_REPUTATION_RANK)
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Reaction condition (entry %u, type %u) has invalid rank %u (must be 0..7), skipped", m_entry, m_condition, m_value1);
+                return false;
+            }
+
+            if (m_value2 > 2)
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Reaction condition (entry %u, type %u) has invalid argument %u (must be 0..2), skipped", m_entry, m_condition, m_value2);
+                return false;
+            }
+            break;
+        }
         case CONDITION_DB_GUID:
         {
             if (!sObjectMgr.IsExistingCreatureGuid(m_value1) && !sObjectMgr.IsExistingGameObjectGuid(m_value1))
@@ -1299,7 +1329,6 @@ bool ConditionEntry::IsValid()
         case CONDITION_IS_MOVING:
         case CONDITION_HAS_PET:
         case CONDITION_IS_IN_COMBAT:
-        case CONDITION_IS_HOSTILE_TO:
         case CONDITION_IS_IN_GROUP:
         case CONDITION_IS_ALIVE:
         case CONDITION_CANT_PATH_TO_VICTIM:

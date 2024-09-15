@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup realmd
-/// @{
-/// \file
+// \addtogroup realmd
+// @{
+// \file
 
 #ifndef _AUTHSOCKET_H
 #define _AUTHSOCKET_H
@@ -51,7 +51,7 @@ enum LockFlag
     GEO_CITY        = 0x20
 };
 
-/// Handle login commands
+// Handle login commands
 class AuthSocket: public BufferedSocket
 {
     public:
@@ -90,6 +90,7 @@ class AuthSocket: public BufferedSocket
         };
 
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
+        std::string GetRealmAddress(Realm const& realm) const;
 
         SRP6 srp;
         BigNumber m_reconnectProof;
@@ -138,4 +139,4 @@ class AuthSocket: public BufferedSocket
         void InitPatch();
 };
 #endif
-/// @}
+// @}

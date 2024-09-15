@@ -912,7 +912,7 @@ bool TerrainInfo::GetAreaInfo(float x, float y, float z, uint32& flags, int32& a
 
 uint16 TerrainInfo::GetAreaFlag(float x, float y, float z, bool* isOutdoors) const
 {
-    uint32 mogpFlags;
+    uint32 mogpFlags = 0;
     int32 adtId, rootId, groupId;
     WMOAreaTableEntry const* wmoEntry = nullptr;
     AreaEntry const* atEntry = nullptr;
@@ -989,15 +989,33 @@ GridMapLiquidStatus TerrainInfo::getLiquidStatus(float x, float y, float z, uint
             {
                 uint32 liquidFlagType = 0;
                 if (LiquidTypeEntry const* liq = sTerrainMgr.GetLiquidType(liquid_type))
+                    liquidFlagType = liq->Type;
+
+                if (liquid_type && liquid_type < 21)
                 {
-                    liquidFlagType = 1 << liq->Type;
+                    if (AreaEntry const* area = AreaEntry::GetByAreaFlagAndMap(GetAreaFlag(x, y, z), GetMapId()))
+                    {
+                        uint32 overrideLiquid = area->LiquidTypeId;
+                        if (!overrideLiquid && area->ZoneId)
+                        {
+                            area = AreaEntry::GetById(area->ZoneId);
+                            if (area)
+                                overrideLiquid = area->LiquidTypeId;
+                        }
+
+                        if (LiquidTypeEntry const* liq = sTerrainMgr.GetLiquidType(overrideLiquid))
+                        {
+                            liquid_type = overrideLiquid;
+                            liquidFlagType = liq->Type;
+                        }
+                    }
                 }
 
                 data->level = liquid_level;
                 data->depth_level = ground_level;
 
                 data->entry = liquid_type;
-                data->type_flags = liquidFlagType;
+                data->type_flags = 1 << liquidFlagType;
             }
 
             // For speed check as int values

@@ -67,7 +67,7 @@ enum MovementChangeType
 
 #define UNIT_PVP_COMBAT_TIMER 5500
 
-#define BASE_MELEERANGE_OFFSET 1.33f
+#define BASE_MELEERANGE_OFFSET 1.333333373069763f
 #define BASE_MINDAMAGE 1.0f
 #define BASE_MAXDAMAGE 2.0f
 #define BASE_ATTACK_TIME 2000
@@ -248,6 +248,7 @@ enum VictimState
 
 enum HitInfo
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     HITINFO_NORMALSWING         = 0x00000000,
     HITINFO_UNK0                = 0x00000001,               // req correct packet structure
     HITINFO_AFFECTS_VICTIM      = 0x00000002,               // no being hit animation on victim without it
@@ -256,17 +257,26 @@ enum HitInfo
     HITINFO_MISS                = 0x00000010,
     HITINFO_ABSORB              = 0x00000020,               // plays absorb sound
     HITINFO_RESIST              = 0x00000040,               // resisted atleast some damage
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     HITINFO_CRITICALHIT         = 0x00000080,
-#else
-    HITINFO_CRITICALHIT         = 0x00000008,
-#endif
     HITINFO_UNK8                = 0x00000100,               // wotlk?
     HITINFO_UNK9                = 0x00002000,               // wotlk?
     HITINFO_GLANCING            = 0x00004000,
     HITINFO_CRUSHING            = 0x00008000,
     HITINFO_NOACTION            = 0x00010000,
     HITINFO_SWINGNOHITSOUND     = 0x00080000
+#else
+    HITINFO_NORMALSWING         = 0x00000000,
+    HITINFO_MISS                = 0x00000001,
+    HITINFO_AFFECTS_VICTIM      = 0x00000002,               // no being hit animation on victim without it
+    HITINFO_CRITICALHIT         = 0x00000008,
+    HITINFO_LEFTSWING           = 0x00000200,
+    HITINFO_NOACTION            = 0x00001000,
+    HITINFO_ABSORB              = 0x00010000,               // plays absorb sound
+    HITINFO_RESIST              = 0x00020000,               // resisted atleast some damage
+    HITINFO_GLANCING            = 0x00100000,
+    HITINFO_CRUSHING            = 0x00200000,
+    HITINFO_SWINGNOHITSOUND     = 0x00800000
+#endif
 };
 
 //i would like to remove this: (it is defined in item.h
@@ -333,8 +343,6 @@ enum UnitMods
     UNIT_MOD_RESISTANCE_FROST,
     UNIT_MOD_RESISTANCE_SHADOW,
     UNIT_MOD_RESISTANCE_ARCANE,
-    UNIT_MOD_ATTACK_POWER,
-    UNIT_MOD_ATTACK_POWER_RANGED,
     UNIT_MOD_DAMAGE_MAINHAND,
     UNIT_MOD_DAMAGE_OFFHAND,
     UNIT_MOD_DAMAGE_RANGED,
@@ -353,7 +361,6 @@ enum BaseModGroup
 {
     CRIT_PERCENTAGE,
     RANGED_CRIT_PERCENTAGE,
-    OFFHAND_CRIT_PERCENTAGE,
     SHIELD_BLOCK_VALUE,
     BASEMOD_END
 };
@@ -408,19 +415,19 @@ enum UnitState
     // MMAPS
     UNIT_STAT_IGNORE_PATHFINDING    = 0x00080000,               // do not use pathfinding in any MovementGenerator
 
-    UNIT_STAT_PENDING_ROOT          = 0x00100000,
-    UNIT_STAT_PENDING_STUNNED       = 0x00200000,
-    UNIT_STAT_FLYING_ALLOWED        = 0x00400000,               // has gm fly mode enabled
+    UNIT_STAT_PENDING_ROOT          = 0x00100000,               // apply root on finishing charge
+    UNIT_STAT_PENDING_STUNNED       = 0x00200000,               // apply stun on finishing charge
+    UNIT_STAT_ROOT_ON_LANDING       = 0x00400000,               // used to verify modern client behavior on root while falling
 
     // High-level states
-    UNIT_STAT_RUNNING            = 0x00800000,
+    UNIT_STAT_RUNNING            = 0x01000000,
 
-    UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x01000000, // allow movement with incomplete or partial paths
-    UNIT_STAT_ALLOW_LOS_ATTACK      = 0x02000000, // allow melee attacks without LoS
+    UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x02000000, // allow movement with incomplete or partial paths
+    UNIT_STAT_PENDING_CHANNEL_RESET = 0x04000000, // pending end of spell channeling animation
 
-    UNIT_STAT_NO_SEARCH_FOR_OTHERS   = 0x04000000, // MoveInLineOfSight will not be called
-    UNIT_STAT_NO_BROADCAST_TO_OTHERS = 0x08000000, // ScheduleAINotify will not be called
-    UNIT_STAT_AI_USES_MOVE_IN_LOS    = 0x10000000, // AI overrides MoveInLineOfSight so always search for others
+    UNIT_STAT_NO_SEARCH_FOR_OTHERS   = 0x08000000, // MoveInLineOfSight will not be called
+    UNIT_STAT_NO_BROADCAST_TO_OTHERS = 0x10000000, // ScheduleAINotify will not be called
+    UNIT_STAT_AI_USES_MOVE_IN_LOS    = 0x20000000, // AI overrides MoveInLineOfSight so always search for others
 
     // masks (only for check)
 
@@ -452,7 +459,7 @@ enum UnitState
     UNIT_STAT_MOVING          = UNIT_STAT_ROAMING_MOVE | UNIT_STAT_CHASE_MOVE | UNIT_STAT_FOLLOW_MOVE | UNIT_STAT_FLEEING_MOVE,
 
     UNIT_STAT_ALL_STATE       = 0xFFFFFFFF,
-    UNIT_STAT_ALL_DYN_STATES  = UNIT_STAT_ALL_STATE & ~(UNIT_STAT_RUNNING | UNIT_STAT_IGNORE_PATHFINDING | UNIT_STAT_NO_SEARCH_FOR_OTHERS | UNIT_STAT_NO_BROADCAST_TO_OTHERS | UNIT_STAT_AI_USES_MOVE_IN_LOS),
+    UNIT_STAT_ALL_DYN_STATES  = UNIT_STAT_ALL_STATE & ~(UNIT_STAT_RUNNING | UNIT_STAT_IGNORE_PATHFINDING | UNIT_STAT_PENDING_CHANNEL_RESET | UNIT_STAT_NO_SEARCH_FOR_OTHERS | UNIT_STAT_NO_BROADCAST_TO_OTHERS | UNIT_STAT_AI_USES_MOVE_IN_LOS),
 };
 
 static char const* UnitStateToString(uint32 state)
@@ -501,14 +508,14 @@ static char const* UnitStateToString(uint32 state)
             return "Pending Root";
         case UNIT_STAT_PENDING_STUNNED:
             return "Pending Stunned";
-        case UNIT_STAT_FLYING_ALLOWED:
-            return "Flying Allowed";
+        case UNIT_STAT_ROOT_ON_LANDING:
+            return "Root on Landing";
         case UNIT_STAT_RUNNING:
             return "Running";
         case UNIT_STAT_ALLOW_INCOMPLETE_PATH:
             return "Allow Incomplete Path";
-        case UNIT_STAT_ALLOW_LOS_ATTACK:
-            return "Allow LoS Attack";
+        case UNIT_STAT_PENDING_CHANNEL_RESET:
+            return "Pending Channel Reset";
         case UNIT_STAT_NO_SEARCH_FOR_OTHERS:
             return "No Search for Others";
         case UNIT_STAT_NO_BROADCAST_TO_OTHERS:
@@ -645,7 +652,7 @@ static char const* UnitFlagToString(uint32 flag)
     return "UNKNOWN";
 }
 
-/// Non Player Character flags
+// Non Player Character flags
 enum NPCFlags
 {
     UNIT_NPC_FLAG_NONE                  = 0x00000000,

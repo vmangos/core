@@ -84,6 +84,7 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recv_data)
 
     if ((_player->IsBankPos(INVENTORY_SLOT_BAG_0, srcslot) || _player->IsBankPos(INVENTORY_SLOT_BAG_0, dstslot)) && !_player->CanUseBank())
     {
+        _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, nullptr, nullptr);
         ProcessAnticheatAction("ItemsCheck", "Attempt to cheat-bank items", CHEAT_ACTION_REPORT_GMS);
         return;
     }
@@ -139,6 +140,7 @@ void WorldSession::HandleSwapItem(WorldPacket& recv_data)
 
     if ((_player->IsBankPos(srcbag, srcslot) || _player->IsBankPos(dstbag, dstslot)) && !_player->CanUseBank())
     {
+        _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, nullptr, nullptr);
         ProcessAnticheatAction("ItemsCheck", "Attempt to cheat-bank items", CHEAT_ACTION_REPORT_GMS);
         return;
     }
@@ -182,7 +184,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recv_data)
         msg = _player->CanUnequipItem(dest, !pSrcItem->IsBag());
         if (msg != EQUIP_ERR_OK)
         {
-            _player->SendEquipError(msg, pDstItem, nullptr);
+            _player->SendEquipError(msg, pDstItem, pSrcItem);
             return;
         }
 
@@ -327,12 +329,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->RequiredSkill;
         data << pProto->RequiredSkillRank;
         data << pProto->RequiredSpell;
-        // Item de style insigne
-        if (pProto->Spells[0].SpellId != 0)
-            data << uint32(0);
-        else
-            data << pProto->RequiredHonorRank;
-
+        data << pProto->RequiredHonorRank;
         data << pProto->RequiredCityRank;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         data << pProto->RequiredReputationFaction;
@@ -824,8 +821,19 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
 
                     // when no faction required but rank > 0 will be used faction id from the vendor faction template to compare the rank
                     if (!pProto->RequiredReputationFaction && pProto->RequiredReputationRank > 0 &&
-                            ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->GetFactionId()))
+                        ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->GetFactionId()))
                         continue;
+
+                    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                    // - Argent Dawn, Timbermaw, Zandalar and Arathi Basin vendors now show
+                    //   you their entire inventory regardless of current reputation, allowing
+                    //   players to peruse their full range of wares.The items in question
+                    //   now require the appropriate reputation level to make use of them.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+                    if (pProto->RequiredReputationFaction && pProto->RequiredReputationRank > 0 &&
+                        ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pProto->RequiredReputationFaction))
+                        continue;
+#endif
 
                     if (crItem->conditionId && !IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
                         continue;
@@ -843,6 +851,9 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
                 data << uint32(price);
                 data << uint32(pProto->MaxDurability);
                 data << uint32(pProto->BuyCount);
+
+                if (count >= MAX_VENDOR_ITEMS)
+                    break;
             }
         }
     }
@@ -877,7 +888,10 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recv_data)
     if (_player->IsBankPos(srcbag, srcslot) || (dstbag >= BANK_SLOT_BAG_START && dstbag < BANK_SLOT_BAG_END))
     {
         if (!_player->CanUseBank())
+        {
+            _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, pItem, nullptr);
             return;
+        }
     }
 
     uint16 src = pItem->GetPos();
@@ -990,7 +1004,10 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket& recvPacket)
         return;
 
     if (!_player->CanUseBank())
+    {
+        _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, pItem, nullptr);
         return;
+    }
 
     ItemPosCountVec dest;
     InventoryResult msg = _player->CanBankItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
@@ -1022,7 +1039,10 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
         return;
 
     if (!_player->CanUseBank())
+    {
+        _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, pItem, nullptr);
         return;
+    }
 
     if (_player->IsBankPos(srcbag, srcslot))                // moving from bank to inventory
     {
@@ -1081,12 +1101,13 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recv_data)
 
 void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid playerGuid, ObjectGuid itemGuid, uint32 slot, uint32 duration)
 {
-    // last check 2.0.10
     WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8 + 4 + 4 + 8));
     data << ObjectGuid(itemGuid);
     data << uint32(slot);
     data << uint32(duration);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     data << ObjectGuid(playerGuid);
+#endif
     SendPacket(&data);
 }
 

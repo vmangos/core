@@ -34,14 +34,14 @@
 class WardenModuleMgr
 {
 private:
-    std::vector<WardenModule> _winModules;
-    std::vector<WardenModule> _macModules;
+    std::vector<WardenModule> m_winModules;
+    std::vector<WardenModule> m_macModules;
 
 public:
     WardenModuleMgr();
 
-    const WardenModule *GetWindowsModule() const;
-    const WardenModule *GetMacModule() const;
+    WardenModule const* GetWindowsModule() const;
+    WardenModule const* GetMacModule() const;
 };
 
 #define sWardenModuleMgr MaNGOS::Singleton<WardenModuleMgr>::Instance()

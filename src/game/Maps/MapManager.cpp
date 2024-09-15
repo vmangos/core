@@ -31,6 +31,7 @@
 #include "Group.h"
 #include "ZoneScriptMgr.h"
 #include "Map.h"
+#include "BattleGround.h"
 
 typedef MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
@@ -194,9 +195,8 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
                 Group* group = player->GetGroup();
                 if (!group || !group->isRaidGroup())
                 {
-                    // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
                     // TODO: this is not a good place to send the message
-                    player->GetSession()->SendAreaTriggerMessage("You must be in a raid group to enter %s instance", mapName);
+                    player->SendRaidGroupOnlyError(0, ERR_RAID_GROUP_REQUIRED);
                     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MAP: Player '%s' must be in a raid group to enter instance of '%s'", player->GetName(), mapName);
                     return false;
                 }
@@ -231,6 +231,62 @@ void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)
             delete pMap;
         }
     }
+}
+
+void MapManager::ScheduleNewWorldOnFarTeleport(Player* pPlayer)
+{
+    WorldLocation const& dest = pPlayer->GetTeleportDest();
+    MapEntry const* pMapEntry = sMapStorage.LookupEntry<MapEntry>(dest.mapId);
+    MANGOS_ASSERT(pMapEntry);
+
+    if (pMapEntry->IsDungeon())
+    {
+        DungeonPersistentState* pSave = pPlayer->GetBoundInstanceSaveForSelfOrGroup(pMapEntry->id);
+        if (!pSave || !FindMap(pMapEntry->id, pSave->GetInstanceId()))
+        {
+            m_scheduledNewInstancesForPlayers.insert(pPlayer);
+            return;
+        }
+    }
+
+    // map already created
+    pPlayer->SendNewWorld();
+}
+
+void MapManager::CreateNewInstancesForPlayers()
+{
+    do
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::unordered_set<Player*> players;
+        std::swap(players, m_scheduledNewInstancesForPlayers);
+
+        for (auto const& player : players)
+        {
+            WorldLocation const& dest = player->GetTeleportDest();
+            if (!player->IsBeingTeleportedFar())
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Scheduled instance creation for map %u for player %u but he is no longer being teleported!", dest.mapId, player->GetGUIDLow());
+                continue;
+            }
+
+            MapEntry const* pMapEntry = sMapStorage.LookupEntry<MapEntry>(dest.mapId);
+            MANGOS_ASSERT(pMapEntry->IsDungeon());
+
+            DungeonMap* pMap = static_cast<DungeonMap*>(CreateInstance(dest.mapId, player));
+            if (pMap->CanEnter(player))
+            {
+                pMap->BindPlayerOrGroupOnEnter(player);
+                player->SendNewWorld();
+            } 
+            else
+            {
+                WorldLocation oldLoc;
+                player->GetPosition(oldLoc);
+                player->HandleReturnOnTeleportFail(oldLoc);
+            }
+        } 
+    } while (asyncMapUpdating);
 }
 
 class MapAsyncUpdater : public ACE_Based::Runnable
@@ -330,6 +386,7 @@ void MapManager::Update(uint32 diff)
             continentsUpdaters.push_back(task);
         }
     }
+    std::thread instanceCreationThread = std::thread(&MapManager::CreateNewInstancesForPlayers, this);
     i_maxContinentThread = continentsIdx;
     i_continentUpdateFinished = new volatile bool[i_maxContinentThread];
     for (int i = 0; i < i_maxContinentThread; ++i)
@@ -361,6 +418,9 @@ void MapManager::Update(uint32 diff)
     delete[] i_continentUpdateFinished;
     i_continentUpdateFinished = nullptr;
     asyncMapUpdating = false;
+
+    if (instanceCreationThread.joinable())
+        instanceCreationThread.join();
 
     // Execute far teleports after all map updates have finished
     ExecuteDelayedPlayerTeleports();
@@ -442,11 +502,10 @@ void MapManager::InitMaxInstanceId()
 {
     i_MaxInstanceId = RESERVED_INSTANCES_LAST;
 
-    QueryResult* result = CharacterDatabase.Query("SELECT MAX(`id`) FROM `instance`");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT MAX(`id`) FROM `instance`");
     if (result)
     {
         i_MaxInstanceId = result->Fetch()[0].GetUInt32();
-        delete result;
     }
     if (i_MaxInstanceId < RESERVED_INSTANCES_LAST)
         i_MaxInstanceId = RESERVED_INSTANCES_LAST;
@@ -478,8 +537,8 @@ uint32 MapManager::GetNumPlayersInInstances()
     return ret;
 }
 
-///// returns a new or existing Instance
-///// in case of battlegrounds it will only return an existing map, those maps are created by bg-system
+// returns a new or existing Instance
+// in case of battlegrounds it will only return an existing map, those maps are created by bg-system
 Map* MapManager::CreateInstance(uint32 id, Player* player)
 {
     Guard _guard(*this);
@@ -719,7 +778,7 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
                 return MAP0_IRONFORGE_AREA;
             if (IsNorthTo(x, y, stormwindAreaNorthLimit, sizeof(stormwindAreaNorthLimit) / (2 * sizeof(float))))
                 return MAP0_MIDDLE;
-            if (IsNorthTo(x, y, stormwindAreaSouthLimit, sizeof(stormwindAreaNorthLimit) / (2 * sizeof(float))))
+            if (IsNorthTo(x, y, stormwindAreaSouthLimit, sizeof(stormwindAreaSouthLimit) / (2 * sizeof(float))))
                 return MAP0_STORMWIND_AREA;
             return MAP0_SOUTH;
         }
@@ -815,7 +874,7 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
                     1735.6906f, -3834.2417f,
                     1654.3671f, -3380.9902f,
                     1593.9861f, -3975.5413f,
-                    1439.2548f, -4249.6923f,
+                    1400.9472f, -4242.2387f,
                     1436.3106f, -4007.8950f,
                     1393.3199f, -4196.0625f,
                     1445.2428f, -4373.9052f,

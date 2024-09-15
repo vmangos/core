@@ -32,7 +32,6 @@ EndScriptData
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
 npc_injured_patient     100%    patients for triage-quests (6622 and 6624)
 npc_doctor              100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 and 6624 (Triage)
-npc_lunaclaw_spirit     100%    Appears at two different locations, quest 6001/6002
 npc_mount_vendor        100%    Regular mount vendors all over the world. Display gossip if player doesn't meet the requirements to buy
 npc_event_fireworks     100%    Shoots fireworks every hour. Used for New Year's Eve event.
 EndContentData */
@@ -502,7 +501,7 @@ void npc_doctorAI::UpdateAI(uint32 const uiDiff)
                         case DOCTOR_ALLIANCE: patientEntry = AllianceSoldierId[urand(0, 2)]; break;
                         case DOCTOR_HORDE:    patientEntry = HordeSoldierId[urand(0, 2)];    break;
                         default:
-                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
+                            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
                             return;
                     }
 
@@ -685,40 +684,6 @@ struct npc_steam_tonkAI : public ScriptedAI
 CreatureAI* GetAI_npc_steam_tonk(Creature* pCreature)
 {
     return new npc_steam_tonkAI(pCreature);
-}
-
-/*######
-## npc_lunaclaw_spirit
-######*/
-
-enum
-{
-    QUEST_BODY_HEART_A      = 6001,
-    QUEST_BODY_HEART_H      = 6002,
-
-    TEXT_ID_DEFAULT         = 4714,
-    TEXT_ID_PROGRESS        = 4715
-};
-
-#define GOSSIP_ITEM_GRANT   "You have thought well, spirit. I ask you to grant me the strength of your body and the strength of your heart."
-
-bool GossipHello_npc_lunaclaw_spirit(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(QUEST_BODY_HEART_A) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(QUEST_BODY_HEART_H) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_GRANT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(TEXT_ID_DEFAULT, pCreature->GetGUID());
-    return true;
-}
-
-bool GossipSelect_npc_lunaclaw_spirit(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->SEND_GOSSIP_MENU(TEXT_ID_PROGRESS, pCreature->GetGUID());
-        pPlayer->AreaExploredOrEventHappens((pPlayer->GetTeam() == ALLIANCE) ? QUEST_BODY_HEART_A : QUEST_BODY_HEART_H);
-    }
-    return true;
 }
 
 /*
@@ -1370,7 +1335,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (m_creature->IsTemporarySummon())
         {
             if (Player* pSummoner = m_creature->GetMap()->GetPlayer(static_cast<TemporarySummon*>(m_creature)->GetSummonerGuid()))
-                if (CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(Fireworks[m_uiIndex].m_bIsCluster ? NPC_CLUSTER_CREDIT_MARKER : NPC_FIREWORK_CREDIT_MARKER))
+                if (CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(Fireworks[m_uiIndex].m_bIsCluster ? NPC_CLUSTER_CREDIT_MARKER : NPC_FIREWORK_CREDIT_MARKER))
                     pSummoner->KilledMonster(cInfo, ObjectGuid());
         }
 
@@ -2419,6 +2384,32 @@ CreatureAI* GetAI_npc_oozeling_jubjub(Creature* pCreature)
     return new npc_oozeling_jubjubAI(pCreature);
 }
 
+/*
+  Alliance Res Fixer
+  Horde Res Fixer
+*/
+
+bool GossipHello_npc_res_fixer(Player* pPlayer, Creature* pCreature)
+{
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, 8995, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->SEND_GOSSIP_MENU(6440, pCreature->GetObjectGuid());
+    return true;
+}
+
+bool GossipSelect_npc_res_fixer(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+    {
+        ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(pPlayer->GetRace());
+        uint32 const spellId = raceEntry ? raceEntry->resSicknessSpellId : SPELL_ID_PASSIVE_RESURRECTION_SICKNESS;
+        pPlayer->RemoveAurasDueToSpell(spellId);
+        pPlayer->DurabilityRepairAll(false, 0);
+        pPlayer->CLOSE_GOSSIP_MENU();
+    }
+
+    return true;
+}
+
 void AddSC_npcs_special()
 {
     Script* newscript;
@@ -2454,12 +2445,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_steam_tonk";
     newscript->GetAI = &GetAI_npc_steam_tonk;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_lunaclaw_spirit";
-    newscript->pGossipHello =  &GossipHello_npc_lunaclaw_spirit;
-    newscript->pGossipSelect = &GossipSelect_npc_lunaclaw_spirit;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -2559,5 +2544,11 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_oozeling_jubjub";
     newscript->GetAI = &GetAI_npc_oozeling_jubjub;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_res_fixes";
+    newscript->pGossipHello = &GossipHello_npc_res_fixer;
+    newscript->pGossipSelect = &GossipSelect_npc_res_fixer;
     newscript->RegisterSelf();
 }

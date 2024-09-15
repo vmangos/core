@@ -25,6 +25,7 @@
 
 #include <map>
 #include <set>
+#include <mutex>
 
 typedef std::set<Unit*> PassengerSet;
 
@@ -45,16 +46,15 @@ public:
     void UpdatePosition(float x, float y, float z, float o);
     void UpdatePassengerPosition(Unit* object);
 
-    typedef std::set<Player*> PlayerSet;
     PassengerSet& GetPassengers() { return m_passengers; }
 
-    /// This method transforms supplied transport offsets into global coordinates
+    // This method transforms supplied transport offsets into global coordinates
     void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const
     {
         CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
     }
 
-    /// This method transforms supplied global coordinates into local offsets
+    // This method transforms supplied global coordinates into local offsets
     void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const
     {
         CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
@@ -67,8 +67,9 @@ public:
 
     uint32 GetPathProgress() const { return m_pathProgress; }
 protected:
-    void UpdatePassengerPositions(PassengerSet& passengers);
+    void UpdatePassengerPositions();
 
+    std::mutex m_passengerMutex;
     PassengerSet m_passengers;
     PassengerSet::iterator m_passengerTeleportItr;
 

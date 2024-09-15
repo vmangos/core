@@ -77,12 +77,48 @@ enum GameObjectFlags
     GO_FLAG_TRIGGERED       = 0x00000040                    //typically, summoned objects. Triggered by spell or other events
 };
 
+inline char const* GameObjectFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case GO_FLAG_IN_USE:
+            return "In Use";
+        case GO_FLAG_LOCKED:
+            return "Locked";
+        case GO_FLAG_INTERACT_COND:
+            return "Interact Condition";
+        case GO_FLAG_TRANSPORT:
+            return "Transport";
+        case GO_FLAG_NO_INTERACT:
+            return "No Interact";
+        case GO_FLAG_NODESPAWN:
+            return "No Despawn";
+        case GO_FLAG_TRIGGERED:
+            return "Triggered";
+    }
+    return "UNKNOWN";
+}
+
 enum GameObjectDynamicLowFlags
 {
     GO_DYNFLAG_LO_ACTIVATE          = 0x01,                 // enables interaction with GO
     GO_DYNFLAG_LO_ANIMATE           = 0x02,                 // possibly more distinct animation of GO
     GO_DYNFLAG_LO_NO_INTERACT       = 0x04,                 // appears to disable interaction (not fully verified)
 };
+
+inline char const* GameObjectDynamicFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case GO_DYNFLAG_LO_ACTIVATE:
+            return "Activate";
+        case GO_DYNFLAG_LO_ANIMATE:
+            return "Animate";
+        case GO_DYNFLAG_LO_NO_INTERACT:
+            return "No Interact";
+    }
+    return "UNKNOWN";
+}
 
 enum class GameObjectActions : uint32
 {                                   // Name from client executable      // Comments
@@ -686,6 +722,16 @@ struct GameObjectInfo
         {
             case GAMEOBJECT_TYPE_TRANSPORT:             return true;
             case GAMEOBJECT_TYPE_MO_TRANSPORT:          return true;
+            default: return false;
+        }
+    }
+
+    bool CanAlwaysBreakLoS() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_DOOR:              return true;
+            case GAMEOBJECT_TYPE_GENERIC:           return true;
             default: return false;
         }
     }

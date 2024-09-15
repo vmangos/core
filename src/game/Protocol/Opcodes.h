@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup u2w
-/// @{
-/// \file
+// \addtogroup u2w
+// @{
+// \file
 
 #ifndef _OPCODES_H
 #define _OPCODES_H
@@ -34,22 +34,115 @@
 //       table opcodeTable in source when Opcode.h included but WorldSession.h not included
 #include "WorldSession.h"
 
-/// List of Opcodes
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+// List of Opcodes
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 #include "Opcodes_1_12_1.h"
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+#include "Opcodes_1_11_2.h"
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+#include "Opcodes_1_10_2.h"
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#include "Opcodes_1_9_4.h"
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+#include "Opcodes_1_8_4.h"
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+#include "Opcodes_1_7_1.h"
 #else
-#include "Opcodes_1_8_0.h"
+#include "Opcodes_1_6_1.h"
 #endif
 
-/// Player state
+inline bool IsAnyMoveAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case MSG_MOVE_TELEPORT_ACK:
+        case MSG_MOVE_WORLDPORT_ACK:
+        case MSG_MOVE_SET_RAW_POSITION_ACK:
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_MOVE_ROOT_ACK:
+        case CMSG_FORCE_MOVE_UNROOT_ACK:
+        case CMSG_MOVE_KNOCK_BACK_ACK:
+        case CMSG_MOVE_HOVER_ACK:
+        case CMSG_MOVE_FEATHER_FALL_ACK:
+        case CMSG_MOVE_WATER_WALK_ACK:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+            return true;
+    }
+
+    return false;
+}
+
+inline bool IsFlagAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case CMSG_FORCE_MOVE_ROOT_ACK:
+        case CMSG_FORCE_MOVE_UNROOT_ACK:
+        case CMSG_MOVE_WATER_WALK_ACK:
+        case CMSG_MOVE_HOVER_ACK:
+        case CMSG_MOVE_FEATHER_FALL_ACK:
+            return true;
+    }
+
+    return false;
+}
+
+inline bool IsSpeedAckOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+            return true;
+    }
+
+    return false;
+}
+
+inline bool IsStopOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case MSG_MOVE_STOP:
+        case MSG_MOVE_STOP_STRAFE:
+        case MSG_MOVE_STOP_TURN:
+        case MSG_MOVE_STOP_PITCH:
+        case MSG_MOVE_STOP_SWIM:
+            return true;
+    }
+
+    return false;
+}
+
+inline bool IsFallEndOpcode(uint16 opcode)
+{
+    switch (opcode)
+    {
+        case MSG_MOVE_FALL_LAND:
+        case MSG_MOVE_START_SWIM:
+            return true;
+    }
+
+    return false;
+}
+
+// Player state
 enum SessionStatus
 {
-    STATUS_AUTHED = 0,                                      ///< Player authenticated (_player==nullptr, m_playerRecentlyLogout = false or will be reset before handler call)
-    STATUS_LOGGEDIN,                                        ///< Player in game (_player!=nullptr, inWorld())
-    STATUS_TRANSFER,                                        ///< Player transferring to another map (_player!=nullptr, !inWorld())
-    STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT,                  ///< _player!= nullptr or _player==nullptr && m_playerRecentlyLogout)
-    STATUS_NEVER,                                           ///< Opcode not accepted from client (deprecated or server side only)
-    STATUS_UNHANDLED                                        ///< We don' handle this opcode yet
+    STATUS_AUTHED = 0,                                      // Player authenticated (_player==nullptr, m_playerRecentlyLogout = false or will be reset before handler call)
+    STATUS_LOGGEDIN,                                        // Player in game (_player!=nullptr, inWorld())
+    STATUS_TRANSFER,                                        // Player transferring to another map (_player!=nullptr, !inWorld())
+    STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT,                  // _player!= nullptr or _player==nullptr && m_playerRecentlyLogout)
+    STATUS_NEVER,                                           // Opcode not accepted from client (deprecated or server side only)
+    STATUS_UNHANDLED                                        // We don' handle this opcode yet
 };
 
 class WorldPacket;
@@ -80,7 +173,7 @@ class Opcodes
             ref.handler = handler;
         }
 
-        /// Lookup opcode
+        // Lookup opcode
         inline OpcodeHandler const* LookupOpcode(uint16 id) const
         {
             OpcodeMap::const_iterator itr = mOpcodeMap.find(id);
@@ -89,7 +182,7 @@ class Opcodes
             return nullptr;
         }
 
-        /// compatible with other mangos branches access
+        // compatible with other mangos branches access
 
         inline OpcodeHandler const& operator[] (uint16 id) const
         {
@@ -107,7 +200,7 @@ class Opcodes
 
 #define opcodeTable MaNGOS::Singleton<Opcodes>::Instance()
 
-/// Lookup opcode name for human understandable logging
+// Lookup opcode name for human understandable logging
 inline char const* LookupOpcodeName(uint16 id)
 {
     if (OpcodeHandler const* op = opcodeTable.LookupOpcode(id))
@@ -116,4 +209,4 @@ inline char const* LookupOpcodeName(uint16 id)
 }
 
 #endif
-/// @}
+// @}

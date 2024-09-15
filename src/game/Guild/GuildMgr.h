@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 #include "World.h"
+#include <shared_mutex>
 
 class Guild;
 class ObjectGuid;
@@ -75,6 +76,7 @@ class GuildMgr
         void LoadPetitions();
     private:
         void CleanUpPetitions();
+
         mutable ACE_Thread_Mutex m_guildMutex;
         GuildMap m_GuildMap;
         ACE_Thread_Mutex m_guid2GuildMutex;
@@ -95,7 +97,7 @@ public:
 
     ~Petition();
 
-    bool LoadFromDB(QueryResult* result);
+    bool LoadFromDB(const std::unique_ptr<QueryResult>& result);
     void Delete();
     void SaveToDB();
 

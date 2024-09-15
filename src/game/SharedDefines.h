@@ -1111,6 +1111,9 @@ enum SkillCategory
     SKILL_CATEGORY_GENERIC       = 12
 };
 
+#define MAX_TRIAL_MAIN_PROFESSION_SKILL 100
+#define MAX_TRIAL_SECONDARY_PROFESSION_SKILL 150
+
 // These errors are only printed in client console.
 enum TrainingFailureReason
 {
@@ -1161,6 +1164,8 @@ enum CorpseDynFlags
 };
 
 // Passive Spell codes explicit used in code
+#define SPELL_ID_LOGIN_EFFECT                   836
+#define SPELL_ID_DAZE                           1604
 #define SPELL_ID_PASSIVE_BATTLE_STANCE          2457
 #define SPELL_ID_PASSIVE_RESURRECTION_SICKNESS  15007
 
@@ -1441,6 +1446,31 @@ enum ShapeshiftForm
     FORM_SPIRITOFREDEMPTION = 0x20
 };
 
+inline bool IsTankingForm(ShapeshiftForm form)
+{
+    switch (form)
+    {
+        case FORM_BEAR:
+        case FORM_DIREBEAR:
+        case FORM_DEFENSIVESTANCE:
+            return true;
+    }
+    return false;
+}
+
+inline bool IsAttackSpeedOverridenForm(ShapeshiftForm form)
+{
+    switch (form)
+    {
+        case FORM_CAT:
+        case FORM_BEAR:
+        case FORM_DIREBEAR:
+            return true;
+    }
+
+    return false;
+}
+
 enum ShapeshiftFlags
 {
     SHAPESHIFT_FLAG_STANCE                  = 0x00000001,   // Form allows various player activities, which normally cause "You can't X while shapeshifted." errors (npc/go interaction, item use, etc)
@@ -1556,7 +1586,7 @@ enum ResponseCodes
     CHAR_NAME_SUCCESS,
 };
 
-/// Ban function modes
+// Ban function modes
 enum BanMode
 {
     BAN_ACCOUNT,
@@ -1564,7 +1594,7 @@ enum BanMode
     BAN_IP
 };
 
-/// Ban function return codes
+// Ban function return codes
 enum BanReturn
 {
     BAN_SUCCESS,
@@ -1725,6 +1755,11 @@ struct Position
     float y = 0.0f;
     float z = 0.0f;
     float o = 0.0f;
+
+    bool IsEmpty() const
+    {
+        return !x && !y && !z && !o;
+    }
 };
 
 struct WorldLocation
@@ -1738,6 +1773,11 @@ struct WorldLocation
         : mapId(_mapid), x(_x), y(_y), z(_z), o(_o) {}
     WorldLocation(WorldLocation const& loc)
         : mapId(loc.mapId), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
+
+    bool IsEmpty() const
+    {
+        return !mapId && !x && !y && !z && !o;
+    }
 };
 
 #endif

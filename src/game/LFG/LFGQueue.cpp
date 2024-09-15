@@ -173,7 +173,7 @@ void LFGQueue::Update()
             // Pick Leader as first target.
             QueuedPlayersMap::iterator leader = m_queuedPlayers.begin();
 
-            std::list<ObjectGuid> playersInArea;
+            std::vector<ObjectGuid> playersInArea;
             FindInArea(playersInArea, leader->second.areaId, leader->second.team, leader->first);
 
             // 4 players + the leader
@@ -275,7 +275,7 @@ void LFGQueue::AddPlayer(LFGPlayerQueueInfo const& playerInfo, ObjectGuid player
     });
 }
 
-void LFGQueue::FindInArea(std::list<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude)
+void LFGQueue::FindInArea(std::vector<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude)
 {
     for (const auto& itr : m_queuedPlayers)
     {

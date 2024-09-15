@@ -19,6 +19,7 @@
 #define OUTDOOR_PVP_SI_
 
 #include "ZoneScript.h"
+#include "WorldStates.h"
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
@@ -45,13 +46,6 @@ uint32 const SI_TURNIN_QUEST_CM_A   = 17090;
 uint32 const SI_TURNIN_QUEST_CM_H   = 18199;
 uint32 const SI_SILITHYST_MOUND     = 181597;
 uint32 const SI_SILITHYST_GEYSER    = 181598;
-
-enum SI_WorldStates
-{
-    SI_GATHERED_A      = 2313,
-    SI_GATHERED_H      = 2314,
-    SI_SILITHYST_MAX   = 2317
-};
 
 class OutdoorPvPSI : public OutdoorPvP
 {

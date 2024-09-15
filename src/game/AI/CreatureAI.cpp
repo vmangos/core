@@ -28,7 +28,11 @@
 #include "ScriptMgr.h"
 #include "Group.h"
 
-CreatureAI::CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_bMeleeAttack(true), m_bCombatMovement(true), m_uiCastingDelay(0), m_uLastAlertTime(0)
+CreatureAI::CreatureAI(Creature* creature) :
+    m_creature(creature), m_bUseAiAtControl(false),
+    m_bMeleeAttack(!creature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_MELEE)),
+    m_bCombatMovement(!creature->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE)),
+    m_uiCastingDelay(0), m_uLastAlertTime(0)
 {
     SetSpellsList(creature->GetCreatureInfo()->spell_list_id);
 }
@@ -43,8 +47,8 @@ void CreatureAI::JustRespawned()
     SetSpellsList(m_creature->GetCreatureInfo()->spell_list_id);
 
     // Reset combat movement and melee attack.
-    m_bCombatMovement = true;
-    m_bMeleeAttack = true;
+    m_bCombatMovement = !m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE);
+    m_bMeleeAttack = !m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_MELEE);
 }
 
 void CreatureAI::AttackedBy(Unit* attacker)
@@ -286,7 +290,7 @@ struct EnterEvadeModeHelper
     {
         if (unit->IsCreature() && unit->ToCreature()->IsTotem())
             ((Totem*)unit)->UnSummon();
-        else
+        else if (unit->IsAlive())
         {
             unit->GetMotionMaster()->Clear(false);
             // for a controlled unit this will result in a follow move
@@ -304,8 +308,8 @@ void CreatureAI::OnCombatStop()
     SetSpellsList(m_creature->GetCreatureInfo()->spell_list_id);
 
     // Reset combat movement and melee attack.
-    m_bCombatMovement = true;
-    m_bMeleeAttack = true;
+    m_bCombatMovement = !m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE);
+    m_bMeleeAttack = !m_creature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_MELEE);
 }
 
 void CreatureAI::EnterEvadeMode()
@@ -334,24 +338,35 @@ void CreatureAI::EnterEvadeMode()
 }
 
 // Distract creature, if player gets too close while stealthed/prowling
-void CreatureAI::TriggerAlert(Unit const* who)
+void CreatureAI::OnMoveInStealth(Unit* who)
+{
+    if (CanTriggerAlert(who))
+        TriggerAlertDirect(who);
+}
+
+bool CreatureAI::CanTriggerAlert(Unit const* who)
 {
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
     if (m_creature->GetTypeId() != TYPEID_UNIT || m_creature->IsInCombat() || m_creature->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
-        return;
+        return false;
 
     // Only alert for hostiles!
     if (m_creature->IsCivilian() || m_creature->HasReactState(REACT_PASSIVE) || !m_creature->IsValidAttackTarget(who))
-        return;
+        return false;
 
     // 10 sec cooldown for stealth warning
     if (WorldTimer::getMSTimeDiffToNow(m_uLastAlertTime) < 10000)
-        return;
+        return false;
 
     // only alert if target is within line of sight
     if (!m_creature->IsWithinLOSInMap(who))
-        return;
+        return false;
 
+    return true;
+}
+
+void CreatureAI::TriggerAlertDirect(Unit const* who)
+{
     // Send alert sound (if any) for this creature
     m_creature->SendAIReaction(AI_REACTION_ALERT);
 

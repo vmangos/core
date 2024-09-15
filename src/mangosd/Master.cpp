@@ -42,7 +42,6 @@
 #include "Database/DatabaseEnv.h"
 #include "CliRunnable.h"
 #include "RASocket.h"
-#include "ChatSocket.h"
 #include "Util.h"
 #include "MaNGOSsoap.h"
 #include "MassMailMgr.h"
@@ -177,75 +176,6 @@ public:
     }
 };
 
-class OfflineChatRunnable : public ACE_Based::Runnable
-{
-private:
-    ACE_Reactor *m_Reactor;
-    OfflineChatSocket::Acceptor *m_Acceptor;
-public:
-    OfflineChatRunnable()
-    {
-        ACE_Reactor_Impl* imp = 0;
-
-        #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-
-        imp = new ACE_Dev_Poll_Reactor ();
-
-        imp->max_notify_iterations (128);
-        imp->restart (1);
-
-        #else
-
-        imp = new ACE_TP_Reactor ();
-        imp->max_notify_iterations (128);
-
-        #endif
-
-        m_Reactor = new ACE_Reactor (imp, 1 /* 1= delete implementation so we don't have to care */);
-
-        m_Acceptor = new OfflineChatSocket::Acceptor;
-
-    }
-
-    ~OfflineChatRunnable()
-    {
-        delete m_Reactor;
-        delete m_Acceptor;
-    }
-
-    void run ()
-    {
-        LoginDatabase.ThreadStart();
-        uint16 raport = sConfig.GetIntDefault ("OfflineChat.Port", 3444);
-        std::string stringip = sConfig.GetStringDefault ("OfflineChat.IP", "0.0.0.0");
-
-        ACE_INET_Addr listen_addr(raport, stringip.c_str());
-
-        if (m_Acceptor->open (listen_addr, m_Reactor, ACE_NONBLOCK) == -1)
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
-        }
-
-       sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting offline-chat listener on port %d on %s", raport, stringip.c_str ());
-
-        while (!m_Reactor->reactor_event_loop_done())
-        {
-            ACE_Time_Value interval (0, 10000);
-
-            if (m_Reactor->run_reactor_event_loop (interval) == -1)
-                break;
-
-            if (World::IsStopped())
-            {
-                m_Acceptor->close();
-                break;
-            }
-        }
-        LoginDatabase.ThreadEnd();
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "OfflineChatRunnable thread ended");
-    }
-};
-
 Master::Master()
 {
 }
@@ -254,10 +184,10 @@ Master::~Master()
 {
 }
 
-/// Main function
+// Main function
 int Master::Run()
 {
-    /// worldd PID file creation
+    // worldd PID file creation
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
     if(!pidfile.empty())
     {
@@ -272,30 +202,30 @@ int Master::Run()
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL,  "Daemon PID: %u\n", pid );
     }
 
-    ///- Start the databases
+    // Start the databases
     if (!_StartDB())
     {
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
 
-    ///- Initialize the World
+    // Initialize the World
     sWorld.SetInitialWorldSettings();
 
     #ifndef WIN32
     detachDaemon();
     #endif
-    //server loaded successfully => enable async DB requests
-    //this is done to forbid any async transactions during server startup!
+    // server loaded successfully => enable async DB requests
+    // this is done to forbid any async transactions during server startup!
     CharacterDatabase.AllowAsyncTransactions();
     WorldDatabase.AllowAsyncTransactions();
     LoginDatabase.AllowAsyncTransactions();
     LogsDatabase.AllowAsyncTransactions();
 
-    ///- Catch termination signals
+    // Catch termination signals
     _HookSignals();
 
-    ///- Launch WorldRunnable thread
+    // Launch WorldRunnable thread
     ACE_Based::Thread world_thread(new WorldRunnable);
     world_thread.setPriority(ACE_Based::Highest);
 
@@ -315,18 +245,15 @@ int Master::Run()
     if (sConfig.GetBoolDefault("Console.Enable", true))
 #endif
     {
-        ///- Launch CliRunnable thread
+        // Launch CliRunnable thread
         cliThread = new ACE_Based::Thread(new CliRunnable);
     }
 
     ACE_Based::Thread* rar_thread = nullptr;
     if (sConfig.GetBoolDefault ("Ra.Enable", false))
         rar_thread = new ACE_Based::Thread(new RARunnable);
-    ACE_Based::Thread* offlinechat_thread = nullptr;
-    if (sConfig.GetBoolDefault ("OfflineChat.Enable", false))
-        offlinechat_thread = new ACE_Based::Thread(new OfflineChatRunnable);
 
-    ///- Handle affinity for multiple processors and process priority on Windows
+    // Handle affinity for multiple processors and process priority on Windows
     #ifdef WIN32
     {
         HANDLE hProcess = GetCurrentProcess();
@@ -358,7 +285,7 @@ int Master::Run()
 
         bool Prio = sConfig.GetBoolDefault("ProcessPriority", false);
 
-//        if(Prio && (m_ServiceStatus == -1)/* need set to default process priority class in service mode*/)
+     // if(Prio && (m_ServiceStatus == -1)/* need set to default process priority class in service mode*/)
         if(Prio)
         {
             if(SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
@@ -369,7 +296,7 @@ int Master::Run()
     }
     #endif
 
-    ///- Start soap serving thread
+    // Start soap serving thread
     ACE_Based::Thread* soap_thread = nullptr;
 
     if(sConfig.GetBoolDefault("SOAP.Enabled", false))
@@ -380,7 +307,7 @@ int Master::Run()
         soap_thread = new ACE_Based::Thread(runnable);
     }
 
-    ///- Start up freeze catcher thread
+    // Start up freeze catcher thread
     ACE_Based::Thread* freeze_thread = nullptr;
     if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
     {
@@ -391,7 +318,7 @@ int Master::Run()
     }
 
     // Wait for clients ?
-    ///- Launch the world listener socket
+    // Launch the world listener socket
     uint16 wsport = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
     std::string bind_ip = sConfig.GetStringDefault("BindIP", "0.0.0.0");
 
@@ -411,14 +338,14 @@ int Master::Run()
     }
     sWorldSocketMgr->Wait();
 
-    ///- Stop freeze protection before shutdown tasks
+    // Stop freeze protection before shutdown tasks
     if (freeze_thread)
     {
         freeze_thread->destroy();
         delete freeze_thread;
     }
 
-    ///- Stop soap thread
+    // Stop soap thread
     if(soap_thread)
     {
         soap_thread->wait();
@@ -426,10 +353,10 @@ int Master::Run()
         delete soap_thread;
     }
 
-    ///- Set server offline in realmlist
+    // Set server offline in realmlist
     //LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%u'", REALM_FLAG_OFFLINE, realmID);
 
-    ///- Remove signal handling before leaving
+    // Remove signal handling before leaving
     _UnhookSignals();
 
     // when the main thread closes the singletons get unloaded
@@ -443,14 +370,6 @@ int Master::Run()
         delete rar_thread;
     }
 
-    if (offlinechat_thread)
-    {
-        offlinechat_thread->wait();
-        offlinechat_thread->destroy();
-        delete offlinechat_thread;
-    }
-
-    ///- Clean account database before leaving
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Cleaning character database...");
     clearOnlineAccounts();
 
@@ -458,7 +377,7 @@ int Master::Run()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Sending queued mail...");
     sMassMailMgr.Update(true);
 
-    ///- Wait for DB delay threads to end
+    // Wait for DB delay threads to end
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Closing database connections...");
     CharacterDatabase.StopServer();
     WorldDatabase.StopServer();
@@ -517,13 +436,13 @@ int Master::Run()
         delete cliThread;
     }
 
-    ///- Exit the process with specified return value
+    // Exit the process with specified return value
     return World::GetExitCode();
 }
 
 bool StartDB(std::string name, DatabaseType& database, const char **migrations)
 {
-    ///- Get database info from configuration file
+    // Get database info from configuration file
     std::string dbstring = sConfig.GetStringDefault((name + "Database.Info").c_str(), "");
     int nConnections = sConfig.GetIntDefault((name + "Database.Connections").c_str(), 1);
     int nAsyncConnections = sConfig.GetIntDefault((name + "Database.WorkerThreads").c_str(), 1);
@@ -568,7 +487,7 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s Database: %s, sync threads: %i, workers: %i", name.c_str(), dbStringLog.c_str(), nConnections, nAsyncConnections);
 
-    ///- Initialise the world database
+    // Initialise the world database
     if (!database.Initialize(dbstring.c_str(), nConnections, nAsyncConnections))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot connect to world database %s", name.c_str());
@@ -577,10 +496,10 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
 
     return database.CheckRequiredMigrations(migrations);
 }
-/// Initialize connection to the databases
+// Initialize connection to the databases
 bool Master::_StartDB()
 {
-    ///- Get the realm Id from the configuration file
+    // Get the realm Id from the configuration file
     realmID = sConfig.GetIntDefault("RealmID", 0);
     if(!realmID)
     {
@@ -602,18 +521,18 @@ bool Master::_StartDB()
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Realm running as realm ID %d", realmID);
 
-    ///- Clean the database before starting
+    // Clean the database before starting
     clearOnlineAccounts();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     return true;
 }
 
-/// Clear 'online' status for all accounts with characters in this realm
+// Clear 'online' status for all accounts with characters in this realm
 void Master::clearOnlineAccounts()
 {
     // Cleanup online status for characters hosted at current realm
-    /// \todo Only accounts with characters logged on *this* realm should have online status reset. Move the online column from 'account' to 'realmcharacters'?
+    // TODO: Only accounts with characters logged on *this* realm should have online status reset. Move the online column from 'account' to 'realmcharacters'?
     LoginDatabase.PExecute("UPDATE `account` SET `current_realm` = 0 WHERE `current_realm` = '%u'", realmID);
 
     CharacterDatabase.Execute("UPDATE `characters` SET `online` = 0 WHERE `online`<>0");
@@ -634,7 +553,7 @@ void createdump(void)
 #endif
     
 }
-/// Handle termination signals
+// Handle termination signals
 void Master::SigvSignalHandler()
 {
     if (m_handleSigvSignals)
@@ -705,7 +624,7 @@ void Master::ArmAnticrash()
     m_handleSigvSignals = true;
 }
 
-/// Unhook the signals before leaving
+// Unhook the signals before leaving
 void Master::_UnhookSignals()
 {
     signal(SIGINT, 0);

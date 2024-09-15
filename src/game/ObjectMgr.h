@@ -39,8 +39,6 @@
 #include <map>
 #include <limits>
 
-extern SQLStorage sCreatureDataLinkGroupStorage;
-
 class Group;
 class Item;
 
@@ -127,6 +125,7 @@ struct SoundEntriesEntry
 
 typedef std::unordered_map<uint32, CreatureSpellsList> CreatureSpellsMap;
 typedef std::unordered_map<uint32, std::vector<CreatureClassLevelStats>> CreatureCLSMap;
+typedef std::unordered_map<uint32, EquipmentTemplate> CreatureEquipmentMap;
 
 typedef std::map<uint32/*player guid*/,uint32/*instance*/> CellCorpseSet;
 struct CellObjectGuids
@@ -202,6 +201,7 @@ typedef std::unordered_map<uint32, FactionEntry> FactionsMap;
 typedef std::unordered_map<uint32, FactionTemplateEntry> FactionTemplatesMap;
 typedef std::unordered_map<uint32, SoundEntriesEntry> SoundEntryMap;
 typedef std::unordered_map<uint32, ItemPrototype> ItemPrototypeMap;
+typedef std::unordered_map<uint32, std::unique_ptr<CreatureInfo>> CreatureInfoMap;
 
 typedef std::unordered_map<uint32,GameObjectData> GameObjectDataMap;
 typedef GameObjectDataMap::value_type GameObjectDataPair;
@@ -226,6 +226,12 @@ class FindGOData
         float i_spawnedDist;
 };
 
+struct AreaTriggerLocale
+{
+    std::vector<std::string> message;
+};
+
+typedef std::unordered_map<uint32, AreaTriggerLocale> AreaTriggerLocaleMap;
 typedef std::unordered_map<uint32,CreatureLocale> CreatureLocaleMap;
 typedef std::unordered_map<uint32,GameObjectLocale> GameObjectLocaleMap;
 typedef std::unordered_map<uint32,ItemLocale> ItemLocaleMap;
@@ -588,6 +594,7 @@ class ObjectMgr
 
         typedef std::unordered_map<uint32, AreaTriggerEntry> AreaTriggerMap;
         typedef std::map<uint32, AreaTriggerTeleport> AreaTriggerTeleportMap;
+
         typedef std::unordered_map<uint32, BattlegroundEntranceTrigger> BGEntranceTriggerMap;
 
         typedef std::unordered_map<uint32, RepRewardRate > RepRewardRateMap;
@@ -619,11 +626,16 @@ class ObjectMgr
         GroupMap::iterator GetGroupMapBegin() { return m_GroupMap.begin(); }
         GroupMap::iterator GetGroupMapEnd() { return m_GroupMap.end(); }
 
-        static CreatureInfo const* GetCreatureTemplate(uint32 id);
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoAddon(uint32 display_id);
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoRandomGender(uint32 display_id);
 
-        EquipmentInfo const* GetEquipmentInfo(uint32 entry);
+        EquipmentTemplate const* GetEquipmentTemplate(uint32 entry)
+        {
+            auto itr = m_CreatureEquipmentMap.find(entry);
+            if (itr != m_CreatureEquipmentMap.end())
+                return &itr->second;
+            return nullptr;
+        }
         static CreatureDataAddon const* GetCreatureAddon(uint32 lowguid)
         {
             return sCreatureDataAddonStorage.LookupEntry<CreatureDataAddon>(lowguid);
@@ -825,7 +837,20 @@ class ObjectMgr
         void LoadPetSpellData();
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
-        void CheckCreatureTemplates();
+        void LoadCreatureTemplate(uint32 entry);
+        void CheckCreatureTemplate(CreatureInfo* cInfo);
+        CreatureInfo const* GetCreatureTemplate(uint32 id) const
+        {
+            auto itr = m_creatureInfoMap.find(id);
+            if (itr != m_creatureInfoMap.end())
+                return itr->second.get();
+
+            return nullptr;
+        }
+        CreatureInfoMap const& GetCreatureInfoMap() const
+        {
+            return m_creatureInfoMap;
+        }
         void CorrectCreatureDisplayIds(uint32, uint32&);
 
         void LoadCreatures(bool reload = false);
@@ -857,6 +882,7 @@ class ObjectMgr
         void LoadAreaTriggerTeleports();
         void LoadQuestAreaTriggers();
         void LoadTavernAreaTriggers();
+        void LoadAreaTriggerLocales();
         void LoadGameObjectForQuests();
         void LoadBattlegroundEntranceTriggers();
 
@@ -984,6 +1010,13 @@ class ObjectMgr
         {
             auto itr = m_CreatureSpellsMap.find(entry);
             if (itr == m_CreatureSpellsMap.end()) return nullptr;
+            return &itr->second;
+        }
+
+        AreaTriggerLocale const* GetAreaTriggerLocale(uint32 entry) const
+        {
+            auto itr = m_AreaTriggerLocaleMap.find(entry);
+            if (itr == m_AreaTriggerLocaleMap.end()) return nullptr;
             return &itr->second;
         }
 
@@ -1199,7 +1232,7 @@ class ObjectMgr
 
         void AddVendorItem(uint32 entry,uint32 item, uint32 maxcount, uint32 incrtime, uint32 itemflags);
         bool RemoveVendorItem(uint32 entry,uint32 item);
-        bool IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item, uint32 maxcount, uint32 incrtime, uint32 conditionId, Player* pl = nullptr, std::set<uint32>* skip_vendors = nullptr) const;
+        bool IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item, uint32 maxcount, uint32 incrtime, uint32 conditionId, Player* pl = nullptr) const;
 
         int GetOrNewIndexForLocale(LocaleConstant loc);
 
@@ -1260,7 +1293,7 @@ class ObjectMgr
         PlayerCacheData* GetPlayerDataByGUID(uint32 lowGuid);
         PlayerCacheData const* GetPlayerDataByGUID(uint32 lowGuid) const;
         PlayerCacheData const* GetPlayerDataByName(std::string const& name) const;
-        void GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheData const*>& data) const;
+        void GetPlayerDataForAccount(uint32 accountId, std::vector<PlayerCacheData const*>& data) const;
         PlayerCacheData* InsertPlayerInCache(Player* pPlayer);
         PlayerCacheData* InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, std::string const& name, uint32 level, uint32 zoneId);
         void DeletePlayerFromCache(uint32 lowGuid);
@@ -1461,6 +1494,7 @@ class ObjectMgr
         uint32 m_OldMailCounter;
 
     private:
+        void LoadCreatureInfo(Field* result);
         void LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment);
         void LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table);
         void LoadVendors(char const* tableName, bool isTemplates);
@@ -1503,10 +1537,12 @@ class ObjectMgr
         MapObjectGuids m_MapObjectGuids;
         ACE_Thread_Mutex m_MapObjectGuids_lock;
 
+        AreaTriggerLocaleMap m_AreaTriggerLocaleMap;
         CreatureDataMap m_CreatureDataMap;
         CreatureLocaleMap m_CreatureLocaleMap;
         CreatureSpellsMap m_CreatureSpellsMap;
         CreatureCLSMap m_CreatureCLSMap;
+        CreatureEquipmentMap m_CreatureEquipmentMap;
         GameObjectDataMap m_GameObjectDataMap;
         GameObjectLocaleMap m_GameObjectLocaleMap;
         ItemLocaleMap m_ItemLocaleMap;
@@ -1525,6 +1561,7 @@ class ObjectMgr
         FactionTemplatesMap m_FactionTemplatesMap;
 
         SoundEntryMap m_SoundEntriesMap;
+        CreatureInfoMap m_creatureInfoMap;
         ItemPrototypeMap m_itemPrototypesMap;
 
         typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;

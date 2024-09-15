@@ -43,9 +43,6 @@
 
 bool WorldSession::CheckChatMessageValidity(char* msg, uint32 lang, uint32 msgType)
 {
-    if (!IsLanguageAllowedForChatType(lang, msgType))
-        return false;
-
     if (lang != LANG_ADDON)
     {
         // strip invisible characters for non-addon messages
@@ -88,7 +85,7 @@ bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)
                 case CHAT_MSG_GUILD:
                 case CHAT_MSG_OFFICER:
                 case CHAT_MSG_RAID:
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
                 case CHAT_MSG_RAID_LEADER:
                 case CHAT_MSG_RAID_WARNING:
 #endif
@@ -98,9 +95,18 @@ bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)
 #endif
                 case CHAT_MSG_CHANNEL:
                     return true;
-                default:
-                    return false;
             }
+            return false;
+        }
+        case LANG_UNIVERSAL:
+        {
+            switch (msgType)
+            {
+                case CHAT_MSG_AFK:
+                case CHAT_MSG_DND:
+                    return true;
+            }
+            return false;
         }
         default:
             return true;
@@ -154,16 +160,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
         return;
     }
 
-    // prevent talking at unknown language (cheating)
-    LanguageDesc const* langDesc = GetLanguageDescByID(lang);
-    if (!langDesc)
+    if (!IsLanguageAllowedForChatType(lang, type))
     {
-        SendNotification(LANG_UNKNOWN_LANGUAGE);
-        return;
-    }
-    if (_player && langDesc->skill_id != 0 && !_player->HasSkill(langDesc->skill_id))
-    {
-        SendNotification(LANG_NOT_LEARNED_LANGUAGE);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHAT: Wrong language %u received for chat type %u.", lang, type);
         return;
     }
 
@@ -176,6 +175,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
     // LANG_ADDON should not be changed nor be affected by flood control
     else
     {
+        // prevent talking in unknown language (cheating)
+        if (lang != LANG_UNIVERSAL && _player && !_player->KnowsLanguage(lang))
+        {
+            SendNotification(LANG_NOT_LEARNED_LANGUAGE);
+            return;
+        }
+
         // send in universal language if player in .gmon mode (ignore spell effects)
         if (_player && _player->IsGameMaster())
             lang = LANG_UNIVERSAL;
@@ -190,7 +196,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 {
                     case CHAT_MSG_PARTY:
                     case CHAT_MSG_RAID:
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
                     case CHAT_MSG_RAID_LEADER:
                     case CHAT_MSG_RAID_WARNING:
 #endif
@@ -267,7 +273,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
         case CHAT_MSG_GUILD:
         case CHAT_MSG_OFFICER:
         case CHAT_MSG_RAID:
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         case CHAT_MSG_RAID_LEADER:
         case CHAT_MSG_RAID_WARNING:
 #endif
@@ -328,10 +334,16 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                     // Public channels restrictions
                     if (!chn->HasFlag(Channel::CHANNEL_FLAG_CUSTOM))
                     {
+                        if (HasTrialRestrictions())
+                        {
+                            SendNotification(LANG_CANT_USE_PUBLIC_CHANNELS);
+                            return;
+                        }
+
                         // GMs should not be able to use public channels
                         if (GetSecurity() > SEC_PLAYER && !sWorld.getConfig(CONFIG_BOOL_GMS_ALLOW_PUBLIC_CHANNELS))
                         {
-                            ChatHandler(this).SendSysMessage("GMs can't use public channels.");
+                            SendNotification(LANG_CANT_USE_PUBLIC_CHANNELS);
                             return;
                         }
 
@@ -496,8 +508,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             {
                 bool allowIgnoreAntispam = toPlayer->IsAllowedWhisperFrom(masterPlr->GetObjectGuid());
                 bool allowSendWhisper = allowIgnoreAntispam;
-                if (!sWorld.getConfig(CONFIG_BOOL_WHISPER_RESTRICTION) || !toPlayer->IsEnabledWhisperRestriction())
-                    allowSendWhisper = true;
+
+                if (!allowSendWhisper)
+                {
+                    if (pSecurity == SEC_PLAYER && HasTrialRestrictions())
+                        SendNotification(LANG_CAN_ONLY_WHISPER_FRIENDS);
+                    else if (!sWorld.getConfig(CONFIG_BOOL_WHISPER_RESTRICTION) || !toPlayer->IsEnabledWhisperRestriction())
+                        allowSendWhisper = true;
+                }
 
                 if (masterPlr->IsGameMaster() || allowSendWhisper)
                     masterPlr->Whisper(msg, lang, player);
@@ -579,7 +597,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 sWorld.LogChat(this, "Raid", msg, nullptr, group->GetId());
         }
         break;
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         case CHAT_MSG_RAID_LEADER: // Master side: TODO
         {
             // if player is in battleground, he cannot say to battleground members by /ra
@@ -811,7 +829,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recv_data)
     recv_data >> iguid;
 
     Player* player = sObjectMgr.GetPlayer(iguid);
-    if (!player || !player->GetSession())
+    if (!player)
         return;
 
     WorldPacket data;

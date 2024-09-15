@@ -27,6 +27,7 @@
 #include "CreatureAI.h"
 #include "ObjectGuid.h"
 #include "Player.h"
+#include "Map.h"
 
 void WorldSession::HandleAttackSwingOpcode(WorldPacket& recv_data)
 {

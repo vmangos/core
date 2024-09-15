@@ -304,7 +304,7 @@ void SocialMgr::BroadcastToFriendListers(MasterPlayer* player, WorldPacket* pack
     }
 }
 
-PlayerSocial* SocialMgr::LoadFromDB(QueryResult* result, ObjectGuid guid)
+PlayerSocial* SocialMgr::LoadFromDB(std::unique_ptr<QueryResult> result, ObjectGuid guid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(_socialMapLock);
     PlayerSocial* social = &m_socialMap[guid.GetCounter()];

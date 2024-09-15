@@ -156,23 +156,19 @@ struct mob_jadespine_basiliskAI : public ScriptedAI
         if (Cslumber_Timer < diff)
         {
             //Cast
-            // DoCastSpellIfCan(m_creature->GetVictim(),SPELL_CRYSTALLINE_SLUMBER);
             m_creature->CastSpell(m_creature->GetVictim(), SPELL_CRYSTALLINE_SLUMBER, false);
+            m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
 
-            //Stop attacking target thast asleep and pick new target
+            //Stop attacking target thats asleep and pick new target
             Cslumber_Timer = 28000;
 
-            Unit* Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
+            Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
 
-            if (!Target || Target == m_creature->GetVictim())
-            {
-                Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            }
+            if (!pTarget || pTarget == m_creature->GetVictim())
+                pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
 
-            if (Target)
-            {
-                m_creature->TauntApply(Target);
-            }
+            if (pTarget)
+                AttackStart(pTarget);
         }
         else Cslumber_Timer -= diff;
 

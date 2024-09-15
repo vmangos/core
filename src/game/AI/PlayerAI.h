@@ -41,10 +41,10 @@ class PlayerAI
         virtual void UpdateAI(uint32 const /*diff*/);
         virtual void MovementInform(uint32 MovementType, uint32 Data = 0) {}
 
-        ///== Helpers =====================================
+        // == Helpers =====================================
         bool CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered, bool checkControlled = true);
 
-        ///== Fields =======================================
+        // == Fields =======================================
 
         // Pointer to controlled by AI player
         Player* me;
@@ -63,7 +63,7 @@ class PlayerControlledAI: public PlayerAI
         Unit* FindController();
         void UpdateTarget(Unit* victim);
 
-        ///== Fields =======================================
+        // == Fields =======================================
         ObjectGuid controllerGuid;
         uint32 uiGlobalCD;
         std::vector<uint32> usableSpells;

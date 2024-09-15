@@ -57,8 +57,6 @@ namespace VMAP
 
     TileAssembler::TileAssembler(std::string const& pSrcDirName, std::string const& pDestDirName) : iDestDir(pDestDirName), iSrcDir(pSrcDirName)
     {
-        iCurrentUniqueNameId = 0;
-        iFilterMethod = nullptr;
     }
 
     TileAssembler::~TileAssembler()
@@ -139,7 +137,7 @@ namespace VMAP
                 if (success && fwrite(&nIdx->second, sizeof(uint32), 1, mapfile) != 1) success = false;
             }
 
-            printf("Map %u global objects %u", map_iter->first, i);
+            printf("Map %u global objects %u\n", map_iter->first, i);
 
             fclose(mapfile);
 

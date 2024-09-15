@@ -1008,6 +1008,7 @@ struct npc_murkdeepAI : public ScriptedAI
 
     ObjectGuid m_playerGuid;
     ObjectGuid m_bonfireGuid;
+    bool m_bHasFled;
     bool m_bEventState;
     uint8 m_uiEventPhase;
     uint32 m_uiEventTimer;
@@ -1018,6 +1019,7 @@ struct npc_murkdeepAI : public ScriptedAI
     {
         m_uiEventPhase = 0;
         m_bEventState = false;
+        m_bHasFled = false;
 
         m_uiSunderArmorTimer = urand(0, 5);
         m_uiNetTimer = urand(0, 20);
@@ -1153,40 +1155,47 @@ struct npc_murkdeepAI : public ScriptedAI
                 {
                     switch (m_uiEventPhase)
                     {
-                    case 1:
-                        DoSummon();
-                        m_uiEventTimer = 30000;
-                        ++m_uiEventPhase;
-                        break;
-                    case 2:
-                        DoSummon();
-                        m_uiEventTimer = 30000;
-                        ++m_uiEventPhase;
-                        break;
-                    case 3:
-                        DoSummon();
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-                        m_creature->SetVisibility(VISIBILITY_ON);
+                        case 1:
+                            DoSummon();
+                            m_uiEventTimer = 30000;
+                            ++m_uiEventPhase;
+                            break;
+                        case 2:
+                            DoSummon();
+                            m_uiEventTimer = 30000;
+                            ++m_uiEventPhase;
+                            break;
+                        case 3:
+                            DoSummon();
+                            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                            m_creature->SetVisibility(VISIBILITY_ON);
 
-                        Player* player = GetPlayer();
-                        if (player)
-                        {
-                            AttackStart(player);
-                        }
-                        else
-                        {
-                            m_creature->ForcedDespawn();
-                            m_creature->RemoveCorpse();
-                        }
-                        m_uiEventPhase = 0;
-                        break;
+                            Player* player = GetPlayer();
+                            if (player)
+                            {
+                                AttackStart(player);
+                            }
+                            else
+                            {
+                                m_creature->ForcedDespawn();
+                                m_creature->RemoveCorpse();
+                            }
+                            m_uiEventPhase = 0;
+                            break;
                     }
                 }
                 else
                     m_uiEventTimer -= uiDiff;
             }
 
+            return;
+        }
+
+        if (!m_bHasFled && m_creature->GetHealthPercent() < 15.0f)
+        {
+            m_bHasFled = true;
+            m_creature->DoFlee();
             return;
         }
 

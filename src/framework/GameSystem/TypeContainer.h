@@ -216,7 +216,7 @@ class TypeMapContainer
         template<class SPECIFIC_TYPE>
         size_t Count() const { return MaNGOS::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
 
-        /// inserts a specific object into the container
+        // inserts a specific object into the container
         template<class SPECIFIC_TYPE>
         bool insert(SPECIFIC_TYPE *obj)
         {
@@ -224,7 +224,7 @@ class TypeMapContainer
             return (t != nullptr);
         }
 
-        ///  Removes the object from the container, and returns the removed object
+        //  Removes the object from the container, and returns the removed object
         template<class SPECIFIC_TYPE>
         bool remove(SPECIFIC_TYPE* obj)
         {

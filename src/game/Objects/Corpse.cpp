@@ -54,7 +54,7 @@ Corpse::~Corpse()
 
 void Corpse::AddToWorld()
 {
-    ///- Register the corpse for guid lookup
+    // Register the corpse for guid lookup
     if (!IsInWorld())
         sObjectAccessor.AddObject(this);
 
@@ -63,7 +63,7 @@ void Corpse::AddToWorld()
 
 void Corpse::RemoveFromWorld()
 {
-    ///- Remove the corpse from the accessor
+    // Remove the corpse from the accessor
     if (IsInWorld())
         sObjectAccessor.RemoveObject(this);
 
@@ -155,8 +155,8 @@ void Corpse::DeleteFromDB()
 
 bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
 {
-    ////                                                    0            1            2                  3                  4                  5                   6
-    //QueryResult* result = CharacterDatabase.Query("SELECT corpse.guid, player_guid, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
+    ////                                                                    0            1            2                  3                  4                  5                   6
+    //std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT corpse.guid, player_guid, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
     ////   7     8            9         10      11    12     13     14   15          16          17           18               19        20
     //    "time, corpse_type, instance, gender, race, class, skin, face, hair_style, hair_color, facial_hair, equipment_cache, guild_id, player_flags FROM corpse"
     uint32 playerLowGuid = fields[1].GetUInt32();
