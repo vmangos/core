@@ -29,7 +29,7 @@ IO::Networking::AsyncSocket::AsyncSocket(AsyncSocket&& other) noexcept :
 
 IO::Networking::AsyncSocket::~AsyncSocket()
 {
-    int state = m_atomicState.load(std::memory_order::memory_order_relaxed);
+    int state = m_atomicState.load(std::memory_order_relaxed);
     if (state & SocketStateFlags::WAS_MOVED_NO_DTOR)
         return; // Ignore destructor
 
@@ -48,7 +48,7 @@ IO::Networking::AsyncSocket::~AsyncSocket()
 
 bool IO::Networking::AsyncSocket::IsClosing() const
 {
-    bool isClosing = m_atomicState.load(std::memory_order::memory_order_relaxed) & SHUTDOWN_PENDING;
+    bool isClosing = m_atomicState.load(std::memory_order_relaxed) & SHUTDOWN_PENDING;
     return isClosing;
 }
 

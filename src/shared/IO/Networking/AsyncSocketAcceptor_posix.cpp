@@ -27,6 +27,7 @@
 #include <memory>
 #include <string>
 #include <chrono>
+#include <functional>
 
 IO::Networking::AsyncSocketAcceptor::AsyncSocketAcceptor(IO::IoContext* ctx, IO::Native::SocketHandle acceptorNativeSocket)
     : m_ctx(ctx), m_acceptorNativeSocket(acceptorNativeSocket), m_wasClosed(false), m_onNewSocketCallback{nullptr} {}
