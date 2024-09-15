@@ -228,9 +228,9 @@ bool Database::InitDelayThread(int i, std::string const& infoString)
     SqlConnection* threadConnection = CreateConnection();
     if(!threadConnection->Initialize(infoString.c_str()))
         return false;
-    m_threadsBodies[i] = std::make_shared<SqlDelayThread*>(new SqlDelayThread(this, threadConnection, i));
-    (*m_threadsBodies[i])->incReference();
-    m_delayThreads[i] = new ACE_Based::Thread(*m_threadsBodies[i]);
+    m_threadsBodies[i] = new SqlDelayThread(this, threadConnection, i);
+    m_threadsBodies[i]->incReference();
+    m_delayThreads[i] = new ACE_Based::Thread(m_threadsBodies[i]);
 
     m_serialDelayQueue[i] = new SqlQueue();
 
@@ -244,10 +244,10 @@ void Database::HaltDelayThread()
 
     for (uint32 i = 0; i < m_numAsyncWorkers; ++i)
     {
-        (*m_threadsBodies[i])->Stop();
+        m_threadsBodies[i]->Stop();
         m_delayThreads[i]->wait();
         delete m_delayThreads[i];
-        (*m_threadsBodies[i])->decReference();
+        m_threadsBodies[i]->decReference();
     }
     delete[] m_serialDelayQueue;
     m_delayThreads.clear();

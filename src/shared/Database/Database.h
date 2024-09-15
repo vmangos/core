@@ -30,7 +30,6 @@
 #include <ace/TSS_T.h>
 #include <ace/Atomic_Op.h>
 #include "SqlPreparedStatement.h"
-#include <memory>
 
 class SqlTransaction;
 class SqlResultQueue;
@@ -339,7 +338,7 @@ class Database
 
         SqlResultQueue*     m_pResultQueue;                                 // Transaction queues from diff. threads
         uint32              m_numAsyncWorkers;
-        std::vector<std::shared_ptr<SqlDelayThread*>> m_threadsBodies;      // Pointer to delay sql executer (owned by m_delayThread)
+        std::vector<SqlDelayThread*> m_threadsBodies;                       // Pointer to delay sql executer (owned by m_delayThread)
         std::vector<ACE_Based::Thread*> m_delayThreads;                     // Pointer to executer thread
 
         bool m_bAllowAsyncTransactions;                                     // Flag which specifies if async transactions are enabled
