@@ -50,6 +50,7 @@ void IO::IoContext::RunUntilShutdown()
             {
                 sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::GetQueuedCompletionStatus(...) Has no TASK!!! Error: %u", errorCode);
             }
+            std::this_thread::yield(); // wait one os tick to try again
         }
     }
 }
