@@ -35,6 +35,11 @@ std::string const& GetErrorBaseString(IO::NetworkError::ErrorType errorType)
             static std::string txt = "InvalidProtocolBehavior";
             return txt;
         }
+        default:
+        {
+            static std::string txt = "UndefinedErrorType";
+            return txt;
+        }
     }
 }
 
