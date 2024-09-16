@@ -146,6 +146,13 @@ int Master::Run()
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Daemon PID: %u\n", pid);
     }
 
+    // Start the databases
+    if (!_StartDB())
+    {
+        Log::WaitBeforeContinueIfNeed();
+        return 1;
+    }
+
     std::unique_ptr<IO::IoContext> ioCtxUniquePtr = IO::IoContext::CreateIoContext();
     IO::IoContext* ioCtx = ioCtxUniquePtr.get();
     std::vector<std::thread> ioCtxRunners;
@@ -162,13 +169,6 @@ int Master::Run()
         {
             ioCtx->RunUntilShutdown();
         }));
-    }
-
-    // Start the databases
-    if (!_StartDB())
-    {
-        Log::WaitBeforeContinueIfNeed();
-        return 1;
     }
 
     // Initialize the World
@@ -296,6 +296,11 @@ int Master::Run()
     {
         Log::WaitBeforeContinueIfNeed();
         World::StopNow(ERROR_EXIT_CODE);
+
+        ioCtx->Shutdown();
+        for (std::thread& thread : ioCtxRunners)
+            thread.join();
+
         return 1;
     }
 
