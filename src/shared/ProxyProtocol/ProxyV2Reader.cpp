@@ -10,7 +10,8 @@
 
 struct proxy_hdr_v2 {
     uint8_t sig[12];  /* hex 0D 0A 0D 0A 00 0D 0A 51 55 49 54 0A */
-    uint8_t ver_cmd;  /* protocol version and command */
+    uint8_t ver: 4;   /* protocol version (2) */
+    uint8_t cmd: 4;   /* command (1 = PROXY) */
     uint8_t fam;      /* protocol family and address */
     uint16_t len;     /* number of following bytes part of the header */
 };
@@ -41,8 +42,7 @@ union proxy_addr {
 #pragma pack(pop)
 #endif
 
-// https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt
-
+// Read protocol doc at: https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt
 void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, std::function<void(nonstd::expected<IO::Networking::IpAddress, IO::NetworkError> const&)> const& callback)
 {
     std::shared_ptr<proxy_hdr_v2> proxyHeader(new proxy_hdr_v2());
@@ -63,6 +63,23 @@ void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, st
             return;
         }
 
+        // Check version
+        if (proxyHeader->ver != 2) // we only support proxy v2
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ProxyV2 unexpected version");
+            callback(nonstd::make_unexpected(IO::NetworkError(IO::NetworkError::ErrorType::InvalidProtocolBehavior)));
+            return;
+        }
+
+        // Check command
+        constexpr uint8_t PROXY_V2_CMD_PROXY = 1;
+        if (proxyHeader->cmd != PROXY_V2_CMD_PROXY)
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ProxyV2 unexpected cmd");
+            callback(nonstd::make_unexpected(IO::NetworkError(IO::NetworkError::ErrorType::InvalidProtocolBehavior)));
+            return;
+        }
+
         // Check if we have IPv4_TCP which is currently the only one supported by the vanilla client
         constexpr uint8_t PROXY_V2_TCP_OVER_IPV4 = 0x11;
         if (proxyHeader->fam != PROXY_V2_TCP_OVER_IPV4)
@@ -72,17 +89,9 @@ void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, st
             return;
         }
 
-        // Check cmd version
-        if (proxyHeader->ver_cmd != 0x21)
-        {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ProxyV2 unexpected ver_cmd");
-            callback(nonstd::make_unexpected(IO::NetworkError(IO::NetworkError::ErrorType::InvalidProtocolBehavior)));
-            return;
-        }
-
         // Unexpected body size
         uint16_t headerLength = ::ntohs(proxyHeader->len);
-        if (headerLength != 12)
+        if (headerLength != sizeof(proxy_addr::ipv4_addr))
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ProxyV2 unexpected body size");
             callback(nonstd::make_unexpected(IO::NetworkError(IO::NetworkError::ErrorType::InvalidProtocolBehavior)));

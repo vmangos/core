@@ -7,8 +7,9 @@
 
 namespace ProxyProtocol
 {
-    /// Allows you to read the proxy protocol V2
-    /// Keep in mind that this must be from a trusted source
+    /// Allows you to receive the correct client IP via proxy protocol V2.
+    /// If you are using HaProxy you can enable it with the "send-proxy-v2" at the "backend server".
+    /// \warning You have to verify if the socket is from a trusted proxy IP!
     void ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, std::function<void(nonstd::expected<IO::Networking::IpAddress, IO::NetworkError> const&)> const& callback);
 }
 
