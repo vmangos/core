@@ -24,7 +24,7 @@ namespace IO { namespace Networking
         /// IPv6 Format: [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]
         std::string const& toString() const { return m_cachedToString; }
 
-        Type getType() const;
+        Type GetType() const;
 
         /// "127.0.0.1" would return 2130706433
         uint32_t _getInternalIPv4ReprAsUint32() const;

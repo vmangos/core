@@ -267,7 +267,7 @@ void RealmList::LoadAllowedClients()
 
 IO::Networking::IpEndpoint Realm::GetAddressForClient(IO::Networking::IpAddress const& clientAddr) const
 {
-    if (clientAddr.getType() != IO::Networking::IpAddress::Type::IPv4)
+    if (clientAddr.GetType() != IO::Networking::IpAddress::Type::IPv4)
         return externalAddress;
 
     // Check if user connected with an IpAddress that is in the same subnet as the localAddress of the realm

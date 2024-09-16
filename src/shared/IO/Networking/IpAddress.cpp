@@ -65,7 +65,7 @@ nonstd::optional<IO::Networking::IpAddress> IO::Networking::IpAddress::TryParseF
     return result;
 }
 
-IO::Networking::IpAddress::Type IO::Networking::IpAddress::getType() const
+IO::Networking::IpAddress::Type IO::Networking::IpAddress::GetType() const
 {
     return m_address.type;
 }
