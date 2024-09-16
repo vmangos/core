@@ -94,7 +94,7 @@ nonstd::expected<ServerStartupArguments, int /* exit value */> ParseServerStartu
                 args.inputServiceMode = ServiceDaemonAction::Uninstall;
             }
 #else
-                else if (nextPart == "stop")
+            else if (nextPart == "stop")
             {
                 args.inputServiceMode = ServiceDaemonAction::Stop;
             }
