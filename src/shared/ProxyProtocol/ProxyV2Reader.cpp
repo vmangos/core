@@ -42,7 +42,8 @@ union proxy_addr {
 #pragma pack(pop)
 #endif
 
-// Read protocol doc at: https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt
+
+// Read protocol doc at https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt (2.2. Binary header format (version 2)).
 void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, std::function<void(nonstd::expected<IO::Networking::IpAddress, IO::NetworkError> const&)> const& callback)
 {
     std::shared_ptr<proxy_hdr_v2> proxyHeader(new proxy_hdr_v2());
@@ -55,7 +56,7 @@ void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, st
         }
 
         constexpr uint8_t expectedSignature[12] = { 0x0D, 0x0A, 0x0D, 0x0A, 0x00, 0x0D, 0x0A, 0x51, 0x55, 0x49, 0x54, 0x0A };
-        // We have a valid signature
+        // Check if we have a valid signature
         if (std::memcmp(proxyHeader->sig, expectedSignature, sizeof(expectedSignature)) != 0)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ProxyV2 invalid signature");
