@@ -175,7 +175,6 @@ LogTimestamp = 0
 LogFileLevel = 0
 UseProcessors = 0
 ProcessPriority = 1
-WaitAtStartupError = 0
 WaitAtStartupError = 5 # consider fixing your actual problem before changing this value!
 MinRealmListDelay = 1
 RealmsStateUpdateDelay = 20
