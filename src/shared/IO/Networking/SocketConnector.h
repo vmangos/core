@@ -25,7 +25,7 @@ namespace IO { namespace Networking
 
     // Bind socketDescriptor to AsyncSocket and initialize
     auto socket = std::make_shared<IO::Networking::AsyncSocket>(ctx, std::move(maybeSocketDescriptor.value()));
-    MANGOS_ASSERT(!(socket->InitializeAndFixMemoryLocation()));
+    MANGOS_ASSERT(!(socket->InitializeAndFixateMemoryLocation()));
 
     // Send example request
     std::string requestString = "Hello World!!!";

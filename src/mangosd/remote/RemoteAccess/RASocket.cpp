@@ -57,7 +57,7 @@ RASocket::~RASocket()
 
 void RASocket::Start()
 {
-    if (IO::NetworkError initError = m_socket.InitializeAndFixMemoryLocation())
+    if (IO::NetworkError initError = m_socket.InitializeAndFixateMemoryLocation())
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] Failed to initialize RASocket %s", m_socket.GetRemoteIpString().c_str(), initError.ToString().c_str());
         return; // implicit close()

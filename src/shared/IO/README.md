@@ -62,7 +62,7 @@ You can `std::move` it into an `AsyncSocket`, to get a fully working socket.
 `IO::Networking::AsyncSocket` manages asynchronous read and write operations on a socket.  
 (_see one transfer per-direction restriction_)
 
-Before initiating any transfers, you must call `InitializeAndFixMemoryLocation()`
+Before initiating any transfers, you must call `InitializeAndFixateMemoryLocation()`
 to prepare the socket for IO operations.  
 For all transfers you have to keep the socket alive until the callback is called.
 
