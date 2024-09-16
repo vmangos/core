@@ -1081,7 +1081,8 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #    WaitAtStartupError
 #        After startup error report wait for <Enter> or some time before continuing (and possibly close console window)
 #                 -1 (wait until <Enter> press)
-#        Default:  0 (not wait)
+#                  0 (no wait)
+#         Default: 5 (wait 5 sec)
 #                  N (>0, wait N secs)
 #
 #    Motd
@@ -1155,7 +1156,7 @@ Spell.EffectDelay = 400
 Spell.ProcDelay = 800
 BeepAtStart = 1
 ShowProgressBars = 0
-WaitAtStartupError = 0
+WaitAtStartupError = 5 # consider fixing your actual problem before changing this value!
 Motd = "Welcome to World of Warcraft!"
 
 ###################################################################################################################
@@ -3015,3 +3016,4 @@ DynamicRespawn.AffectRespawnTimeBelow   = 0
 DynamicRespawn.AffectLevelBelow         = 0
 DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
+

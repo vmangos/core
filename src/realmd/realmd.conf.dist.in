@@ -44,10 +44,15 @@ ConfVersion=2020010501
 #        Default: ""             - do not create PID file
 #                 "./realmd.pid" - create PID file (recommended name)
 #
-#    LogLevel
+#    LogLevel.Console
 #        Server console level of logging
-#        0 = Minimum; 1 = Error; 2 = Detail; 3 = Full/Debug
-#        Default: 0
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
+#
+#    LogLevel.File
+#        Server file level of logging
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
 #
 #    LogTime
 #        Include time in server console output [hh:mm:ss]
@@ -83,6 +88,7 @@ ConfVersion=2020010501
 #        After startup error report wait <Enter> or some time before continue (and possible close console window)
 #                 -1 (wait until <Enter> press)
 #        Default:  0 (not wait)
+#         Default: 5 (wait 5 sec)
 #                  N (>0, wait N secs)
 #
 #    MinRealmListDelay
@@ -161,14 +167,16 @@ MaxPingTime = 30
 RealmServerPort = 3724
 BindIP = "0.0.0.0"
 PidFile = ""
-LogLevel = 0
-LogTime = 0
+LogLevel.Console = 2
+LogLevel.File = 2
+LogTime = 1
 LogFile = "Realmd.log"
 LogTimestamp = 0
 LogFileLevel = 0
 UseProcessors = 0
 ProcessPriority = 1
 WaitAtStartupError = 0
+WaitAtStartupError = 5 # consider fixing your actual problem before changing this value!
 MinRealmListDelay = 1
 RealmsStateUpdateDelay = 20
 WrongPass.MaxCount = 0
