@@ -29,7 +29,7 @@ namespace IO { namespace Networking
         /// "127.0.0.1" would return 2130706433
         uint32_t _getInternalIPv4ReprAsUint32() const;
      private:
-        struct
+        struct // NOLINT(*-pro-type-member-init) we manage the initialization on our own.
         {
             Type type = Type::IPv4;
             union
