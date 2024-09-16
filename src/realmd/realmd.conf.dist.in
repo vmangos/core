@@ -87,7 +87,7 @@ ConfVersion=2020010501
 #    WaitAtStartupError
 #        After startup error report wait <Enter> or some time before continue (and possible close console window)
 #                 -1 (wait until <Enter> press)
-#        Default:  0 (not wait)
+#                  0 (no wait)
 #         Default: 5 (wait 5 sec)
 #                  N (>0, wait N secs)
 #
