@@ -4271,7 +4271,7 @@ void Aura::HandleModMechanicImmunityMask(bool apply, bool /*Real*/)
     // check implemented in Unit::IsImmuneToSpell and Unit::IsImmuneToSpellEffect
 }
 
-//this method is called whenever we add / remove aura which gives m_target some immunity to some spell effect
+// this method is called whenever we add / remove aura which gives m_target some immunity to some spell effect
 void Aura::HandleAuraModEffectImmunity(bool apply, bool /*Real*/)
 {
     Unit* target = GetTarget();
