@@ -12,7 +12,7 @@ bool IO::Networking::IsInSameSubnet(IpAddress const& ipAddressInQuestion, IpAddr
     // An IPv4 address is in the same subnet if the first n-bits (subnetMaskBits) are the same
     uint32_t binarySubnetMask = 0xFFFFFFFF << (32 - subnetMaskInCidrNotation);
     uint32_t inQuestionNet = ipAddressInQuestion._getInternalIPv4ReprAsUint32() & binarySubnetMask;
-    uint32_t subnetNet = ipAddressInQuestion._getInternalIPv4ReprAsUint32() & binarySubnetMask;
+    uint32_t subnetNet = subnetIpAddress._getInternalIPv4ReprAsUint32() & binarySubnetMask;
     bool isInSameSubnet = (inQuestionNet == subnetNet);
 
     return isInSameSubnet;
