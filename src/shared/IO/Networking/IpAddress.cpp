@@ -70,6 +70,7 @@ IO::Networking::IpAddress::Type IO::Networking::IpAddress::getType() const
     return m_address.type;
 }
 
+/// "127.0.0.1" would return 2130706433
 uint32_t IO::Networking::IpAddress::_getInternalIPv4ReprAsUint32() const
 {
     MANGOS_ASSERT(m_address.type == Type::IPv4);
