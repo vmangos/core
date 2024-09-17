@@ -34,7 +34,7 @@ namespace IO { namespace Networking
             Type type = Type::IPv4;
             union
             {
-                uint32_t                ipv4; // IPv4 address in
+                uint32_t                ipv4; // "127.0.0.1" would be 2130706433
                 std::array<uint16_t, 8> ipv6; // index[0] is leftmost element in string representation
             };
         } m_address;
