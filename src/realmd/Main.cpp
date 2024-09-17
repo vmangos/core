@@ -39,6 +39,7 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include "ArgparserForServer.h"
+#include "ProxyProtocol/ProxyV2Reader.h"
 
 #include "IO/Networking/AsyncSocketAcceptor.h"
 #include "IO/Timer/AsyncSystemTimer.h"
@@ -51,7 +52,6 @@
 
 #ifdef WIN32
 #include "ServiceWin32.h"
-#include "ProxyProtocol/ProxyV2Reader.h"
 
 char serviceName[] = "realmd";
 char serviceLongName[] = "MaNGOS realmd service";

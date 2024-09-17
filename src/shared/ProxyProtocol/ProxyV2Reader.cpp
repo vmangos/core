@@ -1,6 +1,10 @@
 #include "ProxyV2Reader.h"
 #include "Log.h"
 
+#if defined(__linux__) || defined(__APPLE__)
+#include <arpa/inet.h> // for ntohs
+#endif
+
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
 #if defined( __GNUC__ )
 #pragma pack(1)
@@ -90,7 +94,7 @@ void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, st
         }
 
         // Unexpected body size
-        uint16_t headerLength = ::ntohs(proxyHeader->len);
+        uint16_t headerLength = ntohs(proxyHeader->len);
         if (headerLength != sizeof(proxy_addr::ipv4_addr))
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ProxyV2 unexpected body size");
