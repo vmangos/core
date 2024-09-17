@@ -5,8 +5,8 @@
 It is used in MaNGOS to print the stack trace on failure.  
 
 ## Source
-Commit: https://github.com/jeremy-rifkin/cpptrace/commit/142e0b9ea48d2067d031a992a41a66042af6d207  
-Date: 2024-09-13T05:06:05Z
+Commit: https://github.com/jeremy-rifkin/cpptrace/commit/54a3e6fdf7837c44d20436c77d3469f4524bf6a1  
+Date: 2024-09-17T13:25:23Z
 
 ## Copied files
 ```
@@ -14,7 +14,8 @@ cmake/*
 include/*
 src/*
 CMakeLists.txt
-LICENSE.txt
+LICENSE
+README.md -> README_original.md
 ```
 
 ## Manual changes
