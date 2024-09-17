@@ -652,6 +652,11 @@ std::vector<std::string> SplitStringByDelimiter(std::string const& str, char del
         vec.emplace_back(str.substr(old_pos, pos - old_pos));
         old_pos = pos + 1;
     }
-    vec.emplace_back(str.substr(old_pos));
+
+    // add last element
+    std::string stringPart = str.substr(old_pos);
+    if (!stringPart.empty())
+        vec.emplace_back(stringPart);
+
     return vec;
 }
