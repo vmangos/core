@@ -37,6 +37,7 @@ struct WorldSocketMgrOptions
     uint16 bindPort;
     int socketOutByteBufferSize;
     bool doExplicitTcpNoDelay;
+    std::vector<std::string> trustedProxyIps;
 };
 
 class WorldSocketMgr : public MaNGOS::Singleton<WorldSocketMgr, MaNGOS::ClassLevelLockable<WorldSocketMgr, std::mutex>>

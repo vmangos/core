@@ -283,6 +283,7 @@ int Master::Run()
     uint16 bindPort = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
     int socketOutByteBufferSize = sConfig.GetIntDefault("Network.SystemSendBuffer", -1);
     bool doExplicitTcpNoDelay = sConfig.GetBoolDefault("Network.TcpNoDelay", true);
+    std::vector<std::string> trustedProxyIps = SplitStringByDelimiter(sConfig.GetStringDefault("Network.TrustedProxyServers", ""), ',');
 
     WorldSocketMgrOptions socketOptions
     {
@@ -290,6 +291,7 @@ int Master::Run()
         bindPort,
         socketOutByteBufferSize,
         doExplicitTcpNoDelay,
+        trustedProxyIps,
     };
 
     if (!sWorldSocketMgr.StartWorldNetworking(ioCtx, socketOptions))
