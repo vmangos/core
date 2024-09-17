@@ -75,11 +75,13 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, MaNGOS::Poli
         void _HandleXferCancel();
 
         /// Returns the IP of the peer e.g. "192.168.13.37"
-        std::string GetRemoteIpString() const;
+        inline std::string const& GetRemoteIpString() const { return m_remoteIpAddressStringAfterProxy; }
         void CloseSocket();
 
-    private:
+    public: // A bit hacky, that this is public. In WorldSocket we have WorldSocketMgr as friend, this is not possible here
+        std::string m_remoteIpAddressStringAfterProxy; // might differ from `m_socket.m_descriptor` if behind proxy
         IO::Networking::AsyncSocket m_socket;
+    private:
 
         enum eStatus
         {

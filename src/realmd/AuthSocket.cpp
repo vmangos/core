@@ -71,37 +71,21 @@ std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B,
 // Accept the connection and set the s random value for SRP6 // TODO where is this SRP6 done?
 AuthSocket::AuthSocket(IO::Networking::AsyncSocket socket) : m_socket(std::move(socket))
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", GetRemoteIpString().c_str());
 }
 
 void AuthSocket::Start()
 {
-    if (IO::NetworkError initError = m_socket.InitializeAndFixateMemoryLocation())
+    if (int secs = sConfig.GetIntDefault("MaxSessionDuration", 300))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] Failed to initialize AuthSocket %s", GetRemoteIpString().c_str(), initError.ToString().c_str());
-        return; // implicit close()
+        m_sessionDurationTimeout = sAsyncSystemTimer.ScheduleFunctionOnce(std::chrono::seconds(secs), [this]()
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%s] Connection has reached MaxSessionDuration. Closing socket...", this->GetRemoteIpString().c_str());
+            // It's correct that we capture _this_ and not a shared_ptr, since the timer will be canceled in destructor
+            this->CloseSocket();
+        });
     }
 
-    ProxyProtocol::ReadProxyV2Handshake(&m_socket, [self = shared_from_this()](nonstd::expected<IO::Networking::IpAddress, IO::NetworkError> const& maybeIp)
-    {
-        if (!maybeIp.has_value())
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%s] Error %s", self->GetRemoteIpString().c_str(), maybeIp.error().ToString().c_str());
-            return;
-        }
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "RealIP: %s", maybeIp.value().toString().c_str());
-
-        if (int secs = sConfig.GetIntDefault("MaxSessionDuration", 300))
-        {
-            self->m_sessionDurationTimeout = sAsyncSystemTimer.ScheduleFunctionOnce(std::chrono::seconds(secs), [self]()
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%s] Connection has reached MaxSessionDuration. Closing socket...", self->GetRemoteIpString().c_str());
-                // It's correct that we capture _this_ and not a shared_ptr, since the timer will be canceled in destructor
-                self->CloseSocket();
-            });
-        }
-        self->DoRecvIncomingData();
-    });
+    DoRecvIncomingData();
 }
 
 AuthSocket::~AuthSocket()
@@ -1488,11 +1472,6 @@ bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versi
     }
 
     return false;
-}
-
-std::string AuthSocket::GetRemoteIpString() const
-{
-    return m_socket.GetRemoteEndpoint().ip.toString();
 }
 
 void AuthSocket::CloseSocket()
