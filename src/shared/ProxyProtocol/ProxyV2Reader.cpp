@@ -10,8 +10,7 @@
 
 struct proxy_hdr_v2 {
     uint8_t sig[12];  /* hex 0D 0A 0D 0A 00 0D 0A 51 55 49 54 0A */
-    uint8_t ver: 4;   /* protocol version (2) */
-    uint8_t cmd: 4;   /* command (1 = PROXY) */
+    uint8_t ver_cmd;  /* protocol version and command */
     uint8_t fam;      /* protocol family and address */
     uint16_t len;     /* number of following bytes part of the header */
 };
@@ -65,7 +64,7 @@ void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, st
         }
 
         // Check version
-        if (proxyHeader->ver != 2) // we only support proxy v2
+        if ((proxyHeader->ver_cmd >> 4) != 2) // we only support proxy v2
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ProxyV2 unexpected version");
             callback(nonstd::make_unexpected(IO::NetworkError(IO::NetworkError::ErrorType::InvalidProtocolBehavior)));
@@ -74,7 +73,7 @@ void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, st
 
         // Check command
         constexpr uint8_t PROXY_V2_CMD_PROXY = 1;
-        if (proxyHeader->cmd != PROXY_V2_CMD_PROXY)
+        if ((proxyHeader->ver_cmd & 0x0F) != PROXY_V2_CMD_PROXY)
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "ProxyV2 unexpected cmd");
             callback(nonstd::make_unexpected(IO::NetworkError(IO::NetworkError::ErrorType::InvalidProtocolBehavior)));
