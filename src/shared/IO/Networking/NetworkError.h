@@ -31,7 +31,7 @@ namespace IO
         }
     private:
         ErrorType m_error;
-        /// internal variable for toString(), might be os and situation dependent (On windows there is ::GetLastError()/errno and ::WSAGetLastError())
+        /// internal variable for ToString(), might be os and situation dependent (On windows there is ::GetLastError()/errno and ::WSAGetLastError())
         int m_additionalOsErrorCode;
     };
 
