@@ -27,7 +27,6 @@ namespace IO { namespace Networking {
 #endif
     {
         public:
-            /// Dont forget to call `InitializeAndFixMemoryLocation` before making a transfer
             /// Dont forget to call `InitializeAndFixateMemoryLocation` before making a transfer
             explicit AsyncSocket(IO::IoContext* ctx, SocketDescriptor socketDescriptor);
             AsyncSocket(AsyncSocket&& other) noexcept;
