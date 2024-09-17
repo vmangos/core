@@ -47,7 +47,7 @@ void IO::Networking::Internal::CloseSocket(IO::Native::SocketHandle nativeSocket
 // Converts a `IO::Networking::IpAddress` to a native `IN_ADDR`
 void IO::Networking::Internal::inet_pton(IO::Networking::IpAddress const& ipAddress, in_addr* out_dest)
 {
-    MANGOS_ASSERT(ipAddress.getType() == IpAddress::Type::IPv4);
+    MANGOS_ASSERT(ipAddress.GetType() == IpAddress::Type::IPv4);
 
 #if defined(WIN32)
     // We cant use `inet_pton`, because it's not supported on WinXP.
