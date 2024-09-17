@@ -118,8 +118,8 @@ public:
 
     // ----- Exposing `m_socket` features -----
     std::string const& GetRemoteIpString() const { return m_socket.GetRemoteIpString(); }
-    bool IsClosing() const { return m_socket.IsClosing(); }
-    void CloseSocket() { m_socket.CloseSocket(); }
+    inline bool IsClosing() const { return m_socket.IsClosing(); }
+    void CloseSocket();
 };
 
 #endif // MANGOS_GAME_SERVER_WORLDSOCKET_H

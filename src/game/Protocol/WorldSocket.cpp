@@ -594,3 +594,8 @@ void WorldSocket::Start()
 
     SendInitialPacketAndStartRecvLoop();
 }
+
+void WorldSocket::CloseSocket()
+{
+    m_socket.CloseSocket();
+}
