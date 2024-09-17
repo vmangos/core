@@ -22,7 +22,7 @@ namespace IO { namespace Networking
 
         /// IPv4 Format: 255.255.255.255
         /// IPv6 Format: [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]
-        std::string const& toString() const { return m_cachedToString; }
+        std::string const& ToString() const { return m_cachedToString; }
 
         Type GetType() const;
 
@@ -58,7 +58,7 @@ namespace IO { namespace Networking
         /// IPv6 Format: [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]:1337
         std::string toString() const
         {
-            return ip.toString() + ':' + std::to_string(port);
+            return ip.ToString() + ':' + std::to_string(port);
         };
     };
 }} // namespace IO::Networking

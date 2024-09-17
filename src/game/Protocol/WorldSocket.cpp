@@ -213,7 +213,7 @@ static std::set<std::string> GetServerAddresses()
     std::vector<IO::Networking::IpAddress> ipAddresses = IO::Networking::DNS::ResolveDomain(myHostname, IO::Networking::IpAddress::Type::IPv4);
     for (auto const& ipAddress : ipAddresses)
     {
-        addresses.insert(ipAddress.toString());
+        addresses.insert(ipAddress.ToString());
     }
 
     return addresses;

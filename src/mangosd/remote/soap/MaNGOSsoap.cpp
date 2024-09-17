@@ -41,7 +41,7 @@ void SoapThreadBody(struct soap* soap)
             continue; // most likely, we ran into an accept timeout
 
         auto ip = IO::Networking::IpAddress::FromIpv4Uint32(soap->ip);
-        sLog.Out(LOG_RA, LOG_LVL_BASIC, "MaNGOSsoap: Accepted connection from %s", ip.toString().c_str());
+        sLog.Out(LOG_RA, LOG_LVL_BASIC, "MaNGOSsoap: Accepted connection from %s", ip.ToString().c_str());
 
         soap_serve(soap); // handle soap request
     }

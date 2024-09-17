@@ -74,7 +74,7 @@ namespace IO { namespace Networking {
             /// IPv6 Format: [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]
             std::string const& GetRemoteIpString() const
             {
-                return GetRemoteEndpoint().ip.toString();
+                return GetRemoteEndpoint().ip.ToString();
             }
 
         private:
