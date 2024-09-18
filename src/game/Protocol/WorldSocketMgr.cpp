@@ -25,6 +25,7 @@
 #include "Policies/SingletonImp.h"
 #include "IO/Networking/AsyncSocketAcceptor.h"
 #include "IO/Multithreading/CreateThread.h"
+#include "ProxyProtocol/ProxyV2Reader.h"
 
 INSTANTIATE_SINGLETON_1(WorldSocketMgr);
 
@@ -59,27 +60,55 @@ void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socke
 {
     // Attach descriptor to AsyncSocket and configure it before attaching it to the WorldSocket
     IO::IoContext* ioContext = GetLeastUsedIoContext();
-    IO::Networking::AsyncSocket socket(ioContext, std::move(socketDescriptor));
+    auto worldSocket = std::make_shared<WorldSocket>(std::move(IO::Networking::AsyncSocket(ioContext, std::move(socketDescriptor))));
+    std::string const& socketIp = worldSocket->m_socket.GetRemoteIpString();
+
+    if (IO::NetworkError initError = worldSocket->m_socket.InitializeAndFixateMemoryLocation())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] Failed to InitializeAndFixateMemoryLocation %s", socketIp.c_str(), initError.ToString().c_str());
+        return; // implicit close()
+    }
 
     if (m_settings.socketOutByteBufferSize >= 0)
     {
-        IO::NetworkError error = socket.SetNativeSocketOption_SystemOutgoingSendBuffer(m_settings.socketOutByteBufferSize);
+        IO::NetworkError error = worldSocket->m_socket.SetNativeSocketOption_SystemOutgoingSendBuffer(m_settings.socketOutByteBufferSize);
         if (error)
         { // We don't close the socket, since its basically just a "warning" I guess.
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set SystemOutgoingSendBuffer option on socket for IP %s Error: %s", socket.GetRemoteIpString().c_str(), error.ToString().c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] Failed to set SystemOutgoingSendBuffer option on socket. Error: %s", socketIp.c_str(), error.ToString().c_str());
         }
     }
 
     if (m_settings.doExplicitTcpNoDelay) // Set TCP_NODELAY.
     {
-        IO::NetworkError error = socket.SetNativeSocketOption_NoDelay(true);
+        IO::NetworkError error = worldSocket->m_socket.SetNativeSocketOption_NoDelay(true);
         if (error)
         { // We don't close the socket, since its basically just a "warning" I guess.
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to set NoDelay option on socket for IP %s Error: %s", socket.GetRemoteIpString().c_str(), error.ToString().c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] Failed to set NoDelay option on socket. Error: %s", socketIp.c_str(), error.ToString().c_str());
         }
     }
 
-    std::make_shared<WorldSocket>(std::move(socket))->Start();
+    // Check if the remote endpoint is actually a trusted proxy, so we can retrieve the real client ip
+    if (!m_settings.trustedProxyIps.empty() && std::find(m_settings.trustedProxyIps.begin(), m_settings.trustedProxyIps.end(), socketIp) != m_settings.trustedProxyIps.end())
+    {
+        // parse proxy header
+        ProxyProtocol::ReadProxyV2Handshake(&(worldSocket->m_socket), [worldSocket](nonstd::expected<IO::Networking::IpAddress, IO::NetworkError> const& maybeIp)
+        {
+            if (!maybeIp.has_value())
+            {
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] Failed to parse proxy header. Error: %s", worldSocket->m_socket.GetRemoteIpString().c_str(), maybeIp.error().ToString().c_str());
+                return; // implicit close()
+            }
+            worldSocket->m_remoteIpAddressStringAfterProxy = maybeIp.value().ToString();
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from %s (proxy ip: %s)", worldSocket->GetRemoteIpString().c_str(), worldSocket->m_socket.GetRemoteIpString().c_str());
+            worldSocket->Start();
+        });
+    }
+    else
+    {
+        // no proxy, we can start directly
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from %s", worldSocket->GetRemoteIpString().c_str());
+        worldSocket->Start();
+    }
 }
 
 IO::IoContext* WorldSocketMgr::GetLeastUsedIoContext()

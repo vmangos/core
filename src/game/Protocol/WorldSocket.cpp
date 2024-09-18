@@ -68,10 +68,10 @@ WorldSocket::WorldSocket(IO::Networking::AsyncSocket socket)
       m_lastPingTime(std::chrono::system_clock::time_point::min()),
       m_overSpeedPings(0),
       m_Session(nullptr),
-      m_authSeed(static_cast<uint32>(rand32()))
+      m_authSeed(static_cast<uint32>(rand32())),
+      m_remoteIpAddressStringAfterProxy(m_socket.GetRemoteIpString())
 {
     m_sendQueueIsRunning.clear(); // there is no atomic_flag::constructor on windows to initialize it with false by default (and if left out, linux is uninitialized and will fail randomly)
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from '%s'", m_socket.GetRemoteIpString().c_str());
 }
 
 WorldSocket::~WorldSocket()
@@ -213,7 +213,7 @@ static std::set<std::string> GetServerAddresses()
     std::vector<IO::Networking::IpAddress> ipAddresses = IO::Networking::DNS::ResolveDomain(myHostname, IO::Networking::IpAddress::Type::IPv4);
     for (auto const& ipAddress : ipAddresses)
     {
-        addresses.insert(ipAddress.toString());
+        addresses.insert(ipAddress.ToString());
     }
 
     return addresses;
@@ -586,11 +586,10 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
 
 void WorldSocket::Start()
 {
-    if (IO::NetworkError initError = m_socket.InitializeAndFixMemoryLocation())
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] Failed to initialize WorldSocket %s", GetRemoteIpString().c_str(), initError.ToString().c_str());
-        return; // implicit close()
-    }
-
     SendInitialPacketAndStartRecvLoop();
+}
+
+void WorldSocket::CloseSocket()
+{
+    m_socket.CloseSocket();
 }

@@ -25,10 +25,22 @@ std::string const& GetErrorBaseString(IO::NetworkError::ErrorType errorType)
             static std::string txt = "OnlyOneTransferPerDirectionAllowed";
             return txt;
         }
+        case IO::NetworkError::ErrorType::Timeout:
+        {
+            static std::string txt = "Timeout";
+            return txt;
+        }
+        case IO::NetworkError::ErrorType::InvalidProtocolBehavior:
+        {
+            static std::string txt = "InvalidProtocolBehavior";
+            return txt;
+        }
+        default:
+        {
+            static std::string txt = "UndefinedErrorType";
+            return txt;
+        }
     }
-
-    static std::string undefined = "<UNDEFINED>";
-    return undefined;
 }
 
 std::string IO::NetworkError::ToString() const

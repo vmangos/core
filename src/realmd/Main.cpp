@@ -39,6 +39,7 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include "ArgparserForServer.h"
+#include "ProxyProtocol/ProxyV2Reader.h"
 
 #include "IO/Networking/AsyncSocketAcceptor.h"
 #include "IO/Timer/AsyncSystemTimer.h"
@@ -235,10 +236,42 @@ extern int main(int argc, char** argv)
         return 1;
     }
 
-    listener->AutoAcceptSocketsUntilClose([ctx = ioCtx.get()](IO::Networking::SocketDescriptor socketDescriptor)
+    std::vector<std::string> trustedProxyIps = SplitStringByDelimiter(sConfig.GetStringDefault("TrustedProxyServers", ""), ',');
+
+    listener->AutoAcceptSocketsUntilClose([ctx = ioCtx.get(), trustedProxyIps](IO::Networking::SocketDescriptor socketDescriptor)
     {
         // Create a socket and attach it to our global ioCtx
-        std::make_shared<AuthSocket>(std::move(IO::Networking::AsyncSocket(ctx, std::move(socketDescriptor))))->Start();
+        auto authSocket = std::make_shared<AuthSocket>(std::move(IO::Networking::AsyncSocket(ctx, std::move(socketDescriptor))));
+
+        if (IO::NetworkError initError = authSocket->m_socket.InitializeAndFixateMemoryLocation())
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] Failed to initialize AuthSocket %s", authSocket->m_socket.GetRemoteIpString().c_str(), initError.ToString().c_str());
+            return; // implicit close()
+        }
+
+
+        // Check if the remote endpoint is actually a trusted proxy, so we can retrieve the real client ip
+        if (!trustedProxyIps.empty() && std::find(trustedProxyIps.begin(), trustedProxyIps.end(), authSocket->m_socket.GetRemoteIpString()) != trustedProxyIps.end())
+        {
+            // parse proxy header
+            ProxyProtocol::ReadProxyV2Handshake(&(authSocket->m_socket), [authSocket](nonstd::expected<IO::Networking::IpAddress, IO::NetworkError> const& maybeIp)
+            {
+                if (!maybeIp.has_value())
+                {
+                    sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] Failed to parse proxy header. Error: %s", authSocket->m_socket.GetRemoteIpString().c_str(), maybeIp.error().ToString().c_str());
+                    return; // implicit close()
+                }
+                authSocket->m_remoteIpAddressStringAfterProxy = maybeIp.value().ToString();
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from %s (proxy ip: %s)", authSocket->GetRemoteIpString().c_str(), authSocket->m_socket.GetRemoteIpString().c_str());
+                authSocket->Start();
+            });
+        }
+        else
+        {
+            // no proxy, we can start directly
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from %s", authSocket->GetRemoteIpString().c_str());
+            authSocket->Start();
+        }
     });
 
     // Catch termination signals

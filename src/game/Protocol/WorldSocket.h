@@ -76,6 +76,9 @@ private:
     /// Session key used to authenticate the client (value from db `account` table)
     //BigNumber m_authSessionKey;
 
+    /// Starting the recv loop
+    void Start();
+
     /// Called by WorldSocketMgr when a new connection is made
     void SendInitialPacketAndStartRecvLoop();
 
@@ -98,11 +101,11 @@ private:
     std::atomic_flag m_sendQueueIsRunning;
 
     IO::Networking::AsyncSocket m_socket;
-
-    void Start();
+    std::string m_remoteIpAddressStringAfterProxy; // might differ from `m_socket.m_descriptor` if behind proxy
 
 public:
     explicit WorldSocket(IO::Networking::AsyncSocket socket);
+    /// The destructor will automatically close the socket
     ~WorldSocket();
     WorldSocket(WorldSocket const&) = delete;
     WorldSocket& operator=(WorldSocket const&) = delete;
@@ -117,9 +120,9 @@ public:
     }
 
     // ----- Exposing `m_socket` features -----
-    std::string const& GetRemoteIpString() const { return m_socket.GetRemoteIpString(); }
-    bool IsClosing() const { return m_socket.IsClosing(); }
-    void CloseSocket() { m_socket.CloseSocket(); }
+    inline std::string const& GetRemoteIpString() const { return m_remoteIpAddressStringAfterProxy; }
+    inline bool IsClosing() const { return m_socket.IsClosing(); }
+    void CloseSocket();
 };
 
 #endif // MANGOS_GAME_SERVER_WORLDSOCKET_H

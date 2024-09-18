@@ -463,7 +463,7 @@ bool Log::IsSmartLog(uint32 entry, uint32 guid) const
 
 void Log::WaitBeforeContinueIfNeed()
 {
-    int mode = sConfig.GetIntDefault("WaitAtStartupError", 0);
+    int mode = sConfig.GetIntDefault("WaitAtStartupError", 5);
 
     if (mode < 0)
     {

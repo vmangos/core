@@ -18,7 +18,7 @@ IO::Networking::AsyncSocket::AsyncSocket(IO::IoContext* ctx, IO::Networking::Soc
 {
 }
 
-IO::NetworkError IO::Networking::AsyncSocket::InitializeAndFixMemoryLocation()
+IO::NetworkError IO::Networking::AsyncSocket::InitializeAndFixateMemoryLocation()
 {
     int state = m_atomicState.fetch_or(SocketStateFlags::IS_INITIALIZED);
     MANGOS_ASSERT(!(state & SocketStateFlags::IS_INITIALIZED)); // can be only performed once

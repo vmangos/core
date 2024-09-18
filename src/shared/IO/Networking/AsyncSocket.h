@@ -27,7 +27,7 @@ namespace IO { namespace Networking {
 #endif
     {
         public:
-            /// Dont forget to call `InitializeAndFixMemoryLocation` before making a transfer
+            /// Dont forget to call `InitializeAndFixateMemoryLocation` before making a transfer
             explicit AsyncSocket(IO::IoContext* ctx, SocketDescriptor socketDescriptor);
             AsyncSocket(AsyncSocket&& other) noexcept;
             ~AsyncSocket(); // this destructor will throw if there is a pending transaction
@@ -38,8 +38,9 @@ namespace IO { namespace Networking {
             /// This makes it a bit harder to use this class, but improves performance a little bit.
             /// This cannot be undone. You have to destruct the socket.
             [[nodiscard("Check the returning error code and close the socket in case of an error")]]
-            IO::NetworkError InitializeAndFixMemoryLocation();
+            IO::NetworkError InitializeAndFixateMemoryLocation();
 
+            /// If set to true, it asks the OS to disables "Nagle's algorithm" for this socket.
             IO::NetworkError SetNativeSocketOption_NoDelay(bool doNoDelay);
             IO::NetworkError SetNativeSocketOption_SystemOutgoingSendBuffer(int bytes);
 
@@ -72,7 +73,7 @@ namespace IO { namespace Networking {
             /// IPv6 Format: [FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF]
             std::string const& GetRemoteIpString() const
             {
-                return GetRemoteEndpoint().ip.toString();
+                return GetRemoteEndpoint().ip.ToString();
             }
 
         private:

@@ -643,3 +643,20 @@ std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc)
     }
     return names;
 }
+std::vector<std::string> SplitStringByDelimiter(std::string const& str, char delimiter)
+{
+    std::vector<std::string> vec;
+    std::size_t old_pos = 0;
+    std::size_t pos = 0;
+    while((pos = str.find_first_of(delimiter, old_pos)) != std::string::npos) {
+        vec.emplace_back(str.substr(old_pos, pos - old_pos));
+        old_pos = pos + 1;
+    }
+
+    // add last element
+    std::string stringPart = str.substr(old_pos);
+    if (!stringPart.empty())
+        vec.emplace_back(stringPart);
+
+    return vec;
+}

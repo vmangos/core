@@ -14,6 +14,7 @@ namespace IO
             SocketClosed,
             OnlyOneTransferPerDirectionAllowed,
             Timeout,
+            InvalidProtocolBehavior,
         };
     public:
         explicit constexpr NetworkError(ErrorType errorType) : NetworkError(errorType, 0) {};
@@ -30,7 +31,7 @@ namespace IO
         }
     private:
         ErrorType m_error;
-        /// internal variable for toString(), might be os and situation dependent (On windows there is ::GetLastError()/errno and ::WSAGetLastError())
+        /// internal variable for ToString(), might be os and situation dependent (On windows there is ::GetLastError()/errno and ::WSAGetLastError())
         int m_additionalOsErrorCode;
     };
 

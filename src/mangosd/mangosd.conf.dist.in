@@ -3,7 +3,7 @@
 #####################################
 
 [MangosdConf]
-ConfVersion=2024071601
+ConfVersion=2024091701
 
 ###################################################################################################################
 # CONNECTIONS AND DIRECTORIES
@@ -1081,7 +1081,8 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #    WaitAtStartupError
 #        After startup error report wait for <Enter> or some time before continuing (and possibly close console window)
 #                 -1 (wait until <Enter> press)
-#        Default:  0 (not wait)
+#                  0 (no wait)
+#         Default: 5 (wait 5 sec)
 #                  N (>0, wait N secs)
 #
 #    Motd
@@ -1155,7 +1156,7 @@ Spell.EffectDelay = 400
 Spell.ProcDelay = 800
 BeepAtStart = 1
 ShowProgressBars = 0
-WaitAtStartupError = 0
+WaitAtStartupError = 5 # consider fixing your actual problem before changing this value!
 Motd = "Welcome to World of Warcraft!"
 
 ###################################################################################################################
@@ -2783,6 +2784,20 @@ LFG.MatchmakingTimer = 600
 #         How often packet broadcasting threads run in milliseconds.
 #         Default: 50
 #
+#    Network.PacketBroadcast.ReduceVisDistance.DiffAbove
+#        Description: TODO
+#        Default: 0
+#
+#    Network.TrustedProxyServers
+#        Description: Enables the parsing of Proxy Protocol v2 for specific IPs.
+#                     You can use this feature when your server is behind a proxy, load balancer, or similar component,
+#                     to retrieve the real IP address of players.
+#                     You need to enable Proxy Protocol v2 on both this server and the proxy/load balancer.
+#                     For example see HaProxy "send-proxy-v2" option.
+#                     Multiple servers can be separated with ','
+#        Default:     ""                      - (Disabled, no proxy)
+#        Example      "10.13.37.1,10.13.37.2" - (to allow multiple proxy servers)
+#
 ###################################################################################################################
 
 Network.Threads = 1
@@ -2792,6 +2807,7 @@ Network.KickOnBadPacket = 0
 Network.PacketBroadcast.Threads = 0
 Network.PacketBroadcast.Frequency = 50
 Network.PacketBroadcast.ReduceVisDistance.DiffAbove = 0
+Network.TrustedProxyServers = ""
 
 ###################################################################################################################
 # CONSOLE, REMOTE ACCESS AND SOAP
@@ -3015,3 +3031,4 @@ DynamicRespawn.AffectRespawnTimeBelow   = 0
 DynamicRespawn.AffectLevelBelow         = 0
 DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
+
