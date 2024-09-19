@@ -865,9 +865,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
             return;
 
         if (m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, CMSG_MOVE_SPLINE_DONE))
-        {
             return;
-        }
     }
 
     HandleMoverRelocation(pMover, movementInfo);
