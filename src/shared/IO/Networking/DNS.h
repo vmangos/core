@@ -7,6 +7,9 @@
 namespace IO { namespace Networking { namespace DNS
 {
     std::string GetOwnHostname();
+
+    /// Will also work with IP addresses without touching the DNS layer
+    /// \warning Will return an empty list if unable to resolve the domain
     std::vector<IO::Networking::IpAddress> ResolveDomain(std::string const& domainName, IO::Networking::IpAddress::Type type);
 }}} // namespace IO::Networking
 
