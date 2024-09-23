@@ -210,7 +210,7 @@ static std::set<std::string> GetServerAddresses()
     addresses.insert("127.0.0.1");
 
     std::string myHostname = IO::Networking::DNS::GetOwnHostname();
-    std::vector<IO::Networking::IpAddress> ipAddresses = IO::Networking::DNS::ResolveDomain(myHostname, IO::Networking::IpAddress::Type::IPv4);
+    std::vector<IO::Networking::IpAddress> ipAddresses = IO::Networking::DNS::ResolveDomainAll(myHostname, IO::Networking::IpAddress::Type::IPv4);
     for (auto const& ipAddress : ipAddresses)
     {
         addresses.insert(ipAddress.ToString());

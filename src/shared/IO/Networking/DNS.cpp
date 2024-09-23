@@ -2,6 +2,7 @@
 #include "./Internal.h"
 #include "Log.h"
 #include "Errors.h"
+#include "Util.h"
 #include "IO/SystemErrorToString.h"
 
 #if defined(WIN32)
@@ -23,7 +24,7 @@ std::string IO::Networking::DNS::GetOwnHostname()
     return hostname;
 }
 
-std::vector<IO::Networking::IpAddress> IO::Networking::DNS::ResolveDomain(std::string const& domainName, IO::Networking::IpAddress::Type type)
+std::vector<IO::Networking::IpAddress> IO::Networking::DNS::ResolveDomainAll(std::string const& domainName, IpAddress::Type type)
 {
     MANGOS_ASSERT(type == IpAddress::Type::IPv4); // TODO: this function is only tested with IPv4. `inet_ntop` will fail
 
@@ -81,4 +82,21 @@ std::vector<IO::Networking::IpAddress> IO::Networking::DNS::ResolveDomain(std::s
     freeaddrinfo(dnsResult);
 
     return list;
+}
+
+nonstd::optional<IO::Networking::IpAddress> IO::Networking::DNS::ResolveDomainSingle(std::string const& domainName, IpAddress::Type type, SelectionStrategy strategy)
+{
+    std::vector<IpAddress> allIps = ResolveDomainAll(domainName, type);
+    if (allIps.empty())
+        return nonstd::nullopt; // No IP found
+
+    switch (strategy)
+    {
+        case SelectionStrategy::First:
+            return allIps.front();
+        case SelectionStrategy::Random:
+            return allIps[urand(0, allIps.size() - 1)];
+    }
+
+    MANGOS_ASSERT(false);
 }
