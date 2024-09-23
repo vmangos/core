@@ -298,12 +298,6 @@ int Master::Run()
     {
         Log::WaitBeforeContinueIfNeed();
         World::StopNow(ERROR_EXIT_CODE);
-
-        ioCtx->Shutdown();
-        for (std::thread& thread : ioCtxRunners)
-            thread.join();
-
-        return 1;
     }
 
     // Stop freeze protection before shutdown tasks

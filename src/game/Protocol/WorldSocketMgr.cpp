@@ -52,8 +52,11 @@ bool WorldSocketMgr::StartWorldNetworking(IO::IoContext* ioCtx, WorldSocketMgrOp
 void WorldSocketMgr::StopWorldNetworking()
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stop world networking...");
-    m_listener->ClosePortAndStopAcceptingNewConnections();
-    m_listener = nullptr;
+    if (m_listener != nullptr)
+    {
+        m_listener->ClosePortAndStopAcceptingNewConnections();
+        m_listener = nullptr;
+    }
 }
 
 void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socketDescriptor)
