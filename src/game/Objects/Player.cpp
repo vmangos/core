@@ -1853,7 +1853,7 @@ void Player::SetWorldMask(uint32 newMask)
 void Player::UpdateCinematic(uint32 diff)
 {
     m_cinematicElapsedTime += diff;
-    // On check une nouvelle position toutes les secondes.
+    // We check a new position every second.
     if ((m_cinematicLastCheck + 1000) > m_cinematicElapsedTime)
         return;
 
@@ -1867,13 +1867,13 @@ void Player::UpdateCinematic(uint32 diff)
 
     float x_diff = (m_cinematicStartPos.x - tpPosition->x);
     float y_diff = (m_cinematicStartPos.y - tpPosition->y);
-    // Re-tp a la position de fin de la cinematique
+    // Re-teleport to end of cinematic's position
     if ((x_diff * x_diff) <= 20 || (y_diff * y_diff) <= 20)
     {
         GetCamera().ResetView();
         return;
     }
-    // Sinon on place un petit waypoint sur lequel on met notre camera, pour voir les mobs alentour
+    // Otherwise we place a small waypoint on which we put our camera, to see the surrounding mobs.
     if (Creature* viewPoint = SummonCreature(1, tpPosition->x, tpPosition->y, tpPosition->z - 20, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000, true))
         GetCamera().SetView(viewPoint);
 }
@@ -1889,7 +1889,7 @@ void Player::CinematicStart(uint32 id)
     m_cinematicElapsedTime = 0;
     m_currentCinematicEntry = id;
 
-    // Pour teleporter a la premiere position de la cinematique
+    // Teleport to the first position of the cinematic
     UpdateCinematic(1);
 }
 
