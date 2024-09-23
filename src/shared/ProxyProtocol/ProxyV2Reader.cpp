@@ -111,7 +111,7 @@ void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, st
                 callback(nonstd::make_unexpected(error));
                 return;
             }
-            IO::Networking::IpAddress ipAddress = IO::Networking::IpAddress::FromIpv4Uint32(::ntohl(addressBody->ipv4_addr.src_addr));
+            IO::Networking::IpAddress ipAddress = IO::Networking::IpAddress::FromIpv4Uint32(ntohl(addressBody->ipv4_addr.src_addr));
             callback(ipAddress);
         });
     });
