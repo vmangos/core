@@ -10,7 +10,8 @@ namespace IO { namespace Networking { namespace Internal
 {
     /// Converts a native `IN_ADDR` to a `IO::Networking::IpAddress`
     IO::Networking::IpAddress inet_ntop(in_addr const* nativeAddress);
-    // Converts a `IO::Networking::IpAddress` to a native `IN_ADDR`
+
+    /// Converts a `IO::Networking::IpAddress` to a native `IN_ADDR`
     void inet_pton(IO::Networking::IpAddress const& ipAddress, in_addr* out_dest);
 
     /// Closes a socket

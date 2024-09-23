@@ -31,6 +31,7 @@
 #include "Errors.h"
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
+#include "IO/Networking/DNS.h"
 #include "IO/Networking/Utils.h"
 
 INSTANTIATE_SINGLETON_1( RealmList );
@@ -179,19 +180,21 @@ void RealmList::UpdateRealms(bool init)
                 realmflags &= (REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD);
             }
 
-            // TODO: maybe dns-resolve it like TrinityCore does
-            auto externalIpAddress = IO::Networking::IpAddress::TryParseFromString(externalAddressString);
-            if (!externalIpAddress)
+            auto realmIpAddresses = IO::Networking::DNS::ResolveDomain(externalAddressString, IO::Networking::IpAddress::Type::IPv4);
+            if (realmIpAddresses.empty())
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not parse externalAddress: %s for realm \"%s\" (id %d) will skip realm update.", externalAddressString.c_str(), name.c_str(), realmId);
                 continue;
             }
-            auto localIpAddress = IO::Networking::IpAddress::TryParseFromString(localAddressString);
-            if (!localIpAddress)
+            auto const& externalIpAddress = realmIpAddresses[urand(0, realmIpAddresses.size() - 1)];
+
+            auto localIpAddresses = IO::Networking::DNS::ResolveDomain(localAddressString, IO::Networking::IpAddress::Type::IPv4);
+            if (localIpAddresses.empty())
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not parse localAddress: %s for realm \"%s\" (id %d) will skip realm update.", localAddressString.c_str(), name.c_str(), realmId);
                 continue;
             }
+            auto const& localIpAddress = localIpAddresses[urand(0, localIpAddresses.size() - 1)];
 
             auto localSubnetMaskIp = IO::Networking::IpAddress::TryParseFromString(localSubnetMaskString);
             if (!localSubnetMaskIp)
@@ -217,7 +220,7 @@ void RealmList::UpdateRealms(bool init)
             }
 
             UpdateRealm(
-                realmId, name, *externalIpAddress, *localIpAddress, localSubnetMaskCidr, port, icon, RealmFlags(realmflags), timezone,
+                realmId, name, externalIpAddress, localIpAddress, localSubnetMaskCidr, port, icon, RealmFlags(realmflags), timezone,
                 (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR),
                 population, realmBuilds);
 
