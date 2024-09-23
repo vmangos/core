@@ -6,6 +6,7 @@
 #include "IO/Context/AsyncIoOperation.h"
 #include "IO/Networking/IpAddress.h"
 #include "IO/Networking/SocketDescriptor.h"
+#include "IO/SystemErrorToString.h"
 #include "Log.h"
 #include "Memory/ArrayDeleter.h"
 
@@ -78,14 +79,14 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     m_serverAddress.sin_port = ::htons(port);
     if (::bind(listenNativeSocket, (struct sockaddr*)(&m_serverAddress), sizeof(m_serverAddress)) != 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::bind(...) Error: %u", ::WSAGetLastError());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::bind(...) Error: %s", SystemErrorToString(::WSAGetLastError()).c_str());
         return nullptr;
     }
 
     int const acceptBacklogCount = 50; // the number of connection requests that are queued in the kernel until this process calls "accept"
     if (::listen(listenNativeSocket, acceptBacklogCount) != 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::listen(...) Error: %u", ::WSAGetLastError());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::listen(...) Error: %s", SystemErrorToString(::WSAGetLastError()).c_str());
         return nullptr;
     }
 
