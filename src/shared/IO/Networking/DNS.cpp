@@ -74,7 +74,7 @@ std::vector<IO::Networking::IpAddress> IO::Networking::DNS::ResolveDomain(std::s
         }
         else
         {
-            std::unexpected();
+            MANGOS_ASSERT(false && (ptr->ai_family == AF_INET || ptr->ai_family == AF_INET6));
         }
     }
 
