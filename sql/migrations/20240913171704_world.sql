@@ -49,42 +49,40 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11035, -3, 11027, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
 (11036, -2, 11035, 11028, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies if both profession requirements are met (Uses engineering text currently. Can be checked for correct text in the future)
 
+-- Enable relevant npc_text entries
+UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3283; -- 1128
+UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3284; -- 1129
+UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3285; -- 1130
+UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3286; -- 1131
+
+-- IDs known from neighbouring entries being sorted numerically by broadcast text id
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES 
-(21000, 11880, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21001, 11882, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21002, 11884, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21003, 11875, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21004, 11894, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21005, 11900, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21006, 11902, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21007, 11892, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21008, 11899, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21009, 11901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21010, 3283, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21011, 3284, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21012, 3285, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21013, 3286, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(8325, 11884, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(8329, 11900, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(8331, 11902, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(8328, 11899, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(8330, 11901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
 -- Post-1.10 gossips
-(1469, 21000, 0, 11002), -- Gossip for Nixx Sprocketspring
-(1468, 21001, 0, 11002), -- Gossip for Tinkmaster Overspark
-(1467, 21002, 0, 11004), -- Gossip for Oglethorpe Obnoticus
-(7058, 21003, 0, 11036), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
-(7058, 21007, 0, 11034), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
-(22000, 21004, 0, 4018), -- Gossip sub-menu for Dragonscale Leatherworking (male)
-(22001, 21005, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (male)
-(22002, 21006, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
-(22003, 21008, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (female)
-(22004, 21009, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
-(22005, 21010, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 1)
-(22006, 21011, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 2)
-(22007, 21012, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 1)
-(22008, 21013, 0, 0); -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 2)
+(1469, 8323, 0, 11002), -- Gossip for Nixx Sprocketspring
+(1468, 8324, 0, 11002), -- Gossip for Tinkmaster Overspark
+(1467, 8325, 0, 11004), -- Gossip for Oglethorpe Obnoticus
+(7058, 8322, 0, 11036), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
+(7058, 8326, 0, 11034), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
+(22000, 8327, 0, 4018), -- Gossip sub-menu for Dragonscale Leatherworking (male)
+(22001, 8329, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (male)
+(22002, 8331, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
+(22003, 8328, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (female)
+(22004, 8330, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
+(22005, 1128, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 1)
+(22006, 1129, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 2)
+(22007, 1130, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 1)
+(22008, 1131, 0, 0); -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 2)
 
 -- Add patch condition for base Book Soothsaying for dummies gossip (Book should have no gossip menu entry before patch 1.10)
-UPDATE `gossip_menu` SET `condition_id` = 4018 WHERE `text_id` = 11874;
+UPDATE `gossip_menu` SET `condition_id` = 4018 WHERE `text_id` = 8321;
 
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (2861, 0, 0, 15, 20221, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4018, 'Book Soothsaying for Dummies - Teach Goblin Engineering'),
