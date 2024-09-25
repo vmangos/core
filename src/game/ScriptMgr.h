@@ -306,7 +306,7 @@ class ScriptMgr
         
         TextDataMap     m_mTextDataMap;                     //additional data for text strings
         PointMoveMap    m_mPointMoveMap;                    //coordinates for waypoints
-        EscortDataMap   m_mEscortDataMap;                   // Des donnees pour les quetes d'escorte scriptees via la DB
+        EscortDataMap   m_mEscortDataMap;                   // Data for escort quests scripted via DB
         std::set<uint32> m_referencedCreatureGuids;
         std::set<uint32> m_referencedGameObjectGuids;
 
