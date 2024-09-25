@@ -10,6 +10,7 @@ INSERT INTO `migrations` VALUES ('20230629153420');
 
 
 -- Create new pool to hold Dented Footlocker spawns in Searing Gorge.
+DELETE FROM `pool_template` WHERE `entry` = 514;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
 (514, 14, 'Dented Footlockers in Searing Gorge', 1, 10);
 -- Add existing spawns to pool.
