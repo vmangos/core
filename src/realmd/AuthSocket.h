@@ -79,10 +79,10 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, MaNGOS::Poli
         void CloseSocket();
 
     public: // A bit hacky, that this is public. In WorldSocket we have WorldSocketMgr as friend, this is not possible here
-        std::string m_remoteIpAddressStringAfterProxy; // might differ from `m_socket.m_descriptor` if behind proxy
         IO::Networking::AsyncSocket m_socket;
-    private:
+        std::string m_remoteIpAddressStringAfterProxy; // might differ from `m_socket.m_descriptor` if behind proxy
 
+    private:
         enum eStatus
         {
             STATUS_CHALLENGE,

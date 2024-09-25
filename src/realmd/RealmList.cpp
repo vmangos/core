@@ -180,21 +180,19 @@ void RealmList::UpdateRealms(bool init)
                 realmflags &= (REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD);
             }
 
-            auto realmIpAddresses = IO::Networking::DNS::ResolveDomain(externalAddressString, IO::Networking::IpAddress::Type::IPv4);
-            if (realmIpAddresses.empty())
+            auto externalIpAddress = IO::Networking::DNS::ResolveDomainSingle(externalAddressString, IO::Networking::IpAddress::Type::IPv4);
+            if (!externalIpAddress)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not parse externalAddress: %s for realm \"%s\" (id %d) will skip realm update.", externalAddressString.c_str(), name.c_str(), realmId);
                 continue;
             }
-            auto const& externalIpAddress = realmIpAddresses[urand(0, realmIpAddresses.size() - 1)];
 
-            auto localIpAddresses = IO::Networking::DNS::ResolveDomain(localAddressString, IO::Networking::IpAddress::Type::IPv4);
-            if (localIpAddresses.empty())
+            auto localIpAddress = IO::Networking::DNS::ResolveDomainSingle(localAddressString, IO::Networking::IpAddress::Type::IPv4);
+            if (!localIpAddress)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not parse localAddress: %s for realm \"%s\" (id %d) will skip realm update.", localAddressString.c_str(), name.c_str(), realmId);
                 continue;
             }
-            auto const& localIpAddress = localIpAddresses[urand(0, localIpAddresses.size() - 1)];
 
             auto localSubnetMaskIp = IO::Networking::IpAddress::TryParseFromString(localSubnetMaskString);
             if (!localSubnetMaskIp)
@@ -220,7 +218,7 @@ void RealmList::UpdateRealms(bool init)
             }
 
             UpdateRealm(
-                realmId, name, externalIpAddress, localIpAddress, localSubnetMaskCidr, port, icon, RealmFlags(realmflags), timezone,
+                realmId, name, *externalIpAddress, *localIpAddress, localSubnetMaskCidr, port, icon, RealmFlags(realmflags), timezone,
                 (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR),
                 population, realmBuilds);
 
