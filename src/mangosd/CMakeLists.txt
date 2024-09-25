@@ -21,18 +21,13 @@ set(EXECUTABLE_SRCS
   MaNGOSsoap.h
   Master.h
   RASocket.h
-  soapH.h
-  soapStub.h
   WorldRunnable.h
   CliRunnable.cpp
   Main.cpp
   MaNGOSsoap.cpp
   Master.cpp
   RASocket.cpp
-  soapC.cpp
-  soapServer.cpp
   WorldRunnable.cpp
-
 )
 
 
@@ -46,7 +41,6 @@ endif()
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/src/shared
-  ${CMAKE_SOURCE_DIR}/dep/include/gsoap
   ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
   ${CMAKE_SOURCE_DIR}/src/framework
   ${CMAKE_SOURCE_DIR}/src/framework/Network
