@@ -6895,7 +6895,7 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
     else
     {
         // remove this assert when not unit casters will be supported
-        MANGOS_ASSERT(caster->isType(TYPEMASK_UNIT))
+        MANGOS_ASSERT(caster->isType(TYPEMASK_UNIT));
         m_casterGuid = caster->GetObjectGuid();
     }
 
