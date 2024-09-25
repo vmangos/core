@@ -506,7 +506,7 @@ void Master::clearOnlineAccounts()
 
 #include "ObjectAccessor.h"
 #include "Language.h"
-void createdump(void)
+void CreateCrashDump()
 {
 #ifndef WIN32
     if (!fork()) { //child process
@@ -540,30 +540,36 @@ void Master::_OnSignal(int s)
             signal(SIGSEGV, 0);
             if (!m_handleSigvSignals)
                 return;
+            m_handleSigvSignals = false; // Disarm anti-crash
+
             std::exception_ptr exc = std::current_exception();
-            m_handleSigvSignals = false; // Desarm anticrash
             sWorld.SetAnticrashRearmTimer(sWorld.getConfig(CONFIG_UINT32_ANTICRASH_REARM_TIMER));
             uint32 anticrashOptions = sWorld.getConfig(CONFIG_UINT32_ANTICRASH_OPTIONS);
+
             // Log crash stack
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Received SIGSEGV");
-            ACE_Stack_Trace st;
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", st.c_str());
+            MaNGOS::Errors::PrintStacktrace();
+
             if (anticrashOptions & ANTICRASH_GENERATE_COREDUMP)
-                createdump();
+                CreateCrashDump();
+
             if (anticrashOptions & ANTICRASH_OPTION_ANNOUNCE_PLAYERS)
             {
                 if (anticrashOptions & ANTICRASH_OPTION_SAVEALL)
                     sWorld.SendWorldText(LANG_SYSTEMMESSAGE, "Server has crashed. Now saving online players ...");
                 else
                     sWorld.SendWorldText(LANG_SYSTEMMESSAGE, "Crash server occurred :(");
+
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
+
             if (anticrashOptions & ANTICRASH_OPTION_SAVEALL)
             {
                 CharacterDatabase.ThreadStart();
                 sObjectAccessor.SaveAllPlayers();
                 std::this_thread::sleep_for(std::chrono::seconds(25));
             }
+
             std::rethrow_exception(exc); // Crash for real now.
             return;
     }

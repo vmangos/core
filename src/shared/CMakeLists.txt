@@ -21,6 +21,7 @@ set (shared_SRCS
     Common.h
     DelayExecutor.h
     Errors.h
+    Errors.cpp
     LockedQueue.h
     Log.h
     migrations_list.h
@@ -189,5 +190,7 @@ endif(UNIX)
 if(MINGW)
   target_link_libraries(shared ${ACE_LIBRARIES} -lws2_32)
 endif()
+
+target_link_libraries(shared cpptrace::cpptrace)
 
 SET_TARGET_PROPERTIES (shared PROPERTIES FOLDER "Game Libs")
