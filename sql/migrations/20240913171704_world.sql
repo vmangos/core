@@ -23,40 +23,31 @@ UPDATE `quest_template` SET `RewRepFaction1` = 83, `RewRepValue1` = 200 WHERE `e
 -- No reputation is rewarded for Weaponsmithing sub-specialisations, likely due to lack of need in implementation
 
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
-(10994, 8, 3639, 0, 0, 0, 0), -- Condition for completing Show Your Work (goblin engineering)
-(10995, 8, 3641, 0, 0, 0, 0), -- Condition for completing Show Your Work (gnomish engineering - alliance side) 
-(10996, 8, 3643, 0, 0, 0, 0), -- Condition for completing Show Your Work (gnomish engineering - horde side) 
-(10998, -2, 10994, 10995, 10996, 0, 0), -- Condition to return true if any of the above quests are complete
-(10999, 17, 20219, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Gnomish Engineering
-(11000, 17, 20222, 1, 0, 0, 0), -- Condition to return true if the player has NOT learnt Goblin Engineering
-(11001, -2, 10999, 11000, 0, 0, 0), -- Condition to return true if the player has NOT learnt Gnomish Engineering OR Goblin Engineering
+(10994, 30, 550, 3, 0, 0, 1), -- Condition to check if Goblin Engineering reputation higher than Neutral 0/3000
+(10995, 30, 551, 3, 0, 0, 1), -- Condition to check if Gnome Engineering reputation higher than Neutral 0/3000
+(10996, -2, 10994, 10995, 0, 0, 0), -- Condition to check if the player has any Engineering specialisation reputation
+(10997, 17, 20219, 1, 0, 0, 0), -- Condition to check if the player has NOT learnt Gnomish Engineering
+(10998, 17, 20222, 1, 0, 0, 0), -- Condition to check if the player has NOT learnt Goblin Engineering
+(10999, -2, 10999, 11000, 0, 0, 0), -- Condition to check if the player has NOT learnt an Engineering specialisation
 -- Note: Condition 4018 corresponds to a condition checking if the current patch is 1.10 or higher
 -- Note: Condition 393 corresponds to a condition checking if the player has an Engineering skill of 200
-(11002, -1, 11001, 10998, 393, 4018, 0), -- Condition to return true if the player doesn't have an Engineering specialisation, completed one of the Engineering specialisation quests, and has a skill of 200 Engineering, and the current patch is 1.10 or later
-(11003, -1, 11001, 10995, 393, 10994, 0), -- Same as above (missing patch requirement) but requires specifically completing Show Your Work (gnomish engineering - alliance side) or Show Your Work (goblin engineering) for gossip option
-(11004, -1, 11001, 10996, 393, 10994, 0), -- Same as above (missing patch requirement) but requires specifically completing Show Your Work (gnomish engineering - horde side) or Show Your Work (goblin engineering) for gossip option
-(11005, -1, 11003, 4018, 0, 0, 0), -- Add patch requirement to alliance-side gossip condition
-(11006, -1, 11004, 4018, 0, 0, 0), -- Add patch requirement to horde-side gossip condition
-(11027, -1, 11002, 11023, 0, 0, 1), -- NAND gate for Leatherworking and Engineering requirements for Book "Soothsaying for Dummies" gossip (If the conditions for both Leatherworking and Engineering gossips are met then this condition allows to easily decide what should be displayed)
+(11002, -1, 10999, 10996, 393, 4018, 0), -- Condition to return true if the player doesn't have an Engineering specialisation, has Engineering specialisation reputation, has a skill of 200 Engineering, and the current patch is 1.10 or later
+-- Note: Condition 2 corresponds to a condition checking if the player belongs to the horde
+(11004, -1, 11002, 2, 0, 0, 0), -- Same as above as well as requiring being a horde character (for gossip purposes)
+(11027, -1, 11002, 11023, 0, 0, 1), -- NAND gate for Leatherworking and Engineering requirements for Book "Soothsaying for Dummies" gossip (If the conditions for both Leatherworking and Engineering gossips are met then this condition allows to decide what gossip to display)
 (11028, -1, 11002, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
-(11009, 7, 165, 225, 0, 0, 0), -- Condition for Leatherworking skill of 225
-(11010, 8, 5141, 0, 0, 0, 0), -- Condition for completing Dragonscale Leatherworking (alliance side)
-(11011, 8, 5143, 0, 0, 0, 0), -- Condition for completing Tribal Leatherworking (alliance side)
-(11012, 8, 5144, 0, 0, 0, 0), -- Condition for completing Elemental Leatherworking (alliance side)
-(11013, -2, 11012, 11011, 11010, 0, 0), -- Condition to return true if any of the above quests are complete
-(11014, 8, 5145, 0, 0, 0, 0), -- Condition for completing Dragonscale Leatherworking (horde side)
-(11015, 8, 5148, 0, 0, 0, 0), -- Condition for completing Tribal Leatherworking (horde side)
-(11016, 8, 5146, 0, 0, 0, 0), -- Condition for completing Elemental Leatherworking (horde side)
-(11017, -2, 11014, 11015, 11016, 0, 0), -- Condition to return true if any of the above quests are complete
-(11018, -2, 11013, 11017, 0, 0, 0), -- Condition to return true if either of the two above OR conditions are true
-(11019, 17, 10660, 0, 0, 0, 0), -- Condition to return true if the player has learnt Tribal Leatherworking
-(11020, 17, 10658, 0, 0, 0, 0), -- Condition to return true if the player has learnt Elemental Leatherworking
-(11021, 17, 10656, 0, 0, 0, 0), -- Condition to return true if the player has learnt Dragonscale Leatherworking
+(11014, 30, 549, 3, 0, 0, 1), -- Condition to check if Tribal Leatherworking reputation higher than Neutral 0/3000
+(11015, 30, 86, 3, 0, 0, 1), -- Condition to check if Dragonscale Leatherworking reputation higher than Neutral 0/3000
+(11016, 30, 83, 3, 0, 0, 1), -- Condition to check if Elemental Leatherworking reputation higher than Neutral 0/3000
+(11017, -2, 11014, 11015, 11016, 0, 0), -- Condition to check if the player has any Leatherworking specialisation reputation
+(11019, 17, 10660, 0, 0, 0, 0), -- Condition to check if the player has learnt Tribal Leatherworking
+(11020, 17, 10658, 0, 0, 0, 0), -- Condition to check if the player has learnt Elemental Leatherworking
+(11021, 17, 10656, 0, 0, 0, 0), -- Condition to check if the player has learnt Dragonscale Leatherworking
 (11022, -2, 11019, 11020, 11021, 0, 1), -- Condition to return true if the player has NOT learnt Tribal, Elemental, OR Dragonscale Leatherworking
-(11023, -1, 11009, 11018, 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, completed one of the Leatherworking specialisation quests, and has a skill of 225 Leatherworking, and the current patch is 1.10 or later
+(11023, -1, 11009, 11017 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, has Leatherworking specialisation reputation, has a skill of 225 Leatherworking, and the current patch is 1.10 or later
 (11034, -1, 11023, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Leatherworking gossip
 (11035, -3, 11027, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
-(11036, -2, 11035, 11028, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies if both requirements are met (Uses engineering text with this implementation. Can be checked for correct text, although properly accounting for the case of someone being able to relearn both a leatherworking and an engineering specialisation at this book is absurd)
+(11036, -2, 11035, 11028, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies if both profession requirements are met (Uses engineering text currently. Can be checked for correct text in the future)
 
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES 
 (21000, 11880, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -73,8 +64,8 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastText
 -- Post-1.10 gossips
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
 (1469, 21000, 0, 11002), -- Gossip for Nixx Sprocketspring
-(1468, 21001, 0, 11005), -- Gossip for Tinkmaster Overspark
-(1467, 21002, 0, 11006), -- Gossip for Oglethorpe Obnoticus
+(1468, 21001, 0, 11002), -- Gossip for Tinkmaster Overspark
+(1467, 21002, 0, 11004), -- Gossip for Oglethorpe Obnoticus
 (7058, 21003, 0, 11036), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
 (7058, 21007, 0, 11034), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
 (22000, 21004, 0, 4018), -- Gossip sub-menu for Dragonscale Leatherworking (male)
@@ -144,14 +135,16 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3073 AN
 DELETE FROM `conditions` WHERE `condition_entry` = 1357;
 
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
-(11040, 30, 46, 3, 0, 0, 0), -- Condition to check if the player has less than 6000 Armorsmithing reputation
-(11041, 30, 289, 3, 0, 0, 0), -- Condition to check if the player has less than 6000 Weaponsmithing reputation
+(11040, 5, 46, 4, 0, 0, 1), -- Condition to check if the player has less than 6000 Armorsmithing reputation
+(11041, 5, 289, 4, 0, 0, 1), -- Condition to check if the player has less than 6000 Weaponsmithing reputation
 (11042, 8, 5283, 0, 0, 0, 0), -- Condition to check if the player has completed "The Art of the Armorsmith" (Alliance)
 -- Note: Condition 178 corresponds to a condition checking if the player is level 40 or higher
 -- Note: Condition 368 corresponds to a condition checking if the player has a Blacksmithing skill of 200
-(11055, -1, 178, 368, 11040, 11041, 0), -- Condition for first specialisation gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde)
+(11055, -1, 178, 368, 11040, 11041, 0), -- Condition for first specialisation gossip by Myolor Sunderfury (Alliance) and Krathok Moltenfist (Horde)
+-- Note: Condition 1356 corresponds to a condition checking if the player has NOT learnt Armorsmith AND has NOT learnt Weaponsmith
+(11056, -1, 178, 368, 1356, 0, 0), -- Condition for gossip by Bengus Deepforge (Alliance) and Saru Steelfury (Horde) TODO: Add relevant gossips
 -- Note: Condition 1354 corresponds to a condition checking if the player has learnt Artisan Armorsmith
-(11057, -2, 1354, 11040, 11042, 0, 1); -- Condition to check if the player has Armorsmithing reputation, has NOT completed "The Art of the Armorsmith" (Alliance), NOR learnt Armorsmithing (for special Grumnus Steelshaper gossip) TODO: Check if it works
+(11057, -2, 1354, 11040, 11042, 0, 1); -- Condition to check if the player has Armorsmithing reputation, has NOT completed "The Art of the Armorsmith" (Alliance), NOR learnt Armorsmithing (for special Grumnus Steelshaper gossip)
 
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5283; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Alliance)
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5301; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Horde)
