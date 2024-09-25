@@ -10,6 +10,18 @@ INSERT INTO `migrations` VALUES ('20240913171704');
 
 UPDATE `gameobject_template` SET `flags` = 0, `data0` = 14 WHERE `entry` = 177226; -- Enables object gossip for Book "Soothsaying for Dummies" 
 
+-- Add hidden "specialisation" faction reputation from sniffs
+UPDATE `quest_template` SET `RewRepFaction1` = 551, `RewRepValue1` = 75 WHERE `entry` = 3641; -- Gnome Engineering Alliance
+UPDATE `quest_template` SET `RewRepFaction1` = 551, `RewRepValue1` = 75 WHERE `entry` = 3643; -- Gnome Engineering Horde
+UPDATE `quest_template` SET `RewRepFaction1` = 550, `RewRepValue1` = 75 WHERE `entry` = 3639; -- Goblin Engineering
+UPDATE `quest_template` SET `RewRepFaction1` = 549, `RewRepValue1` = 200 WHERE `entry` = 5143; -- Tribal Leatherworking Alliance
+UPDATE `quest_template` SET `RewRepFaction1` = 549, `RewRepValue1` = 200 WHERE `entry` = 5148; -- Tribal Leatherworking Horde
+UPDATE `quest_template` SET `RewRepFaction1` = 86, `RewRepValue1` = 200 WHERE `entry` = 5141; -- Dragonscale Leatherworking Alliance
+UPDATE `quest_template` SET `RewRepFaction1` = 86, `RewRepValue1` = 200 WHERE `entry` = 5145; -- Dragonscale Leatherworking Horde
+UPDATE `quest_template` SET `RewRepFaction1` = 83, `RewRepValue1` = 200 WHERE `entry` = 5144; -- Elemental Leatherworking Alliance
+UPDATE `quest_template` SET `RewRepFaction1` = 83, `RewRepValue1` = 200 WHERE `entry` = 5146; -- Elemental Leatherworking Horde
+-- No reputation is rewarded for Weaponsmithing sub-specialisations, likely due to lack of need in implementation
+
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
 (10994, 8, 3639, 0, 0, 0, 0), -- Condition for completing Show Your Work (goblin engineering)
 (10995, 8, 3641, 0, 0, 0, 0), -- Condition for completing Show Your Work (gnomish engineering - alliance side) 
@@ -58,17 +70,18 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastText
 (21008, 11899, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (21009, 11901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
+-- Post-1.10 gossips
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
 (1469, 21000, 0, 11002), -- Gossip for Nixx Sprocketspring
 (1468, 21001, 0, 11005), -- Gossip for Tinkmaster Overspark
 (1467, 21002, 0, 11006), -- Gossip for Oglethorpe Obnoticus
 (7058, 21003, 0, 11036), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
 (7058, 21007, 0, 11034), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
-(22000, 21004, 0, 0), -- Gossip sub-menu for Dragonscale Leatherworking (male)
-(22001, 21005, 0, 0), -- Gossip sub-menu for Elemental Leatherworking (male)
-(22002, 21006, 0, 0), -- Gossip sub-menu for Tribal Leatherworking (male)
-(22003, 21008, 0, 0), -- Gossip sub-menu for Elemental Leatherworking (female)
-(22004, 21009, 0, 0); -- Gossip sub-menu for Tribal Leatherworking (male)
+(22000, 21004, 0, 4018), -- Gossip sub-menu for Dragonscale Leatherworking (male)
+(22001, 21005, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (male)
+(22002, 21006, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
+(22003, 21008, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (female)
+(22004, 21009, 0, 4018); -- Gossip sub-menu for Tribal Leatherworking (male)
 
 -- Add patch condition for base Book Soothsaying for dummies gossip (Book should have no gossip menu entry before patch 1.10)
 UPDATE `gossip_menu` SET `condition_id` = 4018 WHERE `text_id` = 11874;
