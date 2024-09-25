@@ -59,10 +59,15 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastText
 (21006, 11902, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (21007, 11892, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (21008, 11899, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(21009, 11901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(21009, 11901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(21010, 3283, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(21011, 3284, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(21012, 3285, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(21013, 3286, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
--- Post-1.10 gossips
+
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+-- Post-1.10 gossips
 (1469, 21000, 0, 11002), -- Gossip for Nixx Sprocketspring
 (1468, 21001, 0, 11002), -- Gossip for Tinkmaster Overspark
 (1467, 21002, 0, 11004), -- Gossip for Oglethorpe Obnoticus
@@ -72,7 +77,11 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (22001, 21005, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (male)
 (22002, 21006, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
 (22003, 21008, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (female)
-(22004, 21009, 0, 4018); -- Gossip sub-menu for Tribal Leatherworking (male)
+(22004, 21009, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
+(22005, 21010, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 1)
+(22006, 21011, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 2)
+(22007, 21012, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 1)
+(22008, 21013, 0, 0); -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 2)
 
 -- Add patch condition for base Book Soothsaying for dummies gossip (Book should have no gossip menu entry before patch 1.10)
 UPDATE `gossip_menu` SET `condition_id` = 4018 WHERE `text_id` = 11874;
@@ -100,7 +109,11 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3069, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22001, 0, 2867, 0, 0, '', 0, 11023), -- Brumn Winterhoof (Elemental Leatherworking - Horde)
 (3070, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22003, 0, 2867, 0, 0, '', 0, 11023), -- Sarah Tanner (Elemental Leatherworking - Alliance)
 (3072, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22004, 0, 2868, 0, 0, '', 0, 11023), -- Caryssia Moonhunter (Tribal Leatherworking - Alliance)
-(3073, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22002, 0, 2868, 0, 0, '', 0, 11023); -- Se'Jib (Tribal Leatherworking - Horde)
+(3073, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22002, 0, 2868, 0, 0, '', 0, 11023), -- Se'Jib (Tribal Leatherworking - Horde)
+(2762, 2, 0, 'Tell me more about Forging Armor.', 3267, 1, 17, 22005, 0, 0, 0, 0, '', 0, 11056),
+(22005, 1, 0, 'Can you give me directions?', 3269, 1, 17, 22006, 0, 0, 0, 0, '', 0, 0),
+(2762, 3, 0, 'Tell me more about Forging Weapons.', 3271, 1, 17, 22007, 0, 0, 0, 0, '', 0, 11056),
+(22007, 1, 0, 'Can you give me directions?', 3269, 1, 17, 22008, 0, 0, 0, 0, '', 0, 0);
 
 -- Remove deprecated field trainer spell that is preventing proper implementation
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7406 AND `patch` = 0; -- Trainer gossip for Oglethorpe Obnoticus (Gnomish Engineering - Horde)
