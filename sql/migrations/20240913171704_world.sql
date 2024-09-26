@@ -57,7 +57,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11060, -1, 11015, 11009, 11022, 4027, 0), -- Condition for Dragonscale Leatherworking teach focus script
 (11061, -2, 11023, 11060, 0, 0, 0), -- Condition for Dragonscale Leatherworking gossip option
 (11062, -1, 11016, 11009, 11022, 4027, 0), -- Condition for Elemental Leatherworking teach focus script
-(11063, -2, 11023, 11058, 0, 0, 0); -- Condition for Elemental Leatherworking gossip option
+(11063, -2, 11023, 11062, 0, 0, 0); -- Condition for Elemental Leatherworking gossip option
 
 -- Enable relevant npc_text entries
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3283; -- 1128
