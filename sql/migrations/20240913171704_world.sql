@@ -79,7 +79,11 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (22005, 1128, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 1)
 (22006, 1129, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 2)
 (22007, 1130, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 1)
-(22008, 1131, 0, 0); -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 2)
+(22008, 1131, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 2)
+(22009, 1119, 0, 0), -- Gossip sub-menu for Therum Deepforge (Forging Armour pt. 1)
+(22010, 1120, 0, 0), -- Gossip sub-menu for Therum Deepforge (Forging Armour pt. 2)
+(22011, 1121, 0, 0), -- Gossip sub-menu for Therum Deepforge (Forging Weapons pt. 1)
+(22012, 1122, 0, 0); -- Gossip sub-menu for Therum Deepforge (Forging Weapons pt. 2)
 
 -- Add patch condition for base Book Soothsaying for dummies gossip (Book should have no gossip menu entry before patch 1.10)
 UPDATE `gossip_menu` SET `condition_id` = 4018 WHERE `text_id` = 8321;
@@ -111,14 +115,18 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (2762, 2, 0, 'Tell me more about Forging Armor.', 3267, 1, 17, 22005, 0, 0, 0, 0, '', 0, 11056),
 (22005, 1, 0, 'Can you give me directions?', 3269, 1, 17, 22006, 0, 0, 0, 0, '', 0, 0),
 (2762, 3, 0, 'Tell me more about Forging Weapons.', 3271, 1, 17, 22007, 0, 0, 0, 0, '', 0, 11056),
-(22007, 1, 0, 'Can you give me directions?', 3269, 1, 17, 22008, 0, 0, 0, 0, '', 0, 0);
+(22007, 1, 0, 'Can you give me directions?', 3269, 1, 17, 22008, 0, 0, 0, 0, '', 0, 0),
+(581, 2, 0, 'Tell me more about Forging Armor.', 3267, 1, 17, 22009, 0, 0, 0, 0, '', 0, 11056),
+(22009, 1, 0, 'Can you give me directions?', 3269, 1, 17, 22010, 0, 0, 0, 0, '', 0, 0),
+(581, 3, 0, 'Tell me more about Forging Weapons.', 3271, 1, 17, 22011, 0, 0, 0, 0, '', 0, 11056),
+(22011, 1, 0, 'Can you give me directions?', 3269, 1, 17, 22012, 0, 0, 0, 0, '', 0, 0);
 
--- Remove deprecated field trainer spell that is preventing proper implementation
+-- Remove deprecated field trainer spell for remaining entries
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7406 AND `patch` = 0; -- Trainer gossip for Oglethorpe Obnoticus (Gnomish Engineering - Horde)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7866 AND `patch` = 0; -- Trainer gossip for Peter Galen (Dragonscale Leatherworking - Alliance)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7867 AND `patch` = 0; -- Trainer gossip for Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7868 AND `patch` = 0; -- Trainer gossip for Sarah Tanner (Elemental Leatherworking - Alliance)
-UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7868 AND `patch` = 0; -- Trainer gossip for Brumn Winterhoof (Elemental Leatherworking - Horde)
+UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7869 AND `patch` = 0; -- Trainer gossip for Brumn Winterhoof (Elemental Leatherworking - Horde)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7870 AND `patch` = 0; -- Trainer gossip for Caryssia Moonhunter (Tribal Leatherworking - Alliance)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7871 AND `patch` = 0; -- Trainer gossip for Se'Jib (Tribal Leatherworking - Horde)
 UPDATE `creature_template` SET `trainer_spell` = 0 WHERE `entry` = 7944 AND `patch` = 0; -- Trainer gossip for Tinkmaster Overspark (Gnomish Engineering - Alliance)
@@ -158,7 +166,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Note: Condition 368 corresponds to a condition checking if the player has a Blacksmithing skill of 200
 (11055, -1, 178, 368, 11040, 11041, 0), -- Condition for first specialisation gossip by Myolor Sunderfury (Alliance) and Krathok Moltenfist (Horde)
 -- Note: Condition 1356 corresponds to a condition checking if the player has NOT learnt Armorsmith AND has NOT learnt Weaponsmith
-(11056, -1, 178, 368, 1356, 0, 0), -- Condition for gossip by Bengus Deepforge (Alliance) and Saru Steelfury (Horde) TODO: Add relevant gossips
+(11056, -1, 178, 368, 1356, 0, 0), -- Condition for gossip by Bengus Deepforge and Therum Deepforge
 -- Note: Condition 1354 corresponds to a condition checking if the player has learnt Artisan Armorsmith
 (11057, -2, 1354, 11040, 11042, 0, 1); -- Condition to check if the player has Armorsmithing reputation, has NOT completed "The Art of the Armorsmith" (Alliance), NOR learnt Armorsmithing (for special Grumnus Steelshaper gossip)
 
