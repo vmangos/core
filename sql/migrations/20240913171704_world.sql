@@ -65,7 +65,7 @@ UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3284; -- 112
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3285; -- 1130
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3286; -- 1131
 
--- IDs known from neighbouring entries of thr same NPCs being sorted numerically by broadcast text id
+-- IDs known from neighbouring entries of the same NPCs being sorted numerically by broadcast text id
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES 
 (8325, 11884, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (8329, 11900, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -107,7 +107,9 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (2865, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11023, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking'),
 (2866, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11060, 'Learn Leatherworking Focus - Teach Dragonscale Leatherworking'),
 (2867, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11062, 'Learn Leatherworking Focus - Teach Elemental Leatherworking'),
-(2868, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11058, 'Learn Leatherworking Focus - Teach Tribal Leatherworking');
+(2868, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11058, 'Learn Leatherworking Focus - Teach Tribal Leatherworking'),
+(318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11048, 'Cast Artisan Armorsmith'),
+(318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11049, 'Cast Artisan Weaponsmith');
 
 UPDATE `gossip_menu_option` SET `id` = 1 WHERE `menu_id` = 581 AND `option_icon` = 3; -- Correct ID for training menu for Therum Deepforge
 
@@ -177,13 +179,29 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11040, 5, 46, 4, 0, 0, 1), -- Condition to check if the player has less than 6000 Armorsmithing reputation
 (11041, 5, 289, 4, 0, 0, 1), -- Condition to check if the player has less than 6000 Weaponsmithing reputation
 (11042, 8, 5283, 0, 0, 0, 0), -- Condition to check if the player has completed "The Art of the Armorsmith" (Alliance)
+(11043, 8, 5284, 0, 0, 0, 0), -- Condition to check if the player has completed "The Way of the Weaponsmith" (Alliance)
+(11044, 8, 5301, 0, 0, 0, 0), -- Condition to check if the player has completed "The Art of the Armorsmith" (Horde)
+(11045, 8, 5302, 0, 0, 0, 0), -- Condition to check if the player has completed "The Way of the Weaponsmith" (Horde)
+(11046, -2, 11042, 11044, 0, 0, 0), -- Condition to check if the player has completed "The Art of the Armorsmith" (Both factions)
+(11047, -2, 11043, 11045, 0, 0, 0), -- Condition to check if the player has completed "The Way of the Weaponsmith" (Both factions)
 -- Note: Condition 178 corresponds to a condition checking if the player is level 40 or higher
 -- Note: Condition 368 corresponds to a condition checking if the player has a Blacksmithing skill of 200
-(11055, -1, 178, 368, 11040, 11041, 0), -- Condition for first specialisation gossip by Myolor Sunderfury (Alliance) and Krathok Moltenfist (Horde)
 -- Note: Condition 1356 corresponds to a condition checking if the player has NOT learnt Armorsmith AND has NOT learnt Weaponsmith
+(11048, -1, 178, 368, 1356, 11046, 0), -- Condition for relearning gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for Armorsmithing
+(11049, -1, 178, 368, 1356, 11047, 0), -- Condition for relearning gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for Weaponsmithing
+(11050, 8, 5305, 0, 0, 0, 0), -- Condition to check if the player has completed "Sweet Serenity" (Hammersmith sub-specialisation)
+(11051, 8, 5306, 0, 0, 0, 0), -- Condition to check if the player has completed "Snakestone of the Shadow Huntress" (Axesmith sub-specialisation)
+(11052, 8, 5307, 0, 0, 0, 0), -- Condition to check if the player has completed "Corruption" (Swordsmith sub-specialisation)
+(11055, -1, 178, 368, 11040, 11041, 0), -- Condition for first specialisation gossip by Myolor Sunderfury (Alliance) and Krathok Moltenfist (Horde)
 (11056, -1, 178, 368, 1356, 0, 0), -- Condition for gossip by Bengus Deepforge and Therum Deepforge
 -- Note: Condition 1354 corresponds to a condition checking if the player has learnt Artisan Armorsmith
-(11057, -2, 1354, 11040, 11042, 0, 1); -- Condition to check if the player has Armorsmithing reputation, has NOT completed "The Art of the Armorsmith" (Alliance), NOR learnt Armorsmithing (for special Grumnus Steelshaper gossip)
+(11057, -2, 1354, 11040, 11042, 0, 1), -- Condition to check if the player has Armorsmithing reputation, has NOT completed "The Art of the Armorsmith" (Alliance), NOR learnt Armorsmithing (for special Grumnus Steelshaper gossip)
+-- Note: Condition 1351 corresponds to a condition checking if the player has a Blacksmithing skill of 250
+-- Note: Condition 1352 corresponds to a condition checking if the player has learnt Artisan Weaponsmith
+-- Note: Condition 1364 corresponds to a condition checking if the player has NOT learnt any of the weaponsmith sub-specialisations
+(11064, -1, 1351, 1352, 1364, 11050, 0), -- Condition for relearning Hammersmithing
+(11065, -1, 1351, 1352, 1364, 11051, 0), -- Condition for relearning Axesmithing
+(11066, -1, 1351, 1352, 1364, 11052, 0); -- Condition for relearning Swordsmithing
 
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5283; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Alliance)
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5301; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Horde)
@@ -213,7 +231,7 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (318206, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6486, 0, 0, 0, 0, 0, 0, 0, 0, 'Myolor Sunderfury - Talk (Weaponsmithing)'),
 (318206, 6, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.48033, 0, 'Myolor Sunderfury - Set Orientation');
 
--- Update first specialisation gossip and scripts to new condition and new scripts
+-- Update blacksmithing specialisation gossip and scripts to new conditions and new scripts
 UPDATE `gossip_menu` SET `condition_id` = 11055 WHERE `entry` = 3187 AND `text_id` = 3953; -- Specialisation gossip for Krathok Moltenfist
 UPDATE `gossip_menu` SET `condition_id` = 11055 WHERE `entry` = 3182 AND `text_id` = 3938; -- Specialisation gossip for Myolor Sunderfury
 UPDATE `gossip_menu` SET `condition_id` = 11057 WHERE `entry` = 597 AND `text_id` = 1136; -- Special gossip for Grumnus Steelshaper
@@ -221,6 +239,17 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318206 WHERE `menu_id` = 3182 AND `id` = 1; -- Weaponsmith Alliance
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318201 WHERE `menu_id` = 3187 AND `id` = 0; -- Armorsmith Horde
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318202 WHERE `menu_id` = 3187 AND `id` = 1; -- Weaponsmith Horde
+
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
+(3182, 2, 0, 'Myolor, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8892, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11048),
+(3182, 3, 0, 'Myolor, I was once a weaponsmith and wish to retake the hammer once more! Teach me the way of the weaponsmith!', 8893, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11049), -- This option has 2 exclamation marks! Alliance weaponsmiths are extra exciting I guess!
+(3187, 2, 0, 'Krathok, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8894, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11048),
+(3187, 3, 0, 'Krathok, I was once a weaponsmith and wish to retake the hammer once more! Teach me the way of the weaponsmith.', 8895, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11049);
+
+-- Update conditions for relearning gossip for weaponsmithing sub-specialisations
+UPDATE `gossip_menu_option` SET `condition_id` = 11065 WHERE `menu_id` = 6089 AND `id` = 0; -- Kilram (Axesmithing)
+UPDATE `gossip_menu_option` SET `condition_id` = 11064 WHERE `menu_id` = 6090 AND `id` = 0; -- Lilith (Hammersmithing)
+UPDATE `gossip_menu_option` SET `condition_id` = 11066 WHERE `menu_id` = 6091 AND `id` = 0; -- Seril (Swordsmithing)
 
 -- Correct specialisations teaching artisan of profession by removing specialisation from profession spell chain (incorrect implementation according to SkillLineAbility)
 DELETE FROM `spell_chain` WHERE `spell_id` = 9787; -- Correct for Weaponsmithing
