@@ -55,17 +55,17 @@ UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3284; -- 112
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3285; -- 1130
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3286; -- 1131
 
--- IDs known from neighbouring entries being sorted numerically by broadcast text id
+-- IDs known from neighbouring entries of thr same NPCs being sorted numerically by broadcast text id
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES 
 (8325, 11884, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (8329, 11900, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (8331, 11902, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (8328, 11899, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(8330, 11901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(8330, 11901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(1123, 3274, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
--- Post-1.10 gossips
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES 
+-- Post-1.10 gossips --
 (1469, 8323, 0, 11002), -- Gossip for Nixx Sprocketspring
 (1468, 8324, 0, 11002), -- Gossip for Tinkmaster Overspark
 (1467, 8325, 0, 11004), -- Gossip for Oglethorpe Obnoticus
@@ -76,6 +76,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (22002, 8331, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
 (22003, 8328, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (female)
 (22004, 8330, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
+-- Other gossips --
 (22005, 1128, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 1)
 (22006, 1129, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 2)
 (22007, 1130, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Weapons pt. 1)
@@ -99,7 +100,6 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (2867, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4027, 'Learn Leatherworking Focus - Teach Elemental Leatherworking'),
 (2868, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4027, 'Learn Leatherworking Focus - Teach Tribal Leatherworking');
 
-    
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
 (7058, 1, 0, 'I am 100% confident that I wish to learn in the ways of goblin engineering.', 11876, 1, 1, -1, 0, 2861, 0, 0, '', 0, 11002),
 (7058, 2, 0, 'I am 100% confident that I wish to learn in the ways of gnomish engineering.', 11878, 1, 1, -1, 0, 2862, 0, 0, '', 0, 11002),
@@ -140,11 +140,15 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Note: Condition 1374 corresponds to a condition checking if the player has a Gnome Engineer Membership Card in their inventory
 (11038, -1, 1368, 1374, 0, 0, 0), -- Condition for gnomish engineering trainer gossip
 (11039, -1, 11038, 2, 0, 0, 0); -- Condition for gnomish engineering trainer gossip for horde (Oglethorpe is a neutral NPC)
-  
+
 -- Add missing trainer gossip menu options
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
 (3068, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, 0, NULL, 0, 11021), -- Trainer gossip menu option for Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
 (3069, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, 0, NULL, 0, 11020); -- Trainer gossip menu option for Brumn Winterhoof (Elemental Leatherworking - Horde)
+
+-- Add missing gossip for Therum Deepforge
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES 
+(581, 1123, 0, 4);
 
 -- Update condition for existing trainer gossip menu options
 UPDATE `gossip_menu_option` SET `condition_id` = 11039 WHERE `menu_id` = 1467 AND `id` = 0; -- Condition for trainer gossip for Oglethorpe Obnoticus (Gnomish Engineering - Horde)
