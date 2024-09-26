@@ -100,6 +100,8 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (2867, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4027, 'Learn Leatherworking Focus - Teach Elemental Leatherworking'),
 (2868, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4027, 'Learn Leatherworking Focus - Teach Tribal Leatherworking');
 
+UPDATE `gossip_menu_option` SET `id` = 1 WHERE `menu_id` = 581 AND `option_icon` = 3; -- Correct ID for training menu for Therum Deepforge
+
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
 (7058, 1, 0, 'I am 100% confident that I wish to learn in the ways of goblin engineering.', 11876, 1, 1, -1, 0, 2861, 0, 0, '', 0, 11002),
 (7058, 2, 0, 'I am 100% confident that I wish to learn in the ways of gnomish engineering.', 11878, 1, 1, -1, 0, 2862, 0, 0, '', 0, 11002),
