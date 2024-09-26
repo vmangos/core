@@ -23,6 +23,7 @@ UPDATE `quest_template` SET `RewRepFaction1` = 83, `RewRepValue1` = 200 WHERE `e
 -- No reputation is rewarded for Weaponsmithing sub-specialisations, likely due to lack of need in implementation
 
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
+-- Conditions for post 1.10 implementation --
 (10994, 30, 550, 3, 0, 0, 1), -- Condition to check if Goblin Engineering reputation higher than Neutral 0/3000
 (10995, 30, 551, 3, 0, 0, 1), -- Condition to check if Gnome Engineering reputation higher than Neutral 0/3000
 (10996, -2, 10994, 10995, 0, 0, 0), -- Condition to check if the player has any Engineering specialisation reputation
@@ -34,6 +35,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11002, -1, 10999, 10996, 393, 4018, 0), -- Condition to return true if the player doesn't have an Engineering specialisation, has Engineering specialisation reputation, has a skill of 200 Engineering, and the current patch is 1.10 or later
 -- Note: Condition 2 corresponds to a condition checking if the player belongs to the horde
 (11004, -1, 11002, 2, 0, 0, 0), -- Same as above as well as requiring being a horde character (for gossip purposes)
+(11009, 7, 165, 225, 0, 0, 0), -- Condition for Leatherworking skill of 225
 (11027, -1, 11002, 11023, 0, 0, 1), -- NAND gate for Leatherworking and Engineering requirements for Book "Soothsaying for Dummies" gossip (If the conditions for both Leatherworking and Engineering gossips are met then this condition allows to decide what gossip to display)
 (11028, -1, 11002, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
 (11014, 30, 549, 3, 0, 0, 1), -- Condition to check if Tribal Leatherworking reputation higher than Neutral 0/3000
@@ -47,7 +49,15 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11023, -1, 11009, 11017, 11022, 4018, 0), -- Condition to return true if the player doesn't have a Leatherworking specialisation, has Leatherworking specialisation reputation, has a skill of 225 Leatherworking, and the current patch is 1.10 or later
 (11034, -1, 11023, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Leatherworking gossip
 (11035, -3, 11027, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
-(11036, -2, 11035, 11028, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies if both profession requirements are met (Uses engineering text currently. Can be checked for correct text in the future)
+(11036, -2, 11035, 11028, 0, 0, 0), -- Gossip for Book Soothslaying for Dummies if both profession requirements are met (Uses engineering text currently. Can be checked for correct text in the future)
+-- Conditions for pre-1.10 implementation --
+-- Note: Condition 4027 corresponds to a condition checking if the current patch is lower than 1.10
+(11058, -1, 11014, 11009, 11022, 4027, 0), -- Condition for Tribal Leatherworking teach focus script
+(11059, -2, 11023, 11058, 0, 0, 0), -- Condition for Tribal Leatherworking gossip option
+(11060, -1, 11015, 11009, 11022, 4027, 0), -- Condition for Dragonscale Leatherworking teach focus script
+(11061, -2, 11023, 11060, 0, 0, 0), -- Condition for Dragonscale Leatherworking gossip option
+(11062, -1, 11016, 11009, 11022, 4027, 0), -- Condition for Elemental Leatherworking teach focus script
+(11063, -2, 11023, 11058, 0, 0, 0); -- Condition for Elemental Leatherworking gossip option
 
 -- Enable relevant npc_text entries
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3283; -- 1128
@@ -90,15 +100,14 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 UPDATE `gossip_menu` SET `condition_id` = 4018 WHERE `text_id` = 8321;
 
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
-(2861, 0, 0, 15, 20221, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4018, 'Book Soothsaying for Dummies - Teach Goblin Engineering'),
-(2862, 0, 0, 15, 20220, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4018, 'Book Soothsaying for Dummies - Teach Gnomish Engineering'),
-(2863, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4018, 'Book Soothsaying for Dummies - Teach Dragonscale Leatherworking'),
-(2864, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4018, 'Book Soothsaying for Dummies - Teach Elemental Leatherworking'),
-(2865, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4018, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking'),
--- Note: Condition 4027 corresponds to a condition checking if the current patch is lower than 1.10
-(2866, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4027, 'Learn Leatherworking Focus - Teach Dragonscale Leatherworking'),
-(2867, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4027, 'Learn Leatherworking Focus - Teach Elemental Leatherworking'),
-(2868, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4027, 'Learn Leatherworking Focus - Teach Tribal Leatherworking');
+(2861, 0, 0, 15, 20221, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11002, 'Book Soothsaying for Dummies - Teach Goblin Engineering'),
+(2862, 0, 0, 15, 20220, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11002, 'Book Soothsaying for Dummies - Teach Gnomish Engineering'),
+(2863, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11023, 'Book Soothsaying for Dummies - Teach Dragonscale Leatherworking'),
+(2864, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11023, 'Book Soothsaying for Dummies - Teach Elemental Leatherworking'),
+(2865, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11023, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking'),
+(2866, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11060, 'Learn Leatherworking Focus - Teach Dragonscale Leatherworking'),
+(2867, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11062, 'Learn Leatherworking Focus - Teach Elemental Leatherworking'),
+(2868, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11058, 'Learn Leatherworking Focus - Teach Tribal Leatherworking');
 
 UPDATE `gossip_menu_option` SET `id` = 1 WHERE `menu_id` = 581 AND `option_icon` = 3; -- Correct ID for training menu for Therum Deepforge
 
@@ -108,12 +117,12 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (7058, 3, 0, 'I am absolutely certain that I want to learn dragonscale leatherworking.', 11889, 1, 1, -1, 0, 2863, 0, 0, '', 0, 11023),
 (7058, 4, 0, 'I am absolutely certain that I want to learn elemental leatherworking.', 11890, 1, 1, -1, 0, 2864, 0, 0, '', 0, 11023),
 (7058, 5, 0, 'I am absolutely certain that I want to learn tribal leatherworking.', 11891, 1, 1, -1, 0, 2865, 0, 0, '', 0, 11023),
-(3067, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 2866, 0, 0, '', 0, 11023), -- Peter Galen (Dragonscale Leatherworking - Alliance)
-(3068, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 2866, 0, 0, '', 0, 11023), -- Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
-(3069, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22001, 0, 2867, 0, 0, '', 0, 11023), -- Brumn Winterhoof (Elemental Leatherworking - Horde)
-(3070, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22003, 0, 2867, 0, 0, '', 0, 11023), -- Sarah Tanner (Elemental Leatherworking - Alliance)
-(3072, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22004, 0, 2868, 0, 0, '', 0, 11023), -- Caryssia Moonhunter (Tribal Leatherworking - Alliance)
-(3073, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22002, 0, 2868, 0, 0, '', 0, 11023), -- Se'Jib (Tribal Leatherworking - Horde)
+(3067, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 2866, 0, 0, '', 0, 11061), -- Peter Galen (Dragonscale Leatherworking - Alliance)
+(3068, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 2866, 0, 0, '', 0, 11061), -- Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
+(3069, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22001, 0, 2867, 0, 0, '', 0, 11063), -- Brumn Winterhoof (Elemental Leatherworking - Horde)
+(3070, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22003, 0, 2867, 0, 0, '', 0, 11063), -- Sarah Tanner (Elemental Leatherworking - Alliance)
+(3072, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22004, 0, 2868, 0, 0, '', 0, 11059), -- Caryssia Moonhunter (Tribal Leatherworking - Alliance)
+(3073, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22002, 0, 2868, 0, 0, '', 0, 11059), -- Se'Jib (Tribal Leatherworking - Horde)
 (2762, 2, 0, 'Tell me more about Forging Armor.', 3267, 1, 17, 22005, 0, 0, 0, 0, '', 0, 11056),
 (22005, 1, 0, 'Can you give me directions?', 3269, 1, 17, 22006, 0, 0, 0, 0, '', 0, 0),
 (2762, 3, 0, 'Tell me more about Forging Weapons.', 3271, 1, 17, 22007, 0, 0, 0, 0, '', 0, 11056),
