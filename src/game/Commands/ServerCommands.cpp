@@ -967,7 +967,6 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAllSpellCommand(char* /*args*/)
 {
-    HandleReloadSpellAffectCommand((char*)"a");
     HandleReloadSpellAreaCommand((char*)"a");
     HandleReloadSpellChainCommand((char*)"a");
     HandleReloadSpellElixirCommand((char*)"a");
@@ -1355,14 +1354,6 @@ bool ChatHandler::HandleReloadSkillFishingBaseLevelCommand(char* /*args*/)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading Skill Fishing base level requirements...");
     sObjectMgr.LoadFishingBaseSkillLevel();
     SendSysMessage("DB table `skill_fishing_base_level` (fishing base level for zone/subzone) reloaded.");
-    return true;
-}
-
-bool ChatHandler::HandleReloadSpellAffectCommand(char* /*args*/)
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading SpellAffect definitions...");
-    sSpellMgr.LoadSpellAffects();
-    SendSysMessage("DB table `spell_affect` (spell mods apply requirements) reloaded.");
     return true;
 }
 

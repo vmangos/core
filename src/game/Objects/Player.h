@@ -127,7 +127,7 @@ struct SpellModifier
 
     SpellModifier(SpellModOp _op, SpellModType _type, int32 _value, Aura* aura, int16 _charges = 0);
 
-    bool isAffectedOnSpell(SpellEntry const* spell) const;
+    bool IsAffectedOnSpell(SpellEntry const* spell) const;
 
     SpellModOp   op   : 8;
     SpellModType type : 8;

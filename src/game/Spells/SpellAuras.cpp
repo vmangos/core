@@ -933,10 +933,10 @@ void Aura::ApplyModifier(bool apply, bool Real, bool skipCheckExclusive)
     GetHolder()->SetInUse(false);
 }
 
-bool Aura::isAffectedOnSpell(SpellEntry const* spell) const
+bool Aura::IsAffectedOnSpell(SpellEntry const* spell) const
 {
     if (m_spellmod)
-        return m_spellmod->isAffectedOnSpell(spell);
+        return m_spellmod->IsAffectedOnSpell(spell);
 
     // Check family name
     if (spell->SpellFamilyName != GetSpellProto()->SpellFamilyName)
@@ -948,7 +948,7 @@ bool Aura::isAffectedOnSpell(SpellEntry const* spell) const
 
 bool Aura::CanProcFrom(SpellEntry const* spell, uint32 EventProcEx, uint32 procEx, bool active, bool useClassMask) const
 {
-    // Check EffectClassMask (in pre-3.x stored in spell_affect in fact)
+    // Check EffectClassMask (stored in EffectItemType)
     uint64 mask = sSpellMgr.GetSpellAffectMask(GetId(), GetEffIndex());
 
     // Nostalrius: c'est la moindre des choses d'utiliser un peu 'spell_proc_event' non ?
@@ -1002,7 +1002,7 @@ void Aura::ReapplyAffectedPassiveAuras(Unit* target)
                 // and affected by aura
                 itr->second->GetCasterGuid() == target->GetObjectGuid() &&
                 // and affected by spellmod
-                isAffectedOnSpell(itr->second->GetSpellProto()))
+                IsAffectedOnSpell(itr->second->GetSpellProto()))
             affectedSelf[itr->second->GetId()] = itr->second->GetCastItemGuid();
     }
 

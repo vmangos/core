@@ -3043,107 +3043,6 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
     return true;
 }
 
-void SpellMgr::LoadSpellAffects()
-{
-    mSpellAffectMap.clear();                                // need for reload case
-
-    uint32 count = 0;
-
-    //                                                                0        1           2
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `effectId`, `SpellFamilyMask` FROM `spell_affect` WHERE (`build_min` <= %u) && (`build_max` >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
-    if (!result)
-    {
-
-        BarGoLink bar(1);
-
-        bar.step();
-
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spell affect definitions", count);
-        return;
-    }
-
-    BarGoLink bar(result->GetRowCount());
-
-    do
-    {
-        Field* fields = result->Fetch();
-
-        bar.step();
-
-        uint32 entry = fields[0].GetUInt32();
-        uint8 effectId = fields[1].GetUInt8();
-
-        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(entry);
-
-        if (!spellInfo)
-        {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_affect` does not exist", entry);
-            continue;
-        }
-
-        if (effectId >= MAX_EFFECT_INDEX)
-        {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_affect` have invalid effect index (%u)", entry, effectId);
-            continue;
-        }
-
-        if (spellInfo->Effect[effectId] != SPELL_EFFECT_APPLY_AURA || (
-                    spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_FLAT_MODIFIER &&
-                    spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_PCT_MODIFIER  &&
-                    spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_TARGET_TRIGGER &&
-                    spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_OVERRIDE_CLASS_SCRIPTS))
-        {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_affect` have not SPELL_AURA_ADD_FLAT_MODIFIER (%u) or SPELL_AURA_ADD_PCT_MODIFIER (%u) or SPELL_AURA_ADD_TARGET_TRIGGER (%u) or SPELL_AURA_OVERRIDE_CLASS_SCRIPTS (%u) for effect index (%u)", entry, SPELL_AURA_ADD_FLAT_MODIFIER, SPELL_AURA_ADD_PCT_MODIFIER, SPELL_AURA_ADD_TARGET_TRIGGER, SPELL_AURA_OVERRIDE_CLASS_SCRIPTS, effectId);
-            continue;
-        }
-
-        uint64 spellAffectMask = fields[2].GetUInt64();
-
-        // Spell.dbc have own data for low part of SpellFamilyMask
-        if (spellInfo->EffectItemType[effectId])
-        {
-            if (static_cast<uint64>(spellInfo->EffectItemType[effectId]) == spellAffectMask)
-            {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_affect` have redundant (same with EffectItemType%d) data for effect index (%u) and not needed, skipped.", entry, effectId + 1, effectId);
-                continue;
-            }
-        }
-
-        mSpellAffectMap.insert(SpellAffectMap::value_type((entry << 8) + effectId, spellAffectMask));
-
-        ++count;
-    }
-    while (result->NextRow());
-
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spell affect definitions", count);
-
-    for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); ++id)
-    {
-        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(id);
-        if (!spellInfo)
-            continue;
-
-        for (uint8 effectId = 0; effectId < MAX_EFFECT_INDEX; ++effectId)
-        {
-            if (spellInfo->Effect[effectId] != SPELL_EFFECT_APPLY_AURA || (
-                        spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_FLAT_MODIFIER &&
-                        spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_PCT_MODIFIER  &&
-                        spellInfo->EffectApplyAuraName[effectId] != SPELL_AURA_ADD_TARGET_TRIGGER))
-                continue;
-
-            if (spellInfo->EffectItemType[effectId] != 0)
-                continue;
-
-            if (mSpellAffectMap.find((id << 8) + effectId) !=  mSpellAffectMap.end())
-                continue;
-
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u (%s) misses spell_affect for effect %u", id, spellInfo->SpellName[sWorld.GetDefaultDbcLocale()].c_str(), effectId);
-        }
-    }
-}
-
 void SpellMgr::LoadExistingSpellIds()
 {
     mExistingSpellsSet.clear();
@@ -3841,9 +3740,9 @@ void SpellMgr::LoadSpells()
         spell->EffectChainTarget[0] = fields[104].GetUInt32();
         spell->EffectChainTarget[1] = fields[105].GetUInt32();
         spell->EffectChainTarget[2] = fields[106].GetUInt32();
-        spell->EffectItemType[0] = fields[107].GetUInt32();
-        spell->EffectItemType[1] = fields[108].GetUInt32();
-        spell->EffectItemType[2] = fields[109].GetUInt32();
+        spell->EffectItemType[0] = fields[107].GetUInt64();
+        spell->EffectItemType[1] = fields[108].GetUInt64();
+        spell->EffectItemType[2] = fields[109].GetUInt64();
         spell->EffectMiscValue[0] = fields[110].GetInt32();
         spell->EffectMiscValue[1] = fields[111].GetInt32();
         spell->EffectMiscValue[2] = fields[112].GetInt32();
