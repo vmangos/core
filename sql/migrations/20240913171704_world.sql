@@ -250,6 +250,9 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 UPDATE `gossip_menu_option` SET `condition_id` = 11065 WHERE `menu_id` = 6089 AND `id` = 0; -- Kilram (Axesmithing)
 UPDATE `gossip_menu_option` SET `condition_id` = 11064 WHERE `menu_id` = 6090 AND `id` = 0; -- Lilith (Hammersmithing)
 UPDATE `gossip_menu_option` SET `condition_id` = 11066 WHERE `menu_id` = 6091 AND `id` = 0; -- Seril (Swordsmithing)
+UPDATE `gossip_menu` SET `condition_id` = 11065 WHERE `entry` = 6089 AND `text_id` = 7244; -- Kilram (Axesmithing)
+UPDATE `gossip_menu` SET `condition_id` = 11064 WHERE `entry` = 6090 AND `text_id` = 7246; -- Lilith (Hammersmithing)
+UPDATE `gossip_menu` SET `condition_id` = 11066 WHERE `entry` = 6091 AND `text_id` = 7248; -- Seril (Swordsmithing)
 
 -- Correct specialisations teaching artisan of profession by removing specialisation from profession spell chain (incorrect implementation according to SkillLineAbility)
 DELETE FROM `spell_chain` WHERE `spell_id` = 9787; -- Correct for Weaponsmithing
