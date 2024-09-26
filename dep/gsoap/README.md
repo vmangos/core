@@ -1,6 +1,6 @@
 # gSOAP
 SOAP is an older protocol that communicates over HTTP.
-For MaNGOS it is used to execute commands on the world server.
+In MaNGOS it is used to remotely execute commands on the world server.
 
 ## How to update this
 

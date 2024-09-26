@@ -441,24 +441,15 @@ InstanceData* GetInstanceData_instance_zulgurub(Map* pMap)
 
 enum
 {
-    TABLET_GRILEK1 = 180358,
-    TABLET_HAZZARAH1 = 180364,
-    TABLET_RENATAKI1 = 180365,
-    TABLET_WUSHOOLAY1 = 180393,
-    TABLET_GRILEK2 = 987654,
-    TABLET_HAZZARAH2 = 987655,
-    TABLET_RENATAKI2 = 987656,
-    TABLET_WUSHOOLAY2 = 987657,
-    TABLET_ALCHEMIST_SPELL = 24266,
+    TABLET_GRILEK = 180358,
+    TABLET_HAZZARAH = 180364,
+    TABLET_RENATAKI = 180365,
+    TABLET_WUSHOOLAY = 180393,
 };
 
 
 bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
 {
-    //Check if the player has the alchemist skill at 300 and if he doesn't know yet Mojo Madness recipe
-    if(pPlayer->HasSkill(171) && !pPlayer->HasSpell(24266))
-        if(pPlayer->GetSkillValue(171) >= 300)    
-            pPlayer->LearnSpell(TABLET_ALCHEMIST_SPELL,false);
 
     ScriptedInstance* m_pInstance = (ScriptedInstance*)pGo->GetInstanceData();
     if(!m_pInstance)
@@ -484,29 +475,25 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
     //pPlayer->Say(sMessage,0);
     switch(pGo->GetEntry())
     {
-        case TABLET_GRILEK1:
-        case TABLET_GRILEK2:
+        case TABLET_GRILEK:
             if (randomBoss == BOSS_GRILEK)
                 pPlayer->SEND_GOSSIP_MENU(7669, pGo->GetGUID());
             else
                 pPlayer->SEND_GOSSIP_MENU(7643, pGo->GetGUID());
             break;
-    case TABLET_HAZZARAH1:
-    case TABLET_HAZZARAH2:
+    case TABLET_HAZZARAH:
             if (randomBoss == BOSS_HAZZARAH)
                 pPlayer->SEND_GOSSIP_MENU(7671, pGo->GetGUID());
             else
                 pPlayer->SEND_GOSSIP_MENU(7670, pGo->GetGUID());
             break;
-    case TABLET_RENATAKI1:
-    case TABLET_RENATAKI2:
+    case TABLET_RENATAKI:
             if (randomBoss == BOSS_RENATAKI)
                 pPlayer->SEND_GOSSIP_MENU(7673, pGo->GetGUID());
             else
                 pPlayer->SEND_GOSSIP_MENU(7672, pGo->GetGUID());
             break;
-    case TABLET_WUSHOOLAY1:
-    case TABLET_WUSHOOLAY2:
+    case TABLET_WUSHOOLAY:
             if (randomBoss == BOSS_WUSHOOLAY)
                 pPlayer->SEND_GOSSIP_MENU(7675, pGo->GetGUID());
             else
