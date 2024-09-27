@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20240913171704');
 -- Add your query below.
 
-UPDATE `gameobject_template` SET `flags` = 0, `data0` = 14 WHERE `entry` = 177226; -- Enables object gossip for Book "Soothsaying for Dummies" 
+UPDATE `gameobject_template` SET `type` = 10, `flags` = 0, `data0` = 0, `data2` = 7058, `data3` = 0, `data9` = 1, `data19` = 7058 WHERE `entry` = 177226; -- Enables object gossip and scripts for Book "Soothsaying for Dummies" 
 
 -- Add hidden "specialisation" faction reputation from sniffs
 UPDATE `quest_template` SET `RewRepFaction1` = 551, `RewRepValue1` = 75 WHERE `entry` = 3641; -- Gnome Engineering Alliance
@@ -106,11 +106,13 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (2863, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11024, 'Book Soothsaying for Dummies - Teach Dragonscale Leatherworking'),
 (2864, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11024, 'Book Soothsaying for Dummies - Teach Elemental Leatherworking'),
 (2865, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11024, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking'),
-(2866, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11060, 'Book Soothsaying for Dummies - Teach Dragonscale Leatherworking (pre-1.10)'),
-(2867, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11062, 'Book Soothsaying for Dummies - Teach Elemental Leatherworking (pre-1.10)'),
-(2868, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11058, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking (pre-1.10)'),
 (318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11048, 'Cast Artisan Armorsmith'),
 (318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11049, 'Cast Artisan Weaponsmith');
+
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
+(7058, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11060, 'Book Soothsaying for Dummies - Teach Dragonscale Leatherworking (pre-1.10)'),
+(7058, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11062, 'Book Soothsaying for Dummies - Teach Elemental Leatherworking (pre-1.10)'),
+(7058, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11058, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking (pre-1.10)');
 
 UPDATE `gossip_menu_option` SET `id` = 1 WHERE `menu_id` = 581 AND `option_icon` = 3; -- Correct ID for training menu for Therum Deepforge
 
