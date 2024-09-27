@@ -35,7 +35,6 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Note: Condition 4018 corresponds to a condition checking if the current patch is 1.10 or higher
 (11003, -1, 11002, 4018, 0, 0, 0), -- Same as 11002 and the patch is 1.10 or later
 -- Note: Condition 2 corresponds to a condition checking if the player belongs to the horde
-(11004, -1, 11003, 2, 0, 0, 0), -- Same as 11002 and the player is a horde character (for gossip purposes)
 (11009, 7, 165, 225, 0, 0, 0), -- Condition for Leatherworking skill of 225
 (11027, -1, 11003, 11024, 0, 0, 1), -- NAND gate for Leatherworking and Engineering requirements for Book "Soothsaying for Dummies" gossip (If the conditions for both Leatherworking and Engineering gossips are met then this condition allows to decide what gossip to display)
 (11028, -1, 11003, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Engineering gossip
@@ -54,11 +53,17 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11036, -2, 11035, 11028, 0, 0, 0), -- Gossip for Book Soothslaying for Dummies if both profession requirements are met (Uses engineering text currently. Can be checked for correct text in the future)
 -- Note: Condition 4027 corresponds to a condition checking if the current patch is lower than 1.10
 (11058, -1, 11014, 11009, 11022, 4027, 0), -- Condition for Soothsaying Tribal Leatherworking teach script
-(11059, -2, 11023, 11058, 0, 0, 0), -- Condition for Tribal Leatherworking gossip option
+(11059, -2, 11024, 11058, 0, 0, 0), -- Condition for Tribal Leatherworking gossip option
 (11060, -1, 11015, 11009, 11022, 4027, 0), -- Condition for Soothsaying Dragonscale Leatherworking teach script
-(11061, -2, 11023, 11060, 0, 0, 0), -- Condition for Dragonscale Leatherworking gossip option
+(11061, -2, 11024, 11060, 0, 0, 0), -- Condition for Dragonscale Leatherworking gossip option
 (11062, -1, 11016, 11009, 11022, 4027, 0), -- Condition for Soothsaying Elemental Leatherworking teach script
-(11063, -2, 11023, 11062, 0, 0, 0); -- Condition for Elemental Leatherworking gossip option
+(11063, -2, 11024, 11062, 0, 0, 0), -- Condition for Elemental Leatherworking gossip option
+(11067, -1, 10994, 393, 10999, 4027, 0), -- Condition for Soothsaying Goblin Engineering teach script
+(11068, -2, 11003, 11067, 0, 0, 0), -- Condition for Goblin Engineering gossip
+(11069, -1, 10995, 393, 10999, 4027, 0), -- Condition for Soothsaying Gnome Engineering teach script
+(11070, -2, 11003, 11069, 0, 0, 0), -- Condition for Gnome Engineering gossip
+-- Note: Condition 2 corresponds to a condition checking if the player belongs to the horde
+(11071, -1, 11070, 2, 0, 0, 0); -- Condition for Gnome Engineering gossip (Horde-only)
 
 -- Enable relevant npc_text entries
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3283; -- 1128
@@ -77,9 +82,9 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastText
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES 
 -- Post-1.10 gossips --
-(1469, 8323, 0, 11002), -- Gossip for Nixx Sprocketspring
-(1468, 8324, 0, 11002), -- Gossip for Tinkmaster Overspark
-(1467, 8325, 0, 11004), -- Gossip for Oglethorpe Obnoticus
+(1469, 8323, 0, 11068), -- Gossip for Nixx Sprocketspring
+(1468, 8324, 0, 11070), -- Gossip for Tinkmaster Overspark
+(1467, 8325, 0, 11071), -- Gossip for Oglethorpe Obnoticus
 (7058, 8322, 0, 11036), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
 (7058, 8326, 0, 11034), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
 (22000, 8327, 0, 0), -- Gossip sub-menu for Dragonscale Leatherworking (male)
@@ -112,7 +117,9 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES 
 (7058, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11060, 'Book Soothsaying for Dummies - Teach Dragonscale Leatherworking (pre-1.10)'),
 (7058, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11062, 'Book Soothsaying for Dummies - Teach Elemental Leatherworking (pre-1.10)'),
-(7058, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11058, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking (pre-1.10)');
+(7058, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11058, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking (pre-1.10)'),
+(7058, 0, 0, 15, 20221, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11067, 'Book Soothsaying for Dummies - Teach Goblin Engineering (pre-1.10)'),
+(7058, 0, 0, 15, 20220, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11069, 'Book Soothsaying for Dummies - Teach Gnomish Engineering (pre-1.10)');
 
 UPDATE `gossip_menu_option` SET `id` = 1 WHERE `menu_id` = 581 AND `option_icon` = 3; -- Correct ID for training menu for Therum Deepforge
 
