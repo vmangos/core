@@ -1994,8 +1994,6 @@ void World::Update(uint32 diff)
         sAuctionMgr.Update();
     }
 
-    m_canProcessAsyncPackets = false;
-
     GetMessager().Execute(this);
 
     // <li> Handle session updates
@@ -2119,8 +2117,6 @@ void World::Update(uint32 diff)
 
     // And last, but not least handle the issued cli commands
     ProcessCliCommands();
-
-    m_canProcessAsyncPackets = true;
 
     //cleanup unused GridMap objects as well as VMaps
     if (getConfig(CONFIG_BOOL_CLEANUP_TERRAIN))
