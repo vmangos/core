@@ -392,6 +392,18 @@ bool Map::EnsureGridLoaded(Cell const& cell)
     return false;
 }
 
+void Map::ForceLoadGridsAroundPosition(float x, float y)
+{
+    if (!IsLoaded(x, y))
+    {
+        CellPair p = MaNGOS::ComputeCellPair(x, y);
+        Cell cell(p);
+        EnsureGridLoadedAtEnter(cell);
+        NULLNotifier notifier = NULLNotifier();
+        Cell::VisitAllObjects(x, y, this, notifier, GetGridActivationDistance(), false);
+    }
+}
+
 void Map::LoadGrid(Cell const& cell, bool no_unload)
 {
     EnsureGridLoaded(cell);

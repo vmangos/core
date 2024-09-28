@@ -277,6 +277,7 @@ void MapManager::CreateNewInstancesForPlayers()
             DungeonMap* pMap = static_cast<DungeonMap*>(CreateInstance(dest.mapId, player));
             if (pMap->CanEnter(player))
             {
+                pMap->ForceLoadGridsAroundPosition(dest.x, dest.y);
                 pMap->BindPlayerOrGroupOnEnter(player);
                 player->SendNewWorld();
             } 
