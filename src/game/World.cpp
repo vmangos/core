@@ -1941,11 +1941,15 @@ void World::DetectDBCLang()
 // Only processes packets while session update, the messager, and cli commands processing are NOT running
 void World::ProcessAsyncPackets()
 {
-    while (!sWorld.IsStopped())
+    while (!IsStopped())
     {
         do
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+            if (IsStopped())
+                return;
+
         } while (!m_canProcessAsyncPackets);
 
         for (auto const& itr : m_sessions)
