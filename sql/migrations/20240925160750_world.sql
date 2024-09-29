@@ -1,3 +1,4 @@
+SET NAMES utf8;
 DROP PROCEDURE IF EXISTS add_migration;
 DELIMITER ??
 CREATE PROCEDURE `add_migration`()
@@ -8,11 +9,12 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES ('20240925160750');
 
 -- Add german translation for harbor signs.
+SET NAMES utf8;
 UPDATE `locales_gameobject` SET `name_loc3`='Schiff nach Menethil' WHERE `entry`=176364;
 UPDATE `locales_gameobject` SET `name_loc3`='Schiff nach Teldrassil' WHERE `entry`=176365;
 UPDATE `locales_gameobject` SET `name_loc3`='Schiff nach Theramore' WHERE `entry`=176369;
 UPDATE `locales_gameobject` SET `name_loc3`='Schiff nach Auberdine' WHERE `entry`=176370;
-UPDATE `locales_gameobject` SET `name_loc3`='Schiff nach Auberdine' WHERE `entry`=181985;
+-- UPDATE `locales_gameobject` SET `name_loc3`='Schiff nach Auberdine' WHERE `entry`=181985;
 
 -- Add german trainer greeting text.
 UPDATE `npc_trainer_greeting` SET  content_loc3='Hallo $GMagier:Magierin;! Wollt Ihr ein bisschen üben?' WHERE `entry`=198;
