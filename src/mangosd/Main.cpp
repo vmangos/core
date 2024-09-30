@@ -83,6 +83,8 @@ extern int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
+    sLog.OpenWorldLogFiles();
+
     switch (args.inputServiceMode)
     {
         case ServiceDaemonAction::NotSet:
