@@ -2028,8 +2028,7 @@ void World::Update(uint32 diff)
         m_updateThreads = std::unique_ptr<ThreadPool>(new ThreadPool(
                     "WorldUpdate",
                     getConfig(CONFIG_UINT32_ASYNC_TASKS_THREADS_COUNT),
-                    ThreadPool::ClearMode::UPPON_COMPLETION)
-                                             );
+                    ThreadPool::ClearMode::UPPON_COMPLETION));
         m_updateThreads->start<ThreadPool::MySQL<>>();
     }
     std::unique_lock<std::mutex> lock(m_asyncTaskQueueMutex);

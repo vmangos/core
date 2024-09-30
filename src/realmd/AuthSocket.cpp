@@ -770,7 +770,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
             LoginDatabase.PExecute("UPDATE `account` SET `failed_logins` = `failed_logins` + 1 WHERE `username` = '%s'",m_safelogin.c_str());
 
-            if(std::unique_ptr<QueryResult> failedLoginsDbResult = LoginDatabase.PQuery("SELECT `id`, `failed_logins` FROM `account` WHERE `username` = '%s'", m_safelogin.c_str()))
+            if (std::unique_ptr<QueryResult> failedLoginsDbResult = LoginDatabase.PQuery("SELECT `id`, `failed_logins` FROM `account` WHERE `username` = '%s'", m_safelogin.c_str()))
             {
                 Field* fields = failedLoginsDbResult->Fetch();
                 uint32 failed_logins = fields[1].GetUInt32();
