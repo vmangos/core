@@ -592,7 +592,13 @@ DebuffLimit = 0
 #
 #    LogFile.Trades
 #        Log file of trade related messages
-#        Default: "" (Disable)
+#        Default: "Trades.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.Network
+#        Log file of network related messages
+#        Default: "Network.log"
+#                 "" - Empty name for disable
 #
 #    CharLogDump
 #        Write character dump before deleting in Char.log
@@ -685,6 +691,7 @@ LogFile.Performance = "Perf.log"
 LogFile.Gm = ""
 LogFile.GmCriticalCommands = "gm_critical.log"
 LogFile.Trades = "Trades.log"
+LogFile.Network = "Network.log"
 
 LogMoneyTreshold = 10000
 CharLogDump = 0

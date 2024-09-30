@@ -116,6 +116,7 @@ void Log::OpenWorldLogFiles()
     logFiles[LOG_GM_CRITICAL] = OpenLogFile("LogFile.CriticalCommands", "gm_critical.log", log_file_timestamp, false);
     logFiles[LOG_ANTICHEAT] = OpenLogFile("LogFile.Anticheat", "Anticheat.log", log_file_timestamp, false);
     logFiles[LOG_SCRIPTS] = OpenLogFile("LogFile.Scripts", "Scripts.log", log_file_timestamp, false);
+    logFiles[LOG_NETWORK] = OpenLogFile("LogFile.Network", "Network.log", log_file_timestamp, false);
 }
 
 void Log::InitSmartlogEntries(std::string const& str)
