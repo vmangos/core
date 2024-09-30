@@ -414,7 +414,7 @@ SpellModifier::SpellModifier(SpellModOp _op, SpellModType _type, int32 _value, A
     mask = sSpellMgr.GetSpellAffectMask(aura->GetId(), aura->GetEffIndex());
 }
 
-bool SpellModifier::isAffectedOnSpell(SpellEntry const* spell) const
+bool SpellModifier::IsAffectedOnSpell(SpellEntry const* spell) const
 {
     SpellEntry const* affect_spell = sSpellMgr.GetSpellEntry(spellId);
     // False if affect_spell == nullptr or spellFamily not equal
@@ -18060,7 +18060,7 @@ bool Player::HasInstantCastingSpellMod(SpellEntry const* spellInfo) const
 {
     for (const auto& mod : m_spellMods[SPELLMOD_CASTING_TIME])
     {
-        if ((mod->type == SPELLMOD_PCT) && (mod->value <= -100) && mod->isAffectedOnSpell(spellInfo))
+        if ((mod->type == SPELLMOD_PCT) && (mod->value <= -100) && mod->IsAffectedOnSpell(spellInfo))
             return true;
     }
     return false;
@@ -18081,7 +18081,7 @@ bool Player::IsAffectedBySpellmod(SpellEntry const* spellInfo, SpellModifier con
             return false;
     }
 
-    return mod->isAffectedOnSpell(spellInfo);
+    return mod->IsAffectedOnSpell(spellInfo);
 }
 
 void Player::AddSpellMod(SpellModifier* mod, bool apply)

@@ -4651,7 +4651,7 @@ void Spell::HandleAddTargetTriggerAuras()
     auto const& targetTriggers = m_casterUnit->GetAurasByType(SPELL_AURA_ADD_TARGET_TRIGGER);
     for (const auto targetTrigger : targetTriggers)
     {
-        if (!targetTrigger->isAffectedOnSpell(m_spellInfo))
+        if (!targetTrigger->IsAffectedOnSpell(m_spellInfo))
             continue;
         for (const auto& ihit : m_UniqueTargetInfo)
         {

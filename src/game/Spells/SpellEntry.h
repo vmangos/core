@@ -611,7 +611,7 @@ class SpellEntry
         uint32    EffectAmplitude[MAX_EFFECT_INDEX] = {};          // 97-99
         float     EffectMultipleValue[MAX_EFFECT_INDEX] = {};      // 100-102
         uint32    EffectChainTarget[MAX_EFFECT_INDEX] = {};        // 103-105
-        uint32    EffectItemType[MAX_EFFECT_INDEX] = {};           // 106-108
+        uint64    EffectItemType[MAX_EFFECT_INDEX] = {};           // 106-108
         int32     EffectMiscValue[MAX_EFFECT_INDEX] = {};          // 109-111
         uint32    EffectTriggerSpell[MAX_EFFECT_INDEX] = {};       // 112-114
         float     EffectPointsPerComboPoint[MAX_EFFECT_INDEX] = {};// 115-117

@@ -1023,6 +1023,7 @@ class World
 
         // This thread handles packets while the world sessions update is not running
         std::unique_ptr<std::thread> m_asyncPacketsThread;
+        std::mutex m_asyncPacketsMutex;
         bool m_canProcessAsyncPackets;
         void ProcessAsyncPackets();
 

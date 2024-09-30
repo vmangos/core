@@ -57,6 +57,13 @@ class GenericTransport;
 struct FactionEntry;
 struct FactionTemplateEntry;
 
+class NULLNotifier
+{
+public:
+    template<class T> void Visit(GridRefManager<T>& m) {}
+    void Visit(CameraMapType&) {}
+};
+
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 
 //use this class to measure time between world update ticks
