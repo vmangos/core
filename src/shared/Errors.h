@@ -24,14 +24,14 @@
 
 namespace MaNGOS { namespace Errors
 {
-    /// Prints a stack trace to std::cout and will then terminate the program
+    /// Prints a stack trace to `sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ...)` and will then terminate the program
     [[noreturn]]
     void PrintStacktraceAndThrow(char const* filename, int line, char const* functionName, char const* failedExpression, char const* message = nullptr);
 
-    /// Prints a stack trace to `sLog.(LOG_BASIC,LOG_LVL_MINIMAL, ...)`
+    /// Prints a stack trace to `sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ...)`
     void PrintStacktrace();
 
-    /// Prints a stack trace to `sLog.(LOG_BASIC,LOG_LVL_MINIMAL, ...)`
+    /// Prints a stack trace to `sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ...)`
     void PrintStacktrace(int skipFrames, int maxFrames);
 }} // namespace MaNGOS::Errors
 
