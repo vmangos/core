@@ -24,9 +24,6 @@
 
 #include "Platform/Define.h"
 
-// Nostalrius : pour SD0.
-#define barGoLink BarGoLink
-
 class BarGoLink
 {
     public:                                                 // constructors
