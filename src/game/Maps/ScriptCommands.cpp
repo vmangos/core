@@ -1349,7 +1349,7 @@ bool Map::ScriptCommand_RemoveGameObject(ScriptInfo const& script, WorldObject* 
     }
 
     pGo->SetLootState(GO_JUST_DEACTIVATED);
-    pGo->AddObjectToRemoveList();
+    pGo->Delete();
     return false;
 }
 
