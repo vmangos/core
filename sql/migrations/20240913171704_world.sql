@@ -52,13 +52,6 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11034, -1, 11024, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Leatherworking gossip
 (11035, -3, 11027, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
 (11036, -2, 11035, 11028, 0, 0, 0), -- Gossip for Book Soothslaying for Dummies if both profession requirements are met (Uses engineering text currently. Can be checked for correct text in the future)
--- Note: Condition 4027 corresponds to a condition checking if the current patch is lower than 1.10
-(11058, -1, 11014, 11009, 11022, 4027, 0), -- Condition for Soothsaying Tribal Leatherworking teach script
-(11059, -2, 11024, 11058, 0, 0, 0), -- Condition for Tribal Leatherworking gossip option
-(11060, -1, 11015, 11009, 11022, 4027, 0), -- Condition for Soothsaying Dragonscale Leatherworking teach script
-(11061, -2, 11024, 11060, 0, 0, 0), -- Condition for Dragonscale Leatherworking gossip option
-(11062, -1, 11016, 11009, 11022, 4027, 0), -- Condition for Soothsaying Elemental Leatherworking teach script
-(11063, -2, 11024, 11062, 0, 0, 0); -- Condition for Elemental Leatherworking gossip option
 
 -- Enable relevant npc_text entries
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3283; -- 1128
@@ -66,7 +59,7 @@ UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3284; -- 112
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3285; -- 1130
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3286; -- 1131
 
--- IDs known from neighbouring entries of the same NPCs being sorted numerically by broadcast text id
+-- IDs known from neighbouring entries of the same NPCs being sorted numerically by broadcast_text id
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES 
 (8325, 11884, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (8329, 11900, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -82,11 +75,11 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (1467, 8325, 0, 11004), -- Gossip for Oglethorpe Obnoticus
 (7058, 8322, 0, 11036), -- Gossip for Book Soothslaying for Dummies (Engineering), and for both req
 (7058, 8326, 0, 11034), -- Gossip for Book Soothslaying for Dummies (Leatherworking)
-(22000, 8327, 0, 4018), -- Gossip sub-menu for Dragonscale Leatherworking (male)
-(22001, 8329, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (male)
-(22002, 8331, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
-(22003, 8328, 0, 4018), -- Gossip sub-menu for Elemental Leatherworking (female)
-(22004, 8330, 0, 4018), -- Gossip sub-menu for Tribal Leatherworking (male)
+(22000, 8327, 0, 0), -- Gossip sub-menu for Dragonscale Leatherworking (male)
+(22001, 8329, 0, 0), -- Gossip sub-menu for Elemental Leatherworking (male)
+(22002, 8331, 0, 0), -- Gossip sub-menu for Tribal Leatherworking (male)
+(22003, 8328, 0, 0), -- Gossip sub-menu for Elemental Leatherworking (female)
+(22004, 8330, 0, 0), -- Gossip sub-menu for Tribal Leatherworking (male)
 -- Other gossips --
 (22005, 1128, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 1)
 (22006, 1129, 0, 0), -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 2)
@@ -106,11 +99,8 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (2863, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11024, 'Book Soothsaying for Dummies - Teach Dragonscale Leatherworking'),
 (2864, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11024, 'Book Soothsaying for Dummies - Teach Elemental Leatherworking'),
 (2865, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11024, 'Book Soothsaying for Dummies - Teach Tribal Leatherworking'),
-(2866, 0, 0, 15, 10657, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11060, 'Learn My Leatherworking Focus - Teach Dragonscale Leatherworking'),
-(2867, 0, 0, 15, 10659, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11062, 'Learn My Leatherworking Focus - Teach Elemental Leatherworking'),
-(2868, 0, 0, 15, 10661, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 11058, 'Learn My Leatherworking Focus - Teach Tribal Leatherworking'),
-(318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11048, 'Retake the Hammer Once More - Teach Artisan Armorsmith'),
-(318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11049, 'Retake the Hammer Once More - Teach Artisan Weaponsmith');
+(318203, 0, 0, 15, 9790, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11053, 'Retake the Hammer Once More - Teach Artisan Armorsmith'),
+(318204, 0, 0, 15, 9789, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11054, 'Retake the Hammer Once More - Teach Artisan Weaponsmith');
 
 UPDATE `gossip_menu_option` SET `id` = 1 WHERE `menu_id` = 581 AND `option_icon` = 3; -- Correct ID for training menu for Therum Deepforge
 
@@ -120,12 +110,12 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (7058, 3, 0, 'I am absolutely certain that I want to learn dragonscale leatherworking.', 11889, 1, 1, -1, 0, 2863, 0, 0, '', 0, 11024),
 (7058, 4, 0, 'I am absolutely certain that I want to learn elemental leatherworking.', 11890, 1, 1, -1, 0, 2864, 0, 0, '', 0, 11024),
 (7058, 5, 0, 'I am absolutely certain that I want to learn tribal leatherworking.', 11891, 1, 1, -1, 0, 2865, 0, 0, '', 0, 11024),
-(3067, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 2866, 0, 0, '', 0, 11061), -- Peter Galen (Dragonscale Leatherworking - Alliance)
-(3068, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 2866, 0, 0, '', 0, 11061), -- Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
-(3069, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22001, 0, 2867, 0, 0, '', 0, 11063), -- Brumn Winterhoof (Elemental Leatherworking - Horde)
-(3070, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22003, 0, 2867, 0, 0, '', 0, 11063), -- Sarah Tanner (Elemental Leatherworking - Alliance)
-(3072, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22004, 0, 2868, 0, 0, '', 0, 11059), -- Caryssia Moonhunter (Tribal Leatherworking - Alliance)
-(3073, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22002, 0, 2868, 0, 0, '', 0, 11059), -- Se'Jib (Tribal Leatherworking - Horde)
+(3067, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 0, 0, 0, '', 0, 11024), -- Peter Galen (Dragonscale Leatherworking - Alliance)
+(3068, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22000, 0, 0, 0, 0, '', 0, 11024), -- Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
+(3069, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22001, 0, 0, 0, 0, '', 0, 11024), -- Brumn Winterhoof (Elemental Leatherworking - Horde)
+(3070, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22003, 0, 0, 0, 0, '', 0, 11024), -- Sarah Tanner (Elemental Leatherworking - Alliance)
+(3072, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22004, 0, 0, 0, 0, '', 0, 11024), -- Caryssia Moonhunter (Tribal Leatherworking - Alliance)
+(3073, 2, 0, 'I wish to learn my leatherworking focus.', 8678, 1, 19, 22002, 0, 0, 0, 0, '', 0, 11024), -- Se'Jib (Tribal Leatherworking - Horde)
 (2762, 2, 0, 'Tell me more about Forging Armor.', 3267, 1, 17, 22005, 0, 0, 0, 0, '', 0, 11056),
 (22005, 1, 0, 'Can you give me directions?', 3269, 1, 17, 22006, 0, 0, 0, 0, '', 0, 0),
 (2762, 3, 0, 'Tell me more about Forging Weapons.', 3271, 1, 17, 22007, 0, 0, 0, 0, '', 0, 11056),
@@ -188,8 +178,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Note: Condition 178 corresponds to a condition checking if the player is level 40 or higher
 -- Note: Condition 368 corresponds to a condition checking if the player has a Blacksmithing skill of 200
 -- Note: Condition 1356 corresponds to a condition checking if the player has NOT learnt Armorsmith AND has NOT learnt Weaponsmith
-(11048, -1, 178, 368, 1356, 11046, 0), -- Condition for relearning gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for Armorsmithing
-(11049, -1, 178, 368, 1356, 11047, 0), -- Condition for relearning gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for Weaponsmithing
+(11048, -1, 178, 368, 1356, 4018, 0), -- Condition for above conditions and patch is 1.10 or later
+(11053, -1, 11048, 11046, 0, 0, 0), -- Condition for relearning gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for Armorsmithing
+(11054, -1, 11048, 11047, 0, 0, 0), -- Condition for relearning gossip by Bengus Deepforge (Alliance) and Krathok Moltenfist (Horde) for Weaponsmithing
 (11050, 8, 5305, 0, 0, 0, 0), -- Condition to check if the player has completed "Sweet Serenity" (Hammersmith sub-specialisation)
 (11051, 8, 5306, 0, 0, 0, 0), -- Condition to check if the player has completed "Snakestone of the Shadow Huntress" (Axesmith sub-specialisation)
 (11052, 8, 5307, 0, 0, 0, 0), -- Condition to check if the player has completed "Corruption" (Swordsmith sub-specialisation)
@@ -200,9 +191,10 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Note: Condition 1351 corresponds to a condition checking if the player has a Blacksmithing skill of 250
 -- Note: Condition 1352 corresponds to a condition checking if the player has learnt Artisan Weaponsmith
 -- Note: Condition 1364 corresponds to a condition checking if the player has NOT learnt any of the weaponsmith sub-specialisations
-(11064, -1, 1351, 1352, 1364, 11050, 0), -- Condition for relearning Hammersmithing
-(11065, -1, 1351, 1352, 1364, 11051, 0), -- Condition for relearning Axesmithing
-(11066, -1, 1351, 1352, 1364, 11052, 0); -- Condition for relearning Swordsmithing
+(11063, -1, 1351, 1352, 1364, 4018, 0), -- Condition checking for the above conditions and the patch is 1.10 or later
+(11064, -1, 11063, 10500, 0, 0, 0),    -- Condition for relearning Hammersmithing
+(11065, -1, 11063, 11051, 0, 0, 0), -- Condition for relearning Axesmithing
+(11066, -1, 11063, 11052, 0, 0, 0); -- Condition for relearning Swordsmithing
 
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5283; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Alliance)
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` = 5301; -- Add Armorsmithing reputation requirement for "The Art of the Armorsmith" (Horde)
@@ -242,10 +234,10 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318202 WHERE `menu_id` = 3187 AND `id` = 1; -- Weaponsmith Horde
 
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-(3182, 2, 0, 'Myolor, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8892, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11048),
-(3182, 3, 0, 'Myolor, I was once a weaponsmith and wish to retake the hammer once more! Teach me the way of the weaponsmith!', 8893, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11049), -- This option has 2 exclamation marks! Alliance weaponsmiths are extra exciting I guess!
-(3187, 2, 0, 'Krathok, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8894, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11048),
-(3187, 3, 0, 'Krathok, I was once a weaponsmith and wish to retake the hammer once more! Teach me the way of the weaponsmith.', 8895, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11049);
+(3182, 2, 0, 'Myolor, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8892, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11053),
+(3182, 3, 0, 'Myolor, I was once a weaponsmith and wish to retake the hammer once more! Teach me the way of the weaponsmith!', 8893, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11054), -- This option has 2 exclamation marks! Alliance weaponsmiths are extra exciting I guess!
+(3187, 2, 0, 'Krathok, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8894, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11053),
+(3187, 3, 0, 'Krathok, I was once a weaponsmith and wish to retake the hammer once more! Teach me the way of the weaponsmith.', 8895, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11054);
 
 -- Update conditions for relearning gossip for weaponsmithing sub-specialisations
 UPDATE `gossip_menu_option` SET `condition_id` = 11065 WHERE `menu_id` = 6089 AND `id` = 0; -- Kilram (Axesmithing)
