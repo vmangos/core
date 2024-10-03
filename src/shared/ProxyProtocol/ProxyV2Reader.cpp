@@ -1,6 +1,8 @@
 #include "ProxyV2Reader.h"
 #include "Log.h"
 
+#include <cstring>
+
 #if defined(__linux__) || defined(__APPLE__)
 #include <arpa/inet.h> // for ntohs
 #endif
