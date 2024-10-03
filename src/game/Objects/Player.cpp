@@ -19692,11 +19692,20 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
     if (!found)
         return;
 
-    // Prevent learning profession specializations, because unlearning and re-learning a profession doesn't automatically re-add the specialization
+    // Prevent learning profession specializations from 1.10 onwards, because unlearning and re-learning a profession doesn't automatically re-add the specialization
     SpellEntry const* learned_0 = sSpellMgr.GetSpellEntry(spellInfo->EffectTriggerSpell[EFFECT_INDEX_0]);
     if (learned_0->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_TRADE_SKILL && !learned_0->Effect[EFFECT_INDEX_1])
-        return;
-    
+        if (sWorld.GetWowPatch() >= WOW_PATCH_110)
+        {
+            return;
+        }
+        // Pre-1.10 teach the specialization only if the player has acquired the relevant profession (any skill level)
+        else
+        {
+            uint32 skill = quest->GetRequiredSkill();
+            if (GetSkillValue(skill) == 0)
+                return;
+        }
     CastSpell(this, spellId, true);
 }
 
