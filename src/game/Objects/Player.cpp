@@ -21571,6 +21571,12 @@ void Player::SetControlledBy(Unit* pWho)
 
 bool Player::ChangeRace(uint8 newRace)
 {
+    uint8 oldRace = GetRace();
+    uint8 pClass = GetClass();
+    uint8 gender = GetGender();
+    uint8 team = GetTeam();
+    Powers powertype = GetPowerType();
+
     if (IsSavingDisabled() || IsBot())
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot change race of bot or temporary character!");
@@ -21581,7 +21587,6 @@ bool Player::ChangeRace(uint8 newRace)
     if (!info)
         return false;
 
-    uint8 oldRace = GetRace();
     bool bChangeTeam = (TeamForRace(oldRace) != TeamForRace(newRace));
 
     m_saveDisabled = true;
@@ -21591,11 +21596,19 @@ bool Player::ChangeRace(uint8 newRace)
         return false;
     }
 
+    ResetSpells();
+
     // Change the race
-    SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE, newRace);
     LearnDefaultSpells();
 
     SetFactionForRace(newRace);
+    SetFloatValue(OBJECT_FIELD_SCALE_X, ((newRace == RACE_TAUREN) ? 1.3f : 1.0f));
+    SetUInt32Value(UNIT_FIELD_BYTES_0, ((newRace) | (pClass << 8) | (gender << 16) | (powertype << 24)));
+    SetUInt32Value(UNIT_FIELD_DISPLAYID, gender == GENDER_MALE ? info->displayId_m : info->displayId_f);
+    SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, gender == GENDER_MALE ? info->displayId_m : info->displayId_f);
+    SetUInt32Value(PLAYER_BYTES, 1 | (1 << 8) | (1 << 16) | (1 << 24));
+    SetUInt32Value(PLAYER_BYTES_2, (1) | (0x02 << 24));
+    SetByteValue(PLAYER_BYTES_2, 2, 7); // keep bank tabs
 
     if (!ChangeReputationsForRace(oldRace, newRace))
     {
@@ -21617,6 +21630,11 @@ bool Player::ChangeRace(uint8 newRace)
     RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     // Save with the new race
+    SetHealth(GetMaxHealth());
+
+    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+    SetPower(POWER_RAGE, 0);
+    SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
     m_saveDisabled = false;
     SaveToDB();
     m_saveDisabled = true;
