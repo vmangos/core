@@ -124,7 +124,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* sourcePacket, WorldPacket* targ
             decompressedPacket >> addonName;
             decompressedPacket >> flags >> modulusCRC >> urlCRC;
 
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ADDON: Name: %s Flags %u Modulus CRC: %u URL CRC %u", addonName.c_str(), flags, modulusCRC, urlCRC);
+            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ADDON: Name: %s Flags %u Modulus CRC: %u URL CRC %u", addonName.c_str(), flags, modulusCRC, urlCRC);
 
             if (addonName.find("Blizzard") != std::string::npos) // hide standard addons
             {
