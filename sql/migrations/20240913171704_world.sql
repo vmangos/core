@@ -51,7 +51,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11024, -1, 11009, 11017, 11022, 4018, 0), -- Same as 11023 and the patch is 1.10 or later
 (11034, -1, 11024, 11027, 0, 0, 0), -- Condition for Book "Soothsaying for Dummies" Leatherworking gossip
 (11035, -3, 11027, 0, 0, 0, 0), -- Condition if requirements for both Engineering and Leatherworking gossip is met
-(11036, -2, 11035, 11028, 0, 0, 0), -- Gossip for Book Soothslaying for Dummies if both profession requirements are met (Uses engineering text currently. Can be checked for correct text in the future)
+(11036, -2, 11035, 11028, 0, 0, 0); -- Gossip for Book Soothslaying for Dummies if both profession requirements are met (Uses engineering text currently. Can be checked for correct text in the future)
 
 -- Enable relevant npc_text entries
 UPDATE `npc_text` SET `Probability0` = 1 WHERE `BroadcastTextID0` = 3283; -- 1128
