@@ -6306,6 +6306,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_casterUnit && m_casterUnit->HasAura(18172))
                         return SPELL_FAILED_ITEM_NOT_READY;
                 }
+                else if (m_spellInfo->Id == 21050) // Melodious Rapture
+                {
+                    if (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetEntry() != 13016)
+                        return SPELL_FAILED_BAD_TARGETS;
+                }
                 else if (m_spellInfo->IsFitToFamilyMask<CF_WARLOCK_LIFE_TAP>() && m_casterUnit)
                 {
                     float cost = m_currentBasePoints[EFFECT_INDEX_0];

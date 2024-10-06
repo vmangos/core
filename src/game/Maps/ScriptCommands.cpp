@@ -806,7 +806,7 @@ bool Map::ScriptCommand_SetMovementType(ScriptInfo const& script, WorldObject* s
             break;
         case FOLLOW_MOTION_TYPE:
             if (pTarget)
-                pSource->GetMotionMaster()->MoveFollow(pTarget, script.x, script.o);
+                pSource->GetMotionMaster()->MoveFollow(pTarget, script.x, script.o < 0 ? frand(0, 2 * M_PI_F) : script.o);
             break;
         case CHARGE_MOTION_TYPE:
             if (pTarget)
