@@ -383,7 +383,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
             crea->SetHomePosition(x, y, z, 0);
             crea->GetMotionMaster()->Clear();
             crea->GetMotionMaster()->Initialize();
-            crea->GetMotionMaster()->MovePoint(1, x, y, z, true);
+            crea->GetMotionMaster()->MovePoint(1, x, y, z, MOVE_PATHFINDING);
         }
     }
     void SummonGuard()
@@ -398,7 +398,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
             crea->SetHomePosition(x, y, z, 0);
             crea->GetMotionMaster()->Clear();
             crea->GetMotionMaster()->Initialize();
-            crea->GetMotionMaster()->MovePoint(1, x, y, z, true);
+            crea->GetMotionMaster()->MovePoint(1, x, y, z, MOVE_PATHFINDING);
         }
     }
     EventLocations spawnPoints[18];//not using m_wait though
@@ -428,7 +428,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                             crea->SetHomePosition(x, y, z, 0);
                             crea->GetMotionMaster()->Clear();
                             crea->GetMotionMaster()->Initialize();
-                            crea->GetMotionMaster()->MovePoint(1, x, y, z, true);
+                            crea->GetMotionMaster()->MovePoint(1, x, y, z, MOVE_PATHFINDING);
                         }
                     }
                     waveTimer = 60000;
