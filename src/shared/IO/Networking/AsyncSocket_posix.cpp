@@ -504,7 +504,16 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
 #if defined(__linux__)
     if (event & EPOLLERR)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "epoll reported socket error");
+        int error = 0;
+        socklen_t errLen = sizeof(error);
+        if (::getsockopt(m_descriptor.GetNativeSocket(), SOL_SOCKET, SO_ERROR, (void*)&error, &errLen) == 0)
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "epoll reported socket error: %s", SystemErrorToString(error).c_str());
+        }
+        else
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "epoll reported socket error: Internal error");
+        }
         StopPendingTransactionsAndForceClose();
     }
     else if (event & EPOLLRDHUP)
@@ -526,10 +535,10 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
         case EVFILT_EXCEPT:
         {
             int error = 0;
-            socklen_t errlen = sizeof(error);
-            if (::getsockopt(m_descriptor.GetNativeSocket(), SOL_SOCKET, SO_ERROR, (void*)&error, &errlen) == 0)
+            socklen_t errLen = sizeof(error);
+            if (::getsockopt(m_descriptor.GetNativeSocket(), SOL_SOCKET, SO_ERROR, (void*)&error, &errLen) == 0)
             {
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "kqueue reported socket exception: Error: %s", SystemErrorToCString(error));
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "kqueue reported socket exception: Error: %s", SystemErrorToString(error).c_str());
 
                 if (error == 0)
                     break;
