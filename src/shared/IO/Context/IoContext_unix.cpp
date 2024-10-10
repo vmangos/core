@@ -75,13 +75,13 @@ void IO::IoContext::RunUntilShutdown()
                 while (!m_contextSwitchQueue.empty())
                 {
                     IO::SystemIoEventReceiver* eventReceiver;
-                    m_contextSwitchQueueLock.lock();
-                    if (!m_contextSwitchQueue.empty())
                     {
+                        std::lock_guard<std::mutex> lock(m_contextSwitchQueueLock);
+                        if (m_contextSwitchQueue.empty()) // re-check after we locked the queue if it's really not empty
+                            continue;
                         eventReceiver = m_contextSwitchQueue.front();
                         m_contextSwitchQueue.pop();
                     }
-                    m_contextSwitchQueueLock.unlock();
                     eventReceiver->OnIoEvent(0);
                 }
             }
