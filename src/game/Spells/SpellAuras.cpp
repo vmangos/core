@@ -1802,7 +1802,10 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         return;
                     }
                     case 16739: // Orb of Deception (before patch 1.7)
+                    {
                         return HandleAuraTransform(apply, Real);
+                    }
+                    case 21051: // Melodious Rapture Visual (DND)
                     case 21827: // Frostwolf Aura DND
                     case 21863: // Alterac Ram Aura DND
                     {
@@ -6702,6 +6705,18 @@ void Aura::PeriodicDummyTick()
                             target->CastSpell(target, 16334, true); // Summon Spiteful Phantom
                         else
                             target->CastSpell(target, 16335, true); // Summon Wrath Phantom
+                    }
+                    return;
+                }
+                case 21051: // Melodious Rapture Visual (DND)
+                {
+                    if (Creature* pRat = target->ToCreature())
+                    {
+                        if (pRat->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
+                        {
+                            // lost track of player
+                            pRat->DespawnOrUnsummon(1);
+                        }
                     }
                     return;
                 }

@@ -31,6 +31,7 @@
 #include "MapManager.h"
 #include "BattleGroundMgr.h"
 #include "Master.h"
+#include "TimePeriod.h"
 
 #include "Database/DatabaseEnv.h"
 
@@ -51,6 +52,9 @@ void WorldRunnable::operator()()
 
     Master::ArmAnticrash();
     uint32 anticrashRearmTimer = 0;
+
+    // Set the platform's timer period
+    const auto scoped_tp = set_time_period(std::chrono::milliseconds(1));
 
     // Aim for WORLD_SLEEP_CONST update times
     // If we update slower, update again immediately.

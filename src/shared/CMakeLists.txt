@@ -70,6 +70,7 @@ set (shared_SRCS
     Multithreading/Messager.h
     SRP6/SRP6.h
     nonstd/expected.hpp
+    TimePeriod.h
     nonstd/optional.hpp
     ByteBuffer.cpp
     Common.cpp
@@ -152,6 +153,7 @@ set (shared_SRCS
     ArgparserForServer.cpp
     Memory/ArrayDeleter.h
     Memory/NoDeleter.h
+    TimePeriod.cpp
 )
 
 if(USE_LIBCURL)
