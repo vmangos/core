@@ -7863,7 +7863,11 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
             chance = GetPPMProcChance(WeaponSpeed, 1.0f);   // default to 1 PPM for unknown proc rates
 
         if (roll_chance_f(chance))
-            CastSpell(Target, spellInfo->Id, true, item);
+        {
+            // if this item casts an on-hit positive spell, set target to self
+            // this prevents Ravager Bladestorm channel from ending on enemy death
+            CastSpell(spellInfo->IsPositiveSpell() ? this : Target, spellInfo->Id, true, item);
+        }
     }
 
     // item combat enchantments

@@ -286,7 +286,7 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
 
     // extra attack
     Unit* victim = GetVictim();
-    if (IsInCombat() && m_doExtraAttacks && GetExtraAttacks() && victim && (CanAutoAttackTarget(victim) == ATTACK_RESULT_OK))
+    if (IsInCombat() && m_doExtraAttacks && GetExtraAttacks() && victim && (CanAutoAttackTarget(victim) == ATTACK_RESULT_OK) && !IsNonMeleeSpellCasted(false, false, true))
     {
         m_doExtraAttacks = false;
 

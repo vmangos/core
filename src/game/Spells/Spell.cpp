@@ -943,6 +943,11 @@ void Spell::prepareDataForTriggerSystem()
                 if (m_spellInfo->IsFitToFamilyMask<CF_PRIEST_TOUCH_OF_WEAKNESS, CF_PRIEST_DEVOURING_PLAGUE>())
                     m_canTrigger = true;
                 break;
+            case SPELLFAMILY_GENERIC:
+                // Ravager Whirlwind procs can trigger procs
+                if (m_spellInfo->Id == 9633)
+                    m_canTrigger = true;
+                break;
             default:
                 break;
         }
@@ -1660,6 +1665,12 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                 // Judgement of Righteousness
                     (m_spellInfo->IsFitToFamilyMask<CF_PALADIN_JUDGEMENT_OF_RIGHTEOUSNESS>() && m_spellInfo->SpellIconID == 25))
                     triggerWeaponProcs = true;
+            }
+
+            // trigger weapon procs for Ravager's Bladestorm Whirlwind attacks
+            else if (m_spellInfo->Id == 9633)
+            {
+                triggerWeaponProcs = true;
             }
         }
 
