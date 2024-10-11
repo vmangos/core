@@ -1260,6 +1260,7 @@ bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint3
         case TARGET_T_HOSTILE_LAST_AGGRO:
         case TARGET_T_HOSTILE_RANDOM:
         case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
+        case TARGET_T_HOSTILE_FARTHEST:
         {
             if (targetParam1& ~MAX_SELECT_FLAG_MASK)
             {
@@ -2959,6 +2960,10 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, Map* pM
                 param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (Unit* pUnitSource = ToUnit(pSource))
                 return pUnitSource->FindNearestFriendlyPlayer(param1);
+            break;
+        case TARGET_T_HOSTILE_FARTHEST:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_FARTHEST, 0, pSpellEntry, param1 ? param1 : SELECT_FLAG_NO_TOTEM);
             break;
     }
     return nullptr;
