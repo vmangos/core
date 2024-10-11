@@ -238,7 +238,7 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(uint32 const uiDiff)
             break;
         case NPC_SYLVANAS:
         case NPC_VARIMATHRAS:
-            if (m_creature->GetDistance(fX, fY, fZ) < 120.0f)
+            if (fZ < -53.0f)
                 return false;
             break;
         default:

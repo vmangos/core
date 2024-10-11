@@ -69,6 +69,9 @@ public:
 
     void UpdateAI(uint32 const uiDiff) override
     {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+            return;
+
         if (m_uiFadedTimer)
         {
             if (m_uiFadedTimer > uiDiff)
@@ -77,11 +80,9 @@ public:
                 return;
             }
             m_uiFadedTimer = 0;
-            m_creature->GetMotionMaster()->Clear();
+            m_creature-> GetMotionMaster()->Clear();
+            m_creature-> GetMotionMaster()->MoveChase(m_creature->GetVictim());
         }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
 
         if (m_uiSummSkelTimer <= uiDiff)
         {
