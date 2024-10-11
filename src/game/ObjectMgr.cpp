@@ -10082,6 +10082,7 @@ GameTele const* ObjectMgr::GetGameTele(std::string const& name) const
     GameTele const* alt = nullptr;
     std::wstring::size_type size = -1;
     for (const auto& itr : m_GameTeleMap)
+    {
         if (itr.second.wnameLow == wname)
             return &itr.second;
         else if (itr.second.wnameLow.find(wname) != std::wstring::npos)
@@ -10093,6 +10094,7 @@ GameTele const* ObjectMgr::GetGameTele(std::string const& name) const
                 size = newSize;
             }
         }
+    }
 
     return alt;
 }
