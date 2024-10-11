@@ -961,17 +961,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     m_casterUnit->GetThreatManager().modifyThreatPercent(unitTarget, -100);
                     return;
                 }
-                case 9976:                                  // Polly Eats the E.C.A.C.
-                {
-                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
-                        return;
-
-                    // Summon Polly Jr.
-                    unitTarget->CastSpell(unitTarget, 9998, true);
-
-                    ((Creature*)unitTarget)->ForcedDespawn(100);
-                    return;
-                }
                 case 12162:                                 // Deep wounds
                 case 12850:                                 // (now good common check for this spells)
                 case 12868:
