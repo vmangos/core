@@ -2216,10 +2216,9 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
 
     // bonus from skills is 0.04%
     int32    skillDiff = attackerWeaponSkill - victimMaxSkillValueForLevel;
-    int32    cappedSkillDiff = std::min(attackerMaxSkillValueForLevel, attackerWeaponSkill) - victimMaxSkillValueForLevel;
     int32    blockSkillBonus = pVictim->IsPlayer() ? 4 * skillDiff : 10 * skillDiff;
     int32    dodgeSkillBonus = pVictim->IsPlayer() ? 4 * skillDiff : 10 * skillDiff;
-    int32    parrySkillBonus = pVictim->IsPlayer() ? 4 * skillDiff : cappedSkillDiff < -10 ? 60 * cappedSkillDiff : 20 * cappedSkillDiff;
+    int32    parrySkillBonus = pVictim->IsPlayer() ? 4 * skillDiff : skillDiff < -10 ? 60 * skillDiff : 10 * skillDiff;
     int32    sum = 0, tmp = 0;
     int32    roll = urand(0, 9999);
 
