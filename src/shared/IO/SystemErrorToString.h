@@ -3,8 +3,7 @@
 
 #include <string>
 
-// The buffer is thread_local, don't free it
-char const* SystemErrorToCString(int nativeSystemErrorCode);
+/** Returns the status code and text description of a system error */
 std::string SystemErrorToString(int nativeSystemErrorCode);
 
 #endif //MANGOS_IO_SYSTEMERRORTOSTRING_H

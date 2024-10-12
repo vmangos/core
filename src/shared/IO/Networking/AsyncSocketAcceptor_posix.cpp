@@ -44,14 +44,14 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     IO::Native::SocketHandle listenNativeSocket = ::socket(AF_INET, SOCK_STREAM, 0);
     if (listenNativeSocket == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::socket(listen) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::socket(listen) Error: %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
 
     int optionValue = 1; // Unix/macOS is a bit weird. When someone else is still connected to our socket, but we restart the server, the server cannot bind again.
     if (::setsockopt(listenNativeSocket, SOL_SOCKET, SO_REUSEADDR, &optionValue, sizeof(optionValue)) != 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::setsockopt(reuseaddr) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::setsockopt(reuseaddr) Error: %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
 
@@ -61,14 +61,14 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     m_serverAddress.sin_port = htons(port);
     if (::bind(listenNativeSocket, (struct sockaddr*)&m_serverAddress, sizeof(m_serverAddress)) != 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::bind(listen) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::bind(listen) Error: %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
 
     int const acceptBacklogCount = 50; // the number of connection requests that are queued in the kernel until this process calls "accept"
     if (::listen(listenNativeSocket, acceptBacklogCount) != 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::listen(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::listen(...) Error: %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
 
@@ -84,7 +84,7 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     event.data.ptr = server.get(); // note static_assert above
     if (::epoll_ctl(ctx->GetUnixEpollDescriptor(), EPOLL_CTL_ADD, listenNativeSocket, &event) == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::epoll_ctl(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::epoll_ctl(...) Error: %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
 #elif defined(__APPLE__)
@@ -93,7 +93,7 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     EV_SET(&addedEvents, listenNativeSocket, EVFILT_READ, EV_ADD | EV_ERROR, 0, 0, server.get());
     if (::kevent(ctx->GetKqueueDescriptor(), &addedEvents, 1, nullptr, 0, nullptr) == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::kevent(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::kevent(...) Error: %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
 #else
@@ -130,7 +130,7 @@ void IO::Networking::AsyncSocketAcceptor::OnNewClientToAcceptAvailable()
     int nativePeerSocket = ::accept(m_acceptorNativeSocket, (struct sockaddr*)&peerAddress, &client_len);
     if (nativePeerSocket == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "RunEventLoop -> ::accept(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "RunEventLoop -> ::accept(...) Error: %s", SystemErrorToString(errno).c_str());
         return;
     }
 

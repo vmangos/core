@@ -58,7 +58,7 @@ uint64_t IO::Filesystem::FileHandleReadonly::ReadSync(uint8_t* dest, uint64_t am
         ssize_t actuallyReadThisCycle = ::read(m_nativeFileHandle, dest, amountToReadThisCycle);
         if (actuallyReadThisCycle == -1)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ReadSync -> ::read() Error: %s", SystemErrorToCString(errno));
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ReadSync -> ::read() Error: %s", SystemErrorToString(errno).c_str());
             return 0;
         }
         leftToRead -= actuallyReadThisCycle;

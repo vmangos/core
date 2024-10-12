@@ -29,7 +29,7 @@ IO::NetworkError IO::Networking::AsyncSocket::InitializeAndFixateMemoryLocation(
     event.data.ptr = this;
     if (::epoll_ctl(m_ctx->GetUnixEpollDescriptor(), EPOLL_CTL_ADD, m_descriptor.GetNativeSocket(), &event) == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "OnNewClientToAcceptAvailable -> ::epoll_ctl(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "OnNewClientToAcceptAvailable -> ::epoll_ctl(...) Error: %s", SystemErrorToString(errno).c_str());
         return IO::NetworkError(NetworkError::ErrorType::InternalError, errno);
     }
 #elif defined(__APPLE__)
@@ -43,7 +43,7 @@ IO::NetworkError IO::Networking::AsyncSocket::InitializeAndFixateMemoryLocation(
 
     if (::kevent(m_ctx->GetKqueueDescriptor(), addedEvents, 2, nullptr, 0, nullptr) == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "AsyncSocket -> ::kevent(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "AsyncSocket -> ::kevent(...) Error: %s", SystemErrorToString(errno).c_str());
         return IO::NetworkError(NetworkError::ErrorType::InternalError, errno);
     }
 #else
@@ -297,7 +297,7 @@ void IO::Networking::AsyncSocket::PerformNonBlockingRead()
     }
     if (newWrittenBytes < 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::recv on client failed: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::recv on client failed: %s", SystemErrorToString(errno).c_str());
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_LOAD);
         return;
     }
@@ -364,7 +364,7 @@ void IO::Networking::AsyncSocket::PerformNonBlockingWrite()
     {
         if (errno != EWOULDBLOCK)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::send on client failed: %s", SystemErrorToCString(errno));
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::send on client failed: %s", SystemErrorToString(errno).c_str());
         }
         m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_LOAD);
         return;

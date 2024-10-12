@@ -24,7 +24,7 @@ std::unique_ptr<IO::IoContext> IO::IoContext::CreateIoContext()
     int epollDescriptor = ::epoll_create(epollSizeHint);
     if (epollDescriptor == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateIoContext() -> ::epoll_create(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateIoContext() -> ::epoll_create(...) Error: %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
 
@@ -33,7 +33,7 @@ std::unique_ptr<IO::IoContext> IO::IoContext::CreateIoContext()
     IO::Native::FileHandle contextSwitchEventFd = ::eventfd(initialCounter, 0);
     if (contextSwitchEventFd == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateIoContext() -> ::eventfd(...) : %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateIoContext() -> ::eventfd(...) : %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
 
@@ -43,7 +43,7 @@ std::unique_ptr<IO::IoContext> IO::IoContext::CreateIoContext()
     event.data.u32 = static_cast<uint32_t>(IoContextEpollTargetType::ContextSwitchRequest);
     if (::epoll_ctl(epollDescriptor, EPOLL_CTL_ADD, contextSwitchEventFd, &event) == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateIoContext() -> ::epoll_ctl(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateIoContext() -> ::epoll_ctl(...) Error: %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
 
@@ -62,7 +62,7 @@ void IO::IoContext::RunUntilShutdown()
         if (numEvents == -1)
         {
             if (errno != EINTR) // ignore interrupted system call
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "RunEventLoop -> ::epoll_wait(...) Error: %s", SystemErrorToCString(errno));
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "RunEventLoop -> ::epoll_wait(...) Error: %s", SystemErrorToString(errno).c_str());
             continue;
         }
 

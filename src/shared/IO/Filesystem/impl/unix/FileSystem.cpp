@@ -16,7 +16,7 @@ std::unique_ptr<IO::Filesystem::FileHandleReadonly> IO::Filesystem::TryOpenFileR
     IO::Native::FileHandle fileHandle = ::open(filePath.c_str(), nativeFlags);
 
     if (fileHandle == -1) {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to open file. Error %s on file: %s", SystemErrorToCString(errno), filePath.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to open file. Error %s on file: %s", SystemErrorToString(errno).c_str(), filePath.c_str());
         return nullptr;
     }
 
