@@ -243,6 +243,7 @@ void IO::Networking::AsyncSocket::Write(IO::ReadableBuffer const& source, std::f
     }
 
     m_writeSrc = source;
+    m_writeSrcAlreadyTransferred = alreadySent;
     m_writeCallback = callback;
 
     m_atomicState.fetch_xor(SocketStateFlags::WRITE_PRESENT | SocketStateFlags::WRITE_PENDING_SET); // set PRESENT and unset PENDING_SET
