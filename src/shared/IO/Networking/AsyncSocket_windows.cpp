@@ -100,7 +100,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
                 int err = ::WSAGetLastError();
                 if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
                 {
-                    sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
+                    sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::WSARecv(...) Error: %u", err);
                     auto tmpCallback = std::move(m_readCallback);
                     m_currentReadTask.Reset();
                     m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
@@ -126,7 +126,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
         int err = ::WSAGetLastError();
         if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::WSARecv(...) Error: %u", err);
             auto tmpCallback = std::move(m_readCallback);
             m_currentReadTask.Reset();
             m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
@@ -208,7 +208,7 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
         int err = ::WSAGetLastError();
         if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSARecv(...) Error: %u", err);
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::WSARecv(...) Error: %u", err);
             auto tmpCallback = std::move(m_readCallback);
             m_currentReadTask.Reset();
             m_atomicState.fetch_and(~SocketStateFlags::READ_PRESENT);
@@ -304,7 +304,7 @@ void IO::Networking::AsyncSocket::Write(IO::ReadableBuffer const& source, std::f
         int err = ::WSAGetLastError();
         if (err != WSA_IO_PENDING) // Pending means that this task was queued (which is what we want)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSASend(...) Error: %u", err);
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::WSASend(...) Error: %u", err);
             auto tmpCallback = std::move(m_writeCallback);
             m_writeSrc = nullptr;
             m_currentWriteTask.Reset();

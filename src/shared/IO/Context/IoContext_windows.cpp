@@ -9,7 +9,7 @@ std::unique_ptr<IO::IoContext> IO::IoContext::CreateIoContext()
     HANDLE completionPort = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, completionKey, numberOfMaxThreads);
     if (completionPort == nullptr)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::CreateIoCompletionPort(root, ...) Error: %u", GetLastError());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::CreateIoCompletionPort(root, ...) Error: %u", GetLastError());
         return nullptr;
     }
     return std::unique_ptr<IoContext>(new IoContext(completionPort));
@@ -48,7 +48,7 @@ void IO::IoContext::RunUntilShutdown()
             DWORD errorCode = ::GetLastError();
             if (errorCode != WAIT_TIMEOUT && m_isRunning)
             {
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::GetQueuedCompletionStatus(...) Has no TASK!!! Error: %u", errorCode);
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::GetQueuedCompletionStatus(...) Has no TASK!!! Error: %u", errorCode);
             }
             std::this_thread::yield(); // wait one os tick to try again
         }
@@ -76,7 +76,7 @@ void IO::IoContext::PostOperationForImmediateInvocation(IO::AsyncIoOperation* ta
     if (!::PostQueuedCompletionStatus(m_completionPort, 0, completionKey, task))
     {
         DWORD error = ::GetLastError();
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::PostQueuedCompletionStatus(...) Error: %u", error);
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::PostQueuedCompletionStatus(...) Error: %u", error);
     }
 }
 

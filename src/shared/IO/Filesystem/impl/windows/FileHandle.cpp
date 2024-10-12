@@ -65,7 +65,7 @@ uint64_t IO::Filesystem::FileHandleReadonly::ReadSync(uint8_t* dest, uint64_t am
         bool isOkay = ::ReadFile(m_nativeFileHandle, dest, amountToReadThisCycle, &actuallyReadThisCycle, nullptr);
         if (!isOkay)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] ReadSync -> ::ReadFile() Error: %u", GetLastError());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ReadSync -> ::ReadFile() Error: %u", GetLastError());
             return 0;
         }
         leftToRead -= actuallyReadThisCycle;

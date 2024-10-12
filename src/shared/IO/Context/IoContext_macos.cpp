@@ -20,7 +20,7 @@ std::unique_ptr<IO::IoContext> IO::IoContext::CreateIoContext()
     int kqueueDescriptor = ::kqueue();
     if (kqueueDescriptor == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] CreateIoContext() -> ::kqueue(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateIoContext() -> ::kqueue(...) Error: %s", SystemErrorToCString(errno));
         return nullptr;
     }
 
@@ -43,7 +43,7 @@ void IO::IoContext::RunUntilShutdown()
         if (numEvents == -1)
         {
             if (errno != EINTR) // ignore interrupted system call
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] RunEventLoop -> ::kevent(...) Error: %s", SystemErrorToCString(errno));
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "RunEventLoop -> ::kevent(...) Error: %s", SystemErrorToCString(errno));
             continue;
         }
 
@@ -74,6 +74,6 @@ void IO::IoContext::PostForImmediateInvocation(IO::SystemIoEventReceiver* eventR
 
     if (::kevent(m_kqueueDescriptor, &addedEvent, 1, nullptr, 0, nullptr) == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] PostKqueueEventForImmediateExecution() -> ::kevent(...) Error: %s", SystemErrorToCString(errno));
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "PostKqueueEventForImmediateExecution() -> ::kevent(...) Error: %s", SystemErrorToCString(errno));
     }
 }

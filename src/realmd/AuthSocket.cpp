@@ -647,7 +647,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         else
         {
             pinResult = false;
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] Invalid PIN flags set for user %s - user cannot log-in until fixed", m_login.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid PIN flags set for user %s - user cannot log-in until fixed", m_login.c_str());
         }
     }
 
@@ -900,7 +900,7 @@ void AuthSocket::_HandleReconnectChallenge()
             // Stop if the account is not found
             if (!queryResult)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s tried to login and we cannot find his session key in the database.", self->m_login.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "user %s tried to login and we cannot find his session key in the database.", self->m_login.c_str());
                 self->CloseSocket();
                 return;
             }
@@ -981,7 +981,7 @@ void AuthSocket::_HandleReconnectProof()
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s tried to login, but session invalid.", self->m_login.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "user %s tried to login, but session invalid.", self->m_login.c_str());
             self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
             return;
         }
@@ -1011,7 +1011,7 @@ void AuthSocket::_HandleRealmList()
 
         if (delay < minDelay)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", self->m_login.c_str(), self->GetRemoteIpString().c_str(), delay);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", self->m_login.c_str(), self->GetRemoteIpString().c_str(), delay);
 
             self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
             return;

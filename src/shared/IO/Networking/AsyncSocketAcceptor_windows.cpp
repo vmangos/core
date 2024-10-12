@@ -54,7 +54,7 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     errorCode = ::WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (errorCode != 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::WSAStartup(...) Error: %u", errorCode);
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::WSAStartup(...) Error: %u", errorCode);
         return nullptr;
     }
 
@@ -62,7 +62,7 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     SOCKET listenNativeSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (listenNativeSocket == INVALID_SOCKET)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::socket(listen, ...) Error: %u", ::WSAGetLastError());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::socket(listen, ...) Error: %u", ::WSAGetLastError());
         return nullptr;
     }
 
@@ -86,7 +86,7 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
     int const acceptBacklogCount = 50; // the number of connection requests that are queued in the kernel until this process calls "accept"
     if (::listen(listenNativeSocket, acceptBacklogCount) != 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[ERROR] ::listen(...) Error: %s", SystemErrorToString(::WSAGetLastError()).c_str());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::listen(...) Error: %s", SystemErrorToString(::WSAGetLastError()).c_str());
         return nullptr;
     }
 
