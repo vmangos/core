@@ -557,11 +557,14 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
     while (!m_sendQueue.empty())
     {
         m_sendQueueLock.lock();
-        WorldPacket packet = m_sendQueue.front();
+        if (m_sendQueue.empty()) // re-check after we locked the queue if it's really not empty
+        {
+            m_sendQueueLock.unlock();
+            break;
+        }
+        WorldPacket packet = std::move(m_sendQueue.front());
         m_sendQueue.pop();
         m_sendQueueLock.unlock();
-
-        uint32 opcode = packet.GetOpcode();
 
         ServerPktHeader header{};
 
@@ -578,7 +581,7 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
             alreadyAllocatedBuffer->append(packet.contents(), packet.size());
     }
 
-    m_socket.Write({ alreadyAllocatedBuffer /* dont move */ }, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error)
+    m_socket.Write({ alreadyAllocatedBuffer /* dont move, re-used in lambda */ }, [self = shared_from_this(), alreadyAllocatedBuffer](IO::NetworkError const& error)
     {
         self->HandleResultOfAsyncWrite(error, alreadyAllocatedBuffer);
     });
