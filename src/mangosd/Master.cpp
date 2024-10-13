@@ -189,7 +189,7 @@ int Master::Run()
 
     // Launch WorldRunnable thread
     std::thread world_thread = IO::Multithreading::CreateThread("WorldRunnable", WorldRunnable());
-    // world_thread.setPriority(ACE_Based::Highest);
+    // world_thread.setPriority(ACE_Based::Highest); // TODO
 
     // set realmbuilds depend on mangosd expected builds, and set server online
     {

@@ -83,7 +83,6 @@ source_group("Dynamic"
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${TBB_INCLUDE_DIRS}
-  ${ACE_INCLUDE_DIR}
   ${CMAKE_SOURCE_DIR}/src/shared
 )
 
