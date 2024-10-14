@@ -6663,8 +6663,6 @@ void Aura::PeriodicDummyTick()
                     if (spellRandom == 7052)
                         spellRandom = 7053;
 
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "7054 %u", spellRandom);
-
                     target->CastSpell(target, spellRandom, true, nullptr, this);
                     // Possibly need cast one of them (but
                     // 7038 Forsaken Skill: Swords
