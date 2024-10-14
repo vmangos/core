@@ -1457,6 +1457,9 @@ void Aura::TriggerSpell()
         {
             case 7054:
                 spellRandom = urand(0, 14) + 7038;
+                if (spellRandom == 7052)
+                    spellRandom = 7053;
+
                 target->CastSpell(target, spellRandom, true, nullptr, this);
                 return;
                 break;
