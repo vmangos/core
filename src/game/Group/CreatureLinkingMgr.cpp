@@ -82,7 +82,7 @@ void CreatureLinkingMgr::LoadFromDB()
     }
     else
     {
-        BarGoLink bar((int)result->GetRowCount());
+        BarGoLink bar(result->GetRowCount());
         do
         {
             bar.step();
@@ -127,7 +127,7 @@ void CreatureLinkingMgr::LoadFromDB()
         return;
     }
 
-    BarGoLink guidBar((int)result->GetRowCount());
+    BarGoLink guidBar(result->GetRowCount());
     do
     {
         guidBar.step();

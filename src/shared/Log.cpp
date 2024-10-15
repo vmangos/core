@@ -24,13 +24,15 @@
 #include "Policies/SingletonImp.h"
 #include "Config/Config.h"
 #include "Util.h"
-#include "ByteBuffer.h"
 #include "ProgressBar.h"
 
-#include <stdarg.h>
+#include <cstdarg>
 #include <iostream>
+#include <thread>
 
-#include "ace/OS_NS_unistd.h"
+#if PLATFORM == PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
 
 INSTANTIATE_SINGLETON_1(Log);
 
@@ -114,6 +116,7 @@ void Log::OpenWorldLogFiles()
     logFiles[LOG_GM_CRITICAL] = OpenLogFile("LogFile.CriticalCommands", "gm_critical.log", log_file_timestamp, false);
     logFiles[LOG_ANTICHEAT] = OpenLogFile("LogFile.Anticheat", "Anticheat.log", log_file_timestamp, false);
     logFiles[LOG_SCRIPTS] = OpenLogFile("LogFile.Scripts", "Scripts.log", log_file_timestamp, false);
+    logFiles[LOG_NETWORK] = OpenLogFile("LogFile.Network", "Network.log", log_file_timestamp, false);
 }
 
 void Log::InitSmartlogEntries(std::string const& str)
@@ -377,7 +380,8 @@ if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= l
 
 void Log::Out(LogType logType, LogLevel logLevel, char const* format, ...)
 {
-    ASSERT(logType >= 0 && logType < LOG_TYPE_MAX&& logLevel >= 0 && logLevel <= LOG_LVL_DEBUG);
+    if (!(logType >= 0 && logType < LOG_TYPE_MAX&& logLevel >= 0 && logLevel <= LOG_LVL_DEBUG))
+        return;
 
     if (!format)
         return;
@@ -460,7 +464,7 @@ bool Log::IsSmartLog(uint32 entry, uint32 guid) const
 
 void Log::WaitBeforeContinueIfNeed()
 {
-    int mode = sConfig.GetIntDefault("WaitAtStartupError", 0);
+    int mode = sConfig.GetIntDefault("WaitAtStartupError", 5);
 
     if (mode < 0)
     {
@@ -476,7 +480,7 @@ void Log::WaitBeforeContinueIfNeed()
         for (int i = 0; i < mode; ++i)
         {
             bar.step();
-            ACE_OS::sleep(1);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
 }

@@ -143,6 +143,7 @@ enum LogType
     LOG_GM_CRITICAL,
     LOG_ANTICHEAT,
     LOG_SCRIPTS,
+    LOG_NETWORK,
     LOG_TYPE_MAX
 };
 

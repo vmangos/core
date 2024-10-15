@@ -23,7 +23,7 @@ class PlayerBroadcaster final
 
     std::size_t const MAX_QUEUE_SIZE;
 
-    WorldSocket* m_socket;
+    std::shared_ptr<WorldSocket> m_socket;
     ObjectGuid m_self;
 
     std::map<ObjectGuid, std::shared_ptr<PlayerBroadcaster> > m_listeners;
@@ -45,13 +45,13 @@ class PlayerBroadcaster final
     uint32 lastUpdatePackets;
 
 public:
-    PlayerBroadcaster(WorldSocket* socket, ObjectGuid const& self, std::size_t max_queue = 500);
+    PlayerBroadcaster(std::shared_ptr<WorldSocket> socket, ObjectGuid const& self, std::size_t max_queue = 500);
     ~PlayerBroadcaster();
 
     static uint32 num_bcaster_created;
     static uint32 num_bcaster_deleted;
 
-    void ChangeSocket(WorldSocket* new_socket);
+    void ChangeSocket(std::shared_ptr<WorldSocket> const& new_socket);
     void FreeAtLogout();
 
     ObjectGuid GetGUID() const;
