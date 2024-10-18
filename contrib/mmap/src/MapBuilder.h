@@ -35,7 +35,6 @@
 #include "json.hpp"
 
 using namespace VMAP;
-// G3D namespace typedefs conflicts with ACE typedefs
 
 using json = nlohmann::json;
 

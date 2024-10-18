@@ -487,7 +487,7 @@ void CreatureGroupsManager::Load()
             int32 maxCount = fields[3].GetInt32();
 
             if (maxCount <= 0)
-                maxCount = INT_MAX;
+                maxCount = std::numeric_limits<int32>::max();
             else if (minCount > maxCount)
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Min count %u is bigger than Max count %u for id %u in group with leader guid %u", minCount, maxCount, creatureId, fields[0].GetUInt32());

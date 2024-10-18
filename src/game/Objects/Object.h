@@ -24,6 +24,7 @@
 
 #include "Common.h"
 #include "Log.h"
+#include "Errors.h"
 #include "ByteBuffer.h"
 #include "UpdateFields.h"
 #include "UpdateData.h"

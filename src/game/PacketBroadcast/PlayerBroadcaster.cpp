@@ -1,4 +1,5 @@
 #include "PlayerBroadcaster.h"
+
 #include "MovementBroadcaster.h"
 #include "WorldPacket.h"
 #include "WorldSocket.h"
@@ -7,22 +8,15 @@
 uint32 PlayerBroadcaster::num_bcaster_created = 0;
 uint32 PlayerBroadcaster::num_bcaster_deleted = 0;
 
-PlayerBroadcaster::PlayerBroadcaster(WorldSocket* w_socket, ObjectGuid const& self, std::size_t max_queue)
-    : MAX_QUEUE_SIZE(max_queue), m_socket(w_socket), m_self(self), instanceId(0), lastUpdatePackets(0)
+PlayerBroadcaster::PlayerBroadcaster(std::shared_ptr<WorldSocket> socket, ObjectGuid const& self, std::size_t max_queue)
+    : MAX_QUEUE_SIZE(max_queue), m_socket(std::move(socket)), m_self(self), instanceId(0), lastUpdatePackets(0)
 {
-    if (m_socket)
-        m_socket->AddReference();
-
     m_queue.reserve(max_queue);
     ++num_bcaster_created;
 }
 
-void PlayerBroadcaster::ChangeSocket(WorldSocket* new_socket)
+void PlayerBroadcaster::ChangeSocket(std::shared_ptr<WorldSocket> const& new_socket)
 {
-    if (m_socket)
-        m_socket->RemoveReference();
-    if (new_socket)
-        new_socket->AddReference();
     m_socket = new_socket;
 }
 
@@ -117,11 +111,7 @@ ObjectGuid PlayerBroadcaster::GetGUID() const
 
 void PlayerBroadcaster::FreeAtLogout()
 {
-    if (m_socket)
-    {
-        m_socket->RemoveReference();
-        m_socket = nullptr;
-    }
+    m_socket = nullptr;
     std::unique_lock<std::mutex> q_g(m_queue_lock), v_g(m_listeners_lock);
     m_queue.clear();
     m_listeners.clear();
@@ -129,7 +119,6 @@ void PlayerBroadcaster::FreeAtLogout()
 
 PlayerBroadcaster::~PlayerBroadcaster()
 {
-    if (m_socket)
-        m_socket->RemoveReference();
+    m_socket = nullptr;
     ++num_bcaster_deleted;
 }

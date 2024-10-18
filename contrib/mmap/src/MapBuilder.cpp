@@ -24,6 +24,7 @@
 #include "Maps/GridMapDefines.h"
 #include "DetourNavMeshBuilder.h"
 #include "DetourCommon.h"
+#include <climits>
 
 using namespace VMAP;
 
