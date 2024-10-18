@@ -5333,6 +5333,9 @@ bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellS
     if (spellProto->SpellFamilyName == SPELLFAMILY_POTION ||
             (spellProto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HEALTHSTONE>()))
         crit_chance = 10.0f;
+    // flat 5% crit chance for Sweeping Strikes
+    if (spellProto->Id == 26654)
+        crit_chance = 5.0f;
     else
     {
         // Wand shoot forced to use ranged crit

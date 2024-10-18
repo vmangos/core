@@ -371,7 +371,12 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
                 return SPELL_PROC_TRIGGER_OK;
         }
 #endif
-
+        //  Never proc for Rend.	
+        if (spellProto->Id == 12292) 
+        {
+            if (procSpell->SpellIconID == 245)      
+                return SPELL_PROC_TRIGGER_FAILED;
+        }
         // SHAMAN
         // Elemental Mastery
         // Do not consume aura if spell did not benefit from crit chance bonus.
@@ -550,7 +555,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
     uint32 triggered_spell_id = 0;
     Unit* target = pVictim;
     int32  basepoints[MAX_EFFECT_INDEX] = {0, 0, 0};
-
+    int8 stacks_left = triggeredByAura->GetHolder()->GetAuraCharges();
 
     switch (dummySpell->SpellFamilyName)
     {
@@ -614,7 +619,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     target = SelectRandomUnfriendlyTarget(pVictim, radius, false, true, false);
 #endif
                     if (!target)
-                        return SPELL_AURA_PROC_FAILED;
+                        return SPELL_AURA_PROC_OK; //Burn charges when solo target
 
                     // World of Warcraft Client Patch 1.10.0 (2006-03-28)
                     // - Execute - This ability will now work with Sweeping Strikes again. If
@@ -640,6 +645,13 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                             triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                         }
                     }
+                    else if (procSpell && procSpell->Id == 1680 && stacks_left > 1) //Whirlwind
+                    {   
+                        basepoints[0] = ditheru(amount * 100 / CalcArmorReducedDamage(pVictim, 100)); 
+                        triggered_spell_id = 12723;                                                   
+                        CastSpell(pVictim, 26654, true);                                              
+                        triggeredByAura->GetHolder()->DropAuraCharge();
+                    }    
                     else // Full damage on anything else
 #endif
                     {
