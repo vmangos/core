@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 
 #include <sstream>
+#include <iomanip>
 
 char const* ObjectGuid::GetTypeName(HighGuid high)
 {
@@ -56,6 +57,7 @@ char const* ObjectGuid::GetTypeName(HighGuid high)
 std::string ObjectGuid::GetString() const
 {
     std::ostringstream str;
+    str << "0x" << std::setfill('0') << std::setw(16) << std::hex << m_guid << " ";
     str << GetTypeName();
 
     if (IsPlayer())
@@ -65,7 +67,7 @@ std::string ObjectGuid::GetString() const
             str << " " << name;
     }
 
-    str << " (";
+    str << " (" << std::dec;
     if (HasEntry())
         str << (IsPet() ? "Petnumber: " : "Entry: ") << GetEntry() << " ";
     str << "Guid: " << GetCounter() << ")";
