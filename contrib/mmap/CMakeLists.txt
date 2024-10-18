@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 2.6...3.20)
 
-project(MoveMapGen)
+project(MoveMapGenerator)
 
 ADD_DEFINITIONS(-DMMAP_GENERATOR -DDEBUG)
 
@@ -47,10 +47,10 @@ set(SOURCES
     ./src/VMapExtensions.cpp
 )
 
-add_executable(MoveMapGen ${SOURCES})
-SET_TARGET_PROPERTIES (MoveMapGen PROPERTIES FOLDER Extractors)
+add_executable(MoveMapGenerator ${SOURCES})
+SET_TARGET_PROPERTIES (MoveMapGenerator PROPERTIES FOLDER Extractors)
 
-target_link_libraries(MoveMapGen 
+target_link_libraries(MoveMapGenerator
                         vmap 
                         Detour
                         Recast
@@ -59,4 +59,10 @@ target_link_libraries(MoveMapGen
                         framework
                         )
 
-install(TARGETS MoveMapGen DESTINATION ${BIN_DIR})
+install(TARGETS MoveMapGenerator DESTINATION ${BIN_DIR}/Extractors)
+install(FILES ${CMAKE_SOURCE_DIR}/contrib/mmap/offmesh.txt DESTINATION ${BIN_DIR}/Extractors)
+install(FILES ${CMAKE_SOURCE_DIR}/contrib/mmap/config.json DESTINATION ${BIN_DIR}/Extractors)
+
+if(WIN32 AND MSVC)
+  install(FILES ${CMAKE_SOURCE_DIR}/bin/Debug/MoveMapGenerator.pdb DESTINATION ${BIN_DIR}/Extractors CONFIGURATIONS Debug)
+endif()
