@@ -103,11 +103,11 @@ def get_subprocess_config() -> SubprocessConfig:
         startup_info.dwFlags |= 0x00000001
         startup_info.wShowWindow = 7
         creation_flags = subprocess.CREATE_NEW_CONSOLE  # type: ignore
-        executable = script_directory / "MoveMapGen.exe"
+        executable = script_directory / "MoveMapGenerator.exe"
     else:
         startup_info = None
         creation_flags = 0
-        executable = script_directory / "MoveMapGen"
+        executable = script_directory / "MoveMapGenerator"
 
     return SubprocessConfig(executable, startup_info, creation_flags)
 
