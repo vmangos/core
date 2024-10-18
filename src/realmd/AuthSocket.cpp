@@ -92,10 +92,12 @@ void AuthSocket::Start()
 
 AuthSocket::~AuthSocket()
 {
-    m_socket.CloseSocket();
+    CloseSocket();
 
     if (m_sessionDurationTimeout)
         m_sessionDurationTimeout->Cancel();
+
+    sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] Connection closed", GetRemoteIpString().c_str());
 }
 
 AccountTypes AuthSocket::GetSecurityOn(uint32 realmId) const
@@ -111,13 +113,13 @@ void AuthSocket::DoRecvIncomingData()
 {
     std::shared_ptr<eAuthCmd> cmd = std::make_shared<eAuthCmd>();
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "DoRecvIncomingData() Reading... Ready for next opcode");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[%s] DoRecvIncomingData() Reading... Ready for next opcode", GetRemoteIpString().c_str());
     m_socket.Read((char*)cmd.get(), sizeof(eAuthCmd), [self = shared_from_this(), cmd](IO::NetworkError const& error, size_t) -> void
     {
         if (error)
         {
             if (error.GetErrorType() != IO::NetworkError::ErrorType::SocketClosed)
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] DoRecvIncomingData Read(cmd) error: %s", error.ToString().c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] DoRecvIncomingData Read(cmd) error: %s", self->GetRemoteIpString().c_str(), error.ToString().c_str());
             return;
         }
 
@@ -143,15 +145,15 @@ void AuthSocket::DoRecvIncomingData()
             if (table[i].cmd != *cmd)
                 continue;
 
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] CMD: %u requires status %u, user has %u", *cmd, table[i].status, self->m_status);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[%s] CMD: %u requires status %u, user has %u", self->GetRemoteIpString().c_str(), *cmd, table[i].status, self->m_status);
 
             if (table[i].status != self->m_status)
             { // unauthorized
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Auth] Received unauthorized command %u", *cmd);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] Received unauthorized command %u", self->GetRemoteIpString().c_str(), *cmd);
                 return;
             }
 
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[Auth] Got data for cmd %u", *cmd);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[%s] Got data for cmd %u", self->GetRemoteIpString().c_str(), *cmd);
 
             // this handler will async call Read and Write, and hopefully will call DoRecvIncomingData or CloseSocket when done.
             ((*self).*table[i].asyncHandler)();

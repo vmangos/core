@@ -90,7 +90,7 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
     if (alreadyRead == 0)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "Read(...) -> ::recv() returned 0, which means the socket is half-closed.");
+        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "[%s] Read(...) -> ::recv() returned 0, which means the socket is half-closed.", GetRemoteIpString().c_str());
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         StopPendingTransactionsAndForceClose();
         return;
@@ -158,7 +158,7 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
     if (alreadyRead == 0)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
-        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "Read(...) -> ::recv() returned 0, which means the socket is half-closed.");
+        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "[%s] Read(...) -> ::recv() returned 0, which means the socket is half-closed.", GetRemoteIpString().c_str());
         callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         StopPendingTransactionsAndForceClose();
         return;
@@ -255,7 +255,7 @@ void IO::Networking::AsyncSocket::CloseSocket()
     if (m_atomicState.fetch_or(SocketStateFlags::SHUTDOWN_PENDING) & SocketStateFlags::SHUTDOWN_PENDING)
         return; // there was already a ::close()
 
-    sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "CloseSocket(): Disconnect request");
+    sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "[%s] CloseSocket(): Disconnect request", GetRemoteIpString().c_str());
     m_descriptor.CloseSocket(); // will silently remove from this socket from the epoll/kqueue set
 }
 
@@ -292,13 +292,13 @@ void IO::Networking::AsyncSocket::PerformNonBlockingRead()
     if (newWrittenBytes == 0)
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_LOAD);
-        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "::recv() returned 0, which means the socket is half-closed.");
+        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "[%s] ::recv() returned 0, which means the socket is half-closed.", GetRemoteIpString().c_str());
         StopPendingTransactionsAndForceClose();
         return;
     }
     if (newWrittenBytes < 0)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::recv on client failed: %s", SystemErrorToString(errno).c_str());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] ::recv on client failed: %s", GetRemoteIpString().c_str(), SystemErrorToString(errno).c_str());
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_LOAD);
         return;
     }
@@ -365,7 +365,7 @@ void IO::Networking::AsyncSocket::PerformNonBlockingWrite()
     {
         if (errno != EWOULDBLOCK)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "::send on client failed: %s", SystemErrorToString(errno).c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] ::send on client failed: %s", GetRemoteIpString().c_str(), SystemErrorToString(errno).c_str());
         }
         m_atomicState.fetch_and(~SocketStateFlags::WRITE_PENDING_LOAD);
         return;
@@ -509,17 +509,17 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
         socklen_t errLen = sizeof(error);
         if (::getsockopt(m_descriptor.GetNativeSocket(), SOL_SOCKET, SO_ERROR, (void*)&error, &errLen) == 0)
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "epoll reported socket error: %s", SystemErrorToString(error).c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] epoll reported socket error: %s", GetRemoteIpString().c_str(), SystemErrorToString(error).c_str());
         }
         else
         {
-            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "epoll reported socket error: Internal error");
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] epoll reported socket error: Internal error", GetRemoteIpString().c_str());
         }
         StopPendingTransactionsAndForceClose();
     }
     else if (event & EPOLLRDHUP)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "EPOLLRDHUP -> Going to disconnect.");
+        sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "[%s] EPOLLRDHUP -> Going to disconnect.", GetRemoteIpString().c_str());
         StopPendingTransactionsAndForceClose();
     }
     else
@@ -539,14 +539,14 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
             socklen_t errLen = sizeof(error);
             if (::getsockopt(m_descriptor.GetNativeSocket(), SOL_SOCKET, SO_ERROR, (void*)&error, &errLen) == 0)
             {
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "kqueue reported socket exception: Error: %s", SystemErrorToString(error).c_str());
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] kqueue reported socket exception: Error: %s", GetRemoteIpString().c_str(), SystemErrorToString(error).c_str());
 
                 if (error == 0)
                     break;
             }
             else
             {
-                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "kqueue reported socket exception: Internal error");
+                sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] kqueue reported socket exception: Internal error", GetRemoteIpString().c_str());
             }
             StopPendingTransactionsAndForceClose();
             break;

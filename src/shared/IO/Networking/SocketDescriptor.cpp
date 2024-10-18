@@ -15,9 +15,8 @@ IO::Networking::SocketDescriptor::~SocketDescriptor()
 
 void IO::Networking::SocketDescriptor::CloseSocket()
 {
-    if (!m_isClosed)
-    {
-        IO::Networking::Internal::CloseSocket(m_nativeSocket);
-        m_isClosed = true;
-    }
+    if (m_isClosed)
+        return;
+    m_isClosed = true;
+    IO::Networking::Internal::CloseSocket(m_nativeSocket);
 }

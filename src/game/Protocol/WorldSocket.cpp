@@ -76,7 +76,8 @@ WorldSocket::WorldSocket(IO::Networking::AsyncSocket socket)
 
 WorldSocket::~WorldSocket()
 {
-    m_socket.CloseSocket();
+    CloseSocket();
+    sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] Connection closed", GetRemoteIpString().c_str());
 }
 
 void WorldSocket::DoRecvIncomingData()
@@ -89,7 +90,7 @@ void WorldSocket::DoRecvIncomingData()
         {
             if (error.GetErrorType() != IO::NetworkError::ErrorType::SocketClosed || !self->IsClosing())
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "WorldSocket::DoRecvIncomingData: IoError: %s", error.ToString().c_str());
+                sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] WorldSocket::DoRecvIncomingData: IoError: %s", self->m_socket.GetRemoteIpString().c_str(), error.ToString().c_str());
                 self->CloseSocket(); // This call to CloseSocket is actually necessary for once, so that others can see that this socket is not usable anymore
             }
             return;
@@ -103,7 +104,7 @@ void WorldSocket::DoRecvIncomingData()
 
         if ((header->size < 4) || (header->size > 0x2800) || (header->cmd >= NUM_MSG_TYPES))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "WorldSocket::DoRecvIncomingData: client sent malformed packet size = %u , cmd = %u", header->size, header->cmd);
+            sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] WorldSocket::DoRecvIncomingData: client sent malformed packet size = %u, cmd = %u", self->m_socket.GetRemoteIpString().c_str(), header->size, header->cmd);
             return;
         }
 
@@ -520,7 +521,7 @@ void WorldSocket::SendPacket(WorldPacket packet)
     if (m_sendQueue.size() > 1024) // There should never be so many packets queued up. The socket is probably not responding.
     {
         m_sendQueueLock.unlock();
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Send queue is full. Disconnect IP: ", GetRemoteIpString().c_str());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] Send queue is full. Disconnecting.", GetRemoteIpString().c_str());
         CloseSocket();
         return;
     }
@@ -541,7 +542,7 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
 {
     if (error)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "Failed to send packet %s", error.ToString().c_str());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] Failed to send packet %s", GetRemoteIpString().c_str(), error.ToString().c_str());
         m_sendQueueIsRunning.clear();
         return;
     }

@@ -102,14 +102,14 @@ void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socke
                 return; // implicit close()
             }
             worldSocket->m_remoteIpAddressStringAfterProxy = maybeIp.value().ToString();
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from %s (proxy ip: %s)", worldSocket->GetRemoteIpString().c_str(), worldSocket->m_socket.GetRemoteIpString().c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] Connection accepted (proxy ip: %s)", worldSocket->GetRemoteIpString().c_str(), worldSocket->m_socket.GetRemoteIpString().c_str());
             worldSocket->Start();
         });
     }
     else
     {
         // no proxy, we can start directly
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from %s", worldSocket->GetRemoteIpString().c_str());
+        sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] Connection accepted", worldSocket->GetRemoteIpString().c_str());
         worldSocket->Start();
     }
 }

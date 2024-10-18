@@ -262,14 +262,14 @@ extern int main(int argc, char** argv)
                     return; // implicit close()
                 }
                 authSocket->m_remoteIpAddressStringAfterProxy = maybeIp.value().ToString();
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from %s (proxy ip: %s)", authSocket->GetRemoteIpString().c_str(), authSocket->m_socket.GetRemoteIpString().c_str());
+                sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] Connection accepted (proxy ip: %s)", authSocket->GetRemoteIpString().c_str(), authSocket->m_socket.GetRemoteIpString().c_str());
                 authSocket->Start();
             });
         }
         else
         {
             // no proxy, we can start directly
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Accepting connection from %s", authSocket->GetRemoteIpString().c_str());
+            sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] Connection accepted", authSocket->GetRemoteIpString().c_str());
             authSocket->Start();
         }
     });

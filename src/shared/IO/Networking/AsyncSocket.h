@@ -21,12 +21,12 @@
 namespace IO { namespace Networking {
 
     /// You have to keep the instance alive while a transaction is running. Use a shared pointer or something on every callback!
-    class AsyncSocket : public MaNGOS::Policies::NoCopyButAllowMove
+    class AsyncSocket final : public MaNGOS::Policies::NoCopyButAllowMove
 #if defined(__linux__) || defined(__APPLE__)
            , public IO::SystemIoEventReceiver
 #endif
     {
-        public:
+        public: // public functions
             /// Dont forget to call `InitializeAndFixateMemoryLocation` before making a transfer
             explicit AsyncSocket(IO::IoContext* ctx, SocketDescriptor socketDescriptor);
             AsyncSocket(AsyncSocket&& other) noexcept;
@@ -127,7 +127,6 @@ namespace IO { namespace Networking {
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
 #elif defined(__linux__) || defined(__APPLE__)
-        private:
             void PerformNonBlockingRead();
             void PerformNonBlockingWrite();
             void PerformContextSwitch();
