@@ -300,23 +300,18 @@ int Master::Run()
         World::StopNow(ERROR_EXIT_CODE);
     }
 
-    // Stop freeze protection before shutdown tasks
+    world_thread.join(); // <-- This will block until the world stops
+
+    _UnhookSignals(); // Remove signal handling before leaving
+
     if (freeze_thread)
         freeze_thread->join();
 
-    // Stop soap thread
     if (soap_thread)
         soap_thread->join();
 
     // Set server offline in realmlist
-    //LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%u'", REALM_FLAG_OFFLINE, realmID);
-
-    // Remove signal handling before leaving
-    _UnhookSignals();
-
-    // when the main thread closes the singletons get unloaded
-    // since worldrunnable uses them, it will crash if unloaded after master
-    world_thread.join();
+    LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%u'", REALM_FLAG_OFFLINE, realmID);
 
     sWorldSocketMgr.StopWorldNetworking();
 
