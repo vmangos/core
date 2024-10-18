@@ -400,6 +400,8 @@ void IO::Networking::AsyncSocket::PerformContextSwitch()
         return; // We are not allowed to react to it
     }
 
+    MANGOS_ASSERT(state & SocketStateFlags::CONTEXT_PRESENT); // why was this function even called if we have no context?
+
     auto tmpCallback = std::move(m_contextCallback);
     m_atomicState.fetch_and(~(SocketStateFlags::CONTEXT_PENDING_LOAD | SocketStateFlags::CONTEXT_PRESENT));
 
@@ -411,9 +413,9 @@ void IO::Networking::AsyncSocket::StopPendingTransactionsAndForceClose()
 {
     CloseSocket(); // this guarantees SHUTDOWN_PENDING to be set
 
-    m_atomicState.fetch_or(SocketStateFlags::IGNORE_TRANSFERS);
-
     int state = m_atomicState.fetch_or(SocketStateFlags::IGNORE_TRANSFERS);
+    if (state & SocketStateFlags::IGNORE_TRANSFERS)
+        return; // maybe another thread also called StopPendingTransactionsAndForceClose
 
     // we must wait for the other threads to finish
     int const pendingTransferMask = SocketStateFlags::WRITE_PENDING_SET |
