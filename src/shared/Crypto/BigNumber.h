@@ -84,8 +84,8 @@ class BigNumber
         uint32 AsDword();
         std::vector<uint8> AsByteArray(int minSize = 0, bool reverse = true) const;
 
-        char const* AsHexStr();
-        char const* AsDecStr();
+        std::string AsHexStr();
+        std::string AsDecStr();
 
     private:
         struct bignum_st* _bn;

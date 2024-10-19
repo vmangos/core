@@ -756,13 +756,11 @@ bool AuthSocket::_HandleLogonProof()
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
-        const char* K_hex = srp.GetStrongSessionKey().AsHexStr();
+        std::string K_hex = srp.GetStrongSessionKey().AsHexStr();
         const char *os = reinterpret_cast<char *>(&m_os); // no injection as there are only two possible values
         const char *platform = reinterpret_cast<char *>(&m_platform); // no injection as there are only two possible values
         std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",
-            K_hex, get_remote_address().c_str(), GetLocaleByName(m_localizationName), os, platform, m_safelogin.c_str() );
-
-        OPENSSL_free((void*)K_hex);
+            K_hex.c_str(), get_remote_address().c_str(), GetLocaleByName(m_localizationName), os, platform, m_safelogin.c_str() );
 
         // Finish SRP6 and send the final result to the client
         Sha1Hash sha;
@@ -928,7 +926,7 @@ bool AuthSocket::_HandleReconnectProof()
     sha.UpdateBigNumbers(&t1, &m_reconnectProof, &K, nullptr);
     sha.Finalize();
 
-    if (!memcmp(sha.GetDigest(), lp.R2, SHA_DIGEST_LENGTH))
+    if (!memcmp(sha.GetDigest(), lp.R2, sha.GetLength()))
     {
         if (!VerifyVersion(lp.R1, sizeof(lp.R1), lp.R3, true))
         {
@@ -1258,7 +1256,7 @@ bool AuthSocket::VerifyPinData(uint32 pin, const PINData& clientData)
     sha.Finalize();
     hash.SetBinary(sha.GetDigest(), sha.GetLength());
 
-    return !memcmp(hash.AsDecStr(), clientHash.AsDecStr(), 20);
+    return hash.AsDecStr() == clientHash.AsDecStr();
 }
 
 uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {

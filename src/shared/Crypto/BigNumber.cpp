@@ -183,12 +183,18 @@ std::vector<uint8> BigNumber::AsByteArray(int minSize, bool reverse) const
     return byteArray;
 }
 
-char const* BigNumber::AsHexStr()
+std::string BigNumber::AsHexStr()
 {
-    return BN_bn2hex(_bn);
+    char* chars = BN_bn2hex(_bn);
+    std::string str(chars);
+    OPENSSL_free(chars);
+    return str;
 }
 
-char const* BigNumber::AsDecStr()
+std::string BigNumber::AsDecStr()
 {
-    return BN_bn2dec(_bn);
+    char* chars = BN_bn2dec(_bn);
+    std::string str(chars);
+    OPENSSL_free(chars);
+    return str;
 }

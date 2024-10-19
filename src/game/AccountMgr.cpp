@@ -57,15 +57,12 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
 
     SRP6 srp;
     srp.CalculateVerifier(CalculateShaPassHash(username, password));
-    const char* s_hex = srp.GetSalt().AsHexStr();
-    const char* v_hex = srp.GetVerifier().AsHexStr();
+    std::string s_hex = srp.GetSalt().AsHexStr();
+    std::string v_hex = srp.GetVerifier().AsHexStr();
 
     bool update_sv = LoginDatabase.PExecute(
         "INSERT INTO account(`username`, `v`, `s`, `joindate`) VALUES('%s','%s','%s',NOW())",
-        username.c_str(), v_hex, s_hex);
-
-    OPENSSL_free((void*)s_hex);
-    OPENSSL_free((void*)v_hex);
+        username.c_str(), v_hex.c_str(), s_hex.c_str());
 
     if (!update_sv)
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error
@@ -138,15 +135,12 @@ AccountOpResult AccountMgr::ChangeUsername(uint32 accid, std::string new_uname, 
     std::string safe_new_uname = new_uname;
     LoginDatabase.escape_string(safe_new_uname);
 
-    const char* s_hex = srp.GetSalt().AsHexStr();
-    const char* v_hex = srp.GetVerifier().AsHexStr();
+    std::string s_hex = srp.GetSalt().AsHexStr();
+    std::string v_hex = srp.GetVerifier().AsHexStr();
 
     bool update_sv = LoginDatabase.PExecute(
         "UPDATE `account` SET `v`='%s', `s`='%s', `username`='%s' WHERE `id`='%u'",
-        v_hex, s_hex, safe_new_uname.c_str(), accid);
-
-    OPENSSL_free((void*)s_hex);
-    OPENSSL_free((void*)v_hex);
+        v_hex.c_str(), s_hex.c_str(), safe_new_uname.c_str(), accid);
 
     if (!update_sv)
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error
@@ -175,15 +169,12 @@ AccountOpResult AccountMgr::ChangePassword(uint32 accid, std::string new_passwd,
 
     srp.CalculateVerifier(CalculateShaPassHash(username, new_passwd));
 
-    const char* s_hex = srp.GetSalt().AsHexStr();
-    const char* v_hex = srp.GetVerifier().AsHexStr();
+    std::string s_hex = srp.GetSalt().AsHexStr();
+    std::string v_hex = srp.GetVerifier().AsHexStr();
 
     bool update_sv = LoginDatabase.PExecute(
         "UPDATE `account` SET `v`='%s', `s`='%s' WHERE `id`='%u'",
         v_hex, s_hex, accid);
-
-    OPENSSL_free((void*)s_hex);
-    OPENSSL_free((void*)v_hex);
 
     // also reset s and v to force update at next realmd login
     if (!update_sv)

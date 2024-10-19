@@ -169,17 +169,7 @@ bool SRP6::Proof(uint8* lp_M, int l)
 
 bool SRP6::ProofVerifier(std::string vC)
 {
-    const char* vC_hex = vC.c_str();
-    const char* v_hex = v.AsHexStr();
-
-    if (memcmp(vC_hex, v_hex, strlen(vC_hex)) == 0)
-    {
-        OPENSSL_free((void*)v_hex);
-        return true;
-    }
-
-    OPENSSL_free((void*)v_hex);
-    return false;
+    return vC == v.AsHexStr();
 }
 
 void SRP6::Finalize(Sha1Hash& sha)
