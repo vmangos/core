@@ -41,7 +41,6 @@ set (shared_SRCS
     Auth/BigNumber.h
     Auth/Hmac.h
     Auth/HMACSHA1.h
-    Auth/md5.h
     Auth/Sha1.h
     Config/Config.h
     Config/ConfigEnv.h
