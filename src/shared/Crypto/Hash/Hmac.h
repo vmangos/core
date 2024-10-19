@@ -20,8 +20,6 @@
 #define _AUTH_HMAC_H
 
 #include "Common.h"
-#include <openssl/hmac.h>
-#include <openssl/sha.h>
 #include <vector>
 
 class BigNumber;
@@ -32,20 +30,19 @@ class HmacHash
         HmacHash() { }
         HmacHash(uint8 const* data, int length);
         ~HmacHash();
+
         void UpdateBigNumber(BigNumber* bn);
         void UpdateData(std::vector<uint8> const& data);
         void UpdateData(uint8 const* data, int length);
-        void Initialize();
-        void Finalize();
-        uint8* GetDigest() { return m_digest; };
-        int GetLength() { return SHA_DIGEST_LENGTH; };
-    private:
 
-#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10100000L
+        void Finalize();
+
+        uint8* GetDigest() { return m_digest; }
+        int constexpr GetLength() { return sizeof(m_digest); }
+
+    private:
+        typedef struct hmac_ctx_st HMAC_CTX;
         HMAC_CTX* m_ctx;
-#else
-        HMAC_CTX m_ctx;
-#endif
-        uint8 m_digest[SHA_DIGEST_LENGTH];
+        uint8 m_digest[20]; // SHA_DIGEST_LENGTH
 };
 #endif

@@ -44,9 +44,6 @@
 #include "WardenScanMgr.hpp"
 #include "AccountMgr.h"
 
-#include <openssl/md5.h>
-#include <openssl/sha.h>
-
 #include <zlib.h>
 
 #include <algorithm>

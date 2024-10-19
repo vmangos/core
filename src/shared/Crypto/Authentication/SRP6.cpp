@@ -22,6 +22,9 @@
 #include "Auth/base32.h"
 #include "SRP6.h"
 
+#include <crypto.h>
+#include <openssl/sha.h>
+
 SRP6::SRP6()
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
@@ -94,10 +97,7 @@ bool SRP6::CalculateVerifier(const std::string& rI)
 {
     BigNumber salt;
     salt.SetRand(s_BYTE_SIZE * 8);
-    const char* _salt = salt.AsHexStr();
-    bool ret = CalculateVerifier(rI, _salt);
-    OPENSSL_free((void*)_salt);
-    return ret;
+    return CalculateVerifier(rI, salt.AsHexStr().c_str());
 }
 
 bool SRP6::CalculateVerifier(const std::string& rI, const char* salt)
@@ -121,7 +121,7 @@ bool SRP6::CalculateVerifier(const std::string& rI, const char* salt)
     sha.UpdateData(mDigest, SHA_DIGEST_LENGTH);
     sha.Finalize();
     BigNumber x;
-    x.SetBinary(sha.GetDigest(), Sha1Hash::GetLength());
+    x.SetBinary(sha.GetDigest(), sha.GetLength());
     v = g.ModExp(x, N);
 
     return true;

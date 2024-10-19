@@ -94,5 +94,5 @@ void AuthCrypt::GenerateKey(uint8* key, BigNumber* bn)
     HmacHash hash;
     hash.UpdateBigNumber(bn);
     hash.Finalize();
-    memcpy(key, hash.GetDigest(), SHA_DIGEST_LENGTH);
+    memcpy(key, hash.GetDigest(), hash.GetLength());
 }

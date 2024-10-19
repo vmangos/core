@@ -17,8 +17,9 @@
 #ifndef _AUTH_SARC4_H
 #define _AUTH_SARC4_H
 
-#include <openssl/evp.h>
 #include "Common.h"
+
+typedef struct evp_cipher_ctx_st EVP_CIPHER_CTX;
 
 class RC4
 {

@@ -18,26 +18,30 @@
 
 #include "Sha1.h"
 #include "../BigNumber.h"
+
 #include <cstdarg>
+#include <openssl/sha.h>
 
 Sha1Hash::Sha1Hash()
 {
-    SHA1_Init(&mC);
+    m_ctx = new SHA_CTX;
+    SHA1_Init(m_ctx);
 }
 
 Sha1Hash::~Sha1Hash()
 {
-    SHA1_Init(&mC);
+    SHA1_Init(m_ctx);
+    delete m_ctx;
 }
 
 void Sha1Hash::UpdateData(uint8 const* dta, int len)
 {
-    SHA1_Update(&mC, dta, len);
+    SHA1_Update(m_ctx, dta, len);
 }
 
 void Sha1Hash::UpdateData(std::vector<uint8> const& data)
 {
-    SHA1_Update(&mC, data.data(), data.size());
+    SHA1_Update(m_ctx, data.data(), data.size());
 }
 
 void Sha1Hash::UpdateData(std::string const& str)
@@ -62,10 +66,10 @@ void Sha1Hash::UpdateBigNumbers(BigNumber* bn0, ...)
 
 void Sha1Hash::Initialize()
 {
-    SHA1_Init(&mC);
+    SHA1_Init(m_ctx);
 }
 
-void Sha1Hash::Finalize(void)
+void Sha1Hash::Finalize()
 {
-    SHA1_Final(mDigest, &mC);
+    SHA1_Final(m_digest, m_ctx);
 }

@@ -20,8 +20,6 @@
 #define _AUTH_SHA1_H
 
 #include "Common.h"
-#include <openssl/sha.h>
-#include <openssl/crypto.h>
 
 class BigNumber;
 
@@ -32,19 +30,19 @@ class Sha1Hash
         ~Sha1Hash();
 
         void UpdateBigNumbers(BigNumber* bn0, ...);
-
+        void UpdateData(std::vector<uint8> const& data);
         void UpdateData(uint8 const* dta, int len);
         void UpdateData(std::string const& str);
-        void UpdateData(std::vector<uint8> const& data);
 
         void Initialize();
         void Finalize();
 
-        uint8* GetDigest(void) { return mDigest; };
-        static int GetLength(void) { return SHA_DIGEST_LENGTH; };
+        uint8* GetDigest() { return m_digest; }
+        int constexpr GetLength() { return sizeof(m_digest); }
 
     private:
-        SHA_CTX mC;
-        uint8 mDigest[SHA_DIGEST_LENGTH];
+        typedef struct SHAstate_st SHA_CTX;
+        SHA_CTX* m_ctx;
+        uint8 m_digest[20]; // SHA_DIGEST_LENGTH
 };
 #endif

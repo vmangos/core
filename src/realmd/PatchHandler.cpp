@@ -38,6 +38,8 @@
 #include "Policies/SingletonImp.h"
 #include "Policies/ThreadingModel.h"
 
+#include <openssl/md5.h>
+
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
 #endif
