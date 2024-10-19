@@ -80,8 +80,8 @@ enum HighGuid
 // NOSTALRIUS : Code supprime par MaNGOS. Eviter de l'utiliser.
 #define GUID_HIPART(x)   (uint32)((uint64(x) >> 48) & 0x0000FFFF)
 // We have different low and middle part size for different guid types
-#define _GUID_LOPART_2(x) (uint32)(uint64(x)         & UI64LIT(0x00000000FFFFFFFF))
-#define _GUID_LOPART_3(x) (uint32)(uint64(x)         & UI64LIT(0x0000000000FFFFFF))
+#define _GUID_LOPART_2(x) (uint32)(uint64(x)         & uint64(0x00000000FFFFFFFF))
+#define _GUID_LOPART_3(x) (uint32)(uint64(x)         & uint64(0x0000000000FFFFFF))
 
 // Pour les codes TrinityCore
 #define IS_EMPTY_GUID(g)       (g == 0)
@@ -148,7 +148,7 @@ class ObjectGuid
         static HighGuid GetHigh(uint64 guid) { return HighGuid((guid >> 48) & 0x0000FFFF); }
         static void ClampPlayerGuid(uint64& value);
         HighGuid GetHigh() const { return GetHigh(m_guid); }
-        uint32   GetEntry() const { return HasEntry() ? uint32((m_guid >> 24) & UI64LIT(0x0000000000FFFFFF)) : 0; }
+        uint32   GetEntry() const { return HasEntry() ? uint32((m_guid >> 24) & uint64(0x0000000000FFFFFF)) : 0; }
         uint32   GetCounter()  const
         {
             return GetCounter(m_guid, HasEntry());
@@ -157,8 +157,8 @@ class ObjectGuid
         static uint32 GetCounter(uint64 guid, bool hasEntry)
         {
             return hasEntry
-                ? uint32(guid & UI64LIT(0x0000000000FFFFFF))
-                : uint32(guid & UI64LIT(0x00000000FFFFFFFF));
+                ? uint32(guid & uint64(0x0000000000FFFFFF))
+                : uint32(guid & uint64(0x00000000FFFFFFFF));
         }
 
         static uint32 GetMaxCounter(HighGuid high)

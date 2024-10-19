@@ -24,6 +24,7 @@
 #include <G3D/AABox.h>
 #include <G3D/Table.h>
 #include <G3D/PositionTrait.h>
+#include "Errors.h"
 
 using G3D::Vector2;
 using G3D::Vector3;

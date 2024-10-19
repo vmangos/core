@@ -62,7 +62,7 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
         case SPELLFAMILY_MAGE:
         {
             // family flags 18(Molten), 25(Frost/Ice), 28(Mage)
-            if (spellInfo->SpellFamilyFlags & UI64LIT(0x12000000))
+            if (spellInfo->SpellFamilyFlags & uint64(0x12000000))
                 return SPELL_MAGE_ARMOR;
 
             if (spellInfo->EffectApplyAuraName[EFFECT_INDEX_0] == SPELL_AURA_MOD_CONFUSE && spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
@@ -72,7 +72,7 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
         }
         case SPELLFAMILY_WARRIOR:
         {
-            if (spellInfo->SpellFamilyFlags & UI64LIT(0x00008000010000))
+            if (spellInfo->SpellFamilyFlags & uint64(0x00008000010000))
                 return SPELL_POSITIVE_SHOUT;
 
             break;
@@ -110,10 +110,10 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             if (spellInfo->IsSealSpell())
                 return SPELL_SEAL;
 
-            if (spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000010000100)))
+            if (spellInfo->IsFitToFamilyMask(uint64(0x0000000010000100)))
                 return SPELL_BLESSING;
 
-            if ((spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000020180400))) && spellInfo->baseLevel != 0)
+            if ((spellInfo->IsFitToFamilyMask(uint64(0x0000000020180400))) && spellInfo->baseLevel != 0)
                 return SPELL_JUDGEMENT;
 
             // Old Judgement of Command
@@ -640,7 +640,7 @@ float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEf
         case SPELLFAMILY_PALADIN:
         {
             // Seal of Righteousness
-            if (IsFitToFamilyMask(UI64LIT(0x0000000008000000)) && SpellIconID == 25)
+            if (IsFitToFamilyMask(uint64(0x0000000008000000)) && SpellIconID == 25)
             {
                 coeff = 0.10f;
                 float speed = BASE_ATTACK_TIME;
@@ -670,7 +670,7 @@ float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEf
                 return coeff;
 
             // Chain Lightning / Chain Heal / Healing Wave (T1 8/8 bonus)
-            if (IsFitToFamilyMask(UI64LIT(0x00000000142)))
+            if (IsFitToFamilyMask(uint64(0x00000000142)))
             {
                 float multiplier = DmgMultiplier[0];
 

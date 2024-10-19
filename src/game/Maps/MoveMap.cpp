@@ -21,6 +21,7 @@
 #include "VMapFactory.h"
 #include "MoveMap.h"
 #include "MoveMapSharedDefines.h"
+#include "Errors.h"
 
 namespace MMAP
 {

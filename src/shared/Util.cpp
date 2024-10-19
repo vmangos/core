@@ -22,16 +22,21 @@
 #include "Util.h"
 #include "Timer.h"
 #include "Log.h"
+#include "Errors.h"
+
+#include "IO/Utils.h"
+#include "IO/Networking/IpAddress.h"
 
 #include "utf8cpp/utf8.h"
 #include "mersennetwister/MersenneTwister.h"
 
-#include <ace/TSS_T.h>
-#include <ace/OS_NS_arpa_inet.h>
+#include <cstdarg>
 
-typedef ACE_TSS<MTRand> MTRandTSS;
-static MTRandTSS mtRand;
+#if PLATFORM == PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
 
+thread_local MTRand mtRand;
 
 Tokenizer::Tokenizer(std::string const& src, char const sep, uint32 vectorReserve)
 {
@@ -67,8 +72,6 @@ Tokenizer::Tokenizer(std::string const& src, char const sep, uint32 vectorReserv
     }
 }
 
-static ACE_Time_Value g_SystemTickTime = ACE_OS::gettimeofday();
-
 uint32 WorldTimer::m_iTime = 0;
 uint32 WorldTimer::m_iPrevTime = 0;
 
@@ -81,7 +84,7 @@ uint32 WorldTimer::tick()
     m_iPrevTime = m_iTime;
 
     //get the new one and don't forget to persist current system time in m_SystemTickTime
-    m_iTime = WorldTimer::getMSTime_internal();
+    m_iTime = WorldTimer::getMSTime();
 
     //return tick diff
     return getMSTimeDiff(m_iPrevTime, m_iTime);
@@ -89,63 +92,50 @@ uint32 WorldTimer::tick()
 
 uint32 WorldTimer::getMSTime()
 {
-    return getMSTime_internal();
-}
+    using namespace std::chrono;
 
-uint32 WorldTimer::getMSTime_internal()
-{
-    //get current time
-    ACE_Time_Value const currTime = ACE_OS::gettimeofday();
-    //calculate time diff between two world ticks
-    //special case: curr_time < old_time - we suppose that our time has not ticked at all
-    //this should be constant value otherwise it is possible that our time can start ticking backwards until next world tick!!!
-    uint64 diff = 0;
-    (currTime - g_SystemTickTime).msec(diff);
-
-    //lets calculate current world time
-    uint32 iRes = uint32(diff % UI64LIT(0x00000000FFFFFFFF));
-    return iRes;
+    return static_cast<uint32>(duration_cast<milliseconds>(steady_clock::now().time_since_epoch() - GetApplicationStartTime().time_since_epoch()).count());
 }
 
 //////////////////////////////////////////////////////////////////////////
 int32 irand (int32 min, int32 max)
 {
-    return int32 (mtRand->randInt (max - min)) + min;
+    return int32 (mtRand.randInt(max - min)) + min;
 }
 
 uint32 urand (uint32 min, uint32 max)
 {
-    return mtRand->randInt (max - min) + min;
+    return mtRand.randInt(max - min) + min;
 }
 
 float frand (float min, float max)
 {
-    return mtRand->randExc (max - min) + min;
+    return mtRand.randExc (max - min) + min;
 }
 
 int32 rand32 ()
 {
-    return mtRand->randInt ();
+    return mtRand.randInt ();
 }
 
 double rand_norm(void)
 {
-    return mtRand->randExc ();
+    return mtRand.randExc ();
 }
 
 float rand_norm_f(void)
 {
-    return (float)mtRand->randExc ();
+    return (float)mtRand.randExc ();
 }
 
 double rand_chance (void)
 {
-    return mtRand->randExc (100.0);
+    return mtRand.randExc (100.0);
 }
 
 float rand_chance_f(void)
 {
-    return (float)mtRand->randExc (100.0);
+    return (float)mtRand.randExc (100.0);
 }
 
 Milliseconds randtime(Milliseconds const& min, Milliseconds const& max)
@@ -357,15 +347,14 @@ std::string TimeToTimestampStr(time_t t)
     return std::string(buf);
 }
 
-// Check if the string is a valid ip address representation
-bool IsIPAddress(char const* ipaddress)
+/// Check if the string is a valid ip address representation
+bool IsIPAddress(char const* ipAddressString)
 {
-    if(!ipaddress)
+    if (!ipAddressString)
         return false;
 
-    // Let the big boys do it.
-    // Drawback: all valid ip address formats are recognized e.g.: 12.23,121234,0xABCD)
-    return ACE_OS::inet_addr(ipaddress) != INADDR_NONE;
+    auto result = IO::Networking::IpAddress::TryParseFromString(ipAddressString);
+    return result.has_value();
 }
 
 // create PID file
@@ -375,11 +364,7 @@ uint32 CreatePIDFile(std::string const& filename)
     if (pid_file == nullptr)
         return 0;
 
-#ifdef WIN32
-    DWORD pid = GetCurrentProcessId();
-#else
-    pid_t pid = getpid();
-#endif
+    int pid = IO::Utils::GetCurrentProcessId();
 
     fprintf(pid_file, "%lu", pid);
     fclose(pid_file);
@@ -471,7 +456,7 @@ bool utf8ToConsole(std::string const& utf8str, std::string& conStr)
     conStr.resize(wstr.size());
     CharToOemBuffW(&wstr[0], &conStr[0], wstr.size());
 #else
-    // not implemented yet
+    // On Linux/MacOS, typically no conversion is needed for UTF-8 strings
     conStr = utf8str;
 #endif
 
@@ -487,7 +472,7 @@ bool consoleToUtf8(std::string const& conStr, std::string& utf8str)
 
     return WStrToUtf8(wstr, utf8str);
 #else
-    // not implemented yet
+    // On Linux/MacOS, typically no conversion is needed for UTF-8 strings
     utf8str = conStr;
     return true;
 #endif
@@ -657,4 +642,21 @@ std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc)
         }
     }
     return names;
+}
+std::vector<std::string> SplitStringByDelimiter(std::string const& str, char delimiter)
+{
+    std::vector<std::string> vec;
+    std::size_t old_pos = 0;
+    std::size_t pos = 0;
+    while((pos = str.find_first_of(delimiter, old_pos)) != std::string::npos) {
+        vec.emplace_back(str.substr(old_pos, pos - old_pos));
+        old_pos = pos + 1;
+    }
+
+    // add last element
+    std::string stringPart = str.substr(old_pos);
+    if (!stringPart.empty())
+        vec.emplace_back(stringPart);
+
+    return vec;
 }
