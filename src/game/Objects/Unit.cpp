@@ -2242,6 +2242,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
     }
 
     bool from_behind = !pVictim->HasInArc(this);
+    bool victimIsTotem = ((Creature const*)pVictim)->IsTotem();
 
     if (from_behind)
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: attack came from behind.");
@@ -2249,7 +2250,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
     // Dodge chance
 
     // only players can't dodge if attacker is behind
-    if (!pVictim->IsPlayer() || !from_behind)
+    if ((!pVictim->IsPlayer() || !from_behind) && !victimIsTotem)
     {
         dodge_chance -= dodgeSkillBonus;
 
@@ -2267,7 +2268,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
 
     // parry chances
     // check if attack comes from behind, nobody can parry or block if attacker is behind
-    if (!from_behind && (parry_chance > 0))
+    if ((!from_behind && (parry_chance > 0)) && !victimIsTotem)
     {
         if (pVictim->IsPlayer() || !((Creature*)pVictim)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_PARRY))
         {
@@ -2703,7 +2704,7 @@ float Unit::GetUnitParryChance() const
     {
         // Can't really know for sure, but Totems probably shouldn't parry.
         // They are inanimate objects, have no arms nor weapons, and cannot move.
-        if (GetCreatureType() != CREATURE_TYPE_TOTEM)
+        if (!((Creature const*)this)->IsTotem())
         {
             chance = 5.0f;
             chance += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
