@@ -25,8 +25,8 @@
 #include "WardenModuleMgr.hpp"
 #include "WardenScanMgr.hpp"
 #include "WorldSession.h"
-#include "Auth/BigNumber.h"
-#include "Auth/Sha1.h"
+#include "Crypto/BigNumber.h"
+#include "Crypto/Hash/Sha1.h"
 #include "World.h"
 #include "Database/DatabaseEnv.h"
 

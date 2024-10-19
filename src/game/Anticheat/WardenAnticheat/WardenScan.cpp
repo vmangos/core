@@ -26,8 +26,8 @@
 #include "WardenModule.hpp"
 #include "ByteBuffer.h"
 #include "Util.h"
-#include "Auth/HMACSHA1.h"
-#include "Auth/Sha1.h"
+#include "Crypto/Hash/HMACSHA1.h"
+#include "Crypto/Hash/Sha1.h"
 #include <openssl/sha.h>
 #include <openssl/md5.h>
 

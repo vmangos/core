@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Auth/HMACSHA1.h"
-#include "BigNumber.h"
+#include "HMACSHA1.h"
+#include "../BigNumber.h"
 
 HMACSHA1::HMACSHA1(const uint8* seed, size_t len)
 {

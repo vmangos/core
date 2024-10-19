@@ -43,11 +43,8 @@
 #include "PlayerBotAI.h"
 #include "Anticheat.h"
 #include "Language.h"
-#include "Auth/Sha1.h"
 #include "Chat.h"
 #include "MasterPlayer.h"
-
-#include <openssl/md5.h>
 
 // select opcodes appropriate for processing in Map::Update context for current session state
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)

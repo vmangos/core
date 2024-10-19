@@ -23,7 +23,8 @@
  */
 
 #include "AuthCrypt.h"
-#include "Hmac.h"
+
+#include "Crypto/Hash/Hmac.h"
 
 AuthCrypt::AuthCrypt()
 {

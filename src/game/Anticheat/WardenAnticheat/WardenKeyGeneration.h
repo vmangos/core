@@ -5,7 +5,7 @@
  */
 
 
-#include "Auth/Sha1.h"
+#include "Crypto/Hash/Sha1.h"
 
 #ifndef _WARDEN_KEY_GENERATION_H
 #define _WARDEN_KEY_GENERATION_H

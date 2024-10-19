@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Auth/Sha1.h"
-#include "Auth/BigNumber.h"
+#include "Sha1.h"
+#include "../BigNumber.h"
 #include <cstdarg>
 
 Sha1Hash::Sha1Hash()

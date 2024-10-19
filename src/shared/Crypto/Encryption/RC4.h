@@ -20,12 +20,12 @@
 #include <openssl/evp.h>
 #include "Common.h"
 
-class ARC4
+class RC4
 {
     public:
-        ARC4(uint8 len);
-        ARC4(uint8* seed, uint8 len);
-        ~ARC4();
+        RC4(uint8 len);
+        RC4(uint8* seed, uint8 len);
+        ~RC4();
         void Init(const uint8* seed);
         void UpdateData(uint8* data, size_t len);
     private:

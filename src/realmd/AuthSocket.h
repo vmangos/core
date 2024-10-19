@@ -27,9 +27,9 @@
 #define _AUTHSOCKET_H
 
 #include "Common.h"
-#include "Auth/BigNumber.h"
-#include "Auth/Sha1.h"
-#include "SRP6/SRP6.h"
+#include "Crypto/BigNumber.h"
+#include "Crypto/Hash/Sha1.h"
+#include "Crypto/Authentication/SRP6.h"
 #include "ByteBuffer.h"
 
 #include "BufferedSocket.h"

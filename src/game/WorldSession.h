@@ -31,7 +31,7 @@
 #include "Chat/AbstractPlayer.h"
 #include "SniffFile.h"
 #include "ClientDefines.h"
-#include "Auth/BigNumber.h"
+#include "Crypto/BigNumber.h"
 #include "AccountData.h"
 
 struct ItemPrototype;

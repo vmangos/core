@@ -27,12 +27,12 @@
 #include "Player.h"
 #include "Policies/SingletonImp.h"
 #include "Util.h"
-#include "Auth/Sha1.h"
 #include "World.h"
 #include "WorldSession.h"
 #include "MasterPlayer.h"
 #include "Anticheat.h"
-#include "SRP6/SRP6.h"
+#include "Crypto/Authentication/SRP6.h"
+#include "Crypto/Hash/Sha1.h"
 
 INSTANTIATE_SINGLETON_1(AccountMgr);
 

@@ -35,7 +35,7 @@
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"
 #include "Policies/SingletonImp.h"
-#include "Auth/BigNumber.h"
+#include "Crypto/BigNumber.h"
 #include "Warden.hpp"
 #include "WardenModuleMgr.hpp"
 #include "Util.h"
