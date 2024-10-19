@@ -10078,13 +10078,23 @@ GameTele const* ObjectMgr::GetGameTele(std::string const& name) const
     // converting string that we try to find to lower case
     wstrToLower(wname);
 
-    // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
+    // if no GameTele location is found use the shortest one which contains wnameLow as substring
     GameTele const* alt = nullptr;
+    std::wstring::size_type size = -1;
     for (const auto& itr : m_GameTeleMap)
+    {
         if (itr.second.wnameLow == wname)
             return &itr.second;
-        else if (alt == nullptr && itr.second.wnameLow.find(wname) != std::wstring::npos)
-            alt = &itr.second;
+        else if (itr.second.wnameLow.find(wname) != std::wstring::npos)
+        {
+            std::wstring::size_type newSize = itr.second.wnameLow.size();
+            if (size == -1 || newSize < size)
+            {
+                alt = &itr.second;
+                size = newSize;
+            }
+        }
+    }
 
     return alt;
 }
