@@ -28,7 +28,7 @@
 
 #include "Common.h"
 #include "Crypto/BigNumber.h"
-#include "Crypto/Hash/Sha1.h"
+#include "Crypto/Hash/Sha1Hash.h"
 #include "Crypto/Authentication/SRP6.h"
 #include "ByteBuffer.h"
 

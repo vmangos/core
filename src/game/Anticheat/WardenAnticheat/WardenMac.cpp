@@ -26,7 +26,7 @@
 #include "WardenScanMgr.hpp"
 #include "WorldSession.h"
 #include "Crypto/BigNumber.h"
-#include "Crypto/Hash/Sha1.h"
+#include "Crypto/Hash/Sha1Hash.h"
 #include "World.h"
 #include "Database/DatabaseEnv.h"
 

@@ -32,7 +32,7 @@
 #include "MasterPlayer.h"
 #include "Anticheat.h"
 #include "Crypto/Authentication/SRP6.h"
-#include "Crypto/Hash/Sha1.h"
+#include "Crypto/Hash/Sha1Hash.h"
 
 INSTANTIATE_SINGLETON_1(AccountMgr);
 

@@ -21,7 +21,7 @@
 
 #include "Common.h"
 #include "Crypto/BigNumber.h"
-#include "Crypto/Hash/Sha1.h"
+#include "Crypto/Hash/Sha1Hash.h"
 #include "ByteBuffer.h"
 
 #define HMAC_RES_SIZE 20

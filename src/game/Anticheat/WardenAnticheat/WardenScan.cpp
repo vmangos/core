@@ -27,7 +27,7 @@
 #include "ByteBuffer.h"
 #include "Util.h"
 #include "Crypto/Hash/HMACSHA1.h"
-#include "Crypto/Hash/Sha1.h"
+#include "Crypto/Hash/Sha1Hash.h"
 #include <openssl/sha.h>
 #include <openssl/md5.h>
 
