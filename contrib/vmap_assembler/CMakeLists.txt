@@ -11,6 +11,7 @@
 
 cmake_minimum_required(VERSION 2.6...3.20)
 project (MANGOS_VMAP_ASSEMB_IO)
+set(EXECUTABLE_NAME VMapAssembler)
 
 #set(CMAKE_VERBOSE_MAKEFILE true)
 
@@ -52,13 +53,16 @@ else()
   target_link_libraries(vmap g3dlite zlib)
 endif(UNIX)
 
-add_executable(vmap_assembler vmap_assembler.cpp)
-SET_TARGET_PROPERTIES (vmap_assembler PROPERTIES FOLDER Extractors)
-target_link_libraries(vmap_assembler 
+add_executable(${EXECUTABLE_NAME} vmap_assembler.cpp)
+SET_TARGET_PROPERTIES (${EXECUTABLE_NAME} PROPERTIES FOLDER Extractors)
+target_link_libraries(${EXECUTABLE_NAME}
                     vmap
                     g3dlite
                     ${ACE_LIBRARIES}
                     framework
 )
 
-install(TARGETS vmap_assembler DESTINATION ${BIN_DIR})
+install(TARGETS ${EXECUTABLE_NAME} DESTINATION ${BIN_DIR}/Extractors)
+if(WIN32 AND MSVC)
+  install(FILES $<TARGET_PDB_FILE:${EXECUTABLE_NAME}> DESTINATION ${BIN_DIR}/Extractors OPTIONAL)
+endif()

@@ -16,6 +16,7 @@
 
 cmake_minimum_required(VERSION 2.6...3.20)
 project (MANGOS_MAP_EXTRACTOR)
+set(EXECUTABLE_NAME MapExtractor)
 
 include_directories (${CMAKE_SOURCE_DIR}/dep/libmpq)
 include_directories (loadlib)
@@ -23,7 +24,7 @@ include_directories (
      ../../src/game/Maps
 )
 
-add_executable (mapextractor
+add_executable (${EXECUTABLE_NAME}
     dbcfile.cpp
     System.cpp
     loadlib/loadlib.cpp 
@@ -31,16 +32,19 @@ add_executable (mapextractor
     loadlib/wdt.cpp
     )
 
-SET_TARGET_PROPERTIES (mapextractor PROPERTIES FOLDER Extractors)
+SET_TARGET_PROPERTIES (${EXECUTABLE_NAME} PROPERTIES FOLDER Extractors)
 
 if(UNIX)
   find_package(ZLIB REQUIRED)
   if(ZLIB_FOUND)
     include_directories(${ZLIB_INCLUDE_DIRS})
-    target_link_libraries(mapextractor ${ZLIB_LIBRARIES} libmpq bz2)
+    target_link_libraries(${EXECUTABLE_NAME} ${ZLIB_LIBRARIES} libmpq bz2)
   endif(ZLIB_FOUND)
 else()
-  target_link_libraries (mapextractor zlib libmpq bz2)
+  target_link_libraries (${EXECUTABLE_NAME} zlib libmpq bz2)
 endif(UNIX)
 
-install(TARGETS mapextractor DESTINATION ${BIN_DIR})
+install(TARGETS ${EXECUTABLE_NAME} DESTINATION ${BIN_DIR}/Extractors)
+if(WIN32 AND MSVC)
+  install(FILES $<TARGET_PDB_FILE:${EXECUTABLE_NAME}> DESTINATION ${BIN_DIR}/Extractors OPTIONAL)
+endif()
