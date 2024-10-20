@@ -6167,31 +6167,6 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
 
             // Remove all spells dependent on this skill unconditionally
             UpdateSkillTrainedSpells(id, 0);
-
-            // remove all quests related to this skill (else the spell will be automatically learned at next login, cf Player::LearnQuestRewardedSpells)
-            for (auto& itr : mQuestStatus)
-            { 
-                if (Quest const* quest = sObjectMgr.GetQuestTemplate(itr.first))
-                {
-                    if (quest->GetRequiredSkill() == id)
-                    {
-                        // remove all quest entries for 'entry' from quest log
-                        for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
-                        {
-                            if (GetQuestSlotQuestId(slot) == itr.first)
-                            {
-                                SetQuestSlot(slot, 0);
-                                TakeOrReplaceQuestStartItems(itr.first, false, false);
-                                break;
-                            }
-                        }
-
-                        // set quest status to not started (will updated in DB at next save)
-                        SetQuestStatus(itr.first, QUEST_STATUS_NONE); // Does not invalidate the iterator
-                        itr.second.uState = QUEST_DELETED;
-                    }
-                }
-            }
         }
     }
     else if (currVal)                                       // add
@@ -19725,47 +19700,20 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
     if (!found)
         return;
 
-    // prevent learn non first rank unknown profession and second specialization for same profession)
-    uint32 learned_0 = spellInfo->EffectTriggerSpell[EFFECT_INDEX_0];
-    if (sSpellMgr.GetSpellRank(learned_0) > 1 && !HasSpell(learned_0))
-    {
-        // not have first rank learned (unlearned prof?)
-        uint32 first_spell = sSpellMgr.GetFirstSpellInChain(learned_0);
-        if (!HasSpell(first_spell))
-            return;
-
-        SpellEntry const* learnedInfo = sSpellMgr.GetSpellEntry(learned_0);
-        if (!learnedInfo)
-            return;
-
-        // specialization
-        if (learnedInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_TRADE_SKILL && learnedInfo->Effect[EFFECT_INDEX_1] == 0)
+    // Prevent learning profession specializations from 1.10 onwards, because unlearning and re-learning a profession doesn't automatically re-add the specialization
+    SpellEntry const* learned_0 = sSpellMgr.GetSpellEntry(spellInfo->EffectTriggerSpell[EFFECT_INDEX_0]);
+    if (learned_0->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_TRADE_SKILL && !learned_0->Effect[EFFECT_INDEX_1])
+        if (sWorld.GetWowPatch() >= WOW_PATCH_110)
         {
-            // search other specialization for same prof
-            for (const auto& itr : m_spells)
-            {
-                if (itr.second.state == PLAYERSPELL_REMOVED || itr.first == learned_0)
-                    continue;
-
-                SpellEntry const* itrInfo = sSpellMgr.GetSpellEntry(itr.first);
-                if (!itrInfo)
-                    return;
-
-                // compare only specializations
-                if (itrInfo->Effect[EFFECT_INDEX_0] != SPELL_EFFECT_TRADE_SKILL || itrInfo->Effect[EFFECT_INDEX_1] != 0)
-                    continue;
-
-                // compare same chain spells
-                if (sSpellMgr.GetFirstSpellInChain(itr.first) != first_spell)
-                    continue;
-
-                // now we have 2 specialization, learn possible only if found is lesser specialization rank
-                if (!sSpellMgr.IsHighRankOfSpell(learned_0, itr.first))
-                    return;
-            }
+            return;
         }
-    }
-
+        // Pre-1.10 teach the specialization only if the player has acquired the relevant profession (any skill level)
+        else
+        {
+            uint32 skill = quest->GetRequiredSkill();
+            if (GetSkillValue(skill) == 0)
+                return;
+        }
     CastSpell(this, spellId, true);
 }
 
