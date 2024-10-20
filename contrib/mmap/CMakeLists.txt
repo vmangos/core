@@ -64,5 +64,5 @@ install(FILES ${CMAKE_SOURCE_DIR}/contrib/mmap/offmesh.txt DESTINATION ${BIN_DIR
 install(FILES ${CMAKE_SOURCE_DIR}/contrib/mmap/config.json DESTINATION ${BIN_DIR}/Extractors)
 
 if(WIN32 AND MSVC)
-  install(FILES ${CMAKE_SOURCE_DIR}/bin/Debug/MoveMapGenerator.pdb DESTINATION ${BIN_DIR}/Extractors CONFIGURATIONS Debug)
+  install(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/MoveMapGenerator.pdb DESTINATION ${BIN_DIR}/Extractors CONFIGURATIONS Debug)
 endif()

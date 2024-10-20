@@ -45,5 +45,5 @@ endif(UNIX)
 
 install(TARGETS MapExtractor DESTINATION ${BIN_DIR}/Extractors)
 if(WIN32 AND MSVC)
-  install(FILES ${CMAKE_SOURCE_DIR}/bin/Debug/MapExtractor.pdb DESTINATION ${BIN_DIR}/Extractors CONFIGURATIONS Debug)
+  install(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/MapExtractor.pdb DESTINATION ${BIN_DIR}/Extractors CONFIGURATIONS Debug)
 endif()

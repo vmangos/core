@@ -63,5 +63,5 @@ target_link_libraries(VMapAssembler
 
 install(TARGETS VMapAssembler DESTINATION ${BIN_DIR}/Extractors)
 if(WIN32 AND MSVC)
-  install(FILES ${CMAKE_SOURCE_DIR}/bin/Debug/VMapAssembler.pdb DESTINATION ${BIN_DIR}/Extractors CONFIGURATIONS Debug)
+  install(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/VMapAssembler.pdb DESTINATION ${BIN_DIR}/Extractors CONFIGURATIONS Debug)
 endif()
