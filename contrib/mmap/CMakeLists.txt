@@ -63,6 +63,7 @@ target_link_libraries(${EXECUTABLE_NAME}
 install(TARGETS ${EXECUTABLE_NAME} DESTINATION ${BIN_DIR}/Extractors)
 install(FILES ${CMAKE_SOURCE_DIR}/contrib/mmap/offmesh.txt DESTINATION ${BIN_DIR}/Extractors)
 install(FILES ${CMAKE_SOURCE_DIR}/contrib/mmap/config.json DESTINATION ${BIN_DIR}/Extractors)
+install(FILES ${CMAKE_SOURCE_DIR}/contrib/mmap/mmap_extract.py DESTINATION ${BIN_DIR}/Extractors)
 
 if(WIN32 AND MSVC)
   install(FILES $<TARGET_PDB_FILE:${EXECUTABLE_NAME}> DESTINATION ${BIN_DIR}/Extractors OPTIONAL)
