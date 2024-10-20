@@ -1,5 +1,5 @@
-#ifndef _MANGOS_MD5_HASH_H
-#define _MANGOS_MD5_HASH_H
+#ifndef _MANGOS_CRYPTO_HASH_MD5_H
+#define _MANGOS_CRYPTO_HASH_MD5_H
 
 #include "Platform/Define.h"
 
@@ -39,4 +39,4 @@ namespace Crypto { namespace Hash { namespace MD5
     };
 }}} // namespace Crypto::Hash::MD5
 
-#endif // _MANGOS_MD5_HASH_H
+#endif // _MANGOS_CRYPTO_HASH_MD5_H
