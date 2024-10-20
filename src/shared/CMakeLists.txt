@@ -47,6 +47,8 @@ set (shared_SRCS
     Crypto/Hash/Hmac.cpp
     Crypto/Hash/HMACSHA1.h
     Crypto/Hash/HMACSHA1.cpp
+    Crypto/Hash/MD5.h
+    Crypto/Hash/MD5.cpp
     Crypto/Hash/Sha1Hash.h
     Crypto/Hash/Sha1Hash.cpp
     Database/Database.h
