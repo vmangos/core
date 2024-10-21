@@ -47,7 +47,7 @@ class InstanceData : public ZoneScript
 
         //On load
         virtual void Load(char const* /*data*/) {}
-        virtual void Create() {} // A la creation. Pas au chargement.
+        virtual void Create() {} // At creation. Not at loading.
 
         //When save is needed, this function generates the data
         virtual char const* Save() { return ""; }

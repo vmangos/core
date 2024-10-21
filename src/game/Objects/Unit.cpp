@@ -2019,7 +2019,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
             // Nostalrius : la reflection (bene de sacrifice par exemple) ne fait pas forcement des degats (si pala sous bouclier divin)
             uint32 reflectAbsorb = 0;
             int32 reflectResist = 0;
-            // On evite une boucle infinie
+            // We avoid an infinite loop
             if (!reflectTo->HasAuraType(SPELL_AURA_SPLIT_DAMAGE_FLAT))
                 reflectTo->CalculateDamageAbsorbAndResist(pCaster, schoolMask, DOT, splitted, &reflectAbsorb, &reflectResist, spellProto);
             splitted -= (reflectAbsorb + reflectResist);
@@ -2296,16 +2296,16 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
         int32 maxskill = attackerMaxSkillValueForLevel;
         skill = (skill > maxskill) ? maxskill : skill;
 
-        // (Youfie) Le +skill avant BC ne permet pas de réduire la fréquence des glancing blows une fois qu'il est égal au niveau du joueur*5
+        // (Youfie) The +skill before BC does not reduce the frequency of glancing blows once it is equal to the player's level*5
         if (attackerWeaponSkill > maxskill)
             attackerWeaponSkill = maxskill;
 
-        // (Youfie) Chance de glance en Vanilla (inchangée par le +skill au delà de maxskill, cf. au dessus) :
+        // (Youfie) Chance of glance in Vanilla (unchanged by +skill beyond maxskill, see above):
         tmp = (10 + ((victimDefenseSkill - attackerWeaponSkill) * 2)) * 100;
         tmp = tmp > 4000 ? 4000 : tmp;
         if (tmp < 0)
             tmp = 0;
-        // sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "tmp = %i, Skill = %i, Max Skill = %i", tmp, attackerWeaponSkill, attackerMaxSkillValueForLevel); //Pour tests & débug via la console
+        // sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "tmp = %i, Skill = %i, Max Skill = %i", tmp, attackerWeaponSkill, attackerMaxSkillValueForLevel); //For testing & debugging via the console
 
         if (roll < (sum += tmp))
         {
@@ -2720,6 +2720,18 @@ float Unit::GetUnitBlockChance() const
 
     if (Player const* pPlayer = ToPlayer())
     {
+        // Test results from classic:
+        // Sheath State Unarmed - Can't Block
+        // Sheath State Melee - Can Block
+        // Sheath State Ranged - Can Block
+        // Parry and Dodge don't have any sheath state restrictions.
+        // https://warcraft.wiki.gg/wiki/Patch_2.1.0_(undocumented_changes)
+        // "You can now block attacks while your shield is in the sheathed position."
+        // "Previously, Warriors, Shamans and Paladins were vulnerable while using"
+        // "instant-cast abilities that caused their shield to momentarily appear on their back."
+        if (pPlayer->GetSheath() == SHEATH_STATE_UNARMED)
+            return 0.0f;
+
         if (pPlayer->CanBlock() && pPlayer->CanUseEquippedWeapon(OFF_ATTACK))
         {
             Item* tmpitem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);

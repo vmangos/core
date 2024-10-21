@@ -615,6 +615,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_LFG_MATCHMAKING,
     CONFIG_BOOL_LIMIT_PLAY_TIME,
     CONFIG_BOOL_RESTRICT_UNVERIFIED_ACCOUNTS,
+    CONFIG_BOOL_DURABILITY_LOSS_ENABLE,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -1021,6 +1022,7 @@ class World
 
         // This thread handles packets while the world sessions update is not running
         std::unique_ptr<std::thread> m_asyncPacketsThread;
+        std::mutex m_asyncPacketsMutex;
         bool m_canProcessAsyncPackets;
         void ProcessAsyncPackets();
 

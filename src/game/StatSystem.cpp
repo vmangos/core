@@ -472,13 +472,13 @@ void Player::UpdateDamagePhysical(WeaponAttackType attType)
 
 float Player::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType auraType) const
 {
-    float chance = 0.0f;
-    AuraList const& hitAurasList = GetAurasByType(auraType);
-    if (hitAurasList.empty())
-        return chance;
+    float amount = 0.0f;
+    AuraList const& auras = GetAurasByType(auraType);
+    if (auras.empty())
+        return amount;
 
     Item* pWeapon = GetWeaponForAttack(attType);
-    for (auto const& i : hitAurasList)
+    for (auto const& i : auras)
     {
         SpellEntry const* pSpellEntry = i->GetSpellProto();
         if (pSpellEntry->EquippedItemClass >= 0)
@@ -490,9 +490,9 @@ float Player::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType aura
                 continue;
         }
 
-        chance += i->GetModifier()->m_amount;
+        amount += i->GetModifier()->m_amount;
     }
-    return chance;
+    return amount;
 }
 
 void Player::UpdateDefenseBonusesMod()
@@ -975,9 +975,9 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
 
 float Creature::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType auraType) const
 {
-    float chance = 0.0f;
-    AuraList const& mTotalAuraList = GetAurasByType(auraType);
-    for (auto const& i : mTotalAuraList)
+    float amount = 0.0f;
+    AuraList const& auras = GetAurasByType(auraType);
+    for (auto const& i : auras)
     {
         SpellEntry const* pSpellEntry = i->GetSpellProto();
         if (pSpellEntry->EquippedItemClass >= 0)
@@ -989,9 +989,9 @@ float Creature::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType au
                 continue;
         }
 
-        chance += i->GetModifier()->m_amount;
+        amount += i->GetModifier()->m_amount;
     }
-    return chance;
+    return amount;
 }
 
 /*#######################################

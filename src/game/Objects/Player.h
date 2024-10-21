@@ -127,7 +127,7 @@ struct SpellModifier
 
     SpellModifier(SpellModOp _op, SpellModType _type, int32 _value, Aura* aura, int16 _charges = 0);
 
-    bool isAffectedOnSpell(SpellEntry const* spell) const;
+    bool IsAffectedOnSpell(SpellEntry const* spell) const;
 
     SpellModOp   op   : 8;
     SpellModType type : 8;
@@ -1112,6 +1112,7 @@ class Player final: public Unit
         static uint32 GetAttackBySlot(uint8 slot);        // MAX_ATTACK if not weapon slot
         uint32 GetHighestKnownArmorProficiency() const;
         std::vector<Item*>& GetItemUpdateQueue() { return m_itemUpdateQueue; }
+        static bool IsMainHandPos(uint16 pos) { return uint8(pos >> 8) == INVENTORY_SLOT_BAG_0 && uint8(pos & 255) == EQUIPMENT_SLOT_MAINHAND; }
         static bool IsInventoryPos(uint16 pos) { return IsInventoryPos(pos >> 8, pos & 255); }
         static bool IsInventoryPos(uint8 bag, uint8 slot);
         static bool IsEquipmentPos(uint16 pos) { return IsEquipmentPos(pos >> 8, pos & 255); }

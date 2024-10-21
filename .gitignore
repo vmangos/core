@@ -9,7 +9,6 @@
 #
 # Normal rules
 #
-.*
 *.o
 *.o.*
 *.a
@@ -64,11 +63,6 @@ callgrind.out.*
 patches-*
 
 #
-# Github stuff
-#
-!.github/
-
-#
 # VS binaries output
 #
 bin/*
@@ -86,7 +80,6 @@ win/*
 ipch
 *.user
 
-
 #
 # CMake temporary files
 #
@@ -99,6 +92,14 @@ cmake_install.cmake
 #
 # MacOS
 .DS_Store
+
+# CLion / JetBrain Tools
+# But allow premade code style
+.idea/*
+!.idea/codeStyles/
+
+# VSCode
+.vscode
 
 # Nostalrius
 newsletter

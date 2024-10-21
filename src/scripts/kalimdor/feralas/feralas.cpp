@@ -280,15 +280,12 @@ struct MushgogAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        m_creature->SetInCombatWithZone();
         if (!m_bAggro)
         {
-            std::list<Creature*> m_AggroList;
-            GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-            for (const auto& it : m_AggroList)
+            if (Creature* pGriniblix = GetClosestCreatureWithEntry(m_creature, 14395, 120.0f))
             {
-                if (it->IsAlive())
-                    it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_01);
+                if (pGriniblix->IsAlive())
+                    pGriniblix->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_01);
             }
             m_bAggro = true;
         }
@@ -401,15 +398,12 @@ struct TheRazzaAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        m_creature->SetInCombatWithZone();
         if (!m_bAggro)
         {
-            std::list<Creature*> m_AggroList;
-            GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-            for (const auto& it : m_AggroList)
+            if (Creature* pGriniblix = GetClosestCreatureWithEntry(m_creature, 14395, 120.0f))
             {
-                if (it->IsAlive())
-                    it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_02);
+                if (pGriniblix->IsAlive())
+                    pGriniblix->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_02);
             }
             m_bAggro = true;
         }
@@ -417,12 +411,10 @@ struct TheRazzaAI : public ScriptedAI
 
     void JustDied(Unit* pWho) override
     {
-        std::list<Creature*> m_AggroList;
-        GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-        for (const auto& it : m_AggroList)
+        if (Creature* pGriniblix = GetClosestCreatureWithEntry(m_creature, 14395, 120.0f))
         {
-            if (it->IsAlive())
-                it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_03);
+            if (pGriniblix->IsAlive())
+                pGriniblix->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_03);
         }
     }
 
@@ -506,15 +498,12 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        m_creature->SetInCombatWithZone();
         if (!m_bAggro)
         {
-            std::list<Creature*> m_AggroList;
-            GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-            for (const auto& it : m_AggroList)
+            if (Creature* pGriniblix = GetClosestCreatureWithEntry(m_creature, 14395, 120.0f))
             {
-                if (it->IsAlive())
-                     it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_04);
+                if (pGriniblix->IsAlive())
+                    pGriniblix->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_04);
             }
             m_bAggro = true;
         }

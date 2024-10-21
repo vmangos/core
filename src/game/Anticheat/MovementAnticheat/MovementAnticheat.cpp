@@ -812,19 +812,29 @@ uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movemen
     }
 #undef APPEND_CHEAT
 
-    AddCheats(cheatFlags);
-
-    if (ShouldRejectMovement(cheatFlags) &&
-        me->movespline->Finalized() &&
-       !me->IsBeingTeleported())
+    if (cheatFlags)
     {
-        me->RemoveUnitMovementFlag(removeMoveFlags);
-        me->ResolvePendingMovementChanges(true, true);
-        me->SendHeartBeat(true);
-        return WorldTimer::getMSTime() + 100 + std::min(1000u, sWorld.GetCurrentDiff() + m_session->GetLatency());
+        // Since we dont require client confirmation for flag changes
+        // during move splines, it's possible for client to not have
+        // yet processed the changes when the move spline expires.
+        // So just ignore this packet and dont send forced update.
+        if (opcode == CMSG_MOVE_SPLINE_DONE)
+            return 1;
+
+        AddCheats(cheatFlags);
+
+        if (ShouldRejectMovement(cheatFlags) &&
+            me->movespline->Finalized() &&
+            !me->IsBeingTeleported())
+        {
+            me->RemoveUnitMovementFlag(removeMoveFlags);
+            me->ResolvePendingMovementChanges(true, true);
+            me->SendHeartBeat(true);
+            return WorldTimer::getMSTime() + 100 + std::min(1000u, sWorld.GetCurrentDiff() + m_session->GetLatency());
+        }
+        else if (removeMoveFlags)
+            movementInfo.RemoveMovementFlag(removeMoveFlags);
     }
-    else if (removeMoveFlags)
-        movementInfo.RemoveMovementFlag(removeMoveFlags);
 
     return 0;
 }

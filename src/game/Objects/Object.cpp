@@ -3460,13 +3460,6 @@ void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
     ExecuteDelayedActions();
 }
 
-class NULLNotifier
-{
-public:
-    template<class T> void Visit(GridRefManager<T>& m) {}
-    void Visit(CameraMapType&) {}
-};
-
 void WorldObject::LoadMapCellsAround(float dist) const
 {
     ASSERT(IsInWorld());

@@ -39,9 +39,6 @@ class Player;
 class Spell;
 class Unit;
 
-// Spell affects related declarations (accessed using SpellMgr functions)
-typedef std::map<uint32, uint64> SpellAffectMap;
-
 struct SpellProcEventEntry
 {
     uint32      schoolMask;
@@ -391,9 +388,6 @@ class SpellMgr
         // Spell affects
         uint64 GetSpellAffectMask(uint32 spellId, SpellEffectIndex effectId) const
         {
-            SpellAffectMap::const_iterator itr = mSpellAffectMap.find((spellId<<8) + effectId);
-            if (itr != mSpellAffectMap.end())
-                return itr->second;
             if (SpellEntry const* spellEntry = GetSpellEntry(spellId))
                 return spellEntry->EffectItemType[effectId];
             return 0;
@@ -682,7 +676,6 @@ class SpellMgr
         void LoadSpellLearnSkills();
         void LoadSpellLearnSpells();
         void LoadSpellScriptTarget();
-        void LoadSpellAffects();
         void LoadSpellElixirs();
         void LoadSpellProcEvents();
         void LoadSpellProcItemEnchant();
@@ -729,7 +722,6 @@ class SpellMgr
         SpellLearnSkillMap mSpellLearnSkills;
         SpellLearnSpellMap mSpellLearnSpells;
         SpellTargetPositionMap mSpellTargetPositions;
-        SpellAffectMap     mSpellAffectMap;
         SpellElixirMap     mSpellElixirs;
         SpellThreatMap     mSpellThreatMap;
         SpellProcEventMap  mSpellProcEventMap;

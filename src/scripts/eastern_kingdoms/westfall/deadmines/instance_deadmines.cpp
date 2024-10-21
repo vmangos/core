@@ -45,13 +45,13 @@ struct instance_deadmines : public ScriptedInstance
     uint64 m_uiDoor3GUID;
 
     uint32 m_uiSpawnPatrolOnRhahkDeath;
-    bool   isRhahkDead;
-    uint32 isGunPowderEventDone;
-    bool   isGilnidDead;
+    bool   m_isRhahkDead;
+    uint32 m_isGunPowderEventDone;
+    bool   m_isGilnidDead;
     uint32 m_uiSpawnPatrolOnGilnidDeath;
 
-    uint32 m_uiIronDoor_Timer;
-    uint32 m_uiDoor_Step;
+    uint32 m_uiIronDoorTimer;
+    uint32 m_uiIronDoorStep;
 
     void Initialize() override
     {
@@ -63,13 +63,13 @@ struct instance_deadmines : public ScriptedInstance
         m_uiRhahkGUID = 0;
         m_uiGilnidGUID = 0;
         m_uiSpawnPatrolOnRhahkDeath = 30000;
-        isRhahkDead = false;
-        isGunPowderEventDone = 0;
-        isGilnidDead = false;
+        m_isRhahkDead = false;
+        m_isGunPowderEventDone = 0;
+        m_isGilnidDead = false;
         m_uiSpawnPatrolOnGilnidDeath = 30000;
 
-        m_uiIronDoor_Timer = 0;
-        m_uiDoor_Step = 0;
+        m_uiIronDoorTimer = 0;
+        m_uiIronDoorStep = 0;
     }
 
     void OnCreatureCreate(Creature* pCreature) override
@@ -107,7 +107,7 @@ struct instance_deadmines : public ScriptedInstance
                     if (pGo->GetGoState() != GO_STATE_ACTIVE)
                         DoUseDoorOrButton(m_uiDoor1GUID);
 
-                isRhahkDead = true;
+                m_isRhahkDead = true;
                 m_uiSpawnPatrolOnRhahkDeath = 60000;
                 break;
             case NPC_SNEED :
@@ -120,7 +120,7 @@ struct instance_deadmines : public ScriptedInstance
                     if (pGo->GetGoState() != GO_STATE_ACTIVE)
                         DoUseDoorOrButton(m_uiDoor3GUID);
 
-                isGilnidDead = true;
+                m_isGilnidDead = true;
                 m_uiSpawnPatrolOnGilnidDeath = 30000;
 
                 break;
@@ -173,13 +173,13 @@ struct instance_deadmines : public ScriptedInstance
                     // no breaking the door if it's open
                     if (!(pGo->GetGoState() == GO_STATE_ACTIVE))
                         pGo->UseDoorOrButton(0, true);
-                    m_uiIronDoor_Timer = 3000;
+                    m_uiIronDoorTimer = 3000;
                 }
             }
             m_auiEncounter[0] = uiData;
         }
         else if (uiType == GUN_POWDER_EVENT)
-            isGunPowderEventDone = uiData;
+            m_isGunPowderEventDone = uiData;
     }
 
     uint32 GetData(uint32 uiType) override
@@ -187,7 +187,7 @@ struct instance_deadmines : public ScriptedInstance
         if (uiType == TYPE_DEFIAS_ENDDOOR)
             return m_auiEncounter[0];
         else if (uiType == GUN_POWDER_EVENT)
-            return isGunPowderEventDone;
+            return m_isGunPowderEventDone;
         return 0;
     }
 
@@ -201,103 +201,105 @@ struct instance_deadmines : public ScriptedInstance
 
     void Update(uint32 uiDiff) override
     {
-        if (isRhahkDead)
+        if (m_isRhahkDead && m_uiSpawnPatrolOnRhahkDeath)
         {
-            std::list<Creature*> m_EscortList;
-
-            if (Creature* pRhahk = instance->GetCreature(m_uiRhahkGUID))
+            if (m_uiSpawnPatrolOnRhahkDeath <= uiDiff)
             {
-
-                if (m_uiSpawnPatrolOnRhahkDeath <= uiDiff)
+                if (Creature* pRhahk = instance->GetCreature(m_uiRhahkGUID))
                 {
-                    GetCreatureListWithEntryInGrid(m_EscortList, pRhahk, 634, 400.0f);
-                    for (const auto& it : m_EscortList)
+                    std::list<Creature*> escortList;
+
+                    GetCreatureListWithEntryInGrid(escortList, pRhahk, 634, 400.0f);
+                    for (const auto& it : escortList)
                         if (it->GetRespawnDelay() == 43199)
                         {
                             it->SetVisibility(VISIBILITY_ON);
                             it->SetFactionTemplateId(17);
                         }
-                    m_EscortList.clear();
+                    escortList.clear();
 
-                    GetCreatureListWithEntryInGrid(m_EscortList, pRhahk, 1729, 400.0f);
-                    for (const auto& it : m_EscortList)
+                    GetCreatureListWithEntryInGrid(escortList, pRhahk, 1729, 400.0f);
+                    for (const auto& it : escortList)
                         if (it->GetRespawnDelay() == 43199)
                         {
                             it->SetVisibility(VISIBILITY_ON);
                             it->SetFactionTemplateId(17);
                         }
-                    m_EscortList.clear();
+                    escortList.clear();
+
+                    m_uiSpawnPatrolOnRhahkDeath = 0;
                 }
-                else
-                    m_uiSpawnPatrolOnRhahkDeath -= uiDiff;
             }
+            else
+                m_uiSpawnPatrolOnRhahkDeath -= uiDiff;
         }
 
-        if (isGilnidDead)
+        if (m_isGilnidDead && m_uiSpawnPatrolOnGilnidDeath)
         {
-            std::list<Creature*> m_EscortList;
-
-            if (Creature* pGilnid = instance->GetCreature(m_uiGilnidGUID))
+            if (m_uiSpawnPatrolOnGilnidDeath <= uiDiff)
             {
-                if (m_uiSpawnPatrolOnGilnidDeath <= uiDiff)
+                if (Creature* pGilnid = instance->GetCreature(m_uiGilnidGUID))
                 {
-                    GetCreatureListWithEntryInGrid(m_EscortList, pGilnid, 4417, 400.0f);
-                    for (const auto& it : m_EscortList)
-                        if (it->GetRespawnDelay() == 43201)
-                        {
-                            it->SetVisibility(VISIBILITY_ON);
-                            it->SetFactionTemplateId(17);
-                        }
-                    m_EscortList.clear();
+                    std::list<Creature*> escortList;
 
-                    GetCreatureListWithEntryInGrid(m_EscortList, pGilnid, 4418, 400.0f);
-                    for (const auto& it : m_EscortList)
+                    GetCreatureListWithEntryInGrid(escortList, pGilnid, 4417, 400.0f);
+                    for (const auto& it : escortList)
                         if (it->GetRespawnDelay() == 43201)
                         {
                             it->SetVisibility(VISIBILITY_ON);
                             it->SetFactionTemplateId(17);
                         }
-                    m_EscortList.clear();
+                    escortList.clear();
+
+                    GetCreatureListWithEntryInGrid(escortList, pGilnid, 4418, 400.0f);
+                    for (const auto& it : escortList)
+                        if (it->GetRespawnDelay() == 43201)
+                        {
+                            it->SetVisibility(VISIBILITY_ON);
+                            it->SetFactionTemplateId(17);
+                        }
+                    escortList.clear();
+
+                    m_uiSpawnPatrolOnGilnidDeath = 0;
                 }
-                else
-                    m_uiSpawnPatrolOnGilnidDeath -= uiDiff;
             }
+            else
+                m_uiSpawnPatrolOnGilnidDeath -= uiDiff;
         }
 
-
-        if (m_uiIronDoor_Timer)
+        if (m_uiIronDoorTimer)
         {
-            if (m_uiIronDoor_Timer <= uiDiff)
+            if (m_uiIronDoorTimer <= uiDiff)
             {
                 if (Creature* pMrSmite = instance->GetCreature(m_uiSmiteGUID))
                 {
-                    std::list<Creature*> m_EscortList;
+                    std::list<Creature*> escortList;
 
-                    switch (m_uiDoor_Step)
+                    switch (m_uiIronDoorStep)
                     {
                         case 0:
                             DoScriptText(INST_SAY_ALARM1, pMrSmite);
-                            GetCreatureListWithEntryInGrid(m_EscortList, pMrSmite, 657, 400.0f);
-                            for (const auto& it : m_EscortList)
+                            GetCreatureListWithEntryInGrid(escortList, pMrSmite, 657, 400.0f);
+                            for (const auto& it : escortList)
                                 if (it->GetRespawnDelay() == 43202)
                                     it->GetMotionMaster()->MovePoint(0, -99.6611f, -671.071655f, 7.42241f, MOVE_PATHFINDING | MOVE_RUN_MODE);
-                            m_EscortList.clear();
-                            ++m_uiDoor_Step;
-                            m_uiIronDoor_Timer = 15000;
+                            escortList.clear();
+                            ++m_uiIronDoorStep;
+                            m_uiIronDoorTimer = 15000;
                             break;
                         case 1:
                             DoScriptText(INST_SAY_ALARM2, pMrSmite);
-                            m_uiDoor_Step = 0;
-                            m_uiIronDoor_Timer = 0;
+                            m_uiIronDoorStep = 0;
+                            m_uiIronDoorTimer = 0;
                             sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Deadmines: Iron door event reached end.");
                             break;
                     }
                 }
                 else
-                    m_uiIronDoor_Timer = 0;
+                    m_uiIronDoorTimer = 0;
             }
             else
-                m_uiIronDoor_Timer -= uiDiff;
+                m_uiIronDoorTimer -= uiDiff;
         }
     }
 };

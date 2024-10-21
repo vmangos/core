@@ -2533,6 +2533,11 @@ Visibility.ForceActiveObjects      = 1
 #         Default: 1 (enabled)
 #                  0 (disabled)
 #
+#    DurabilityLoss.Enable
+#         Description: Enable durability loss
+#         Default: 1 (enabled)
+#                  0 (disabled)
+#
 #    DurabilityLossChance.Damage
 #         Chance to lose durability on an equipped item when taking or dealing damage
 #         Default: 0.5
@@ -2625,10 +2630,8 @@ SkillChance.SkinningSteps = 0
 SkillFail.Loot.Fishing = 0
 SkillFail.Gain.Fishing = 0
 SkillFail.Possible.FishingPool = 1
+DurabilityLoss.Enable = 1
 DurabilityLossChance.Damage = 0.5
-DurabilityLossChance.Absorb = 0.5
-DurabilityLossChance.Parry  = 0.05
-DurabilityLossChance.Block  = 0.05
 Death.SicknessLevel = 11
 Death.CorpseReclaimDelay.PvP = 1
 Death.CorpseReclaimDelay.PvE = 1

@@ -37,43 +37,53 @@ AddonHandler::~AddonHandler()
 {
 }
 
-bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
+enum AddonStatus
 {
-    ByteBuffer AddOnPacked;
-    uLongf AddonRealSize;
-    uint32 CurrentPosition;
-    uint32 TempValue;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    ADDON_STATUS_BANNED  = 0,
+    ADDON_STATUS_VISIBLE = 1,
+#else
+    ADDON_STATUS_VISIBLE = 0,
+    ADDON_STATUS_BANNED  = 1,
+#endif
+    ADDON_STATUS_HIDDEN  = 2,
+};
+
+bool AddonHandler::BuildAddonPacket(WorldPacket* sourcePacket, WorldPacket* targetPacket)
+{
+    ByteBuffer decompressedPacket;
+    uLongf addonRealSize;
+    uint32 currentPosition;
+    uint32 tempValue;
 
     // broken addon packet, can't be received from real client
-    if (Source->rpos() + 4 > Source->size())
+    if (sourcePacket->rpos() + 4 > sourcePacket->size())
         return false;
 
-    *Source >> TempValue;                                   // get real size of the packed structure
+    *sourcePacket >> tempValue;                             // get real size of the packed structure
 
     // empty addon packet, nothing process, can't be received from real client
-    if (!TempValue)
+    if (!tempValue)
         return false;
 
-    if (TempValue > 0xFFFFF)
+    if (tempValue > 0xFFFFF)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::ReadAddonsInfo addon info too big, size %u", TempValue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::ReadAddonsInfo addon info too big, size %u", tempValue);
         return false;
     }
 
-    AddonRealSize = TempValue;                              // temp value because ZLIB only excepts uLongf
+    addonRealSize = tempValue;                              // temp value because ZLIB only excepts uLongf
 
-    CurrentPosition = Source->rpos();                       // get the position of the pointer in the structure
+    currentPosition = sourcePacket->rpos();                 // get the position of the pointer in the structure
 
-    AddOnPacked.resize(AddonRealSize);                      // resize target for zlib action
+    decompressedPacket.resize(addonRealSize);               // resize target for zlib action
 
-    if (!uncompress(const_cast<uint8*>(AddOnPacked.contents()), &AddonRealSize, const_cast<uint8*>((*Source).contents() + CurrentPosition), (*Source).size() - CurrentPosition) != Z_OK)
+    if (!uncompress(const_cast<uint8*>(decompressedPacket.contents()), &addonRealSize, const_cast<uint8*>((*sourcePacket).contents() + currentPosition), (*sourcePacket).size() - currentPosition) != Z_OK)
     {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-        Target->Initialize(SMSG_ADDON_INFO);
+        targetPacket->Initialize(SMSG_ADDON_INFO);
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-
-        unsigned char tdata[256] =
+        static constexpr uint8 tdata[256] =
         {
             0xC3, 0x5B, 0x50, 0x84, 0xB9, 0x3E, 0x32, 0x42, 0x8C, 0xD0, 0xC7, 0x48, 0xFA, 0x0E, 0x5D, 0x54,
             0x5A, 0xA3, 0x0E, 0x14, 0xBA, 0x9E, 0x0D, 0xB9, 0x5D, 0x8B, 0xEE, 0xB6, 0x84, 0x93, 0x45, 0x75,
@@ -92,71 +102,51 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
             0xC3, 0xFB, 0x1B, 0x8C, 0x29, 0xEF, 0x8E, 0xE5, 0x34, 0xCB, 0xD1, 0x2A, 0xCE, 0x79, 0xC3, 0x9A,
             0x0D, 0x36, 0xEA, 0x01, 0xE0, 0xAA, 0x91, 0x20, 0x54, 0xF0, 0x72, 0xD8, 0x1E, 0xC7, 0x89, 0xD2
         };
-        while (AddOnPacked.rpos() < AddOnPacked.size())
+        static constexpr uint32 correctModulusCRC = 0x4C1C776D;
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+        uint8 unknown0;
+        uint32 unknown1;
+        decompressedPacket >> unknown0;
+        decompressedPacket >> unknown1;
+
+        // wowdev.pub
+        *targetPacket << uint8(0);
+#endif
+
+        while (decompressedPacket.rpos() < decompressedPacket.size())
         {
-            std::string AddonNames;
-            uint8 unk6;
-            uint32 crc, unk7;
+            std::string addonName;
+            uint8 flags;
+            uint32 modulusCRC;
+            uint32 urlCRC;
 
-            AddOnPacked >> AddonNames;
+            decompressedPacket >> addonName;
+            decompressedPacket >> flags >> modulusCRC >> urlCRC;
 
-            AddOnPacked >> crc >> unk7 >> unk6;
+            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ADDON: Name: %s Flags %u Modulus CRC: %u URL CRC %u", addonName.c_str(), flags, modulusCRC, urlCRC);
 
-            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ADDON: Name:%s CRC:%x Unknown1 :%x Unknown2 :%x", AddonNames.c_str(), crc, unk7, unk6);
-
-            *Target << (uint8)2;
-
-            uint8 unk1 = 1;
-            *Target << (uint8)unk1;
-            if (unk1)
+            if (addonName.find("Blizzard") != std::string::npos) // hide standard addons
             {
-                uint8 unk2 = crc != UI64LIT(0x1c776d01);           //If addon is Standard addon CRC
-                *Target << (uint8)unk2;
-                if (unk2)
-                    Target->append(tdata, sizeof(tdata));
-
-                *Target << (uint32)0;
-            }
-
-            uint8 unk3 = 0;
-            *Target << (uint8)unk3;
-            if (unk3)
-            {
-                // String, 256
-            }
-        }
-#else
-        uint32 Unknown1;
-        uint8 Unknown0;
-
-        AddOnPacked >> Unknown0;
-        AddOnPacked >> Unknown1;
-        while (AddOnPacked.rpos() < AddOnPacked.size())
-        {
-            std::string AddonNames;
-            uint8 unk6;
-            uint64 crc;
-
-            AddOnPacked >> AddonNames;
-
-            AddOnPacked >> crc >> unk6;
-
-            //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ADDON: Name:%s CRC:%llx Unknown1 :%x", AddonNames.c_str(), crc, unk6);
-
-            if (crc == 0x4C1C776D01LL)  // standard addon CRC
-            {
-                *Target << uint8(0) << uint8(2) << uint8(1) << uint8(0) << uint32(0);
+                *targetPacket << uint8(ADDON_STATUS_HIDDEN);
+                *targetPacket << uint8(1);  // InfoProvided
+                if (modulusCRC != correctModulusCRC)
+                {
+                    *targetPacket << uint8(1);  // KeyProvided
+                    targetPacket->append(tdata, sizeof(tdata)); // KeyData
+                }
+                else
+                {
+                    *targetPacket << uint8(0);  // KeyProvided
+                }
+                *targetPacket << uint32(0); // Revision
+                *targetPacket << uint8(0); // UrlProvided
             }
             else // if addon is custom
-            {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-                *Target << uint8(0x00) << uint8(0x01) << uint8(0x00) << uint8(0x01);
-#else
-                *Target << uint8(0x00) << uint8(0x0) << uint8(0x00) << uint8(0x0);
-#endif
-            }
+                *targetPacket << uint8(ADDON_STATUS_VISIBLE)
+                              << uint8(0)  // InfoProvided
+                              << uint8(0); // UrlProvided
         }
-#endif
 #endif
     }
     else

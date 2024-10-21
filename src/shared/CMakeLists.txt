@@ -66,6 +66,7 @@ set (shared_SRCS
     Database/SQLStorageImpl.h
     Multithreading/Messager.h
     SRP6/SRP6.h
+    TimePeriod.h
     nonstd/optional.hpp
     ByteBuffer.cpp
     Common.cpp
@@ -99,6 +100,7 @@ set (shared_SRCS
     Database/SQLStorage.cpp
     Multithreading/Messager.cpp
     SRP6/SRP6.cpp
+    TimePeriod.cpp
 )
 
 if(USE_LIBCURL)
