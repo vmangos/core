@@ -32,7 +32,7 @@
 #include "MasterPlayer.h"
 #include "Anticheat.h"
 #include "Crypto/Authentication/SRP6.h"
-#include "Crypto/Hash/Sha1Hash.h"
+#include "Crypto/Hash/SHA1.h"
 
 INSTANTIATE_SINGLETON_1(AccountMgr);
 
@@ -308,15 +308,10 @@ bool AccountMgr::normalizeString(std::string& utf8str)
 
 std::string AccountMgr::CalculateShaPassHash(std::string& name, std::string& password)
 {
-    Sha1Hash sha;
-    sha.Initialize();
-    sha.UpdateData(name);
-    sha.UpdateData(":");
-    sha.UpdateData(password);
-    sha.Finalize();
+    auto pwHash = Crypto::Hash::SHA1::ComputeFrom(name + ":" + password);
 
     std::string encoded;
-    hexEncodeByteArray(sha.GetDigest(), sha.GetLength(), encoded);
+    hexEncodeByteArray(pwHash.data(), pwHash.size(), encoded);
 
     return encoded;
 }

@@ -2,21 +2,30 @@
 
 #include <openssl/md5.h>
 
-Crypto::Hash::MD5::Digest Crypto::Hash::MD5::CreateFrom(std::vector<uint8> const& data)
+#include "Crypto/BigNumber.h"
+
+Crypto::Hash::MD5::Digest Crypto::Hash::MD5::ComputeFrom(std::vector<uint8> const& data)
 {
     Generator generator;
     generator.UpdateData(data);
     return generator.GetDigest();
 }
 
-Crypto::Hash::MD5::Digest Crypto::Hash::MD5::CreateFrom(std::string const& data)
+Crypto::Hash::MD5::Digest Crypto::Hash::MD5::ComputeFrom(std::string const& data)
 {
     Generator generator;
     generator.UpdateData(data);
     return generator.GetDigest();
 }
 
-Crypto::Hash::MD5::Digest Crypto::Hash::MD5::CreateFrom(uint8 const* data, size_t length)
+Crypto::Hash::MD5::Digest Crypto::Hash::MD5::ComputeFrom(BigNumber const& data)
+{
+    Generator generator;
+    generator.UpdateData(data);
+    return generator.GetDigest();
+}
+
+Crypto::Hash::MD5::Digest Crypto::Hash::MD5::ComputeFrom(uint8 const* data, size_t length)
 {
     Generator generator;
     generator.UpdateData(data, length);
@@ -44,6 +53,12 @@ void Crypto::Hash::MD5::Generator::UpdateData(std::string const& data)
     UpdateData(reinterpret_cast<uint8 const*>(data.c_str()), data.size());
 }
 
+void Crypto::Hash::MD5::Generator::UpdateData(BigNumber const& data)
+{
+    std::vector<uint8> bytes = data.AsByteArray();
+    UpdateData(bytes);
+}
+
 void Crypto::Hash::MD5::Generator::UpdateData(uint8 const* data, size_t length)
 {
     MD5_Update(m_ctx, data, length);
@@ -55,4 +70,3 @@ Crypto::Hash::MD5::Digest Crypto::Hash::MD5::Generator::GetDigest()
     MD5_Final(digest.data(), m_ctx);
     return digest;
 }
-

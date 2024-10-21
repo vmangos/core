@@ -22,7 +22,7 @@
 #include "Auth/base32.h"
 #include "SRP6.h"
 
-#include <crypto.h>
+#include <openssl/crypto.h>
 #include <openssl/sha.h>
 
 SRP6::SRP6()
@@ -42,35 +42,27 @@ void SRP6::CalculateHostPublicEphemeral(void)
 
 void SRP6::CalculateProof(std::string username)
 {
-    uint8 hash[20];
+    using namespace Crypto::Hash;
 
-    Sha1Hash sha;
-    sha.Initialize();
-    sha.UpdateBigNumbers(&N, nullptr);
-    sha.Finalize();
-    memcpy(hash, sha.GetDigest(), 20);
-    sha.Initialize();
-    sha.UpdateBigNumbers(&g, nullptr);
-    sha.Finalize();
+    SHA1::Digest hashN = SHA1::ComputeFrom(N);
+    auto hashG = SHA1::ComputeFrom(g);
     for (int i = 0; i < 20; ++i)
     {
-        hash[i] ^= sha.GetDigest()[i];
+        hashN[i] ^= hashG[i];
     }
     BigNumber t3;
-    t3.SetBinary(hash, 20);
+    t3.SetBinary(hashN.data(), hashN.size());
 
-    sha.Initialize();
-    sha.UpdateData(username);
-    sha.Finalize();
-    uint8 t4[SHA_DIGEST_LENGTH];
-    memcpy(t4, sha.GetDigest(), SHA_DIGEST_LENGTH);
+    SHA1::Generator generator;
+    generator.UpdateData(t3);
+    generator.UpdateData(SHA1::ComputeFrom(username));
+    generator.UpdateData(s);
+    generator.UpdateData(A);
+    generator.UpdateData(B);
+    generator.UpdateData(K);
+    SHA1::Digest hashM = generator.GetDigest();
 
-    sha.Initialize();
-    sha.UpdateBigNumbers(&t3, nullptr);
-    sha.UpdateData(t4, SHA_DIGEST_LENGTH);
-    sha.UpdateBigNumbers(&s, &A, &B, &K, nullptr);
-    sha.Finalize();
-    M.SetBinary(sha.GetDigest(), 20);
+    M.SetBinary(hashM.data(), hashM.size());
 }
 
 bool SRP6::CalculateSessionKey(uint8* lp_A, int l)
@@ -84,10 +76,11 @@ bool SRP6::CalculateSessionKey(uint8* lp_A, int l)
     if ((A % N).isZero())
         return false;
 
-    Sha1Hash sha;
-    sha.UpdateBigNumbers(&A, &B, nullptr);
-    sha.Finalize();
-    u.SetBinary(sha.GetDigest(), 20);
+    Crypto::Hash::SHA1::Generator generator;
+    generator.UpdateData(A);
+    generator.UpdateData(B);
+    u.SetBinary(generator.GetDigest().data(), 20);
+
     S = (A * (v.ModExp(u, N))).ModExp(b, N);
 
     return true;
@@ -116,12 +109,15 @@ bool SRP6::CalculateVerifier(const std::string& rI, const char* salt)
 
     std::reverse(mDigest, mDigest + SHA_DIGEST_LENGTH);
 
-    Sha1Hash sha;
-    sha.UpdateData(s.AsByteArray().data(), s.GetNumBytes());
-    sha.UpdateData(mDigest, SHA_DIGEST_LENGTH);
-    sha.Finalize();
+    Crypto::Hash::SHA1::Generator generator;
+    generator.UpdateData(A);
+    generator.UpdateData(s);
+    generator.UpdateData(mDigest, SHA_DIGEST_LENGTH);
+    auto sha1 = generator.GetDigest();
+
+
     BigNumber x;
-    x.SetBinary(sha.GetDigest(), sha.GetLength());
+    x.SetBinary(sha1.data(), sha1.size());
     v = g.ModExp(x, N);
 
     return true;
@@ -137,24 +133,21 @@ void SRP6::HashSessionKey(void)
     {
         t1[i] = t[i * 2];
     }
-    Sha1Hash sha;
-    sha.Initialize();
-    sha.UpdateData(t1, 16);
-    sha.Finalize();
+
+    auto t1HashFirst = Crypto::Hash::SHA1::ComputeFrom(t1, 16);
     for (int i = 0; i < 20; ++i)
     {
-        vK[i * 2] = sha.GetDigest()[i];
+        vK[i * 2] = t1HashFirst[i];
     }
     for (int i = 0; i < 16; ++i)
     {
         t1[i] = t[i * 2 + 1];
     }
-    sha.Initialize();
-    sha.UpdateData(t1, 16);
-    sha.Finalize();
+
+    auto t1HashSecond = Crypto::Hash::SHA1::ComputeFrom(t1, 16);
     for (int i = 0; i < 20; ++i)
     {
-        vK[i * 2 + 1] = sha.GetDigest()[i];
+        vK[i * 2 + 1] = t1HashSecond[i];
     }
     K.SetBinary(vK, 40);
 }
@@ -172,11 +165,13 @@ bool SRP6::ProofVerifier(std::string vC)
     return vC == v.AsHexStr();
 }
 
-void SRP6::Finalize(Sha1Hash& sha)
+Crypto::Hash::SHA1::Digest SRP6::Finalize()
 {
-    sha.Initialize();
-    sha.UpdateBigNumbers(&A, &M, &K, nullptr);
-    sha.Finalize();
+    Crypto::Hash::SHA1::Generator generator;
+    generator.UpdateData(A);
+    generator.UpdateData(M);
+    generator.UpdateData(K);
+    return generator.GetDigest();
 }
 
 bool SRP6::SetSalt(const char* new_s)

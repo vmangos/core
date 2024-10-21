@@ -1048,9 +1048,8 @@ void WorldSession::SendAccountDataTimes()
                 continue;
         }
 
-        std::string accountData = m_accountData[index].data;
-
-        MD5::Digest hash = accountData.empty() ? MD5::CreateEmpty() : MD5::CreateFrom(accountData);
+        std::string const& accountData = m_accountData[index].data;
+        MD5::Digest hash = accountData.empty() ? MD5::CreateEmpty() : MD5::ComputeFrom(accountData);
         data.append(hash.data(), hash.size());
     }
     SendPacket(&data);

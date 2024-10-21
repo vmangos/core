@@ -53,7 +53,7 @@ WardenModule::WardenModule(std::string const& bin, std::string const& kf, std::s
     b.close();
 
     // compute md5 hash of encrypted/compressed data
-    hash = Crypto::Hash::MD5::CreateFrom(binary);
+    hash = Crypto::Hash::MD5::ComputeFrom(binary);
 
     std::ifstream k(kf, std::ios::binary | std::ios::ate);
 

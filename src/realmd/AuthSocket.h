@@ -28,7 +28,7 @@
 
 #include "Common.h"
 #include "Crypto/BigNumber.h"
-#include "Crypto/Hash/Sha1Hash.h"
+#include "Crypto/Hash/SHA1.h"
 #include "Crypto/Authentication/SRP6.h"
 #include "ByteBuffer.h"
 
@@ -62,7 +62,7 @@ class AuthSocket: public BufferedSocket
 
         void OnAccept();
         void OnRead();
-        void SendProof(Sha1Hash sha);
+        void SendProof(Crypto::Hash::SHA1::Digest sha);
         void LoadRealmlist(ByteBuffer &pkt);
         bool VerifyPinData(uint32 pin, const PINData& clientData);
         uint32 GenerateTotpPin(const std::string& secret, int interval);

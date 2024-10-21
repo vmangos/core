@@ -1,5 +1,5 @@
-#ifndef _MANGOS_CRYPTO_HASH_MD5_H
-#define _MANGOS_CRYPTO_HASH_MD5_H
+#ifndef _MANGOS_CRYPTO_HASH_SHA1_H
+#define _MANGOS_CRYPTO_HASH_SHA1_H
 
 #include "Platform/Define.h"
 
@@ -9,16 +9,16 @@
 
 class BigNumber;
 
-typedef struct MD5state_st MD5_CTX;
+typedef struct SHAstate_st SHA_CTX;
 
-namespace Crypto { namespace Hash { namespace MD5
+namespace Crypto { namespace Hash { namespace SHA1
 {
-    struct Digest : std::array<uint8, 16>
+    struct Digest : std::array<uint8, 20>
     {
-        static constexpr size_t size() { return 16; }
+        static constexpr size_t size() { return 20; }
     };
 
-    constexpr Digest CreateEmpty() { return {}; }
+    constexpr Digest CreateZero() { return {}; }
 
     template <std::size_t N>
     Digest ComputeFrom(std::array<uint8, N> const& data) { return ComputeFrom(data.data(), data.size()); }
@@ -43,8 +43,8 @@ namespace Crypto { namespace Hash { namespace MD5
         Digest GetDigest();
 
     private:
-        MD5_CTX* m_ctx;
+        SHA_CTX* m_ctx;
     };
-}}} // namespace Crypto::Hash::MD5
+}}} // namespace Crypto::Hash::SHA1
 
-#endif // _MANGOS_CRYPTO_HASH_MD5_H
+#endif

@@ -16,8 +16,6 @@
 #include "SharedDefines.h"
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"
-#include "Crypto/BigNumber.h"
-#include "Crypto/Hash/Sha1Hash.h"
 #include "WorldSession.h"
 #include "Log.h"
 #include "DBCStores.h"

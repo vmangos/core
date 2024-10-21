@@ -21,7 +21,7 @@
 
 #include "Common.h"
 #include "Crypto/BigNumber.h"
-#include "Crypto/Hash/Sha1Hash.h"
+#include "Crypto/Hash/SHA1.h"
 #include "ByteBuffer.h"
 
 #define HMAC_RES_SIZE 20
@@ -96,9 +96,8 @@ class SRP6
           this hash has to be send to the client for client-side proof.
           client has to show it's proof first. If the server detects an incorrect proof
           it must abort without showing it's proof.
-          \param sha reference to an empty Sha1Hash object
         */
-        void Finalize(Sha1Hash& sha);
+        Crypto::Hash::SHA1::Digest Finalize();
 
         BigNumber GetHostPublicEphemeral(void) { return B; };
         BigNumber GetGeneratorModulo(void) { return g; };

@@ -22,7 +22,7 @@
  */
 
 #include "WardenModule.hpp"
-#include "WardenKeyGeneration.h"
+#include "WardenKeyGenerator.h"
 
 #include "Common.h"
 #include "Language.h"
@@ -108,7 +108,7 @@ Warden::Warden(WorldSession* session, WardenModule const* module, BigNumber cons
 {
     auto const kBytes = K.AsByteArray();
 
-    SHA1Randx WK(kBytes.data(), kBytes.size());
+    WardenKeyGenerator WK(kBytes.data(), kBytes.size());
 
     uint8 inputKey[KeyLength];
     WK.Generate(inputKey, sizeof(inputKey));

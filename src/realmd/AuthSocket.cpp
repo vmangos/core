@@ -263,12 +263,12 @@ void AuthSocket::OnRead()
     }
 }
 
-void AuthSocket::SendProof(Sha1Hash sha)
+void AuthSocket::SendProof(Crypto::Hash::SHA1::Digest sha)
 {
     if (m_build < 6299)  // before version 2.0.3 (exclusive)
     {
         sAuthLogonProof_S proof;
-        memcpy(proof.M2, sha.GetDigest(), 20);
+        memcpy(proof.M2, sha.data(), sha.size());
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
         proof.surveyId = 0x00000000;
@@ -278,7 +278,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
     else if (m_build < 8089) // before version 2.4.0 (exclusive)
     {
         sAuthLogonProof_S_BUILD_6299 proof;
-        memcpy(proof.M2, sha.GetDigest(), 20);
+        memcpy(proof.M2, sha.data(), sha.size());
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
         proof.surveyId = 0x00000000;
@@ -289,7 +289,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
     else
     {
         sAuthLogonProof_S_BUILD_8089 proof;
-        memcpy(proof.M2, sha.GetDigest(), 20);
+        memcpy(proof.M2, sha.data(), sha.size());
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
         proof.accountFlags = ACCOUNT_FLAG_PROPASS;
@@ -762,8 +762,7 @@ bool AuthSocket::_HandleLogonProof()
             K_hex.c_str(), get_remote_address().c_str(), GetLocaleByName(m_localizationName), os, platform, m_safelogin.c_str() );
 
         // Finish SRP6 and send the final result to the client
-        Sha1Hash sha;
-        srp.Finalize(sha);
+        Crypto::Hash::SHA1::Digest sha = srp.Finalize();
 
         SendProof(sha);
         m_status = STATUS_AUTHED;
@@ -919,13 +918,14 @@ bool AuthSocket::_HandleReconnectProof()
     BigNumber t1;
     t1.SetBinary(lp.R1, 16);
 
-    Sha1Hash sha;
-    sha.Initialize();
+    Crypto::Hash::SHA1::Generator sha;
     sha.UpdateData(m_login);
-    sha.UpdateBigNumbers(&t1, &m_reconnectProof, &K, nullptr);
-    sha.Finalize();
+    sha.UpdateData(t1);
+    sha.UpdateData(m_reconnectProof);
+    sha.UpdateData(K);
+    Crypto::Hash::SHA1::Digest digest = sha.GetDigest();
 
-    if (!memcmp(sha.GetDigest(), lp.R2, sha.GetLength()))
+    if (!memcmp(digest.data(), lp.R2, digest.size()))
     {
         if (!VerifyVersion(lp.R1, sizeof(lp.R1), lp.R3, true))
         {
@@ -1240,20 +1240,21 @@ bool AuthSocket::VerifyPinData(uint32 pin, const PINData& clientData)
         pinBytes[i] += 0x30;
 
     // validate the PIN, x = H(client_salt | H(server_salt | ascii(pin_bytes)))
-    Sha1Hash sha;
-    sha.UpdateData(m_serverSecuritySalt.AsByteArray());
-    sha.UpdateData(pinBytes.data(), pinBytes.size());
-    sha.Finalize();
+    Crypto::Hash::SHA1::Generator shaFirst;
+    shaFirst.UpdateData(m_serverSecuritySalt.AsByteArray());
+    shaFirst.UpdateData(pinBytes.data(), pinBytes.size());
+    auto shaFirstHash = shaFirst.GetDigest();
 
     BigNumber hash, clientHash;
-    hash.SetBinary(sha.GetDigest(), sha.GetLength());
+    hash.SetBinary(shaFirstHash.data(), shaFirstHash.size());
     clientHash.SetBinary(clientData.hash, 20);
 
-    sha.Initialize();
-    sha.UpdateData(clientData.salt, sizeof(clientData.salt));
-    sha.UpdateData(hash.AsByteArray());
-    sha.Finalize();
-    hash.SetBinary(sha.GetDigest(), sha.GetLength());
+    Crypto::Hash::SHA1::Generator shaSecond;
+    shaSecond.UpdateData(clientData.salt, sizeof(clientData.salt));
+    shaSecond.UpdateData(hash);
+    auto shaSecondHash = shaSecond.GetDigest();
+
+    hash.SetBinary(shaSecondHash.data(), shaSecondHash.size());
 
     return hash.AsDecStr() == clientHash.AsDecStr();
 }
@@ -1423,12 +1424,12 @@ bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versi
         else
             versionHash = &zeros;
 
-        Sha1Hash version;
+        Crypto::Hash::SHA1::Generator version;
         version.UpdateData(a, aLength);
         version.UpdateData(versionHash->data(), versionHash->size());
-        version.Finalize();
+        auto expectedHash = version.GetDigest();
 
-        if (memcmp(versionProof, version.GetDigest(), version.GetLength()) == 0)
+        if (memcmp(versionProof, expectedHash.data(), expectedHash.size()) == 0)
             return true;
     }
 
