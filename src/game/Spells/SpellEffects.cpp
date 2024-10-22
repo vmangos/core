@@ -5718,10 +5718,6 @@ void Spell::EffectSummonPlayer(SpellEffectIndex /*effIdx*/)
     if (!pPlayerTarget)
         return;
 
-    // Evil Twin (ignore player summon, but hide this for summoner)
-    if (pPlayerTarget->HasAura(23445))
-        return;
-
     float x, y, z;
     SpellCaster* landingObject = m_caster;
     // summon to the ritual go location if any
