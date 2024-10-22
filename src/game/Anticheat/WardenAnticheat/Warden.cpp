@@ -22,7 +22,7 @@
  */
 
 #include "WardenModule.hpp"
-#include "WardenKeyGeneration.h"
+#include "WardenKeyGenerator.h"
 
 #include "Common.h"
 #include "Language.h"
@@ -35,7 +35,7 @@
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"
 #include "Policies/SingletonImp.h"
-#include "Auth/BigNumber.h"
+#include "Crypto/BigNumber.h"
 #include "Warden.hpp"
 #include "WardenModuleMgr.hpp"
 #include "Util.h"
@@ -43,9 +43,6 @@
 #include "WardenMac.hpp"
 #include "WardenScanMgr.hpp"
 #include "AccountMgr.h"
-
-#include <openssl/md5.h>
-#include <openssl/sha.h>
 
 #include <zlib.h>
 
@@ -111,7 +108,7 @@ Warden::Warden(WorldSession* session, WardenModule const* module, BigNumber cons
 {
     auto const kBytes = K.AsByteArray();
 
-    SHA1Randx WK(kBytes.data(), kBytes.size());
+    WardenKeyGenerator WK(kBytes.data(), kBytes.size());
 
     uint8 inputKey[KeyLength];
     WK.Generate(inputKey, sizeof(inputKey));

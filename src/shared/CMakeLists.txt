@@ -35,16 +35,22 @@ set (shared_SRCS
     Util.h
     WheatyExceptionReport.h
     WorldPacket.h
-    Auth/ARC4.h
-    Auth/AuthCrypt.h
-    Auth/base32.h
-    Auth/BigNumber.h
-    Auth/Hmac.h
-    Auth/HMACSHA1.h
-    Auth/md5.h
-    Auth/Sha1.h
     Config/Config.h
     Config/ConfigEnv.h
+    Crypto/BigNumber.h
+    Crypto/BigNumber.cpp
+    Crypto/Authentication/SRP6.h
+    Crypto/Authentication/SRP6.cpp
+    Crypto/Encryption/RC4.h
+    Crypto/Encryption/RC4.cpp
+    Crypto/Hash/Hmac.h
+    Crypto/Hash/Hmac.cpp
+    Crypto/Hash/HMACSHA1.h
+    Crypto/Hash/HMACSHA1.cpp
+    Crypto/Hash/MD5.h
+    Crypto/Hash/MD5.cpp
+    Crypto/Hash/SHA1.h
+    Crypto/Hash/SHA1.cpp
     Database/Database.h
     Database/DatabaseCallback.h
     Database/DatabaseEnv.h
@@ -65,7 +71,6 @@ set (shared_SRCS
     Database/SQLStorage.h
     Database/SQLStorageImpl.h
     Multithreading/Messager.h
-    SRP6/SRP6.h
     TimePeriod.h
     nonstd/optional.hpp
     ByteBuffer.cpp
@@ -79,13 +84,10 @@ set (shared_SRCS
     Util.cpp
     Duration.h
     WheatyExceptionReport.cpp
-    Auth/ARC4.cpp
+    Auth/AuthCrypt.h
+    Auth/base32.h
     Auth/AuthCrypt.cpp
     Auth/base32.cpp
-    Auth/BigNumber.cpp
-    Auth/Hmac.cpp
-    Auth/HMACSHA1.cpp
-    Auth/Sha1.cpp
     Config/Config.cpp
     Database/Database.cpp
     Database/DatabaseMysql.cpp
@@ -99,7 +101,6 @@ set (shared_SRCS
     Database/SqlPreparedStatement.cpp
     Database/SQLStorage.cpp
     Multithreading/Messager.cpp
-    SRP6/SRP6.cpp
     TimePeriod.cpp
 )
 

@@ -26,8 +26,8 @@
 #include "WardenModule.hpp"
 #include "ByteBuffer.h"
 #include "Util.h"
-#include "Auth/HMACSHA1.h"
-#include "Auth/Sha1.h"
+#include "Crypto/Hash/HMACSHA1.h"
+#include "Crypto/Hash/SHA1.h"
 #include <openssl/sha.h>
 #include <openssl/md5.h>
 
@@ -89,33 +89,27 @@ Scan::CheckT StringHashScan::GetChecker()
     {
         // calculate server side hashes
 
-        uint8 serverSHA[SHA_DIGEST_LENGTH];
-        uint8 serverMD5[MD5_DIGEST_LENGTH];
 
         static constexpr uint32 magic = 0xFEEDFACE;
 
-        Sha1Hash sha1;
+        Crypto::Hash::SHA1::Generator sha1;
         sha1.UpdateData(warden->m_hashString);
         if (!warden->IsUsingMaiev()) // this constant is only used if there is a module
             sha1.UpdateData(reinterpret_cast<uint8 const*>(&magic), sizeof(magic));
-        sha1.Finalize();
 
-        memcpy(serverSHA, sha1.GetDigest(), sizeof(serverSHA));
-
-        MD5_CTX md5;
-        MD5_Init(&md5);
-        MD5_Update(&md5, warden->m_hashString.c_str(), warden->m_hashString.size());
-        MD5_Final(serverMD5, &md5);
+        Crypto::Hash::SHA1::Digest serverSHA = sha1.GetDigest();
+        Crypto::Hash::MD5::Digest serverMD5 = Crypto::Hash::MD5::ComputeFrom(warden->m_hashString);
 
         // compare with client side hashes
+        Crypto::Hash::SHA1::Digest clientSHA;
+        Crypto::Hash::MD5::Digest clientMD5;
 
-        uint8 clientSHA[SHA_DIGEST_LENGTH];
-        uint8 clientMD5[MD5_DIGEST_LENGTH];
+        // read into buffer
+        buff.read(clientSHA.data(), clientSHA.size());
+        buff.read(clientMD5.data(), clientMD5.size());
 
-        buff.read(clientSHA, sizeof(clientSHA));
-        buff.read(clientMD5, sizeof(clientMD5));
-
-        return !!memcmp(clientSHA, serverSHA, sizeof(clientSHA)) || !!memcmp(clientMD5, serverMD5, sizeof(clientMD5));
+        bool isCorrect = clientSHA == serverSHA && clientMD5 == serverMD5;
+        return !isCorrect; // true if mismatch
     };
 }
 

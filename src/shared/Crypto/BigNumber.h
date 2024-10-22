@@ -16,11 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _AUTH_BIGNUMBER_H
-#define _AUTH_BIGNUMBER_H
+#ifndef _MANGOS_CRYPTO_BIGNUMBER_H
+#define _MANGOS_CRYPTO_BIGNUMBER_H
 
-#include "Common.h"
-#include <memory>
+#include "Platform/Define.h"
+
+#include <string>
+#include <vector>
 
 struct bignum_st;
 
@@ -84,10 +86,11 @@ class BigNumber
         uint32 AsDword();
         std::vector<uint8> AsByteArray(int minSize = 0, bool reverse = true) const;
 
-        char const* AsHexStr();
-        char const* AsDecStr();
+        std::string AsHexStr();
+        std::string AsDecStr();
 
     private:
         struct bignum_st* _bn;
 };
+
 #endif

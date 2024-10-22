@@ -1,6 +1,4 @@
 /*
- * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,35 +14,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _AUTH_SHA1_H
-#define _AUTH_SHA1_H
+#ifndef _AUTH_SARC4_H
+#define _AUTH_SARC4_H
 
 #include "Common.h"
-#include <openssl/sha.h>
-#include <openssl/crypto.h>
 
-class BigNumber;
+typedef struct evp_cipher_ctx_st EVP_CIPHER_CTX;
 
-class Sha1Hash
+class RC4
 {
     public:
-        Sha1Hash();
-        ~Sha1Hash();
-
-        void UpdateBigNumbers(BigNumber* bn0, ...);
-
-        void UpdateData(uint8 const* dta, int len);
-        void UpdateData(std::string const& str);
-        void UpdateData(std::vector<uint8> const& data);
-
-        void Initialize();
-        void Finalize();
-
-        uint8* GetDigest(void) { return mDigest; };
-        static int GetLength(void) { return SHA_DIGEST_LENGTH; };
-
+        RC4(uint8 len);
+        RC4(uint8* seed, uint8 len);
+        ~RC4();
+        void Init(const uint8* seed);
+        void UpdateData(uint8* data, size_t len);
     private:
-        SHA_CTX mC;
-        uint8 mDigest[SHA_DIGEST_LENGTH];
+        EVP_CIPHER_CTX* m_ctx;
 };
+
 #endif

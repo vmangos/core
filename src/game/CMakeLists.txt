@@ -462,7 +462,7 @@ if(USE_ANTICHEAT)
       Anticheat/MovementAnticheat/MovementAnticheat.h
       Anticheat/WardenAnticheat/Warden.cpp
       Anticheat/WardenAnticheat/Warden.hpp
-      Anticheat/WardenAnticheat/WardenKeyGeneration.h
+      Anticheat/WardenAnticheat/WardenKeyGenerator.h
       Anticheat/WardenAnticheat/WardenMac.cpp
       Anticheat/WardenAnticheat/WardenMac.hpp
       Anticheat/WardenAnticheat/WardenModule.cpp

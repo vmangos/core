@@ -24,8 +24,7 @@
 #include "WardenModule.hpp"
 
 #include "Platform/Define.h"
-
-#include <openssl/md5.h>
+#include "Crypto/Hash/MD5.h"
 
 #include <zlib.h>
 
@@ -33,6 +32,7 @@
 #include <vector>
 #include <fstream>
 #include <exception>
+
 
 WardenModule::WardenModule(std::string const& bin, std::string const& kf, std::string const& cr)
 {
@@ -53,15 +53,7 @@ WardenModule::WardenModule(std::string const& bin, std::string const& kf, std::s
     b.close();
 
     // compute md5 hash of encrypted/compressed data
-    {
-        // md5 hash
-        MD5_CTX ctx;
-        MD5_Init(&ctx);
-        MD5_Update(&ctx, &binary[0], binary.size());
-
-        hash.resize(MD5_DIGEST_LENGTH);
-        MD5_Final(&hash[0], &ctx);
-    }
+    hash = Crypto::Hash::MD5::ComputeFrom(binary);
 
     std::ifstream k(kf, std::ios::binary | std::ios::ate);
 

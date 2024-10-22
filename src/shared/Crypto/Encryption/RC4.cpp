@@ -14,12 +14,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ARC4.h"
+#include "RC4.h"
+
+#include <openssl/evp.h>
+
 #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
 #include <openssl/provider.h>
 #endif
 
-ARC4::ARC4(uint8 len) : m_ctx()
+RC4::RC4(uint8 len) : m_ctx()
 {
     #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
         OSSL_PROVIDER_load(NULL, "legacy");
@@ -29,7 +32,7 @@ ARC4::ARC4(uint8 len) : m_ctx()
     EVP_CIPHER_CTX_set_key_length(m_ctx, len);
 }
 
-ARC4::ARC4(uint8* seed, uint8 len) : m_ctx()
+RC4::RC4(uint8* seed, uint8 len) : m_ctx()
 {
     #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
         OSSL_PROVIDER_load(NULL, "legacy");
@@ -40,17 +43,17 @@ ARC4::ARC4(uint8* seed, uint8 len) : m_ctx()
     EVP_EncryptInit_ex(m_ctx, nullptr, nullptr, seed, nullptr);
 }
 
-ARC4::~ARC4()
+RC4::~RC4()
 {
     EVP_CIPHER_CTX_free(m_ctx);
 }
 
-void ARC4::Init(const uint8* seed)
+void RC4::Init(const uint8* seed)
 {
     EVP_EncryptInit_ex(m_ctx, nullptr, nullptr, seed, nullptr);
 }
 
-void ARC4::UpdateData(uint8* data, size_t len)
+void RC4::UpdateData(uint8* data, size_t len)
 {
     int outlen = 0;
     EVP_EncryptUpdate(m_ctx, data, &outlen, data, len);

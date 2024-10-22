@@ -28,8 +28,6 @@
 #include "WardenScan.hpp"
 #include "WorldPacket.h"
 
-#include <openssl/md5.h>
-
 #include <string>
 
 class WorldSession;

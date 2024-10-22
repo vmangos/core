@@ -30,7 +30,7 @@
 #include "Common.h"
 #include "ByteBuffer.h"
 #include "ClientDefines.h"
-#include "Auth/ARC4.h"
+#include "Crypto/Encryption/RC4.h"
 
 #include <vector>
 #include <memory>
@@ -76,8 +76,8 @@ class Warden
         // true when we have sent a module to the client and are waiting for a result
         bool m_moduleSendPending;
 
-        ARC4 m_inputCrypto;
-        ARC4 m_outputCrypto;
+        RC4 m_inputCrypto;
+        RC4 m_outputCrypto;
 
         void EncryptData(uint8* buffer, size_t size);
         void DecryptData(uint8* buffer, size_t size);

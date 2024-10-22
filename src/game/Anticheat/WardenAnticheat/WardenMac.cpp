@@ -25,17 +25,12 @@
 #include "WardenModuleMgr.hpp"
 #include "WardenScanMgr.hpp"
 #include "WorldSession.h"
-#include "Auth/BigNumber.h"
-#include "Auth/Sha1.h"
 #include "World.h"
 #include "Database/DatabaseEnv.h"
-
-#include <openssl/md5.h>
 
 #include <memory>
 #include <vector>
 #include <string>
-#include <sstream>
 
 void WardenMac::LoadScriptedScans()
 {
