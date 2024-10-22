@@ -1115,8 +1115,6 @@ void Aura::TriggerSpell()
     uint32 auraId = auraSpellInfo->Id;
     Unit* target = GetTarget();
 
-    uint32 spellRandom;
-
     // not in banished state
     if (triggerTarget->HasUnitState(UNIT_STAT_ISOLATED))
         return;
@@ -1456,10 +1454,15 @@ void Aura::TriggerSpell()
         switch (auraId)
         {
             case 7054:
-                spellRandom = urand(0, 14) + 7038;
+            {
+                uint32 spellRandom = urand(0, 14) + 7038;
+                // spellRandom contains a random number from 7038 to 7052. But the available spells range from 7038 to 7051 and 7053. So we increase 7052 to 7053
+                if (spellRandom == 7052)
+                    spellRandom = 7053;
+
                 target->CastSpell(target, spellRandom, true, nullptr, this);
                 return;
-                break;
+            }
             case 8892:  // Goblin Rocket Boots
             case 13141: // Gnomish Rocket Boots
                 // FIXME: Confirm that the chance for rocket boots to explode in retail is actually meant to be 1% per-tick or 1/5 overall
@@ -6660,7 +6663,9 @@ void Aura::PeriodicDummyTick()
                 case 7054:
                 {
                     uint32 spellRandom = urand(0, 14) + 7038;
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "7054 %u", spellRandom);
+                    // spellRandom contains a random number from 7038 to 7052. But the available spells range from 7038 to 7051 and 7053. So we increase 7052 to 7053
+                    if (spellRandom == 7052)
+                        spellRandom = 7053;
 
                     target->CastSpell(target, spellRandom, true, nullptr, this);
                     // Possibly need cast one of them (but
