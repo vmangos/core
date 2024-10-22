@@ -937,7 +937,7 @@ class Unit : public SpellCaster
         HostileRefManager m_HostileRefManager; // Manage all Units that are threatened by us (has list of creatures that have us in their threat list)
         std::vector<ObjectGuid> m_tauntGuids;
     protected:
-        uint32 m_attackTimer[MAX_ATTACK];
+        int32 m_attackTimer[MAX_ATTACK];
         AttackerSet m_attackers;
         Unit* m_attacking;
         uint32 m_reactiveTimer[MAX_REACTIVE];
@@ -951,19 +951,20 @@ class Unit : public SpellCaster
          * @param type The type of weapon that we want to update the time for
          * @param time the remaining time until we can attack with the WeaponAttackType again
          */
-        void SetAttackTimer(WeaponAttackType type, uint32 time) { m_attackTimer[type] = time; }
+        void SetAttackTimer(WeaponAttackType type, int32 time) { m_attackTimer[type] = time; }
         /**
          * Resets the attack timer to the base value decided by Unit::m_modAttackSpeedPct and
          * Unit::GetAttackTime
          * @param type The weapon attack type to reset the attack timer for.
+         * @param compensateDiff Deduct the diff in update tick from the reseted timer.
          */
-        void ResetAttackTimer(WeaponAttackType type = BASE_ATTACK);
+        void ResetAttackTimer(WeaponAttackType type = BASE_ATTACK, bool compensateDiff = false);
         /**
          * Get's the remaining time until we can do an attack
          * @param type The weapon type to check the remaining time for
          * @return The remaining time until we can attack with this weapon type.
          */
-        uint32 GetAttackTimer(WeaponAttackType type) const { return m_attackTimer[type]; }
+        int32 GetAttackTimer(WeaponAttackType type) const { return m_attackTimer[type]; }
         /**
          * Checks whether the unit can do an attack. Does this by checking the attacktimer for the
          * WeaponAttackType, can probably be thought of as a cooldown for each swing/shot
@@ -989,6 +990,11 @@ class Unit : public SpellCaster
          * Called from UpdateMeleeAttackingState if attack can't happen now.
          */
         void DelayAutoAttacks();
+        /**
+         * When a starts autoattacking. Erases the saved update diff on its swing timer
+         * and delays the offhand attack to half its attack speed
+         */
+        void FirstAttackDelay();
         /**
          * Checks that need to be done before an auto attack swing happens.
          * Target's faction is only checked for players since its done elsewhere
