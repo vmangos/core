@@ -88,7 +88,7 @@ void WorldSocket::DoRecvIncomingData()
     {
         if (error)
         {
-            if (error.GetErrorType() != IO::NetworkError::ErrorType::SocketClosed || !self->IsClosing())
+            if (error.GetErrorType() != IO::NetworkError::ErrorType::SocketClosed || !self->IsClosing()) // only print error if it's not "normal close" related
             {
                 sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] WorldSocket::DoRecvIncomingData: IoError: %s", self->m_socket.GetRemoteIpString().c_str(), error.ToString().c_str());
                 self->CloseSocket(); // This call to CloseSocket is actually necessary for once, so that others can see that this socket is not usable anymore
@@ -542,7 +542,12 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
 {
     if (error)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] Failed to send packet %s", GetRemoteIpString().c_str(), error.ToString().c_str());
+        if (error.GetErrorType() != IO::NetworkError::ErrorType::SocketClosed || !IsClosing()) // only print error if it's not "normal close" related
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[%s] WorldSocket::HandleResultOfAsyncWrite: IoError: %s", GetRemoteIpString().c_str(), error.ToString().c_str());
+            CloseSocket(); // This call to CloseSocket is actually necessary for once, so that others can see that this socket is not usable anymore
+        }
+
         m_sendQueueIsRunning.clear();
         return;
     }
