@@ -18,6 +18,7 @@
 
 #include "Common.h"
 #include "Log.h"
+#include "Errors.h"
 #include "Auth/HMACSHA1.h"
 #include "Auth/base32.h"
 #include "SRP6.h"
@@ -70,7 +71,7 @@ void SRP6::CalculateProof(std::string username)
     M.SetBinary(sha.GetDigest(), 20);
 }
 
-bool SRP6::CalculateSessionKey(uint8* lp_A, int l)
+bool SRP6::CalculateSessionKey(uint8 const* lp_A, int l)
 {
     A.SetBinary(lp_A, l);
 
@@ -159,7 +160,7 @@ void SRP6::HashSessionKey(void)
     K.SetBinary(vK, 40);
 }
 
-bool SRP6::Proof(uint8* lp_M, int l)
+bool SRP6::Proof(uint8 const* lp_M, int l)
 {
     if (!memcmp(M.AsByteArray().data(), lp_M, l))
         return false;

@@ -5983,7 +5983,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         // Swiftmend
         if (m_spellInfo->Id == 18562)                       // future versions have special aura state for this
         {
-            if (!target->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, UI64LIT(0x50)))
+            if (!target->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, uint64(0x50)))
                 return SPELL_FAILED_TARGET_AURASTATE;
         }
 #endif

@@ -1,9 +1,4 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
- * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
- * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
- * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -24,46 +19,41 @@
 
 #include "Common.h"
 #include "Platform/Define.h"
-#include "ace/Configuration_Import_Export.h"
 #include "Policies/SingletonImp.h"
 #include "Policies/ThreadingModel.h"
 #include <shared_mutex>
-
-class ACE_Configuration_Heap;
+#include <unordered_map>
 
 class Config
 {
-    public:
-        using Lock = MaNGOS::ClassLevelLockable<Config, std::shared_timed_mutex>;
+ public:
+    using Lock = MaNGOS::ClassLevelLockable<Config, std::shared_timed_mutex>;
 
-        Config();
-        ~Config();
+    bool LoadFromFile(std::string const& filename);
+    bool Reload();
 
-        bool SetSource(char const* file);
-        bool Reload();
+    bool IsSet(char const* name) const;
 
-        std::string GetStringDefault(char const* name, char const* def);
-        bool GetBoolDefault(char const* name, bool const def = false);
-        int32 GetIntDefault(char const* name, int32 const def);
-        float GetFloatDefault(char const* name, float const def);
+    std::string GetStringDefault(char const* name, char const* def) const;
+    bool GetBoolDefault(char const* name, bool def) const;
+    int32 GetIntDefault(char const* name, int32 def) const;
+    float GetFloatDefault(char const* name, float def) const;
 
-        std::string GetFilename() const { return mFilename; }
-        bool GetValueHelper(char const* name, ACE_TString &result);
+    std::string GetFilename() const;
+    bool GetValueHelper(char const* name, std::string& result) const;
 
-    private:
-        friend class MaNGOS::Singleton<Config, Lock>;
+ private:
+    friend class MaNGOS::Singleton<Config, Lock>;
 
-        std::string mFilename;
-        ACE_Configuration_Heap* mConf;
+    bool ProcessLine(char const* line);
 
-        using LockType = std::mutex;
-        using GuardType = std::unique_lock<LockType>;
+    std::string m_fileName;
+    std::unordered_map<std::string, std::string> m_configMap;
 
-        std::string _filename;
-        LockType m_configLock;
+    using LockType = std::shared_timed_mutex;
+    mutable LockType m_configLock;
 };
 
-// Nostalrius : multithreading lock
 #define sConfig (MaNGOS::Singleton<Config, Config::Lock>::Instance())
 
 #endif

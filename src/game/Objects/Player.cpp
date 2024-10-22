@@ -81,6 +81,8 @@
 #include "world/scourge_invasion.h"
 #include "world/world_event_wareffort.h"
 
+#include <climits>
+
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
@@ -22799,7 +22801,8 @@ static char const* type_strings[] =
     "GM",
     "GMCritical",
     "Anticheat",
-    "Scripts"
+    "Scripts",
+    "Network",
 };
 
 static_assert(sizeof(type_strings) / sizeof(type_strings[0]) == LOG_TYPE_MAX, "type_strings must be updated");

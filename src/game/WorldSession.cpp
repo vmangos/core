@@ -23,7 +23,7 @@
     \ingroup u2w
 */
 
-#include "WorldSocket.h"                                    // must be first to make ACE happy with ACE includes in it
+#include "WorldSocket.h"
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
@@ -72,22 +72,17 @@ bool MapSessionFilter::Process(std::unique_ptr<WorldPacket> const& packet)
 static uint32 g_sessionCounter = 0;
 
 // WorldSession constructor
-WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale) :
+WorldSession::WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, AccountTypes sec, time_t mute_time, LocaleConstant locale) :
     m_guid(g_sessionCounter++), m_muteTime(mute_time), m_connected(true), m_disconnectTimer(0), m_who_recvd(false), m_ah_list_recvd(false),
     m_accountFlags(0), m_idleTime(WorldTimer::getMSTime()), _player(nullptr), m_socket(sock), m_security(sec), m_accountId(id),
     m_exhaustionState(0), m_createTime(time(nullptr)), m_previousPlayTime(0), m_logoutTime(0), m_inQueue(false),
     m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_playerSave(false), m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)),
     m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr), m_cheatData(nullptr),
     m_bot(nullptr), m_clientOS(CLIENT_OS_UNKNOWN), m_clientPlatform(CLIENT_PLATFORM_UNKNOWN), m_gameBuild(0), m_verifiedEmail(true),
-    m_charactersCount(10), m_characterMaxLevel(0), m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr)
+    m_charactersCount(10), m_characterMaxLevel(0), m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr), m_receivedPacketType{},
+    m_floodPacketsCount{}, m_tutorials{}
 {
-    if (sock)
-    {
-        m_address = sock->GetRemoteAddress();
-        sock->AddReference();
-    }
-    else
-        m_address = "<BOT>";
+    m_remoteIpAddress = sock ? sock->GetRemoteIpString() : "<BOT>";
 }
 
 // WorldSession destructor
@@ -100,9 +95,8 @@ WorldSession::~WorldSession()
     // If have unclosed socket, close it
     if (m_socket)
     {
-        m_socket->CloseSocket();
-        m_socket->RemoveReference();
-        m_socket = nullptr;
+        m_socket->FinalizeSession();
+        m_socket = nullptr; // <-- technically this is unnecessary, since we are in the destructor that will destruct all other members soon anyway
     }
 
     // empty incoming packet queue
@@ -178,14 +172,13 @@ void WorldSession::SendPacketImpl(WorldPacket const* packet)
         sendLastPacketBytes = packet->wpos();               // wpos is real written size
     }
 
-#endif                                                  // !_DEBUG
+#endif // _DEBUG
 
     // sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s]Send packet : %u|0x%x (%s)", GetPlayerName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
     if (m_sniffFile)
         m_sniffFile->WritePacket(*packet, false, time(nullptr));
 
-    if (m_socket->SendPacket(*packet) == -1)
-        m_socket->CloseSocket();
+    m_socket->SendPacket(*packet);
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
@@ -434,10 +427,10 @@ bool WorldSession::Update(PacketFilter& updater)
             return false;
         }
 
-        // Cleanup socket pointer if need
-        if (m_socket && m_socket->IsClosed())
+        // Cleanup socket pointer if needed
+        if (m_socket && m_socket->IsClosing())
         {
-            m_socket->RemoveReference();
+            m_socket->FinalizeSession();
             m_socket = nullptr;
 
             if (m_warden)
@@ -494,7 +487,7 @@ bool WorldSession::Update(PacketFilter& updater)
 
 bool WorldSession::CanProcessPackets() const
 {
-    return ((m_socket && !m_socket->IsClosed()) || (_player && (m_bot || sPlayerBotMgr.IsChatBot(_player->GetGUIDLow()))));
+    return ((m_socket && !m_socket->IsClosing()) || (_player && (m_bot || sPlayerBotMgr.IsChatBot(_player->GetGUIDLow()))));
 }
 
 void WorldSession::ProcessPackets(PacketFilter& updater)

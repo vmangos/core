@@ -18,16 +18,16 @@
 set(EXECUTABLE_NAME mangosd)
 set(EXECUTABLE_SRCS 
   CliRunnable.h
-  MaNGOSsoap.h
   Master.h
-  RASocket.h
   WorldRunnable.h
   CliRunnable.cpp
   Main.cpp
-  MaNGOSsoap.cpp
   Master.cpp
-  RASocket.cpp
   WorldRunnable.cpp
+  remote/RemoteAccess/RASocket.h
+  remote/RemoteAccess/RASocket.cpp
+  remote/soap/MaNGOSsoap.h
+  remote/soap/MaNGOSsoap.cpp
 )
 
 
@@ -71,7 +71,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/vmap
   ${CMAKE_BINARY_DIR}/src/shared
   ${CMAKE_BINARY_DIR}
-  ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
 )
@@ -101,7 +100,6 @@ if(USE_SCRIPTS)
     framework
     g3dlite
     gsoap
-    ${ACE_LIBRARIES}
   )
 else()
   target_link_libraries(${EXECUTABLE_NAME}
@@ -111,7 +109,6 @@ else()
     framework
     g3dlite
     gsoap
-    ${ACE_LIBRARIES}
   )
 endif()
 

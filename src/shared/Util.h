@@ -417,7 +417,7 @@ bool Utf8FitTo(std::string const& str, std::wstring search);
 void utf8printf(FILE* out, char const* str, ...);
 void vutf8printf(FILE* out, char const* str, va_list* ap);
 
-bool IsIPAddress(char const* ipaddress);
+bool IsIPAddress(char const* ipAddressString);
 uint32 CreatePIDFile(std::string const& filename);
 
 void hexEncodeByteArray(uint8* bytes, uint32 arrayLen, std::string& result);
@@ -441,5 +441,7 @@ inline uint32 BatchifyTimer(uint32 timer, uint32 interval)
 typedef char const*(*ValueToStringFunc) (uint32 value);
 
 std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc);
+
+std::vector<std::string> SplitStringByDelimiter(std::string const& str, char delimiter);
 
 #endif

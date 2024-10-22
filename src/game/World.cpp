@@ -81,6 +81,7 @@
 #include "InstanceStatistics.h"
 #include "GuardMgr.h"
 #include "TransportMgr.h"
+#include "IO/Multithreading/CreateThread.h"
 
 #include <chrono>
 
@@ -210,10 +211,10 @@ void World::Shutdown()
     sAnticheatMgr->StopWardenUpdateThread();
 }
 
-// Find a session by its id
-WorldSession* World::FindSession(uint32 id) const
+/// Find a session by its accountId. Might return nullptr if not found.
+WorldSession* World::FindSession(uint32 accountId) const
 {
-    SessionMap::const_iterator itr = m_sessions.find(id);
+    SessionMap::const_iterator itr = m_sessions.find(accountId);
 
     if (itr != m_sessions.end())
         return itr->second;                                 // also can return nullptr for kicked session
@@ -221,11 +222,11 @@ WorldSession* World::FindSession(uint32 id) const
     return nullptr;
 }
 
-// Remove a given session
-bool World::RemoveSession(uint32 id)
+/// Remove a given session by its accountId
+bool World::RemoveSession(uint32 accountId)
 {
     // Find the session, kick the user, but we can't delete session at this moment to prevent iterator invalidation
-    SessionMap::const_iterator itr = m_sessions.find(id);
+    SessionMap::const_iterator itr = m_sessions.find(accountId);
 
     if (itr != m_sessions.end() && itr->second)
     {
@@ -1866,10 +1867,7 @@ void World::SetInitialWorldSettings()
 
     if (GetWowPatch() >= WOW_PATCH_103 || !getConfig(CONFIG_BOOL_ACCURATE_LFG))
     {
-        m_lfgQueueThread.reset(new std::thread([&]()
-        {
-            m_lfgQueue.Update();
-        }));
+        m_lfgQueueThread = IO::Multithreading::CreateThreadPtr("LfgUpdate", [&] { m_lfgQueue.Update(); });
     }
 
     sAnticheatMgr->StartWardenUpdateThread();
@@ -1878,8 +1876,8 @@ void World::SetInitialWorldSettings()
         std::make_unique<MovementBroadcaster>(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
 
-    m_charDbWorkerThread.reset(new std::thread(&CharactersDatabaseWorkerThread));
-    m_asyncPacketsThread.reset(new std::thread(&World::ProcessAsyncPackets, this));
+    m_charDbWorkerThread = IO::Multithreading::CreateThreadPtr("CharDB", [](){ CharactersDatabaseWorkerThread(); });
+    m_asyncPacketsThread = IO::Multithreading::CreateThreadPtr("AsyncPacket", [this](){ ProcessAsyncPackets(); });
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "==========================================================");
@@ -2031,10 +2029,10 @@ void World::Update(uint32 diff)
     // TODO: find a better place for this
     if (!m_updateThreads)
     {
-        m_updateThreads = std::unique_ptr<ThreadPool>( new ThreadPool(
+        m_updateThreads = std::unique_ptr<ThreadPool>(new ThreadPool(
+                    "WorldUpdate",
                     getConfig(CONFIG_UINT32_ASYNC_TASKS_THREADS_COUNT),
-                    ThreadPool::ClearMode::UPPON_COMPLETION)
-                                             );
+                    ThreadPool::ClearMode::UPPON_COMPLETION));
         m_updateThreads->start<ThreadPool::MySQL<>>();
     }
     std::unique_lock<std::mutex> lock(m_asyncTaskQueueMutex);

@@ -24,6 +24,7 @@
 #include "Common.h"
 #include "Log.h"
 #include <cstring>
+#include <Windows.h>
 #include <winsvc.h>
 
 #if !defined(WINADVAPI)
@@ -34,17 +35,12 @@
 #endif
 #endif
 
-
-#ifdef main
-#undef main
-#endif
-
 extern int main(int argc, char** argv);
 extern char serviceLongName[];
 extern char serviceName[];
 extern char serviceDescription[];
 
-extern int m_ServiceStatus;
+extern volatile int m_ServiceStatus;
 
 SERVICE_STATUS serviceStatus;
 
@@ -275,7 +271,7 @@ bool WinServiceRun()
     SERVICE_TABLE_ENTRY serviceTable[] =
     {
         { serviceName, ServiceMain },
-        { 0, 0 }
+        { nullptr, nullptr }
     };
 
     if (!StartServiceCtrlDispatcher(serviceTable))

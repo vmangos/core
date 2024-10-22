@@ -21,6 +21,7 @@
 
 #include "ByteBuffer.h"
 #include "Log.h"
+#include "Errors.h"
 
 void ByteBufferException::PrintPosError() const
 {

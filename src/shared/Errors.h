@@ -22,71 +22,33 @@
 #ifndef MANGOSSERVER_ERRORS_H
 #define MANGOSSERVER_ERRORS_H
 
-#include "Common.h"
+namespace MaNGOS { namespace Errors
+{
+    /// Prints a stack trace to `sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ...)` and will then terminate the program
+    [[noreturn]]
+    void PrintStacktraceAndThrow(char const* filename, int line, char const* functionName, char const* failedExpression, char const* message = nullptr);
 
-//#ifndef HAVE_CONFIG_H
-#define HAVE_ACE_STACK_TRACE_H 1
-//#endif
+    /// Prints a stack trace to `sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ...)`
+    void PrintStacktrace();
 
-#ifdef HAVE_ACE_STACK_TRACE_H
-#include "ace/Stack_Trace.h"
-#include "Log.h" // sLog in only used when HAVE_ACE_STACK_TRACE_H
-#endif
+    /// Prints a stack trace to `sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ...)`
+    void PrintStacktrace(int skipFrames, int maxFrames);
+}} // namespace MaNGOS::Errors
 
-#ifdef HAVE_ACE_STACK_TRACE_H
-// Normal assert.
-#define WPError(CONDITION) \
-if (!(CONDITION)) \
-{ \
-    ACE_Stack_Trace st; \
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s:%i: Error: Assertion in %s failed: %s", \
-        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION)); \
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", st.c_str()); \
-    throw std::runtime_error(STRINGIZE(CONDITION)); \
-    assert(STRINGIZE(CONDITION) && 0); \
-}
+/// Just a macro that converse a raw string to a quoted "string"
+#define MANGOS_ERROR_STRING_ESCAPE(a) #a
 
-// Just warn.
-#define WPWarning(CONDITION) \
-if (!(CONDITION)) \
-{ \
-    ACE_Stack_Trace st; \
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s:%i: Warning: Assertion in %s failed: %s",\
-        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION)); \
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s", st.c_str()); \
-}
-#else
-// Normal assert.
-#define WPError(CONDITION) \
-if (!(CONDITION)) \
-{ \
-    printf("%s:%i: Error: Assertion in %s failed: %s", \
-        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION)); \
-    assert(STRINGIZE(CONDITION) && 0); \
-}
-
-// Just warn.
-#define WPWarning(CONDITION) \
-if (!(CONDITION)) \
-{ \
-    printf("%s:%i: Warning: Assertion in %s failed: %s",\
-        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION)); \
-}
-#endif
-
-#define ASSERT MANGOS_ASSERT
-#ifndef MANGOS_ASSERT
-#ifdef MANGOS_DEBUG
-#  define MANGOS_ASSERT WPError
-#else
-#  define MANGOS_ASSERT WPError                             // Error even if in release mode.
-#endif
-#endif
+/// <example>
+/// MANGOS_ASSERT(abc == 2); // will throw if abc is not 2
+/// </example>
+#define MANGOS_ASSERT(condition) do { if (!(condition)) { MaNGOS::Errors::PrintStacktraceAndThrow(__FILE__, __LINE__, __FUNCTION__, MANGOS_ERROR_STRING_ESCAPE(condition)); } } while(0)
 
 #ifdef MANGOS_DEBUG
 #define MANGOS_DEBUG_ASSERT(x) MANGOS_ASSERT(x)
 #else
-#define MANGOS_DEBUG_ASSERT(x)
+#define MANGOS_DEBUG_ASSERT(x) do {} while(0)
 #endif
+
+#define ASSERT MANGOS_ASSERT
 
 #endif

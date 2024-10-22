@@ -16,11 +16,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 # Glob only and not recurse, there are other libs for that
-set (shared_SRCS 
+set (shared_SRCS
     ByteBuffer.h
     Common.h
-    DelayExecutor.h
+    EnumFlag.h
     Errors.h
+    Errors.cpp
     LockedQueue.h
     Log.h
     migrations_list.h
@@ -31,6 +32,8 @@ set (shared_SRCS
     ServiceWin32.h
     SystemConfig.h
     ThreadPool.h
+    ThreadSpecificPtr.h
+    ThreadSpecificPtr.cpp
     Timer.h
     Util.h
     WheatyExceptionReport.h
@@ -66,11 +69,11 @@ set (shared_SRCS
     Database/SQLStorageImpl.h
     Multithreading/Messager.h
     SRP6/SRP6.h
+    nonstd/expected.hpp
     TimePeriod.h
     nonstd/optional.hpp
     ByteBuffer.cpp
     Common.cpp
-    DelayExecutor.cpp
     Log.cpp
     PosixDaemon.cpp
     ProgressBar.cpp
@@ -100,6 +103,56 @@ set (shared_SRCS
     Database/SQLStorage.cpp
     Multithreading/Messager.cpp
     SRP6/SRP6.cpp
+    IO/Context/IoContext.h
+    IO/Utils.h
+    IO/Utils.cpp
+    IO/Utils_Unix.h
+    IO/ReadableBuffer.h
+    IO/Context/IoContext_macos.cpp
+    IO/Context/IoContext_unix.cpp
+    IO/Context/IoContext_windows.cpp
+    IO/SystemErrorToString.h
+    IO/SystemErrorToString.cpp
+    IO/Networking/Internal.h
+    IO/Networking/Internal.cpp
+    IO/Networking/AsyncSocket.h
+    IO/Networking/AsyncSocket.cpp
+    IO/Networking/AsyncSocket_posix.cpp
+    IO/Networking/AsyncSocket_windows.cpp
+    IO/Networking/AsyncSocketAcceptor.h
+    IO/Networking/AsyncSocketAcceptor_posix.cpp
+    IO/Networking/AsyncSocketAcceptor_windows.cpp
+    IO/Networking/SocketConnector.h
+    IO/Networking/SocketConnector.cpp
+    IO/Networking/NetworkError.h
+    IO/Networking/NetworkError.cpp
+    IO/Networking/SocketDescriptor.h
+    IO/Networking/SocketDescriptor.cpp
+    IO/Networking/Utils.h
+    IO/Networking/Utils.cpp
+    IO/Networking/IpAddress.h
+    IO/Networking/IpAddress.cpp
+    IO/Networking/DNS.h
+    IO/Networking/DNS.cpp
+    IO/Multithreading/CreateThread.h
+    IO/Multithreading/CreateThread.cpp
+    IO/Timer/impl/windows/AsyncSystemTimer.cpp
+    IO/Timer/impl/windows/TimerHandle.cpp
+    IO/Timer/impl/unix/AsyncSystemTimer.cpp
+    IO/Timer/impl/unix/TimerHandle.cpp
+    IO/Timer/AsyncSystemTimer.h
+    IO/Filesystem/FileSystem.h
+    IO/Filesystem/FileHandle.h
+    IO/Filesystem/impl/windows/FileSystem.cpp
+    IO/Filesystem/impl/windows/FileHandle.cpp
+    IO/Filesystem/impl/unix/FileSystem.cpp
+    IO/Filesystem/impl/unix/FileHandle.cpp
+    ProxyProtocol/ProxyV2Reader.h
+    ProxyProtocol/ProxyV2Reader.cpp
+    ArgparserForServer.h
+    ArgparserForServer.cpp
+    Memory/ArrayDeleter.h
+    Memory/NoDeleter.h
     TimePeriod.cpp
 )
 
@@ -113,13 +166,22 @@ if(USE_LIBCURL)
   )
 endif()
 
-# Exclude Win32 files
-if(WIN32)
+
+if(WIN32) # For window build: Exclude Unix/MacOS files
   list(REMOVE_ITEM shared_SRCS
     PosixDaemon.h
     PosixDaemon.cpp
     revision.h
     migrations_list.h
+    IO/Utils_Unix.h
+    IO/Context/IoContext_unix.cpp
+    IO/Context/IoContext_macos.cpp
+    IO/Networking/AsyncSocket_posix.cpp
+    IO/Networking/AsyncSocketAcceptor_posix.cpp
+    IO/Timer/impl/unix/AsyncSystemTimer.cpp
+    IO/Timer/impl/unix/TimerHandle.cpp
+    IO/Filesystem/impl/unix/FileSystem.cpp
+    IO/Filesystem/impl/unix/FileHandle.cpp
   )
   
   if (NOT MSVC)
@@ -128,8 +190,6 @@ if(WIN32)
       WheatyExceptionReport.h
     )
   endif()
-  
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
 else()
   list(REMOVE_ITEM shared_SRCS
     WheatyExceptionReport.cpp
@@ -138,7 +198,25 @@ else()
     ServiceWin32.h
     revision.h
     migrations_list.h
+    IO/Context/IoContext_windows.cpp
+    IO/Networking/AsyncSocket_windows.cpp
+    IO/Networking/AsyncSocketAcceptor_windows.cpp
+    IO/Timer/impl/windows/AsyncSystemTimer.cpp
+    IO/Timer/impl/windows/TimerHandle.cpp
+    IO/Filesystem/impl/windows/FileSystem.cpp
+    IO/Filesystem/impl/windows/FileHandle.cpp
   )
+  if(APPLE)
+    # Remove Linux specific stuff
+    list(REMOVE_ITEM shared_SRCS
+      IO/Context/IoContext_unix.cpp
+    )
+  else()
+    # Remove macOS specific stuff
+    list(REMOVE_ITEM shared_SRCS
+      IO/Context/IoContext_macos.cpp
+    )
+  endif()
 endif()
 
 source_group("Util"
@@ -168,7 +246,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/dep/include
   ${CMAKE_SOURCE_DIR}/src/framework
   ${CMAKE_BINARY_DIR}
-  ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
 )
@@ -185,11 +262,13 @@ add_library(shared STATIC
 
 if(UNIX)
   find_package(Threads)
-  target_link_libraries(shared ${ACE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(shared ${CMAKE_THREAD_LIBS_INIT})
 endif(UNIX)
 
-if(MINGW)
-  target_link_libraries(shared ${ACE_LIBRARIES} -lws2_32)
+if(WIN32)
+  target_link_libraries(shared ws2_32 mswsock)
 endif()
+
+target_link_libraries(shared cpptrace::cpptrace)
 
 SET_TARGET_PROPERTIES (shared PROPERTIES FOLDER "Game Libs")

@@ -54,14 +54,6 @@
 
 #include "Platform/Define.h"
 
-#if COMPILER == COMPILER_MICROSOFT
-#  pragma warning(disable:4996)                             // 'function': was declared deprecated
-#ifndef __SHOW_STUPID_WARNINGS__
-#  pragma warning(disable:4244)                             // 'argument' : conversion from 'type1' to 'type2', possible loss of data
-#  pragma warning(disable:4355)                             // 'this' : used in base member initializer list
-#endif                                                      // __SHOW_STUPID_WARNINGS__
-#endif                                                      // __GNUC__
-
 #include "Platform/CompilerDefs.h"
 #include "Platform/Define.h"
 #include <cstdio>
@@ -72,10 +64,6 @@
 #include <cerrno>
 #include <csignal>
 #include <cassert>
-
-#if defined(__sun__)
-#include <ieeefp.h> // finite() on Solaris
-#endif
 
 #include <set>
 #include <list>
@@ -90,43 +78,12 @@
 typedef std::chrono::system_clock Clock;
 typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> TimePoint;
 
-#include "Errors.h"
-#include "LockedQueue.h"
-
-#include <ace/Basic_Types.h>
-#include <ace/Guard_T.h>
-#include <ace/OS_NS_arpa_inet.h>
-
-// Old ACE versions (pre-ACE-5.5.4) not have this type (add for allow use at Unix side external old ACE versions)
-#if PLATFORM != PLATFORM_WINDOWS
-#  ifndef ACE_OFF_T
-typedef off_t ACE_OFF_T;
-#  endif
-#endif
-
-#if PLATFORM == PLATFORM_WINDOWS
-#  if !defined (FD_SETSIZE)
-#    define FD_SETSIZE 4096
-#  endif
-#  include <ace/config-all.h>
-#  include <ws2tcpip.h>
-#else
-#  include <sys/types.h>
-#  include <sys/ioctl.h>
-#  include <sys/socket.h>
-#  include <netinet/in.h>
-#  include <unistd.h>
-#  include <netdb.h>
-#endif
-
 #if COMPILER == COMPILER_MICROSOFT
 
-#  include <float.h>
+#  include <cfloat>
 
 #  define I32FMT "%08I32X"
 #  define I64FMT "%016I64X"
-//#  define snprintf _snprintf
-#  define vsnprintf _vsnprintf
 
 #else
 
@@ -142,24 +99,22 @@ typedef off_t ACE_OFF_T;
 
 #endif
 
-#define UI64FMTD ACE_UINT64_FORMAT_SPECIFIER
-#define UI64LIT(N) ACE_UINT64_LITERAL(N)
+#include <cinttypes>
 
-#define SI64FMTD ACE_INT64_FORMAT_SPECIFIER
-#define SI64LIT(N) ACE_INT64_LITERAL(N)
+#define UI64FMTD "%" PRIu64
+#define SI64FMTD "%" PRId64
 
-#define SIZEFMTD ACE_SIZE_T_FORMAT_SPECIFIER
+#define SIZEFMTD "%zu"
 
+/// Will always return a finite float. If the provided float is infinite it will return 0
 inline float finiteAlways(float f) { return std::isfinite(f) ? f : 0.0f; }
 
 #define atol(a) strtoul(a, nullptr, 10)
 
-#define STRINGIZE(a) #a
-
 // used for creating values for respawn for example
 #define MAKE_PAIR64(l, h)  uint64( uint32(l) | ( uint64(h) << 32 ) )
-#define PAIR64_HIPART(x)   (uint32)((uint64(x) >> 32) & UI64LIT(0x00000000FFFFFFFF))
-#define PAIR64_LOPART(x)   (uint32)(uint64(x)         & UI64LIT(0x00000000FFFFFFFF))
+#define PAIR64_HIPART(x)   (uint32)((uint64(x) >> 32) & uint64(0x00000000FFFFFFFF))
+#define PAIR64_LOPART(x)   (uint32)(uint64(x)         & uint64(0x00000000FFFFFFFF))
 
 #define MAKE_PAIR32(l, h)  uint32( uint16(l) | ( uint32(h) << 16 ) )
 #define PAIR32_HIPART(x)   (uint16)((uint32(x) >> 16) & 0x0000FFFF)
@@ -277,10 +232,6 @@ inline char* mangos_strdup(char const* source)
 #  define M_PI_F        float(M_PI)
 #endif
 
-#ifndef countof
-#define countof(array) (sizeof(array) / sizeof((array)[0]))
-#endif
-
-#define BATCHING_INTERVAL 400
+#define BATCHING_INTERVAL 400 // TODO, why is this here? What is "Spell.*Delay" in the config used for then?
 
 #endif
