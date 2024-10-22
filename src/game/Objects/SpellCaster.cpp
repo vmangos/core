@@ -1369,10 +1369,23 @@ float SpellCaster::SpellDamageBonusDone(Unit const* pVictim, SpellEntry const* s
             {
                 case 4418: // Increased Shock Damage
                 case 4554: // Increased Lightning Damage
-                case 4555: // Improved Moonfire
                 {
                     DoneTotal += i->GetModifier()->m_amount;
                     break;
+                }
+                case 4555: // Improved Moonfire (Idol of the moon)
+                {
+                    // Idol of the moon was bugged during vanilla 1.12
+                    // Following math is based on reported numbers from classic and an old post on allakhazam and wowhead classic
+                    // Direct damage bonus = 17/8 % and Dot damage bonus = 17/tickcount %
+                    // Further information and discussion can be found at vmangos PR #2802
+                    uint32 divisor = 800;
+                    if (damagetype == DOT)
+                    {
+                        divisor = 100 * spellProto->GetAuraMaxTicks();
+                    }
+
+                    DoneTotal += i->GetModifier()->m_amount * pdamage / divisor;
                 }
             }
         }
