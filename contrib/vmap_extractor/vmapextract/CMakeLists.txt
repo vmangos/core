@@ -16,9 +16,10 @@
 
 cmake_minimum_required(VERSION 2.6...3.20)
 project (MANGOS_IOMAP_EXTRACTOR)
+set(EXECUTABLE_NAME VMapExtractor)
 
-add_executable(vmapextractor adtfile.cpp  dbcfile.cpp gameobject_extract.cpp model.cpp  vmapexport.cpp  wdtfile.cpp  wmo.cpp)
-SET_TARGET_PROPERTIES (vmapextractor PROPERTIES FOLDER Extractors)
+add_executable(${EXECUTABLE_NAME} adtfile.cpp dbcfile.cpp gameobject_extract.cpp model.cpp vmapexport.cpp wdtfile.cpp wmo.cpp)
+SET_TARGET_PROPERTIES (${EXECUTABLE_NAME} PROPERTIES FOLDER Extractors)
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
@@ -28,10 +29,13 @@ if(UNIX)
   find_package(ZLIB REQUIRED)
   if(ZLIB_FOUND)
     include_directories(${ZLIB_INCLUDE_DIRS})
-    target_link_libraries(vmapextractor libmpq bz2 g3dlite shared ${ZLIB_LIBRARIES})
+    target_link_libraries(${EXECUTABLE_NAME} libmpq bz2 g3dlite shared ${ZLIB_LIBRARIES})
   endif(ZLIB_FOUND)
 else()
-  target_link_libraries(vmapextractor libmpq bz2 g3dlite shared zlib)
+  target_link_libraries(${EXECUTABLE_NAME} libmpq bz2 g3dlite shared zlib)
 endif(UNIX)
 
-install(TARGETS vmapextractor DESTINATION ${BIN_DIR})
+install(TARGETS ${EXECUTABLE_NAME} DESTINATION ${BIN_DIR}/Extractors)
+if(WIN32 AND MSVC)
+  install(FILES $<TARGET_PDB_FILE:${EXECUTABLE_NAME}> DESTINATION ${BIN_DIR}/Extractors OPTIONAL)
+endif()
