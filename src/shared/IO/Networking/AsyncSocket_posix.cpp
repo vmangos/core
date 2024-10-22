@@ -91,8 +91,8 @@ void IO::Networking::AsyncSocket::Read(char* target, std::size_t size, std::func
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
         sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "[%s] Read(...) -> ::recv() returned 0, which means the socket is half-closed.", GetRemoteIpString().c_str());
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         StopPendingTransactionsAndForceClose();
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         return;
     }
     else if (alreadyRead == -1)
@@ -159,8 +159,8 @@ void IO::Networking::AsyncSocket::ReadSome(char* target, std::size_t size, std::
     {
         m_atomicState.fetch_and(~SocketStateFlags::READ_PENDING_SET);
         sLog.Out(LOG_NETWORK, LOG_LVL_DEBUG, "[%s] Read(...) -> ::recv() returned 0, which means the socket is half-closed.", GetRemoteIpString().c_str());
-        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         StopPendingTransactionsAndForceClose();
+        callback(IO::NetworkError(IO::NetworkError::ErrorType::SocketClosed), 0);
         return;
     }
     else if (alreadyRead == -1)
