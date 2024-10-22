@@ -317,12 +317,15 @@ int Master::Run()
 
     if (remoteAccessServer)
     {
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stop remote access...");
         remoteAccessServer->ClosePortAndStopAcceptingNewConnections();
         remoteAccessServer.reset();
     }
 
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stop system timers...");
     sAsyncSystemTimer.RemoveAllTimersAndStopThread();
 
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stop IO context...");
     ioCtx->Shutdown();
     for (std::thread& thread : ioCtxRunners)
         thread.join();
