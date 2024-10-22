@@ -6697,8 +6697,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!target || target->GetOwnerGuid().IsPlayer())
                     return SPELL_FAILED_BAD_TARGETS;
 
-                if (!target->GetCreatureInfo()->pickpocket_loot_id &&
-                    !(target->GetCreatureTypeMask() & CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD))
+                if (!target->GetCreatureInfo()->pickpocket_loot_id)
                     return SPELL_FAILED_TARGET_NO_POCKETS;
 
                 break;
