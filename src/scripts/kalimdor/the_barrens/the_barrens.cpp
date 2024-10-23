@@ -288,14 +288,6 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         }
     }
 
-    void SetChallengerReady(Unit *pUnit)
-    {
-        pUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        pUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-        pUnit->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-        pUnit->SetFactionTemplateId(FACTION_MONSTER);
-    }
-
     void UpdateAI(uint32 const diff) override
     {
         if (!EventInProgress)
@@ -337,9 +329,20 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                     break;
                 case 1:
                     DoScriptText(SAY_TWIGGY_FRAY, m_creature);
-                    if (Unit *challenger = m_creature->GetMap()->GetUnit(AffrayChallenger[Challenger_Count]))
-                        SetChallengerReady(challenger);
-                    else Reset();
+                    if (Unit* challenger = m_creature->GetMap()->GetUnit(AffrayChallenger[Challenger_Count]))
+                    {
+                        // make attackable
+                        challenger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        challenger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+                        challenger->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                        challenger->SetFactionTemplateId(FACTION_MONSTER);
+                        // start combat
+                        challenger->SetInCombatWithVictim(pPlayer);
+                    }
+                    else
+                    {
+                        Reset();
+                    }
                     ++Challenger_Count;
                     Event_Timer = 25000;
                     if (Challenger_Count == 6)
