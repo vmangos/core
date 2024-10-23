@@ -28,8 +28,6 @@
 #include "Util.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "Crypto/Hash/SHA1.h"
-#include <openssl/sha.h>
-#include <openssl/md5.h>
 
 #include <string>
 #include <algorithm>
@@ -119,7 +117,7 @@ WindowsStringHashScan::WindowsStringHashScan()
     GetBuilder(),
     // checker
     GetChecker(),
-    128, sizeof(uint8) + SHA_DIGEST_LENGTH + MD5_DIGEST_LENGTH, "Maiev string hash",
+    128, sizeof(uint8) + Crypto::Hash::SHA1::Digest::size() + Crypto::Hash::MD5::Digest::size(), "Maiev string hash",
     ScanFlags::Maiev, 0, UINT16_MAX)
 {
     
@@ -131,7 +129,7 @@ MacStringHashScan::MacStringHashScan(bool moduleLoaded)
         GetBuilder(),
         // checker
         GetChecker(),
-        128, sizeof(uint8) + SHA_DIGEST_LENGTH + MD5_DIGEST_LENGTH, moduleLoaded ? "Mac string hash" : "Maiev string hash",
+        128, sizeof(uint8) + Crypto::Hash::SHA1::Digest::size() + Crypto::Hash::MD5::Digest::size(), moduleLoaded ? "Mac string hash" : "Maiev string hash",
         (moduleLoaded ? ScanFlags::None : ScanFlags::Maiev), 0, UINT16_MAX)
 {
 
@@ -159,7 +157,7 @@ WindowsModuleScan::WindowsModuleScan(std::string const& module, bool wanted, std
     {
         auto const found = buff.read<uint8>() == ModuleFound;
         return found != this->m_wanted;
-    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH, sizeof(uint8), comment, flags, minBuild, maxBuild)
+    }, sizeof(uint8) + sizeof(uint32) + Crypto::Hash::SHA1::Digest::size(), sizeof(uint8), comment, flags, minBuild, maxBuild)
 {
     // the game depends on uppercase module names being sent
     std::transform(m_module.begin(), m_module.end(), m_module.begin(), ::toupper);
@@ -182,7 +180,7 @@ WindowsModuleScan::WindowsModuleScan(std::string const& module, CheckT checker, 
 
         scan.append(hash.GetDigest(), hash.GetLength());
     },
-    checker, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH, sizeof(uint8), comment, flags, minBuild, maxBuild)
+    checker, sizeof(uint8) + sizeof(uint32) + Crypto::Hash::SHA1::Digest::size(), sizeof(uint8), comment, flags, minBuild, maxBuild)
 {
     // the game depends on uppercase module names being sent
     std::transform(m_module.begin(), m_module.end(), m_module.begin(), ::toupper);
@@ -317,13 +315,13 @@ WindowsCodeScan::WindowsCodeScan(uint32 offset, std::vector<uint8> const& patter
     {
         auto const found = buff.read<uint8>() == PatternFound;
         return found != this->m_wanted;
-    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint32) + sizeof(uint8), sizeof(uint8), comment, flags, minBuild, maxBuild)
+    }, sizeof(uint8) + sizeof(uint32) + Crypto::Hash::SHA1::Digest::size() + sizeof(uint32) + sizeof(uint8), sizeof(uint8), comment, flags, minBuild, maxBuild)
 {
     MANGOS_ASSERT(m_pattern.size() <= 0xFF);
 }
 
-WindowsFileHashScan::WindowsFileHashScan(std::string const& file, void const* expected, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
-    : m_file(file), m_wanted(wanted), m_hashMatch(!!expected),
+WindowsFileHashScan::WindowsFileHashScan(std::string const& file, nonstd::optional<Crypto::Hash::SHA1::Digest> const& expectedHash, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
+    : m_file(file), m_wanted(wanted), m_expectedHash(expectedHash),
     WindowsScan(
     // builder
     [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
@@ -350,16 +348,13 @@ WindowsFileHashScan::WindowsFileHashScan(std::string const& file, void const* ex
         if (!this->m_wanted && !success)
             return false;
 
-        uint8 hash[SHA_DIGEST_LENGTH];
-
-        buff.read(hash, sizeof(hash));
+        Crypto::Hash::SHA1::Digest hashFromClient;
+        buff.read(hashFromClient.data(), hashFromClient.size());
 
         // if a hash was given, check it (some checks may only be interested in existence)
-        return this->m_hashMatch && !!memcmp(hash, this->m_expected, sizeof(hash));
-    }, sizeof(uint8) + sizeof(uint8) + file.length(), sizeof(uint8) + SHA_DIGEST_LENGTH, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
+        return m_expectedHash.has_value() && hashFromClient != m_expectedHash;
+    }, sizeof(uint8) + sizeof(uint8) + file.length(), sizeof(uint8) + Crypto::Hash::SHA1::Digest::size(), comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
-    if (m_hashMatch)
-        ::memcpy(m_expected, expected, sizeof(m_expected));
 }
 
 WindowsLuaScan::WindowsLuaScan(std::string const& lua, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
@@ -445,9 +440,9 @@ WindowsLuaScan::WindowsLuaScan(std::string const& lua, CheckT checker, std::stri
     MANGOS_ASSERT(checker);
 }
 
-WindowsHookScan::WindowsHookScan(std::string const& module, std::string const& proc, void const* hash,
+WindowsHookScan::WindowsHookScan(std::string const& module, std::string const& proc, Crypto::Hash::SHA1::Digest const& hash,
     uint32 offset, size_t length, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
-    : m_module(module), m_proc(proc), m_offset(offset), m_length(length),
+    : m_module(module), m_proc(proc), m_hash(hash), m_offset(offset), m_length(length),
     WindowsScan(
     // builder
     [this](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
@@ -462,7 +457,7 @@ WindowsHookScan::WindowsHookScan(std::string const& module, std::string const& p
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[API_CHECK] ^ winWarden->GetXor()) << seed;
 
-        scan.append(this->m_hash, sizeof(this->m_hash));
+        scan.append(m_hash.data(), m_hash.size());
         scan << static_cast<uint8>(strings.size() - 1)
              << static_cast<uint8>(strings.size())
              << this->m_offset
@@ -473,11 +468,10 @@ WindowsHookScan::WindowsHookScan(std::string const& module, std::string const& p
     {
         return buff.read<uint8>() == Detoured;
     },
-        sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
+        sizeof(uint8) + sizeof(uint32) + Crypto::Hash::SHA1::Digest::size() + sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
         sizeof(uint8), comment, flags, minBuild, maxBuild)
 {
     MANGOS_ASSERT(length <= 0xFF);
-    ::memcpy(m_hash, hash, sizeof(m_hash));
 }
 
 WindowsDriverScan::WindowsDriverScan(std::string const& name, std::string const& targetPath, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
@@ -508,7 +502,7 @@ WindowsDriverScan::WindowsDriverScan(std::string const& name, std::string const&
         auto const found = buff.read<uint8>() == Found;
 
         return found != this->m_wanted;
-    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint8) + name.length(), sizeof(uint8), comment, flags, minBuild, maxBuild) {}
+    }, sizeof(uint8) + sizeof(uint32) + Crypto::Hash::SHA1::Digest::size() + sizeof(uint8) + name.length(), sizeof(uint8), comment, flags, minBuild, maxBuild) {}
 
 WindowsTimeScan::WindowsTimeScan(CheckT checker, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild) :
     WindowsScan(
