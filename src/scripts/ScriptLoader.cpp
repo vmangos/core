@@ -164,7 +164,6 @@ void AddSC_boss_omen();
 void AddSC_arathi_highlands();
 void AddSC_blasted_lands();
 void AddSC_burning_steppes();
-void AddSC_dun_morogh();
 void AddSC_eastern_plaguelands();
 void AddSC_elwynn_forest();
 void AddSC_hillsbrad_foothills();
@@ -400,7 +399,6 @@ void AddScripts()
     AddSC_arathi_highlands();
     AddSC_blasted_lands();
     AddSC_burning_steppes();
-    AddSC_dun_morogh();
     AddSC_eastern_plaguelands();
     AddSC_elwynn_forest();
     AddSC_hillsbrad_foothills();
