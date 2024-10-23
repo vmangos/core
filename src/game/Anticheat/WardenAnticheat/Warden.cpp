@@ -437,13 +437,14 @@ void Warden::StopScanClock()
 
 uint32 Warden::BuildChecksum(uint8 const* data, size_t size)
 {
-    uint8 hash[SHA_DIGEST_LENGTH];
-    SHA1(data, size, hash);
+    auto hash = Crypto::Hash::SHA1::ComputeFrom(data, size);
 
     uint32 checkSum = 0;
-
-    for (auto i = 0u; i < sizeof(hash) / sizeof(uint32); ++i)
-        checkSum ^= *reinterpret_cast<uint32*>(&hash[i * 4]);
+    checkSum ^= *reinterpret_cast<uint32*>(&hash[sizeof(uint32) * 0]);
+    checkSum ^= *reinterpret_cast<uint32*>(&hash[sizeof(uint32) * 1]);
+    checkSum ^= *reinterpret_cast<uint32*>(&hash[sizeof(uint32) * 2]);
+    checkSum ^= *reinterpret_cast<uint32*>(&hash[sizeof(uint32) * 3]);
+    checkSum ^= *reinterpret_cast<uint32*>(&hash[sizeof(uint32) * 4]);
 
     return checkSum;
 }
