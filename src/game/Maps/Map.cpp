@@ -2585,13 +2585,28 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, Scr
     // If we have a buddy lets find it.
     if (script.target_type)
     {
-        if (!(target = GetTargetByType(source, target, this, script.target_type, script.target_param1, script.target_param2)))
+        // Cast Spell scripts include spellinfo in target finding
+        if ((script.command == SCRIPT_COMMAND_CAST_SPELL))
         {
-            if (!(script.raw.data[4] & SF_GENERAL_SKIP_MISSING_TARGETS))
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FindScriptTargets: Failed to find target for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
-            return false;
+            SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(script.castSpell.spellId);
+            if (!(target = GetTargetByType(source, target, this, script.target_type, script.target_param1, script.target_param2, pSpellInfo)))
+            {
+                if (!(script.raw.data[4] & SF_GENERAL_SKIP_MISSING_TARGETS))
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FindScriptTargets: Failed to find target for Cast Spell script with id %u (spellId: %u), (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.castSpell.spellId, script.target_param1, script.target_param2, script.target_type);
+                return false;
+            }
+        }
+        else
+        {
+            if (!(target = GetTargetByType(source, target, this, script.target_type, script.target_param1, script.target_param2)))
+            {
+                if (!(script.raw.data[4] & SF_GENERAL_SKIP_MISSING_TARGETS))
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FindScriptTargets: Failed to find target for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
+                return false;
+            }
         }
     }
+
 
     // we swap target and source again if data_flags & 0x2
     // this way we have all possible combinations with 3 targets
