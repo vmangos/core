@@ -34,7 +34,6 @@ set(SUPPORTED_CLIENT_BUILD "CLIENT_BUILD_1_12_1" CACHE STRING "Client version th
 option(USE_STD_MALLOC "Use standard malloc instead of TBB" OFF)
 option(BUILD_FOR_HOST_CPU "Build specifically for the host CPU via `-march=native` (might not run on different machines)" ON)
 option(TBB_DEBUG "Use TBB debug librairies" OFF)
-option(USE_ANTICHEAT "Use anticheat" OFF)
 option(USE_SCRIPTS "Compile scripts" ON)
 option(USE_EXTRACTORS "Compile extractors" OFF)
 option(USE_LIBCURL "Compile with libcurl for email support" OFF)
@@ -325,13 +324,6 @@ else()
 endif()
 
 message(STATUS "Build type            : ${CMAKE_BUILD_TYPE}")
-
-if(USE_ANTICHEAT)
-  message(STATUS "Use anticheat         : Yes")
-  set(DEFINITIONS ${DEFINITIONS} USE_ANTICHEAT)
-else()
-  message(STATUS "Use anticheat         : No  (default)")
-endif()
 
 if(USE_SCRIPTS)
   message(STATUS "Build scripts         : Yes (default)")

@@ -1307,7 +1307,6 @@ void WorldSession::HandleRequestPetInfoOpcode(WorldPacket& /*recv_data */)
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
 {
-#ifdef USE_ANTICHEAT
     if (!m_warden)
     {
         sLog.Player(GetAccountId(), LOG_ANTICHEAT, LOG_LVL_MINIMAL,
@@ -1317,5 +1316,4 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
 
     std::lock_guard<std::mutex> lock(m_warden->m_packetQueueMutex);
     m_warden->m_packetQueue.emplace_back(std::move(recv_data));
-#endif
 }
