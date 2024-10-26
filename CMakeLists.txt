@@ -45,20 +45,6 @@ if(BUILDING_IN_SOURCE)
   )
 endif()
 
-if(WIN32)
-  if(MSVC)
-    if(MSVC_VERSION LESS 1900)
-      message(FATAL_ERROR "Only Visual Studio 2015 or newer is supported")
-    endif()
-  endif()
-
-  # Added by Giperion, in WIN32 output all compiled files in one directory
-  set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
-  set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib )
-  # Allow creating folders in solution
-  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-endif()
-
 find_package(Git)
 
 # Output description of this script
