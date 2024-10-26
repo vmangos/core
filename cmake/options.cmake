@@ -47,3 +47,29 @@ endif()
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
+
+
+message("")
+message(STATUS
+  "This script builds the vMaNGOS server.
+  Options that can be used in order to configure the process:
+    PREFIX                    Path where the server should be installed to
+    CMAKE_INSTALL_PREFIX      Path where the server should be installed to
+    USE_PCH                   Use precompiled headers
+    USE_PCH_OLD               Use precompiled headers
+    USE_STD_MALLOC            Use standard malloc instead of TBB
+    BUILD_FOR_HOST_CPU        Build specifically for the host CPU via `-march=native` (might not run on different machines)
+    TBB_DEBUG                 Use TBB debug libraries
+    USE_SCRIPTS               Compile scripts
+    USE_EXTRACTORS            Compile extractors
+    USE_LIBCURL               Compile with libcurl for email support
+    USE_REALMMERGE            Compile helper tool for merging character databases
+    SUPPORTED_CLIENT_BUILD    Client version the core will support
+
+
+  To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
+  Also, you can specify the generator with -G. see 'cmake --help' for more details
+  For example:
+    Build server
+    cmake -DCMAKE_INSTALL_PREFIX=../opt/vmangos ..
+")

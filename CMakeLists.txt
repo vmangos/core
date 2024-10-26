@@ -47,16 +47,6 @@ endif()
 
 find_package(Git)
 
-# Output description of this script
-message(STATUS
-  "\nThis script builds the MaNGOS server.
-  Options that can be used in order to configure the process:
-    PREFIX: Path where the server should be installed to
-    USE_PCH: Use precompiled headers
-  To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
-  For example: cmake .. -DPREFIX=/opt/mangos\n"
-) # TODO: PLATFORM: Sets the architecture for compile (X86,X64)
-
 # Find out what system we use to include the needed libs
 if(WIN32)
   if(PLATFORM MATCHES X86) # 32-bit
