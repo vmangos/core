@@ -28,6 +28,8 @@ endif()
 include(cmake/common.cmake)
 include(cmake/options.cmake)
 
+include(cmake/platform/detect_platform.cmake)
+
 if(USE_LIBCURL)
   find_package(CURL REQUIRED)
   #add_definitions(-D_HAS_AUTO_PTR_ETC) # for VS2017 ACE support, won't do any harm to other compilers
@@ -57,7 +59,6 @@ if(WIN32)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
-find_package(Platform REQUIRED)
 find_package(Git)
 
 # Output description of this script
