@@ -1485,13 +1485,13 @@ Antiflood.Sanction = 8
 #
 #    Warden.WinEnabled
 #        Description: Enables Warden checks for Windows clients.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#                     1 - (Enabled)
+#        Default:     0 - (Disabled)
 #
 #    Warden.OSXEnabled
 #        Description: Enables Warden checks for OSX clients.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#                     1 - (Enabled)
+#        Default:     0 - (Disabled)
 #
 #    Warden.PlayersOnly
 #        Description: Ignore game master accounts.
@@ -1535,8 +1535,8 @@ Antiflood.Sanction = 8
 #
 ###################################################################################################
 
-Warden.WinEnabled            = 1
-Warden.OSXEnabled            = 1
+Warden.WinEnabled            = 0
+Warden.OSXEnabled            = 0
 Warden.PlayersOnly           = 0
 Warden.NumScans              = 10
 Warden.ClientResponseDelay   = 30
@@ -1551,8 +1551,8 @@ Warden.ModuleDir             = "warden_modules"
 #
 #    Anticheat.Enable
 #        Description: Enables player movement checks.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#                     1 - (Enabled)
+#        Default:     0 - (Disabled)
 #
 #    Anticheat.PlayersOnly
 #        Description: Ignore game master accounts.
@@ -2100,7 +2100,7 @@ Warden.ModuleDir             = "warden_modules"
 #
 ###################################################################################################
 
-Anticheat.Enable = 1
+Anticheat.Enable = 0
 Anticheat.PlayersOnly = 1
 Anticheat.NotifyCheaters = 0
 Anticheat.BanDuration = 86400
