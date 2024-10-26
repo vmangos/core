@@ -271,12 +271,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/generators/Progression.h.in ${C
 # Generate migrations list
 include(cmake/generators/migrations_list.h.cmake)
 
-message(STATUS "")
-message(STATUS "Core revision: ${rev_hash} ${rev_date} ")
-message(STATUS "Supported version: ${supported_build}")
-message(STATUS "Install server to: ${CMAKE_INSTALL_PREFIX}")
-message(STATUS "")
-
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
   if(USE_PCH AND NOT PCHSupport_FOUND)
     set(USE_PCH OFF CACHE BOOL
@@ -288,20 +282,6 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
   endif()
 endif()
 
-if(USE_PCH)
-  message(STATUS "Use PCH               : Yes")
-else()
-  message(STATUS "Use PCH               : No")
-endif()
-
-if(PROFILE_GENERATE)
-  message(STATUS "PGO profile           : Generate")
-elseif(PROFILE_USE)
-  message(STATUS "PGO profile           : ${GCC_PROFILE_USE}")
-else()
-  message(STATUS "PGO profile           : Disabled")
-endif()
-
 if(USE_STD_MALLOC)
   set(ALLOC_LIB_INFO_STRING "std::malloc")
 else()
@@ -311,31 +291,10 @@ else()
     set(ALLOC_LIB_INFO_STRING "TBB/Release")
   endif()
 endif()
-message(STATUS "Memory allocation     : ${ALLOC_LIB_INFO_STRING} ${TBB_LIBRARIES}")
-message(STATUS "Detected compiler     : ${CMAKE_CXX_COMPILER_ID}")
 
-if(BUILD_FOR_HOST_CPU)
-  message(STATUS "Build for host CPU    : Yes (default)")
-else()
-  message(STATUS "Build for host CPU    : No")
-endif()
-
-message(STATUS "Build type            : ${CMAKE_BUILD_TYPE}")
-
-if(USE_SCRIPTS)
-  message(STATUS "Build scripts         : Yes (default)")
-else()
-  message(STATUS "Build scripts         : No")
-endif()
+include(cmake/showoptions.cmake)
 
 if(UNIX)
-  if(DEBUG_SYMBOLS)
-    message(STATUS "Debug symbols         : Included")
-    set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -g")
-  else()
-    message(STATUS "Debug symbols         : Disabled")
-  endif()
-
   if(GCC_SANITIZE)
     set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
     set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fsanitize=address")
