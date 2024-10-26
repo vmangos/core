@@ -90,6 +90,25 @@ WardenModuleMgr::WardenModuleMgr()
             continue;
         }
     }
+
+    bool isMissingModules = false;
+
+    if (m_winModules.empty() && sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED))
+    {
+        sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "No Windows Warden module found - reduced cheat detection capabilities! Check your `Warden.ModuleDir` in config!");
+        isMissingModules = true;
+    }
+
+    if (m_macModules.empty() && sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_OSX_ENABLED))
+    {
+        sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "No macOS Warden module found - reduced cheat detection capabilities! Check your `Warden.ModuleDir` in config!");
+        isMissingModules = true;
+    }
+
+    if (isMissingModules)
+    {
+        sLog.WaitBeforeContinueIfNeed();
+    }
 }
 
 WardenModule const* WardenModuleMgr::GetWindowsModule() const
