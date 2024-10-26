@@ -25,10 +25,7 @@ if(${CMAKE_VERSION} VERSION_GREATER "3.11")
   cmake_policy(SET CMP0074 NEW)
 endif()
 
-set(CMAKE_MODULE_PATH
-  ${CMAKE_MODULE_PATH}
-  ${CMAKE_SOURCE_DIR}/cmake
-)
+include(cmake/common.cmake)
 
 set(SUPPORTED_CLIENT_BUILD "CLIENT_BUILD_1_12_1" CACHE STRING "Client version the core will support")
 option(USE_STD_MALLOC "Use standard malloc instead of TBB" OFF)
@@ -265,14 +262,14 @@ else()
     set(rev_hash "unknown")
   endif()
 
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/revision.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/shared/revision.h)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/generators/revision.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/shared/revision.h)
 endif()
 
 set(supported_build ${SUPPORTED_CLIENT_BUILD})
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Progression.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/shared/Progression.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/generators/Progression.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/shared/Progression.h)
 
 # Generate migrations list
-include(cmake/migrations.cmake)
+include(cmake/generators/migrations_list.h.cmake)
 
 message(STATUS "")
 message(STATUS "Core revision: ${rev_hash} ${rev_date} ")
