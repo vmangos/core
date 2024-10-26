@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20241026225509');
 -- Add your query below.
 
 
--- Un'Goro gorrilas is not tameable prior to patch 1.9
+-- Un'Goro - some gorrilas is not tameable prior to patch 1.9
 
 -- Un'Goro Thunderer
 UPDATE `creature_template` SET `pet_family`=0 WHERE  `entry`=6516 AND `patch`=0;
