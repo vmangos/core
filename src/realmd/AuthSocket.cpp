@@ -35,7 +35,7 @@
 #include "PatchHandler.h"
 #include "Util.h"
 
-#ifdef USE_SENDGRID
+#ifdef ENABLE_MAILSENDER
 #include "MailerService.h"
 #include "SendgridMail.h"
 #endif
@@ -722,7 +722,7 @@ bool AuthSocket::_HandleLogonProof()
                 return true;
             }
 
-#ifdef USE_SENDGRID
+#ifdef ENABLE_MAILSENDER
             if (sConfig.GetBoolDefault("SendMail", false))
             {
                 auto mail = std::make_unique<SendgridMail>

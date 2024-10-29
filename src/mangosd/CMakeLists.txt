@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 set(EXECUTABLE_NAME mangosd)
-set(EXECUTABLE_SRCS 
+set(EXECUTABLE_SRCS
   CliRunnable.h
   MaNGOSsoap.h
   Master.h
@@ -35,12 +35,11 @@ if(WIN32)
   list(APPEND EXECUTABLE_SRCS
     mangosd.rc
   )
-  
+
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
 endif()
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/src/shared
   ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
   ${CMAKE_SOURCE_DIR}/src/framework
   ${CMAKE_SOURCE_DIR}/src/framework/Network
@@ -69,8 +68,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/Threat
   ${CMAKE_SOURCE_DIR}/src/game/Transports
   ${CMAKE_SOURCE_DIR}/src/game/vmap
-  ${CMAKE_BINARY_DIR}/src/shared
-  ${CMAKE_BINARY_DIR}
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}

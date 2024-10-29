@@ -35,6 +35,12 @@ else()
   message(STATUS "Build scripts         : No")
 endif()
 
+if(ENABLE_MAILSENDER)
+  message(STATUS "Mailsender enabled    : Yes")
+else()
+  message(STATUS "Mailsender enabled    : No (default)")
+endif()
+
 if(UNIX)
   if(DEBUG_SYMBOLS)
     message(STATUS "Debug symbols         : Included")

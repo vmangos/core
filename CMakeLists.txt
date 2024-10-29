@@ -30,13 +30,6 @@ include(cmake/options.cmake)
 
 include(cmake/platform/detect_platform.cmake)
 
-if(USE_LIBCURL)
-  find_package(CURL REQUIRED)
-  #add_definitions(-D_HAS_AUTO_PTR_ETC) # for VS2017 ACE support, won't do any harm to other compilers
-  #set(CMAKE_CXX_STANDARD 17)
-  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
-endif()
-
 # Force out-of-source build
 string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" BUILDING_IN_SOURCE)
 if(BUILDING_IN_SOURCE)
@@ -136,7 +129,13 @@ if(NOT USE_STD_MALLOC)
 
 endif()
 
-# Win32 delifered packages
+if (ENABLE_MAILSENDER)
+  set(REQUIRES_LIBCURL ON)
+else()
+  set(REQUIRES_LIBCURL OFF)
+endif()
+
+# Using the prepackages Windows dependencies from the repo
 if(WIN32)
   set(MYSQL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/windows/include/mysql)
   set(MYSQL_LIBRARY ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libmySQL.lib)
@@ -145,6 +144,10 @@ if(WIN32)
   set(OPENSSL_LIBRARIES ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libeay32.lib)
   set(OPENSSL_DEBUG_LIBRARIES ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libeay32.lib)
   set(ZLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/dep/windows/include/zlib)
+  if (REQUIRES_LIBCURL)
+    set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/windows/optional_dependencies/curl/include)
+    set(CURL_LIBRARY     ${CMAKE_SOURCE_DIR}/dep/windows/optional_dependencies/curl/lib/libcurl.lib)
+  endif()
 endif()
 
 # *nix-specific packages
@@ -152,6 +155,20 @@ if(UNIX)
   find_package(MySQL REQUIRED)
   find_package(OpenSSL REQUIRED)
   find_package(ZLIB REQUIRED)
+endif()
+
+if(REQUIRES_LIBCURL)
+  if(WIN32)
+    find_package(CURL) # No `REQUIRED`, since we want to print our own message.
+    if(NOT CURL_FOUND OR NOT CURL_VERSION_STRING)
+      message(FATAL_ERROR
+              "Your build options require CURL to be present, but it was not found.\n"
+              "You can find a script to automatically download CURL in dep/windows/optional_dependencies"
+      )
+    endif()
+  else()
+    find_package(CURL REQUIRED)
+  endif()
 endif()
 
 # Add uninstall script and target
@@ -304,8 +321,8 @@ if(USE_STD_MALLOC)
   set(DEFINITIONS ${DEFINITIONS} USE_STANDARD_MALLOC)
 endif()
 
-if (USE_LIBCURL)
-  set(DEFINITIONS ${DEFINITIONS} USE_SENDGRID)
+if (ENABLE_MAILSENDER)
+  set(DEFINITIONS ${DEFINITIONS} ENABLE_MAILSENDER)
 endif()
 
 set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ${DEFINITIONS})
