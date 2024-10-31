@@ -58,6 +58,7 @@ DatabaseType LoginDatabase;                                 // Accessor to the r
 DatabaseType LogsDatabase;                                  // Accessor to the logs database
 
 uint32 realmID;                                             // Id of the realm
+std::string realmName;                                      // Name of the realm
 
 // Print out the usage string for this program on the console.
 void usage(const char *prog)
