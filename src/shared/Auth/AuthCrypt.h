@@ -49,8 +49,6 @@ class AuthCrypt
 
         bool IsInitialized() { return _initialized; }
 
-        static void GenerateKey(uint8*, BigNumber*);
-
     private:
         std::vector<uint8> _key;
         uint8 _send_i, _send_j, _recv_i, _recv_j;

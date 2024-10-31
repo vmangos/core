@@ -24,7 +24,7 @@
 */
 
 #include "Common.h"
-#include "Crypto/Hash/Hmac.h"
+#include "Crypto/Hash/HMACSHA1.h"
 #include "Auth/base32.h"
 #include "Database/DatabaseEnv.h"
 #include "Config/Config.h"
@@ -1275,7 +1275,7 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
     uint64 step = static_cast<uint64>((floor(now / 30))) + interval;
     EndianConvertReverse(step);
 
-    HmacHash hmac(decoded_key.data(), key_size);
+    HMACSHA1 hmac(decoded_key.data(), key_size);
     hmac.UpdateData((uint8*)&step, sizeof(step));
     hmac.Finalize();
 
