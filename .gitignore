@@ -35,8 +35,10 @@ cmake-build-*
 #
 # Top-level generic files
 #
-bin
-build
+/bin/
+/build/
+/run/
+/opt/
 tags
 TAGS
 !.gitignore
