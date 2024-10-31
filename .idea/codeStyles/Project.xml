@@ -24,52 +24,15 @@
       <option name="HEADER_GUARD_STYLE_PATTERN" value="_${FILE_NAME}_${EXT}_" />
     </Objective-C>
     <Objective-C-extensions>
-      <rules>
-        <rule entity="MACRO" visibility="ANY" specifier="ANY" prefix="" style="SCREAMING_SNAKE_CASE" suffix="" />
-        <rule entity="NAMESPACE" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="CLASS,ENUM,UNION,TYPEDEF" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="CLASS_MEMBER_FUNCTION,STRUCT_MEMBER_FUNCTION" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="CLASS_MEMBER_FIELD,STRUCT_MEMBER_FIELD" visibility="ANY" specifier="ANY" prefix="m_" style="CAMEL_CASE" suffix="" />
-        <rule entity="GLOBAL_FUNCTION" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="PARAMETER" visibility="ANY" specifier="ANY" prefix="" style="CAMEL_CASE" suffix="" />
-        <rule entity="LOCAL_VARIABLE" visibility="ANY" specifier="ANY" prefix="" style="CAMEL_CASE" suffix="" />
-      </rules>
       <option name="TYPE_QUALIFIERS_PLACEMENT" value="AFTER" />
     </Objective-C-extensions>
     <Objective-C-extensions>
-      <rules>
-        <rule entity="MACRO" visibility="ANY" specifier="ANY" prefix="" style="SCREAMING_SNAKE_CASE" suffix="" />
-        <rule entity="NAMESPACE" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="CLASS,ENUM,UNION,TYPEDEF" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="CLASS_MEMBER_FUNCTION,STRUCT_MEMBER_FUNCTION" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="CLASS_MEMBER_FIELD,STRUCT_MEMBER_FIELD" visibility="ANY" specifier="ANY" prefix="m_" style="CAMEL_CASE" suffix="" />
-        <rule entity="GLOBAL_FUNCTION" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="PARAMETER" visibility="ANY" specifier="ANY" prefix="" style="CAMEL_CASE" suffix="" />
-        <rule entity="LOCAL_VARIABLE" visibility="ANY" specifier="ANY" prefix="" style="CAMEL_CASE" suffix="" />
-      </rules>
       <option name="TYPE_QUALIFIERS_PLACEMENT" value="AFTER" />
     </Objective-C-extensions>
+    <RiderCodeStyleSettings>
+      <option name="/Default/CodeStyle/CodeFormatting/CppCodeStyle/CVQualifiersPlacement/@EntryValue" value="AfterType" type="string" />
+    </RiderCodeStyleSettings>
     <codeStyleSettings language="ObjectiveC">
-      <option name="RIGHT_MARGIN" value="999" />
-      <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
-      <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
-      <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
-      <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
-      <option name="BLANK_LINES_BEFORE_IMPORTS" value="0" />
-      <option name="BLANK_LINES_AFTER_IMPORTS" value="0" />
-      <option name="BLANK_LINES_AROUND_CLASS" value="0" />
-      <option name="BLANK_LINES_AROUND_METHOD" value="0" />
-      <option name="BLANK_LINES_AROUND_METHOD_IN_INTERFACE" value="0" />
-      <option name="BRACE_STYLE" value="2" />
-      <option name="CLASS_BRACE_STYLE" value="2" />
-      <option name="ELSE_ON_NEW_LINE" value="true" />
-      <option name="CATCH_ON_NEW_LINE" value="true" />
-      <option name="SPACE_WITHIN_ARRAY_INITIALIZER_BRACES" value="true" />
-      <option name="SPACE_AFTER_TYPE_CAST" value="false" />
-      <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
-      <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
-      <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="false" />
-      <option name="FOR_STATEMENT_WRAP" value="5" />
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
       </indentOptions>
