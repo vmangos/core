@@ -744,11 +744,11 @@ void WardenWin::LoadScriptedScans()
 
             scan << opcode << seed;
 
-            HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+            Crypto::Hash::HMACSHA1::Generator hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
             hash.UpdateData(hypervisor.DeviceName);
-            hash.Finalize();
+            auto digest = hash.GetDigest();
 
-            scan.append(hash.GetDigest(), hash.GetLength());
+            scan.append(digest.data(), digest.size());
             scan << static_cast<uint8>(strings.size());
         }
     },
@@ -798,11 +798,11 @@ void WardenWin::LoadScriptedScans()
 
         static_assert(sizeof(pattern) <= 0xFF, "pattern length must fit into 8 bits");
 
-        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        Crypto::Hash::HMACSHA1::Generator hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
         hash.UpdateData(&pattern[0], sizeof(pattern));
-        hash.Finalize();
+        auto digest = hash.GetDigest();
 
-        scan.append(hash.GetDigest(), hash.GetLength());
+        scan.append(digest.data(), digest.size());
 
         scan << warden->GetModule()->memoryRead << static_cast<uint8>(sizeof(pattern));
     },

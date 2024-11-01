@@ -21,19 +21,18 @@
 
 #include <openssl/hmac.h>
 
-HMACSHA1::HMACSHA1(const uint8* seed, size_t len)
+Crypto::Hash::HMACSHA1::Generator::Generator(uint8 const* key, size_t len)
 {
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10100000L
     m_ctx = HMAC_CTX_new();
-    HMAC_Init_ex(m_ctx, seed, len, EVP_sha1(), nullptr);
 #else
     m_ctx = new HMAC_CTX;
     HMAC_CTX_init(m_ctx);
-    HMAC_Init_ex(m_ctx, seed, static_cast<int>(len), EVP_sha1(), nullptr);
 #endif
+    HMAC_Init_ex(m_ctx, key, static_cast<int>(len), EVP_sha1(), nullptr);
 }
 
-HMACSHA1::~HMACSHA1()
+Crypto::Hash::HMACSHA1::Generator::~Generator()
 {
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10100000L
     HMAC_CTX_free(m_ctx);
@@ -43,28 +42,30 @@ HMACSHA1::~HMACSHA1()
 #endif
 }
 
-void HMACSHA1::UpdateBigNumber(BigNumber* bn)
+void Crypto::Hash::HMACSHA1::Generator::UpdateData(std::vector<uint8> const& data)
 {
-    UpdateData(bn->AsByteArray());
+    UpdateData(data.data(), data.size());
 }
 
-void HMACSHA1::UpdateData(std::vector<uint8> const& data)
+void Crypto::Hash::HMACSHA1::Generator::UpdateData(std::string const& str)
 {
-    HMAC_Update(m_ctx, data.data(), data.size());
+    UpdateData(reinterpret_cast<uint8 const*>(str.c_str()), str.length());
 }
 
-void HMACSHA1::UpdateData(uint8 const* data, int length)
+void Crypto::Hash::HMACSHA1::Generator::UpdateData(BigNumber const& bn)
+{
+    UpdateData(bn.AsByteArray());
+}
+
+void Crypto::Hash::HMACSHA1::Generator::UpdateData(uint8 const* data, size_t length)
 {
     HMAC_Update(m_ctx, data, length);
 }
 
-void HMACSHA1::UpdateData(std::string const& str)
+Crypto::Hash::HMACSHA1::Digest Crypto::Hash::HMACSHA1::Generator::GetDigest()
 {
-    UpdateData((uint8 const*) str.c_str(), str.length());
-}
-
-void HMACSHA1::Finalize()
-{
+    Digest digest;
     uint32 length = 0;
-    HMAC_Final(m_ctx, m_digest, &length);
+    HMAC_Final(m_ctx, digest.data(), &length);
+    return digest;
 }

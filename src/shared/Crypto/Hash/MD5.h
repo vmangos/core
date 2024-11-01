@@ -47,4 +47,4 @@ namespace Crypto { namespace Hash { namespace MD5
     };
 }}} // namespace Crypto::Hash::MD5
 
-#endif // _MANGOS_CRYPTO_HASH_MD5_H
+#endif

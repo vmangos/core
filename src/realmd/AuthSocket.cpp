@@ -1275,9 +1275,8 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
     uint64 step = static_cast<uint64>((floor(now / 30))) + interval;
     EndianConvertReverse(step);
 
-    HMACSHA1 hmac(decoded_key.data(), key_size);
+    Crypto::Hash::HMACSHA1::Generator hmac(decoded_key.data(), key_size);
     hmac.UpdateData((uint8*)&step, sizeof(step));
-    hmac.Finalize();
 
     auto hmac_result = hmac.GetDigest();
 

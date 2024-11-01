@@ -146,11 +146,11 @@ WindowsModuleScan::WindowsModuleScan(std::string const& module, bool wanted, std
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_MODULE_BY_NAME] ^ winWarden->GetXor()) << seed;
 
-        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        Crypto::Hash::HMACSHA1::Generator hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
         hash.UpdateData(this->m_module);
-        hash.Finalize();
+        auto digest = hash.GetDigest();
 
-        scan.append(hash.GetDigest(), hash.GetLength());
+        scan.append(digest.data(), digest.size());
     },
     // checker
     [this](Warden const*, ByteBuffer& buff)
@@ -174,11 +174,11 @@ WindowsModuleScan::WindowsModuleScan(std::string const& module, CheckT checker, 
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_MODULE_BY_NAME] ^ winWarden->GetXor()) << seed;
 
-        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        Crypto::Hash::HMACSHA1::Generator hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
         hash.UpdateData(this->m_module);
-        hash.Finalize();
+        auto digest = hash.GetDigest();
 
-        scan.append(hash.GetDigest(), hash.GetLength());
+        scan.append(digest.data(), digest.size());
     },
     checker, sizeof(uint8) + sizeof(uint32) + Crypto::Hash::SHA1::Digest::size(), sizeof(uint8), comment, flags, minBuild, maxBuild)
 {
@@ -303,11 +303,11 @@ WindowsCodeScan::WindowsCodeScan(uint32 offset, std::vector<uint8> const& patter
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[this->m_memImageOnly ? FIND_MEM_IMAGE_CODE_BY_HASH : FIND_CODE_BY_HASH] ^ winWarden->GetXor())
              << seed;
 
-        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        Crypto::Hash::HMACSHA1::Generator hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
         hash.UpdateData(&this->m_pattern[0], this->m_pattern.size());
-        hash.Finalize();
-        
-        scan.append(hash.GetDigest(), hash.GetLength());
+        auto digest = hash.GetDigest();
+
+        scan.append(digest.data(), digest.size());
 
         scan << this->m_offset << static_cast<uint8>(this->m_pattern.size());
     },
@@ -489,11 +489,11 @@ WindowsDriverScan::WindowsDriverScan(std::string const& name, std::string const&
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_DRIVER_BY_NAME] ^ winWarden->GetXor()) << seed;
 
-        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        Crypto::Hash::HMACSHA1::Generator hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
         hash.UpdateData(this->m_targetPath);
-        hash.Finalize();
+        auto digest = hash.GetDigest();
 
-        scan.append(hash.GetDigest(), hash.GetLength());
+        scan.append(digest.data(), digest.size());
         scan << static_cast<uint8>(strings.size());
     },
     // checker

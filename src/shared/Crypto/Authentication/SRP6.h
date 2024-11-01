@@ -22,9 +22,6 @@
 #include "Common.h"
 #include "Crypto/BigNumber.h"
 #include "Crypto/Hash/SHA1.h"
-#include "ByteBuffer.h"
-
-#define HMAC_RES_SIZE 20
 
 /*! Secure Remote Password protocol */
 class SRP6
