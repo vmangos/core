@@ -9,6 +9,8 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES ('20241023190300');
 -- Add your query below.
 
+SET NAMES 'utf8';
+
 -- Add missing german gameobject locales
 UPDATE `locales_gameobject` SET `name_loc3`='Drizzliks Kaufhaus' WHERE `entry`= 3767;
 UPDATE `locales_gameobject` SET `name_loc3`='Zerbrechlich - nicht fallen lassen' WHERE `entry`= 3768;
