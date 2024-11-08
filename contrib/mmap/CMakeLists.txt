@@ -46,6 +46,7 @@ set(SOURCES
     ./src/MapBuilder.cpp
     ./src/TerrainBuilder.cpp
     ./src/VMapExtensions.cpp
+    ./src/TileWorker.cpp
 )
 
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
