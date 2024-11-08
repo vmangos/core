@@ -82,7 +82,7 @@ void printUsage()
     printf("-? or /? or -h : This help\n");
     printf("[#] : Build only the map specified by #.\n");
     printf("--tile [#,#] : Build the specified tile\n");
-    printf("--skipPromtCores : use only 1 thread for extraction.\n");
+    printf("--threads : amount of threads to use for extraction.\n");
     printf("--skipLiquid : liquid data for maps\n");
     printf("--skipContinents : skip continents\n");
     printf("--skipJunkMaps : junk maps include some unused\n");
@@ -113,7 +113,7 @@ bool handleArgs(int argc, char** argv,
                 bool& buildOnlyGameobjectModels,
                 const char*& offMeshInputPath,
                 const char*& configInputPath,
-                bool& skipPromtCores)
+                int& threads)
 {
     char* param = nullptr;
     for (int i = 1; i < argc; ++i)
@@ -140,9 +140,13 @@ bool handleArgs(int argc, char** argv,
                 return false;
             }
         }
-        else if (strcmp(argv[i], "--skipPromtCores") == 0)
+        else if (strcmp(argv[i], "--threads") == 0)
         {
-            skipPromtCores = true;
+            param = argv[++i];
+            if (!param)
+                return false;
+
+            threads = std::max(1, atoi(param));
         }
         else if (strcmp(argv[i], "--skipLiquid") == 0)
         {
@@ -237,12 +241,12 @@ int main(int argc, char** argv)
     bool silent = false;
     bool buildOnlyGameobjectModels = false;
     bool quick = false;
-    bool skipPromtCores = false;
+    int threads = 0;
 
     const char* offMeshInputPath = "offmesh.txt";
     const char* configInputPath = "config.json";
 
-    bool validParam = handleArgs(argc, argv, mapId, tileX, tileY, skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds, debug, silent, quick, buildOnlyGameobjectModels, offMeshInputPath, configInputPath, skipPromtCores);
+    bool validParam = handleArgs(argc, argv, mapId, tileX, tileY, skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds, debug, silent, quick, buildOnlyGameobjectModels, offMeshInputPath, configInputPath, threads);
 
     if (!validParam)
         return silent ? EXIT_FAILURE : finish("You have specified invalid parameters (use -? for more help)", EXIT_FAILURE);
@@ -265,24 +269,22 @@ int main(int argc, char** argv)
     std::cout << "offMeshInputPath = " << offMeshInputPath << endl;
     std::cout << "configInputPath = " << configInputPath << endl;
 
-    int userThreads = 1;
-    if (!skipPromtCores)
+    if (!threads)
     {
         int systemThreads = std::thread::hardware_concurrency();
         std::cout << "How many cores should be used? (" << systemThreads << " are available)" << std::endl;
-        std::cin >> userThreads;
+        std::cin >> threads;
         std::cin.get();
-        userThreads = std::min(systemThreads, userThreads);
-        userThreads = std::max(1, userThreads);
-        std::cout << "Using " << userThreads << " cores." << std::endl;
+        threads = std::min(systemThreads, threads);
+        threads = std::max(1, threads);
+        std::cout << "Using " << threads << " cores." << std::endl;
 
         std::cout << "Press enter to start building mmaps." << endl;
         std::cout << "====================================" << endl;
         std::cin.get();
     }
 
-    MapBuilder builder(configInputPath, skipLiquid, skipContinents, skipJunkMaps,
-                       skipBattlegrounds, debug, quick, offMeshInputPath, uint8(userThreads));
+    MapBuilder builder(configInputPath, skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds, debug, quick, offMeshInputPath, uint8(threads));
 
     if (buildOnlyGameobjectModels)
         builder.buildTransports();
