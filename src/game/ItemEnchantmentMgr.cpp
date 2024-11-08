@@ -117,7 +117,7 @@ uint32 GetItemEnchantMod(uint32 entry)
     float const roll = rand_chance() * (chance / 100.f);
     chance = 0.f;
 
-    for (const auto& ench_iter : enchantList)
+    for (auto const& ench_iter : enchantList)
     {
         chance += ench_iter.chance;
 
