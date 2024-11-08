@@ -115,7 +115,7 @@ def get_subprocess_config() -> SubprocessConfig:
 def run_move_map_gen(map_id: int) -> None:
     config = get_subprocess_config()
     subprocess.check_call(
-        (config.executable, str(map_id), "--silent --skipPromtCores", *sys.argv[2:]),
+        (config.executable, str(map_id), "--silent", "--skipPromtCores", *sys.argv[2:]),
         startupinfo=config.startupinfo,
         creationflags=config.creation_flags,
         stdout=subprocess.DEVNULL,
