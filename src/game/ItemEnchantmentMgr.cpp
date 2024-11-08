@@ -109,7 +109,7 @@ uint32 GetItemEnchantMod(uint32 entry)
     float chance = 0;
 
     EnchStoreList const& enchantList = tab->second;
-    for (const auto& ench_iter : enchantList)
+    for (auto const& ench_iter : enchantList)
     {
         chance += ench_iter.chance;
     }
