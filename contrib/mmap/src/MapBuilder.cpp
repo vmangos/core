@@ -152,18 +152,18 @@ namespace MMAP
                 buildMap(mapID);
         }
 
-		std::vector<TileWorker*> workers;
-		for (uint8 i = 0; i < m_threads; ++i)
-		{
-                                    workers.emplace_back(new TileWorker(this, false, m_quick, m_debug, m_config));
-		}
+        std::vector<TileWorker*> workers;
+        for (uint8 i = 0; i < m_threads; ++i)
+        {
+            workers.emplace_back(new TileWorker(this, false, m_quick, m_debug, m_config));
+        }
 
-		while (!m_tileQueue.Empty())
+        while (!m_tileQueue.Empty())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 
-		m_cancel.store(true);
+        m_cancel.store(true);
         m_tileQueue.Cancel();
 
         for (auto& th : workers)

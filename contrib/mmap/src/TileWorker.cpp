@@ -214,7 +214,6 @@ static void from_json(const json& j, rcConfig& config)
 
 namespace MMAP
 {
-
     void TileWorker::WorkerThread()
     {
         while (true)
