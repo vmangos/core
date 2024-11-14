@@ -189,6 +189,7 @@ bool MySQLConnection::HandleMySQLError(uint32 errNo)
             return false;
         default:
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Unhandled MySQL errno %u. Unexpected behaviour possible.", errNo);
+            ASSERT(false);
             return false;
     }
 }
