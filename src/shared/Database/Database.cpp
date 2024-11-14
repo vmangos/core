@@ -487,9 +487,7 @@ bool Database::CommitTransaction()
         return false;
 
     //check if we have pending transaction
-    //ASSERT(m_TransStorage->get());
-    if (!m_TransStorage->get())
-        return false;
+    ASSERT(m_TransStorage->get()); // if we will get a nested transaction request - we MUST fix code!!!
 
     //if async execution is not available
     if(!m_bAllowAsyncTransactions)
