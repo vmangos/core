@@ -100,12 +100,14 @@ class WMORoot
 
 struct WMOLiquidHeader
 {
-    int xverts, yverts, xtiles, ytiles;
+    int32 xverts, yverts, xtiles, ytiles;
     float pos_x;
     float pos_y;
     float pos_z;
-    short type;
+    uint16 type;
 };
+
+constexpr int32 WMOLiquidHeaderSize = sizeof(int32) /* xverts */ + sizeof(int32) /* yverts */ + sizeof(int32) /* xtiles */ + sizeof(int32) /* ytiles */ + sizeof(float) /* pos_x */ + sizeof(float) /* pos_y */ + sizeof(float) /* pos_z */ + sizeof(uint16) /* type */;
 
 struct WMOLiquidVert
 {
