@@ -83,14 +83,13 @@ namespace MMAP
 
             ~MapBuilder();
 
-            // builds all mmap tiles for the specified map id (ignores skip settings)
-            void buildMap(uint32 mapID);
-
             // builds an mmap tile for the specified map and its mesh
             void buildSingleTile(uint32 mapID, uint32 tileX, uint32 tileY);
 
             // builds list of maps, then builds all of mmap tiles (based on the skip settings)
             void buildAllMaps();
+            // builds all mmap tiles for the specified map id (ignores skip map id settings)
+            void buildSingleMap(uint32 mapID);
 
             void buildGameObject(std::string modelName, uint32 displayId);
             void buildTransports();
@@ -102,6 +101,7 @@ namespace MMAP
             void discoverTiles();
             std::set<uint32>& getTileList(uint32 mapID);
 
+            void buildMap(uint32 mapID);
             void buildNavMesh(uint32 mapID, dtNavMesh*& navMesh);
 
             void getTileBounds(uint32 tileX, uint32 tileY, float* verts, int vertCount, float* bmin, float* bmax);

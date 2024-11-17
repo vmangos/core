@@ -141,6 +141,34 @@ namespace MMAP
         return m_tiles.emplace(mapID, std::set<uint32>{}).first->second;
     }
 
+    void MapBuilder::buildSingleMap(uint32 mapID)
+    {
+        m_cancel.store(false);
+
+        buildMap(mapID);
+
+        std::vector<TileWorker*> workers;
+        for (uint8 i = 0; i < m_threads; ++i)
+        {
+            workers.emplace_back(new TileWorker(this, false, m_quick, m_debug, m_config));
+        }
+
+        while (!m_tileQueue.Empty())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+
+        m_cancel.store(true);
+        m_tileQueue.Cancel();
+
+        for (auto& th : workers)
+        {
+            delete th;
+        }
+
+        printf("Done.");
+    }
+
     void MapBuilder::buildAllMaps()
     {
         m_cancel.store(false);
@@ -220,6 +248,8 @@ namespace MMAP
 
     void MapBuilder::buildSingleTile(uint32 mapID, uint32 tileX, uint32 tileY)
     {
+        m_cancel.store(false);
+
         // make sure we process maps which don't have tiles
         std::set<uint32>& tiles = getTileList(mapID);
         if (!tiles.size())
@@ -234,8 +264,10 @@ namespace MMAP
                     if (i == tileX && j == tileY)
                         tiles.insert(StaticMapTree::packTileID(i, j));
         }
+
         if (!tiles.size())
             return;
+
         dtNavMesh* navMesh = nullptr;
         buildNavMesh(mapID, navMesh);
         if (!navMesh)

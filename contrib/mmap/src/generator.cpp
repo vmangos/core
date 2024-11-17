@@ -228,9 +228,6 @@ char const* g_mainLogFileName = "MoveMapGen.log";
 
 int main(int argc, char** argv)
 {
-    std::cout << "MMap Generator" << endl;
-    std::cout << "====================================" << endl;
-
     int mapId = -1;
     int tileX = -1, tileY = -1;
     bool skipLiquid = false;
@@ -251,6 +248,12 @@ int main(int argc, char** argv)
     if (!validParam)
         return silent ? EXIT_FAILURE : finish("You have specified invalid parameters (use -? for more help)", EXIT_FAILURE);
 
+    if (!silent)
+    {
+        std::cout << "MMap Generator" << endl;
+        std::cout << "====================================" << endl;
+    }
+
     if (mapId == -1 && debug && !buildOnlyGameobjectModels)
     {
         if (silent)
@@ -266,8 +269,11 @@ int main(int argc, char** argv)
     if (!checkDirectories(debug))
         return silent ? EXIT_FAILURE : finish("Press any key to close...", EXIT_FAILURE);
 
-    std::cout << "offMeshInputPath = " << offMeshInputPath << endl;
-    std::cout << "configInputPath = " << configInputPath << endl;
+    if (!silent)
+    {
+        std::cout << "offMeshInputPath = " << offMeshInputPath << endl;
+        std::cout << "configInputPath = " << configInputPath << endl;
+    }
 
     if (!threads)
     {
@@ -291,7 +297,7 @@ int main(int argc, char** argv)
     else if (tileX > -1 && tileY > -1 && mapId >= 0)
         builder.buildSingleTile(mapId, tileX, tileY);
     else if (mapId >= 0)
-        builder.buildMap(uint32(mapId));
+        builder.buildSingleMap(uint32(mapId));
     else
     {
         builder.buildAllMaps();
