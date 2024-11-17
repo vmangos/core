@@ -29,6 +29,7 @@ bool ExtractSingleModel(std::string& origPath, std::string& fixedName, StringSet
         return ch == ' ' ? '_' : ch;
         });
 
+    fixnamen((char*)s.c_str(), s.size());
     fixedName = s;
 
     std::string output(szWorkDirWmo);                       // Stores output filename (possible changed)
