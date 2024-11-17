@@ -1679,6 +1679,20 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     }
                     return;
                 }
+                case 7669: // Bethor's Potion (debuff removal spell 8320 does not work, fix it here...)
+                {
+                    // HEX_OF_RAVENCLAW_1
+                    if (m_casterUnit->HasAura(7656))
+                    {
+                        m_casterUnit->RemoveAurasDueToSpell(7656);
+                    }
+                    // HEX_OF_RAVENCLAW_2
+                    if (m_casterUnit->HasAura(7657))
+                    {
+                        m_casterUnit->RemoveAurasDueToSpell(7657);
+                    }
+                    return;
+                }
             }
 
             //All IconID Check in there
