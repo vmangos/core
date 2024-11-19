@@ -534,9 +534,15 @@ namespace MMAP
                 unsigned char* areas = new unsigned char[tTriCount];
                 memset(areas, AREA_NONE, tTriCount * sizeof(unsigned char));
                 float norm[3];
+
+                // allow modifying walkable slopes using config.json
+                const float walkableSlopeAngleTerrain = config.walkableSlopeAngle;
+                // Custom parameter (not part of rcConfig)
+                const float walkableSlopeAngleVMaps = jsonTileConfig["walkableSlopeAngleVMaps"].get<float>();
+                // Player slope angle is fix (client side controlled)
                 const float playerClimbLimit = cosf(52.0f / 180.0f * RC_PI);
-                const float maxClimbLimitTerrain = cosf(75.0f / 180.0f * RC_PI);
-                const float maxClimbLimitVmaps = cosf(61.0f / 180.0f * RC_PI);
+                const float maxClimbLimitTerrain = cosf(walkableSlopeAngleTerrain / 180.0f * RC_PI);
+                const float maxClimbLimitVmaps = cosf(walkableSlopeAngleVMaps / 180.0f * RC_PI);
 
                 for (int i = 0; i < tTriCount; ++i)
                 {
@@ -909,18 +915,19 @@ namespace MMAP
     {
         return
         {
-            {"borderSize",             0},   // placeholder
-            {"detailSampleDist",       2.0f},
-            {"detailSampleMaxError",   0.5f},
-            {"maxEdgeLen",             0},   // placeholder
-            {"maxSimplificationError", 1.8f},
-            {"mergeRegionArea",        10},
-            {"minRegionArea",          30},
-            {"walkableClimb",          0},   // placeholder
-            {"walkableHeight",         0},   // placeholder
-            {"walkableRadius",         0},   // placeholder
-            {"walkableSlopeAngle",     75.0f},
-            {"quick",                  -1},
+            { "borderSize",              0     }, // placeholder
+            { "detailSampleDist",        2.0f  },
+            { "detailSampleMaxError",    0.5f  },
+            { "maxEdgeLen",              0     }, // placeholder
+            { "maxSimplificationError",  1.8f  },
+            { "mergeRegionArea",         10    },
+            { "minRegionArea",           30    },
+            { "walkableClimb",           0     }, // placeholder
+            { "walkableHeight",          0     }, // placeholder
+            { "walkableRadius",          0     }, // placeholder
+            { "walkableSlopeAngle",      75.0f }, // slope terrain
+            { "walkableSlopeAngleVMaps", 61.0f }, // slope model (WMO...)
+            { "quick",                   -1    }, // skip 'undermesh removal'
         };
     }
 
