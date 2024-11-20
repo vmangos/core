@@ -12,10 +12,10 @@
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
 
-    EXEC_PROGRAM(
-      ${CMAKE_CXX_COMPILER}
-        ARGS  ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
-        OUTPUT_VARIABLE gcc_compiler_version)
+    EXECUTE_PROCESS(
+      COMMAND ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
+      OUTPUT_VARIABLE gcc_compiler_version
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
     #MESSAGE("GCC Version: ${gcc_compiler_version}")
     IF(gcc_compiler_version MATCHES "4\\.[0-9]\\.[0-9]")
         SET(PCHSupport_FOUND TRUE)
