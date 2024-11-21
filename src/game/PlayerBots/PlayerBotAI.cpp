@@ -197,7 +197,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         x += (x - target->GetPositionX()) * 5.0f / d;
         y += (y - target->GetPositionY()) * 5.0f / d;
         me->UpdateGroundPositionZ(x, y, z);
-        me->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
+        me->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
         return;
     }
 
@@ -315,7 +315,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         else
             return;
     }
-    me->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
+    me->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
 }
 
 void PopulateAreaBotAI::BeforeAddToMap(Player* player)
