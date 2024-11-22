@@ -1862,16 +1862,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->HandleEmoteCommand(EMOTE_STATE_DANCE);
                         break;
                     }
-                    case 6870: // Moss Covered Feet
-                    {
-                        if (target)
-                        {
-                            m_positive = false;
-                            m_isPeriodic = true;
-                            m_modifier.periodictime = 1000;
-                        }
-                        return;
-                    }
                 }
                 break;
             }
@@ -2076,11 +2066,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     if (Unit* caster = GetCaster())
                     {
                         // Azuregos
-                        // Only cast Mark of Frost on targets nearby when engaged
-                        if (caster->IsInCombat())
-                        {
+                        // TODO verify: Only cast Mark of Frost on targets nearby when engaged?
+                        // if (caster->IsInCombat())
+                        // {
                             target->CastSpell(target, 23182, true, nullptr, this);
-                        }
+                        // }
                     }
                 }
                 return;
@@ -6834,18 +6824,6 @@ void Aura::PeriodicDummyTick()
                                 // Golemagg's Trust Buff
                                 pCaster->CastSpell(itr, 20553, true, nullptr, this);
                             }
-                        }
-                    }
-                    return;
-                }
-                case 6870: // Moss Covered Feet
-                {
-                    if (target->IsInCombat())
-                    {
-                        // 5% proc chance
-                        if (urand(0, 99) < 5)
-                        {
-                            target->CastSpell(target, 6869, true, nullptr, this); // Fall Down
                         }
                     }
                     return;
