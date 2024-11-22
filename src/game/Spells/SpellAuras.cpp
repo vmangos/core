@@ -1826,6 +1826,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
+                    case 20556: // Golemagg's Trust
+                    {
+                            m_isPeriodic = true;
+                            m_modifier.periodictime = 1000;
+                            return;
+                    }
                     case 22646:                             // Goblin Rocket Helmet
                     {
                         if (Unit* caster = GetCaster())
