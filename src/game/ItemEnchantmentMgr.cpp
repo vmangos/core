@@ -72,7 +72,7 @@ void LoadRandomEnchantmentsTable()
 
             if (chance > 0.000001f && chance <= 100.0f)
             {
-                RandomItemEnch[entry].push_back(EnchStoreItem(ench, chance));
+                RandomItemEnch[entry].emplace_back(ench, chance);
             }
             else
             {
@@ -114,7 +114,7 @@ uint32 GetItemEnchantMod(uint32 entry)
         chance += ench_iter.chance;
     }
 
-    float const roll = rand_chance() * (chance / 100.f);
+    float const roll = rand_chance_f() * (chance / 100.f);
     chance = 0.f;
 
     for (auto const& ench_iter : enchantList)

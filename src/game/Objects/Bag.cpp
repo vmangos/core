@@ -203,7 +203,7 @@ uint32 Bag::GetItemCount(uint32 item, Item const* eItem) const
 uint8 Bag::GetSlotByItemGUID(ObjectGuid guid) const
 {
     for (uint32 i = 0; i < GetBagSize(); ++i)
-        if (m_bagslot[i] != 0)
+        if (m_bagslot[i] != nullptr)
             if (m_bagslot[i]->GetObjectGuid() == guid)
                 return i;
 

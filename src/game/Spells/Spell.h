@@ -409,7 +409,7 @@ class Spell
         SpellCastTargets m_targets;
 
         int32 GetCastTime() const { return m_casttime; }
-        uint32 GetCastedTime() { return m_timer; }
+        uint32 GetCastedTime() const { return m_timer; }
         bool IsChanneled() const { return m_channeled; }
         bool IsAutoRepeat() const { return m_autoRepeat; }
         void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
@@ -764,7 +764,7 @@ namespace MaNGOS
             if (!i_originalCaster)
                 return;
 
-            for(const auto & itr : m)
+            for (const auto & itr : m)
             {
                 Player* pPlayer = itr.getSource();
                 if (!pPlayer->IsAlive() || pPlayer->IsTaxiFlying())

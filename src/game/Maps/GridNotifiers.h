@@ -1600,7 +1600,7 @@ namespace MaNGOS
             explicit NearestHostileUnitInAttackDistanceCheck(Creature const* creature, float dist = 0) : me(creature)
             {
                 m_range = (dist == 0 ? 9999 : dist);
-                m_force = (dist == 0 ? false : true);
+                m_force = dist != 0;
             }
             bool operator()(Unit* u)
             {

@@ -259,7 +259,7 @@ class Item : public Object
 
         ObjectGuid const& GetOwnerGuid() const { return GetGuidValue(ITEM_FIELD_OWNER); }
         void SetOwnerGuid(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
-        Player* GetOwner()const;
+        Player* GetOwner() const;
 
         void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOUND, val); }
         bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOUND); }
@@ -303,7 +303,7 @@ class Item : public Object
         InventoryResult CanBeMergedPartlyWith(ItemPrototype const* proto) const;
 
         uint8 GetSlot() const {return m_slot;}
-        Bag* GetContainer() { return m_container; }
+        Bag* GetContainer() const { return m_container; }
         uint8 GetBagSlot() const;
         void SetSlot(uint8 slot) {m_slot = slot;}
         uint16 GetPos() const { return uint16(GetBagSlot()) << 8 | GetSlot(); }
@@ -360,7 +360,7 @@ class Item : public Object
         void RemoveFromClientUpdateList() override;
         void BuildUpdateData(UpdateDataMapType& update_players) override;
         void SetGeneratedLoot(bool value) { generatedLoot = value; }
-        bool HasGeneratedLootSecondary() {  return generatedLoot; } // todo, remove and add condition to HasGeneratedLoot
+        bool HasGeneratedLootSecondary() const {  return generatedLoot; } // todo, remove and add condition to HasGeneratedLoot
 
         bool IsCharter() const { return GetEntry() == 5863u; }
         static void GetLocalizedNameWithSuffix(std::string& name, ItemPrototype const* proto, ItemRandomPropertiesEntry const* randomProp, int dbLocale, LocaleConstant dbcLocale);

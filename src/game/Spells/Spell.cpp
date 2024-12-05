@@ -3661,13 +3661,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
 bool IsAcceptableAutorepeatError(SpellCastResult result)
 {
-    switch (result)
-    {
-        case SPELL_FAILED_MOVING:   // Let's toggle auto attack while moving
-        case SPELL_CAST_OK:
-            return true;
-    }
-    return false;
+    return result == SPELL_FAILED_MOVING || result == SPELL_CAST_OK; // Let's toggle auto attack while moving
 }
 
 void Spell::UpdateCastStartPosition()

@@ -38,6 +38,7 @@
 #include "HonorMgr.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <functional>
 #include <shared_mutex>
@@ -948,7 +949,7 @@ struct ScheduledTeleportData
     ScheduledTeleportData(uint32 mapid, float x, float y, float z, float o,
         uint32 options, std::function<void()> recover)
         : targetMapId(mapid), x(x), y(y), z(z),
-          orientation(o), options(options), recover(recover) {};
+          orientation(o), options(options), recover(std::move(recover)) {};
 
     uint32 targetMapId = 0;
     float x = 0.0f;
@@ -1815,7 +1816,7 @@ class Player final: public Unit
         // sometimes they need a refresh before being usable
         bool m_justBoarded;
         void SetJustBoarded(bool hasBoarded) { m_justBoarded = hasBoarded; }
-        bool HasJustBoarded() { return m_justBoarded; }
+        bool HasJustBoarded() const { return m_justBoarded; }
 
         void SetCanDelayTeleport(bool setting) { m_bCanDelayTeleport = setting; }
         bool IsHasDelayedTeleport() const
@@ -2639,7 +2640,7 @@ class Player final: public Unit
         uint64 m_auraUpdateMask;
         uint32 m_LFGAreaId;
     public:
-        Group* GetGroupInvite() { return m_groupInvite; }
+        Group* GetGroupInvite() const { return m_groupInvite; }
         void SetGroupInvite(Group* group) { m_groupInvite = group; }
         Group* GetGroup() { return m_group.getTarget(); }
         Group const* GetGroup() const { return (Group const*)m_group.getTarget(); }
@@ -2675,7 +2676,7 @@ class Player final: public Unit
         // BattleGround Group System
         void SetBattleGroundRaid(Group* group, int8 subgroup = -1);
         void RemoveFromBattleGroundRaid();
-        Group* GetOriginalGroup() { return m_originalGroup.getTarget(); }
+        Group* GetOriginalGroup() const { return m_originalGroup.getTarget(); }
         GroupReference& GetOriginalGroupRef() { return m_originalGroup; }
         uint8 GetOriginalSubGroup() const { return m_originalGroup.getSubGroup(); }
         void SetOriginalGroup(Group* group, int8 subgroup = -1);
@@ -2694,7 +2695,7 @@ class Player final: public Unit
         uint32 GetRank() const { return GetUInt32Value(PLAYER_GUILDRANK); }
         static uint32 GetGuildIdFromDB(ObjectGuid guid);
         static uint32 GetRankFromDB(ObjectGuid guid);
-        int GetGuildIdInvited() { return m_GuildIdInvited; }
+        int GetGuildIdInvited() const { return m_GuildIdInvited; }
         static void RemovePetitionsAndSigns(ObjectGuid guid, uint32 exceptPetitionId = 0);
 };
 

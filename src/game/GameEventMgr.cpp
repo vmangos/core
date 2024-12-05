@@ -519,7 +519,7 @@ void GameEventMgr::LoadFromDB()
                 newData.spell_id_end = 0;
             }
 
-            equiplist.push_back(GameEventCreatureDataPair(guid, newData));
+            equiplist.emplace_back(guid, newData);
             mGameEventCreatureDataPerGuid.insert(GameEventCreatureDataPerGuidMap::value_type(guid, event_id));
 
         }

@@ -924,7 +924,7 @@ void Aura::ApplyModifier(bool apply, bool Real, bool skipCheckExclusive)
     }
     m_applied = apply;
     if (aura < TOTAL_AURAS)
-        (*this.*AuraHandler [aura])(apply, Real);
+        (this->*AuraHandler [aura])(apply, Real);
 
     if (!apply && !skipCheckExclusive && IsExclusive())
         ExclusiveAuraUnapply();

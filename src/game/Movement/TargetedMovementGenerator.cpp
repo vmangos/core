@@ -201,9 +201,9 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
             {
                 float distFactor = 1.0f;
                 if (pOwner->IsMounted())
-                    distFactor += 0.04 * (dist - speedupDistance * 2);
+                    distFactor += 0.04f * (dist - speedupDistance * 2);
                 else
-                    distFactor += 0.04 * (dist - speedupDistance);
+                    distFactor += 0.04f * (dist - speedupDistance);
                 if (distFactor < 1.0f) distFactor = 1.0f;
                 if (distFactor > 2.1f) distFactor = 2.1f;
                 init.SetVelocity(distFactor * owner.GetSpeed(MOVE_RUN));

@@ -1749,7 +1749,7 @@ void ScriptMgr::LoadEventIdScripts()
 
 void ScriptMgr::LoadScriptNames()
 {
-    m_scriptNames.push_back("");
+    m_scriptNames.emplace_back("");
 
     BarGoLink bar(6);
     uint32 count = 0;
@@ -1760,7 +1760,7 @@ void ScriptMgr::LoadScriptNames()
         "scripted_areatrigger",
         "scripted_event_id",
         "spell_template",
-        "map_template",
+        "map_template"
     };
 
     for (uint32 i = 0; i < 6; ++i)

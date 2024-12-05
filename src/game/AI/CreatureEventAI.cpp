@@ -79,7 +79,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : BasicAI(c)
             if (i.event_type == EVENT_T_OOC_LOS)
                 c->EnableMoveInLosEvent();
 
-            m_CreatureEventAIList.push_back(CreatureEventAIHolder(i));
+            m_CreatureEventAIList.emplace_back(i);
         }
     }
     else

@@ -176,7 +176,7 @@ class SpellAuraHolder
 
         bool IsSingleTarget() const { return m_isSingleTarget; }
         void SetIsSingleTarget(bool val) { m_isSingleTarget = val; }
-        bool IsChanneled() { return m_isChanneled; }
+        bool IsChanneled() const { return m_isChanneled; }
         void UnregisterSingleCastHolder();
 
         int32 GetAuraMaxDuration() const { return m_maxDuration; }

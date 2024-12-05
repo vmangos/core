@@ -2516,8 +2516,8 @@ bool Unit::RollSpellBlockChanceOutcome(SpellCaster const* pCaster, WeaponAttackT
 float Unit::RollMagicResistanceMultiplierOutcomeAgainst(float resistanceChance, SpellSchoolMask schoolMask, DamageEffectType damagetype, SpellEntry const* spellProto) const
 {
     // Magic vulnerability instead of magic resistance:
-    bool negative;
-    if (negative = (resistanceChance < 0.0f))
+    bool negative = resistanceChance < 0.0f;
+    if (negative)
         resistanceChance = -resistanceChance;
 
     resistanceChance *= 100.0f;
@@ -3583,7 +3583,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
         {
             // Nostalrius - fix stack same HoT rank / diff caster
             if (firstInChain)
-                aurasToRemove.push_back({ spellId, i.second->GetCasterGuid() });
+                aurasToRemove.emplace_back(spellId, i.second->GetCasterGuid());
             else switch (spellId)
             {
             // Blessing of Light does not stack between casters.
@@ -3591,7 +3591,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
                 case 19978:
                 case 19979:
                 case 25890:
-                    aurasToRemove.push_back({ spellId, i.second->GetCasterGuid() });
+                    aurasToRemove.emplace_back(spellId, i.second->GetCasterGuid());
                     break;
             }
             continue;
@@ -3608,7 +3608,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
                 return false;
             }
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[STACK][DB] Unable to stack %u and %u. %u will be removed.", spellId, i_spellId, i_spellId);
-            aurasToRemove.push_back({ i_spellId, i.second->GetCasterGuid() });
+            aurasToRemove.emplace_back(i_spellId, i.second->GetCasterGuid());
             continue;
         }
 
@@ -3645,7 +3645,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
                 continue;
             }
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[STACK][%u/%u] SpellSpecPerTarget ou SpellSpecPerCaster", spellId, i_spellId);
-            aurasToRemove.push_back({ i_spellId, i.second->GetCasterGuid() });
+            aurasToRemove.emplace_back(i_spellId, i.second->GetCasterGuid());
             continue;
         }
 
@@ -3668,7 +3668,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
                 continue;
             }
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[STACK][%u/%u] SpellPerTarget", spellId, i_spellId);
-            aurasToRemove.push_back({ i_spellId, i.second->GetCasterGuid() });
+            aurasToRemove.emplace_back(i_spellId, i.second->GetCasterGuid());
             continue;
         }
 
@@ -3694,7 +3694,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
                 continue;
             }
             sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[STACK][%u/%u] NoStackSpellDueToSpell", spellId, i_spellId);
-            aurasToRemove.push_back({ i_spellId, i.second->GetCasterGuid() });
+            aurasToRemove.emplace_back(i_spellId, i.second->GetCasterGuid());
             continue;
         }
     }
@@ -4430,7 +4430,7 @@ void Unit::HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, uint32
         {
             // If last charge dropped add spell to remove list
             if (triggeredByHolder->DropAuraCharge())
-                removedSpells.push_back(RemovedSpellData(triggeredByHolder->GetId(), caster));
+                removedSpells.emplace_back(triggeredByHolder->GetId(), caster);
         }
 
         triggeredByHolder->SetInUse(false);
@@ -5368,7 +5368,7 @@ bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellS
                 AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
                 for (const auto& i : mOverrideClassScript)
                 {
-                    if (!(i->GetSpellProto()->SpellFamilyName == spellProto->SpellFamilyName))
+                    if (i->GetSpellProto()->SpellFamilyName != spellProto->SpellFamilyName)
                         continue;
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
                     // 1.11.0 - Mage talent Shatter was changed to affect all spells, previously limited to Frost spells.
@@ -6549,7 +6549,7 @@ bool Unit::IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const*
     //players detect players only in Player::HandleStealthedUnitsDetection()
     // Units detect Units only in Units::HandleStealthedUnitsDetection()
     if (!detect)
-        return pDetectorPlayer ? pDetectorPlayer->IsInVisibleList(this) : false;
+        return pDetectorPlayer != nullptr && pDetectorPlayer->IsInVisibleList(this);
 
     // Special cases
     if (pDetectorUnit && !pDetectorUnit->CanDetectStealthOf(this, GetDistance3dToCenter(viewPoint), alert))
@@ -7704,7 +7704,7 @@ void Unit::IncrDiminishing(DiminishingGroup group)
             i.hitCount += 1;
         return;
     }
-    m_Diminishing.push_back(DiminishingReturn(group, WorldTimer::getMSTime(), DIMINISHING_LEVEL_2));
+    m_Diminishing.emplace_back(group, WorldTimer::getMSTime(), DIMINISHING_LEVEL_2);
 }
 
 void Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, WorldObject const* caster, DiminishingLevels Level, bool isReflected)
@@ -9048,7 +9048,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, ProcSystemArgumen
         }
 
         itr.second->SetInUse(true);                        // prevent holder deletion
-        triggeredList.push_back(ProcTriggeredData(spellProcEvent, itr.second, pTarget, procFlag));
+        triggeredList.emplace_back(spellProcEvent, itr.second, pTarget, procFlag);
     }
 }
 

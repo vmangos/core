@@ -336,7 +336,7 @@ class Creature : public Unit
         bool CanInitiateAttack() const;
         bool CanHaveTarget() const { return !HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET); }
 
-        uint32 GetDefaultMount() { return m_mountId; }
+        uint32 GetDefaultMount() const { return m_mountId; }
         void SetDefaultMount(uint32 id) { m_mountId = id; }
 
         MovementGeneratorType GetDefaultMovementType() const { return m_defaultMovementType; }
@@ -571,7 +571,7 @@ class Creature : public Unit
         }
 
         // (msecs)timer used for group loot
-        uint32 GetGroupLootTimer() { return m_groupLootTimer; }
+        uint32 GetGroupLootTimer() const { return m_groupLootTimer; }
 
         void SetEscortable(bool escortable)
         {
@@ -581,8 +581,8 @@ class Creature : public Unit
                 ClearCreatureState(CSTATE_ESCORTABLE); 
         }
         bool IsEscortable() const { return HasCreatureState(CSTATE_ESCORTABLE); }
-        bool CanAssistPlayers() { return HasFactionTemplateFlag(FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS) || HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
-        bool CanSummonGuards() { return HasStaticFlag(CREATURE_STATIC_FLAG_CALLS_GUARDS); }
+        bool CanAssistPlayers() const { return HasFactionTemplateFlag(FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS) || HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
+        bool CanSummonGuards() const { return HasStaticFlag(CREATURE_STATIC_FLAG_CALLS_GUARDS); }
         uint32 GetOriginalEntry() const { return m_originalEntry; }
 
     protected:

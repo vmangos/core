@@ -329,7 +329,7 @@ class WorldSession
         // Played time limit
         time_t GetCreateTime() const { return m_createTime; }
         time_t GetConsecutivePlayTime(time_t now) const { return (now - m_createTime) + m_previousPlayTime; }
-        time_t GetPreviousPlayedTime() { return m_previousPlayTime; }
+        time_t GetPreviousPlayedTime() const { return m_previousPlayTime; }
         void SetPreviousPlayedTime(time_t playedTime) { m_previousPlayTime = playedTime; }
         void CheckPlayedTimeLimit(time_t now);
         void SendPlayTimeWarning(PlayTimeFlag flag, int32 timeLeftInSeconds);

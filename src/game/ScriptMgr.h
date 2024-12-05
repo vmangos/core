@@ -63,7 +63,7 @@ extern ScriptMapMap sCreatureAIScripts;
 #define VISIBLE_RANGE       (166.0f)                        //MAX visible range (size of grid)
 #define DEFAULT_TEXT        "<ScriptDev2 Text Entry Missing!>"
 
-#define TEXT_SOURCE_RANGE -1000000                          //the amount of entries each text source has available
+#define TEXT_SOURCE_RANGE (-1000000)                        //the amount of entries each text source has available
 
 #define TEXT_SOURCE_TEXT_START      TEXT_SOURCE_RANGE
 #define TEXT_SOURCE_TEXT_END        TEXT_SOURCE_RANGE*2 + 1

@@ -31,7 +31,7 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
         uint32 ptsPerCycle = ceil(i_wanderDistance * 2);
         static uint32 const nbCyclesPerPacket = 1;
         for (uint32 i = 0; i <= nbCyclesPerPacket * ptsPerCycle; ++i)
-            path.push_back(Vector3(i_startPosition.x + i_wanderDistance * cos(i * 2 * M_PI / ptsPerCycle), i_startPosition.y + i_wanderDistance * sin(i * 2 * M_PI / ptsPerCycle), i_startPosition.z));
+            path.emplace_back(i_startPosition.x + i_wanderDistance * cos(i * 2 * M_PI / ptsPerCycle), i_startPosition.y + i_wanderDistance * sin(i * 2 * M_PI / ptsPerCycle), i_startPosition.z);
         Movement::MoveSplineInit init(creature, "RandomMovementGenerator (CanFly)");
         init.SetFly();
         init.SetWalk(false);

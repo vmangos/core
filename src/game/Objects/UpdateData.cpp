@@ -53,12 +53,12 @@ void UpdateData::AddOutOfRangeGUID(ObjectGuid const& guid)
 ByteBuffer& UpdateData::AddUpdateBlockAndGetBuffer()
 {
     if (m_datas.empty())
-        m_datas.push_back(UpdatePacket());
+        m_datas.emplace_back(); // m_datas.push_back(UpdatePacket());
     std::list<UpdatePacket>::iterator it = m_datas.end();
     --it;
     if (it->data.wpos() > MAX_UNCOMPRESSED_PACKET_SIZE)
     {
-        m_datas.push_back(UpdatePacket());
+        m_datas.emplace_back(); // m_datas.push_back(UpdatePacket());
         it = m_datas.end();
         --it;
     }
