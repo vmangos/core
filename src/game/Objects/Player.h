@@ -947,9 +947,9 @@ struct ScheduledTeleportData
 {
     ScheduledTeleportData() = default;
     ScheduledTeleportData(uint32 mapid, float x, float y, float z, float o,
-        uint32 options, std::function<void()> recover)
+        uint32 options, std::function<void()> recover_)
         : targetMapId(mapid), x(x), y(y), z(z),
-          orientation(o), options(options), recover(std::move(recover)) {};
+          orientation(o), options(options), recover(std::move(recover_)) {};
 
     uint32 targetMapId = 0;
     float x = 0.0f;
