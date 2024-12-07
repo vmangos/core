@@ -4253,7 +4253,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
     if (!unitTarget->IsAlive())
         return;
 
-    if (m_spellInfo->Id == 17364) // Stormstrike
+    if (m_spellInfo->Id == 17364 || m_spellInfo->Id == 20218) // Stormstrike and Crusader Strike
     {
         if (!m_casterUnit->IsAlive()) // CalculateMeleeDamage does not work in that case.
             return;
