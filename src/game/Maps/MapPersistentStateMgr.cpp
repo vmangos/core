@@ -491,7 +491,7 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
     }
 }
 
-void DungeonResetScheduler::ScheduleReset(const bool add, const time_t time, DungeonResetEvent event)
+void DungeonResetScheduler::ScheduleReset(bool add, time_t const time, DungeonResetEvent event)
 {
     MapPersistentStateManager::PersistentStateMap::iterator itr = m_InstanceSaves.m_instanceSaveByInstanceId.find(event.instanceId);
     if (itr == m_InstanceSaves.m_instanceSaveByInstanceId.end())

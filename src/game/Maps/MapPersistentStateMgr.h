@@ -300,7 +300,7 @@ class DungeonResetScheduler
             m_resetTimeByMapId[mapId] = t;
         }
 
-        void ScheduleReset(const bool add, const time_t time, DungeonResetEvent event);
+        void ScheduleReset(bool add, time_t const time, DungeonResetEvent event);
 
         void Update();
 
