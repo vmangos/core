@@ -396,7 +396,7 @@ class Unit : public SpellCaster
         void SetCreateResistance(SpellSchools school, int32 val) { m_createResistances[school] = val; }
         void SetStat(Stats stat, int32 val) { SetStatInt32Value(UNIT_FIELD_STAT0 + stat, val); }
         void SetResistance(SpellSchools school, int32 val) { SetInt32Value(UNIT_FIELD_RESISTANCES + school, val); }
-        float GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, float agility) const;
+        float GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, float agility, float spirit) const;
         float GetRegenHPPerSpirit() const;
         float GetRegenMPPerSpirit() const;
     public:

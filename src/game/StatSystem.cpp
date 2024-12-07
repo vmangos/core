@@ -34,9 +34,6 @@
 
 bool Player::UpdateStats(Stats stat)
 {
-    if (stat > STAT_SPIRIT)
-        return false;
-
     // value = ((base_value * base_pct) + total_value) * total_pct
     float value  = GetTotalStatValue(stat);
 
@@ -61,6 +58,7 @@ bool Player::UpdateStats(Stats stat)
             break;
 
         case STAT_SPIRIT:
+            UpdateAttackPowerAndDamage(); 
             break;
 
         default:
@@ -190,7 +188,7 @@ void Player::UpdateMaxPower(Powers power)
     SetMaxPower(power, uint32(value));
 }
 
-float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, float agility) const
+float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, float agility, float spirit) const
 {
     float val2 = 0.0f;
     float level = float(GetLevel());
@@ -303,7 +301,7 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
         }
     }
 
-    return val2 * sWorld.getConfig(CONFIG_FLOAT_RATE_ATTACK_POWER);
+    return val2 * sWorld.getConfig(CONFIG_FLOAT_RATE_ATTACK_POWER) + spirit * sWorld.getConfig(CONFIG_FLOAT_RATE_ATTACK_POWER_SPIRIT);
 }
 
 void Player::UpdateAttackPowerAndDamage(bool ranged)
@@ -325,7 +323,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 #endif  
     }
 
-    float baseAttackPower = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY));
+    float baseAttackPower = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY), GetStat(STAT_SPIRIT));
 
     // attack power mods are split into positive and negative field
     float attackPowerModPositive = GetAttackPowerModifierValue(unitMod, AP_MOD_POSITIVE_FLAT);
@@ -864,10 +862,11 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
     // Only apply AP bonus from stats when different than default value,
     // as the stats are already taken into account in the base AP values.
     if (GetCreateStat(STAT_STRENGTH) != GetStat(STAT_STRENGTH) ||
-        GetCreateStat(STAT_AGILITY) != GetStat(STAT_AGILITY))
+        GetCreateStat(STAT_AGILITY) != GetStat(STAT_AGILITY) ||
+        GetCreateStat(STAT_SPIRIT) != GetStat(STAT_SPIRIT)) 
     {
-        float defaultAPBonus = GetAttackPowerFromStrengthAndAgility(ranged, GetCreateStat(STAT_STRENGTH), GetCreateStat(STAT_AGILITY));
-        float currentAPBonus = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY));
+        float defaultAPBonus = GetAttackPowerFromStrengthAndAgility(ranged, GetCreateStat(STAT_STRENGTH), GetCreateStat(STAT_AGILITY), GetCreateStat(STAT_SPIRIT));
+        float currentAPBonus = GetAttackPowerFromStrengthAndAgility(ranged, GetStat(STAT_STRENGTH), GetStat(STAT_AGILITY), GetStat(STAT_SPIRIT));
 
         float modFromStats = (currentAPBonus - defaultAPBonus);
         if (modFromStats > 0.0f)
