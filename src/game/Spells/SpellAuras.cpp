@@ -8112,114 +8112,22 @@ void Aura::HandleAuraAuraSpell(bool apply, bool real)
         target->RemoveAurasDueToSpell(spell);
 }
 
-
-// Exclusive Auras
-/*
-Example spells:
-Resistance (ID 11364) (+50)
-Gift of the Wild (ID 21849) (+15)
-*/
-
 bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, AuraType auraname)
 {
-    // Flametongue Totem / Totem of Wrath / Strength of Earth Totem / Fel Intelligence / Leader of the Pack
-    // Moonkin Aura / Mana Spring Totem / Tree of Life Aura / Improved Devotion Aura / Improved Icy Talons / Trueshot Aura
-    // Improved Moonkin Form / Sanctified Retribution Aura / Blood Pact
-    if (spellproto->Effect[eff] == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
-        return false;
-
-    // Exceptions - These stack with everything.
+    // Exceptions - These don't stack with each other
     switch (spellproto->Id)
     {
-        // Blasted lands item buffs
-        case 10693: // Spiritual Domination
-        case 10691: // Spiritual Domination
-        case 10668: // Spirit of Boar
-        case 10671: // Spirit of Boar
-        case 10667: // Rage of Ages
-        case 10670: // Rage of Ages
-        case 10669: // Strike of the Scorpok
-        case 10672: // Strike of the Scorpok
-        case 10692: // Infallible Mind
-        case 10690: // Infallible Mind
-        case 24382: // Spirit of Zanza
-        // Alcohols
-        case 25804: // Rumsey Rum Black Label
-        case 20875: // Rumsey Rum
-        case 25722: // Rumsey Rum Dark
-        case 25037: // Rumsey Rum Light
-        case 22789: // Gordok Green Grog
-        case 22790: // Kreeg's Stout Beatdown
-        case 6114:  // Raptor Punch
-        case 5020:  // Stormstout
-        case 5021:  // Trog Ale
-        case 23179: // Taint of Shadow
-        case 20007: // Holy Strength
-        case 20572: // Blood Fury
-        case 17038: // Winterfall Firewater
-        case 16329: // Juju Might
-        case 25891: // Earthstrike
-        case 18264: // Headmaster's Charge
-        case 12022: // Admiral's Hat
-        case 22817: // Fengus' Ferocity
-        case 19506: // Trueshot Aura
-        case 20905: // Trueshot Aura
-        case 20906: // Trueshot Aura
-        case 18262: // Call Bloodshot
-        case 24932: // Leader of the Pack
-        case 24907: // Moonkin Aura
-        case 22888: // Rallying Cry of the Dragonslayer
-        case 15366: // Songflower Serenade
-        case 22820: // Slip'kik's Savvy
-        case 17628: // Supreme Power
-        case 22730: // Increased Intellect
-        case 18141: // Blessed Sunfruit Juice
-        case 18125: // Blessed Sunfruit
-        case 18192: // Increased Agility
-        case 18191: // Increased Stamina
-        case 25661: // Increased Stamina
-        case 24427: // Toasty
-        case 17528: // Mighty Rage
-        case 23697: // Alterac Spring Water
-        // Love is in the Air buffs
-        case 27664: // Stormwind Gift of Friendship
-        case 27665: // Ironforge Gift of Friendship
-        case 27666: // Darnassus Gift of Friendship
-        case 27669: // Orgrimmar Gift of Friendship
-        case 27670: // Thunder Bluff Gift of Friendship
-        case 27671: // Undercity Gift of Friendship
-            return false;
-
-        case 17538: // Elixir of the Mongoose, should stack with EVERYTHING
-            return (eff == EFFECT_INDEX_0);
+    // SPELL_AURA_MOD_ATTACK_POWER_PCT
+    case 6673: // Battle Shout
+    case 99: // Demoralizing Roar
+    case 1160: // Demoralizing Shout
+    case 19740: // Blessing of Might
+    case 25782: // Greater Blessing of Might
+    case 8075: // Strength of Earth Totem
+        return true;
     }
     switch (spellproto->SpellFamilyName)
     {
-        case SPELLFAMILY_WARLOCK:
-            // Blood Pact
-            if (spellproto->IsFitToFamilyMask<CF_WARLOCK_IMP_BUFFS>())
-                return false;
-            break;
-        case SPELLFAMILY_SHAMAN:
-            // Strength of Earth (ID 8076, 8162, 8163, 10441, 25362)
-            if (spellproto->IsFitToFamilyMask<CF_SHAMAN_STRENGTH_OF_EARTH>())
-                return false;
-            break;
-        case SPELLFAMILY_WARRIOR:
-            // Battle Shout (ID 6673, 5242, 6192, 11549, 11550, 11551, 25289)
-            if (spellproto->IsFitToFamilyMask<CF_WARRIOR_BATTLE_SHOUT>())
-                return false;
-            break;
-        case SPELLFAMILY_PALADIN:
-            // Blessing of Might (ID 19740, 19834, 19835, 19836, 19837, 19838, 25291, 25782, 25916)
-            if (spellproto->IsFitToFamilyMask<CF_PALADIN_BLESSING_OF_MIGHT, CF_PALADIN_BLESSINGS>())
-                return false;
-            break;
-        case SPELLFAMILY_HUNTER:
-            // Aspect of the Hawk
-            if (spellproto->IsFitToFamilyMask<CF_HUNTER_ASPECT_OF_THE_HAWK>())
-                return false;
-            break;
         case SPELLFAMILY_DRUID:
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
             // World of Warcraft Client Patch 1.8.0 (2005-10-11)
@@ -8236,47 +8144,26 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
 
     switch (auraname)
     {
-        //case SPELL_AURA_PERIODIC_DAMAGE:
-        //case SPELL_AURA_DUMMY:
-        //    return false;
-        case SPELL_AURA_MOD_HEALING_DONE:                               // Demonic Pact
-        case SPELL_AURA_MOD_DAMAGE_DONE:                                // Demonic Pact
-        case SPELL_AURA_MOD_ATTACK_POWER_PCT:                           // Abomination's Might / Unleashed Rage
-        case SPELL_AURA_MOD_RANGED_ATTACK_POWER_PCT:
-        case SPELL_AURA_MOD_ATTACK_POWER:                               // (Greater) Blessing of Might / Battle Shout
-        case SPELL_AURA_MOD_RANGED_ATTACK_POWER:
-        case SPELL_AURA_MOD_POWER_REGEN:                                // (Greater) Blessing of Wisdom
-        case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:                       // Glyph of Salvation / Pain Suppression / Safeguard ?
-        case SPELL_AURA_MOD_STAT:
-        case SPELL_AURA_WATER_BREATHING:
-            return true;
-        case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
-            return true;
-        case SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE:                 // Winter's Chill / Improved Scorch
-            if (spellproto->SpellFamilyName == SPELLFAMILY_MAGE)
-                return false;
-            return true;
-        case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE: // Special case for Resistance
+    case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
+    case SPELL_AURA_WATER_BREATHING:
+    case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
+        return true;
+    case SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE: // Winter's Chill / Improved Scorch
+        if (spellproto->SpellFamilyName == SPELLFAMILY_MAGE)
             return false;
-        case SPELL_AURA_MOD_HEALING_PCT:                                // Mortal Strike / Wound Poison / Aimed Shot / Furious Attacks
-            // Healing taken debuffs
-            if (spellproto->EffectBasePoints[eff] < 0)
-                return false;
-            return true;
-        case SPELL_AURA_MOD_RESISTANCE_PCT:
-            // Ancestral Healing / Inspiration
-            if (spellproto->SpellFamilyName == SPELLFAMILY_SHAMAN ||
-                    spellproto->SpellFamilyName == SPELLFAMILY_PRIEST)
-                return false;
-            return true;
-        case SPELL_AURA_MOD_MELEE_HASTE:
-        case SPELL_AURA_MOD_DECREASE_SPEED:
-            // Attack and movement speed reduction
-            if (spellproto->EffectBasePoints[eff] >= 0)
-                return false;
-            return true;
-        default:
+        return true;
+    case SPELL_AURA_MOD_HEALING_PCT:
+        // Healing taken debuffs
+        if (spellproto->EffectBasePoints[eff] < 0)
             return false;
+        return true;
+    case SPELL_AURA_MOD_DECREASE_SPEED:
+        // Attack and movement speed reduction
+        if (spellproto->EffectBasePoints[eff] >= 0)
+            return false;
+        return true;
+    default:
+        return false;
     }
 }
 
