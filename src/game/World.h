@@ -382,7 +382,10 @@ enum eConfigInt32Values
 // Server config
 enum eConfigFloatValues
 {
-    CONFIG_FLOAT_RATE_HEALTH = 0,
+    // Vanilla Reforged - Custom Rates Start
+    CONFIG_FLOAT_RATE_ATTACK_POWER = 0,
+    // Vanilla Reforged - Custom Rates End
+    CONFIG_FLOAT_RATE_HEALTH,
     CONFIG_FLOAT_MAX_CREATURE_ATTACK_RADIUS,
     CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE,
     CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE,

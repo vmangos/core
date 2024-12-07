@@ -302,7 +302,8 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 break;
         }
     }
-    return val2;
+
+    return val2 * sWorld.getConfig(CONFIG_FLOAT_RATE_ATTACK_POWER);
 }
 
 void Player::UpdateAttackPowerAndDamage(bool ranged)
