@@ -5131,6 +5131,16 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     // update visibility of player for nearby cameras
     UpdateObjectVisibility();
 
+    if (InBattleGround())
+    {
+        AddAura(17282, 0, this); // Essence of the Blue (Custom)
+        if (SpellAuraHolder* holder = GetSpellAuraHolder(17282))
+        {
+            holder->SetAuraDuration(10000);
+            holder->UpdateAuraDuration();
+        }
+    }
+
     if (!applySickness)
         return;
 

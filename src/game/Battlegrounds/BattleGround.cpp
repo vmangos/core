@@ -1049,6 +1049,13 @@ void BattleGround::AddPlayer(Player* pPlayer)
     PlayerAddedToBGCheckIfBGIsRunning(pPlayer);
     AddOrSetPlayerToCorrectBgGroup(pPlayer, guid, team);
 
+    pPlayer->AddAura(17282, 0, pPlayer); // Essence of the Blue (Custom)
+    if (SpellAuraHolder* holder = pPlayer->GetSpellAuraHolder(17282))
+    {
+        holder->SetAuraDuration(30000);
+        holder->UpdateAuraDuration();
+    }
+
     // Log
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "BATTLEGROUND: Player %s joined the battle.", pPlayer->GetName());
 }
