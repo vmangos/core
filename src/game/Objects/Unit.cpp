@@ -694,6 +694,8 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             // Damage received under shield for example.
             if (cleanDamage->absorb)
             {
+                if (cleanDamage->damage && damagetype == DIRECT_DAMAGE && this != pVictim && pVictim->IsPlayer() && (pVictim->GetPowerType() == POWER_RAGE))
+                    ((Player*)pVictim)->RewardRage(cleanDamage->absorb * 0.25, true);
                 // In patch 1.10 proc flags were added to CC auras to make them break on damage.
                 // Before that chance to break on damage was handled by attributes.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
