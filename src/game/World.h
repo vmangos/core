@@ -634,7 +634,7 @@ enum RealmType
 class SessionPacketSendTask
 {
 public:
-    SessionPacketSendTask(const SessionPacketSendTask&) = delete;
+    SessionPacketSendTask(SessionPacketSendTask const&) = delete;
     SessionPacketSendTask(uint32 accountId, WorldPacket& data) : m_accountId(accountId), m_data(data) {}
     void operator ()();
 private:
