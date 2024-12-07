@@ -4617,6 +4617,15 @@ float Aura::CalculateDotDamage() const
 #endif
             break;
         }
+        case SPELLFAMILY_WARRIOR:
+            if (spellProto->IsFitToFamilyMask<CF_WARRIOR_REND>())
+            {
+                if (caster->IsPlayer())
+                {
+                    damage += caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.03;
+                }
+                break;
+            }
         default:
             break;
     }
