@@ -4605,7 +4605,16 @@ float Aura::CalculateDotDamage() const
             // - Garrote: The damage from this ability has been increased. In
             //   addition, Garrote now increases in potency with greater attack power.
             else if (spellProto->IsFitToFamilyMask<CF_ROGUE_GARROTE>())
+            {
                 damage += caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.03f;
+            }
+            else if (spellProto->IsFitToFamilyMask<CF_ROGUE_DEADLY_POISON>())
+            {
+                if (caster->IsPlayer())
+                {
+                    damage += caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.03;
+                }
+            }
 #endif
             break;
         }
