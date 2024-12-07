@@ -2639,7 +2639,86 @@ void Spell::DoCreateItem(SpellEffectIndex effIdx, uint32 itemtype)
             break;
     }
 
-    uint32 numToAdd = damage;
+    // Duplication logic: determine multiplier based on profession and crafting category
+    float chanceX4 = 0.0f, chanceX3 = 0.0f, chanceX2 = 0.0f;
+    uint32 multiplier = 1;
+    uint64 professionMask = 0;
+    // Determine the profession mask based on the player's learned spell
+    if (player->HasSpell(30340)) // Gifted Alchemist (Potions)
+        professionMask = 1 | 2 | 4;
+    else if (player->HasSpell(30341)) // Gifted Alchemist (Transmutations)
+        professionMask = 8 | 16 | 32;
+    else if (player->HasSpell(30342)) // Gifted Blacksmith
+        professionMask = 64 | 128 | 256;
+    else if (player->HasSpell(30343)) // Gifted Enchanter
+        professionMask = 512 | 1024 | 2048;
+    else if (player->HasSpell(30344)) // Gifted Engineer
+        professionMask = 4096 | 8192 | 16384;
+    else if (player->HasSpell(30345)) // Gifted Leatherworker
+        professionMask = 32768 | 65536 | 131072;
+    else if (player->HasSpell(30346)) // Gifted Miner
+        professionMask = 262144 | 524288 | 1048576;
+    else if (player->HasSpell(30347)) // Gifted Tailor
+        professionMask = 2097152 | 4194304 | 8388608;
+    else
+        professionMask = 0; // No profession
+    // Check if the crafting spell matches the player's profession and category
+    if (m_spellInfo->SpellFamilyName == 0 && (m_spellInfo->SpellFamilyFlags & professionMask))
+    {
+        // Match the specific category based on the crafting spell's bitmask
+        switch (m_spellInfo->SpellFamilyFlags & professionMask) // Isolate the matching category
+        {
+        case 1:
+        case 8:
+        case 64:
+        case 1024:
+        case 8192:
+        case 65536:
+        case 524288:
+        case 4194304: // Category 1
+            chanceX4 = 0.44f;
+            chanceX3 = 1.76f;
+            chanceX2 = 3.3f;
+            break;
+        case 2:
+        case 16:
+        case 128:
+        case 2048:
+        case 16384:
+        case 131072:
+        case 1048576:
+        case 8388608: // Category 2
+            chanceX4 = 0.88f;
+            chanceX3 = 3.52;
+            chanceX2 = 6.6f;
+            break;
+        case 4:
+        case 32:
+        case 256:
+        case 4096:
+        case 32768:
+        case 262144:
+        case 2097152:
+        case 16777216: // Category 3
+            chanceX4 = 1.32f;
+            chanceX3 = 5.28f;
+            chanceX2 = 9.9f;
+            break;
+        default:
+            // No matching category; no bonuses
+            break;
+        }
+        // Determine the multiplier based on random chance
+        float randomRoll = frand(0.0f, 100.0f);
+        if (randomRoll <= chanceX4)
+            multiplier = 4;
+        else if (randomRoll <= (chanceX4 + chanceX3))
+            multiplier = 3;
+        else if (randomRoll <= (chanceX4 + chanceX3 + chanceX2))
+            multiplier = 2;
+    }
+
+    uint32 numToAdd = damage * multiplier;
 
     if (numToAdd < 1)
         numToAdd = 1;
