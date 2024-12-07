@@ -73,7 +73,7 @@ struct WMODoodadData
     std::vector<WMO::MODS> Sets;
     std::unique_ptr<char[]> Paths;
     std::vector<WMO::MODD> Spawns;
-    std::unordered_set<uint16> References;
+    std::set<uint16> References;
 };
 
 class WMORoot
