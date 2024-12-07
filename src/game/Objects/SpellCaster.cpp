@@ -191,7 +191,9 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     else
         schoolMask = spell->GetSpellSchoolMask();
 
-    if (pVictim != this && pVictim->IsImmuneToDamage(schoolMask, spell))
+    if (pVictim != this
+        && !spell->IsIgnoringCasterAndTargetRestrictions()
+        && pVictim->IsImmuneToDamage(schoolMask, spell))
         return SPELL_MISS_IMMUNE;
 
     // Try victim reflect spell
