@@ -1513,8 +1513,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     // https://www.youtube.com/watch?v=klMsyF_Kz5o
     bool triggerWeaponProcs = m_casterUnit != unitTarget &&
         m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON &&
-        m_spellInfo->rangeIndex == SPELL_RANGE_IDX_COMBAT;
-
+        m_spellInfo->rangeIndex == SPELL_RANGE_IDX_COMBAT &&
+        m_damage > 0; // Not on Vanilla Reforged ;-)
     // All calculated do it!
     // Do healing and triggers
     if (m_healing && unitTarget->IsAlive())
