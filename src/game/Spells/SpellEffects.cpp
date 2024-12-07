@@ -3664,8 +3664,6 @@ void Spell::EffectSummonGuardian(SpellEffectIndex effIdx)
 
     // Guardian pets use their creature template level by default
     uint32 level = urand(cInfo->level_min, cInfo->level_max);
-    if (m_casterUnit->GetTypeId() != TYPEID_PLAYER)
-    {
         // If EffectMultipleValue <= 0, guardian pets use their caster level modified by EffectMultipleValue for their own level
         if (m_spellInfo->EffectMultipleValue[effIdx] <= 0)
         {
@@ -3675,18 +3673,6 @@ void Spell::EffectSummonGuardian(SpellEffectIndex effIdx)
             if (resultLevel > 0 && resultLevel <= CREATURE_MAX_LEVEL)
                 level = resultLevel;
         }
-    }
-    // level of pet summoned using engineering trinket scales with engineering skill level
-    else if (m_CastItem)
-    {
-        ItemPrototype const* proto = m_CastItem->GetProto();
-        if (proto && proto->RequiredSkill == SKILL_ENGINEERING && proto->InventoryType == INVTYPE_TRINKET)
-        {
-            uint16 engiLevel = ((Player*)m_casterUnit)->GetSkillValue(SKILL_ENGINEERING);
-            if (engiLevel)
-                level = engiLevel / 5;
-        }
-    }
 
     // select center of summon position
     float centerX = m_targets.m_destX;
