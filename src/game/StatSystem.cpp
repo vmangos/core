@@ -240,7 +240,7 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 val2 = level * 2.0f + strength + agility - 20.0f;
                 break;
             case CLASS_SHAMAN:
-                val2 = level * 2.0f + strength * 2.0f    - 20.0f;
+                val2 = level * 3.0f + strength * 2.0f    - 20.0f;
                 break;
             case CLASS_DRUID:
             {
@@ -519,7 +519,7 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
             value += 3.0f;
             break;
         case CLASS_SHAMAN:
-            value += 1.7f;
+            value += 0.7f;
             break;
         case CLASS_WARLOCK:
             value += 2.0f;
@@ -575,7 +575,7 @@ void Player::UpdateDodgePercentage()
             value += 3.0f;
             break;
         case CLASS_SHAMAN:
-            value += 1.7f;
+            value += 0.7f;
             break;
         case CLASS_WARLOCK:
             value += 2.0f;
