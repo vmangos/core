@@ -4255,6 +4255,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
         // if damage unitTarget call AI reaction
         unitTarget->AttackedBy(m_casterUnit);
         m_damage = 0.f;
+        m_casterUnit->CastSpell(m_casterUnit, 16090, true);
         return;
     }
 
