@@ -246,30 +246,6 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
             {
                 ShapeshiftForm form = GetShapeshiftForm();
 
-                //Check if Predatory Strikes is skilled
-                float mLevelMult = 0.0;
-                switch (form)
-                {
-                    case FORM_CAT:
-                    case FORM_BEAR:
-                    case FORM_DIREBEAR:
-                    {
-                        Unit::AuraList const& mDummy = GetAurasByType(SPELL_AURA_DUMMY);
-                        for (const auto itr : mDummy)
-                        {
-                            // Predatory Strikes
-                            if (itr->GetSpellProto()->SpellIconID == 1563)
-                            {
-                                mLevelMult = itr->GetModifier()->m_amount / 100.0f;
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                        break;
-                }
-
                 switch (form)
                 {
                     case FORM_CAT:
