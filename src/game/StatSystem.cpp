@@ -273,18 +273,10 @@ float Unit::GetAttackPowerFromStrengthAndAgility(bool ranged, float strength, fl
                 switch (form)
                 {
                     case FORM_CAT:
-                       // World of Warcraft Client Patch 1.7.0 (2005-09-13)
-                       // - Cat Form - Each point of agility now adds 1 attack power.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-                        val2 = GetLevel() * mLevelMult + strength * 2.0f + agility - 20.0f;
-                        break;
-#endif
                     case FORM_BEAR:
                     case FORM_DIREBEAR:
-                        val2 = GetLevel() * mLevelMult + strength * 2.0f - 20.0f;
-                        break;
                     default:
-                        val2 = strength * 2.0f - 20.0f;
+                        val2 = level * 2.0f + strength + agility - 20.0f;
                         break;
                 }
                 break;
@@ -541,9 +533,6 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     float value = GetTotalPercentageModValue(modGroup);
     switch (GetClass())
     {
-        case CLASS_DRUID:
-            value += 0.9f;
-            break;
         case CLASS_MAGE:
             value += 3.2f;
             break;
@@ -600,9 +589,6 @@ void Player::UpdateDodgePercentage()
     float value = 0.0f;
     switch (GetClass())
     {
-        case CLASS_DRUID:
-            value += 0.9f;
-            break;
         case CLASS_MAGE:
             value += 3.2f;
             break;

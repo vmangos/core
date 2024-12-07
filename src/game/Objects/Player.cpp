@@ -5639,8 +5639,8 @@ float Player::GetMeleeCritFromAgility() const
         case CLASS_PALADIN:
         case CLASS_SHAMAN:
         case CLASS_DRUID:
-            valLevel1 = 4.6f;
-            valLevel60 = 20.0f;
+            valLevel1 = 2.2f;
+            valLevel60 = 29.0f;
             break;
         case CLASS_MAGE:
             valLevel1 = 12.9f;
@@ -5683,8 +5683,8 @@ float Player::GetDodgeFromAgility() const
         case CLASS_PALADIN:
         case CLASS_SHAMAN:
         case CLASS_DRUID:
-            valLevel1 = 4.6f;
-            valLevel60 = 20.0f;
+            valLevel1 = 1.8f;
+            valLevel60 = 26.5f;
             break;
         case CLASS_MAGE:
             valLevel1 = 12.9f;
