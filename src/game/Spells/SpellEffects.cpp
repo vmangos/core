@@ -1202,21 +1202,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     return;
                 }
 #endif
-                case 20572:                                 // Blood Fury
-                {
-                    Player* pPlayer = m_caster->ToPlayer();
-                    if (!pPlayer)
-                        return;
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-                    pPlayer->CastSpell(pPlayer, 23230, true);
-#endif
-
-                    damage = dither(damage * (pPlayer->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100);
-                    if (damage > 0)
-                        pPlayer->CastCustomSpell(pPlayer, 23234, damage, {}, {}, true, nullptr);
-                    return;
-                }
                 case 20577:                                 // Cannibalize
                 {
                     if (m_casterUnit && (unitTarget || corpseTarget))
