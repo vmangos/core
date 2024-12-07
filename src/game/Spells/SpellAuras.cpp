@@ -4575,6 +4575,17 @@ float Aura::CalculateDotDamage() const
         {
             break;
         }
+        case SPELLFAMILY_HUNTER:
+        {
+            if (spellProto->IsFitToFamilyMask<CF_HUNTER_SERPENT_STING>())
+            {
+                if (caster->IsPlayer())
+                {
+                    damage += caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.03;
+                }
+            }
+            break;
+        }
         case SPELLFAMILY_ROGUE:
         {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
