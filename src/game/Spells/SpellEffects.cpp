@@ -3162,10 +3162,6 @@ void Spell::EffectDispel(SpellEffectIndex effIdx)
     if (!unitTarget)
         return;
 
-    // Shield Slam 50% chance dispel
-    if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_SHIELD_SLAM>() && !roll_chance_i(50))
-        return;
-
     // Fill possible dispel list
     int32 priorityDispel = -1;
     std::list <std::pair<SpellAuraHolder*, uint32>> dispelList;
