@@ -5691,8 +5691,8 @@ float Player::GetDodgeFromAgility() const
             valLevel60 = 20.0f;
             break;
         case CLASS_ROGUE:
-            valLevel1 = 1.1f;
-            valLevel60 = 14.5f;
+            valLevel1 = 1.8f;
+            valLevel60 = 26.5f;
             break;
         case CLASS_HUNTER:
             valLevel1 = 1.8f;
