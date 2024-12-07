@@ -1831,6 +1831,10 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
 
     int32 remainingDamage = int32(damage);
 
+    if (IsPet() && IsControlledByPlayer() && // Stoabrogga - Reduced AoE Damage for Player Pets
+        ((spellProto && spellProto->IsAreaOfEffectSpell()) || (spell && spell->GetTargetNum() > 1 && (spell->m_spellInfo->EffectChainTarget[EFFECT_INDEX_0] > 1 || spell->m_spellInfo->EffectChainTarget[EFFECT_INDEX_1] > 1 || spell->m_spellInfo->EffectChainTarget[EFFECT_INDEX_2] > 1))))
+        remainingDamage *= 0.5;
+
     // Magic damage, check for resists
     bool canResist = (schoolMask & SPELL_SCHOOL_MASK_NORMAL) == 0;
 
