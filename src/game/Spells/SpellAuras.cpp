@@ -5723,9 +5723,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             spellId1 = 24905;
             break;
         case FORM_SPIRITOFREDEMPTION:
-            spellId1 = 27792;
-            spellId2 = 27795;                               // must be second, this important at aura remove to prevent to early iterator invalidation.
-            break;
         case FORM_GHOSTWOLF:
         case FORM_AMBIENT:
         case FORM_GHOUL:
