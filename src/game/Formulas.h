@@ -138,14 +138,43 @@ namespace MaNGOS
             if (!xp_gain)
                 return 0;
 
+            Player const* pPlayer = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
+            TeamId teamId = pPlayer ? pPlayer->GetTeamId() : TEAM_NEUTRAL;
+            // Initialize XP multipliers for non-elite creatures
+            float generalMultiplier = sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL);
+            if (teamId == TEAM_HORDE)
+            {
+                float hordeMultiplier = sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL_HORDE);
+                generalMultiplier = std::max(generalMultiplier, hordeMultiplier);
+            }
+            else if (teamId == TEAM_ALLIANCE)
+            {
+                float allianceMultiplier = sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL_ALLIANCE);
+                generalMultiplier = std::max(generalMultiplier, allianceMultiplier);
+            }
+            // Initialize XP multipliers for elite creatures
+            float eliteMultiplier = sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE);
+            if (teamId == TEAM_HORDE)
+            {
+                float hordeEliteMultiplier = sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE_HORDE);
+                eliteMultiplier = std::max(eliteMultiplier, hordeEliteMultiplier);
+            }
+            else if (teamId == TEAM_ALLIANCE)
+            {
+                float allianceEliteMultiplier = sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE_ALLIANCE);
+                eliteMultiplier = std::max(eliteMultiplier, allianceEliteMultiplier);
+            }
+
             if (pCreature->IsElite())
             {
                 if (pCreature->GetMap()->IsNonRaidDungeon())
-                    xp_gain *= 2.5;
+                    xp_gain *= 2.5 * eliteMultiplier;
                 else
-                    xp_gain *= 2;
-
-                xp_gain *= sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE);
+                    xp_gain *= 2 * eliteMultiplier;
+            }
+            else
+            {
+                xp_gain *= generalMultiplier;
             }
 
             if (pCreature->IsPet())

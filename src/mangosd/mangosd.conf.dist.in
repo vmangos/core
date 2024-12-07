@@ -2579,6 +2579,10 @@ Visibility.ForceActiveObjects      = 1
 Rate.Attack.Power = 1
 Rate.Attack.Power.Spirit = 0
 Rate.Spirit.Scaling.Wands = 0
+Rate.XP.Kill.Horde = 1
+Rate.XP.Kill.Elite.Horde = 1
+Rate.XP.Kill.Alliance = 1
+Rate.XP.Kill.Elite.Alliance = 1
 # Vanilla Reforged - Custom Rates End
 Rate.Health = 1
 Rate.Mana = 1

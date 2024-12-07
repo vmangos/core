@@ -482,6 +482,10 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_FLOAT_RATE_ATTACK_POWER,            "Rate.Attack.Power", 1.0f);
     setConfig(CONFIG_FLOAT_RATE_ATTACK_POWER_SPIRIT,     "Rate.Attack.Power.Spirit", 0.0f);
     setConfig(CONFIG_FLOAT_RATE_SPIRIT_SCALING_WANDS,    "Rate.Spirit.Scaling.Wands", 0.0f);
+    setConfig(CONFIG_FLOAT_RATE_XP_KILL_HORDE,           "Rate.XP.Kill.Horde", 1.0f);
+    setConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE_HORDE,     "Rate.XP.Kill.Elite.Horde", 1.0f);
+    setConfig(CONFIG_FLOAT_RATE_XP_KILL_ALLIANCE,        "Rate.XP.Kill.Alliance", 1.0f);
+    setConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE_ALLIANCE,  "Rate.XP.Kill.Elite.Alliance", 1.0f);
     // Vanilla Reforged - Custom Rates End
     setConfigPos(CONFIG_FLOAT_RATE_HEALTH,               "Rate.Health", 1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_POWER_MANA,           "Rate.Mana", 1.0f);
