@@ -215,7 +215,7 @@ Creature::Creature(CreatureSubtype subtype) :
 
 Creature::~Creature()
 {
-    CleanupsBeforeDelete();
+    Unit::CleanupsBeforeDelete();
 
     m_vendorItemCounts.clear();
 

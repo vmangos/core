@@ -363,7 +363,7 @@ class Unit : public SpellCaster
         typedef std::set<uint32> ComboPointHolderSet;
         typedef std::map<SpellEntry const*, ObjectGuid> SingleCastSpellTargetMap;
 
-        virtual ~Unit () override;
+        virtual ~Unit() override;
 
         void AddToWorld() override;
         void RemoveFromWorld() override;
@@ -1352,7 +1352,6 @@ class Unit : public SpellCaster
         bool IsFallingSlow() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_SAFE_FALL); }
 
         void SetLevitate(bool apply);
-        bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_LEVITATING); }
 
         void KnockBackFrom(WorldObject const* target, float horizontalSpeed, float verticalSpeed);
         void KnockBack(float angle, float horizontalSpeed, float verticalSpeed);

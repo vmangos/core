@@ -68,8 +68,8 @@ private:
 class ThreatListProcesser
 {
 public:
-    ThreatListProcesser() {}
-    virtual ~ThreatListProcesser() {}
+    ThreatListProcesser() = default;
+    virtual ~ThreatListProcesser() = default;
     virtual bool Process(Unit* unit) = 0;
 };
 
@@ -126,7 +126,7 @@ class Creature : public Unit
         void SaveHomePosition() { SetHomePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
         void SetHomePosition(float x, float y, float z, float o);
         void GetHomePosition(float &x, float &y, float &z, float &o);
-        Position const& GetHomePosition() { return m_homePosition; }
+        Position const& GetHomePosition() const { return m_homePosition; }
         float GetHomePositionO() const { return m_homePosition.o; }
         void ResetHomePosition();
 
@@ -141,12 +141,12 @@ class Creature : public Unit
         void SetDefaultValuesFromStaticFlags();
 
         CreatureSubtype GetSubtype() const { return m_subtype; }
-        bool IsPet() const { return m_subtype == CREATURE_SUBTYPE_PET; }
+        bool IsPet() const override { return m_subtype == CREATURE_SUBTYPE_PET; }
         bool IsTotem() const { return m_subtype == CREATURE_SUBTYPE_TOTEM; }
         Totem const* ToTotem() const { return IsTotem() ? reinterpret_cast<Totem const*>(this) : nullptr; }
         Totem* ToTotem() { return IsTotem() ? reinterpret_cast<Totem*>(this) : nullptr; }
         bool IsTemporarySummon() const { return m_subtype == CREATURE_SUBTYPE_TEMPORARY_SUMMON; }
-        bool IsCorpse() const { return GetDeathState() ==  CORPSE; }
+        bool IsCorpse() const override { return GetDeathState() ==  CORPSE; }
         bool IsDespawned() const { return GetDeathState() ==  DEAD; }
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
         bool IsRacialLeader() const { return GetCreatureInfo()->racial_leader; }
@@ -272,7 +272,7 @@ class Creature : public Unit
         bool FallGround();
 
         bool LoadFromDB(uint32 guid, Map* map, bool force = false);
-        void SaveToDB();
+        virtual void SaveToDB();
                                                             // overwrited in Pet
         virtual void SaveToDB(uint32 mapid);
         virtual void DeleteFromDB();                        // overwrited in Pet

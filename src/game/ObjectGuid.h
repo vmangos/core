@@ -240,19 +240,14 @@ class ObjectGuid
         uint64 m_guid;
 };
 
-namespace std {
-
-    template <>
-    struct hash<ObjectGuid>
+template <>
+struct std::hash<ObjectGuid>
+{
+    std::size_t operator()(ObjectGuid const& k) const
     {
-        std::size_t operator()(ObjectGuid const& k) const
-        {
-            using std::hash;
-            return hash<uint64>()(k.GetRawValue());
-        }
-    };
-
-}
+        return std::hash<uint64>()(k.GetRawValue());
+    }
+};
 
 typedef std::unordered_set<ObjectGuid> ObjectGuidSet;
 typedef std::list<ObjectGuid> GuidList;

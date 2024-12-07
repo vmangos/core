@@ -757,9 +757,10 @@ uint32 BattleGround::GetBonusHonorFromKill(uint32 kills) const
     return kills * (uint32)MaNGOS::Honor::GetHonorGain(GetMaxLevel(), GetMaxLevel(), 1);
 }
 
-float BattleGround::GetHonorModifier() {
+float BattleGround::GetHonorModifier() const
+{
     // If the game ends in under one hour, less Bonus Honor will be earned from control of mines, graveyards and for the General kill (win).
-    float elapsed = (float)GetStartTime() / IN_MILLISECONDS / HOUR;
+    const float elapsed = (float)GetStartTime() / (float)IN_MILLISECONDS / (float)HOUR;
     return elapsed < 1.0f ? pow(60, elapsed - 1) : 1.0f;
 }
 

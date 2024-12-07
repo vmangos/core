@@ -105,7 +105,7 @@ private:
     void MoveToNextWayPoint();                          // move m_next/m_cur to next points
     float CalculateSegmentPos(float perc);
 
-    bool IsMoving() const { return m_isMoving; }
+    bool IsMoving() const override { return m_isMoving; }
     void SetMoving(bool val) { m_isMoving = val; }
 
     ShortTimeTracker m_positionChangeTimer;

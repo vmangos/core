@@ -1126,7 +1126,7 @@ class Player final: public Unit
         uint8 GetBankBagSlotCount() const { return GetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_BANK_BAG_SLOTS); }
         void SetBankBagSlotCount(uint8 count) { SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_BANK_BAG_SLOTS, count); }
         bool HasItemCount(uint32 item, uint32 count = 1, bool inBankAlso = false) const;
-        bool HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item const* ignoreItem = nullptr);
+        bool HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item const* ignoreItem = nullptr) const;
         bool HasItemWithIdEquipped(uint32 item, uint32 count = 1, uint8 except_slot = NULL_SLOT) const;
         InventoryResult CanStoreNewItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 item, uint32 count, uint32* no_space_count = nullptr) const
         {
@@ -1488,9 +1488,9 @@ class Player final: public Unit
     public:
         void SendPetTameFailure(PetTameFailureReason reason) const;
         void PetSpellInitialize();
-        void CharmSpellInitialize();
+        void CharmSpellInitialize() const;
         void PossessSpellInitialize();
-        void RemovePetActionBar();
+        void RemovePetActionBar() const;
 
         // Take possession of a new spawned creature
         Creature* SummonPossessedMinion(uint32 creatureId, uint32 spellId, float x, float y, float z, float ang, uint32 duration);
@@ -1584,7 +1584,7 @@ class Player final: public Unit
         void SendClearAllCooldowns(Unit const* target) const;
         void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
         void _LoadSpellCooldowns(std::unique_ptr<QueryResult> result);
-        void _SaveSpellCooldowns();
+        void _SaveSpellCooldowns() const;
 
         template <typename F>
         void RemoveSomeCooldown(F check)
@@ -1938,7 +1938,7 @@ class Player final: public Unit
         bool IsFalling() const { return m_fallStartZ != 0; }
 
         bool IsControlledByOwnClient() const { return m_session->GetClientMoverGuid() == GetObjectGuid(); }
-        void SetClientControl(Unit const* target, uint8 allowMove);
+        void SetClientControl(Unit const* target, uint8 allowMove) const;
         void SetMover(Unit* target) { m_mover = target ? target : this; }
         Unit* GetMover() const { return m_mover; } // can never be null
         Unit* GetConfirmedMover() const; // only returns mover confirmed by client, can be null
@@ -1948,7 +1948,7 @@ class Player final: public Unit
         ObjectGuid const& GetFarSightGuid() const { return GetGuidValue(PLAYER_FARSIGHT); }
 
         void SaveRecallPosition();
-        void GetRecallPosition(uint32& map, float& x, float& y, float& z, float& o)
+        void GetRecallPosition(uint32& map, float& x, float& y, float& z, float& o) const
         {
             map = m_recallMap;
             x = m_recallX;
@@ -1981,7 +1981,7 @@ class Player final: public Unit
 
         uint32 GetLongSight() const { return m_longSightSpell; }
         void SetLongSight(Aura const* aura = nullptr);
-        void UpdateLongSight();
+        void UpdateLongSight() const;
 
         bool CanWalk() const override { return true; }
         bool CanSwim() const override { return true; }
@@ -2036,7 +2036,7 @@ class Player final: public Unit
         float GetXYSpeed() const { return xy_speed; }
         void SetXYSpeed(float speed) { xy_speed = speed; }
 
-        void SendRaidGroupOnlyError(uint32 timer, RaidGroupError error);
+        void SendRaidGroupOnlyError(uint32 timer, RaidGroupError error) const;
         void SendInitialPacketsBeforeAddToMap();
         void SendInitialPacketsAfterAddToMap(bool login = true);
 
@@ -2124,7 +2124,7 @@ class Player final: public Unit
         bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const* npc = nullptr, uint32 spellid = 0, bool nocheck = false);
         bool ActivateTaxiPathTo(uint32 taxi_path_id, uint32 spellid = 0, bool nocheck = false);
         void TaxiStepFinished(bool lastPointReached);
-        void ContinueTaxiFlight();
+        void ContinueTaxiFlight() const;
 
         /*********************************************************/
         /***                 CINEMATIC SYSTEM                  ***/
@@ -2261,9 +2261,9 @@ class Player final: public Unit
         void SetSelectedGobj(ObjectGuid guid) { m_selectedGobj = guid; }
         ObjectGuid const& GetSelectionGuid() const { return m_curSelectionGuid; }
         void SetSelectionGuid(ObjectGuid guid) { m_curSelectionGuid = guid; SetTargetGuid(guid); }
-        Unit* GetSelectedUnit();
-        Creature* GetSelectedCreature();
-        Player* GetSelectedPlayer();
+        Unit* GetSelectedUnit() const;
+        Creature* GetSelectedCreature() const;
+        Player* GetSelectedPlayer() const;
         Object* GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask);
 
         void SetResurrectRequestData(ObjectGuid guid, uint16 mapId, uint32 instanceId, float x, float y, float z, float o, uint32 health, uint32 mana)
@@ -2424,7 +2424,7 @@ class Player final: public Unit
         void RewardHonor(Unit const* uVictim, uint32 groupSize);
         void RewardHonorOnDeath();
         bool IsHonorOrXPTarget(Unit const* pVictim) const;
-        bool IsCityProtector();
+        bool IsCityProtector() const;
         void SetCityTitle();
         void RemoveCityTitle();
 
@@ -2436,7 +2436,7 @@ class Player final: public Unit
         /*********************************************************/
 
     public:
-        ZoneScript* GetZoneScript() const;
+        ZoneScript* GetZoneScript() const override;
         // returns true if the player is in active state for outdoor pvp objective capturing, false otherwise
         bool IsOutdoorPvPActive() const;
 
@@ -2583,7 +2583,7 @@ class Player final: public Unit
         std::shared_ptr<PlayerBroadcaster> m_broadcaster;
         void DeletePacketBroadcaster();
         void CreatePacketBroadcaster();
-        std::shared_ptr<PlayerBroadcaster> GetPacketBroadcaster() { return m_broadcaster; }
+        std::shared_ptr<PlayerBroadcaster> GetPacketBroadcaster() const { return m_broadcaster; }
 
         /*********************************************************/
         /***                 INSTANCE SYSTEM                   ***/

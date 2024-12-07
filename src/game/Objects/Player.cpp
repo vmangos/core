@@ -1492,7 +1492,7 @@ SpellAuraHolder const* Player::GetMirrorTimerBuff(MirrorTimer::Type timer) const
     }
 }
 
-bool Player::IsCityProtector() { return m_ExtraFlags & PLAYER_EXTRA_CITY_PROTECTOR; }
+bool Player::IsCityProtector() const { return m_ExtraFlags & PLAYER_EXTRA_CITY_PROTECTOR; }
 
 void Player::SetCityTitle()
 {
@@ -4472,7 +4472,7 @@ void Player::_LoadSpellCooldowns(std::unique_ptr<QueryResult> result)
     }
 }
 
-void Player::_SaveSpellCooldowns()
+void Player::_SaveSpellCooldowns() const
 {
     static SqlStatementID deleteSpellCooldown;
 
@@ -17924,7 +17924,7 @@ void Player::PossessSpellInitialize()
     GetSession()->SendPacket(&data);
 }
 
-void Player::CharmSpellInitialize()
+void Player::CharmSpellInitialize() const
 {
     Unit* charm = GetCharm();
 
@@ -17992,7 +17992,7 @@ void Player::CharmSpellInitialize()
     GetSession()->SendPacket(&data);
 }
 
-void Player::RemovePetActionBar()
+void Player::RemovePetActionBar() const
 {
     WorldPacket data(SMSG_PET_SPELLS, 8);
     data << ObjectGuid();
@@ -18558,7 +18558,7 @@ bool Player::ActivateTaxiPathTo(uint32 taxi_path_id, uint32 spellid /*= 0*/, boo
     return ActivateTaxiPathTo(nodes, nullptr, spellid, nocheck);
 }
 
-void Player::ContinueTaxiFlight()
+void Player::ContinueTaxiFlight() const
 {
     uint32 sourceNode = m_taxi.GetTaxiSource();
     if (!sourceNode)
@@ -18933,7 +18933,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
     return crItem->maxcount != 0;
 }
 
-void Player::SendRaidGroupOnlyError(uint32 timer, RaidGroupError error)
+void Player::SendRaidGroupOnlyError(uint32 timer, RaidGroupError error) const
 {
     WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
     data << uint32(timer);
@@ -19412,7 +19412,7 @@ void Player::SetLongSight(Aura const* aura)
     }
 }
 
-void Player::UpdateLongSight()
+void Player::UpdateLongSight() const
 {
     if (!m_longSightSpell)
         return;
@@ -20160,7 +20160,7 @@ ZoneScript* Player::GetZoneScript() const
     return sZoneScriptMgr.GetZoneScriptToZoneId(GetZoneId());
 }
 
-bool Player::HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item const* ignoreItem)
+bool Player::HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item const* ignoreItem) const
 {
     if (spellInfo->EquippedItemClass < 0)
         return true;
@@ -20509,7 +20509,7 @@ void Player::ResurectUsingRequestData()
     SpawnCorpseBones();
 }
 
-void Player::SetClientControl(Unit const* target, uint8 allowMove)
+void Player::SetClientControl(Unit const* target, uint8 allowMove) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
@@ -21453,17 +21453,17 @@ bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown)
     return TeleportTo(m_homebind, (options | TELE_TO_FORCE_MAP_CHANGE));
 }
 
-Unit* Player::GetSelectedUnit()
+Unit* Player::GetSelectedUnit() const
 {
     return GetMap()->GetUnit(m_curSelectionGuid);
 }
 
-Creature* Player::GetSelectedCreature()
+Creature* Player::GetSelectedCreature() const
 {
     return GetMap()->GetCreature(m_curSelectionGuid);
 }
 
-Player* Player::GetSelectedPlayer()
+Player* Player::GetSelectedPlayer() const
 {
     return GetMap()->GetPlayer(m_curSelectionGuid);
 }

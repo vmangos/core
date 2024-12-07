@@ -276,7 +276,7 @@ struct DungeonResetEvent
     DungeonResetEvent(ResetEventType t, uint32 _mapid, uint32 _instanceid)
         : type(t), mapId(_mapid), instanceId(_instanceid) {}
 
-    bool operator == (DungeonResetEvent const& e) { return e.mapId == mapId && e.instanceId == instanceId; }
+    bool operator==(DungeonResetEvent const& e) const { return e.mapId == mapId && e.instanceId == instanceId; }
 };
 
 typedef std::map<uint32, std::pair<uint32, time_t> > ResetTimeMapType;
@@ -300,7 +300,7 @@ class DungeonResetScheduler
             m_resetTimeByMapId[mapId] = t;
         }
 
-        void ScheduleReset(bool add, time_t time, DungeonResetEvent event);
+        void ScheduleReset(const bool add, const time_t time, DungeonResetEvent event);
 
         void Update();
 

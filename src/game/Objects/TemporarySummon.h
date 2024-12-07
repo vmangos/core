@@ -35,7 +35,7 @@ class TemporarySummon : public Creature
         void Summon(TempSummonType type, uint32 lifetime, CreatureAiSetter pFuncAiSetter = nullptr);
         void UnSummon(uint32 delayDespawnTime = 0);
         void CleanupsBeforeDelete() override;
-        void SaveToDB();
+        void SaveToDB() override;
         ObjectGuid const& GetSummonerGuid() const { return m_summoner ; }
         Unit* GetSummoner() const { return ObjectAccessor::GetUnit(*this, m_summoner); }
         TempSummonType GetDespawnType() const { return m_type; }

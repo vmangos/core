@@ -391,11 +391,11 @@ class Object
         SpellCaster* ToSpellCaster();
         SpellCaster const* ToSpellCaster() const;
 
-        inline bool IsCorpse() const { return GetTypeId() == TYPEID_CORPSE; }
+        virtual inline bool IsCorpse() const { return GetTypeId() == TYPEID_CORPSE; }
         Corpse* ToCorpse();
         Corpse const* ToCorpse() const;
 
-        bool IsPet() const;
+        virtual bool IsPet() const;
         Pet* ToPet();
         Pet const* ToPet() const;
 
@@ -403,7 +403,7 @@ class Object
         virtual bool HasInvolvedQuest(uint32 /* quest_id */) const { return false; }
     protected:
 
-        Object ();
+        Object();
 
         void _InitValues();
         void _Create (uint32 guidlow, uint32 entry, HighGuid guidhigh);
@@ -651,7 +651,7 @@ class WorldObject : public Object
         bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_FLYING); }
         bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE); }
         bool IsWalkingBackward() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD); }
-        bool IsMoving() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING); }
+        virtual bool IsMoving() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING); }
         bool IsSwimming() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING); }
         bool IsMovingButNotWalking() const { return IsMoving() && !(IsWalking() || IsWalkingBackward()); }
 
@@ -744,7 +744,7 @@ class WorldObject : public Object
         bool HasMMapsForCurrentMap() const;
 
         void SetZoneScript();
-        ZoneScript* GetZoneScript() const { return m_zoneScript; }
+        virtual ZoneScript* GetZoneScript() const { return m_zoneScript; }
 
         void AddToClientUpdateList() override;
         void RemoveFromClientUpdateList() override;

@@ -368,11 +368,11 @@ class WorldSession
 
         // Public chat cooldown restriction functionality
         // Intentionally session-based to avoid login/logout hijinks
-        time_t GetLastPubChanMsgTime() { return m_lastPubChannelMsgTime; }
+        time_t GetLastPubChanMsgTime() const { return m_lastPubChannelMsgTime; }
         void SetLastPubChanMsgTime(time_t time) { m_lastPubChannelMsgTime = time; }
 
         // Bot system
-        PlayerBotEntry* GetBot() { return m_bot.get(); }
+        PlayerBotEntry* GetBot() const { return m_bot.get(); }
         void SetBot(std::shared_ptr<PlayerBotEntry> const& b) { m_bot = b; }
 
         // Warden / Anticheat
@@ -484,7 +484,7 @@ class WorldSession
         void LoadTutorialsData();
         void SendTutorialsData();
         void SaveTutorialsData();
-        uint32 GetTutorialInt(uint32 intId)
+        uint32 GetTutorialInt(uint32 intId) const
         {
             ASSERT(intId < ACCOUNT_TUTORIALS_COUNT);
             return m_tutorials[intId];

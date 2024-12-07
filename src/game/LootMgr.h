@@ -217,7 +217,7 @@ class LootTemplate
     public:
         // Adds an entry to the group (at loading stage)
         void AddEntry(LootStoreItem& item);
-        // Rolls for every item in the template and adds the rolled items the the loot
+        // Rolls for every item in the template and adds the rolled items to the loot
         void Process(Loot& loot, LootStore const& store, bool rate, uint8 GroupId = 0) const;
 
         // True if template includes at least 1 quest drop entry
@@ -238,7 +238,7 @@ class LootTemplate
 class LootValidatorRef :  public Reference<Loot, LootValidatorRef>
 {
     public:
-        LootValidatorRef() {}
+        LootValidatorRef() = default;
         void targetObjectDestroyLink() override {}
         void sourceObjectDestroyLink() override {}
 };

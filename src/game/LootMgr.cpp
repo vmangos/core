@@ -63,7 +63,6 @@ public:
     float TotalChance() const;                          // Overall chance for the group
 
     void Verify(LootStore const& lootstore, uint32 id, uint32 group_id) const;
-    void CollectLootIds(LootIdSet& set) const;
     void CheckLootRefs(LootIdSet* ref_set) const;
 private:
     LootStoreItemList ExplicitlyChanced;                // Entries with chances defined in DB
