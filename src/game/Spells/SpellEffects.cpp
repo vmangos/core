@@ -4048,21 +4048,6 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
     // petEntry==0 for hunter "call pet" (current pet summoned if any)
     if (GetTypeId() == TYPEID_PLAYER && newSummon->LoadPetFromDB((Player*)this, petEntry))
     {
-        if (newSummon->getPetType() == SUMMON_PET)
-        {
-            // Remove Demonic Sacrifice auras (known pet)
-            Unit::AuraList const& auraClassScripts = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-            for (Unit::AuraList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end();)
-            {
-                if ((*itr)->GetModifier()->m_miscvalue == 2228)
-                {
-                    RemoveAurasDueToSpell((*itr)->GetId());
-                    itr = auraClassScripts.begin();
-                }
-                else
-                    ++itr;
-            }
-        }
         return newSummon->GetObjectGuid();
     }
 
