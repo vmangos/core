@@ -4573,20 +4573,6 @@ float Aura::CalculateDotDamage() const
     {
         case SPELLFAMILY_DRUID:
         {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-            // Rip
-            if (spellProto->IsFitToFamilyMask<CF_DRUID_RIP_BITE>())
-            {
-                // $AP * min(0.06*$cp, 0.24)/6 [Yes, there is no difference, whether 4 or 5 CPs are being used]
-                if (caster->GetTypeId() == TYPEID_PLAYER)
-                {
-                    uint8 cp = ((Player*)caster)->GetComboPoints();
-
-                    if (cp > 4) cp = 4;
-                    damage += caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp / 100;
-                }
-            }
-#endif
             break;
         }
         case SPELLFAMILY_ROGUE:
