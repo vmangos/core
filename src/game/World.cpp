@@ -481,6 +481,7 @@ void World::LoadConfigSettings(bool reload)
     // Vanilla Reforged - Custom Rates Start
     setConfig(CONFIG_FLOAT_RATE_ATTACK_POWER,            "Rate.Attack.Power", 1.0f);
     setConfig(CONFIG_FLOAT_RATE_ATTACK_POWER_SPIRIT,     "Rate.Attack.Power.Spirit", 0.0f);
+    setConfig(CONFIG_FLOAT_RATE_SPIRIT_SCALING_WANDS,    "Rate.Spirit.Scaling.Wands", 0.0f);
     // Vanilla Reforged - Custom Rates End
     setConfigPos(CONFIG_FLOAT_RATE_HEALTH,               "Rate.Health", 1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_POWER_MANA,           "Rate.Mana", 1.0f);

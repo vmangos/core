@@ -2578,6 +2578,7 @@ Visibility.ForceActiveObjects      = 1
 # Vanilla Reforged - Custom Rates Start
 Rate.Attack.Power = 1
 Rate.Attack.Power.Spirit = 0
+Rate.Spirit.Scaling.Wands = 0
 # Vanilla Reforged - Custom Rates End
 Rate.Health = 1
 Rate.Mana = 1

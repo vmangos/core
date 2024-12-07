@@ -385,6 +385,7 @@ enum eConfigFloatValues
     // Vanilla Reforged - Custom Rates Start
     CONFIG_FLOAT_RATE_ATTACK_POWER = 0,
     CONFIG_FLOAT_RATE_ATTACK_POWER_SPIRIT,
+    CONFIG_FLOAT_RATE_SPIRIT_SCALING_WANDS,
     // Vanilla Reforged - Custom Rates End
     CONFIG_FLOAT_RATE_HEALTH,
     CONFIG_FLOAT_MAX_CREATURE_ATTACK_RADIUS,

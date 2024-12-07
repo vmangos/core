@@ -4328,8 +4328,19 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
         bonus = unitTarget->SpellDamageBonusTaken(m_casterUnit, m_spellInfo, effIdx, bonus, SPELL_DIRECT_DAMAGE);
     }
 
+    // Wands scaling with Spirit
+    if (m_spellInfo->Id == 5019)
+    {
+        if (Player* playerCaster = m_caster->ToPlayer())
+        {
+            float spiritBonus = playerCaster->GetTotalStatValue(STAT_SPIRIT) * sWorld.getConfig(CONFIG_FLOAT_RATE_SPIRIT_SCALING_WANDS);
+            bonus += spiritBonus;
+        }
+    }
+
     // prevent negative damage
     m_damage += bonus > 0.f ? bonus : 0.f;
+    // sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Final Damage (m_damage): %f", m_damage + bonus);
 }
 
 void Spell::EffectThreat(SpellEffectIndex effIdx)
