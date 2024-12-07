@@ -887,46 +887,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                             return SPELL_AURA_PROC_FAILED;
                     }
                     
-                    // Get current Ignite Aura if exist
-                    Aura* igniteAura = target->GetAura(12654, EFFECT_INDEX_0);
-                    
-                    if (igniteAura)
-                    {
-                        Modifier *igniteModifier = igniteAura->GetModifier();
-                        SpellAuraHolder* igniteHolder = igniteAura->GetHolder();
-                        
-                        int32 tickDamage = igniteModifier->m_amount;
-                        
-                        bool notAtMaxStack = igniteAura->GetStackAmount() < 5;
-                        
-                        bool reapplyIgnite = igniteAura->GetAuraTicks() >= igniteAura->GetAuraMaxTicks();
-                        
-                        if (!reapplyIgnite)
-                        {
-                            if (notAtMaxStack)
-                            {
-                                tickDamage += basepoints[0];
-                                
-                                igniteHolder->ModStackAmount(1);
-                                
-                                // Update DOT damage
-                                igniteModifier->m_amount = tickDamage;
-                                igniteAura->ApplyModifier(true, true, false);
-                            }
-                            else
-                                igniteHolder->SetStackAmount(5);
-                            
-                            // Refresh Ignite Stack
-                            igniteHolder->Refresh(igniteAura->GetCaster(), target, igniteHolder);
-                            
-                            return SPELL_AURA_PROC_OK;
-                        }
-                        
-                        // All damage done, remove and continue to reapply
-                        target->RemoveAurasDueToSpell(12654);
-                    }
-                    
-                    // No Ignite found, apply Ignite Aura
+                    // Apply Ignite Spell
                     triggered_spell_id = 12654;
                     break;
                 }
