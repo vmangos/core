@@ -4597,7 +4597,6 @@ float Aura::CalculateDotDamage() const
                 if (caster->IsPlayer())
                 {
                     uint8 cp = ((Player*)caster)->GetComboPoints();
-                    if (cp > 3) cp = 3;
                     damage += caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp / 100;
                 }
             }
