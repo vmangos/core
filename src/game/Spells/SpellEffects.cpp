@@ -479,18 +479,6 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage += playerCaster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12;
                     }
                 }
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-                // World of Warcraft Client Patch 1.12.0 (2006-08-22)
-                // - Eviscerate: Manual of Eviscerate (Rank 9) now drops off Blackhand
-                //   Assassins in Black Rock Spire.In addition, Eviscerate now increases
-                //   in potency with greater attack power.
-                if (m_spellInfo->IsFitToFamilyMask<CF_ROGUE_EVISCERATE>())
-                {
-                    if (Player* pPlayer = m_caster->ToPlayer())
-                        if (uint32 combo = pPlayer->GetComboPoints())
-                            damage += pPlayer->GetTotalAttackPowerValue(BASE_ATTACK) * combo * 0.03f;
-                }
-#endif
                 break;
             }
             case SPELLFAMILY_HUNTER:
