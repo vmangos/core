@@ -472,6 +472,13 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
             }
             case SPELLFAMILY_ROGUE:
             {
+                if (m_spellInfo->IsFitToFamilyMask<CF_ROGUE_INSTANT_POISON>())
+                {
+                    if (Player* playerCaster = m_caster->ToPlayer())
+                    {
+                        damage += playerCaster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12;
+                    }
+                }
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
                 // World of Warcraft Client Patch 1.12.0 (2006-08-22)
                 // - Eviscerate: Manual of Eviscerate (Rank 9) now drops off Blackhand
