@@ -517,7 +517,7 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE
 -- Master Pools For Alterac, STV, Desolace
 -- Alterac
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+53, 12, 'Alterac Mountains - Mining Nodes (Master Pool)', 0, 0, 0, 10);
+(@PTEMPLATE+53, 4, 'Alterac Mountains - Mining Nodes (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (2916, @PTEMPLATE+53, 0, 'Alterac Mountains - Mining Nodes', 0),
 (2917, @PTEMPLATE+53, 0, 'Alterac Mountains - Mining Nodes', 0),
@@ -550,7 +550,9 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (2928, @PTEMPLATE+53, 0, 'Alterac Mountains - Mining Nodes', 0),
 (18870, @PTEMPLATE+53, 0, 'Alterac Mountains - Mining Nodes', 0),
 (18871, @PTEMPLATE+53, 0, 'Alterac Mountains - Mining Nodes', 0),
-(23047, @PTEMPLATE+53, 0, 'Alterac Mountains - Mining Nodes', 0);
+(23047, @PTEMPLATE+53, 0, 'Alterac Mountains - Mining Nodes', 0),
+(427134, @PTEMPLATE+53, 0, 'Alterac Mountains - Mining Nodes', 0),
+(427023, @PTEMPLATE+53, 0, 'Alterac Mountains - Mining Nodes', 0);
 
 -- STV
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
@@ -580,11 +582,13 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (2881, @PTEMPLATE+54, 0, 'Stranglethorn Vale - Mining Nodes', 0),
 (2882, @PTEMPLATE+54, 0, 'Stranglethorn Vale - Mining Nodes', 0),
 (2883, @PTEMPLATE+54, 0, 'Stranglethorn Vale - Mining Nodes', 0),
-(2884, @PTEMPLATE+54, 0, 'Stranglethorn Vale - Mining Nodes', 0);
+(2884, @PTEMPLATE+54, 0, 'Stranglethorn Vale - Mining Nodes', 0),
+(31587, @PTEMPLATE+54, 0, 'Stranglethorn Vale - Mining Nodes', 0),
+(251502, @PTEMPLATE+54, 0, 'Stranglethorn Vale - Mining Nodes', 0);
 
 -- Desolace
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+55, 12, 'Desolace - Mining Nodes (Master Pool)', 0, 0, 0, 10);
+(@PTEMPLATE+55, 44, 'Desolace - Mining Nodes (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (3663, @PTEMPLATE+55, 0, 'Desolace - Mining Nodes', 0),
 (3664, @PTEMPLATE+55, 0, 'Desolace - Mining Nodes', 0),
@@ -618,7 +622,9 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (3677, @PTEMPLATE+55, 0, 'Desolace - Mining Nodes', 0),
 (3678, @PTEMPLATE+55, 0, 'Desolace - Mining Nodes', 0),
 (3661, @PTEMPLATE+55, 0, 'Desolace - Mining Nodes', 0),
-(3662, @PTEMPLATE+55, 0, 'Desolace - Mining Nodes', 0);
+(3662, @PTEMPLATE+55, 0, 'Desolace - Mining Nodes', 0),
+(34210, @PTEMPLATE+55, 0, 'Desolace - Mining Nodes', 0),
+(20790, @PTEMPLATE+55, 0, 'Desolace - Mining Nodes', 0);
 
 -- Update Chance
 UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Gold Vein / Mithril Deposit / Dark Iron Deposit - Searing George" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
@@ -1008,6 +1014,7 @@ UPDATE `pool_gameobject` SET `chance` = 50 WHERE `description` = "Tin Vein / Sil
 UPDATE `pool_gameobject` SET `chance` = 10 WHERE `description` = "Tin Vein / Silver Vein / Incendicite Mineral Vein - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
 UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Tin Vein / Silver Vein / Incendicite Mineral Vein - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1610);
 UPDATE `pool_gameobject` SET `chance` = 20 WHERE `description` = "Tin Vein / Silver Vein / Incendicite Mineral Vein - Wetlands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1667);
+
 
 -- End of migration.
 END IF;
