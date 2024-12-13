@@ -122,7 +122,7 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, MaNGOS::Poli
         std::string m_os;
         std::string m_platform;
         uint32 m_accountId = 0;
-        nonstd::optional<uint32> m_lastRealmListRequest;
+        nonstd::optional<std::chrono::steady_clock::time_point> m_lastRealmListRequest;
 
         // Since GetLocaleByName() is _NOT_ bijective, we have to store the locale as a string. Otherwise we can't differ
         // between enUS and enGB, which is important for the patch system
