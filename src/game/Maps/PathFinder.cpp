@@ -430,7 +430,11 @@ void PathInfo::BuildPointPath(float const* startPoint, float const* endPoint, fl
 
     m_pathPoints.resize(pointCount);
     for (uint32 i = 0; i < pointCount; ++i)
-        m_pathPoints[i] = Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
+    {
+        Vector3 p = Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
+        m_sourceUnit->UpdateAllowedPositionZ(p.x, p.y, p.z);
+        m_pathPoints[i] = p;
+    }
 
     // first point is always our current location - we need the next one
     setActualEndPosition(m_pathPoints[pointCount - 1]);
