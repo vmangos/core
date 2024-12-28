@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20230716203252');
 -- Add your query below.
 
 
-SET @OGUID = 44226;
+SET @OGUID = 90447;
 SET @PTEMPLATE = 4824;
 
 DELETE FROM `gameobject` WHERE `id` IN (19535, 13891);
@@ -281,7 +281,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`,
 (@OGUID+104, @PTEMPLATE+52, 'Barrens - Serpentbloom', 10, 100);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+53, 23, 'Barrens - Serpentbloom (Master Pool)', 0, 0, 0, 10);
+(@PTEMPLATE+53, 8, 'Barrens - Serpentbloom (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (@PTEMPLATE+1, @PTEMPLATE+53, 0, 'Barrens - Serpentbloom', 0),
 (@PTEMPLATE+2, @PTEMPLATE+53, 0, 'Barrens - Serpentbloom', 0),
@@ -337,7 +337,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+52, @PTEMPLATE+53, 0, 'Barrens - Serpentbloom', 0);
 
 -- Instance Serpentbloom
-SET @OGUID = 51201;
+SET @OGUID = 93886;
 SET @PTEMPLATE = 7123;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -472,7 +472,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`,
 (@OGUID+50, @PTEMPLATE+25, 'Wailing Caverns - Serpentbloom', 10, 100);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+26, 10, 'Wailing Caverns - Serpentbloom (Master Pool)', 0, 0, 0, 10);
+(@PTEMPLATE+26, 8, 'Wailing Caverns - Serpentbloom (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (@PTEMPLATE+1, @PTEMPLATE+26, 0, 'Wailing Caverns - Serpentbloom', 0),
 (@PTEMPLATE+2, @PTEMPLATE+26, 0, 'Wailing Caverns - Serpentbloom', 0),
