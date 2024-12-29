@@ -64,7 +64,6 @@ static thread_local uint32 splineCounter = 1;
 
 int32 MoveSplineInit::Launch()
 {
-    float realSpeedRun = 0.0f;
     MoveSpline& move_spline = *unit.movespline;
 
     GenericTransport* newTransport = nullptr;
@@ -119,9 +118,7 @@ int32 MoveSplineInit::Launch()
         moveFlags &= ~MOVEFLAG_ONTRANSPORT;
 
     if (args.velocity == 0.f)
-        realSpeedRun = args.velocity = unit.GetSpeed(SelectSpeedType(moveFlags));
-    else
-        realSpeedRun = unit.GetSpeed(MOVE_RUN);
+        args.velocity = unit.GetSpeed(SelectSpeedType(moveFlags));
 
     if (!args.Validate(&unit))
         return 0;
