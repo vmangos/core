@@ -192,21 +192,18 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     if (petFollowing)
     {
         float dist = path.Length();
+        float speed = i_target->GetSpeedForMovementInfo(i_target->m_movementInfo);
         init.SetWalk(false);
-        float speedupDistance = m_fOffset * 2.0f + owner.GetObjectBoundingRadius() + i_target->GetObjectBoundingRadius();
-        if (dist > speedupDistance)
+        init.SetVelocity(speed);
+        if (dist > speed)
         {
             Unit* pOwner = owner.GetCharmerOrOwner();
             if (pOwner && (!pOwner->IsInCombat() && !owner.IsInCombat() || pOwner->IsPlayer() && pOwner->IsMounted()))
             {
-                float distFactor = 1.0f;
-                if (pOwner->IsMounted())
-                    distFactor += 0.04f * (dist - speedupDistance * 2);
-                else
-                    distFactor += 0.04f * (dist - speedupDistance);
+                float distFactor = 1.0f + 0.04f * (dist - speed);
                 if (distFactor < 1.0f) distFactor = 1.0f;
                 if (distFactor > 2.1f) distFactor = 2.1f;
-                init.SetVelocity(distFactor * owner.GetSpeed(MOVE_RUN));
+                init.SetVelocity(distFactor * speed);
             }
         }
         else if (dist < 2.0f)
