@@ -2550,6 +2550,7 @@ void Spell::DoCreateItem(SpellEffectIndex effIdx, uint32 itemtype)
     // Duplication logic: determine multiplier based on profession and crafting category
     float chanceX4 = 0.0f, chanceX3 = 0.0f, chanceX2 = 0.0f;
     uint32 multiplier = 1;
+    uint32 buffMultiplier = 1;
     uint64 professionMask = 0;
     // Determine the profession mask based on the player's learned spell
     if (player->HasSpell(30340)) // Gifted Alchemist (Potions)
@@ -2626,7 +2627,91 @@ void Spell::DoCreateItem(SpellEffectIndex effIdx, uint32 itemtype)
             multiplier = 2;
     }
 
-    uint32 numToAdd = damage * multiplier;
+    // Check for profession buff auras and their multipliers
+    if (m_spellInfo->SpellFamilyName == 0)
+    {
+        uint64 buffMask = 0;
+        bool hasBuff = false;
+
+        if (player->HasAura(30356)) // Gifted Alchemist (Potions) buff
+            buffMask = 1 | 2 | 4;
+        else if (player->HasAura(30357)) // Gifted Alchemist (Transmutations) buff
+            buffMask = 8 | 16 | 32;
+        else if (player->HasAura(30358)) // Gifted Blacksmith buff
+            buffMask = 64 | 128 | 256;
+        else if (player->HasAura(30359)) // Gifted Enchanter buff
+            buffMask = 512 | 1024 | 2048;
+        else if (player->HasAura(30360)) // Gifted Engineer buff
+            buffMask = 4096 | 8192 | 16384;
+        else if (player->HasAura(30361)) // Gifted Leatherworker buff
+            buffMask = 32768 | 65536 | 131072;
+        else if (player->HasAura(30362)) // Gifted Miner buff
+            buffMask = 262144 | 524288 | 1048576;
+        else if (player->HasAura(30363)) // Gifted Tailor buff
+            buffMask = 2097152 | 4194304 | 8388608;
+
+        if (m_spellInfo->SpellFamilyFlags & buffMask)
+        {
+            hasBuff = true;
+            // Reset chances for buff roll
+            chanceX4 = 0.0f;
+            chanceX3 = 0.0f;
+            chanceX2 = 0.0f;
+
+            switch (m_spellInfo->SpellFamilyFlags & buffMask)
+            {
+            case 1:
+            case 8:
+            case 64:
+            case 512:
+            case 4096:
+            case 32768:
+            case 262144:
+            case 2097152:
+                chanceX4 = 0.44f;
+                chanceX3 = 1.76f;
+                chanceX2 = 3.3f;
+                break;
+            case 2:
+            case 16:
+            case 128:
+            case 1024:
+            case 8192:
+            case 65536:
+            case 524288:
+            case 4194304:
+                chanceX4 = 0.88f;
+                chanceX3 = 3.52f;
+                chanceX2 = 6.6f;
+                break;
+            case 4:
+            case 32:
+            case 256:
+            case 2048:
+            case 16384:
+            case 131072:
+            case 1048576:
+            case 8388608:
+                chanceX4 = 1.32f;
+                chanceX3 = 5.28f;
+                chanceX2 = 9.9f;
+                break;
+            }
+
+            if (hasBuff)
+            {
+                float buffRoll = frand(0.0f, 100.0f);
+                if (buffRoll <= chanceX4)
+                    buffMultiplier = 4;
+                else if (buffRoll <= (chanceX4 + chanceX3))
+                    buffMultiplier = 3;
+                else if (buffRoll <= (chanceX4 + chanceX3 + chanceX2))
+                    buffMultiplier = 2;
+            }
+        }
+    }
+
+    uint32 numToAdd = damage * multiplier * buffMultiplier;
 
     if (numToAdd < 1)
         numToAdd = 1;
