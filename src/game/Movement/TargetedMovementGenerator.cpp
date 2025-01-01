@@ -193,6 +193,9 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     {
         float dist = path.Length();
         float speed = i_target->GetSpeedForMovementInfo(i_target->m_movementInfo);
+        if (!speed)
+            speed = owner.GetSpeedForMovementInfo(owner.m_movementInfo);
+
         init.SetWalk(false);
         init.SetVelocity(speed);
         if (dist > speed)
