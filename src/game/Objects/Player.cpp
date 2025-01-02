@@ -80,6 +80,7 @@
 #include "GameEventMgr.h"
 #include "world/scourge_invasion.h"
 #include "world/world_event_wareffort.h"
+#include "OutdoorPvP/OutdoorPvPHY.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -7166,6 +7167,15 @@ void Player::UpdateArea(uint32 newArea)
     m_areaUpdateId    = newArea;
 
     DismountCheck();
+
+    if (ZoneScript* zoneScript = GetZoneScript())
+    {
+        if (OutdoorPvPHY* pvpHY = dynamic_cast<OutdoorPvPHY*>(zoneScript))
+        {
+            if (pvpHY->HandleAreaTrigger(this, newArea))
+                return;
+        }
+    }
 
     const auto* areaEntry = AreaEntry::GetById(newArea);
 
