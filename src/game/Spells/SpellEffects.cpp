@@ -50,6 +50,7 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "scriptPCH.h"
+#include "ZoneScriptMgr.h"
 
 using namespace Spells;
 
@@ -2930,9 +2931,29 @@ void Spell::EffectOpenLock(SpellEffectIndex effIdx)
                     bg->EventPlayerClickedOnFlag(player, gameObjTarget);
                 return;
             }
+            // Add check for Hyjal zone
+            uint32 zoneId = gameObjTarget->GetZoneId();
+            if (zoneId == 616)
+            {
+                if (ZoneScript* script = sZoneScriptMgr.GetZoneScript(zoneId))
+                {
+                    script->HandleCustomSpell(player, m_spellInfo->Id, gameObjTarget);
+                }
+                return;
+            }
         }
         else if (goInfo->type == GAMEOBJECT_TYPE_FLAGSTAND)
         {
+            // Add check for Hyjal zone
+            uint32 zoneId = gameObjTarget->GetZoneId();
+            if (zoneId == 616)
+            {
+                if (ZoneScript* script = sZoneScriptMgr.GetZoneScript(zoneId))
+                {
+                    script->HandleCustomSpell(player, m_spellInfo->Id, gameObjTarget);
+                }
+                return;
+            }
             //CanUseBattleGroundObject() already called in CheckCast()
             // in battleground check
             if (BattleGround *bg = player->GetBattleGround())

@@ -48,6 +48,7 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 #include "Geometry.h"
+#include "ZoneScriptMgr.h"
 
 bool QuaternionData::isUnit() const
 {
@@ -1550,11 +1551,24 @@ void GameObject::Use(Unit* user)
         }
         case GAMEOBJECT_TYPE_GOOBER:                        //10
         {
-            GameObjectInfo const* info = GetGOInfo();
+            if (user->GetTypeId() != TYPEID_PLAYER)
+            return;
 
-            if (user->GetTypeId() == TYPEID_PLAYER)
+            Player* player = (Player*)user;
+
+            // Add Hyjal zone check
+            if (player->GetZoneId() == 616) // Hyjal zone ID
             {
-                Player* player = (Player*)user;
+                if (ZoneScript* script = sZoneScriptMgr.GetZoneScript(616))
+                {
+                    player->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                    player->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
+                    script->HandleCustomSpell(player, 0, this);
+                    return;
+                }
+            }      
+
+	        GameObjectInfo const* info = GetGOInfo();
 
                 if (info->goober.pageId)                    // show page...
                 {
@@ -1598,8 +1612,7 @@ void GameObject::Use(Unit* user)
                 }
 
                 player->RewardPlayerAndGroupAtCast(this);
-            }
-
+            
             TriggerLinkedGameObject(user);
 
             SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
@@ -1876,6 +1889,17 @@ void GameObject::Use(Unit* user)
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
                 bg->EventPlayerClickedOnFlag(player, this);
                 return;                                     //we don't need to delete flag ... it is despawned!
+            }
+            // Add Hyjal zone check
+            if (player->GetZoneId() == 616) // Hyjal zone ID
+            {
+                if (ZoneScript* script = sZoneScriptMgr.GetZoneScript(616))
+                {
+                    player->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                    player->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
+                    script->HandleCustomSpell(player, 0, this); // We pass 0 as spellId since it's a direct click
+                    return;
+                }
             }
             break;
         }
