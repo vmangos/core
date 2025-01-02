@@ -132,7 +132,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
             delete group;
             return;
         }
-        if (!group->AddInvite(player))
+        if (!group->AddInvite(player, GetPlayer()->GetObjectGuid()))
         {
             delete group;
             return;
@@ -141,7 +141,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
     else
     {
         // already existing group: if can't add then just leave
-        if (!group->AddInvite(player))
+        if (!group->AddInvite(player, GetPlayer()->GetObjectGuid()))
             return;
     }
 

@@ -211,7 +211,8 @@ class Group
         bool   Create(ObjectGuid guid, char const*  name);
         bool   LoadGroupFromDB(Field* fields);
         bool   LoadMemberFromDB(uint32 guidLow, uint8 subgroup, bool assistant);
-        bool   AddInvite(Player* player);
+        bool   AddInvite(Player* player, ObjectGuid inviterGuid);
+        const  InvitesList& GetInvitees() const { return m_invitees; };
         uint32 RemoveInvite(Player* player);
         void   RemoveAllInvites();
         bool   AddLeaderInvite(Player* player);

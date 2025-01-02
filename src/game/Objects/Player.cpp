@@ -7191,6 +7191,15 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 {
     uint32 oldZoneId  = m_zoneUpdateId;
 
+    if (oldZoneId != newZone && GuildAreaAreaCheck(newZone))
+    {
+        Group* currentGroup = GetGroup();
+        if (currentGroup)
+        {
+            currentGroup->RemoveMember(GetObjectGuid(), GROUP_LEAVE);
+        }
+    }
+
     const auto* zoneEntry = AreaEntry::GetById(newZone);
     if (!zoneEntry)
         return;
@@ -7266,6 +7275,20 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 
     UpdateZoneDependentAuras();
     SetZoneScript();
+}
+
+bool Player::GuildAreaAreaCheck(uint32 areaId)
+{
+    static const std::unordered_set<uint32> GUILD_RAID_ZONES = {
+        616, // Hyjal
+    };
+    const AreaEntry* areaEntry = AreaEntry::GetById(areaId);
+    if (!areaEntry)
+        return false;
+
+    // Get the zone ID - either this is a zone, or get its parent zone
+    uint32 zoneId = areaEntry->IsZone() ? areaEntry->Id : areaEntry->ZoneId;
+    return GUILD_RAID_ZONES.find(zoneId) != GUILD_RAID_ZONES.end();
 }
 
 //If players are too far way of duel flag... then player loose the duel

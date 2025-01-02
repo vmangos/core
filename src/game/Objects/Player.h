@@ -1908,6 +1908,7 @@ class Player final: public Unit
 
         void UpdateZone(uint32 newZone,uint32 newArea);
         void UpdateArea(uint32 newArea);
+        bool GuildAreaAreaCheck(uint32 areaId);
         uint32 GetCachedZoneId() const { return m_zoneUpdateId; }
         uint32 GetCachedAreaId() const { return m_areaUpdateId; }
 

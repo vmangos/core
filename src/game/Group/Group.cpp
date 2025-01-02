@@ -38,6 +38,7 @@
 #include "LFGMgr.h"
 #include "LFGQueue.h"
 #include "UpdateMask.h"
+#include "Guild.h"
 
 #include <array>
 
@@ -255,7 +256,7 @@ void Group::ConvertToRaid()
     }
 }
 
-bool Group::AddInvite(Player* player)
+bool Group::AddInvite(Player* player, ObjectGuid inviterGuid)
 {
     if (!player || player->GetGroupInvite())
         return false;
@@ -264,6 +265,20 @@ bool Group::AddInvite(Player* player)
         group = player->GetOriginalGroup();
     if (group)
         return false;
+
+    Player* inviter = sObjectMgr.GetPlayer(inviterGuid);
+
+    // Check location first
+    bool inRestrictedArea = inviter->GuildAreaAreaCheck(inviter->GetAreaId()) || player->GuildAreaAreaCheck(player->GetAreaId());
+
+    // If either player is in restricted area, do guild check
+    if (inRestrictedArea)
+    {
+        Guild* inviterGuild = sGuildMgr.GetGuildById(inviter->GetGuildId());
+        Guild* inviteeGuild = sGuildMgr.GetGuildById(player->GetGuildId());
+        if (!inviterGuild || !inviteeGuild || inviterGuild->GetId() != inviteeGuild->GetId())
+            return false;
+    }
 
     RemoveInvite(player);
 
@@ -276,7 +291,7 @@ bool Group::AddInvite(Player* player)
 
 bool Group::AddLeaderInvite(Player* player)
 {
-    if (!AddInvite(player))
+    if (!AddInvite(player, player->GetObjectGuid()))
         return false;
 
     _updateLeaderFlag(true);
