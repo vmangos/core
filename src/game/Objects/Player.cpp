@@ -5467,6 +5467,22 @@ void Player::RepopAtGraveyard()
     // for example from WorldSession::HandleMovementOpcodes
 
     m_repopAtGraveyardPending = false;
+
+    // Check for Hyjal outdoor PvP first
+    if (GetZoneId() == ZONE_ID) // 616 is Hyjal zone ID
+    {
+        if (ZoneScript* script = GetZoneScript())
+        {
+            if (OutdoorPvPHY* hyPvP = dynamic_cast<OutdoorPvPHY*>(script))
+            {
+                // Let the outdoor PvP script handle the death
+                // If it returns true, it means it handled the respawn
+                if (hyPvP->HandlePlayerDeath(this))
+                    return;
+            }
+        }
+    }
+
     WorldSafeLocsEntry const* ClosestGrave = nullptr;
 
     // Special handle for battleground maps
