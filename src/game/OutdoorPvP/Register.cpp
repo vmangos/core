@@ -2,6 +2,7 @@
 
 void AddSC_outdoorpvp_ep();
 void AddSC_outdoorpvp_si();
+void AddSC_outdoorpvp_hy();
 
 void RegisterZoneScripts()
 {
@@ -10,5 +11,7 @@ void RegisterZoneScripts()
         AddSC_outdoorpvp_ep();
     if (sWorld.GetWowPatch() >= WOW_PATCH_112 && sWorld.getConfig(CONFIG_BOOL_OUTDOORPVP_SI_ENABLE))
         AddSC_outdoorpvp_si();
+    if (sWorld.GetWowPatch() >= WOW_PATCH_102 && sWorld.getConfig(CONFIG_BOOL_OUTDOORPVP_HY_ENABLE))
+        AddSC_outdoorpvp_hy();
 #endif
 }

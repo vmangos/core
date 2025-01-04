@@ -801,6 +801,9 @@ void World::LoadConfigSettings(bool reload)
             setConfig(CONFIG_UINT32_BATTLEGROUND_QUEUES_COUNT, 1);
     }
 
+    // Vanilla Reforged - Custom OutdoorPvP Start
+    setConfig(CONFIG_BOOL_OUTDOORPVP_HY_ENABLE, "OutdoorPvP.HY.Enable", false);
+    // Vanilla Reforged - Custom OutdoorPvP End
     setConfig(CONFIG_BOOL_OUTDOORPVP_EP_ENABLE, "OutdoorPvP.EP.Enable", true);
     setConfig(CONFIG_BOOL_OUTDOORPVP_SI_ENABLE, "OutdoorPvP.SI.Enable", true);
 

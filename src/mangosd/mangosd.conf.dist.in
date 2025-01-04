@@ -2741,6 +2741,9 @@ Alterac.InitMaxPlayers = 0
 #
 ###################################################################################################################
 
+# Vanilla Reforged - Custom OutdoorPvP Start
+OutdoorPvP.HY.Enable = 0
+# Vanilla Reforged - Custom OutdoorPvP End
 OutdoorPvP.SI.Enable = 1
 OutdoorPvP.EP.Enable = 1
 
