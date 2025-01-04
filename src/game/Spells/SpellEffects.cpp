@@ -51,6 +51,7 @@
 #include "SocialMgr.h"
 #include "scriptPCH.h"
 #include "ZoneScriptMgr.h"
+#include "OutdoorPvP/OutdoorPvPHY.h"
 
 using namespace Spells;
 
@@ -1606,6 +1607,26 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     }
                     return;
                 }
+                case 30364: // Defender Recall
+                    {
+                        if (!unitTarget || !unitTarget->IsPlayer())
+                            return;
+
+                        Player* playerTarget = static_cast<Player*>(unitTarget);
+
+                        if (OutdoorPvPHY* outdoorPvP = static_cast<OutdoorPvPHY*>(sZoneScriptMgr.GetZoneScript(ZONE_ID)))
+                        {
+                            if (!outdoorPvP->IsFightInProgress()) // Add this getter method to OutdoorPvPHY
+                            {
+                                playerTarget->GetSession()->SendNotification("This can only be used during an active base fight.");
+                                return;
+                            }
+
+                            // Let the OutdoorPvPHY handle the teleport with proper base coordinates
+                            outdoorPvP->HandleCustomSpell(playerTarget, 30364, nullptr);
+                        }
+                        return;
+                    }
             }
 
             //All IconID Check in there
