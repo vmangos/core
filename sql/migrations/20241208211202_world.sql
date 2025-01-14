@@ -237,6 +237,18 @@ UPDATE `gameobject` SET `animprogress` = 100 WHERE `guid` IN (35876, 82575);
 -- Fix Creature Under Map (credit cmangos)
 UPDATE `creature` SET `position_x` = 544.298828, `position_y` = -3755.502930, `position_z` = 15.736476, `wander_distance` = 10, `movement_type` = 1 WHERE `guid` = 13565;
 
+-- Restore Stranglekelp Pre 1.7
+UPDATE `pool_template` SET `max_limit` = 3 WHERE `entry` = 1064 AND `patch_min`=0 AND `patch_max`=4;
+UPDATE `pool_template` SET `max_limit` = 4 WHERE `entry` = 1322 AND `patch_min`=0 AND `patch_max`=4;
+UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 1145 AND `patch_min`=0 AND `patch_max`=4;
+UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 1190 AND `patch_min`=0 AND `patch_max`=4;
+UPDATE `pool_template` SET `max_limit` = 3 WHERE `entry` = 1123 AND `patch_min`=0 AND `patch_max`=4;
+UPDATE `pool_template` SET `patch_min` = 0 WHERE `entry` = 43522 AND `patch_min`=7 AND `patch_max`=10;
+UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 1065 AND `patch_min`=0 AND `patch_max`=4;
+UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 984 AND `patch_min`=0 AND `patch_max`=4;
+UPDATE `pool_template` SET `max_limit` = 4 WHERE `entry` = 1122 AND `patch_min`=0 AND `patch_max`=4;
+UPDATE `pool_template` SET `max_limit` = 5 WHERE `entry` = 1149 AND `patch_min`=0 AND `patch_max`=4;
+
 
 -- End of migration.
 END IF;
