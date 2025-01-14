@@ -229,20 +229,6 @@ DELETE FROM `pool_template` WHERE `entry` = 1765;
 DELETE FROM `pool_gameobject` WHERE `guid` IN (247, 253);
 DELETE FROM `pool_pool` WHERE `pool_id` = 1765;
 
--- Pool Dustwallow Marsh Mining Nodes
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(4825, 4, ' Dustwallow Marsh - Mining Nodes (Master Pool)', 0, 0, 0, 10);
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(2872, 4825, 0, ' Dustwallow Marsh - Mining Nodes', 0),
-(2873, 4825, 0, ' Dustwallow Marsh - Mining Nodes', 0),
-(2874, 4825, 0, ' Dustwallow Marsh - Mining Nodes', 0),
-(2875, 4825, 0, ' Dustwallow Marsh - Mining Nodes', 0),
-(2871, 4825, 0, ' Dustwallow Marsh - Mining Nodes', 0),
-(2223, 4825, 0, ' Dustwallow Marsh - Mining Nodes', 0),
-(23046, 4825, 0, 'Dustwallow Marsh - Mining Nodes', 0),
-(9005, 4825, 0, ' Dustwallow Marsh - Mining Nodes', 0),
-(9006, 4825, 0, ' Dustwallow Marsh - Mining Nodes', 0);
-
 -- Update Respawn Times
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (42673, 42662, 35422, 13767, 16617, 16611, 16610, 13260, 15090, 15099, 32614, 47598, 47599, 47600, 47602, 45008, 6929, 12671, 12194, 11829, 47699, 45014, 35412, 15719, 42620, 49828, 13166, 6849, 45332, 10663, 45719, 45720, 45721, 32686, 49376, 46198, 46199, 13525, 27085, 9986 , 10135, 10030, 17201, 10043, 47905, 12699, 11418, 32387, 14067, 29362);
 UPDATE `gameobject` SET `spawntimesecsmin` = 10, `spawntimesecsmax` = 10 WHERE `guid` IN (3996164, 26772, 49695, 12863, 14137, 40668, 11014, 12872, 12864, 12871, 40688, 30277, 15008, 40688, 234778, 350470, 362149, 35792, 29680);
