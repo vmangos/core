@@ -249,6 +249,9 @@ UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 984 AND `patch_min`=0
 UPDATE `pool_template` SET `max_limit` = 4 WHERE `entry` = 1122 AND `patch_min`=0 AND `patch_max`=4;
 UPDATE `pool_template` SET `max_limit` = 5 WHERE `entry` = 1149 AND `patch_min`=0 AND `patch_max`=4;
 
+-- Deathclasp Should Only Be Accompanied with Stonelash Flayers
+UPDATE `creature` SET `id2`=0 WHERE  `guid` IN (44396, 44397);
+
 
 -- End of migration.
 END IF;
