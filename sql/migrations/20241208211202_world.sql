@@ -258,6 +258,9 @@ UPDATE `gossip_menu_option` SET `condition_id` = 374 WHERE `menu_id` = 4844 AND 
 -- Remove Duplicate Creatures
 DELETE FROM `creature` WHERE `guid` IN (16672, 16722);
 
+-- Defias Rogue Wizard Should Wander
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 10 WHERE `guid` IN (81164, 81160, 81159, 81166, 81162, 81165, 81161, 81320, 81311, 81294, 81299, 81167, 81172, 81171, 81170, 81176, 81173);
+
 
 -- End of migration.
 END IF;
