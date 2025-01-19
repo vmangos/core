@@ -13,7 +13,7 @@ INSERT INTO `migrations` VALUES ('20250113175252');
 SET @OGUID = 85100;
 SET @PTEMPLATE = 5000;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(9901, 4, 'Alterac Mountains - Gold Vein / Mithril Deposit / Truesilver Deposit (Master Pool)', 0, 0, 0, 10);
+(9901, 5, 'Alterac Mountains - Gold Vein / Mithril Deposit / Truesilver Deposit (Master Pool)', 0, 0, 0, 10);
 
 DELETE FROM `pool_gameobject` WHERE `guid` IN (87879, 220432);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -285,7 +285,7 @@ DELETE FROM `pool_pool` WHERE `pool_id` = 9003;
 
 -- Pool Gold / Silver / Iron Spawns in Alterac Mountains.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(9900, 8, 'Alterac Mountains - Silver Vein / Gold Vein / Iron Deposit (Master Pool)', 0, 0, 0, 10);
+(9900, 12, 'Alterac Mountains - Silver Vein / Gold Vein / Iron Deposit (Master Pool)', 0, 0, 0, 10);
 
 DELETE FROM `pool_gameobject` WHERE `guid` IN (6509);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
