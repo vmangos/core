@@ -252,6 +252,9 @@ UPDATE `pool_template` SET `max_limit` = 5 WHERE `entry` = 1149 AND `patch_min`=
 -- Deathclasp Should Only Be Accompanied with Stonelash Flayers
 UPDATE `creature` SET `id2`=0 WHERE  `guid` IN (44396, 44397);
 
+-- Add Missing Condition to Josephine Lister
+UPDATE `gossip_menu_option` SET `condition_id` = 374 WHERE `menu_id` = 4844 AND `id` = 0;
+
 
 -- End of migration.
 END IF;
