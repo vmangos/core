@@ -1107,6 +1107,289 @@ UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Gold Vein / Mi
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Blasted Lands - Garrison Armory" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 150080);
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Blasted Lands - Garrison Armory" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 150081);
 
+-- Redridge Mountains
+SET @OGUID = 90551;
+SET @PTEMPLATE = 9367;
+DELETE FROM `pool_gameobject` WHERE `guid` IN (34770, 34771, 40601, 40602, 40603, 40604, 40605, 40606, 40607, 40608, 40609, 40610, 40611, 40612, 40613, 40614, 40615, 40616, 40617, 40618, 40619, 40620, 40621, 40622, 40623, 40624, 40625, 40626, 40627, 40628, 40629, 251513, 251514, 251515, 251516, 251517, 251518, 389362);
+DELETE FROM `gameobject` WHERE `guid` IN (34770, 34771, 40601, 40602, 40603, 40604, 40605, 40606, 40607, 40608, 40609, 40610, 40611, 40612, 40613, 40614, 40615, 40616, 40617, 40618, 40619, 40620, 40621, 40622, 40623, 40624, 40625, 40626, 40627, 40628, 40629, 251513, 251514, 251515, 251516, 251517, 251518, 389362);
+DELETE FROM `pool_template` WHERE `entry` = 1129;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 1732, 0, -9681.26, -3114.55, 55.7525, 2.30383, 0, 0, 0.913545, 0.406738, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 1732, 0, -9550.32, -3301.11, 50.2162, 2.74017, 0, 0, 0.979925, 0.199368, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 1732, 0, -9533.11, -2925.66, 107.77, -1.78024, 0, 0, 0.777146, -0.62932, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 1732, 0, -9470.41, -3442.23, 122.738, 1.8326, 0, 0, 0.793353, 0.608761, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 1732, 0, -9423.47, -2985.06, 136.619, 0.733038, 0, 0, 0.358368, 0.93358, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 1732, 0, -9315.86, -3138.06, 100.133, 1.0821, 0, 0, 0.515038, 0.857167, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 1732, 0, -9254.95, -2870.78, 94.876, 3.14159, 0, 0, -1, 0, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 1732, 0, -9140.93, -2028.65, 124.528, 0.436332, 0, 0, 0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 1732, 0, -9110.86, -2796.44, 106.933, 4.97, 0, 0, 0.610266, -0.792197, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 1732, 0, -8827.17, -2188.08, 179.982, 1.78023, 0, 0, 0.777145, 0.629321, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+11, 1732, 0, -8754.97, -2199.17, 154.057, 1.93731, 0, 0, 0.824126, 0.566406, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+12, 1732, 0, -8749.71, -2186.82, 163.259, 5.21854, 0, 0, -0.507538, 0.861629, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+13, 1732, 0, -8721.37, -2148.08, 161.364, -1.36136, 0, 0, 0.629321, -0.777146, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+14, 1732, 0, -8709.11, -2189.66, 154.599, 3.12412, 0, 0, 0.999962, 0.00873464, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+15, 1732, 0, -8704.96, -2174.29, 151.974, 4.86947, 0, 0, -0.649447, 0.760406, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+16, 1732, 0, -9701.02, -2719.39, 70.9252, 0.453785, 0, 0, 0.224951, 0.97437, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+17, 1732, 0, -9607.09, -2858.38, 65.9065, 0.331611, 0, 0, 0.165047, 0.986286, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+18, 1732, 0, -9603.3, -3099.33, 57.9278, 3.31614, 0, 0, -0.996194, 0.087165, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+19, 1732, 0, -9081.92, -2429.31, 128.663, 1.88495, 0, 0, 0.809016, 0.587786, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+20, 1732, 0, -8756.82, -2241.76, 152.626, 4.41568, 0, 0, -0.803857, 0.594823, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+21, 1732, 0, -8725.6, -2201.18, 152.555, 2.14675, 0, 0, 0.878817, 0.47716, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+22, 1732, 0, -8682.86, -2272.17, 155.088, 4.83456, 0, 0, -0.66262, 0.748956, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+23, 1732, 0, -8703.86, -2309.01, 162.106, -0.349066, 0, 0, 0.173648, -0.984808, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+24, 1732, 0, -9354.13, -2989.31, 135.666, -1.97222, 0, 0, 0.833886, -0.551937, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+25, 1732, 0, -9077.6, -3180.13, 115.942, 2.44346, 0, 0, 0.939692, 0.34202, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+26, 1732, 0, -8818.36, -2204.01, 137.801, 2.23402, 0, 0, 0.898793, 0.438373, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+27, 1732, 0, -8808.98, -2176.18, 143.724, 3.54302, 0, 0, -0.979924, 0.19937, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+28, 1732, 0, -8805.3, -2146, 154.329, 0.855211, 0, 0, 0.414693, 0.909961, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+29, 1732, 0, -8758.65, -2191.66, 139.589, 1.98967, 0, 0, 0.83867, 0.54464, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+30, 1732, 0, -8750, -2144, 156.404, 5.86431, 0, 0, -0.207911, 0.978148, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+31, 1732, 0, -9797.6, -3226.64, 61.2402, 0.977384, 0, 0, 0.469472, 0.882948, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+32, 1733, 0, -9681.26, -3114.55, 55.7525, 2.30383, 0, 0, 0.913545, 0.406738, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+33, 1733, 0, -9550.32, -3301.11, 50.2162, 2.74017, 0, 0, 0.979925, 0.199368, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+34, 1733, 0, -9533.11, -2925.66, 107.77, -1.78024, 0, 0, 0.777146, -0.62932, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+35, 1733, 0, -9470.41, -3442.23, 122.738, 1.8326, 0, 0, 0.793353, 0.608761, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+36, 1733, 0, -9423.47, -2985.06, 136.619, 0.733038, 0, 0, 0.358368, 0.93358, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+37, 1733, 0, -9315.86, -3138.06, 100.133, 1.0821, 0, 0, 0.515038, 0.857167, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+38, 1733, 0, -9254.95, -2870.78, 94.876, 3.14159, 0, 0, -1, 0, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+39, 1733, 0, -9140.93, -2028.65, 124.528, 0.436332, 0, 0, 0.216439, 0.976296, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+40, 1733, 0, -9110.86, -2796.44, 106.933, 4.97, 0, 0, 0.610266, -0.792197, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+41, 1733, 0, -8827.17, -2188.08, 179.982, 1.78023, 0, 0, 0.777145, 0.629321, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+42, 1733, 0, -8754.97, -2199.17, 154.057, 1.93731, 0, 0, 0.824126, 0.566406, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+43, 1733, 0, -8749.71, -2186.82, 163.259, 5.21854, 0, 0, -0.507538, 0.861629, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+44, 1733, 0, -8721.37, -2148.08, 161.364, -1.36136, 0, 0, 0.629321, -0.777146, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+45, 1733, 0, -8709.11, -2189.66, 154.599, 3.12412, 0, 0, 0.999962, 0.00873464, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+46, 1733, 0, -8704.96, -2174.29, 151.974, 4.86947, 0, 0, -0.649447, 0.760406, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+47, 1733, 0, -9701.02, -2719.39, 70.9252, 0.453785, 0, 0, 0.224951, 0.97437, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+48, 1733, 0, -9607.09, -2858.38, 65.9065, 0.331611, 0, 0, 0.165047, 0.986286, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+49, 1733, 0, -9603.3, -3099.33, 57.9278, 3.31614, 0, 0, -0.996194, 0.087165, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+50, 1733, 0, -9081.92, -2429.31, 128.663, 1.88495, 0, 0, 0.809016, 0.587786, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+51, 1733, 0, -8756.82, -2241.76, 152.626, 4.41568, 0, 0, -0.803857, 0.594823, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+52, 1733, 0, -8725.6, -2201.18, 152.555, 2.14675, 0, 0, 0.878817, 0.47716, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+53, 1733, 0, -8682.86, -2272.17, 155.088, 4.83456, 0, 0, -0.66262, 0.748956, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+54, 1733, 0, -8703.86, -2309.01, 162.106, -0.349066, 0, 0, 0.173648, -0.984808, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+55, 1733, 0, -9354.13, -2989.31, 135.666, -1.97222, 0, 0, 0.833886, -0.551937, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+56, 1733, 0, -9077.6, -3180.13, 115.942, 2.44346, 0, 0, 0.939692, 0.34202, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+57, 1733, 0, -8818.36, -2204.01, 137.801, 2.23402, 0, 0, 0.898793, 0.438373, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+58, 1733, 0, -8808.98, -2176.18, 143.724, 3.54302, 0, 0, -0.979924, 0.19937, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+59, 1733, 0, -8805.3, -2146, 154.329, 0.855211, 0, 0, 0.414693, 0.909961, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+60, 1733, 0, -8758.65, -2191.66, 139.589, 1.98967, 0, 0, 0.83867, 0.54464, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+61, 1733, 0, -8750, -2144, 156.404, 5.86431, 0, 0, -0.207911, 0.978148, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+62, 1733, 0, -9797.6, -3226.64, 61.2402, 0.977384, 0, 0, 0.469472, 0.882948, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+2, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+3, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+4, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+5, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+6, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+7, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+8, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+9, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+10, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+11, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+12, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+13, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+14, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+15, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+16, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+17, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+18, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+19, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+20, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+21, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+22, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+23, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+24, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+25, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+26, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+27, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+28, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+29, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+30, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+31, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+5, @PTEMPLATE+5, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+6, @PTEMPLATE+6, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+7, @PTEMPLATE+7, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+8, @PTEMPLATE+8, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+9, @PTEMPLATE+9, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+10, @PTEMPLATE+10, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+11, @PTEMPLATE+11, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+12, @PTEMPLATE+12, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+13, @PTEMPLATE+13, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+14, @PTEMPLATE+14, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+15, @PTEMPLATE+15, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+16, @PTEMPLATE+16, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+17, @PTEMPLATE+17, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+18, @PTEMPLATE+18, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+19, @PTEMPLATE+19, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+20, @PTEMPLATE+20, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+21, @PTEMPLATE+21, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+22, @PTEMPLATE+22, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+23, @PTEMPLATE+23, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+24, @PTEMPLATE+24, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+25, @PTEMPLATE+25, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+26, @PTEMPLATE+26, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+27, @PTEMPLATE+27, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+28, @PTEMPLATE+28, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+29, @PTEMPLATE+29, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+30, @PTEMPLATE+30, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+31, @PTEMPLATE+31, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+32, @PTEMPLATE+1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+33, @PTEMPLATE+2, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+34, @PTEMPLATE+3, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+35, @PTEMPLATE+4, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+36, @PTEMPLATE+5, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+37, @PTEMPLATE+6, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+38, @PTEMPLATE+7, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+39, @PTEMPLATE+8, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+40, @PTEMPLATE+9, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+41, @PTEMPLATE+10, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+42, @PTEMPLATE+11, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+43, @PTEMPLATE+12, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+44, @PTEMPLATE+13, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+45, @PTEMPLATE+14, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+46, @PTEMPLATE+15, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+47, @PTEMPLATE+16, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+48, @PTEMPLATE+17, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+49, @PTEMPLATE+18, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+50, @PTEMPLATE+19, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+51, @PTEMPLATE+20, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+52, @PTEMPLATE+21, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+53, @PTEMPLATE+22, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+54, @PTEMPLATE+23, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+55, @PTEMPLATE+24, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+56, @PTEMPLATE+25, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+57, @PTEMPLATE+26, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+58, @PTEMPLATE+27, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+59, @PTEMPLATE+28, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+60, @PTEMPLATE+29, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+61, @PTEMPLATE+30, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+62, @PTEMPLATE+31, 'Tin Vein / Silver Vein - Redridge Mountains', 10);
+
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+2, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+3, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+4, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+5, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+6, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+7, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+8, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+9, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+10, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+11, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+12, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+13, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+14, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+15, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+16, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+17, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+18, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+19, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+20, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+21, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+22, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+23, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+24, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+25, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+26, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+27, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+28, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+29, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+30, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+31, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0);
+
+SET @OGUID = 93000;
+SET @PTEMPLATE = 9398;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 1733, 0, -8786.52, -2028.94, 130.408, 3.05433, 0, 0, 0.999048, 0.0436193, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 1733, 0, -8901.02, -2016.14, 126.447, 1.46608, 0, 0, 0.66913, 0.743145, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 1733, 0, -8759.31, -2013.18, 130.802, 5.5676, 0, 0, -0.350207, 0.936672, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 1733, 0, -8962.55, -1990.87, 137.634, 0.261799, 0, 0, 0.130526, 0.991445, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 1733, 0, -8817.11, -2061.81, 131.111, 0.139626, 0, 0, 0.0697565, 0.997564, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 2054, 0, -8786.52, -2028.94, 130.408, 3.05433, 0, 0, 0.999048, 0.0436193, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 2054, 0, -8901.02, -2016.14, 126.447, 1.46608, 0, 0, 0.66913, 0.743145, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 2054, 0, -8759.31, -2013.18, 130.802, 5.5676, 0, 0, -0.350207, 0.936672, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 2054, 0, -8962.55, -1990.87, 137.634, 0.261799, 0, 0, 0.130526, 0.991445, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 2054, 0, -8817.11, -2061.81, 131.111, 0.139626, 0, 0, 0.0697565, 0.997564, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+2, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+3, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+4, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+5, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+5, @PTEMPLATE+5, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+6, @PTEMPLATE+1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+7, @PTEMPLATE+2, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+8, @PTEMPLATE+3, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+9, @PTEMPLATE+4, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+10, @PTEMPLATE+5, 'Tin Vein / Silver Vein - Redridge Mountains', 10);
+
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+2, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+3, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+4, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+5, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0);
+
+SET @OGUID = 93010;
+SET @PTEMPLATE = 9403;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 1732, 0, -8778.13, -2251.59, 149.732, 1.64061, 0, 0, 0.731353, 0.681999, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 1732, 0, -8932.18, -2079.43, 139.813, 4.7822, 0, 0, -0.681998, 0.731354, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 1733, 0, -8778.13, -2251.59, 149.732, 1.64061, 0, 0, 0.731353, 0.681999, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 1733, 0, -8932.18, -2079.43, 139.813, 4.7822, 0, 0, -0.681998, 0.731354, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@PTEMPLATE+2, 1, 'Tin Vein / Silver Vein - Redridge Mountains', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+3, @PTEMPLATE+1, 'Tin Vein / Silver Vein - Redridge Mountains', 10),
+(@OGUID+4, @PTEMPLATE+2, 'Tin Vein / Silver Vein - Redridge Mountains', 10);
+
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+2, 400, 0, 'Redridge Mountains - Tin Vein / Silver Vein', 0);
+
+UPDATE `pool_gameobject`
+SET `description` = REPLACE(`description`, 'Redridge', 'Redridge Mountains')
+WHERE `description` LIKE '%Redridge';
+
+UPDATE `pool_template`
+SET `description` = REPLACE(`description`, 'Redridge', 'Redridge Mountains')
+WHERE `description` LIKE '%Redridge';
+
+UPDATE `pool_pool`
+SET `description` = REPLACE(`description`, 'Redridge', 'Redridge Mountains')
+WHERE `description` LIKE '%Redridge';
+
+UPDATE `pool_template` SET `description` = 'Copper Veins - Redridge Mountains (Master Pool)' WHERE `entry` = 1128;
+UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein / Silver Vein - Redridge Mountains" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
+UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein / Silver Vein - Redridge Mountains" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2054);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein / Silver Vein - Redridge Mountains" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_template` SET `description`='Redridge Mountains - Barrel of Melon Juice / Food Crate (Master Pool)' WHERE `entry` IN (211, 2723);
+
 
 -- End of migration.
 END IF;
