@@ -235,6 +235,12 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318201 WHERE `menu_id` = 3187 AND `id` = 0; -- Armorsmith Horde
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318202 WHERE `menu_id` = 3187 AND `id` = 1; -- Weaponsmith Horde
 
+-- Update condition for existing trainer gossip menu options
+UPDATE `gossip_menu_option` SET `condition_id` = 1352 WHERE `menu_id` = 1041 AND `id` = 0; -- Condition for trainer gossip for Borgus Steelhand (Weaponsmithing - Alliance)
+UPDATE `gossip_menu_option` SET `condition_id` = 1352 WHERE `menu_id` = 1042 AND `id` = 0; -- Condition for trainer gossip for Kelgruk Blooadaxe (Weaponsmithing - Horde)
+UPDATE `gossip_menu_option` SET `condition_id` = 1352 WHERE `menu_id` = 3201 AND `id` = 0; -- Condition for trainer gossip for Ironus Coldsteel (Weaponsmithing - Alliance)
+UPDATE `gossip_menu_option` SET `condition_id` = 1352 WHERE `menu_id` = 3202 AND `id` = 0; -- Condition for trainer gossip for Borgosh Corebender (Weaponsmithing - Horde)
+
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
 (3182, 2, 0, 'Myolor, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8892, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11053),
 (3182, 3, 0, 'Myolor, I was once a weaponsmith and wish to retake the hammer once more! Teach me the way of the weaponsmith!', 8893, 1, 3, -1, 0, 318204, 0, 0, '', 0, 11054), -- This option has 2 exclamation marks! Alliance weaponsmiths are extra exciting I guess!
