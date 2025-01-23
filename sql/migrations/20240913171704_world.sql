@@ -151,20 +151,19 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3068, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, 0, NULL, 0, 11021), -- Trainer gossip menu option for Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
 (3069, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, 0, NULL, 0, 11020); -- Trainer gossip menu option for Brumn Winterhoof (Elemental Leatherworking - Horde)
 
--- Add missing gossip for Therum Deepforge
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES 
-(581, 1123, 0, 4);
-
 -- Update condition for existing trainer gossip menu options
 UPDATE `gossip_menu_option` SET `condition_id` = 11039 WHERE `menu_id` = 1467 AND `id` = 0; -- Condition for trainer gossip for Oglethorpe Obnoticus (Gnomish Engineering - Horde)
 UPDATE `gossip_menu_option` SET `condition_id` = 11038 WHERE `menu_id` = 1468 AND `id` = 0; -- Condition for trainer gossip for Tinkmaster Overspark (Gnomish Engineering - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 11037 WHERE `menu_id` = 1469 AND `id` = 0; -- Condition for trainer gossip for Nixx Sprocketspring (Goblin Engineering)
 UPDATE `gossip_menu_option` SET `condition_id` = 11037, `option_broadcast_text` = 4551 WHERE `menu_id` = 1465 AND `id` = 0; -- Condition for trainer gossip for Vazario Linkgrease (Goblin Engineering) + Correction to broadcast_text entry (currently uses 4553 which is the gnomish entry)
 UPDATE `gossip_menu_option` SET `condition_id` = 11021 WHERE `menu_id` = 3067 AND `id` = 0; -- Condition for trainer gossip for Peter Galen (Dragonscale Leatherworking - Alliance)
-UPDATE `gossip_menu_option` SET `condition_id` = 11020 WHERE `menu_id` = 3069 AND `id` = 0; -- Condition for trainer gossip for Brumn Winterhoof (Elemental Leatherworking - Horde)
 UPDATE `gossip_menu_option` SET `condition_id` = 11020 WHERE `menu_id` = 3070 AND `id` = 0; -- Trainer gossip for Sarah Tanner (Elemental Leatherworking - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3072 AND `id` = 0; -- Condition for trainer gossip for Caryssia Moonhunter (Tribal Leatherworking - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3073 AND `id` = 0; -- Condition for trainer gossip for Se'Jib (Tribal Leatherworking - Horde)
+
+-- Add missing gossip for Therum Deepforge
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES 
+(581, 1123, 0, 4);
 
 -- Delete now unused condition
 DELETE FROM `conditions` WHERE `condition_entry` = 1357;
