@@ -285,6 +285,10 @@ UPDATE `quest_template` SET `RequiredCondition` = 1368 WHERE `entry` = 3647; -- 
 -- Remove trainer spell and disable gossip for Master Elemental Shaper Krixix (remnant from an ancient incorrect implementation of teaching Smelt Elementium via training menu)
 UPDATE `creature_template` SET `npc_flags` = 0, `display_probability1` = 0, `display_total_probability` = 0, `trainer_spell` = 0 WHERE `entry` = 14401;
 
+-- Remove trainer_spell column, which is now empty
+ALTER TABLE `creature_template`
+    DROP COLUMN `trainer_spell`;
+
 -- End of migration.
 END IF;
 END??
