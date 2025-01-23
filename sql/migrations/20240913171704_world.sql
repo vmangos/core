@@ -161,6 +161,7 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11038 WHERE `menu_id` = 1468 AN
 UPDATE `gossip_menu_option` SET `condition_id` = 11037 WHERE `menu_id` = 1469 AND `id` = 0; -- Condition for trainer gossip for Nixx Sprocketspring (Goblin Engineering)
 UPDATE `gossip_menu_option` SET `condition_id` = 11037, `option_broadcast_text` = 4551 WHERE `menu_id` = 1465 AND `id` = 0; -- Condition for trainer gossip for Vazario Linkgrease (Goblin Engineering) + Correction to broadcast_text entry (currently uses 4553 which is the gnomish entry)
 UPDATE `gossip_menu_option` SET `condition_id` = 11021 WHERE `menu_id` = 3067 AND `id` = 0; -- Condition for trainer gossip for Peter Galen (Dragonscale Leatherworking - Alliance)
+UPDATE `gossip_menu_option` SET `condition_id` = 11020 WHERE `menu_id` = 3069 AND `id` = 0; -- Condition for trainer gossip for Brumn Winterhoof (Elemental Leatherworking - Horde)
 UPDATE `gossip_menu_option` SET `condition_id` = 11020 WHERE `menu_id` = 3070 AND `id` = 0; -- Trainer gossip for Sarah Tanner (Elemental Leatherworking - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3072 AND `id` = 0; -- Condition for trainer gossip for Caryssia Moonhunter (Tribal Leatherworking - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `menu_id` = 3073 AND `id` = 0; -- Condition for trainer gossip for Se'Jib (Tribal Leatherworking - Horde)
@@ -236,10 +237,13 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318
 UPDATE `gossip_menu_option` SET `condition_id` = 11055, `action_script_id` = 318202 WHERE `menu_id` = 3187 AND `id` = 1; -- Weaponsmith Horde
 
 -- Update condition for existing trainer gossip menu options
+UPDATE `gossip_menu_option` SET `condition_id` = 1354 WHERE `menu_id` = 597 AND `id` = 0; -- Condition for trainer gossip for Grumnus Steelshaper (Armorsmithing - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 1352 WHERE `menu_id` = 1041 AND `id` = 0; -- Condition for trainer gossip for Borgus Steelhand (Weaponsmithing - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 1352 WHERE `menu_id` = 1042 AND `id` = 0; -- Condition for trainer gossip for Kelgruk Blooadaxe (Weaponsmithing - Horde)
+UPDATE `gossip_menu_option` SET `condition_id` = 1354 WHERE `menu_id` = 1043 AND `id` = 3; -- Condition for trainer gossip for Shayis Steelfury (Armorsmithing - Horde)
 UPDATE `gossip_menu_option` SET `condition_id` = 1352 WHERE `menu_id` = 3201 AND `id` = 0; -- Condition for trainer gossip for Ironus Coldsteel (Weaponsmithing - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 1352 WHERE `menu_id` = 3202 AND `id` = 0; -- Condition for trainer gossip for Borgosh Corebender (Weaponsmithing - Horde)
+UPDATE `gossip_menu_option` SET `condition_id` = 1354 WHERE `menu_id` = 3203 AND `id` = 0; -- Condition for trainer gossip for Okothos Ironrage (Armorsmithing - Horde)
 
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
 (3182, 2, 0, 'Myolor, I was once an armorsmith and wish to retake the hammer once more! Teach me the way of the armorsmith.', 8892, 1, 3, -1, 0, 318203, 0, 0, '', 0, 11053),
