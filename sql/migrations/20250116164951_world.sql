@@ -1390,6 +1390,14 @@ UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein / Sil
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein / Silver Vein - Redridge Mountains" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
 UPDATE `pool_template` SET `description`='Redridge Mountains - Barrel of Melon Juice / Food Crate (Master Pool)' WHERE `entry` IN (211, 2723);
 
+-- Tidy Azshara
+UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Azshara' WHERE `guid` IN (65944, 65940, 65945, 65941, 65946, 65942, 65911, 65943, 65947, 65948);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Azshara" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Azshara" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Azshara" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Truesilver Deposit / Rich Thorium Vein - Azshara" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
+UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Truesilver Deposit / Rich Thorium Vein - Azshara" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 175404);
+
 
 -- End of migration.
 END IF;
