@@ -261,6 +261,10 @@ DELETE FROM `creature` WHERE `guid` IN (16672, 16722);
 -- Defias Rogue Wizard Should Wander
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 10 WHERE `guid` IN (81164, 81160, 81159, 81166, 81162, 81165, 81161, 81320, 81311, 81294, 81299, 81167, 81172, 81171, 81170, 81176, 81173);
 
+-- Soriid the Devourer Should Not Be Skinnable
+DELETE FROM `skinning_loot_template` WHERE `entry` = 100003;
+UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE `entry` = 8204;
+
 
 -- End of migration.
 END IF;
