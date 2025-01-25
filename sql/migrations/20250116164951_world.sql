@@ -1398,6 +1398,16 @@ UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mit
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Truesilver Deposit / Rich Thorium Vein - Azshara" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Truesilver Deposit / Rich Thorium Vein - Azshara" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 175404);
 
+-- Tidy UnGoro
+UPDATE `pool_template` SET `description` = 'Mountain Silversage in Un\'Goro Crater' WHERE `entry` = 1218;
+UPDATE `pool_template` SET `description` = 'Dreamfoil in Un\'Goro Crater' WHERE `entry` = 1212;
+UPDATE `pool_template` SET `description` = 'Golden Sansam in Un\'Goro Crater' WHERE `entry` = 1214;
+UPDATE `pool_template` SET `description` = 'Sungrass in Un\'Goro Crater' WHERE `entry` = 1215;
+UPDATE `pool_template` SET `description` = 'Blindweed in Un\'Goro Crater' WHERE `entry` = 1216;
+UPDATE `pool_template` SET `description` = 'Un\'Goro Crater - Dirt Pile' WHERE `entry` = 98;
+UPDATE `pool_template` SET `description` = 'Un\'Goro Crater - Dinosaur Bone' WHERE `entry` = 99;
+UPDATE `pool_template` SET `description` = 'Un\'Goro Crater - Bloodpetal Sprout' WHERE `entry` = 102;
+
 
 -- End of migration.
 END IF;
