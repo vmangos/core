@@ -1404,7 +1404,7 @@ UPDATE `pool_template` SET `description` = 'Dreamfoil in Un\'Goro Crater' WHERE 
 UPDATE `pool_template` SET `description` = 'Golden Sansam in Un\'Goro Crater' WHERE `entry` = 1214;
 UPDATE `pool_template` SET `description` = 'Sungrass in Un\'Goro Crater' WHERE `entry` = 1215;
 UPDATE `pool_template` SET `description` = 'Blindweed in Un\'Goro Crater' WHERE `entry` = 1216;
-UPDATE `pool_template` SET `description` = 'Un\'Goro Crater - Dirt Pile' WHERE `entry` = 98;
+UPDATE `pool_template` SET `description` = 'Un\'Goro Crater - Un\'Goro Dirt Pile' WHERE `entry` = 98;
 UPDATE `pool_template` SET `description` = 'Un\'Goro Crater - Dinosaur Bone' WHERE `entry` = 99;
 UPDATE `pool_template` SET `description` = 'Un\'Goro Crater - Bloodpetal Sprout' WHERE `entry` = 102;
 
