@@ -228,7 +228,7 @@ class GossipMenu
 
         uint32 MenuItemSender(unsigned int ItemId);
         uint32 MenuItemAction(unsigned int ItemId);
-        bool MenuItemCoded(unsigned int ItemId);
+        bool MenuItemCoded(unsigned int ItemId) const;
 
         void ClearMenu();
 
@@ -295,7 +295,7 @@ class PlayerMenu
         void ClearMenus();
         uint32 GossipOptionSender(unsigned int Selection);
         uint32 GossipOptionAction(unsigned int Selection);
-        bool GossipOptionCoded(unsigned int Selection);
+        bool GossipOptionCoded(unsigned int Selection) const;
 
         void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGuid);
         void CloseGossip();

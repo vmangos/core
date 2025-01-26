@@ -260,9 +260,9 @@ void npc_j_eevee_scholomanceAI::UpdateAI(uint32 const uiDiff)
 
 CreatureAI* GetAI_npc_j_eevee(Creature* pCreature)
 {
-    if (pCreature->GetMapId() == 429) //Map 429 Zone 2557. Dire Maul.
+    if (pCreature->GetMapId() == MAP_DIRE_MAUL) //Map 429 Zone 2557. Dire Maul.
         return new npc_j_eevee_dreadsteedAI(pCreature);
-    else if (pCreature->GetMapId() == 289) // Map 289, Zone 2057. Scholomance
+    else if (pCreature->GetMapId() == MAP_SCHOLOMANCE) // Map 289, Zone 2057. Scholomance
         return new npc_j_eevee_scholomanceAI(pCreature);
 
     return nullptr;

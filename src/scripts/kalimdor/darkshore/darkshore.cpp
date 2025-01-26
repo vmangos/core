@@ -140,6 +140,7 @@ struct npc_kerlonianAI : public FollowerAI
         }
 
         m_creature->SetStandState(UNIT_STAND_STATE_SLEEP);
+        m_creature->SetFactionTemplateId(35);
         m_creature->CastSpell(m_creature, SPELL_SLEEP_VISUAL, false);
     }
 
@@ -147,9 +148,9 @@ struct npc_kerlonianAI : public FollowerAI
     {
         m_creature->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-
+        m_creature->SetFactionTemplateId(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+        m_creature->EnableMoveInLosEvent();
         DoScriptText(EMOTE_KER_AWAKEN, m_creature);
-
         SetFollowPaused(false);
     }
 
@@ -192,7 +193,7 @@ bool QuestAccept_npc_kerlonian(Player* pPlayer, Creature* pCreature, Quest const
             pCreature->SetStandState(UNIT_STAND_STATE_STAND);
             pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             DoScriptText(SAY_KER_START, pCreature, pPlayer);
-            pKerlonianAI->StartFollow(pPlayer, FACTION_ESCORT_N_FRIEND_PASSIVE, pQuest);
+            pKerlonianAI->StartFollow(pPlayer, FACTION_ESCORT_A_NEUTRAL_PASSIVE, pQuest);
         }
     }
 

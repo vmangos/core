@@ -104,6 +104,7 @@ Quest::Quest(Field* questRecord)
     for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
         RewRepValue[i] = questRecord[90 + i].GetInt32();
 
+    RewRepSpilloverMask = questRecord[130].GetUInt8();
     RewXP = questRecord[127].GetUInt32();
     RewOrReqMoney = questRecord[95].GetInt32();
     RewMoneyMaxLevel = questRecord[96].GetUInt32();

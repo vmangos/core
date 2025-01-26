@@ -444,14 +444,6 @@ void Log::OutFile(LogType logType, LogLevel logLevel, std::string const& str) co
     fflush(logFiles[logType]);
 }
 
-#ifndef USE_ANTICHEAT
-
-void Log::OutWarden(Warden const* /*warden*/, LogLevel /*logLevel*/, char const* /*format*/, ...)
-{
-}
-
-#endif
-
 bool Log::IsSmartLog(uint32 entry, uint32 guid) const
 {
     return m_smartlogExtraEntries.find(entry) != m_smartlogExtraEntries.end() ||

@@ -30,6 +30,7 @@
 #include "Opcodes.h"
 #include "MangosSocketImpl.h"
 #include "ace/OS_NS_netdb.h"
+#include "Crypto/Hash/SHA1.h"
 
 template class MangosSocket<WorldSession, WorldSocket, AuthCrypt>;
 
@@ -136,7 +137,7 @@ static std::set<std::string> GetServerAddresses()
 int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 {
     // NOTE: ATM the socket is singlethread, have this in mind ...
-    uint8 digest[20];
+    Crypto::Hash::SHA1::Digest digest;
     uint32 clientSeed;
     uint32 serverId;
     uint32 clientBuild;
@@ -153,7 +154,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> account;
 
     recvPacket >> clientSeed;
-    recvPacket.read(digest, 20);
+    recvPacket.read(digest.data(), digest.size());
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WorldSocket::HandleAuthSession: client %u, serverId %u, account %s, clientseed %u",
               clientBuild,
@@ -254,19 +255,19 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     }
 
     // Check that Key and account name are the same on client and server
-    Sha1Hash sha;
+    Crypto::Hash::SHA1::Generator sha;
 
     uint32 t = 0;
     uint32 seed = m_Seed;
 
     sha.UpdateData(account);
-    sha.UpdateData((uint8 *) & t, 4);
-    sha.UpdateData((uint8 *) & clientSeed, 4);
-    sha.UpdateData((uint8 *) & seed, 4);
-    sha.UpdateBigNumbers(&K, nullptr);
-    sha.Finalize();
+    sha.UpdateData((uint8 *) &t, 4);
+    sha.UpdateData((uint8 *) &clientSeed, 4);
+    sha.UpdateData((uint8 *) &seed, 4);
+    sha.UpdateData(K);
+    auto expectedDigest = sha.GetDigest();
 
-    if (memcmp(sha.GetDigest(), digest, 20))
+    if (digest != expectedDigest)
     {
         packet.Initialize(SMSG_AUTH_RESPONSE, 1);
         packet << uint8(AUTH_FAILED);

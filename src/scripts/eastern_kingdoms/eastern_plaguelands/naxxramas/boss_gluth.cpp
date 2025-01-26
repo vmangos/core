@@ -144,7 +144,7 @@ struct boss_gluthAI : public ScriptedAI
     void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         // only want to do these calculations inside naxx
-        if (m_pInstance->GetMap()->GetId() != 533)
+        if (m_pInstance->GetMap()->GetId() != MAP_NAXXRAMAS)
             return;
 
         if (pSpell->Id == SPELL_DECIMATE)

@@ -150,7 +150,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
 
     void UpdateAI(uint32 const diff) override
     {
-        if (m_creature->GetMapId() == 30)
+        if (m_creature->GetMapId() == MAP_ALTERAC_VALLEY)
             if (m_creature->GetDistance2d(POSITION_VANNDAR_CENTER_X, POSITION_VANNDAR_CENTER_Y) > 35.0f)
             {
                 m_creature->CombatStop();
@@ -407,7 +407,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
     void UpdateAI(uint32 const diff) override
     {
-        if (m_creature->GetMapId() == 30)
+        if (m_creature->GetMapId() == MAP_ALTERAC_VALLEY)
         {
             if (m_creature->GetDistance2d(POSITION_DKT_CENTER_X, POSITION_DKT_CENTER_Y) > 33.0f)
             {
@@ -620,7 +620,7 @@ struct npc_BalindaAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->GetMapId() == 30)
+        if (m_creature->GetMapId() == MAP_ALTERAC_VALLEY)
             if (m_creature->GetDistance2d(POSITION_BAL_CENTER_X, POSITION_BAL_CENTER_Y) > 45.0f)
             {
                 m_creature->CombatStop();
@@ -861,7 +861,7 @@ struct npc_GalvangarAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->GetMapId() == 30)
+        if (m_creature->GetMapId() == MAP_ALTERAC_VALLEY)
         {
             if (m_creature->GetDistance2d(POSITION_GAL_CENTER_X, POSITION_GAL_CENTER_Y) > 45.0f)
             {

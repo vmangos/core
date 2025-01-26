@@ -1031,13 +1031,13 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 // We only update the wipe counter if the boss has been in combat for at least 10 seconds
                 if (pCreature->GetCombatTime(false) > 10)
                 {
-                    sInstanceStatistics.IncrementWipeCounter(533, entry);
+                    sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, entry);
                     if (entry == NPC_ZELIEK)
                     {
                         // special case handling for these 4hm buggers
-                        sInstanceStatistics.IncrementWipeCounter(533, NPC_MOGRAINE);
-                        sInstanceStatistics.IncrementWipeCounter(533, NPC_BLAUMEUX);
-                        sInstanceStatistics.IncrementWipeCounter(533, NPC_THANE);
+                        sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, NPC_MOGRAINE);
+                        sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, NPC_BLAUMEUX);
+                        sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, NPC_THANE);
                     }
                 }
             }

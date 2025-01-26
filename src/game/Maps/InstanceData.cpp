@@ -36,9 +36,9 @@ void InstanceData::SaveToDB()
     CharacterDatabase.escape_string(data);
 
     if (instance->Instanceable())
-        CharacterDatabase.PExecute("UPDATE instance SET data = '%s' WHERE id = '%u'", data.c_str(), instance->GetInstanceId());
+        CharacterDatabase.PExecute("UPDATE `instance` SET `data` = '%s' WHERE `id` = %u", data.c_str(), instance->GetInstanceId());
     else
-        CharacterDatabase.PExecute("UPDATE world SET data = '%s' WHERE map = '%u'", data.c_str(), instance->GetId());
+        CharacterDatabase.PExecute("UPDATE `world` SET `data` = '%s' WHERE `map` = %u", data.c_str(), instance->GetId());
 }
 
 bool InstanceData::CheckConditionCriteriaMeet(Player const* /*player*/, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const

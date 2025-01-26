@@ -1492,7 +1492,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         else
                         {
                             if (Player* pPlayer = m_casterUnit->GetMap()->GetPlayer(playerGUID))
-                                pPlayer->TeleportTo(1, -7341.38f, -3908.11f, 150.7f, 0.51f);
+                                pPlayer->TeleportTo(MAP_KALIMDOR, -7341.38f, -3908.11f, 150.7f, 0.51f);
                         }
                     }
                     return;
@@ -1504,7 +1504,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 case 23725:                                 // Gift of Life (warrior bwl trinket)
                     if (m_casterUnit)
                     {
-                        int32 LifegivingGemHealthMod = int32(m_casterUnit->GetMaxHealth() * 0.15);
+                        int32 LifegivingGemHealthMod = int32(m_casterUnit->GetMaxHealth() * 0.15f);
                         m_casterUnit->CastCustomSpell(m_casterUnit, 23782, LifegivingGemHealthMod, {}, {}, true, nullptr);
                     }
                     return;
@@ -2172,7 +2172,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 // but own calculation say 0.385 gives at most one point difference to published values
                 float spellDamage = m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSpellSchoolMask());
                 float weaponSpeed = (1.0f / IN_MILLISECONDS) * m_CastItem->GetProto()->Delay;
-                float totalDamage = (damage + 3.85f * spellDamage) * 0.01 * weaponSpeed;
+                float totalDamage = (damage + 3.85f * spellDamage) * 0.01f * weaponSpeed;
 
                 m_caster->CastCustomSpell(unitTarget, 10444, dither(totalDamage), {}, {}, true, m_CastItem);
                 return;
@@ -3235,6 +3235,9 @@ void Spell::EffectSummon(SpellEffectIndex effIdx)
         ((Creature*)m_casterUnit)->AI()->JustSummoned((Creature*)spawnCreature);
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
+
+    if (m_spellScript)
+        m_spellScript->OnSummon(this, spawnCreature);
 }
 
 void Spell::EffectLearnSpell(SpellEffectIndex effIdx)
@@ -3368,7 +3371,7 @@ void Spell::EffectDispel(SpellEffectIndex effIdx)
                     }
                 }
                 if (!foundDispelled)
-                    successList.push_back(std::pair<SpellAuraHolder*, uint32>(holder, 1));
+                    successList.emplace_back(holder, 1);
             }
         }
         // Send success log and really remove auras
@@ -3628,6 +3631,9 @@ void Spell::EffectSummonWild(SpellEffectIndex effIdx)
 
             if (count == 0)
                 AddExecuteLogInfo(effIdx, ExecuteLogInfo(summon->GetObjectGuid()));
+
+            if (m_spellScript)
+                m_spellScript->OnSummon(this, summon);
         }
     }
 }
@@ -3818,6 +3824,9 @@ void Spell::EffectSummonGuardian(SpellEffectIndex effIdx)
 
         if (count == 0)
             AddExecuteLogInfo(effIdx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
+
+        if (m_spellScript)
+            m_spellScript->OnSummon(this, spawnCreature);
     }
 }
 
@@ -3839,6 +3848,9 @@ void Spell::EffectSummonPossessed(SpellEffectIndex effIdx)
     // Notify Summoner
     if (m_originalCaster && m_originalCaster != m_caster && m_originalCaster->AI())
         m_originalCaster->AI()->JustSummoned(pMinion);
+
+    if (m_spellScript)
+        m_spellScript->OnSummon(this, pMinion);
 }
 
 void Spell::EffectTeleUnitsFaceCaster(SpellEffectIndex effIdx)
@@ -4564,7 +4576,7 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex effIdx)
 
         switch (pGameObj->GetMapId())
         {
-            case 489:                                       //WS
+            case MAP_WARSONG_GULCH: //WS
             {
                 if (bg && bg->GetTypeID() == BATTLEGROUND_WS && bg->GetStatus() == STATUS_IN_PROGRESS)
                 {
@@ -4588,6 +4600,9 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex effIdx)
         ((GameObject*)m_caster)->AI()->JustSummoned(pGameObj);
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
+
+    if (m_spellScript)
+        m_spellScript->OnSummon(this, pGameObj);
 }
 
 void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
@@ -5457,7 +5472,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 case  5699:
                 case 11729:
                 case 11730:
-                case 27230:
                 {
                     if (!unitTarget)
                         return;
@@ -5479,14 +5493,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                         }
                     }
 
-                    static uint32 const itypes[6][3] =
+                    static uint32 const itypes[5][3] =
                     {
                         { 5512, 19004, 19005},              // Minor Healthstone
                         { 5511, 19006, 19007},              // Lesser Healthstone
                         { 5509, 19008, 19009},              // Healthstone
                         { 5510, 19010, 19011},              // Greater Healthstone
-                        { 9421, 19012, 19013},              // Major Healthstone
-                        {22103, 22104, 22105}               // Master Healthstone
+                        { 9421, 19012, 19013}               // Major Healthstone
                     };
 
                     switch (m_spellInfo->Id)
@@ -5506,9 +5519,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                         case 11730:
                             itemtype = itypes[4][rank];
                             break; // Major Healthstone
-                        case 27230:
-                            itemtype = itypes[5][rank];
-                            break; // Master Healthstone
                         default:
                             return;
                     }
@@ -6080,6 +6090,9 @@ void Spell::EffectSummonTotem(SpellEffectIndex effIdx)
     pTotem->Summon(m_casterUnit);
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(pTotem->GetObjectGuid()));
+
+    if (m_spellScript)
+        m_spellScript->OnSummon(this, pTotem);
 }
 
 void Spell::EffectEnchantHeldItem(SpellEffectIndex effIdx)
@@ -6298,6 +6311,9 @@ void Spell::EffectSummonObject(SpellEffectIndex effIdx)
         ((Creature*)m_casterUnit)->AI()->JustSummoned(pGameObj);
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
+
+    if (m_spellScript)
+        m_spellScript->OnSummon(this, pGameObj);
 }
 
 void Spell::EffectResurrect(SpellEffectIndex effIdx)
@@ -6564,6 +6580,9 @@ void Spell::EffectSummonCritter(SpellEffectIndex effIdx)
         ((Creature*)m_caster)->AI()->JustSummoned(critter);
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(critter->GetObjectGuid()));
+
+    if (m_spellScript)
+        m_spellScript->OnSummon(this, critter);
 }
 
 void Spell::EffectKnockBack(SpellEffectIndex effIdx)
@@ -6957,6 +6976,9 @@ void Spell::EffectSummonDemon(SpellEffectIndex effIdx)
     }
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(pSummon->GetObjectGuid()));
+
+    if (m_spellScript)
+        m_spellScript->OnSummon(this, pSummon);
 }
 
 void Spell::EffectSpiritHeal(SpellEffectIndex /*effIdx*/)

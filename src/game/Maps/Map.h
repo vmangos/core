@@ -95,7 +95,7 @@ struct MapEntry
     bool Instanceable() const { return mapType == MAP_INSTANCE || mapType == MAP_RAID || mapType == MAP_BATTLEGROUND; }
     bool IsRaid() const { return mapType == MAP_RAID; }
     bool IsBattleGround() const { return mapType == MAP_BATTLEGROUND; }
-    bool IsMountAllowed() const { return !IsDungeon() || id == 309 || id == 209 || id == 509 || id == 269; }
+    bool IsMountAllowed() const { return !IsDungeon() || id == MAP_ZUL_GURUB || id == MAP_ZUL_FARRAK || id == MAP_AHN_QIRAJ_RUINS || id == MAP_CAVERNS_OF_TIME; }
     bool IsContinent() const { return id == 0 || id == 1; }
 };
 
@@ -393,6 +393,7 @@ class Map : public GridRefManager<NGridType>
 
         bool GetUnloadLock(GridPair const& p) const { return getNGrid(p.x_coord, p.y_coord)->getUnloadLock(); }
         void SetUnloadLock(GridPair const& p, bool on) { getNGrid(p.x_coord, p.y_coord)->setUnloadExplicitLock(on); }
+        void ForceLoadGridsAroundPosition(float x, float y);
         void LoadGrid(Cell const& cell, bool no_unload = false);
         bool UnloadGrid(uint32 const& x, uint32 const& y, bool pForce);
         virtual void UnloadAll(bool pForce);

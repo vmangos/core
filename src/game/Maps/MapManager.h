@@ -225,6 +225,7 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
 
         std::unique_ptr<ThreadPool> m_threads;
         std::unique_ptr<ThreadPool> m_continentThreads;
+        std::unique_ptr<ThreadPool> m_instanceCreationThreads;
         bool asyncMapUpdating = false;
 
         // Instanced continent zones

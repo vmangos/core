@@ -941,7 +941,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             if (unreachableTarget)
             {
                 m_TargetNotReachableTimer += update_diff;
-                if (GetMapId() == 30 && CanHaveThreatList() && m_TargetNotReachableTimer > 1000) // Alterac Valley exploit fix
+                if (GetMapId() == MAP_ALTERAC_VALLEY && CanHaveThreatList() && m_TargetNotReachableTimer > 1000) // Alterac Valley exploit fix
                     GetThreatManager().modifyThreatPercent(GetVictim(), -101);
             }
             else

@@ -157,8 +157,8 @@ enum NaxxAreaTriggers : uint32
     AREATRIGGER_START_DK_WING       = 4117
 };
 
-static const WorldLocation toFrostwyrmTPPos(533, 3498.13f, -5349.6f, 144.967f, 1.48353f);
-static const WorldLocation entranceHubTPPos(533, 3023.52f, -3434.31f, 296.1f, 0.0f);
+static const WorldLocation toFrostwyrmTPPos(MAP_NAXXRAMAS, 3498.13f, -5349.6f, 144.967f, 1.48353f);
+static const WorldLocation entranceHubTPPos(MAP_NAXXRAMAS, 3023.52f, -3434.31f, 296.1f, 0.0f);
 
 enum NaxxGOs : uint32
 {

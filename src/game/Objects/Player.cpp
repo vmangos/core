@@ -412,7 +412,7 @@ SpellModifier::SpellModifier(SpellModOp _op, SpellModType _type, int32 _value, A
     mask = sSpellMgr.GetSpellAffectMask(aura->GetId(), aura->GetEffIndex());
 }
 
-bool SpellModifier::isAffectedOnSpell(SpellEntry const* spell) const
+bool SpellModifier::IsAffectedOnSpell(SpellEntry const* spell) const
 {
     SpellEntry const* affect_spell = sSpellMgr.GetSpellEntry(spellId);
     // False if affect_spell == nullptr or spellFamily not equal
@@ -841,7 +841,7 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     SetLocationMapId(info->mapId);
     Relocate(info->positionX, info->positionY, info->positionZ, info->orientation);
 
-    if (GetMapId() <= 1)
+    if (GetMapId() <= MAX_CONTINENT_ID)
         SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
     SetMap(sMapMgr.CreateMap(info->mapId, this));
 
@@ -1853,7 +1853,7 @@ void Player::SetWorldMask(uint32 newMask)
 void Player::UpdateCinematic(uint32 diff)
 {
     m_cinematicElapsedTime += diff;
-    // On check une nouvelle position toutes les secondes.
+    // We check a new position every second.
     if ((m_cinematicLastCheck + 1000) > m_cinematicElapsedTime)
         return;
 
@@ -1867,13 +1867,13 @@ void Player::UpdateCinematic(uint32 diff)
 
     float x_diff = (m_cinematicStartPos.x - tpPosition->x);
     float y_diff = (m_cinematicStartPos.y - tpPosition->y);
-    // Re-tp a la position de fin de la cinematique
+    // Re-teleport to end of cinematic's position
     if ((x_diff * x_diff) <= 20 || (y_diff * y_diff) <= 20)
     {
         GetCamera().ResetView();
         return;
     }
-    // Sinon on place un petit waypoint sur lequel on met notre camera, pour voir les mobs alentour
+    // Otherwise we place a small waypoint on which we put our camera, to see the surrounding mobs.
     if (Creature* viewPoint = SummonCreature(1, tpPosition->x, tpPosition->y, tpPosition->z - 20, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000, true))
         GetCamera().SetView(viewPoint);
 }
@@ -1889,7 +1889,7 @@ void Player::CinematicStart(uint32 id)
     m_cinematicElapsedTime = 0;
     m_currentCinematicEntry = id;
 
-    // Pour teleporter a la premiere position de la cinematique
+    // Teleport to the first position of the cinematic
     UpdateCinematic(1);
 }
 
@@ -2390,7 +2390,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         uint32 instanceId = 0;
         if (state)
             instanceId = state->GetInstanceId();
-        if (mapid <= 1)
+        if (mapid <= MAX_CONTINENT_ID)
             instanceId = sMapMgr.GetContinentInstanceId(mapid, x, y);
         Map* map = sMapMgr.FindMap(mapid, instanceId);
         if (map && !map->CanEnter(this))
@@ -2423,7 +2423,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
     uint32 instanceId = 0;
     if (state)
         instanceId = state->GetInstanceId();
-    if (mapid <= 1)
+    if (mapid <= MAX_CONTINENT_ID)
         instanceId = sMapMgr.GetContinentInstanceId(mapid, data->x, data->y);
     Map* map = sMapMgr.FindMap(mapid, instanceId);
     if (!map || map->CanEnter(this))
@@ -3471,6 +3471,9 @@ void Player::GiveXP(uint32 xp, Unit const* victim)
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME))
         xp /= 2;
 #endif
+
+    if (GetPersonalXpRate() >= 0.0f)
+        xp *= GetPersonalXpRate();
 
     if (xp < 1)
         return;
@@ -5326,6 +5329,9 @@ void Player::DurabilityPointsLossAll(int32 points, bool inventory)
 
 void Player::DurabilityPointsLoss(Item* item, int32 points)
 {
+    if (!sWorld.getConfig(CONFIG_BOOL_DURABILITY_LOSS_ENABLE))
+        return;
+
     int32 pMaxDurability = item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
     int32 pOldDurability = item->GetUInt32Value(ITEM_FIELD_DURABILITY);
     int32 pNewDurability = pOldDurability - points;
@@ -6759,7 +6765,7 @@ void Player::CheckAreaExploreAndOutdoor()
             uint32 xp = 0;
             if (p->AreaLevel > 0 && GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
             {
-                float const explorationRate = GetPersonalXpRate() >= 0.0f ? GetPersonalXpRate() : sWorld.getConfig(CONFIG_FLOAT_RATE_XP_EXPLORE);
+                float const explorationRate = sWorld.getConfig(CONFIG_FLOAT_RATE_XP_EXPLORE);
                 int32 const diff = int32(GetLevel()) - p->AreaLevel;
                 if (diff < -5)
                     xp = uint32(sObjectMgr.GetBaseXP(GetLevel() + 5) * explorationRate);
@@ -7021,12 +7027,12 @@ void Player::RewardReputation(Quest const* pQuest)
         {
             int32 rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST,  pQuest->RewRepValue[i], pQuest->RewRepFaction[i], GetQuestLevelForPlayer(pQuest));
 
+            bool noSpillover = (pQuest->GetRewRepSpilloverMask() & (1 << i)) != 0;
+
             if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(pQuest->RewRepFaction[i]))
-                GetReputationMgr().ModifyReputation(factionEntry, rep);
+                GetReputationMgr().ModifyReputation(factionEntry, rep, noSpillover);
         }
     }
-
-    // TODO: implement reputation spillover
 }
 
 uint32 Player::GetGuildIdFromDB(ObjectGuid guid)
@@ -10327,8 +10333,13 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
     if (pItem->HasTemporaryLoot())
         return EQUIP_ERR_ALREADY_LOOTED;
 
-    // do not allow unequipping gear except weapons, offhands, projectiles, relics in
-    // - combat
+    // you cannot unequip main hand weapon while disarmed
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    if (IsMainHandPos(pos) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
+        return EQUIP_ERR_NOT_WHILE_DISARMED;
+#endif
+
+    // do not allow unequipping gear except weapons, offhands, projectiles, relics in combat
     if (!pProto->CanChangeEquipStateInCombat())
     {
         if (IsInCombat())
@@ -13631,7 +13642,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
     q_status.m_reward_choice = pQuest->RewChoiceItemId[reward];
 
     // Used for client inform but rewarded only in case not max level
-    uint32 xp = uint32(pQuest->XPValue(this) * (GetPersonalXpRate() >= 0.0f ? GetPersonalXpRate() : sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST)));
+    uint32 xp = uint32(pQuest->XPValue(this) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
 
     if (GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         GiveXP(xp , nullptr);
@@ -15075,8 +15086,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     //"honor_rank_points, honor_highest_rank, honor_standing, honor_last_week_hk, honor_last_week_cp, honor_stored_hk, honor_stored_dk,"
     // 48                49     50      51      52      53      54      55      56              57               58       59
     //"watched_faction,  drunk, health, power1, power2, power3, power4, power5, explored_zones, equipment_cache, ammo_id, action_bars,"
-    // 60                61
-    //"world_phase_mask, create_time FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
+    // 60                61           62
+    //"world_phase_mask, create_time, instance FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
 
     std::unique_ptr<QueryResult> result = holder->TakeResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
@@ -15268,7 +15279,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     }
 
     // load the player's map here if it's not already loaded
-    if (GetMapId() <= 1)
+    if (GetMapId() <= MAX_CONTINENT_ID)
         SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
     SetMap(sMapMgr.CreateMap(GetMapId(), this));
 
@@ -15294,7 +15305,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
                 m_movementInfo.ClearTransportData();
 
                 RelocateToHomebind();
-                if (GetMapId() <= 1)
+                if (GetMapId() <= MAX_CONTINENT_ID)
                     SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
                 SetMap(sMapMgr.CreateMap(GetMapId(), this));
             }
@@ -15302,7 +15313,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
             {
                 if (transport->GetMap() != this->GetMap())
                 {
-                    if (transport->GetMapId() <= 1)
+                    if (transport->GetMapId() <= MAX_CONTINENT_ID)
                         SetLocationInstanceId(sMapMgr.GetContinentInstanceId(transport->GetMapId(), transport->GetPositionX(), transport->GetPositionY()));
                     SetMap(transport->GetMap());
                 }
@@ -15317,7 +15328,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
                           guid.GetString().c_str(), transGUID);
 
             RelocateToHomebind();
-            if (GetMapId() <= 1)
+            if (GetMapId() <= MAX_CONTINENT_ID)
                 SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
             SetMap(sMapMgr.CreateMap(GetMapId(), this));
         }
@@ -15333,24 +15344,25 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if (mapEntry && mapEntry->IsDungeon())
     {
         // if the player is in an instance and it has been reset in the meantime teleport him to the entrance
-        if (!state)
+        uint32 instanceId = fields[62].GetUInt32();
+        if (!state || state->GetInstanceId() != instanceId)
         {
             AreaTriggerTeleport const* at = sObjectMgr.GetGoBackTrigger(GetMapId());
             if (at)
             {
                 Relocate(at->destination.x, at->destination.y, at->destination.z, at->destination.o);
                 SetLocationMapId(at->destination.mapId);
-                if (GetMapId() <= 1)
+                if (GetMapId() <= MAX_CONTINENT_ID)
                     SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
                 SetMap(sMapMgr.CreateMap(GetMapId(), this));
             }
-            else if (GetMapId() == 533) // Naxxramas
+            else if (GetMapId() == MAP_NAXXRAMAS) // Naxxramas
             {
                 // There is no exit areatrigger for Naxx, but exit destination for
                 // all dungeons is stored in WorldSafeLocs.db2 in 1.13 classic client.
                 Relocate(3362.15f, -3379.35f, 144.782f, 6.28319f);
-                SetLocationMapId(0);
-                if (GetMapId() <= 1)
+                SetLocationMapId(MAP_EASTERN_KINGDOMS);
+                if (GetMapId() <= MAX_CONTINENT_ID)
                     SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
                 SetMap(sMapMgr.CreateMap(GetMapId(), this));
             }
@@ -15507,7 +15519,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
         //we can be relocated from taxi and still have an outdated Map pointer!
         //so we need to get a new Map pointer!
-        if (GetMapId() <= 1)
+        if (GetMapId() <= MAX_CONTINENT_ID)
             SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
         SetMap(sMapMgr.CreateMap(GetMapId(), this));
         SaveRecallPosition();                           // save as recall also to prevent recall and fall from sky
@@ -16840,7 +16852,7 @@ void Player::SaveToDB(bool online, bool force)
     static SqlStatementID insChar;
 
     SqlStatement uberInsert = CharacterDatabase.CreateStatement(insChar, "REPLACE INTO `characters` (`guid`, `account`, `name`, `race`, `class`, `gender`, `level`, `xp`, `money`, `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `bank_bag_slots`, `player_flags`,"
-                              "`map`, `position_x`, `position_y`, `position_z`, `orientation`, "
+                              "`map`, `instance`, `position_x`, `position_y`, `position_z`, `orientation`, "
                               "`transport_guid`, `transport_x`, `transport_y`, `transport_z`, `transport_o`, "
                               "`known_taxi_mask`, `current_taxi_path`, `online`, `played_time_total`, `played_time_level`, "
                               "`rest_bonus`, `logout_time`, `is_logout_resting`, `reset_talents_multiplier`, `reset_talents_time`, "
@@ -16849,7 +16861,7 @@ void Player::SaveToDB(bool online, bool force)
                               "`watched_faction`, `drunk`, `health`, `power1`, `power2`, `power3`, `power4`, `power5`, "
                               "`explored_zones`, `equipment_cache`, `ammo_id`, `action_bars`, `world_phase_mask`, `create_time`) "
                               "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                              "?, ?, ?, ?, ?, "
+                              "?, ?, ?, ?, ?, ?, "
                                "?, ?, ?, ?, ?, "
                               "?, ?, ?, ?, ?, "
                               "?, ?, ?, ?, ?, "
@@ -16883,6 +16895,7 @@ void Player::SaveToDB(bool online, bool force)
     if (!IsBeingTeleported())
     {
         uberInsert.addUInt32(GetMapId());
+        uberInsert.addUInt32(GetInstanceId());
         uberInsert.addFloat(finiteAlways(GetPositionX()));
         uberInsert.addFloat(finiteAlways(GetPositionY()));
         uberInsert.addFloat(finiteAlways(GetPositionZ()));
@@ -16891,6 +16904,7 @@ void Player::SaveToDB(bool online, bool force)
     else
     {
         uberInsert.addUInt32(GetTeleportDest().mapId);
+        uberInsert.addUInt32(0);
         uberInsert.addFloat(finiteAlways(GetTeleportDest().x));
         uberInsert.addFloat(finiteAlways(GetTeleportDest().y));
         uberInsert.addFloat(finiteAlways(GetTeleportDest().z));
@@ -18050,7 +18064,7 @@ bool Player::HasInstantCastingSpellMod(SpellEntry const* spellInfo) const
 {
     for (const auto& mod : m_spellMods[SPELLMOD_CASTING_TIME])
     {
-        if ((mod->type == SPELLMOD_PCT) && (mod->value <= -100) && mod->isAffectedOnSpell(spellInfo))
+        if ((mod->type == SPELLMOD_PCT) && (mod->value <= -100) && mod->IsAffectedOnSpell(spellInfo))
             return true;
     }
     return false;
@@ -18071,7 +18085,7 @@ bool Player::IsAffectedBySpellmod(SpellEntry const* spellInfo, SpellModifier con
             return false;
     }
 
-    return mod->isAffectedOnSpell(spellInfo);
+    return mod->IsAffectedOnSpell(spellInfo);
 }
 
 void Player::AddSpellMod(SpellModifier* mod, bool apply)
@@ -20287,9 +20301,6 @@ uint32 Player::SelectResurrectionSpellId() const
                 case 20765:
                     spellId = 20761;
                     break;        // rank 5
-                case 27239:
-                    spellId = 27240;
-                    break;        // rank 6
                 default:
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unhandled spell %u: S.Resurrection", dummyAura->GetId());
                     continue;

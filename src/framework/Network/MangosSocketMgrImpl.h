@@ -240,6 +240,8 @@ MangosSocketMgr<SocketType>::MangosSocketMgr():
 template <typename SocketType>
 MangosSocketMgr<SocketType>::~MangosSocketMgr()
 {
+    Wait();
+
     delete [] m_NetThreads;
     delete m_Acceptor;
 }
@@ -305,11 +307,6 @@ void MangosSocketMgr<SocketType>::StopNetwork()
         for (size_t i = 0; i < m_NetThreadsCount; ++i)
             m_NetThreads[i].Stop();
     }
-
-    // Avoid hanging on shutdown on some unix systems.
-#ifdef _WIN32
-    Wait();
-#endif
 }
 
 template <typename SocketType>

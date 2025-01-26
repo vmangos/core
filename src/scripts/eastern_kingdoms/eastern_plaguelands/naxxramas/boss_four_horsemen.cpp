@@ -140,7 +140,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     void AggroRadius(uint32 diff)
     {
         // He is used for SM event too, sooo 
-        if (m_creature->GetMapId() != 533)
+        if (m_creature->GetMapId() != MAP_NAXXRAMAS)
             return;
 
         if (m_pInstance->GetData(TYPE_FOUR_HORSEMEN) != NOT_STARTED && m_pInstance->GetData(TYPE_FOUR_HORSEMEN) != FAIL)
@@ -193,7 +193,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         // He is used for SM event too, sooo 
-        if (m_creature->GetMapId() != 533)
+        if (m_creature->GetMapId() != MAP_NAXXRAMAS)
             return;
 
         if (!m_creature->IsWithinDistInMap(pWho, 75.0f))
@@ -223,7 +223,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     void Reset() override
     {
         // Mograine is used for SM event too, sooo 
-        if (m_creature->GetMapId() != 533)
+        if (m_creature->GetMapId() != MAP_NAXXRAMAS)
             return;
 
         pullCheckTimer = 1000;
@@ -267,7 +267,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     void Aggro(Unit* pWho) override
     {
         // Mograine is used for SM event too, sooo 
-        if (m_creature->GetMapId() != 533)
+        if (m_creature->GetMapId() != MAP_NAXXRAMAS)
             return;
 
         if (m_pInstance->GetData(TYPE_FOUR_HORSEMEN) == IN_PROGRESS)
@@ -339,7 +339,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     void UpdateAI(uint32 const uiDiff) override
     {
         // He is used for SM event too, sooo 
-        if (m_creature->GetMapId() != 533)
+        if (m_creature->GetMapId() != MAP_NAXXRAMAS)
             return;
 
         if (!m_bIsSpirit)
@@ -542,7 +542,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
     void KilledUnit(Unit* Victim) override
     {
         // He is used for SM event too, sooo 
-        if (m_creature->GetMapId() != 533)
+        if (m_creature->GetMapId() != MAP_NAXXRAMAS)
             return;
 
         // Not sure about it

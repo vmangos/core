@@ -153,14 +153,7 @@ namespace MaNGOS
 
             xp_gain *= pCreature->GetCreatureInfo()->xp_multiplier;
             xp_gain *= pCreature->GetXPModifierDueToDamageOrigin();
-
-            Player const* pPlayer = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
-            float personalRate = pPlayer ? pPlayer->GetPersonalXpRate() : -1.0f;
-
-            if (personalRate >= 0.0f)
-                xp_gain *= personalRate;
-            else
-                xp_gain *= sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL);
+            xp_gain *= sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL);
 
             return std::nearbyint(xp_gain);
         }

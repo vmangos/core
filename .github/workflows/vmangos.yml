@@ -57,7 +57,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get -qq update
-        sudo apt-get -qq install build-essential cmake cppcheck git libace-dev libiberty-dev libmysql++-dev libssl-dev libtbb-dev make openssl
+        sudo apt-get -qq install build-essential cmake libace-dev libmysql++-dev libtbb-dev libcurl4-openssl-dev openssl
       #windows dependencies
     - name: windows dependencies
       if: matrix.os == 'windows-2019'
@@ -92,21 +92,25 @@ jobs:
         mkdir build
         mkdir _install
         cd build
-        cmake ../ -DCMAKE_INSTALL_PREFIX=../_install -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1
+        cmake ../ -DCMAKE_INSTALL_PREFIX=../_install -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -DENABLE_MAILSENDER=1
         make -j2
         make install
     #windows
     - name: windows build & install
       if: matrix.os == 'windows-2019'
       run: |
-        #directory variables
+        # Build ACE
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
         cd $GITHUB_WORKSPACE/ACE_wrappers
         /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "ACE_wrappers_vs2019.sln" //p:Configuration=Release //p:Platform=x64 //t:ACE //m:2
+        # Build CURL
+        cd $GITHUB_WORKSPACE/dep/windows/optional_dependencies/
+        ./curl_download_and_build.bat
+        # Build actual project
         cd $GITHUB_WORKSPACE
         mkdir build
         cd build
-        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 16 2019" -A x64 ..
+        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -DENABLE_MAILSENDER=1 -G "Visual Studio 16 2019" -A x64 ..
         /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
       #git bash shell
       shell: bash

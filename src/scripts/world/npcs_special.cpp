@@ -686,117 +686,6 @@ CreatureAI* GetAI_npc_steam_tonk(Creature* pCreature)
     return new npc_steam_tonkAI(pCreature);
 }
 
-/*
- * Rat of the depths
- */
-
-enum
-{
-    QUEST_CHASSE_AU_RAT        = 6661,
-    SPELL_EXTASE_MELODIEUSE    = 21050,
-    SPELL_EXTASE_MELO_VISU     = 21051,
-    SPELL_MONTY_FRAPPE_RATS    = 21052,
-    NPC_RAT_PROFONDEURS        = 13016,
-    NPC_RAT_ENSORCELE          = 13017,
-    NPC_MONTY                  = 12997,
-};
-
-struct rat_des_profondeursAI : public ScriptedAI
-{
-    rat_des_profondeursAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    ObjectGuid m_FollowingPlayerGuid;
-    uint32 QuestFinishCheck_Timer;
-
-    void Reset() override
-    {
-        QuestFinishCheck_Timer = 0;
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_FollowingPlayerGuid)
-            return;
-        Player* pPlayer = m_creature->GetMap()->GetPlayer(m_FollowingPlayerGuid);
-        if (!pPlayer || !pPlayer->IsInWorld() ||
-                (pPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_INCOMPLETE && pPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_COMPLETE))
-        {
-            m_FollowingPlayerGuid.Clear();
-            m_creature->RemoveAurasDueToSpell(SPELL_EXTASE_MELO_VISU);
-            m_creature->UpdateEntry(NPC_RAT_PROFONDEURS);
-            m_creature->DisappearAndDie();
-            return;
-        }
-        // La quete est-elle terminee ?
-        if (QuestFinishCheck_Timer < uiDiff)
-        {
-            Creature* pMonty = m_creature->FindNearestCreature(NPC_MONTY, 20.0f, true);
-            if (!pMonty || pPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_COMPLETE)
-            {
-                QuestFinishCheck_Timer = 5000;
-                return;
-            }
-            // Quete finie.
-            pPlayer->GroupEventHappens(QUEST_CHASSE_AU_RAT, m_creature);        // Complete la quete
-            pMonty->CastSpell(m_creature, SPELL_MONTY_FRAPPE_RATS, true);       // Monty frappe le rat
-            // Et on ".die" les autres rats.
-            std::list<Creature*> pCreaList;
-            m_creature->GetCreatureListWithEntryInGrid(pCreaList, NPC_RAT_ENSORCELE, 100.0f);
-            for (const auto& pCreature : pCreaList)
-            {
-                if (pCreature->AI()->GetData(0) == m_FollowingPlayerGuid.GetCounter())
-                    pCreature->DisappearAndDie();
-            }
-        }
-        else
-            QuestFinishCheck_Timer -= uiDiff;
-    }
-
-    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpellInfo) override
-    {
-        // Ce rat est deja pris !
-        if (!m_FollowingPlayerGuid.IsEmpty())
-            return;
-        if (!pSpellInfo || pSpellInfo->Id != SPELL_EXTASE_MELODIEUSE)
-            return;
-        Player* pCasterPlayer = pCaster->ToPlayer();
-        if (!pCasterPlayer)
-            return;
-        if (pCasterPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_INCOMPLETE)
-            return;
-        m_FollowingPlayerGuid = pCasterPlayer->GetObjectGuid();
-        m_creature->UpdateEntry(NPC_RAT_ENSORCELE);
-        m_creature->CastSpell(m_creature, SPELL_EXTASE_MELO_VISU, true);
-        m_creature->GetMotionMaster()->Clear(false);
-        m_creature->GetMotionMaster()->MoveFollow(pCasterPlayer, 1.0f, M_PI_F);
-        pCasterPlayer->RewardPlayerAndGroupAtCast(m_creature, SPELL_EXTASE_MELODIEUSE);
-    }
-
-    void JustDied(Unit* pKiller) override
-    {
-        if (!m_FollowingPlayerGuid)
-            return;
-        Player* pQuestPlayer = m_creature->GetMap()->GetPlayer(m_FollowingPlayerGuid);
-        if (!pQuestPlayer || !pQuestPlayer->IsInWorld())
-            return;
-        pQuestPlayer->FailQuest(QUEST_CHASSE_AU_RAT);
-        m_FollowingPlayerGuid.Clear();
-    }
-
-    uint32 GetData(uint32 dataType) override
-    {
-        return dataType == 0 ? m_FollowingPlayerGuid.GetCounter() : 0;
-    }
-};
-
-CreatureAI* GetAI_rat_des_profondeurs(Creature* pCreature)
-{
-    return new rat_des_profondeursAI(pCreature);
-}
-
 /*######
 ## npc_felhound_minion
 ######*/
@@ -2445,11 +2334,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_steam_tonk";
     newscript->GetAI = &GetAI_npc_steam_tonk;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "rat_des_profondeurs";
-    newscript->GetAI = &GetAI_rat_des_profondeurs;
     newscript->RegisterSelf();
 
     newscript = new Script;

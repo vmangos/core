@@ -93,7 +93,7 @@ void CreatureAI::SetSpellsList(CreatureSpellsList const* pSpellsList)
     m_CreatureSpells.clear();
     for (const auto& entry : *pSpellsList)
     {
-        m_CreatureSpells.push_back(CreatureAISpellsEntry(entry));
+        m_CreatureSpells.emplace_back(entry);
     }
     m_CreatureSpells.shrink_to_fit();
     m_uiCastingDelay = 0;

@@ -3093,13 +3093,13 @@ void CombatBotBaseAI::SendBattlemasterJoinPacket(uint8 battlegroundId)
     switch (battlegroundId)
     {
         case BATTLEGROUND_QUEUE_AV:
-            data << uint32(30);
+            data << uint32(MAP_ALTERAC_VALLEY);
             break;
         case BATTLEGROUND_QUEUE_WS:
-            data << uint32(489);
+            data << uint32(MAP_WARSONG_GULCH);
             break;
         case BATTLEGROUND_QUEUE_AB:
-            data << uint32(529);
+            data << uint32(MAP_ARATHI_BASIN);
             break;
         default:
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Invalid BG queue type!");

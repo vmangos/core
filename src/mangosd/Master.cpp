@@ -177,6 +177,20 @@ int Master::Run()
         return 1;
     }
 
+    {
+        std::unique_ptr<QueryResult> result{LoginDatabase.PQuery("SELECT `name` FROM `realmlist` WHERE `id` = %d", realmID)};
+        if (!result)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Config contains invalid realmID %d, make sure its set in the `realmlist` table", realmID);
+            Log::WaitBeforeContinueIfNeed();
+            return 1;
+        }
+        realmName = (*result)[0].GetCppString();
+    }
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "World server is running realm ID: %d Name: \"%s\"", realmID, realmName.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+
     // Initialize the World
     sWorld.SetInitialWorldSettings();
 
@@ -481,8 +495,6 @@ bool Master::_StartDB()
         LogsDatabase.HaltDelayThread();
         return false;
     }
-
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Realm running as realm ID %d", realmID);
 
     // Clean the database before starting
     clearOnlineAccounts();

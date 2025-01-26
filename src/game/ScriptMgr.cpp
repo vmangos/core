@@ -1749,37 +1749,34 @@ void ScriptMgr::LoadEventIdScripts()
 
 void ScriptMgr::LoadScriptNames()
 {
-    m_scriptNames.push_back("");
-    std::unique_ptr<QueryResult> result = WorldDatabase.Query(
-                              "SELECT DISTINCT(`script_name`) FROM `creature_template` WHERE `script_name` <> '' "
-                              "UNION "
-                              "SELECT DISTINCT(`script_name`) FROM `gameobject_template` WHERE `script_name` <> '' "
-                              "UNION "
-                              "SELECT DISTINCT(`script_name`) FROM `scripted_areatrigger` WHERE `script_name` <> '' "
-                              "UNION "
-                              "SELECT DISTINCT(`script_name`) FROM `scripted_event_id` WHERE `script_name` <> '' "
-                              "UNION "
-                              "SELECT DISTINCT(`script_name`) FROM `map_template` WHERE `script_name` <> ''");
+    m_scriptNames.emplace_back("");
 
-    if (!result)
-    {
-        BarGoLink bar(1);
-        bar.step();
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, ">> Loaded empty set of Script Names!");
-        return;
-    }
-
-    BarGoLink bar(result->GetRowCount());
+    BarGoLink bar(6);
     uint32 count = 0;
-
-    do
+    char const* tableNames[6] =
     {
+        "creature_template",
+        "gameobject_template",
+        "scripted_areatrigger",
+        "scripted_event_id",
+        "spell_template",
+        "map_template"
+    };
+
+    for (uint32 i = 0; i < 6; ++i)
+    {
+        std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT DISTINCT(script_name) FROM %s WHERE script_name <> ''", tableNames[i]);
         bar.step();
-        m_scriptNames.push_back((*result)[0].GetString());
-        ++count;
+
+        if (!result)
+            continue;
+
+        do
+        {
+            ++count;
+            m_scriptNames.emplace_back((*result)[0].GetString());
+        } while (result->NextRow());
     }
-    while (result->NextRow());
 
     std::sort(m_scriptNames.begin(), m_scriptNames.end());
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -1848,6 +1845,16 @@ InstanceData* ScriptMgr::CreateInstanceData(Map* pMap)
         return nullptr;
 
     return pTempScript->GetInstanceData(pMap);
+}
+
+SpellScript* ScriptMgr::GetSpellScript(SpellEntry const* pSpell)
+{
+    Script* pTempScript = m_scripts[pSpell->ScriptId];
+
+    if (!pTempScript || !pTempScript->GetSpellScript)
+        return nullptr;
+
+    return pTempScript->GetSpellScript(pSpell);
 }
 
 bool ScriptMgr::OnGossipHello(Player* pPlayer, Creature* pCreature)

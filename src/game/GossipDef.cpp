@@ -107,10 +107,10 @@ uint32 GossipMenu::MenuItemAction(unsigned int ItemId)
     return m_gItems[ ItemId ].m_gOptionId;
 }
 
-bool GossipMenu::MenuItemCoded(unsigned int ItemId)
+bool GossipMenu::MenuItemCoded(unsigned int ItemId) const
 {
     if (ItemId >= m_gItems.size())
-        return 0;
+        return false;
 
     return m_gItems[ ItemId ].m_gCoded;
 }
@@ -148,7 +148,7 @@ uint32 PlayerMenu::GossipOptionAction(unsigned int Selection)
     return mGossipMenu.MenuItemAction(Selection);
 }
 
-bool PlayerMenu::GossipOptionCoded(unsigned int Selection)
+bool PlayerMenu::GossipOptionCoded(unsigned int Selection) const
 {
     return mGossipMenu.MenuItemCoded(Selection);
 }

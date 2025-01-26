@@ -812,19 +812,29 @@ uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movemen
     }
 #undef APPEND_CHEAT
 
-    AddCheats(cheatFlags);
-
-    if (ShouldRejectMovement(cheatFlags) &&
-        me->movespline->Finalized() &&
-       !me->IsBeingTeleported())
+    if (cheatFlags)
     {
-        me->RemoveUnitMovementFlag(removeMoveFlags);
-        me->ResolvePendingMovementChanges(true, true);
-        me->SendHeartBeat(true);
-        return WorldTimer::getMSTime() + 100 + std::min(1000u, sWorld.GetCurrentDiff() + m_session->GetLatency());
+        // Since we dont require client confirmation for flag changes
+        // during move splines, it's possible for client to not have
+        // yet processed the changes when the move spline expires.
+        // So just ignore this packet and dont send forced update.
+        if (opcode == CMSG_MOVE_SPLINE_DONE)
+            return 1;
+
+        AddCheats(cheatFlags);
+
+        if (ShouldRejectMovement(cheatFlags) &&
+            me->movespline->Finalized() &&
+            !me->IsBeingTeleported())
+        {
+            me->RemoveUnitMovementFlag(removeMoveFlags);
+            me->ResolvePendingMovementChanges(true, true);
+            me->SendHeartBeat(true);
+            return WorldTimer::getMSTime() + 100 + std::min(1000u, sWorld.GetCurrentDiff() + m_session->GetLatency());
+        }
+        else if (removeMoveFlags)
+            movementInfo.RemoveMovementFlag(removeMoveFlags);
     }
-    else if (removeMoveFlags)
-        movementInfo.RemoveMovementFlag(removeMoveFlags);
 
     return 0;
 }
@@ -1175,7 +1185,7 @@ bool MovementAnticheat::CheckForbiddenArea(MovementInfo const& movementInfo) con
 
     switch(me->GetMapId())
     {
-        case 30: // Alterac Valley
+        case MAP_ALTERAC_VALLEY: // Alterac Valley
         {
             if (BattleGround* bg = me->GetBattleGround())
             {
@@ -1190,7 +1200,7 @@ bool MovementAnticheat::CheckForbiddenArea(MovementInfo const& movementInfo) con
             }
             break;
         }
-        case 489: // Warsong Gulch
+        case MAP_WARSONG_GULCH: // Warsong Gulch
         {
             // Only way to get this high is with engineering items malfunction.
             if (!(movementInfo.moveFlags & (MOVEFLAG_FALLINGFAR | MOVEFLAG_JUMPING)) && movementInfo.pos.z > 380.0f)
@@ -1209,7 +1219,7 @@ bool MovementAnticheat::CheckForbiddenArea(MovementInfo const& movementInfo) con
             }
             break;
         }
-        case 529: // Arathi Basin
+        case MAP_ARATHI_BASIN: // Arathi Basin
         {
             if (BattleGround* bg = me->GetBattleGround())
             {

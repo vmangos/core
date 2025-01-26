@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-set (game_SRCS 
+set (game_SRCS
     AccountMgr.cpp
     AuraRemovalMgr.cpp
     AutoBroadCastMgr.cpp
@@ -278,6 +278,23 @@ set (game_SRCS
     AI/ScriptedPetAI.h
     AI/TotemAI.h
     Anticheat/Anticheat.h
+    Anticheat/MovementAnticheat/MovementAnticheat.cpp
+    Anticheat/MovementAnticheat/MovementAnticheat.h
+    Anticheat/WardenAnticheat/Warden.cpp
+    Anticheat/WardenAnticheat/Warden.hpp
+    Anticheat/WardenAnticheat/WardenKeyGenerator.h
+    Anticheat/WardenAnticheat/WardenMac.cpp
+    Anticheat/WardenAnticheat/WardenMac.hpp
+    Anticheat/WardenAnticheat/WardenModule.cpp
+    Anticheat/WardenAnticheat/WardenModule.hpp
+    Anticheat/WardenAnticheat/WardenModuleMgr.cpp
+    Anticheat/WardenAnticheat/WardenModuleMgr.hpp
+    Anticheat/WardenAnticheat/WardenScan.cpp
+    Anticheat/WardenAnticheat/WardenScan.hpp
+    Anticheat/WardenAnticheat/WardenScanMgr.cpp
+    Anticheat/WardenAnticheat/WardenScanMgr.hpp
+    Anticheat/WardenAnticheat/WardenWin.cpp
+    Anticheat/WardenAnticheat/WardenWin.hpp
     AuctionHouse/AuctionHouseBotMgr.h
     AuctionHouse/AuctionHouseMgr.h
     Battlegrounds/BattleGround.h
@@ -455,29 +472,6 @@ else()
       ${CMAKE_SOURCE_DIR}/src/scripts/ScriptLoader.h
   )
 endif()
-
-if(USE_ANTICHEAT)
-  list(APPEND game_SRCS
-      Anticheat/MovementAnticheat/MovementAnticheat.cpp
-      Anticheat/MovementAnticheat/MovementAnticheat.h
-      Anticheat/WardenAnticheat/Warden.cpp
-      Anticheat/WardenAnticheat/Warden.hpp
-      Anticheat/WardenAnticheat/WardenKeyGeneration.h
-      Anticheat/WardenAnticheat/WardenMac.cpp
-      Anticheat/WardenAnticheat/WardenMac.hpp
-      Anticheat/WardenAnticheat/WardenModule.cpp
-      Anticheat/WardenAnticheat/WardenModule.hpp
-      Anticheat/WardenAnticheat/WardenModuleMgr.cpp
-      Anticheat/WardenAnticheat/WardenModuleMgr.hpp
-      Anticheat/WardenAnticheat/WardenScan.cpp
-      Anticheat/WardenAnticheat/WardenScan.hpp
-      Anticheat/WardenAnticheat/WardenScanMgr.cpp
-      Anticheat/WardenAnticheat/WardenScanMgr.hpp
-      Anticheat/WardenAnticheat/WardenWin.cpp
-      Anticheat/WardenAnticheat/WardenWin.hpp
-  )
-endif()
-
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}

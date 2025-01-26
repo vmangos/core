@@ -142,8 +142,8 @@ bool ChatHandler::HandleSpellInfosCommand(char *args)
     PSendSysMessage("MaxTargetLevel%u:DmgClass%u:rangeIndex%u", pSpell->MaxTargetLevel, pSpell->DmgClass, pSpell->rangeIndex);
     PSendSysMessage("procChance%u:procFlags0x%x:procCharges%u", pSpell->procChance, pSpell->procFlags, pSpell->procCharges);
     PSendSysMessage("InterruptFlags0x%x:AuraInterruptFlags0x%x:PreventionType%x:spellLevel%u", pSpell->InterruptFlags, pSpell->AuraInterruptFlags, pSpell->PreventionType, pSpell->spellLevel);
-    PSendSysMessage("SpellSpecific%u:Binaire%s:spellPriority%u:Positive%u", Spells::GetSpellSpecific(pSpell->Id), pSpell->IsBinary() ? "OUI" : "NON", pSpell->spellPriority, pSpell->IsPositiveSpell());
-    PSendSysMessage("RecoveryTime%u:CategoryRecoveryTime%u:PvEHeartBeat%s", pSpell->RecoveryTime, pSpell->CategoryRecoveryTime, pSpell->IsPvEHeartBeat() ? "OUI" : "NON");
+    PSendSysMessage("SpellSpecific%u:Binaire%s:spellPriority%u:Positive%u", Spells::GetSpellSpecific(pSpell->Id), pSpell->IsBinary() ? "YES" : "NO", pSpell->spellPriority, pSpell->IsPositiveSpell());
+    PSendSysMessage("RecoveryTime%u:CategoryRecoveryTime%u:PvEHeartBeat%s", pSpell->RecoveryTime, pSpell->CategoryRecoveryTime, pSpell->IsPvEHeartBeat() ? "YES" : "NO");
     return true;
 }
 

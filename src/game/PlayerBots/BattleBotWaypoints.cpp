@@ -1782,7 +1782,7 @@ void BattleBotAI::MoveToNextPoint()
 
     BattleBotWaypoint& nextPoint = m_currentPath->at(m_currentPoint);
 
-    me->GetMotionMaster()->MovePoint(m_currentPoint, nextPoint.x + frand(-1, 1), nextPoint.y + frand(-1, 1), nextPoint.z, MOVE_PATHFINDING);
+    me->GetMotionMaster()->MovePoint(m_currentPoint, nextPoint.x + frand(-1, 1), nextPoint.y + frand(-1, 1), nextPoint.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
 }
 
 bool BattleBotAI::StartNewPathFromBeginning()

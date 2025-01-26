@@ -628,7 +628,7 @@ struct boss_victor_nefariusAI : ScriptedAI
 
 CreatureAI* GetAI_boss_victor_nefarius(Creature* creature)
 {
-    if (creature->GetMapId() == 469) //BWL
+    if (creature->GetMapId() == MAP_BLACKWING_LAIR) //BWL
         return new boss_victor_nefariusAI(creature);
 
     // UBRS

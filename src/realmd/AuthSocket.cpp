@@ -24,7 +24,7 @@
 */
 
 #include "Common.h"
-#include "Auth/Hmac.h"
+#include "Crypto/Hash/HMACSHA1.h"
 #include "Auth/base32.h"
 #include "Database/DatabaseEnv.h"
 #include "Config/Config.h"
@@ -35,12 +35,11 @@
 #include "PatchHandler.h"
 #include "Util.h"
 
-#ifdef USE_SENDGRID
+#ifdef ENABLE_MAILSENDER
 #include "MailerService.h"
 #include "SendgridMail.h"
 #endif
 
-#include <openssl/md5.h>
 #include <ctime>
 //#include "Util.h" -- for commented utf8ToUpperOnlyLatin
 
@@ -162,7 +161,7 @@ typedef struct XFER_INIT
     uint8 fileNameLen;                                      // strlen(fileName);
     uint8 fileName[5];                                      // fileName[fileNameLen]
     uint64 file_size;                                       // file size (bytes)
-    uint8 md5[MD5_DIGEST_LENGTH];                           // MD5
+    uint8 md5[Crypto::Hash::MD5::Digest::size()];           // MD5
 }XFER_INIT;
 
 typedef struct AuthHandler
@@ -264,12 +263,12 @@ void AuthSocket::OnRead()
     }
 }
 
-void AuthSocket::SendProof(Sha1Hash sha)
+void AuthSocket::SendProof(Crypto::Hash::SHA1::Digest sha)
 {
     if (m_build < 6299)  // before version 2.0.3 (exclusive)
     {
         sAuthLogonProof_S proof;
-        memcpy(proof.M2, sha.GetDigest(), 20);
+        memcpy(proof.M2, sha.data(), sha.size());
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
         proof.surveyId = 0x00000000;
@@ -279,7 +278,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
     else if (m_build < 8089) // before version 2.4.0 (exclusive)
     {
         sAuthLogonProof_S_BUILD_6299 proof;
-        memcpy(proof.M2, sha.GetDigest(), 20);
+        memcpy(proof.M2, sha.data(), sha.size());
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
         proof.surveyId = 0x00000000;
@@ -290,7 +289,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
     else
     {
         sAuthLogonProof_S_BUILD_8089 proof;
-        memcpy(proof.M2, sha.GetDigest(), 20);
+        memcpy(proof.M2, sha.data(), sha.size());
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
         proof.accountFlags = ACCOUNT_FLAG_PROPASS;
@@ -723,7 +722,7 @@ bool AuthSocket::_HandleLogonProof()
                 return true;
             }
 
-#ifdef USE_SENDGRID
+#ifdef ENABLE_MAILSENDER
             if (sConfig.GetBoolDefault("SendMail", false))
             {
                 auto mail = std::make_unique<SendgridMail>
@@ -756,17 +755,14 @@ bool AuthSocket::_HandleLogonProof()
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
-        const char* K_hex = srp.GetStrongSessionKey().AsHexStr();
+        std::string K_hex = srp.GetStrongSessionKey().AsHexStr();
         const char *os = reinterpret_cast<char *>(&m_os); // no injection as there are only two possible values
         const char *platform = reinterpret_cast<char *>(&m_platform); // no injection as there are only two possible values
         std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",
-            K_hex, get_remote_address().c_str(), GetLocaleByName(m_localizationName), os, platform, m_safelogin.c_str() );
-
-        OPENSSL_free((void*)K_hex);
+            K_hex.c_str(), get_remote_address().c_str(), GetLocaleByName(m_localizationName), os, platform, m_safelogin.c_str() );
 
         // Finish SRP6 and send the final result to the client
-        Sha1Hash sha;
-        srp.Finalize(sha);
+        Crypto::Hash::SHA1::Digest sha = srp.Finalize();
 
         SendProof(sha);
         m_status = STATUS_AUTHED;
@@ -922,13 +918,14 @@ bool AuthSocket::_HandleReconnectProof()
     BigNumber t1;
     t1.SetBinary(lp.R1, 16);
 
-    Sha1Hash sha;
-    sha.Initialize();
+    Crypto::Hash::SHA1::Generator sha;
     sha.UpdateData(m_login);
-    sha.UpdateBigNumbers(&t1, &m_reconnectProof, &K, nullptr);
-    sha.Finalize();
+    sha.UpdateData(t1);
+    sha.UpdateData(m_reconnectProof);
+    sha.UpdateData(K);
+    Crypto::Hash::SHA1::Digest digest = sha.GetDigest();
 
-    if (!memcmp(sha.GetDigest(), lp.R2, SHA_DIGEST_LENGTH))
+    if (!memcmp(digest.data(), lp.R2, digest.size()))
     {
         if (!VerifyVersion(lp.R1, sizeof(lp.R1), lp.R3, true))
         {
@@ -1057,13 +1054,15 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             if (!ok_build || (i->second.allowedSecurityLevel > GetSecurityOn(i->second.id)))
                 realmflags = RealmFlags(realmflags | REALM_FLAG_OFFLINE);
 
+            uint8 const categoryId = GetRealmCategoryIdByBuildAndZone(m_build, RealmZone(i->second.timeZone));
+
             pkt << uint32(i->second.icon);              // realm type
             pkt << uint8(realmflags);                   // realmflags
             pkt << name;                                // name
             pkt << GetRealmAddress(i->second);          // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
-            pkt << uint8(i->second.timeZone);           // realm category
+            pkt << uint8(categoryId);                   // realm category
             pkt << uint8(0x00);                         // unk, may be realm number/id?
         }
 
@@ -1105,6 +1104,8 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             if (!buildInfo)
                 realmFlags = RealmFlags(realmFlags & ~REALM_FLAG_SPECIFYBUILD);
 
+            uint8 const categoryId = GetRealmCategoryIdByBuildAndZone(m_build, RealmZone(i->second.timeZone));
+
             pkt << uint8(i->second.icon);               // realm type (this is second column in Cfg_Configs.dbc)
             pkt << uint8(lock);                         // flags, if 0x01, then realm locked
             pkt << uint8(realmFlags);                   // see enum RealmFlags
@@ -1112,7 +1113,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             pkt << GetRealmAddress(i->second);          // address
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
-            pkt << uint8(i->second.timeZone);           // realm category (Cfg_Categories.dbc)
+            pkt << uint8(categoryId);                   // realm category (Cfg_Categories.dbc)
             pkt << uint8(0x2C);                         // unk, may be realm number/id?
 
             if (realmFlags & REALM_FLAG_SPECIFYBUILD)
@@ -1243,22 +1244,23 @@ bool AuthSocket::VerifyPinData(uint32 pin, const PINData& clientData)
         pinBytes[i] += 0x30;
 
     // validate the PIN, x = H(client_salt | H(server_salt | ascii(pin_bytes)))
-    Sha1Hash sha;
-    sha.UpdateData(m_serverSecuritySalt.AsByteArray());
-    sha.UpdateData(pinBytes.data(), pinBytes.size());
-    sha.Finalize();
+    Crypto::Hash::SHA1::Generator shaFirst;
+    shaFirst.UpdateData(m_serverSecuritySalt.AsByteArray());
+    shaFirst.UpdateData(pinBytes.data(), pinBytes.size());
+    auto shaFirstHash = shaFirst.GetDigest();
 
     BigNumber hash, clientHash;
-    hash.SetBinary(sha.GetDigest(), sha.GetLength());
+    hash.SetBinary(shaFirstHash.data(), shaFirstHash.size());
     clientHash.SetBinary(clientData.hash, 20);
 
-    sha.Initialize();
-    sha.UpdateData(clientData.salt, sizeof(clientData.salt));
-    sha.UpdateData(hash.AsByteArray());
-    sha.Finalize();
-    hash.SetBinary(sha.GetDigest(), sha.GetLength());
+    Crypto::Hash::SHA1::Generator shaSecond;
+    shaSecond.UpdateData(clientData.salt, sizeof(clientData.salt));
+    shaSecond.UpdateData(hash);
+    auto shaSecondHash = shaSecond.GetDigest();
 
-    return !memcmp(hash.AsDecStr(), clientHash.AsDecStr(), 20);
+    hash.SetBinary(shaSecondHash.data(), shaSecondHash.size());
+
+    return hash.AsDecStr() == clientHash.AsDecStr();
 }
 
 uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
@@ -1277,9 +1279,8 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
     uint64 step = static_cast<uint64>((floor(now / 30))) + interval;
     EndianConvertReverse(step);
 
-    HmacHash hmac(decoded_key.data(), key_size);
+    Crypto::Hash::HMACSHA1::Generator hmac(decoded_key.data(), key_size);
     hmac.UpdateData((uint8*)&step, sizeof(step));
-    hmac.Finalize();
 
     auto hmac_result = hmac.GetDigest();
 
@@ -1426,12 +1427,12 @@ bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versi
         else
             versionHash = &zeros;
 
-        Sha1Hash version;
+        Crypto::Hash::SHA1::Generator version;
         version.UpdateData(a, aLength);
         version.UpdateData(versionHash->data(), versionHash->size());
-        version.Finalize();
+        auto expectedHash = version.GetDigest();
 
-        if (memcmp(versionProof, version.GetDigest(), version.GetLength()) == 0)
+        if (memcmp(versionProof, expectedHash.data(), expectedHash.size()) == 0)
             return true;
     }
 

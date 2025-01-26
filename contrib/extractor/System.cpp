@@ -84,7 +84,7 @@ enum Extract
 // Select data for extract
 int   CONF_extract = EXTRACT_MAP | EXTRACT_DBC | EXTRACT_CAMERA;
 // This option allow limit minimum height to some value (Allow save some memory)
-// see contrib/mmap/src/Tilebuilder.h, INVALID_MAP_LIQ_HEIGHT
+// see contrib/mmap/src/TerrainBuilder.h, INVALID_MAP_LIQ_HEIGHT
 bool  CONF_allow_height_limit = true;
 float CONF_use_minHeight = -500.0f;
 

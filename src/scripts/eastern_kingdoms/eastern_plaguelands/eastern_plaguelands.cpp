@@ -1766,7 +1766,7 @@ enum MarkOfDetonationData
 
 bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpellId, SpellEffectIndex effIndex, GameObject* pGameObjectTarget)
 {
-    //always check spellid and effectindex
+    // always check spellid and effectindex
     if (uiSpellId == SPELL_PLACING_SMOKEY_S_EXPLOSIVES && effIndex == EFFECT_INDEX_0)
     {
         if (Player* pPlayer = pCaster->ToPlayer())
@@ -1775,8 +1775,36 @@ bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpe
             {
                 pPlayer->KilledMonsterCredit(pCreature->GetEntry(), pCreature->GetObjectGuid());
                 pCreature->DealDamage(pCreature, pCreature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+
+                // TODO: move this to db as On Death event script on the creature with guid condition
+                static std::map<uint32 /*npcGuid*/, std::vector<uint32 /*goGuid*/>> const fireObjectsMap =
+                {
+                    // TODO: fire and smoke gameobjects for the other positions are not sniffed
+                    // { 53157, {} },
+                    // { 53168, {} },
+                    // { 54270, {} },
+                    { 54271 ,{ 2780, 2781, 2782, 2783, 2784, 2787, 2790, 2791, 2792, 2793 } }
+                    // { 56689, {} },
+                    // { 92232, {} },
+                    // { 92254, {} },
+                    // { 92262, {} },
+                };
+
+                auto itr = fireObjectsMap.find(pCreature->GetGUIDLow());
+                if (itr != fireObjectsMap.end())
+                {
+                    ScriptInfo script;
+                    script.id = uiSpellId;
+                    script.command = SCRIPT_COMMAND_RESPAWN_GAMEOBJECT;
+                    script.respawnGo.despawnDelay = 12;
+                    for (auto const& goGuid : itr->second)
+                    {
+                        script.respawnGo.goGuid = goGuid;
+                        pCreature->GetMap()->ScriptCommandStartDirect(script, pCreature, pCreature);
+                    }
+                }
             }
-            //always return true when we are handling this spell and effect
+            // always return true when we are handling this spell and effect
             pGameObjectTarget->Despawn();
             return true;
         }

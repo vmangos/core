@@ -327,7 +327,7 @@ void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recv_data)
 #endif
 
     /** error handling **/
-    if (!player || !group->IsLeader(GetPlayer()->GetObjectGuid()) || player->GetGroup() != group)
+    if (!player || player == GetPlayer() || !group->IsLeader(GetPlayer()->GetObjectGuid()) || player->GetGroup() != group)
         return;
     /********************/
 
@@ -837,7 +837,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
 
     Player* player = HashMapHolder<Player>::Find(guid);
 
-    if (!player || player->GetGroup() != _player->GetGroup())
+    if (!player || !player->IsInSameRaidWith(_player))
     {
         WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 3 + 4 + 1);
         data << guid.WriteAsPacked();

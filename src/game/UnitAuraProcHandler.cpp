@@ -590,6 +590,11 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     if (!pVictim)
                         return SPELL_AURA_PROC_FAILED;
 
+                    // dont trigger from non damaging spells, amount is 1 for non damaging spells if they hit
+                    // tested on classic that rend does not trigger sweeping strikes
+                    if (amount <= 1)
+                        return SPELL_AURA_PROC_FAILED;
+
                     // Prevent chain of triggered spell from same triggered spell
                     if (procSpell && (procSpell->Id == 26654 || procSpell->Id == 12723))
                         return SPELL_AURA_PROC_FAILED;
@@ -1420,7 +1425,21 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 a
         case SPELLFAMILY_DRUID:
             break;
         case SPELLFAMILY_HUNTER:
+        {
+            switch (auraSpellInfo->Id)
+            {
+                case 5118: // Aspect of the Cheetah
+                case 13159: // Aspect of the Pack
+                {
+                    // dont trigger from non damaging spells, amount is 1 for non damaging spells if they hit
+                    if (amount <= 1)
+                        return SPELL_AURA_PROC_FAILED;
+
+                    break;
+                }
+            }
             break;
+        }
         case SPELLFAMILY_PALADIN:
         {
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4

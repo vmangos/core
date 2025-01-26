@@ -44,7 +44,7 @@
 #include <ace/Acceptor.h>
 #include <ace/SOCK_Acceptor.h>
 
-#ifdef USE_SENDGRID
+#ifdef ENABLE_MAILSENDER
 #include "MailerService.h"
 #include <curl/curl.h>
 #endif
@@ -217,7 +217,7 @@ extern int main(int argc, char **argv)
 
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using ACE: %s", ACE_VERSION);
 
-#ifdef USE_SENDGRID
+#ifdef ENABLE_MAILSENDER
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using CURL version %s", curl_version());
 
     // not checking the SendMail config option here to make sure config reloads will work (in the future?)

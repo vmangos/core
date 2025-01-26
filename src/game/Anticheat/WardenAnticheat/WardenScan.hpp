@@ -27,13 +27,14 @@
 #include "ByteBuffer.h"
 #include "World.h"
 #include "Log.h"
-#include <openssl/sha.h>
-#include <openssl/md5.h>
+#include "Crypto/Hash/SHA1.h"
 
 #include <functional>
 #include <vector>
 #include <memory>
 #include <string>
+
+#include "nonstd/optional.hpp"
 
 enum class ScanFlags : uint32
 {
@@ -191,12 +192,11 @@ class WindowsFileHashScan : public WindowsScan
 {
     private:
         std::string m_file;
-        uint8 m_expected[SHA_DIGEST_LENGTH];
-        bool m_hashMatch;
+        nonstd::optional<Crypto::Hash::SHA1::Digest> m_expectedHash;
         bool m_wanted;
 
     public:
-        WindowsFileHashScan(std::string const& file, void const* expected, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsFileHashScan(std::string const& file, nonstd::optional<Crypto::Hash::SHA1::Digest> const& expectedHash, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 
 // reads the value of a lua variable and returns it.  keep in mind when using this that different states
@@ -225,12 +225,12 @@ class WindowsHookScan : public WindowsScan
 
         std::string m_module;
         std::string m_proc;
-        uint8 m_hash[SHA_DIGEST_LENGTH];
+        Crypto::Hash::SHA1::Digest m_hash;
         uint32 m_offset;
         size_t m_length;
 
     public:
-        WindowsHookScan(std::string const& module, std::string const& proc, void const* hash, uint32 offset, size_t length, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
+        WindowsHookScan(std::string const& module, std::string const& proc, Crypto::Hash::SHA1::Digest const& hash, uint32 offset, size_t length, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild);
 };
 
 // this scan will search for call kernel32!QueryDosDevice() and search for a device with the given name.

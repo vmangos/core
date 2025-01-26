@@ -191,7 +191,9 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     else
         schoolMask = spell->GetSpellSchoolMask();
 
-    if (pVictim != this && pVictim->IsImmuneToDamage(schoolMask, spell))
+    if (pVictim != this
+        && !spell->IsIgnoringCasterAndTargetRestrictions()
+        && pVictim->IsImmuneToDamage(schoolMask, spell))
         return SPELL_MISS_IMMUNE;
 
     // Try victim reflect spell
@@ -1089,6 +1091,9 @@ float SpellCaster::MeleeDamageBonusDone(Unit const* pVictim, float pdamage, Weap
     // ====================
     float DonePercent   = 1.0f;
 
+    if (!isWeaponDamageBasedSpell && GetTypeId() == TYPEID_UNIT && !(IsPet() && ((Creature*)this)->GetOwnerGuid().IsPlayer()))
+        DonePercent *= Creature::_GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
+
     // ..done pct, already included in weapon damage based spells
     if (pUnit && !isWeaponDamageBasedSpell)
     {
@@ -1221,7 +1226,7 @@ float SpellCaster::SpellHealingBonusDone(Unit const* pVictim, SpellEntry const* 
         Unit::AuraList const& mOverrideClassScript = owner->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
         for (const auto i : mOverrideClassScript)
         {
-            if (!i->isAffectedOnSpell(spellProto))
+            if (!i->IsAffectedOnSpell(spellProto))
                 continue;
             switch (i->GetModifier()->m_miscvalue)
             {
@@ -1317,7 +1322,7 @@ float SpellCaster::SpellDamageBonusDone(Unit const* pVictim, SpellEntry const* s
     Item* pWeapon = GetTypeId() == TYPEID_PLAYER ? ((Player*)this)->GetWeaponForAttack(BASE_ATTACK, true, false) : nullptr;
 
     // Creature damage
-    if (GetTypeId() == TYPEID_UNIT && !((Creature*)this)->IsPet())
+    if (GetTypeId() == TYPEID_UNIT && !(IsPet() && ((Creature*)this)->GetOwnerGuid().IsPlayer()))
         DoneTotalMod *= Creature::_GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
 
     if (pUnit)
@@ -1363,17 +1368,30 @@ float SpellCaster::SpellDamageBonusDone(Unit const* pVictim, SpellEntry const* s
         Unit::AuraList const& mOverrideClassScript = owner->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
         for (const auto i : mOverrideClassScript)
         {
-            if (!i->isAffectedOnSpell(spellProto))
+            if (!i->IsAffectedOnSpell(spellProto))
                 continue;
             switch (i->GetModifier()->m_miscvalue)
             {
-            case 4418: // Increased Shock Damage
-            case 4554: // Increased Lightning Damage
-            case 4555: // Improved Moonfire
-            {
-                DoneTotal += i->GetModifier()->m_amount;
-                break;
-            }
+                case 4418: // Increased Shock Damage
+                case 4554: // Increased Lightning Damage
+                {
+                    DoneTotal += i->GetModifier()->m_amount;
+                    break;
+                }
+                case 4555: // Improved Moonfire (Idol of the moon)
+                {
+                    // Idol of the moon was bugged during vanilla 1.12
+                    // Following math is based on reported numbers from classic and an old post on allakhazam and wowhead classic
+                    // Direct damage bonus = 17/8 % and Dot damage bonus = 17/tickcount %
+                    // Further information and discussion can be found at vmangos PR #2802
+                    uint32 divisor = 800;
+                    if (damagetype == DOT)
+                    {
+                        divisor = 100 * spellProto->GetAuraMaxTicks();
+                    }
+
+                    DoneTotal += i->GetModifier()->m_amount * pdamage / divisor;
+                }
             }
         }
     }

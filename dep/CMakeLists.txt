@@ -17,6 +17,7 @@
 
 add_subdirectory(src)
 add_subdirectory(recastnavigation)
+add_subdirectory(gsoap)
 if (USE_EXTRACTORS)
 	add_subdirectory(libmpq)
 endif()

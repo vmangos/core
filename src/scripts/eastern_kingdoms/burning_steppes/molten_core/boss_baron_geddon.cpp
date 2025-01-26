@@ -64,6 +64,7 @@ struct boss_baron_geddonAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GEDDON, NOT_STARTED);
 
         m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        SetCombatMovement(true);
     }
 
     void Aggro(Unit* pWho) override

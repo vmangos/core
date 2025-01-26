@@ -27,8 +27,6 @@ AnticheatManager* GetAnticheatLib()
     return AnticheatManager::instance();
 }
 
-#ifdef USE_ANTICHEAT
-
 #include "World.h"
 #include "WorldSession.h"
 
@@ -55,7 +53,7 @@ void AnticheatManager::LoadAnticheatData()
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, "Loading warden checks...");
     sWardenScanMgr.LoadFromDB();
     Warden::LoadScriptedScans();
-    
+
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, "Loading warden modules...");
     sWardenModuleMgr;
@@ -179,4 +177,3 @@ void AnticheatManager::RemoveWardenSession(Warden* warden)
     m_wardenSessionsToRemove.push_back(warden);
 }
 
-#endif

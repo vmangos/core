@@ -350,10 +350,10 @@ LootItem::LootItem(LootStoreItem const& li)
 
     count       = urand(li.mincountOrRef, li.maxcount);     // constructor called for mincountOrRef > 0 only
     randomPropertyId = Item::GenerateItemRandomPropertyId(itemid);
-    is_looted = 0;
-    is_blocked = 0;
-    is_underthreshold = 0;
-    is_counted = 0;
+    is_looted = false;
+    is_blocked = false;
+    is_underthreshold = false;
+    is_counted = false;
 }
 
 LootItem::LootItem(uint32 itemid_, uint32 count_, int32 randomPropertyId_)
@@ -368,10 +368,10 @@ LootItem::LootItem(uint32 itemid_, uint32 count_, int32 randomPropertyId_)
 
     count       = count_;
     randomPropertyId = randomPropertyId_;
-    is_looted = 0;
-    is_blocked = 0;
-    is_underthreshold = 0;
-    is_counted = 0;
+    is_looted = false;
+    is_blocked = false;
+    is_underthreshold = false;
+    is_counted = false;
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
@@ -418,8 +418,14 @@ bool LootStoreItem::AllowedForTeam(Loot const& loot) const
 
         // Team check
         Team conditionTeam = condition->GetTeam();
-        if ((conditionTeam == ALLIANCE || conditionTeam == HORDE) && conditionTeam != loot.GetTeam())
-            return false;
+        if (conditionTeam == ALLIANCE || conditionTeam == HORDE)
+        {
+            if (TEAM_CROSSFACTION == loot.GetTeam())
+                return true;
+
+            if (conditionTeam != loot.GetTeam())
+                return false;
+        }
 
         // Check non-player dependant conditions
         if (ConditionEntry::CanBeUsedWithoutPlayer(conditionId))
@@ -470,11 +476,11 @@ void Loot::AddItem(LootStoreItem const& item)
     if (item.needs_quest)                                   // Quest drop
     {
         if (m_questItems.size() < MAX_NR_QUEST_ITEMS)
-            m_questItems.push_back(LootItem(item));
+            m_questItems.emplace_back(item);
     }
     else if (items.size() < MAX_NR_LOOT_ITEMS)              // Non-quest drop
     {
-        items.push_back(LootItem(item));
+        items.emplace_back(item);
 
         // non-conditional one-player only items are counted here,
         // free for all items are counted in FillFFALoot(),
@@ -581,7 +587,7 @@ QuestItemList* Loot::FillFFALoot(Player* player)
         LootItem &item = items[i];
         if (!item.is_looted && item.freeforall && item.AllowedForPlayer(player, GetLootTarget()))
         {
-            ql->push_back(QuestItem(i));
+            ql->emplace_back(i);
             ++unlootedCount;
         }
     }
@@ -608,7 +614,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
         LootItem &item = m_questItems[i];
         if (!item.is_looted && item.AllowedForPlayer(player, GetLootTarget()))
         {
-            ql->push_back(QuestItem(i));
+            ql->emplace_back(i);
 
             // questitems get blocked when they first apper in a
             // player's quest vector
@@ -645,7 +651,7 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
         LootItem &item = items[i];
         if (!item.is_looted && !item.freeforall && item.conditionId && item.AllowedForPlayer(player, GetLootTarget()))
         {
-            ql->push_back(QuestItem(i));
+            ql->emplace_back(i);
             if (!item.is_counted)
             {
                 ++unlootedCount;

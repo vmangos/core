@@ -459,9 +459,8 @@ bool Database::BeginTransaction(uint32 serialId)
 {
     if (!m_pAsyncConn)
         return false;
-    //ASSERT(!m_TransStorage->get());
-    if (m_TransStorage->get())
-        return false;
+
+    MANGOS_ASSERT(!m_TransStorage->get());   // if we will get a nested transaction request - we MUST fix code!!!
 
     //initiate transaction on current thread
     m_TransStorage->init(serialId);

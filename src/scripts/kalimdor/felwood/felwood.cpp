@@ -503,7 +503,7 @@ bool QuestAccept_npc_arei(Player* pPlayer, Creature* pCreature, Quest const* pQu
         if (npc_areiAI* pEscortAI = dynamic_cast<npc_areiAI*>(pCreature->AI()))
         {
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
-            pCreature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
+            pCreature->SetFactionTemporary(FACTION_ESCORT_A_NEUTRAL_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
             DoScriptText(SAY_AREI_ESCORT_START, pCreature, pPlayer);
         }
     }

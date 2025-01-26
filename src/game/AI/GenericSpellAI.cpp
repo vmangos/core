@@ -32,13 +32,13 @@ enum
     SPELL_FLAG_STOP_ATTACK_TARGET = 0x008,
 };
 
-// Generic pour spells simples
+// Generic for single spells
 struct GenericAISpell
 {
     uint32 spellId;
 
     uint32 minCD;
-    uint32 maxCD; /* Ou 0 si pas repetable.*/
+    uint32 maxCD; /* Or 0 if not repeatable.*/
 
     uint32 initialMinCD;
     uint32 initialMaxCD;
@@ -47,7 +47,7 @@ struct GenericAISpell
 
     uint32 timer;
 
-    // Variables en interne.
+    // Internal variables.
     float minRange;
     float maxRange;
     uint32 healValue;
@@ -79,7 +79,7 @@ struct GenericSpellMob : public ScriptedAI
 
     std::vector<GenericAISpell> m_uiSpells;
 
-    // Si 'true', le mob attaquera a distance tant qu'il aura du mana.
+    // If 'true', the mob will attack from a distance as long as it has mana.
     bool isDistanceCaster;
     uint32 casterGCD;
 
@@ -167,7 +167,7 @@ struct GenericSpellMob : public ScriptedAI
                 casterGCD = GLOBAL_CD_MS;
             }
         }*/
-        // Vu que le script ne fait que caster des sorts ...
+        // Since the script only casts spells...
         if (m_creature->IsNonMeleeSpellCasted(false))
             return;
 
@@ -226,7 +226,7 @@ struct GenericSpellMob : public ScriptedAI
                         {
                             Creature* crea = creaList.front();
                             creaList.pop_front();
-                            // TODO : Chercher la creature qui correspond au dispell.
+                            // TODO : Find the creature that matches the dispell.
                             target = crea;
                         }
                         break;
@@ -331,37 +331,37 @@ CreatureAI* GetAI_GenericSpellAI(Creature* pCreature)
         ScriptedMob->Finalize();
         return ScriptedMob;
     }
-    /* Sinon, ca signifie qu'il n'y a pas de script de ce mob en particulier.
-    Dans ce cas, on recupere ses sorts (spell[1-4]) et on lui ajoute en fonction de comment sont scriptes ces sorts
-    chez d'autres mobs.
+    /* Otherwise, it means that there is no script for this particular mob.
+    In this case, we collect the mob's spells (spell[1-4]) and add them, depending on how the spells are scripted
+    in other mobs.
     */
 #ifdef DEBUG_ON
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Impossible de trouver les spells du mob %u. Va essayer de les deduire ...", pCreature->GetEntry());
 #endif
     bool mobFoundSpells[CREATURE_MAX_SPELLS] = {false};
     CreatureInfo const* infos = pCreature->GetCreatureInfo();
-    // Ne pas chercher les sorts = 0
+    // Do not search for spells = 0
     for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
     {
         if (infos->spells[i] == 0)
             mobFoundSpells[i] = true;
     }
-    // On ajoute les sorts qu'on connait de creature_spells
+    // We add the spells we know from creature_spells
     for (iter = GenericSpellMobData.begin(); iter != GenericSpellMobData.end(); ++iter)
     {
         for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
         {
-            if (!mobFoundSpells[i] // Pas deja ajoute
-                    && iter->spell.spellId == infos->spells[i] // Et le sort est trouve dans la DB
+            if (!mobFoundSpells[i] // Not added yet
+                    && iter->spell.spellId == infos->spells[i] // And the spell is found in the DB
                )
             {
                 ScriptedMob->AddSpell(iter->spell);
-                // Histoire de ne pas ajouter le meme sort 2 fois a la meme creature...
+                // So as not to add the same spell twice to the same creature...
                 mobFoundSpells[i] = true;
             }
         }
     }
-    // Et finalement on essaye d'ajouter les autres
+    // And finally we try to add the others
     for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
     {
         if (!mobFoundSpells[i])
@@ -371,7 +371,7 @@ CreatureAI* GetAI_GenericSpellAI(Creature* pCreature)
                                          DEFAULT_MIN_CD,
                                          DEFAULT_MAX_CD,
                                          DEFAULT_TARGET);
-            if (mySpell.spellId != 0) // Pas d'erreur
+            if (mySpell.spellId != 0) // No error
                 ScriptedMob->AddSpell(mySpell);
         }
     }
@@ -434,18 +434,18 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
 
     if (spellToModify->target == GENERIC_TARGET_AUTO)
     {
-        /* 1 : Sorts amicaux*/
+        /* 1 : Friendly spells*/
         // Heal
         if (spellToModify->healValue != 0)
             spellToModify->target = GENERIC_TARGET_FRIEND_NEED_HEAL;
-        // Autres sorts positifs
+        // Other positive spells
         else if (Spells::IsPositiveSpell(spellToModify->spellId))
             spellToModify->target = GENERIC_TARGET_SELF;
-        /* 2 : Sorts negatifs*/
+        /* 2 : Negative spells*/
         // Attaque a distance
         else if (spellToModify->minRange >= 2.0f)
             spellToModify->target = GENERIC_TARGET_HOSTILE_IN_RANGE;
-        // Sinon, on prend l'aggro n1
+        // Otherwise, we take aggro n1
         else
             spellToModify->target = GENERIC_TARGET_VICTIM;
 
@@ -470,7 +470,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
             }
         }
 
-        // Si le sort a un CD
+        // If the spell has a CD
         if (spellInfos->CategoryRecoveryTime > 1500)
         {
             spellToModify->initialMinCD = 0;
@@ -478,7 +478,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
             spellToModify->minCD        = spellInfos->CategoryRecoveryTime;
             spellToModify->maxCD        = spellInfos->CategoryRecoveryTime;
         }
-        // Autres modifs :
+        // Other changes :
         for (uint8 i = 0; i < 3; ++i)
         {
             switch (spellInfos->Effect[i])
@@ -513,7 +513,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
         // SELECT field0, field6, field7, field8, field122 FROM spells WHERE field8 & 0x200000 AND field6 & 0x50000 AND (field7 & 0x8000 OR field7=0) limit 0,50;
         if (spellInfos->Attributes & 0x50000 && (spellInfos->AttributesEx & 0x8000 || spellInfos->AttributesEx == 0) && spellInfos->AttributesEx2 & 0x200000)
         {
-            // Apres 30 a 50 sec de combat
+            // After 30 to 50 seconds of fighting
             spellToModify->initialMinCD = 30000;
             spellToModify->initialMaxCD = 50000;
             // Toutes les 3 a 4 minutes ensuite
