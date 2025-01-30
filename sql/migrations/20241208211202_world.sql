@@ -265,6 +265,10 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 10 WHERE `guid` I
 DELETE FROM `skinning_loot_template` WHERE `entry` = 100003;
 UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE `entry` = 8204;
 
+-- Remove 100% chance from serpentbloom pools and correct count 12
+UPDATE `pool_template` SET `max_limit` = 13 WHERE `entry` = 4893;
+UPDATE `pool_gameobject` SET `chance` = 0 WHERE DESCRIPTION LIKE "%serpentbloom%";
+
 
 -- End of migration.
 END IF;
