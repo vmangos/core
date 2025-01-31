@@ -111,19 +111,24 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (14431, @PTEMPLATE+3, 0, 'Western Plaguelands - Hearthglen Mine - Truesilver Deposit / Rich Thorium Vein', 0);
 
 -- Weeping Cave
+-- Weeping Cave
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (25485, 23011, 21660, 21661));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (25485, 23011, 21660, 21661);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `entry` IN (25485, 23011);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `pool_entry` IN (25485, 23011);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `entry` IN (21660, 21661);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `pool_entry` IN (21660, 21661);
+UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `entry` IN (25485, 23011);
+UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `pool_entry` IN (25485, 23011);
+UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `entry` IN (21660, 21661);
+UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `pool_entry` IN (21660, 21661);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+4, 2, 'Western Plaguelands - Weeping Cave - Minerals (Master Pool)', 0, 0, 0, 10);
+(@PTEMPLATE+4, 1, 'Western Plaguelands - Weeping Cave - Minerals (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (25485, @PTEMPLATE+4, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Small Thorium Vein', 0),
-(23011, @PTEMPLATE+4, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Small Thorium Vein', 0),
-(21660, @PTEMPLATE+4, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Rich Thorium Vein', 0),
-(21661, @PTEMPLATE+4, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Rich Thorium Vein', 0);
+(23011, @PTEMPLATE+4, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Small Thorium Vein', 0);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+21, 1, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(21660, @PTEMPLATE+21, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Rich Thorium Vein', 0),
+(21661, @PTEMPLATE+21, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Rich Thorium Vein', 0);
 
 UPDATE `pool_template` SET `max_limit` = 1 WHERE `entry` = 1262;
 
