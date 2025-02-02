@@ -29,7 +29,7 @@ UPDATE `pool_gameobject` SET `description`='Truesilver Deposit / Small Thorium V
 UPDATE `pool_gameobject` SET `description`='Truesilver Deposit / Small Thorium Vein - Un\'Goro Crater' WHERE `guid` = 23874;
 UPDATE `pool_template` SET `description`='Truesilver Deposit / Small Thorium Vein - Un\'Goro Crater' WHERE `entry` = 1400;
 UPDATE `pool_pool` SET `description`='Un\'Goro Crater - Truesilver Deposit / Small Thorium Vein' WHERE `pool_id` = 1400;
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1400, 1802, 1791, 1801, 1794, 1803, 1790, 1792, 1793, 1804, 14416));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1400, 1802, 1791, 1801, 1794, 1803, 1790, 1792, 1793, 1804, 14416));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (1400, 1802, 1791, 1801, 1794, 1803, 1790, 1792, 1793, 1804, 14416);
 UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Un\'Goro Crater - Fungal Rock' WHERE `entry` IN (1400, 1802, 1791, 1801, 1794, 1803, 1790, 1792, 1793, 1804, 14416);
 UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Un\'Goro Crater - Fungal Rock' WHERE `pool_entry` IN (1400, 1802, 1791, 1801, 1794, 1803, 1790, 1792, 1793, 1804, 14416);
@@ -64,7 +64,7 @@ UPDATE `pool_gameobject` SET `chance` = 40 WHERE `description` = "Silver Vein / 
 UPDATE `pool_gameobject` SET `chance` = 45 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit / Mithril Deposit / Truesilver Deposit - Swamp of Sorrows" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit / Mithril Deposit / Truesilver Deposit - Swamp of Sorrows" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
 -- Stagalbog Cave
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (21574, 17064, 21572, 17063, 4259, 4256, 4255, 4257, 4258, 9801, 17145, 23036));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (21574, 17064, 21572, 17063, 4259, 4256, 4255, 4257, 4258, 9801, 17145, 23036));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (21574, 17064, 21572, 17063, 4259, 4256, 4255, 4257, 4258, 9801, 17145, 23036);
 UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Swamp of Sorrows - Stagalbog Cave' WHERE `entry` IN (21574, 17064, 21572, 17063);
 UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Swamp of Sorrows - Stagalbog Cave' WHERE `pool_entry` IN (21574, 17064, 21572, 17063);
@@ -99,7 +99,7 @@ UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Truesilver Dep
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Western Plaguelands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Western Plaguelands" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 324);
 -- Hearthglen Mine
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (21659, 14432, 14431));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (21659, 14432, 14431));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (21659, 14432, 14431);
 UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Western Plaguelands - Hearthglen Mine' WHERE `entry` IN (21659, 14432, 14431);
 UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Western Plaguelands - Hearthglen Mine' WHERE `pool_entry` IN (21659, 14432, 14431);
@@ -112,7 +112,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 -- Weeping Cave
 -- Weeping Cave
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (25485, 23011, 21660, 21661));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (25485, 23011, 21660, 21661));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (25485, 23011, 21660, 21661);
 UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `entry` IN (25485, 23011);
 UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `pool_entry` IN (25485, 23011);
@@ -123,7 +123,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `inst
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (25485, @PTEMPLATE+4, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Small Thorium Vein', 0),
 (23011, @PTEMPLATE+4, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Small Thorium Vein', 0);
-
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+21, 1, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
@@ -144,7 +143,7 @@ UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Truesilver Depo
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Winterspring" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 324);
 
 -- Ice Thistle Hills
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14343, 14329, 14410));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14343, 14329, 14410));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (14343, 14329, 14410);
 UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Winterspring - Ice Thistle Hills' WHERE `entry` IN (14343, 14329, 14410);
 UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Winterspring - Ice Thistle Hills' WHERE `pool_entry` IN (14343, 14329, 14410);
@@ -156,7 +155,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (14410, @PTEMPLATE+5, 0, 'Winterspring - Ice Thistle Hills - Truesilver Deposit / Small Thorium Vein', 0);
 
 -- Mazthoril
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14407, 14342, 14337, 14328, 14341));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14407, 14342, 14337, 14328, 14341));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (14407, 14342, 14337, 14328, 14341);
 UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Winterspring - Mazthoril' WHERE `entry` IN (14407, 14342, 14337, 14328, 14341);
 UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Winterspring - Mazthoril' WHERE `pool_entry` IN (14407, 14342, 14337, 14328, 14341);
@@ -170,7 +169,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (14341, @PTEMPLATE+6, 0, 'Winterspring - Mazthoril - Truesilver Deposit / Small Thorium Vein', 0);
 
 -- Rich Thorium Pools
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14409, 3987, 14368, 14372, 14367, 14366, 14373, 14371, 14344, 14345, 14443, 14369, 14346, 14347, 14348, 14349, 14350, 14376, 14351, 14352, 14353, 14354, 14355, 14356, 14374, 14375, 14357, 14377, 14358, 14365, 14359, 14360, 14361, 14362, 14444, 14363, 14370, 14364));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14409, 3987, 14368, 14372, 14367, 14366, 14373, 14371, 14344, 14345, 14443, 14369, 14346, 14347, 14348, 14349, 14350, 14376, 14351, 14352, 14353, 14354, 14355, 14356, 14374, 14375, 14357, 14377, 14358, 14365, 14359, 14360, 14361, 14362, 14444, 14363, 14370, 14364));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (14409, 3987, 14368, 14372, 14367, 14366, 14373, 14371, 14344, 14345, 14443, 14369, 14346, 14347, 14348, 14349, 14350, 14376, 14351, 14352, 14353, 14354, 14355, 14356, 14374, 14375, 14357, 14377, 14358, 14365, 14359, 14360, 14361, 14362, 14444, 14363, 14370, 14364);
 -- Darkwhisper Gorge
 UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Winterspring - Darkwhisper Gorge' WHERE `entry` IN (3987, 14368, 14372, 14367, 14366);
@@ -271,7 +270,7 @@ DELETE FROM `pool_template` WHERE `entry` = 1235;
 
 -- Eastern Plaguelands
 -- Rich Thorium Pools
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1429, 1408, 1409, 1410, 1411, 1412, 3985, 14438, 1413, 1415, 1417, 1434, 1435, 1414, 1416, 1418, 1419, 1420, 1421, 1422, 1423, 3986, 1425, 1426, 1427, 1269, 1432, 1433));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1429, 1408, 1409, 1410, 1411, 1412, 3985, 14438, 1413, 1415, 1417, 1434, 1435, 1414, 1416, 1418, 1419, 1420, 1421, 1422, 1423, 3986, 1425, 1426, 1427, 1269, 1432, 1433));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (1429, 1408, 1409, 1410, 1411, 1412, 3985, 14438, 1413, 1415, 1417, 1434, 1435, 1414, 1416, 1418, 1419, 1420, 1421, 1422, 1423, 3986, 1425, 1426, 1427, 1269, 1432, 1433);
 -- Tyr's Hand
 UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Eastern Plaguelands - Tyr\'s Hand' WHERE `entry` IN (1408, 1409, 1410, 1411, 1412, 3985, 14438);
