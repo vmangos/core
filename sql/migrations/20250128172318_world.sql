@@ -14,8 +14,8 @@ SET @PTEMPLATE = 8110;
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 150082);
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Blasted Lands - Garrison Armory" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 150081);
 -- Dreadmaul Post
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14472));
-UPDATE `gameobject` SET `spawntimesecsmin` = 900, `spawntimesecsmax` = 1800 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14402));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14472));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14402));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (14472, 14402);
 UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Blasted Lands - Dreadmaul Post' WHERE `entry` IN (14472);
 UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Blasted Lands - Dreadmaul Post' WHERE `pool_entry` IN (14472);
@@ -28,8 +28,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (14402, @PTEMPLATE+1, 0, 'Blasted Lands - Dreadmaul Post - Truesilver Deposit / Small Thorium Vein', 0);
 
 -- Serpent's Coil
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14459, 14460, 14403));
-UPDATE `gameobject` SET `spawntimesecsmin` = 900, `spawntimesecsmax` = 1800 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (21522, 21519, 21521));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14459, 14460, 14403));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (21522, 21519, 21521));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (14459, 14460, 14403, 21522, 21519, 21521);
 UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Blasted Lands - Serpent\'s Coil' WHERE `entry` IN (14459, 14460, 14403);
 UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Blasted Lands - Serpent\'s Coil' WHERE `pool_entry` IN (14459, 14460, 14403);
@@ -64,8 +64,8 @@ UPDATE `pool_gameobject` SET `chance` = 80 WHERE `description` = "Truesilver Dep
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
 UPDATE `pool_gameobject` SET `chance` = 15 WHERE `description` = "Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 165658);
 -- Dreadmaul Rock Lower Cave
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (22921, 22927, 22930, 22926));
-UPDATE `gameobject` SET `spawntimesecsmin` = 900, `spawntimesecsmax` = 1800 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14248, 14240, 14244, 14238));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (22921, 22927, 22930, 22926));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14248, 14240, 14244, 14238));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (22921, 22927, 22930, 22926, 14248, 14240, 14244, 14238);
 UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Burning Steppes - Dreadmaul Rock Lower Cave' WHERE `entry` IN (22921, 22927, 22930, 22926);
 UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Burning Steppes - Dreadmaul Rock Lower Cave' WHERE `pool_entry` IN (22921, 22927, 22930, 22926);
@@ -84,8 +84,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (14238, @PTEMPLATE+3, 0, 'Burning Steppes - Dreadmaul Rock Lower Cave - Truesilver Deposit / Dark Iron Deposit / Small Thorium Vein', 0);
 
 -- Dreadmaul Rock Upper Cave
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (22932, 22931, 22923, 22925, 22928));
-UPDATE `gameobject` SET `spawntimesecsmin` = 900, `spawntimesecsmax` = 1800 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14246, 14237, 14239, 14236));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (22932, 22931, 22923, 22925, 22928));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (14246, 14237, 14239, 14236));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (22932, 22931, 22923, 22925, 22928, 14246, 14237, 14239, 14236);
 UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Burning Steppes - Dreadmaul Rock Upper Cave' WHERE `entry` IN (22932, 22931, 22923, 22925, 22928);
 UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Burning Steppes - Dreadmaul Rock Upper Cave' WHERE `pool_entry` IN (22932, 22931, 22923, 22925, 22928);
@@ -127,8 +127,8 @@ UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mit
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Felwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 181108);
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Truesilver Deposit / Small Thorium Vein - Felwood" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 176643);
 -- Shadow Hold
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2358, 2373, 2357, 2354));
-UPDATE `gameobject` SET `spawntimesecsmin` = 900, `spawntimesecsmax` = 1800 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (3270, 3271, 3272, 3274, 3275));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2358, 2373, 2357, 2354));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (3270, 3271, 3272, 3274, 3275));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (2358, 2373, 2357, 2354, 3270, 3271, 3272, 3274, 3275);
 UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Felwood - Shadow Hold' WHERE `entry` IN (2358, 2373, 2357, 2354);
 UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Felwood - Shadow Hold' WHERE `pool_entry` IN (2358, 2373, 2357, 2354);
@@ -148,7 +148,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (3275, @PTEMPLATE+5, 0, 'Felwood - Shadow Hold - Truesilver Deposit / Small Thorium Vein', 0);
 
 -- Shrine of the Deceiver
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2361, 2360, 2362, 2363, 2359));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2361, 2360, 2362, 2363, 2359));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (2361, 2360, 2362, 2363, 2359);
 UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Felwood - Shrine of the Deceiver' WHERE `entry` IN (2361, 2360, 2362, 2363, 2359);
 UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Felwood - Shrine of the Deceiver' WHERE `pool_entry` IN (2361, 2360, 2362, 2363, 2359);
@@ -162,8 +162,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (2359, @PTEMPLATE+6, 0, 'Felwood - Shrine of the Deceiver - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
 
 -- Irontree Cavern
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2349, 2348, 2350));
-UPDATE `gameobject` SET `spawntimesecsmin` = 900, `spawntimesecsmax` = 1800 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (3282, 3281, 3280));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2349, 2348, 2350));
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (3282, 3281, 3280));
 DELETE FROM `pool_pool` WHERE `pool_id` IN (2349, 2348, 2350, 3282, 3281, 3280);
 UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Felwood - Irontree Cavern' WHERE `entry` IN (2349, 2348, 2350);
 UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Felwood - Irontree Cavern' WHERE `pool_entry` IN (2349, 2348, 2350);
