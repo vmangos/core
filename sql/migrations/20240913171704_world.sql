@@ -91,7 +91,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (22001, 8329, 0, 0),     -- Gossip sub-menu for Elemental Leatherworking (male)
 (22002, 8331, 0, 0),     -- Gossip sub-menu for Tribal Leatherworking (male)
 (22003, 8328, 0, 0),     -- Gossip sub-menu for Elemental Leatherworking (female)
-(22004, 8330, 0, 0),     -- Gossip sub-menu for Tribal Leatherworking (male)
+(22004, 8330, 0, 0),     -- Gossip sub-menu for Tribal Leatherworking (female)
 -- Other gossips (Pending sniffed menu ids) --
 (22005, 1128, 0, 0),     -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 1)
 (22006, 1129, 0, 0),     -- Gossip sub-menu for Bengus Deepforge (Forging Armour pt. 2)
