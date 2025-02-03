@@ -180,7 +180,7 @@ UPDATE `gossip_menu_option` SET `condition_id` = 11021 WHERE `menu_id` = 3067 AN
 UPDATE `gossip_menu_option` SET `condition_id` = 11020 WHERE `menu_id` = 3070 AND `id` = 0;     -- TSarah Tanner (Elemental Leatherworking - Alliance)
 
 UPDATE `gossip_menu_option` SET `condition_id` = 11019 WHERE `id` = 0 AND `menu_id` IN (
-3072       -- Caryssia Moonhunter (Tribal Leatherworking - Alliance)
+3072,       -- Caryssia Moonhunter (Tribal Leatherworking - Alliance)
 3073);     -- Se'Jib (Tribal Leatherworking - Horde)
 
 -- Add missing gossip for Therum Deepforge
