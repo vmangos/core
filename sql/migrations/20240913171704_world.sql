@@ -394,10 +394,15 @@ UPDATE `gossip_menu_option` SET `condition_id` = 90 WHERE `option_icon` = 3 AND 
 4827);    -- Lexington Mortaim
 -- Shaman
 UPDATE `gossip_menu_option` SET `condition_id` = 92 WHERE `option_icon` = 3 AND menu_id IN (
-);
-
-    
-    
+4103,     -- Meela Dawnstrider, Narm Skychaser
+4104,     -- Swart
+4515,     -- Sian'tsu
+4516,     -- Kardris Dreamseeker
+4528,     -- Siln Skychaser
+4529,     -- Beram Skychaser
+4530,     -- Tigor Skychaser
+4652,     -- Haromm, Shikrik
+5123);    -- Sagorne Creststrider
     
 -- End of migration.
 END IF;
