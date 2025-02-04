@@ -321,6 +321,50 @@ UPDATE `creature_template` SET `npc_flags` = 0, `display_probability1` = 0, `dis
 ALTER TABLE `creature_template`
     DROP COLUMN `trainer_spell`;
 
+-- Add class conditions for class trainer gossip --
+-- Druid
+UPDATE `gossip_menu_option` SET `condition_id` = 89 WHERE `option_icon` = 3 AND menu_id IN (
+1403,      -- Mathrengyl Bearwalker
+3921,      -- Turak Runetotem
+3923,      -- Kal
+3924,      -- Denatharion
+3926,      -- Gennia Runetotem
+4507,      -- Maldryn
+4508,      -- Sheldras Moontree
+4571,      -- Fylerian Nightwing
+4606,      -- Sheal Runetotem, Jannos Lighthoof
+4607,      -- Kym Wildmane
+4644,      -- Gart Mistrunner
+4687,      -- Loganaar
+4688,      -- Mardant Strongoak, Theridran
+4689);     -- Golhine the Hooded
+-- Warlock
+UPDATE `gossip_menu_option` SET `condition_id` = 67 WHERE `option_icon` = 3 AND menu_id IN (
+1503,      -- Drusilla La Salle
+2381,      -- Briarthorn
+2383,      -- Kaal Soulreaper
+2384,      -- Zevrost
+4503,      -- Demisette Cloyce
+4504,      -- Sandahl
+4505,      -- Ursula Deline
+4566,      -- Alexander Calder
+4567,      -- Thistleheart
+4603,      -- Grol'dar
+4604,      -- Mirket
+4609,      -- Luther Pickman
+4610,      -- Richard Kerwin
+4641,      -- Dhugru Gorelust
+4642,      -- Kartosh
+4643,      -- Nartok
+4655,      -- Maximillion
+4656,      -- Rupert Boch
+4667,      -- Maximillian Crowe
+4681,      -- Alamar Grimm
+4682);     -- Gimrizz Shadowcog
+
+
+    
+    
 -- End of migration.
 END IF;
 END??
