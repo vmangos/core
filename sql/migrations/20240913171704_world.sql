@@ -361,8 +361,42 @@ UPDATE `gossip_menu_option` SET `condition_id` = 67 WHERE `option_icon` = 3 AND 
 4667,      -- Maximillian Crowe
 4681,      -- Alamar Grimm
 4682);     -- Gimrizz Shadowcog
+-- Mage (including Portal trainers)
+UPDATE `gossip_menu_option` SET `condition_id` = 90 WHERE `option_icon` = 3 AND menu_id IN (
+63,       -- Cain Firesong
+64,       -- Un'Thuwa, Mai'ah
+4484,     -- Elsharin
+4485,     -- Jennea Cannon
+4486,     -- Maginor Dumas
+4517,     -- Uthel'nay
+4518,     -- Enyo
+4519,     -- Deino
+4520,     -- Pephredo
+4534,     -- Archmage Shymm
+4535,     -- Thurston Xane
+4536,     -- Ursyn Ghull
+4537,     -- Anastasia Hartwell
+4538,     -- Pierce Shackleton
+4539,     -- Kaelystia Hatebringer
+4552,     -- Bink, Nittlebur Sparkfizzle
+4553,     -- Dink
+4554,     -- Juli Stormkettle
+4654,     -- Isabella
+4660,     -- Khelden Bremen
+4661,     -- Zaldimar Wefhellt
+4685,     -- Magis Sparkmantle
+4686,     -- Marryk Nurribit
+4821,     -- Elissa Dumas
+4822,     -- Larimaine Purdue
+4823,     -- Milstaff Stormeye
+4825,     -- Birgitte Cranston
+4826,     -- Thuul
+4827);    -- Lexington Mortaim
+-- Shaman
+UPDATE `gossip_menu_option` SET `condition_id` = 92 WHERE `option_icon` = 3 AND menu_id IN (
+);
 
-
+    
     
     
 -- End of migration.
