@@ -221,7 +221,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (11066, -1, 11063, 11052, 0, 0, 0);         -- Condition for relearning Swordsmithing
 
 -- Add relevant reputation requirement for Blacksmith specialisation quests
-UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` IN 
+UPDATE `quest_template` SET `RequiredMinRepFaction` = 46, `RequiredMinRepValue` = 6000  WHERE `entry` IN (
 5283,      -- "The Art of the Armorsmith" (Alliance)
 5301);     -- "The Art of the Armorsmith" (Horde)
 
