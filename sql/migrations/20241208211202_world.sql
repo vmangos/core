@@ -224,10 +224,20 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (1768, @PTEMPLATE+10, 0, 'Silithus - Twilight Tablet Fragment', 0),
 (1769, @PTEMPLATE+10, 0, 'Silithus - Twilight Tablet Fragment', 0);
 UPDATE `gameobject` SET `spawntimesecsmin` = 60, `spawntimesecsmax` = 60 WHERE `id` IN (180501, 180436);
+DELETE FROM `gameobject` WHERE `guid` IN (263, 252, 246);
+DELETE FROM `pool_template` WHERE `entry` = 1764;
+DELETE FROM `pool_gameobject` WHERE `guid` IN (252, 246);
+DELETE FROM `pool_pool` WHERE `pool_id` = 1764;
+
 DELETE FROM `gameobject` WHERE `guid` IN (261, 247, 253);
 DELETE FROM `pool_template` WHERE `entry` = 1765;
 DELETE FROM `pool_gameobject` WHERE `guid` IN (247, 253);
 DELETE FROM `pool_pool` WHERE `pool_id` = 1765;
+
+DELETE FROM `gameobject` WHERE `guid` IN (262, 254, 248);
+DELETE FROM `pool_template` WHERE `entry` = 1766;
+DELETE FROM `pool_gameobject` WHERE `guid` IN (254, 248);
+DELETE FROM `pool_pool` WHERE `pool_id` = 1766;
 
 -- Update Respawn Times
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` IN (42673, 42662, 35422, 13767, 16617, 16611, 16610, 13260, 15090, 15099, 32614, 47598, 47599, 47600, 47602, 45008, 6929, 12671, 12194, 11829, 47699, 45014, 35412, 15719, 42620, 49828, 13166, 6849, 45332, 10663, 45719, 45720, 45721, 32686, 49376, 46198, 46199, 13525, 27085, 9986 , 10135, 10030, 17201, 10043, 47905, 12699, 11418, 32387, 14067, 29362);
