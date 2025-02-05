@@ -321,7 +321,12 @@ UPDATE `creature_template` SET `npc_flags` = 0, `display_probability1` = 0, `dis
 ALTER TABLE `creature_template`
     DROP COLUMN `trainer_spell`;
 
--- Add class conditions for class trainer gossip --
+-- Add missing talent unlearn gossip
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
+
+
+    
+-- Add class conditions for all class trainer gossip options --
 -- Druid
 UPDATE `gossip_menu_option` SET `condition_id` = 89 WHERE `option_icon` = 3 AND menu_id IN (
 1403,      -- Mathrengyl Bearwalker
@@ -430,6 +435,19 @@ UPDATE `gossip_menu_option` SET `condition_id` = 94 WHERE `option_icon` = 3 AND 
 4679,     -- Branstock Khalder
 4680,     -- Maxan Anvol, Theodrus Frostbeard
 4691);    -- Shanda, Laurna Morninglight, Astarii Starseeker, Priestess Alathea
+UPDATE `gossip_menu_option` SET `condition_id` = 94 WHERE `option_icon` = 3 AND menu_id IN (
+
+
+
+
+
+
+
+
+
+
+
+
 
     
 
