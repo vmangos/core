@@ -403,6 +403,37 @@ UPDATE `gossip_menu_option` SET `condition_id` = 92 WHERE `option_icon` = 3 AND 
 4530,     -- Tigor Skychaser
 4652,     -- Haromm, Shikrik
 5123);    -- Sagorne Creststrider
+-- Priest
+UPDATE `gossip_menu_option` SET `condition_id` = 94 WHERE `option_icon` = 3 AND menu_id IN (
+3642,     -- High Priest Rohan
+3643,     -- Nara Meideros
+3644,     -- Tai'jin, Ken'jai
+3645,     -- Dark Cleric Duesten, Dark Cleric Beryl
+4466,     -- High Priestess Laurena
+4467,     -- Brother Joshua
+4468,     -- Brother Benjamin
+4521,     -- Ur'kyo
+4522,     -- Zayus
+4523,     -- X'yera
+4531,     -- Malakai Cross
+4532,     -- Father Cobb
+4533,     -- Miles Welsh
+4543,     -- Father Lazarus
+4544,     -- Aelthalyste
+4545,     -- Father Lankester
+4558,     -- Braenna Flintcrag
+4560,     -- Toldren Deepiron
+4572,     -- Lariia
+4573,     -- Jandria
+4665,     -- Priestess Anetta
+4666,     -- Priestess Josetta
+4679,     -- Branstock Khalder
+4680,     -- Maxan Anvol, Theodrus Frostbeard
+4691);    -- Shanda, Laurna Morninglight, Astarii Starseeker, Priestess Alathea
+
+    
+
+    
     
 -- End of migration.
 END IF;
