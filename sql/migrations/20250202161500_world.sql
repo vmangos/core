@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20250202161500');
 -- Add your query below.
 
 
-SET @PTEMPLATE = 8137;
+SET @PTEMPLATE = 8138;
 -- Kingsblood / Grave Moss - Scarlet Monastery Graveyard
 UPDATE `pool_template` SET `description` = 'Kingsblood / Grave Moss - Scarlet Monastery Graveyard' WHERE `entry` IN (2250, 2251, 2253, 2256, 2257, 2258, 2259, 2260, 2252, 2261, 2254, 2255);
 
