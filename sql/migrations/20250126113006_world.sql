@@ -343,78 +343,78 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (1444, @PTEMPLATE+36, 0, 'Westfall - Gold Coast Quarry - Tin Vein / Silver Vein', 0),
 (1445, @PTEMPLATE+36, 0, 'Westfall - Gold Coast Quarry - Tin Vein / Silver Vein', 0);
 
--- Deadmines Cave
+-- Deadmines Entrance
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (23409, 34829, 31952, 31946, 34832, 34835, 31947, 31951, 31950, 31956, 31953, 31948, 31077, 31053, 31088, 112607, 112604, 112602, 23361, 23389, 23362, 23390, 23363, 23391, 23364, 23392, 23365, 23393, 23372, 23400, 23373, 23401, 23374, 23402);
 DELETE FROM `pool_gameobject` WHERE `guid` IN (34829, 31952, 31946, 34832, 34835, 31947, 31951, 31950, 31956, 31953, 31948, 31077, 31053, 31088, 112607, 112604, 112602);
 DELETE FROM `pool_pool` WHERE `pool_id` IN (1451, 1450, 1449, 1442, 1440, 1438, 1439, 1441);
-UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Westfall - Deadmines Cave' WHERE `entry` IN (1451, 1450, 1449, 1442, 1440, 1438, 1439, 1441);
-UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Westfall - Deadmines Cave' WHERE `pool_entry` IN (1451, 1450, 1449, 1442, 1440, 1438, 1439, 1441);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Westfall - Deadmines Entrance' WHERE `entry` IN (1451, 1450, 1449, 1442, 1440, 1438, 1439, 1441);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Westfall - Deadmines Entrance' WHERE `pool_entry` IN (1451, 1450, 1449, 1442, 1440, 1438, 1439, 1441);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(@PTEMPLATE+37, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+38, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+39, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+40, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+41, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+42, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+43, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+44, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+45, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+46, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+47, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+48, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+49, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+50, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+51, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+52, 1, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(@PTEMPLATE+53, 1, 'Copper Veins - Westfall - Deadmines Cave', 10);
+(@PTEMPLATE+37, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+38, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+39, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+40, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+41, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+42, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+43, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+44, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+45, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+46, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+47, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+48, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+49, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+50, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+51, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+52, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(@PTEMPLATE+53, 1, 'Copper Veins - Westfall - Deadmines Entrance', 10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
-(34829, @PTEMPLATE+37, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31952, @PTEMPLATE+38, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31946, @PTEMPLATE+39, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(34832, @PTEMPLATE+40, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(34835, @PTEMPLATE+41, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31947, @PTEMPLATE+42, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31951, @PTEMPLATE+43, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31950, @PTEMPLATE+44, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31956, @PTEMPLATE+45, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31953, @PTEMPLATE+46, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31948, @PTEMPLATE+47, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31077, @PTEMPLATE+48, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31053, @PTEMPLATE+49, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(31088, @PTEMPLATE+50, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(112607, @PTEMPLATE+51, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(112604, @PTEMPLATE+52, 'Copper Veins - Westfall - Deadmines Cave', 10),
-(112602, @PTEMPLATE+53, 'Copper Veins - Westfall - Deadmines Cave', 10);
+(34829, @PTEMPLATE+37, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31952, @PTEMPLATE+38, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31946, @PTEMPLATE+39, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(34832, @PTEMPLATE+40, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(34835, @PTEMPLATE+41, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31947, @PTEMPLATE+42, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31951, @PTEMPLATE+43, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31950, @PTEMPLATE+44, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31956, @PTEMPLATE+45, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31953, @PTEMPLATE+46, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31948, @PTEMPLATE+47, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31077, @PTEMPLATE+48, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31053, @PTEMPLATE+49, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(31088, @PTEMPLATE+50, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(112607, @PTEMPLATE+51, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(112604, @PTEMPLATE+52, 'Copper Veins - Westfall - Deadmines Entrance', 10),
+(112602, @PTEMPLATE+53, 'Copper Veins - Westfall - Deadmines Entrance', 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+54, 4, 'Westfall - Deadmines Cave - Minerals (Master Pool)', 0, 0, 0, 10);
+(@PTEMPLATE+54, 4, 'Westfall - Deadmines Entrance - Minerals (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(@PTEMPLATE+37, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+38, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+39, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+40, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+41, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+42, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+43, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+44, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+45, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+46, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+47, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+48, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+49, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+50, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+51, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+52, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(@PTEMPLATE+53, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Copper Veins', 0),
-(1451, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Tin Vein / Silver Vein', 0),
-(1450, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Tin Vein / Silver Vein', 0),
-(1449, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Tin Vein / Silver Vein', 0),
-(1442, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Tin Vein / Silver Vein', 0),
-(1440, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Tin Vein / Silver Vein', 0),
-(1438, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Tin Vein / Silver Vein', 0),
-(1439, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Tin Vein / Silver Vein', 0),
-(1441, @PTEMPLATE+54, 0, 'Westfall - Deadmines Cave - Tin Vein / Silver Vein', 0);
+(@PTEMPLATE+37, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+38, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+39, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+40, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+41, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+42, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+43, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+44, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+45, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+46, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+47, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+48, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+49, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+50, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+51, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+52, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(@PTEMPLATE+53, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Copper Veins', 0),
+(1451, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Tin Vein / Silver Vein', 0),
+(1450, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Tin Vein / Silver Vein', 0),
+(1449, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Tin Vein / Silver Vein', 0),
+(1442, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Tin Vein / Silver Vein', 0),
+(1440, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Tin Vein / Silver Vein', 0),
+(1438, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Tin Vein / Silver Vein', 0),
+(1439, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Tin Vein / Silver Vein', 0),
+(1441, @PTEMPLATE+54, 0, 'Westfall - Deadmines Entrance - Tin Vein / Silver Vein', 0);
 
 UPDATE `pool_template` SET `max_limit` = 6 WHERE `entry` = 1112;
 UPDATE `pool_template` SET `max_limit` = 20 WHERE `entry` = 1111;
