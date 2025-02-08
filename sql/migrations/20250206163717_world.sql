@@ -10,6 +10,7 @@ INSERT INTO `migrations` VALUES ('20250206163717');
 
 
 -- Hillsbrad Foothills
+UPDATE `pool_pool` SET `description` = 'Hillsbrad Foothills - Azurelode Mine - Tin Vein / Silver Vein' WHERE `pool_id` IN (1468, 1468, 1469, 1470, 1471, 1472, 1473, 1474, 1475, 1476, 1477, 1478, 1479, 1480, 1481, 1482, 14445, 14446);
 UPDATE `pool_template` SET `description` = 'Copper Veins - Hillsbrad Foothills (Master Pool)' WHERE `entry` = 1066;
 UPDATE `pool_template` SET `description` = 'Hillsbrad Foothills - Tin Vein / Silver Vein (Master Pool)' WHERE `entry` = 1273;
 UPDATE `pool_template` SET `description` = 'Hillsbrad Foothills - Azurelode Mine - Tin Vein / Silver Vein (Master Pool)' WHERE `entry` = 3310;
