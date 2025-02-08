@@ -40,33 +40,33 @@ jobs:
         ls
     - name: Create tables
       run: |
-        docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS realmd DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
-        docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS characters DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
-        docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS mangos DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
-        docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS logs DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
+        docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS realmd_db_check DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
+        docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS characters_db_check DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
+        docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS mangos_db_check DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
+        docker exec mysqldb sh -c 'exec mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS logs_db_check DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"'
     - name: Import data
       run: |
-        docker exec -i mysqldb sh -c 'exec mysql -u root -proot realmd' < ${{github.workspace}}/sql/logon.sql
-        docker exec -i mysqldb sh -c 'exec mysql -u root -proot logs' < ${{github.workspace}}/sql/logs.sql
-        docker exec -i mysqldb sh -c 'exec mysql -u root -proot mangos' < ${{github.workspace}}/${{env.WORLD_DB}}.sql
-        docker exec -i mysqldb sh -c 'exec mysql -u root -proot characters' < ${{github.workspace}}/sql/characters.sql
+        docker exec -i mysqldb sh -c 'exec mysql -u root -proot realmd_db_check' < ${{github.workspace}}/sql/logon.sql
+        docker exec -i mysqldb sh -c 'exec mysql -u root -proot logs_db_check' < ${{github.workspace}}/sql/logs.sql
+        docker exec -i mysqldb sh -c 'exec mysql -u root -proot mangos_db_check' < ${{github.workspace}}/${{env.WORLD_DB}}.sql
+        docker exec -i mysqldb sh -c 'exec mysql -u root -proot characters_db_check' < ${{github.workspace}}/sql/characters.sql
 
     - name: Apply Migration
       run: |
         cd ${{github.workspace}}/sql/migrations/ && chmod +x merge.sh && ./merge.sh
-        [ -f "${{github.workspace}}/sql/migrations/world_db_updates.sql" ] && docker exec -i mysqldb sh -c 'exec mysql -u root -proot mangos' < ${{github.workspace}}/sql/migrations/world_db_updates.sql
-        [ -f "${{github.workspace}}/sql/migrations/characters_db_updates.sql" ] && docker exec -i mysqldb sh -c 'exec mysql -u root -proot characters' < ${{github.workspace}}/sql/migrations/characters_db_updates.sql
-        [ -f "${{github.workspace}}/sql/migrations/logon_db_updates.sql" ] && docker exec -i mysqldb sh -c 'exec mysql -u root -proot realmd' < ${{github.workspace}}/sql/migrations/logon_db_updates.sql
-        [ -f "${{github.workspace}}/sql/migrations/logs_db_updates.sql" ] && docker exec -i mysqldb sh -c 'exec mysql -u root -proot logs' < ${{github.workspace}}/sql/migrations/logs_db_updates.sql
+        [ -f "${{github.workspace}}/sql/migrations/world_db_updates.sql" ] && docker exec -i mysqldb sh -c 'exec mysql -u root -proot mangos_db_check' < ${{github.workspace}}/sql/migrations/world_db_updates.sql
+        [ -f "${{github.workspace}}/sql/migrations/characters_db_updates.sql" ] && docker exec -i mysqldb sh -c 'exec mysql -u root -proot characters_db_check' < ${{github.workspace}}/sql/migrations/characters_db_updates.sql
+        [ -f "${{github.workspace}}/sql/migrations/logon_db_updates.sql" ] && docker exec -i mysqldb sh -c 'exec mysql -u root -proot realmd_db_check' < ${{github.workspace}}/sql/migrations/logon_db_updates.sql
+        [ -f "${{github.workspace}}/sql/migrations/logs_db_updates.sql" ] && docker exec -i mysqldb sh -c 'exec mysql -u root -proot logs_db_check' < ${{github.workspace}}/sql/migrations/logs_db_updates.sql
     - name: Export Dump
       run: |
         mkdir dbexport
         cd ${{github.workspace}}/dbexport
         mkdir db_dump
-        docker exec mysqldb sh -c 'exec mysqldump -u root -proot mangos' > ${{github.workspace}}/dbexport/db_dump/mangos.sql
-        docker exec mysqldb sh -c 'exec mysqldump -u root -proot realmd' > ${{github.workspace}}/dbexport/db_dump/logon.sql
-        docker exec mysqldb sh -c 'exec mysqldump -u root -proot logs' > ${{github.workspace}}/dbexport/db_dump/logs.sql
-        docker exec mysqldb sh -c 'exec mysqldump -u root -proot characters' > ${{github.workspace}}/dbexport/db_dump/characters.sql
+        docker exec mysqldb sh -c 'exec mysqldump -u root -proot mangos_db_check' > ${{github.workspace}}/dbexport/db_dump/mangos.sql
+        docker exec mysqldb sh -c 'exec mysqldump -u root -proot realmd_db_check' > ${{github.workspace}}/dbexport/db_dump/logon.sql
+        docker exec mysqldb sh -c 'exec mysqldump -u root -proot logs_db_check' > ${{github.workspace}}/dbexport/db_dump/logs.sql
+        docker exec mysqldb sh -c 'exec mysqldump -u root -proot characters_db_check' > ${{github.workspace}}/dbexport/db_dump/characters.sql
 
 
         # cd db_dump
