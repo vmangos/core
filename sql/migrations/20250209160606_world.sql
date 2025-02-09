@@ -425,6 +425,267 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein / Silver Vein - Wetlands - Thelgen Rock" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein / Silver Vein - Wetlands - Thelgen Rock" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+
+-- Dustwallow Marsh
+-- Add Missing Gold / Mithril / Truesilver (Credit Cmangos)
+SET @OGUID = 58826;
+SET @PTEMPLATE = 2453;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 1734, 1, -4969.15185546875, -3877.734375000000, 57.78450012207031250, 1.815141916275024414, 0, 0, 0.788010597229003906, 0.615661680698394775, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 1734, 1, -4979.04785156250, -3583.969970703125, 49.82926940917968750, 1.431168079376220703, 0, 0, 0.656058311462402343, 0.754710197448730468, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 1734, 1, -4914.44580078125, -3295.939697265625, 56.76278686523437500, 1.117009282112121582, 0, 0, 0.529918670654296875, 0.848048448562622070, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 1734, 1, -4903.81445312500, -3182.384521484375, 69.23558044433593750, 0.418878614902496337, 0, 0, 0.207911491394042968, 0.978147625923156738, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 1734, 1, -4751.76855468750, -3116.785156250000, 67.46291351318359375, 1.343901276588439941, 0, 0, 0.622513771057128906, 0.782608807086944580, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 1734, 1, -4441.83984375000, -3842.842041015625, 36.90475463867187500, 1.256635904312133789, 0, 0, 0.587784767150878906, 0.809017360210418701, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 1734, 1, -4544.00976562500, -3974.585937500000, 48.42370223999023437, 2.164205789566040039, 0, 0, 0.882946968078613281, 0.469472706317901611, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 1734, 1, -4834.18994140625, -4001.447509765625, 63.02287673950195312, 4.310965538024902343, 0, 0, -0.83388519287109375, 0.551937937736511230, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 1734, 1, -4652.35742187500, -3061.899658203125, 51.58527755737304687, 1.658061861991882324, 0, 0, 0.737277030944824218, 0.675590515136718750, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 1734, 1, -4639.07080078125, -2942.411376953125, 51.51849365234375000, 2.548179388046264648, 0, 0, 0.956304550170898437, 0.292372345924377441, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+11, 2040, 1, -4969.15185546875, -3877.734375000000, 57.78450012207031250, 1.815141916275024414, 0, 0, 0.788010597229003906, 0.615661680698394775, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+12, 2040, 1, -4979.04785156250, -3583.969970703125, 49.82926940917968750, 1.431168079376220703, 0, 0, 0.656058311462402343, 0.754710197448730468, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+13, 2040, 1, -4914.44580078125, -3295.939697265625, 56.76278686523437500, 1.117009282112121582, 0, 0, 0.529918670654296875, 0.848048448562622070, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+14, 2040, 1, -4903.81445312500, -3182.384521484375, 69.23558044433593750, 0.418878614902496337, 0, 0, 0.207911491394042968, 0.978147625923156738, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+15, 2040, 1, -4751.76855468750, -3116.785156250000, 67.46291351318359375, 1.343901276588439941, 0, 0, 0.622513771057128906, 0.782608807086944580, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+16, 2040, 1, -4441.83984375000, -3842.842041015625, 36.90475463867187500, 1.256635904312133789, 0, 0, 0.587784767150878906, 0.809017360210418701, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+17, 2040, 1, -4544.00976562500, -3974.585937500000, 48.42370223999023437, 2.164205789566040039, 0, 0, 0.882946968078613281, 0.469472706317901611, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+18, 2040, 1, -4834.18994140625, -4001.447509765625, 63.02287673950195312, 4.310965538024902343, 0, 0, -0.83388519287109375, 0.551937937736511230, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+19, 2040, 1, -4652.35742187500, -3061.899658203125, 51.58527755737304687, 1.658061861991882324, 0, 0, 0.737277030944824218, 0.675590515136718750, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+20, 2040, 1, -4639.07080078125, -2942.411376953125, 51.51849365234375000, 2.548179388046264648, 0, 0, 0.956304550170898437, 0.292372345924377441, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+21, 2047, 1, -4969.15185546875, -3877.734375000000, 57.78450012207031250, 1.815141916275024414, 0, 0, 0.788010597229003906, 0.615661680698394775, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+22, 2047, 1, -4979.04785156250, -3583.969970703125, 49.82926940917968750, 1.431168079376220703, 0, 0, 0.656058311462402343, 0.754710197448730468, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+23, 2047, 1, -4914.44580078125, -3295.939697265625, 56.76278686523437500, 1.117009282112121582, 0, 0, 0.529918670654296875, 0.848048448562622070, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+24, 2047, 1, -4903.81445312500, -3182.384521484375, 69.23558044433593750, 0.418878614902496337, 0, 0, 0.207911491394042968, 0.978147625923156738, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+25, 2047, 1, -4751.76855468750, -3116.785156250000, 67.46291351318359375, 1.343901276588439941, 0, 0, 0.622513771057128906, 0.782608807086944580, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+26, 2047, 1, -4441.83984375000, -3842.842041015625, 36.90475463867187500, 1.256635904312133789, 0, 0, 0.587784767150878906, 0.809017360210418701, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+27, 2047, 1, -4544.00976562500, -3974.585937500000, 48.42370223999023437, 2.164205789566040039, 0, 0, 0.882946968078613281, 0.469472706317901611, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+28, 2047, 1, -4834.18994140625, -4001.447509765625, 63.02287673950195312, 4.310965538024902343, 0, 0, -0.83388519287109375, 0.551937937736511230, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+29, 2047, 1, -4652.35742187500, -3061.899658203125, 51.58527755737304687, 1.658061861991882324, 0, 0, 0.737277030944824218, 0.675590515136718750, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+30, 2047, 1, -4639.07080078125, -2942.411376953125, 51.51849365234375000, 2.548179388046264648, 0, 0, 0.956304550170898437, 0.292372345924377441, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@PTEMPLATE+2, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@PTEMPLATE+3, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@PTEMPLATE+4, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@PTEMPLATE+5, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@PTEMPLATE+6, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@PTEMPLATE+7, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@PTEMPLATE+8, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@PTEMPLATE+9, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@PTEMPLATE+10, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+5, @PTEMPLATE+5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+6, @PTEMPLATE+6, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+7, @PTEMPLATE+7, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+8, @PTEMPLATE+8, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+9, @PTEMPLATE+9, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+10, @PTEMPLATE+10, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+11, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+12, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+13, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+14, @PTEMPLATE+4, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+15, @PTEMPLATE+5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+16, @PTEMPLATE+6, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+17, @PTEMPLATE+7, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+18, @PTEMPLATE+8, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+19, @PTEMPLATE+9, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+20, @PTEMPLATE+10, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+21, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+22, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+23, @PTEMPLATE+3, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+24, @PTEMPLATE+4, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+25, @PTEMPLATE+5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+26, @PTEMPLATE+6, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+27, @PTEMPLATE+7, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+28, @PTEMPLATE+8, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+29, @PTEMPLATE+9, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10),
+(@OGUID+30, @PTEMPLATE+10, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh', 10);
+
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+2, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+3, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+4, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+5, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+6, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+7, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+8, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+9, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+10, 9903, 0, 'Dustwallow Marsh - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+-- Den of Flame
+SET @OGUID = 58856;
+SET @PTEMPLATE = 2773;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 1734, 1, -4434.32031250000, -2957.626220703125, 26.79018974304199218, 4.223697185516357421, 0, 0, -0.85716724395751953, 0.515038192272186279, 600, 2700, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 1734, 1, -4405.98535156250, -2952.440917968750, 23.67043495178222656, 5.009094715118408203, 0, 0, -0.59482288360595703, 0.803856790065765380, 600, 2700, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 2040, 1, -4434.32031250000, -2957.626220703125, 26.79018974304199218, 4.223697185516357421, 0, 0, -0.85716724395751953, 0.515038192272186279, 600, 2700, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 2040, 1, -4405.98535156250, -2952.440917968750, 23.67043495178222656, 5.009094715118408203, 0, 0, -0.59482288360595703, 0.803856790065765380, 600, 2700, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 2047, 1, -4434.32031250000, -2957.626220703125, 26.79018974304199218, 4.223697185516357421, 0, 0, -0.85716724395751953, 0.515038192272186279, 600, 2700, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 2047, 1, -4405.98535156250, -2952.440917968750, 23.67043495178222656, 5.009094715118408203, 0, 0, -0.59482288360595703, 0.803856790065765380, 600, 2700, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames', 10),
+(@PTEMPLATE+2, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames', 10),
+(@OGUID+3, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames', 10),
+(@OGUID+4, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames', 10),
+(@OGUID+5, @PTEMPLATE+1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames', 10),
+(@OGUID+6, @PTEMPLATE+2, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames', 10);
+
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, 8104, 0, 'Dustwallow Marsh - Den of Flames - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+2, 8104, 0, 'Dustwallow Marsh - Den of Flames - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+DELETE FROM `gameobject` WHERE `guid` IN (220414, 56033);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (220414, 56033);
+UPDATE `pool_pool` SET `mother_pool` = 9904, `description` = 'Dustwallow Marsh - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6057;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh' WHERE `guid` IN (90719, 90720, 90721);
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90721;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh' WHERE `entry` = 6057;
+UPDATE `pool_template` SET `max_limit` = 7 WHERE  `entry` = 9904;
+DELETE FROM `pool_template` WHERE `entry` = 9906;
+
+-- Darkmist Cavern
+DELETE FROM `gameobject` WHERE `guid` IN (427137, 90696);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (427137, 90696);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90697;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90698;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90699;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `entry` = 6051;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `pool_entry` = 6051;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Darkmist Cavern - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6051;
+
+DELETE FROM `gameobject` WHERE `guid` IN (55948, 90680);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (55948, 90680);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90681;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90682;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90683;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `entry` = 6047;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `pool_entry` = 6047;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Darkmist Cavern - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6047;
+
+DELETE FROM `gameobject` WHERE `guid` IN (14612, 90676);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (14612, 90676);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90677;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90678;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90679;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `entry` = 6046;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `pool_entry` = 6046;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Darkmist Cavern - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6046;
+
+DELETE FROM `gameobject` WHERE `guid` IN (55950, 90684);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (55950, 90684);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90685;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90686;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90687;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `entry` = 6048;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `pool_entry` = 6048;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Darkmist Cavern - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6048;
+
+DELETE FROM `gameobject` WHERE `guid` IN (427139, 90704);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (427139, 90704);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90705;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90706;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90707;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `entry` = 6053;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `pool_entry` = 6053;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Darkmist Cavern - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6053;
+
+DELETE FROM `gameobject` WHERE `guid` IN (427138, 90700);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (427138, 90700);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90701;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90702;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90703;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `entry` = 6052;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `pool_entry` = 6052;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Darkmist Cavern - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6052;
+
+DELETE FROM `gameobject` WHERE `guid` IN (2223, 220419);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (2223, 220419);
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90722;
+UPDATE `gameobject` SET `id` = 2040 WHERE `guid` = 90723;
+UPDATE `gameobject` SET `id` = 2047 WHERE `guid` = 90724;
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `entry` = 6058;
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Darkmist Cavern' WHERE `pool_entry` = 6058;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Darkmist Cavern - Gold Vein / Mithril Deposit / Truesilver Deposit' WHERE `pool_id` = 6058;
+
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Darkmist Cavern" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Darkmist Cavern" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Darkmist Cavern" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Darkmist Cavern" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
+
+-- Den of Flames
+DELETE FROM `gameobject` WHERE `guid` IN (56058, 90688);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (56058, 90688);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90689;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90690;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90691;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames' WHERE `entry` = 6049;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames' WHERE `pool_entry` = 6049;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Den of Flames - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6049;
+
+DELETE FROM `gameobject` WHERE `guid` IN (427135, 90692);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (427135, 90692);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90693;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90694;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90695;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames' WHERE `entry` = 6050;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames' WHERE `pool_entry` = 6050;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Den of Flames - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6050;
+
+DELETE FROM `gameobject` WHERE `guid` IN (56057, 90708);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (56057, 90708);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90709;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90710;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90711;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames' WHERE `entry` = 6054;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames' WHERE `pool_entry` = 6054;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Den of Flames - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6054;
+
+DELETE FROM `gameobject` WHERE `guid` IN (328, 220415);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (328, 220415);
+UPDATE `gameobject` SET `id` = 1733 WHERE `guid` = 90716;
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90717;
+UPDATE `gameobject` SET `id` = 1735 WHERE `guid` = 90718;
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames' WHERE `entry` = 6056;
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames' WHERE `pool_entry` = 6056;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Den of Flames - Silver Vein / Gold Vein / Iron Deposit' WHERE `pool_id` = 6056;
+
+DELETE FROM `gameobject` WHERE `guid` IN (220828, 90712);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (220828, 90712);
+UPDATE `gameobject` SET `id` = 1734 WHERE `guid` = 90713;
+UPDATE `gameobject` SET `id` = 2040 WHERE `guid` = 90714;
+UPDATE `gameobject` SET `id` = 2047 WHERE `guid` = 90715;
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames' WHERE `entry` = 6055;
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames' WHERE `pool_entry` = 6055;
+UPDATE `pool_pool` SET `description` = 'Dustwallow Marsh - Den of Flames - Gold Vein / Mithril Deposit / Truesilver Deposit' WHERE `pool_id` = 6055;
+
+-- Add Chance
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh - Den of Flames" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh - Den of Flames" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2040);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Gold Vein / Mithril Deposit / Truesilver Deposit - Dustwallow Marsh" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 2047);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1734);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `description` = "Silver Vein / Gold Vein / Iron Deposit - Dustwallow Marsh" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1735);
+
+
 -- End of migration.
 END IF;
 END??
