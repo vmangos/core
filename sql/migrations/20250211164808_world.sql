@@ -439,6 +439,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 UPDATE `pool_template` SET `description` = 'Barrens - Tin Vein (1732) / Silver Vein (Master Pool)' WHERE `entry` = 1033;
 UPDATE `pool_template` SET `description` = 'Copper Veins (1731) - Barrens (Master Pool)' WHERE `entry` = 4303;
+UPDATE `pool_template` SET `max_limit` = 1 WHERE `entry` = 2273;
+UPDATE `pool_template` SET `max_limit` = 1 WHERE `entry` = 3165;
 
 -- Add Chance
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
