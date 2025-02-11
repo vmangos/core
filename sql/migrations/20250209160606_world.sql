@@ -232,7 +232,7 @@ DELETE FROM `pool_pool` WHERE `mother_pool` IN (3660);
 DELETE FROM `gameobject` WHERE `guid` = 118820;
 DELETE FROM `pool_pool` WHERE `pool_id` = 7030;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(7030, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0);
+(7030, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0);
 
 -- Tin Vein / Silver Vein
 SET @OGUID = 74579;
@@ -304,20 +304,20 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 (@OGUID+24, @PTEMPLATE+12, 'Tin Vein / Silver Vein - Wetlands - Thelgen Rock', 10);
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(3258, 3, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein (Master Pool)', 0, 0, 0, 10);
+(9916, 3, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(@PTEMPLATE+1, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+2, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+3, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+4, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+5, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+6, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+7, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+8, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+9, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+10, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+11, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
-(@PTEMPLATE+12, 3258, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0);
+(@PTEMPLATE+1, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+2, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+3, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+4, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+5, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+6, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+7, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+8, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+9, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+10, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+11, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0),
+(@PTEMPLATE+12, 9916, 0, 'Wetlands - Thelgen Rock - Tin Vein / Silver Vein', 0);
 
 -- Incendicite Mineral Vein
 SET @OGUID = 68987;
