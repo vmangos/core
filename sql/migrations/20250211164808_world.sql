@@ -441,10 +441,10 @@ UPDATE `pool_template` SET `description` = 'Barrens - Tin Vein (1732) / Silver V
 UPDATE `pool_template` SET `description` = 'Copper Veins (1731) - Barrens (Master Pool)' WHERE `entry` = 4303;
 
 -- Add Chance
-UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
-UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein (3764) / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 3764);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein (3764) / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein (3764) / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 3764);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein (3764) / Silver Vein - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein (103711) / Silver Vein (105569) - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 105569);
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein (103711) / Silver Vein (105569) - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 103711);
 
