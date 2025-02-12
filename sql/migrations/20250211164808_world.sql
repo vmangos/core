@@ -450,6 +450,9 @@ UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein (3764)
 UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein (103711) / Silver Vein (105569) - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 105569);
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein (103711) / Silver Vein (105569) - Barrens" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 103711);
 
+UPDATE `pool_template` SET `max_limit` = 4 WHERE `entry` = 1033;
+UPDATE `pool_template` SET `max_limit` = 4 WHERE `entry` = 2587;
+
 
 -- End of migration.
 END IF;
