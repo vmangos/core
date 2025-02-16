@@ -479,13 +479,23 @@ void World::LoadConfigSettings(bool reload)
 
     // Read all rates from the config file
     // Vanilla Reforged - Custom Rates Start
-    setConfig(CONFIG_FLOAT_RATE_ATTACK_POWER,            "Rate.Attack.Power", 1.0f);
-    setConfig(CONFIG_FLOAT_RATE_ATTACK_POWER_SPIRIT,     "Rate.Attack.Power.Spirit", 0.0f);
-    setConfig(CONFIG_FLOAT_RATE_SPIRIT_SCALING_WANDS,    "Rate.Spirit.Scaling.Wands", 0.0f);
-    setConfig(CONFIG_FLOAT_RATE_XP_KILL_HORDE,           "Rate.XP.Kill.Horde", 1.0f);
-    setConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE_HORDE,     "Rate.XP.Kill.Elite.Horde", 1.0f);
-    setConfig(CONFIG_FLOAT_RATE_XP_KILL_ALLIANCE,        "Rate.XP.Kill.Alliance", 1.0f);
-    setConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE_ALLIANCE,  "Rate.XP.Kill.Elite.Alliance", 1.0f);
+    setConfig(CONFIG_FLOAT_RATE_ATTACK_POWER,                        "Rate.Attack.Power", 1.0f);
+    setConfig(CONFIG_FLOAT_RATE_ATTACK_POWER_SPIRIT,                 "Rate.Attack.Power.Spirit", 0.0f);
+    setConfig(CONFIG_FLOAT_RATE_SPIRIT_SCALING_WANDS,                "Rate.Spirit.Scaling.Wands", 0.0f);
+    setConfig(CONFIG_FLOAT_RATE_XP_KILL_HORDE,                       "Rate.XP.Kill.Horde", 1.0f);
+    setConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE_HORDE,                 "Rate.XP.Kill.Elite.Horde", 1.0f);
+    setConfig(CONFIG_FLOAT_RATE_XP_KILL_ALLIANCE,                    "Rate.XP.Kill.Alliance", 1.0f);
+    setConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE_ALLIANCE,              "Rate.XP.Kill.Elite.Alliance", 1.0f);
+    setConfig(CONFIG_UINT32_HY_TICK_TIMER,                           "Hy.Tick.Timer", 1000);
+    setConfig(CONFIG_UINT32_HY_CAPTURE_TIME,                         "Hy.Capture.Time", 60000);
+    setConfig(CONFIG_UINT32_HY_RESOURCE_BROADCAST_INTERVAL,          "Hy.Resource.Broadcast.Interval", 60);
+    setConfig(CONFIG_UINT32_HY_BASE_COOLDOWN_MIN,                    "Hy.Base.Cooldown.Min", 64800);
+    setConfig(CONFIG_UINT32_HY_BASE_COOLDOWN_MAX,                    "Hy.Base.Cooldown.Max", 129600);
+    setConfig(CONFIG_UINT32_HY_BETWEEN_FIGHT_COOLDOWN,               "Hy.Between.Fight.Cooldown", 3600);
+    setConfig(CONFIG_UINT32_HY_ATTACKABLE_BROADCAST_INTERVAL,        "Hy.Attackable.Broadcast.Interval", 900);
+    setConfig(CONFIG_UINT32_HY_FIGHT_DISABLE_HOUR_START,             "Hy.Fight.Disable.Hour.Start", 2);
+    setConfig(CONFIG_UINT32_HY_FIGHT_DISABLE_HOUR_END,               "Hy.Fight.Disable.Hour.End", 6);
+    setConfig(CONFIG_UINT32_HY_PREPARATION_TIME,                     "Hy.Preparation.Time", 300);
     // Vanilla Reforged - Custom Rates End
     setConfigPos(CONFIG_FLOAT_RATE_HEALTH,               "Rate.Health", 1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_POWER_MANA,           "Rate.Mana", 1.0f);

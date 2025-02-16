@@ -2583,6 +2583,16 @@ Rate.XP.Kill.Horde = 1
 Rate.XP.Kill.Elite.Horde = 1
 Rate.XP.Kill.Alliance = 1
 Rate.XP.Kill.Elite.Alliance = 1
+Hy.Tick.Timer = 1000
+Hy.Capture.Time = 60000
+Hy.Resource.Broadcast.Interval = 60
+Hy.Base.Cooldown.Min = 64800
+Hy.Base.Cooldown.Max = 129600
+Hy.Between.Fight.Cooldown = 3600
+Hy.Attackable.Broadcast.Interval = 900
+Hy.Fight.Disable.Hour.Start = 2
+Hy.Fight.Disable.Hour.End = 6
+Hy.Preparation.Time = 300
 # Vanilla Reforged - Custom Rates End
 Rate.Health = 1
 Rate.Mana = 1
