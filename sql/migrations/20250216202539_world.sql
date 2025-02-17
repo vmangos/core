@@ -266,7 +266,178 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (23020, @PTEMPLATE+2, 0, 'Wetlands - Misc Cave - Tin Vein / Silver Vein', 0);
 UPDATE `pool_template` SET `max_limit` = 9 WHERE `entry` = 1156;
 
+-- Hinterlands
 UPDATE `pool_template` SET `description` = 'Hinterlands - Silver Vein / Gold Vein / Iron Deposit (Master Pool)' WHERE `entry` = 1349;
+UPDATE `pool_template` SET `max_limit` = 17 WHERE `entry` = 1067;
+UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 1349;
+UPDATE `pool_template` SET `max_limit` = 3 WHERE `entry` = 1070;
+-- Skull Rock
+SET @PTEMPLATE = 292;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (3069, 3067, 3075, 3073, 3065, 3063, 3070, 3079, 3078, 3071, 3066));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (3069, 3067, 3075, 3073, 3065, 3063, 3070, 3079, 3078, 3071, 3066);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Hinterlands - Skull Rock' WHERE `entry` IN (3069, 3067, 3075, 3073, 3065, 3063, 3070, 3079, 3078, 3071, 3066);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Hinterlands - Skull Rock' WHERE `pool_entry` IN (3069, 3067, 3075, 3073, 3065, 3063, 3070, 3079, 3078, 3071, 3066);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 2, 'Hinterlands - Skull Rock - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(3069, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3067, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3075, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3073, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3065, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3063, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3070, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3079, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3078, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3071, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3066, @PTEMPLATE+1, 0, 'Hinterlands - Skull Rock - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+-- Jintha\'Alor 1
+SET @PTEMPLATE = 293;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (9441, 9440, 25618, 17206));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (9441, 9440, 25618, 17206);
+UPDATE `pool_template` SET `description` = 'Small Thorium Vein / Truesilver Deposit - Hinterlands - Jintha\'Alor Cave 1' WHERE `entry` IN (9441, 9440, 25618, 17206);
+UPDATE `pool_gameobject` SET `description` = 'Small Thorium Vein / Truesilver Deposit - Hinterlands - Jintha\'Alor Cave 1' WHERE `pool_entry` IN (9441, 9440, 25618, 17206);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 3, 'Hinterlands - Jintha\'Alor Cave 1 - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(9441, @PTEMPLATE+1, 0, 'Hinterlands - Jintha\'Alor Cave 1 - Small Thorium Vein / Truesilver Deposit', 0),
+(9440, @PTEMPLATE+1, 0, 'Hinterlands - Jintha\'Alor Cave 1 - Small Thorium Vein / Truesilver Deposit', 0),
+(25618, @PTEMPLATE+1, 0, 'Hinterlands - Jintha\'Alor Cave 1 - Small Thorium Vein / Truesilver Deposit', 0),
+(17206, @PTEMPLATE+1, 0, 'Hinterlands - Jintha\'Alor Cave 1 - Small Thorium Vein / Truesilver Deposit', 0);
+
+-- Jintha\'Alor 2
+SET @PTEMPLATE = 294;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (25612, 25619, 25611, 3031));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (25612, 25619, 25611, 3031);
+UPDATE `pool_template` SET `description` = 'Small Thorium Vein / Truesilver Deposit - Hinterlands - Jintha\'Alor Cave 2' WHERE `entry` IN (25612, 25619, 25611, 3031);
+UPDATE `pool_gameobject` SET `description` = 'Small Thorium Vein / Truesilver Deposit - Hinterlands - Jintha\'Alor Cave 2' WHERE `pool_entry` IN (25612, 25619, 25611, 3031);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Hinterlands - Jintha\'Alor Cave 2 - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(25612, @PTEMPLATE+1, 0, 'Hinterlands - Jintha\'Alor Cave 2 - Small Thorium Vein / Truesilver Deposit', 0),
+(25619, @PTEMPLATE+1, 0, 'Hinterlands - Jintha\'Alor Cave 2 - Small Thorium Vein / Truesilver Deposit', 0),
+(25611, @PTEMPLATE+1, 0, 'Hinterlands - Jintha\'Alor Cave 2 - Small Thorium Vein / Truesilver Deposit', 0),
+(3031, @PTEMPLATE+1, 0, 'Hinterlands - Jintha\'Alor Cave 2 - Small Thorium Vein / Truesilver Deposit', 0);
+
+-- Feralas
+-- Ruins of Isildien
+SET @PTEMPLATE = 295;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (21492, 21493, 23008, 21491, 21494));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (21492, 21493, 23008, 21491, 21494);
+UPDATE `pool_template` SET `description` = 'Small Thorium Vein / Truesilver Deposit - Feralas - Ruins of Isildien' WHERE `entry` IN (21492, 21493, 23008, 21491, 21494);
+UPDATE `pool_gameobject` SET `description` = 'Small Thorium Vein / Truesilver Deposit - Feralas - Ruins of Isildien' WHERE `pool_entry` IN (21492, 21493, 23008, 21491, 21494);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 2, 'Feralas - Ruins of Isildien - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(21492, @PTEMPLATE+1, 0, 'Feralas - Ruins of Isildien - Small Thorium Vein / Truesilver Deposit', 0),
+(21493, @PTEMPLATE+1, 0, 'Feralas - Ruins of Isildien - Small Thorium Vein / Truesilver Deposit', 0),
+(23008, @PTEMPLATE+1, 0, 'Feralas - Ruins of Isildien - Small Thorium Vein / Truesilver Deposit', 0),
+(21491, @PTEMPLATE+1, 0, 'Feralas - Ruins of Isildien - Small Thorium Vein / Truesilver Deposit', 0),
+(21494, @PTEMPLATE+1, 0, 'Feralas - Ruins of Isildien - Small Thorium Vein / Truesilver Deposit', 0);
+
+-- Feral Scar Vale
+SET @PTEMPLATE = 296;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (17116, 17117, 17115, 17053, 32988, 32982, 32983, 2167, 6364, 6374, 6363, 6376, 6375));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (17116, 17117, 17115, 17053, 32988, 32982, 32983, 2167, 6364, 6374, 6363, 6376, 6375);
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Feralas - Feral Scar Vale' WHERE `entry` IN (17116, 17117, 17115, 17053, 32988, 32982, 32983, 2167);
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Feralas - Feral Scar Vale' WHERE `pool_entry` IN (17116, 17117, 17115, 17053, 32988, 32982, 32983, 2167);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Feral Scar Vale' WHERE `entry` IN (6364, 6374, 6363, 6376, 6375);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Feral Scar Vale' WHERE `pool_entry` IN (6364, 6374, 6363, 6376, 6375);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 3, 'Feralas - Feral Scar Vale - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(17116, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Silver Vein / Gold Vein / Iron Deposit', 0),
+(17117, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Silver Vein / Gold Vein / Iron Deposit', 0),
+(17115, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Silver Vein / Gold Vein / Iron Deposit', 0),
+(17053, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Silver Vein / Gold Vein / Iron Deposit', 0),
+(32988, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Silver Vein / Gold Vein / Iron Deposit', 0),
+(32982, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Silver Vein / Gold Vein / Iron Deposit', 0),
+(32983, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Silver Vein / Gold Vein / Iron Deposit', 0),
+(2167, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Silver Vein / Gold Vein / Iron Deposit', 0),
+(6364, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6374, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6363, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6376, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6375, @PTEMPLATE+1, 0, 'Feralas - Feral Scar Vale - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+-- Rage Scar Hold
+SET @PTEMPLATE = 320;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (6360, 6392, 6380, 6382, 6381, 6359));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (6360, 6392, 6380, 6382, 6381, 6359);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Rage Scar Hold' WHERE `entry` IN (6360, 6392, 6380, 6382, 6381, 6359);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Rage Scar Hold' WHERE `pool_entry` IN (6360, 6392, 6380, 6382, 6381, 6359);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 2, 'Feralas - Rage Scar Hold - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(6360, @PTEMPLATE+1, 0, 'Feralas - Rage Scar Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6392, @PTEMPLATE+1, 0, 'Feralas - Rage Scar Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6380, @PTEMPLATE+1, 0, 'Feralas - Rage Scar Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6382, @PTEMPLATE+1, 0, 'Feralas - Rage Scar Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6381, @PTEMPLATE+1, 0, 'Feralas - Rage Scar Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6359, @PTEMPLATE+1, 0, 'Feralas - Rage Scar Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+-- Shalzaru\'s Lair
+SET @PTEMPLATE = 329;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (6387, 6370, 6389, 6371, 6390, 6372));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (6387, 6370, 6389, 6371, 6390, 6372);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Shalzaru\'s Lair' WHERE `entry` IN (6387, 6370, 6389, 6371, 6390, 6372);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Shalzaru\'s Lair' WHERE `pool_entry` IN (6387, 6370, 6389, 6371, 6390, 6372);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 3, 'Feralas - Shalzaru\'s Lair - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(6387, @PTEMPLATE+1, 0, 'Feralas - Shalzaru\'s Lair - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6370, @PTEMPLATE+1, 0, 'Feralas - Shalzaru\'s Lair - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6389, @PTEMPLATE+1, 0, 'Feralas - Shalzaru\'s Lair - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6371, @PTEMPLATE+1, 0, 'Feralas - Shalzaru\'s Lair - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6390, @PTEMPLATE+1, 0, 'Feralas - Shalzaru\'s Lair - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6388, @PTEMPLATE+1, 0, 'Feralas - Shalzaru\'s Lair - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(6372, @PTEMPLATE+1, 0, 'Feralas - Shalzaru\'s Lair - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+-- Searing Gorge
+UPDATE `pool_template` SET `max_limit` = 3 WHERE `entry` = 4350;
+UPDATE `pool_template` SET `max_limit` = 7 WHERE `entry` = 1338;
+-- Firewatch Ridge
+SET @PTEMPLATE = 330;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (4013, 4035, 4012, 4044, 4055, 4049));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (4013, 4035, 4012, 4044, 4055, 4049);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Searing Gorge - Firewatch Ridge' WHERE `entry` IN (4013, 4035, 4012);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Searing Gorge - Firewatch Ridge' WHERE `pool_entry` IN (4013, 4035, 4012);
+UPDATE `pool_template` SET `description` = 'Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit - Searing Gorge - Firewatch Ridge' WHERE `entry` IN (4044, 4055, 4049);
+UPDATE `pool_gameobject` SET `description` = 'Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit - Searing Gorge - Firewatch Ridge' WHERE `pool_entry` IN (4044, 4055, 4049);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 3, 'Searing Gorge - Firewatch Ridge - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(4013, @PTEMPLATE+1, 0, 'Searing Gorge - Firewatch Ridge - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4035, @PTEMPLATE+1, 0, 'Searing Gorge - Firewatch Ridge - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4012, @PTEMPLATE+1, 0, 'Searing Gorge - Firewatch Ridge - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4044, @PTEMPLATE+1, 0, 'Searing Gorge - Firewatch Ridge - Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit', 0),
+(4055, @PTEMPLATE+1, 0, 'Searing Gorge - Firewatch Ridge - Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit', 0),
+(4049, @PTEMPLATE+1, 0, 'Searing Gorge - Firewatch Ridge - Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit', 0);
+
+-- Slag Pit
+SET @PTEMPLATE = 332;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (4027, 4033, 4017, 4037, 4038, 4031, 4014, 4040, 4051, 4050, 4046, 4045));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (4027, 4033, 4017, 4037, 4038, 4031, 4014, 4040, 4051, 4050, 4046, 4045);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Searing Gorge - Slag Pit' WHERE `entry` IN (4027, 4033, 4017, 4037, 4038, 4031, 4014, 4040);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit - Searing Gorge - Slag Pit' WHERE `pool_entry` IN (4027, 4033, 4017, 4037, 4038, 4031, 4014, 4040);
+UPDATE `pool_template` SET `description` = 'Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit - Searing Gorge - Slag Pit' WHERE `entry` IN (4051, 4050, 4046, 4045);
+UPDATE `pool_gameobject` SET `description` = 'Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit - Searing Gorge - Slag Pit' WHERE `pool_entry` IN (4051, 4050, 4046, 4045);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 3, 'Searing Gorge - Slag Pit - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(4027, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4033, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4017, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4037, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4038, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4031, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4014, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4040, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Gold Vein / Mithril Deposit / Truesilver Deposit / Dark Iron Deposit', 0),
+(4051, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit', 0),
+(4050, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit', 0),
+(4046, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit', 0),
+(4045, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit', 0);
 
 
 -- End of migration.
