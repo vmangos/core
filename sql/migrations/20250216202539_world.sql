@@ -379,10 +379,10 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 -- Shalzaru\'s Lair
 SET @PTEMPLATE = 329;
-UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (6387, 6370, 6389, 6371, 6390, 6372));
-DELETE FROM `pool_pool` WHERE `pool_id` IN (6387, 6370, 6389, 6371, 6390, 6372);
-UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Shalzaru\'s Lair' WHERE `entry` IN (6387, 6370, 6389, 6371, 6390, 6372);
-UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Shalzaru\'s Lair' WHERE `pool_entry` IN (6387, 6370, 6389, 6371, 6390, 6372);
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (6387, 6370, 6389, 6371, 6390, 6372, 6388));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (6387, 6370, 6389, 6371, 6390, 6372, 6388);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Shalzaru\'s Lair' WHERE `entry` IN (6387, 6370, 6389, 6371, 6390, 6372, 6388);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Feralas - Shalzaru\'s Lair' WHERE `pool_entry` IN (6387, 6370, 6389, 6371, 6390, 6372, 6388);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+1, 3, 'Feralas - Shalzaru\'s Lair - Minerals (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
