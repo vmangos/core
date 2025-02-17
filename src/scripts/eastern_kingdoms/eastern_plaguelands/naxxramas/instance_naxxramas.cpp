@@ -2038,6 +2038,30 @@ bool GossipHello_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreature
     */
 }
 
+// 29153 - Gargoyle Stoneform Visual
+struct GargoyleStoneformScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply)
+        {
+            // using stand state 9 in sniff
+            aura->GetTarget()->SetStandState(MAX_UNIT_STAND_STATE);
+            aura->GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+        else // on remove
+        {
+            aura->GetTarget()->SetStandState(UNIT_STAND_STATE_STAND);
+            aura->GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+    }
+};
+
+AuraScript* GetScript_GargoyleStoneform(SpellEntry const*)
+{
+    return new GargoyleStoneformScript();
+}
+
 void AddSC_instance_naxxramas()
 {
     Script* pNewScript;
@@ -2082,5 +2106,10 @@ void AddSC_instance_naxxramas()
     pNewScript->Name = "mob_craftsman_omarion";
     pNewScript->pGossipHello = &GossipHello_npc_MasterCraftsmanOmarion;
     pNewScript->pGossipSelect = &GossipSelect_npc_MasterCraftsmanOmarion;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_gargoyle_stoneform";
+    pNewScript->GetAuraScript = &GetScript_GargoyleStoneform;
     pNewScript->RegisterSelf();
 }

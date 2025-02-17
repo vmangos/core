@@ -1288,7 +1288,6 @@ void Aura::TriggerSpell()
 //                    case 27177: break;
 //                    // Teleport: IF/UC
 //                    case 27601: break;
-//                    // Five Fat Finger Exploding Heart Technique
 //                    case 27673: break;
                     // Nitrous Boost
                     case 27746:
@@ -1816,13 +1815,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
-                    case 7057:  // Haunting Spirits
-                    case 16336: // Haunting Phantoms
-                    {
-                        m_isPeriodic = true;
-                        m_modifier.periodictime = 5 * IN_MILLISECONDS; // expected to tick with 5 sec period
-                        return;
-                    }
                     case 16739: // Orb of Deception (before patch 1.7)
                     {
                         return HandleAuraTransform(apply, Real);
@@ -1845,12 +1837,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
-                    case 20556: // Golemagg's Trust
-                    {
-                            m_isPeriodic = true;
-                            m_modifier.periodictime = 1000;
-                            return;
-                    }
                     case 22646:                             // Goblin Rocket Helmet
                     {
                         if (Unit* caster = GetCaster())
@@ -1865,13 +1851,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             m_modifier.periodictime = 1000;
                         }
                         return;
-                    }
-                    case 29153: // Gargoyle Stoneform Visual
-                    {
-                        // using stand state 9 in sniff
-                        target->SetStandState(MAX_UNIT_STAND_STATE);
-                        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        break;
                     }
                     case 29705: // Midsummer Pole Dancing
                     case 29726:
@@ -2102,26 +2081,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
                 return;
             }
-            case 28169:                                     // Mutating Injection
-            {
-                if (Unit* caster = GetCaster())
-                {
-                    // Mutagen Explosion
-                    if (m_removeMode == AuraRemoveMode::AURA_REMOVE_BY_DISPEL)
-                    {
-                        caster->CastSpell(target, 28206, true);
-                    }
-                    else
-                    {
-                        caster->CastSpell(target, 28206, true, nullptr, this);
-                    }
-                }
-
-                // Summons Poison Cloud creature
-                target->CastSpell(target, 28240, true, nullptr, this);
-                return;
-            }
-            case 24324:  // Ivina < Nostalrius > : Hakkar's Blood Siphon
+            case 24324: // Ivina < Nostalrius > : Hakkar's Blood Siphon
             {
                 target->RemoveAurasDueToSpell(24321); // Poisonous Blood
                 return;
@@ -2136,12 +2096,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             {
                 if (target->HasAura(29660))
                     target->RemoveAurasDueToSpell(29660);
-                break;
-            }
-            case 29153: // Gargoyle Stoneform Visual
-            {
-                target->SetStandState(UNIT_STAND_STATE_STAND);
-                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 break;
             }
         }
@@ -6720,25 +6674,6 @@ void Aura::PeriodicDummyTick()
                         target->HandleEmoteCommand(PickRandomValue(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_DANCE));
                     return;
                 }
-                case 7057:                                  // Haunting Spirits
-                {
-                    if (roll_chance_i(5))
-                    {
-                        target->CastSpell(target, 7067, true, nullptr, this); // Summon Haunting Spirit
-                    }
-                    return;
-                }
-                case 16336:                                 // Haunting Phantoms
-                {
-                    if (roll_chance_i(5))
-                    {
-                        if (urand(0, 1))
-                            target->CastSpell(target, 16334, true); // Summon Spiteful Phantom
-                        else
-                            target->CastSpell(target, 16335, true); // Summon Wrath Phantom
-                    }
-                    return;
-                }
                 case 21051: // Melodious Rapture Visual (DND)
                 {
                     if (Creature* pRat = target->ToCreature())
@@ -6819,29 +6754,6 @@ void Aura::PeriodicDummyTick()
                     if (ribbonCount > 1)
                         target->CastSpell(GetCaster(), 29175, true); // Midsummer Pole Buff
 
-                    return;
-                }
-                case 20556: // Golemagg's Trust
-                {
-                    if (Unit* pCaster = GetCaster())
-                    {
-                        if (pCaster->IsDead() && !pCaster->IsInCombat())
-                        {
-                            return;
-                        }
-                        // Golemagg's Core Ragers will deal increased damage
-                        // and have 50% increased attack speed if tanked too close to Golemagg.
-                        std::list<Creature*> addList;
-                        pCaster->GetCreatureListWithEntryInGrid(addList, 11672, 30.0f);
-                        if (!addList.empty())
-                        {
-                            for (const auto& itr : addList)
-                            {
-                                // Golemagg's Trust Buff
-                                pCaster->CastSpell(itr, 20553, true, nullptr, this);
-                            }
-                        }
-                    }
                     return;
                 }
             }

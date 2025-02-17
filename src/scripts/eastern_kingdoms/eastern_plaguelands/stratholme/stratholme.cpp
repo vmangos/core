@@ -667,6 +667,36 @@ GameObjectAI* GetAIgo_supply_crate(GameObject *pGo)
     return new go_supply_crateAI(pGo);
 }
 
+// 16336 - Haunting Phantoms
+struct HauntingPhantomsScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply && aura->GetEffIndex() == EFFECT_INDEX_0)
+            aura->SetPeriodicTimer(5 * IN_MILLISECONDS);
+    }
+
+    void OnPeriodicDummy(Aura* aura) final
+    {
+        if (roll_chance_i(5)) // 5% chance every tick
+        {
+            if (urand(0, 1))
+            {
+                aura->GetTarget()->CastSpell(aura->GetTarget(), 16334, true); // Summon Spiteful Phantom
+            }
+            else
+            {
+                aura->GetTarget()->CastSpell(aura->GetTarget(), 16335, true); // Summon Wrath Phantom
+            }
+        }
+    }
+};
+
+AuraScript* GetScript_HauntingPhantoms(SpellEntry const*)
+{
+    return new HauntingPhantomsScript();
+}
+
 void AddSC_stratholme()
 {
     Script* newscript;
@@ -710,5 +740,10 @@ void AddSC_stratholme()
     newscript = new Script;
     newscript->Name = "go_supply_crate";
     newscript->GOGetAI = &GetAIgo_supply_crate;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_haunting_phantoms";
+    newscript->GetAuraScript = &GetScript_HauntingPhantoms;
     newscript->RegisterSelf();
 }

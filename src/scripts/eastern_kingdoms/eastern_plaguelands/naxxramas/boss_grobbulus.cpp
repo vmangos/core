@@ -45,6 +45,7 @@ enum GrobbulusData
     SPELL_BERSERK = 26662,
 
     SPELL_POISON_CLOUD          = 28240, // Summons a poison cloud npc
+    SPELL_MUTAGEN_EXPLOSION     = 28206,
     //SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud, triggers 28241 every second
 
     //SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes EventAI
@@ -234,6 +235,38 @@ CreatureAI* GetAI_boss_grobbulus(Creature* pCreature)
     return new boss_grobbulusAI(pCreature);
 }
 
+// 28169 - Mutating Injection
+struct MutatingInjectionScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (!apply) // on remove
+        {
+            if (Unit* pCaster = aura->GetCaster())
+            {
+                if (aura->GetRemoveMode()  == AuraRemoveMode::AURA_REMOVE_BY_DISPEL)
+                {
+                    // Mutagen Explosion
+                    pCaster->CastSpell(aura->GetTarget(), SPELL_MUTAGEN_EXPLOSION, true);
+                }
+                else
+                {
+                    // Mutagen Explosion
+                    pCaster->CastSpell(aura->GetTarget(), SPELL_MUTAGEN_EXPLOSION, true, nullptr, aura);
+                }
+            }
+
+            // Poison Cloud
+            aura->GetTarget()->CastSpell(aura->GetTarget(), SPELL_POISON_CLOUD, true, nullptr, aura);
+        }
+    }
+};
+
+AuraScript* GetScript_MutatingInjection(SpellEntry const*)
+{
+    return new MutatingInjectionScript();
+}
+
 void AddSC_boss_grobbulus()
 {
     Script* pNewScript;
@@ -241,5 +274,10 @@ void AddSC_boss_grobbulus()
     pNewScript = new Script;
     pNewScript->Name = "boss_grobbulus";
     pNewScript->GetAI = &GetAI_boss_grobbulus;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_mutating_injection";
+    pNewScript->GetAuraScript = &GetScript_MutatingInjection;
     pNewScript->RegisterSelf();
 }
