@@ -547,6 +547,93 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (8911, @PTEMPLATE+3, 0, 'Barrens - Stagnant Oasis - Tin Vein / Silver Vein', 0),
 (8883, @PTEMPLATE+3, 0, 'Barrens - Stagnant Oasis - Tin Vein / Silver Vein', 0);
 
+-- Stonetalon Mountains
+UPDATE `gameobject` SET `position_x` = 18.176 WHERE `guid` = 2516734;
+UPDATE `pool_template` SET `max_limit` = 10 WHERE `entry` = 1090;
+-- Boulderslide Cavern
+SET @PTEMPLATE = 333;
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (23015, 2293, 2292, 2294, 2291, 1090));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (23015, 2293, 2292, 2294, 2291, 1090);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Stonetalon Mountains - Boulderslide Cavern' WHERE `entry` IN (23015, 2293, 2292, 2294, 2291, 1090);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Stonetalon Mountains - Boulderslide Cavern' WHERE `pool_entry` IN (23015, 2293, 2292, 2294, 2291, 1090);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 2, 'Stonetalon Mountains - Boulderslide Cavern - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(23015, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Boulderslide Cavern - Tin Vein / Silver Vein', 0),
+(2293, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Boulderslide Cavern - Tin Vein / Silver Vein', 0),
+(2292, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Boulderslide Cavern - Tin Vein / Silver Vein', 0),
+(2294, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Boulderslide Cavern - Tin Vein / Silver Vein', 0),
+(2291, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Boulderslide Cavern - Tin Vein / Silver Vein', 0),
+(1090, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Boulderslide Cavern - Tin Vein / Silver Vein', 0);
+
+-- Windshear Mine
+SET @PTEMPLATE = 385;
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2308, 2305, 2302, 2303, 2301, 2306, 2304, 23024, 23013));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (2308, 2305, 2302, 2303, 2301, 2306, 2304, 23024, 23013);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Stonetalon Mountains - Windshear Mine' WHERE `entry` IN (2308, 2305, 2302, 2303, 2301, 2306, 2304, 23024, 23013);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Stonetalon Mountains - Windshear Mine' WHERE `pool_entry` IN (2308, 2305, 2302, 2303, 2301, 2306, 2304, 23024, 23013);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 3, 'Stonetalon Mountains - Windshear Mine - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(2308, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0),
+(2305, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0),
+(2302, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0),
+(2303, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0),
+(2301, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0),
+(2306, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0),
+(2304, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0),
+(23024, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0),
+(23013, @PTEMPLATE+1, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0);
+
+-- Thousand Needles
+UPDATE `pool_template` SET `max_limit` = 14 WHERE `entry` = 329;
+-- Roguefeather Den
+SET @PTEMPLATE = 395;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (5819, 5787, 5785, 5784, 5782, 5818, 5783));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (5819, 5787, 5785, 5784, 5782, 5818, 5783);
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Thousand Needles - Roguefeather Den' WHERE `entry` IN (5819, 5787, 5785, 5784, 5782, 5818, 5783);
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Thousand Needles - Roguefeather Den' WHERE `pool_entry` IN (5819, 5787, 5785, 5784, 5782, 5818, 5783);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 2, 'Thousand Needles - Roguefeather Den - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(5819, @PTEMPLATE+1, 0, 'Thousand Needles - Roguefeather Den - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5787, @PTEMPLATE+1, 0, 'Thousand Needles - Roguefeather Den - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5785, @PTEMPLATE+1, 0, 'Thousand Needles - Roguefeather Den - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5784, @PTEMPLATE+1, 0, 'Thousand Needles - Roguefeather Den - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5782, @PTEMPLATE+1, 0, 'Thousand Needles - Roguefeather Den - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5818, @PTEMPLATE+1, 0, 'Thousand Needles - Roguefeather Den - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5783, @PTEMPLATE+1, 0, 'Thousand Needles - Roguefeather Den - Silver Vein / Gold Vein / Iron Deposit', 0);
+
+-- Splithoof Hold
+SET @PTEMPLATE = 396;
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (17112, 5825, 5800, 5799, 5806, 5830, 5828, 5827, 5809, 5808, 5802, 5804, 3203, 3206, 3209, 3205, 3207, 3208));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (17112, 5825, 5800, 5799, 5806, 5830, 5828, 5827, 5809, 5808, 5802, 5804, 3203, 3206, 3209, 3205, 3207, 3208);
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Thousand Needles - Splithoof Hold' WHERE `entry` IN (17112, 5825, 5800, 5799, 5806, 5830, 5828, 5827, 5809, 5808, 5802, 5804);
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Thousand Needles - Splithoof Hold' WHERE `pool_entry` IN (17112, 5825, 5800, 5799, 5806, 5830, 5828, 5827, 5809, 5808, 5802, 5804);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Thousand Needles - Splithoof Hold' WHERE `entry` IN (3203, 3206, 3209, 3205, 3207, 3208);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Thousand Needles - Splithoof Hold' WHERE `pool_entry` IN (3203, 3206, 3209, 3205, 3207, 3208);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 3, 'Thousand Needles - Splithoof Hold - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(17112, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5825, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5800, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5799, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5806, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5830, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5828, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5827, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5809, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5808, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5802, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(5804, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Silver Vein / Gold Vein / Iron Deposit', 0),
+(3203, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3206, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3209, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3205, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3207, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(3208, @PTEMPLATE+1, 0, 'Thousand Needles - Splithoof Hold - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
 
 -- End of migration.
 END IF;
