@@ -439,6 +439,114 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (4046, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit', 0),
 (4045, @PTEMPLATE+1, 0, 'Searing Gorge - Slag Pit - Small Thorium Vein / Truesilver Deposit / Dark Iron Deposit', 0);
 
+-- Barrens
+UPDATE `pool_template` SET `max_limit` = 11 WHERE `entry` = 2588;
+UPDATE `pool_template` SET `max_limit` = 37 WHERE `entry` = 4303;
+-- Boulder Lode Mine
+SET @PTEMPLATE = 391;
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (40279, 40280, 40281);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (40279, 40280, 40281);
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (8896, 8895, 8897));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (8896, 8895, 8897);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Barrens - Boulder Lode Mine' WHERE `entry` IN (8896, 8895, 8897);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Barrens - Boulder Lode Mine' WHERE `pool_entry` IN (8896, 8895, 8897);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Copper Veins - Barrens - Boulder Lode Mine', 10),
+(@PTEMPLATE+2, 1, 'Copper Veins - Barrens - Boulder Lode Mine', 10),
+(@PTEMPLATE+3, 1, 'Copper Veins - Barrens - Boulder Lode Mine', 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(40279, @PTEMPLATE+1, 'Copper Veins - Barrens - Boulder Lode Mine', 10),
+(40280, @PTEMPLATE+2, 'Copper Veins - Barrens - Boulder Lode Mine', 10),
+(40281, @PTEMPLATE+3, 'Copper Veins - Barrens - Boulder Lode Mine', 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+4, 2, 'Barrens - Boulder Lode Mine - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, @PTEMPLATE+4, 0, 'Barrens - Boulder Lode Mine - Copper Veins', 0),
+(@PTEMPLATE+2, @PTEMPLATE+4, 0, 'Barrens - Boulder Lode Mine - Copper Veins', 0),
+(@PTEMPLATE+3, @PTEMPLATE+4, 0, 'Barrens - Boulder Lode Mine - Copper Veins', 0),
+(8896, @PTEMPLATE+4, 0, 'Barrens - Boulder Lode Mine - Tin Vein / Silver Vein', 0),
+(8895, @PTEMPLATE+4, 0, 'Barrens - Boulder Lode Mine - Tin Vein / Silver Vein', 0),
+(8897, @PTEMPLATE+4, 0, 'Barrens - Boulder Lode Mine - Tin Vein / Silver Vein', 0);
+
+-- Forgotten Pools
+SET @PTEMPLATE = 515;
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (46505, 46506);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (46505, 46506);
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (8914, 8889, 8890, 8891, 8900));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (8914, 8889, 8890, 8891, 8900);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Barrens - Forgotten Pools' WHERE `entry` IN (8914, 8889, 8890, 8891, 8900);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Barrens - Forgotten Pools' WHERE `pool_entry` IN (8914, 8889, 8890, 8891, 8900);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Copper Veins - Barrens - Forgotten Pools', 10),
+(@PTEMPLATE+2, 1, 'Copper Veins - Barrens - Forgotten Pools', 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(46505, @PTEMPLATE+1, 'Copper Veins - Barrens - Forgotten Pools', 10),
+(46506, @PTEMPLATE+2, 'Copper Veins - Barrens - Forgotten Pools', 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+3, 1, 'Barrens - Forgotten Pools - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, @PTEMPLATE+3, 0, 'Barrens - Forgotten Pools - Copper Veins', 0),
+(@PTEMPLATE+2, @PTEMPLATE+3, 0, 'Barrens - Forgotten Pools - Copper Veins', 0),
+(8914, @PTEMPLATE+3, 0, 'Barrens - Forgotten Pools - Tin Vein / Silver Vein', 0),
+(8889, @PTEMPLATE+3, 0, 'Barrens - Forgotten Pools - Tin Vein / Silver Vein', 0),
+(8890, @PTEMPLATE+3, 0, 'Barrens - Forgotten Pools - Tin Vein / Silver Vein', 0),
+(8891, @PTEMPLATE+3, 0, 'Barrens - Forgotten Pools - Tin Vein / Silver Vein', 0),
+(8900, @PTEMPLATE+3, 0, 'Barrens - Forgotten Pools - Tin Vein / Silver Vein', 0);
+
+-- Lushwater Oasis
+SET @PTEMPLATE = 1493;
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (46495, 40211, 46494, 40210);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (46495, 40211, 46494, 40210);
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (8913, 8886, 8885, 8884, 8912));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (8913, 8886, 8885, 8884, 8912);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Barrens - Lushwater Oasis' WHERE `entry` IN (8913, 8886, 8885, 8884, 8912);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Barrens - Lushwater Oasis' WHERE `pool_entry` IN (8913, 8886, 8885, 8884, 8912);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Copper Veins - Barrens - Lushwater Oasis', 10),
+(@PTEMPLATE+2, 1, 'Copper Veins - Barrens - Lushwater Oasis', 10),
+(@PTEMPLATE+3, 1, 'Copper Veins - Barrens - Lushwater Oasis', 10),
+(@PTEMPLATE+4, 1, 'Copper Veins - Barrens - Lushwater Oasis', 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(46495, @PTEMPLATE+1, 'Copper Veins - Barrens - Lushwater Oasis', 10),
+(40211, @PTEMPLATE+2, 'Copper Veins - Barrens - Lushwater Oasis', 10),
+(46494, @PTEMPLATE+3, 'Copper Veins - Barrens - Lushwater Oasis', 10),
+(40210, @PTEMPLATE+4, 'Copper Veins - Barrens - Lushwater Oasis', 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+5, 2, 'Barrens - Lushwater Oasis - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, @PTEMPLATE+5, 0, 'Barrens - Lushwater Oasis - Copper Veins', 0),
+(@PTEMPLATE+2, @PTEMPLATE+5, 0, 'Barrens - Lushwater Oasis - Copper Veins', 0),
+(@PTEMPLATE+3, @PTEMPLATE+5, 0, 'Barrens - Lushwater Oasis - Copper Veins', 0),
+(@PTEMPLATE+4, @PTEMPLATE+5, 0, 'Barrens - Lushwater Oasis - Copper Veins', 0),
+(8913, @PTEMPLATE+5, 0, 'Barrens - Lushwater Oasis - Tin Vein / Silver Vein', 0),
+(8886, @PTEMPLATE+5, 0, 'Barrens - Lushwater Oasis - Tin Vein / Silver Vein', 0),
+(8885, @PTEMPLATE+5, 0, 'Barrens - Lushwater Oasis - Tin Vein / Silver Vein', 0),
+(8884, @PTEMPLATE+5, 0, 'Barrens - Lushwater Oasis - Tin Vein / Silver Vein', 0),
+(8912, @PTEMPLATE+5, 0, 'Barrens - Lushwater Oasis - Tin Vein / Silver Vein', 0);
+
+-- Stagnant Oasis
+SET @PTEMPLATE = 1174;
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (84133, 46493);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (84133, 46493);
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (8898, 8911, 8883));
+DELETE FROM `pool_pool` WHERE `pool_id` IN (8898, 8911, 8883);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Barrens - Stagnant Oasis' WHERE `entry` IN (8898, 8911, 8883);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Barrens - Stagnant Oasis' WHERE `pool_entry` IN (8898, 8911, 8883);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Copper Veins - Barrens - Stagnant Oasis', 10),
+(@PTEMPLATE+2, 1, 'Copper Veins - Barrens - Stagnant Oasis', 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(84133, @PTEMPLATE+1, 'Copper Veins - Barrens - Stagnant Oasis', 10),
+(46493, @PTEMPLATE+2, 'Copper Veins - Barrens - Stagnant Oasis', 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+3, 1, 'Barrens - Stagnant Oasis - Minerals (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1, @PTEMPLATE+3, 0, 'Barrens - Stagnant Oasis - Copper Veins', 0),
+(@PTEMPLATE+2, @PTEMPLATE+3, 0, 'Barrens - Stagnant Oasis - Copper Veins', 0),
+(8898, @PTEMPLATE+3, 0, 'Barrens - Stagnant Oasis - Tin Vein / Silver Vein', 0),
+(8911, @PTEMPLATE+3, 0, 'Barrens - Stagnant Oasis - Tin Vein / Silver Vein', 0),
+(8883, @PTEMPLATE+3, 0, 'Barrens - Stagnant Oasis - Tin Vein / Silver Vein', 0);
+
 
 -- End of migration.
 END IF;
