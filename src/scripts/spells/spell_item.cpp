@@ -17,7 +17,7 @@
 #include "scriptPCH.h"
 
 // 8063 - Deviate Fish
-struct DeviatFishScript : public SpellScript
+struct DeviateFishScript : public SpellScript
 {
     void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
@@ -44,13 +44,13 @@ struct DeviatFishScript : public SpellScript
     }
 };
 
-SpellScript* GetScript_DeviatFish(SpellEntry const*)
+SpellScript* GetScript_DeviateFish(SpellEntry const*)
 {
-    return new DeviatFishScript();
+    return new DeviateFishScript();
 }
 
 // 8213 - Cooked Deviate Fish
-struct CookedDeviatFishScript : public SpellScript
+struct CookedDeviateFishScript : public SpellScript
 {
     void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
@@ -84,9 +84,9 @@ struct CookedDeviatFishScript : public SpellScript
     }
 };
 
-SpellScript* GetScript_CookedDeviatFish(SpellEntry const*)
+SpellScript* GetScript_CookedDeviateFish(SpellEntry const*)
 {
-    return new CookedDeviatFishScript();
+    return new CookedDeviateFishScript();
 }
 
 // 16589 - Noggenfogger Elixir
@@ -136,13 +136,13 @@ void AddSC_item_spell_scripts()
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "spell_deviat_fish";
-    newscript->GetSpellScript = &GetScript_DeviatFish;
+    newscript->Name = "spell_deviate_fish";
+    newscript->GetSpellScript = &GetScript_DeviateFish;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "spell_cooked_deviat_fish";
-    newscript->GetSpellScript = &GetScript_CookedDeviatFish;
+    newscript->Name = "spell_cooked_deviate_fish";
+    newscript->GetSpellScript = &GetScript_CookedDeviateFish;
     newscript->RegisterSelf();
 
     newscript = new Script;
