@@ -243,6 +243,7 @@ void AddSC_npc_j_eevee();                            // J'Eevee, the Imp in a Ja
 void AddSC_hunter_spell_scripts();
 void AddSC_warrior_spell_scripts();
 void AddSC_warlock_spell_scripts();
+void AddSC_item_spell_scripts();
 
 void AddScripts()
 {
@@ -482,4 +483,5 @@ void AddScripts()
     AddSC_hunter_spell_scripts();
     AddSC_warrior_spell_scripts();
     AddSC_warlock_spell_scripts();
+    AddSC_item_spell_scripts();
 }

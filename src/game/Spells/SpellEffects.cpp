@@ -850,41 +850,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                             return;
                     };
                 }
-                case 8063:                                  // Deviate Fish
-                {
-                    Player* pPlayer = m_caster->ToPlayer();
-                    if (!pPlayer)
-                        return;
-
-                    uint32 spellId = PickRandomValue(8064, 8065, 8066, 8067, 8068, 8070);
-                    pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
-                    return;
-                }
-                case 8213:                                  // Savory Deviate Delight
-                {
-                    Player* pPlayer = m_caster->ToPlayer();
-                    if (!pPlayer)
-                        return;
-
-                    uint32 spellId = 0;
-                    uint32 spells[6] = {
-                        (pPlayer->GetGender() == GENDER_MALE ? 8219u : 8220u), // Flip Out - ninja
-                        (pPlayer->GetGender() == GENDER_MALE ? 8221u : 8222u), // Yaaarrrr - pirate
-                        8223u, // Oops - goo
-                        8215u, // Rapid Cast
-                        8224u, // Cowardice
-                        8226u  // Fake Death
-                    };
-
-                    // Had additional effects before BWL patch.
-                    if (sWorld.GetWowPatch() < WOW_PATCH_106 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_SPELL_EFFECTS))
-                        spellId = spells[urand(0, 5)];
-                    else
-                        spellId = spells[urand(0, 1)];
-
-                    pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
-                    return;
-                }
                 case 8593:                                  // Symbol of life (restore creature to life)
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
@@ -1020,29 +985,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         return;
 
                     ((Creature*)unitTarget)->ForcedDespawn();
-                    return;
-                }
-                case 16589:                                 // Noggenfogger Elixir
-                {
-                    Player* pPlayer = m_caster->ToPlayer();
-                    if (!pPlayer)
-                        return;
-
-                    // https://old.reddit.com/r/classicwow/comments/jwycmc/noggenfogger_1000_consumes_593_skellies_210_minis/
-                    uint32 spellId = 16591; // skeleton (60%)
-                    switch (urand(1, 10))
-                    {
-                        case 1:
-                        case 2:
-                            spellId = 16595; // mini (20%)
-                            break;
-                        case 3:
-                        case 4:
-                            spellId = 16593; // slow fall (20%)
-                            break;
-                    }
-
-                    pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
                     return;
                 }
                 case 17251:                                 // Spirit Healer Res
