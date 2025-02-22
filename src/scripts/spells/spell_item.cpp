@@ -74,15 +74,11 @@ struct CookedDeviatFishScript : public SpellScript
             };
 
             // Had additional effects before BWL patch.
-            if (sWorld.GetWowPatch() < WOW_PATCH_106 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_SPELL_EFFECTS))
-            {
-                randomSpellId = spells[urand(0, 5)];
-            }
-            else
-            {
-                randomSpellId = spells[urand(0, 1)];
-            }
-
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
+            randomSpellId = spells[urand(0, 5)];
+#else
+            randomSpellId = spells[urand(0, 1)];
+#endif
             pPlayer->CastSpell(pPlayer, randomSpellId, true, nullptr);
         }
     }

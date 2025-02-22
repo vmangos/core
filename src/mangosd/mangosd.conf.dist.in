@@ -406,12 +406,6 @@ Anticrash.Rearm.Timer = 60000
 #        affect quests and other scripted scenes.
 #        Default: 1
 #
-#    Progression.AccurateSpellEffects
-#        Whether to accurately portray changes in spell effects (eg. Deviate Fish). NOT applicable to effects
-#        which change their functionality (eg. spell changed) or values between patches. Only affects
-#        spells which had effects added or removed which still exist in the game client.
-#        Default: 1
-#
 #    Progression.RestoreDeletedItems
 #        Whether to automatically restore items which were previously deleted because no item template with
 #        this entry existed on that content patch. Players will receive the item in the mail once it has been
@@ -450,7 +444,6 @@ Progression.RestoreDeletedItems = 1
 Progression.AccuratePetStatistics = 1
 Progression.AccurateLFGAvailability = 1
 Progression.AccuratePVEEvents = 1
-Progression.AccurateSpellEffects = 1
 Progression.NoRespecPriceDecay = 1
 Progression.NoQuestXpToGold = 1
 Progression.UnlinkedAuctionHouses = 1
