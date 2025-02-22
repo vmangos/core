@@ -74,7 +74,7 @@ struct CookedDeviatFishScript : public SpellScript
             };
 
             // Had additional effects before BWL patch.
-#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_5_1
             randomSpellId = spells[urand(0, 5)];
 #else
             randomSpellId = spells[urand(0, 1)];
