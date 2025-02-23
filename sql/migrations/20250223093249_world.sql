@@ -154,9 +154,9 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
 (417, 1, 'Food Crate / Armor Crate / Weapon Crate - Barrens', 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
-(291, @PTEMPLATE+1, 'Food Crate / Armor Crate / Weapon Crate - Barrens', 0, 10),
-(328, @PTEMPLATE+1, 'Food Crate / Armor Crate / Weapon Crate - Barrens', 0, 10),
-(330, @PTEMPLATE+1, 'Food Crate / Armor Crate / Weapon Crate - Barrens', 0, 10);
+(291, 417, 'Food Crate / Armor Crate / Weapon Crate - Barrens', 0, 10),
+(328, 417, 'Food Crate / Armor Crate / Weapon Crate - Barrens', 0, 10),
+(330, 417, 'Food Crate / Armor Crate / Weapon Crate - Barrens', 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (417, 18843, 0, 'Food Crate / Armor Crate / Weapon Crate - Barrens', 0);
 
