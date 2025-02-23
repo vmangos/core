@@ -1797,7 +1797,7 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
         ExtractUInt32(&args, botLevel);
     }
 
-    sPlayerBotMgr.AddBattleBot(BattleGroundQueueTypeId(bg), botTeam, botLevel, false);
+    sPlayerBotMgr.AddBattleBot(BattleGroundQueueTypeId(bg), botTeam, botLevel, true);
     return true;
 }
 
