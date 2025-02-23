@@ -101,7 +101,7 @@ public:
     float m_y = 0.0f;
     float m_z = 0.0f;
     float m_o = 0.0f;
-    bool m_temporary = false;
+    bool m_temporary = true;
     bool m_wasDead = false;
     bool m_wasInBG = false;
 
