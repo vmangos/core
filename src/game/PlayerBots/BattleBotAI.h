@@ -36,8 +36,7 @@ enum FlagSpellsWS
 class BattleBotAI : public CombatBotBaseAI
 {
 public:
-
-    BattleBotAI(uint8 race, uint8 class_, uint8 level, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, uint8 bgId, bool temporary)
+    BattleBotAI(uint8 race, uint8 class_, uint8 level, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, uint8 bgId, bool temporary = false)
         : CombatBotBaseAI(),  m_race(race), m_class(class_), m_level(level), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o), m_battlegroundId(bgId), m_temporary(temporary)
     {
         m_updateTimer.Reset(2000);
@@ -46,7 +45,9 @@ public:
     {
         return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o);
     }
-
+    // new functions added here
+    void SetTemporary(bool temp) { m_temporary = temp; }
+    bool IsTemporary() const { return m_temporary; }
     void OnPlayerLogin() final;
     void UpdateAI(uint32 const diff) final;
     void OnPacketReceived(WorldPacket const* packet) final;
@@ -101,7 +102,7 @@ public:
     float m_y = 0.0f;
     float m_z = 0.0f;
     float m_o = 0.0f;
-    bool m_temporary = true;
+    bool m_temporary = false;
     bool m_wasDead = false;
     bool m_wasInBG = false;
 
