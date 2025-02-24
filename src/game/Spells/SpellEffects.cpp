@@ -961,7 +961,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     switch (m_triggeredByAuraSpell->Id)
                     {
                         case 26467:                         // Persistent Shield
-                            m_caster->CastCustomSpell(unitTarget, 26470, damage, {}, {}, true);
+                            m_caster->CastCustomSpell(unitTarget, 26470, (int32)damage, {}, {}, true);
                             break;
                         default:
                             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "EffectDummy: Non-handled case for spell 13567 for triggered aura %u", m_triggeredByAuraSpell->Id);
@@ -1120,7 +1120,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     damage = dither(damage * (pPlayer->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100);
                     if (damage > 0)
-                        pPlayer->CastCustomSpell(pPlayer, 23234, damage, {}, {}, true, nullptr);
+                        pPlayer->CastCustomSpell(pPlayer, 23234, (int32)(damage), {}, {}, true, nullptr);
                     return;
                 }
                 case 20577:                                 // Cannibalize
@@ -1921,7 +1921,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 // found spelldamage coefficients of 0.381% per 0.1 speed and 15.244 per 4.0 speed
                 // but own calculation say 0.385 gives at most one point difference to published values
                 float spellDamage = m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSpellSchoolMask());
-                float weaponSpeed = (1.0f / IN_MILLISECONDS) * m_CastItem->GetProto()->Delay;
+                float weaponSpeed = (1.0f / float(IN_MILLISECONDS)) * m_CastItem->GetProto()->Delay;
                 float totalDamage = (damage + 3.85f * spellDamage) * 0.01f * weaponSpeed;
 
                 m_caster->CastCustomSpell(unitTarget, 10444, dither(totalDamage), {}, {}, true, m_CastItem);
@@ -3225,7 +3225,7 @@ void Spell::EffectDistract(SpellEffectIndex effIdx)
     unitTarget->ClearUnitState(UNIT_STATE_MOVING);
 
     if (unitTarget->GetTypeId() == TYPEID_UNIT)
-        unitTarget->GetMotionMaster()->MoveDistract(damage * IN_MILLISECONDS);
+        unitTarget->GetMotionMaster()->MoveDistract(damage * (uint32)IN_MILLISECONDS);
 
     AddExecuteLogInfo(effIdx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
 }

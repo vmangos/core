@@ -30,7 +30,7 @@
 #include "Player.h"
 #include "ObjectMgr.h"
 
-inline float GetAge(uint64 t) { return float(time(nullptr) - t) / DAY; }
+inline float GetAge(uint64 t) { return float(time(nullptr) - t) / float(DAY); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GM ticket

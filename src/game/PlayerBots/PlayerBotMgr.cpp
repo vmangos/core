@@ -507,7 +507,7 @@ bool PlayerBotMgr::DeleteBot(uint32 playerGUID)
     return DeleteBot(iter);
 }
 
-bool PlayerBotMgr::DeleteBot(std::map<uint32, std::shared_ptr<PlayerBotEntry>>::iterator iter)
+bool PlayerBotMgr::DeleteBot(std::map<uint64, std::shared_ptr<PlayerBotEntry>>::iterator iter)
 {
     if (iter->second->state == PB_STATE_LOADING)
         m_stats.loadingCount--;
