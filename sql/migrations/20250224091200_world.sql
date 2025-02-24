@@ -3,9 +3,9 @@ DELIMITER ??
 CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
-SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20250223093250');
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20250224091200');
 IF v = 0 THEN
-INSERT INTO `migrations` VALUES ('20250223093250');
+INSERT INTO `migrations` VALUES ('20250224091200');
 -- Add your query below.
 
 -- Add temporary battlebot messages with faction colors
