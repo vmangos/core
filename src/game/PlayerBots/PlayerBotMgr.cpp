@@ -1772,7 +1772,7 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
 {
     if (!*args)
     {
-        SendSysMessage("Incorrect syntax. Expected: faction [level] [temp]");
+        SendSysMessage("Incorrect syntax. Expected faction");
         SetSentErrorMessage(true);
         return false;
     }
@@ -1781,7 +1781,6 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
     uint32 botLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
     bool isTemporary = false;
     std::string option;
-
     if (char* arg1 = ExtractArg(&args))
     {
         option = arg1;
@@ -1791,22 +1790,19 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
             botTeam = ALLIANCE;
         else
         {
-            SendSysMessage("Incorrect syntax. Expected: faction [level] [temp]");
+            SendSysMessage("Incorrect syntax. Expected faction");
             SetSentErrorMessage(true);
             return false;
         }
 
-        // Extract level if provided
-        if (char* levelStr = ExtractArg(&args))
-        {
-            botLevel = atoi(levelStr);
+        
+        ExtractUInt32(&args, botLevel);
 
-            // Check for temp parameter
-            if (char* tempStr = ExtractArg(&args))
-            {
-                if (strcmp(tempStr, "temp") == 0)
-                    isTemporary = true;
-            }
+        
+        if (char* tempStr = ExtractArg(&args))
+        {
+            if (strcmp(tempStr, "temp") == 0)
+                isTemporary = true;
         }
     }
 
