@@ -435,8 +435,31 @@ UPDATE `gossip_menu_option` SET `condition_id` = 94 WHERE `option_icon` = 3 AND 
 4679,     -- Branstock Khalder
 4680,     -- Maxan Anvol, Theodrus Frostbeard
 4691);    -- Shanda, Laurna Morninglight, Astarii Starseeker, Priestess Alathea
-UPDATE `gossip_menu_option` SET `condition_id` = 94 WHERE `option_icon` = 3 AND menu_id IN (
-
+UPDATE `gossip_menu_option` SET `condition_id` = 100 WHERE `option_icon` = 3 AND menu_id IN (
+85,       -- David Trias, Marion Call
+141,      -- Rwag, Kaplak
+381,      -- Keryn Sylvius
+410,      -- Hogral Bakkan
+411,      -- Hulfdan Blackbeard
+436,      -- Jannok Breezesong
+521,      -- Shenthul
+3984,     -- Fahrad
+4502,     -- Osborne the Night Man
+4512,     -- Ormok
+4513,     -- Gest
+4540,     -- Miles Dexter
+4541,     -- Gregory Charles
+4542,     -- Carolyn Ward
+4561,     -- Fenthwick
+4562,     -- Ormyr Flinteye
+4575,     -- Anishar
+4576,     -- Syurna
+4577,     -- Erion Shadewhisper
+4658,     -- Ian Strom
+4659,     -- Jorik Kerridan
+4676,     -- Solm Hargrin
+4690,     -- Frahun Shadewhisper
+5061);    -- Lord Tony Romano
 
 
 
