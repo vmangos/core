@@ -1800,7 +1800,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
             }
             wpDestination = (WaypointPathOrigin)wpTarget->GetPathOrigin();
             wpPathId = wpTarget->GetPathId();
-            wpPointId = wpTarget->GetWaypointId() + 1;      // Insert as next waypoint
+            wpPointId = wpTarget->GetWaypointId();      // Insert as next waypoint
         }
         else // normal creature selected
             wpOwner = targetCreature;
@@ -1880,7 +1880,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
     m_session->GetPlayer()->GetPosition(x, y, z);
     if (!sWaypointMgr.AddNode(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), wpPointId, wpDestination, x, y, z))
     {
-        PSendSysMessage(LANG_WAYPOINT_NOTCREATED, wpPointId, wpOwner->GetGuidStr().c_str(), wpPathId, WaypointManager::GetOriginString(wpDestination).c_str());
+        PSendSysMessage(LANG_WAYPOINT_NOTCREATED, wpPointId + 1, wpOwner->GetGuidStr().c_str(), wpPathId, WaypointManager::GetOriginString(wpDestination).c_str());
         SetSentErrorMessage(true);
         return false;
     }
@@ -1898,7 +1898,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
         }
     }
 
-    PSendSysMessage(LANG_WAYPOINT_ADDED, wpPointId, wpOwner->GetGuidStr().c_str(), wpPathId, WaypointManager::GetOriginString(wpDestination).c_str());
+    PSendSysMessage(LANG_WAYPOINT_ADDED, wpPointId + 1, wpOwner->GetGuidStr().c_str(), wpPathId, WaypointManager::GetOriginString(wpDestination).c_str());
 
     return true;
 }                                                           // HandleWpAddCommand
