@@ -29,6 +29,10 @@
 #include "Util.h"
 #include "CliRunnable.h"
 #include "Database/DatabaseEnv.h"
+#include "Log.h"
+#include <unistd.h>  // For isatty()
+#include <thread>    // For std::this_thread::sleep_for
+#include <chrono>    // For std::chrono::seconds
 
 void utf8print(void* /*arg*/, const char* str)
 {
@@ -82,12 +86,23 @@ void CliRunnable::operator()()
     // Init new SQL thread for the world database (one connection call enough)
     WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests
 
-    char commandbuf[256];
+    // Check if stdin is connected to a terminal
+    bool stdinIsTerminal = isatty(STDIN_FILENO);
+    
+    if (!stdinIsTerminal)
+    {
+        sLog.outString("CLI: stdin is not connected to a terminal, CLI thread exiting");
+        // End the database thread and exit this thread
+        WorldDatabase.ThreadEnd();
+        return;
+    }
 
+    char commandbuf[256];
+    
     // Display the list of available CLI functions then beep
     if (sConfig.GetBoolDefault("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
-
+    
     // print this here the first time
     // later it will be printed after command queue updates
     printf("\nmangos>");
