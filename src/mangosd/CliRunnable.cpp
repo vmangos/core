@@ -83,19 +83,23 @@ int kb_hit_return()
 // %Thread start
 void CliRunnable::operator()()
 {
-    // Init new SQL thread for the world database (one connection call enough)
-    WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests
-
     // Check if stdin is connected to a terminal
-    bool stdinIsTerminal = isatty(STDIN_FILENO);
+    bool stdinIsTerminal = false;
+    
+    #if PLATFORM == PLATFORM_WINDOWS
+    stdinIsTerminal = _isatty(_fileno(stdin));
+    #else
+    stdinIsTerminal = isatty(STDIN_FILENO);
+    #endif
     
     if (!stdinIsTerminal)
     {
         sLog.outString("CLI: stdin is not connected to a terminal, CLI thread exiting");
-        // End the database thread and exit this thread
-        WorldDatabase.ThreadEnd();
-        return;
+        return; // Exit without starting the database thread
     }
+
+    // Only initialize database if we're actually going to use the CLI
+    WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests
 
     char commandbuf[256];
     
