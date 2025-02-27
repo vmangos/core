@@ -52,8 +52,8 @@ enum AreaTeams
 
 enum AreaFlags
 {
-    AREA_FLAG_SNOW                  = 0x00000001,           // snow (only Dun Morogh, Naxxramas, Razorfen Downs and Winterspring)
-    AREA_FLAG_UNK1                  = 0x00000002,           // unknown, (only Naxxramas and Razorfen Downs)
+    AREA_FLAG_SNOW                  = 0x00000001,           // Has Breath Particles (only Dun Morogh, Naxxramas, Razorfen Downs and Winterspring)
+    AREA_FLAG_UNK1                  = 0x00000002,           // Override Parent Breath Particles (only Naxxramas and Razorfen Downs)
     AREA_FLAG_UNK2                  = 0x00000004,           // Only used on development map
     AREA_FLAG_SLAVE_CAPITAL         = 0x00000008,           // slave capital city flag?
     AREA_FLAG_UNK3                  = 0x00000010,           // unknown
@@ -61,7 +61,7 @@ enum AreaFlags
     AREA_FLAG_DUEL                  = 0x00000040,           // zones where duels allowed
     AREA_FLAG_ARENA                 = 0x00000080,           // arena, both instanced and world arenas
     AREA_FLAG_CAPITAL               = 0x00000100,           // main capital city flag
-    AREA_FLAG_CITY                  = 0x00000200,           // only for one zone named "City" (where it located?)
+    AREA_FLAG_CITY                  = 0x00000200,           // Highest areaid with this flag will be the name labeled on chat channels (e.g. Trade - City)
 };
 
 enum FactionTemplateFlags
