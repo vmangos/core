@@ -6767,8 +6767,14 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     }
 
     if (pvpInfo.inPvPEnforcedArea && !IsTaxiFlying()) // in hostile area
+    {
         UpdatePvP(true);
-
+        if (sWorld.IsFFAPvPRealm() && !IsGameMaster() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
+            SetFFAPvP(true);
+    }
+    else
+        SetFFAPvP(false);
+	
     if ((zoneEntry->Flags & AREA_FLAG_CAPITAL) && !pvpInfo.inPvPEnforcedArea) // in capital city
         SetRestType(REST_TYPE_IN_CITY);
     else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && GetRestType() != REST_TYPE_IN_TAVERN)
@@ -21054,13 +21060,7 @@ void Player::SetRestType(RestType restType, uint32 areaTriggerId /*= 0*/)
 {
     m_restType = restType;
     if (m_restType == REST_TYPE_NO)
-    {
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
-
-        // Set player to FFA PVP when not in rested environment.
-        if (sWorld.IsFFAPvPRealm())
-            SetFFAPvP(true);
-    }
     else
     {
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
