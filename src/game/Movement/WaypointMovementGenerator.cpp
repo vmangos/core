@@ -112,7 +112,7 @@ void WaypointMovementGenerator<Creature>::Reset(Creature &creature)
     if (m_isWandering)
     {
         // prevent a crash at empty waypoint path.
-        if (!i_path || i_path->empty())
+        if (!i_path || i_path->empty() || !m_lastReachedWaypoint)
             return;
 
         const WaypointNode& node = i_path->at(m_lastReachedWaypoint);
