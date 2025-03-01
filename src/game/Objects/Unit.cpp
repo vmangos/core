@@ -7482,6 +7482,10 @@ void Unit::SetDeathState(DeathState s)
         }
 
         RemoveAllAurasOnDeath();
+        // Only unsummon totems for non-creature units (creature-owned totems should persist)
+        if (GetTypeId() != TYPEID_UNIT)
+            UnsummonAllTotems();
+        
         UnsummonAllTotems();
 
         m_motionMaster.Clear(false, true);
