@@ -2892,28 +2892,26 @@ CharDelete.KeepDays = 30
 #
 #    AHBot.Enable
 #        Enable AH bot.
+#        The AH bot will automatically create listings based on the data in the 'auctionhousebot' table.
 #        Default: 0 - off
 #                 1 - on
 #
-#    AHBot.ah.id
-#        The ID of the auction house from AuctionHouse.dbc into which to put items.
-#        Default: 7 - Blackwater Auction House
-#
 #    AHBot.ah.fid
-#        The faction template ID of the virtual auctioneer.
-#        Default: 120 - Booty Bay
+#        The faction template ID used for the AH bot.
+#        This determines which auction house(s) listings are put into.
+#        Default: 120 - Neutral (Booty Bay, Gadgetzan and Everlook)
+#                  55 - Alliance (Ironforge, Stormwind and Teldrassil)
+#                  29 - Horde (Orgrimmar, Thunderbluff and Undercity)
 #
 #    AHBot.itemcount
-#        How many items to put into the auction house.
+#        How many listings to put into the auction house at most.
+#        The AH bot will add items until this number of listings is reached in the auction house (this includes potential player listings).
 #        Default: 50
 #
 ###################################################################################################################
 AHBot.Enable = 0
-AHBot.ah.id = 7
 AHBot.ah.fid = 120
 AHBot.itemcount = 50
-#AHBot.bot.guid = 1123
-#AHBot.bot.account = 32377
 
 ###################################################################################################################
 # PLAYER BOTS
