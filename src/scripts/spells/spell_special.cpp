@@ -39,6 +39,24 @@ SpellScript* GetScript_Meteor(SpellEntry const*)
     return new MeteorScript();
 }
 
+// 24934 - Darkmoon Steam Tonk Control Console
+struct DarkmoonSteamTonkControlConsoleScript : public SpellScript
+{
+    void OnInit(Spell* spell) const final
+    {
+        // Unsummon a potential Hunter or Warlock pet when using the Tonk Control Console.
+        // Without this, the player will be unable to summon a Tonk but will still be
+        // locked in place without being able to move (until relogging).
+        if (Player* pPlayer = spell->GetCaster()->ToPlayer())
+            pPlayer->UnsummonPetTemporaryIfAny();
+    }
+};
+
+SpellScript* GetScript_DarkmoonSteamTonkControlConsole(SpellEntry const*)
+{
+    return new DarkmoonSteamTonkControlConsoleScript();
+}
+
 // 24933 - Cannon (Darkmoon Steam Tonk)
 struct DarkmoonSteamTonkCannonScript : public SpellScript
 {
@@ -63,6 +81,11 @@ void AddSC_special_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_meteor";
     newscript->GetSpellScript = &GetScript_Meteor;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_darkmoon_steam_tonk_control_console";
+    newscript->GetSpellScript = &GetScript_DarkmoonSteamTonkControlConsole;
     newscript->RegisterSelf();
 
     newscript = new Script;
