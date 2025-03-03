@@ -366,6 +366,7 @@ UPDATE `gossip_menu_option` SET `condition_id` = 67 WHERE `option_icon` = 3 AND 
 4667,      -- Maximillian Crowe
 4681,      -- Alamar Grimm
 4682);     -- Gimrizz Shadowcog
+-- Demon trainers already use condition 67
 -- Mage (including Portal trainers)
 UPDATE `gossip_menu_option` SET `condition_id` = 90 WHERE `option_icon` = 3 AND menu_id IN (
 63,       -- Cain Firesong
@@ -435,6 +436,7 @@ UPDATE `gossip_menu_option` SET `condition_id` = 94 WHERE `option_icon` = 3 AND 
 4679,     -- Branstock Khalder
 4680,     -- Maxan Anvol, Theodrus Frostbeard
 4691);    -- Shanda, Laurna Morninglight, Astarii Starseeker, Priestess Alathea
+-- Rogue
 UPDATE `gossip_menu_option` SET `condition_id` = 100 WHERE `option_icon` = 3 AND menu_id IN (
 85,       -- David Trias, Marion Call
 141,      -- Rwag, Kaplak
@@ -459,21 +461,83 @@ UPDATE `gossip_menu_option` SET `condition_id` = 100 WHERE `option_icon` = 3 AND
 4659,     -- Jorik Kerridan
 4676,     -- Solm Hargrin
 4690,     -- Frahun Shadewhisper
+4783,	  -- (Entry for all Pet trainers)
 5061);    -- Lord Tony Romano
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
+-- Hunter (including Pet trainers)
+UPDATE `gossip_menu_option` SET `condition_id` = 96 WHERE `option_icon` = 3 AND menu_id IN (
+4007, 	  -- Grif Wildheart
+4008, 	  -- Jocaste
+4009, 	  -- Dazalar
+4010, 	  -- Ormak Grimshot
+4011, 	  -- Kary Thunderhorn
+4012, 	  -- Yaw Sharpmane
+4013, 	  -- Sian'dur
+4017, 	  -- Thotar
+4023, 	  -- Holt Thunderhorn
+4092, 	  -- Danlaar Nightstride, Alenndaar Lapidaar
+4101, 	  -- Ogromm
+4472, 	  -- Thorfin Stoneshield
+4473, 	  -- Ulfir Ironbeard
+4474, 	  -- Einris Brightspear
+4506, 	  -- Xor'juul
+4524, 	  -- Urek Thunderhorn
+4549, 	  -- Daera Brightspear
+4550, 	  -- Olmin Burningbeard
+4551, 	  -- Regnus Thundergranite
+4621, 	  -- Jeen'ra Nightrunner
+4647, 	  -- Lanka Farshot
+4648, 	  -- Jen'shan
+4657, 	  -- Kragg
+4674, 	  -- Dargh Trueaim
+4675, 	  -- Thorgas Grimson
+4693, 	  -- Dorion
+4694, 	  -- Kaerbrus
+4695);	  -- Ayanna Everstride
+-- Paladin
+UPDATE `gossip_menu_option` SET `condition_id` = 106 WHERE `option_icon` = 3 AND menu_id IN (
+2304, 	  -- Brandur Ironhammer
+4469, 	  -- Arthur the Faithful
+4470, 	  -- Katherine the Pure
+4471, 	  -- Lord Grayson Shadowbreaker
+4556, 	  -- Beldruk Doombrow
+4557, 	  -- Valgar Highforge
+4662, 	  -- Brother Karman
+4663, 	  -- Brother Sammuel
+4664, 	  -- Brother Wilhelm
+4677, 	  -- Azar Stronghammer
+4678);	  -- Bromos Grummner
+-- Warrior
+UPDATE `gossip_menu_option` SET `condition_id` = 98 WHERE `option_icon` = 3 AND menu_id IN (
+523, 	  -- Malosh, Frang, Tarshaw Jaggedscar
+655, 	  -- Krang Stonehoof
+656, 	  -- Austil de Mon
+4091, 	  -- Captain Evencane
+4475, 	  -- Ander Germaine
+4481, 	  -- Ilsa Corbin
+4482, 	  -- Wu Shen
+4509, 	  -- Grezz Ragefist
+4510, 	  -- Zel'mak
+4511, 	  -- Sorek
+4525, 	  -- Sark Ragetotem
+4526, 	  -- Torm Ragetotem
+4527, 	  -- Ker Ragetotem
+4546, 	  -- Angela Curthas
+4547, 	  -- Baltus Fowler
+4548, 	  -- Christoph Walker
+4568, 	  -- Bilban Tosslespanner
+4569, 	  -- Kelstrum Stonebreaker
+4570, 	  -- Kelv Sternhammer
+4578, 	  -- Sildanair
+4579, 	  -- Darnath Bladesinger
+4581, 	  -- Arias'ta Bladesinger
+4645, 	  -- Harutt Thunderhorn
+4649, 	  -- Lyria Du Lac
+4650, 	  -- Llane Beshere
+4653, 	  -- Dannal Stern
+4683, 	  -- Granis Swiftaxe
+4684, 	  -- Thran Khorman
+4696, 	  -- Alyissia
+4697); 	  -- Kyra Windblade
     
     
 -- End of migration.
