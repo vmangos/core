@@ -176,7 +176,6 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     uint32 maxcount = (cSpells ? cSpells->spellList.size() : 0) + (tSpells ? tSpells->spellList.size() : 0);
-    uint32 trainer_type = cSpells && cSpells->trainerType ? cSpells->trainerType : (tSpells ? tSpells->trainerType : 0);
 
     std::string strTitle;
     if (TrainerGreetingLocale const* trainerGreeting = sObjectMgr.GetTrainerGreetingLocale(guid.GetEntry()))
@@ -195,7 +194,6 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
 
     WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + maxcount * 38 + strTitle.size() + 1);
     data << ObjectGuid(guid);
-    data << uint32(trainer_type);
 
     size_t count_pos = data.wpos();
     data << uint32(maxcount);

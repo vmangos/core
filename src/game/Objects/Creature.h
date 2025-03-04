@@ -172,7 +172,7 @@ class Creature : public Unit
         bool HasCreatureReactState(ReactStates state) const { return (m_reactState == state); }
         void InitializeReactState();
 
-        bool IsTrainerOf(Player* player, bool msg) const;
+        bool IsTrainerOf(Player* player) const;
         bool CanInteractWithBattleMaster(Player* player, bool msg) const;
 
         bool IsOutOfThreatArea(Unit const* pVictim) const;

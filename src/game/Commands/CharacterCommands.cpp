@@ -2833,22 +2833,9 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
             if (!(cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER))
                 continue;
 
-            switch (cInfo->trainer_type)
-            {
-                case TRAINER_TYPE_CLASS:
-                {
-                    if (cInfo->trainer_class != pPlayer->GetClass())
-                        continue;
-                    break;
-                }
-                case TRAINER_TYPE_PETS:
-                {
-                    if (pPlayer->GetClass() != CLASS_HUNTER)
-                        continue;
-                    break;
-                }
-            }
-
+            if (!cInfo->IsTrainerOf(pPlayer))
+				continue;
+			break;
             if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
                 HandleLearnTrainerHelper(pPlayer, cSpells);
 
