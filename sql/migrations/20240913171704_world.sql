@@ -317,10 +317,6 @@ UPDATE `quest_template` SET `RequiredCondition` = 1368 WHERE `entry` = 3647;    
 -- Remove trainer spell and disable gossip for Master Elemental Shaper Krixix (remnant from an ancient incorrect implementation of teaching Smelt Elementium via training menu)
 UPDATE `creature_template` SET `npc_flags` = 0, `display_probability1` = 0, `display_total_probability` = 0, `trainer_spell` = 0 WHERE `entry` = 14401;
 
--- Remove trainer_spell column, which is now empty
-ALTER TABLE `creature_template`
-    DROP COLUMN `trainer_spell`;
-
 -- Add missing talent unlearn gossip
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
 
@@ -538,7 +534,27 @@ UPDATE `gossip_menu_option` SET `condition_id` = 98 WHERE `option_icon` = 3 AND 
 4684, 	  -- Thran Khorman
 4696, 	  -- Alyissia
 4697); 	  -- Kyra Windblade
-    
+
+/*World of Warcraft Client Patch 1.10.0 (2006-03-28)
+- Riding Instructors Velma Warnam and Xar'Ti will now let Tauren know
+  in advance that they cannot be taught to ride Skeletal Mounts and
+  Raptors.*/
+  
+  -- Add patch condition to mentioned gossip
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
+-- Note: Condition 4105 corresponds to a condition checking if the player is a Tauren
+(4130,-1,4105,4018,0,0,0);
+
+UPDATE `gossip_menu` SET `condition_id` = 4130, `text_id` = 8370 WHERE `entry` = 4015 AND `text_id` = 8368 -- Velma Warnam (currently uses an incorrect npc_text entry for gossip from Huntsman Leopold)
+
+UPDATE `gossip_menu` SET `condition_id` = 4130 WHERE `entry` = 4022 AND `text_id` = 8407 -- Xar'Ti
+
+-- Remove the now deprecated columns
+ALTER TABLE `creature_template`
+	DROP COLUMN `trainer_spell`,
+	DROP COLUMN `trainer_race`,
+	DROP COLUMN `trainer_class`,
+	DROP COLUMN `trainer_type`;
     
 -- End of migration.
 END IF;

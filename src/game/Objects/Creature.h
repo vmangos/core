@@ -174,7 +174,6 @@ class Creature : public Unit
 
         bool IsTrainerOf(Player* player, bool msg) const;
         bool CanInteractWithBattleMaster(Player* player, bool msg) const;
-        bool CanTrainAndResetTalentsOf(Player const* pPlayer) const;
 
         bool IsOutOfThreatArea(Unit const* pVictim) const;
         void FillGuidsListFromThreatList(std::vector<ObjectGuid>& guids, uint32 maxamount = 0);
