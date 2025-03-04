@@ -2823,32 +2823,7 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
     }
     else
     {
-        std::set<uint32> checkedTrainerTemplates;
-        for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
-        {
-            CreatureInfo const* cInfo = itr.second.get();
-            if (!cInfo)
-                continue;
-
-            if (!(cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER))
-                continue;
-
-            if (!cInfo->IsTrainerOf(pPlayer))
-				continue;
-			break;
-            if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
-                HandleLearnTrainerHelper(pPlayer, cSpells);
-
-            if (trainerId = cInfo->trainer_id) // assignment
-            {
-                if (checkedTrainerTemplates.find(trainerId) != checkedTrainerTemplates.end())
-                    continue;
-
-                checkedTrainerTemplates.insert(trainerId);
-                if (TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId))
-                    HandleLearnTrainerHelper(pPlayer, tSpells);
-            }
-        }
+	//TODO; Implement without using trainer_type
     }
 
     SendSysMessage("Learned all available spells from trainers.");

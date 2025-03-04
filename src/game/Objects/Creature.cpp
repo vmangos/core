@@ -1296,7 +1296,7 @@ bool Creature::IsTrainerOf(Player* pPlayer) const
 	uint32 gossipMenuId = GetCreatureInfo()->gossip_menu_id;
     if (!gossipMenuId)
 	{
-		sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature %u (Entry: %u) has npc_flag UNIT_NPC_FLAG_TRAINER but does not have a gossip_menu_id assigned to it.";
+		sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature %u (Entry: %u) has npc_flag UNIT_NPC_FLAG_TRAINER but does not have a gossip_menu_id assigned to it.");
 		return false;
 	}
 	
@@ -1305,7 +1305,7 @@ bool Creature::IsTrainerOf(Player* pPlayer) const
 		sObjectMgr.GetGossipMenuItemsMapBounds(gossipMenuId);
 	
 	// Loop through for trainer option
-	for (GossipMenuItemsMap::iterator itr = bounds.first; itr != bounds.second; ++itr)
+	for (auto itr = bounds.first; itr != bounds.second; ++itr)
 	{
 		GossipMenuItem const& gMenuItem = itr->second;
 		if (gMenuItem.option_icon == 3)
