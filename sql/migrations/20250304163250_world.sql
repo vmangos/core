@@ -3,9 +3,9 @@ delimiter ??
 CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
-SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20240913171704');
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20250304163250');
 IF v=0 THEN
-INSERT INTO `migrations` VALUES ('20240913171704');
+INSERT INTO `migrations` VALUES ('20250304163250');
 -- Add your query below.
 
 UPDATE `gameobject_template` SET `flags` = 0, `data0` = 0 WHERE `entry` = 177226;     -- Enables object gossip for Book "Soothsaying for Dummies"
@@ -540,9 +540,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Note: Condition 4105 corresponds to a condition checking if the player is a Tauren
 (4130,-1,4105,4018,0,0,0);
 
-UPDATE `gossip_menu` SET `condition_id` = 4130, `text_id` = 8370 WHERE `entry` = 4015 AND `text_id` = 8368 -- Velma Warnam (currently uses an incorrect npc_text entry for gossip from Huntsman Leopold)
+UPDATE `gossip_menu` SET `condition_id` = 4130, `text_id` = 8370 WHERE `entry` = 4015 AND `text_id` = 8368; -- Velma Warnam (currently uses an incorrect npc_text entry for gossip from Huntsman Leopold)
 
-UPDATE `gossip_menu` SET `condition_id` = 4130 WHERE `entry` = 4022 AND `text_id` = 8407 -- Xar'Ti
+UPDATE `gossip_menu` SET `condition_id` = 4130 WHERE `entry` = 4022 AND `text_id` = 8407; -- Xar'Ti
 
 -- Remove the now deprecated columns
 ALTER TABLE `creature_template`
