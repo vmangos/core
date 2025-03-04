@@ -316,11 +316,6 @@ UPDATE `quest_template` SET `RequiredCondition` = 1368 WHERE `entry` = 3647;    
 
 -- Remove trainer spell and disable gossip for Master Elemental Shaper Krixix (remnant from an ancient incorrect implementation of teaching Smelt Elementium via training menu)
 UPDATE `creature_template` SET `npc_flags` = 0, `display_probability1` = 0, `display_total_probability` = 0, `trainer_spell` = 0 WHERE `entry` = 14401;
-
--- Add missing talent unlearn gossip
-INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
-
-
     
 -- Add class conditions for all class trainer gossip options --
 -- Druid
