@@ -588,6 +588,14 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                         m_cooldownTime = 0;
                     }
                     break;
+                case GAMEOBJECT_TYPE_CHEST:
+                {
+                    if (m_cooldownTime > 0 && m_cooldownTime < time(nullptr))
+                    {
+                        SetLootState(GO_JUST_DEACTIVATED);
+                    }
+                    break;
+                }
                 default:
                     break;
             }
@@ -2252,6 +2260,11 @@ bool GameObject::PlayerCanUse(Player* pPlayer)
 
 void GameObject::SetLootState(LootState state)
 {
+    if (state == GO_JUST_DEACTIVATED && GetGoType() == GAMEOBJECT_TYPE_CHEST)
+    {
+        m_cooldownTime = 0;
+    }
+
     m_lootState = state;
     UpdateCollisionState();
 }
