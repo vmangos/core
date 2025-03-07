@@ -2060,11 +2060,10 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     float destY = pos.y + dist * sin(angle);
     float destZ = pos.z;
 
-    GenericTransport* transport = GetTransport();
-
     float halfHeight = IsUnit() ? static_cast<Unit*>(this)->GetCollisionHeight() : 1.0f;
     if (IsUnit())
     {
+        GenericTransport* transport = GetTransport();
         PathFinder path(static_cast<Unit*>(this));
         Vector3 src(pos.x, pos.y, pos.z);
         Vector3 dest(destX, destY, destZ + halfHeight);
@@ -2092,14 +2091,10 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 
     if (colPoint)
     {
-        destX -= CONTACT_DISTANCE * cos(angle);
-        destY -= CONTACT_DISTANCE * sin(angle);
         dist = sqrt((pos.x - destX) * (pos.x - destX) + (pos.y - destY) * (pos.y - destY));
     }
 
     colPoint = GetMap()->GetLosHitPosition(destX, destY, destZ + halfHeight, destX, destY, destZ, -0.5f);
-    if (colPoint)
-        dist = sqrt((pos.x - destX) * (pos.x - destX) + (pos.y - destY) * (pos.y - destY));
 
     float step = dist / 10.0f;
     Position tempPos(destX, destY, destZ, 0.f);
