@@ -7888,7 +7888,7 @@ SpellCastResult Spell::CheckItems()
                     return SPELL_FAILED_ITEM_GONE;
 
                 // Special case for Heavy Armor Kit enchant since baseLevel is 0 in spell_template
-                if (targetItem->GetProto()->ItemLevel < m_spellInfo->baseLevel || (m_spellInfo->Id = 2833 && targetItem->GetProto()->ItemLevel < 15 && sWorld.GetWowPatch() >= WOW_PATCH_107))
+                if (targetItem->GetProto()->ItemLevel < m_spellInfo->baseLevel || (m_spellInfo->Id == 2833 && targetItem->GetProto()->ItemLevel < 15 && sWorld.GetWowPatch() >= WOW_PATCH_107))
                     return SPELL_FAILED_LOWLEVEL;
 
                 // Not allow enchant in trade slot for some enchant type
