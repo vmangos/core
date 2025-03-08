@@ -16,6 +16,23 @@
 
 #include "scriptPCH.h"
 
+// 2833 - Heavy Armor Kit
+struct HeavyArmorKitScript : public SpellScript
+{
+    SpellCastResult OnCheckCast(Spell* spell, bool strict) const final
+    {
+        Item* targetItem = spell->m_targets.getItemTarget();
+        if (targetItem->GetProto()->ItemLevel < 15)
+            return SPELL_FAILED_LOWLEVEL;
+        return SPELL_CAST_OK;
+    }
+};
+
+SpellScript* GetScript_HeavyArmorKit(SpellEntry const*)
+{
+    return new HeavyArmorKitScript();
+}
+
 // 8063 - Deviate Fish
 struct DeviateFishScript : public SpellScript
 {
@@ -134,6 +151,11 @@ SpellScript* GetScript_NoggenfoggerElixir(SpellEntry const*)
 void AddSC_item_spell_scripts()
 {
     Script* newscript;
+
+    newscript = new Script;
+    newscript->Name = "spell_heavy_armor_kit";
+    newscript->GetSpellScript = &GetScript_HeavyArmorKit;
+    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "spell_deviate_fish";
