@@ -1246,20 +1246,18 @@ CreatureAI* GetAI_npc_aqwar_cenarionhold_attack(Creature *pCreature)
 
 enum
 {
-    SCRIPT_SAURFANG_CH_ATTACK_WARN  = -1780300,
-    SCRIPT_SAURFANG_SPEECH1         = -1780301,
-    SCRIPT_SAURFANG_SPEECH2         = -1780302,
-    SCRIPT_SAURFANG_SPEECH3         = -1780303,
-    SCRIPT_SAURFANG_SPEECH4         = -1780304,
-    SCRIPT_SAURFANG_SPEECH5         = -1780305,
-    SCRIPT_SAURFANG_SPEECH6         = -1780306,
-    SCRIPT_SAURFANG_SPEECH7         = -1780307,
-    SCRIPT_SAURFANG_SPEECH8         = -1780308,
-    SCRIPT_SAURFANG_SPEECH9         = -1780309,
-    SCRIPT_SAURFANG_SPEECH10        = -1780310,
-    SCRIPT_SAURFANG_FINAL_BATTLE    = -1780311,
-
-    WORLD_TEXT_FINAL_BATTLE         = -1780311,     // The final battle for Kalimdor is upon us...
+    SCRIPT_SAURFANG_CH_ATTACK_WARN  = 11612,
+    SCRIPT_SAURFANG_SPEECH1         = 11622,
+    SCRIPT_SAURFANG_SPEECH2         = 11624,
+    SCRIPT_SAURFANG_SPEECH3         = 11625,
+    SCRIPT_SAURFANG_SPEECH4         = 11626,
+    SCRIPT_SAURFANG_SPEECH5         = 11627,
+    SCRIPT_SAURFANG_SPEECH6         = 11628,
+    SCRIPT_SAURFANG_SPEECH7         = 11629,
+    SCRIPT_SAURFANG_SPEECH8         = 11630,
+    SCRIPT_SAURFANG_SPEECH9         = 11631,
+    SCRIPT_SAURFANG_SPEECH10        = 11646,
+    SCRIPT_SAURFANG_FINAL_BATTLE    = 11619,
 
     // Taken from Orgrimmar script
     SPELL_SF_EXECUTE                = 7160,  //OK
@@ -1429,7 +1427,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
                 if (m_speechStep == 10)
                 {
-                    sWorld.SendWorldText(WORLD_TEXT_FINAL_BATTLE);
+                    sWorld.SendWorldText(SCRIPT_SAURFANG_FINAL_BATTLE);
                     m_inSpeech = false;
                     m_movingToGate = true;
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);

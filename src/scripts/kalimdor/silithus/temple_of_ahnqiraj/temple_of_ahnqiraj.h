@@ -84,7 +84,7 @@ enum
     AREATRIGGER_STOMACH_AIR     = 4034,
     AREATRIGGER_CTHUN_KNOCKBACK = 4036,
 
-    // Whispered on players around the map
+    // Whispered on players around the map - NO SNIFF DATA EXISTS IN BROADCAST_TEXTS FOR THESE!!
     SAY_CTHUN_WHISPER_1         = -1531033,
     SAY_CTHUN_WHISPER_2         = -1531034,
     SAY_CTHUN_WHISPER_3         = -1531035,

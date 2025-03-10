@@ -572,7 +572,7 @@ enum
     SPELL_FIREBALLVOLLEY    = 15285,
     SPELL_MIGHTYBLOW        = 14099,
 
-    YELL_PHALANX_AGGRO      = -1230041
+    YELL_PHALANX_AGGRO      = 5300
 };
 
 struct mob_phalanxAI : public ScriptedAI
@@ -697,10 +697,10 @@ enum
     SPELL_POTION_LOVE           = 14928,
     SPELL_NAGMARA_ROCKNOT       = 15064,
 
-    SAY_NAGMARA_1               = -1230071,
-    SAY_NAGMARA_2               = -1230072,
-    TEXTEMOTE_NAGMARA           = -1230073,
-    TEXTEMOTE_ROCKNOT           = -1230074,
+    SAY_NAGMARA_1               = 5000,
+    SAY_NAGMARA_2               = 5001,
+    TEXTEMOTE_NAGMARA           = 5002,
+    TEXTEMOTE_ROCKNOT           = 5003,
 
     QUEST_POTION_LOVE           = 4201
 };
@@ -863,11 +863,11 @@ CreatureAI* GetAI_npc_mistress_nagmara(Creature* pCreature)
 
 enum
 {
-    SAY_GOT_BEER       = -1230060,
-    SAY_MORE_BEER      = -1230061,
-    SAY_BARREL_1       = -1230062,
-    SAY_BARREL_2       = -1230063,
-    SAY_BARREL_3       = -1230064,
+    SAY_GOT_BEER       = 5172,
+    SAY_MORE_BEER      = 5166,
+    SAY_BARREL_1       = 5167,
+    SAY_BARREL_2       = 5168,
+    SAY_BARREL_3       = 5169,
 
     SPELL_DRUNKEN_RAGE = 14872,
 
@@ -1449,7 +1449,7 @@ static float const aGuardSpawnPositions[2][4] =
 enum
 {
     NPC_ANVILRAGE_GUARDMAN             = 8891,
-    SAY_GUARD_AGGRO                    = -1230043
+    SAY_GUARD_AGGRO                    = 5271
 };
 
 // When players cross the shadowforge bridge for the first time, two guards spawn and attack.
@@ -1486,18 +1486,18 @@ bool AreaTrigger_at_shadowforge_bridge(Player* pPlayer, AreaTriggerEntry const* 
 
 enum
 {
-    SAY_OOC_1                       = -1230065,
-    SAY_OOC_2                       = -1230066,
-    SAY_OOC_3                       = -1230067,
-    SAY_OOC_4                       = -1230068,
+    SAY_OOC_1                       = 5310,
+    SAY_OOC_2                       = 5308,
+    SAY_OOC_3                       = 5307,
+    SAY_OOC_4                       = 5309,
 
-    YELL_STOLEN_1                   = -1230054,
-    YELL_STOLEN_2                   = -1230055,
-    YELL_STOLEN_3                   = -1230056,
+    YELL_STOLEN_1                   = 5054,
+    YELL_STOLEN_2                   = 5053,
+    YELL_STOLEN_3                   = 5055,
     
-    YELL_AGRRO_1                    = -1230057,
-    YELL_AGRRO_2                    = -1230058,
-    YELL_PICKPOCKETED               = -1230059,
+    YELL_AGRRO_1                    = 5060,
+    YELL_AGRRO_2                    = 5267,
+    YELL_PICKPOCKETED               = 5266,
 
     // spells
     SPELL_BANISH                    = 8994,
@@ -1720,40 +1720,39 @@ bool GOUse_go_bar_ale_mug(Player* pPlayer, GameObject* pGo)
 
 enum
 {
-    SAY_DUGHAL_FREE             = -1230010,
-    SAY_WINDSOR_AGGRO1          = -1230011,
-    SAY_WINDSOR_AGGRO2          = -1230012,
-    SAY_WINDSOR_AGGRO3          = -1230013,
-    SAY_WINDSOR_1               = -1230014,
-    SAY_WINDSOR_4_1             = -1230015,
-    SAY_WINDSOR_4_2             = -1230016,
-    SAY_WINDSOR_4_3             = -1230017,
-    SAY_WINDSOR_6               = -1230018,
-    SAY_WINDSOR_9               = -1230019,
+    SAY_DUGHAL_FREE             = 5210,
+    SAY_WINDSOR_AGGRO1          = 5253,
+    SAY_WINDSOR_AGGRO2          = 5252,
+    SAY_WINDSOR_AGGRO3          = 5250,
+    SAY_WINDSOR_1               = 5205,
+    SAY_WINDSOR_4_1             = 5207,
+    SAY_WINDSOR_4_2             = 5230,
+    SAY_WINDSOR_4_3             = 5213,
+    SAY_WINDSOR_6               = 5214,
+    SAY_WINDSOR_9               = 5215,
 
-    SAY_REGINALD_WINDSOR_0_1    = -1230020,
-    SAY_REGINALD_WINDSOR_0_2    = -1230021,
-    SAY_REGINALD_WINDSOR_5_1    = -1230022,
-    SAY_REGINALD_WINDSOR_5_2    = -1230023,
-    SAY_REGINALD_WINDSOR_5_3    = -1230040,
-    SAY_REGINALD_WINDSOR_7_1    = -1230024,
-    SAY_REGINALD_WINDSOR_7_2    = -1230025,
-    SAY_REGINALD_WINDSOR_7_3    = -1230026,
-    SAY_REGINALD_WINDSOR_7_4    = -1230037,
-    SAY_REGINALD_WINDSOR_13_1   = -1230027,
-    SAY_REGINALD_WINDSOR_13_2   = -1230028,
-    SAY_REGINALD_WINDSOR_13_3   = -1230029,
-    SAY_REGINALD_WINDSOR_14_1   = -1230030,
-    SAY_REGINALD_WINDSOR_14_2   = -1230031,
-    SAY_REGINALD_WINDSOR_20_1   = -1230032,
-    SAY_REGINALD_WINDSOR_20_2   = -1230033,
+    SAY_REGINALD_WINDSOR_0_1    = 5216,
+    SAY_REGINALD_WINDSOR_0_2    = 5217,
+    SAY_REGINALD_WINDSOR_5_1    = 5222,
+    SAY_REGINALD_WINDSOR_5_2    = 5223,
+    SAY_REGINALD_WINDSOR_5_3    = 5265,
+    SAY_REGINALD_WINDSOR_7_1    = 5224,
+    SAY_REGINALD_WINDSOR_7_2    = 5225,
+    SAY_REGINALD_WINDSOR_7_3    = 5227,
+    SAY_REGINALD_WINDSOR_7_4    = 5249,
+    SAY_REGINALD_WINDSOR_13_1   = 5228,
+    SAY_REGINALD_WINDSOR_13_2   = 5249,
+    SAY_REGINALD_WINDSOR_13_3   = 5229,
+    SAY_REGINALD_WINDSOR_14_1   = 5230,
+    SAY_REGINALD_WINDSOR_14_2   = 5221,
+    SAY_REGINALD_WINDSOR_20_1   = 5231,
+    SAY_REGINALD_WINDSOR_20_2   = 5232,
 
-    SAY_TOBIAS_FREE_1           = -1230034,
-    SAY_TOBIAS_FREE_2           = -1230039,
+    SAY_TOBIAS_FREE             = 5218,
 
-    SAY_SHILL_DINGER            = -1230035,
-    SAY_CREST_KILLER            = -1230036,
-    SAY_OGRABISI                = -1230038,
+    SAY_SHILL_DINGER            = 5203,
+    SAY_CREST_KILLER            = 5258,
+    SAY_OGRABISI                = 5199,
 
     NPC_REGINALD_WINDSOR        = 9682,
     NPC_DUGHAL                  = 9022,
@@ -2223,11 +2222,8 @@ struct npc_tobias_seecherAI : npc_escortAI
         switch (uiPointId)
         {
             case 0:
-                switch (urand(0, 1))
-                {
-                    case 0: DoScriptText(SAY_TOBIAS_FREE_1, m_creature); break;
-                    case 1: DoScriptText(SAY_TOBIAS_FREE_2, m_creature); break;
-                }
+                DoScriptText(SAY_TOBIAS_FREE, m_creature);
+                break;
             case 2:
                 m_pInstance->SetData(TYPE_JAIL_TOBIAS, IN_PROGRESS);
                 break;

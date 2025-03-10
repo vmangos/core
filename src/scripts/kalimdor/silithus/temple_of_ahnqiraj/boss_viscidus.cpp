@@ -29,7 +29,7 @@ EndScriptData */
 #include <bitset>
 
 enum
-{
+{   // THESE EXIST BUT NEED TO BE RESCRIPTED AS THERE IS NO %s PARAMETER IN THE TEXT
     // emotes
     EMOTE_SLOW                  = -1531041, // Viscidus begins to slow.
     EMOTE_FREEZE                = -1531042, // Viscidus is freezing up.

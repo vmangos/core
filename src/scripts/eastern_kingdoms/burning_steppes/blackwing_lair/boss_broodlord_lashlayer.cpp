@@ -26,8 +26,8 @@ EndScriptData */
 
 enum
 {
-    SAY_AGGRO                   = -1469000,
-    SAY_LEASH                   = -1469001,
+    SAY_AGGRO                   = 9967,
+    SAY_LEASH                   = 9968,
 
     SPELL_CLEAVE                = 15284, //26350
     SPELL_KNOCK_AWAY            = 18670, //25778

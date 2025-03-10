@@ -65,7 +65,7 @@ enum eSpells {
     // Mute Bugs
 };
 
-enum eScriptTexts {
+enum eScriptTexts {                     // NO SNIFFED BROADCAST_TEXT DATA EXISTS FOR THESE!!
     SAY_VEKLOR_AGGRO_1      = -1531019, // its too late to turn away
     SAY_VEKLOR_AGGRO_2      = -1531020, // prepare to embrace oblivion
     SAY_VEKLOR_AGGRO_3      = -1531021, // like a fly in a web

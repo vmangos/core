@@ -662,7 +662,7 @@ void instance_blackrock_spire::DoSendNextStadiumWave()
 
 enum
 {
-    SAY_ROOKERY_EVENT_START = -1229020
+    SAY_ROOKERY_EVENT_START = 5538
 };
 
 void instance_blackrock_spire::Update(uint32 uiDiff)

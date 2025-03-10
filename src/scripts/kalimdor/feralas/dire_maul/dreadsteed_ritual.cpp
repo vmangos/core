@@ -42,9 +42,8 @@ enum
     SPELL_BELL_AURA         = 23117,
     SPELL_CANDLE_AURA       = 23226,
 
-    SAY_HEL_NURATH          = -1780201,
-    SAY_IMP_DESPAWN         = -1780202,
-    SAY_DREAD_GUARD_DESPAWN = -1780203
+    SAY_HEL_NURATH          = 9727,
+    SAY_DEMON_DESPAWN       = 9768
 };
 
 struct EventLocations
@@ -182,14 +181,14 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         for (const auto& it : lCrea)
         {
             if (it->IsAlive())
-                DoScriptText(SAY_IMP_DESPAWN, it);
+                DoScriptText(SAY_DEMON_DESPAWN, it);
             it->DisappearAndDie();
         }
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_DREAD_GUARD, 30.0f);
         for (const auto& it : lCrea)
         {
             if (it->IsAlive())
-                DoScriptText(SAY_DREAD_GUARD_DESPAWN, it);
+                DoScriptText(SAY_DEMON_DESPAWN, it);
             it->DisappearAndDie();
         }
     }
@@ -229,14 +228,14 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         for (const auto& it : lCrea)
         {
             if (it->IsAlive())
-                DoScriptText(SAY_IMP_DESPAWN, it);
+                DoScriptText(SAY_DEMON_DESPAWN, it);
             it->DisappearAndDie();
         }
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_DREAD_GUARD, 30.0f);
         for (const auto& it : lCrea)
         {
             if (it->IsAlive())
-                DoScriptText(SAY_DREAD_GUARD_DESPAWN, it);
+                DoScriptText(SAY_DEMON_DESPAWN, it);
             it->DisappearAndDie();
         }
         reset();

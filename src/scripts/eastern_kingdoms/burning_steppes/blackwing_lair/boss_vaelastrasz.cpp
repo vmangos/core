@@ -32,13 +32,13 @@ enum
     // Emotes
     // ------
 
-    SAY_LINE_1                  = -1469026,
-    SAY_LINE_2                  = -1469027,
-    SAY_LINE_3                  = -1469028,
-    SAY_HALFLIFE                = -1469029,
-    SAY_KILLTARGET              = -1469030,
-    SAY_NEFARIUS_CORRUPT_1      = -1469006,                 // When he corrupts Vaelastrasz
-    SAY_NEFARIUS_CORRUPT_2      = -1469037,
+    SAY_LINE_1                  = 9886,
+    SAY_LINE_2                  = 9887,
+    SAY_LINE_3                  = 9888,
+    SAY_HALFLIFE                = 9965,
+    SAY_KILLTARGET              = 9964,
+    SAY_NEFARIUS_CORRUPT_1      = 9794,                 // When he corrupts Vaelastrasz
+    SAY_NEFARIUS_CORRUPT_2      = 9844,
     // Spells
     // ------
 

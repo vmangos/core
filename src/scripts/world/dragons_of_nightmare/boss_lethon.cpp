@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  */
 
@@ -7,8 +7,8 @@
 
 enum
 {
-    SAY_LETHON_AGGRO                = -1000590,
-    SAY_SUMMON_SHADE                = -1000591,
+    SAY_LETHON_AGGRO                = 10883,
+    SAY_SUMMON_SHADE                = 10882,
 
     SPELL_SHADOW_BOLT_WHIRL         = 24834,
     SPELL_DRAW_SPIRIT               = 24811,

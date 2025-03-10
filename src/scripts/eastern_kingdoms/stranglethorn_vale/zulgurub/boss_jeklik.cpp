@@ -26,11 +26,11 @@ EndScriptData */
 
 enum
 {
-    SAY_AGGRO               = -1309002,
-    SAY_RAIN_FIRE           = -1309003,
-    SAY_DEATH               = -1309004,
-    TEXT_GREAT_HEAL         = -1309025,
-    TEXT_SUMMON_BATS        = -1309026,
+    SAY_AGGRO               = 10027,
+    SAY_RAIN_FIRE           = 10369,
+    SAY_DEATH               = 10452,
+    TEXT_GREAT_HEAL         = 10494,
+    TEXT_SUMMON_BATS        = 10370,
 
     SPELL_GREENCHANNELING   = 13540, // Green Spell. [ChanneledInstant]
     SPELL_BAT_FORM          = 23966, // Transform to bat. [Instant]

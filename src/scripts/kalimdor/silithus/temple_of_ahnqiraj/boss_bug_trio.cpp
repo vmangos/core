@@ -15,7 +15,7 @@ the script is using Magmadar's panic spell which has the exact same range and du
 enum
 {
     // emote
-    EMOTE_DEVOUR = -1388004,
+    EMOTE_DEVOUR = 11115,
 
     // kri
     SPELL_THRASH = 3391,

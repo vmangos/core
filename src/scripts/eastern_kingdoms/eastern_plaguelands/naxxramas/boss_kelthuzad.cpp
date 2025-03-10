@@ -37,7 +37,7 @@ enum KelthuzadData
     SAY_REQUEST_AID                     = 12998,         // Master! I require aid! 
     SAY_ANSWER_REQUEST                  = 12994,         // Very well... warriors of the frozen wastes, rise up! I command you to fight, kill, and die for your master. Let none survive...
 
-    SAY_SPECIAL1_MANA_DET               = -1533106,         // (need find correct bct id!) Your petty magics are no challenge to the might of the Scourge! 
+    SAY_SPECIAL1_MANA_DET               = 13492,         
     SAY_SPECIAL3_MANA_DET               = -1533107,         // (need find correct bct id!) Enough! I grow tired of these distractions! 
     SAY_SPECIAL2_DISPELL                = -1533108,         // (need find correct bct id!) Fools, you have spread your powers too thin. Be free, my minions!
 

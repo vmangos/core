@@ -27,11 +27,11 @@ enum
     BLACKWING_MAGE             = 12420,
     DEATH_TALON_DRAGONSPAWN    = 12422,
 
-    SAY_EGGS_BROKEN_1          = -1469022,
-    SAY_EGGS_BROKEN_2          = -1469023,
-    SAY_EGGS_BROKEN_3          = -1469024,
-    SAY_DEATH                  = -1469025,
-    EMOTE_FLEE                 = -1469035,
+    SAY_EGGS_BROKEN_1          = 9961,
+    SAY_EGGS_BROKEN_2          = 9962,
+    SAY_EGGS_BROKEN_3          = 9963,
+    SAY_DEATH                  = 9591,
+    EMOTE_FLEE                 = 9592,
 
     SPELL_CLEAVE               = 19632,
     SPELL_WARSTOMP             = 24375,

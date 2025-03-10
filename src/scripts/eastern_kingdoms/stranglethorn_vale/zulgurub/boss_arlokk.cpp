@@ -40,9 +40,9 @@ bool GOHello_go_gong_of_bethekk(Player* pPlayer, GameObject* pGo)
 
 enum
 {
-    SAY_AGGRO                   = -1309011,
-    SAY_FEAST_PANTHER           = -1309012,
-    SAY_DEATH                   = -1309013,
+    SAY_AGGRO                   = 10461,
+    SAY_FEAST_PANTHER           = 10472,
+    SAY_DEATH                   = 10450,
 
     SPELL_SHADOWWORDPAIN        = 24212, // Mot de l'ombre : douleur
     SPELL_GOUGE                 = 12540, // Suriner

@@ -33,12 +33,12 @@ EndContentData */
 
 enum
 {
-    SAY_AME_START           = -1000446,
-    SAY_AME_PROGRESS        = -1000447,
-    SAY_AME_END             = -1000448,
-    SAY_AME_AGGRO1          = -1000449,
-    SAY_AME_AGGRO2          = -1000450,
-    SAY_AME_AGGRO3          = -1000451,
+    SAY_AME_START           = 5062,
+    SAY_AME_PROGRESS        = 5063,
+    SAY_AME_END             = 5156,
+    SAY_AME_AGGRO1          = 5158,
+    SAY_AME_AGGRO2          = 5159,
+    SAY_AME_AGGRO3          = 5157,
 
     QUEST_CHASING_AME       = 4245
 };
@@ -128,27 +128,25 @@ CreatureAI* GetAI_npc_ame01(Creature* pCreature)
 
 enum
 {
-    SAY_RIN_START_1             = -1000416,
-    SAY_RIN_START_2             = -1000417,
+    SAY_RIN_START_1             = 5391,
+    SAY_RIN_START_2             = 5392,
 
-    SAY_FAINT_1                 = -1000418,
-    SAY_FAINT_2                 = -1000419,
-    SAY_FAINT_3                 = -1000420,
-    SAY_FAINT_4                 = -1000421,
+    SAY_FAINT_1                 = 5396,
+    SAY_FAINT_2                 = 5397,
+    SAY_FAINT_3                 = 5394,
+    SAY_FAINT_4                 = 5395,
 
-    SAY_WAKE_1                  = -1000422,
-    SAY_WAKE_2                  = -1000423,
-    SAY_WAKE_3                  = -1000424,
-    SAY_WAKE_4                  = -1000425,
+    SAY_WAKE_1                  = 5400,
+    SAY_WAKE_2                  = 5399,
+    SAY_WAKE_3                  = 5398,
+    SAY_WAKE_4                  = 5401,
 
-    SAY_RIN_END_1               = -1000426,
-    SAY_SPR_END_2               = -1000427,
-    SAY_RIN_END_3               = -1000428,
-    EMOTE_RIN_END_4             = -1000429,
-    EMOTE_RIN_END_5             = -1000430,
-    SAY_RIN_END_6               = -1000431,
-    SAY_SPR_END_7               = -1000432,
-    EMOTE_RIN_END_8             = -1000433,
+    SAY_RIN_END_1               = 5402,
+    SAY_SPR_END_2               = 5405,
+    SAY_RIN_END_3               = 5403,
+    EMOTE_RIN_END_4             = 5393,
+    SAY_RIN_END_6               = 5404,
+    SAY_SPR_END_7               = 5406,
 
     SPELL_REVIVE_RINGO          = 15591,
     QUEST_A_LITTLE_HELP         = 4491,
@@ -296,7 +294,6 @@ struct npc_ringoAI : public FollowerAI
                             m_uiEndEventTimer = 9000;
                             break;
                         case 5:
-                            DoScriptText(EMOTE_RIN_END_5, m_creature);
                             ClearFaint();
                             m_uiEndEventTimer = 1000;
                             break;
@@ -309,7 +306,6 @@ struct npc_ringoAI : public FollowerAI
                             m_uiEndEventTimer = 10000;
                             break;
                         case 8:
-                            DoScriptText(EMOTE_RIN_END_8, m_creature);
                             m_uiEndEventTimer = 5000;
                             break;
                         case 9:
@@ -451,7 +447,7 @@ enum
     SPELL_TEMPTRESS_KISS            = 23205,
     SPELL_SILENCE                   = 23207,
     
-    EMOTE_SILENCE                   = -1000652,
+    EMOTE_SILENCE                   = 9762,
 
     NPC_SIMONE_THE_INCONSPICUOUS    = 14527,
     NPC_SIMONE_THE_SEDUCTRESS       = 14533,

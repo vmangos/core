@@ -33,8 +33,8 @@ static constexpr uint32 CTHUN_WHISPER_FREQ_MIN      = 30000;
 static constexpr uint32 CTHUN_WHISPER_FREQ_MAX      = 60000;
 
 enum eTwinsDeathTexts {
-    SAY_VEKLOR_DEATH    = -1531024, //my brother...nO!
-    SAY_VEKNILASH_DEATH = -1531031 // Vek'loor, i feel your pain! 
+    SAY_VEKLOR_DEATH    = 11452, //my brother...nO!
+    SAY_VEKNILASH_DEATH = 11454 // Vek'loor, i feel your pain! 
 };
 static const SIDialogueEntry twinsDeathDialogue[] =
 {
@@ -45,15 +45,15 @@ static const SIDialogueEntry twinsDeathDialogue[] =
 
 enum eTwinsDialogueEntries
 {
-    EMOTE_EYE_INTRO         = -1531012,
+    EMOTE_EYE_INTRO         = 11700,
     EVENT_EYE_TURN_AROUND   = 1,
     EVENT_EMPERORS_RISE     = 2,
-    SAY_EMPERORS_INTRO_1    = -1531013, // Only flesh and bone. .. 
-    SAY_EMPERORS_INTRO_2    = -1531014, // Where are your manners...
-    SAY_EMPERORS_INTRO_3    = -1531015, // There will be pain...
-    SAY_EMPERORS_INTRO_4    = -1531016, // Oh so much pain...
-    SAY_EMPERORS_INTRO_5    = -1531017, // Come, little ones...
-    SAY_EMPERORS_INTRO_6    = -1531018, // The feast of souls...
+    SAY_EMPERORS_INTRO_1    = 11702, // Only flesh and bone. .. 
+    SAY_EMPERORS_INTRO_2    = 11706, // Where are your manners...
+    SAY_EMPERORS_INTRO_3    = 11707, // There will be pain...
+    SAY_EMPERORS_INTRO_4    = 11708, // Oh so much pain...
+    SAY_EMPERORS_INTRO_5    = 11709, // Come, little ones...
+    SAY_EMPERORS_INTRO_6    = 11710, // The feast of souls...
 };
 
 // Sources:

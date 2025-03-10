@@ -9,7 +9,7 @@ enum
     SPELL_WAR_STOMP         = 16727,
     SPELL_SUNDER_ARMOR      = 15572,
     
-    SAY_AGGRO               = -1900045,
+    SAY_AGGRO               = 9481,
 };
 
 struct boss_king_gordokAI : public ScriptedAI

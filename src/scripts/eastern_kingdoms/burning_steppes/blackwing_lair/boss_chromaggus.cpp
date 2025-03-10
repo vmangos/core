@@ -27,7 +27,7 @@ EndScriptData */
 enum
 {
     EMOTE_GENERIC_FRENZY_KILL   = 7797,
-    EMOTE_SHIMMER               = -1469003,
+    EMOTE_SHIMMER               = 9793,
 
     // These spells are actually called elemental shield
     // What they do is decrease all damage by 75% then they increase

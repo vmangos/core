@@ -31,7 +31,7 @@
 
 enum eCreatures
 {
-    EMOTE_WEAKENED                  = -1531011,
+    EMOTE_WEAKENED                  = 11476,
     MOB_EYE_TENTACLE                = 15726,
     MOB_CLAW_TENTACLE               = 15725,
     MOB_GIANT_CLAW_TENTACLE         = 15728,

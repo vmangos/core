@@ -39,7 +39,7 @@ enum
     QUEST_MISSING_DIPLO_PT14 = 1265, // quest id
     QUEST_MISSING_DIPLO_PT16 = 1324, // quest id
     TERVOSH_SPAWN_DURATION = 60000, // 60 sec blizzlike value
-    TERVOSH_SAY_ON_QUEST_MD_PT14 = -1999914, // Go with grace, and may the Lady's magic protect you.
+    TERVOSH_SAY_ON_QUEST_MD_PT14 = 1751, // Go with grace, and may the Lady's magic protect you.
     NPC_SENTRY_POINT_GUARD = 5085, // all guards around Tervosh will salute.
     NPC_TERVOSH = 4967,
 
@@ -605,7 +605,7 @@ CreatureAI* GetAI_npc_stinky_ignatz(Creature* pCreature)
 enum
 {
     EMOTE_GENERIC_FRENZY_KILL   = 7797,
-    EMOTE_GENERIC_IS_WEAKENED   = -1531011,
+    EMOTE_GENERIC_IS_WEAKENED   = 11476,
 
     SPELL_FRENZY                = 8269,
     SPELL_CLEAVE                = 19983,

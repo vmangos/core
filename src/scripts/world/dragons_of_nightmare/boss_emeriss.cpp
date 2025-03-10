@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  */
 
@@ -7,8 +7,8 @@
 
 enum
 {
-    SAY_EMERISS_AGGRO               = -1000401,
-    SAY_CAST_CORRUPTION             = -1000402,
+    SAY_EMERISS_AGGRO               = 10885,
+    SAY_CAST_CORRUPTION             = 10884,
 
     SPELL_EMERISS_AURA              = 24906,
     SPELL_VOLATILE_INFECTION        = 24928,

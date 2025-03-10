@@ -42,9 +42,7 @@ EndContentData */
 
 enum
 {
-    EMOTE_A_HELLO           = -1000204,
-    EMOTE_H_HELLO           = -1000205,
-    EMOTE_CLUCK_TEXT2       = -1000206,
+    EMOTE_A_HELLO           = 4714,
 
     QUEST_CLUCK             = 3861,
     FACTION_FRIENDLY        = 35,
@@ -92,13 +90,6 @@ struct npc_chicken_cluckAI : public CritterAI
                     m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
 
                     DoScriptText(EMOTE_A_HELLO, m_creature);
-
-                    /* are there any difference in texts, after 3.x ?
-                    if (pPlayer->GetTeam() == HORDE)
-                        DoScriptText(EMOTE_H_HELLO, m_creature);
-                    else
-                        DoScriptText(EMOTE_A_HELLO, m_creature);
-                    */
                 }
             }
         }
@@ -109,7 +100,6 @@ struct npc_chicken_cluckAI : public CritterAI
             {
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
-                DoScriptText(EMOTE_CLUCK_TEXT2, m_creature);
             }
         }
     }
@@ -162,9 +152,9 @@ bool QuestComplete_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, Quest
 
 enum
 {
-    SAY_DOC1                    = -1000201,
-    SAY_DOC2                    = -1000202,
-    SAY_DOC3                    = -1000203,
+    SAY_DOC1                    = 8355,
+    SAY_DOC2                    = 8359,
+    SAY_DOC3                    = 8361,
 
     QUEST_TRIAGE_H              = 6622,
     QUEST_TRIAGE_A              = 6624,
@@ -970,7 +960,7 @@ CreatureAI* GetAI_npc_cannonball_runner(Creature* pCreature)
 enum
 {
     SPELL_IMMUNITY      = 29230,
-    SAY_CLEANER_AGGRO   = -1289010
+    SAY_CLEANER_AGGRO   = 9726
 };
 
 struct npc_the_cleanerAI : public ScriptedAI

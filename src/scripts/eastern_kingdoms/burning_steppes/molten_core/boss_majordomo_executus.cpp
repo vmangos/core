@@ -3,18 +3,17 @@
 
 enum
 {
-    SAY_AGGRO                   = -1409003,
-    SAY_SPAWN                   = -1409004,
-    SAY_SLAY                    = -1409005,
-    SAY_SPECIAL                 = -1409006,
-    SAY_DEFEAT                  = -1409007,
+    SAY_AGGRO                   = 7612,
+    SAY_SPAWN                   = 7566,
+    SAY_SLAY                    = 9425,
+    SAY_DEFEAT                  = 7561,
 
-    SAY_LAST_ADD                = -1409020,                     // When only one add remaining - From SD2
-    SAY_MAJ                     = -1409019,
-    SAY_SUMMON_MAJ              = -1409008,
-    SAY_ARRIVAL1_RAG            = -1409009,
-    SAY_ARRIVAL2_MAJ            = -1409010,
-    SAY_ARRIVAL3_RAG            = -1409011,
+    SAY_LAST_ADD                = 8545,
+    SAY_MAJ                     = 7655,
+    SAY_SUMMON_MAJ              = 7657,
+    SAY_ARRIVAL1_RAG            = 7636,
+    SAY_ARRIVAL2_MAJ            = 7661,
+    SAY_ARRIVAL3_RAG            = 7662,
 
     SPELL_MAGIC_REFLECTION      = 20619,
     SPELL_DAMAGE_REFLECTION     = 21075,

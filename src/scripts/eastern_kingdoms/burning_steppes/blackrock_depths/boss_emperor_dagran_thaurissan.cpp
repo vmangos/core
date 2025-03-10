@@ -27,8 +27,8 @@ EndScriptData */
 enum eEmperor
 {
     FACTION_FRIENDLY            = 35,
-    SAY_AGGRO                   = -1230001,
-    SAY_SLAY                    = -1230002,
+    SAY_AGGRO                   = 5457,
+    SAY_SLAY                    = 5431,
     EMOTE_SHAKEN                = 5429,
 
     SPELL_HANDOFTHAURISSAN      = 17492,
