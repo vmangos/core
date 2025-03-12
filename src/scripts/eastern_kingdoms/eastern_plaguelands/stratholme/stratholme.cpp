@@ -8,8 +8,11 @@ EndContentData */
 #include "scriptPCH.h"
 #include "stratholme.h"
 
-#define SAY_CRYSTAL_DESTROYED         -1900116
-#define SAY_ALL_CRYSTALS_DESTROYED    -1900115
+enum : uint32
+{
+    SAY_CRYSTAL_DESTROYED      = 6527,
+    SAY_ALL_CRYSTALS_DESTROYED = 6289
+};
 
 /*######
 ## go_gauntlet_gate (this is the _first_ of the gauntlet gates, two exist)
@@ -67,12 +70,6 @@ bool GOOpen_go_stratholme_postbox(Player* pPlayer, GameObject* pGo)
 ## mob_freed_soul
 ######*/
 
-//Possibly more of these quotes around.
-#define SAY_ZAPPED0 -1329000
-#define SAY_ZAPPED1 -1329001
-#define SAY_ZAPPED2 -1329002
-#define SAY_ZAPPED3 -1329003
-
 struct mob_freed_soulAI : public ScriptedAI
 {
     mob_freed_soulAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -82,21 +79,9 @@ struct mob_freed_soulAI : public ScriptedAI
 
     void Reset() override
     {
-        switch (urand(0, 3))
-        {
-            case 0:
-                DoScriptText(SAY_ZAPPED0, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_ZAPPED1, m_creature);
-                break;
-            case 2:
-                DoScriptText(SAY_ZAPPED2, m_creature);
-                break;
-            case 3:
-                DoScriptText(SAY_ZAPPED3, m_creature);
-                break;
-        }
+        // Possibly more of these quotes around.
+        const uint32 randomText = PickRandomValue(6451, 6452, 6453, 6454, 6455);
+        DoScriptText(randomText, m_creature);
     }
 };
 

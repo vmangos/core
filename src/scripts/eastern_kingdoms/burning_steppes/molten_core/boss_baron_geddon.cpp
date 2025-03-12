@@ -24,7 +24,7 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "molten_core.h"
 
-#define EMOTE_SERVICE               -1409000
+#define EMOTE_SERVICE               8253
 
 #define SPELL_INFERNO               19695
 #define SPELL_IGNITEMANA            19659

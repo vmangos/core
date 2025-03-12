@@ -45,7 +45,11 @@ enum
     NPC_BALNAZZAR                   = 10813,
     //NPC_ZOMBIE                      = 10698                 //probably incorrect
     NPC_SKEL_BERSERKER              = 10391,
-    NPC_SKEL_GUARDIAN               = 10390
+    NPC_SKEL_GUARDIAN               = 10390,
+
+    SAY_DATHROHAN_AGGRO     = 6441,
+    SAY_DATHROHAN_TRANSFORM = 6447,
+    SAY_DATHROHAN_DEATH     = 6442
 };
 
 struct SummonDef
@@ -144,7 +148,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
 
     void JustDied(Unit* Victim) override
     {
-        m_creature->MonsterSay("Damn you mortals! All my plans of revenge, all my hate... all burned to ash...");
+        DoScriptText(SAY_DATHROHAN_DEATH, m_creature);
         
         static uint32 uiCount = sizeof(m_aSummonPoint) / sizeof(SummonDef);
 
@@ -168,7 +172,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
 
     void Aggro(Unit* /*pWho*/) override
     {
-        m_creature->MonsterYell("Today you have unmade what took me years to create! For this you shall all die by my hand!");
+        DoScriptText(SAY_DATHROHAN_AGGRO, m_creature);
     }
 
     void UpdateAI(uint32 const uiDiff) override
@@ -231,7 +235,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
             {
                 if (m_uiTransform_Timer <= uiDiff)
                 {
-                    m_creature->MonsterYell("You fools think you can defeat me so easily? Face the true might of the Nathrezim!");
+                    DoScriptText(SAY_DATHROHAN_TRANSFORM, m_creature);
                     m_uiTransform_Timer = 0;
                 }
                 else

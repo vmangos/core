@@ -65,20 +65,22 @@ enum eSpells {
     // Mute Bugs
 };
 
-enum eScriptTexts {                     // NO SNIFFED BROADCAST_TEXT DATA EXISTS FOR THESE!!
-    SAY_VEKLOR_AGGRO_1      = -1531019, // its too late to turn away
-    SAY_VEKLOR_AGGRO_2      = -1531020, // prepare to embrace oblivion
-    SAY_VEKLOR_AGGRO_3      = -1531021, // like a fly in a web
-    SAY_VEKLOR_AGGRO_4      = -1531022, // your brash arrogance
-    SAY_VEKLOR_SLAY         = -1531023, // you will not escape death
-    SAY_VEKLOR_SPECIAL      = -1531025, // to decorate our halls
+// NO SNIFFED BROADCAST_TEXT DATA EXISTS FOR MOST OF THESE!!
+enum eScriptTexts
+{
+    SAY_VEKLOR_AGGRO_1   = -1531019, // its too late to turn away
+    SAY_VEKLOR_AGGRO_2   = 11453,    // you will not escape death
+    SAY_VEKLOR_KILL_1    = -1531020, // prepare to embrace oblivion
+    SAY_VEKLOR_KILL_2    = -1531021, // like a fly in a web
+    SAY_VEKLOR_KILL_3    = -1531022, // your brash arrogance
+    SAY_VEKLOR_SPECIAL   = -1531025, // to decorate our halls (wipe)
                                            
-    SAY_VEKNILASH_AGGRO_1   = -1531026, // ah, lambs to the slaughter
-    SAY_VEKNILASH_AGGRO_2   = -1531027, // let none survive
-    SAY_VEKNILASH_AGGRO_3   = -1531028, // join me brother, there is blood to be shed
-    SAY_VEKNILASH_AGGRO_4   = -1531029, // look brother, fresh bloood
-    SAY_VEKNILASH_SLAY      = -1531030, // your fate is sealed
-    SAY_VEKNILASH_SPECIAL   = -1531032, // Shall be your undoing (wipe?)
+    SAY_VEKNILASH_AGGRO_1 = -1531026, // ah, lambs to the slaughter
+    SAY_VEKNILASH_AGGRO_2 = -1531027, // let none survive
+    SAY_VEKNILASH_AGGRO_3 = -1531028, // join me brother, there is blood to be shed
+    SAY_VEKNILASH_AGGRO_4 = -1531029, // look brother, fresh bloood
+    SAY_VEKNILASH_SLAY    = 11455,    // your fate is sealed
+    SAY_VEKNILASH_SPECIAL = -1531032, // Shall be your undoing (wipe)
                                         
     //death is handled by instance_temple_of_ahnqiraj.cpp
     //NOTE: according to wowwiki, the *_SLAY emotes are used during enrage,
@@ -623,9 +625,15 @@ struct boss_veklorAI : public boss_twinemperorsAI
     void KilledUnit(Unit*) override
     {
         if (killSayCooldown == 0) {
-            DoScriptText(SAY_VEKLOR_SLAY, m_creature);
+            DoScriptText(SAY_VEKNILASH_SLAY, m_creature);
             killSayCooldown = urand(5000, 10000);
         }
+    }
+
+    void JustReachedHome() override
+    {
+        DoScriptText(SAY_VEKLOR_SPECIAL, m_creature);
+        boss_twinemperorsAI::JustReachedHome();
     }
 
     uint32 GetBugSpellCooldown() override
@@ -740,7 +748,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
             if (pullDialogueTimer < diff) 
             {
                 didPullDialogue = true;
-                DoScriptText(irand(SAY_VEKLOR_AGGRO_4, SAY_VEKLOR_AGGRO_1), m_creature);
+                DoScriptText(PickRandomValue(SAY_VEKLOR_AGGRO_1, SAY_VEKLOR_AGGRO_2), m_creature);
             }
             else 
             {
@@ -834,6 +842,12 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_SPELL, true);
     }
 
+    void JustReachedHome() override
+    {
+        DoScriptText(SAY_VEKNILASH_SPECIAL, m_creature);
+        boss_twinemperorsAI::JustReachedHome();
+    }
+
     void OnEndTeleportVirtual() override
     {
         //todo: anything that needs doing?
@@ -879,7 +893,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         // Vek'nilash goes first, instantly does his yell when we are in combat. 
         if (!didPullDialogue) {
             didPullDialogue = true;
-            DoScriptText(irand(SAY_VEKNILASH_AGGRO_4, SAY_VEKNILASH_AGGRO_1), m_creature);
+            DoScriptText(PickRandomValue(SAY_VEKNILASH_AGGRO_1, SAY_VEKNILASH_AGGRO_2, SAY_VEKNILASH_AGGRO_3, SAY_VEKNILASH_AGGRO_4), m_creature);
         }
 
         if(!m_creature->HasAura(SPELL_DOUBLE_ATTACK))

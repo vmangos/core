@@ -23,12 +23,13 @@ EndScriptData */
 
 #include "scriptPCH.h"
 
-#define SAY_SPAWN               -1900160
-
-#define SPELL_RAVENOUSCLAW      17470
-#define SPELL_ENRAGE            8599
-
-#define TIMMY_ENTRY             10808
+enum : uint32
+{
+    SAY_SPAWN          = 6150,
+    SPELL_RAVENOUSCLAW = 17470,
+    SPELL_ENRAGE       = 8599,
+    TIMMY_ENTRY        = 10808
+};
 
 struct boss_timmy_the_cruelAI : public ScriptedAI
 {
