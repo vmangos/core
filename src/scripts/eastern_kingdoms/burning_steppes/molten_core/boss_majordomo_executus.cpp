@@ -1,10 +1,6 @@
 #include "scriptPCH.h"
 #include "molten_core.h"
 
-#define GOSSIP_ITEM_1               "Tell me more."
-#define GOSSIP_ITEM_2               "What else do you have to say?"
-#define GOSSIP_ITEM_3               "You challenged us and and we have come. Where is this master that you speak of?"
-
 #define POINT_RESPAWN               1
 #define POINT_SUMMON1               2
 #define POINT_SUMMON2               3
