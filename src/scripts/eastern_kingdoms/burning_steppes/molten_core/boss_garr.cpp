@@ -75,13 +75,10 @@ struct boss_garrAI : ScriptedAI
 
             for (const auto& itr : firesworn)
             {
-                if (itr->GetObjectGuid())
-                {
-                    m_lFiresworn.push_back(itr->GetObjectGuid());
+                m_lFiresworn.push_back(itr->GetObjectGuid());
 
-                    if (Creature* pAdd = m_creature->GetMap()->GetCreature(itr->GetObjectGuid()))
-                        DoCastSpellIfCan(pAdd, SPELL_SEPARATION_ANXIETY, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
-                }
+                if (Creature* pAdd = m_creature->GetMap()->GetCreature(itr->GetObjectGuid()))
+                    DoCastSpellIfCan(pAdd, SPELL_SEPARATION_ANXIETY, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
             }
         }
     }
