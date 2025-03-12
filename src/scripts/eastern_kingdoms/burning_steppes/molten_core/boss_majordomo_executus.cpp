@@ -239,12 +239,12 @@ struct boss_majordomoAI : public ScriptedAI
                         if (pAdd->IsAlive())
                         {
                             DoCastSpellIfCan(pAdd, SPELL_SEPARATION_ANXIETY, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
-                            DoCastSpellIfCan(pAdd, SPELL_AEGIS_OF_RAGNAROS, CF_TRIGGERED);
                         }
                     }
                 }
             }
 
+            DoCastSpellIfCan(m_creature, SPELL_AEGIS_OF_RAGNAROS, CF_TRIGGERED);
             DoScriptText(SAY_AGGRO, m_creature);
         }
 

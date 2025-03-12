@@ -15,7 +15,7 @@ enum
     // Add spells
     SPELL_IMMOLATE              = 15733,
     SPELL_THRASH                = 8876,
-    SPELL_SEPARATION_ANXIETY    = 23492,
+    SPELL_SEPARATION_ANXIETY    = 23487,
     SPELL_ADD_ERUPTION          = 19497,
     SPELL_MASSIVE_ERUPTION      = 20483,
     SPELL_ERUPTION_TRIGGER      = 20482,
@@ -75,7 +75,13 @@ struct boss_garrAI : ScriptedAI
 
             for (const auto& itr : firesworn)
             {
-                m_lFiresworn.push_back(itr->GetObjectGuid());
+                if (itr->GetObjectGuid())
+                {
+                    m_lFiresworn.push_back(itr->GetObjectGuid());
+
+                    if (Creature* pAdd = m_creature->GetMap()->GetCreature(itr->GetObjectGuid()))
+                        DoCastSpellIfCan(pAdd, SPELL_SEPARATION_ANXIETY, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                }
             }
         }
     }
@@ -161,12 +167,10 @@ struct mob_fireswornAI : ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    uint32 m_uiAnxietyTimer;
     bool m_bForceExplosion;
 
     void Reset() override
     {
-        m_uiAnxietyTimer = 10000;
         m_bForceExplosion = false;
     }
 
@@ -211,28 +215,6 @@ struct mob_fireswornAI : ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
-
-        if (m_uiAnxietyTimer < diff)
-        {
-            if (!m_creature->HasAura(SPELL_SEPARATION_ANXIETY))
-            {
-                if (!m_pInstance)
-                    return;
-
-                if (Creature* pGarr = m_pInstance->GetSingleCreatureFromStorage(NPC_GARR))
-                {
-                    if (m_creature->GetDistance2d(pGarr) > 45.0f)
-                    {
-                        SpellCastResult result = DoCastSpellIfCan(m_creature, SPELL_SEPARATION_ANXIETY);
-
-                        if (result == CAST_OK)
-                            m_uiAnxietyTimer = 5000;
-                    }
-                }
-            }
-        }
-        else
-            m_uiAnxietyTimer -= diff;
 
         DoMeleeAttackIfReady();
     }
