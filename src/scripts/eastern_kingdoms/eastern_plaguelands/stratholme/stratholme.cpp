@@ -80,7 +80,7 @@ struct mob_freed_soulAI : public ScriptedAI
     void Reset() override
     {
         // Possibly more of these quotes around.
-        const uint32 randomText = PickRandomValue(6451, 6452, 6453, 6454, 6455);
+        uint32 const randomText = PickRandomValue(6451, 6452, 6453, 6454, 6455);
         DoScriptText(randomText, m_creature);
     }
 };
