@@ -60,10 +60,6 @@ enum
 
     OBJECT_LAVA_STEAM           = 178107, // Lava steam spawned before Ragnaros
     OBJECT_LAVA_SPLASH          = 178108, // Lava splashes spawned before Ragnaros
-
-    GOSSIP_TEXTID_DOMO_1        = 4995,   // "Tell me more."
-    GOSSIP_TEXTID_DOMO_2        = 5011,   // "What else do you have to say?"
-    GOSSIP_TEXTID_DOMO_3        = 5012,   // "You challenged us and and we have come. Where is this master that you speak of?"
 };
 
 struct sSpawnLocation
