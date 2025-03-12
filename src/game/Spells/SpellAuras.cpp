@@ -1819,6 +1819,15 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     {
                         return HandleAuraTransform(apply, Real);
                     }
+                    case 21094: // Separation Anxiety (Majordomo Executus)
+                    case 23487: // Separation Anxiety (Garr)
+                    {
+                        // expected to tick with 5 sec period (tick part see in Aura::PeriodicTick)
+                        m_isPeriodic = true;
+                        m_modifier.periodictime = 5 * IN_MILLISECONDS;
+                        m_periodicTimer = m_modifier.periodictime;
+                        return;
+                    }
                     case 21051: // Melodious Rapture Visual (DND)
                     case 21827: // Frostwolf Aura DND
                     case 21863: // Alterac Ram Aura DND
@@ -6683,6 +6692,17 @@ void Aura::PeriodicDummyTick()
                             // lost track of player
                             pRat->DespawnOrUnsummon(1);
                         }
+                    }
+                    return;
+                }
+                case 21094:
+                case 23487:
+                {
+                    if (Unit* caster = GetCaster())
+                    {
+                        float m_radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(spell->EffectRadiusIndex[m_effIndex]));
+                        if (caster->IsAlive() && !caster->IsWithinDistInMap(target, m_radius))
+                            target->CastSpell(target, (spell->Id == 21094 ? 21095 : 23492), true, nullptr); // Spell 21095: Separation Anxiety for Majordomo Executus' adds, 23492: Separation Anxiety for Garr's adds
                     }
                     return;
                 }

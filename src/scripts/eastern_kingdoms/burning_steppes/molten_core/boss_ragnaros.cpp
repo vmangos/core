@@ -304,6 +304,10 @@ struct boss_ragnarosAI : ScriptedAI
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     m_uiEnterCombatTimer = 0;
+
+                    // Despawn Majordomo's corpse
+                    if (Creature* domo = m_creature->FindNearestCreature(NPC_DOMO, 20.f, false))
+                        domo->ForcedDespawn(5000);
                 }
             }
             else

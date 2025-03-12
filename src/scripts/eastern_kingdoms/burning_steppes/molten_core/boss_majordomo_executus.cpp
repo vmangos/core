@@ -1,43 +1,9 @@
 #include "scriptPCH.h"
 #include "molten_core.h"
 
-enum
-{
-    SAY_AGGRO                   = 7612,
-    SAY_SPAWN                   = 7566,
-    SAY_SLAY                    = 9425,
-    SAY_DEFEAT                  = 7561,
-
-    SAY_LAST_ADD                = 8545,
-    SAY_MAJ                     = 7655,
-    SAY_SUMMON_MAJ              = 7657,
-    SAY_ARRIVAL1_RAG            = 7636,
-    SAY_ARRIVAL2_MAJ            = 7661,
-    SAY_ARRIVAL3_RAG            = 7662,
-
-    SPELL_MAGIC_REFLECTION      = 20619,
-    SPELL_DAMAGE_REFLECTION     = 21075,
-    SPELL_BLASTWAVE             = 20229,
-    SPELL_AEGIS                 = 20620,                   //This is self casted whenever we are below 50%
-    SPELL_TELEPORT              = 20618,
-    SPELL_SUMMON_RAGNAROS       = 19774,
-    SPELL_RAGNAROS_EMERGE       = 20568,
-    SPELL_ELEMENTAL_FIRE        = 19773,
-
-    SPELL_VISUAL_TELEPORT       = 19484, 
-
-    NPC_FLAMEWAKER_HEALER       = 11663,
-    NPC_FLAMEWAKER_ELITE        = 11664,
-    // NPC_RAGNAROS                = 11502, // Already defined in instance script
-
-    GOSSIP_TEXTID_DOMO_1        = 4995,
-    GOSSIP_TEXTID_DOMO_2        = 5011,
-    GOSSIP_TEXTID_DOMO_3        = 5012,
-};
-
-#define GOSSIP_ITEM_1                "Tell me more."
-#define GOSSIP_ITEM_2                "What else do you have to say?"
-#define GOSSIP_ITEM_3                "You challenged us and and we have come. Where is this master that you speak of?"
+#define GOSSIP_ITEM_1               "Tell me more."
+#define GOSSIP_ITEM_2               "What else do you have to say?"
+#define GOSSIP_ITEM_3               "You challenged us and and we have come. Where is this master that you speak of?"
 
 #define POINT_RESPAWN               1
 #define POINT_SUMMON1               2
@@ -57,6 +23,52 @@ enum
 #define POINT_SUMMON2_Y             -814.4016f
 #define POINT_SUMMON2_Z             -228.9452f
 #define POINT_SUMMON2_O             5.1210f
+
+enum
+{
+    SAY_AGGRO                   = 7612,
+    SAY_SPAWN                   = 7566,
+    SAY_SLAY                    = 9425,
+    SAY_DEFEAT1                 = 7561,
+    SAY_DEFEAT2                 = 7567,
+    SAY_DEFEAT3                 = 7568,
+
+    SAY_LAST_ADD                = 8545,
+    SAY_MAJ                     = 7655,
+    SAY_SUMMON_MAJ              = 7657,
+    SAY_ARRIVAL1_RAG            = 7636,
+    SAY_ARRIVAL2_MAJ            = 7661,
+    SAY_ARRIVAL3_RAG            = 7662,
+
+    NPC_FLAMEWAKER_HEALER       = 11663,
+    NPC_FLAMEWAKER_ELITE        = 11664,
+
+    SPELL_AEGIS_OF_RAGNAROS     = 20620,  // Cast at start and at 50% health to fully heal Majordomo Executus
+
+    SPELL_MAGIC_REFLECTION      = 20619,  // Cast one of these every 30 seconds
+    SPELL_DAMAGE_SHIELD         = 21075,  // Cast one of these every 30 seconds
+
+    SPELL_TELEPORT_TARGET       = 20534,  // Teleport current target
+    SPELL_TELEPORT_RANDOM       = 20618,  // Teleport random target
+
+    SPELL_ENCOURAGEMENT         = 21086,  // Cast onto all remaining adds every time one is killed
+    SPELL_IMMUNITY              = 21087,  // Cast onto Flamewaker Healers when half the adds are dead
+    SPELL_CHAMPION              = 21090,  // Cast onto the last remaining add
+    SPELL_SEPARATION_ANXIETY    = 21094,  // Cast onto all adds at start by Majordomo Executus, if adds move out of range, they will cast spell 21095 on themselves
+
+    SPELL_VISUAL_TELEPORT       = 19484,  // Visual used after fight ending dialogue to teleport to Ragnaros
+    SPELL_ELEMENTAL_FIRE        = 19773,  // Spell used by Ragnaros to kill Majordomo Executus
+    SPELL_SUMMON_RAGNAROS       = 19774,  // Spell used by Majordomo Executus to summon Ragnaros
+
+    FACTION_FRIENDLY            = 1080,   // Faction used after Majordomo Executus is defeated to mark him as friendly
+
+    OBJECT_LAVA_STEAM           = 178107, // Lava steam spawned before Ragnaros
+    OBJECT_LAVA_SPLASH          = 178108, // Lava splashes spawned before Ragnaros
+
+    GOSSIP_TEXTID_DOMO_1        = 4995,   // "Tell me more."
+    GOSSIP_TEXTID_DOMO_2        = 5011,   // "What else do you have to say?"
+    GOSSIP_TEXTID_DOMO_3        = 5012,   // "You challenged us and and we have come. Where is this master that you speak of?"
+};
 
 struct sSpawnLocation
 {
@@ -86,30 +98,32 @@ struct boss_majordomoAI : public ScriptedAI
 
     ObjectGuid m_addSpawns[8];
     uint32 Reflection_Timer;
-    uint32 Blastwave_Timer;
-    uint32 TPDomo_Timer[2];
-    uint32 Immune;
-    uint32 AddVivant;
+    uint32 TPDomo_Timer;
+    uint32 AddCount;
     bool AddSpawn;
 
     ScriptedInstance* m_pInstance;
 
-    // Event de Ragna
+    // Post-defeat dialogue sequence timer
+    uint32 DialogueDefeatTimer = 0;
+    bool DialogueDefeatStart0 = false;
+    bool DialogueDefeatStart1 = false;
+    bool DialogueDefeatStart2 = false;
+    bool DialogueDefeatStart3 = false;
 
-    uint32 DialogRagnaros_M;
-    uint32 DialogRagnarosTimer;
+    // Ragnaros Event
+    uint32 DialogueRagnaros_M;
+    uint32 DialogueRagnarosTimer;
     bool RagnarosEventStart;
 
+    // Majordomo can respawn after 2 hours; the event progress *must* stay DONE
     void Reset() override
     {
         m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
         Reflection_Timer =  30000;
-        Blastwave_Timer = 10000;
-        for (uint32 & i : TPDomo_Timer)
-            i = 10000 + rand() % 20000;
+        TPDomo_Timer = 10000 + rand() % 20000;
         AddSpawn = false;
-        AddVivant = 8;
-        Immune = 0;
+        AddCount = 8;
 
         for (auto& guid : m_addSpawns)
         {
@@ -123,25 +137,29 @@ struct boss_majordomoAI : public ScriptedAI
             }
         }
 
-        if (m_pInstance && m_creature->GetFactionTemplateId() != 35)
-        {
-            if (m_pInstance->GetData(TYPE_MAJORDOMO) != DONE)
-                m_pInstance->SetData(TYPE_MAJORDOMO, NOT_STARTED);
-        }
+        if (m_pInstance && m_pInstance->GetData(TYPE_MAJORDOMO) != DONE)
+            m_pInstance->SetData(TYPE_MAJORDOMO, NOT_STARTED);
 
-        // Event de Ragna
+        // Post-defeat dialogue event
+        DialogueDefeatTimer = 0;
+        DialogueDefeatStart0 = false;
+        DialogueDefeatStart1 = false;
+        DialogueDefeatStart2 = false;
+        DialogueDefeatStart3 = false;
 
-        DialogRagnaros_M = 0;
-        DialogRagnarosTimer = 0;
+        // Ragnaros Event
+        DialogueRagnaros_M = 0;
+        DialogueRagnarosTimer = 0;
         RagnarosEventStart = false;
     }
 
+    // Handler for spells cast on adds death
     void SummonedCreatureJustDied(Creature* pSummoned) override
     {
-        if (AddVivant > 0)
-            AddVivant--;
+        if (AddCount > 0)
+            AddCount--;
 
-        if (AddVivant > 0)
+        if (AddCount > 0)
         {
             for (auto const& guid : m_addSpawns)
             {
@@ -151,18 +169,13 @@ struct boss_majordomoAI : public ScriptedAI
                     {
                         if (pAdd->IsAlive())
                         {
-                            float dmgMin;
-                            float dmgMax;
-                            pAdd->GetDefaultDamageRange(dmgMin, dmgMax);
-                            pAdd->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, dmgMin + dmgMin / AddVivant);
-                            pAdd->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, dmgMax + dmgMax / AddVivant);
+                            DoCastSpellIfCan(pAdd, SPELL_ENCOURAGEMENT);
                         }
                     }
                 }
             }
         }
-
-        if (AddVivant == 4 && Immune == 0)
+        if (AddCount <= 4)
         {
             for (auto const& guid : m_addSpawns)
             {
@@ -172,16 +185,13 @@ struct boss_majordomoAI : public ScriptedAI
                     {
                         if (pAdd->IsAlive())
                         {
-                            pAdd->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                            pAdd->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                            pAdd->RemoveSpellsCausingAura(SPELL_AURA_MOD_CONFUSE);
+                            DoCastSpellIfCan(pAdd, SPELL_IMMUNITY, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
                         }
                     }
                 }
             }
-            Immune++;
         }
-        else if (AddVivant == 1 && Immune == 1)
+        if (AddCount == 1)
         {
             for (auto const& guid : m_addSpawns)
             {
@@ -192,65 +202,83 @@ struct boss_majordomoAI : public ScriptedAI
                         if (pAdd->IsAlive())
                         {
                             m_creature->MonsterYell(SAY_LAST_ADD);
-                            pAdd->SetPower(POWER_MANA, pAdd->GetMaxPower(POWER_MANA));
-                            pAdd->SetHealthPercent(100.0f);
+                            DoCastSpellIfCan(pAdd, SPELL_CHAMPION, CF_TRIGGERED);
                         }
                     }
                 }
             }
-            Immune++;
         }
-        else if (AddVivant == 0)
+        else if (AddCount == 0)
         {
-            DialogRagnarosTimer = 0;
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            m_creature->SetFactionTemplateId(35);
-            EnterEvadeMode();
-            DoScriptText(SAY_DEFEAT, m_creature);
             if (m_pInstance)
-            {
                 if (m_pInstance->GetData(TYPE_MAJORDOMO) != DONE)
                     m_pInstance->SetData(TYPE_MAJORDOMO, DONE);
-            }
+
+            EnterEvadeMode();
+            m_creature->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME | UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IN_COMBAT);
         }
     }
 
+    // Handler for beginning dialogue sequence
+    void JustReachedHome() override
+    {
+        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME) && DialogueDefeatStart0 == false)
+            DialogueDefeatStart0 = true;
+    }
+
+    // Dialogue: "Ashes to ashes!"
     void KilledUnit(Unit* victim) override
     {
-        if (m_creature->GetFactionTemplateId() != 35)
+        if (m_creature->GetFactionTemplateId() != FACTION_FRIENDLY)
             DoScriptText(SAY_SLAY, m_creature);
     }
 
+    // Aggro handler
     void Aggro(Unit *who) override
     {
-        if (m_creature->GetFactionTemplateId() != 35)
-            DoScriptText(SAY_AGGRO, m_creature);
-
-        if (m_pInstance)
+        if (m_creature->GetFactionTemplateId() != FACTION_FRIENDLY)
         {
-            if (m_pInstance->GetData(TYPE_MAJORDOMO) != DONE)
-                m_pInstance->SetData(TYPE_MAJORDOMO, IN_PROGRESS);
+            for (auto const& guid : m_addSpawns)
+            {
+                if (!guid.IsEmpty())
+                {
+                    if (Creature* pAdd = m_creature->GetMap()->GetCreature(guid))
+                    {
+                        if (pAdd->IsAlive())
+                        {
+                            DoCastSpellIfCan(pAdd, SPELL_SEPARATION_ANXIETY, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                            DoCastSpellIfCan(pAdd, SPELL_AEGIS_OF_RAGNAROS, CF_TRIGGERED);
+                        }
+                    }
+                }
+            }
+
+            DoScriptText(SAY_AGGRO, m_creature);
         }
+
+        if (m_pInstance && m_pInstance->GetData(TYPE_MAJORDOMO) != DONE)
+            m_pInstance->SetData(TYPE_MAJORDOMO, IN_PROGRESS);
     }
 
+    // Movement handler for Ragnaros summoning sequence
     void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
 
+        // Face forward when resetting or before defeat dialogue
         if (uiPointId == POINT_RESPAWN)
         {
             m_creature->SetOrientation((float)POINT_RESPAWN_O);
             return;
         }
-
+        // Begin Ragnaros Event movement sequence
         else if (uiPointId == POINT_SUMMON1)
         {
             m_creature->GetMotionMaster()->Clear();
             m_creature->GetMotionMaster()->MovePoint(POINT_SUMMON2, (float)POINT_SUMMON2_X, (float)POINT_SUMMON2_Y, (float)POINT_SUMMON2_Z);
             return;
         }
-
         // SetOrientation etc. move m_creature back to the previous point, so we're turning him this way:
         else if (uiPointId == POINT_SUMMON2)
         {
@@ -258,7 +286,7 @@ struct boss_majordomoAI : public ScriptedAI
             m_creature->GetMotionMaster()->MovePoint(POINT_SUMMON3, (float)POINT_SUMMON2_X + 1, (float)POINT_SUMMON2_Y - 1, (float)POINT_SUMMON2_Z);
             return;
         }
-
+        // Ragnaros Event final position
         else if (uiPointId == POINT_SUMMON3)
         {
             m_creature->GetMotionMaster()->Clear();
@@ -267,29 +295,34 @@ struct boss_majordomoAI : public ScriptedAI
         }
     }
 
+    // Teleport to Ragnaros after dialogue sequence has concluded
     void DomoTP()
     {
+        // Summon new copy of Majordomo at Ragnaros Event position
         if (Creature* Domo = m_creature->SummonCreature(m_creature->GetEntry(), 847.103f, -816.153f, -229.775f, 4.344f, TEMPSUMMON_TIMED_DESPAWN, (2 * 60 * 60 * 1000)))
         {
             Domo->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            Domo->SetFactionTemplateId(35);
+            Domo->SetFactionTemplateId(FACTION_FRIENDLY);
             Domo->SetHealth(35);
             Domo->SetMaxHealth(35);
         }
-        DialogRagnarosTimer = 0;
+
+        // Reset Ragnaros timer, cast teleport to Ragnaros visual, and despawn
+        DialogueRagnarosTimer = 0;
         m_creature->CastSpell(m_creature, SPELL_VISUAL_TELEPORT, false);
         m_creature->ForcedDespawn(1000);
     }
 
+    // Ragnaros Event sequence
     void DomoEvent()
     {
-        switch (DialogRagnaros_M)
+        switch (DialogueRagnaros_M)
         {
             case 6:
                 m_creature->GetMotionMaster()->MovePoint(POINT_SUMMON1, (float)POINT_SUMMON1_X, (float)POINT_SUMMON1_Y, (float)POINT_SUMMON1_Z);
-                m_creature->SummonGameObject(178107, 838.951f, -830.383f, -230.206f, 0.837757f, 0, 0, 0.406736f, 0.913546f, 0);
-                m_creature->SummonGameObject(178108, 839.279f, -831.058f, -230.202f, 4.90438f, 0, 0, -0.636078f, 0.771625f, 0);
-                m_creature->CastSpell(m_creature, 19774, false);
+                m_creature->SummonGameObject(OBJECT_LAVA_STEAM, 838.951f, -830.383f, -230.206f, 0.837757f, 0, 0, 0.406736f, 0.913546f, 0);
+                m_creature->SummonGameObject(OBJECT_LAVA_SPLASH, 839.279f, -831.058f, -230.202f, 4.90438f, 0, 0, -0.636078f, 0.771625f, 0);
+                m_creature->CastSpell(m_creature, SPELL_SUMMON_RAGNAROS, false);
                 DoScriptText(SAY_MAJ, m_creature);
                 break;
             case 15:
@@ -326,17 +359,18 @@ struct boss_majordomoAI : public ScriptedAI
                 }
                 break;
             case 76:
-                m_creature->SetInvincibilityHpThreshold(0);
                 if (Creature* Ragnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
-                    Ragnaros->CastSpell(m_creature, SPELL_ELEMENTAL_FIRE, false);  // 20565
+                    Ragnaros->CastSpell(m_creature, SPELL_ELEMENTAL_FIRE, false);
                 // Handle rest in Ragnaros script
                 break;
             }
     }
 
+    // Update handler
     void UpdateAI(uint32 const diff) override
     {
-        if (m_creature->GetFactionTemplateId() != 35 && !AddSpawn)
+        // If respawning, resummon adds
+        if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER) && m_creature->GetFactionTemplateId() != FACTION_FRIENDLY && !AddSpawn)
         {
             for (int i = 0; i < 8; i++)
             {
@@ -352,86 +386,144 @@ struct boss_majordomoAI : public ScriptedAI
                 if (Creature* pNewAdd = m_creature->SummonCreature(m_aBosspawnLocs[i].m_uiEntry, m_aBosspawnLocs[i].m_fX, m_aBosspawnLocs[i].m_fY, m_aBosspawnLocs[i].m_fZ, m_aBosspawnLocs[i].m_fO, TEMPSUMMON_DEAD_DESPAWN, 0))
                 {
                     m_addSpawns[i] = pNewAdd->GetObjectGuid();
-
-                    if (i < 4)
-                        pNewAdd->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                    else
-                        pNewAdd->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
                 }
             }
 
             AddSpawn = true;
         }
 
-        if (RagnarosEventStart && m_creature->GetFactionTemplateId() == 35)
+        // Dialogue: "Impossible! Stay your attack, mortals..."
+        if (DialogueDefeatStart0 == true)
+        {
+            DialogueDefeatTimer += diff;
+            if (DialogueDefeatTimer > 2400)
+            {
+                m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
+                m_creature->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IN_COMBAT);
+                DialogueDefeatStart0 = false;
+                DialogueDefeatStart1 = true;
+                DialogueDefeatTimer = 0;
+                DoScriptText(SAY_DEFEAT1, m_creature);
+            }
+        }
+
+        // Dialogue: "Brashly, you have come..."
+        if (DialogueDefeatStart1 == true)
+        {
+            DialogueDefeatTimer += diff;
+            if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT) && DialogueDefeatTimer > 3600)
+            {
+                m_creature->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+            }
+            if (DialogueDefeatTimer > 7700)
+            {
+                DialogueDefeatStart1 = false;
+                DialogueDefeatStart2 = true;
+                DialogueDefeatTimer = 0;
+                DoScriptText(SAY_DEFEAT2, m_creature);
+            }
+        }
+
+        // Dialogue: "I go now to summon..."
+        if (DialogueDefeatStart2 == true)
+        {
+            DialogueDefeatTimer += diff;
+            if (DialogueDefeatTimer > 8600)
+            {
+                DialogueDefeatStart2 = false;
+                DialogueDefeatStart3 = true;
+                DialogueDefeatTimer = 0;
+                DoScriptText(SAY_DEFEAT3, m_creature);
+            }
+        }
+
+        // Teleport to Ragnaros after dialogue
+        if (DialogueDefeatStart3 == true)
+        {
+            if (m_creature->GetDistance2d(758.089f, -1176.71f) < 2.0f && m_creature->GetFactionTemplateId() == FACTION_FRIENDLY)
+            {
+                DialogueDefeatTimer += diff;
+                if (DialogueDefeatTimer > 17600)
+                {
+                    DialogueDefeatStart3 = false;
+                    DialogueDefeatTimer = 0;
+                    DomoTP();
+                }
+            }
+        }
+
+        // Start the Ragnaros summoning event
+        if (RagnarosEventStart && m_creature->GetFactionTemplateId() == FACTION_FRIENDLY)
         {
             bool Up = false;
-            DialogRagnarosTimer += diff;
-            if (DialogRagnarosTimer > 1000)
+            DialogueRagnarosTimer += diff;
+            if (DialogueRagnarosTimer > 1000)
             {
-                DialogRagnaros_M++;
-                DialogRagnarosTimer = 0;
+                DialogueRagnaros_M++;
+                DialogueRagnarosTimer = 0;
                 Up = true;
             }
             if (Up)
                 DomoEvent();
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->GetFactionTemplateId() == 35)
-        {
-            if (m_creature->GetDistance2d(758.089f, -1176.71f) < 2.0f && m_creature->GetFactionTemplateId() == 35)
-            {
-                DialogRagnarosTimer += diff;
-                if (DialogRagnarosTimer > 28000)
-                    DomoTP();
-            }
+        // Raid wipe handler
+        if (m_creature->GetFactionTemplateId() != FACTION_FRIENDLY && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
-        }
 
-        //Cast Ageis if less than 50% hp
+        // Cast Aegis Of Ragnaros if less than 50% hp
         if (m_creature->GetHealthPercent() < 50.0f)
-            DoCastSpellIfCan(m_creature, SPELL_AEGIS);
+            DoCastSpellIfCan(m_creature, SPELL_AEGIS_OF_RAGNAROS);
 
-        //MagicReflection_Timer
+        // Reflect spell timer
         if (Reflection_Timer < diff)
         {
-            uint32 Reflect = rand() % 2 ? SPELL_MAGIC_REFLECTION : SPELL_DAMAGE_REFLECTION;
-
-            if (m_creature->GetVictim())
-                m_creature->CastSpell(m_creature, Reflect, true);
+            uint32 Reflect = rand() % 2 ? SPELL_MAGIC_REFLECTION : SPELL_DAMAGE_SHIELD;
+            for (auto const& guid : m_addSpawns)
+            {
+                if (!guid.IsEmpty())
+                {
+                    if (Creature* pAdd = m_creature->GetMap()->GetCreature(guid))
+                    {
+                        if (pAdd->IsAlive())
+                        {
+                            DoCastSpellIfCan(pAdd, Reflect);
+                        }
+                    }
+                }
+            }
             Reflection_Timer = 30000;
         }
         else Reflection_Timer -= diff;
 
-        //Blastwave_Timer
-        if (Blastwave_Timer < diff)
+        // Teleport spell timer
+        if (TPDomo_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_BLASTWAVE) == CAST_OK)
-                Blastwave_Timer = 10000;
-        }
-        else
-            Blastwave_Timer -= diff;
-
-        for (int i = 0; i < 2; i++)
-        {
-            if (TPDomo_Timer[i] < diff)
+            Unit* uTarget = m_creature->GetVictim();
+            if (urand(0, 1) == 0)
             {
-                Unit* uTarget = m_creature->GetVictim();
-                if (i == 1)
-                    uTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
-                if (uTarget && uTarget->IsPlayer() && DoCastSpellIfCan(uTarget, SPELL_TELEPORT) == CAST_OK)
+                uTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
+                if (uTarget && uTarget->IsPlayer() && DoCastSpellIfCan(uTarget, SPELL_TELEPORT_RANDOM) == CAST_OK)
                 {
                     DoResetThreat();
-                    TPDomo_Timer[i] = 20000 + rand() % 10000;
+                    TPDomo_Timer = 20000 + rand() % 10000;
                 }
             }
             else
-                TPDomo_Timer[i] -= diff;
+            {
+                if (uTarget && uTarget->IsPlayer() && DoCastSpellIfCan(uTarget, SPELL_TELEPORT_TARGET) == CAST_OK)
+                {
+                    DoResetThreat();
+                    TPDomo_Timer = 20000 + rand() % 10000;
+                }
+            }
         }
+        else TPDomo_Timer -= diff;
 
         DoMeleeAttackIfReady();
     }
 
+    // Begin Ragnaros sequence
     void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
     {
         if (pInvoker && pInvoker->IsPlayer())
