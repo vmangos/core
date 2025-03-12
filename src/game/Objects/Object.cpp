@@ -2094,7 +2094,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
         dist = sqrt((pos.x - destX) * (pos.x - destX) + (pos.y - destY) * (pos.y - destY));
     }
 
-    colPoint = GetMap()->GetLosHitPosition(destX, destY, destZ + halfHeight, destX, destY, destZ, -0.5f);
+    GetMap()->GetLosHitPosition(destX, destY, destZ + halfHeight, destX, destY, destZ, -0.5f);
 
     float step = dist / 10.0f;
     Position tempPos(destX, destY, destZ, 0.f);
@@ -2103,22 +2103,20 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 
     for (int i = 0; i < 10; i++)
     {
-        if (fabs(pos.z - destZ) > ATTACK_DISTANCE)
-        {
-            previousZ = destZ;
-            destX -= step * cos(angle);
-            destY -= step * sin(angle);
-            UpdateAllowedPositionZ(destX, destY, destZ);
-            if (fabs(previousZ - destZ) > (ATTACK_DISTANCE / 2))
-                distanceZSafe = false;
-        }
-        else
+        if (fabs(pos.z - destZ) <= ATTACK_DISTANCE)
         {
             pos.x = destX;
             pos.y = destY;
             pos.z = destZ;
             break;
         }
+
+        previousZ = destZ;
+        destX -= step * cos(angle);
+        destY -= step * sin(angle);
+        UpdateAllowedPositionZ(destX, destY, destZ);
+        if (fabs(previousZ - destZ) > (ATTACK_DISTANCE * 0.5f))
+            distanceZSafe = false;
     }
 
     if (distanceZSafe)
