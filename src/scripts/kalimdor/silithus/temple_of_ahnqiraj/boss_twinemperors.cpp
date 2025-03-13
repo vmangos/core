@@ -278,13 +278,16 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         if (Creature* pTwin = GetOtherBoss())
         {
-            float fDamPercent = ((float)damage) / ((float)m_creature->GetMaxHealth());
-            uint32 uiTwinDamage = (uint32)(fDamPercent * ((float)pTwin->GetMaxHealth()));
-            uint32 uiTwinHealth = pTwin->GetHealth() - std::min(uiTwinDamage, pTwin->GetHealth());
-            pTwin->SetHealth(std::max((uint32)0, uiTwinHealth));
-            
-            // Possibly needed to make sure the damage dealth through setHealth is counted 
-            pTwin->CountDamageTaken(uiTwinDamage, true);
+            if (pTwin->IsAlive())
+            {
+                float fDamPercent = ((float)damage) / ((float)m_creature->GetMaxHealth());
+                uint32 uiTwinDamage = (uint32)(fDamPercent * ((float)pTwin->GetMaxHealth()));
+                uint32 uiTwinHealth = pTwin->GetHealth() - std::min(uiTwinDamage, pTwin->GetHealth());
+                pTwin->SetHealth(std::max((uint32)0, uiTwinHealth));
+
+                // Possibly needed to make sure the damage dealth through setHealth is counted
+                pTwin->CountDamageTaken(uiTwinDamage, true);
+            }
         }
     }
 
@@ -370,6 +373,23 @@ struct boss_twinemperorsAI : public ScriptedAI
         // The rest of this script requires an instance, less managment and code duplication, and a bit of lazyness
         if (!m_pInstance)
             return;
+
+        // Evade in case starts running after someone outside their room
+        if (m_creature->GetPositionZ() > -95.0f)
+        {
+            if (Creature* pOther = GetOtherBoss())
+            {
+                pOther->AI()->EnterEvadeMode();
+            }
+            EnterEvadeMode();
+            return;
+        }
+
+        // prevent potential edge case
+        if (m_creature->IsDead())
+        {
+            return;
+        }
       
         if (justTeleported) {
 
@@ -419,13 +439,6 @@ struct boss_twinemperorsAI : public ScriptedAI
         // We skip updating emperor-specific spells during teleport stun
         if (!justTeleported) {
             UpdateEmperor(diff);
-        }
-
-        // Evade in case starts running after someone outside their room
-        if (m_creature->GetPositionZ() > -95.0f) {
-            if(Creature* pOther = GetOtherBoss())
-                pOther->AI()->EnterEvadeMode();
-            EnterEvadeMode();
         }
     }
 
@@ -604,6 +617,14 @@ struct boss_veklorAI : public boss_twinemperorsAI
 
         // Can be removed if its included in DB.
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+
+        if (Creature* pTwin = GetOtherBoss())
+        {
+            if (pTwin->IsDead())
+            {
+                pTwin->Respawn();
+            }
+        }
     }
 
     void AttackStart(Unit* who) override
@@ -685,9 +706,10 @@ struct boss_veklorAI : public boss_twinemperorsAI
             return;
         }
 
-        if (healTimer < diff) {
-            Unit *pOtherBoss = GetOtherBoss();
-            if (pOtherBoss && pOtherBoss->IsWithinDist(m_creature, HEAL_BROTHER_RANGE))
+        if (healTimer < diff)
+        {
+            Unit* pOtherBoss = GetOtherBoss();
+            if (pOtherBoss && pOtherBoss->IsAlive() && pOtherBoss->IsWithinDist(m_creature, HEAL_BROTHER_RANGE))
             {
                 if (DoCastSpellIfCan(pOtherBoss, SPELL_HEAL_BROTHER) == CAST_OK) {
                     // triggered-cast from brother on me if we successfully healed the other way
@@ -840,6 +862,14 @@ struct boss_veknilashAI : public boss_twinemperorsAI
 
         //Added. Can be removed if its included in DB.
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_SPELL, true);
+
+        if (Creature* pTwin = GetOtherBoss())
+        {
+            if (pTwin->IsDead())
+            {
+                pTwin->Respawn();
+            }
+        }
     }
 
     void JustReachedHome() override

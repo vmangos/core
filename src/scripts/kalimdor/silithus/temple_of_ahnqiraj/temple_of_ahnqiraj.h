@@ -159,6 +159,11 @@ private:
     std::vector<ObjectGuid> graspsOfCthun;
     
     void UpdateCThunWhisper(uint32 diff);
+
+    // Ouro server crash handling
+    void RestoreOuroSpawnTrigger();
+    uint32 m_uiRestoreOuroSpawnTriggerTimer = 0;
+
     std::vector<std::pair<ObjectGuid, uint32>> cthunWhisperMutes;
     uint32 m_uiCthunWhisperTimer;
     uint32 m_uiCthunPrevWhisperTimer;
