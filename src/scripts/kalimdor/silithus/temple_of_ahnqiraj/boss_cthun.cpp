@@ -84,8 +84,15 @@ enum eSpells
 };
 
 static std::vector<uint32> const allTentacleTypes
-({ MOB_EYE_TENTACLE, MOB_CLAW_TENTACLE, MOB_GIANT_CLAW_TENTACLE, MOB_GIANT_EYE_TENTACLE, MOB_FLESH_TENTACLE,
-    MOB_SMALL_PORTAL, MOB_GIANT_PORTAL});
+({
+    MOB_EYE_TENTACLE,
+    MOB_CLAW_TENTACLE,
+    MOB_GIANT_CLAW_TENTACLE,
+    MOB_GIANT_EYE_TENTACLE,
+    MOB_FLESH_TENTACLE,
+    MOB_SMALL_PORTAL,
+    MOB_GIANT_PORTAL
+});
 
 static constexpr uint32 CANNOT_CAST_SPELL_MASK = (UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED
                                                  | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING);
@@ -100,7 +107,6 @@ static constexpr float fleshTentaclePositions[2][4] =
     { -8571.0f, 1990.0f, -98.0f, 1.22f },
     { -8525.0f, 1994.0f, -98.0f, 2.12f }
 };
-
 
 static constexpr float eyeTentaclePositions[8][3] =
 {
