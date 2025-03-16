@@ -1398,7 +1398,7 @@ struct cthunAI : public ScriptedAI
     void DespawnAllTentacles()
     {
         std::list<Creature*> creaturesToDespawn;
-        GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, allTentacleTypes, 2000.0f);
+        GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, allTentacleTypes, 350.0f);
         for (const auto it : creaturesToDespawn)
         {
             if (auto* cpt = dynamic_cast<cthunPortalTentacle*>(it->AI()))
