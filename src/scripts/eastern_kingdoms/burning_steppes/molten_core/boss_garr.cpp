@@ -83,24 +83,6 @@ struct boss_garrAI : ScriptedAI
         {
             m_pInstance->SetData(TYPE_GARR, DONE);
         }
-
-        // TODO:
-        // When Garr dies, will his adds also die?
-        // KillAdds();
-    }
-
-    void KillAdds()
-    {
-        for (const auto& itr : m_lFiresworn)
-        {
-            if (Creature* pFiresworn = m_creature->GetMap()->GetCreature(itr))
-            {
-                if (pFiresworn->IsAlive())
-                {
-                    pFiresworn->DisappearAndDie();
-                }
-            }
-        }
     }
 
     void SpellHit(SpellCaster* /*pCaster*/, SpellEntry const* pSpell) override
