@@ -291,7 +291,7 @@ struct boss_majordomoAI : public ScriptedAI
     void DomoTP()
     {
         // Summon new copy of Majordomo at Ragnaros Event position
-        if (Creature* Domo = m_creature->SummonCreature(m_creature->GetEntry(), 847.103f, -816.153f, -229.775f, 4.344f, TEMPSUMMON_TIMED_DESPAWN, (2 * 60 * 60 * 1000)))
+        if (Creature* Domo = m_creature->SummonCreature(m_creature->GetEntry(), 847.103f, -816.153f, -229.775f, 4.344f, TEMPSUMMON_TIMED_DESPAWN, (2 * 60 * 60 * 1000), false, 5000))
         {
             Domo->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             Domo->SetFactionTemplateId(FACTION_FRIENDLY);
