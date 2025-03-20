@@ -53,6 +53,7 @@ enum
     SPELL_SEPARATION_ANXIETY    = 21094,  // Cast onto all adds at start by Majordomo Executus, if adds move out of range, they will cast spell 21095 on themselves
 
     SPELL_VISUAL_TELEPORT       = 19484,  // Visual used after fight ending dialogue to teleport to Ragnaros
+    SPELL_MAJORDOMO_TELEPORT    = 19527,  // Spell cast to facilitate teleporting of Majordomo to Ragnaros
     SPELL_ELEMENTAL_FIRE        = 19773,  // Spell used by Ragnaros to kill Majordomo Executus
     SPELL_SUMMON_RAGNAROS       = 19774,  // Spell used by Majordomo Executus to summon Ragnaros
 
@@ -102,6 +103,8 @@ struct boss_majordomoAI : public ScriptedAI
     bool DialogueDefeatStart1 = false;
     bool DialogueDefeatStart2 = false;
     bool DialogueDefeatStart3 = false;
+    bool DialogueTeleportStart = false;
+    bool DialogueTeleportFinished = false;
 
     // Ragnaros Event
     uint32 DialogueRagnaros_M;
@@ -287,24 +290,6 @@ struct boss_majordomoAI : public ScriptedAI
         }
     }
 
-    // Teleport to Ragnaros after dialogue sequence has concluded
-    void DomoTP()
-    {
-        // Summon new copy of Majordomo at Ragnaros Event position
-        if (Creature* Domo = m_creature->SummonCreature(m_creature->GetEntry(), 847.103f, -816.153f, -229.775f, 4.344f, TEMPSUMMON_TIMED_DESPAWN, (2 * 60 * 60 * 1000)))
-        {
-            Domo->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            Domo->SetFactionTemplateId(FACTION_FRIENDLY);
-            Domo->SetHealth(35);
-            Domo->SetMaxHealth(35);
-        }
-
-        // Reset Ragnaros timer, cast teleport to Ragnaros visual, and despawn
-        DialogueRagnarosTimer = 0;
-        m_creature->CastSpell(m_creature, SPELL_VISUAL_TELEPORT, false);
-        m_creature->ForcedDespawn(1000);
-    }
-
     // Ragnaros Event sequence
     void DomoEvent()
     {
@@ -391,11 +376,12 @@ struct boss_majordomoAI : public ScriptedAI
             DialogueDefeatTimer += diff;
             if (DialogueDefeatTimer > 2400)
             {
-                m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
-                m_creature->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IN_COMBAT);
                 DialogueDefeatStart0 = false;
                 DialogueDefeatStart1 = true;
                 DialogueDefeatTimer = 0;
+
+                m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
+                m_creature->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IN_COMBAT);
                 DoScriptText(SAY_DEFEAT1, m_creature);
             }
         }
@@ -413,6 +399,7 @@ struct boss_majordomoAI : public ScriptedAI
                 DialogueDefeatStart1 = false;
                 DialogueDefeatStart2 = true;
                 DialogueDefeatTimer = 0;
+
                 DoScriptText(SAY_DEFEAT2, m_creature);
             }
         }
@@ -426,6 +413,7 @@ struct boss_majordomoAI : public ScriptedAI
                 DialogueDefeatStart2 = false;
                 DialogueDefeatStart3 = true;
                 DialogueDefeatTimer = 0;
+
                 DoScriptText(SAY_DEFEAT3, m_creature);
             }
         }
@@ -439,9 +427,38 @@ struct boss_majordomoAI : public ScriptedAI
                 if (DialogueDefeatTimer > 17600)
                 {
                     DialogueDefeatStart3 = false;
+                    DialogueTeleportStart = true;
                     DialogueDefeatTimer = 0;
-                    DomoTP();
+
+                    DoCastSpellIfCan(m_creature, SPELL_VISUAL_TELEPORT, CF_FORCE_CAST);
                 }
+            }
+        }
+
+        // Majordomo Teleport sequence start
+        if (DialogueTeleportStart)
+        {
+            DialogueDefeatTimer += diff;
+            if (DialogueDefeatTimer > 1510)
+            {
+                DialogueTeleportStart = false;
+                DialogueTeleportFinished = true;
+                DialogueDefeatTimer = 0;
+
+                DoCastSpellIfCan(m_creature, SPELL_MAJORDOMO_TELEPORT, CF_FORCE_CAST);
+            }
+        }
+
+        // Majordomo Teleport sequence end
+        if (DialogueTeleportFinished)
+        {
+            DialogueDefeatTimer += diff;
+            if (DialogueDefeatTimer > 100)
+            {
+                DialogueTeleportFinished = false;
+                DialogueDefeatTimer = 0;
+
+                m_creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
         }
 
