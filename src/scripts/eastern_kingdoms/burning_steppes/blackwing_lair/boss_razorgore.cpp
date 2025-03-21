@@ -30,6 +30,7 @@ enum
     SAY_EGGS_BROKEN_1          = 9961,
     SAY_EGGS_BROKEN_2          = 9962,
     SAY_EGGS_BROKEN_3          = 9963,
+    SAY_FREE                   = 7980,
     SAY_DEATH                  = 9591,
     EMOTE_FLEE                 = 9592,
 
@@ -190,7 +191,7 @@ struct boss_razorgoreAI : public ScriptedAI
             m_pInstance->SetData(TYPE_RAZORGORE, FAIL);
 
         SituationInitiale();
-        m_creature->MonsterYell("I'm free! That device shall never torment me again!",0,0);
+        DoScriptText(SAY_FREE, m_creature);
     }
 
     void SituationInitiale()

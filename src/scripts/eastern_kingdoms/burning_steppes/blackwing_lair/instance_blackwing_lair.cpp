@@ -133,7 +133,9 @@ enum
     GOSSIP_OPTION_NEFARIUS      = 6045,
 
     CONDITION_SCEPTER_FAIL      = 1,
-    CONDITION_SCEPTER_WIN       = 2
+    CONDITION_SCEPTER_WIN       = 2,
+
+    SAY_DEATH = 9591
 };
 
 void NefariusGossipOptionClicked(Creature* pCreature);
@@ -465,17 +467,21 @@ struct instance_blackwing_lair : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature *who) override
+    void OnCreatureDeath(Creature* who) override
     {
         switch (who->GetEntry())
         {
             case NPC_RAZORGORE:
+            {
                 if (m_auiEncounter[TYPE_RAZORGORE] == FAIL)
                 {
                     if (Creature* pRazorgore = instance->GetCreature(m_auiData[DATA_RAZORGORE_GUID]))
-                        pRazorgore->MonsterYell("If I fall into the abyss, I'll take all of you mortals with me!",0,0);
+                    {
+                        DoScriptText(SAY_DEATH, pRazorgore);
+                    }
                 }
                 break;
+            }
         }
     }
 
@@ -926,6 +932,13 @@ bool GOHello_go_orbe_domination(Player* pPlayer, GameObject* pGo)
     return true;
 }
 
+enum EggsOfRaz : uint32
+{
+    SAY_EGGS_BROKEN_1 = 9961,
+    SAY_EGGS_BROKEN_2 = 9962,
+    SAY_EGGS_BROKEN_3 = 9963
+};
+
 struct go_oeuf_razAI: public GameObjectAI
 {
     go_oeuf_razAI(GameObject* pGo) : GameObjectAI(pGo) {}
@@ -934,28 +947,30 @@ struct go_oeuf_razAI: public GameObjectAI
     {
         if (!pUser)
             return true;
+
         if (ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData())
         {
             pInstance->SetData(DATA_EGG, IN_PROGRESS);
-            //char sMessage[200];
-            //sprintf(sMessage, "Nombre d'oeufs detruits : %d sur 30", pInstance->GetData64(DATA_HOW_EGG));
+
             if (pUser->IsCreature() && pUser->GetEntry() == NPC_RAZORGORE)
             {
-                //pUser->MonsterYell(sMessage, 0);
                 switch (urand(0, 5))
                 {
                     case 0:
-                        pUser->MonsterYell("No! Not another one! I'll have your heads for this atrocity!", LANG_UNIVERSAL);
-                        pUser->PlayDirectSound(8277);
+                    {
+                        DoScriptText(SAY_EGGS_BROKEN_1, pUser);
                         break;
+                    }
                     case 1:
-                        pUser->MonsterYell("Fools! These eggs are more precious than you know!", LANG_UNIVERSAL);
-                        pUser->PlayDirectSound(8276);
+                    {
+                        DoScriptText(SAY_EGGS_BROKEN_2, pUser);
                         break;
+                    }
                     case 2:
-                        pUser->MonsterYell("You'll pay for forcing me to do this!", LANG_UNIVERSAL);
-                        pUser->PlayDirectSound(8275);
+                    {
+                        DoScriptText(SAY_EGGS_BROKEN_3, pUser);
                         break;
+                    }
                 }
 
                 if (pInstance->GetData64(DATA_EGG) == DONE)
