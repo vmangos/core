@@ -1,0 +1,70 @@
+name: Linux Development Release
+
+on:
+  push:
+    branches:
+      - development
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/ISSUE_TEMPLATE.md'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - '.github/workflows/db_check.yml'
+      - '.github/workflows/db_dump.yml'
+      - 'sql/**'
+      - '.drone.yml'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - uses: actions/checkout@v4
+
+    - name: Build
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get -qq install build-essential cmake libace-dev libmysql++-dev libtbb-dev libcurl4-openssl-dev openssl
+        mkdir build
+        mkdir _install
+        cd build
+        sudo cmake ../ -DCMAKE_INSTALL_PREFIX=/vmangos -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=0 -DENABLE_MAILSENDER=0 -DDEBUG=0 -DSUPPORTED_CLIENT_BUILD=5875
+        sudo make -j $(nproc)
+        sudo make install
+        
+    - name: Collect Files
+      run: |
+        sudo mv /vmangos/etc/realmd.conf.dist /vmangos/etc/realmd.conf
+        sudo mv /vmangos/etc/mangosd.conf.dist /vmangos/etc/mangosd.conf
+    - uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: |
+          /vmangos/bin/realmd
+          /vmangos/etc/realmd.conf
+          /vmangos/bin/mangosd
+          /vmangos/etc/mangosd.conf
+        
+    - name: Download Artifact
+      uses: actions/download-artifact@v4
+      with:
+        pattern: my-artifact
+        path: all_snapshots
+
+    - name: Get Date
+      id: date
+      uses: Kaven-Universe/github-action-current-date-time@v1
+      with:
+        format: "YYYY-MM-DD"
+
+    - name: Upload Snapshot
+      uses: "crowbarmaster/GH-Automatic-Releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Linux Development Build(${{ steps.date.outputs.time }})"
+        files: all_snapshots
