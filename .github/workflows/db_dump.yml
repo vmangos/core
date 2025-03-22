@@ -28,8 +28,19 @@ jobs:
         sudo docker pull mysql
         sudo docker run --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql:5.6 --max_allowed_packet=128M
         sudo docker start mysqldb
-        until nc -z localhost 3306 ; do sleep 5 ; echo "Waiting for database availability..." ; done
-
+        echo "Waiting for database availability..."
+        max_attempts=30
+        attempt=0
+        until docker exec mysqldb mysqladmin -u root -proot ping --silent &> /dev/null; do
+          attempt=$((attempt+1))
+          if [ $attempt -gt $max_attempts ]; then
+            echo "Database failed to become ready in time!"
+            exit 1
+          fi
+          echo "Waiting for database to be ready... (attempt $attempt/$max_attempts)"
+          sleep 5
+        done
+        echo "Database is ready!"
 
     - name: Checkout update sql
       uses: actions/checkout@v4
