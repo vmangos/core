@@ -27,10 +27,10 @@ jobs:
     - name: Build
       run: |
         sudo apt-get -qq update
-        sudo apt-get -qq install build-essential cmake libace-dev libmysql++-dev libtbb-dev libcurl4-openssl-dev openssl
+        sudo apt-get -qq install build-essential cmake libace-dev libtbb-dev libmysqlclient-dev
         mkdir build
         cd build
-        sudo cmake ../ -DCMAKE_INSTALL_PREFIX=/vmangos -DWITH_WARNINGS=0 -DDEBUG_SYMBOLS=0 -DSUPPORTED_CLIENT_BUILD=5875 -DBUILD_FOR_HOST_CPU=0
+        sudo cmake ../ -DCMAKE_INSTALL_PREFIX=/vmangos -DDEBUG_SYMBOLS=0 -DSUPPORTED_CLIENT_BUILD=5875 -DBUILD_FOR_HOST_CPU=0
         sudo make -j $(nproc)
         sudo make install
         
