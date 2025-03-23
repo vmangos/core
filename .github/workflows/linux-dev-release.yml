@@ -29,7 +29,6 @@ jobs:
         sudo apt-get -qq update
         sudo apt-get -qq install build-essential cmake libace-dev libmysql++-dev libtbb-dev libcurl4-openssl-dev openssl
         mkdir build
-        mkdir _install
         cd build
         sudo cmake ../ -DCMAKE_INSTALL_PREFIX=/vmangos -DWITH_WARNINGS=0 -DDEBUG_SYMBOLS=0 -DSUPPORTED_CLIENT_BUILD=5875 -DBUILD_FOR_HOST_CPU=0
         sudo make -j $(nproc)
