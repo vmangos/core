@@ -31,7 +31,7 @@ jobs:
         mkdir build
         mkdir _install
         cd build
-        sudo cmake ../ -DCMAKE_INSTALL_PREFIX=/vmangos -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=0 -DENABLE_MAILSENDER=0 -DDEBUG=0 -DSUPPORTED_CLIENT_BUILD=5875
+        sudo cmake ../ -DCMAKE_INSTALL_PREFIX=/vmangos -DWITH_WARNINGS=0 -DDEBUG_SYMBOLS=0 -DSUPPORTED_CLIENT_BUILD=5875 -DBUILD_FOR_HOST_CPU=0
         sudo make -j $(nproc)
         sudo make install
         
