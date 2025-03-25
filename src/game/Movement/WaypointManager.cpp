@@ -506,12 +506,28 @@ void WaypointManager::DeleteNode(uint32 entry, uint32 dbGuid, uint32 point, int3
     if (!path)
         return;
 
+    WaypointPath::iterator find = path->find(point);
+    if (find == path->end())
+        return;
+
+    WaypointPath::iterator findNext = path->find(point + 1);
+    while (findNext != path->end())
+    {
+        std::swap(find->second, findNext->second);
+        ++find;
+        ++findNext;
+    }
+
     char const* const table = wpOrigin == PATH_FROM_GUID ? "creature_movement" : "creature_movement_template";
     char const* const key_field = wpOrigin == PATH_FROM_GUID ? "id" : "entry";
     uint32 const key = wpOrigin == PATH_FROM_GUID ? dbGuid : entry;
     WorldDatabase.PExecuteLog("DELETE FROM %s WHERE %s=%u AND point=%u", table, key_field, key, point+1);
 
-    path->erase(point);
+    for (WaypointPath::iterator itr = path->begin(); itr != path->end(); ++itr)
+        if (itr->first > point)
+            WorldDatabase.PExecuteLog("UPDATE %s SET point=point-1 WHERE %s=%u AND point=%u", table, key_field, key, itr->first + 1);
+
+    path->erase(find->first);
 }
 
 void WaypointManager::DeletePath(uint32 id)

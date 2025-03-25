@@ -2081,9 +2081,18 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
     if (subCmd == "del")                                    // Remove WP, no additional command required
     {
         sWaypointMgr.DeleteNode(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), wpId, wpPathId, wpSource);
-
-        if (TemporarySummonWaypoint* wpCreature = dynamic_cast<TemporarySummonWaypoint*>(targetCreature))
-            wpCreature->UnSummon();
+        // Unsummon old visuals, summon new ones
+        UnsummonVisualWaypoints(m_session->GetPlayer(), wpOwner->GetObjectGuid());
+        WaypointPath const* wpPath = sWaypointMgr.GetPathFromOrigin(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), wpPathId, wpSource);
+        for (const auto& itr : *wpPath)
+        {
+            if (!Helper_CreateWaypointFor(wpOwner, wpSource, wpPathId, itr.first, &itr.second, waypointInfo))
+            {
+                PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
+                SetSentErrorMessage(true);
+                return false;
+            }
+        }
 
         if (wpPath->empty())
         {
