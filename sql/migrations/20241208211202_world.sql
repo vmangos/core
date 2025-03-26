@@ -296,6 +296,9 @@ UPDATE `skinning_loot_template` SET `ChanceOrQuestChance` = 3, `groupid` = 1 WHE
 UPDATE `skinning_loot_template` SET `ChanceOrQuestChance` = 20, `groupid` = 1 WHERE `entry` = 4397 AND `item` = 4304;
 UPDATE `skinning_loot_template` SET `ChanceOrQuestChance` = 25, `groupid` = 2 WHERE `entry` = 4397 AND `item` = 8167;
 
+-- Remove Dire Pool Object Added In Classic
+DELETE FROM `gameobject` WHERE `guid` = 1936;
+
 
 -- End of migration.
 END IF;
