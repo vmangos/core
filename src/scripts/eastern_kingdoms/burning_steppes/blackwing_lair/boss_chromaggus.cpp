@@ -57,10 +57,23 @@ enum
     SPELL_CHROMATIC_MUT_1       = 23174,                    // Spell cast on player if they get all 5 debuffs
 
     SPELL_FRENZY                = 23128,                    // 28371 The frenzy spell may be wrong
-    SPELL_ENRAGE                = 28747
+    SPELL_ENRAGE                = 28747,
+
+    SPELL_CHROMATIC_MUTATION_ONE = 23175,
+    SPELL_CHROMATIC_MUTATION_TWO = 23177,
+    SPELL_BROOD_AFFLICTION_RED   = 23168
 };
 
-static uint32 const aPossibleBreaths[MAX_BREATHS] = {SPELL_INCINERATE, SPELL_TIME_LAPSE, SPELL_CORROSIVE_ACID, SPELL_IGNITE_FLESH, SPELL_FROST_BURN};
+static constexpr uint32 aPossibleBreaths[MAX_BREATHS] =
+{
+    SPELL_INCINERATE,
+    SPELL_TIME_LAPSE,
+    SPELL_CORROSIVE_ACID,
+    SPELL_IGNITE_FLESH,
+    SPELL_FROST_BURN
+};
+
+static constexpr uint32 NUM_BREATHS = sizeof(aPossibleBreaths) / sizeof(aPossibleBreaths[0]);
 
 struct boss_chromaggusAI : public ScriptedAI
 {
@@ -73,7 +86,6 @@ struct boss_chromaggusAI : public ScriptedAI
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         if (m_pInstance)
         {
-            const static uint32 NUM_BREATHS = sizeof(aPossibleBreaths) / sizeof(aPossibleBreaths[0]);
             uint32 breaths = m_pInstance->GetData64(DATA_CHROM_BREATH);
             m_uiBreathOneSpell = aPossibleBreaths[breaths % NUM_BREATHS];
             uint32 idx2 = breaths / NUM_BREATHS;
@@ -125,8 +137,8 @@ struct boss_chromaggusAI : public ScriptedAI
         {
             if (Player* pTarget = m_creature->GetMap()->GetPlayer(guid))
             {
-                pTarget->RemoveAurasDueToSpell(23175);
-                pTarget->RemoveAurasDueToSpell(23177);
+                pTarget->RemoveAurasDueToSpell(SPELL_CHROMATIC_MUTATION_ONE);
+                pTarget->RemoveAurasDueToSpell(SPELL_CHROMATIC_MUTATION_TWO);
                 pTarget->DealDamage(pTarget, pTarget->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
         }
@@ -246,25 +258,12 @@ struct boss_chromaggusAI : public ScriptedAI
                 m_creature->RemoveAurasDueToSpell(m_uiCurrentVulnerabilitySpell);
 
             // Cast new random vurlnabilty on self
-            uint32 uiSpell;
-            switch (urand(0, 4))
-            {
-                case 0:
-                    uiSpell = SPELL_FIRE_VULNERABILITY;
-                    break;
-                case 1:
-                    uiSpell = SPELL_FROST_VULNERABILITY;
-                    break;
-                case 2:
-                    uiSpell = SPELL_SHADOW_VULNERABILITY;
-                    break;
-                case 3:
-                    uiSpell = SPELL_NATURE_VULNERABILITY;
-                    break;
-                case 4:
-                    uiSpell = SPELL_ARCANE_VULNERABILITY;
-                    break;
-            }
+            uint32 uiSpell = PickRandomValue(
+                SPELL_FIRE_VULNERABILITY,
+                SPELL_FROST_VULNERABILITY,
+                SPELL_SHADOW_VULNERABILITY,
+                SPELL_NATURE_VULNERABILITY,
+                SPELL_ARCANE_VULNERABILITY);
 
             if (DoCastSpellIfCan(m_creature, uiSpell) == CAST_OK)
             {
@@ -298,26 +297,16 @@ struct boss_chromaggusAI : public ScriptedAI
         // Affliction Timer
         if (m_uiAfflictionTimer < uiDiff)
         {
-            uint32 m_uiSpellAfflict = 0;
+            uint32 uiSpellAfflict = PickRandomValue(
+                SPELL_BROODAF_BLUE,
+                SPELL_BROODAF_BLACK,
+                SPELL_BROODAF_RED,
+                SPELL_BROODAF_BRONZE,
+                SPELL_BROODAF_GREEN);
 
-            switch (urand(0, 4))
+            if (uiSpellAfflict == SPELL_BROODAF_RED)
             {
-                case 0:
-                    m_uiSpellAfflict = SPELL_BROODAF_BLUE;
-                    break;
-                case 1:
-                    m_uiSpellAfflict = SPELL_BROODAF_BLACK;
-                    break;
-                case 2:
-                    m_uiSpellAfflict = SPELL_BROODAF_RED;
-                    m_lRedAfflictionPlayerGUID.clear();
-                    break;
-                case 3:
-                    m_uiSpellAfflict = SPELL_BROODAF_BRONZE;
-                    break;
-                case 4:
-                    m_uiSpellAfflict = SPELL_BROODAF_GREEN;
-                    break;
+                m_lRedAfflictionPlayerGUID.clear();
             }
 
             for (uint32 i = 0; i < urand(11, 15); ++i) // Affliction is applied 11-15 times per cast. Creatures such as pets can be targetted
@@ -328,9 +317,9 @@ struct boss_chromaggusAI : public ScriptedAI
                         continue;
 
                     // Cast affliction
-                    if (DoCastSpellIfCan(afflictionTarget, m_uiSpellAfflict, CF_TRIGGERED) == CAST_OK)
+                    if (DoCastSpellIfCan(afflictionTarget, uiSpellAfflict, CF_TRIGGERED) == CAST_OK)
                     {
-                        if (m_uiSpellAfflict == SPELL_BROODAF_RED && afflictionTarget->GetTypeId() == TYPEID_PLAYER)
+                        if (uiSpellAfflict == SPELL_BROODAF_RED && afflictionTarget->GetTypeId() == TYPEID_PLAYER)
                             m_lRedAfflictionPlayerGUID.push_back(afflictionTarget->GetObjectGuid());
                     }
                     // Chromatic mutation if target is effected by all afflictions
@@ -348,10 +337,10 @@ struct boss_chromaggusAI : public ScriptedAI
 
                         if (afflictionTarget->GetTypeId() == TYPEID_PLAYER) // Only players are mutated
                         {
-                                afflictionTarget->AddAura(SPELL_CHROMATIC_MUT_1, ADD_AURA_NO_OPTION, m_creature); // Main MC aura
-                                afflictionTarget->AddAura(23175); // Mod DMG 500% + Mod Haste Melee 100 + Mod Haste Spell 300
-                                afflictionTarget->AddAura(23177); // Max Health 10000 + Mod healing 1000%
-                                m_lChromaticPlayerGUID.push_back(afflictionTarget->GetObjectGuid());
+                            afflictionTarget->AddAura(SPELL_CHROMATIC_MUT_1, ADD_AURA_NO_OPTION, m_creature); // Main MC aura
+                            afflictionTarget->AddAura(SPELL_CHROMATIC_MUTATION_ONE);                          // Mod DMG 500% + Mod Haste Melee 100 + Mod Haste Spell 300
+                            afflictionTarget->AddAura(SPELL_CHROMATIC_MUTATION_TWO);                          // Max Health 10000 + Mod healing 1000%
+                            m_lChromaticPlayerGUID.push_back(afflictionTarget->GetObjectGuid());
                         }
                         else    // Pets die instantly
                             afflictionTarget->DealDamage(afflictionTarget, afflictionTarget->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
@@ -365,7 +354,7 @@ struct boss_chromaggusAI : public ScriptedAI
             m_uiAfflictionTimer -= uiDiff;
 
         // If player dies while he had the aura SPELL_BROODAF_RED
-        for (AfflictionGuids::iterator itr = m_lRedAfflictionPlayerGUID.begin(); itr != m_lRedAfflictionPlayerGUID.end();)
+        for (auto itr = m_lRedAfflictionPlayerGUID.begin(); itr != m_lRedAfflictionPlayerGUID.end();)
         {
             Player* pTarget = m_creature->GetMap()->GetPlayer(*itr);
             if (pTarget && pTarget->IsAlive() && !pTarget->HasAura(SPELL_BROODAF_RED, EFFECT_INDEX_0))
@@ -384,15 +373,15 @@ struct boss_chromaggusAI : public ScriptedAI
         }
 
         // If player dies while he had the aura SPELL_CHROMATIC_MUT_1
-        for (AfflictionGuids::iterator itr = m_lChromaticPlayerGUID.begin(); itr != m_lChromaticPlayerGUID.end();)
+        for (auto itr = m_lChromaticPlayerGUID.begin(); itr != m_lChromaticPlayerGUID.end();)
         {
             if (Player* pTarget = m_creature->GetMap()->GetPlayer(*itr))
             {
                 if (pTarget->IsDead())
                 {
-                    pTarget->RemoveAurasDueToSpell(23175);
-                    pTarget->RemoveAurasDueToSpell(23177);
-                    if (DoCastSpellIfCan(m_creature, 23168) == CAST_OK) //Heal 150000 HP
+                    pTarget->RemoveAurasDueToSpell(SPELL_CHROMATIC_MUTATION_ONE);
+                    pTarget->RemoveAurasDueToSpell(SPELL_CHROMATIC_MUTATION_TWO);
+                    if (DoCastSpellIfCan(m_creature, SPELL_BROOD_AFFLICTION_RED) == CAST_OK) // Heal 150000 HP
                         itr = m_lChromaticPlayerGUID.erase(itr);
                     break;
                 }

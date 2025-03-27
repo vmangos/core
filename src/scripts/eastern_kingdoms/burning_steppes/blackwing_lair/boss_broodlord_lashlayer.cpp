@@ -118,13 +118,15 @@ struct boss_broodlordAI : public ScriptedAI
         if (m_bMobsDesactives == on)
             return;
 
-        std::vector<uint32> mobsEntries;
-        std::vector<uint32>::iterator entriesIt;
-        mobsEntries.push_back(12459); // Blackwing Warlock
-        mobsEntries.push_back(13996); // Blackwing Technician
-        mobsEntries.push_back(12457); // Blackwing Spellbinder
-        mobsEntries.push_back(12461); // Death Talon Overseer
+        std::vector<uint32> mobsEntries =
+        {
+            NPC_BLACKWING_WARLOCK,
+            NPC_BLACKWING_TECHNICIAN,
+            NPC_BLACKWING_SPELLBINDER,
+            NPC_DEATH_TALON_OVERSEER
+        };
 
+        std::vector<uint32>::iterator entriesIt;
         for (entriesIt = mobsEntries.begin(); entriesIt != mobsEntries.end(); ++entriesIt)
         {
             std::list<Creature*> tmpMobsList;

@@ -35,62 +35,57 @@ enum
     SAY_SCEPTER_TAUNT_2             = 11216,
     SAY_SCEPTER_TAUNT_3             = 11217,
     SAY_SCEPTER_TAUNT_4             = 11218,
-    MAX_SCEPTER_TAUNTS              = 6,
-
     SAY_SCEPTER_RUN_LAUGHTER        = 11230,
-
     SAY_SCEPTER_FAIL_LAUGHTER       = 11231,
     SAY_SCEPTER_FAIL                = 11219,
 
-    GOSSIP_TEXT_NEFARIUS_1          = 7134,
-    GOSSIP_TEXT_NEFARIUS_2          = 7198,
-    GOSSIP_TEXT_NEFARIUS_3          = 7199,
+    MAX_SCEPTER_TAUNTS = 6,
+
+    // GOSSIP_TEXT_NEFARIUS_1          = 7134,
+    // GOSSIP_TEXT_NEFARIUS_2          = 7198,
+    // GOSSIP_TEXT_NEFARIUS_3          = 7199,
 
     MAX_DRAKES                      = 5,
     MAX_DRAKE_KILLED                = 42,
-    NPC_BRONZE_DRAKANOID            = 14263,
-    NPC_BLUE_DRAKANOID              = 14261,
-    NPC_RED_DRAKANOID               = 14264,
-    NPC_GREEN_DRAKANOID             = 14262,
-    NPC_BLACK_DRAKANOID             = 14265,
-    NPC_CHROMATIC_DRAKANOID         = 14302,
 
-    SPELL_NEFARIUS_BARRIER          = 22663,                // immunity in phase 1
+    SPELL_NEFARIUS_BARRIER          = 22663, // immunity in phase 1
     SPELL_SHADOWBOLT                = 22677,
     SPELL_SHADOWBOLT_VOLLEY         = 22665,
     SPELL_FEAR                      = 22678,
     SPELL_SILENCE                   = 22666,
-    SPELL_SHADOW_COMMAND            = 22667,                // charm a player
-    SPELL_SHADOW_BLINK              = 22664,                // 22681 ? // teleport around the room, possibly random
+    SPELL_SHADOW_COMMAND            = 22667, // charm a player
+    // SPELL_SHADOW_BLINK           = 22664, // 22681 ? // teleport around the room, possibly random
     SPELL_ROOT                      = 17507,
     SPELL_VISUAL_EFFECT             = 24180,
     SPELL_HOVER                     = 17131,
-
-    FACTION_MONSTER                 = 14,
-    FACTION_FRIENDLY                = 35,
-
-    GO_DRAKONID_BONES               = 179804,
-
-    NPC_NEFARIAN                    = 11583,
-
-    QUEST_NEFARIUS_CORRUPTION       = 8730
 };
+
+static constexpr uint32 aPossibleDrake[MAX_DRAKES] =
+{
+    NPC_BRONZE_DRAKANOID,
+    NPC_BLUE_DRAKANOID,
+    NPC_RED_DRAKANOID,
+    NPC_GREEN_DRAKANOID,
+    NPC_BLACK_DRAKANOID
+};
+
+static constexpr uint32 MAX_SCEPTER_RUN_TIME   = 5 * HOUR * IN_MILLISECONDS ;
+static constexpr uint32 SCEPTER_TAUNT_INTERVAL = MAX_SCEPTER_RUN_TIME / MAX_SCEPTER_TAUNTS;
+static constexpr uint32 SCEPTER_TAUNT_OFFSET   =  SCEPTER_TAUNT_INTERVAL / 2;
 
 struct SpawnLocation
 {
     float m_fX, m_fY, m_fZ;
 };
 
-static SpawnLocation const aNefarianLocs[5] =
+static constexpr SpawnLocation const aNefarianLocs[5] =
 {
-    { -7599.32f, -1191.72f, 475.545f},                      // opening where red/blue/black darknid spawner appear (ori 3.05433)
-    { -7526.27f, -1135.04f, 473.445f},                      // same as above, closest to door (ori 5.75959)
-    { -7515.644f, -1222.698f, 534.7169f},                    // nefarian spawn location (ori 1.798)
-    { -7592.0f, -1264.0f, 481.0f},                          // hide pos (useless; remove this)
-    { -7502.002f, -1256.503f, 486.758f}                    // nefarian fly to this position
+    { -7599.32f,  -1191.72f,  475.545f }, // opening where red/blue/black darknid spawner appear (ori 3.05433)
+    { -7526.27f,  -1135.04f,  473.445f }, // same as above, closest to door (ori 5.75959)
+    { -7515.644f, -1222.698f, 534.7169f}, // nefarian spawn location (ori 1.798)
+    { -7592.0f,   -1264.0f,   481.0f   }, // hide pos (useless; remove this)
+    { -7502.002f, -1256.503f, 486.758f }  // nefarian fly to this position
 };
-
-static uint32 const aPossibleDrake[MAX_DRAKES] = {NPC_BRONZE_DRAKANOID, NPC_BLUE_DRAKANOID, NPC_RED_DRAKANOID, NPC_GREEN_DRAKANOID, NPC_BLACK_DRAKANOID};
 
 //This script is complicated
 //Instead of morphing Victor Nefarius we will have him control phase 1
@@ -127,10 +122,6 @@ struct boss_victor_nefariusAI : ScriptedAI
         boss_victor_nefariusAI::Reset();
     }
 
-    uint32 const MAX_SCEPTER_RUN_TIME = 5 * HOUR * IN_MILLISECONDS;
-    uint32 const SCEPTER_TAUNT_INTERVAL = MAX_SCEPTER_RUN_TIME / MAX_SCEPTER_TAUNTS;
-    uint32 const SCEPTER_TAUNT_OFFSET = SCEPTER_TAUNT_INTERVAL / 2;
-
     ScriptedInstance* m_pInstance;
 
     uint32 m_uiKilledAdds;
@@ -142,7 +133,7 @@ struct boss_victor_nefariusAI : ScriptedAI
     uint32 m_uiSilenceTimer;
     uint32 m_uiMindControlTimer;
     uint32 m_uiShadowBlinkTimer;
-    uint32 m_uiResetTimer;
+    // uint32 m_uiResetTimer;
     uint32 m_uiDrakeTypeOne;
     uint32 m_uiDrakeTypeTwo;
     uint32 m_uiEventTimer;
@@ -173,7 +164,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         m_uiSilenceTimer          = 20000;
         m_uiMindControlTimer      = 25000;
         m_uiShadowBlinkTimer      = 1000;
-        m_uiResetTimer            = 15 * MINUTE * IN_MILLISECONDS;
+        // m_uiResetTimer         = 15 * MINUTE * IN_MILLISECONDS;
         scepterRunTime            = 0;
         nextScepterTauntTime      = 0;
         scepterTauntID            = 0;
@@ -181,14 +172,14 @@ struct boss_victor_nefariusAI : ScriptedAI
         m_uiMindControledPlayerGuid.Clear();
         m_uiMindControledPlayerAggro = 0;
 
-        m_uiEventTimer = 1000;
-        blaBlaCount = 0;
-        NefaEventStart = false;
-        phase1 = false;
-        phase2 = false;
-        phase2bis = false;
-        Smoke = false;
-        scepterRun = false;
+        m_uiEventTimer  = 1000;
+        blaBlaCount     = 0;
+        NefaEventStart  = false;
+        phase1          = false;
+        phase2          = false;
+        phase2bis       = false;
+        Smoke           = false;
+        scepterRun      = false;
         watchScepterRun = false;
 
         m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
@@ -228,7 +219,6 @@ struct boss_victor_nefariusAI : ScriptedAI
             // Restore time to next taunt
             nextScepterTauntTime  = SCEPTER_TAUNT_INTERVAL - (elapsedTime % SCEPTER_TAUNT_INTERVAL);
         }
-
     }
 
     void StartScepterRun()
@@ -292,7 +282,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         // Despawn self when Nefarian is killed
         if (pSummoned->GetEntry() == NPC_NEFARIAN)
         {
-            if (nullptr == m_pInstance)
+            if (!m_pInstance)
                 return;
 
             uint32 scepterRunResult = FAIL;
@@ -613,7 +603,7 @@ struct boss_victor_nefariusAI : ScriptedAI
 
     void FailScepterRun()
     {
-        if (nullptr == m_pInstance)
+        if (!m_pInstance)
             return;
 
         scepterRun =  false;

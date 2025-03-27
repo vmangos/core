@@ -26,12 +26,6 @@ EndScriptData */
 
 enum
 {
-    NPC_VAELASTRAZ              = 13020,
-    NPC_LORD_NEFARIAN_VAEL      = 10162,
-
-    // Emotes
-    // ------
-
     SAY_LINE_1                  = 9886,
     SAY_LINE_2                  = 9887,
     SAY_LINE_3                  = 9888,
@@ -72,22 +66,17 @@ enum
     SPELL_BANISHEMENT_OF_SCALE  = 16404,
     SPELL_NEFARIUS_CORRUPTION   = 23642,
 
-    FACTION_MONSTER             = 14,
-    FACTION_FRIENDLY            = 35,
-
     MODEL_INVISIBLE             = 11686,
 
     GOSSIP_TEXT_VAEL_1          = 7156,
     GOSSIP_TEXT_VAEL_2          = 7256,
 
-    QUEST_NEFARIUS_CORRUPTION   = 8730
+    GOSSIP_ITEM_VAEL_1          = 9847,  // I cannot, Vaelastrasz! Surely something can be done to heal you!
+    GOSSIP_ITEM_VAEL_2          = 10011, // Vaelastrasz, no!!!
 };
 
 // Coords used to spawn Nefarius at the throne
-static float const aNefariusSpawnLoc[4] = { -7466.16f, -1040.80f, 412.053f, 2.14675f};
-
-#define GOSSIP_ITEM_VAEL_1         "I cannot, Vaelastrasz! Surely something can be done to heal you!"
-#define GOSSIP_ITEM_VAEL_2         "Vaelastrasz, no!!!"
+static constexpr float aNefariusSpawnLoc[4] = { -7466.16f, -1040.80f, 412.053f, 2.14675f};
 
 struct boss_vaelAI : public ScriptedAI
 {
@@ -155,7 +144,9 @@ struct boss_vaelAI : public ScriptedAI
 
     void BeginSpeech(Unit* target)
     {
-        ASSERT(target);
+        if (!target)
+            return;
+
         // Stand up and begin speech
         m_playerGuid = target->GetObjectGuid();
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
@@ -167,7 +158,7 @@ struct boss_vaelAI : public ScriptedAI
         m_uiSpeechNum = 0;
         m_bIsDoingSpeech = true;
 
-        if (nullptr == m_pInstance)
+        if (!m_pInstance)
             return;
 
         // If Nefarius's Corruption has not been accepted by this point, fail Scepter Run
@@ -245,7 +236,7 @@ struct boss_vaelAI : public ScriptedAI
                 switch (m_uiIntroPhase)
                 {
                 case 0:
-                    if (Creature *pNefarius = m_creature->SummonCreature(NPC_LORD_NEFARIAN_VAEL, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 25000, false, 25000, [](Creature* pCreature) { pCreature->GetMotionMaster()->MoveIdle(); pCreature->SetAI(new NullCreatureAI(pCreature));}))
+                    if (Creature *pNefarius = m_creature->SummonCreature(NPC_LORD_NEFARIAN, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 25000, false, 25000, [](Creature* pCreature) { pCreature->GetMotionMaster()->MoveIdle(); pCreature->SetAI(new NullCreatureAI(pCreature));}))
                     {
                         pNefarius->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         m_nefariusGuid = pNefarius->GetObjectGuid();
@@ -483,25 +474,25 @@ bool QuestAccept_vaelastrasz(Player* pPlayer, Creature* pCreature, Quest const* 
 {
     ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
 
-    if (nullptr == m_pInstance)
+    if (!m_pInstance)
         return false;
 
     if (pQuest->GetQuestId() == QUEST_NEFARIUS_CORRUPTION)
     {
-            // Only one may accept
-            if (m_pInstance->GetData(TYPE_SCEPTER_RUN) != NOT_STARTED)
-            {
-                pPlayer->FailQuest(QUEST_NEFARIUS_CORRUPTION);
-                return false;
-            }
+        // Only one may accept
+        if (m_pInstance->GetData(TYPE_SCEPTER_RUN) != NOT_STARTED)
+        {
+            pPlayer->FailQuest(QUEST_NEFARIUS_CORRUPTION);
+            return false;
+        }
 
-            m_pInstance->SetData(TYPE_SCEPTER_RUN, SPECIAL);
-            m_pInstance->SetData(DATA_SCEPTER_CHAMPION, pPlayer->GetObjectGuid());
+        m_pInstance->SetData(TYPE_SCEPTER_RUN, SPECIAL);
+        m_pInstance->SetData(DATA_SCEPTER_CHAMPION, pPlayer->GetObjectGuid());
 
-            // Permanently bind player to instance
-            pCreature->GetMap()->BindToInstanceOrRaid(pPlayer, pCreature->GetRespawnTimeEx(), true);
+        // Permanently bind player to instance
+        pCreature->GetMap()->BindToInstanceOrRaid(pPlayer, pCreature->GetRespawnTimeEx(), true);
 
-            return true;
+        return true;
     }
 
     return false;
@@ -518,10 +509,6 @@ CreatureAI* GetAI_boss_vael(Creature* pCreature)
 
 enum
 {
-    MOB_RONGE_GRIFFEMORT        = 12464,
-    MOB_WYRMIDE_GRIFFEMORT      = 12465,
-    MOB_FLAMMECAILLE_GRIFFEMORT = 12463,
-
     SPELL_MARK_DETONATION       = 22438,
     SPELL_MARK_FLAMES           = 25050,
     SPELL_COMMANDING_SHOUT      = 22440,
@@ -579,10 +566,10 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
 
     void SetAuraFlames(bool on)
     {
-        std::list<Creature *> lCreature;
-        GetCreatureListWithEntryInGrid(lCreature, m_creature, MOB_FLAMMECAILLE_GRIFFEMORT, 50.0f);
-        GetCreatureListWithEntryInGrid(lCreature, m_creature, MOB_WYRMIDE_GRIFFEMORT, 50.0f);
-        GetCreatureListWithEntryInGrid(lCreature, m_creature, MOB_RONGE_GRIFFEMORT, 50.0f);
+        std::list<Creature*> lCreature;
+        GetCreatureListWithEntryInGrid(lCreature, m_creature, NPC_DEATH_TALON_FLAMESCALE, 50.0f);
+        GetCreatureListWithEntryInGrid(lCreature, m_creature, NPC_DEATH_TALON_WYRMKIN,    50.0f);
+        GetCreatureListWithEntryInGrid(lCreature, m_creature, NPC_DEATH_TALON_SEETHER,    50.0f);
 
         for (const auto& itr : lCreature)
         {
