@@ -206,11 +206,11 @@ void CreatureAI::ClearTargetIcon()
     std::unordered_set<Group*> instanceGroups;
 
     // Clear target icon for every unique group in instance
-    for (const auto& player : players)
+    for (auto const& player : players)
     {
         if (Group* pGroup = player.getSource()->GetGroup())
         {
-            const auto& result = instanceGroups.insert(pGroup);
+            auto const& result = instanceGroups.insert(pGroup);
 
             if (result.second)
             {
