@@ -17,15 +17,7 @@
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
 
-struct EggCoords
-{
-    float X;
-    float Y;
-    float Z;
-    float O;
-};
-
-static constexpr EggCoords EggSpawnCoords[] =
+static const Position EggSpawnCoords[] =
 {
     {-7579.49f, -1051.48f, 408.157f, 0.523599f},
     {-7563.15f, -1088.71f, 413.381f, -0.453786f},
@@ -864,7 +856,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         }
         for (const auto& position : EggSpawnCoords)
         {
-            pCreature->SummonGameObject(GO_BLACK_DRAGON_EGG, position.X, position.Y, position.Z, position.O);
+            pCreature->SummonGameObject(GO_BLACK_DRAGON_EGG, position.x, position.y, position.z, position.o);
         }
     }
 
