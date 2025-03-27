@@ -212,7 +212,7 @@ void CreatureAI::ClearTargetIcon()
         {
             const auto& result = instanceGroups.insert(pGroup);
 
-            if (result->second)
+            if (result.second)
             {
                 pGroup->ClearTargetIcon(m_creature->GetObjectGuid());
             }
