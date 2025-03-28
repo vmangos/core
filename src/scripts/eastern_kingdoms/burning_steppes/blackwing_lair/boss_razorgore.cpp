@@ -356,7 +356,6 @@ struct trigger_orb_of_commandAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
 
     uint32 m_uiPopTimer;
-    uint32 m_uiCheckTimer;
     bool m_uiRazorgorePhase;
     bool m_uiCombatStarted;
     ObjectGuid m_uiPossesseurGuid;
@@ -365,7 +364,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
     {
         m_uiPopTimer       = 45000; // Timer confirmed by BigWigs
         m_uiRazorgorePhase = true;
-        m_uiCombatStarted = false;
+        m_uiCombatStarted  = false;
         m_uiPossesseurGuid.Clear();
     }
 
