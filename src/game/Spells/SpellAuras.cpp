@@ -2131,6 +2131,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             switch (GetId())
             {
                 case 6606:                                  // Self Visual - Sleep Until Cancelled (DND)
+                case 16093:
+                case 14915:
                 {
                     if (apply)
                     {
@@ -2143,32 +2145,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                     return;
                 }
-				case 16093:                                  // Self Visual - Sleep Until Cancelled (DND)
-                {
-                    if (apply)
-                    {
-                        target->m_Events.AddLambdaEventAtOffset([target]
-                        {
-                            target->HandleEmoteState(EMOTE_STATE_SLEEP);
-                            target->SetStandState(UNIT_STAND_STATE_SLEEP);
-                        }, 500);
-                    }
-
-                    return;
-                }
-				case 14915:                                  // Self Visual - Sleep Until Cancelled (DND)
-                {
-                    if (apply)
-                    {
-                        target->m_Events.AddLambdaEventAtOffset([target]
-                        {
-                            target->HandleEmoteState(EMOTE_STATE_SLEEP);
-                            target->SetStandState(UNIT_STAND_STATE_SLEEP);
-                        }, 500);
-                    }
-
-                    return;
-                }
+				
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
                 case 24658:                                 // Unstable Power
                 {
