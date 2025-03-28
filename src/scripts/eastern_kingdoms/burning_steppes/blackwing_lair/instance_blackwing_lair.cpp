@@ -532,8 +532,13 @@ struct instance_blackwing_lair : public ScriptedInstance
             case NPC_DEATH_TALON_SEETHER:
             case NPC_DEATH_TALON_WYRMKIN:
             case NPC_DEATH_TALON_FLAMESCALE:
+            {
                 if (m_auiEncounter[TYPE_LASHLAYER] == DONE)
-                    pCreature->DeleteLater();/*
+                {
+                    pCreature->DeleteLater();
+                }
+                /*
+
                 else switch (urand(0, 3))
                 {
                     case 0:
@@ -542,8 +547,10 @@ struct instance_blackwing_lair : public ScriptedInstance
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_FROST_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
-                        }*/
+                }
+                */
                 break;
+            }
             case NPC_DEATH_TALON_CAPTAIN:
             case NPC_DEATH_TALON_HATCHER:
             case NPC_BLACKWING_TASKMASTER:
@@ -591,178 +598,233 @@ struct instance_blackwing_lair : public ScriptedInstance
     {
         switch (uiType)
         {
-        case DATA_SCEPTER_RUN_TIME:
-            m_auiData[DATA_SCEPTER_RUN_TIME] = uiData;
-            break;
-
-        case TYPE_RAZORGORE:
-            m_auiEncounter[TYPE_RAZORGORE] = uiData;
-            if (uiData == IN_PROGRESS)
+            case DATA_SCEPTER_RUN_TIME:
             {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
-                {
-                    if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
-                }
+                m_auiData[DATA_SCEPTER_RUN_TIME] = uiData;
+                break;
             }
-            else if (uiData == FAIL)
+            case TYPE_RAZORGORE:
             {
-                m_auiData[DATA_HOW_EGG] = 0;
-                RespawnEggs();
-                SetData(DATA_EGG, FAIL);
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
+                m_auiEncounter[TYPE_RAZORGORE] = uiData;
+                if (uiData == IN_PROGRESS)
                 {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
-                }
-            }
-            else if (uiData == DONE)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
-                }
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
-                }
-                for (const auto& guid : m_lVaelGobs)
-                {
-                    if (Creature *pCreature = instance->GetCreature(guid))
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
                     {
-                        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                    }
-                }
-            }
-            break;
-        case TYPE_VAELASTRASZ:
-            m_auiEncounter[TYPE_VAELASTRASZ] = uiData;
-            if (uiData == IN_PROGRESS)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
-                {
-                    if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
-                }
-            }
-            else if (uiData == DONE)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
-                }
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_VAELASTRASZ]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_VAELASTRASZ]);
-                }
-            }
-            else if (uiData == FAIL)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
-                }
-            }
-            break;
-        case TYPE_LASHLAYER:
-            m_auiEncounter[TYPE_LASHLAYER] = uiData;
-            if (uiData == DONE)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_LASHLAYER]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_LASHLAYER]);
-                }
-            }
-            break;
-        case TYPE_FIREMAW:
-            m_auiEncounter[TYPE_FIREMAW] = uiData;
-            break;
-        case TYPE_EBONROC:
-            m_auiEncounter[TYPE_EBONROC] = uiData;
-            break;
-        case TYPE_FLAMEGOR:
-            m_auiEncounter[TYPE_FLAMEGOR] = uiData;
-            break;
-        case TYPE_CHROMAGGUS:
-            m_auiEncounter[TYPE_CHROMAGGUS] = uiData;
-            if (uiData == DONE)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_CHROMAGGUS_EXIT]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_CHROMAGGUS_EXIT]);
-                }
-            }
-            break;
-        case TYPE_NEFARIAN:
-            m_auiEncounter[TYPE_NEFARIAN] = uiData;
-            if (uiData == DONE || uiData == FAIL)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_NEFARIAN]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_NEFARIAN]);
-                }
-            }
-            if (uiData == IN_PROGRESS)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_NEFARIAN]))
-                {
-                    if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_NEFARIAN]);
-                }
-            }
-            break;
-        case TYPE_VAEL_EVENT:
-            m_auiEncounter[TYPE_VAEL_EVENT] = uiData;
-            if (uiData == DONE)
-            {
-                bool bYelled = false;
-                for (const auto& guid : m_lVaelGobs)
-                {
-                    if (Creature *pCreature = instance->GetCreature(guid))
-                    {
-                        if (!bYelled)
+                        if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
                         {
-                            bYelled = true;
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
                         }
-                        pCreature->MonsterMoveWithSpeed(-7608.0f, -888.0f, 432.0f, 10.0f, pCreature->GetSpeed(MOVE_RUN), uint32(MOVE_PATHFINDING));
                     }
                 }
+                else if (uiData == FAIL)
+                {
+                    m_auiData[DATA_HOW_EGG] = 0;
+                    RespawnEggs();
+                    SetData(DATA_EGG, FAIL);
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
+                        }
+                    }
+                }
+                else if (uiData == DONE)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
+                        }
+                    }
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
+                        }
+                    }
+                    for (const auto& guid : m_lVaelGobs)
+                    {
+                        if (Creature* pCreature = instance->GetCreature(guid))
+                        {
+                            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+                        }
+                    }
+                }
+                break;
             }
-            break;
-        case DATA_EGG:
-            if (uiData == IN_PROGRESS)
+            case TYPE_VAELASTRASZ:
             {
-                if (++m_auiData[DATA_HOW_EGG] >= EGGS_COUNT)
-                    m_auiData[DATA_EGG] = DONE;
+                m_auiEncounter[TYPE_VAELASTRASZ] = uiData;
+                if (uiData == IN_PROGRESS)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
+                    {
+                        if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
+                        }
+                    }
+                }
+                else if (uiData == DONE)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
+                        }
+                    }
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_VAELASTRASZ]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_VAELASTRASZ]);
+                        }
+                    }
+                }
+                else if (uiData == FAIL)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
+                        }
+                    }
+                }
+                break;
             }
-            else if (uiData == FAIL)
+            case TYPE_LASHLAYER:
             {
-                if (Creature *pCreature = instance->GetCreature(m_auiData[DATA_TRIGGER_GUID]))
-                    pCreature->DeleteLater();
-                m_auiData[DATA_TRIGGER_GUID] = 0;
-                m_auiData[DATA_EGG] = FAIL;
+                m_auiEncounter[TYPE_LASHLAYER] = uiData;
+                if (uiData == DONE)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_LASHLAYER]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_LASHLAYER]);
+                        }
+                    }
+                }
+                break;
             }
-            break;
-
-        case TYPE_SCEPTER_RUN:
-            m_auiEncounter[TYPE_SCEPTER_RUN] = uiData;
-            break;
-
-        case DATA_SCEPTER_CHAMPION:
-            m_auiData[DATA_SCEPTER_CHAMPION] = uiData;
-            break;
-        case GOSSIP_OPTION_NEFARIUS:
-            if (Creature* pCreature = GetCreature(m_auiData[DATA_NEFARIUS_GUID]))
-                NefariusGossipOptionClicked(pCreature);
-            break;
+            case TYPE_FIREMAW:
+            {
+                m_auiEncounter[TYPE_FIREMAW] = uiData;
+                break;
+            }
+            case TYPE_EBONROC:
+            {
+                m_auiEncounter[TYPE_EBONROC] = uiData;
+                break;
+            }
+            case TYPE_FLAMEGOR:
+            {
+                m_auiEncounter[TYPE_FLAMEGOR] = uiData;
+                break;
+            }
+            case TYPE_CHROMAGGUS:
+            {
+                m_auiEncounter[TYPE_CHROMAGGUS] = uiData;
+                if (uiData == DONE)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_CHROMAGGUS_EXIT]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_CHROMAGGUS_EXIT]);
+                        }
+                    }
+                }
+                break;
+            }
+            case TYPE_NEFARIAN:
+            {
+                m_auiEncounter[TYPE_NEFARIAN] = uiData;
+                if (uiData == DONE || uiData == FAIL)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_NEFARIAN]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_NEFARIAN]);
+                        }
+                    }
+                }
+                if (uiData == IN_PROGRESS)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_NEFARIAN]))
+                    {
+                        if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_NEFARIAN]);
+                        }
+                    }
+                }
+                break;
+            }
+            case TYPE_VAEL_EVENT:
+            {
+                m_auiEncounter[TYPE_VAEL_EVENT] = uiData;
+                if (uiData == DONE)
+                {
+                    bool bYelled = false;
+                    for (const auto& guid : m_lVaelGobs)
+                    {
+                        if (Creature* pCreature = instance->GetCreature(guid))
+                        {
+                            if (!bYelled)
+                            {
+                                bYelled = true;
+                            }
+                            pCreature->MonsterMoveWithSpeed(-7608.0f, -888.0f, 432.0f, 10.0f, pCreature->GetSpeed(MOVE_RUN), uint32(MOVE_PATHFINDING));
+                        }
+                    }
+                }
+                break;
+            }
+            case DATA_EGG:
+            {
+                if (uiData == IN_PROGRESS)
+                {
+                    if (++m_auiData[DATA_HOW_EGG] >= EGGS_COUNT)
+                    {
+                        m_auiData[DATA_EGG] = DONE;
+                    }
+                }
+                else if (uiData == FAIL)
+                {
+                    if (Creature* pCreature = instance->GetCreature(m_auiData[DATA_TRIGGER_GUID]))
+                    {
+                        pCreature->DeleteLater();
+                    }
+                    m_auiData[DATA_TRIGGER_GUID] = 0;
+                    m_auiData[DATA_EGG] = FAIL;
+                }
+                break;
+            }
+            case TYPE_SCEPTER_RUN:
+            {
+                m_auiEncounter[TYPE_SCEPTER_RUN] = uiData;
+                break;
+            }
+            case DATA_SCEPTER_CHAMPION:
+            {
+                m_auiData[DATA_SCEPTER_CHAMPION] = uiData;
+                break;
+            }
+            case GOSSIP_OPTION_NEFARIUS:
+            {
+                if (Creature* pCreature = GetCreature(m_auiData[DATA_NEFARIUS_GUID]))
+                {
+                    NefariusGossipOptionClicked(pCreature);
+                }
+                break;
+            }
         }
 
         if (uiData == DONE || TYPE_SCEPTER_RUN == uiType || DATA_SCEPTER_CHAMPION == uiData)
@@ -783,24 +845,28 @@ struct instance_blackwing_lair : public ScriptedInstance
 
     bool CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const override
     {
-        ObjectGuid scepterChampion = m_auiData[DATA_SCEPTER_CHAMPION];
+        uint64 scepterChampion = m_auiData[DATA_SCEPTER_CHAMPION];
 
         // No scepter run attempted
-        if (scepterChampion.IsEmpty())
+        if (scepterChampion == 0)
             return false;
 
         // On scepter "alternate success", give everyone a copy of "From the Desk of Lord Victor Nefarius"
-        if (CONDITION_SCEPTER_FAIL == instance_condition_id)
+        if (instance_condition_id == CONDITION_SCEPTER_FAIL)
         {
-            if (FAIL == m_auiEncounter[TYPE_SCEPTER_RUN])
+            if (m_auiEncounter[TYPE_SCEPTER_RUN] == FAIL)
+            {
                 return true;
+            }
         }
 
         // A true champion. Reward only this one with the Red Scepter Shard
-        if (CONDITION_SCEPTER_WIN == instance_condition_id)
-        { 
-            if (DONE == m_auiEncounter[TYPE_SCEPTER_RUN] && player->GetGUID() == scepterChampion)
+        if (instance_condition_id == CONDITION_SCEPTER_WIN)
+        {
+            if ((m_auiEncounter[TYPE_SCEPTER_RUN] == DONE) && (scepterChampion == player->GetGUID()))
+            {
                 return true;
+            }
         }
 
         return false;
@@ -1071,9 +1137,6 @@ bool AreaTrigger_at_enter_vael_room(Player *pPlayer, AreaTriggerEntry const* pAt
 
 enum
 {
-    NPC_OVERSEER                = 12461,
-    NPC_WYRMGUARD               = 12460,
-
     SPELL_CLEAVE                = 15284,
     SPELL_WARSTOMP              = 24375,
     SPELL_FIREBLAST             = 20623,
@@ -1365,7 +1428,6 @@ CreatureAI* GetAI_npc_corrupted_whelp(Creature* pCreature)
 {
     return new CorruptedWhelpAI(pCreature);
 }
-
 
 void AddSC_instance_blackwing_lair()
 {

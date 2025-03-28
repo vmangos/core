@@ -18,19 +18,19 @@
 #include "blackwing_lair.h"
 
 // Razorgore Phase 2 Script
-enum
+enum Razorgore : uint32
 {
-    SAY_FREE                   = 7980,
-    EMOTE_FLEE                 = 9592,
+    SAY_FREE              = 7980,
+    EMOTE_FLEE            = 9592,
 
-    SPELL_CLEAVE               = 19632,
-    SPELL_WARSTOMP             = 24375,
-    SPELL_FIREBALL_VOLLEY      = 22425,
-    SPELL_CONFLAGRATION        = 23023,
-    SPELL_SUMMON_PLAYER        = 24776,
-    MODEL_INVISIBLE            = 11686,
+    SPELL_CLEAVE          = 19632,
+    SPELL_WARSTOMP        = 24375,
+    SPELL_FIREBALL_VOLLEY = 22425,
+    SPELL_CONFLAGRATION   = 23023,
+    SPELL_SUMMON_PLAYER   = 24776,
+    MODEL_INVISIBLE       = 11686,
 
-    SPELL_EXPLOSION            = 20038,             // TODO : better use?
+    SPELL_EXPLOSION       = 20038, // TODO : better use?
 };
 
 // North
@@ -95,7 +95,7 @@ struct boss_razorgoreAI : public ScriptedAI
     void Reset() override
     {
         SetCombatMovement(true);
-        m_uiCleaveTimer         = 9000;                       // These times are probably wrong
+        m_uiCleaveTimer         = 9000; // These times are probably wrong
         m_uiWarStompTimer       = 22000;
         m_uiConflagrationTimer  = 12000;
         m_uiFireballVolleyTimer = 7000;
@@ -143,12 +143,13 @@ struct boss_razorgoreAI : public ScriptedAI
 
     void MortPhaseUn()
     {
-        DEBUG_RAZOR("MortPhaseUn");
-        Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (const auto& i : liste)
+        Map::PlayerList const& playerList = m_creature->GetMap()->GetPlayers();
+        for (auto const& player : playerList)
         {
-            if (i.getSource() && i.getSource()->IsAlive())
-                i.getSource()->CastSpell(i.getSource(), SPELL_EXPLOSION, true);
+            if (player.getSource() && player.getSource()->IsAlive())
+            {
+                player.getSource()->CastSpell(player.getSource(), SPELL_EXPLOSION, true);
+            }
         }
 
         if (m_pInstance)
@@ -160,7 +161,6 @@ struct boss_razorgoreAI : public ScriptedAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        DEBUG_RAZOR("Razor JustDied");
         if (m_pInstance)
         {
             if (m_pInstance->GetData64(DATA_EGG) == DONE)
@@ -235,8 +235,6 @@ struct boss_razorgoreAI : public ScriptedAI
         float x, y, z, o;
         m_creature->GetRespawnCoord(x, y, z, &o);
         m_creature->NearTeleportTo(x, y, z, o);
-
-        DEBUG_RAZOR("Initial situation");
     }
 
     void EvadeTroops()
@@ -296,7 +294,6 @@ struct boss_razorgoreAI : public ScriptedAI
         {
             if (m_uiOutOfReachTimer < uiDiff)
             {
-                DEBUG_EMOTE("summon");
                 if (m_creature->TryToCast(m_creature->GetVictim(), SPELL_SUMMON_PLAYER, CF_TRIGGERED, 100) == SPELL_CAST_OK)
                     m_uiOutOfReachTimer = 10000;
             }
@@ -306,7 +303,6 @@ struct boss_razorgoreAI : public ScriptedAI
 
         if (m_uiCleaveTimer < uiDiff)
         {
-            DEBUG_EMOTE("cleave");
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(5000, 10000);
         }
@@ -316,7 +312,6 @@ struct boss_razorgoreAI : public ScriptedAI
         // War Stomp
         if (m_uiWarStompTimer < uiDiff)
         {
-            DEBUG_EMOTE("War stomp");
             if (DoCastSpellIfCan(m_creature, SPELL_WARSTOMP) == CAST_OK)
                 m_uiWarStompTimer = urand(25000, 45000);
         }
@@ -326,7 +321,6 @@ struct boss_razorgoreAI : public ScriptedAI
         // Fireball Volley
         if (m_uiFireballVolleyTimer < uiDiff)
         {
-            DEBUG_EMOTE("FB");
             if (DoCastSpellIfCan(m_creature, SPELL_FIREBALL_VOLLEY) == CAST_OK)
                 m_uiFireballVolleyTimer = urand(15000, 20000);
         }
@@ -336,7 +330,6 @@ struct boss_razorgoreAI : public ScriptedAI
         // Conflagration
         if (m_uiConflagrationTimer < uiDiff)
         {
-            DEBUG_RAZOR("confl");
             if (DoCastSpellIfCan(m_creature, SPELL_CONFLAGRATION) == CAST_OK)
                 m_uiConflagrationTimer = urand(15000, 25000);
         }
@@ -344,11 +337,6 @@ struct boss_razorgoreAI : public ScriptedAI
             m_uiConflagrationTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
-    }
-
-    void GetAIInformation(ChatHandler& handler) override
-    {
-        handler.PSendSysMessage("* CombatMovement : %s", IsCombatMovementEnabled() ? "YES" : "NO");
     }
 };
 
@@ -375,12 +363,10 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
     void Reset() override
     {
-        m_uiPopTimer = 45000; // Timer confirmed by BigWigs
-        m_uiCheckTimer = 5000;
+        m_uiPopTimer       = 45000; // Timer confirmed by BigWigs
         m_uiRazorgorePhase = true;
         m_uiCombatStarted = false;
         m_uiPossesseurGuid.Clear();
-        DEBUG_RAZOR("Reset NPC orb");
     }
 
     void PhaseSwitch()
@@ -388,7 +374,6 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        DEBUG_RAZOR("Passage en P2");
         DoScriptText(EMOTE_FLEE, m_creature);
 
         std::list<Creature*> lCreatureNear;
@@ -468,18 +453,28 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         switch (uiType)
         {
             case 1:
+            {
                 uiID = NPC_BLACKWING_LEGGIONAIRE;
-                if (rand() % 2)
+                if (urand(0, 1))
+                {
                     bSpawnTwo = true;
+                }
                 break;
+            }
             case 2:
+            {
                 uiID = NPC_BLACKWING_MAGE;
-                if (rand() % 2)
+                if (urand(0, 1))
+                {
                     bSpawnTwo = true;
+                }
                 break;
+            }
             case 3:
+            {
                 uiID = NPC_DEATH_TALON_DRAGONSPAWN;
                 break;
+            }
         }
 
         if (!bSpawnTwo)
@@ -592,8 +587,6 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                     }
                 }
             }
-            else
-                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
         }
 
         if (m_uiRazorgorePhase && m_uiCombatStarted)
@@ -610,7 +603,6 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                     if (!m_uiPossesseurGuid)
                     {
                         m_uiPossesseurGuid = pRazorgore->GetCharmerGuid();
-                        DEBUG_RAZOR("Possessed by %s", pRazorgore->GetCharmerGuid().GetString().c_str());
                         ((ScriptedAI*)pRazorgore->AI())->SetCombatMovement(false);
                         pRazorgore->GetMotionMaster()->Initialize();
                         pRazorgore->StopMoving();
@@ -669,12 +661,9 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                         pRazorgore->SetInCombatWithZone();
                         m_uiPossesseurGuid.Clear();
                     }
-                    else
-                        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MC/Razor] Unable to find the controller (%s)", m_uiPossesseurGuid.GetString().c_str());
                 }
             }
-            else
-                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
+
             if (m_uiPopTimer < uiDiff)
             {
                 for (uint8 i = 0; i < 4; ++i)

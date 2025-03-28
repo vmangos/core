@@ -14,17 +14,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Broodlord_Lashlayer
-SD%Complete: 100
-SDComment:
-SDCategory: Blackwing Lair
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
 
-enum
+enum Broodlord : uint32
 {
     SAY_AGGRO                   = 9967,
     SAY_LEASH                   = 9968,
@@ -64,7 +57,7 @@ struct boss_broodlordAI : public ScriptedAI
 
     void Reset() override
     {
-        m_uiCleaveTimer         = 8000;                     // These times are probably wrong
+        m_uiCleaveTimer         = 8000; // These times are probably wrong
         m_uiBlastWaveTimer      = 20000;
         m_uiMortalStrikeTimer   = 25000;
         m_uiKnockAwayTimer      = urand(20000, 25000);

@@ -14,22 +14,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Firemaw
-SD%Complete: 80
-SDComment: Thrash missing
-SDCategory: Blackwing Lair
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
 
-enum
+enum Firemaw : uint32
 {
-    SPELL_SHADOW_FLAME          = 22539,
-    SPELL_WING_BUFFET           = 23339,
-    SPELL_FLAME_BUFFET          = 23341,
-    SPELL_THRASH                = 3391,
+    SPELL_SHADOW_FLAME  = 22539,
+    SPELL_WING_BUFFET   = 23339,
+    SPELL_FLAME_BUFFET  = 23341,
+    SPELL_THRASH        = 3391,
 };
 
 struct boss_firemawAI : public ScriptedAI
@@ -49,7 +42,7 @@ struct boss_firemawAI : public ScriptedAI
     void Reset() override
     {
         m_uiShadowFlameTimer = 16000;
-        m_uiWingBuffetTimer = 30000;
+        m_uiWingBuffetTimer  = 30000;
         m_uiFlameBuffetTimer = 2000;
     }
 
@@ -116,8 +109,13 @@ struct boss_firemawAI : public ScriptedAI
         else
             m_uiFlameBuffetTimer -= uiDiff;
 
-        if (m_creature->IsAttackReady() && !urand(0, 2))
-            DoCastSpellIfCan(m_creature, SPELL_THRASH);
+        if (m_creature->IsAttackReady() && m_creature->IsNonMeleeSpellCasted(true))
+        {
+            if (!urand(0, 2))
+            {
+                DoCastSpellIfCan(m_creature, SPELL_THRASH);
+            }
+        }
 
         DoMeleeAttackIfReady();
     }

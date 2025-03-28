@@ -14,50 +14,43 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Victor_Nefarius
-SD%Complete: 75
-SDComment: Missing some text, Vael beginning event, and spawns Nef in wrong place
-SDCategory: Blackwing Lair
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
 
-enum
+enum VictorNefarius : uint32
 {
-    SAY_GAMESBEGIN_1                = 9907,
-    SAY_GAMESBEGIN_2                = 9845,
+    SAY_GAMESBEGIN_1             = 9907,
+    SAY_GAMESBEGIN_2             = 9845,
 
-    SAY_SCEPTER_RUN_START           = 11267,
-    SAY_SCEPTER_TAUNT_0             = 11214,
-    SAY_SCEPTER_TAUNT_1             = 11215,
-    SAY_SCEPTER_TAUNT_2             = 11216,
-    SAY_SCEPTER_TAUNT_3             = 11217,
-    SAY_SCEPTER_TAUNT_4             = 11218,
-    SAY_SCEPTER_RUN_LAUGHTER        = 11230,
-    SAY_SCEPTER_FAIL_LAUGHTER       = 11231,
-    SAY_SCEPTER_FAIL                = 11219,
+    SAY_SCEPTER_RUN_START        = 11267,
+    SAY_SCEPTER_TAUNT_0          = 11214,
+    SAY_SCEPTER_TAUNT_1          = 11215,
+    SAY_SCEPTER_TAUNT_2          = 11216,
+    SAY_SCEPTER_TAUNT_3          = 11217,
+    SAY_SCEPTER_TAUNT_4          = 11218,
+    SAY_SCEPTER_RUN_LAUGHTER     = 11230,
+    SAY_SCEPTER_FAIL_LAUGHTER    = 11231,
+    SAY_SCEPTER_FAIL             = 11219,
 
-    MAX_SCEPTER_TAUNTS = 6,
+    MAX_SCEPTER_TAUNTS           = 6,
 
-    // GOSSIP_TEXT_NEFARIUS_1          = 7134,
-    // GOSSIP_TEXT_NEFARIUS_2          = 7198,
-    // GOSSIP_TEXT_NEFARIUS_3          = 7199,
+    // GOSSIP_TEXT_NEFARIUS_1    = 7134,
+    // GOSSIP_TEXT_NEFARIUS_2    = 7198,
+    // GOSSIP_TEXT_NEFARIUS_3    = 7199,
 
-    MAX_DRAKES                      = 5,
-    MAX_DRAKE_KILLED                = 42,
+    MAX_DRAKES                   = 5,
+    MAX_DRAKE_KILLED             = 42,
 
-    SPELL_NEFARIUS_BARRIER          = 22663, // immunity in phase 1
-    SPELL_SHADOWBOLT                = 22677,
-    SPELL_SHADOWBOLT_VOLLEY         = 22665,
-    SPELL_FEAR                      = 22678,
-    SPELL_SILENCE                   = 22666,
-    SPELL_SHADOW_COMMAND            = 22667, // charm a player
-    // SPELL_SHADOW_BLINK           = 22664, // 22681 ? // teleport around the room, possibly random
-    SPELL_ROOT                      = 17507,
-    SPELL_VISUAL_EFFECT             = 24180,
-    SPELL_HOVER                     = 17131,
+    SPELL_NEFARIUS_BARRIER       = 22663, // immunity in phase 1
+    SPELL_SHADOWBOLT             = 22677,
+    SPELL_SHADOWBOLT_VOLLEY      = 22665,
+    SPELL_FEAR                   = 22678,
+    SPELL_SILENCE                = 22666,
+    SPELL_SHADOW_COMMAND         = 22667, // charm a player
+    // SPELL_SHADOW_BLINK        = 22664, // 22681 ? // teleport around the room, possibly random
+    SPELL_ROOT                   = 17507,
+    SPELL_VISUAL_EFFECT          = 24180,
+    SPELL_HOVER                  = 17131,
 };
 
 static constexpr uint32 aPossibleDrake[MAX_DRAKES] =
@@ -329,7 +322,7 @@ struct boss_victor_nefariusAI : ScriptedAI
                         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                         m_creature->SetFactionTemplateId(FACTION_MONSTER);
 
-                        Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
+                        Map::PlayerList const& liste = m_creature->GetMap()->GetPlayers();
                         for (const auto& i : liste)
                             if (i.getSource() && i.getSource()->IsAlive())
                                 m_creature->AddThreat(i.getSource(), 10000.0f);
@@ -416,16 +409,16 @@ struct boss_victor_nefariusAI : ScriptedAI
         if (phase2) // 40 drakes killed
             return;
 
-        //Begin phase 2 by spawning Nefarian
+        // Begin phase 2 by spawning Nefarian
         if (m_uiKilledAdds >= (MAX_DRAKE_KILLED - 2)) // 40 drakes killed
         {
-            //Inturrupt any spell casting
+            // Inturrupt any spell casting
             m_creature->InterruptNonMeleeSpells(false);
 
-            //Root self
+            // Root self
             DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED);
 
-            //Make super invis
+            // Make super invis
             if (m_creature->GetVisibility() != VISIBILITY_OFF)
                 m_creature->SetVisibility(VISIBILITY_OFF);
 
@@ -507,7 +500,7 @@ struct boss_victor_nefariusAI : ScriptedAI
                 m_creature->SendSpellGo(m_creature, SPELL_VISUAL_EFFECT);
                 AttackStart(pTarget);
                 m_creature->SetInCombatWithZone();
-                DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED);    // Root Self
+                DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED); // Root Self
                 m_uiShadowBlinkTimer = urand(20000, 25000);
                 m_uiShadowBoltTimer = urand(3000, 6000);
                 Smoke = false;
@@ -584,7 +577,7 @@ struct boss_victor_nefariusAI : ScriptedAI
 
             }
 
-            scepterTauntID ++;
+            ++scepterTauntID;
             nextScepterTauntTime = SCEPTER_TAUNT_INTERVAL;
 
         }
@@ -614,7 +607,6 @@ struct boss_victor_nefariusAI : ScriptedAI
         DoScriptText(SAY_SCEPTER_FAIL_LAUGHTER, m_creature);
     }
 };
-
 
 CreatureAI* GetAI_boss_victor_nefarius(Creature* creature)
 {

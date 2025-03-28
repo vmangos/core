@@ -14,17 +14,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Chromaggus
-SD%Complete: 95
-SDComment: Chromatic Mutation disabled due to lack of core support
-SDCategory: Blackwing Lair
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
 
-enum
+enum Chromaggus : uint32
 {
     EMOTE_GENERIC_FRENZY_KILL   = 7797,
     EMOTE_SHIMMER               = 9793,
