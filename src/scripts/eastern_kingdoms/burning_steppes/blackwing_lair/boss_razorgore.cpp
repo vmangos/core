@@ -67,9 +67,6 @@ enum Razorgore : uint32
 #define SPAWN_Y4_BIS -1012.5256f
 #define SPAWN_Z4_BIS 407.206f
 
-#define DEBUG_RAZOR(...) //sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[MC/Razor] "__VA_ARGS__)
-#define DEBUG_EMOTE(s)  //m_creature->MonsterTextEmote(s, nullptr);
-
 struct boss_razorgoreAI : public ScriptedAI
 {
     boss_razorgoreAI(Creature* pCreature) : ScriptedAI(pCreature)
