@@ -299,6 +299,15 @@ UPDATE `skinning_loot_template` SET `ChanceOrQuestChance` = 25, `groupid` = 2 WH
 -- Remove Dire Pool Object Added In Classic
 DELETE FROM `gameobject` WHERE `guid` = 1936;
 
+-- Add Derina Rumdnul Script
+UPDATE `creature` SET `wander_distance` = 0, `movement_type` = 2 WHERE `guid` = 9569;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(148401, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 394, 395, 396, 0, 0, 0, 0, 0, 0, 'Derina Rumdnul - Talk');
+INSERT INTO `creature_movement_template` VALUES
+(1484, 1, -3743.43, -886.878, 11.0101, 100, 360000, 1, 0, 0),
+(1484, 2, -3742.26, -876.78, 9.90981, 100, 0, 0, 0, 0),
+(1484, 3, -3741.16, -871.94, 9.90022, 100, 8000, 0, 148401, 0);
+
 
 -- End of migration.
 END IF;
