@@ -2105,6 +2105,10 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
             }
             wpOwner->SaveToDB();
         }
+        else if (wpOwner->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
+            if (WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(wpOwner->GetMotionMaster()->GetCurrent()))
+                if (wpPath->size() == wpMMGen->GetCurrentNode())
+                    wpOwner->GetMotionMaster()->Initialize();
 
         PSendSysMessage(LANG_WAYPOINT_REMOVED);
         return true;
