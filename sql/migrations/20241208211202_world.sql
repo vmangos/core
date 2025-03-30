@@ -308,6 +308,20 @@ INSERT INTO `creature_movement_template` VALUES
 (1484, 2, -3742.26, -876.78, 9.90981, 100, 0, 0, 0, 0),
 (1484, 3, -3741.16, -871.94, 9.90022, 100, 8000, 0, 148401, 0);
 
+-- Correct SPAWN Orientation For Squire Maltrake
+UPDATE `creature` SET `orientation` = 2.86234 WHERE `guid` = 5598;
+
+-- Add Events list for Kalaran Windblade
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 8479;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(847901, 8479, 0, 1, 0, 100, 1, 360000, 600000, 360000, 600000, 847901, 0, 0, 'Kalaran Windblade - Emote - OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(847901, 0, 0, 39, 847901, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Kalaran Windblade - Start Script');
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(847901, 0, 0, 1, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kalaran Windblade - Emote'),
+(847901, 5, 0, 1, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kalaran Windblade - Emote'),
+(847901, 9, 0, 1, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kalaran Windblade - Emote');
+
 
 -- End of migration.
 END IF;
