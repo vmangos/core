@@ -176,7 +176,7 @@ struct boss_ragnarosAI : ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        if (pWho->GetTypeId() == TYPEID_UNIT && pWho->GetEntry() == NPC_DOMO)
+        if (pWho->GetTypeId() == TYPEID_UNIT && pWho->GetEntry() == NPC_MAJORDOMO)
             return;
 
         if (m_pInstance)
@@ -192,7 +192,7 @@ struct boss_ragnarosAI : ScriptedAI
     void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         // As Majordomo is now killed, the last timer (until attacking) must be handled with Ragnaros script
-        if (pSpell->Id == SPELL_ELEMENTAL_FIRE_KILL && pTarget->GetTypeId() == TYPEID_UNIT && pTarget->GetEntry() == NPC_DOMO)
+        if (pSpell->Id == SPELL_ELEMENTAL_FIRE_KILL && pTarget->GetTypeId() == TYPEID_UNIT && pTarget->GetEntry() == NPC_MAJORDOMO)
             m_uiEnterCombatTimer = 7000;
     }
 
@@ -306,7 +306,7 @@ struct boss_ragnarosAI : ScriptedAI
                     m_uiEnterCombatTimer = 0;
 
                     // Despawn Majordomo's corpse
-                    if (Creature* domo = m_creature->FindNearestCreature(NPC_DOMO, 20.f, false))
+                    if (Creature* domo = m_creature->FindNearestCreature(NPC_MAJORDOMO, 20.f, false))
                         domo->ForcedDespawn(5000);
                 }
             }

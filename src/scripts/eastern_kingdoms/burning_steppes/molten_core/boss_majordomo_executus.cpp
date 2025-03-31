@@ -23,7 +23,6 @@
 enum
 {
     SAY_AGGRO                   = 7612,
-    SAY_SPAWN                   = 7566,
     SAY_SLAY                    = 9425,
     SAY_DEFEAT1                 = 7561,
     SAY_DEFEAT2                 = 7567,
@@ -35,9 +34,6 @@ enum
     SAY_ARRIVAL1_RAG            = 7636,
     SAY_ARRIVAL2_MAJ            = 7661,
     SAY_ARRIVAL3_RAG            = 7662,
-
-    NPC_FLAMEWAKER_HEALER       = 11663,
-    NPC_FLAMEWAKER_ELITE        = 11664,
 
     SPELL_AEGIS_OF_RAGNAROS     = 20620,  // Cast at start and at 50% health to fully heal Majordomo Executus
 
