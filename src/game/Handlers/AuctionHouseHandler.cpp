@@ -282,6 +282,11 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
     }
 
     Player* pl = GetPlayer();
+    if (!pl)
+    {
+        SendAuctionCommandResult(nullptr, AUCTION_STARTED, AUCTION_ERR_DATABASE);
+        return;
+    }
 
     AuctionHouseEntry const* auctionHouseEntry = GetCheckedAuctionHouseForAuctioneer(auctioneerGuid);
     if (!auctionHouseEntry)
@@ -474,6 +479,11 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recv_data)
 
     AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
     Player* pl = GetPlayer();
+    if (!pl)
+    {
+        SendAuctionCommandResult(nullptr, AUCTION_BID_PLACED, AUCTION_ERR_DATABASE);
+        return;
+    }
 
     if (!auction)
     {
@@ -616,7 +626,12 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
 
     AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
     Player* pl = GetPlayer();
-
+    if (!pl || !auction)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHEAT: Attempt to use invalid auction data!!!");
+        SendAuctionCommandResult(nullptr, AUCTION_REMOVED, AUCTION_ERR_DATABASE);
+        return;
+    }
     if (auction && auction->owner == pl->GetGUIDLow())
     {
         Item *pItem = sAuctionMgr.GetAItem(auction->itemGuidLow);
