@@ -287,7 +287,7 @@ struct instance_molten_core : ScriptedInstance
         if (DomoAndHisAdds.empty())
             return;
 
-        for (const auto& itr : DomoAndHisAdds)
+        for (auto const& itr : DomoAndHisAdds)
         {
             if (itr->IsAlive() && !itr->IsInCombat())
             {
