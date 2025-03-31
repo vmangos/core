@@ -17,15 +17,6 @@
 #include "scriptPCH.h"
 #include "molten_core.h"
 
-struct sSpawnLocation
-{
-    uint32 m_uiEntry;
-    float m_fX;
-    float m_fY;
-    float m_fZ;
-    float m_fO;
-};
-
 struct instance_molten_core : ScriptedInstance
 {
     explicit instance_molten_core(Map* pMap) : ScriptedInstance(pMap)
