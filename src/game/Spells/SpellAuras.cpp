@@ -2958,6 +2958,48 @@ void Aura::HandleAuraModSkill(bool apply, bool /*Real*/)
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
         return;
 
+    // Special case: affect all weapon skills
+    // Using a special value for miscvalue (e.g., -1) to indicate "all weapon skills"
+    if (m_modifier.m_miscvalue == -1) // -1 indicates "all weapon skills"
+    {
+        // List of all weapon skill IDs with their numeric values
+        const uint16 weaponSkills[] = {
+            43, // Swords
+            55, // Two-Handed Swords
+            44, // Axes
+            172, // Two-Handed Axes
+            54, // Maces
+            160, // Two-Handed Maces
+            136, // Staves
+            162, // Unarmed
+            473, // Fist Weapons
+            173, // Daggers
+            176, // Thrown
+            45, // Bows
+            46, // Guns
+            226, // Crossbows
+            228, // Wands
+            229 // Polearms
+        };
+
+        const size_t numWeaponSkills = sizeof(weaponSkills) / sizeof(weaponSkills[0]);
+        Player* playerTarget = static_cast<Player*>(GetTarget());
+        int16 const amount = int16(m_modifier.m_amount);
+        bool const permanent = (m_modifier.m_auraname == SPELL_AURA_MOD_SKILL_TALENT);
+
+        // Apply/remove the bonus to each weapon skill the player has
+        for (size_t i = 0; i < numWeaponSkills; ++i)
+        {
+            uint16 skillId = weaponSkills[i];
+            // Only modify skills the player actually has
+            if (playerTarget->HasSkill(skillId))
+            {
+                playerTarget->ModifySkillBonus(skillId, (apply ? amount : -amount), permanent);
+            }
+        }
+        return;
+    }
+
     uint16 const skillId = uint16(GetSpellProto()->EffectMiscValue[m_effIndex]);
 
     // Can't modify an unknown skill
