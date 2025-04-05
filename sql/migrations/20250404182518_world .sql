@@ -68,9 +68,9 @@ UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 179505; -- Dood
 UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 179506; -- Doodad_DiremaulMagicVortex01
 
 
-
 -- Corrected factions according to Classic sniffs
 
+UPDATE `gameobject_template` SET `faction` = 94 WHERE `entry` = 153463;
 UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` IN (179669, 179670, 179671); -- Warlock Mount Quest Symbol 1-3
 UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 179681; -- Dreadsteed Portal
 UPDATE `gameobject_template` SET `faction` = 94 WHERE `entry` = 179697; -- Arena Treasure Chest
