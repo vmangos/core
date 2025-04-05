@@ -20,6 +20,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 UPDATE `gossip_menu` SET `condition_id` = 4130, `text_id` = 8370 WHERE `entry` = 4015 AND `text_id` = 8368; -- Velma Warnam
 UPDATE `gossip_menu` SET `condition_id` = 4130 WHERE `entry` = 4022 AND `text_id` = 8407; -- Xar'Ti
 
+-- Correct lockId for Jinxed Hoodoo Pile according to both 1.8 and Classic sniffs
+UPDATE `gameobject_template` SET `data0` = 43 WHERE `entry` IN (180228, 180229);
+
 -- End of migration.
 END IF;
 END??
