@@ -127,7 +127,7 @@ UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 181120; -- Glut
 UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 181123; -- Patchwork - Exit Door
 UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 181124; -- Vaccuum - Enter Gate
 UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 181125; -- Vaccuum - Exit Gate
-UPDATE `gameobject_template` SET `faction` =  WHERE `entry` IN (181168, 181169); -- Icebellow Furnace
+UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` IN (181168, 181169); -- Icebellow Furnace
 UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 181170; -- Vaccuum - Combat Gate
 UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 181197; -- Maexxna - Inner Web Door
 UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` = 181200; -- Noth - Entry Door
