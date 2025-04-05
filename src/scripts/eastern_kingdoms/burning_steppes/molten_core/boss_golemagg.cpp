@@ -45,8 +45,8 @@ struct boss_golemaggAI : public ScriptedAI
         boss_golemaggAI::Reset();
     }
 
-    EventMap m_CombatEvents{};
-    ScriptedInstance* m_pInstance{};
+    EventMap m_CombatEvents;
+    ScriptedInstance* m_pInstance;
     std::list<ObjectGuid> m_addList;
 
     bool m_bEnraged = false;
@@ -247,8 +247,8 @@ struct mob_core_ragerAI : public ScriptedAI
         Reset();
     }
 
-    EventMap m_CombatEvents{};
-    ScriptedInstance* m_pInstance{};
+    EventMap m_CombatEvents;
+    ScriptedInstance* m_pInstance;
 
     void Reset() override
     {

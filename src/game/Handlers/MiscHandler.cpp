@@ -723,8 +723,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (sScriptMgr.OnAreaTrigger(pPlayer, pTrigger))
-        return;
+    if (pTrigger->script_id || pTrigger->script_name)
+        pPlayer->GetMap()->StartAreaTriggerScript(pTrigger, pPlayer);
 
     uint32 quest_id = sObjectMgr.GetQuestForAreaTrigger(triggerId);
     if (quest_id && pPlayer->IsAlive() && pPlayer->IsActiveQuest(quest_id))
@@ -770,6 +770,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
             if (bg->HandleAreaTrigger(pPlayer, triggerId))
                 return;
     }
+
     if (ZoneScript* pZoneScript = pPlayer->GetZoneScript())
     {
         if (pZoneScript->HandleAreaTrigger(_player, triggerId))

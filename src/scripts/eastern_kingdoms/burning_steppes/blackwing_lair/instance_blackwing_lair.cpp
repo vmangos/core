@@ -14,25 +14,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Instance_Blackwing_Lair
-SD%Complete: 90
-SDComment:
-SDCategory: Blackwing Lair
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
 
-struct RazCoords
-{
-    float X;
-    float Y;
-    float Z;
-    float O;
-};
-
-static RazCoords RazOeufs[] =
+static const Position EggSpawnCoords[] =
 {
     {-7579.49f, -1051.48f, 408.157f, 0.523599f},
     {-7563.15f, -1088.71f, 413.381f, -0.453786f},
@@ -78,20 +63,8 @@ enum
     SPELL_FIRE_IMMUNITY         = 7942,
     SPELL_ARCANE_IMMUNITY       = 33020, // Spell_mod
     SPELL_MIND_EXHAUSTION       = 23958,
-    SPELL_POSSESS               = 19832,
-    SPELL_POSSESS_VISUAL        = 23014,
     SPELL_WARMING_FLAMES        = 23040,
     SPELL_SUPPRESSION_AURA      = 22247,
-
-    NPC_RAZORGORE               = 12435,
-    NPC_VAELASTRASZ             = 13020,
-    NPC_LASHLAYER               = 12017,
-    NPC_FIREMAW                 = 11983,
-    NPC_EBONROC                 = 14601,
-    NPC_FLAMEGOR                = 11981,
-    NPC_CHROMAGGUS              = 14020,
-    NPC_NEFARIAN                = 11583,
-    NPC_LORD_NEFARIAN           = 10162,
 
     GO_DOOR_RAZORGORE_ENTER     = 176964,
     GO_DOOR_RAZORGORE_EXIT      = 176965,
@@ -102,38 +75,18 @@ enum
     GO_DOOR_CHROMAGGUS_EXIT     = 179117,
     GO_DOOR_VAELASTRASZ         = 179364,
     GO_DOOR_LASHLAYER           = 179365,
-
-    GO_OEUF_RAZ                 = 177807,
-    GO_ORBE_DOMINATION          = 177808,
-
-    // Raz
-    MOB_RAZ_TRIGGER             = 14453,
-    MOB_GRETHOK                 = 12557,
-    MOB_GARDE_AILE_NOIRE        = 14456,
-    // Vael
-    MOB_TECHNICIEN_AILE_NOIRE   = 13996,
-    // Lashlayer
-    MOB_CAPITAINE_GRIFFEMORT    = 12467,
-    MOB_RONGE_GRIFFEMORT        = 12464,
-    MOB_WYRMIDE_GRIFFEMORT      = 12465,
-    MOB_FLAMMECAILLE_GRIFFEMORT = 12463,
-    MOB_EVEILLEUR_GRIFFEMORT    = 12468,
-    MOB_SOUS_CHEF_AILE_NOIRE    = 12458,
-    MOB_DRACO_VERT              = 14023,
-    MOB_DRACO_ROUGE             = 14022,
-    MOB_DRACO_BLEU              = 14024,
-    MOB_DRACO_BRONZE            = 14025,
+    GO_BLACK_DRAGON_EGG         = 177807,
+    GO_ORB_OF_DOMINATION        = 177808,
     GO_SUPPRESSION_ENGINE       = 179784,
-    // Drags
-    MOB_DEMONISTE_AILE_NOIRE    = 12459,
-    MOB_SURVEILLANT_GRIFFEMORT  = 12461,
-    MOB_LIEUR_SORT_AILE_NOIRE   = 12457,
-    MOB_GARDE_WYRM_GRIFFEMORT   = 12460,
 
     GOSSIP_OPTION_NEFARIUS      = 6045,
 
     CONDITION_SCEPTER_FAIL      = 1,
-    CONDITION_SCEPTER_WIN       = 2
+    CONDITION_SCEPTER_WIN       = 2,
+
+    SAY_DEATH                   = 9591,
+
+    QUEST_BLACKHANDS_COMMAND    = 7761
 };
 
 void NefariusGossipOptionClicked(Creature* pCreature);
@@ -147,21 +100,27 @@ public:
         m_pInstance(pInstance)
     {
     }
-    void AddTechnician(Creature *pTechnician)
+
+    void AddTechnician(Creature* pTechnician)
     {
-        ASSERT(pTechnician);
+        if (!pTechnician)
+        {
+            return;
+        }
+
         m_vTechniciansGuid.push_back(pTechnician->GetObjectGuid());
         ThreatList threatList = pTechnician->GetThreatManager().getThreatList();
-        for (const auto i : threatList)
+        for (const auto& i : threatList)
         {
-            if (Unit *pUnit = m_pInstance->instance->GetCreature(i->getUnitGuid()))
+            if (Unit* pUnit = m_pInstance->instance->GetCreature(i->getUnitGuid()))
             {
                 m_mThreatGuid[pUnit->GetObjectGuid()] += i->getThreat();
                 pTechnician->GetThreatManager().modifyThreatPercent(pUnit, -100);
             }
         }
     }
-    void RemoveTechnician(Creature *pTechnician)
+
+    void RemoveTechnician(Creature* pTechnician)
     {
         for (std::vector<ObjectGuid>::iterator itr = m_vTechniciansGuid.begin(); itr != m_vTechniciansGuid.end(); ++itr)
         {
@@ -199,10 +158,11 @@ public:
             m_mThreatGuid.erase(itr);
     }
 
-    ScriptedInstance *GetInstance() const
+    ScriptedInstance* GetInstance() const
     {
-        return (m_pInstance);
+        return m_pInstance;
     }
+
     void RecalculateThreat()
     {
         // Update when m_uiTechniciansUpdate == 0 (buffered update)
@@ -219,15 +179,15 @@ public:
             m_bUpdated = true;
             for (const auto& guid : m_vTechniciansGuid)
             {
-                if (Creature *pCreature = m_pInstance->instance->GetCreature(guid))
+                if (Creature* pCreature = m_pInstance->instance->GetCreature(guid))
                 {
                     if (!pCreature->IsAlive())
                         continue;
                     // Copy the list, since it may get invalidated at 'modifyThreatPercent' call
                     ThreatList threatList = pCreature->GetThreatManager().getThreatList();
-                    for (const auto i : threatList)
+                    for (const auto& i : threatList)
                     {
-                        if (Unit *pUnit = m_pInstance->instance->GetUnit(i->getUnitGuid()))
+                        if (Unit* pUnit = m_pInstance->instance->GetUnit(i->getUnitGuid()))
                         {
                             m_mThreatGuid[pUnit->GetObjectGuid()] += i->getThreat();
                             pCreature->GetThreatManager().modifyThreatPercent(pUnit, -100);
@@ -320,9 +280,10 @@ struct instance_blackwing_lair : public ScriptedInstance
                 if (m_auiEncounter[TYPE_LASHLAYER] == DONE)
                     pGo->DeleteLater();
                 break;
-            case GO_ORBE_DOMINATION:
+            case GO_ORB_OF_DOMINATION:
                 m_auiData[DATA_ORB_DOMINATION_GUID] = pGo->GetObjectGuid();
-            case GO_OEUF_RAZ:
+                // no break - intended?
+            case GO_BLACK_DRAGON_EGG:
                 if (m_auiEncounter[TYPE_RAZORGORE] == DONE)
                     pGo->DeleteLater();
                 break;
@@ -337,8 +298,9 @@ struct instance_blackwing_lair : public ScriptedInstance
     {
         switch (pCreature->GetEntry())
         {
-            case MOB_GRETHOK:
-            case MOB_GARDE_AILE_NOIRE:
+            case NPC_GRETHOK_THE_CONTROLLER:
+            case NPC_BLACKWING_GUARDSMAN:
+            {
                 if (m_auiEncounter[TYPE_RAZORGORE] == NOT_STARTED)
                     m_auiEncounter[TYPE_RAZORGORE] = IN_PROGRESS;
                 if (Creature* pCreature = instance->GetCreature(m_auiData[DATA_RAZORGORE_GUID]))
@@ -347,13 +309,16 @@ struct instance_blackwing_lair : public ScriptedInstance
                         pCreature->SetInCombatWithZone();
                 }
                 break;
+            }
             case NPC_RAZORGORE:
+            {
                 if (Creature* pCreature = instance->GetCreature(m_auiData[DATA_GRETOK_GUID]))
                 {
                     if (pCreature->IsAlive() && !pCreature->IsInCombat())
                         pCreature->SetInCombatWithZone();
                 }
                 break;
+            }
         }
     }
 
@@ -361,16 +326,16 @@ struct instance_blackwing_lair : public ScriptedInstance
     {
         switch (pCreature->GetEntry())
         {
-            case MOB_DRACO_VERT:
+            case NPC_CORRUPTED_GREEN_WHELP:
                 pCreature->AddAura(SPELL_NATURE_IMMUNITY, ADD_AURA_PERMANENT);
                 break;
-            case MOB_DRACO_BLEU:
+            case NPC_CORRUPTED_BLUE_WHELP:
                 pCreature->AddAura(SPELL_FROST_IMMUNITY, ADD_AURA_PERMANENT);
                 break;
-            case MOB_DRACO_ROUGE:
+            case NPC_CORRUPTED_RED_WHELP:
                 pCreature->AddAura(SPELL_FIRE_IMMUNITY, ADD_AURA_PERMANENT);
                 break;
-            case MOB_DRACO_BRONZE:
+            case NPC_CORRUPTED_BRONZE_WHELP:
                 pCreature->AddAura(SPELL_ARCANE_IMMUNITY, ADD_AURA_PERMANENT);
                 break;
         }
@@ -380,41 +345,41 @@ struct instance_blackwing_lair : public ScriptedInstance
     {
         switch (pCreature->GetEntry())
         {
-            case MOB_RAZ_TRIGGER:
+            case NPC_ORB_OF_DOMINATION:
                 pCreature->DeleteLater();
                 break;
-            case MOB_GRETHOK:
-            case MOB_GARDE_AILE_NOIRE:
+            case NPC_GRETHOK_THE_CONTROLLER:
+            case NPC_BLACKWING_GUARDSMAN:
                 if (m_auiEncounter[TYPE_RAZORGORE] == DONE)
                     pCreature->DeleteLater();
                 break;
-            case MOB_DRACO_VERT:
-            case MOB_DRACO_BLEU:
-            case MOB_DRACO_ROUGE:
-            case MOB_DRACO_BRONZE:
-                switch (rand() % 4)
+            case NPC_CORRUPTED_GREEN_WHELP:
+            case NPC_CORRUPTED_BLUE_WHELP:
+            case NPC_CORRUPTED_RED_WHELP:
+            case NPC_CORRUPTED_BRONZE_WHELP:
+                switch (urand(0, 3))
                 {
                     case 0:
-                        pCreature->SetEntry(MOB_DRACO_BLEU);
-                        pCreature->UpdateEntry(MOB_DRACO_BLEU);
+                        pCreature->SetEntry(NPC_CORRUPTED_BLUE_WHELP);
+                        pCreature->UpdateEntry(NPC_CORRUPTED_BLUE_WHELP);
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_FROST_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
                     case 1:
-                        pCreature->SetEntry(MOB_DRACO_VERT);
-                        pCreature->UpdateEntry(MOB_DRACO_VERT);
+                        pCreature->SetEntry(NPC_CORRUPTED_GREEN_WHELP);
+                        pCreature->UpdateEntry(NPC_CORRUPTED_GREEN_WHELP);
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_NATURE_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
                     case 2:
-                        pCreature->SetEntry(MOB_DRACO_ROUGE);
-                        pCreature->UpdateEntry(MOB_DRACO_ROUGE);
+                        pCreature->SetEntry(NPC_CORRUPTED_RED_WHELP);
+                        pCreature->UpdateEntry(NPC_CORRUPTED_RED_WHELP);
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_FIRE_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
                     case 3:
-                        pCreature->SetEntry(MOB_DRACO_BRONZE);
-                        pCreature->UpdateEntry(MOB_DRACO_BRONZE);
+                        pCreature->SetEntry(NPC_CORRUPTED_BRONZE_WHELP);
+                        pCreature->UpdateEntry(NPC_CORRUPTED_BRONZE_WHELP);
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_ARCANE_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
@@ -433,20 +398,20 @@ struct instance_blackwing_lair : public ScriptedInstance
                     pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING | UNIT_FLAG_IMMUNE_TO_NPC);
                 }
                 break;
-            case MOB_EVEILLEUR_GRIFFEMORT:
-            case MOB_SOUS_CHEF_AILE_NOIRE:
-            case MOB_RONGE_GRIFFEMORT:
-            case MOB_WYRMIDE_GRIFFEMORT:
-            case MOB_FLAMMECAILLE_GRIFFEMORT:
-            case MOB_CAPITAINE_GRIFFEMORT:
+            case NPC_DEATH_TALON_HATCHER:
+            case NPC_BLACKWING_TASKMASTER:
+            case NPC_DEATH_TALON_SEETHER:
+            case NPC_DEATH_TALON_WYRMKIN:
+            case NPC_DEATH_TALON_FLAMESCALE:
+            case NPC_DEATH_TALON_CAPTAIN:
                 if (m_auiEncounter[TYPE_LASHLAYER] == DONE)
                     pCreature->DeleteLater();
                 break;
-            case MOB_DEMONISTE_AILE_NOIRE:
-            case MOB_LIEUR_SORT_AILE_NOIRE:
-            case MOB_GARDE_WYRM_GRIFFEMORT:
-            case MOB_TECHNICIEN_AILE_NOIRE:
-            case MOB_SURVEILLANT_GRIFFEMORT:
+            case NPC_BLACKWING_WARLOCK:
+            case NPC_BLACKWING_SPELLBINDER:
+            case NPC_DEATH_TALON_WYRMGUARD:
+            case NPC_BLACKWING_TECHNICIAN:
+            case NPC_DEATH_TALON_OVERSEER:
                 if (m_auiEncounter[TYPE_FIREMAW] == DONE &&
                         m_auiEncounter[TYPE_EBONROC] == DONE &&
                         m_auiEncounter[TYPE_FLAMEGOR] == DONE)
@@ -465,17 +430,21 @@ struct instance_blackwing_lair : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature *who) override
+    void OnCreatureDeath(Creature* who) override
     {
         switch (who->GetEntry())
         {
             case NPC_RAZORGORE:
+            {
                 if (m_auiEncounter[TYPE_RAZORGORE] == FAIL)
                 {
                     if (Creature* pRazorgore = instance->GetCreature(m_auiData[DATA_RAZORGORE_GUID]))
-                        pRazorgore->MonsterYell("If I fall into the abyss, I'll take all of you mortals with me!",0,0);
+                    {
+                        DoScriptText(SAY_DEATH, pRazorgore);
+                    }
                 }
                 break;
+            }
         }
     }
 
@@ -516,42 +485,43 @@ struct instance_blackwing_lair : public ScriptedInstance
                 if (m_auiEncounter[TYPE_NEFARIAN] == DONE)
                     pCreature->DeleteLater();
                 break;
-            case MOB_GRETHOK:
+            case NPC_GRETHOK_THE_CONTROLLER:
                 m_auiData[DATA_GRETOK_GUID] = pCreature->GetObjectGuid();
-            case MOB_GARDE_AILE_NOIRE:
+                // no break - intended?
+            case NPC_BLACKWING_GUARDSMAN:
                 if (m_auiEncounter[TYPE_RAZORGORE] == DONE)
                     pCreature->DeleteLater();
                 break;
-            case MOB_RAZ_TRIGGER:
-                m_auiData[DATA_TRIGGER_GUID] =  pCreature->GetObjectGuid();
+            case NPC_ORB_OF_DOMINATION:
+                m_auiData[DATA_TRIGGER_GUID] = pCreature->GetObjectGuid();
                 break;
-            case MOB_DRACO_VERT:
-            case MOB_DRACO_BLEU:
-            case MOB_DRACO_ROUGE:
-            case MOB_DRACO_BRONZE:
-                switch (rand() % 4)
+            case NPC_CORRUPTED_GREEN_WHELP:
+            case NPC_CORRUPTED_BLUE_WHELP:
+            case NPC_CORRUPTED_RED_WHELP:
+            case NPC_CORRUPTED_BRONZE_WHELP:
+                switch (urand(0, 3))
                 {
                     case 0:
-                        pCreature->SetEntry(MOB_DRACO_BLEU);
-                        pCreature->UpdateEntry(MOB_DRACO_BLEU);
+                        pCreature->SetEntry(NPC_CORRUPTED_BLUE_WHELP);
+                        pCreature->UpdateEntry(NPC_CORRUPTED_BLUE_WHELP);
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_FROST_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
                     case 1:
-                        pCreature->SetEntry(MOB_DRACO_VERT);
-                        pCreature->UpdateEntry(MOB_DRACO_VERT);
+                        pCreature->SetEntry(NPC_CORRUPTED_GREEN_WHELP);
+                        pCreature->UpdateEntry(NPC_CORRUPTED_GREEN_WHELP);
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_NATURE_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
                     case 2:
-                        pCreature->SetEntry(MOB_DRACO_ROUGE);
-                        pCreature->UpdateEntry(MOB_DRACO_ROUGE);
+                        pCreature->SetEntry(NPC_CORRUPTED_RED_WHELP);
+                        pCreature->UpdateEntry(NPC_CORRUPTED_RED_WHELP);
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_FIRE_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
                     case 3:
-                        pCreature->SetEntry(MOB_DRACO_BRONZE);
-                        pCreature->UpdateEntry(MOB_DRACO_BRONZE);
+                        pCreature->SetEntry(NPC_CORRUPTED_BRONZE_WHELP);
+                        pCreature->UpdateEntry(NPC_CORRUPTED_BRONZE_WHELP);
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_ARCANE_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
@@ -559,12 +529,17 @@ struct instance_blackwing_lair : public ScriptedInstance
                 if (m_auiEncounter[TYPE_LASHLAYER] == DONE || m_auiEncounter[TYPE_LASHLAYER] == IN_PROGRESS)
                     pCreature->DeleteLater();
                 break;
-            case MOB_RONGE_GRIFFEMORT:
-            case MOB_WYRMIDE_GRIFFEMORT:
-            case MOB_FLAMMECAILLE_GRIFFEMORT:
+            case NPC_DEATH_TALON_SEETHER:
+            case NPC_DEATH_TALON_WYRMKIN:
+            case NPC_DEATH_TALON_FLAMESCALE:
+            {
                 if (m_auiEncounter[TYPE_LASHLAYER] == DONE)
-                    pCreature->DeleteLater();/*
-                else switch (rand() % 4)
+                {
+                    pCreature->DeleteLater();
+                }
+                /*
+
+                else switch (urand(0, 3))
                 {
                     case 0:
                         pCreature->SetEntry(MOB_DRACO_BLEU);
@@ -572,15 +547,17 @@ struct instance_blackwing_lair : public ScriptedInstance
                         pCreature->RemoveAllAuras();
                         pCreature->AddAura(SPELL_FROST_IMMUNITY, ADD_AURA_PERMANENT);
                         break;
-                        }*/
+                }
+                */
                 break;
-            case MOB_CAPITAINE_GRIFFEMORT:
-            case MOB_EVEILLEUR_GRIFFEMORT:
-            case MOB_SOUS_CHEF_AILE_NOIRE:
+            }
+            case NPC_DEATH_TALON_CAPTAIN:
+            case NPC_DEATH_TALON_HATCHER:
+            case NPC_BLACKWING_TASKMASTER:
                 if (m_auiEncounter[TYPE_LASHLAYER] == DONE)
                     pCreature->DeleteLater();
                 break;
-            case MOB_TECHNICIEN_AILE_NOIRE:
+            case NPC_BLACKWING_TECHNICIAN:
                 if (pCreature->GetPositionZ() < 420.0f)
                 {
                     if (m_auiEncounter[TYPE_VAEL_EVENT] == DONE)
@@ -591,11 +568,12 @@ struct instance_blackwing_lair : public ScriptedInstance
                     if (m_auiEncounter[TYPE_RAZORGORE] != DONE)
                         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     m_lVaelGobs.push_back(pCreature->GetObjectGuid());
+                    // no break - intended?
                  }
-            case MOB_DEMONISTE_AILE_NOIRE:
-            case MOB_LIEUR_SORT_AILE_NOIRE:
-            case MOB_GARDE_WYRM_GRIFFEMORT:
-            case MOB_SURVEILLANT_GRIFFEMORT:
+            case NPC_BLACKWING_WARLOCK:
+            case NPC_BLACKWING_SPELLBINDER:
+            case NPC_DEATH_TALON_WYRMGUARD:
+            case NPC_DEATH_TALON_OVERSEER:
                 if (m_auiEncounter[TYPE_FIREMAW] == DONE &&
                     m_auiEncounter[TYPE_EBONROC] == DONE &&
                     m_auiEncounter[TYPE_FLAMEGOR] == DONE)
@@ -620,178 +598,233 @@ struct instance_blackwing_lair : public ScriptedInstance
     {
         switch (uiType)
         {
-        case DATA_SCEPTER_RUN_TIME:
-            m_auiData[DATA_SCEPTER_RUN_TIME] = uiData;
-            break;
-
-        case TYPE_RAZORGORE:
-            m_auiEncounter[TYPE_RAZORGORE] = uiData;
-            if (uiData == IN_PROGRESS)
+            case DATA_SCEPTER_RUN_TIME:
             {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
-                {
-                    if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
-                }
+                m_auiData[DATA_SCEPTER_RUN_TIME] = uiData;
+                break;
             }
-            else if (uiData == FAIL)
+            case TYPE_RAZORGORE:
             {
-                m_auiData[DATA_HOW_EGG] = 0;
-                RepopOeufs();
-                SetData(DATA_EGG, FAIL);
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
+                m_auiEncounter[TYPE_RAZORGORE] = uiData;
+                if (uiData == IN_PROGRESS)
                 {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
-                }
-            }
-            else if (uiData == DONE)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
-                }
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
-                }
-                for (const auto& guid : m_lVaelGobs)
-                {
-                    if (Creature *pCreature = instance->GetCreature(guid))
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
                     {
-                        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                    }
-                }
-            }
-            break;
-        case TYPE_VAELASTRASZ:
-            m_auiEncounter[TYPE_VAELASTRASZ] = uiData;
-            if (uiData == IN_PROGRESS)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
-                {
-                    if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
-                }
-            }
-            else if (uiData == DONE)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
-                }
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_VAELASTRASZ]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_VAELASTRASZ]);
-                }
-            }
-            else if (uiData == FAIL)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
-                }
-            }
-            break;
-        case TYPE_LASHLAYER:
-            m_auiEncounter[TYPE_LASHLAYER] = uiData;
-            if (uiData == DONE)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_LASHLAYER]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_LASHLAYER]);
-                }
-            }
-            break;
-        case TYPE_FIREMAW:
-            m_auiEncounter[TYPE_FIREMAW] = uiData;
-            break;
-        case TYPE_EBONROC:
-            m_auiEncounter[TYPE_EBONROC] = uiData;
-            break;
-        case TYPE_FLAMEGOR:
-            m_auiEncounter[TYPE_FLAMEGOR] = uiData;
-            break;
-        case TYPE_CHROMAGGUS:
-            m_auiEncounter[TYPE_CHROMAGGUS] = uiData;
-            if (uiData == DONE)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_CHROMAGGUS_EXIT]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_CHROMAGGUS_EXIT]);
-                }
-            }
-            break;
-        case TYPE_NEFARIAN:
-            m_auiEncounter[TYPE_NEFARIAN] = uiData;
-            if (uiData == DONE || uiData == FAIL)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_NEFARIAN]))
-                {
-                    if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_NEFARIAN]);
-                }
-            }
-            if (uiData == IN_PROGRESS)
-            {
-                if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_NEFARIAN]))
-                {
-                    if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
-                        DoUseDoorOrButton(m_auiData[DATA_DOOR_NEFARIAN]);
-                }
-            }
-            break;
-        case TYPE_VAEL_EVENT:
-            m_auiEncounter[TYPE_VAEL_EVENT] = uiData;
-            if (uiData == DONE)
-            {
-                bool bYelled = false;
-                for (const auto& guid : m_lVaelGobs)
-                {
-                    if (Creature *pCreature = instance->GetCreature(guid))
-                    {
-                        if (!bYelled)
+                        if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
                         {
-                            bYelled = true;
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
                         }
-                        pCreature->MonsterMoveWithSpeed(-7608.0f, -888.0f, 432.0f, 10.0f, pCreature->GetSpeed(MOVE_RUN), uint32(MOVE_PATHFINDING));
                     }
                 }
+                else if (uiData == FAIL)
+                {
+                    m_auiData[DATA_HOW_EGG] = 0;
+                    RespawnEggs();
+                    SetData(DATA_EGG, FAIL);
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
+                        }
+                    }
+                }
+                else if (uiData == DONE)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
+                        }
+                    }
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_ENTER]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
+                        }
+                    }
+                    for (const auto& guid : m_lVaelGobs)
+                    {
+                        if (Creature* pCreature = instance->GetCreature(guid))
+                        {
+                            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+                        }
+                    }
+                }
+                break;
             }
-            break;
-        case DATA_EGG:
-            if (uiData == IN_PROGRESS)
+            case TYPE_VAELASTRASZ:
             {
-                if (++m_auiData[DATA_HOW_EGG] >= EGGS_COUNT)
-                    m_auiData[DATA_EGG] = DONE;
+                m_auiEncounter[TYPE_VAELASTRASZ] = uiData;
+                if (uiData == IN_PROGRESS)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
+                    {
+                        if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
+                        }
+                    }
+                }
+                else if (uiData == DONE)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
+                        }
+                    }
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_VAELASTRASZ]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_VAELASTRASZ]);
+                        }
+                    }
+                }
+                else if (uiData == FAIL)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_RAZORGORE_EXIT]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_EXIT]);
+                        }
+                    }
+                }
+                break;
             }
-            else if (uiData == FAIL)
+            case TYPE_LASHLAYER:
             {
-                if (Creature *pCreature = instance->GetCreature(m_auiData[DATA_TRIGGER_GUID]))
-                    pCreature->DeleteLater();
-                m_auiData[DATA_TRIGGER_GUID] = 0;
-                m_auiData[DATA_EGG] = FAIL;
+                m_auiEncounter[TYPE_LASHLAYER] = uiData;
+                if (uiData == DONE)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_LASHLAYER]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_LASHLAYER]);
+                        }
+                    }
+                }
+                break;
             }
-            break;
-
-        case TYPE_SCEPTER_RUN:
-            m_auiEncounter[TYPE_SCEPTER_RUN] = uiData;
-            break;
-
-        case DATA_SCEPTER_CHAMPION:
-            m_auiData[DATA_SCEPTER_CHAMPION] = uiData;
-            break;
-        case GOSSIP_OPTION_NEFARIUS:
-            if (Creature* pCreature = GetCreature(m_auiData[DATA_NEFARIUS_GUID]))
-                NefariusGossipOptionClicked(pCreature);
-            break;
+            case TYPE_FIREMAW:
+            {
+                m_auiEncounter[TYPE_FIREMAW] = uiData;
+                break;
+            }
+            case TYPE_EBONROC:
+            {
+                m_auiEncounter[TYPE_EBONROC] = uiData;
+                break;
+            }
+            case TYPE_FLAMEGOR:
+            {
+                m_auiEncounter[TYPE_FLAMEGOR] = uiData;
+                break;
+            }
+            case TYPE_CHROMAGGUS:
+            {
+                m_auiEncounter[TYPE_CHROMAGGUS] = uiData;
+                if (uiData == DONE)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_CHROMAGGUS_EXIT]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_CHROMAGGUS_EXIT]);
+                        }
+                    }
+                }
+                break;
+            }
+            case TYPE_NEFARIAN:
+            {
+                m_auiEncounter[TYPE_NEFARIAN] = uiData;
+                if (uiData == DONE || uiData == FAIL)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_NEFARIAN]))
+                    {
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_NEFARIAN]);
+                        }
+                    }
+                }
+                if (uiData == IN_PROGRESS)
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_auiData[DATA_DOOR_NEFARIAN]))
+                    {
+                        if (pGo->GetGoState() == GO_STATE_ACTIVE) // Open
+                        {
+                            DoUseDoorOrButton(m_auiData[DATA_DOOR_NEFARIAN]);
+                        }
+                    }
+                }
+                break;
+            }
+            case TYPE_VAEL_EVENT:
+            {
+                m_auiEncounter[TYPE_VAEL_EVENT] = uiData;
+                if (uiData == DONE)
+                {
+                    bool bYelled = false;
+                    for (const auto& guid : m_lVaelGobs)
+                    {
+                        if (Creature* pCreature = instance->GetCreature(guid))
+                        {
+                            if (!bYelled)
+                            {
+                                bYelled = true;
+                            }
+                            pCreature->MonsterMoveWithSpeed(-7608.0f, -888.0f, 432.0f, 10.0f, pCreature->GetSpeed(MOVE_RUN), uint32(MOVE_PATHFINDING));
+                        }
+                    }
+                }
+                break;
+            }
+            case DATA_EGG:
+            {
+                if (uiData == IN_PROGRESS)
+                {
+                    if (++m_auiData[DATA_HOW_EGG] >= EGGS_COUNT)
+                    {
+                        m_auiData[DATA_EGG] = DONE;
+                    }
+                }
+                else if (uiData == FAIL)
+                {
+                    if (Creature* pCreature = instance->GetCreature(m_auiData[DATA_TRIGGER_GUID]))
+                    {
+                        pCreature->DeleteLater();
+                    }
+                    m_auiData[DATA_TRIGGER_GUID] = 0;
+                    m_auiData[DATA_EGG] = FAIL;
+                }
+                break;
+            }
+            case TYPE_SCEPTER_RUN:
+            {
+                m_auiEncounter[TYPE_SCEPTER_RUN] = uiData;
+                break;
+            }
+            case DATA_SCEPTER_CHAMPION:
+            {
+                m_auiData[DATA_SCEPTER_CHAMPION] = uiData;
+                break;
+            }
+            case GOSSIP_OPTION_NEFARIUS:
+            {
+                if (Creature* pCreature = GetCreature(m_auiData[DATA_NEFARIUS_GUID]))
+                {
+                    NefariusGossipOptionClicked(pCreature);
+                }
+                break;
+            }
         }
 
         if (uiData == DONE || TYPE_SCEPTER_RUN == uiType || DATA_SCEPTER_CHAMPION == uiData)
@@ -812,28 +845,31 @@ struct instance_blackwing_lair : public ScriptedInstance
 
     bool CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const override
     {
-        ObjectGuid scepterChampion = m_auiData[DATA_SCEPTER_CHAMPION];
+        uint64 scepterChampion = m_auiData[DATA_SCEPTER_CHAMPION];
 
         // No scepter run attempted
-        if (0 == scepterChampion)
+        if (scepterChampion == 0)
             return false;
 
         // On scepter "alternate success", give everyone a copy of "From the Desk of Lord Victor Nefarius"
-        if (CONDITION_SCEPTER_FAIL == instance_condition_id)
+        if (instance_condition_id == CONDITION_SCEPTER_FAIL)
         {
-            if (FAIL == m_auiEncounter[TYPE_SCEPTER_RUN])
+            if (m_auiEncounter[TYPE_SCEPTER_RUN] == FAIL)
+            {
                 return true;
+            }
         }
 
         // A true champion. Reward only this one with the Red Scepter Shard
-        if (CONDITION_SCEPTER_WIN == instance_condition_id)
-        { 
-            if (DONE == m_auiEncounter[TYPE_SCEPTER_RUN] && player->GetGUID() == scepterChampion)
+        if (instance_condition_id == CONDITION_SCEPTER_WIN)
+        {
+            if ((m_auiEncounter[TYPE_SCEPTER_RUN] == DONE) && (scepterChampion == player->GetGUID()))
+            {
                 return true;
+            }
         }
 
         return false;
-
     }
 
     char const* Save() override
@@ -873,23 +909,24 @@ struct instance_blackwing_lair : public ScriptedInstance
         OUT_LOAD_INST_DATA_COMPLETE;
     }
 
-    void RepopOeufs()
+    void RespawnEggs()
     {
         Creature* pCreature = instance->GetCreature(m_auiData[DATA_RAZORGORE_GUID]);
-
-        if (pCreature)
+        if (!pCreature)
+            return;
+        std::list<GameObject*> lGameObjects;
+        pCreature->GetGameObjectListWithEntryInGrid(lGameObjects, GO_BLACK_DRAGON_EGG, 250.0f);
+        for (const auto& pGo : lGameObjects)
         {
-            std::list<GameObject *> lGameObjects;
-            pCreature->GetGameObjectListWithEntryInGrid(lGameObjects, GO_OEUF_RAZ, 250.0f);
-            for (const auto pGo : lGameObjects)
-                pGo->DeleteLater();
-
-            for (const auto& position : RazOeufs)
-                pCreature->SummonGameObject(GO_OEUF_RAZ, position.X, position.Y, position.Z, position.O);
+            pGo->DeleteLater();
+        }
+        for (const auto& position : EggSpawnCoords)
+        {
+            pCreature->SummonGameObject(GO_BLACK_DRAGON_EGG, position.x, position.y, position.z, position.o);
         }
     }
 
-    blackwing_technicians_helper *GetTechnicianHelper() { return &m_hBlackwingTechnicians; }
+    blackwing_technicians_helper* GetTechnicianHelper() { return &m_hBlackwingTechnicians; }
 };
 
 InstanceData* GetInstanceData_instance_blackwing_lair(Map* pMap)
@@ -897,7 +934,7 @@ InstanceData* GetInstanceData_instance_blackwing_lair(Map* pMap)
     return new instance_blackwing_lair(pMap);
 }
 
-bool GOHello_go_orbe_domination(Player* pPlayer, GameObject* pGo)
+bool GOHello_go_orb_of_domination(Player* pPlayer, GameObject* pGo)
 {
     if (ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData())
     {
@@ -926,43 +963,54 @@ bool GOHello_go_orbe_domination(Player* pPlayer, GameObject* pGo)
     return true;
 }
 
-struct go_oeuf_razAI: public GameObjectAI
+enum EggsOfRaz : uint32
 {
-    go_oeuf_razAI(GameObject* pGo) : GameObjectAI(pGo) {}
+    SAY_EGGS_BROKEN_1 = 9961,
+    SAY_EGGS_BROKEN_2 = 9962,
+    SAY_EGGS_BROKEN_3 = 9963
+};
+
+struct go_egg_razAI: public GameObjectAI
+{
+    explicit go_egg_razAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
     bool OnUse(Unit* pUser) override
     {
         if (!pUser)
             return true;
+
         if (ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData())
         {
             pInstance->SetData(DATA_EGG, IN_PROGRESS);
-            //char sMessage[200];
-            //sprintf(sMessage, "Nombre d'oeufs detruits : %d sur 30", pInstance->GetData64(DATA_HOW_EGG));
+
             if (pUser->IsCreature() && pUser->GetEntry() == NPC_RAZORGORE)
             {
-                //pUser->MonsterYell(sMessage, 0);
                 switch (urand(0, 5))
                 {
                     case 0:
-                        pUser->MonsterYell("No! Not another one! I'll have your heads for this atrocity!", LANG_UNIVERSAL);
-                        pUser->PlayDirectSound(8277);
+                    {
+                        DoScriptText(SAY_EGGS_BROKEN_1, pUser);
                         break;
+                    }
                     case 1:
-                        pUser->MonsterYell("Fools! These eggs are more precious than you know!", LANG_UNIVERSAL);
-                        pUser->PlayDirectSound(8276);
+                    {
+                        DoScriptText(SAY_EGGS_BROKEN_2, pUser);
                         break;
+                    }
                     case 2:
-                        pUser->MonsterYell("You'll pay for forcing me to do this!", LANG_UNIVERSAL);
-                        pUser->PlayDirectSound(8275);
+                    {
+                        DoScriptText(SAY_EGGS_BROKEN_3, pUser);
                         break;
+                    }
                 }
 
                 if (pInstance->GetData64(DATA_EGG) == DONE)
                 {
                     pUser->RemoveAllAuras();
-                    if (pUser->GetMaxHealth() != 450000)
-                        pUser->SetMaxHealth(450000);
+                    if (pUser->GetMaxHealth() != RAZORGORE_MAX_HEALTH_DURING_POSESSION)
+                    {
+                        pUser->SetMaxHealth(RAZORGORE_MAX_HEALTH_DURING_POSESSION);
+                    }
                     pUser->CastSpell(pUser, SPELL_WARMING_FLAMES, true);
                 }
             }
@@ -973,9 +1021,9 @@ struct go_oeuf_razAI: public GameObjectAI
     }
 };
 
-GameObjectAI* GetAIgo_oeuf_raz(GameObject *pGo)
+GameObjectAI* GetAIgo_egg_raz(GameObject* pGo)
 {
-    return new go_oeuf_razAI(pGo);
+    return new go_egg_razAI(pGo);
 }
 
 struct go_engin_suppressionAI: public GameObjectAI
@@ -1001,7 +1049,8 @@ struct go_engin_suppressionAI: public GameObjectAI
     void ApplyAura()
     {
         me->SendGameObjectCustomAnim();
-        Map::PlayerList const &liste = me->GetMap()->GetPlayers();
+        Map::PlayerList const& liste = me->GetMap()->GetPlayers();
+
         for (const auto& i : liste)
         {
             if (me->GetDistance(i.getSource()) <= 15.0f)
@@ -1050,8 +1099,11 @@ bool AreaTrigger_at_orb_of_command(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pAt->id == AT_ORB_OF_COMMAND)
     {
-        Corpse *pCorpse = pPlayer->GetCorpse();
-        if (pPlayer->IsDead() && pPlayer->GetQuestRewardStatus(7761) && pCorpse && (pCorpse->GetMapId() == MAP_BLACKWING_LAIR))
+        Corpse* pCorpse = pPlayer->GetCorpse();
+        if (pCorpse &&
+            pPlayer->IsDead() &&
+            pPlayer->GetQuestRewardStatus(QUEST_BLACKHANDS_COMMAND) &&
+            pCorpse->GetMapId() == MAP_BLACKWING_LAIR)
         {
             pPlayer->ResurrectPlayer(0.5f);
             pPlayer->SpawnCorpseBones();
@@ -1085,9 +1137,6 @@ bool AreaTrigger_at_enter_vael_room(Player *pPlayer, AreaTriggerEntry const* pAt
 
 enum
 {
-    NPC_OVERSEER                = 12461,
-    NPC_WYRMGUARD               = 12460,
-
     SPELL_CLEAVE                = 15284,
     SPELL_WARSTOMP              = 24375,
     SPELL_FIREBLAST             = 20623,
@@ -1110,7 +1159,7 @@ struct npc_death_talonAI : public ScriptedAI
     {
         m_uiBroodPower = RandomPower();
         m_uiSchoolSensibility = RandomSensibility();
-        m_bIsOverSeer = (pCreature->GetEntry() == NPC_OVERSEER);
+        m_bIsOverSeer = (pCreature->GetEntry() == NPC_DEATH_TALON_OVERSEER);
         Reset();
     }
 
@@ -1143,38 +1192,22 @@ struct npc_death_talonAI : public ScriptedAI
 
     uint32 RandomPower()
     {
-        switch (urand(0, 4))
-        {
-            case 0:
-                return SPELL_BROODPOWER_BLUE;
-            case 1:
-                return SPELL_BROODPOWER_BLACK;
-            case 2:
-                return SPELL_BROODPOWER_BRONZE;
-            case 3:
-                return SPELL_BROODPOWER_RED;
-            case 4:
-                return SPELL_BROODPOWER_GREEN;
-        }
-        return (0);
+        return PickRandomValue(
+            SPELL_BROODPOWER_BLUE,
+            SPELL_BROODPOWER_BLACK,
+            SPELL_BROODPOWER_BRONZE,
+            SPELL_BROODPOWER_RED,
+            SPELL_BROODPOWER_GREEN);
     }
 
     uint32 RandomSensibility()
     {
-        switch (urand(0, 4))
-        {
-            case 0:
-                return SPELL_FIRE_VULNERABILITY;
-            case 1:
-                return SPELL_FROST_VULNERABILITY;
-            case 2:
-                return SPELL_SHADOW_VULNERABILITY;
-            case 3:
-                return SPELL_NATURE_VULNERABILITY;
-            case 4:
-                return SPELL_ARCANE_VULNERABILITY;
-        }
-        return (0);
+        return PickRandomValue(
+            SPELL_FIRE_VULNERABILITY,
+            SPELL_FROST_VULNERABILITY,
+            SPELL_SHADOW_VULNERABILITY,
+            SPELL_NATURE_VULNERABILITY,
+            SPELL_ARCANE_VULNERABILITY);
     }
 
     void UpdateAI(uint32 const uiDiff) override
@@ -1241,11 +1274,12 @@ struct npc_blackwing_technicianAI : public ScriptedAI
     {
         m_bAdded = false;
         m_bVaelGob = (pCreature->GetPositionZ() < 420.0f);
-        if (ScriptedInstance *pInstance = (ScriptedInstance*)pCreature->GetInstanceData())
+
+        if (instance_blackwing_lair* pBlackwingLair = dynamic_cast<instance_blackwing_lair*>(pCreature->GetInstanceData()))
         {
-            if (instance_blackwing_lair *pBlackwingLair = dynamic_cast<instance_blackwing_lair*>(pInstance))
-                m_pTechnicianHelper = pBlackwingLair->GetTechnicianHelper();
+            m_pTechnicianHelper = pBlackwingLair->GetTechnicianHelper();
         }
+
         Reset();
     }
 
@@ -1304,7 +1338,7 @@ struct npc_blackwing_technicianAI : public ScriptedAI
         {
             if (m_uiEmoteTimer <= uiDiff)
             {
-                m_creature->HandleEmote(133);
+                m_creature->HandleEmote(EMOTE_STATE_USESTANDING_NOSHEATHE);
                 m_uiEmoteTimer = 0;
             }
             else m_uiEmoteTimer -= uiDiff;
@@ -1395,7 +1429,6 @@ CreatureAI* GetAI_npc_corrupted_whelp(Creature* pCreature)
     return new CorruptedWhelpAI(pCreature);
 }
 
-
 void AddSC_instance_blackwing_lair()
 {
     Script* pNewscript;
@@ -1406,12 +1439,12 @@ void AddSC_instance_blackwing_lair()
 
     pNewscript = new Script;
     pNewscript->Name = "go_orbe_domination";
-    pNewscript->pGOHello = &GOHello_go_orbe_domination;
+    pNewscript->pGOHello = &GOHello_go_orb_of_domination;
     pNewscript->RegisterSelf();
 
     pNewscript = new Script;
     pNewscript->Name = "go_oeuf_raz";
-    pNewscript->GOGetAI = &GetAIgo_oeuf_raz;
+    pNewscript->GOGetAI = &GetAIgo_egg_raz;
     pNewscript->RegisterSelf();
 
     pNewscript = new Script;

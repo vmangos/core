@@ -54,16 +54,17 @@ class Spell;
 typedef std::multimap<uint32, ScriptInfo> ScriptMap;
 typedef std::map<uint32, ScriptMap > ScriptMapMap;
 
+extern ScriptMapMap sAreaTriggerScripts;
+extern ScriptMapMap sCreatureAIScripts;
+extern ScriptMapMap sCreatureMovementScripts;
+extern ScriptMapMap sCreatureSpellScripts;
+extern ScriptMapMap sEventScripts;
+extern ScriptMapMap sGameObjectScripts;
+extern ScriptMapMap sGenericScripts;
+extern ScriptMapMap sGossipScripts;
 extern ScriptMapMap sQuestEndScripts;
 extern ScriptMapMap sQuestStartScripts;
 extern ScriptMapMap sSpellScripts;
-extern ScriptMapMap sCreatureSpellScripts;
-extern ScriptMapMap sGameObjectScripts;
-extern ScriptMapMap sEventScripts;
-extern ScriptMapMap sGenericScripts;
-extern ScriptMapMap sGossipScripts;
-extern ScriptMapMap sCreatureMovementScripts;
-extern ScriptMapMap sCreatureAIScripts;
 
 #define MAX_SCRIPTS         5000                            //72 bytes each (approx 351kb)
 #define VISIBLE_RANGE       (166.0f)                        //MAX visible range (size of grid)
@@ -254,6 +255,7 @@ class ScriptMgr
         ScriptMgr();
         ~ScriptMgr();
 
+        void LoadAreaTriggerScripts();
         void LoadGameObjectScripts();
         void LoadQuestEndScripts();
         void LoadQuestStartScripts();
@@ -269,10 +271,7 @@ class ScriptMgr
         bool CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint32 targetParam2, char const* tableName, uint32 tableEntry);
 
         void LoadScriptNames();
-        void LoadAreaTriggerScripts();
         void LoadEventIdScripts();
-
-        uint32 GetAreaTriggerScriptId(uint32 triggerId) const;
         uint32 GetEventIdScriptId(uint32 eventId) const;
 
         char const* GetScriptName(uint32 id) const { return id < m_scriptNames.size() ? m_scriptNames[id].c_str() : ""; }
@@ -373,9 +372,7 @@ class ScriptMgr
         typedef std::unordered_map<uint32, std::vector<ScriptPointMove> > PointMoveMap;
         typedef std::unordered_map<int32, CreatureEscortData> EscortDataMap;
 
-        AreaTriggerScriptMap    m_AreaTriggerScripts;
         EventIdScriptMap        m_EventIdScripts;
-
         ScriptNameMap           m_scriptNames;
         
         TextDataMap     m_mTextDataMap;                     //additional data for text strings
@@ -390,7 +387,6 @@ class ScriptMgr
 
 #define sScriptMgr MaNGOS::Singleton<ScriptMgr>::Instance()
 
-uint32 GetAreaTriggerScriptId(uint32 triggerId);
 uint32 GetEventIdScriptId(uint32 eventId);
 uint32 GetScriptId(char const* name);
 char const* GetScriptName(uint32 id);

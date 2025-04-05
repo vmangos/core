@@ -1412,26 +1412,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
         }
         case SPELLFAMILY_MAGE:
         {
-            switch (m_spellInfo->Id)
-            {
-                case 12472:                                 // Cold Snap
-                {
-                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    // immediately finishes the cooldown on Frost spells
-                    auto cdCheck = [](SpellEntry const & spellEntry) -> bool
-                    {
-                        if (spellEntry.SpellFamilyName != SPELLFAMILY_MAGE)
-                            return false;
-                        if ((spellEntry.GetSpellSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellEntry.GetRecoveryTime() > 0)
-                            return true;
-                        return false;
-                    };
-                    static_cast<Player*>(m_caster)->RemoveSomeCooldown(cdCheck);
-                    return;
-                }
-            }
             break;
         }
         case SPELLFAMILY_WARRIOR:
@@ -1440,170 +1420,16 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
         }
         case SPELLFAMILY_WARLOCK:
         {
-            // Life Tap
-            if (m_spellInfo->IsFitToFamilyMask<CF_WARLOCK_LIFE_TAP>())
-            {
-                if (!m_casterUnit)
-                    return;
-
-                float dmg = m_casterUnit->CalculateSpellEffectValue(m_casterUnit, m_spellInfo, effIdx, &m_currentBasePoints[EFFECT_INDEX_0]);
-                if (Player* modOwner = m_casterUnit->GetSpellModOwner())
-                    modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, dmg, this);
-
-                dmg = m_casterUnit->SpellDamageBonusDone(m_casterUnit, m_spellInfo, effIdx, dmg > 0 ? dmg : 0, SPELL_DIRECT_DAMAGE);
-                dmg = m_casterUnit->SpellDamageBonusTaken(m_casterUnit, m_spellInfo, effIdx, dmg, SPELL_DIRECT_DAMAGE);
-                int32 idmg = dither(dmg);
-
-                if (int32(m_casterUnit->GetHealth()) > idmg)
-                {
-                    // Shouldn't Appear in Combat Log
-                    m_casterUnit->ModifyHealth(-idmg);
-
-                    int32 mana = idmg;
-
-                    Unit::AuraList const& auraDummy = m_casterUnit->GetAurasByType(SPELL_AURA_DUMMY);
-                    for (const auto itr : auraDummy)
-                    {
-                        // only Imp. Life Tap have this in combination with dummy aura
-                        if (itr->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK && itr->GetSpellProto()->SpellIconID == 208)
-                            mana = (itr->GetModifier()->m_amount + 100) * mana / 100;
-                    }
-
-                    m_casterUnit->CastCustomSpell(m_casterUnit, 31818, mana, {}, {}, true, nullptr);
-                }
-                else
-                    SendCastResult(SPELL_FAILED_FIZZLE);
-
-                return;
-            }
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
-            if (m_spellInfo->Id == 18280) // Curse of Agony Dummy
-            {
-                if (SpellEntry const* pSpellEntry = m_triggeredByAuraSpell)
-                {
-                    SpellCaster* pCaster = m_caster;
-                    if (SpellAuraHolder const* pAuraHolder = unitTarget->GetSpellAuraHolder(pSpellEntry->Id))
-                        if (Unit* pAuraCaster = pAuraHolder->GetCaster())
-                            pCaster = pAuraCaster;
-
-                    int32 damagePoint = m_triggeredByAuraBasePoints;
-                    damagePoint = pCaster->SpellDamageBonusDone(unitTarget, pSpellEntry, EFFECT_INDEX_0, damagePoint, DOT);
-                    pCaster->CastCustomSpell(unitTarget, 18277, damagePoint, {}, {}, true);
-                }
-                return;
-            }
-#endif
             break;
         }
         case SPELLFAMILY_PRIEST:
         {
-            switch (m_spellInfo->Id)
-            {
-                case 28598:                                 // Touch of Weakness triggered spell
-                {
-                    if (!unitTarget || !m_triggeredByAuraSpell)
-                        return;
-
-                    uint32 spellId;
-                    switch (m_triggeredByAuraSpell->Id)
-                    {
-                        case 2652:
-                            spellId =  2943;
-                            break; // Rank 1
-                        case 19261:
-                            spellId = 19249;
-                            break; // Rank 2
-                        case 19262:
-                            spellId = 19251;
-                            break; // Rank 3
-                        case 19264:
-                            spellId = 19252;
-                            break; // Rank 4
-                        case 19265:
-                            spellId = 19253;
-                            break; // Rank 5
-                        case 19266:
-                            spellId = 19254;
-                            break; // Rank 6
-                        default:
-                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::EffectDummy: Spell 28598 triggered by unhandeled spell %u", m_triggeredByAuraSpell->Id);
-                            return;
-                    }
-                    m_caster->CastSpell(unitTarget, spellId, true, nullptr);
-                    return;
-                }
-            }
             break;
         }
         case SPELLFAMILY_DRUID:
-            switch (m_spellInfo->Id)
-            {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-                case 5229:                                  // Enrage
-                {
-                    if (!unitTarget)
-                        return;
-
-                    // Reduce base armor by 27% in Bear Form and 16% in Dire Bear Form
-                    int32 reductionMod = unitTarget->HasAura(9634) ? -16 : -27;
-                    unitTarget->CastCustomSpell(unitTarget, 25503, reductionMod, {}, {}, true);
-                    break;
-                }
-#endif
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
-                // Ferocious Bite
-                case 22568: // Rank 1
-                case 22827: // Rank 2
-                case 22828: // Rank 3
-                case 22829: // Rank 4
-                {
-                    if (!m_casterUnit || !unitTarget)
-                        return;
-
-                    uint32 damageSpellId;
-                    switch (m_spellInfo->Id)
-                    {
-                        case 22568: // Rank 1
-                            damageSpellId = 22851;
-                            break;
-                        case 22827: // Rank 2
-                            damageSpellId = 22853;
-                            break;
-                        case 22828: // Rank 3
-                            damageSpellId = 22861;
-                            break;
-                        case 22829: // Rank 4
-                            damageSpellId = 22862;
-                            break;
-                        default:
-                            return;
-                    }
-
-                    int32 dmg = m_casterUnit->GetPower(POWER_ENERGY) * m_spellInfo->DmgMultiplier[effIdx];
-                    m_casterUnit->CastCustomSpell(unitTarget, damageSpellId, dmg, {}, {}, true);
-                    m_casterUnit->SetPower(POWER_ENERGY, 0);
-                    break;
-                }
-#endif
-                case 29201: // Loatheb Corrupted Mind triggered sub spells
-                {
-                    uint32 spellid;
-                    switch (unitTarget->GetClass())
-                    {
-                        // priests should be getting 29185, but it triggers on dmg effects as well, don't know why.
-                        // stealing druid version for priests until anyone has a reason priests cant smite.s
-                        case CLASS_PRIEST:  spellid = 29194; break;//29185; break;
-                        case CLASS_DRUID:   spellid = 29194; break;
-                        case CLASS_PALADIN: spellid = 29196; break;
-                        case CLASS_SHAMAN:  spellid = 29198; break;
-                        default: return;
-                    }
-                    m_caster->CastSpell(unitTarget, spellid, true);
-
-                    break;
-                }
-            }
+        {
             break;
+        }
         case SPELLFAMILY_HUNTER:
         {
             break;
@@ -1614,90 +1440,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
         }
         case SPELLFAMILY_SHAMAN:
         {
-            // Rockbiter Weapon
-            if (m_spellInfo->IsFitToFamilyMask<CF_SHAMAN_ROCKBITER_WEAPON>())
-            {
-                uint32 spellId;
-                switch (m_spellInfo->Id)
-                {
-                    case  8017:
-                        spellId = 36494;
-                        break;    // Rank 1
-                    case  8018:
-                        spellId = 36750;
-                        break;    // Rank 2
-                    case  8019:
-                        spellId = 36755;
-                        break;    // Rank 3
-                    case 10399:
-                        spellId = 36759;
-                        break;    // Rank 4
-                    case 16314:
-                        spellId = 36763;
-                        break;    // Rank 5
-                    case 16315:
-                        spellId = 36766;
-                        break;    // Rank 6
-                    case 16316:
-                        spellId = 36771;
-                        break;    // Rank 7
-                    default:
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::EffectDummy: Spell %u not handled in RW", m_spellInfo->Id);
-                        return;
-                }
-
-                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
-
-                if (!spellInfo)
-                {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Rockbiter Weapon: unknown spell id %i", spellId);
-                    return;
-                }
-
-                Player* pPlayer = m_caster->ToPlayer();
-                if (!pPlayer)
-                    return;
-
-                for (int j = BASE_ATTACK; j <= OFF_ATTACK; ++j)
-                {
-                    if (Item* item = pPlayer->GetWeaponForAttack(WeaponAttackType(j)))
-                    {
-                        if (item->IsFitToSpellRequirements(m_spellInfo))
-                        {
-                            Spell* spell = new Spell(pPlayer, spellInfo, true);
-
-                            // enchanting spell selected by calculated damage-per-sec in enchanting effect
-                            // at calculation applied affect from Elemental Weapons talent
-                            // real enchantment damage
-                            spell->m_currentBasePoints[1] = damage;
-
-                            SpellCastTargets targets;
-                            targets.setItemTarget(item);
-                            spell->prepare(std::move(targets));
-                        }
-                    }
-                }
-                return;
-            }
-
-            // Flametongue Weapon Proc, Ranks
-            // Daemon : et totem langue de feu
-            if (m_spellInfo->IsFitToFamilyMask<CF_SHAMAN_FLAMETONGUE_WEAPON, CF_SHAMAN_FLAMETONGUE_TOTEM>())
-            {
-                if (!m_CastItem)
-                {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::EffectDummy: spell %i requires cast Item", m_spellInfo->Id);
-                    return;
-                }
-                // found spelldamage coefficients of 0.381% per 0.1 speed and 15.244 per 4.0 speed
-                // but own calculation say 0.385 gives at most one point difference to published values
-                float spellDamage = m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSpellSchoolMask());
-                float weaponSpeed = (1.0f / float(IN_MILLISECONDS)) * m_CastItem->GetProto()->Delay;
-                float totalDamage = (damage + 3.85f * spellDamage) * 0.01f * weaponSpeed;
-
-                m_caster->CastCustomSpell(unitTarget, 10444, dither(totalDamage), {}, {}, true, m_CastItem);
-                return;
-            }
             break;
         }
     }

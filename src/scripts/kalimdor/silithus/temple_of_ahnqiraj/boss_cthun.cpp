@@ -53,7 +53,7 @@ enum eSpells
     SPELL_ROTATE_TRIGGER            = 26137,
     SPELL_ROTATE_NEGATIVE_360       = 26136,
     SPELL_ROTATE_POSITIVE_360       = 26009,
-    SPELL_DARK_GLARE                = 26029,
+    // SPELL_DARK_GLARE             = 26029,
     
     // Shared spells
     SPELL_GREEN_EYE_BEAM            = 26134,
@@ -67,8 +67,8 @@ enum eSpells
 
     // spellid 26100 has a more correct knockback effect for giant tentacles, but wrong dmg values
 
-    //SPELL_PUNT_UPWARD               = 16716, // Used to knock people up from stomach. Remove manually after port as it's the wrong spell and applies slowfall
-    SPELL_MASSIVE_GROUND_RUPTURE    = 26100, // currently unused, ~1k physical huge knockback, not sure who should do it, if any
+    // SPELL_PUNT_UPWARD            = 16716, // Used to knock people up from stomach. Remove manually after port as it's the wrong spell and applies slowfall
+    // SPELL_MASSIVE_GROUND_RUPTURE = 26100, // currently unused, ~1k physical huge knockback, not sure who should do it, if any
     SPELL_GROUND_RUPTURE_PHYSICAL   = 26139, // used by small tentacles
     SPELL_HAMSTRING                 = 26141, //26211 is in DBC with more correct ID?
     SPELL_MIND_FLAY                 = 26143, 
@@ -77,15 +77,22 @@ enum eSpells
     //C'thun spells
     
     SPELL_CARAPACE_OF_CTHUN         = 26156, // Makes C'thun invulnerable
-    SPELL_DIGESTIVE_ACID_TELEPORT   = 26220, // Not yet used, seems to port C'thun instead of player no matter what.
+    // SPELL_DIGESTIVE_ACID_TELEPORT= 26220, // Not yet used, seems to port C'thun instead of player no matter what.
     SPELL_TRANSFORM                 = 26232, // Initiates the p1->p2 transform
     SPELL_CTHUN_VULNERABLE          = 26235, // Adds the red color. Does not actually him vulnerable, need to remove carapace for that.
     SPELL_MOUTH_TENTACLE            = 26332, // Spawns the tentacle that "eats" you to stomach and mounts the player on it.
 };
 
 static std::vector<uint32> const allTentacleTypes
-({ MOB_EYE_TENTACLE, MOB_CLAW_TENTACLE, MOB_GIANT_CLAW_TENTACLE, MOB_GIANT_EYE_TENTACLE, MOB_FLESH_TENTACLE,
-    MOB_SMALL_PORTAL, MOB_GIANT_PORTAL});
+({
+    MOB_EYE_TENTACLE,
+    MOB_CLAW_TENTACLE,
+    MOB_GIANT_CLAW_TENTACLE,
+    MOB_GIANT_EYE_TENTACLE,
+    MOB_FLESH_TENTACLE,
+    MOB_SMALL_PORTAL,
+    MOB_GIANT_PORTAL
+});
 
 static constexpr uint32 CANNOT_CAST_SPELL_MASK = (UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED
                                                  | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING);
@@ -100,7 +107,6 @@ static constexpr float fleshTentaclePositions[2][4] =
     { -8571.0f, 1990.0f, -98.0f, 1.22f },
     { -8525.0f, 1994.0f, -98.0f, 2.12f }
 };
-
 
 static constexpr float eyeTentaclePositions[8][3] =
 {
@@ -187,11 +193,6 @@ public:
         return false;
     }
 
-    uint32 TimeSinceLast()
-    {
-        return timeSinceLast;
-    }
-
 protected:
     Creature* m_creature;
     uint32 spellID;
@@ -232,11 +233,6 @@ public:
         {
             timeSinceLast += diff;
         }
-        return didOnce;
-    }
-
-    bool DidCast()
-    {
         return didOnce;
     }
 private:
@@ -591,6 +587,13 @@ public:
             pPortal = m_pInstance->GetCreature(portalGuid);
         if (!pPortal)
             return;
+
+        if (pPortal->AI())
+        {
+            pPortal->AI()->SetMeleeAttack(false);
+            pPortal->AI()->SetCombatMovement(false);
+        }
+
         uint32 portalEntry = pPortal->GetEntry();
         float radius;
         switch (portalEntry)
@@ -1230,7 +1233,8 @@ struct eye_of_cthunAI : public ScriptedAI
             {
                 target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
             }
-            else
+
+            if (!target || target->IsDead())
             {
                 target = SelectRandomAliveNotStomach(m_pInstance);
             }
@@ -1372,6 +1376,7 @@ struct cthunAI : public ScriptedAI
             }
             eye_of_cthunAI* eyeAI = (eye_of_cthunAI*)pEye->AI();
             eyeAI->Pull(who);
+            ScriptedAI::AttackStart(who);
 #ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
             m_creature->SetInCombatWith(who);
             pEye->SetInCombatWith(who);
@@ -1387,6 +1392,23 @@ struct cthunAI : public ScriptedAI
         else
         {
             ScriptedAI::AttackStart(who);
+        }
+    }
+
+    void DespawnAllTentacles()
+    {
+        std::list<Creature*> creaturesToDespawn;
+        GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, allTentacleTypes, 350.0f);
+        for (const auto it : creaturesToDespawn)
+        {
+            if (auto* cpt = dynamic_cast<cthunPortalTentacle*>(it->AI()))
+            {
+                cpt->DespawnPortal();
+            }
+            if (auto* ts = dynamic_cast<TemporarySummon*>(it))
+            {
+                ts->UnSummon();
+            }
         }
     }
    
@@ -1434,15 +1456,7 @@ struct cthunAI : public ScriptedAI
             CheckRespawnEye();
 
         // Force despawn any tentacles or portals alive. 
-        std::list<Creature*> creaturesToDespawn;
-        GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, allTentacleTypes, 2000.0f);
-        for (const auto it : creaturesToDespawn)
-        {
-            if (cthunPortalTentacle* cpt = dynamic_cast<cthunPortalTentacle*>(it->AI()))
-                cpt->DespawnPortal();
-            if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(it))
-                ts->UnSummon();
-        }
+        DespawnAllTentacles();
 
         if (m_creature->IsAlive())
             m_creature->SetHealth(m_creature->GetMaxHealth());
@@ -1513,13 +1527,13 @@ struct cthunAI : public ScriptedAI
             {
                 sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Flesh tentacle summoned, but there are already %i tentacles up.", fleshTentacles.size());
             }
-            fleshTentacles.push_back(pCreature->GetGUID());
+            fleshTentacles.emplace_back(pCreature->GetGUID());
         }
     }
 
     void UpdateAI(uint32 const diff) override
     {
-        if (!m_pInstance)
+        if (!m_pInstance || m_creature->IsDead())
             return;
 
         // Delaying respawn of eye if it was a wipe so we get the re-emerge animation before spawn
@@ -1637,14 +1651,7 @@ struct cthunAI : public ScriptedAI
         {
             currentPhase = PHASE_CTHUN_DONE;
             m_pInstance->SetData(TYPE_CTHUN, DONE);
-            std::list<Creature*> creaturesToDespawn;
-            GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, MOB_FLESH_TENTACLE, 2000.0f);
-            for (const auto it : creaturesToDespawn)
-            {
-                if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(it))
-                    ts->UnSummon();
-            }
-
+            DespawnAllTentacles();
         }
     }
 

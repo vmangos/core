@@ -3635,7 +3635,7 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
                 return false;
             }
 
-            mapid = atEntry->mapid;
+            mapid = atEntry->map_id;
             x = atEntry->x;
             y = atEntry->y;
             z = atEntry->z;

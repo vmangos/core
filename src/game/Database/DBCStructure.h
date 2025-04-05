@@ -41,20 +41,6 @@
 #pragma pack(push,1)
 #endif
 
-struct AreaTriggerEntry
-{
-    uint32    id;                                           // 0
-    uint32    mapid;                                        // 1
-    float     x;                                            // 2
-    float     y;                                            // 3
-    float     z;                                            // 4
-    float     radius;                                       // 5
-    float     box_x;                                        // 6 extent x edge
-    float     box_y;                                        // 7 extent y edge
-    float     box_z;                                        // 8 extent z edge
-    float     box_orientation;                              // 9 extent rotation by about z axis
-};
-
 struct AuctionHouseEntry
 {
     uint32    houseId;                                      // 0        m_ID

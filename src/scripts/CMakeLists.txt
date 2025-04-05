@@ -42,7 +42,6 @@ set (SCRIPTS_SRCS
     custom/event_attack_city.cpp
     custom/gmisland.cpp
     custom/npc_escort.cpp
-    custom/zero_creatures.cpp
     custom/npc_j_eevee.cpp
     eastern_kingdoms/alterac_mountains/alterac_mountains.cpp
     eastern_kingdoms/arathi_highlands/arathi_highlands.cpp
@@ -244,8 +243,11 @@ set (SCRIPTS_SRCS
     spells/spell_druid.cpp
     spells/spell_hunter.cpp
     spells/spell_item.cpp
+    spells/spell_mage.cpp
     spells/spell_paladin.cpp
+    spells/spell_priest.cpp
     spells/spell_rogue.cpp
+    spells/spell_shaman.cpp
     spells/spell_special.cpp
     spells/spell_warlock.cpp
     spells/spell_warrior.cpp

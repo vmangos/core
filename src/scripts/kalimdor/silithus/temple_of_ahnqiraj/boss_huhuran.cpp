@@ -106,7 +106,7 @@ struct boss_huhuranAI : public ScriptedAI
             return;
 
         //m_uiFrenzyTimer
-        if (m_uiFrenzyTimer < uiDiff)
+        if (m_uiFrenzyTimer < uiDiff && !m_creature->HasAura(SPELL_FRENZY))
         {
             if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
             {

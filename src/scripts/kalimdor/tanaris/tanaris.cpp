@@ -302,8 +302,16 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
 ## npc_Yeh'Kinya
 ######*/
 
-#define QUEST_YELL_HAKKAR_EVENT -1108998
-#define SPELL_AV_VISUALTRANSFORM 24085
+enum Yehkinya : uint32
+{
+    SAY_HAKKAR_EVENT_1 = 10456,
+    SAY_HAKKAR_EVENT_2 = 10457,
+
+    SPELL_TRANSFORM_VISUAL = 24085,
+
+    QUEST_HAKKAR_EVENT = 8181
+};
+
 struct npc_yehkinyaAI : public npc_escortAI
 {
     npc_yehkinyaAI(Creature* pCreature) : npc_escortAI(pCreature)
@@ -311,16 +319,16 @@ struct npc_yehkinyaAI : public npc_escortAI
         Reset();
     }
     
-    uint32 Event_Timer;
-    bool   isEventStarted;
-    uint32 Point;   
+    uint32 m_uiEventTimer;
+    bool   m_isEventStarted;
+    uint32 m_uiPoint;
  
     void Reset() override
     {
-        isEventStarted = false;
+        m_isEventStarted = false;
         m_creature->LoadEquipment(1315, true);
         m_creature->SetDisplayId(7902);
-        Event_Timer = 0;
+        m_uiEventTimer = 0;
         m_creature->SetFly(false);
         m_creature->SetWalk(false);
     }
@@ -330,32 +338,36 @@ struct npc_yehkinyaAI : public npc_escortAI
         switch (i)
         {
             case 1:
+            {
                 m_creature->SetWalk(false);
-                isEventStarted = true;
+                m_isEventStarted = true;
                 m_creature->LoadEquipment(0, true);
-                Event_Timer = 3000;
-                DoCastSpellIfCan(m_creature, SPELL_AV_VISUALTRANSFORM);
+                m_uiEventTimer = 3000;
+                DoCastSpellIfCan(m_creature, SPELL_TRANSFORM_VISUAL);
                 m_creature->SetDisplayId(1336);
                 m_creature->SetFly(true);
                 SetEscortPaused(true);
                 break;
+            }
         }
     }
 
     void UpdateEscortAI(uint32 const diff) override
     {
-        if (Event_Timer <= diff)
+        if (m_uiEventTimer <= diff)
         {
-            if(isEventStarted)
+            if (m_isEventStarted)
             {
                 SetEscortPaused(false);
-                m_creature->MonsterYell(QUEST_YELL_HAKKAR_EVENT, LANG_UNIVERSAL, 0);
+                DoScriptText(SAY_HAKKAR_EVENT_2, m_creature);
                 m_creature->SetWalk(false);
-                Event_Timer = 15000;
+                m_uiEventTimer = 15000;
             }
         }
         else
-            Event_Timer -= diff;
+        {
+            m_uiEventTimer -= diff;
+        }
     }
 };
 
@@ -364,16 +376,13 @@ CreatureAI* GetAI_npc_yehkinya(Creature* pCreature)
     return new npc_yehkinyaAI(pCreature);
 }
 
-#define QUEST_HAKKAR_EVENT 8181
-#define QUEST_TEXT_HAKKAR_EVENT -1108999
-
 bool QuestRewarded_npc_yehkinya(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_HAKKAR_EVENT)
     {
-        DoScriptText(QUEST_TEXT_HAKKAR_EVENT, pCreature);
+        DoScriptText(SAY_HAKKAR_EVENT_1, pCreature, pPlayer);
 
-        if (npc_yehkinyaAI* pEscortAI = dynamic_cast<npc_yehkinyaAI*>(pCreature->AI()))
+        if (auto* pEscortAI = dynamic_cast<npc_yehkinyaAI*>(pCreature->AI()))
         {
             pEscortAI->Start(true, 0, nullptr, true);
             pCreature->SetWalk(false);

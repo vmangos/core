@@ -29,14 +29,14 @@ EndScriptData */
 #include <bitset>
 
 enum
-{   // THESE EXIST BUT NEED TO BE RESCRIPTED AS THERE IS NO %s PARAMETER IN THE TEXT
-    // emotes
-    EMOTE_SLOW                  = -1531041, // Viscidus begins to slow.
-    EMOTE_FREEZE                = -1531042, // Viscidus is freezing up.
-    EMOTE_FROZEN                = -1531043, // Viscidus is frozen solid.
+{
+    EMOTE_SLOW   = 11343,
+    EMOTE_FREEZE = 11345,
+    EMOTE_FROZEN = 11695,
+
     // These are currently handled in UnitAuraProcHandler.cpp.
-    EMOTE_CRACK                 = -1531044, // Viscidus begins to crack.
-    EMOTE_SHATTER               = -1531045, // Viscidus looks ready to shatter.
+    // EMOTE_CRACK   = 11346,
+    // EMOTE_SHATTER = 11347,
 
     // Timer spells
     SPELL_POISON_SHOCK          = 25993,
@@ -60,9 +60,9 @@ enum
     SPELL_VISCIDUS_SHRINKS      = 25893,
     SPELL_VISCIDUS_SHRINKS_HP   = 27934,                    // should be scripted properly
     SPELL_VISCIDUS_GROWS        = 25897,
-    SPELL_SUMMON_GLOBS          = 25885,                    // summons npc 15667 using spells from 25865 to 25884; All spells have target coords
+    // SPELL_SUMMON_GLOBS       = 25885,                    // summons npc 15667 using spells from 25865 to 25884; All spells have target coords
     SPELL_VISCIDUS_TELEPORT     = 25904,                    // teleport to room center
-    SPELL_SUMMONT_TRIGGER       = 26564,                    // summons 15922
+    // SPELL_SUMMONT_TRIGGER    = 26564,                    // summons 15922
 
     SPELL_GLOB_SPEED            = 26633,                    // apply aura 26634 each second
     
@@ -196,7 +196,6 @@ struct boss_viscidusAI : public ScriptedAI
     uint32 m_uiPoisonShockTimer;
     uint32 m_uiPoisonBoltVolleyTimer;
 
-    uint32 m_uiPhaseTimer;
     uint16 m_uiGrowTimer;
     uint8  m_uiPhase;
 
@@ -217,7 +216,6 @@ struct boss_viscidusAI : public ScriptedAI
     {
         m_uiGrowTimer = 0;
         m_uiPhase                 = PHASE_NORMAL;
-        m_uiPhaseTimer            = 0;
 
         m_uiRestoreTargetTimer    = 0;
 
@@ -479,7 +477,7 @@ struct boss_viscidusAI : public ScriptedAI
 
                 // should be part of SPELL_VISCIDUS_SHRINKS_HP script!
                 auto scale = m_creature->GetObjectScale();
-                scale -= 0.04 * m_lGlobesGuidList.size();
+                scale -= 0.04f * m_lGlobesGuidList.size();
                 m_creature->SetObjectScale(scale);
             }
             else

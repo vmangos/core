@@ -166,12 +166,7 @@ struct boss_skeramAI : public ScriptedAI
         if (m_pInstance && m_pInstance->GetData(TYPE_SKERAM) == IN_PROGRESS)
             return;
 
-        switch (urand(0,2))
-        {
-            case 0: DoScriptText(SAY_AGGRO_1, m_creature); break;
-            case 1: DoScriptText(SAY_AGGRO_2, m_creature); break;
-            case 2: DoScriptText(SAY_AGGRO_3, m_creature); break;
-        }
+        DoScriptText(PickRandomValue(SAY_AGGRO_1, SAY_AGGRO_2, SAY_AGGRO_3), m_creature);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SKERAM, IN_PROGRESS);

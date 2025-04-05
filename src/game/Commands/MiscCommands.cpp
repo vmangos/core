@@ -1397,11 +1397,11 @@ void ChatHandler::ShowTriggerListHelper(AreaTriggerEntry const* atEntry)
         snprintf(dist_buf, 50, GetMangosString(LANG_TRIGGER_DIST), dist);
 
         PSendSysMessage(LANG_TRIGGER_LIST_CHAT,
-                        atEntry->id, atEntry->id, atEntry->mapid, atEntry->x, atEntry->y, atEntry->z, dist_buf, tavern, quest);
+                        atEntry->id, atEntry->id, atEntry->map_id, atEntry->x, atEntry->y, atEntry->z, dist_buf, tavern, quest);
     }
     else
         PSendSysMessage(LANG_TRIGGER_LIST_CONSOLE,
-                        atEntry->id, atEntry->mapid, atEntry->x, atEntry->y, atEntry->z, tavern, quest);
+                        atEntry->id, atEntry->map_id, atEntry->x, atEntry->y, atEntry->z, tavern, quest);
 
     if (AreaTriggerTeleport const* at = sObjectMgr.GetAreaTriggerTeleport(atEntry->id))
         ShowTriggerTargetListHelper(atEntry->id, at, true);
@@ -1449,7 +1449,7 @@ bool ChatHandler::HandleTriggerCommand(char* args)
             if (!atTestEntry)
                 continue;
 
-            if (atTestEntry->mapid != m_session->GetPlayer()->GetMapId())
+            if (atTestEntry->map_id != m_session->GetPlayer()->GetMapId())
                 continue;
 
             float dx = atTestEntry->x - player->GetPositionX();
@@ -1531,7 +1531,7 @@ bool ChatHandler::HandleTriggerNearCommand(char* args)
         if (!atEntry)
             continue;
 
-        if (atEntry->mapid != m_session->GetPlayer()->GetMapId())
+        if (atEntry->map_id != m_session->GetPlayer()->GetMapId())
             continue;
 
         float dx = atEntry->x - player->GetPositionX();

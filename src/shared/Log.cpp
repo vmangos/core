@@ -105,8 +105,8 @@ void Log::OpenWorldLogFiles()
     logFiles[LOG_RA] = OpenLogFile("LogFile.Ra", "Ra.log", log_file_timestamp, false);
     logFiles[LOG_DBERROR] = OpenLogFile("LogFile.DBError", "DBErrors.log", log_file_timestamp, true);
     logFiles[LOG_DBERRFIX] = OpenLogFile("LogFile.DBErrorFix", "DBErrorFixes.sql", log_file_timestamp, true);
-    logFiles[LOG_LOOTS] = OpenLogFile("LootsLogFile", "Loot.log", log_file_timestamp, false);
-    logFiles[LOG_LEVELUP] = OpenLogFile("LevelupLogFile", "LevelUp.log", log_file_timestamp, false);
+    logFiles[LOG_LOOTS] = OpenLogFile("LogFile.Loot", "Loot.log", log_file_timestamp, false);
+    logFiles[LOG_LEVELUP] = OpenLogFile("LogFile.LevelUp", "LevelUp.log", log_file_timestamp, false);
     logFiles[LOG_PERFORMANCE] = OpenLogFile("LogFile.Performance", "Perf.log", log_file_timestamp, false);
     logFiles[LOG_MONEY_TRADES] = OpenLogFile("LogFile.Trades", "", log_file_timestamp, false);
     logFiles[LOG_GM] = sConfig.GetBoolDefault("GmLogPerAccount", false) ?

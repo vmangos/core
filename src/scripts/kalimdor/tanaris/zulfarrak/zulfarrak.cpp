@@ -16,18 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Zulfarrak
-SD%Complete: 50
-SDComment: Consider it temporary, no instance script made for this instance yet.
-SDCategory: Zul'Farrak
-EndScriptData */
-
-/* ContentData
-npc_sergeant_bly
-npc_weegli_blastfuse
-EndContentData */
-
 #include "scriptPCH.h"
 #include "zulfarrak.h"
 
@@ -198,18 +186,6 @@ CreatureAI* GetAI_npc_sergeant_bly(Creature* pCreature)
     return new npc_sergeant_blyAI(pCreature);
 }
 
-
-void AddSC_npc_sergeant_bly()
-{
-    Script* pNewScript;
-    pNewScript = new Script;
-    pNewScript->Name = "npc_sergeant_bly";
-    pNewScript->GetAI = &GetAI_npc_sergeant_bly;
-    pNewScript->pGossipHello = &OnGossipHello_npc_sergeant_bly;
-    pNewScript->pGossipSelect = &OnGossipSelect_npc_sergeant_bly;
-    pNewScript->RegisterSelf();
-}
-
 /*######
 +## go_troll_cage
 +######*/
@@ -244,14 +220,6 @@ bool OnGossipHello_go_troll_cage(Player* pPlayer, GameObject* pGo)
     return false;
 }
 
-void AddSC_go_troll_cage()
-{
-    Script* pNewScript;
-    pNewScript = new Script;
-    pNewScript->Name = "go_troll_cage";
-    pNewScript->pGOHello = &OnGossipHello_go_troll_cage;
-    pNewScript->RegisterSelf();
-}
 /*######
 ## npc_weegli_blastfuse
 ######*/
@@ -512,17 +480,6 @@ CreatureAI* GetAI_npc_weegli_blastfuse(Creature* pCreature)
     return new npc_weegli_blastfuseAI(pCreature);
 }
 
-void AddSC_npc_weegli_blastfuse()
-{
-    Script* pNewScript;
-    pNewScript = new Script;
-    pNewScript->Name = "npc_weegli_blastfuse";
-    pNewScript->GetAI = &GetAI_npc_weegli_blastfuse;
-    pNewScript->pGossipHello = &OnGossipHello_npc_weegli_blastfuse;
-    pNewScript->pGossipSelect = &OnGossipSelect_npc_weegli_blastfuse;
-    pNewScript->RegisterSelf();
-}
-
 /*######
 ## go_shallow_grave
 ######*/
@@ -550,47 +507,9 @@ bool OnGossipHello_go_shallow_grave(Player* pPlayer, GameObject* pGo)
     return true;
 }
 
-void AddSC_go_shallow_grave()
-{
-    Script* pNewScript;
-    pNewScript = new Script;
-    pNewScript->Name = "go_shallow_grave";
-    pNewScript->pGOOpen = &OnGossipHello_go_shallow_grave;
-    pNewScript->RegisterSelf();
-}
 /*######
-## at_zumrah
+## go_table_theka
 ######*/
-
-enum zumrahConsts
-{
-    NPC_WITCH_DOCTOR_ZUMRAH = 7271,
-    ZUMRAH_HOSTILE_FACTION  = 37,
-
-    SAY_ZUMRAH_TRIGGER      = 3622,
-    SAY_ZUMRAH_YELL         = 6221,
-    SAY_ZUMRAH_KILLED       = 6222
-};
-
-bool OnTrigger_at_zumrah(Player* pPlayer, AreaTriggerEntry const *at)
-{
-    Creature* pZumrah = pPlayer->FindNearestCreature(NPC_WITCH_DOCTOR_ZUMRAH, 30.0f);
-
-    if (!pZumrah || !pZumrah->IsAlive())
-        return false;
-
-    if (pZumrah->GetFactionTemplateId() != ZUMRAH_HOSTILE_FACTION)
-    {
-        if (InstanceData* pInstance = pZumrah->GetInstanceData())
-            pInstance->SetData(EVENT_ZUMRAH, IN_PROGRESS);
-
-        pZumrah->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-        pZumrah->SetFactionTemplateId(ZUMRAH_HOSTILE_FACTION);
-        DoScriptText(SAY_ZUMRAH_TRIGGER, pZumrah);
-    }
-
-    return true;
-}
 
 bool OnGossipHello_go_table_theka(Player* pPlayer, GameObject* pGo)
 {
@@ -601,6 +520,10 @@ bool OnGossipHello_go_table_theka(Player* pPlayer, GameObject* pGo)
 
     return true;
 }
+
+/*######
+## ward_zumrah
+######*/
 
 struct ward_zumrahAI : public ScriptedAI
 {
@@ -636,24 +559,122 @@ CreatureAI* GetAI_ward_zumrah(Creature* pCreature)
     return new ward_zumrahAI(pCreature);
 }
 
-void AddSC_at_zumrah()
+/*######
+## at_zumrah
+######*/
+
+enum
 {
-    Script* pNewScript;
-    pNewScript = new Script;
-    pNewScript->Name = "at_zumrah";
-    pNewScript->pAreaTrigger = &OnTrigger_at_zumrah;
-    pNewScript->RegisterSelf();
+    NPC_WITCH_DOCTOR_ZUMRAH = 7271,
+    ZUMRAH_HOSTILE_FACTION  = 37,
+
+    SAY_ZUMRAH_TRIGGER      = 3622,
+    SAY_ZUMRAH_YELL         = 6221,
+    SAY_ZUMRAH_KILLED       = 6222
+};
+
+bool OnTrigger_at_zumrah(Player* pPlayer, AreaTriggerEntry const *at)
+{
+    Creature* pZumrah = pPlayer->FindNearestCreature(NPC_WITCH_DOCTOR_ZUMRAH, 30.0f);
+
+    if (!pZumrah || !pZumrah->IsAlive())
+        return false;
+
+    if (pZumrah->GetFactionTemplateId() != ZUMRAH_HOSTILE_FACTION)
+    {
+        if (InstanceData* pInstance = pZumrah->GetInstanceData())
+            pInstance->SetData(EVENT_ZUMRAH, IN_PROGRESS);
+
+        pZumrah->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+        pZumrah->SetFactionTemplateId(ZUMRAH_HOSTILE_FACTION);
+        DoScriptText(SAY_ZUMRAH_TRIGGER, pZumrah);
+    }
+
+    return true;
+}
+
+/*######
+## at_antusul
+######*/
+
+enum
+{
+    NPC_ANTUSUL            = 8127,
+    NPS_SULITHUZ_BROODLING = 8138,
+    SAY_ANTUSUL_TRIGGER    = 4166,
+};
+
+bool OnTrigger_at_antusul(Player* pPlayer, AreaTriggerEntry const *at)
+{
+    Creature* pAntusul = pPlayer->FindNearestCreature(NPC_ANTUSUL, 100.0f);
+
+    if (!pAntusul || !pAntusul->IsAlive() || pAntusul->IsInCombat())
+        return false;
+
+    InstanceData* pInstance = pAntusul->GetInstanceData();
+    if (!pInstance || pInstance->GetData(EVENT_ANTUSUL) != NOT_STARTED)
+        return false;
+    
+    pInstance->SetData(EVENT_ANTUSUL, IN_PROGRESS);
+    DoScriptText(SAY_ANTUSUL_TRIGGER, pAntusul);
+    pAntusul->m_Events.AddLambdaEventAtOffset([pAntusul]()
+    {
+        // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+        // - Antu'sul's Sul'lithuz Broodlings now only hatch 4 at a time and are
+        //   significantly weaker.
+        uint32 count = sWorld.GetWowPatch() < WOW_PATCH_112 ? 2 : 1;
+        for (uint32 i = 0; i < count; ++i)
+        {
+            if (Creature* pBroodling = pAntusul->SummonCreature(NPS_SULITHUZ_BROODLING, 1823.415161f, 748.297485f, 20.794931f, 3.944444f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN))
+                pBroodling->SetInCombatWithZone(true);
+            if (Creature* pBroodling = pAntusul->SummonCreature(NPS_SULITHUZ_BROODLING, 1786.019165f, 743.399048f, 15.481779f, 6.108652f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN))
+                pBroodling->SetInCombatWithZone(true);
+            if (Creature* pBroodling = pAntusul->SummonCreature(NPS_SULITHUZ_BROODLING, 1827.460571f, 738.032410f, 19.131363f, 3.385939f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN))
+                pBroodling->SetInCombatWithZone(true);
+            if (Creature* pBroodling = pAntusul->SummonCreature(NPS_SULITHUZ_BROODLING, 1810.196533f, 749.873230f, 17.597878f, 4.555309f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN))
+                pBroodling->SetInCombatWithZone(true);
+        }
+        
+        if (pAntusul->IsAlive() && !pAntusul->IsInCombat())
+            pAntusul->GetMotionMaster()->MovePoint(0, 1805.133667f, 740.349304f, 14.763382f, MOVE_PATHFINDING | MOVE_RUN_MODE);
+
+    }, BATCHING_INTERVAL * 3);
+
+    return true;
 }
 
 void AddSC_zulfarrak()
 {
-    AddSC_npc_sergeant_bly();
-    AddSC_npc_weegli_blastfuse();
-    AddSC_go_shallow_grave();
-    AddSC_at_zumrah();
-    AddSC_go_troll_cage();
-
     Script* newscript;
+
+    newscript = new Script;
+    newscript->Name = "npc_sergeant_bly";
+    newscript->GetAI = &GetAI_npc_sergeant_bly;
+    newscript->pGossipHello = &OnGossipHello_npc_sergeant_bly;
+    newscript->pGossipSelect = &OnGossipSelect_npc_sergeant_bly;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_weegli_blastfuse";
+    newscript->GetAI = &GetAI_npc_weegli_blastfuse;
+    newscript->pGossipHello = &OnGossipHello_npc_weegli_blastfuse;
+    newscript->pGossipSelect = &OnGossipSelect_npc_weegli_blastfuse;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_shallow_grave";
+    newscript->pGOOpen = &OnGossipHello_go_shallow_grave;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_troll_cage";
+    newscript->pGOHello = &OnGossipHello_go_troll_cage;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_table_theka";
+    newscript->pGOHello = &OnGossipHello_go_table_theka;
+    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "ward_zumrah";
@@ -661,7 +682,12 @@ void AddSC_zulfarrak()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "go_table_theka";
-    newscript->pGOHello = &OnGossipHello_go_table_theka;
+    newscript->Name = "at_zumrah";
+    newscript->pAreaTrigger = &OnTrigger_at_zumrah;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "at_antusul";
+    newscript->pAreaTrigger = &OnTrigger_at_antusul;
     newscript->RegisterSelf();
 }

@@ -27,6 +27,8 @@ struct DruidFerociousBiteScript : SpellScript
             if (!pPlayer)
                 return;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
             // World of Warcraft Client Patch 1.12.0 (2006-08-22)
             // - Ferocious Bite: Book of Ferocious Bite (Rank 5) now drops off The
@@ -36,7 +38,33 @@ struct DruidFerociousBiteScript : SpellScript
             if (uint32 combo = ((Player*)pPlayer)->GetComboPoints())
                 spell->damage += pPlayer->GetTotalAttackPowerValue(BASE_ATTACK) * combo * 0.03f;
 #endif
+
             spell->damage += pPlayer->GetPower(POWER_ENERGY) * spell->m_spellInfo->DmgMultiplier[effIdx];
+
+#else
+
+            uint32 damageSpellId;
+            switch (spell->m_spellInfo->Id)
+            {
+                case 22568: // Rank 1
+                    damageSpellId = 22851;
+                    break;
+                case 22827: // Rank 2
+                    damageSpellId = 22853;
+                    break;
+                case 22828: // Rank 3
+                    damageSpellId = 22861;
+                    break;
+                case 22829: // Rank 4
+                    damageSpellId = 22862;
+                    break;
+                default:
+                    return;
+            }
+
+            int32 dmg = pPlayer->GetPower(POWER_ENERGY) * spell->m_spellInfo->DmgMultiplier[effIdx];
+            pPlayer->CastCustomSpell(spell->GetUnitTarget(), damageSpellId, dmg, {}, {}, true);
+#endif
             pPlayer->SetPower(POWER_ENERGY, 0);
         }
     }
@@ -47,6 +75,27 @@ SpellScript* GetScript_DruidFerociousBite(SpellEntry const*)
     return new DruidFerociousBiteScript();
 }
 
+// 5229 - Enrage
+struct DruidEnrageScript : SpellScript
+{
+    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        if (effIdx == EFFECT_INDEX_1 && spell->GetUnitTarget())
+        {
+            // Reduce base armor by 27% in Bear Form and 16% in Dire Bear Form
+            int32 reductionMod = spell->GetUnitTarget()->HasAura(9634) ? -16 : -27;
+            spell->GetUnitTarget()->CastCustomSpell(spell->GetUnitTarget(), 25503, reductionMod, {}, {}, true);
+        }
+#endif
+    }
+};
+
+SpellScript* GetScript_DruidEnrage(SpellEntry const*)
+{
+    return new DruidEnrageScript();
+}
+
 void AddSC_druid_spell_scripts()
 {
     Script* newscript;
@@ -54,5 +103,10 @@ void AddSC_druid_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_druid_ferocious_bite";
     newscript->GetSpellScript = &GetScript_DruidFerociousBite;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_druid_enrage";
+    newscript->GetSpellScript = &GetScript_DruidEnrage;
     newscript->RegisterSelf();
 }
