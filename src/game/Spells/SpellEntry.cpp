@@ -1,4 +1,6 @@
 #include "SpellEntry.h"
+
+#include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "SpellMgr.h"
@@ -307,7 +309,7 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
                 return DIMINISHING_WARLOCK_FEAR;
 
             // World of Warcraft Client Patch 1.4.0 (2005-04-19)
-            // - Seduction (Succubus) - Is now considered a Fear effect for purposes 
+            // - Seduction (Succubus) - Is now considered a Fear effect for purposes
             //   of diminishing returns.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1
             // Seduction
@@ -329,7 +331,7 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
         case SPELLFAMILY_SHAMAN:
         {
             // World of Warcraft Client Patch 1.4.0 (2005-04-19)
-            // - Frost Shock - Now subject to diminishing returns in PvP. This is 
+            // - Frost Shock - Now subject to diminishing returns in PvP. This is
             //   considered a slowing effect.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1
             // Frost Shock
@@ -348,10 +350,10 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
         case SPELLFAMILY_GENERIC:
         {
             // World of Warcraft Client Patch 1.9.0 (2006-01-03)
-            // - Pyroclasm - The stun effect's duration no longer diminishes or is 
+            // - Pyroclasm - The stun effect's duration no longer diminishes or is
             //   diminished by controlled stun abilities and spells(e.g.Cheap Shot,
             //   Hammer of Justice, Charge, etc).
-            // - Impact - The stun effect's duration no longer diminishes or is 
+            // - Impact - The stun effect's duration no longer diminishes or is
             //   diminished by controlled stun abilities and spells(e.g.Cheap Shot,
             //   Hammer of Justice, Charge etc.).
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -363,7 +365,7 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
                 return DIMINISHING_TRIGGER_STUN;
 #endif
             // World of Warcraft Client Patch 1.8.0 (2005-10-11)
-            // - Gnomish Mind Control Cap - Is now subject to diminishing returns in 
+            // - Gnomish Mind Control Cap - Is now subject to diminishing returns in
             //   the Charm category.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
             // Gnomish Mind Control Cap
@@ -651,11 +653,11 @@ float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEf
                     if (Item *item = ((Player*)caster)->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
                     {
                         coeff = item->isOneHandedWeapon() ? 0.10f : 0.125f;
-                        
+
                     }
                 }
 
-                
+
 
                 return coeff;
             }
@@ -847,7 +849,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                             if (FactionTemplateEntry const* ft2 = caster->GetFactionTemplateEntry())
                                 return ft->IsFriendlyTo(*ft2);
                 }
-                
+
                 return caster->IsFriendlyTo(victim);
             }
         // non-positive aura use
