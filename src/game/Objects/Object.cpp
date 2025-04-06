@@ -2086,7 +2086,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 
     UpdateAllowedPositionZ(destX, destY, destZ);
     destZ += halfHeight;
-    bool colPoint = GetMap()->GetLosHitPosition(pos.x, pos.y, pos.z + halfHeight, destX, destY, destZ, -0.5f);
+    bool colPoint = GetMap()->GetLosHitPosition(pos.x, pos.y, pos.z + halfHeight, destX, destY, destZ, -1.0f);
     destZ -= halfHeight;
 
     if (colPoint)
