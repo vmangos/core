@@ -132,7 +132,28 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
 
         size_t nextpos = ADT.getPos() + size;
 
-        if (!strcmp(fourcc, "MCIN"))
+        if (!strcmp(fourcc, "MVER"))
+        {
+        }
+        else if (!strcmp(fourcc, "MHDR"))
+        {
+        }
+        else if (!strcmp(fourcc, "MMID"))
+        {
+        }
+        else if (!strcmp(fourcc, "MWID"))
+        {
+        }
+        else if (!strcmp(fourcc, "MCNK"))
+        {
+        }
+        else if (!strcmp(fourcc, "MFBO"))
+        {
+        }
+        else if (!strcmp(fourcc, "MTXF"))
+        {
+        }
+        else if (!strcmp(fourcc, "MCIN"))
         {
         }
         else if (!strcmp(fourcc, "MTEX"))
@@ -205,6 +226,12 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
                     Doodad::ExtractSet(WmoDoodads[WmoInstanceNames[id]], inst.m_wmo, map_num, tileX, tileY, dirfile);
                 }
             }
+        }
+        else
+        {
+            printf("Map=%s, Chunk='%s', Pos=%zd, Size=%d\nBad chunk data. Continue processing this tile? (y/n) ", AdtMapNumber.c_str(), fourcc, ADT.getPos(), size);
+            if (getchar() == 'n')
+                return false;
         }
         //======================
         ADT.seek(nextpos);

@@ -44,7 +44,7 @@ void CyclicMovementGenerator<Creature>::LoadPath(uint32 guid, uint32 entry, Wayp
 
 void CyclicMovementGenerator<Creature>::Initialize(Creature& creature)
 {
-    creature.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    creature.AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
 }
 
 void CyclicMovementGenerator<Creature>::InitializeWaypointPath(Creature& creature, WaypointPathOrigin wpSource, uint32 overwriteGuid, uint32 overwriteEntry)
@@ -62,12 +62,12 @@ void CyclicMovementGenerator<Creature>::InitializeWaypointPath(Creature& creatur
 
 void CyclicMovementGenerator<Creature>::Reset(Creature& creature)
 {
-    creature.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    creature.AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
 }
 
 void CyclicMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 {
-    if (owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (owner.HasUnitState(UNIT_STATE_CAN_NOT_MOVE))
         return;
 
     WaypointNode const& firstNode = i_path->at(0);
@@ -113,12 +113,12 @@ bool CyclicMovementGenerator<Creature>::Update(Creature &owner, uint32 const& /*
 
 void CyclicMovementGenerator<Creature>::Finalize(Creature& creature)
 {
-    creature.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    creature.SetWalk(!creature.HasUnitState(UNIT_STAT_RUNNING), false);
+    creature.ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    creature.SetWalk(!creature.HasUnitState(UNIT_STATE_RUNNING), false);
 }
 
 void CyclicMovementGenerator<Creature>::Interrupt(Creature &creature)
 {
-    creature.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    creature.SetWalk(!creature.HasUnitState(UNIT_STAT_RUNNING), false);
+    creature.ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    creature.SetWalk(!creature.HasUnitState(UNIT_STATE_RUNNING), false);
 }

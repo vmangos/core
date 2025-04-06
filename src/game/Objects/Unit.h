@@ -188,20 +188,6 @@ enum AttackPowerModIndex
 
 uint32 CreateProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition);
 
-enum SpellProcEventTriggerCheck
-{
-    SPELL_PROC_TRIGGER_FAILED       = 0,
-    SPELL_PROC_TRIGGER_ROLL_FAILED  = 1,
-    SPELL_PROC_TRIGGER_OK           = 2,
-};
-
-enum SpellAuraProcResult
-{
-    SPELL_AURA_PROC_OK              = 0,                    // proc was processed, will remove charges
-    SPELL_AURA_PROC_FAILED          = 1,                    // proc failed - if at least one aura failed the proc, charges won't be taken
-    SPELL_AURA_PROC_CANT_TRIGGER    = 2                     // aura can't trigger - skip charges taking, move to next aura if exists
-};
-
 typedef SpellAuraProcResult(Unit::*pAuraProcHandler)(Unit* pVictim, uint32 amount, uint32 originalAmount, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
 extern pAuraProcHandler AuraProcHandler[TOTAL_AURAS];
 
@@ -538,7 +524,7 @@ class Unit : public SpellCaster
         ReactStates GetReactState() const;
         bool HasReactState(ReactStates state) const;
         void UpdateControl();
-        bool CanFreeMove() const { return !HasUnitState(UNIT_STAT_NO_FREE_MOVE) && !GetOwnerGuid(); }
+        bool CanFreeMove() const { return !HasUnitState(UNIT_STATE_NO_FREE_MOVE) && !GetOwnerGuid(); }
         uint32 GetCreatureType() const;
         uint32 GetCreatureTypeMask() const
         {
@@ -614,7 +600,7 @@ class Unit : public SpellCaster
                 UNIT_NPC_FLAG_SPIRITGUIDE | UNIT_NPC_FLAG_TABARDDESIGNER | UNIT_NPC_FLAG_AUCTIONEER);
         }
         bool IsSpiritService() const { return HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITHEALER | UNIT_NPC_FLAG_SPIRITGUIDE); }
-        bool IsTaxiFlying() const { return HasUnitState(UNIT_STAT_TAXI_FLIGHT); }
+        bool IsTaxiFlying() const { return HasUnitState(UNIT_STATE_TAXI_FLIGHT); }
 
         bool IsCaster() const;
         CreatureAI* AI() const;
@@ -849,7 +835,7 @@ class Unit : public SpellCaster
         bool IsImmuneToMechanic(Mechanics mechanic) const;
         bool IsFrozen() const { return HasAuraState(AURA_STATE_FROZEN); }
         bool IsFeigningDeath() const { return ((HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD) || IsFeigningDeathSuccessfully()) && IsAlive()); }
-        bool IsFeigningDeathSuccessfully() const { return HasUnitState(UNIT_STAT_FEIGN_DEATH); }
+        bool IsFeigningDeathSuccessfully() const { return HasUnitState(UNIT_STATE_FEIGN_DEATH); }
 
         bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel = nullptr) const;
         bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const;
@@ -1300,6 +1286,7 @@ class Unit : public SpellCaster
         void SetCharm(Unit* pet);
         void Uncharm();
         void RemoveCharmAuras(AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
+        void RemoveSummonPossessedAuras(AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         ObjectGuid const& GetCharmGuid() const { return GetGuidValue(UNIT_FIELD_CHARM); }
         void SetCharmGuid(ObjectGuid charm) { SetGuidValue(UNIT_FIELD_CHARM, charm); }
 
@@ -1342,7 +1329,7 @@ class Unit : public SpellCaster
         void SetRooted(bool apply);
         void SetRootedReal(bool apply);
         bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }
-        bool ShouldBeRooted() const { return GetDeathState() == CORPSE || HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT); }
+        bool ShouldBeRooted() const { return GetDeathState() == CORPSE || HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_ROOT); }
 
         void SetWaterWalking(bool apply);
         void SetWaterWalkingReal(bool apply);
@@ -1437,7 +1424,7 @@ class Unit : public SpellCaster
 
         void MonsterMove(float x, float y, float z);
         void MonsterMoveWithSpeed(float x, float y, float z, float o, float speed, uint32 options);
-        bool IsStopped() const { return !(HasUnitState(UNIT_STAT_MOVING)); }
+        bool IsStopped() const { return !(HasUnitState(UNIT_STATE_MOVING)); }
         void StopMoving(bool force = false);
         void DisableSpline();
 

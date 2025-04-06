@@ -45,8 +45,8 @@ struct boss_golemaggAI : public ScriptedAI
         boss_golemaggAI::Reset();
     }
 
-    EventMap m_CombatEvents{};
-    ScriptedInstance* m_pInstance{};
+    EventMap m_CombatEvents;
+    ScriptedInstance* m_pInstance;
     std::list<ObjectGuid> m_addList;
 
     bool m_bEnraged = false;
@@ -169,7 +169,7 @@ struct boss_golemaggAI : public ScriptedAI
 
     void UpdateEvents()
     {
-        while (const uint32 eventId = m_CombatEvents.ExecuteEvent())
+        while (uint32 const eventId = m_CombatEvents.ExecuteEvent())
         {
             switch (eventId)
             {
@@ -247,8 +247,8 @@ struct mob_core_ragerAI : public ScriptedAI
         Reset();
     }
 
-    EventMap m_CombatEvents{};
-    ScriptedInstance* m_pInstance{};
+    EventMap m_CombatEvents;
+    ScriptedInstance* m_pInstance;
 
     void Reset() override
     {
@@ -306,7 +306,7 @@ struct mob_core_ragerAI : public ScriptedAI
 
     void UpdateEvents()
     {
-        while (const uint32 eventId = m_CombatEvents.ExecuteEvent())
+        while (uint32 const eventId = m_CombatEvents.ExecuteEvent())
         {
             switch (eventId)
             {
@@ -360,6 +360,40 @@ CreatureAI* GetAI_mob_core_rager(Creature* pCreature)
     return new mob_core_ragerAI(pCreature);
 }
 
+// 20556 - Golemagg's Trust
+struct GolemaggsTrustScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply && aura->GetEffIndex() == EFFECT_INDEX_0)
+            aura->SetPeriodicTimer(1 * IN_MILLISECONDS);
+    }
+
+    void OnPeriodicDummy(Aura* aura) final
+    {
+        if (aura->GetCaster()->IsDead() || !aura->GetCaster()->IsInCombat())
+            return;
+
+        // Golemagg's Core Ragers will deal increased damage
+        // and have 50% increased attack speed if tanked too close to Golemagg.
+        std::list<Creature*> addList;
+        aura->GetCaster()->GetCreatureListWithEntryInGrid(addList, NPC_CORE_RAGER, 30.0f);
+        if (!addList.empty())
+        {
+            for (const auto& itr : addList)
+            {
+                // Golemagg's Trust Buff
+                aura->GetCaster()->CastSpell(itr, SPELL_GOLEMAGG_TRUST, true, nullptr, aura);
+            }
+        }
+    }
+};
+
+AuraScript* GetScript_GolemaggsTrust(SpellEntry const*)
+{
+    return new GolemaggsTrustScript();
+}
+
 void AddSC_boss_golemagg()
 {
     Script* newscript;
@@ -372,5 +406,10 @@ void AddSC_boss_golemagg()
     newscript = new Script;
     newscript->Name = "mob_core_rager";
     newscript->GetAI = &GetAI_mob_core_rager;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_golemaggs_trust";
+    newscript->GetAuraScript = &GetScript_GolemaggsTrust;
     newscript->RegisterSelf();
 }

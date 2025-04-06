@@ -144,7 +144,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
                         }
                     }
                     // If we are out of the FOR it means no valid targets, so follow master.
-                    if (!m_creature->HasUnitState(UNIT_STAT_FOLLOW))
+                    if (!m_creature->HasUnitState(UNIT_STATE_FOLLOW))
                         m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
                 }
             }
@@ -152,7 +152,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
         else if (m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
         {
             // not following, so start follow
-            if (!m_creature->HasUnitState(UNIT_STAT_FOLLOW))
+            if (!m_creature->HasUnitState(UNIT_STATE_FOLLOW))
                 m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
             // update when not in combat

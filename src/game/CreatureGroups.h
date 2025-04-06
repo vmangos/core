@@ -63,7 +63,7 @@ class CreatureGroup
         }
         void AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags = (OPTION_FORMATION_MOVE|OPTION_AGGRO_TOGETHER));
         void RemoveMember(ObjectGuid guid);
-        void RemoveTemporaryLeader(Creature* pLeader);
+        void RemoveTemporaryLeader(Creature const* pLeader);
         void DisbandGroup(Creature* pLeader);
         void DeleteFromDb();
         void SaveToDb();
@@ -82,10 +82,10 @@ class CreatureGroup
         void OnMemberDied(Creature* member);
         void OnLeaveCombat(Creature* creature);
         void OnRespawn(Creature* member);
-        void RespawnAll(Creature* except);
+        void RespawnAll(Creature const* except);
     protected:
         void Respawn(Creature* member, CreatureGroupMember const* memberEntry);
-        void MemberAssist(Creature* member, Unit* target, Creature* alliedAttacker);
+        void MemberAssist(Creature* member, Unit* target, Creature const* alliedAttacker);
         ObjectGuid m_leaderGuid;
         ObjectGuid m_originalLeaderGuid;
         uint32 m_options;

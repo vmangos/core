@@ -157,7 +157,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                 pUnitTarget = nullptr;
 
             // make sure pet is facing target
-            if (pUnitTarget && pUnitTarget != pCharmedUnit && !pCharmedUnit->HasUnitState(UNIT_STAT_CAN_NOT_REACT) &&
+            if (pUnitTarget && pUnitTarget != pCharmedUnit && !pCharmedUnit->HasUnitState(UNIT_STATE_CAN_NOT_REACT) &&
                 spellInfo->IsNeedFaceTarget() && !pCharmedUnit->IsFacingTarget(pUnitTarget))
             {
                 float orientation = pCharmedUnit->GetAngle(pUnitTarget);
@@ -165,7 +165,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                 pCharmedUnit->SetOrientation(orientation);
             }
 
-            pCharmedUnit->ClearUnitState(UNIT_STAT_MOVING);
+            pCharmedUnit->ClearUnitState(UNIT_STATE_MOVING);
             SpellCastResult result = pCharmedUnit->CastSpell(pUnitTarget, spellInfo, false);
 
             if (result == SPELL_CAST_OK)
@@ -553,7 +553,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
 
     recvPacket >> targets.ReadForCaster(pet);
 
-    pet->ClearUnitState(UNIT_STAT_MOVING);
+    pet->ClearUnitState(UNIT_STATE_MOVING);
 
     Spell* spell = new Spell(pet, spellInfo, false);
     spell->m_targets = targets;

@@ -780,7 +780,7 @@ namespace MaNGOS
             bool operator()(Unit* u)
             {
                 return u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && !u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) &&
-                       i_obj->IsWithinDistInMap(u, i_range) && (u->IsCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STAT_CAN_NOT_REACT));
+                       i_obj->IsWithinDistInMap(u, i_range) && (u->IsCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STATE_CAN_NOT_REACT));
             }
         private:
             SpellCaster const* i_obj;
@@ -1242,34 +1242,45 @@ namespace MaNGOS
             NearestCreatureEntryWithLiveStateInObjectRangeCheck(NearestCreatureEntryWithLiveStateInObjectRangeCheck const&);
     };
 
-    class NearestCreatureEntryFitConditionInObjectRangeCheck
+    class NearestUnitFitConditionInCombatRangeCheck
     {
-        public:
-            NearestCreatureEntryFitConditionInObjectRangeCheck(WorldObject const& obj,uint32 entry, bool alive, float range, uint32 conditionId)
-                : i_obj(obj), i_entry(entry), i_alive(alive), i_range(range), i_conditionId(conditionId) {}
-            WorldObject const& GetFocusObject() const { return i_obj; }
-            bool operator()(Creature* u)
-            {
-                if (u->GetEntry() == i_entry && ((i_alive && u->IsAlive()) || (!i_alive && u->IsCorpse())) && i_obj.IsWithinCombatDistInMap(u, i_range))
-                {
-                    if (i_conditionId && !IsConditionSatisfied(i_conditionId, u, u->GetMap(), &i_obj, CONDITION_FROM_SPELL_AREA))
-                        return false;
-
-                    i_range = i_obj.GetDistance(u);         // use found unit range as new range limit for next check
-                    return true;
-                }
+    public:
+        explicit NearestUnitFitConditionInCombatRangeCheck(WorldObject const& obj, uint32 entry, bool alive, float range, uint32 conditionId)
+            : i_obj(obj), i_entry(entry), i_alive(alive), i_range(range), i_conditionId(conditionId) {}
+        WorldObject const& GetFocusObject() const { return i_obj; }
+        bool operator()(Unit* u)
+        {
+            if (u->GetEntry() != i_entry)
                 return false;
-            }
-            float GetLastRange() const { return i_range; }
-        private:
-            WorldObject const& i_obj;
-            uint32 i_entry;
-            bool   i_alive;
-            float  i_range;
-            uint32 i_conditionId;
 
-            // prevent clone this object
-            NearestCreatureEntryFitConditionInObjectRangeCheck(NearestCreatureEntryFitConditionInObjectRangeCheck const&);
+            if (i_alive)
+            {
+                if (!u->IsAlive())
+                    return false;
+            }
+            else
+            {
+                if (!u->IsCreature() || !((Creature*)u)->IsCorpse())
+                    return false;
+            }
+
+            if (!i_obj.IsWithinCombatDistInMap(u, i_range))
+                return false;
+
+            if (i_conditionId && !IsConditionSatisfied(i_conditionId, u, u->GetMap(), &i_obj, CONDITION_FROM_SPELL_AREA))
+                return false;
+
+            i_range = i_obj.GetDistance(u);         // use found unit range as new range limit for next check
+            return true;
+        }
+        float GetLastRange() const { return i_range; }
+    private:
+        WorldObject const& i_obj;
+        uint32 i_entry;
+        bool   i_alive;
+        float  i_range;
+        uint32 i_conditionId;
+        NearestUnitFitConditionInCombatRangeCheck(NearestUnitFitConditionInCombatRangeCheck const&);
     };
 
     // Player checks and do

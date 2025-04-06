@@ -291,7 +291,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
     HostileReference* currentRef = nullptr;
     bool found = false;
     bool allowLowPriorityTargets = false;
-    bool attackerImmobilized = pAttacker->HasUnitState(UNIT_STAT_CAN_NOT_MOVE);
+    bool attackerImmobilized = pAttacker->HasUnitState(UNIT_STATE_CAN_NOT_MOVE);
 
     for (int attempt = 0; attempt < 2 && !found; ++attempt)
     {
@@ -413,8 +413,8 @@ void ThreatManager::addThreat(Unit* pVictim, float threat, bool crit, SpellSchoo
     // check for fear, blind, freezing trap, reckless charge, banish, etc.
     if (isAssistThreat)
     {
-        if (getOwner()->HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_ISOLATED) ||
-            (getOwner()->HasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
+        if (getOwner()->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_ISOLATED) ||
+            (getOwner()->HasUnitState(UNIT_STATE_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
         {
             threat = 0.0f;
         }

@@ -32,8 +32,7 @@ enum LazyPeon
     GO_LUMBERPILE                                 = 175784,
     SPELL_BUFF_SLEEP                              = 17743,
     SPELL_AWAKEN_PEON                             = 19938,
-    SAY_SPELL_HIT                                 = -1000600,
-    SAY_SPELL_HIT2                                = -1000601, //Sleepy so sleepy
+    SAY_SPELL_HIT                                 = 5774,
     LAZY_PEON_ENTRY                               = 10556,
     EMOTE_WORKING                                 = 234,
     WORKING_DURATION                              = 120000
@@ -138,12 +137,8 @@ struct LazyPeonAI : public ScriptedAI
                     }
 
                     if (Player* player = m_creature->GetMap()->GetPlayer(playerGuid))
-                    {
-                        if (urand(0, 1))
-                            DoScriptText(SAY_SPELL_HIT,  m_creature, player);
-                        else
-                            DoScriptText(SAY_SPELL_HIT2, m_creature);
-                    }
+                        DoScriptText(SAY_SPELL_HIT,  m_creature, player);
+
                     state = STATE_MOVING_TO_LUMBERPILE;
                 }
                 else

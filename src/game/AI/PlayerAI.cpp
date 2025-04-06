@@ -44,7 +44,7 @@ bool PlayerAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTrig
     if (!isTriggered)
     {
         // State does not allow
-        if (me->HasUnitState(checkControlled ? UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL : UNIT_STAT_CAN_NOT_REACT))
+        if (me->HasUnitState(checkControlled ? UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL : UNIT_STATE_CAN_NOT_REACT))
             return false;
 
         if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))

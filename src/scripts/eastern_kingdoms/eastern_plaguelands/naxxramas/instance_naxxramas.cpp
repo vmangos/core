@@ -1849,7 +1849,7 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
     // if rep < honored, spit on player and be done with it.
     if (argentDawnRep < BOOK_REQ_RANK)
     {
-        DoScriptText(-1999913, pCreature, pPlayer); // spit on player
+        // DoScriptText(-1999913, pCreature, pPlayer); // spit on player -- Not in sniffs. Need confirmation
         pPlayer->CLOSE_GOSSIP_MENU();
         return true;
     }
@@ -2038,6 +2038,47 @@ bool GossipHello_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreature
     */
 }
 
+// 29153 - Gargoyle Stoneform Visual
+struct GargoyleStoneformScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply)
+        {
+            // using stand state 9 in sniff
+            aura->GetTarget()->SetStandState(MAX_UNIT_STAND_STATE);
+            aura->GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+        else // on remove
+        {
+            aura->GetTarget()->SetStandState(UNIT_STAND_STATE_STAND);
+            aura->GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+    }
+};
+
+AuraScript* GetScript_GargoyleStoneform(SpellEntry const*)
+{
+    return new GargoyleStoneformScript();
+}
+
+// 27831 - Shadow Bolt Volley (Naxx, Unrelenting Rider)
+struct UnrelentingRiderShadowBoltVolleyScript : SpellScript
+{
+    bool OnCheckTarget(Spell const* /*spell*/, Unit* target, SpellEffectIndex /*eff*/) const final
+    {
+        // Shadow Bolt volley which should only target players with the Shadow Mark debuff
+        if (!target->HasAura(27825)) // Shadow Mark
+            return false;
+        return true;
+    }
+};
+
+SpellScript* GetScript_UnrelentingRiderShadowBoltVolley(SpellEntry const*)
+{
+    return new UnrelentingRiderShadowBoltVolleyScript();
+}
+
 void AddSC_instance_naxxramas()
 {
     Script* pNewScript;
@@ -2082,5 +2123,15 @@ void AddSC_instance_naxxramas()
     pNewScript->Name = "mob_craftsman_omarion";
     pNewScript->pGossipHello = &GossipHello_npc_MasterCraftsmanOmarion;
     pNewScript->pGossipSelect = &GossipSelect_npc_MasterCraftsmanOmarion;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_gargoyle_stoneform";
+    pNewScript->GetAuraScript = &GetScript_GargoyleStoneform;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_unrelenting_rider_shadow_bolt_volley";
+    pNewScript->GetSpellScript = &GetScript_UnrelentingRiderShadowBoltVolley;
     pNewScript->RegisterSelf();
 }

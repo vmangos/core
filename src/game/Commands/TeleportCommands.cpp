@@ -319,7 +319,7 @@ bool ChatHandler::HandleGoTriggerCommand(char* args)
         return HandleGoHelper(pPlayer, at->destination.mapId, at->destination.x, at->destination.y, &at->destination.z);
     }
     else
-        return HandleGoHelper(pPlayer, atEntry->mapid, atEntry->x, atEntry->y, &atEntry->z);
+        return HandleGoHelper(pPlayer, atEntry->map_id, atEntry->x, atEntry->y, &atEntry->z);
 }
 
 bool ChatHandler::HandleGoGraveyardCommand(char* args)
@@ -1082,11 +1082,11 @@ bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
         if (SpellEntry const* pSpellEntry= sSpellMgr.GetSpellEntry(20939))
             pPlayer->AddCooldown(*pSpellEntry, nullptr, false, HOUR * IN_MILLISECONDS); // Trigger 1 Hour Cooldown
         // Get nearest graveyard.
-        WorldSafeLocsEntry const* ClosestGrave = sObjectMgr.GetClosestGraveYard(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetMapId(), pPlayer->GetTeam());
-        if (!ClosestGrave) //No nearby graveyards (stuck in void?). Send ally to Westfall, Horde to Barrens.
-            ClosestGrave = pPlayer->GetTeamId() ? sWorldSafeLocsStore.LookupEntry(10) : sWorldSafeLocsStore.LookupEntry(4);
-        if (ClosestGrave)
-            pPlayer->TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, sObjectMgr.GetWorldSafeLocFacing(ClosestGrave->ID), 0);
+        WorldSafeLocsEntry const* pClosestGrave = sObjectMgr.GetClosestGraveYard(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetMapId(), pPlayer->GetTeam());
+        if (!pClosestGrave) // No nearby graveyards (stuck in void?). Send ally to Westfall, Horde to Barrens.
+            pClosestGrave = pPlayer->GetTeamId() == TEAM_HORDE ? sWorldSafeLocsStore.LookupEntry(10) : sWorldSafeLocsStore.LookupEntry(4);
+        if (pClosestGrave)
+            pPlayer->TeleportTo(pClosestGrave->map_id, pClosestGrave->x, pClosestGrave->y, pClosestGrave->z, sObjectMgr.GetWorldSafeLocFacing(pClosestGrave->ID), 0);
         SendSysMessage(LANG_UNSTUCK_DEAD);
     }
 

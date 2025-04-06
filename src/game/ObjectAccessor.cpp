@@ -49,8 +49,7 @@ ObjectAccessor::~ObjectAccessor()
     }
 }
 
-Unit*
-ObjectAccessor::GetUnit(WorldObject const& u, ObjectGuid guid)
+Unit* ObjectAccessor::GetUnit(WorldObject const& u, ObjectGuid guid)
 {
     if (!guid)
         return nullptr;
@@ -156,8 +155,7 @@ PlayerPointer ObjectAccessor::FindPlayerPointer(char const* name)
     return PlayerPointer(nullptr);
 }
 
-void
-ObjectAccessor::SaveAllPlayers()
+void ObjectAccessor::SaveAllPlayers()
 {
     HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
     HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
@@ -175,8 +173,7 @@ void ObjectAccessor::KickPlayer(ObjectGuid guid)
     }
 }
 
-Corpse*
-ObjectAccessor::GetCorpseForPlayerGUID(ObjectGuid guid)
+Corpse* ObjectAccessor::GetCorpseForPlayerGUID(ObjectGuid guid)
 {
     ASSERT(guid.IsPlayer());
 
@@ -191,8 +188,7 @@ ObjectAccessor::GetCorpseForPlayerGUID(ObjectGuid guid)
     return iter->second;
 }
 
-void
-ObjectAccessor::RemoveCorpse(Corpse* corpse)
+void ObjectAccessor::RemoveCorpse(Corpse* corpse)
 {
     MANGOS_ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
 
@@ -211,8 +207,7 @@ ObjectAccessor::RemoveCorpse(Corpse* corpse)
     i_player2corpse.erase(iter);
 }
 
-void
-ObjectAccessor::AddCorpse(Corpse* corpse)
+void ObjectAccessor::AddCorpse(Corpse* corpse)
 {
     MANGOS_ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
 
@@ -227,8 +222,7 @@ ObjectAccessor::AddCorpse(Corpse* corpse)
     sObjectMgr.AddCorpseCellData(corpse->GetMapId(), cell_id, corpse->GetOwnerGuid().GetCounter(), corpse->GetInstanceId());
 }
 
-void
-ObjectAccessor::AddCorpsesToGrid(GridPair const& gridpair, GridType& grid, Map* map)
+void ObjectAccessor::AddCorpsesToGrid(GridPair const& gridpair, GridType& grid, Map const* map)
 {
     Guard guard(i_corpseGuard);
     for (const auto& iter : i_player2corpse)
@@ -250,7 +244,7 @@ ObjectAccessor::AddCorpsesToGrid(GridPair const& gridpair, GridType& grid, Map* 
     }
 }
 
-void ObjectAccessor::ConvertCorpseForPlayer(ObjectGuid player_guid, Player* looter)
+void ObjectAccessor::ConvertCorpseForPlayer(ObjectGuid player_guid, Player const* looter)
 {
     ASSERT(player_guid.IsPlayer());
 

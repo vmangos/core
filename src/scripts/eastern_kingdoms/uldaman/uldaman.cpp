@@ -242,12 +242,19 @@ CreatureAI* GetAI_annora(Creature* pCreature)
     return new AnnoraAI(pCreature);
 }
 
-enum
+// 10258 - Awaken Vault Warder (Uldaman)
+struct UldamanAwakenVaultWarderScript : SpellScript
 {
-    SPELL_FIRE_SHIELD       =   2602,
-    SPELL_FLAME_BUFFET      =   10452,
-
+    void OnSetTargetMap(Spell* spell, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& unMaxTargets, bool& /*selectClosestTargets*/) const final
+    {
+        unMaxTargets = 2;
+    }
 };
+
+SpellScript* GetScript_UldamanAwakenVaultWarder(SpellEntry const*)
+{
+    return new UldamanAwakenVaultWarderScript();
+}
 
 void AddSC_uldaman()
 {
@@ -277,5 +284,10 @@ void AddSC_uldaman()
     newscript = new Script;
     newscript->Name = "event_awaken_stone_keeper";
     newscript->pProcessEventId = &ProcessEventId_event_awaken_stone_keeper;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_uldaman_awaken_vault_warder";
+    newscript->GetSpellScript = &GetScript_UldamanAwakenVaultWarder;
     newscript->RegisterSelf();
 }

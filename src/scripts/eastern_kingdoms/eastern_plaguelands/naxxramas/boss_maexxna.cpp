@@ -431,17 +431,39 @@ CreatureAI* GetAI_boss_maexxna(Creature* pCreature)
     return new boss_maexxnaAI(pCreature);
 }
 
+// 29484 - Web Spray (Naxx, Maexxna)
+struct MaexxnaWebSprayScript : SpellScript
+{
+    bool OnCheckTarget(Spell const* /*spell*/, Unit* target, SpellEffectIndex /*eff*/) const final
+    {
+        // Maexxna Web Spray should not hit players under Web Wrap or Petrification
+        if (target->HasAura(17624) || target->HasAura(28622))
+            return false;
+        return true;
+    }
+};
+
+SpellScript* GetScript_MaexxnaWebSpray(SpellEntry const*)
+{
+    return new MaexxnaWebSprayScript();
+}
+
 void AddSC_boss_maexxna()
 {
-    Script* NewScript;
+    Script* pNewScript;
 
-    NewScript = new Script;
-    NewScript->Name = "boss_maexxna";
-    NewScript->GetAI = &GetAI_boss_maexxna;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_maexxna";
+    pNewScript->GetAI = &GetAI_boss_maexxna;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "mob_webwrap";
-    NewScript->GetAI = &GetAI_mob_webwrap;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_webwrap";
+    pNewScript->GetAI = &GetAI_mob_webwrap;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_maexxna_web_spray";
+    pNewScript->GetSpellScript = &GetScript_MaexxnaWebSpray;
+    pNewScript->RegisterSelf();
 }

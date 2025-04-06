@@ -248,9 +248,9 @@ void DragonsOfNightmare::CheckSingleVariable(uint32 idx, uint32& value)
     }
 }
 
-void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid>& dragons, uint32& alive, time_t respawnTime)
+void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> const& dragons, uint32& alive, time_t respawnTime)
 {
-    for (auto& guid : dragons)
+    for (auto const& guid : dragons)
     {
         auto cData = sObjectMgr.GetCreatureData(guid.GetCounter());
 
@@ -610,7 +610,7 @@ void ScourgeInvasionEvent::LogNextZoneTime()
     time_t now = time(nullptr);
     uint32 timer = 0;
     uint32 zoneid = 0;
-    std::vector<uint32> validZones;
+    
     for (const auto& invasionPoint : invasionPoints)
     {
         if (invasionPoint.zoneId == sObjectMgr.GetSavedVariable(VARIABLE_SI_LAST_ATTACK_ZONE))

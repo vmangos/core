@@ -549,7 +549,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                             //BattleGround gameobjects case
                             if (((Player*)ok)->InBattleGround())
                                 if (BattleGround* bg = ((Player*)ok)->GetBattleGround())
-                                    bg->HandleTriggerBuff(GetObjectGuid());
+                                    bg->HandleTriggerBuff(this);
                         }
 
                         // TODO: all traps can be activated, also those without spell.
@@ -588,6 +588,14 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                         m_cooldownTime = 0;
                     }
                     break;
+                case GAMEOBJECT_TYPE_CHEST:
+                {
+                    if (m_cooldownTime > 0 && m_cooldownTime < time(nullptr))
+                    {
+                        SetLootState(GO_JUST_DEACTIVATED);
+                    }
+                    break;
+                }
                 default:
                     break;
             }
@@ -1477,8 +1485,8 @@ void GameObject::Use(Unit* user)
                 Cell::VisitAllObjects(this, searcher, 10.0f);
                 for (Unit* attacker : targets)
                 {
-                    if (!attacker->IsInCombat() && attacker->IsValidAttackTarget(user) &&
-                        attacker->IsWithinLOSInMap(user) && attacker->AI())
+                    if (!attacker->IsInCombat() && !attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) &&
+                        attacker->IsValidAttackTarget(user) && attacker->IsWithinLOSInMap(user) && attacker->AI())
                         attacker->AI()->AttackStart(user);
                 }
             }
@@ -2252,6 +2260,11 @@ bool GameObject::PlayerCanUse(Player* pPlayer)
 
 void GameObject::SetLootState(LootState state)
 {
+    if (state == GO_JUST_DEACTIVATED && GetGoType() == GAMEOBJECT_TYPE_CHEST)
+    {
+        m_cooldownTime = 0;
+    }
+
     m_lootState = state;
     UpdateCollisionState();
 }

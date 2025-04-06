@@ -254,6 +254,20 @@ CreatureAI* GetAI_boss_dragon_of_nightmare(Creature* pCreature)
     } 
 }
 
+// 24781 - Dream Fog (Emerald Dragons)
+struct EmeraldDragonsDreamFogScript : SpellScript
+{
+    void OnSetTargetMap(Spell* spell, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& unMaxTargets, bool& /*selectClosestTargets*/) const final
+    {
+        unMaxTargets = 1;
+    }
+};
+
+SpellScript* GetScript_EmeraldDragonsDreamFog(SpellEntry const*)
+{
+    return new EmeraldDragonsDreamFogScript();
+}
+
 void AddSC_dragons_of_nightmare()
 {
     Script* pNewScript;
@@ -286,5 +300,10 @@ void AddSC_dragons_of_nightmare()
     pNewScript = new Script;
     pNewScript->Name = "go_putrid_shroom";
     pNewScript->GOGetAI = &GetAI_go_putrid_shroom;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_emerald_dragons_dream_fog";
+    pNewScript->GetSpellScript = &GetScript_EmeraldDragonsDreamFog;
     pNewScript->RegisterSelf();
 }

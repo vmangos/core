@@ -137,11 +137,31 @@ CreatureAI* GetAI_boss_shazzrah(Creature* pCreature)
     return new boss_shazzrahAI(pCreature);
 }
 
+// 23138 - Gate of Shazzrah (MC, Shazzrah)
+struct ShazzrahGateScript : SpellScript
+{
+    void OnSetTargetMap(Spell* spell, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& unMaxTargets, bool& /*selectClosestTargets*/) const final
+    {
+        unMaxTargets = 1;
+    }
+};
+
+SpellScript* GetScript_ShazzrahGate(SpellEntry const*)
+{
+    return new ShazzrahGateScript();
+}
+
 void AddSC_boss_shazzrah()
 {
     Script* newscript;
+
     newscript = new Script;
     newscript->Name = "boss_shazzrah";
     newscript->GetAI = &GetAI_boss_shazzrah;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_shazzrah_gate";
+    newscript->GetSpellScript = &GetScript_ShazzrahGate;
     newscript->RegisterSelf();
 }

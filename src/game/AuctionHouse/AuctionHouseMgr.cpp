@@ -34,7 +34,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Mail.h"
-
+#include "TransactionLog.h"
 #include "Policies/SingletonImp.h"
 
 INSTANTIATE_SINGLETON_1(AuctionHouseMgr);

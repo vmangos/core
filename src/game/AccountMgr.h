@@ -94,7 +94,7 @@ class AccountMgr
         AccountOpResult ChangeUsername(uint32 accid, std::string new_uname, std::string new_passwd);
         AccountOpResult ChangePassword(uint32 accid, std::string new_passwd, std::string username="");
         bool CheckPassword(uint32 accid, std::string passwd, std::string username="");
-        std::string CalculateShaPassHash(std::string& name, std::string& password);
+        std::string CalculateShaPassHash(std::string const& name, std::string const& password);
 
         void Load();
         void LoadAccountData();

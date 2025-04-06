@@ -31,10 +31,9 @@ enum
     // the spider
     NPC_SPAWN_OF_MARLI          = 15041,
 
-    SAY_AGGRO                   = -1309005,
-    SAY_TRANSFORM               = -1309006,
-    SAY_SPIDER_SPAWN            = -1309007,
-    SAY_DEATH                   = -1309008,
+    SAY_TRANSFORM               = 10443,
+    SAY_SPIDER_SPAWN            = 10448,
+    SAY_DEATH                   = 10459,
 
     SPELL_CHARGE                = 22911,
     SPELL_ENVELOPINGWEBS        = 24110,
@@ -129,8 +128,6 @@ struct boss_marliAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        DoScriptText(SAY_AGGRO, m_creature);
-
         if (m_pInstance)
             if (m_pInstance->GetData(TYPE_MARLI) != IN_PROGRESS)
                 m_pInstance->SetData(TYPE_MARLI, IN_PROGRESS);

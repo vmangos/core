@@ -521,6 +521,14 @@ enum SpellModOp
     MAX_SPELLMOD                    = 29,
 };
 
+// Note: SPELLMOD_* values is aura types in fact
+enum SpellModType
+{
+    SPELLMOD_TYPE_NONE    = 0,
+    SPELLMOD_FLAT         = 107,                            // SPELL_AURA_ADD_FLAT_MODIFIER
+    SPELLMOD_PCT          = 108                             // SPELL_AURA_ADD_PCT_MODIFIER
+};
+
 // Spell aura states
 enum AuraState
 {   // (C) used in caster aura state     (T) used in target aura state

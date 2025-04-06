@@ -306,7 +306,7 @@ bool AccountMgr::normalizeString(std::string& utf8str)
     return WStrToUtf8(wstr_buf, utf8str);
 }
 
-std::string AccountMgr::CalculateShaPassHash(std::string& name, std::string& password)
+std::string AccountMgr::CalculateShaPassHash(std::string const& name, std::string const& password)
 {
     auto pwHash = Crypto::Hash::SHA1::ComputeFrom(name + ":" + password);
 

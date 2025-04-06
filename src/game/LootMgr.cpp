@@ -439,7 +439,7 @@ bool LootStoreItem::AllowedForTeam(Loot const& loot) const
     return true;
 }
 
-LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Player* viewer, WorldObject const* lootTarget, bool condition_ok /*= false*/) const
+LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Player const* viewer, WorldObject const* lootTarget, bool condition_ok /*= false*/) const
 {
     // ignore looted, FFA (each player get own copy) and not allowed items
     if (is_looted || freeforall || (conditionId && !condition_ok) || !AllowedForPlayer(viewer, lootTarget))
@@ -574,7 +574,7 @@ void Loot::FillNotNormalLootFor(Player* pl)
         FillNonQuestNonFFAConditionalLoot(pl);
 }
 
-QuestItemList* Loot::FillFFALoot(Player* player)
+QuestItemList* Loot::FillFFALoot(Player const* player)
 {
     if (!player->IsInWorld())
         return nullptr;
@@ -600,7 +600,7 @@ QuestItemList* Loot::FillFFALoot(Player* player)
     return ql;
 }
 
-QuestItemList* Loot::FillQuestLoot(Player* player)
+QuestItemList* Loot::FillQuestLoot(Player const* player)
 {
     if (!player->IsInWorld())
         return nullptr;
@@ -638,7 +638,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     return ql;
 }
 
-QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
+QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player const* player)
 {
     if (!player->IsInWorld())
         return nullptr;
@@ -1028,7 +1028,7 @@ bool Loot::hasOverThresholdItem() const
 }
 
 // return true if there is any FFA, quest or conditional item for the player.
-bool Loot::hasItemFor(Player* player) const
+bool Loot::hasItemFor(Player const* player) const
 {
     QuestItemMap const& lootPlayerQuestItems = GetPlayerQuestItems();
     QuestItemMap::const_iterator q_itr = lootPlayerQuestItems.find(player->GetGUIDLow());

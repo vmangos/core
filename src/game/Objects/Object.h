@@ -459,7 +459,7 @@ class WorldObject : public Object
         {
             public:
                 explicit UpdateHelper(WorldObject* obj) : m_obj(obj) {}
-                ~UpdateHelper() { }
+                ~UpdateHelper() = default;
 
                 void Update(uint32 time_diff)
                 {
@@ -586,14 +586,14 @@ class WorldObject : public Object
         template <class T >
         bool IsWithinDist2d(T const& position, float dist2compare, SizeFactor distcalc = SizeFactor::BoundingRadius) const { return IsWithinDist2d(position.x, position.y, dist2compare, distcalc); }
         bool IsWithinDist2d(float x, float y, float dist2compare, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
-        bool _IsWithinDist(WorldObject const* obj, float const dist2compare, const bool is3D, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
+        bool _IsWithinDist(WorldObject const* obj, float const dist2compare, bool const is3D, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
 
         // use only if you will sure about placing both object at same map
-        bool IsWithinDist(WorldObject const* obj, float const& dist2compare, const bool is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
+        bool IsWithinDist(WorldObject const* obj, float const& dist2compare, bool const is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
         {
             return obj && _IsWithinDist(obj, dist2compare, is3D, distcalc);
         }
-        bool IsWithinDistInMap(WorldObject const* obj, float const& dist2compare, const bool is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
+        bool IsWithinDistInMap(WorldObject const* obj, float const& dist2compare, bool const is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
         {
             return obj && IsInMap(obj) && _IsWithinDist(obj, dist2compare, is3D, distcalc);
         }

@@ -1859,7 +1859,7 @@ bool CombatBotBaseAI::AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee, bo
 
             if (pMember->GetTargetGuid() == guid)
             {
-                if (checkMelee && pMember->HasUnitState(UNIT_STAT_MELEE_ATTACKING))
+                if (checkMelee && pMember->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                     return true;
 
                 if (checkSpells && pMember->IsNonMeleeSpellCasted())

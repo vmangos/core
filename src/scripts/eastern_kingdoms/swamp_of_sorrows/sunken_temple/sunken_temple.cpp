@@ -45,11 +45,11 @@ enum
 
 enum
 {
-    EMOTE_MALFURION1              = -1109000,
-    SAY_MALFURION1                = -1109001,
-    SAY_MALFURION2                = -1109002,
-    SAY_MALFURION3                = -1109003,
-    SAY_MALFURION4                = -1109004,
+    EMOTE_MALFURION1              = 11191,
+    SAY_MALFURION1                = 11193,
+    SAY_MALFURION2                = 11194,
+    SAY_MALFURION3                = 11195,
+    SAY_MALFURION4                = 11196,
 
     MAX_MALFURION_TEMPLE_SPEECHES = 7
 };

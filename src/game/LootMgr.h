@@ -150,7 +150,7 @@ struct LootItem
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
     bool AllowedForPlayer(Player const* player, WorldObject const* lootTarget) const;
-    LootSlotType GetSlotTypeForSharedLoot(PermissionTypes permission, Player* viewer, WorldObject const* lootTarget, bool condition_ok = false) const;
+    LootSlotType GetSlotTypeForSharedLoot(PermissionTypes permission, Player const* viewer, WorldObject const* lootTarget, bool condition_ok = false) const;
 };
 
 typedef std::vector<LootItem> LootItemList;
@@ -362,7 +362,7 @@ struct Loot
     WorldObject const* GetLootTarget() const;
 
     // TrinityCore
-    bool hasItemFor(Player* player) const;
+    bool hasItemFor(Player const* player) const;
     bool hasOverThresholdItem() const;
     bool IsAllowedLooter(ObjectGuid guid, bool doPersonalCheck = true) const;
     bool IsOriginalLooter(ObjectGuid guid) const { return IsAllowedLooter(guid, false); }
@@ -377,9 +377,9 @@ struct Loot
     QuestItemMap m_playerFFAItems;
     QuestItemMap m_playerNonQuestNonFFAConditionalItems;
     private:
-        QuestItemList* FillFFALoot(Player* player);
-        QuestItemList* FillQuestLoot(Player* player);
-        QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player);
+        QuestItemList* FillFFALoot(Player const* player);
+        QuestItemList* FillQuestLoot(Player const* player);
+        QuestItemList* FillNonQuestNonFFAConditionalLoot(Player const* player);
 
         typedef std::set<ObjectGuid> PlayersLooting;
         PlayersLooting m_playersLooting;

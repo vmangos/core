@@ -282,7 +282,7 @@ class ObjectGuidGenerator
         explicit ObjectGuidGenerator(uint32 start = 1) : m_nextGuid(start) {}
 
     public:                                                 // modifiers
-        void Set(uint32 val) { m_nextGuid = val; }
+        void SetMaxUsedGuid(uint32 val, char const* guidType);
         uint32 Generate();
         void GenerateRange(uint32& first, uint32& last);
 

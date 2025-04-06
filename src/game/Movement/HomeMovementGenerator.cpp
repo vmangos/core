@@ -33,7 +33,7 @@ void HomeMovementGenerator<Creature>::Reset(Creature &)
 
 void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 {
-    if (owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (owner.HasUnitState(UNIT_STATE_CAN_NOT_MOVE))
         return;
 
     // Remove speed reductions from low hp
@@ -71,7 +71,7 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
     
     arrived = false;
 
-    owner.ClearUnitState(UNIT_STAT_ALL_DYN_STATES);
+    owner.ClearUnitState(UNIT_STATE_ALL_DYN_STATES);
 }
 
 bool HomeMovementGenerator<Creature>::Update(Creature &owner, uint32 const& /*time_diff*/)
@@ -87,7 +87,7 @@ void HomeMovementGenerator<Creature>::Finalize(Creature& owner)
         if (owner.GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_REACH_HOME)
             owner.ClearTemporaryFaction();
 
-        owner.SetWalk(!owner.HasUnitState(UNIT_STAT_RUNNING) && !owner.IsLevitating(), false);
+        owner.SetWalk(!owner.HasUnitState(UNIT_STATE_RUNNING) && !owner.IsLevitating(), false);
         owner.LoadCreatureAddon(true);
         owner.AI()->JustReachedHome();
     }

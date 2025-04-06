@@ -200,7 +200,7 @@ bool Map::ScriptCommand_MoveTo(ScriptInfo const& script, WorldObject* source, Wo
     }
 
     // Only move if we can move.
-    if (pSource->HasUnitState(UNIT_STAT_NOT_MOVE) && !(script.moveTo.flags & SF_MOVETO_FORCED))
+    if (pSource->HasUnitState(UNIT_STATE_NOT_MOVE) && !(script.moveTo.flags & SF_MOVETO_FORCED))
         return ShouldAbortScript(script);
 
     float speed = script.moveTo.travelTime != 0 ? pSource->GetDistance(x, y, z) / ((float)script.moveTo.travelTime * 0.001f) : 0.0f;

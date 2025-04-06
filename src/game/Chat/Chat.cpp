@@ -1411,7 +1411,7 @@ void ChatHandler::LoadRbacPermissions()
     }
 }
 
-bool ChatHandler::SetPermissionMaskForCommandInTable(ChatCommand* commandTable, const char* text, uint32 permissionId)
+bool ChatHandler::SetPermissionMaskForCommandInTable(ChatCommand* commandTable, char const* text, uint32 permissionId)
 {
     std::string fullcommand = text;                         // original `text` can't be used. It content destroyed in command code processing.
 
@@ -3635,7 +3635,7 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
                 return false;
             }
 
-            mapid = atEntry->mapid;
+            mapid = atEntry->map_id;
             x = atEntry->x;
             y = atEntry->y;
             z = atEntry->z;

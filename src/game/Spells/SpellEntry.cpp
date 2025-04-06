@@ -3,6 +3,7 @@
 #include "SpellAuraDefines.h"
 #include "SpellMgr.h"
 #include "Spell.h"
+#include "TradeData.h"
 
 using namespace Spells;
 
@@ -714,7 +715,7 @@ int32 SpellEntry::GetMaxDuration() const
     return (du->Duration[2] == -1) ? -1 : abs(du->Duration[2]);
 }
 
-int32 SpellEntry::CalculateDuration(WorldObject const* caster) const
+int32 SpellEntry::CalculateDuration(WorldObject const* caster, Unit const* target, AuraScript* auraScript) const
 {
     int32 duration = GetDuration();
 
@@ -725,6 +726,9 @@ int32 SpellEntry::CalculateDuration(WorldObject const* caster) const
         if (duration != maxduration)
             if (Player const* pPlayer = caster->ToPlayer())
                 duration += int32((maxduration - duration) * pPlayer->GetComboPoints() / 5);
+
+        if (auraScript)
+            duration = auraScript->OnDurationCalculate(caster, target, duration);
 
         if (Unit const* pUnit = caster->ToUnit())
         {
@@ -737,6 +741,8 @@ int32 SpellEntry::CalculateDuration(WorldObject const* caster) const
             }
         }
     }
+    else if (auraScript)
+        duration = auraScript->OnDurationCalculate(caster, target, duration);
 
     return duration;
 }

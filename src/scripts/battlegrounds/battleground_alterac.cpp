@@ -109,7 +109,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         m_uiAvatar_Timer = urand(12000, 20000);
         m_uiStormbolt_Timer = 8000;
         m_uiThunderclap_Timer = 5000;
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         m_bAggro = true;
         m_bLeashed = false;
         m_bCombat1 = true;
@@ -155,7 +155,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                 m_bLeashed = true;
                 EnterEvadeMode();
                 return;
@@ -351,7 +351,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         m_uiIsInWhirlwind_Timer = 0;
         m_uiKnockDown_Timer = 18000;
         m_uiFrenzy_Timer = 1000;
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         m_bAggro = true;
         m_bLeashed = false;
         m_bCombat1 = true;
@@ -413,7 +413,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                 m_bLeashed = true;
                 EnterEvadeMode();
                 return;
@@ -441,13 +441,13 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
         if (m_uiIsInWhirlwind_Timer == 0)
         {
-            if (m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            if (m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
         }
         else
         {
-            if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->AddUnitState(UNIT_STAT_ROOT);
+            if (!m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->AddUnitState(UNIT_STATE_ROOT);
         }
 
         // SPELL_WHIRLWIND
@@ -589,7 +589,7 @@ struct npc_BalindaAI : public ScriptedAI
         m_uiConeOfCold_Timer = 1500;
         m_uiArcaneExplo_Timer = 2000;
         m_uiPolymorph_Timer = 1750;
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         if (m_bReset)
             DoScriptText(SAY_BALINDA_RESET, m_creature);
         m_bReset = true;
@@ -625,7 +625,7 @@ struct npc_BalindaAI : public ScriptedAI
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                 EnterEvadeMode();
                 return;
             }
@@ -653,13 +653,13 @@ struct npc_BalindaAI : public ScriptedAI
         if (((m_creature->GetDistance(m_creature->GetVictim()) > 25.0f) || (m_creature->GetDistance(m_creature->GetVictim()) < 5.0f))
             || (!m_creature->IsWithinLOSInMap(m_creature->GetVictim())))
         {
-            if (m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            if (m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
         }
         else
         {
-            if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->AddUnitState(UNIT_STAT_ROOT);
+            if (!m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->AddUnitState(UNIT_STATE_ROOT);
         }
 
         // ARCANE EXPLOSION
@@ -838,7 +838,7 @@ struct npc_GalvangarAI : public ScriptedAI
         m_uiMortalStrike_Timer = 7000;
         m_uiCleave_Timer = 4000;
         m_uiFrighteningShout_Timer = m_uiWhirlwind_Timer + urand(1000, 5000);
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         if (m_bReset)
             DoScriptText(SAY_GALVANGAR_RESET, m_creature);
         m_bReset = true;
@@ -867,7 +867,7 @@ struct npc_GalvangarAI : public ScriptedAI
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                 EnterEvadeMode();
                 return;
             }
@@ -901,13 +901,13 @@ struct npc_GalvangarAI : public ScriptedAI
 
         if (m_uiIsInWhirlwind_Timer == 0)
         {
-            if (m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            if (m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
         }
         else
         {
-            if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->AddUnitState(UNIT_STAT_ROOT);
+            if (!m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->AddUnitState(UNIT_STATE_ROOT);
         }
 
         // SPELL_WHIRLWIND_GAL
@@ -1040,7 +1040,7 @@ struct npc_WarMasterAI : public ScriptedAI
         m_uiWhirlwind_Timer = 12000;
         m_uiEnrage_Timer    = 0;
         m_uiIsInWhirlwind_Timer = 0;
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -1093,9 +1093,9 @@ struct npc_WarMasterAI : public ScriptedAI
         }
 
         if (!m_uiIsInWhirlwind_Timer)
-            m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            m_creature->ClearUnitState(UNIT_STATE_ROOT);
         else
-            m_creature->AddUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STATE_ROOT);
 
         // SPELL_WHIRLWIND_WM
         if (m_uiWhirlwind_Timer < diff)

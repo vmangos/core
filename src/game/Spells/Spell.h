@@ -361,7 +361,7 @@ class Spell
         SpellCastResult CheckCasterAuras() const;
 
         float CalculateDamage(SpellEffectIndex i, Unit* target) { return m_caster->CalculateSpellEffectValue(target, m_spellInfo, i, &m_currentBasePoints[i], this); }
-        static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell = nullptr, Item* castItem = nullptr, bool casting = true);
+        static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell = nullptr, Item* castItem = nullptr, bool dropModCharge = true);
 
         bool HaveTargetsForEffect(SpellEffectIndex effect) const;
         void Delayed();
@@ -473,7 +473,7 @@ class Spell
 
         void AddChanneledAuraHolder(SpellAuraHolder* holder);
         void RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode);
-
+        void UpdateCastStartPosition();
         void Delete() const;
 
         bool HasModifierApplied(SpellModifier* mod);
@@ -498,7 +498,6 @@ class Spell
         void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
-        void UpdateCastStartPosition();
 
         ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
                                                             // e.g. damage around area spell trigered by victim aura and damage enemies of aura caster
@@ -506,8 +505,10 @@ class Spell
 
         Spell** m_selfContainer = nullptr;                  // pointer to our spell container (if applicable)
 
-        //Spell data
+        // Spell data
+    public:
         WeaponAttackType m_attackType;                      // For weapon based attack
+    protected:
         uint32 m_powerCost = 0;                             // Calculated spell cost     initialized only in Spell::prepare
         int32 m_casttime = 0;                               // Calculated spell cast time initialized only in Spell::prepare
         int32 m_duration = 0;
@@ -651,7 +652,7 @@ class Spell
         void DoAllEffectOnTarget(ItemTargetInfo *target);
         bool HasValidUnitPresentInTargetList();
         SpellCastResult CanOpenLock(SpellEffectIndex effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);
-        uint32 GetSpellBatchingEffectDelay(SpellCaster const* pTarget) const;
+        uint32 GetSpellBatchingEffectDelay(SpellCaster const* pTarget, SpellEffectIndex effIndex) const;
         // -------------------------------------------
 
         //List For Triggered Spells
@@ -663,7 +664,9 @@ class Spell
 
         uint32 m_spellState = SPELL_STATE_NULL;
         uint32 m_timer = 0;
+    public:
         uint32 m_triggeredByAuraBasePoints = 0;
+    protected:
 
         Position m_castPosition;
         bool m_IsTriggeredSpell = false;
@@ -671,7 +674,9 @@ class Spell
         // if need this can be replaced by Aura copy
         // we can't store original aura link to prevent access to deleted auras
         // and in same time need aura data and after aura deleting.
+    public:
         SpellEntry const* m_triggeredByAuraSpell = nullptr;
+    protected:
 
         struct ExecuteLogInfo
         {
@@ -804,7 +809,7 @@ class ChannelResetEvent : public BasicEvent
     public:
         ChannelResetEvent(Unit* caster) : m_caster(caster)
         {
-            caster->AddUnitState(UNIT_STAT_PENDING_CHANNEL_RESET);
+            caster->AddUnitState(UNIT_STATE_PENDING_CHANNEL_RESET);
         }
         ~ChannelResetEvent() override {}
 

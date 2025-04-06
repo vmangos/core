@@ -312,12 +312,31 @@ CreatureAI* GetAI_boss_faerlina(Creature* pCreature)
     return new boss_faerlinaAI(pCreature);
 }
 
+// 28796 - Poison Bolt Volley (Naxx, Faerlina)
+struct FaerlinaPoisonBoltVolleyScript : SpellScript
+{
+    void OnSetTargetMap(Spell* spell, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& unMaxTargets, bool& /*selectClosestTargets*/) const final
+    {
+        unMaxTargets = 10;
+    }
+};
+
+SpellScript* GetScript_FaerlinaPoisonBoltVolley(SpellEntry const*)
+{
+    return new FaerlinaPoisonBoltVolleyScript();
+}
 
 void AddSC_boss_faerlina()
 {
-    Script* NewScript;
-    NewScript = new Script;
-    NewScript->Name = "boss_faerlina";
-    NewScript->GetAI = &GetAI_boss_faerlina;
-    NewScript->RegisterSelf();
+    Script* pNewScript;
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_faerlina";
+    pNewScript->GetAI = &GetAI_boss_faerlina;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_faerlina_poison_bolt_volley";
+    pNewScript->GetSpellScript = &GetScript_FaerlinaPoisonBoltVolley;
+    pNewScript->RegisterSelf();
 }

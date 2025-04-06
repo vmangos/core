@@ -369,7 +369,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
         }
         case EVENT_T_VICTIM_ROOTED:
         {
-            if (!m_creature->GetVictim() || !m_creature->GetVictim()->HasUnitState(UNIT_STAT_ROOT))
+            if (!m_creature->GetVictim() || !m_creature->GetVictim()->HasUnitState(UNIT_STATE_ROOT))
                 return false;
 
             pHolder.UpdateRepeatTimer(m_creature, event.victim_rooted.repeatMin, event.victim_rooted.repeatMax);

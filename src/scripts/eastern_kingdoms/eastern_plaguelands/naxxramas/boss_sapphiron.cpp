@@ -514,7 +514,7 @@ struct boss_sapphironAI : public ScriptedAI
                     if (m_creature->GetHealthPercent() > 10.0f)
                     {
                         events.Reset();
-                        m_creature->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
+                        m_creature->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
                         m_creature->InterruptNonMeleeSpells(false);
                         m_creature->GetMotionMaster()->Clear(false);
                         m_creature->GetMotionMaster()->MoveIdle();
@@ -760,16 +760,36 @@ CreatureAI* GetAI_npc_sapphironBlizzard(Creature* pCreature)
     return new npc_sapphiron_blizzardAI(pCreature);
 }
 
+// 28542 - Life Drain (Naxx, Sapphiron)
+struct SapphironLifeDrainScript : SpellScript
+{
+    void OnSetTargetMap(Spell* spell, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& unMaxTargets, bool& /*selectClosestTargets*/) const final
+    {
+        unMaxTargets = urand(7, 10);
+    }
+};
+
+SpellScript* GetScript_SapphironLifeDrain(SpellEntry const*)
+{
+    return new SapphironLifeDrainScript();
+}
+
 void AddSC_boss_sapphiron()
 {
-    Script* NewScript;
-    NewScript = new Script;
-    NewScript->Name = "boss_sapphiron";
-    NewScript->GetAI = &GetAI_boss_sapphiron;
-    NewScript->RegisterSelf();
+    Script* pNewScript;
 
-    NewScript = new Script;
-    NewScript->Name = "npc_sapphiron_blizzard";
-    NewScript->GetAI = &GetAI_npc_sapphironBlizzard;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_sapphiron";
+    pNewScript->GetAI = &GetAI_boss_sapphiron;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_sapphiron_blizzard";
+    pNewScript->GetAI = &GetAI_npc_sapphironBlizzard;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_sapphiron_life_drain";
+    pNewScript->GetSpellScript = &GetScript_SapphironLifeDrain;
+    pNewScript->RegisterSelf();
 }

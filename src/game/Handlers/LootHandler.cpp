@@ -359,7 +359,7 @@ void WorldSession::HandleLootOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (_player->HasUnitState(UNIT_STAT_STUNNED))
+    if (_player->HasUnitState(UNIT_STATE_STUNNED))
     {
         _player->SendLootError(guid, LOOT_ERROR_STUNNED);
         return;
@@ -493,8 +493,16 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 loot->clear();
             }
             else
+            {
                 // not fully looted object
                 go->SetLootState(GO_ACTIVATED);
+
+                // respawn partially looted chests 5 mins after being opened
+                if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
+                {
+                    go->SetCooldownTime(time(nullptr) + 5 * MINUTE);
+                }
+            }
             break;
         }
         case HIGHGUID_CORPSE:                               // ONLY remove insignia at BG

@@ -178,8 +178,8 @@ class ChatHandler
 
         void SendGlobalSysMessage(char const* str);
 
-        static bool SetPermissionMaskForCommandInTable(ChatCommand* table, const char* text, uint32 permissionId);
-        static bool SetDataForCommandInTable(ChatCommand *table, const char* text, uint8 security, std::string const& help, uint8 flags);
+        static bool SetPermissionMaskForCommandInTable(ChatCommand* table, char const* text, uint32 permissionId);
+        static bool SetDataForCommandInTable(ChatCommand *table, char const* text, uint8 security, std::string const& help, uint8 flags);
         void ExecuteCommand(char const* text);
         bool ShowHelpForCommand(ChatCommand *table, char const* cmd);
         bool ShowHelpForSubCommands(ChatCommand *table, char const* cmd);

@@ -51,7 +51,6 @@ void LoadRandomEnchantmentsTable()
 {
     RandomItemEnch.clear();                                 // for reload case
 
-    EnchantmentStore::const_iterator tab;
     uint32 entry, ench;
     uint32 count = 0;
 

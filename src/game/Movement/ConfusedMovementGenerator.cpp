@@ -33,7 +33,7 @@ void ConfusedMovementGenerator<T>::Initialize(T &unit)
 
     if (!unit.movespline->Finalized())
         unit.StopMoving();
-    unit.AddUnitState(UNIT_STAT_CONFUSED);
+    unit.AddUnitState(UNIT_STATE_CONFUSED);
     unit.UpdateControl();
 }
 
@@ -46,7 +46,7 @@ template<class T>
 void ConfusedMovementGenerator<T>::Reset(T &unit)
 {
     unit.StopMoving();
-    unit.AddUnitState(UNIT_STAT_CONFUSED);
+    unit.AddUnitState(UNIT_STATE_CONFUSED);
     unit.UpdateControl();
 }
 
@@ -54,7 +54,7 @@ template<class T>
 bool ConfusedMovementGenerator<T>::Update(T &unit, uint32 const& diff)
 {
     // ignore in case other no reaction state
-    if (unit.HasUnitState((UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) & ~UNIT_STAT_CONFUSED))
+    if (unit.HasUnitState((UNIT_STATE_CAN_NOT_REACT | UNIT_STATE_CAN_NOT_MOVE | UNIT_STATE_STUNNED | UNIT_STATE_PENDING_STUNNED) & ~UNIT_STATE_CONFUSED))
         return true;
 
     if (Player* pPlayer = unit.ToPlayer())
@@ -90,7 +90,7 @@ bool ConfusedMovementGenerator<T>::Update(T &unit, uint32 const& diff)
 template<>
 void ConfusedMovementGenerator<Player>::Finalize(Player &unit)
 {
-    unit.ClearUnitState(UNIT_STAT_CONFUSED);
+    unit.ClearUnitState(UNIT_STATE_CONFUSED);
     unit.StopMoving();
     unit.UpdateControl();
 }
@@ -98,7 +98,7 @@ void ConfusedMovementGenerator<Player>::Finalize(Player &unit)
 template<>
 void ConfusedMovementGenerator<Creature>::Finalize(Creature &unit)
 {
-    unit.ClearUnitState(UNIT_STAT_CONFUSED);
+    unit.ClearUnitState(UNIT_STATE_CONFUSED);
     unit.UpdateControl();
 }
 

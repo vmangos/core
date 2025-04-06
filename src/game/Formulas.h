@@ -109,7 +109,7 @@ namespace MaNGOS
                 (pCreature->GetCreatureInfo()->health_multiplier <= 0.1f)))
                 return 0;
 
-            if (pCreature->HasUnitState(UNIT_STAT_NO_KILL_REWARD))
+            if (pCreature->HasUnitState(UNIT_STATE_NO_KILL_REWARD))
                 return 0;
 
             if (pCreature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_XP))

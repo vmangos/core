@@ -191,6 +191,8 @@ class GameObject : public SpellCaster
         void AddUse() { ++m_useTimes; }
         uint32 GetUseCount() const { return m_useTimes; }
 
+        void SetCooldownTime(time_t cooldown) { m_cooldownTime = cooldown; }
+
         void SaveRespawnTime() override;
 
         Loot        loot;

@@ -1122,7 +1122,7 @@ float TerrainInfo::GetWaterOrGroundLevel(float x, float y, float z, float* pGrou
         GridMapLiquidData liquid_status;
 
         GridMapLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
-        return res ? (swim ? liquid_status.level - 2.0f : liquid_status.level) : ground_z;
+        return std::max(res ? (swim ? liquid_status.level - 2.0f : liquid_status.level) : ground_z, ground_z);
     }
 
     return VMAP_INVALID_HEIGHT_VALUE;

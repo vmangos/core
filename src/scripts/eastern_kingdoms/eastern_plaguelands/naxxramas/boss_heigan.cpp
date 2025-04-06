@@ -485,11 +485,32 @@ CreatureAI* GetAI_boss_heigan(Creature* pCreature)
     return new boss_heiganAI(pCreature);
 }
 
+// 29310 - Mana Burn (Heigan, naxxramas)
+struct HeiganManaBurnScript : SpellScript
+{
+    void OnSetTargetMap(Spell* /*spell*/, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& radius, uint32& /*unMaxTargets*/, bool& /*selectClosestTargets*/) const final
+    {
+        // Without a bigger raidus its possible to tank heigan in one corner of the platform, and have ranged stay in the other corner
+        radius = 28.0f;
+    }
+};
+
+SpellScript* GetScript_HeiganManaBurn(SpellEntry const*)
+{
+    return new HeiganManaBurnScript();
+}
+
 void AddSC_boss_heigan()
 {
-    Script* NewScript;
-    NewScript = new Script;
-    NewScript->Name = "boss_heigan";
-    NewScript->GetAI = &GetAI_boss_heigan;
-    NewScript->RegisterSelf();
+    Script* pNewScript;
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_heigan";
+    pNewScript->GetAI = &GetAI_boss_heigan;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_heigan_mana_burn";
+    pNewScript->GetSpellScript = &GetScript_HeiganManaBurn;
+    pNewScript->RegisterSelf();
 }

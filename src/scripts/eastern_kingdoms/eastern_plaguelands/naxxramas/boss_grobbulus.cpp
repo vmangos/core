@@ -45,6 +45,7 @@ enum GrobbulusData
     SPELL_BERSERK = 26662,
 
     SPELL_POISON_CLOUD          = 28240, // Summons a poison cloud npc
+    SPELL_MUTAGEN_EXPLOSION     = 28206,
     //SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud, triggers 28241 every second
 
     //SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes EventAI
@@ -234,6 +235,88 @@ CreatureAI* GetAI_boss_grobbulus(Creature* pCreature)
     return new boss_grobbulusAI(pCreature);
 }
 
+// 28169 - Mutating Injection (Grobbulus)
+struct GrobbulusMutatingInjectionScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (!apply) // on remove
+        {
+            if (Unit* pCaster = aura->GetCaster())
+            {
+                if (aura->GetRemoveMode()  == AuraRemoveMode::AURA_REMOVE_BY_DISPEL)
+                {
+                    // Mutagen Explosion
+                    pCaster->CastSpell(aura->GetTarget(), SPELL_MUTAGEN_EXPLOSION, true);
+                }
+                else
+                {
+                    // Mutagen Explosion
+                    pCaster->CastSpell(aura->GetTarget(), SPELL_MUTAGEN_EXPLOSION, true, nullptr, aura);
+                }
+            }
+
+            // Poison Cloud
+            aura->GetTarget()->CastSpell(aura->GetTarget(), SPELL_POISON_CLOUD, true, nullptr, aura);
+        }
+    }
+};
+
+AuraScript* GetScript_GrobbulusMutatingInjection(SpellEntry const*)
+{
+    return new GrobbulusMutatingInjectionScript();
+}
+
+// 28241 - Poison (Grobbulus Cloud)
+struct GrobbulusCloudPoisonScript : SpellScript
+{
+    void OnSetTargetMap(Spell* spell, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& radius, uint32& /*unMaxTargets*/, bool& /*selectClosestTargets*/) const final
+    {
+        // Spell states 30yd radius, which you would think is the max radius once its all grown,
+        // however, the visual of the spell goes no further than ~20yd, so lets stop it there.
+        // It will instantly get a 2(?) yd radius, and grow to 20 from there
+        if (spell->m_casterUnit)
+        {
+            if (SpellAuraHolder* auraHolder = spell->m_casterUnit->GetSpellAuraHolder(28158))
+            {
+                const int maxDur = auraHolder->GetAuraMaxDuration();
+                const int currTick = maxDur - auraHolder->GetAuraDuration();
+                radius = 18.0f / maxDur * currTick + 2;
+                //radius = 0.5f * (60000 - auraHolder->GetAuraDuration()) * 0.001f;
+            }
+        }
+    }
+};
+
+SpellScript* GetScript_GrobbulusCloudPoison(SpellEntry const*)
+{
+    return new GrobbulusCloudPoisonScript();
+}
+
+// 28206 - Mutagen Explosion (Grobbulus)
+struct GrobbulusMutagenExplosionScript : public SpellScript
+{
+    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // All sources say the explosion should do around 4.5k physical dmg if it runs out,
+            // but "less" if dispelled. I have been able to find different variations of this spell,
+            // so the hack has become to set m_triggeredBySpellInfo when casting this spell from Aura::HandleAuraDummy
+            // when 28169 expires, and NOT set m_triggeredBySpellInfo 28169 is dispelled.
+            if (spell->m_triggeredBySpellInfo)
+                spell->damage = spell->damage * 1.5f;
+            else
+                spell->damage = spell->damage / 1.5f;
+        }
+    }
+};
+
+SpellScript* GetScript_GrobbulusMutagenExplosion(SpellEntry const*)
+{
+    return new GrobbulusMutagenExplosionScript();
+}
+
 void AddSC_boss_grobbulus()
 {
     Script* pNewScript;
@@ -241,5 +324,20 @@ void AddSC_boss_grobbulus()
     pNewScript = new Script;
     pNewScript->Name = "boss_grobbulus";
     pNewScript->GetAI = &GetAI_boss_grobbulus;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_grobbulus_mutating_injection";
+    pNewScript->GetAuraScript = &GetScript_GrobbulusMutatingInjection;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_grobbulus_cloud_poison";
+    pNewScript->GetSpellScript = &GetScript_GrobbulusCloudPoison;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_grobbulus_mutagen_explosion";
+    pNewScript->GetSpellScript = &GetScript_GrobbulusMutagenExplosion;
     pNewScript->RegisterSelf();
 }

@@ -302,7 +302,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 m_archerGUIDs[j] = summoned->GetGUID();
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summoned->AddUnitState(UNIT_STAT_ROOT);
+                summoned->AddUnitState(UNIT_STATE_ROOT);
                 break;
             case NPC_WARRIOR:
                 SetAttackOnPeasantOrPlayer(summoned);

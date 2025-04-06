@@ -507,7 +507,7 @@ bool PlayerBotMgr::DeleteBot(uint32 playerGUID)
     return DeleteBot(iter);
 }
 
-bool PlayerBotMgr::DeleteBot(std::map<uint32, std::shared_ptr<PlayerBotEntry>>::iterator iter)
+bool PlayerBotMgr::DeleteBot(std::map<uint64, std::shared_ptr<PlayerBotEntry>>::iterator iter)
 {
     if (iter->second->state == PB_STATE_LOADING)
         m_stats.loadingCount--;
@@ -587,13 +587,29 @@ void PlayerBotMgr::AddBattleBot(BattleGroundQueueTypeId queueType, Team botTeam,
 
     if (botTeam == ALLIANCE)
     {
-        sWorld.SendWorldTextToBGAndQueue(LANG_ALLIANCE_BATTLEBOT_ADDED, botLevel, queueType, botLevel, queueType);
-        sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
+        if (temporary)
+        {
+            sWorld.SendWorldTextToBGAndQueue(LANG_ALLIANCE_BATTLEBOT_TEMP_ADDED, botLevel, queueType, botLevel, queueType);
+            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding temporary level %u alliance battlebot to bg queue %u.", botLevel, queueType);
+        }
+        else
+        {
+            sWorld.SendWorldTextToBGAndQueue(LANG_ALLIANCE_BATTLEBOT_ADDED, botLevel, queueType, botLevel, queueType);
+            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u alliance battlebot to bg queue %u.", botLevel, queueType);
+        }
     }
     else
     {
-        sWorld.SendWorldTextToBGAndQueue(LANG_HORDE_BATTLEBOT_ADDED, botLevel, queueType, botLevel, queueType);
-        sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
+        if (temporary)
+        {
+            sWorld.SendWorldTextToBGAndQueue(LANG_HORDE_BATTLEBOT_TEMP_ADDED, botLevel, queueType, botLevel, queueType);
+            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding temporary level %u horde battlebot to bg queue %u.", botLevel, queueType);
+        }
+        else
+        {
+            sWorld.SendWorldTextToBGAndQueue(LANG_HORDE_BATTLEBOT_ADDED, botLevel, queueType, botLevel, queueType);
+            sLog.Out(LOG_BG, LOG_LVL_BASIC, "[PlayerBotMgr] Adding level %u horde battlebot to bg queue %u.", botLevel, queueType);
+        }
     }
 }
 
@@ -1406,7 +1422,7 @@ bool ChatHandler::HandlePartyBotClearMarksCommand(char* args)
 
 bool HandlePartyBotComeToMeHelper(Player* pBot, Player* pPlayer)
 {
-    if (pBot->AI() && pBot->IsAlive() && pBot->IsInMap(pPlayer) && !pBot->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
+    if (pBot->AI() && pBot->IsAlive() && pBot->IsInMap(pPlayer) && !pBot->HasUnitState(UNIT_STATE_NO_FREE_MOVE))
     {
         if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pBot->AI()))
         {
@@ -1779,6 +1795,7 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
 
     Team botTeam = HORDE;
     uint32 botLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+    bool isTemporary = false;
     std::string option;
     if (char* arg1 = ExtractArg(&args))
     {
@@ -1794,10 +1811,18 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
             return false;
         }
 
+        
         ExtractUInt32(&args, botLevel);
+
+        
+        if (char* tempStr = ExtractArg(&args))
+        {
+            if (strcmp(tempStr, "temp") == 0)
+                isTemporary = true;
+        }
     }
 
-    sPlayerBotMgr.AddBattleBot(BattleGroundQueueTypeId(bg), botTeam, botLevel, false);
+    sPlayerBotMgr.AddBattleBot(BattleGroundQueueTypeId(bg), botTeam, botLevel, isTemporary);
     return true;
 }
 

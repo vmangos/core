@@ -31,10 +31,10 @@ HonorStandingList& HonorMaintenancer::GetStandingListByTeam(Team team)
     }
 }
 
-float HonorMaintenancer::GetStandingCPByPosition(HonorStandingList& standingList, uint32 position)
+float HonorMaintenancer::GetStandingCPByPosition(HonorStandingList const& standingList, uint32 position)
 {
     uint32 pos = 1;
-    for (auto& standing : standingList)
+    for (auto const& standing : standingList)
     {
         if (pos == position)
             return standing.cp;

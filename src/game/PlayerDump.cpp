@@ -675,12 +675,20 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     CharacterDatabase.CommitTransaction();
 
     //FIXME: current code with post-updating guids not safe for future per-map threads
-    sObjectMgr.m_ItemGuids.Set(sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed() + items.size());
-    sObjectMgr.m_MailIds.Set(sObjectMgr.m_MailIds.GetNextAfterMaxUsed() +  mails.size());
-    sObjectMgr.m_ItemTextIds.Set(sObjectMgr.m_ItemTextIds.GetNextAfterMaxUsed() + itemTexts.size());
+    uint64 newMaxItemGuid = sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed() + uint64(items.size());
+    MANGOS_ASSERT(newMaxItemGuid < UINT32_MAX);
+    sObjectMgr.m_ItemGuids.SetMaxUsedGuid(newMaxItemGuid, "Item");
+    
+    uint64 newMaxMailId = sObjectMgr.m_MailIds.GetNextAfterMaxUsed() + uint64(mails.size());
+    MANGOS_ASSERT(newMaxMailId < UINT32_MAX);
+    sObjectMgr.m_MailIds.SetMaxUsedGuid(newMaxMailId, "Mail");
+
+    uint64 newMaxItemTextId = sObjectMgr.m_ItemTextIds.GetNextAfterMaxUsed() + uint64(itemTexts.size());
+    MANGOS_ASSERT(newMaxItemTextId < UINT32_MAX);
+    sObjectMgr.m_ItemTextIds.SetMaxUsedGuid(newMaxItemTextId, "Item Text");
 
     if (incHighest)
-        sObjectMgr.m_CharGuids.Set(sObjectMgr.m_CharGuids.GetNextAfterMaxUsed() + 1);
+        sObjectMgr.m_CharGuids.SetMaxUsedGuid(sObjectMgr.m_CharGuids.GetNextAfterMaxUsed() + 1, "Character");
 
     fclose(fin);
 

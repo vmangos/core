@@ -87,7 +87,7 @@ class BattleGroundQueue
         void Update(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId);
 
         void FillPlayersToBg(BattleGround* bg, BattleGroundBracketId bracketId);
-        bool CheckPremadeMatch(BattleGroundBracketId bracketId, uint32 maxPlayersPerTeam, uint32 minPlayersPerTeam);
+        bool CheckPremadeMatch(BattleGroundBracketId bracketId, uint32 minPlayersPerTeam, uint32 maxPlayersPerTeam);
         bool CheckNormalMatch(BattleGroundBracketId bracketId, uint32 minPlayers, uint32 maxPlayers);
         GroupQueueInfo* AddGroup(Player* leader, Group* group, BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId, bool isPremade, uint32 instanceId, std::vector<uint32>* excludedMembers);
         void RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount);

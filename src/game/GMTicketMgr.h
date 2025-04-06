@@ -261,7 +261,7 @@ public:
     void ShowClosedList(ChatHandler& handler) const;
     void ShowEscalatedList(ChatHandler& handler) const;
 
-    void SendTicket(WorldSession* session, GmTicket* ticket) const;
+    void SendTicket(WorldSession* session, GmTicket const* ticket) const;
     void ReloadTicket(uint32 ticketId);
     void ReloadTicketCallback(std::unique_ptr<QueryResult> result);
 

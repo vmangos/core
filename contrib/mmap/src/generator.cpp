@@ -111,8 +111,8 @@ bool handleArgs(int argc, char** argv,
                 bool& silent,
                 bool& quick,
                 bool& buildOnlyGameobjectModels,
-                const char*& offMeshInputPath,
-                const char*& configInputPath,
+                char const*& offMeshInputPath,
+                char const*& configInputPath,
                 int& threads)
 {
     char* param = nullptr;
@@ -217,7 +217,7 @@ bool handleArgs(int argc, char** argv,
     return true;
 }
 
-int finish(const char* message, int returnValue)
+int finish(char const* message, int returnValue)
 {
     printf("%s", message);
     getchar();
@@ -240,8 +240,8 @@ int main(int argc, char** argv)
     bool quick = false;
     int threads = 0;
 
-    const char* offMeshInputPath = "offmesh.txt";
-    const char* configInputPath = "config.json";
+    char const* offMeshInputPath = "offmesh.txt";
+    char const* configInputPath = "config.json";
 
     bool validParam = handleArgs(argc, argv, mapId, tileX, tileY, skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds, debug, silent, quick, buildOnlyGameobjectModels, offMeshInputPath, configInputPath, threads);
 

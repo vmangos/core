@@ -867,8 +867,8 @@ bool QuestRewarded_go_broken_trap(Player* pPlayer, GameObject* pGo, Quest const*
 
 enum
 {
-    SAY_KILL_KING_1      = -1900012,
-    SAY_KILL_KING_2      = -1900013,
+    SAY_KILL_KING_1      = 9348,
+    SAY_KILL_KING_2      = 9411,
 };
 
 struct npc_mizzle_the_craftyAI : public ScriptedAI
@@ -1195,7 +1195,7 @@ enum
     // Guard Mol'dar
     SPELL_MOLDAR_MOXIE          = 22818,
 
-    EMOTE_ENRAGE                = -1900040,
+    EMOTE_ENRAGE                = 9413,
 };
 
 struct boss_guardsAI : public ScriptedAI
@@ -1376,11 +1376,11 @@ enum
 
     NPC_GORDOK_REAVER           = 11450,
 
-    EMOTE_RETALIATION           = -1900039,
-    SAY_AGGRO                   = -1900038,
-    SAY_CALL_HELP               = -1900037,
-    SAY_GO_FURGUS               = -1900046,
-    SAY_FIND_FURGUS             = -1900047
+    EMOTE_RETALIATION           = 9477,
+    SAY_AGGRO                   = 9418,
+    SAY_CALL_HELP               = 9478,
+    SAY_GO_FURGUS               = 9416,
+    SAY_FIND_FURGUS             = 9424
 };
 
 struct boss_kromcrushAI : public ScriptedAI

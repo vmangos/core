@@ -1087,6 +1087,44 @@ CreatureAI* GetAI_boss_thaddius(Creature* pCreature)
     return new boss_thaddiusAI(pCreature);
 }
 
+// 28062 - Positive Charge (Thaddius)
+struct ThaddiusPositiveChargeScript : public SpellScript
+{
+    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // Target also has positive charge, so no damage
+            if (spell->GetUnitTarget()->HasAura(28059))
+                spell->damage = 0;
+        }
+    }
+};
+
+SpellScript* GetScript_ThaddiusPositiveCharge(SpellEntry const*)
+{
+    return new ThaddiusPositiveChargeScript();
+}
+
+// 28085 - Negative Charge (Thaddius)
+struct ThaddiusNegativeChargeScript : public SpellScript
+{
+    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // Target also has negative charge, so no damage
+            if (spell->GetUnitTarget()->HasAura(28084))
+                spell->damage = 0;
+        }
+    }
+};
+
+SpellScript* GetScript_ThaddiusNegativeCharge(SpellEntry const*)
+{
+    return new ThaddiusNegativeChargeScript();
+}
+
 void AddSC_boss_thaddius()
 {
     Script* pNewScript;
@@ -1109,5 +1147,15 @@ void AddSC_boss_thaddius()
     pNewScript = new Script;
     pNewScript->Name = "npc_tesla_coil";
     pNewScript->GetAI = &GetAI_npc_tesla_coil;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_thaddius_positive_charge";
+    pNewScript->GetSpellScript = &GetScript_ThaddiusPositiveCharge;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_thaddius_negative_charge";
+    pNewScript->GetSpellScript = &GetScript_ThaddiusNegativeCharge;
     pNewScript->RegisterSelf();
 }

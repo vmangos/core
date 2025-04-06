@@ -2339,13 +2339,13 @@ bool ChatHandler::HandleUnitStatCommand(char *args)
     if (!pTarget)
         return false;
     uint32 unitStat = 0x0;
-    for (int i = 1; i < UNIT_STAT_IGNORE_PATHFINDING; i *= 2)
+    for (int i = 1; i < UNIT_STATE_IGNORE_PATHFINDING; i *= 2)
         if (pTarget->HasUnitState(i))
             unitStat |= i;
     PSendSysMessage("UnitState = 0x%x (%u)", unitStat, unitStat);
     if (ExtractUInt32(&args, unitStat))
     {
-        pTarget->ClearUnitState(UNIT_STAT_ALL_STATE);
+        pTarget->ClearUnitState(UNIT_STATE_ALL_STATE);
         pTarget->AddUnitState(unitStat);
         PSendSysMessage("UnitState changed to 0x%x (%u)", unitStat, unitStat);
     }

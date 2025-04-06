@@ -360,7 +360,7 @@ struct go_pile_dechetsAI: public GameObjectAI
         {
             if (Creature* Guru = pUser->SummonCreature(15047, pUser->GetPositionX(), pUser->GetPositionY(), pUser->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000))
             {
-                Guru->AddUnitState(UNIT_STAT_ROOT);
+                Guru->AddUnitState(UNIT_STATE_ROOT);
 
                 Map::PlayerList const& players = Guru->GetMap()->GetPlayers();
                 bool OtherPlayerFound = false;
@@ -424,7 +424,7 @@ struct go_pile_dechetsAI: public GameObjectAI
                                 Guru->AddThreat(itr);
                                 Guru->SetInCombatWith(itr);
                                 Guru->CastSpell(pUser, 24178, true);
-                                Guru->AddUnitState(UNIT_STAT_ROOT);
+                                Guru->AddUnitState(UNIT_STATE_ROOT);
                                 Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                                 Guru->SetFactionTemplateId(14); // Troll Bloodscalp

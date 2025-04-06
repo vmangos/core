@@ -24,12 +24,12 @@ enum
     // Emotes
     // ------
 
-    SAY_AGGRO           = -1309015,
-    SAY_DING_KILL       = -1309016,
-    SAY_GRATS_JINDO     = -1309017,
-    SAY_WATCH           = -1309018,
-    SAY_WATCH_WHISPER   = -1309019,
-    EMOTE_RAGE          = -1309024,
+    SAY_AGGRO           = 10446,
+    SAY_DING_KILL       = 10505,
+    SAY_GRATS_JINDO     = 10601,
+    SAY_WATCH           = 10604,
+    SAY_WATCH_WHISPER   = 10628,
+    EMOTE_RAGE          = 10545,
 
     // Mandokir's spells
     // -----------------

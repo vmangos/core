@@ -108,6 +108,18 @@ void ObjectGuidGenerator<high>::GenerateRange(uint32& first, uint32& last)
     last = m_nextGuid;
 }
 
+template<HighGuid high>
+void ObjectGuidGenerator<high>::SetMaxUsedGuid(uint32 val, char const* guidType)
+{
+    if (val == UINT32_MAX)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s guids have been exhausted! Aborting startup.", guidType);
+        Log::WaitBeforeContinueIfNeed();
+        exit(1);
+    }
+    m_nextGuid = val + 1;
+}
+
 ByteBuffer& operator<< (ByteBuffer& buf, ObjectGuid const& guid)
 {
     buf << uint64(guid.GetRawValue());

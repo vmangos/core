@@ -123,17 +123,17 @@ CreatureAI* GetAI_npc_tainted_ooze(Creature* pCreature)
 
 enum
 {
-    SAY_ESCORT_START                = -1001148,
-    SAY_FIRST_STOP                  = -1001149,
-    SAY_SECOND_STOP                 = -1001150,
-    SAY_AGGRO                       = -1001151,
-    SAY_FOUND_EQUIPMENT             = -1001152,
-    SAY_ESCAPE_DEMONS               = -1001153,
-    SAY_FRESH_AIR                   = -1001154,
-    SAY_TREY_BETRAYER               = -1001155,
-    SAY_TREY                        = -1001156,
-    SAY_TREY_ATTACK                 = -1001157,
-    SAY_ESCORT_COMPLETE             = -1001158,
+    SAY_ESCORT_START                = 6433,
+    SAY_FIRST_STOP                  = 6456,
+    SAY_SECOND_STOP                 = 6457,
+    SAY_AGGRO                       = 6801,
+    SAY_FOUND_EQUIPMENT             = 6458,
+    SAY_ESCAPE_DEMONS               = 6460,
+    SAY_FRESH_AIR                   = 6461,
+    SAY_TREY_BETRAYER               = 6466,
+    SAY_TREY                        = 6463,
+    SAY_TREY_ATTACK                 = 6802,
+    SAY_ESCORT_COMPLETE             = 6468,
 
     SPELL_STRENGTH_ARKONARIN        = 18163,
     SPELL_MORTAL_STRIKE             = 16856,
@@ -321,15 +321,15 @@ bool QuestAccept_npc_captured_arkonarin(Player* pPlayer, Creature* pCreature, Qu
 
 enum
 {
-    SAY_AREI_ESCORT_START           = -1001159,
-    SAY_ATTACK_IRONTREE             = -1001160,
-    SAY_ATTACK_TOXIC_HORROR         = -1001161,
-    SAY_EXIT_WOODS                  = -1001162,
-    SAY_CLEAR_PATH                  = -1001163,//NPC_AREI,   4000
-    SAY_ASHENVALE                   = -1001164,
-    SAY_TRANSFORM                   = -1001165,
-    SAY_LIFT_CURSE                  = -1001166,
-    SAY_AREI_ESCORT_COMPLETE        = -1001167,
+    SAY_AREI_ESCORT_START           = 5004,
+    SAY_ATTACK_IRONTREE             = 5474,
+    SAY_ATTACK_TOXIC_HORROR         = 5005,
+    SAY_EXIT_WOODS                  = 5473,
+    SAY_CLEAR_PATH                  = 5008,//NPC_AREI,   4000
+    SAY_ASHENVALE                   = 5023,
+    SAY_TRANSFORM                   = 5026,
+    SAY_LIFT_CURSE                  = 5029,
+    SAY_AREI_ESCORT_COMPLETE        = 5036,
 
     SPELL_WITHER_STRIKE             = 5337,//5000
     SPELL_AREI_TRANSFORM            = 14888,
@@ -639,6 +639,27 @@ bool AreaTrigger_at_irontree_wood(Player* pPlayer, AreaTriggerEntry const* pAt)
     return false;
 }
 
+// 6946 - Curse of the Bleakheart
+struct CurseOfTheBleakheartScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply && aura->GetEffIndex() == EFFECT_INDEX_0)
+            aura->SetPeriodicTimer(5 * IN_MILLISECONDS);
+    }
+
+    void OnPeriodicDummy(Aura* aura) final
+    {
+        if (roll_chance_i(5))
+            aura->GetTarget()->CastSpell(aura->GetTarget(), 6945, true, nullptr, aura);
+    }
+};
+
+AuraScript* GetScript_CurseOfTheBleakheart(SpellEntry const*)
+{
+    return new CurseOfTheBleakheartScript();
+}
+
 void AddSC_felwood()
 {
     Script* newscript;
@@ -675,4 +696,9 @@ void AddSC_felwood()
     newscript->Name = "at_irontree_wood";
     newscript->pAreaTrigger = &AreaTrigger_at_irontree_wood;
     newscript->RegisterSelf(); 
+
+    newscript = new Script;
+    newscript->Name = "spell_curse_of_bleakheart";
+    newscript->GetAuraScript = &GetScript_CurseOfTheBleakheart;
+    newscript->RegisterSelf();
 }

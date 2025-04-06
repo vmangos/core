@@ -39,6 +39,7 @@
 #include "Chat.h"
 #include "Anticheat.h"
 #include "AccountMgr.h"
+#include "TransactionLog.h"
 #include "Database/DatabaseImpl.h"
 
 void WorldSession::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, uint32 item_guid, uint32 item_count)
@@ -821,7 +822,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
 
         data << (*itr)->subject;                            // Subject string - once 00, when mail type = 3
         data << uint32((*itr)->itemTextId);                 // sure about this
-        data << uint32(0);                                  // unknown
+        data << uint32(0);                                  // package (Package.dbc)
         data << uint32((*itr)->stationery);                 // stationery (Stationery.dbc)
 
         // 1.12.1 can have only single item

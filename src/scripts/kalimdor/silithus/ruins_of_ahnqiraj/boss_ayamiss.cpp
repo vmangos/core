@@ -197,7 +197,7 @@ struct boss_ayamissAI : public ScriptedAI
             SetCombatMovement(true);
             m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
             m_creature->AttackerStateUpdate(m_creature->GetVictim());
-            m_creature->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING); //pathfinding desactivation
+            m_creature->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING); //pathfinding desactivation
             m_bIsInPhaseTwo = true;
 
             /** Aggro list reset */
@@ -234,7 +234,7 @@ struct boss_ayamissAI : public ScriptedAI
             std::list<Creature*> SwarmerList;
             GetCreatureListWithEntryInGrid(SwarmerList, m_creature, NPC_HIVEZARA_SWARMER, 300.0f);
             for (const auto& itr : SwarmerList)
-                itr->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING);
+                itr->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
 
             m_uiSummonSwarmer_Timer = 60000;
         }

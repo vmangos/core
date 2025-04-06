@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "Spell.h"
 #include "SpellAuras.h"
+#include "SpellModifier.h"
 #include "SpellMgr.h"
 #include "Util.h"
 #include "World.h"
@@ -380,6 +381,10 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
             return SPELL_PROC_TRIGGER_FAILED;
     }
 
+    if (holder->GetAuraScript())
+        if (auto result = holder->GetAuraScript()->OnCheckProc(this, pVictim, holder, procSpell, procFlag, procExtra, attType, isVictim))
+            return result.value();
+
     // Get proc Event Entry
     spellProcEvent = sSpellMgr.GetSpellProcEvent(spellProto->Id);
 
@@ -661,7 +666,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     //  15 seconds.In addition, retaliatory strikes will not be possible
                     //  while stunned.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-                    if (HasUnitState(UNIT_STAT_CAN_NOT_REACT))
+                    if (HasUnitState(UNIT_STATE_CAN_NOT_REACT))
                         return SPELL_AURA_PROC_FAILED;
 #endif
 
@@ -725,9 +730,9 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                     triggerAmount = triggeredByAura->GetModifier()->m_amount;
 
                     if (triggerAmount == 50)
-                        MonsterTextEmote(-1531044, nullptr, true); // Cracks
+                        MonsterTextEmote(11346, this, true); // begins to crack!
                     else if (triggerAmount == 100)
-                        MonsterTextEmote(-1531045, nullptr, true); // Shatter
+                        MonsterTextEmote(11347, nullptr, true); // looks ready to shatter!
                     else if (triggerAmount == 150)
                     {
                         RemoveAurasDueToSpell(25937);

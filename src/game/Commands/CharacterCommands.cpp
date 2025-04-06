@@ -4296,7 +4296,7 @@ bool ChatHandler::HandleModifyGenderCommand(char *args)
     // Change display ID
     player->InitPlayerDisplayIds();
 
-    char const* gender_full = gender ? "female" : "male";
+    char const* gender_full = gender == GENDER_FEMALE ? "female" : "male";
 
     PSendSysMessage(LANG_YOU_CHANGE_GENDER, player->GetName(), gender_full);
 

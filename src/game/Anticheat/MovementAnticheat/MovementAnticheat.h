@@ -56,7 +56,7 @@ enum CheatType
 };
 
 #define CHEATS_UPDATE_INTERVAL      4000
-const char* GetMovementCheatName(CheatType type);
+char const* GetMovementCheatName(CheatType type);
 
 class Player;
 class MovementInfo;

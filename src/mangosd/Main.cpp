@@ -115,18 +115,17 @@ extern int main(int argc, char **argv)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [world-daemon]", _FULLVERSION);
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "<Ctrl-C> to stop." );
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "\n\n"
-        "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"
-        "MM   MM         MM   MM MMM MMM MM  MM MMM MMM\n"
-        "MMM MMM         MMM  MM MMM MMM MM  MM MMM\n"
-        "MM M MM         MMMM MM MMM     MM  MM  MMM\n"
-        "MM M MM  MMMMM  MM MMMM MMM     MM  MM   MMM\n"
-        "MM M MM M   MMM MM  MMM MMMMMMM MM  MM    MMM\n"
-        "MM   MM     MMM MM   MM MM  MMM MM  MM     MMM\n"
-        "MM   MM MMMMMMM MM   MM MMM MMM MM  MM MMM MMM\n"
-        "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM\n"
-        "        MM  MMM http://getmangos.com\n"
-        "        MMMMMM\n\n");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "VMaNGOS : https://github.com/vmangos");
+        "MM     MM MM   MM         MM   MM  MMMMM   MMMMM   MMMMM\n"
+        "MM     MM MM   MM         MM   MM MMM MMM MM   MM MMM MMM\n"
+        " MM   MM  MMM MMM         MMM  MM MMM MMM MM   MM MMM\n"
+        " MM   MM  MM M MM  MMMMM  MMMM MM MMM     MM   MM  MMM\n"
+        "  MM MM   MM M MM M   MMM MM MMMM MMM     MM   MM   MMM\n"
+        "  MM MM   MM M MM     MMM MM  MMM MMMMMMM MM   MM    MMM\n"
+        "   MMM    MM   MM MMMMMMM MM   MM MM  MMM MM   MM     MMM\n"
+        "   MMM    MM   MM MM  MMM MM   MM MMM MMM MM   MM MMM MMM\n"
+        "    M     MM   MM MM  MMM MM   MM  MMMMMM  MMMMM   MMMMM\n"
+        "                  MMMMMM\n"
+        "                          https://github.com/vmangos\n\n");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s", sConfig.GetFilename().c_str());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Alloc library: " MANGOS_ALLOC_LIB "");

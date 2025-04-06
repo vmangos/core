@@ -37,7 +37,7 @@ namespace MMAP
                            bool skipBattlegrounds,
                            bool debug,
                            bool quick,
-                           const char* offMeshFilePath,
+                           char const* offMeshFilePath,
                            uint8 threads) :
         m_terrainBuilder(nullptr),
         m_debug(debug),

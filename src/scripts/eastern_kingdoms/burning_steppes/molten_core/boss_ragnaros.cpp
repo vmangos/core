@@ -31,13 +31,13 @@ EndScriptData */
 
 enum
 {
-    SAY_REINFORCEMENTS1       = -1409013,
-    SAY_REINFORCEMENTS2       = -1409014,
-    SAY_HAND                  = -1409015,
-    SAY_WRATH                 = -1409016,
-    SAY_KILL                  = -1409017,
-    SAY_MAGMABURST            = -1409018,
-    SAY_ARRIVAL5_RAG          = -1409012,
+    SAY_REINFORCEMENTS1       = 8572,
+    SAY_REINFORCEMENTS2       = 8573,
+    SAY_HAND                  = 9426,
+    SAY_WRATH                 = 9427,
+    SAY_KILL                  = 7626,
+    SAY_MAGMABURST            = -1409018, // NO SNIFF DATA IN BROADCAST_TEXT FOR THIS ENTRY - wiki confirms it exists though?
+    SAY_ARRIVAL5_RAG          = 7685,
 
     SPELL_ELEMENTAL_FIRE_KILL = 19773, // Kill Majordomo
 
@@ -176,7 +176,7 @@ struct boss_ragnarosAI : ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        if (pWho->GetTypeId() == TYPEID_UNIT && pWho->GetEntry() == NPC_DOMO)
+        if (pWho->GetTypeId() == TYPEID_UNIT && pWho->GetEntry() == NPC_MAJORDOMO)
             return;
 
         if (m_pInstance)
@@ -192,7 +192,7 @@ struct boss_ragnarosAI : ScriptedAI
     void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         // As Majordomo is now killed, the last timer (until attacking) must be handled with Ragnaros script
-        if (pSpell->Id == SPELL_ELEMENTAL_FIRE_KILL && pTarget->GetTypeId() == TYPEID_UNIT && pTarget->GetEntry() == NPC_DOMO)
+        if (pSpell->Id == SPELL_ELEMENTAL_FIRE_KILL && pTarget->GetTypeId() == TYPEID_UNIT && pTarget->GetEntry() == NPC_MAJORDOMO)
             m_uiEnterCombatTimer = 7000;
     }
 
@@ -304,6 +304,10 @@ struct boss_ragnarosAI : ScriptedAI
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     m_uiEnterCombatTimer = 0;
+
+                    // Despawn Majordomo's corpse
+                    if (Creature* domo = m_creature->FindNearestCreature(NPC_MAJORDOMO, 20.f, false))
+                        domo->ForcedDespawn(5000);
                 }
             }
             else
@@ -367,7 +371,7 @@ struct boss_ragnarosAI : ScriptedAI
                 {
                     if (itr->IsAlive())
                     {
-                        if (!itr->HasUnitState(UNIT_STAT_ISOLATED)) // banished
+                        if (!itr->HasUnitState(UNIT_STATE_ISOLATED)) // banished
                         {
                             Allbanished = false;
                             break;

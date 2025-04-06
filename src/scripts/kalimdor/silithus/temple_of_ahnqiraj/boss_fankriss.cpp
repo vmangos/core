@@ -98,7 +98,8 @@ struct creature_spawn_fankrissAI : public ScriptedAI
 
     void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+        {
             return;
         }
 
@@ -174,7 +175,8 @@ struct creature_vekniss_hatchlingAI : public ScriptedAI
             {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(AttackingTarget::ATTACKING_TARGET_NEAREST, 0))
                 {
-                    if (m_creature->GetDistance(pTarget) > 200) {
+                    if (m_creature->GetDistance(pTarget) > 200)
+                    {
                         return; //avoid running after people far off in the instance somewhere
                     }
                     m_creature->GetThreatManager().addThreat(pTarget, 1);
@@ -183,12 +185,14 @@ struct creature_vekniss_hatchlingAI : public ScriptedAI
                 }
             }
         }
-        else if(!hasEngaged) {
+        else if(!hasEngaged)
+        {
             engageTimer -= diff;
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+        {
             return;
         }
         DoMeleeAttackIfReady();
@@ -212,12 +216,14 @@ struct boss_fankrissAI : public ScriptedAI
     uint32 m_uiEvadeCheckTimer;
     uint32 entangleRotationTimer;
 
-    struct Worm {
+    struct Worm
+    {
         bool shouldSpawn;
         bool haveSpawned;
         uint32 enrageTimer;
         uint32 spawnTimer;
     };
+
     std::vector<Worm> worms;
     uint32 numWormsLastWave;
 
@@ -360,7 +366,8 @@ struct boss_fankrissAI : public ScriptedAI
             if (webCast) continue;
 
             uint32& t = entangleTimers[i].first;
-            if (t < uiDiff) {
+            if (t < uiDiff)
+            {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
                 {
                     if (DoCastSpellIfCan(pTarget, entangleSpells[i].first) == CAST_OK)
@@ -396,7 +403,8 @@ struct boss_fankrissAI : public ScriptedAI
 #endif
                 hatchlingVec.push_back(HatchlingBatch(batch));
             }
-            else {
+            else
+            {
                 reInitWebTimers = entangleTimers[i].second ? reInitWebTimers : false;
             }
         }
@@ -405,7 +413,8 @@ struct boss_fankrissAI : public ScriptedAI
         {
             ReinitializeWebTimers();
         }
-        else {
+        else
+        {
             entangleRotationTimer -= uiDiff;
         }
     }
@@ -415,7 +424,8 @@ struct boss_fankrissAI : public ScriptedAI
         if (Creature* pC = m_creature->SummonCreature(NPC_SPAWN_FANKRISS, loc.m_fX, loc.m_fY, loc.m_fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000))
         {
             creature_spawn_fankrissAI* ai = dynamic_cast<creature_spawn_fankrissAI*>(pC->AI());
-            if (!ai) {
+            if (!ai)
+            {
                 sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "unable to cast spawn of fankriss AI to creature_spawn_fankrissAI");
                 return;
             }
@@ -425,7 +435,8 @@ struct boss_fankrissAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->IsInCombat()) {
+        if (!m_creature->IsInCombat())
+        {
             Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
             for (const auto& itr : PlayerList)
             {
@@ -446,7 +457,8 @@ struct boss_fankrissAI : public ScriptedAI
             }
         }
         
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+        {
             return;
         }
 
@@ -464,12 +476,15 @@ struct boss_fankrissAI : public ScriptedAI
         for(size_t i = 0; i < worms.size(); i++)
         {
             Worm& w = worms[i];
-            if (w.shouldSpawn && !w.haveSpawned) {
-                if (w.spawnTimer     < uiDiff) {
+            if (w.shouldSpawn && !w.haveSpawned)
+            {
+                if (w.spawnTimer < uiDiff)
+                {
                     w.haveSpawned = true;
                     SummonWorm(aSummonWormLocs[vIndex[i]], w.enrageTimer);
                 }
-                else {
+                else
+                {
                     allWormsSpawned = false;
                     w.spawnTimer -= uiDiff;
                 }
@@ -486,7 +501,8 @@ struct boss_fankrissAI : public ScriptedAI
                 Worm& w = worms[i];
                 w.haveSpawned = false;
                 w.shouldSpawn = i < spawnCount;
-                if (w.shouldSpawn) {
+                if (w.shouldSpawn)
+                {
                     w.enrageTimer = WORM_ENRAGE_BASE_TIMER + WORM_ENRAGE_ADDITION*i; // 15sec for first, 20 for second and 25 sec for last.
                     /*  How long after each wave has fully spawned will next wave start spawning. (minTime,maxTime)
                         1x snake in prev wave = (18, 23)

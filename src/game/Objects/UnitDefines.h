@@ -388,140 +388,140 @@ enum DeathState
 enum UnitState
 {
     // persistent state (applied by aura/etc until expire)
-    UNIT_STAT_MELEE_ATTACKING = 0x00000001,                     // unit is melee attacking someone Unit::Attack
-    UNIT_STAT_NO_KILL_REWARD  = 0x00000002,                     // Unit should yield no reward (Honor/XP/Rep) on kill
-    UNIT_STAT_FEIGN_DEATH     = 0x00000004,                     // Unit::SetFeignDeath - a successful feign death is currently active
-    UNIT_STAT_STUNNED         = 0x00000008,                     // Aura::HandleAuraModStun
-    UNIT_STAT_ROOT            = 0x00000010,                     // Aura::HandleAuraModRoot
-    UNIT_STAT_ISOLATED        = 0x00000020,                     // area auras do not affect other players, Aura::HandleAuraModSchoolImmunity
-    UNIT_STAT_POSSESSED       = 0x00000040,                     // Aura::HandleAuraModPossess
+    UNIT_STATE_MELEE_ATTACKING = 0x00000001,                     // unit is melee attacking someone Unit::Attack
+    UNIT_STATE_NO_KILL_REWARD  = 0x00000002,                     // Unit should yield no reward (Honor/XP/Rep) on kill
+    UNIT_STATE_FEIGN_DEATH     = 0x00000004,                     // Unit::SetFeignDeath - a successful feign death is currently active
+    UNIT_STATE_STUNNED         = 0x00000008,                     // Aura::HandleAuraModStun
+    UNIT_STATE_ROOT            = 0x00000010,                     // Aura::HandleAuraModRoot
+    UNIT_STATE_ISOLATED        = 0x00000020,                     // area auras do not affect other players, Aura::HandleAuraModSchoolImmunity
+    UNIT_STATE_POSSESSED       = 0x00000040,                     // Aura::HandleAuraModPossess
 
     // persistent movement generator state (all time while movement generator applied to unit (independent from top state of movegen)
-    UNIT_STAT_TAXI_FLIGHT     = 0x00000080,                     // player is in flight mode (in fact interrupted at far teleport until next map telport landing)
-    UNIT_STAT_DISTRACTED      = 0x00000100,                     // DistractedMovementGenerator active
+    UNIT_STATE_TAXI_FLIGHT     = 0x00000080,                     // player is in flight mode (in fact interrupted at far teleport until next map telport landing)
+    UNIT_STATE_DISTRACTED      = 0x00000100,                     // DistractedMovementGenerator active
 
     // persistent movement generator state with non-persistent mirror states for stop support
     // (can be removed temporary by stop command or another movement generator apply)
     // not use _MOVE versions for generic movegen state, it can be removed temporary for unit stop and etc
-    UNIT_STAT_CONFUSED        = 0x00000200,                     // ConfusedMovementGenerator active/onstack
+    UNIT_STATE_CONFUSED        = 0x00000200,                     // ConfusedMovementGenerator active/onstack
     //UNIT_STAT_CONFUSED_MOVE   = 0x00000400,                   // No longer in use (Nostalrius)
-    UNIT_STAT_ROAMING         = 0x00000800,                     // RandomMovementGenerator/PointMovementGenerator/WaypointMovementGenerator active (now always set)
-    UNIT_STAT_ROAMING_MOVE    = 0x00001000,
-    UNIT_STAT_CHASE           = 0x00002000,                     // ChaseMovementGenerator active
-    UNIT_STAT_CHASE_MOVE      = 0x00004000,
-    UNIT_STAT_FOLLOW          = 0x00008000,                     // FollowMovementGenerator active
-    UNIT_STAT_FOLLOW_MOVE     = 0x00010000,
-    UNIT_STAT_FLEEING         = 0x00020000,                     // FleeMovementGenerator/TimedFleeingMovementGenerator active/onstack
-    UNIT_STAT_FLEEING_MOVE    = 0x00040000,
+    UNIT_STATE_ROAMING         = 0x00000800,                     // RandomMovementGenerator/PointMovementGenerator/WaypointMovementGenerator active (now always set)
+    UNIT_STATE_ROAMING_MOVE    = 0x00001000,
+    UNIT_STATE_CHASE           = 0x00002000,                     // ChaseMovementGenerator active
+    UNIT_STATE_CHASE_MOVE      = 0x00004000,
+    UNIT_STATE_FOLLOW          = 0x00008000,                     // FollowMovementGenerator active
+    UNIT_STATE_FOLLOW_MOVE     = 0x00010000,
+    UNIT_STATE_FLEEING         = 0x00020000,                     // FleeMovementGenerator/TimedFleeingMovementGenerator active/onstack
+    UNIT_STATE_FLEEING_MOVE    = 0x00040000,
     // MMAPS
-    UNIT_STAT_IGNORE_PATHFINDING    = 0x00080000,               // do not use pathfinding in any MovementGenerator
+    UNIT_STATE_IGNORE_PATHFINDING    = 0x00080000,               // do not use pathfinding in any MovementGenerator
 
-    UNIT_STAT_PENDING_ROOT          = 0x00100000,               // apply root on finishing charge
-    UNIT_STAT_PENDING_STUNNED       = 0x00200000,               // apply stun on finishing charge
-    UNIT_STAT_ROOT_ON_LANDING       = 0x00400000,               // used to verify modern client behavior on root while falling
+    UNIT_STATE_PENDING_ROOT          = 0x00100000,               // apply root on finishing charge
+    UNIT_STATE_PENDING_STUNNED       = 0x00200000,               // apply stun on finishing charge
+    UNIT_STATE_ROOT_ON_LANDING       = 0x00400000,               // used to verify modern client behavior on root while falling
 
     // High-level states
-    UNIT_STAT_RUNNING            = 0x01000000,
+    UNIT_STATE_RUNNING               = 0x01000000,
 
-    UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x02000000, // allow movement with incomplete or partial paths
-    UNIT_STAT_PENDING_CHANNEL_RESET = 0x04000000, // pending end of spell channeling animation
+    UNIT_STATE_ALLOW_INCOMPLETE_PATH = 0x02000000, // allow movement with incomplete or partial paths
+    UNIT_STATE_PENDING_CHANNEL_RESET = 0x04000000, // pending end of spell channeling animation
 
-    UNIT_STAT_NO_SEARCH_FOR_OTHERS   = 0x08000000, // MoveInLineOfSight will not be called
-    UNIT_STAT_NO_BROADCAST_TO_OTHERS = 0x10000000, // ScheduleAINotify will not be called
-    UNIT_STAT_AI_USES_MOVE_IN_LOS    = 0x20000000, // AI overrides MoveInLineOfSight so always search for others
+    UNIT_STATE_NO_SEARCH_FOR_OTHERS   = 0x08000000, // MoveInLineOfSight will not be called
+    UNIT_STATE_NO_BROADCAST_TO_OTHERS = 0x10000000, // ScheduleAINotify will not be called
+    UNIT_STATE_AI_USES_MOVE_IN_LOS    = 0x20000000, // AI overrides MoveInLineOfSight so always search for others
 
     // masks (only for check)
 
     // can't move currently
-    UNIT_STAT_CAN_NOT_MOVE    = UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_FEIGN_DEATH,
+    UNIT_STATE_CAN_NOT_MOVE    = UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_FEIGN_DEATH,
 
     // stay by different reasons
-    UNIT_STAT_NOT_MOVE        = UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_FEIGN_DEATH |
-                                UNIT_STAT_DISTRACTED,
+    UNIT_STATE_NOT_MOVE        = UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_FEIGN_DEATH |
+                                UNIT_STATE_DISTRACTED,
 
     // stay or scripted movement for effect( = in player case you can't move by client command)
-    UNIT_STAT_NO_FREE_MOVE    = UNIT_STAT_ROOT | UNIT_STAT_STUNNED |
-                                UNIT_STAT_TAXI_FLIGHT |
-                                UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
+    UNIT_STATE_NO_FREE_MOVE    = UNIT_STATE_ROOT | UNIT_STATE_STUNNED |
+                                UNIT_STATE_TAXI_FLIGHT |
+                                UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING,
 
     // not react at move in sight or other
-    UNIT_STAT_CAN_NOT_REACT   = UNIT_STAT_STUNNED | UNIT_STAT_FEIGN_DEATH |
-                                UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
+    UNIT_STATE_CAN_NOT_REACT   = UNIT_STATE_STUNNED | UNIT_STATE_FEIGN_DEATH |
+                                UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING,
 
     // AI disabled by some reason
-    UNIT_STAT_LOST_CONTROL    = UNIT_STAT_FLEEING | UNIT_STAT_POSSESSED,
+    UNIT_STATE_LOST_CONTROL    = UNIT_STATE_FLEEING | UNIT_STATE_POSSESSED,
 
     // above 2 state cases
-    UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL  = UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_LOST_CONTROL,
+    UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL  = UNIT_STATE_CAN_NOT_REACT | UNIT_STATE_LOST_CONTROL,
 
     // masks (for check or reset)
 
     // for real move using movegen check and stop (except unstoppable flight)
-    UNIT_STAT_MOVING          = UNIT_STAT_ROAMING_MOVE | UNIT_STAT_CHASE_MOVE | UNIT_STAT_FOLLOW_MOVE | UNIT_STAT_FLEEING_MOVE,
+    UNIT_STATE_MOVING          = UNIT_STATE_ROAMING_MOVE | UNIT_STATE_CHASE_MOVE | UNIT_STATE_FOLLOW_MOVE | UNIT_STATE_FLEEING_MOVE,
 
-    UNIT_STAT_ALL_STATE       = 0xFFFFFFFF,
-    UNIT_STAT_ALL_DYN_STATES  = UNIT_STAT_ALL_STATE & ~(UNIT_STAT_RUNNING | UNIT_STAT_IGNORE_PATHFINDING | UNIT_STAT_PENDING_CHANNEL_RESET | UNIT_STAT_NO_SEARCH_FOR_OTHERS | UNIT_STAT_NO_BROADCAST_TO_OTHERS | UNIT_STAT_AI_USES_MOVE_IN_LOS),
+    UNIT_STATE_ALL_STATE       = 0xFFFFFFFF,
+    UNIT_STATE_ALL_DYN_STATES  = UNIT_STATE_ALL_STATE & ~(UNIT_STATE_RUNNING | UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_PENDING_CHANNEL_RESET | UNIT_STATE_NO_SEARCH_FOR_OTHERS | UNIT_STATE_NO_BROADCAST_TO_OTHERS | UNIT_STATE_AI_USES_MOVE_IN_LOS),
 };
 
 static char const* UnitStateToString(uint32 state)
 {
     switch (state)
     {
-        case UNIT_STAT_MELEE_ATTACKING:
+        case UNIT_STATE_MELEE_ATTACKING:
             return "Melee Attacking";
-        case UNIT_STAT_NO_KILL_REWARD:
+        case UNIT_STATE_NO_KILL_REWARD:
             return "No Kill Reward";
-        case UNIT_STAT_FEIGN_DEATH:
+        case UNIT_STATE_FEIGN_DEATH:
             return "Feign Death";
-        case UNIT_STAT_STUNNED:
+        case UNIT_STATE_STUNNED:
             return "Stunned";
-        case UNIT_STAT_ROOT:
+        case UNIT_STATE_ROOT:
             return "Root";
-        case UNIT_STAT_ISOLATED:
+        case UNIT_STATE_ISOLATED:
             return "Isolated";
-        case UNIT_STAT_POSSESSED:
+        case UNIT_STATE_POSSESSED:
             return "Possessed";
-        case UNIT_STAT_TAXI_FLIGHT:
+        case UNIT_STATE_TAXI_FLIGHT:
             return "Taxi Flight";
-        case UNIT_STAT_DISTRACTED:
+        case UNIT_STATE_DISTRACTED:
             return "Distracted";
-        case UNIT_STAT_CONFUSED:
+        case UNIT_STATE_CONFUSED:
             return "Confused";
-        case UNIT_STAT_ROAMING:
+        case UNIT_STATE_ROAMING:
             return "Roaming";
-        case UNIT_STAT_ROAMING_MOVE:
+        case UNIT_STATE_ROAMING_MOVE:
             return "Roaming Move";
-        case UNIT_STAT_CHASE:
+        case UNIT_STATE_CHASE:
             return "Chase";
-        case UNIT_STAT_CHASE_MOVE:
+        case UNIT_STATE_CHASE_MOVE:
             return "Chase Move";
-        case UNIT_STAT_FOLLOW:
+        case UNIT_STATE_FOLLOW:
             return "Follow";
-        case UNIT_STAT_FOLLOW_MOVE:
+        case UNIT_STATE_FOLLOW_MOVE:
             return "Follow Move";
-        case UNIT_STAT_FLEEING:
+        case UNIT_STATE_FLEEING:
             return "Fleeing";
-        case UNIT_STAT_FLEEING_MOVE:
+        case UNIT_STATE_FLEEING_MOVE:
             return "Fleeing Move";
-        case UNIT_STAT_IGNORE_PATHFINDING:
+        case UNIT_STATE_IGNORE_PATHFINDING:
             return "Ignore Pathfinding";
-        case UNIT_STAT_PENDING_ROOT:
+        case UNIT_STATE_PENDING_ROOT:
             return "Pending Root";
-        case UNIT_STAT_PENDING_STUNNED:
+        case UNIT_STATE_PENDING_STUNNED:
             return "Pending Stunned";
-        case UNIT_STAT_ROOT_ON_LANDING:
+        case UNIT_STATE_ROOT_ON_LANDING:
             return "Root on Landing";
-        case UNIT_STAT_RUNNING:
+        case UNIT_STATE_RUNNING:
             return "Running";
-        case UNIT_STAT_ALLOW_INCOMPLETE_PATH:
+        case UNIT_STATE_ALLOW_INCOMPLETE_PATH:
             return "Allow Incomplete Path";
-        case UNIT_STAT_PENDING_CHANNEL_RESET:
+        case UNIT_STATE_PENDING_CHANNEL_RESET:
             return "Pending Channel Reset";
-        case UNIT_STAT_NO_SEARCH_FOR_OTHERS:
+        case UNIT_STATE_NO_SEARCH_FOR_OTHERS:
             return "No Search for Others";
-        case UNIT_STAT_NO_BROADCAST_TO_OTHERS:
+        case UNIT_STATE_NO_BROADCAST_TO_OTHERS:
             return "No Broadcast to Others";
-        case UNIT_STAT_AI_USES_MOVE_IN_LOS:
+        case UNIT_STATE_AI_USES_MOVE_IN_LOS:
             return "AI Uses Move in LoS";
     }
     return "UNKNOWN";
@@ -887,5 +887,20 @@ enum ModelIds
     MODEL_TROLL_MALE    = 185,
     MODEL_TROLL_FEMALE  = 186,
 };
+
+enum SpellProcEventTriggerCheck
+{
+    SPELL_PROC_TRIGGER_FAILED       = 0,
+    SPELL_PROC_TRIGGER_ROLL_FAILED  = 1,
+    SPELL_PROC_TRIGGER_OK           = 2,
+};
+
+enum SpellAuraProcResult
+{
+    SPELL_AURA_PROC_OK              = 0,                    // proc was processed, will remove charges
+    SPELL_AURA_PROC_FAILED          = 1,                    // proc failed - if at least one aura failed the proc, charges won't be taken
+    SPELL_AURA_PROC_CANT_TRIGGER    = 2                     // aura can't trigger - skip charges taking, move to next aura if exists
+};
+
 
 #endif

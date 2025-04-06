@@ -237,7 +237,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
         if (m_bIsSpirit)
         {
-            m_creature->AddUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STATE_ROOT);
             m_creature->SetInCombatWithZone();
         }
         else

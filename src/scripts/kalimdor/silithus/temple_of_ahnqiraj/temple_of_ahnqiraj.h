@@ -84,7 +84,7 @@ enum
     AREATRIGGER_STOMACH_AIR     = 4034,
     AREATRIGGER_CTHUN_KNOCKBACK = 4036,
 
-    // Whispered on players around the map
+    // Whispered on players around the map - NO SNIFF DATA EXISTS IN BROADCAST_TEXTS FOR THESE!!
     SAY_CTHUN_WHISPER_1         = -1531033,
     SAY_CTHUN_WHISPER_2         = -1531034,
     SAY_CTHUN_WHISPER_3         = -1531035,
@@ -159,6 +159,11 @@ private:
     std::vector<ObjectGuid> graspsOfCthun;
     
     void UpdateCThunWhisper(uint32 diff);
+
+    // Ouro server crash handling
+    void RestoreOuroSpawnTrigger();
+    uint32 m_uiRestoreOuroSpawnTriggerTimer = 0;
+
     std::vector<std::pair<ObjectGuid, uint32>> cthunWhisperMutes;
     uint32 m_uiCthunWhisperTimer;
     uint32 m_uiCthunPrevWhisperTimer;
