@@ -3,7 +3,7 @@
 #####################################
 
 [MangosdConf]
-ConfVersion=2024091701
+ConfVersion=2025040601
 
 ###################################################################################################################
 # CONNECTIONS AND DIRECTORIES
@@ -2804,6 +2804,12 @@ LFG.MatchmakingTimer = 600
 #        Default:     ""                      - (Disabled, no proxy)
 #        Example      "10.13.37.1,10.13.37.2" - (to allow multiple proxy servers)
 #
+#    Network.TimeoutSecsIfNoAuth
+#        Description: Kicks a player if they dont auth within a certain amount of time.
+#                     (in seconds)
+#        Default: 10
+#                 0  - to disable
+#
 ###################################################################################################################
 
 Network.Threads = 1
@@ -2814,6 +2820,7 @@ Network.PacketBroadcast.Threads = 0
 Network.PacketBroadcast.Frequency = 50
 Network.PacketBroadcast.ReduceVisDistance.DiffAbove = 0
 Network.TrustedProxyServers = ""
+Network.TimeoutSecsIfNoAuth = 10
 
 ###################################################################################################################
 # CONSOLE, REMOTE ACCESS AND SOAP

@@ -27,6 +27,7 @@
 #include "Auth/AuthCrypt.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "IO/Timer/TimerHandle.h"
 
 class WorldSocketMgr;
 
@@ -94,6 +95,8 @@ private:
 
     /// Called by ProcessIncoming() on CMSG_PING.
     HandlerResult _HandlePing(WorldPacket& recvPacket);
+
+    std::shared_ptr<IO::Timer::TimerHandle> m_sessionNoAuthTimeout; // nullptr after auth, or if feature is disabled
 
     std::mutex m_sendQueueLock;
     std::queue<WorldPacket> m_sendQueue;

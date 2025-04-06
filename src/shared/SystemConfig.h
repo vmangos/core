@@ -28,7 +28,7 @@
 // Format is YYYYMMDDRR where RR is the change in the conf file
 // for that day.
 #ifndef _MANGOSDCONFVERSION
-# define _MANGOSDCONFVERSION 2024091701
+# define _MANGOSDCONFVERSION 2025040601
 #endif
 #ifndef _REALMDCONFVERSION
 # define _REALMDCONFVERSION 2024091701

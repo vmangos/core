@@ -94,7 +94,7 @@ namespace IO { namespace Networking {
             // We are doing all this atomic stuff, just so we don't have to std::mutex everything
             enum SocketStateFlags : int
             {
-                SHUTDOWN_PENDING     = (1 << 0), // stop all new transaction requests. There should never be a new _INUSE when this is present
+                SHUTDOWN_PENDING     = (1 << 0), // stop all new transaction requests. There should never be a new `*_PENDING_*` when this is present
                 IGNORE_TRANSFERS     = (1 << 1), // Like SHUTDOWN_PENDING but the event receivers `PerformNonBlockingRead` and `PerformNonBlockingWrite` will ignore the event
 
                 // PRESENT: Stuff that is present and set
@@ -127,10 +127,12 @@ namespace IO { namespace Networking {
             IO::ReadableBuffer m_writeSrc{};
 
 #if defined(WIN32)
+            // Windows IOCP stuff:
             IocpOperationTask m_currentContextTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
 #elif defined(__linux__) || defined(__APPLE__)
+            // Unix epoll stuff:
             void PerformNonBlockingRead();
             void PerformNonBlockingWrite();
             void PerformContextSwitch();

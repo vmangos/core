@@ -20,22 +20,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "WorldSocket.h"
+#include "WorldSocketMgr.h"
+#include "WorldSession.h"
+
 #include "Auth/AuthCrypt.h"
 #include "World.h"
 #include "AccountMgr.h"
 #include "SharedDefines.h"
-#include "WorldSession.h"
-#include "WorldSocket.h"
-
-#include <memory>
 #include "AddonHandler.h"
 #include "Opcodes.h"
 #include "Crypto/Hash/SHA1.h"
 #include "Database/SqlPreparedStatement.h"
 #include "Database/DatabaseEnv.h"
 #include "DBCStores.h"
+#include "Config/Config.h"
+
 #include "IO/Networking/DNS.h"
-#include "WorldSocketMgr.h"
+#include "IO/Timer/AsyncSystemTimer.h"
+
+#include <memory>
 
 #if defined( __GNUC__ )
 #pragma pack(1)
@@ -78,6 +82,11 @@ WorldSocket::~WorldSocket()
 {
     CloseSocket();
     sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] Connection closed", GetRemoteIpString().c_str());
+
+    if (m_sessionNoAuthTimeout)
+    {
+        m_sessionNoAuthTimeout->Cancel();
+    }
 }
 
 void WorldSocket::DoRecvIncomingData()
@@ -412,6 +421,14 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
         return HandlerResult::Fail;
     }
 
+
+    // ===== Auth was successful =====
+    if (this->m_sessionNoAuthTimeout)
+    {
+        this->m_sessionNoAuthTimeout->Cancel();
+        this->m_sessionNoAuthTimeout = nullptr;
+    }
+
     m_Session = new WorldSession(accountId, this->shared_from_this(), security, mutetime, locale);
 
     m_Crypt.SetKey(K.AsByteArray());
@@ -595,6 +612,17 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
 
 void WorldSocket::Start()
 {
+    // Start auto timeout loop
+    if (int secs = sConfig.GetIntDefault("Network.TimeoutSecsIfNoAuth", 10))
+    {
+        m_sessionNoAuthTimeout = sAsyncSystemTimer.ScheduleFunctionOnce(std::chrono::seconds(secs), [this]()
+        {
+            sLog.Out(LOG_NETWORK, LOG_LVL_DETAIL, "[%s] Connection has reached TimeoutSecsIfNoAuth. Closing socket...", this->GetRemoteIpString().c_str());
+            // It's correct that we capture _this_ and not a shared_ptr, since the timer will be canceled in destructor
+            this->CloseSocket();
+        });
+    }
+
     SendInitialPacketAndStartRecvLoop();
 }
 

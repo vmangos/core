@@ -321,7 +321,10 @@ void IO::Networking::AsyncSocket::CloseSocket()
     if (m_atomicState.fetch_or(SocketStateFlags::SHUTDOWN_PENDING) & SocketStateFlags::SHUTDOWN_PENDING)
         return; // there was already a ::shutdown()
 
-    ::shutdown(m_descriptor.GetNativeSocket(), SD_BOTH); // will interrupt and fail all pending IOCP events and post them to the queue
+    // shutdown the native socket to prevent new operations
+    ::shutdown(m_descriptor.GetNativeSocket(), SD_BOTH);
+    // interrupt and fail all pending IOCP events and post them to the completion queue
+    ::CancelIoEx(reinterpret_cast<HANDLE>(m_descriptor.GetNativeSocket()), nullptr);
 }
 
 /// The callback is invoked in the IO thread
