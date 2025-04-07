@@ -806,17 +806,36 @@ namespace MaNGOS
     class AnyUnfriendlyUnitInObjectRangeCheck
     {
         public:
-            AnyUnfriendlyUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range) : i_obj(obj), i_funit(funit), i_range(range) {}
+            AnyUnfriendlyUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range)
+                : i_obj(obj), i_funit(funit), i_fobj(NULL), i_range(range) {}
+
+            // Constructor overloading
+            AnyUnfriendlyUnitInObjectRangeCheck(WorldObject const* obj, WorldObject const* fobj, float range)
+                : i_obj(obj), i_funit(NULL), i_fobj(fobj), i_range(range) {}
+
             WorldObject const& GetFocusObject() const { return *i_obj; }
+
             bool operator()(Unit* u)
             {
-                if (!i_funit->CanSeeInWorld(u))
-                    return false;
-                return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u);
+                if (i_funit)
+                {
+                    if (!i_funit->CanSeeInWorld(u))
+                        return false;
+
+                    return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u);
+                }
+
+                if (i_fobj)
+                {
+                    return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_fobj->IsFriendlyTo(u);
+                }
+
+                return false;
             }
         private:
             WorldObject const* i_obj;
             Unit const* i_funit;
+            WorldObject const* i_fobj;
             float i_range;
     };
 
