@@ -6627,9 +6627,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                             int32 factionId = go->GetGOInfo()->faction;
                             // 77 - "Treasure" faction: Only objects with this faction should cause aggro
                             if (sObjectMgr.GetFactionTemplateEntry(factionId)->faction == 77)
-                                if (WorldObject* pCaster = GetCaster())
+                                if (Unit* pUser = GetCaster()->ToUnit())
                                 {
-                                    Unit* pUser = static_cast<Unit*>(pCaster);
                                     std::list<Unit*> targets;
                                     switch (factionId)
                                     {
