@@ -48,6 +48,15 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     if (owner.HasUnitState(UNIT_STATE_CAN_NOT_MOVE | UNIT_STATE_POSSESSED))
         return;
 
+    // Although paths can be generated, attempting to follow a unit outside
+    // of visibility range will cause the follower to fly across the map
+    // for other clients, and may lead to crashes on grid unload
+    // Long distance travel must be handled by segmented splines
+    if (this->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE)
+        if (Player* pPlayer = i_target->ToPlayer())
+            if (!pPlayer->IsWithinDist(&owner, VISIBILITY_DISTANCE_LARGE))
+                return;
+
     float x, y, z;
     bool losChecked = false;
     bool losResult = false;
