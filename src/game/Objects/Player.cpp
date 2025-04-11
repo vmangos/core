@@ -4262,6 +4262,32 @@ void Player::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
 
 void Player::DestroyForPlayer(Player const* target) const
 {
+    // Clean up visibility lists when players are on different maps
+    if (target->GetMapId() != GetMapId())
+    {
+        bool needSelfCleanup = m_visibleGUIDs.find(target->GetObjectGuid()) != m_visibleGUIDs.end();
+        bool needTargetCleanup = target->m_visibleGUIDs.find(GetObjectGuid()) != target->m_visibleGUIDs.end();
+        
+        if (needSelfCleanup || needTargetCleanup)
+        {
+            if (needSelfCleanup)
+            {
+                std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+                m_visibleGUIDs.erase(target->GetObjectGuid());
+            }
+            
+            if (needTargetCleanup)
+            {
+                std::unique_lock<std::shared_timed_mutex> targetLock(target->m_visibleGUIDs_lock);
+                target->m_visibleGUIDs.erase(GetObjectGuid());
+            }
+            
+            if (target->m_broadcaster)
+                target->m_broadcaster->RemoveListener(this);
+            if (m_broadcaster)
+                m_broadcaster->RemoveListener(target);
+        }
+    }
     Unit::DestroyForPlayer(target);
 
     for (int i = 0; i < INVENTORY_SLOT_BAG_END; ++i)
