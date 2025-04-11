@@ -44,7 +44,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `positi
 (88502, 16506, 0, 0, 0, 0, 533, 3364.08, -3622.85, 261.18, 4.35, 7200, 7200, 0, 100, 100, 0, 0, 0, 9, 10);
 
 -- Link Grand Widow Faerlina, to Naxxramas Follower, Naxxramas Worshipper
-INSERT INTO `creature_linking` (`leader_guid`,`member_guid`,`flag`) VALUES 
+INSERT INTO `creature_linking` (`guid`,`master_guid`,`flag`) VALUES 
 (88497, 88496, 19463),
 (88498, 88496, 19463),
 (88499, 88496, 19463),
