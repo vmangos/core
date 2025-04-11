@@ -60,21 +60,6 @@ https://www.youtube.com/watch?v=iTUc8xUeLgw
 static uint32 RAINOFFIRE_CD() { return urand(8000, 12000); }
 static uint32 const RAINOFFIRE_INITIAL_CD = 16000;
 
-static float const ADD_DESPAWN_TIME = 20000;
-static float const followerPos[2][4] =
-{
-    { 3359.75f, -3621.77f, 261.18f, 4.54f },
-    {3346.29f, -3619.32f, 261.18f, 4.61f }
-};
-
-static float const worshipPos[4][4] =
-{
-    {3350.61f, -3619.74f, 261.18f, 4.65f},
-    {3341.36f, -3619.35f, 261.18f, 4.68f},
-    {3356.69f, -3621.17f, 261.18f, 4.38f},
-    {3364.08f, -3622.85f, 261.18f, 4.35f}
-};
-
 struct boss_faerlinaAI : public ScriptedAI
 {
     boss_faerlinaAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -82,7 +67,6 @@ struct boss_faerlinaAI : public ScriptedAI
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         if (!m_pInstance)
             sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_faerlinaAI::ctor failed to cast instanceData to instance_naxxramas");
-        CheckRespawnAdds();
         Reset();
     }
 
@@ -91,9 +75,6 @@ struct boss_faerlinaAI : public ScriptedAI
     uint32 m_uiPoisonBoltVolleyTimer;
     uint32 m_uiRainOfFireTimer;
     uint32 m_uiEnrageTimer;
-
-    ObjectGuid followers[2] = { 0,0 };
-    ObjectGuid worshippers[4] = { 0,0,0,0 };
 
     void Reset() override
     {
@@ -120,77 +101,10 @@ struct boss_faerlinaAI : public ScriptedAI
         }
     }
 
-    void CheckRespawnAdds()
-    {
-        if (m_pInstance && m_pInstance->GetData(TYPE_FAERLINA) == DONE)
-            return;
-        // 2 Followers.
-        for (int i = 0; i < 2; i++) 
-        {
-            if (followers[i].IsEmpty()) 
-            {
-                if (Creature* c = m_creature->SummonCreature(MOB_FOLLOWER, followerPos[i][0], followerPos[i][1], followerPos[i][2], followerPos[i][3],
-                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, ADD_DESPAWN_TIME))
-                {
-                    followers[i] = c->GetObjectGuid();
-                }
-                else
-                {
-                    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_faerlinaAI::CheckRespawnAdds failed to spawn naxxramas follower");
-                }
-            }
-        }
-
-        // 4 Worshipers
-        for (int i = 0; i < 4; i++)
-        {
-            if (worshippers[i].IsEmpty())
-            {
-                if (Creature* c = m_creature->SummonCreature(MOB_WORSHIPPER, worshipPos[i][0], worshipPos[i][1], worshipPos[i][2], worshipPos[i][3],
-                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, ADD_DESPAWN_TIME))
-                {
-                    worshippers[i] = c->GetObjectGuid();
-                }
-                else
-                {
-                    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_faerlinaAI::CheckRespawnAdds failed to spawn naxxramas worshipper");
-                }
-            }
-        }
-    }
-
-    void SummonedCreatureJustDied(Creature* pSummoned) override
-    {
-        switch (pSummoned->GetEntry())
-        {
-            case MOB_FOLLOWER:
-                for (auto& follower : followers)
-                {
-                    if (follower == pSummoned->GetObjectGuid())
-                    {
-                        follower = 0;
-                        break;
-                    }
-                }
-                break;
-            case MOB_WORSHIPPER:
-                for (auto& worshipper : worshippers)
-                {
-                    if (worshipper == pSummoned->GetObjectGuid())
-                    {
-                        worshipper = 0;
-                        break;
-                    }
-                }
-                break;
-        }
-    }
-
     void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_FAERLINA, FAIL);
-        CheckRespawnAdds();
     }
 
     void Aggro(Unit* pWho) override
@@ -199,18 +113,6 @@ struct boss_faerlinaAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_FAERLINA, IN_PROGRESS);
-
-        for (const auto& follower : followers)
-        {
-            if (Creature* c = m_pInstance->GetCreature(follower))
-                c->AI()->AttackStart(pWho);
-        }
-
-        for (const auto& worshipper : worshippers)
-        {
-            if (Creature* c = m_pInstance->GetCreature(worshipper))
-                c->AI()->AttackStart(pWho);
-        }
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -244,12 +146,7 @@ struct boss_faerlinaAI : public ScriptedAI
 
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
         {
-            std::list<Creature*> creatures;
-            GetCreatureListWithEntryInGrid(creatures, m_creature, { NPC_NaxxramasFollower, NPC_NaxxramasWorshipper}, 150.0f);
-            for (Creature* pCreature : creatures)
-            {
-                pCreature->AI()->EnterEvadeMode();
-            }
+            m_creature->AI()->EnterEvadeMode();
             return;
         }
 
