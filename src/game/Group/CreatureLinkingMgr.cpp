@@ -532,7 +532,8 @@ void CreatureLinkingHolder::ProcessSlave(CreatureLinkingEvent eventType, Creatur
                 else
                     pSlave->SetInCombatWith(pEnemy);
             }
-            else {
+            else if (pSlave->IsAlive())
+            {
                 pSlave->AI()->AttackStart(pEnemy);
                 if (pSource->GetMap()->IsDungeon() && pSource->HasStaticFlag(CREATURE_STATIC_FLAG_2_FORCE_RAID_COMBAT))
                     pSlave->SetInCombatWithZone();
