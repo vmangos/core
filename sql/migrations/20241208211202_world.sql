@@ -413,6 +413,9 @@ UPDATE `creature_template` SET `static_flags1` = 4718598 WHERE `entry` = 6237;
 -- Remove Duplicate Object
 DELETE FROM `gameobject` WHERE `guid` = 21;
 
+-- Remove Incorrect Pre-Quests
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` IN (8846, 8847, 8848, 8849, 8850, 8851, 8852, 8853, 8854, 8855);
+
 
 -- End of migration.
 END IF;
