@@ -410,6 +410,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- Update Creature Flags
 UPDATE `creature_template` SET `static_flags1` = 4718598 WHERE `entry` = 6237;
 
+-- Remove Duplicate Object
+DELETE FROM `gameobject` WHERE `guid` = 21;
+
 
 -- End of migration.
 END IF;
