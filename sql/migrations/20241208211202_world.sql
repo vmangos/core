@@ -407,6 +407,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5733, (@POINT := @POINT + 1), 1455.385, 349.8915, -62.19318),
 (5733, (@POINT := @POINT + 1), 1463.855, 357.4573, -62.18579);
 
+-- Update Creature Flags
+UPDATE `creature_template` SET `static_flags1` = 4718598 WHERE `entry` = 6237;
+
 
 -- End of migration.
 END IF;
