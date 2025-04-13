@@ -181,8 +181,6 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
         return false;
     }
 
-    MANGOS_ASSERT(data);
-
     size_t result = fread(data, fileHeader.size, 1, file);
     if (!result)
     {
