@@ -415,7 +415,7 @@ DELETE FROM `gameobject` WHERE `guid` = 21;
 
 -- Remove Incorrect Pre-Quests
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` IN (8846, 8847, 8848, 8849, 8850, 8851, 8852, 8853, 8854, 8855);
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `PrevQuestId` IN (8795);
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `PrevQuestId` IN (8795, 8792);
 
 
 -- End of migration.
