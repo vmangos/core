@@ -651,6 +651,28 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (50799, (@POINT := @POINT + 1), -4635.6934, 1840.5259, 91.59562, 100),
 (50799, (@POINT := @POINT + 1), -4621.4165, 1875.2921, 99.39326, 100);
 
+-- Correct Rethban Gauntlet Complete Script (credit cmangos)
+DELETE FROM `quest_end_scripts` WHERE `id`=1699;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1699, 0, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Remove NpcFlags'),
+(1699, 0, 1, 1, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Emote Shout'),
+(1699, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2308, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Say Text'),
+(1699, 0, 3, 20, 0, 0, 0, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Stop Waypoint'),
+(1699, 0, 4, 35, 0, 0, 0, 0, 379, 20, 10, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Face Player'),
+(1699, 1, 0, 1, 4, 0, 0, 0, 5620, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Bartender Wental - Emote Cheer'),
+(1699, 3, 0, 1, 21, 0, 0, 0, 346, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Barkeep Daniels - Emote OneShotApplaud'),
+(1699, 3, 1, 1, 21, 0, 0, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Emote OneShotApplaud'),
+(1699, 5, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Emote Cheer'),
+(1699, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Say Text'),
+(1699, 6, 0, 1, 4, 0, 0, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Emote OneShotCheer'),
+(1699, 6, 1, 1, 21, 0, 0, 0, 5620, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Bartender Wental - Emote OneShotApplaud'),
+(1699, 9, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Emote Cheer'),
+(1699, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Say Text'),
+(1699, 10, 0, 20, 2, 0, 12, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Start Waypoint'),
+(1699, 13, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Emote Cheer'),
+(1699, 13, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Say Text'),
+(1699, 14, 0, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Add NpcFlags');
+
 
 -- End of migration.
 END IF;
