@@ -675,7 +675,7 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 
 -- Add Missing Gossip Option (credit cmangos) (FULL BLIZZLIKE SCRIPT:https://github.com/cmangos/tbc-db/commit/96c8008958671945b39d1912645e1d80afaa8c7c)
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_script_id`, `condition_id`) VALUES
-(5763, 1, 'I've lost the cure, Doc! Tell me you got more!!!', 9532, 1, 1, -1, 5763, 5765);
+(5763, 1, 'I\'ve lost the cure, Doc! Tell me you got more!!!', 9532, 1, 1, -1, 5763, 5765);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
 (5763, 8, 2609, 0, 0, 0, 0),
 (5764, 2, 8432, 1, 0, 0, 1),
