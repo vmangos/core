@@ -673,6 +673,17 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (1699, 13, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Say Text'),
 (1699, 14, 0, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Add NpcFlags');
 
+-- Add Missing Gossip Option (credit cmangos) (FULL BLIZZLIKE SCRIPT:https://github.com/cmangos/tbc-db/commit/96c8008958671945b39d1912645e1d80afaa8c7c)
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_script_id`, `condition_id`) VALUES
+(5763, 1, 'I've lost the cure, Doc! Tell me you got more!!!', 9532, 1, 1, -1, 5763, 5765);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
+(5763, 8, 2609, 0, 0, 0, 0),
+(5764, 2, 8432, 1, 0, 0, 1),
+(5765, -1, 5763, 5764, 0, 0, 0);
+DELETE FROM `gossip_scripts` WHERE `id`=5763;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(5763, 0, 0, 15, 22943, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Doc Mixilpixil - cast Player Lost Eau d\' Mixilpixil DND');
+
 
 -- End of migration.
 END IF;
