@@ -36,6 +36,8 @@
 #define FLIGHT_TRAVEL_UPDATE  100
 #define STOP_TIME_FOR_PLAYER  (30 * IN_MILLISECONDS)
 
+static float BuildIntPath(Movement::PointsArray& path, Movement::PointsArray const& genPath);
+
 template<class T, class P>
 class PathMovementBase
 {
@@ -68,7 +70,7 @@ class WaypointMovementGenerator<Creature>
   public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
-        WaypointMovementGenerator(Creature &, bool repeating = true) : i_nextMoveTime(0), m_isArrivalDone(false), m_repeating(repeating), m_isWandering(false), m_lastReachedWaypoint(0) {}
+        WaypointMovementGenerator(Creature &, bool repeating = true) : i_nextMoveTime(0), m_repeating(repeating), m_isWandering(false), m_lastReachedWaypoint(0), m_pathDuration(0), m_creatureSpeed(0.f) {}
         ~WaypointMovementGenerator() { i_path = nullptr; }
         void Initialize(Creature &u);
         void Interrupt(Creature &);
@@ -85,6 +87,7 @@ class WaypointMovementGenerator<Creature>
         void GetPathInformation(WaypointPathOrigin& wpOrigin) const { wpOrigin = m_PathOrigin; }
         void GetPathInformation(std::ostringstream& oss) const;
         bool SetNextWaypoint(uint32 pointId);
+        std::list<int32> const& GetNodeIndexes() const { return m_nodeIndexes; }
 
         void AddPauseTime(int32 waitTimeDiff)
         {
@@ -114,10 +117,12 @@ class WaypointMovementGenerator<Creature>
         }
 
         ShortTimeTracker i_nextMoveTime;
-        bool m_isArrivalDone;
         bool m_repeating;
         bool m_isWandering;
         uint32 m_lastReachedWaypoint;
+        int32 m_pathDuration;
+        float m_creatureSpeed;
+        std::list<int32> m_nodeIndexes;
 
         WaypointPathOrigin m_PathOrigin;
 };
@@ -156,7 +161,7 @@ class PatrolMovementGenerator
 {
     public:
         explicit PatrolMovementGenerator(Creature& c) { ASSERT(InitPatrol(c)); }
-        explicit PatrolMovementGenerator(ObjectGuid leader, CreatureGroupMember const* member) : m_leaderGuid(leader), m_groupMember(*member) {}
+        explicit PatrolMovementGenerator(ObjectGuid leader, CreatureGroupMember const* member) : m_leaderGuid(leader), m_groupMember(*member), m_leaderSplineId(0) {}
         bool InitPatrol(Creature& c);
 
         void LoadPath(Creature &c);
@@ -172,6 +177,7 @@ class PatrolMovementGenerator
     private:
         ObjectGuid m_leaderGuid;
         CreatureGroupMember m_groupMember;
+        uint32 m_leaderSplineId;
 };
 
 #endif

@@ -28,10 +28,31 @@
 #include "MoveSpline.h"
 #include "CreatureGroups.h"
 #include "Map.h"
-
-#include <cassert>
+#include "Geometry.h"
 
 //-----------------------------------------------//
+float BuildIntPath(PointsArray& dstPath, PointsArray const& srcPath)
+{
+    Vector3 prevPoint = dstPath.back();
+    float distance = 0;
+    bool first = true;
+
+    for (auto& point : srcPath)
+    {
+        if (first) // first point has to already be in dstPath
+        {
+            first = false;
+            continue;
+        }
+
+        distance += Geometry::GetDistance3D(point, prevPoint);
+        prevPoint = point;
+        dstPath.push_back(point);
+    }
+
+    return distance;
+}
+
 void WaypointMovementGenerator<Creature>::LoadPath(uint32 guid, uint32 entry, WaypointPathOrigin wpOrigin)
 {
     DETAIL_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "LoadPath: loading waypoint path for GUID %u Entry %u", guid, entry);
@@ -137,16 +158,17 @@ bool WaypointMovementGenerator<Creature>::OnArrived(Creature& creature)
         return false;
     }
 
-    m_lastReachedWaypoint = i_currentNode;
-
-    if (m_isArrivalDone)
-        return true;
-
     creature.ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-    m_isArrivalDone = true;
 
     WaypointPath::const_iterator currPoint = i_path->find(i_currentNode);
-    MANGOS_ASSERT(currPoint != i_path->end());
+    if (currPoint == i_path->end())
+        return false;
+    else
+        m_lastReachedWaypoint = i_currentNode++;
+
+    if (i_path->find(i_currentNode) == i_path->end() && m_repeating)
+        i_currentNode = i_path->begin()->first;
+
     WaypointNode const& node = currPoint->second;
 
     if (node.script_id)
@@ -181,64 +203,111 @@ bool WaypointMovementGenerator<Creature>::OnArrived(Creature& creature)
     return true;
 }
 
+// minimum time that will take the unit to travel the path (much higher value have been seen in sniff)
+static const uint32 MinimumPathTime = 6000;
+// client need to receive new path before the end of previous path (much higher value have been seen in sniff)
+static const uint32 PreSendTime     = 1500;
+
 void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
 {
+    m_nodeIndexes.clear(); // make sure to reset spline indexes as its a new path
+
     if (!i_path || i_path->empty())
         return;
 
     if (Stopped())
         return;
 
+    m_creatureSpeed = creature.GetSpeed(Movement::SelectSpeedType(creature.m_movementInfo.GetMovementFlags()));
     WaypointPath::const_iterator currPoint = i_path->find(i_currentNode);
-    MANGOS_ASSERT(currPoint != i_path->end());
 
-    if (m_isArrivalDone)
+    if (currPoint == i_path->end())
     {
-        bool reachedLast = false;
-        ++currPoint;
-        if (currPoint == i_path->end())
-        {
-            reachedLast = true;
-
-            if (!m_repeating)
-            {
-                creature.SetHomePosition(i_path->at(i_currentNode).x, i_path->at(i_currentNode).y, i_path->at(i_currentNode).z, i_path->at(i_currentNode).orientation);
-                creature.GetMotionMaster()->Initialize();
-                return;
-            }
-
-            currPoint = i_path->begin();
-        }
-
-        i_currentNode = currPoint->first;
+        creature.SetHomePosition(i_path->at(m_lastReachedWaypoint).x, i_path->at(m_lastReachedWaypoint).y, i_path->at(m_lastReachedWaypoint).z, i_path->at(m_lastReachedWaypoint).orientation);
+        creature.GetMotionMaster()->Initialize();
+        return;
     }
 
-    m_isArrivalDone = false;
     creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
 
-    WaypointNode const& nextNode = currPoint->second;
     Movement::MoveSplineInit init(creature, "WaypointMovementGenerator<Creature>::StartMove");
+    PointsArray genPath; // will contain the generated path
+    genPath.reserve(20); // little optimization
+    genPath.push_back(Vector3(creature.GetPositionX(), creature.GetPositionY(), creature.GetPositionZ()));
+    Vector3 startPos, endPos;
+    uint32 travelTime = 0;
+    uint32 nextDelay = 0;
+    float nextOrientation = 0.f;
+    uint32 loops = 0;
 
-    if (WaypointPath const* pSubpath = (nextNode.path_id ? sWaypointMgr.GetPathFromOrigin(nextNode.path_id, 0, 0, PATH_FROM_SPECIAL) : nullptr))
+    do
     {
-        PointsArray genPath;
-        genPath.resize(pSubpath->size());
-        for (auto const& node : *pSubpath)
-            genPath[node.first] = G3D::Vector3(node.second.x, node.second.y, node.second.z);
+        WaypointNode const& currNode = currPoint->second;
+        nextDelay = currNode.delay;
+        nextOrientation = currNode.orientation;
+        startPos = genPath[genPath.size() - 1];
+        endPos = Vector3(currNode.x, currNode.y, currNode.z);
 
-        if (creature.CanFly())
-            init.SetFly();
+        if (WaypointPath const* pSubpath = (currNode.path_id ? sWaypointMgr.GetPathFromOrigin(currNode.path_id, 0, 0, PATH_FROM_SPECIAL) : nullptr))
+        {
+            PointsArray tmp;
+            tmp.push_back(startPos);
+            for (auto const& node : *pSubpath)
+                tmp.push_back(Vector3(node.second.x, node.second.y, node.second.z));
 
-        init.MovebyPath(genPath);
-    }
-    else
-        init.MoveTo(nextNode.x, nextNode.y, nextNode.z, (m_PathOrigin == PATH_FROM_SPECIAL) ? MOVE_STRAIGHT_PATH : MOVE_PATHFINDING);
+            travelTime += BuildIntPath(genPath, tmp) / m_creatureSpeed * 1000.f;
 
-    if (nextNode.orientation != 100 && nextNode.delay != 0)
-        init.SetFacing(nextNode.orientation);
+            if (creature.CanFly())
+                init.SetFly();
+        }
+        else if (m_PathOrigin != PATH_FROM_SPECIAL)
+        {
+            PathFinder pathfinder(&creature);
+            pathfinder.calculate(startPos, endPos, true);
+            travelTime += BuildIntPath(genPath, pathfinder.getPath()) / m_creatureSpeed * 1000.f;
+        }
+        else
+        {
+            PointsArray tmp;
+            tmp.push_back(startPos);
+            tmp.push_back(endPos);
+            travelTime += BuildIntPath(genPath, tmp) / m_creatureSpeed * 1000.f;
+        }
+
+        m_nodeIndexes.push_back(genPath.size() - 1);
+
+        if (nextDelay)
+            break;
+        else
+        {
+            ++currPoint;
+            if (currPoint == i_path->end())
+            {
+                if (!m_repeating)
+                    break;
+                else
+                {
+                    currPoint = i_path->begin();
+                    ++loops;
+                }
+            }
+        }
+    } while (travelTime < MinimumPathTime && loops < 3);
+
+    if (!travelTime)
+        return;
+
+    init.MovebyPath(genPath);
+
+    if (nextOrientation != 100 && nextDelay != 0)
+        init.SetFacing(nextOrientation);
 
     creature.SetWalk(!creature.HasUnitState(UNIT_STATE_RUNNING) && !creature.IsLevitating(), false);
-    init.Launch();
+    m_pathDuration = init.Launch();
+
+    // remove presend time if next node have no delay
+    if (nextDelay == 0)
+        m_pathDuration -= PreSendTime;
 }
 
 bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 const& diff)
@@ -264,7 +333,6 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 cons
         {
             creature.StopMoving();
             i_nextMoveTime.Reset(1);
-            m_isArrivalDone = false;
         }
 
         creature.ClearUnitState(UNIT_STATE_ROAMING_MOVE);
@@ -276,6 +344,12 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 cons
         if (CanMove(diff))
             StartMove(creature);
     }
+    else if (m_creatureSpeed != creature.GetSpeed(Movement::SelectSpeedType(creature.m_movementInfo.GetMovementFlags())))
+    {
+        creature.StopMoving();
+        if (CanMove(diff))
+            StartMove(creature);
+    }
     else
     {
         if (creature.IsStopped())
@@ -284,6 +358,25 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 cons
         {
             if (OnArrived(creature))        // fire script events
                 StartMove(creature);        // restart movement if needed
+        }
+        else
+        {
+            if (m_pathDuration <= 0)
+            {
+                WaypointPath::const_iterator currPoint = i_path->find(i_currentNode);
+                WaypointNode const& node = currPoint->second;
+                if (!node.delay)
+                    StartMove(creature);
+            }
+            else
+                m_pathDuration -= diff;
+
+            if (!m_nodeIndexes.empty() && creature.movespline->currentPathIdx() >= m_nodeIndexes.front())
+            {
+                m_nodeIndexes.pop_front();
+                if (OnArrived(creature));
+                    creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
+            }
         }
     }
     return true;
@@ -321,7 +414,6 @@ bool WaypointMovementGenerator<Creature>::SetNextWaypoint(uint32 pointId)
     // Handle allow movement this way to not interact with PAUSED state.
     // If this function is called while PAUSED, it will move properly when unpaused.
     i_nextMoveTime.Reset(1);
-    m_isArrivalDone = false;
 
     // Set the point
     i_currentNode = pointId;
@@ -533,7 +625,8 @@ bool PatrolMovementGenerator::Update(Creature &creature, uint32 const& diff)
         return true;
     }
 
-    if (creature.movespline->Finalized())
+    Creature* leader = creature.GetMap()->GetCreature(m_leaderGuid);
+    if (creature.movespline->Finalized() || (leader && !leader->movespline->Finalized() && leader->movespline->GetId() != m_leaderSplineId))
         StartMove(creature);
 
     return true;
@@ -559,6 +652,8 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
     if (!leader || leader->movespline->Finalized())
         return;
 
+    m_leaderSplineId = leader->movespline->GetId();
+
     switch (leader->GetMotionMaster()->GetCurrentMovementGeneratorType())
     {
         case RANDOM_MOTION_TYPE:
@@ -583,34 +678,57 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
         return;
 
     uint32 totalLeaderPoints = leader->movespline->CountSplinePoints();
-    Vector3 last = leader->movespline->GetPoint(totalLeaderPoints);
-    Vector3 direction = last - leader->movespline->GetPoint(totalLeaderPoints - 1);
+    uint32 currentDestinationIdx = leader->movespline->_currentSplineIdx() + 1;
 
-    if (direction.isZero())
+    WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(leader->GetMotionMaster()->GetCurrent());
+    if (!wpMMGen || wpMMGen->GetNodeIndexes().empty())
         return;
 
-    float angle = atan2(direction.y, direction.x);
-    float x, y, z;
-    m_groupMember.ComputeRelativePosition(angle, x, y);
-    x += last.x;
-    y += last.y;
-    z = last.z;
-    creature.UpdateGroundPositionZ(x, y, z);
-    creature.GetMap()->GetWalkHitPosition(creature.GetTransport(), last.x, last.y, last.z, x, y, z);
+    std::list<int32> nodeIndexes;
+    for (int32 idx : wpMMGen->GetNodeIndexes())
+        nodeIndexes.push_back(idx);
+
+    float angle = 0.f;
+    float distance = 0.f;
+    PointsArray genPath;
+    genPath.push_back(Vector3(creature.GetPositionX(), creature.GetPositionY(), creature.GetPositionZ()));
+
+    while (!nodeIndexes.empty())
+    {
+        Vector3 last = leader->movespline->GetPoint(nodeIndexes.front());
+        Vector3 direction = last - leader->movespline->GetPoint(nodeIndexes.front() - 1);
+        if (direction.isZero())
+            return;
+
+        angle = atan2(direction.y, direction.x);
+        Vector3 startPos = genPath[genPath.size() - 1];
+        Vector3 point = leader->movespline->GetPoint(nodeIndexes.front());
+        nodeIndexes.pop_front();
+        float x, y, z;
+        m_groupMember.ComputeRelativePosition(angle, x, y);
+        x += point.x;
+        y += point.y;
+        z = point.z;
+        creature.UpdateGroundPositionZ(x, y, z);
+        creature.GetMap()->GetWalkHitPosition(creature.GetTransport(), point.x, point.y, point.z, x, y, z);
+        Vector3 endPos = Vector3(x, y, z);
+        PathFinder pathfinder(&creature);
+        pathfinder.calculate(startPos, endPos, true);
+        distance += BuildIntPath(genPath, pathfinder.getPath());
+    }
+
     creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
 
-    PathInfo p(&creature);
-    p.calculate(x, y, z, true);
-    if (p.Length() < 0.2f)
+    if (distance < 0.2f)
         return;
 
     // Increased speed if late, decreased if in a rotating ...
-    float speed = p.Length() / float(leaderTimeBeforeNextWP) * 1000.0f;
+    float speed = distance / float(leaderTimeBeforeNextWP) * 1000.0f;
     if (speed > creature.GetSpeed(MOVE_RUN) * 1.3f)
         speed = creature.GetSpeed(MOVE_RUN) * 1.3f;
 
     Movement::MoveSplineInit init(creature, "PatrolMovementGenerator::StartMove");
-    init.Move(&p);
+    init.MovebyPath(genPath);
     init.SetWalk(creature.IsWalking() && !creature.IsLevitating());
     init.SetVelocity(speed);
     init.SetFacing(angle);
