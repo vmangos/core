@@ -1236,6 +1236,12 @@ void ObjectMgr::LoadCreatureInfo(Field* fields)
     pInfo->subname = fields[2].GetCppString();
     pInfo->level_min = fields[3].GetUInt32();
     pInfo->level_max = fields[4].GetUInt32();
+    if (pInfo->level_min > pInfo->level_max)
+    {
+        pInfo->level_min = fields[4].GetUInt32();
+        pInfo->level_max = fields[3].GetUInt32();
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has level_min (%u) greater than level_max (%u), values have been swapped.", pInfo->entry, fields[3].GetUInt32(), fields[4].GetUInt32());
+    }
     pInfo->faction = fields[5].GetUInt32();
     pInfo->npc_flags = fields[6].GetUInt32();
     pInfo->gossip_menu_id = fields[7].GetUInt32();
