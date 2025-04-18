@@ -1236,12 +1236,6 @@ void ObjectMgr::LoadCreatureInfo(Field* fields)
     pInfo->subname = fields[2].GetCppString();
     pInfo->level_min = fields[3].GetUInt32();
     pInfo->level_max = fields[4].GetUInt32();
-    if (pInfo->level_min > pInfo->level_max)
-    {
-        pInfo->level_min = fields[4].GetUInt32();
-        pInfo->level_max = fields[3].GetUInt32();
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has level_min (%u) greater than level_max (%u), values have been swapped.", pInfo->entry, fields[3].GetUInt32(), fields[4].GetUInt32());
-    }
     pInfo->faction = fields[5].GetUInt32();
     pInfo->npc_flags = fields[6].GetUInt32();
     pInfo->gossip_menu_id = fields[7].GetUInt32();
@@ -1624,6 +1618,14 @@ void ObjectMgr::CheckCreatureTemplate(CreatureInfo* cInfo)
 
         if (cInfo->skinning_loot_id)
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) with despawn instantly flag has skinning loot assigned. It will never be lootable.", cInfo->entry);
+    }
+
+    if (cInfo->level_min > cInfo->level_max)
+    {
+        uint32 tmp = cInfo->level_min;
+        cInfo->level_min = cInfo->level_max;
+        cInfo->level_max = tmp;
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has level_min (%u) greater than level_max (%u), values have been swapped.", cInfo->entry, cInfo->level_max, cInfo->level_min);
     }
 
     ConvertCreatureAurasField<CreatureInfo>(cInfo, "creature_template", "Entry", cInfo->entry);
