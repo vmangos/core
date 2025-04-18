@@ -677,9 +677,6 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
     if (!leaderTimeBeforeNextWP)
         return;
 
-    uint32 totalLeaderPoints = leader->movespline->CountSplinePoints();
-    uint32 currentDestinationIdx = leader->movespline->_currentSplineIdx() + 1;
-
     WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(leader->GetMotionMaster()->GetCurrent());
     if (!wpMMGen || wpMMGen->GetNodeIndexes().empty())
         return;
@@ -695,14 +692,13 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
 
     while (!nodeIndexes.empty())
     {
-        Vector3 last = leader->movespline->GetPoint(nodeIndexes.front());
-        Vector3 direction = last - leader->movespline->GetPoint(nodeIndexes.front() - 1);
+        Vector3 point = leader->movespline->GetPoint(nodeIndexes.front());
+        Vector3 direction = point - leader->movespline->GetPoint(nodeIndexes.front() - 1);
         if (direction.isZero())
             return;
 
         angle = atan2(direction.y, direction.x);
         Vector3 startPos = genPath[genPath.size() - 1];
-        Vector3 point = leader->movespline->GetPoint(nodeIndexes.front());
         nodeIndexes.pop_front();
         float x, y, z;
         m_groupMember.ComputeRelativePosition(angle, x, y);
