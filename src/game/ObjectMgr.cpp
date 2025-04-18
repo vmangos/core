@@ -1622,9 +1622,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureInfo* cInfo)
 
     if (cInfo->level_min > cInfo->level_max)
     {
-        uint32 tmp = cInfo->level_min;
-        cInfo->level_min = cInfo->level_max;
-        cInfo->level_max = tmp;
+        std::swap(cInfo->level_min, cInfo->level_max);
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has level_min (%u) greater than level_max (%u), values have been swapped.", cInfo->entry, cInfo->level_max, cInfo->level_min);
     }
 
