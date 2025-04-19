@@ -689,17 +689,18 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
     float distance = 0.f;
     PointsArray genPath;
     genPath.push_back(Vector3(creature.GetPositionX(), creature.GetPositionY(), creature.GetPositionZ()));
+    Vector3 prevPoint = leader->movespline->GetPoint(0);
 
     while (!nodeIndexes.empty())
     {
         Vector3 point = leader->movespline->GetPoint(nodeIndexes.front());
-        Vector3 direction = point - leader->movespline->GetPoint(nodeIndexes.front() - 1);
+        nodeIndexes.pop_front();
+        Vector3 direction = point - prevPoint;
         if (direction.isZero())
             return;
 
         angle = atan2(direction.y, direction.x);
         Vector3 startPos = genPath[genPath.size() - 1];
-        nodeIndexes.pop_front();
         float x, y, z;
         m_groupMember.ComputeRelativePosition(angle, x, y);
         x += point.x;
@@ -711,6 +712,7 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
         PathFinder pathfinder(&creature);
         pathfinder.calculate(startPos, endPos, true);
         distance += BuildIntPath(genPath, pathfinder.getPath());
+        prevPoint = point;
     }
 
     creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
