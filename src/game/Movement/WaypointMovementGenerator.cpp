@@ -274,7 +274,7 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
             travelTime += BuildIntPath(genPath, tmp) / m_creatureSpeed * 1000.f;
         }
 
-        m_nodeIndexes.push_back(genPath.size() - 1);
+        m_nodeIndexes.push_back(genPath.size());
 
         if (nextDelay)
             break;
@@ -371,7 +371,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 cons
             else
                 m_pathDuration -= diff;
 
-            if (!m_nodeIndexes.empty() && creature.movespline->currentPathIdx() >= m_nodeIndexes.front())
+            if (!m_nodeIndexes.empty() && creature.movespline->_currentSplineIdx() >= m_nodeIndexes.front())
             {
                 m_nodeIndexes.pop_front();
                 if (OnArrived(creature));
