@@ -163,8 +163,8 @@ bool WaypointMovementGenerator<Creature>::OnArrived(Creature& creature)
     WaypointPath::const_iterator currPoint = i_path->find(i_currentNode);
     if (currPoint == i_path->end())
         return false;
-    else
-        m_lastReachedWaypoint = i_currentNode++;
+
+    m_lastReachedWaypoint = i_currentNode++;
 
     if (i_path->find(i_currentNode) == i_path->end() && m_repeating)
         i_currentNode = i_path->begin()->first;
@@ -233,7 +233,7 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
     Movement::MoveSplineInit init(creature, "WaypointMovementGenerator<Creature>::StartMove");
     PointsArray genPath; // will contain the generated path
     genPath.reserve(20); // little optimization
-    genPath.push_back(Vector3(creature.GetPositionX(), creature.GetPositionY(), creature.GetPositionZ()));
+    genPath.emplace_back(creature.GetPositionX(), creature.GetPositionY(), creature.GetPositionZ());
     Vector3 startPos, endPos;
     uint32 travelTime = 0;
     uint32 nextDelay = 0;
@@ -253,7 +253,7 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
             PointsArray tmp;
             tmp.push_back(startPos);
             for (auto const& node : *pSubpath)
-                tmp.push_back(Vector3(node.second.x, node.second.y, node.second.z));
+                tmp.emplace_back(node.second.x, node.second.y, node.second.z);
 
             travelTime += BuildIntPath(genPath, tmp) / m_creatureSpeed * 1000.f;
 
@@ -278,19 +278,16 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
 
         if (nextDelay)
             break;
-        else
+
+        ++currPoint;
+
+        if (currPoint == i_path->end())
         {
-            ++currPoint;
-            if (currPoint == i_path->end())
-            {
-                if (!m_repeating)
-                    break;
-                else
-                {
-                    currPoint = i_path->begin();
-                    ++loops;
-                }
-            }
+            if (!m_repeating)
+                break;
+
+            currPoint = i_path->begin();
+            ++loops;
         }
     } while (travelTime < MinimumPathTime && loops < 3);
 
@@ -688,7 +685,7 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
     float angle = 0.f;
     float distance = 0.f;
     PointsArray genPath;
-    genPath.push_back(Vector3(creature.GetPositionX(), creature.GetPositionY(), creature.GetPositionZ()));
+    genPath.emplace_back(creature.GetPositionX(), creature.GetPositionY(), creature.GetPositionZ());
     Vector3 prevPoint = leader->movespline->GetPoint(0);
 
     while (!nodeIndexes.empty())
