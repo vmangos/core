@@ -8,6 +8,9 @@
 void AddSC_generic_spell_ai();
 void AddSC_npc_escort();
 
+//Vanilla Reforged
+void AddSC_base_faction_ai();
+
 //battlegrounds
 void AddSC_battleground();
 void AddSC_bg_alterac();
@@ -244,6 +247,9 @@ void AddScripts()
     //Nostalrius
     AddSC_generic_spell_ai();
     AddSC_npc_escort();
+
+    //Vanilla Reforged
+    AddSC_base_faction_ai();
 
     //battlegrounds
     AddSC_battleground();
