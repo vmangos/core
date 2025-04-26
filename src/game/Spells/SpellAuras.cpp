@@ -8042,7 +8042,12 @@ void SpellAuraHolder::CalculateForDebuffLimit()
         case 19755: // Frightalon
         case 19784: // Dark Iron Bomb
         case 19872: // Calm Dragonkin
-        case 19975: // Entangling Roots (Rank 1-6) (Proc from Nature's Grasp)
+        case 19975: // Entangling Roots (Rank 1) (Proc from Nature's Grasp)
+        case 19974: // Entangling Roots (Rank 2) (Proc from Nature's Grasp)
+        case 19973: // Entangling Roots (Rank 3) (Proc from Nature's Grasp)
+        case 19972: // Entangling Roots (Rank 4) (Proc from Nature's Grasp)
+        case 19971: // Entangling Roots (Rank 5) (Proc from Nature's Grasp)
+        case 19970: // Entangling Roots (Rank 6) (Proc from Nature's Grasp)
         case 20066: // Repentance
         case 20586: // Windreaper
         case 24375: // War Stomp
