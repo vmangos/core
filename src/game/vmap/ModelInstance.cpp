@@ -115,9 +115,8 @@ namespace VMAP
         else if (!iBound.contains(p))
             return false;
         // child bounds are defined in object space:
-        Vector3 up(0, 0, 1);
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-        up = iInvRot * up * iInvScale;
+        Vector3 up = iInvRot * Vector3::up() * iInvScale;
 
         return iModel->IsUnderObject(pModel, up, flags & MOD_M2, outDist, inDist);
     }
