@@ -778,17 +778,13 @@ DELETE FROM `creature_movement_special` WHERE `id` = 601301;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`, `path_id`) VALUES
 (601301, 1, -6752.36, -3161.91, 244.696, 100, 0, 0, 0, 0),
 (601301, 2, -6756.26, -3154.47, 243.139, 100, 0, 0, 0, 0),
-(601301, 3, -6759.12, -3146.12, 242.102, 100, 0, 0, 601301, 0),
+(601301, 3, -6759.12, -3146.12, 242.102, 100, 0, 0, 11, 0),
 (601301, 4, -6759.85, -3144.31, 241.801, 100, 0, 0, 0, 0),
 (601301, 5, -6766.58, -3169, 240.869, 100, 0, 0, 0, 0),
 (601301, 6, -6760.42, -3182.86, 240.869, 100, 0, 0, 0, 0),
 (601301, 7, -6752.39, -3193.63, 240.869, 100, 0, 0, 0, 0),
 (601301, 8, -6739.17, -3199.83, 241.064, 100, 0, 0, 0, 0),
-(601301, 9, -6730.48, -3200.03, 244.274, 100, 0, 0, 601302, 0);
-DELETE FROM `creature_movement_scripts` WHERE `id`=601301;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(601301, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Run');
-(601302, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Despawn');
+(601301, 9, -6730.48, -3200.03, 244.274, 100, 0, 0, 4, 0);
 
 DELETE FROM `quest_end_scripts` WHERE `id`=705;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
