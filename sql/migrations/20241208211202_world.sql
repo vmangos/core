@@ -766,6 +766,45 @@ INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `
 (664, 9, 0, 0, 0, 0, 0, 0, 0, 0, 8, 2, 1360, 0, 0, 0, 0, 0, 0, 0, 0, 'The Scythe of Elune: Velinde Starsong - Say Text'),
 (664, 9, 1, 1, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Scythe of Elune - Velinde Starsong - Emote OneShotCry');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Pearl Diving Script
+UPDATE `quest_template` SET `CompleteScript`=705 WHERE  `entry`=705 AND `patch`=0;
+
+DELETE FROM `generic_scripts` WHERE `id` IN (70501, 70502);
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(70501, 1, 0, 60, 3, 1, 0, 0, 0, 0, 0, 0, 0, 601301, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Wayward Buzzard - Start Waypoints'),
+(70502, 1, 0, 60, 3, 1, 0, 0, 0, 0, 0, 0, 0, 601301, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Wayward Buzzard - Start Waypoints');
+DELETE FROM `creature_movement_special` WHERE `id` = 601301;
+INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`, `path_id`) VALUES
+(601301, 1, -6752.36, -3161.91, 244.696, 100, 0, 0, 0, 0),
+(601301, 2, -6756.26, -3154.47, 243.139, 100, 0, 0, 0, 0),
+(601301, 3, -6759.12, -3146.12, 242.102, 100, 0, 0, 601301, 0),
+(601301, 4, -6759.85, -3144.31, 241.801, 100, 0, 0, 0, 0),
+(601301, 5, -6766.58, -3169, 240.869, 100, 0, 0, 0, 0),
+(601301, 6, -6760.42, -3182.86, 240.869, 100, 0, 0, 0, 0),
+(601301, 7, -6752.39, -3193.63, 240.869, 100, 0, 0, 0, 0),
+(601301, 8, -6739.17, -3199.83, 241.064, 100, 0, 0, 0, 0),
+(601301, 9, -6730.48, -3200.03, 244.274, 100, 0, 0, 601302, 0);
+DELETE FROM `creature_movement_scripts` WHERE `id`=601301;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(601301, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Run');
+(601302, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Despawn');
+
+DELETE FROM `quest_end_scripts` WHERE `id`=705;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(705, 0, 0, 31, 6013, 60, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Terminate Script'),
+(705, 0, 1, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.66519, 0, 'Pearl Diving - Rigglefuzz - Set Orientation'),
+(705, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1021, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Say Text'),
+(705, 0, 3, 10, 6013, 22951, 0, 0, 0, 0, 0, 0, 0, 70502, -1, 1, -6744, -3170.58, 249.026, 2.3911, 0, 'Pearl Diving - Rigglefuzz - Summon Creature Wayward Buzzard'),
+(705, 0, 4, 10, 6013, 22951, 0, 0, 0, 0, 0, 0, 0, 70501, -1, 1, -6749.5, -3168.62, 246.617, 1.97383, 0, 'Pearl Diving - Rigglefuzz - Summon Creature Wayward Buzzard'),
+(705, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1023, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Say Text'),
+(705, 7, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.20016, 0, 'Pearl Diving - Rigglefuzz - Set Orientation'),
+(705, 7, 0, 0, 0, 0, 0, 0, 6013, 60, 10, 0, 1022, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Say Text'),
+(705, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1024, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Say Text'),
+(705, 10, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb'),
+(705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb'),
+(705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb');
+  
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
 
