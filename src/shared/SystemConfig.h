@@ -33,9 +33,6 @@
 #ifndef _REALMDCONFVERSION
 # define _REALMDCONFVERSION 2020010501
 #endif
-#ifndef _MODSCONFVERSION
-# define _MODSCONFVERSION 2010062001
-#endif
 
 #if MANGOS_ENDIAN == MANGOS_BIGENDIAN
 # define _ENDIAN_STRING "big-endian"
@@ -70,7 +67,6 @@
 # endif
 # define _MANGOSD_CONFIG  SYSCONFDIR "mangosd.conf"
 # define _REALMD_CONFIG   SYSCONFDIR "realmd.conf"
-# define _MODS_CONFIG     SYSCONFDIR "mods.conf"
 #else
 # if defined  (__FreeBSD__)
 #  define _ENDIAN_PLATFORM "FreeBSD_" ARCHITECTURE " (" _ENDIAN_STRING ")"
@@ -89,7 +85,6 @@
 # endif
 # define _MANGOSD_CONFIG  SYSCONFDIR "mangosd.conf"
 # define _REALMD_CONFIG  SYSCONFDIR "realmd.conf"
-# define _MODS_CONFIG  SYSCONFDIR "mods.conf"
 #endif
 
 #define _FULLVERSION REVISION_HASH " / " REVISION_DATE " / " _ENDIAN_PLATFORM
