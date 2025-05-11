@@ -767,7 +767,7 @@ INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `
 (664, 9, 1, 1, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Scythe of Elune - Velinde Starsong - Emote OneShotCry');
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Add Pearl Diving Script
+-- Add Pearl Diving Script (credit cmangos)
 UPDATE `quest_template` SET `CompleteScript`=705 WHERE  `entry`=705 AND `patch`=0;
 
 DELETE FROM `generic_scripts` WHERE `id` IN (70501, 70502);
