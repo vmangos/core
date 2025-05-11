@@ -800,6 +800,64 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (705, 10, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb'),
 (705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb'),
 (705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb');
+
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Thandol Span Script
+UPDATE `quest_template` SET `StartScript`=632 WHERE  `entry`=632;
+
+-- 390: Creature 4062 Is Dead Within 50 Yards Of The Target
+DELETE FROM `conditions` WHERE `condition_entry` = 390;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
+(390, 20, 4062, 50, 1, 0, 1);
+
+DELETE FROM `creature_movement_special` WHERE `id` = 63101;
+INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`, `path_id`) VALUES
+(63101, 1, -2372.22388, -2483.4741, 74.6390, 100, 0, 0, 0, 0),
+(63101, 2, -2367.6418, -2490.2195, 75.35177, 100, 0, 0, 0, 0),
+(63101, 3, -2376.869, -2491.26, 75.351776, 100, 0, 0, 0, 0),
+(63101, 4, -2372.9832, -2495.345, 75.35177, 100, 0, 0, 0, 0),
+(63101, 5, -2372.842, -2498.6948, 75.35177, 100, 0, 0, 0, 0),
+(63101, 6, -2376.5527, -2499.2554, 75.35176, 100, 0, 0, 0, 0),
+(63101, 7, -2376.8274, -2504.2578, 78.392426, 100, 0, 0, 0, 0),
+(63101, 8, -2376.3125, -2511.2085, 82.58866, 100, 0, 0, 0, 0),
+(63101, 9, -2372.1162, -2514.5889, 82.35177, 100, 0, 0, 0, 0);
+
+DELETE FROM `generic_scripts` WHERE `id`=63101;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(63101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 782, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Iron Bombardier - Talk'),
+(63101, 0, 1, 26, 0, 0, 0, 0, 30, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Iron Bombardier - Start Attack');
+
+DELETE FROM `generic_scripts` WHERE `id`=63102;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(63102, 0, 0, 60, 3, 1, 0, 0, 0, 0, 0, 0, 0, 63101, 0, 0, 0, 0, 0, 0, 0, 'Dark Iron Bombardier - Start Waypoints'),
+(63102, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 783, 784, 0, 0, 0, 0, 0, 0, 0, 'Dark Iron Bombardier - Talk');
+
+DELETE FROM `quest_start_scripts` WHERE `id`=632;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(632, 0, 0, 31, 4062, 50, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Thandol Span - Terminate Script'),
+(632, 0, 1, 10, 4062, 300000, 0, 0, 0, 0, 0, 0, 0, 63101, -1, 1, -2370.93, -2523.82, 74.639, 2.56563, 390, 'The Thandol Span - Summon Creature'),
+(632, 0, 2, 10, 4062, 300000, 0, 0, 0, 0, 0, 0, 0, 63102, -1, 1, -2372.22, -2483.47, 74.639, 0.174533, 390, 'The Thandol Span - Summon Creature');
+
+-- Events list for Dark Iron Saboteur
+DELETE FROM `creature_ai_events` WHERE `creature_id`=1052;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(105202, 1052, 0, 2, 0, 100, 0, 15, 0, 0, 0, 105202, 0, 0, 'Dark Iron Saboteur - Say and Text Emote then Cast Sapper Explode at 15% HP'),
+(105203, 1052, 0, 4, 0, 100, 1, 0, 0, 0, 0, 105201, 0, 0, 'Dark Iron Saboteur - Talk on Aggro');
+DELETE FROM `creature_ai_scripts` WHERE `id`=105201;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(105201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1935, 1934, 1936, 0, 0, 0, 0, 0, 0, 'Dark Iron Saboteur - Talk');
+
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 12039;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`, `path_id`) VALUES
+(12039, 1, -2374.99, -2492.29, 82.2887, 100, 20000, 0, 0, 0),
+(12039, 2, -2367.67, -2495.42, 82.2887, 100, 0, 0, 0, 0),
+(12039, 3, -2366.35, -2501.89, 82.2887, 100, 0, 0, 0, 0),
+(12039, 4, -2367.59, -2510.21, 82.2887, 100, 0, 0, 0, 0),
+(12039, 5, -2372.84, -2513.92, 82.2887, 100, 20000, 0, 0, 0),
+(12039, 6, -2367.59, -2510.21, 82.2887, 100, 0, 0, 0, 0),
+(12039, 7, -2366.35, -2501.89, 82.2887, 100, 0, 0, 0, 0),
+(12039, 8, -2367.67, -2495.42, 82.2887, 100, 0, 0, 0, 0);
+
   
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
