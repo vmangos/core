@@ -19,10 +19,12 @@
 #include "Policies/SingletonImp.h"
 #include "TransportMgr.h"
 #include "Transport.h"
-#include "MapManager.h"
-#include "ObjectMgr.h"
+#include "Geometry.h"
 #include "MoveMap.h"
-#include "World.h"
+#include "SQLStorages.h"
+#include "MoveSplineInitArgs.h"
+#include "Map.h"
+#include "MapManager.h"
 
 INSTANTIATE_SINGLETON_1(TransportMgr);
 
@@ -113,7 +115,7 @@ bool TransportMgr::GenerateWaypoints(GameObjectInfo const* goinfo, TransportTemp
                 KeyFrame k(node_i);
                 G3D::Vector3 h;
                 orientationSpline.evaluate_derivative(i + 1, 0.0f, h);
-                k.InitialOrientation = MapManager::NormalizeOrientation(atan2(h.y, h.x) + M_PI);
+                k.InitialOrientation = Geometry::NormalizeOrientation(atan2(h.y, h.x) + M_PI);
 
                 keyFrames.push_back(k);
                 splinePath.push_back(G3D::Vector3(node_i.x, node_i.y, node_i.z));

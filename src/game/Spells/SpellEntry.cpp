@@ -3,6 +3,7 @@
 #include "SpellAuraDefines.h"
 #include "SpellMgr.h"
 #include "Spell.h"
+#include "ScriptMgr.h"
 #include "TradeData.h"
 
 using namespace Spells;

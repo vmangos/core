@@ -154,7 +154,7 @@ struct DynamicTreeIntersectionCallback
 {
     bool did_hit;
     DynamicTreeIntersectionCallback() : did_hit(false) {}
-    bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
+    bool operator()(const G3D::Ray& r, GameObjectModel const& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
     {
         did_hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
         return did_hit;
@@ -169,7 +169,7 @@ struct DynamicTreeIntersectionCallback_WithLogger
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Dynamic Intersection log");
     }
-    bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
+    bool operator()(const G3D::Ray& r, GameObjectModel const& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "testing intersection with %s", obj.name.c_str());
         bool hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
@@ -292,7 +292,7 @@ bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, flo
 float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist) const
 {
     Vector3 v(x, y, z);
-    G3D::Ray r(v, Vector3(0, 0, -1));
+    G3D::Ray r(v, Vector3::down());
     DynamicTreeIntersectionCallback callback;
     impl.intersectZAllignedRay(r, callback, maxSearchDist);
 

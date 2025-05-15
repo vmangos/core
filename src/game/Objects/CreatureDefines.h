@@ -92,7 +92,6 @@ enum CreatureEliteType
     CREATURE_ELITE_RAREELITE       = 2,
     CREATURE_ELITE_WORLDBOSS       = 3,
     CREATURE_ELITE_RARE            = 4,
-    CREATURE_UNKNOWN               = 5                      // found in 2.2.3 for 2 mobs
 };
 
 enum CreatureStaticFlags
@@ -109,7 +108,7 @@ enum CreatureStaticFlags
     CREATURE_STATIC_FLAG_UNINTERACTIBLE                    = 0x00000200, // Applies UNIT_FLAG_NOT_SELECTABLE on spawn.
     CREATURE_STATIC_FLAG_NO_AUTOMATIC_REGEN                = 0x00000400, // Will not regen health and mana.
     CREATURE_STATIC_FLAG_DESPAWN_INSTANTLY                 = 0x00000800, // Despawn corpse instantly on death.
-    CREATURE_STATIC_FLAG_CORPSE_RAID                       = 0x00001000, // Does not check distance upon death for loot and xp eligibility.
+    CREATURE_STATIC_FLAG_CORPSE_RAID                       = 0x00001000, // Does not check distance or damage origin upon death for loot and xp eligibility.
     CREATURE_STATIC_FLAG_CREATOR_LOOT                      = 0x00002000, // Can be looted by the player who created it.
     CREATURE_STATIC_FLAG_NO_DEFENSE                        = 0x00004000, // Defense skill is 0.
     CREATURE_STATIC_FLAG_NO_SPELL_DEFENSE                  = 0x00008000, // Cannot resist spells.

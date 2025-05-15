@@ -961,7 +961,7 @@ struct npc_infantrymanAI : ScriptedAI
 
         rotated.x = clockwise ? relative.y : -relative.y;
         rotated.y = clockwise ? -relative.x : relative.x;
-        rotated.z = rotated.z;
+        rotated.z = relative.z;
 
         vec = m_origin + rotated;
     }

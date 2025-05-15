@@ -26,7 +26,6 @@
 
 #include "ByteBuffer.h"
 #include "World.h"
-#include "Log.h"
 #include "Crypto/Hash/SHA1.h"
 
 #include <functional>

@@ -18,7 +18,7 @@
 
 #include "Common.h"
 #include "Transport.h"
-#include "MapManager.h"
+#include "Geometry.h"
 #include "ObjectMgr.h"
 #include "Path.h"
 #include "WorldPacket.h"
@@ -30,6 +30,7 @@
 #include "CellImpl.h"
 #include "GameObjectModel.h"
 #include "ObjectAccessor.h"
+#include "MapManager.h"
 
 #include <G3D/Quat.h>
 
@@ -490,14 +491,14 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
 
 void GenericTransport::CalculatePassengerOrientation(float& o) const
 {
-    o = MapManager::NormalizeOrientation(GetOrientation() + o);
+    o = Geometry::NormalizeOrientation(GetOrientation() + o);
 }
 
 void GenericTransport::CalculatePassengerPosition(float& x, float& y, float& z, float* o, float transX, float transY, float transZ, float transO)
 {
     float inx = x, iny = y, inz = z;
     if (o)
-        *o = MapManager::NormalizeOrientation(transO + *o);
+        *o = Geometry::NormalizeOrientation(transO + *o);
 
     x = transX + inx * std::cos(transO) - iny * std::sin(transO);
     y = transY + iny * std::cos(transO) + inx * std::sin(transO);
@@ -507,7 +508,7 @@ void GenericTransport::CalculatePassengerPosition(float& x, float& y, float& z, 
 void GenericTransport::CalculatePassengerOffset(float& x, float& y, float& z, float* o, float transX, float transY, float transZ, float transO)
 {
     if (o)
-        *o = MapManager::NormalizeOrientation(*o - transO);
+        *o = Geometry::NormalizeOrientation(*o - transO);
 
     z -= transZ;
     y -= transY;    // y = searchedY * std::cos(o) + searchedX * std::sin(o)

@@ -953,6 +953,27 @@ bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, AreaTriggerEntry const* pAt)
     return false;
 }
 
+// 15748 - Freeze Rookery Egg
+// 16028 - Freeze Rookery Egg - Prototype
+struct UBRSFreezeRookeryEggScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetGOTarget())
+        {
+            if (spell->GetGOTarget()->getLootState() == GO_READY)
+                spell->GetGOTarget()->UseDoorOrButton(0, true);
+            return false;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_UBRSFreezeRookeryEgg(SpellEntry const*)
+{
+    return new UBRSFreezeRookeryEggScript();
+}
+
 void AddSC_instance_blackrock_spire()
 {
     Script* pNewScript;
@@ -974,5 +995,10 @@ void AddSC_instance_blackrock_spire()
     pNewScript = new Script;
     pNewScript->Name = "at_ubrs_the_beast";
     pNewScript->pAreaTrigger = &AreaTrigger_at_ubrs_the_beast;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_ubrs_freeze_rookery_egg";
+    pNewScript->GetSpellScript = &GetScript_UBRSFreezeRookeryEgg;
     pNewScript->RegisterSelf();
 }

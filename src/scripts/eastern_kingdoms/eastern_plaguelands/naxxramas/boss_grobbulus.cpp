@@ -296,7 +296,7 @@ SpellScript* GetScript_GrobbulusCloudPoison(SpellEntry const*)
 // 28206 - Mutagen Explosion (Grobbulus)
 struct GrobbulusMutagenExplosionScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -309,6 +309,7 @@ struct GrobbulusMutagenExplosionScript : public SpellScript
             else
                 spell->damage = spell->damage / 1.5f;
         }
+        return true;
     }
 };
 

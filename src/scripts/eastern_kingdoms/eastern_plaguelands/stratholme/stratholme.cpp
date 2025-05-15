@@ -682,6 +682,24 @@ AuraScript* GetScript_HauntingPhantoms(SpellEntry const*)
     return new HauntingPhantomsScript();
 }
 
+// 16381 - Summon Rockwing Gargoyles
+struct EyeOfNaxxramasSummonRockwingGargoylesScript : SpellScript
+{
+    void OnSummon(Spell* spell, Creature* summon) const final
+    {
+        if (spell->m_casterUnit)
+        {
+            if (Unit* pTarget = spell->m_casterUnit->GetAttackerForHelper())
+                summon->AI()->AttackStart(pTarget);
+        }
+    }
+};
+
+SpellScript* GetScript_EyeOfNaxxramasSummonRockwingGargoyles(SpellEntry const*)
+{
+    return new EyeOfNaxxramasSummonRockwingGargoylesScript();
+}
+
 void AddSC_stratholme()
 {
     Script* newscript;
@@ -730,5 +748,10 @@ void AddSC_stratholme()
     newscript = new Script;
     newscript->Name = "spell_haunting_phantoms";
     newscript->GetAuraScript = &GetScript_HauntingPhantoms;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_eye_of_naxxramas_summon_rockwing_gargoyles";
+    newscript->GetSpellScript = &GetScript_EyeOfNaxxramasSummonRockwingGargoyles;
     newscript->RegisterSelf();
 }

@@ -19,7 +19,7 @@
 // 24239, 24274, 24275 - Hammer of Wrath
 struct PaladinHammerOfWrathScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -27,6 +27,7 @@ struct PaladinHammerOfWrathScript : SpellScript
             spell->damage = spell->m_caster->SpellDamageBonusDone(spell->GetUnitTarget(), spell->m_spellInfo, effIdx, spell->damage, SPELL_DIRECT_DAMAGE);
             spell->damage = spell->GetUnitTarget()->SpellDamageBonusTaken(spell->m_caster, spell->m_spellInfo, effIdx, spell->damage, SPELL_DIRECT_DAMAGE);
         }
+        return true;
     }
 };
 
@@ -38,7 +39,7 @@ SpellScript* GetScript_PaladinHammerOfWrath(SpellEntry const*)
 // 20467, 20963, 20964, 20965, 20966 - Judgement of Command
 struct PaladinJudgementOfCommandDamageScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -49,6 +50,7 @@ struct PaladinJudgementOfCommandDamageScript : SpellScript
             spell->damage = spell->m_caster->SpellDamageBonusDone(spell->GetUnitTarget(), spell->m_spellInfo, effIdx, spell->damage, SPELL_DIRECT_DAMAGE);
             spell->damage = spell->GetUnitTarget()->SpellDamageBonusTaken(spell->m_caster, spell->m_spellInfo, effIdx, spell->damage, SPELL_DIRECT_DAMAGE);
         }
+        return true;
     }
 };
 
@@ -60,17 +62,18 @@ SpellScript* GetScript_PaladinJudgementOfCommandDamage(SpellEntry const*)
 // 20425, 20961, 20962, 20967, 20968 - Judgement of Command
 struct PaladinJudgementOfCommandDummyScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
             uint32 spellId = spell->m_currentBasePoints[effIdx];
             SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(spellId);
             if (!pSpellEntry)
-                return;
+                return false;
 
             spell->m_caster->CastSpell(spell->GetUnitTarget(), pSpellEntry, true, nullptr);
         }
+        return true;
     }
 };
 
@@ -82,7 +85,7 @@ SpellScript* GetScript_PaladinJudgementOfCommandDummy(SpellEntry const*)
 // 20473, 20929, 20930 - Holy Shock
 struct PaladinHolyShockScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -105,7 +108,7 @@ struct PaladinHolyShockScript : SpellScript
                     break;
                 default:
                     sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Spell::EffectDummy: Spell %u not handled in HS", spell->m_spellInfo->Id);
-                    return;
+                    return false;
             }
 
             if (spell->m_caster->IsFriendlyTo(spell->GetUnitTarget()))
@@ -113,12 +116,86 @@ struct PaladinHolyShockScript : SpellScript
             else
                 spell->m_caster->CastSpell(spell->GetUnitTarget(), hurt, true);
         }
+        return true;
     }
 };
 
 SpellScript* GetScript_PaladinHolyShock(SpellEntry const*)
 {
     return new PaladinHolyShockScript();
+}
+
+// 20185, 20344, 20345, 20346, 25751 - Judgement of Light
+struct PaladinJudgementOfLightProcAuraScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
+        {
+            // Paladin T3 JoL
+            if (spell->m_casterUnit->HasAura(28775))
+                spell->m_currentBasePoints[effIdx] = 20;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_PaladinJudgementOfLightProcAura(SpellEntry const*)
+{
+    return new PaladinJudgementOfLightProcAuraScript();
+}
+
+// 20267, 20341, 20342, 20343 - Judgement of Light
+struct PaladinJudgementOfLightHealScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            // Extra heal stored in m_triggeredByAuraBasePoints
+            if (spell->m_triggeredByAuraBasePoints > 0)
+                spell->damage += spell->m_triggeredByAuraBasePoints;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_PaladinJudgementOfLightHeal(SpellEntry const*)
+{
+    return new PaladinJudgementOfLightHealScript();
+}
+
+// 20178 - Reckoning
+struct PaladinReckoningScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // World of Warcraft Client Patch 1.3.0 (2005-03-22)
+            // - Fixed a bug where abilities that give extra attacks, like the paladin
+            //   Reckoning talent, could cause the following swing to take longer than
+            //   it should.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_2_4
+            spell->GetUnitTarget()->ResetAttackTimer();
+#endif
+
+            // It was possible to stack infinite extra attacks in early vanilla.
+            // https://www.youtube.com/watch?v=TqPQ4SNmx2c
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
+            if (spell->GetUnitTarget()->GetExtraAttacks() < 4)
+#endif
+                spell->GetUnitTarget()->AddExtraAttack();
+
+            return false;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_PaladinReckoning(SpellEntry const*)
+{
+    return new PaladinReckoningScript();
 }
 
 void AddSC_paladin_spell_scripts()
@@ -143,5 +220,20 @@ void AddSC_paladin_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_paladin_holy_shock";
     newscript->GetSpellScript = &GetScript_PaladinHolyShock;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_paladin_judgement_of_light_proc_aura";
+    newscript->GetSpellScript = &GetScript_PaladinJudgementOfLightProcAura;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_paladin_judgement_of_light_heal";
+    newscript->GetSpellScript = &GetScript_PaladinJudgementOfLightHeal;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_paladin_reckoning";
+    newscript->GetSpellScript = &GetScript_PaladinReckoning;
     newscript->RegisterSelf();
 }

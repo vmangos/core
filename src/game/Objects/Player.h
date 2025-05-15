@@ -29,6 +29,7 @@
 #include "MapReference.h"
 #include "WorldSession.h"
 #include "Pet.h"
+#include "Item.h"
 #include "Util.h"                                           // for Tokens typedef
 #include "ReputationMgr.h"
 #include "BattleGroundDefines.h"
@@ -281,6 +282,33 @@ enum DrunkenState
 
 #define MAX_DRUNKEN   4
 
+enum CharacterFlags
+{
+    CHARACTER_FLAG_NONE                                         = 0x00000000,
+    CHARACTER_FLAG_INVIS_GOD                                    = 0x00000001, // Player has God Invis enabled
+    CHARACTER_FLAG_RESTING                                      = 0x00000002, // Player is currently earning rest experience
+    CHARACTER_FLAG_LOCKED_FOR_TRANSFER                          = 0x00000004, // Player is locked - for paid character transfer
+    CHARACTER_FLAG_SILENCED                                     = 0x00000008, // Player's chat is silenced (can talk to GMs)
+    CHARACTER_FLAG_UBERINVIS_GOD                                = 0x00000010, // Player has God Uberinvis enabled
+    CHARACTER_FLAG_BEASTMASTER                                  = 0x00000020, // Beastmaster is on
+    CHARACTER_FLAG_PVP_ENABLED                                  = 0x00000040, // PvP Enabled
+    CHARACTER_FLAG_PORT_AFTER_RESURRECT                         = 0x00000080, // World port after resurrect
+    CHARACTER_FLAG_RESET_TALENTS_ON_LOGIN                       = 0x00000100, // Clear Talents on login
+    CHARACTER_FLAG_HAS_PVP_RANK                                 = 0x00000200, // Player has a PvP Rank
+    CHARACTER_FLAG_HIDE_HELM                                    = 0x00000400, // Hide Helm
+    CHARACTER_FLAG_HIDE_CLOAK                                   = 0x00000800, // Hide Cloak
+    CHARACTER_FLAG_SKINNABLE                                    = 0x00001000, // Player is skinnable
+    CHARACTER_FLAG_GHOST                                        = 0x00002000, // Player is a ghost
+    CHARACTER_FLAG_RENAME                                       = 0x00004000, // Set to force a rename
+    CHARACTER_FLAG_RENAME_NEEDS_GM_REVIEW                       = 0x00008000, // Flag is set after rename for GM review
+    CHARACTER_FLAG_PVP_DESIRED                                  = 0x00010000, // PvP desired flag
+    CHARACTER_FLAG_GM_MODE                                      = 0x00020000, // GM Mode enabled
+    CHARACTER_FLAG_DELETED_BY_TRANSFER                          = 0x00040000, // Deleted by a character transfer
+    CHARACTER_FLAG_ON_UNSAFE_TRANSPORT                          = 0x00080000, // On unsafe transport (port to safe loc on log in)
+    CHARACTER_FLAG_RENAME_FAILED                                = 0x00100000, // Player unable to rename character
+    CHARACTER_FLAG_MOUNT_UPGRADED                               = 0x00200000, // Mount has been upgraded
+};
+
 enum PlayerFlags
 {
     PLAYER_FLAGS_NONE                   = 0x00000000,
@@ -298,14 +326,10 @@ enum PlayerFlags
     PLAYER_FLAGS_HIDE_CLOAK             = 0x00000800,
 #if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
     PLAYER_FLAGS_CAN_SELF_RESURRECT     = 0x00001000,
-#endif
+#else
     PLAYER_FLAGS_PARTIAL_PLAY_TIME      = 0x00001000,       // played long time
     PLAYER_FLAGS_NO_PLAY_TIME           = 0x00002000,       // played too long time
-    PLAYER_FLAGS_UNK15                  = 0x00004000,
-    PLAYER_FLAGS_UNK16                  = 0x00008000,       // strange visual effect (2.0.1), looks like PLAYER_FLAGS_GHOST flag
-    PLAYER_FLAGS_SANCTUARY              = 0x00010000,       // player entered sanctuary
-    PLAYER_FLAGS_TAXI_BENCHMARK         = 0x00020000,       // taxi benchmark mode (on/off) (2.0.1)
-    PLAYER_FLAGS_PVP_TIMER              = 0x00040000,       // 3.0.2, pvp timer active (after you disable pvp manually)
+#endif
 };
 
 enum PlayerBytesOffsets
@@ -388,18 +412,6 @@ enum ActivateTaxiReplies
     ERR_TAXIPLAYERMOVING            = 10,
     ERR_TAXISAMENODE                = 11,
     ERR_TAXINOTSTANDING             = 12
-};
-
-// 2^n values
-enum AtLoginFlags
-{
-    AT_LOGIN_NONE              = 0x00,
-    AT_LOGIN_RENAME            = 0x01,
-    AT_LOGIN_RESET_SPELLS      = 0x02,
-    AT_LOGIN_RESET_TALENTS     = 0x04,
-    //AT_LOGIN_CUSTOMIZE         = 0x08, -- used in post-3.x
-    //AT_LOGIN_RESET_PET_TALENTS = 0x10, -- used in post-3.x
-    AT_LOGIN_FIRST             = 0x20,
 };
 
 enum PlayerCheatOptions : uint16
@@ -786,6 +798,7 @@ class Player final: public Unit
         
         void SetCheatFly(bool on, bool notify = false);
         void SetCheatFixedZ(bool on, bool notify = false);
+        void SetCheatBeastmaster(bool on, bool notify = false);
         void SetCheatGod(bool on, bool notify = false);
         void SetCheatNoCooldown(bool on, bool notify = false);
         void SetCheatInstantCast(bool on, bool notify = false);
@@ -1194,7 +1207,7 @@ class Player final: public Unit
         void _LoadBGData(std::unique_ptr<QueryResult> result);
         void _LoadIntoDataField(char const* data, uint32 startOffset, uint32 count);
         void _LoadGuild(std::unique_ptr<QueryResult> result);
-        uint32 m_atLoginFlags;
+        uint32 m_characterFlags;
     public:
         bool LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder);
         void SendPacketsAtRelogin();
@@ -1204,9 +1217,9 @@ class Player final: public Unit
         static bool LoadPositionFromDB(ObjectGuid guid, uint32& mapid, float& x,float& y,float& z,float& o, bool& in_flight);
         void LoadCorpse();
         void LoadPet();
-        bool HasAtLoginFlag(AtLoginFlags f) const { return m_atLoginFlags & f; }
-        void SetAtLoginFlag(AtLoginFlags f) { m_atLoginFlags |= f; }
-        void RemoveAtLoginFlag(AtLoginFlags f, bool in_db_also = false);
+        bool HasCharacterFlag(CharacterFlags f) const { return m_characterFlags & f; }
+        void SetCharacterFlag(CharacterFlags f, bool enabled) { if (enabled) m_characterFlags |= f; else m_characterFlags &= ~f; }
+        void UpdateCharacterFlags();
         static bool ValidateAppearance(uint8 race, uint8 class_, uint8 gender, uint8 hairID, uint8 hairColor, uint8 faceID, uint8 facialHair, uint8 skinColor, bool create = false);
 
         /*********************************************************/
@@ -2109,6 +2122,10 @@ class Player final: public Unit
         void Say(char const* text, uint32 const language) const;
         void Yell(char const* text, uint32 const language) const;
         void TextEmote(char const* text) const;
+        void SendSysMessage(int32 entry) const;
+        void SendSysMessage(char const* str) const;
+        void PSendSysMessage(int32 entry, ...) const;
+        void PSendSysMessage(char const* format, ...) const ATTR_PRINTF(2, 3);
 
         void LearnLanguage(uint64 languageId) { m_knownLanguagesMask |= (1llu << languageId); }
         void RemoveLanguage(uint64 languageId) { m_knownLanguagesMask &= ~(1llu << languageId);}

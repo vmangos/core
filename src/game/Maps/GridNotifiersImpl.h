@@ -44,14 +44,12 @@ inline void MaNGOS::VisibleNotifier::Visit(GridRefManager<T>& m)
     }
 }
 
-inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType& m)
+inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType &m)
 {
-    std::vector<Creature*> creaturesToUpdate;
-    for (const auto& iter : m)
-        creaturesToUpdate.push_back(iter.getSource());
-    for (const auto& it : creaturesToUpdate)
+    for (CreatureMapType::iterator iter = m.begin(); iter != m.end();)
     {
-        WorldObject::UpdateHelper helper(it);
+        WorldObject::UpdateHelper helper(iter->getSource());
+        ++iter;
         helper.UpdateRealTime(i_now, i_timeDiff);
     }
 }
@@ -600,7 +598,7 @@ void MaNGOS::LocalizedPacketDo<Builder>::operator()(Player* p)
         if (i_data_cache.size() < cache_idx + 1)
             i_data_cache.resize(cache_idx + 1);
 
-        auto data = std::unique_ptr<WorldPacket>(new WorldPacket());
+        auto data = std::make_unique<WorldPacket>();
 
         i_builder(*data, loc_idx);
 

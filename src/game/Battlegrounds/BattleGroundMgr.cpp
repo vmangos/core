@@ -32,7 +32,6 @@
 #include "Map.h"
 #include "ObjectMgr.h"
 #include "ProgressBar.h"
-#include "Chat.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "Language.h"
@@ -183,7 +182,7 @@ GroupQueueInfo* BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleGr
                 if (grp->GetMembersCount() > group_limit) // queue players solo if group size is above limit set in config
                 {
                     AddGroup(member, nullptr, bgTypeId, bracketId, false, instanceId, nullptr);
-                    ChatHandler(member).PSendSysMessage("Group queue limit is set to %u. You have been queued solo.", group_limit);
+                    member->PSendSysMessage("Group queue limit is set to %u. You have been queued solo.", group_limit);
                 }
                 else
                 {
@@ -242,7 +241,7 @@ GroupQueueInfo* BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleGr
                 // Show queue status to player only (when joining queue)
                 if (sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_QUEUE_ANNOUNCER_JOIN) == 1)
                 {
-                    ChatHandler(leader).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bgName, qMinLevel, qMaxLevel - 1,
+                    leader->PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bgName, qMinLevel, qMaxLevel - 1,
                                                         qAlliance, (minPlayers > qAlliance) ? minPlayers - qAlliance : (uint32)0, qHorde, (minPlayers > qHorde) ? minPlayers - qHorde : (uint32)0);
                 }
                 // System message

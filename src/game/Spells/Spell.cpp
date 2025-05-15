@@ -38,7 +38,6 @@
 #include "ScriptMgr.h"
 #include "ObjectAccessor.h"
 #include "SharedDefines.h"
-#include "LootMgr.h"
 #include "VMapFactory.h"
 #include "BattleGround.h"
 #include "Util.h"
@@ -4437,7 +4436,7 @@ void Spell::update(uint32 difftime)
                 // check if there are alive targets left
                 if (!HasValidUnitPresentInTargetList())
                 {
-                    SendChannelUpdate(0);
+                    SendChannelUpdate(0, true);
                     finish();
                 }
 
@@ -4694,17 +4693,6 @@ void Spell::finish(bool ok)
     if (!m_TriggerSpells.empty())
         CastTriggerSpells();
 
-    // Gnomish Death Ray
-    if (m_spellInfo->Id == 13278)
-    {
-        if (Unit* const pTarget = m_targets.getUnitTarget())
-        {
-            SpellEntry const* DRLaunchEntry = sSpellMgr.GetSpellEntry(13279);
-            float DRdamage = m_caster->CalculateSpellEffectValue(pTarget, DRLaunchEntry, EFFECT_INDEX_0, m_currentBasePoints, nullptr);
-            m_caster->CastCustomSpell(pTarget, 13279, dither(DRdamage), {}, {}, true, m_CastItem);
-        }
-    }
-
     if (m_caster->IsPlayer())
     {
         m_caster->ToPlayer()->RemoveSpellMods(this);
@@ -4778,6 +4766,10 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCas
                 data << uint32(sSpellMgr.GetRequiredAreaForSpell(spellInfo->Id));
                 break;
             case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
+            case SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND:
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_10_2
+            case SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND:
+#endif
                 data << uint32(spellInfo->EquippedItemClass);
                 data << uint32(spellInfo->EquippedItemSubClassMask);
                 data << uint32(spellInfo->EquippedItemInventoryTypeMask);
@@ -5651,7 +5643,9 @@ void Spell::HandleEffects(Unit* pUnitTarget, Item *pItemTarget, GameObject* pGOT
     if (eff < TOTAL_SPELL_EFFECTS)
     {
         if (m_spellScript)
-            m_spellScript->OnEffectExecute(this, i);
+            if (!m_spellScript->OnEffectExecute(this, i))
+                return;
+
         (*this.*SpellEffects[eff])(i);
     }
     else
@@ -5739,9 +5733,6 @@ void Spell::RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mo
 
 SpellCastResult Spell::CheckCast(bool strict)
 {
-    if (m_spellInfo->IsIgnoringCasterAndTargetRestrictions())
-        return SPELL_CAST_OK;
-
     if (m_caster->IsPlayer() && m_caster->ToPlayer()->HasCheatOption(PLAYER_CHEAT_NO_CHECK_CAST))
         return SPELL_CAST_OK;
 
@@ -6207,6 +6198,30 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_BAD_TARGETS;
     }
 
+    if (m_spellInfo->HasAttribute(SPELL_ATTR_EX2_SPECIAL_TAMING_FLAG))
+    {
+        Player* pPlayer = m_caster->ToPlayer();
+        if (!pPlayer)
+            return SPELL_FAILED_BAD_TARGETS;
+
+        PetTameFailureReason result = CheckTamingSpell(pPlayer, false);
+        if (result != PETTAME_NONE)
+        {
+            pPlayer->SendPetTameFailure(result);
+            return SPELL_FAILED_DONT_REPORT;
+        }
+
+        auto const& auras = m_targets.getUnitTarget()->GetSpellAuraHolderMap();
+        for (auto const& itr : auras)
+        {
+            if (itr.second->IsDeleted())
+                continue;
+
+            if (itr.second->GetSpellProto()->HasAttribute(SPELL_ATTR_EX2_SPECIAL_TAMING_FLAG))
+                return SPELL_FAILED_ALREADY_BEING_TAMED;
+        }
+    }
+
     for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         // for effects of spells that have only one target
@@ -6222,11 +6237,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                        !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) &&
                        !m_caster->IsFacingTarget(m_targets.getUnitTarget()))
                         return SPELL_FAILED_UNIT_NOT_INFRONT;
-                }
-                else if (m_spellInfo->Id == 13278) // Gnomish Death Ray
-                {
-                    if (!m_targets.getUnitTarget() || m_caster->IsFriendlyTo(m_targets.getUnitTarget()))
-                        return SPELL_FAILED_BAD_TARGETS;
                 }
                 else if (m_spellInfo->Id == 18153) // Kodo Kombobulator
                 {
@@ -6305,47 +6315,14 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_EFFECT_TAMECREATURE:
             {
                 // Spell can be triggered, we need to check original caster prior to caster
-                Unit* caster = GetAffectiveCaster();
-                if (!caster || caster->GetTypeId() != TYPEID_PLAYER ||
-                        !m_targets.getUnitTarget() ||
-                        m_targets.getUnitTarget()->IsPlayer())
+                Player* pPlayer = ToPlayer(GetAffectiveCaster());
+                if (!pPlayer)
                     return SPELL_FAILED_BAD_TARGETS;
 
-                Player* plrCaster = (Player*)caster;
-
-                bool gmmode = m_triggeredBySpellInfo == nullptr;
-
-                if (plrCaster->GetClass() != CLASS_HUNTER && !gmmode)
+                PetTameFailureReason result = CheckTamingSpell(pPlayer, m_triggeredBySpellInfo == nullptr);
+                if (result != PETTAME_NONE)
                 {
-                    plrCaster->SendPetTameFailure(PETTAME_UNITSCANTTAME);
-                    return SPELL_FAILED_DONT_REPORT;
-                }
-
-                Creature* target = (Creature*)m_targets.getUnitTarget();
-
-                if (target->IsPet() || target->IsCharmed())
-                {
-                    plrCaster->SendPetTameFailure(PETTAME_CREATUREALREADYOWNED);
-                    return SPELL_FAILED_DONT_REPORT;
-                }
-
-                if (target->GetLevel() > plrCaster->GetLevel() && !gmmode)
-                {
-                    plrCaster->SendPetTameFailure(PETTAME_TOOHIGHLEVEL);
-                    return SPELL_FAILED_DONT_REPORT;
-                }
-
-                if (!target->GetCreatureInfo()->IsTameable())
-                {
-                    plrCaster->SendPetTameFailure(PETTAME_NOTTAMEABLE);
-                    return SPELL_FAILED_DONT_REPORT;
-                }
-
-                if (plrCaster->GetPetGuid() || plrCaster->GetCharmGuid() ||
-                   (!plrCaster->IsSavingDisabled() &&
-                    sCharacterDatabaseCache.GetCharacterPetByOwner(plrCaster->GetGUIDLow())))
-                {
-                    plrCaster->SendPetTameFailure(PETTAME_ANOTHERSUMMONACTIVE);
+                    pPlayer->SendPetTameFailure(result);
                     return SPELL_FAILED_DONT_REPORT;
                 }
 
@@ -7223,6 +7200,9 @@ SpellCastResult Spell::CheckCasterAuras() const
     if (!m_casterUnit)
         return SPELL_CAST_OK;
 
+    if (m_spellInfo->IsIgnoringCasterAndTargetRestrictions())
+        return SPELL_CAST_OK;
+
     uint8 school_immune = 0;
     uint32 mechanic_immune = 0;
     uint32 dispel_immune = 0;
@@ -7402,6 +7382,31 @@ bool Spell::CanAutoCast(Unit* target)
                 return true;
     }
     return false;                                           //target invalid
+}
+
+PetTameFailureReason Spell::CheckTamingSpell(Player* caster, bool gm)
+{
+    if (caster->GetClass() != CLASS_HUNTER && !gm)
+        return PETTAME_UNITSCANTTAME;
+
+    if (caster->GetPetGuid() || caster->GetCharmGuid() || (!caster->IsSavingDisabled() && sCharacterDatabaseCache.GetCharacterPetByOwner(caster->GetGUIDLow())))
+        return PETTAME_ANOTHERSUMMONACTIVE;
+
+    Creature* target = ToCreature(m_targets.getUnitTarget());
+
+    if (!target)
+        return PETTAME_INVALIDCREATURE;
+
+    if (target->IsPet() || target->IsCharmed())
+        return PETTAME_CREATUREALREADYOWNED;
+
+    if (target->GetLevel() > caster->GetLevel() && !gm)
+        return PETTAME_TOOHIGHLEVEL;
+
+    if (!target->GetCreatureInfo()->IsTameable())
+        return PETTAME_NOTTAMEABLE;
+
+    return PETTAME_NONE;
 }
 
 SpellCastResult Spell::CheckRange(bool strict)
@@ -7759,7 +7764,19 @@ SpellCastResult Spell::CheckItems()
 
         if (!pPlayer->HasItemFitToSpellReqirements(m_spellInfo, ignore))
         {
-            return m_IsTriggeredSpell ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+            if (m_IsTriggeredSpell)
+                return SPELL_FAILED_DONT_REPORT;
+
+            if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_REQUIRES_MAIN_HAND_WEAPON))
+                return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_10_2
+            if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_REQUIRES_OFFHAND_WEAPON))
+                return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
+#endif
+
+            return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+
         }
     }
 
@@ -8243,7 +8260,8 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
 
     // Check targets for not_selectable unit flag and remove
     // A player can cast spells on his pet (or other controlled unit) though in any state
-    if (target != m_caster && target->GetCharmerOrOwnerGuid() != m_caster->GetObjectGuid())
+    if (target != m_caster && target->GetCharmerOrOwnerGuid() != m_caster->GetObjectGuid() &&
+        !m_spellInfo->IsIgnoringCasterAndTargetRestrictions())
     {
         // any unattackable target skipped
         if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING))

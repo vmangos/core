@@ -174,7 +174,12 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
     }
 
     unsigned char* data = (unsigned char*)dtAlloc(fileHeader.size, DT_ALLOC_PERM);
-    MANGOS_ASSERT(data);
+    if (!data)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadMap: Failed to load mmap %03u%02i%02i.mmtile", mapId, x, y);
+        fclose(file);
+        return false;
+    }
 
     size_t result = fread(data, fileHeader.size, 1, file);
     if (!result)

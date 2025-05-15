@@ -56,7 +56,7 @@ AuraScript* GetScript_HunterWyvernSting(SpellEntry const*)
 
 struct HunterReadinessScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0)
         {
@@ -67,6 +67,7 @@ struct HunterReadinessScript : SpellScript
                 pPlayer->RemoveSomeCooldown(cdCheck);
             }
         }
+        return true;
     }
 };
 
@@ -77,7 +78,7 @@ SpellScript* GetScript_HunterReadiness(SpellEntry const*)
 
 struct HunterRefocusScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0)
         {
@@ -89,6 +90,7 @@ struct HunterRefocusScript : SpellScript
                 pPlayer->RemoveSomeCooldown(cdCheck);
             }
         }
+        return true;
     }
 };
 

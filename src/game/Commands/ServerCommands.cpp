@@ -39,6 +39,7 @@
 #include "AuraRemovalMgr.h"
 #include "AutoBroadCastMgr.h"
 #include "SpellModMgr.h"
+#include "MapManager.h"
 #include "CreatureGroups.h"
 #include "HardcodedEvents.h"
 

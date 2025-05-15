@@ -37,7 +37,7 @@ SpellScript* GetScript_WarriorIntimidatingShout(SpellEntry const*)
 // 23881, 23892, 23893, 23894 - Bloodthirst
 struct WarriorBloodthirstScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
         {
@@ -46,6 +46,7 @@ struct WarriorBloodthirstScript : SpellScript
                 attackPower += spell->m_casterUnit->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS, spell->GetUnitTarget()->GetCreatureTypeMask());
             spell->damage = spell->damage * attackPower / 100;
         }
+        return true;
     }
 };
 
@@ -57,12 +58,13 @@ SpellScript* GetScript_WarriorBloodthirst(SpellEntry const*)
 // 23922, 23923, 23924, 23925 - Shield Slam
 struct WarriorShieldSlamScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_1 && spell->m_casterUnit)
         {
             spell->damage += spell->m_casterUnit->GetShieldBlockValue();
         }
+        return true;
     }
 };
 
@@ -74,12 +76,13 @@ SpellScript* GetScript_WarriorShieldSlam(SpellEntry const*)
 // 20647 - Execute
 struct WarriorExecuteDamageScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
         {
             spell->m_casterUnit->SetPower(POWER_RAGE, 0);
         }
+        return true;
     }
 };
 
@@ -110,21 +113,37 @@ SpellScript* GetScript_WarriorExecuteDummy(SpellEntry const*)
 // 21977 - Warrior's Wrath
 struct WarriorWrathScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
-        if (effIdx == EFFECT_INDEX_0)
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
-            if (!spell->GetUnitTarget())
-                return;
-
             spell->m_caster->CastSpell(spell->GetUnitTarget(), 21887, true); // spell mod
         }
+        return true;
     }
 };
 
 SpellScript* GetScript_WarriorWrath(SpellEntry const*)
 {
     return new WarriorWrathScript();
+}
+
+// 2687 - Bloodrage
+struct WarriorBloodrageScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            spell->GetUnitTarget()->SetInCombatState();
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_WarriorBloodrage(SpellEntry const*)
+{
+    return new WarriorBloodrageScript();
 }
 
 void AddSC_warrior_spell_scripts()
@@ -159,5 +178,10 @@ void AddSC_warrior_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_warrior_wrath";
     newscript->GetSpellScript = &GetScript_WarriorWrath;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warrior_bloodrage";
+    newscript->GetSpellScript = &GetScript_WarriorBloodrage;
     newscript->RegisterSelf();
 }

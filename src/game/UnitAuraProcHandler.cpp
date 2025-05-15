@@ -27,6 +27,7 @@
 #include "SpellAuras.h"
 #include "SpellModifier.h"
 #include "SpellMgr.h"
+#include "ScriptMgr.h"
 #include "Util.h"
 #include "World.h"
 #include "GridMap.h"

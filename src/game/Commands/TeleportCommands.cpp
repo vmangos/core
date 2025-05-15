@@ -22,6 +22,7 @@
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "ObjectMgr.h"
+#include "MapManager.h"
 #include "Util.h"
 
 bool ChatHandler::HandleTeleCommand(char* args)
@@ -158,7 +159,7 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
 
         PSendSysMessage(LANG_TELEPORTING_TO, plNameLink.c_str(), "", tele->name.c_str());
         if (needReportToTarget(pl))
-            ChatHandler(pl).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
+            pl->PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
 
         // stop flight if need
         if (pl->IsTaxiFlying())
@@ -248,7 +249,7 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
 
         PSendSysMessage(LANG_SUMMONING, plNameLink.c_str(), "");
         if (needReportToTarget(pl))
-            ChatHandler(pl).PSendSysMessage(LANG_SUMMONED_BY, nameLink.c_str());
+            pl->PSendSysMessage(LANG_SUMMONED_BY, nameLink.c_str());
 
         // stop flight if need
         if (pl->IsTaxiFlying())
@@ -689,7 +690,7 @@ bool ChatHandler::HandleTeleNameCommand(char* args)
 
         PSendSysMessage(LANG_TELEPORTING_TO, chrNameLink.c_str(), "", tele->name.c_str());
         if (needReportToTarget(target))
-            ChatHandler(target).PSendSysMessage(LANG_TELEPORTED_TO_BY, GetNameLink().c_str());
+            target->PSendSysMessage(LANG_TELEPORTED_TO_BY, GetNameLink().c_str());
 
         return HandleGoHelper(target, tele->mapId, tele->x, tele->y, &tele->z, &tele->o);
     }
@@ -1161,7 +1162,7 @@ bool ChatHandler::HandleNamegoCommand(char* args)
         }
         PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), "");
         if (needReportToTarget(pTarget))
-            ChatHandler(pTarget).PSendSysMessage(LANG_SUMMONED_BY, playerLink(pPlayer->GetName()).c_str());
+            pTarget->PSendSysMessage(LANG_SUMMONED_BY, playerLink(pPlayer->GetName()).c_str());
 
         // stop flight if need
         if (pTarget->IsTaxiFlying())
@@ -1296,7 +1297,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
 
         PSendSysMessage(LANG_APPEARING_AT_ONLINE, chrNameLink.c_str());
         if (needReportToTarget(pTarget))
-            ChatHandler(pTarget).PSendSysMessage(LANG_APPEARING_TO, GetNameLink().c_str());
+            pTarget->PSendSysMessage(LANG_APPEARING_TO, GetNameLink().c_str());
 
         // stop flight if need
         if (pPlayer->IsTaxiFlying())

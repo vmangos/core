@@ -140,7 +140,7 @@ struct SpellScript
     virtual ~SpellScript() = default;
 
     // called on spell init
-    virtual void OnInit(Spell* /*spell*/) const {}
+    virtual void OnInit(Spell* /*spell*/) {}
     // called on success during Spell::Prepare
     virtual void OnSuccessfulStart(Spell* /*spell*/) const {}
     // called on success inside Spell::finish - for channels this only happens if whole channel went through
@@ -148,7 +148,7 @@ struct SpellScript
     // called at end of Spell::CheckCast - strict is true in Spell::Prepare
     virtual SpellCastResult OnCheckCast(Spell* /*spell*/, bool /*strict*/) const { return SPELL_CAST_OK; }
     // called before effect execution
-    virtual void OnEffectExecute(Spell* /*spell*/, SpellEffectIndex /*effIdx*/) const {}
+    virtual bool OnEffectExecute(Spell* /*spell*/, SpellEffectIndex /*effIdx*/) const { return true; }
     // called in targeting to determine radius for spell
     virtual void OnSetTargetMap(Spell* /*spell*/, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& /*unMaxTargets*/, bool& /*selectClosestTargets*/) const {}
     // called on Unit Spell::CheckTarget
@@ -165,6 +165,8 @@ struct SpellScript
     virtual void OnSummon(Spell* /*spell*/, Creature* /*summon*/) const {}
     // called after summoning a gameobject
     virtual void OnSummon(Spell* /*spell*/, GameObject* /*summon*/) const {}
+    // called from dispel effect handler if we successfully remove a debuff
+    virtual void OnSuccessfulDispel(Spell* /*spell*/, SpellEffectIndex /*effIdx*/) const {}
 };
 
 struct AuraScript

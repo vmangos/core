@@ -20,12 +20,12 @@
 // 12472 - Cold Snap
 struct MageColdSnapScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0)
         {
             if (spell->m_caster->GetTypeId() != TYPEID_PLAYER)
-                return;
+                return false;
 
             // immediately finishes the cooldown on Frost spells
             auto cdCheck = [](SpellEntry const & spellEntry) -> bool
@@ -38,6 +38,7 @@ struct MageColdSnapScript : SpellScript
             };
             static_cast<Player*>(spell->m_caster)->RemoveSomeCooldown(cdCheck);
         }
+        return true;
     }
 };
 

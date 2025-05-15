@@ -14,6 +14,7 @@
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
 #include "BattleGroundMgr.h"
+#include "MapManager.h"
 #include "Language.h"
 #include "Spell.h"
 
@@ -940,6 +941,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
         SendSysMessage("New party bot added.");
     else
     {
+        delete ai;
         SendSysMessage("Error spawning bot.");
         SetSentErrorMessage(true);
         return false;
@@ -979,6 +981,7 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
         SendSysMessage("New party bot added.");
     else
     {
+        delete ai;
         SendSysMessage("Error spawning bot.");
         SetSentErrorMessage(true);
         return false;

@@ -21,6 +21,7 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Player.h"
+#include "Map.h"
 #include "World.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
@@ -35,210 +36,6 @@ template<class T, typename D>
 bool TargetedMovementGeneratorMedium<T, D>::IsFarEnoughToMoveStationaryFollower(T &owner) const
 {
     return !i_target->IsWithinDist(&owner, 1.4f * m_fOffset);
-}
-
-template<class T, typename D>
-void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
-{
-    // Note: Any method that accesses the target's movespline here must be
-    // internally locked by the target's spline lock
-    if (!i_target.isValid() || !i_target->IsInWorld())
-        return;
-
-    if (owner.HasUnitState(UNIT_STATE_CAN_NOT_MOVE | UNIT_STATE_POSSESSED))
-        return;
-
-    float x, y, z;
-    bool losChecked = false;
-    bool losResult = false;
-
-    GenericTransport* transport = owner.GetTransport();
-    bool isPet = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->IsPet());
-
-    // Can switch transports during follow movement.
-    if (this->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-    {
-        transport = i_target.getTarget()->GetTransport();
-
-        if (transport != owner.GetTransport())
-        {
-            if (owner.GetTransport())
-                owner.GetTransport()->RemoveFollowerFromTransport(i_target.getTarget(), &owner);
-
-            if (transport)
-                transport->AddFollowerToTransport(i_target.getTarget(), &owner);
-        }
-    }
-
-    m_bTargetOnTransport = i_target.getTarget()->GetTransport();
-    i_target->GetPosition(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ, i_target.getTarget()->GetTransport());
-
-    // Can't path to target if transports are still different.
-    if (owner.GetTransport() != i_target.getTarget()->GetTransport())
-    {
-        m_bReachable = false;
-        return;
-    }
-
-    if (!m_fOffset)
-    {
-        if (owner.CanReachWithMeleeAutoAttack(i_target.getTarget()))
-        {
-            losResult = owner.IsWithinLOSInMap(i_target.getTarget());
-            losChecked = true;
-            if (losResult)
-                return;
-        }
-
-        // NOSTALRIUS: Eviter les collisions entre mobs.
-        // Cette fonction prend un angle aleatoire.
-        if (!i_target->GetRandomAttackPoint(&owner, x, y, z))
-        {
-            m_bReachable = false;
-            return;
-        }
-    }
-    // prevent redundant micro-movement for pets, other followers.
-    else if (!i_target->IsMoving() && owner.movespline->Finalized() && !IsFarEnoughToMoveStationaryFollower(owner))
-    {
-        return;
-    }
-    else
-    {
-        // to at m_fOffset distance from target and m_fAngle from target facing
-        float srcX, srcY, srcZ;
-        i_target->GetSafePosition(srcX, srcY, srcZ, transport);
-        if (transport)
-            transport->CalculatePassengerPosition(srcX, srcY, srcZ);
-
-        // TRANSPORT_VMAPS
-        if (transport)
-        {
-            i_target->GetNearPoint2D(x, y, m_fOffset, m_fAngle + i_target->GetOrientation());
-            z = srcZ;
-        }
-        else
-        {
-            float o;
-            if (!(sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET) &&
-                  i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.stime) + 500, x, y, z, o)))
-            {
-                i_target->GetPosition(x, y, z);
-                o = i_target->GetOrientation();
-            }
-            
-            i_target->GetNearPointAroundPosition(&owner, x, y, z, owner.GetObjectBoundingRadius(), m_fOffset, o + m_fAngle);
-        }
-
-        if (!i_target->m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) && !i_target->IsInWater())
-            if (!owner.GetMap()->GetWalkHitPosition(transport, srcX, srcY, srcZ, x, y, z))
-                i_target->GetSafePosition(x, y, z);
-    }
-
-    PathFinder path(&owner);
-
-    // allow pets following their master to cheat while generating paths
-    bool petFollowing = (isPet && owner.HasUnitState(UNIT_STATE_FOLLOW));
-    Movement::MoveSplineInit init(owner, "TargetedMovementGenerator");
-    path.SetTransport(transport);
-    path.calculate(x, y, z, petFollowing);
-
-    PathType pathType = path.getPathType();
-    m_bReachable = pathType & (PATHFIND_NORMAL | PATHFIND_DEST_FORCED);
-    
-    if (!petFollowing)
-    {
-        if (pathType == PATHFIND_NOPATH)
-            return;
-
-        if (isPet)
-        {
-            // prevent pets from going through closed doors
-            path.CutPathWithDynamicLoS();
-            if (path.getPath().size() == 2 && path.Length() < 0.1f)
-            {
-                m_bReachable = false;
-                return;
-            }
-        }
-    }
-
-    if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STATE_ALLOW_INCOMPLETE_PATH))
-        m_bReachable = true;
-
-    m_bRecalculateTravel = false;
-    if (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && !transport && owner.HasDistanceCasterMovement())
-        if (path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
-        {
-            if (!owner.movespline->Finalized())
-                owner.StopMoving();
-            return;
-        }
-
-    // Prevent redundant moves
-    if ((path.Length() < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
-        (!petFollowing && pathType & PATHFIND_NOPATH) ||
-        (!petFollowing && pathType & PATHFIND_INCOMPLETE && !owner.HasUnitState(UNIT_STATE_ALLOW_INCOMPLETE_PATH)) ||
-        (!petFollowing && !m_bReachable && !(owner.IsPlayer() && owner.HasUnitState(UNIT_STATE_FOLLOW))))
-    {
-        if (!losChecked)
-            losResult = owner.IsWithinLOSInMap(i_target.getTarget());
-        if (losResult)
-        {
-            if (!owner.movespline->Finalized())
-                owner.StopMoving();
-            return;
-        }
-    }
-
-    D::_addUnitStateMove(owner);
-    m_bTargetReached = false;
-
-    init.Move(&path);
-    if (petFollowing)
-    {
-        float dist = path.Length();
-        float speed = i_target->GetSpeedForMovementInfo(i_target->m_movementInfo);
-        if (!speed)
-            speed = owner.GetSpeedForMovementInfo(owner.m_movementInfo);
-
-        init.SetWalk(false);
-        init.SetVelocity(speed);
-        if (dist > speed)
-        {
-            Unit* pOwner = owner.GetCharmerOrOwner();
-            if (pOwner && (!pOwner->IsInCombat() && !owner.IsInCombat() || pOwner->IsPlayer() && pOwner->IsMounted()))
-            {
-                float distFactor = 1.0f + 0.04f * (dist - speed);
-                if (distFactor < 1.0f) distFactor = 1.0f;
-                if (distFactor > 2.1f) distFactor = 2.1f;
-                init.SetVelocity(distFactor * speed);
-            }
-        }
-        else if (dist < 2.0f)
-            init.SetWalk(true);
-        init.SetFacing(i_target->GetOrientation());
-    }
-    else
-    { 
-        init.SetWalk(((D*)this)->EnableWalking());
-
-        // Make player face target he is chasing (player does not automatically face target like creature).
-        if (owner.IsPlayer() && this->GetMovementGeneratorType() == CHASE_MOTION_TYPE)
-            init.SetFacingGUID(i_target->GetGUID());
-    }
-
-    init.Launch();
-    m_checkDistanceTimer.Reset(500);
-
-    // Fly-hack
-    if (Player* player = i_target->ToPlayer())
-    {
-        float allowed_dist = owner.GetCombatReach(false) + i_target->GetCombatReach(false) + 5.0f;
-        G3D::Vector3 dest = owner.movespline->FinalDestination();
-        if ((player->GetPositionZ() - allowed_dist - 5.0f) > dest.z)
-            player->GetCheatData()->OnUnreachable(&owner);
-    }
 }
 
 template<>
@@ -281,6 +78,178 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
     // Lock async updates for safety, see Unit::asyncMovesplineLock doc
     std::unique_lock<std::mutex> guard(owner.asyncMovesplineLock);
     _setTargetLocation(owner);
+}
+
+//-----------------------------------------------//
+
+template<class T>
+void ChaseMovementGenerator<T>::_setTargetLocation(T &owner)
+{
+    // Note: Any method that accesses the target's movespline here must be
+    // internally locked by the target's spline lock
+    if (!i_target.isValid() || !i_target->IsInWorld())
+        return;
+
+    if (owner.HasUnitState(UNIT_STATE_CAN_NOT_MOVE | UNIT_STATE_POSSESSED))
+        return;
+
+    float x, y, z;
+    bool losChecked = false;
+    bool losResult = false;
+
+    GenericTransport* transport = owner.GetTransport();
+
+    m_bTargetOnTransport = i_target.getTarget()->GetTransport();
+    i_target->GetPosition(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ, i_target.getTarget()->GetTransport());
+
+    // Can't path to target if transports are different.
+    if (owner.GetTransport() != i_target.getTarget()->GetTransport())
+    {
+        m_bReachable = false;
+        return;
+    }
+
+    if (!m_fOffset)
+    {
+        if (owner.CanReachWithMeleeAutoAttack(i_target.getTarget()))
+        {
+            bool futureOkay = true;
+
+            if (i_target->IsMoving())
+            {
+                Position futurePos;
+                if (i_target->ExtrapolateMovement(i_target->m_movementInfo, 200, futurePos.x, futurePos.y, futurePos.z, futurePos.o))
+                    if (!i_target->CanReachWithMeleeAutoAttackAtPosition(&owner, futurePos.x, futurePos.y, futurePos.z))
+                        futureOkay = false;
+            }
+
+            if (futureOkay)
+            {
+                losResult = owner.IsWithinLOSInMap(i_target.getTarget());
+                losChecked = true;
+                if (losResult)
+                    return;
+            }
+        }
+
+        // Avoid collisions between mobs.
+        // This function takes on a random angle.
+        if (!i_target->GetRandomAttackPoint(&owner, x, y, z))
+        {
+            m_bReachable = false;
+            return;
+        }
+    }
+    // prevent redundant micro-movement for pets, other followers.
+    else if (!i_target->IsMoving() && owner.movespline->Finalized() && !this->IsFarEnoughToMoveStationaryFollower(owner))
+    {
+        return;
+    }
+    else
+    {
+        // to at m_fOffset distance from target and m_fAngle from target facing
+        float srcX, srcY, srcZ;
+        i_target->GetSafePosition(srcX, srcY, srcZ, transport);
+        if (transport)
+            transport->CalculatePassengerPosition(srcX, srcY, srcZ);
+
+        // TRANSPORT_VMAPS
+        if (transport)
+        {
+            i_target->GetNearPoint2D(x, y, m_fOffset, m_fAngle + i_target->GetOrientation());
+            z = srcZ;
+        }
+        else
+        {
+            float o;
+            if (!(sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET) &&
+                i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.stime) + 500, x, y, z, o)))
+            {
+                i_target->GetPosition(x, y, z);
+                o = i_target->GetOrientation();
+            }
+
+            i_target->GetNearPointAroundPosition(&owner, x, y, z, owner.GetObjectBoundingRadius(), m_fOffset, o + m_fAngle);
+        }
+
+        if (!i_target->m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) && !i_target->IsInWater())
+            if (!owner.GetMap()->GetWalkHitPosition(transport, srcX, srcY, srcZ, x, y, z))
+                i_target->GetSafePosition(x, y, z);
+    }
+
+    PathFinder path(&owner);
+
+    // allow pets following their master to cheat while generating paths
+    Movement::MoveSplineInit init(owner, "ChaseMovementGenerator");
+    path.SetTransport(transport);
+    path.calculate(x, y, z, false);
+
+    PathType pathType = path.getPathType();
+    m_bReachable = pathType & (PATHFIND_NORMAL | PATHFIND_DEST_FORCED);
+
+    if (pathType == PATHFIND_NOPATH)
+        return;
+
+    if (owner.IsPet())
+    {
+        // prevent pets from going through closed doors
+        path.CutPathWithDynamicLoS();
+        if (path.getPath().size() == 2 && path.Length() < 0.1f)
+        {
+            m_bReachable = false;
+            return;
+        }
+    }
+
+    if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STATE_ALLOW_INCOMPLETE_PATH))
+        m_bReachable = true;
+
+    m_bRecalculateTravel = false;
+    if (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && !transport && owner.HasDistanceCasterMovement())
+        if (path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
+        {
+            if (!owner.movespline->Finalized())
+                owner.StopMoving();
+            return;
+        }
+
+    // Prevent redundant moves
+    if ((path.Length() < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
+        (pathType & PATHFIND_NOPATH) ||
+        (pathType & PATHFIND_INCOMPLETE && !owner.HasUnitState(UNIT_STATE_ALLOW_INCOMPLETE_PATH)) ||
+        !m_bReachable)
+    {
+        if (!losChecked)
+            losResult = owner.IsWithinLOSInMap(i_target.getTarget());
+        if (losResult)
+        {
+            if (!owner.movespline->Finalized())
+                owner.StopMoving();
+            return;
+        }
+    }
+
+    _addUnitStateMove(owner);
+    m_bTargetReached = false;
+
+    init.Move(&path);
+    init.SetWalk(EnableWalking());
+
+    // Make player face target he is chasing (player does not automatically face target like creature).
+    if (owner.IsPlayer())
+        init.SetFacingGUID(i_target->GetGUID());
+
+    init.Launch();
+    m_checkDistanceTimer.Reset(500);
+
+    // Fly-hack
+    if (Player* player = i_target->ToPlayer())
+    {
+        float allowed_dist = owner.GetCombatReach(false) + i_target->GetCombatReach(false) + 5.0f;
+        G3D::Vector3 dest = owner.movespline->FinalDestination();
+        if ((player->GetPositionZ() - allowed_dist - 5.0f) > dest.z)
+            player->GetCheatData()->OnUnreachable(&owner);
+    }
 }
 
 template<class T>
@@ -602,6 +571,138 @@ void ChaseMovementGenerator<Creature>::MovementInform(Creature& unit)
 //-----------------------------------------------//
 
 template<class T>
+void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
+{
+    // Note: Any method that accesses the target's movespline here must be
+    // internally locked by the target's spline lock
+    if (!i_target.isValid() || !i_target->IsInWorld())
+        return;
+
+    if (owner.HasUnitState(UNIT_STATE_CAN_NOT_MOVE | UNIT_STATE_POSSESSED))
+        return;
+
+    float x, y, z;
+
+    // Can switch transports during follow movement.
+    GenericTransport* transport = transport = i_target.getTarget()->GetTransport();
+    if (transport != owner.GetTransport())
+    {
+        if (owner.GetTransport())
+            owner.GetTransport()->RemoveFollowerFromTransport(i_target.getTarget(), &owner);
+
+        if (transport)
+            transport->AddFollowerToTransport(i_target.getTarget(), &owner);
+    }
+
+    m_bTargetOnTransport = i_target.getTarget()->GetTransport();
+    i_target->GetPosition(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ, i_target.getTarget()->GetTransport());
+
+    // Can't path to target if transports are still different.
+    if (owner.GetTransport() != i_target.getTarget()->GetTransport())
+    {
+        m_bReachable = false;
+        return;
+    }
+
+
+    // prevent redundant micro-movement for pets, other followers.
+    if (!i_target->IsMoving() && owner.movespline->Finalized() && !this->IsFarEnoughToMoveStationaryFollower(owner))
+        return;
+
+    // to at m_fOffset distance from target and m_fAngle from target facing
+    float srcX, srcY, srcZ;
+    i_target->GetSafePosition(srcX, srcY, srcZ, transport);
+    if (transport)
+        transport->CalculatePassengerPosition(srcX, srcY, srcZ);
+
+    // TRANSPORT_VMAPS
+    if (transport)
+    {
+        i_target->GetNearPoint2D(x, y, m_fOffset, m_fAngle + i_target->GetOrientation());
+        z = srcZ;
+    }
+    else
+    {
+        float o;
+        if (!(sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET) &&
+            i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.stime) + 500, x, y, z, o)))
+        {
+            i_target->GetPosition(x, y, z);
+            o = i_target->GetOrientation();
+        }
+
+        i_target->GetNearPointAroundPosition(&owner, x, y, z, owner.GetObjectBoundingRadius(), m_fOffset, o + m_fAngle);
+    }
+
+    if (!i_target->m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) && !i_target->IsInWater())
+        if (!owner.GetMap()->GetWalkHitPosition(transport, srcX, srcY, srcZ, x, y, z))
+            i_target->GetSafePosition(x, y, z);
+
+    PathFinder path(&owner);
+
+    // allow pets following their master to cheat while generating paths
+    Movement::MoveSplineInit init(owner, "FollowMovementGenerator");
+    path.SetTransport(transport);
+    path.calculate(x, y, z, true);
+
+    PathType pathType = path.getPathType();
+    m_bReachable = pathType & (PATHFIND_NORMAL | PATHFIND_DEST_FORCED);
+
+    if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STATE_ALLOW_INCOMPLETE_PATH))
+        m_bReachable = true;
+
+    m_bRecalculateTravel = false;
+    if (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && !transport && owner.HasDistanceCasterMovement())
+        if (path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
+        {
+            if (!owner.movespline->Finalized())
+                owner.StopMoving();
+            return;
+        }
+
+    // Prevent redundant moves
+    // He is flying too high for me. Moving a few meters wont change anything.
+    if (path.Length() < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) 
+    {
+        if (owner.IsWithinLOSInMap(i_target.getTarget()))
+        {
+            if (!owner.movespline->Finalized())
+                owner.StopMoving();
+            return;
+        }
+    }
+
+    _addUnitStateMove(owner);
+    m_bTargetReached = false;
+
+    init.Move(&path);
+    
+    float dist = path.Length();
+    float speed = i_target->GetSpeedForMovementInfo(i_target->m_movementInfo);
+    if (!speed)
+        speed = owner.GetSpeedForMovementInfo(owner.m_movementInfo);
+
+    init.SetWalk(false);
+    init.SetVelocity(speed);
+    if (dist > speed)
+    {
+        Unit* pOwner = owner.GetCharmerOrOwner();
+        if (pOwner && (!pOwner->IsInCombat() && !owner.IsInCombat() || pOwner->IsPlayer() && pOwner->IsMounted()))
+        {
+            float distFactor = 1.0f + 0.04f * (dist - speed);
+            if (distFactor < 1.0f) distFactor = 1.0f;
+            if (distFactor > 2.1f) distFactor = 2.1f;
+            init.SetVelocity(distFactor * speed);
+        }
+    }
+    else if (dist < 2.0f)
+        init.SetWalk(true);
+    init.SetFacing(i_target->GetOrientation());
+    init.Launch();
+    m_checkDistanceTimer.Reset(500);
+}
+
+template<class T>
 bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
@@ -797,10 +898,6 @@ void FollowMovementGenerator<Creature>::MovementInform(Creature& unit)
 }
 
 //-----------------------------------------------//
-template void TargetedMovementGeneratorMedium<Player, ChaseMovementGenerator<Player> >::_setTargetLocation(Player &);
-template void TargetedMovementGeneratorMedium<Player, FollowMovementGenerator<Player> >::_setTargetLocation(Player &);
-template void TargetedMovementGeneratorMedium<Creature, ChaseMovementGenerator<Creature> >::_setTargetLocation(Creature &);
-template void TargetedMovementGeneratorMedium<Creature, FollowMovementGenerator<Creature> >::_setTargetLocation(Creature &);
 template void TargetedMovementGeneratorMedium<Player, ChaseMovementGenerator<Player> >::UpdateAsync(Player &, uint32);
 template void TargetedMovementGeneratorMedium<Player, FollowMovementGenerator<Player> >::UpdateAsync(Player &, uint32);
 template void TargetedMovementGeneratorMedium<Creature, ChaseMovementGenerator<Creature> >::UpdateAsync(Creature &, uint32);
@@ -810,6 +907,8 @@ template bool TargetedMovementGeneratorMedium<Player, FollowMovementGenerator<Pl
 template bool TargetedMovementGeneratorMedium<Creature, ChaseMovementGenerator<Creature> >::IsFarEnoughToMoveStationaryFollower(Creature &) const;
 template bool TargetedMovementGeneratorMedium<Creature, FollowMovementGenerator<Creature> >::IsFarEnoughToMoveStationaryFollower(Creature &) const;
 
+template void ChaseMovementGenerator<Player>::_setTargetLocation(Player &);
+template void ChaseMovementGenerator<Creature>::_setTargetLocation(Creature &);
 template bool ChaseMovementGenerator<Player>::Update(Player &, uint32 const&);
 template bool ChaseMovementGenerator<Creature>::Update(Creature &, uint32 const&);
 template void ChaseMovementGenerator<Player>::_reachTarget(Player &);
@@ -822,6 +921,8 @@ template void ChaseMovementGenerator<Player>::Reset(Player &);
 template void ChaseMovementGenerator<Creature>::Reset(Creature &);
 template void ChaseMovementGenerator<Player>::MovementInform(Player&);
 
+template void FollowMovementGenerator<Player>::_setTargetLocation(Player &);
+template void FollowMovementGenerator<Creature>::_setTargetLocation(Creature &);
 template bool FollowMovementGenerator<Player>::Update(Player &, uint32 const&);
 template bool FollowMovementGenerator<Creature>::Update(Creature &, uint32 const&);
 template void FollowMovementGenerator<Player>::Finalize(Player &);

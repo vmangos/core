@@ -10,6 +10,7 @@
 #include "MoveSpline.h"
 #include "PathFinder.h"
 #include "MoveMap.h"
+#include "Map.h"
 
 template<class T>
 void FearMovementGenerator<T>::_setTargetLocation(T &owner)

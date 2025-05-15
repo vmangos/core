@@ -42,7 +42,8 @@ EndContentData */
 
 enum
 {
-    EMOTE_A_HELLO           = 4714,
+    EMOTE_HELLO             = 4714,
+    EMOTE_TEXT2             = 5170,
 
     QUEST_CLUCK             = 3861,
     FACTION_FRIENDLY        = 35,
@@ -72,7 +73,7 @@ struct npc_chicken_cluckAI : public CritterAI
 
     void Reset()
     {
-        m_uiResetFlagTimer = 120000;
+        m_uiResetFlagTimer = 20000;
 
         m_creature->SetFactionTemplateId(FACTION_CHICKEN);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -89,7 +90,7 @@ struct npc_chicken_cluckAI : public CritterAI
                     m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                     m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
 
-                    DoScriptText(EMOTE_A_HELLO, m_creature);
+                    DoScriptText(EMOTE_HELLO, m_creature);
                 }
             }
         }
@@ -100,6 +101,8 @@ struct npc_chicken_cluckAI : public CritterAI
             {
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
+
+                DoScriptText(EMOTE_TEXT2, m_creature);
             }
         }
     }
@@ -110,7 +113,7 @@ struct npc_chicken_cluckAI : public CritterAI
         if (m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
         {
             if (m_uiResetFlagTimer < uiDiff)
-                EnterEvadeMode();
+                Reset();
             else
                 m_uiResetFlagTimer -= uiDiff;
         }
@@ -122,28 +125,6 @@ struct npc_chicken_cluckAI : public CritterAI
 CreatureAI* GetAI_npc_chicken_cluck(Creature* pCreature)
 {
     return new npc_chicken_cluckAI(pCreature);
-}
-
-bool QuestAccept_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_CLUCK)
-    {
-        if (npc_chicken_cluckAI* pChickenAI = dynamic_cast<npc_chicken_cluckAI*>(pCreature->AI()))
-            pChickenAI->Reset();
-    }
-
-    return true;
-}
-
-bool QuestComplete_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_CLUCK)
-    {
-        if (npc_chicken_cluckAI* pChickenAI = dynamic_cast<npc_chicken_cluckAI*>(pCreature->AI()))
-            pChickenAI->Reset();
-    }
-
-    return true;
 }
 
 /*######
@@ -2293,8 +2274,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_chicken_cluck";
     newscript->GetAI = &GetAI_npc_chicken_cluck;
-    newscript->pQuestAcceptNPC =   &QuestAccept_npc_chicken_cluck;
-    newscript->pQuestComplete = &QuestComplete_npc_chicken_cluck;
     newscript->RegisterSelf();
 
     newscript = new Script;

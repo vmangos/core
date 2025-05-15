@@ -34,7 +34,7 @@
 #include "Utilities/TypeList.h"
 #include "vmap/DynamicTree.h"
 #include "MoveSplineInitArgs.h"
-#include "WorldSession.h"
+#include "PacketProcessing.h"
 #include "SQLStorages.h"
 #include "ScriptCommands.h"
 #include "CreatureLinkingMgr.h"
@@ -567,9 +567,9 @@ class Map : public GridRefManager<NGridType>
         GameObjectModel const* FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
 
         void Balance() { m_dynamicTree.balance(); }
-        void RemoveGameObjectModel(const GameObjectModel& model);
-        void InsertGameObjectModel(const GameObjectModel& model);
-        bool ContainsGameObjectModel(const GameObjectModel& model) const;
+        void RemoveGameObjectModel(GameObjectModel const& model);
+        void InsertGameObjectModel(GameObjectModel const& model);
+        bool ContainsGameObjectModel(GameObjectModel const& model) const;
         bool GetDynamicObjectHitPos(Vector3 start, Vector3 end, Vector3& out, float finalDistMod) const;
         float GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const;
         bool CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2, bool ignoreM2Model) const;

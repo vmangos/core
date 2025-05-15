@@ -24,6 +24,7 @@
 #include "ScriptMgr.h"
 #include "Util.h"
 #include "GameEventMgr.h"
+#include "MapManager.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"

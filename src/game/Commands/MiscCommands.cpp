@@ -31,6 +31,7 @@
 #include "Mail.h"
 #include "MassMailMgr.h"
 #include "InstanceData.h"
+#include "MapManager.h"
 #include "BattleGroundMgr.h"
 
 bool ChatHandler::HandleHelpCommand(char* args)
@@ -600,6 +601,30 @@ bool ChatHandler::HandleInstanceGetDataCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleInstanceSetDataCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    if (!pPlayer)
+        return false;
+    Map* pMap = pPlayer->FindMap();
+    if (!pMap)
+        return false;
+    InstanceData* pData = pMap->GetInstanceData();
+    if (!pData)
+        return false;
+    uint32 index = 0;
+    if (!ExtractUInt32(&args, index))
+        return false;
+    uint32 value = 0;
+    if (!ExtractUInt32(&args, value))
+        return false;
+
+    pData->SetData(index, value);
+
+    PSendSysMessage("Data[%u] = %u", index, pData->GetData(index));
+    return true;
+}
+
 bool ChatHandler::HandleInstancePerfInfosCommand(char* args)
 {
     Player* player = GetSession()->GetPlayer();
@@ -701,19 +726,19 @@ void ChatHandler::HandleInstanceUnbindHelper(Player* player, bool got_map, uint3
 
             if (MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
             {
-                ChatHandler(player).PSendSysMessage("unbinding map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
+                player->PSendSysMessage("unbinding map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
                     itr->first, entry->name, save->GetInstanceId(), itr->second.perm ? "yes" : "no",
                     save->CanReset() ? "yes" : "no", timeleft.c_str());
             }
             else
-                ChatHandler(player).PSendSysMessage("bound for a nonexistent map %u", itr->first);
+                player->PSendSysMessage("bound for a nonexistent map %u", itr->first);
             player->UnbindInstance(itr);
             counter++;
         }
         else
             ++itr;
     }
-    ChatHandler(player).PSendSysMessage("instances unbound: %d", counter);
+    player->PSendSysMessage("instances unbound: %d", counter);
 }
 
 bool ChatHandler::HandleInstanceUnbindCommand(char* args)

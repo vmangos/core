@@ -1114,7 +1114,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
             pkt << float(i->second.populationLevel);
             pkt << uint8(AmountOfCharacters);
             pkt << uint8(categoryId);                   // realm category (Cfg_Categories.dbc)
-            pkt << uint8(0x2C);                         // unk, may be realm number/id?
+            pkt << uint8(i->second.id);                 // realm id
 
             if (realmFlags & REALM_FLAG_SPECIFYBUILD)
             {

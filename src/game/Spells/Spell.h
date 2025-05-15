@@ -385,6 +385,7 @@ class Spell
 
         bool CheckTarget(Unit* target, SpellEffectIndex eff);
         bool CanAutoCast(Unit* target);
+        PetTameFailureReason CheckTamingSpell(Player* caster, bool gm);
 
         static void SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result);
         void SendCastResult(SpellCastResult result);

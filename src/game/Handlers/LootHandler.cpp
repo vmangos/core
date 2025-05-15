@@ -33,6 +33,7 @@
 #include "LootMgr.h"
 #include "Object.h"
 #include "Group.h"
+#include "Map.h"
 #include "World.h"
 #include "ScriptMgr.h"
 #include "Util.h"

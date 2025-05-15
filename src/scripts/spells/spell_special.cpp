@@ -20,7 +20,7 @@
 // 26789 - Shard of the Fallen Star
 struct MeteorScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0)
         {
@@ -31,6 +31,7 @@ struct MeteorScript : public SpellScript
 
             spell->damage /= count; // divide to all targets
         }
+        return true;
     }
 };
 
@@ -42,7 +43,7 @@ SpellScript* GetScript_Meteor(SpellEntry const*)
 // 24934 - Darkmoon Steam Tonk Control Console
 struct DarkmoonSteamTonkControlConsoleScript : public SpellScript
 {
-    void OnInit(Spell* spell) const final
+    void OnInit(Spell* spell) final
     {
         // Unsummon a potential Hunter or Warlock pet when using the Tonk Control Console.
         // Without this, the player will be unable to summon a Tonk but will still be
@@ -60,12 +61,13 @@ SpellScript* GetScript_DarkmoonSteamTonkControlConsole(SpellEntry const*)
 // 24933 - Cannon (Darkmoon Steam Tonk)
 struct DarkmoonSteamTonkCannonScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
             spell->m_caster->CastSpell(spell->GetUnitTarget(), 27766, true);
         }
+        return true;
     }
 };
 

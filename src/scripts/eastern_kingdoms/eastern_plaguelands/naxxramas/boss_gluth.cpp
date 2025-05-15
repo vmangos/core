@@ -378,13 +378,14 @@ CreatureAI* GetAI_mob_zombieChow(Creature* pCreature)
 // 28375 - Decimate (Gluth)
 struct GluthDecimateScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
             // damage should put target at maximum 5% hp, but not reduce it below that
             spell->damage = std::max(0, int32(spell->GetUnitTarget()->GetHealth() - uint32(spell->GetUnitTarget()->GetMaxHealth() * 0.05f)));
         }
+        return true;
     }
 };
 

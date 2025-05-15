@@ -242,9 +242,10 @@ private:
 
 static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
 {
-    if (!instance) return nullptr;
-    std::list<Player*> temp;
-    std::list<Player*>::iterator j;
+    if (!instance)
+        return nullptr;
+
+    std::vector<Player*> temp;
     Map::PlayerList const& PlayerList = instance->GetMap()->GetPlayers();
 
     if (!PlayerList.isEmpty())
@@ -264,14 +265,8 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
     if (temp.empty())
         return nullptr;
 
-    j = temp.begin();
+    return SelectRandomContainerElement(temp);
 
-    if (temp.size() > 1)
-    {
-        advance(j, urand(0, temp.size() - 1));
-    }
-
-    return (*j);
 }
 
 // Helper functions for SpellTimer users

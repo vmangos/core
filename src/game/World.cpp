@@ -612,9 +612,9 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_STRICT_CHARTER_NAMES, "StrictCharterNames", 0);
     setConfig(CONFIG_UINT32_STRICT_PET_NAMES,     "StrictPetNames",     0);
 
-    setConfigMinMax(CONFIG_UINT32_MIN_PLAYER_NAME,  "MinPlayerName",  2, 1, MAX_PLAYER_NAME);
-    setConfigMinMax(CONFIG_UINT32_MIN_CHARTER_NAME, "MinCharterName", 2, 1, MAX_CHARTER_NAME);
-    setConfigMinMax(CONFIG_UINT32_MIN_PET_NAME,     "MinPetName",     2, 1, MAX_PET_NAME);
+    setConfigMinMax(CONFIG_UINT32_MIN_PLAYER_NAME,  "MinPlayerName",  2, 2, MAX_PLAYER_NAME);
+    setConfigMinMax(CONFIG_UINT32_MIN_CHARTER_NAME, "MinCharterName", 2, 2, MAX_CHARTER_NAME);
+    setConfigMinMax(CONFIG_UINT32_MIN_PET_NAME,     "MinPetName",     2, 2, MAX_PET_NAME);
 
     setConfig(CONFIG_BOOL_WORLD_AVAILABLE, "WorldAvailable", true);
     setConfig(CONFIG_UINT32_CHARACTERS_CREATING_DISABLED, "CharactersCreatingDisabled", 0);
@@ -2313,7 +2313,7 @@ void World::SendGMTicketText(char const* text)
             {
                 Player* player = session->GetPlayer();
                 if (player && player->IsInWorld() && player->IsAcceptTickets())
-                    ChatHandler(player).SendSysMessage(text);
+                    player->SendSysMessage(text);
             }
         }
     }

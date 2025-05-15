@@ -469,8 +469,7 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (!pCthun)
         return;
 
-    std::list<Player*> candidates;
-    std::list<Player*>::iterator j;
+    std::vector<Player*> candidates;
     Map::PlayerList const& PlayerList = GetMap()->GetPlayers();
     if (PlayerList.isEmpty())
         return;
@@ -479,10 +478,12 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     {
         if (Player* player = itr.getSource())
         {
-            if (!player->IsDead()) {
+            if (!player->IsDead())
+            {
                 auto find_it = std::find_if(cthunWhisperMutes.begin(), cthunWhisperMutes.end(), 
                     [player](std::pair<ObjectGuid, uint32> const& e) {return e.first == player->GetObjectGuid(); });
-                if (find_it == cthunWhisperMutes.end()) {
+                if (find_it == cthunWhisperMutes.end())
+                {
                     candidates.push_back(player);
                 }
             }
@@ -492,9 +493,8 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (candidates.empty())
         return;
 
-    j = candidates.begin();
-    std::advance(j, urand(0, candidates.size() - 1));
-    Player* targetPlayer = *j;
+    Player* targetPlayer = SelectRandomContainerElement(candidates);
+
     // ToDo: also cast the C'thun Whispering charm spell - requires additional research
     DoScriptText(irand(SAY_CTHUN_WHISPER_8, SAY_CTHUN_WHISPER_1), pCthun, targetPlayer);
 

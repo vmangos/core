@@ -196,6 +196,7 @@ class ChatHandler
 
         //Cheats
         bool HandleCheatStatusCommand(char *);
+        bool HandleCheatBeastmasterCommand(char* args);
         bool HandleCheatFlyCommand(char* args);
         bool HandleCheatFixedZCommand(char* args);
         bool HandleCheatGodCommand(char *);
@@ -583,6 +584,7 @@ class ChatHandler
         bool HandleInstanceSwitchCommand(char* args);
         bool HandleInstanceContinentsCommand(char* args);
         bool HandleInstanceGetDataCommand(char* args);
+        bool HandleInstanceSetDataCommand(char* args);
         bool HandleInstancePerfInfosCommand(char* args);
         bool HandleInstanceBindingMode(char* args);
         bool HandlePBCastStatsCommand(char* args);

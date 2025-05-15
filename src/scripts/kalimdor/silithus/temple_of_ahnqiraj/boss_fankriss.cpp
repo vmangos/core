@@ -401,7 +401,7 @@ struct boss_fankrissAI : public ScriptedAI
                     SummonHatchling(batch, sLoc);
                 }
 #endif
-                hatchlingVec.push_back(HatchlingBatch(batch));
+                hatchlingVec.emplace_back(batch);
             }
             else
             {

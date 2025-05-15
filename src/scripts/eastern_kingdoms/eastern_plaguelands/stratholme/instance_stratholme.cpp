@@ -528,8 +528,7 @@ struct instance_stratholme : public ScriptedInstance
 
                         if (!players.isEmpty())
                         {
-                            std::list<uint32> baronSpells;
-                            std::list<uint32>::iterator spells_itr;
+                            std::vector<uint32> baronSpells;
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_45MIN);
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_10MIN);
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_5MIN);
@@ -539,9 +538,11 @@ struct instance_stratholme : public ScriptedInstance
                             {
                                 if (Player* pPlayer = itr.getSource())
                                 {
-                                    for (spells_itr = baronSpells.begin(); spells_itr != baronSpells.end(); ++spells_itr)
-                                        if (pPlayer->HasAura(*spells_itr))
-                                            pPlayer->RemoveAurasDueToSpell(*spells_itr);
+                                    for (auto spellId : baronSpells)
+                                    {
+                                        if (pPlayer->HasAura(spellId))
+                                            pPlayer->RemoveAurasDueToSpell(spellId);
+                                    }
 
                                     if (pPlayer->GetQuestStatus(QUEST_DEAD_MAN_PLEA) == QUEST_STATUS_INCOMPLETE)
                                         pPlayer->KilledMonsterCredit(NPC_YSIDA, m_uiYsidaGUID);

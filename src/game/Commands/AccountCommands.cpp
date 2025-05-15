@@ -109,7 +109,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
 
     if (targetPlayer)
     {
-        ChatHandler(targetPlayer).PSendSysMessage(LANG_YOURS_SECURITY_CHANGED, GetNameLink().c_str(), gm);
+        targetPlayer->PSendSysMessage(LANG_YOURS_SECURITY_CHANGED, GetNameLink().c_str(), gm);
         targetPlayer->GetSession()->SetSecurity(AccountTypes(gm));
     }
 
@@ -480,7 +480,7 @@ bool ChatHandler::HandleWarnCharacterCommand(char* args)
     sWorld.WarnAccount(playerData->uiAccount, authorName, reason, "WARN");
     sAccountMgr.WarnAccount(playerData->uiAccount, reason);
     if (pPlayer)
-        ChatHandler(pPlayer).PSendSysMessage(LANG_ACCOUNT_WARNED, reason);
+        pPlayer->PSendSysMessage(LANG_ACCOUNT_WARNED, reason);
 
     PSendSysMessage("Account #%u (character %s) has been warned for \"%s\"", playerData->uiAccount, playerData->sName.c_str(), reason);
     return true;
@@ -1148,7 +1148,7 @@ bool ChatHandler::HandleMuteCommand(char* args)
             pAura->RefreshHolder();
         }
             
-        ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notspeaktime);
+        target->PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notspeaktime);
     }
 
     std::string nameLink = playerLink(target_name);
@@ -1206,7 +1206,7 @@ bool ChatHandler::HandleUnmuteCommand(char* args)
     if (target)
     {
         target->RemoveAurasDueToSpell(SPELL_PLAYER_MUTED_VISUAL);
-        ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
+        target->PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
     } 
 
     std::string nameLink = playerLink(target_name);

@@ -192,7 +192,7 @@ struct instance_maraudon : public ScriptedInstance
         // Respawn a larva 4 seconds after the spewer animation start
         if (bRespawnSpewedLarva)
         {
-            if (bRespawnSpewedLarva && uiSpewedLarvaTimer <= uiDiff)
+            if (uiSpewedLarvaTimer <= uiDiff)
             {
                 if (Creature* pSpewedLarva = instance->GetCreature(spewedLarvaGuid))
                     pSpewedLarva->Respawn();

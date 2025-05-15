@@ -1091,7 +1091,7 @@ SpellScript* GetScript_AQ20DrainMana(SpellEntry const*)
 // 25599 - Thundercrash
 struct RajaxxThundercrashScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -1106,6 +1106,7 @@ struct RajaxxThundercrashScript : public SpellScript
             spell->m_caster->CastCustomSpell(spell->GetUnitTarget(), 25598, damage, {}, {}, true);
 #endif
         }
+        return true;
     }
 };
 

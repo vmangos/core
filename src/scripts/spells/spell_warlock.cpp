@@ -19,7 +19,7 @@
 // 18788 - Demonic Sacrifice
 struct WarlockDemonicSacrificeScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit && spell->GetUnitTarget())
         {
@@ -41,11 +41,12 @@ struct WarlockDemonicSacrificeScript : SpellScript
                     break;               // succubus
                 default:
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Demonic Sacrifice: Unhandled creature entry (%u) case.", entry);
-                    return;
+                    return true;
             }
 
             spell->m_casterUnit->CastSpell(spell->m_casterUnit, spellId, true);
         }
+        return true;
     }
 };
 
@@ -57,7 +58,7 @@ SpellScript* GetScript_WarlockDemonicSacrifice(SpellEntry const*)
 // 17962, 18930, 18931, 18932 - Conflagrate
 struct WarlockConflagrateScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -74,6 +75,7 @@ struct WarlockConflagrateScript : SpellScript
                 }
             }
         }
+        return true;
     }
 };
 
@@ -85,7 +87,7 @@ SpellScript* GetScript_WarlockConflagrate(SpellEntry const*)
 // 1454, 1455, 1456, 11687, 11688, 11689 - Life Tap
 struct WarlockLifeTapScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
         {
@@ -117,6 +119,7 @@ struct WarlockLifeTapScript : SpellScript
             else
                 spell->SendCastResult(SPELL_FAILED_FIZZLE);
         }
+        return true;
     }
 };
 
@@ -128,7 +131,7 @@ SpellScript* GetScript_WarlockLifeTap(SpellEntry const*)
 // 18280 - Curse of Agony Dummy
 struct WarlockCurseOfAgonyDummyScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
@@ -146,12 +149,70 @@ struct WarlockCurseOfAgonyDummyScript : SpellScript
             }
         }
 #endif
+        return true;
     }
 };
 
 SpellScript* GetScript_WarlockCurseOfAgonyDummy(SpellEntry const*)
 {
     return new WarlockCurseOfAgonyDummyScript();
+}
+
+// 19505, 19731, 19734, 19736 - Devour Magic
+struct WarlockDevourMagicScript : SpellScript
+{
+    void OnSuccessfulDispel(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
+        {
+            uint32 healSpell;
+            switch (spell->m_spellInfo->Id)
+            {
+                case 19505:
+                    healSpell = 19658;
+                    break;
+                case 19731:
+                    healSpell = 19732;
+                    break;
+                case 19734:
+                    healSpell = 19733;
+                    break;
+                case 19736:
+                    healSpell = 19735;
+                    break;
+                default:
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Spell for Devour Magic %d not handled in Spell::EffectDispel", spell->m_spellInfo->Id);
+                    return;
+            }
+            spell->m_casterUnit->CastSpell(spell->m_casterUnit, healSpell, true);
+        }
+    }
+};
+
+SpellScript* GetScript_WarlockDevourMagic(SpellEntry const*)
+{
+    return new WarlockDevourMagicScript();
+}
+
+// 1122, 24670 - Inferno
+struct WarlockInfernoScript : SpellScript
+{
+    void OnSummon(Spell* spell, Creature* summon) const final
+    {
+        // Enslave demon effect, without mana cost and cooldown
+        spell->m_caster->CastSpell(summon, 20882, true);
+
+        // Short root spell on infernal from sniffs
+        summon->CastSpell(summon, 22707, true);
+
+        // Inferno effect
+        summon->CastSpell(summon, 22703, true);
+    }
+};
+
+SpellScript* GetScript_WarlockInferno(SpellEntry const*)
+{
+    return new WarlockInfernoScript();
 }
 
 void AddSC_warlock_spell_scripts()
@@ -176,5 +237,15 @@ void AddSC_warlock_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_warlock_curse_of_agony_dummy";
     newscript->GetSpellScript = &GetScript_WarlockCurseOfAgonyDummy;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warlock_devour_magic";
+    newscript->GetSpellScript = &GetScript_WarlockDevourMagic;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warlock_inferno";
+    newscript->GetSpellScript = &GetScript_WarlockInferno;
     newscript->RegisterSelf();
 }

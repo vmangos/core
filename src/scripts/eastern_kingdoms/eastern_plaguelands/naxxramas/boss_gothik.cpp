@@ -504,7 +504,7 @@ struct boss_gothikAI : public ScriptedAI
                     if (Unit* victim = m_creature->GetVictim())
                     {
                         bool unitIsRight = m_pInstance->IsInRightSideGothArea(victim);
-                        if ((m_bRightSide && !unitIsRight) || (!m_bRightSide && unitIsRight))
+                        if (m_bRightSide != unitIsRight)
                         {
                             m_creature->GetThreatManager().modifyThreatPercent(victim, -100);
                             m_creature->SelectHostileTarget();

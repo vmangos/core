@@ -609,7 +609,7 @@ struct instance_molten_core : ScriptedInstance
         }
     }
 
-    void Update(uint32 const uiDiff) override
+    void Update(uint32 uiDiff) override
     {
         if (m_ObjectRemoveTimer < uiDiff)
         {

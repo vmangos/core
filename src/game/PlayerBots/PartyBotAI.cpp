@@ -794,6 +794,9 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     if (me->GetStandState() != UNIT_STAND_STATE_STAND)
         me->SetStandState(UNIT_STAND_STATE_STAND);
 
+    if (me->GetSheath() == SHEATH_STATE_UNARMED && !me->IsMounted())
+        me->SetSheath(SHEATH_STATE_MELEE);
+
     if (!me->IsInCombat() && !me->IsMounted())
     {
         UpdateOutOfCombatAI();

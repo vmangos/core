@@ -448,6 +448,38 @@ SpellScript* GetScript_MaexxnaWebSpray(SpellEntry const*)
     return new MaexxnaWebSprayScript();
 }
 
+// 28434 - Spider Web (Naxx, Maexxna)
+struct MaexxnaSpiderWebScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // see boss_maexxnaAI::DoCastWebWrap() for some info on this rather weird implementation
+            float dx = spell->GetUnitTarget()->GetPositionX() - spell->m_caster->GetPositionX();
+            float dy = spell->GetUnitTarget()->GetPositionY() - spell->m_caster->GetPositionY();
+            float dist = sqrt((dx * dx) + (dy * dy));
+            float yDist = spell->m_caster->GetPositionZ() - spell->GetUnitTarget()->GetPositionZ();
+            float horizontalSpeed = dist / 1.5f;
+            float verticalSpeed = 12.0f + (yDist*0.5f);
+            float angle = spell->GetUnitTarget()->GetAngle(spell->m_caster->GetPositionX(), spell->m_caster->GetPositionY());
+
+            // set immune anticheat and calculate speed
+            if (Player* plr = spell->GetUnitTarget()->ToPlayer())
+                plr->SetLaunched(true);
+
+            spell->GetUnitTarget()->KnockBack(angle, horizontalSpeed, verticalSpeed);
+            return false;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_MaexxnaSpiderWeb(SpellEntry const*)
+{
+    return new MaexxnaSpiderWebScript();
+}
+
 void AddSC_boss_maexxna()
 {
     Script* pNewScript;
@@ -465,5 +497,10 @@ void AddSC_boss_maexxna()
     pNewScript = new Script;
     pNewScript->Name = "spell_maexxna_web_spray";
     pNewScript->GetSpellScript = &GetScript_MaexxnaWebSpray;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_maexxna_spider_web";
+    pNewScript->GetSpellScript = &GetScript_MaexxnaSpiderWeb;
     pNewScript->RegisterSelf();
 }
