@@ -94,7 +94,7 @@ namespace MaNGOS
             return 0;
         }
 
-        inline uint32 BaseGain(uint32 ownerLevel, uint32 unitLevel, uint32 mob_level)
+        inline float BaseGain(uint32 ownerLevel, uint32 unitLevel, uint32 mob_level)
         {
             uint32 const nBaseExp = 45;
             return (ownerLevel * 5 + nBaseExp) * BaseGainLevelFactor(unitLevel, mob_level);
