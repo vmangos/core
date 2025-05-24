@@ -513,8 +513,8 @@ void GenericTransport::CalculatePassengerOffset(float& x, float& y, float& z, fl
     float const dy = y - transY;
     z -= transZ;
 
-    float const sinO = std::sinf(transO);
-    float const cosO = std::cosf(transO);
+    float const sinO = std::sin(transO);
+    float const cosO = std::cos(transO);
 
     x = dx * cosO + dy * sinO;
     y = dy * cosO - dx * sinO;
