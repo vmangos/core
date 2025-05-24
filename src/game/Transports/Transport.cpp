@@ -509,12 +509,15 @@ void GenericTransport::CalculatePassengerOffset(float& x, float& y, float& z, fl
     if (o)
         *o = MapManager::NormalizeOrientation(*o - transO);
 
+    float const dx = x - transX;
+    float const dy = y - transY;
     z -= transZ;
-    y -= transY;    // y = searchedY * std::cos(o) + searchedX * std::sin(o)
-    x -= transX;    // x = searchedX * std::cos(o) + searchedY * std::sin(o + pi)
-    float inx = x, iny = y;
-    y = (iny - inx * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
-    x = (inx + iny * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
+
+    float const sinO = std::sinf(transO);
+    float const cosO = std::cosf(transO);
+
+    x = dx * cosO + dy * sinO;
+    y = dy * cosO - dx * sinO;
 }
 
 void GenericTransport::SendOutOfRangeUpdateToMap()
