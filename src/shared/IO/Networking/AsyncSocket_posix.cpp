@@ -6,6 +6,7 @@
 #if defined(__linux__)
 #include <sys/epoll.h>
 #elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#include <sys/socket.h>
 #include <sys/event.h>
 #include <unistd.h>
 #endif
