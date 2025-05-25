@@ -108,8 +108,8 @@ set (shared_SRCS
     IO/Utils.cpp
     IO/Utils_Unix.h
     IO/ReadableBuffer.h
-    IO/Context/IoContext_macos.cpp
-    IO/Context/IoContext_unix.cpp
+    IO/Context/IoContext_bsd.cpp
+    IO/Context/IoContext_linux.cpp
     IO/Context/IoContext_windows.cpp
     IO/SystemErrorToString.h
     IO/SystemErrorToString.cpp
@@ -174,8 +174,8 @@ if(WIN32) # For window build: Exclude Unix/MacOS files
     revision.h
     migrations_list.h
     IO/Utils_Unix.h
-    IO/Context/IoContext_unix.cpp
-    IO/Context/IoContext_macos.cpp
+    IO/Context/IoContext_linux.cpp
+    IO/Context/IoContext_bsd.cpp
     IO/Networking/AsyncSocket_posix.cpp
     IO/Networking/AsyncSocketAcceptor_posix.cpp
     IO/Timer/impl/unix/AsyncSystemTimer.cpp
@@ -206,15 +206,15 @@ else()
     IO/Filesystem/impl/windows/FileSystem.cpp
     IO/Filesystem/impl/windows/FileHandle.cpp
   )
-  if(APPLE)
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # Remove Linux specific stuff
     list(REMOVE_ITEM shared_SRCS
-      IO/Context/IoContext_unix.cpp
+      IO/Context/IoContext_bsd.cpp
     )
   else()
     # Remove macOS specific stuff
     list(REMOVE_ITEM shared_SRCS
-      IO/Context/IoContext_macos.cpp
+      IO/Context/IoContext_linux.cpp
     )
   endif()
 endif()
