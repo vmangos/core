@@ -95,6 +95,31 @@ namespace detail {
 }
 }
 
+#elif IS_BSD
+
+#include <stdlib.h>
+
+namespace cpptrace {
+namespace detail {
+    inline const char* program_name() {
+        static std::mutex mutex;
+        const std::lock_guard<std::mutex> lock(mutex);
+        static std::string name;
+        static bool did_init = false;
+        static bool valid = false;
+        if(!did_init) {
+            did_init = true;
+            if (const char* tmp = getprogname())
+            {
+              name = tmp;
+              valid = true;
+            }
+        }
+        return valid && !name.empty() ? name.c_str() : nullptr;
+    }
+}
+}
+
 #endif
 
 #endif

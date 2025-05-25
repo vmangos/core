@@ -4,6 +4,7 @@
 #define IS_WINDOWS 0
 #define IS_LINUX 0
 #define IS_APPLE 0
+#define IS_BSD 0
 
 #if defined(_WIN32)
  #undef IS_WINDOWS
@@ -14,6 +15,9 @@
 #elif defined(__APPLE__)
  #undef IS_APPLE
  #define IS_APPLE 1
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+ #undef IS_BSD
+ #define IS_BSD 1
 #else
  #error "Unexpected platform"
 #endif

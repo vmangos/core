@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-#if IS_LINUX || IS_APPLE
+#if IS_LINUX || IS_APPLE || IS_BSD
  #include <unistd.h>
  #include <sys/types.h>
  #include <sys/wait.h>
@@ -25,7 +25,7 @@
 namespace cpptrace {
 namespace detail {
 namespace addr2line {
-    #if IS_LINUX || IS_APPLE
+    #if IS_LINUX || IS_APPLE || IS_BSD
     bool has_addr2line() {
         static std::mutex mutex;
         static bool has_addr2line = false;
