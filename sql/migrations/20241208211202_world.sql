@@ -866,6 +866,10 @@ UPDATE `creature_template` SET `xp_multiplier` = 7 WHERE `entry` = 2275;
 -- Add Correct Completion Text to Quest Id 7907 (Taken from WoWHead)
 UPDATE `quest_template` SET `OfferRewardText` = 'So you have put together a deck of Beasts. Your gesture of returning it to us will create a tie between you and the Darkmoon that will not soon be forgotten. Allow me to present you with one of the greater darkmoon cards as a small token of our appreciation.' WHERE `entry` = 7907;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Stop Creature Flying Across Map
+UPDATE `creature` SET `position_x` = -1034.05, `position_y` = -2803.35, `position_z` = 49.2393 WHERE `guid` = 12048;
+
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
