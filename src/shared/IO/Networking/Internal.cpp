@@ -11,6 +11,10 @@
 #include <arpa/inet.h>
 #endif
 
+#ifdef inet_ntop
+#undef inet_ntop
+#endif
+
 /// Converts a native `IN_ADDR` to a `IO::Networking::IpAddress`
 IO::Networking::IpAddress IO::Networking::Internal::inet_ntop(in_addr const* nativeAddress)
 {
