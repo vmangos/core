@@ -23,6 +23,18 @@
 #include <unistd.h>
 #endif
 
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+
+#ifdef inet_pton
+#undef inet_pton
+#endif
+
+#ifdef inet_ntop
+#undef inet_ntop
+#endif
+
+#endif
+
 #include <vector>
 #include <memory>
 #include <string>
