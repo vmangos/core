@@ -13,6 +13,15 @@
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/socket.h>
 #include	<netinet/in.h>
+
+#ifdef inet_ntop
+#undef inet_ntop
+#endif
+
+#ifdef inet_pton
+#undef inet_pton
+#endif
+
 #endif
 
 /// Converts a native `IN_ADDR` to a `IO::Networking::IpAddress`
