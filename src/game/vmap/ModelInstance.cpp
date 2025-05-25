@@ -80,7 +80,7 @@ namespace VMAP
             return;
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-        Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
+        Vector3 zDirModel = iInvRot * Vector3::down();
         float zDist;
         if (iModel->IntersectPoint(pModel, zDirModel, zDist, info))
         {
@@ -138,7 +138,7 @@ namespace VMAP
             return false;
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-        Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
+        Vector3 zDirModel = iInvRot * Vector3::down();
         float zDist;
         GroupLocationInfo groupInfo;
         if (iModel->GetLocationInfo(pModel, zDirModel, zDist, groupInfo))
