@@ -56,9 +56,9 @@ void IO::Multithreading::RenameCurrentThread(std::string const& name)
     __except(EXCEPTION_EXECUTE_HANDLER)
     {
     }
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     ::pthread_setname_np(pthread_self(), name.c_str());
-#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#elif defined(__APPLE__)
     ::pthread_setname_np(name.c_str());
 #else
     // It's not too serisous if we cant rename a thread
