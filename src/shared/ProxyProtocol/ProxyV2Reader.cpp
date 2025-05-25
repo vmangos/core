@@ -3,7 +3,7 @@
 
 #include <cstring>
 
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <arpa/inet.h> // for ntohs
 #endif
 
