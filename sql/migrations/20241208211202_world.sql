@@ -858,7 +858,10 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (12039, 7, -2366.35, -2501.89, 82.2887, 100, 0, 0, 0, 0),
 (12039, 8, -2367.67, -2495.42, 82.2887, 100, 0, 0, 0, 0);
 
-  
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Increase Enraged Stanley Xp Multiplier (credit cmangos)
+UPDATE `creature_template` SET `xp_multiplier` = 7 WHERE `entry` = 2275;
+
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
 
