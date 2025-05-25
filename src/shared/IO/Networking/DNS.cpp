@@ -15,6 +15,7 @@
 
 #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/socket.h>
+#include <netinet/in.h>
 #endif
 
 std::string IO::Networking::DNS::GetOwnHostname()
