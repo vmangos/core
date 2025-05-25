@@ -7,6 +7,7 @@
 #include <WS2tcpip.h>
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <unistd.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
 #endif
 
