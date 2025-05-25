@@ -13,6 +13,10 @@
 #include <unistd.h>
 #endif
 
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#include <sys/socket.h>
+#endif
+
 std::string IO::Networking::DNS::GetOwnHostname()
 {
     char hostname[1024];
