@@ -862,6 +862,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- Increase Enraged Stanley Xp Multiplier (credit cmangos)
 UPDATE `creature_template` SET `xp_multiplier` = 7 WHERE `entry` = 2275;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Correct Completion Text to Quest Id 7907 (Taken from WoWHead)
+UPDATE `quest_template` SET `OfferRewardText` = 'So you have put together a deck of Beasts. Your gesture of returning it to us will create a tie between you and the Darkmoon that will not soon be forgotten. Allow me to present you with one of the greater darkmoon cards as a small token of our appreciation.' WHERE `entry` = 7907;
+
+
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
 
