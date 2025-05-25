@@ -22,7 +22,7 @@ namespace IO { namespace Networking {
 
     /// A class that allows you to bind to a TCP address and accept connections
     class AsyncSocketAcceptor : MaNGOS::Policies::NoCopyButAllowMove
-    #if defined(__linux__) || defined(__APPLE__)
+    #if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
                 , IO::SystemIoEventReceiver
     #endif
     {
@@ -34,7 +34,7 @@ namespace IO { namespace Networking {
 
             /// Automatically accepts all incoming connections until this Acceptor is StoppedAndClosed
             void AutoAcceptSocketsUntilClose(std::function<void(IO::Networking::SocketDescriptor socketDescriptor)> const& onNewSocket);
-    #if defined(__linux__) || defined(__APPLE__)
+    #if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
             void OnIoEvent(uint32_t event); // used for ::accept
     #endif
 
@@ -48,7 +48,7 @@ namespace IO { namespace Networking {
     #if defined(WIN32)
             void AcceptOne(std::function<void(nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> acceptResult)> const& afterAccept);
             IocpOperationTask m_currentAcceptTask;
-    #elif defined(__linux__) || defined(__APPLE__)
+    #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
             std::function<void(IO::Networking::SocketDescriptor socketDescriptor)> m_onNewSocketCallback;
             void OnNewClientToAcceptAvailable(); // a new socket on ::accept() is available
     #endif

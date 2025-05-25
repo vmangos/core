@@ -8,7 +8,7 @@
 #if defined(WIN32)
 #include <WinSock2.h>
 #include <ws2tcpip.h>
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <netdb.h>
 #include <unistd.h>
 #endif

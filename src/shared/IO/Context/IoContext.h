@@ -22,7 +22,7 @@ enum class IoContextEpollTargetType // this is used in `(epoll_event).data.u32` 
 };
 #endif
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include "../NativeAliases.h"
 #endif
 
@@ -51,13 +51,13 @@ namespace IO
         HANDLE GetWindowsCompletionPort() const;
 #elif defined(__linux__)
         IO::Native::FileHandle GetUnixEpollDescriptor() const { return m_epollDescriptor; }
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
         IO::Native::FileHandle GetKqueueDescriptor() const { return m_kqueueDescriptor; }
 #endif
 
 #if defined(WIN32)
         void PostOperationForImmediateInvocation(IO::IocpOperationTask* operation);
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
         /// On linux with epoll: Invokes {SystemIoEventReceiver::OnIoEvent} in IO thread with parameter 0
         /// On macos with kqueue: Invokes {SystemIoEventReceiver::OnIoEvent} in IO thread with parameter EVFILT_USER
         void PostForImmediateInvocation(IO::SystemIoEventReceiver* eventReceiver);
@@ -78,7 +78,7 @@ namespace IO
         std::queue<IO::SystemIoEventReceiver*> m_contextSwitchQueue;
 
         explicit IoContext(IO::Native::FileHandle epollDescriptor, IO::Native::FileHandle contextSwitchEventFd);
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
         IO::Native::FileHandle const m_kqueueDescriptor;
         explicit IoContext(IO::Native::FileHandle kqueueDescriptor);
 #endif

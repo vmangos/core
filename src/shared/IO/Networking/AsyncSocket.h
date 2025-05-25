@@ -22,7 +22,7 @@ namespace IO { namespace Networking {
 
     /// You have to keep the instance alive while a transaction is running. Use a shared pointer or something on every callback!
     class AsyncSocket final : public MaNGOS::Policies::NoCopyButAllowMove
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
            , public IO::SystemIoEventReceiver
 #endif
     {
@@ -81,7 +81,7 @@ namespace IO { namespace Networking {
             }
 
         private:
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
             void OnIoEvent(uint32_t event) final; // invoked by IoContext
 #endif
 
@@ -131,7 +131,7 @@ namespace IO { namespace Networking {
             IocpOperationTask m_currentContextTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentWriteTask; // <-- Internal tasks / callback to internal networking code
             IocpOperationTask m_currentReadTask; // <-- Internal tasks / callback to internal networking code
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
             // Unix epoll stuff:
             void PerformNonBlockingRead();
             void PerformNonBlockingWrite();

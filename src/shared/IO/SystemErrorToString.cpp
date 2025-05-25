@@ -18,7 +18,7 @@ char const* SystemErrorToCString(int nativeSystemErrorCode) {
 #elif defined(__linux__)
     // Linux might not need our buffer in all cases, sometimes it has a pointer to the text already
     return ::strerror_r(nativeSystemErrorCode, g_threadLocalStorage, sizeof(g_threadLocalStorage));
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     if (::strerror_r(nativeSystemErrorCode, g_threadLocalStorage, sizeof(g_threadLocalStorage)) != 0)
         return "<Unable to generate error text>";
     return g_threadLocalStorage;

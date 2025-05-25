@@ -5,7 +5,7 @@
 
 #if defined(__linux__)
 #include <sys/epoll.h>
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/event.h>
 #include <unistd.h>
 #endif
@@ -32,7 +32,7 @@ IO::NetworkError IO::Networking::AsyncSocket::InitializeAndFixateMemoryLocation(
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "OnNewClientToAcceptAvailable -> ::epoll_ctl(...) Error: %s", SystemErrorToString(errno).c_str());
         return IO::NetworkError(NetworkError::ErrorType::InternalError, errno);
     }
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     struct kevent addedEvents[2];
 
     // EVFILT_READ (epoll: EPOLLIN)
@@ -487,7 +487,7 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
     int const CALLBACK_EVENT_FLAG =
 #if defined(__linux__)
         0;
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
         EVFILT_USER;
 #else
     #error "Unsupported"
@@ -530,7 +530,7 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
         if (event & EPOLLOUT)
             PerformNonBlockingWrite();
     }
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     switch ((int)event) // it's a "filter" from kqueue
     {
         case EVFILT_EXCEPT:

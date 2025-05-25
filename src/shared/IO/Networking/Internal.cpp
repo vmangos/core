@@ -5,7 +5,7 @@
 #if defined(WIN32)
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <unistd.h>
 #include <arpa/inet.h>
 #endif
@@ -22,7 +22,7 @@ IO::Networking::IpAddress IO::Networking::Internal::inet_ntop(in_addr const* nat
         snprintf(ipv4AddressString, MAX_IPV4_LENGTH, "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
     }
     auto ipAddress = IO::Networking::IpAddress::TryParseFromString(ipv4AddressString);
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     char ipv4AddressString[INET_ADDRSTRLEN];
     ::inet_ntop(AF_INET, nativeAddress, ipv4AddressString, INET_ADDRSTRLEN);
     auto ipAddress = IO::Networking::IpAddress::TryParseFromString(ipv4AddressString);
@@ -37,7 +37,7 @@ void IO::Networking::Internal::CloseSocket(IO::Native::SocketHandle nativeSocket
 {
 #if defined(WIN32)
     ::closesocket(nativeSocket);
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     ::close(nativeSocket);
 #else
     #error "Unsupported platform"
@@ -53,7 +53,7 @@ void IO::Networking::Internal::inet_pton(IO::Networking::IpAddress const& ipAddr
     // We cant use `inet_pton`, because it's not supported on WinXP.
     // But this method would basically just take the internal representation and store it in a union anyways ¯\_(ツ)_/¯
     out_dest->s_addr = ::htonl(ipAddress._getInternalIPv4ReprAsUint32());
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     MANGOS_ASSERT(::inet_pton(AF_INET, ipAddress.ToString().c_str(), out_dest) == 1);
 #else
     #error "Unsupported platform"

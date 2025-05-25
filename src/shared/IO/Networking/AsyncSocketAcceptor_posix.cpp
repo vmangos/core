@@ -10,7 +10,7 @@
 #include "Log.h"
 #include "Errors.h"
 
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -18,7 +18,7 @@
 
 #if defined(__linux__)
 #include <sys/epoll.h>
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/event.h>
 #include <unistd.h>
 #endif
@@ -87,7 +87,7 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> IO::Networking::AsyncSocket
         sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "CreateAndBindServer -> ::epoll_ctl(...) Error: %s", SystemErrorToString(errno).c_str());
         return nullptr;
     }
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     struct ::kevent addedEvents{};
     static_assert(std::is_base_of<IO::SystemIoEventReceiver, typename std::pointer_traits<decltype(server)>::element_type>::value, "Must implement SystemIoEventReceiver interface!");
     EV_SET(&addedEvents, listenNativeSocket, EVFILT_READ, EV_ADD | EV_ERROR, 0, 0, server.get());

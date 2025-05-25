@@ -11,7 +11,7 @@ namespace IO { namespace Native {
     typedef HANDLE FileHandle;
 }} // namespace IO::_Native
 
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 
 namespace IO { namespace Native {
     typedef int SocketHandle;

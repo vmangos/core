@@ -6,7 +6,7 @@
 #include "Policies/Singleton.h"
 #include "./TimerHandle.h"
 
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <condition_variable>
 #include <thread>
 #elif defined(WIN32)
@@ -47,7 +47,7 @@ namespace IO { namespace Timer {
         std::mutex m_pendingTimers_mutex;
         std::unordered_set<std::shared_ptr<IO::Timer::TimerHandle>> m_pendingTimers;
         HANDLE m_nativeTimerQueueHandle;
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
         struct InternalTimerEntry {
             std::chrono::time_point<std::chrono::system_clock> m_whenToTriggerMe;
             std::shared_ptr<IO::Timer::TimerHandle> m_timerHandle;

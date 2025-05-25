@@ -14,7 +14,7 @@ IO::Networking::AsyncSocket::AsyncSocket(AsyncSocket&& other) noexcept :
     m_currentContextTask(std::move(other.m_currentContextTask)),
     m_currentWriteTask(std::move(other.m_currentWriteTask)),
     m_currentReadTask(std::move(other.m_currentReadTask))
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     m_readDstBuffer(other.m_readDstBuffer),
     m_readDstBufferSize(other.m_readDstBufferSize),
     m_readDstBufferBytesLeft(other.m_readDstBufferBytesLeft),

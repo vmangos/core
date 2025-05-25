@@ -1,7 +1,7 @@
 #include "SocketConnector.h"
 #include "Internal.h"
 
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
@@ -16,7 +16,7 @@
 #if defined(__linux__)
     #include <sys/epoll.h>
     #include <fcntl.h>
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #include <sys/event.h>
     #include <unistd.h>
 #endif
@@ -36,7 +36,7 @@ nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> IO::Network
 
     // Set socket to non-blocking mode, so the `::connect` does not block
 
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     IO::NetworkError err = IO::Utils::SetFdStatusFlag(nativeSocket, O_NONBLOCK);
     if (err)
         return nonstd::make_unexpected(err);
@@ -52,7 +52,7 @@ nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> IO::Network
     {
         int lastError = GetNetworkError();
         if (lastError !=
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
         EINPROGRESS
 #elif defined(WIN32)
         WSAEWOULDBLOCK

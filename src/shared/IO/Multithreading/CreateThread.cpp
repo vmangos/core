@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef WIN32_LEAN_AND_MEAN
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <pthread.h>
 #endif
 
@@ -58,7 +58,7 @@ void IO::Multithreading::RenameCurrentThread(std::string const& name)
     }
 #elif defined(__linux__)
     ::pthread_setname_np(pthread_self(), name.c_str());
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     ::pthread_setname_np(name.c_str());
 #else
     // It's not too serisous if we cant rename a thread

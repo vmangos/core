@@ -46,7 +46,7 @@ namespace IO
     };
 
     typedef IocpOperationTask AsyncIoOperation;
-#elif defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     class SystemIoEventReceiver
     {
     public:
