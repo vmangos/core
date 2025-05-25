@@ -99,6 +99,8 @@ namespace detail {
 
 #include <stdlib.h>
 
+#define CPPTRACE_MAX_PATH CPPTRACE_PATH_MAX
+
 namespace cpptrace {
 namespace detail {
     inline const char* program_name() {
