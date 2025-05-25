@@ -21,6 +21,14 @@
     #include <unistd.h>
 #endif
 
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+
+#ifdef inet_pton
+#undef inet_pton
+#endif
+
+#endif
+
 nonstd::expected<IO::Networking::SocketDescriptor, IO::NetworkError> IO::Networking::SocketConnector::ConnectBlocking(IO::Networking::IpEndpoint const& target, std::chrono::milliseconds timeoutMs)
 {
     IO::Native::SocketHandle nativeSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
