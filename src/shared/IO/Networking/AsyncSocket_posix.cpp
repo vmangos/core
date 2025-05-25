@@ -534,6 +534,7 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
 #elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     switch ((int)event) // it's a "filter" from kqueue
     {
+#if defined(__APPLE__) || defined(__OpenBSD__)
         case EVFILT_EXCEPT:
         {
             int error = 0;
@@ -552,6 +553,7 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
             StopPendingTransactionsAndForceClose();
             break;
         }
+#endif
         case EVFILT_READ:
         {
             PerformNonBlockingRead();
