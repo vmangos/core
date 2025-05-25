@@ -79,10 +79,6 @@ if(WIN32)
 endif()
 
 # Display some debug informations at server startup
-set(DEFINITIONS
-  ${DEFINITIONS}
-  MANGOS_ALLOC_LIB="${ALLOC_LIB_INFO_STRING}"
-)
 set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "${DEFINITIONS}")
 
 add_executable(${EXECUTABLE_NAME}

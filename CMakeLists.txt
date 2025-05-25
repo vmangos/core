@@ -24,7 +24,6 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Allow -DTBB_ROOT, etc.
 if(${CMAKE_VERSION} VERSION_GREATER "3.11")
   cmake_policy(SET CMP0074 NEW)
 endif()
@@ -87,38 +86,6 @@ set(CMAKE_INSTALL_RPATH ${LIBS_DIR})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 # Find needed packages and if necessery abort if something important is missing
-
-if(NOT USE_STD_MALLOC)
-  unset(TBB_INCLUDE_DIRS            CACHE)
-  unset(TBB_LIBRARIES               CACHE)
-  unset(TBB_LIBRARIES_RELEASE       CACHE)
-  unset(TBB_LIBRARIES_DEBUG         CACHE)
-
-  set(TBB_USE_DEBUG_BUILD ${TBB_DEBUG})
-  find_package(TBB COMPONENTS tbbmalloc)
-  if(NOT TBB_FOUND)
-    message(FATAL_ERROR
-      "This project requires TBB installed. Please download the TBB Stable Release from http://www.threadingbuildingblocks.org/ and install it. If this script didn't find TBB and it was correctly installed please set TBB_ROOT_DIR to the correct path."
-    )
-  endif()
-
-  if(TBB_DEBUG)
-    set(TBB_LIBRARIES
-      ${TBB_LIBRARIES_DEBUG}
-    )
-  else()
-    set(TBB_LIBRARIES
-      ${TBB_LIBRARIES}
-    )
-  endif()
-
-  if (WIN32)
-    list (GET TBB_LIBRARIES 1 TBB_SINGLE_FILEDIRECTORY)
-    get_filename_component(TBB_LIB_DIRECTORY "${TBB_SINGLE_FILEDIRECTORY}" DIRECTORY)
-    link_directories(${TBB_LIB_DIRECTORY})
-  endif()
-
-endif()
 
 if (ENABLE_MAILSENDER)
   set(REQUIRES_LIBCURL ON)
@@ -223,16 +190,6 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
   endif()
 endif()
 
-if(USE_STD_MALLOC)
-  set(ALLOC_LIB_INFO_STRING "std::malloc")
-else()
-  if(TBB_DEBUG)
-    set(ALLOC_LIB_INFO_STRING "TBB/Debug")
-  else()
-    set(ALLOC_LIB_INFO_STRING "TBB/Release")
-  endif()
-endif()
-
 include(cmake/showoptions.cmake)
 
 set(DEFINITIONS_RELEASE ${DEFINITIONS_RELEASE} NDEBUG)
@@ -306,10 +263,6 @@ if(WIN32)
   set(DEFINITIONS_RELEASE ${DEFINITIONS_RELEASE} _CRT_SECURE_NO_WARNINGS)
 else()
   set(DEFINITIONS ${DEFINITIONS} SYSCONFDIR="${CONF_DIR}/")
-endif()
-
-if(USE_STD_MALLOC)
-  set(DEFINITIONS ${DEFINITIONS} USE_STANDARD_MALLOC)
 endif()
 
 if (ENABLE_MAILSENDER)

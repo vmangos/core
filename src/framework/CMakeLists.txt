@@ -44,7 +44,6 @@ set(framework_SRCS
   Utilities/TypeList.h
   Utilities/LinkedReference/Reference.h
   Utilities/LinkedReference/RefManager.h
-  Policies/MemoryManagement.cpp
   Policies/ObjectLifeTime.cpp
   Utilities/EventProcessor.cpp
   Utilities/EventMap.cpp

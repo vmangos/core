@@ -18,7 +18,6 @@ else()
   message(STATUS "PGO profile           : Disabled")
 endif()
 
-message(STATUS "Memory allocation     : ${ALLOC_LIB_INFO_STRING} ${TBB_LIBRARIES}")
 message(STATUS "Detected compiler     : ${CMAKE_CXX_COMPILER_ID}")
 
 if(BUILD_FOR_HOST_CPU)
