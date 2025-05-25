@@ -7,12 +7,12 @@
 #include <WS2tcpip.h>
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <unistd.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #endif
 
-#ifdef inet_ntop
-#undef inet_ntop
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#include <sys/socket.h>
+#include	<netinet/in.h>
 #endif
 
 /// Converts a native `IN_ADDR` to a `IO::Networking::IpAddress`
