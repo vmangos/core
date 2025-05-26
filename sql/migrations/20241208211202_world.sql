@@ -765,7 +765,6 @@ INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `
 (664, 5, 0, 0, 0, 0, 0, 0, 0, 0, 8, 2, 1359, 0, 0, 0, 0, 0, 0, 0, 0, 'The Scythe of Elune: Velinde Starsong - Say Text'),
 (664, 9, 0, 0, 0, 0, 0, 0, 0, 0, 8, 2, 1360, 0, 0, 0, 0, 0, 0, 0, 0, 'The Scythe of Elune: Velinde Starsong - Say Text'),
 (664, 9, 1, 1, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Scythe of Elune - Velinde Starsong - Emote OneShotCry');
-
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Pearl Diving Script (credit cmangos)
 UPDATE `quest_template` SET `CompleteScript`=705 WHERE  `entry`=705 AND `patch`=0;
@@ -800,7 +799,6 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (705, 10, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb'),
 (705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb'),
 (705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb');
-
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Thandol Span Script
 UPDATE `quest_template` SET `StartScript`=632 WHERE  `entry`=632;
@@ -857,20 +855,35 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (12039, 6, -2367.59, -2510.21, 82.2887, 100, 0, 0, 0, 0),
 (12039, 7, -2366.35, -2501.89, 82.2887, 100, 0, 0, 0, 0),
 (12039, 8, -2367.67, -2495.42, 82.2887, 100, 0, 0, 0, 0);
-
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Increase Enraged Stanley Xp Multiplier (credit cmangos)
 UPDATE `creature_template` SET `xp_multiplier` = 7 WHERE `entry` = 2275;
-
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Correct Completion Text to Quest Id 7907 (Taken from WoWHead)
 UPDATE `quest_template` SET `OfferRewardText` = 'So you have put together a deck of Beasts. Your gesture of returning it to us will create a tie between you and the Darkmoon that will not soon be forgotten. Allow me to present you with one of the greater darkmoon cards as a small token of our appreciation.' WHERE `entry` = 7907;
-
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Stop Creature Flying Across Map
 UPDATE `creature` SET `position_x` = -1034.05, `position_y` = -2803.35, `position_z` = 49.2393 WHERE `guid` = 12048;
-
-
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Missing Arin'sor and Obi 1 Spawn
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1881, 11702, 0, 0, 0, 0, 1, -6342.67, -660.912, -179.816, 2.32129, 300, 300, 0, 100, 0, 0, 0, 0, 0, 10),
+(1882, 11884, 0, 0, 0, 0, 1, -6342.67, -660.912, -179.83, 3.59357, 300, 300, 15, 100, 0, 1, 0, 0, 0, 10);
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Missing Shen'dralar Zealot Spawns (credit cmangos)
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1885, 14369, 0, 0, 0, 0, 429, 121.172, 468.779, -48.3799, 4.67748, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(1886, 14369, 0, 0, 0, 0, 429, 121.754, 476.583, -48.3816, 1.58825, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(1947, 14369, 0, 0, 0, 0, 429, 186.675, 457.618, -48.3594, 4.79965, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2026, 14369, 0, 0, 0, 0, 429, 186.983, 479.252, -48.371, 1.5708, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2070, 14369, 0, 0, 0, 0, 429, 114.44, 602.178, -27.8082, 3.10669, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2072, 14369, 0, 0, 0, 0, 429, 153.425, 626.966, -27.8899, 0.017453, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2080, 14369, 0, 0, 0, 0, 429, 192.928, 587.385, -48.3836, 6.17846, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2095, 14369, 0, 0, 0, 0, 429, 163.733, 555.391, -48.3836, 3.1765, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2196, 14369, 0, 0, 0, 0, 429, 188.172, 537.305, -48.467, 1.5966, 7200, 7200, 5, 100, 0, 1, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2212, 14369, 0, 0, 0, 0, 429, 130.955, 524.283, -48.0481, 1.61341, 7200, 7200, 5, 100, 0, 1, 0, 0, 0, 10); -- Shen'dralar Zealot
+DELETE FROM `creature` WHERE `guid` IN (84206, 84207);
+  
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
 
