@@ -886,6 +886,10 @@ DELETE FROM `creature` WHERE `guid` IN (84206, 84207);
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Creatures Dont Have Mana
 UPDATE `creature` SET `mana_percent` = 0 WHERE  `guid` IN (75066, 75065);
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Unstuck Creature
+UPDATE `creature` SET `position_x` = -471.59, `position_y` = 1956.37, `position_z` = 115.50, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 28811;
+
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
