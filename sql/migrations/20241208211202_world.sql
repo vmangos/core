@@ -883,6 +883,9 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `positi
 (2196, 14369, 0, 0, 0, 0, 429, 188.172, 537.305, -48.467, 1.5966, 7200, 7200, 5, 100, 0, 1, 0, 0, 0, 10), -- Shen'dralar Zealot
 (2212, 14369, 0, 0, 0, 0, 429, 130.955, 524.283, -48.0481, 1.61341, 7200, 7200, 5, 100, 0, 1, 0, 0, 0, 10); -- Shen'dralar Zealot
 DELETE FROM `creature` WHERE `guid` IN (84206, 84207);
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Creatures Dont Have Mana
+UPDATE `creature` SET `mana_percent` = 0 WHERE  `guid` IN (75066, 75065);
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
