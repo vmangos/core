@@ -893,6 +893,10 @@ UPDATE `creature` SET `position_x` = -471.59, `position_y` = 1956.37, `position_
 -- Add Missing Quest Giver (credit cmangos)
 INSERT INTO `creature_questrelation` (`id`, `quest`) VALUES
 (6929, 5927); -- Innkeeper Gryshka
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Remove Redundant npc_gossip Entries
+DELETE FROM `npc_gossip` WHERE `npc_guid` IN (42301, 53646, 86167, 86184, 89359, 89360, 89361, 89362, 89363, 89364, 89365, 89366, 89367, 89368, 89369, 89370, 89371, 89372, 89375, 89376, 89379, 89380, 89381, 89382, 89383, 89384, 89385, 89386, 89387, 89388, 89389, 89390, 89391, 89392, 89393, 89394, 89395, 89396, 89397, 89398, 89405, 89406, 89413, 89414, 89416, 89417, 89418, 89432, 89440);
+
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
