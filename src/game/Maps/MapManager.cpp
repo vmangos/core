@@ -633,7 +633,7 @@ bool IsNorthTo(float x, float y, InstantiatedContinentBoundary const& icb)
     if (x > icb.maxX)
         return true;
 
-    if (x < icb.minX) // we checking from south to north, so this check most likely wont be needed
+    if (x < icb.minX) 
         return false;
 
     int insideCount = 0;
