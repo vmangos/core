@@ -8825,7 +8825,10 @@ void Spell::OnSpellLaunch()
                     for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
                     {
                         if (lockInfo->Type[i] == LOCK_KEY_SKILL && lockInfo->Index[i] == LOCKTYPE_TREASURE)
+                        {
                             treasureLock = true;
+                            break;
+                        }
                     }
                     if (treasureLock)
                     {
@@ -8836,7 +8839,8 @@ void Spell::OnSpellLaunch()
 
                         for (Unit* attacker : targets)
                         {
-                            if (!attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) && attacker->IsValidAttackTarget(pUser) && attacker->IsWithinLOSInMap(pUser) && attacker->AI())
+                            if (!attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) && attacker->AI()
+                                && attacker->IsValidAttackTarget(pUser) && attacker->IsWithinLOSInMap(pUser))
                                 attacker->AI()->AttackStart(pUser);
                         }
                     }
