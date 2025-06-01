@@ -500,7 +500,6 @@ class WorldSession
 
         void HandleTogglePvP(WorldPacket& recvPacket);
         void HandleZoneUpdateOpcode(WorldPacket& recvPacket);
-        void HandleSetTargetOpcode(WorldPacket& recvPacket);
         void HandleSetSelectionOpcode(WorldPacket& recvPacket);
         void HandleStandStateChangeOpcode(WorldPacket& recvPacket);
         void HandleEmoteOpcode(WorldPacket& recvPacket);

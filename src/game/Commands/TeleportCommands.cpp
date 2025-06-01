@@ -555,7 +555,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
         if (!tEntry)
             return false;
 
-        if (!ObjectMgr::GetGameObjectInfo(tEntry))
+        if (!sObjectMgr.GetGameObjectTemplate(tEntry))
         {
             SendSysMessage(LANG_COMMAND_GOOBJNOTFOUND);
             SetSentErrorMessage(true);

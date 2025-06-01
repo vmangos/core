@@ -16,6 +16,7 @@
 
 #include "scriptPCH.h"
 
+// 19386, 24132, 24133 - Wyvern Sting
 struct HunterWyvernStingScript : public AuraScript
 {
     void OnAfterApply(Aura* aura, bool apply) final
@@ -54,6 +55,7 @@ AuraScript* GetScript_HunterWyvernSting(SpellEntry const*)
     return new HunterWyvernStingScript();
 }
 
+// 23989 - Readiness
 struct HunterReadinessScript : SpellScript
 {
     bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
@@ -76,6 +78,7 @@ SpellScript* GetScript_HunterReadiness(SpellEntry const*)
     return new HunterReadinessScript();
 }
 
+// 24531 - Refocus
 struct HunterRefocusScript : SpellScript
 {
     bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
@@ -99,6 +102,38 @@ SpellScript* GetScript_HunterRefocus(SpellEntry const*)
     return new HunterRefocusScript();
 }
 
+// 1495, 14269, 14270, 14271 - Mongoose Bite
+struct HunterMongooseBiteScript : SpellScript
+{
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        if (spell->m_casterUnit && spell->m_targets.getUnitTargetGuid() != spell->m_casterUnit->GetReactiveTarget(REACTIVE_DEFENSE))
+            return SPELL_FAILED_BAD_TARGETS;
+        return SPELL_CAST_OK;
+    }
+};
+
+SpellScript* GetScript_HunterMongooseBite(SpellEntry const*)
+{
+    return new HunterMongooseBiteScript();
+}
+
+// 19306, 20909, 20910 - Counterattack
+struct HunterCounterAttackScript : SpellScript
+{
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        if (spell->m_casterUnit && spell->m_targets.getUnitTargetGuid() != spell->m_casterUnit->GetReactiveTarget(REACTIVE_HUNTER_PARRY))
+            return SPELL_FAILED_BAD_TARGETS;
+        return SPELL_CAST_OK;
+    }
+};
+
+SpellScript* GetScript_HunterCounterAttack(SpellEntry const*)
+{
+    return new HunterCounterAttackScript();
+}
+
 void AddSC_hunter_spell_scripts()
 {
     Script* newscript;
@@ -116,5 +151,15 @@ void AddSC_hunter_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_hunter_refocus";
     newscript->GetSpellScript = &GetScript_HunterRefocus;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_hunter_mongoose_bite";
+    newscript->GetSpellScript = &GetScript_HunterMongooseBite;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_hunter_counterattack";
+    newscript->GetSpellScript = &GetScript_HunterCounterAttack;
     newscript->RegisterSelf();
 }

@@ -42,7 +42,7 @@ bool ChatHandler::HandleListObjectCommand(char* args)
         return false;
     }
 
-    GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(go_id);
+    GameObjectInfo const* gInfo = sObjectMgr.GetGameObjectTemplate(go_id);
     if (!gInfo)
     {
         PSendSysMessage(LANG_COMMAND_LISTOBJINVALIDID, go_id);
@@ -803,12 +803,13 @@ bool ChatHandler::HandleLookupObjectCommand(char* args)
 
     uint32 counter = 0;
 
-    for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr < sGOStorage.end<GameObjectInfo>(); ++itr)
+    for (auto const& itr : sObjectMgr.GetGameObjectInfoMap())
     {
+        auto const& goInfo = itr.second;
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            GameObjectLocale const* gl = sObjectMgr.GetGameObjectLocale(itr->id);
+            GameObjectLocale const* gl = sObjectMgr.GetGameObjectLocale(goInfo->id);
             if (gl)
             {
                 if ((int32)gl->Name.size() > loc_idx && !gl->Name[loc_idx].empty())
@@ -818,9 +819,9 @@ bool ChatHandler::HandleLookupObjectCommand(char* args)
                     if (Utf8FitTo(name, wnamepart))
                     {
                         if (m_session)
-                            PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, itr->id, itr->id, name.c_str());
+                            PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, goInfo->id, goInfo->id, name.c_str());
                         else
-                            PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, itr->id, name.c_str());
+                            PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, goInfo->id, name.c_str());
                         ++counter;
                         continue;
                     }
@@ -828,16 +829,16 @@ bool ChatHandler::HandleLookupObjectCommand(char* args)
             }
         }
 
-        std::string name = itr->name;
+        std::string name = goInfo->name;
         if (name.empty())
             continue;
 
         if (Utf8FitTo(name, wnamepart))
         {
             if (m_session)
-                PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, itr->id, itr->id, name.c_str());
+                PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, goInfo->id, goInfo->id, name.c_str());
             else
-                PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, itr->id, name.c_str());
+                PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, goInfo->id, name.c_str());
             ++counter;
         }
     }

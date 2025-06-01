@@ -1468,13 +1468,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         }
     }
 
-    // All weapon based abilities can trigger weapon procs,
-    // even if they do no damage, or break on damage, like Sap.
-    // https://www.youtube.com/watch?v=klMsyF_Kz5o
-    bool triggerWeaponProcs = m_casterUnit != unitTarget &&
-        m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON &&
-        m_spellInfo->rangeIndex == SPELL_RANGE_IDX_COMBAT;
-
     // All calculated do it!
     // Do healing and triggers
     if (m_healing && unitTarget->IsAlive())
@@ -1623,50 +1616,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
         // Damage is done after procs so it can trigger auras on the victim that affect the caster in case of killing blow.
         pCaster->DealSpellDamage(&damageInfo, true);
-
-        if (!triggerWeaponProcs && m_caster->IsPlayer())
-        {
-            // trigger mainhand weapon procs for shield attacks (Shield Bash, Shield Slam) NOTE: vanilla only mechanic, patched out in 2.0.1
-            if (m_spellInfo->EquippedItemClass == ITEM_CLASS_ARMOR && m_spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_ARMOR_SHIELD)
-                && (m_spellInfo->SpellIconID == 280 || m_spellInfo->SpellIconID == 413))
-                triggerWeaponProcs = true;
-
-            // Bloodthirt triggers main hand despite not requiring weapon
-            // Execute damage component triggers main hand
-            else if ((m_spellInfo->SpellIconID == 38 && m_spellInfo->SpellVisual == 372) || //bloodthirst
-                    m_spellInfo->Id == 20647) //execute (damage dealing component does not require weapon)
-            {
-                triggerWeaponProcs = true;
-            }
-
-            // special Paladin cases - trigger weapon procs despite not having EquippedItemClass
-            else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
-            {
-                // Seal of Command
-                if ((m_spellInfo->Id == 20424) ||
-                // Judgement of Command
-                    (m_spellInfo->SpellIconID == 561) ||
-                // Judgement of Righteousness
-                    (m_spellInfo->IsFitToFamilyMask<CF_PALADIN_JUDGEMENT_OF_RIGHTEOUSNESS>() && m_spellInfo->SpellIconID == 25))
-                    triggerWeaponProcs = true;
-            }
-        }
-
-        // Courroux Naturel a 20% de chance de faire proc WF.
-        if (m_spellInfo->Id == 17364 && pCaster->IsPlayer())
-        {
-            Player* pPlayer = pCaster->ToPlayer();
-            Item *item = pPlayer->GetWeaponForAttack(BASE_ATTACK, true, true);
-            if (item)
-            {
-                uint32 enchant_id = item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT);
-                SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-                if (pEnchant && roll_chance_f(20.0f))
-                    if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(pEnchant->spellid[0]))
-                        if (spellInfo->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_WINDFURY_WEAPON>())
-                            pPlayer->CastSpell(unitTarget, pEnchant->spellid[0], true, item);
-            }
-        }
     }
     else if (m_canTrigger && (procAttacker || procVictim))
     {
@@ -1739,7 +1688,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             this));
     }
 
-    if (triggerWeaponProcs && m_casterUnit)
+    if (m_casterUnit && m_casterUnit != unitTarget && m_spellInfo->CanTriggerWeaponProcs())
     {
         if (m_casterUnit->IsPlayer() && unitTarget->IsAlive())
             ((Player*)m_casterUnit)->CastItemCombatSpell(unitTarget, m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON ? m_attackType : BASE_ATTACK);
@@ -2170,7 +2119,6 @@ void Spell::InitializeDamageMultipliers()
 // <Daemon>: Changing the operation of this function
 // Indicates whether the cast should stop or not
 // For this, we look if there are any targets.
-
 bool Spell::HasValidUnitPresentInTargetList()
 {
     uint8 foundMask = 0;
@@ -5817,37 +5765,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_MOVING;
         }
 
-        switch (m_spellInfo->Id)
-        {
-            // Mongoose Bite
-            case 1495:
-            case 14269:
-            case 14270:
-            case 14271:
-                if (m_targets.getUnitTargetGuid() != m_casterUnit->GetReactiveTarget(REACTIVE_DEFENSE))
-                    return SPELL_FAILED_BAD_TARGETS;
-                break;
-            // Counterattack
-            case 19306:
-            case 20909:
-            case 20910:
-                if (m_targets.getUnitTargetGuid() != m_casterUnit->GetReactiveTarget(REACTIVE_HUNTER_PARRY))
-                    return SPELL_FAILED_BAD_TARGETS;
-                break;
-            // Reindeer Transformation only castable while mounted
-            case 25860:
-                if (!m_casterUnit->HasAuraType(SPELL_AURA_MOUNTED))
-                    return SPELL_FAILED_ONLY_MOUNTED;
-                break;
-            case 25720: // Place Loot / Quest 8606 Decoy!
-            {
-                if (Player* pPlayer = ToPlayer(GetAffectiveCaster()))
-                    if (!pPlayer->HasAura(25688)) // Narain's Turban
-                        return SPELL_FAILED_TARGET_AURASTATE;
-                break;
-            }
-        }
-
         // Loatheb Corrupted Mind spell failed
         if (!m_CastItem && !m_IsTriggeredSpell)
         {
@@ -5896,15 +5813,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_BAD_TARGETS;
         }
 
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        // Swiftmend
-        if (m_spellInfo->Id == 18562)                       // future versions have special aura state for this
-        {
-            if (!target->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, UI64LIT(0x50)))
-                return SPELL_FAILED_TARGET_AURASTATE;
-        }
-#endif
         if (!m_IsTriggeredSpell && m_spellInfo->IsDeathOnlySpell() && target->IsAlive())
             return SPELL_FAILED_TARGET_NOT_DEAD;
 
@@ -7611,10 +7519,11 @@ SpellCastResult Spell::CheckItems()
         }
     }
 
-    if (!m_caster->IsPlayer())
-        return SPELL_CAST_OK;
+    
 
-    Player* p_caster = (Player*)m_caster;
+    Player* pCaster = m_caster->ToPlayer();
+    if (!pCaster)
+        return SPELL_CAST_OK;
 
     // cast item checks
     if (m_CastItem)
@@ -7623,7 +7532,7 @@ SpellCastResult Spell::CheckItems()
             return SPELL_FAILED_ITEM_GONE;
 
         uint32 itemid = m_CastItem->GetEntry();
-        if (!p_caster->HasItemCount(itemid, 1))
+        if (!pCaster->HasItemCount(itemid, 1))
             return SPELL_FAILED_ITEM_NOT_READY;
 
         ItemPrototype const* proto = m_CastItem->GetProto();
@@ -7783,7 +7692,7 @@ SpellCastResult Spell::CheckItems()
                 }
             }
 
-            if (!p_caster->HasItemCount(itemid, itemcount))
+            if (!pCaster->HasItemCount(itemid, itemcount))
                 return SPELL_FAILED_ITEM_NOT_READY;
         }
 
@@ -7793,7 +7702,7 @@ SpellCastResult Spell::CheckItems()
         {
             if (i != 0)
             {
-                if (p_caster->HasItemCount(i, 1))
+                if (pCaster->HasItemCount(i, 1))
                 {
                     totems -= 1;
                     continue;
@@ -7807,70 +7716,6 @@ SpellCastResult Spell::CheckItems()
             return SPELL_FAILED_ITEM_GONE;                      //[-ZERO] not sure of it
     }
 
-    switch (m_spellInfo->Id)
-    {
-        case  6201:                                 // Healthstone creating spells
-        case  6202:
-        case  5699:
-        case 11729:
-        case 11730:
-        {
-            if (!p_caster)
-                break;
-            uint32 rank = 0;
-            uint32 itemtype;
-            Unit::AuraList const& mDummyAuras = p_caster->GetAurasByType(SPELL_AURA_DUMMY);
-            for (const auto aura : mDummyAuras)
-            {
-                if (aura->GetId() == 18692)
-                {
-                    rank = 1;
-                    break;
-                }
-                else if (aura->GetId() == 18693)
-                {
-                    rank = 2;
-                    break;
-                }
-            }
-
-            static uint32 const itypes[5][3] =
-            {
-                { 5512, 19004, 19005},              // Minor Healthstone
-                { 5511, 19006, 19007},              // Lesser Healthstone
-                { 5509, 19008, 19009},              // Healthstone
-                { 5510, 19010, 19011},              // Greater Healthstone
-                { 9421, 19012, 19013},              // Major Healthstone
-            };
-
-            switch (m_spellInfo->Id)
-            {
-                case  6201:
-                    itemtype = itypes[0][rank];
-                    break; // Minor Healthstone
-                case  6202:
-                    itemtype = itypes[1][rank];
-                    break; // Lesser Healthstone
-                case  5699:
-                    itemtype = itypes[2][rank];
-                    break; // Healthstone
-                case 11729:
-                    itemtype = itypes[3][rank];
-                    break; // Greater Healthstone
-                case 11730:
-                    itemtype = itypes[4][rank];
-                    break; // Major Healthstone
-            }
-
-            ItemPosCountVec dest;
-            InventoryResult msg = p_caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemtype, 1);
-            if (msg != EQUIP_ERR_OK)
-            {
-                p_caster->SendEquipError(msg, nullptr, nullptr, itemtype);
-                return SPELL_FAILED_DONT_REPORT;
-            }
-        }
-    }
     for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         switch (m_spellInfo->Effect[i])
@@ -7971,7 +7816,7 @@ SpellCastResult Spell::CheckItems()
                 if (!m_caster->IsPlayer()) return SPELL_FAILED_TARGET_NOT_PLAYER;
                 if (m_attackType != RANGED_ATTACK)
                     break;
-                Item *pItem = ((Player*)m_caster)->GetWeaponForAttack(m_attackType, true, false);
+                Item *pItem = pCaster->GetWeaponForAttack(m_attackType, true, false);
                 if (!pItem)
                     return SPELL_FAILED_EQUIPPED_ITEM;
 
@@ -7980,7 +7825,7 @@ SpellCastResult Spell::CheckItems()
                     case ITEM_SUBCLASS_WEAPON_THROWN:
                     {
                         uint32 ammo = pItem->GetEntry();
-                        if (!((Player*)m_caster)->HasItemCount(ammo, 1))
+                        if (!pCaster->HasItemCount(ammo, 1))
                             return SPELL_FAILED_NO_AMMO;
                     };
                     break;
@@ -7988,7 +7833,7 @@ SpellCastResult Spell::CheckItems()
                     case ITEM_SUBCLASS_WEAPON_BOW:
                     case ITEM_SUBCLASS_WEAPON_CROSSBOW:
                     {
-                        uint32 ammo = ((Player*)m_caster)->GetUInt32Value(PLAYER_AMMO_ID);
+                        uint32 ammo = pCaster->GetUInt32Value(PLAYER_AMMO_ID);
                         if (!ammo)
                             return SPELL_FAILED_NO_AMMO;
 
@@ -8019,7 +7864,7 @@ SpellCastResult Spell::CheckItems()
                                 return SPELL_FAILED_NO_AMMO;
                         }
 
-                        if (!((Player*)m_caster)->HasItemCount(ammo, 1))
+                        if (!pCaster->HasItemCount(ammo, 1))
                             return SPELL_FAILED_NO_AMMO;
                     };
                     break;
@@ -8810,7 +8655,7 @@ void Spell::SetClientStarted(bool bisClientStarted)
 
 void Spell::OnSpellLaunch()
 {
-    if (!m_casterUnit || !m_caster->IsInWorld())
+    if (!m_casterUnit || !m_casterUnit->IsInWorld())
         return;
 
     // handle 10 yard aggro for Treasure objects
@@ -8845,22 +8690,7 @@ void Spell::OnSpellLaunch()
                         }
                     }
                 }
-
-    // Make sure the player is sending a valid GO target and lock ID. SPELL_EFFECT_OPEN_LOCK
-    // can succeed with a lockId of 0
-    if (m_spellInfo->Id == 21651)
-    {
-        if (GameObject* go = m_targets.getGOTarget())
-        {
-            LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
-            if (lockInfo && lockInfo->Index[1] == LOCKTYPE_SLOW_OPEN)
-            {
-                Spell* visual = new Spell(m_casterUnit, sSpellMgr.GetSpellEntry(24390), true);
-                visual->prepare();
-            }
-        }
-    }
-
+  
     unitTarget = m_targets.getUnitTarget();
 
     // Charge handled here instead of in effect handler

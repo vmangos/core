@@ -1711,8 +1711,8 @@ void Creature::SelectLevel(float percentHealth, float percentMana)
     CreatureInfo const* cinfo = GetCreatureInfo();
 
     // level
-    uint32 const minLevel = std::min(cinfo->level_max, cinfo->level_min);
-    uint32 const maxLevel = std::max(cinfo->level_max, cinfo->level_min);
+    uint32 const minLevel = cinfo->level_min;
+    uint32 const maxLevel = cinfo->level_max;
     uint32 const level = minLevel == maxLevel ? minLevel : urand(minLevel, maxLevel);
 
     SetLevel(level);

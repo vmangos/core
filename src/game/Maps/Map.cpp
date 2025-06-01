@@ -446,7 +446,11 @@ bool Map::Add(Player* player)
     sAuraRemovalMgr.PlayerEnterMap(m_id, player);
 
     player->SetSplineDonePending(false);
-    player->GetSession()->ClearIncomingPacketsByType(PACKET_PROCESS_MOVEMENT);
+
+    // don't clear movement packets during login or we might discard CMSG_SET_ACTIVE_MOVER
+    if (!player->GetSession()->PlayerLoading())
+        player->GetSession()->ClearIncomingPacketsByType(PACKET_PROCESS_MOVEMENT);
+
     player->m_broadcaster->SetInstanceId(GetInstanceId());
     return true;
 }
@@ -569,7 +573,7 @@ void Map::LoadElevatorTransports()
             continue;
         }
 
-        GameObjectInfo const* pInfo = sObjectMgr.GetGameObjectInfo(pData->id);
+        GameObjectInfo const* pInfo = sObjectMgr.GetGameObjectTemplate(pData->id);
         if (!pInfo)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Map::LoadElevatorTransports] Missing gameobject template %u for guid %u!", pData->id, itr->second);
@@ -3690,7 +3694,7 @@ void Map::RemoveOldBones(uint32 const diff)
 
 GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, uint32 worldMask)
 {
-    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectInfo(entry);
+    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectTemplate(entry);
     if (!goinfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject template %u not found in database!", entry);

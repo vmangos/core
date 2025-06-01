@@ -381,7 +381,7 @@ void Opcodes::BuildOpcodeList()
     /*0x13B*/  StoreOpcode(CMSG_CANCEL_CHANNELLING,           "CMSG_CANCEL_CHANNELLING",          STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,        &WorldSession::HandleCancelChanneling);
     /*0x13C*/  StoreOpcode(SMSG_AI_REACTION,                  "SMSG_AI_REACTION",                 STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x13D*/  StoreOpcode(CMSG_SET_SELECTION,                "CMSG_SET_SELECTION",               STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,        &WorldSession::HandleSetSelectionOpcode);
-    /*0x13E*/  StoreOpcode(CMSG_SET_TARGET_OBSOLETE,          "CMSG_SET_TARGET_OBSOLETE",         STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,        &WorldSession::HandleSetTargetOpcode);
+    /*0x13E*/  StoreOpcode(CMSG_SET_TARGET_OBSOLETE,          "CMSG_SET_TARGET_OBSOLETE",         STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,        &WorldSession::HandleSetSelectionOpcode);
     /*0x13F*/  StoreOpcode(CMSG_UNUSED,                       "CMSG_UNUSED",                      STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x140*/  StoreOpcode(CMSG_UNUSED2,                      "CMSG_UNUSED2",                     STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x141*/  StoreOpcode(CMSG_ATTACKSWING,                  "CMSG_ATTACKSWING",                 STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,        &WorldSession::HandleAttackSwingOpcode);

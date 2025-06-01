@@ -76,6 +76,203 @@ SpellScript* GetScript_DarkmoonSteamTonkCannon(SpellEntry const*)
     return new DarkmoonSteamTonkCannonScript();
 }
 
+// 456 - SHOWLABEL Only OFF
+struct ShowlabelOffScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* pPlayer = spell->m_caster->ToPlayer())
+                pPlayer->SetGMChat(false, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_ShowlabelOff(SpellEntry const*)
+{
+    return new ShowlabelOffScript();
+}
+
+// 2765 - SHOWLABEL Only ON
+struct ShowlabelOnScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* pPlayer = spell->m_caster->ToPlayer())
+                pPlayer->SetGMChat(true, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_ShowlabelOn(SpellEntry const*)
+{
+    return new ShowlabelOnScript();
+}
+
+// 1509 - GM Only OFF
+struct GMOffScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* pPlayer = spell->m_caster->ToPlayer())
+                pPlayer->SetGameMaster(false, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_GMOff(SpellEntry const*)
+{
+    return new GMOffScript();
+}
+
+// 18139 - GM Only ON
+struct GMOnScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* pPlayer = spell->m_caster->ToPlayer())
+                pPlayer->SetGameMaster(true, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_GMOn(SpellEntry const*)
+{
+    return new GMOnScript();
+}
+
+// 6147 - INVIS Only OFF
+struct InvisOffScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* pPlayer = spell->m_caster->ToPlayer())
+                pPlayer->SetGMVisible(true, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_InvisOff(SpellEntry const*)
+{
+    return new InvisOffScript();
+}
+
+// 2763 - INVIS Only ON
+struct InvisOnScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* pPlayer = spell->m_caster->ToPlayer())
+                pPlayer->SetGMVisible(false, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_InvisOn(SpellEntry const*)
+{
+    return new InvisOnScript();
+}
+
+// 20114 - BM Only OFF
+// 24675 - BM OFF
+struct BMOffScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* pPlayer = spell->m_caster->ToPlayer())
+                pPlayer->SetCheatBeastmaster(false, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_BMOff(SpellEntry const*)
+{
+    return new BMOffScript();
+}
+
+// 20115 - BM Only ON
+// 24676 - BM ON
+struct BMOnScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            if (Player* pPlayer = spell->m_caster->ToPlayer())
+                pPlayer->SetCheatBeastmaster(true, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_BMOn(SpellEntry const*)
+{
+    return new BMOnScript();
+}
+
+// 29313 - CooldownAll
+struct ClearAllCooldownsScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
+            spell->m_casterUnit->RemoveAllCooldowns();
+        return true;
+    }
+};
+
+SpellScript* GetScript_ClearAllCooldowns(SpellEntry const*)
+{
+    return new ClearAllCooldownsScript();
+}
+
+// 21651 - Opening
+struct OpeningBattlegroundBannerScript : public SpellScript
+{
+    void OnSuccessfulStart(Spell* spell) const final
+    {
+        if (!spell->m_casterUnit)
+            return;
+
+        if (GameObject* go = spell->m_targets.getGOTarget())
+        {
+            // Make sure the player is sending a valid GO target and lock ID.
+            // SPELL_EFFECT_OPEN_LOCK can succeed with a lockId of 0.
+            LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
+            if (lockInfo && lockInfo->Index[1] == LOCKTYPE_SLOW_OPEN)
+            {
+                Spell* visual = new Spell(spell->m_casterUnit, sSpellMgr.GetSpellEntry(24390), true);
+                visual->prepare();
+            }
+        }
+    }
+};
+
+SpellScript* GetScript_OpeningBattlegroundBanner(SpellEntry const*)
+{
+    return new OpeningBattlegroundBannerScript();
+}
+
 void AddSC_special_spell_scripts()
 {
     Script* newscript;
@@ -93,5 +290,55 @@ void AddSC_special_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_darkmoon_steam_tonk_cannon";
     newscript->GetSpellScript = &GetScript_DarkmoonSteamTonkCannon;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_showlabel_off";
+    newscript->GetSpellScript = &GetScript_ShowlabelOff;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_showlabel_on";
+    newscript->GetSpellScript = &GetScript_ShowlabelOn;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_gm_off";
+    newscript->GetSpellScript = &GetScript_GMOff;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_gm_on";
+    newscript->GetSpellScript = &GetScript_GMOn;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_invis_off";
+    newscript->GetSpellScript = &GetScript_InvisOff;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_invis_on";
+    newscript->GetSpellScript = &GetScript_InvisOn;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_bm_off";
+    newscript->GetSpellScript = &GetScript_BMOff;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_bm_on";
+    newscript->GetSpellScript = &GetScript_BMOn;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_clear_all_cooldowns";
+    newscript->GetSpellScript = &GetScript_ClearAllCooldowns;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_opening_battleground_banner";
+    newscript->GetSpellScript = &GetScript_OpeningBattlegroundBanner;
     newscript->RegisterSelf();
 }

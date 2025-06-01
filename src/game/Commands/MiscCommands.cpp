@@ -1211,7 +1211,7 @@ bool ChatHandler::HandlePoolSpawnsCommand(char* args)
     for (const auto itr : goSpawns)
         if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<GameObject>(itr))
             if (GameObjectData const* data = sObjectMgr.GetGOData(itr))
-                if (GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id))
+                if (GameObjectInfo const* info = sObjectMgr.GetGameObjectTemplate(data->id))
                     PSendSysMessage(LANG_GO_LIST_CHAT, itr, PrepareStringNpcOrGoSpawnInformation<GameObject>(itr).c_str(),
                                     itr, info->name, data->position.x, data->position.y, data->position.z, data->position.mapId);
 
@@ -1305,7 +1305,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
         {
             if (GameObjectData const* data = sObjectMgr.GetGOData(itr.guid))
             {
-                if (GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id))
+                if (GameObjectInfo const* info = sObjectMgr.GetGameObjectTemplate(data->id))
                 {
                     char const* active = goSpawns && goSpawns->find(itr.guid) != goSpawns->end() ? active_str.c_str() : "";
                     if (m_session)
@@ -1327,7 +1327,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
         {
             if (GameObjectData const* data = sObjectMgr.GetGOData(itr.guid))
             {
-                if (GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id))
+                if (GameObjectInfo const* info = sObjectMgr.GetGameObjectTemplate(data->id))
                 {
                     char const* active = goSpawns && goSpawns->find(itr.guid) != goSpawns->end() ? active_str.c_str() : "";
                     if (m_session)

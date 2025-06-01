@@ -2143,7 +2143,7 @@ void SpellMgr::LoadSpellScriptTarget()
                 if (!targetEntry)
                     break;
 
-                if (!sGOStorage.LookupEntry<GameObjectInfo>(targetEntry))
+                if (!sObjectMgr.GetGameObjectTemplate(targetEntry))
                 {
                     if (!sObjectMgr.IsExistingGameObjectId(targetEntry))
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `spell_script_target`: gameobject template entry %u does not exist.", targetEntry);

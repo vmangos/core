@@ -684,15 +684,6 @@ void WorldSession::LogoutPlayer(bool Save)
             queue->RemovePlayerFromQueue(playerGuid, PLAYER_SYSTEM_LEAVE);
         });
 
-        // Teleport to home if the player is in an invalid instance
-        if (!_player->m_instanceValid && !_player->IsGameMaster())
-        {
-            _player->TeleportToHomebind();
-            //this is a bad place to call for far teleport because we need player to be in world for successful logout
-            //maybe we should implement delayed far teleport logout?
-            sMapMgr.ExecuteSingleDelayedTeleport(_player);
-        }
-
         // FG: finish pending transfers after starting the logout
         // this should fix players being able to logout and login back with full hp at death position
         while (_player->IsBeingTeleportedFar())

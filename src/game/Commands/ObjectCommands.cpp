@@ -119,7 +119,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
         return false;
     }
 
-    GameObjectInfo const* goI = ObjectMgr::GetGameObjectInfo(id);
+    GameObjectInfo const* goI = sObjectMgr.GetGameObjectTemplate(id);
 
     if (!goI)
     {
@@ -129,7 +129,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 
     GameObject* target = m_session->GetPlayer()->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, id, lowguid));
 
-    PSendSysMessage(LANG_GAMEOBJECT_DETAIL, lowguid, goI->name, lowguid, id, x, y, z, mapid, o);
+    PSendSysMessage(LANG_GAMEOBJECT_DETAIL, lowguid, goI->name.c_str(), lowguid, id, x, y, z, mapid, o);
 
     if (target)
     {
@@ -173,7 +173,7 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
     PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u",
         pGameObject->GetEntry(),
         pGameObject->GetGUIDLow(),
-        pGameObject->GetGOInfo()->name,
+        pGameObject->GetGOInfo()->name.c_str(),
         pGameObject->GetGoType(),
         pGameObject->GetDisplayId(),
         pGameObject->GetGoState(),
@@ -264,7 +264,7 @@ bool ChatHandler::HandleGameObjectTurnCommand(char* args)
     obj->SaveToDB();
     obj->Refresh();
 
-    PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name, obj->GetGUIDLow());
+    PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name.c_str(), obj->GetGUIDLow());
 
     return true;
 }
@@ -341,7 +341,7 @@ bool ChatHandler::HandleGameObjectMoveCommand(char* args)
     obj->SaveToDB();
     obj->Refresh();
 
-    PSendSysMessage(LANG_COMMAND_MOVEOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name, obj->GetGUIDLow());
+    PSendSysMessage(LANG_COMMAND_MOVEOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name.c_str(), obj->GetGUIDLow());
 
     return true;
 }
@@ -412,7 +412,7 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
     if (!ExtractOptInt32(&args, spawntimeSecs, 0))
         return false;
 
-    GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(id);
+    GameObjectInfo const* gInfo = sObjectMgr.GetGameObjectTemplate(id);
 
     if (!gInfo)
     {
@@ -468,13 +468,13 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
         return false;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_GAMEOBJECT_CURRENT), gInfo->name, db_lowGUID, x, y, z, o);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, GetMangosString(LANG_GAMEOBJECT_CURRENT), gInfo->name.c_str(), db_lowGUID, x, y, z, o);
 
     map->Add(pGameObj);
 
     sObjectMgr.AddGameobjectToGrid(db_lowGUID, sObjectMgr.GetGOData(db_lowGUID));
 
-    PSendSysMessage(LANG_GAMEOBJECT_ADD, id, gInfo->name, db_lowGUID, x, y, z);
+    PSendSysMessage(LANG_GAMEOBJECT_ADD, id, gInfo->name.c_str(), db_lowGUID, x, y, z);
     return true;
 }
 
@@ -533,12 +533,12 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
             float z = fields[4].GetFloat();
             int mapid = fields[5].GetUInt16();
 
-            GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(entry);
+            GameObjectInfo const* gInfo = sObjectMgr.GetGameObjectTemplate(entry);
 
             if (!gInfo)
                 continue;
 
-            PSendSysMessage(LANG_GO_MIXED_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<GameObject>(guid).c_str(), entry, guid, gInfo->name, x, y, z, mapid);
+            PSendSysMessage(LANG_GO_MIXED_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<GameObject>(guid).c_str(), entry, guid, gInfo->name.c_str(), x, y, z, mapid);
 
             ++count;
         }
@@ -589,7 +589,7 @@ bool ChatHandler::HandleGameObjectSelectCommand(char*)
     {
         player->SetSelectedGobj(go->GetObjectGuid());
         GameObjectInfo const* data = go->GetGOInfo();
-        PSendSysMessage(LANG_GO_MIXED_LIST_CHAT, go->GetDBTableGUIDLow(), PrepareStringNpcOrGoSpawnInformation<GameObject>(go->GetObjectGuid()).c_str(), go->GetEntry(), go->GetDBTableGUIDLow(), data ? data->name : go->GetName(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), go->GetMapId());
+        PSendSysMessage(LANG_GO_MIXED_LIST_CHAT, go->GetDBTableGUIDLow(), PrepareStringNpcOrGoSpawnInformation<GameObject>(go->GetObjectGuid()).c_str(), go->GetEntry(), go->GetDBTableGUIDLow(), data ? data->name.c_str() : go->GetName(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), go->GetMapId());
     }
     else
         SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);

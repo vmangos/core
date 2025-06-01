@@ -58,7 +58,7 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
 
     Object::_Create(guidlow, 0, HIGHGUID_MO_TRANSPORT);
 
-    GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(guidlow);
+    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectTemplate(guidlow);
 
     if (!goinfo)
     {
@@ -510,12 +510,15 @@ void GenericTransport::CalculatePassengerOffset(float& x, float& y, float& z, fl
     if (o)
         *o = Geometry::NormalizeOrientation(*o - transO);
 
+    float const dx = x - transX;
+    float const dy = y - transY;
     z -= transZ;
-    y -= transY;    // y = searchedY * std::cos(o) + searchedX * std::sin(o)
-    x -= transX;    // x = searchedX * std::cos(o) + searchedY * std::sin(o + pi)
-    float inx = x, iny = y;
-    y = (iny - inx * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
-    x = (inx + iny * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
+
+    float const sinO = std::sin(transO);
+    float const cosO = std::cos(transO);
+
+    x = dx * cosO + dy * sinO;
+    y = dy * cosO - dx * sinO;
 }
 
 void GenericTransport::SendOutOfRangeUpdateToMap()

@@ -603,14 +603,14 @@ public:
         float centerX = m_creature->GetPositionX();
         float centerY = m_creature->GetPositionY();
         float useZ = m_creature->GetPositionZ();
-        float angle = 360.0f / 8.0f;
+        float angle = M_PI_F / 4.0f;
         float highZ = useZ;
         float avg_height = 0.0f;
         uint8 inliers = 0;
         for (uint8 i = 0; i < 8; i++)
         {
-            float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
-            float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
+            float x = centerX + cos((float)i * angle) * radius;
+            float y = centerY + sin((float)i * angle) * radius;
             float z = m_creature->GetMap()->GetHeight(x, y, useZ);
             float deviation = abs(useZ - z);
             // Any deviation >= 0.5 we consider outliers as we dont want to handle sloped terrain
