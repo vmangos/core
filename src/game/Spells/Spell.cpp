@@ -8659,38 +8659,39 @@ void Spell::OnSpellLaunch()
         return;
 
     // handle 10 yard aggro for Treasure objects
-    if (GameObject* go = m_targets.getGOTarget())
-        if (Unit* pUser = GetCaster()->ToUnit())
-            // object uses faction_id 77 (Treasure)
-            if (sObjectMgr.GetFactionTemplateEntry(go->GetGOInfo()->faction)->faction == 77)
-                // object lockId uses LOCKTYPE_TREASURE
-                if (LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId()))
-                {
-                    bool treasureLock = false;
-                    for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
+    if (m_spellInfo->Effect[0] == SPELL_EFFECT_OPEN_LOCK || m_spellInfo->Effect[0] == SPELL_EFFECT_OPEN_LOCK_ITEM)
+        if (GameObject* go = m_targets.getGOTarget())
+            if (Unit* pUser = GetCaster()->ToUnit())
+                // object uses faction_id 77 (Treasure)
+                if (sObjectMgr.GetFactionTemplateEntry(go->GetGOInfo()->faction)->faction == 77)
+                    // object lockId uses LOCKTYPE_TREASURE
+                    if (LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId()))
                     {
-                        if (lockInfo->Type[i] == LOCK_KEY_SKILL && lockInfo->Index[i] == LOCKTYPE_TREASURE)
+                        bool treasureLock = false;
+                        for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
                         {
-                            treasureLock = true;
-                            break;
+                            if (lockInfo->Type[i] == LOCK_KEY_SKILL && lockInfo->Index[i] == LOCKTYPE_TREASURE)
+                            {
+                                treasureLock = true;
+                                break;
+                            }
                         }
-                    }
-                    if (treasureLock)
-                    {
-                        std::list<Unit*> targets;
-                        MaNGOS::AnyUnitInObjectRangeCheck check(go, 10.0f);
-                        MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(targets, check);
-                        Cell::VisitAllObjects(go, searcher, 10.0f);
+                        if (treasureLock)
+                        {
+                            std::list<Unit*> targets;
+                            MaNGOS::AnyUnitInObjectRangeCheck check(go, 10.0f);
+                            MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(targets, check);
+                            Cell::VisitAllObjects(go, searcher, 10.0f);
 
-                        for (Unit* attacker : targets)
-                        {
-                            if (!attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) && attacker->AI()
-                                && attacker->IsValidAttackTarget(pUser) && attacker->IsWithinLOSInMap(pUser))
-                                attacker->AI()->AttackStart(pUser);
+                            for (Unit* attacker : targets)
+                            {
+                                if (!attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) && attacker->AI()
+                                    && attacker->IsValidAttackTarget(pUser) && attacker->IsWithinLOSInMap(pUser))
+                                    attacker->AI()->AttackStart(pUser);
+                            }
                         }
                     }
-                }
-  
+    
     unitTarget = m_targets.getUnitTarget();
 
     // Charge handled here instead of in effect handler
