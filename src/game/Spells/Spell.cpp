@@ -6593,37 +6593,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if ((canFailAtMax || skillValue < sWorld.GetConfigMaxSkillValue()) && reqSkillValue > irand(skillValue - 25, skillValue + 37))
                         return SPELL_FAILED_TRY_AGAIN;
                 }
-
-                // aggro surrounding mobs when opening an object with treasure lockId and faction
-                // only applied on successful start of spell (must be executed last)
-                if (strict)
-                    if (GameObject* go = m_targets.getGOTarget())
-                        if (Unit* pUser = GetCaster()->ToUnit())
-                            // find if object uses Treasure faction (77)
-                            if (sObjectMgr.GetFactionTemplateEntry(go->GetGOInfo()->faction)->faction == 77)
-                                // find if object lockId uses LOCKTYPE_TREASURE
-                                if (LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId()))
-                                {
-                                    bool treasureLock = false;
-                                    for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
-                                    {
-                                        if (lockInfo->Type[i] == LOCK_KEY_SKILL && lockInfo->Index[i] == LOCKTYPE_TREASURE)
-                                            treasureLock = true;
-                                    }
-                                    if (treasureLock)
-                                    {
-                                        std::list<Unit*> targets;
-                                        MaNGOS::AnyUnitInObjectRangeCheck check(go, 10.0f);
-                                        MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(targets, check);
-                                        Cell::VisitAllObjects(go, searcher, 10.0f);
-
-                                        for (Unit* attacker : targets)
-                                        {
-                                            if (!attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) && attacker->IsValidAttackTarget(pUser) && attacker->IsWithinLOSInMap(pUser) && attacker->AI())
-                                                attacker->AI()->AttackStart(pUser);
-                                        }
-                                    }
-                                }
                 break;
             }
             case SPELL_EFFECT_PICKPOCKET:
@@ -8843,6 +8812,35 @@ void Spell::OnSpellLaunch()
 {
     if (!m_casterUnit || !m_caster->IsInWorld())
         return;
+
+    // handle 10 yard aggro for Treasure objects
+    if (GameObject* go = m_targets.getGOTarget())
+        if (Unit* pUser = GetCaster()->ToUnit())
+            // object uses faction_id 77 (Treasure)
+            if (sObjectMgr.GetFactionTemplateEntry(go->GetGOInfo()->faction)->faction == 77)
+                // object lockId uses LOCKTYPE_TREASURE
+                if (LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId()))
+                {
+                    bool treasureLock = false;
+                    for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
+                    {
+                        if (lockInfo->Type[i] == LOCK_KEY_SKILL && lockInfo->Index[i] == LOCKTYPE_TREASURE)
+                            treasureLock = true;
+                    }
+                    if (treasureLock)
+                    {
+                        std::list<Unit*> targets;
+                        MaNGOS::AnyUnitInObjectRangeCheck check(go, 10.0f);
+                        MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(targets, check);
+                        Cell::VisitAllObjects(go, searcher, 10.0f);
+
+                        for (Unit* attacker : targets)
+                        {
+                            if (!attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) && attacker->IsValidAttackTarget(pUser) && attacker->IsWithinLOSInMap(pUser) && attacker->AI())
+                                attacker->AI()->AttackStart(pUser);
+                        }
+                    }
+                }
 
     // Make sure the player is sending a valid GO target and lock ID. SPELL_EFFECT_OPEN_LOCK
     // can succeed with a lockId of 0
