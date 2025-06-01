@@ -6594,42 +6594,36 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_TRY_AGAIN;
                 }
 
-                // aggro surrounding mobs when opening/lockpicking an object
+                // aggro surrounding mobs when opening an object with treasure lockId and faction
                 // only applied on successful start of spell (must be executed last)
                 if (strict)
                     if (GameObject* go = m_targets.getGOTarget())
-                        // For non-locked objects only lockId 57 should cause aggro
-                        if (skillId == SKILL_LOCKPICKING || lockId == 57)
-                            if (Unit* pUser = GetCaster()->ToUnit())
-                            {
-                                int32 factionId = go->GetGOInfo()->faction;
-                                std::list<Unit*> targets;
-                                switch (factionId)
+                        if (Unit* pUser = GetCaster()->ToUnit())
+                            // find if object uses Treasure faction (77)
+                            if (sObjectMgr.GetFactionTemplateEntry(go->GetGOInfo()->faction)->faction == 77)
+                                // find if object lockId uses LOCKTYPE_TREASURE
+                                if (LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId()))
                                 {
-                                    case 94: // Object friendly to FACTION_MASK_MONSTER, no hostile mask (0)
+                                    bool treasureLock = false;
+                                    for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
                                     {
-                                        MaNGOS::AnyFriendlyUnitInObjectRangeCheck check(go, 10.0f);
-                                        MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(targets, check);
-                                        Cell::VisitAllObjects(go, searcher, 10.0f);
-                                        break;
+                                        if (lockInfo->Type[i] == LOCK_KEY_SKILL && lockInfo->Index[i] == LOCKTYPE_TREASURE)
+                                            bool treasureLock = true;
                                     }
-                                    case 101: // Object friendly to player faction (so they can open it), hostile mask to the aggroed faction
-                                    case 102:
+                                    if (treasureLock)
                                     {
-                                        MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck check(go, go, 10.0f);
-                                        MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, check);
+                                        std::list<Unit*> targets;
+                                        MaNGOS::AnyUnitInObjectRangeCheck check(go, 10.0f);
+                                        MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(targets, check);
                                         Cell::VisitAllObjects(go, searcher, 10.0f);
-                                        break;
+
+                                        for (Unit* attacker : targets)
+                                        {
+                                            if (!attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) && attacker->IsValidAttackTarget(pUser) && attacker->IsWithinLOSInMap(pUser) && attacker->AI())
+                                                attacker->AI()->AttackStart(pUser);
+                                        }
                                     }
-                                    default:
-                                        break;
                                 }
-                                for (Unit* attacker : targets)
-                                {
-                                    if (!attacker->IsInCombat() && !attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) && attacker->IsValidAttackTarget(pUser) && attacker->IsWithinLOSInMap(pUser) && attacker->AI())
-                                        attacker->AI()->AttackStart(pUser);
-                                }
-                            }
                 break;
             }
             case SPELL_EFFECT_PICKPOCKET:
