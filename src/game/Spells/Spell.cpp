@@ -6608,7 +6608,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                                     for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
                                     {
                                         if (lockInfo->Type[i] == LOCK_KEY_SKILL && lockInfo->Index[i] == LOCKTYPE_TREASURE)
-                                            bool treasureLock = true;
+                                            treasureLock = true;
                                     }
                                     if (treasureLock)
                                     {
