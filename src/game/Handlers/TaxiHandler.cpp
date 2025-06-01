@@ -96,7 +96,7 @@ void WorldSession::SendTaxiMenu(Creature* unit)
     data << uint32(1);
     data << unit->GetObjectGuid();
     data << uint32(curloc);
-    GetPlayer()->m_taxi.AppendTaximaskTo(data, GetPlayer()->IsTaxiCheater());
+    GetPlayer()->m_taxi.AppendTaximaskTo(data, GetPlayer()->IsTaxiCheater(), GetPlayer()->GetRace());
     SendPacket(&data);
 }
 
