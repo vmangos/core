@@ -675,55 +675,90 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
         return;
 
     WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(leader->GetMotionMaster()->GetCurrent());
-    if (!wpMMGen || wpMMGen->GetNodeIndexes().empty())
-        return;
-
-    std::list<int32> nodeIndexes;
-    for (int32 idx : wpMMGen->GetNodeIndexes())
-        nodeIndexes.push_back(idx);
-
-    float angle = 0.f;
-    float distance = 0.f;
-    PointsArray genPath;
-    genPath.emplace_back(creature.GetPositionX(), creature.GetPositionY(), creature.GetPositionZ());
-    Vector3 prevPoint = leader->movespline->GetPoint(0);
-
-    while (!nodeIndexes.empty())
+    if (wpMMGen && !wpMMGen->GetNodeIndexes().empty())
     {
-        Vector3 point = leader->movespline->GetPoint(nodeIndexes.front());
-        nodeIndexes.pop_front();
-        Vector3 direction = point - prevPoint;
-        if (direction.isZero())
+        std::list<int32> nodeIndexes;
+        for (int32 idx : wpMMGen->GetNodeIndexes())
+            nodeIndexes.push_back(idx);
+
+        float angle = 0.f;
+        float distance = 0.f;
+        PointsArray genPath;
+        genPath.emplace_back(creature.GetPositionX(), creature.GetPositionY(), creature.GetPositionZ());
+        Vector3 prevPoint = leader->movespline->GetPoint(0);
+
+        while (!nodeIndexes.empty())
+        {
+            Vector3 point = leader->movespline->GetPoint(nodeIndexes.front());
+            nodeIndexes.pop_front();
+            Vector3 direction = point - prevPoint;
+            if (direction.isZero())
+                return;
+
+            angle = atan2(direction.y, direction.x);
+            Vector3 startPos = genPath[genPath.size() - 1];
+            float x, y, z;
+            m_groupMember.ComputeRelativePosition(angle, x, y);
+            x += point.x;
+            y += point.y;
+            z = point.z;
+            creature.UpdateGroundPositionZ(x, y, z);
+            creature.GetMap()->GetWalkHitPosition(creature.GetTransport(), point.x, point.y, point.z, x, y, z);
+            Vector3 endPos = Vector3(x, y, z);
+            PathFinder pathfinder(&creature);
+            pathfinder.calculate(startPos, endPos, true);
+            distance += BuildIntPath(genPath, pathfinder.getPath());
+            prevPoint = point;
+        }
+
+        creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
+
+        if (distance < 0.2f)
             return;
 
-        angle = atan2(direction.y, direction.x);
-        Vector3 startPos = genPath[genPath.size() - 1];
-        float x, y, z;
-        m_groupMember.ComputeRelativePosition(angle, x, y);
-        x += point.x;
-        y += point.y;
-        z = point.z;
-        creature.UpdateGroundPositionZ(x, y, z);
-        creature.GetMap()->GetWalkHitPosition(creature.GetTransport(), point.x, point.y, point.z, x, y, z);
-        Vector3 endPos = Vector3(x, y, z);
-        PathFinder pathfinder(&creature);
-        pathfinder.calculate(startPos, endPos, true);
-        distance += BuildIntPath(genPath, pathfinder.getPath());
-        prevPoint = point;
+        // Increased speed if late, decreased if in a rotating ...
+        float speed = distance / float(leaderTimeBeforeNextWP) * 1000.0f;
+        if (speed > creature.GetSpeed(MOVE_RUN) * 1.3f)
+            speed = creature.GetSpeed(MOVE_RUN) * 1.3f;
+
+        Movement::MoveSplineInit init(creature, "PatrolMovementGenerator::StartMove");
+        init.MovebyPath(genPath);
+        init.SetWalk(creature.IsWalking() && !creature.IsLevitating());
+        init.SetVelocity(speed);
+        init.SetFacing(angle);
+        init.Launch();
+        return;
     }
 
+    uint32 totalLeaderPoints = leader->movespline->CountSplinePoints();
+    Vector3 last = leader->movespline->GetPoint(totalLeaderPoints);
+    Vector3 direction = last - leader->movespline->GetPoint(totalLeaderPoints - 1);
+
+    if (direction.isZero())
+        return;
+
+    float angle = atan2(direction.y, direction.x);
+    float x, y, z;
+    m_groupMember.ComputeRelativePosition(angle, x, y);
+    x += last.x;
+    y += last.y;
+    z = last.z;
+    creature.UpdateGroundPositionZ(x, y, z);
+    creature.GetMap()->GetWalkHitPosition(creature.GetTransport(), last.x, last.y, last.z, x, y, z);
     creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
 
-    if (distance < 0.2f)
+    PathInfo p(&creature);
+    p.calculate(x, y, z, true);
+    if (p.Length() < 0.2f)
         return;
 
     // Increased speed if late, decreased if in a rotating ...
-    float speed = distance / float(leaderTimeBeforeNextWP) * 1000.0f;
+    float speed = p.Length() / float(leaderTimeBeforeNextWP) * 1000.0f;
     if (speed > creature.GetSpeed(MOVE_RUN) * 1.3f)
         speed = creature.GetSpeed(MOVE_RUN) * 1.3f;
 
     Movement::MoveSplineInit init(creature, "PatrolMovementGenerator::StartMove");
-    init.MovebyPath(genPath);
+    init.Move(&p);
     init.SetWalk(creature.IsWalking() && !creature.IsLevitating());
     init.SetVelocity(speed);
     init.SetFacing(angle);
