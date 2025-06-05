@@ -23,7 +23,7 @@
 #include "CreatureAISelector.h"
 #include "Creature.h"
 #include "Transport.h"
-
+#include "Map.h"
 #include "ConfusedMovementGenerator.h"
 #include "FleeingMovementGenerator.h"
 #include "FearMovementGenerator.h"

@@ -27,8 +27,6 @@
 char const CreatureDataAddonInfofmt[] = "iiiibbis";
 char const CreatureDisplayInfoAddonfmt[] = "iffffbi";
 char const GameObjectDisplayInfoAddonfmt[] = "iffffff";
-char const GameObjectInfosrcfmt[] = "iiisiifiiiiiiiiiiiiiiiiiiiiiiiiiis";
-char const GameObjectInfodstfmt[] = "iiisiifiiiiiiiiiiiiiiiiiiiiiiiiiii";
 char const PageTextfmt[] = "isi";
 char const MapEntrysrcfmt[] = "iiiiiiiffss";
 char const MapEntrydstfmt[] = "iiiiiiiffsi";
@@ -47,5 +45,3 @@ SQLStorage sConditionStorage(ConditionsSrcFmt, ConditionsDstFmt, "condition_entr
 SQLStorage sAreaStorage(AreaEntryfmt, "entry", "area_template");
 SQLStorage sMailTemplateStorage(MailTemplatefmt, "entry", "mail_text_template");
 SQLStorage sCreatureSpellDataStorage(CreatureSpellDatafmt, "entry", "pet_spell_data");
-
-SQLHashStorage sGOStorage(GameObjectInfosrcfmt, GameObjectInfodstfmt, "entry", "gameobject_template");

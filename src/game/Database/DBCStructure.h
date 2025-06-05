@@ -385,6 +385,11 @@ struct FactionTemplateEntry
         }
         return (hostileMask & entry.ourMask) != 0;
     }
+    bool IsHostileToPlayerTeam(FactionTemplateEntry const& entry) const
+    {
+        return ((hostileMask & entry.ourMask) & (FACTION_MASK_ALLIANCE | FACTION_MASK_HORDE)) != 0 ||
+               ((ourMask & entry.hostileMask) & (FACTION_MASK_ALLIANCE | FACTION_MASK_HORDE)) != 0;
+    }
     bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) !=0; }
     bool IsNeutralToAll() const
     {

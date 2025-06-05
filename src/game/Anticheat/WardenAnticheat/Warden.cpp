@@ -26,7 +26,6 @@
 
 #include "Common.h"
 #include "Language.h"
-#include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "World.h"
@@ -42,10 +41,8 @@
 #include "WardenWin.hpp"
 #include "WardenMac.hpp"
 #include "WardenScanMgr.hpp"
-#include "AccountMgr.h"
 
 #include <zlib.h>
-
 #include <algorithm>
 #include <memory>
 

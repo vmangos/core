@@ -24,6 +24,7 @@
 #include "MoveSpline.h"
 #include "PathFinder.h"
 #include "MoveMap.h"
+#include "Map.h"
 
 #define SEARCH_RANDOM_RADIUS 5.0f
 #define MIN_QUIET_DISTANCE 28.0f

@@ -174,10 +174,11 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     // World of Warcraft Client Patch 1.7.0 (2005-09-13)
     // - Effects that make players immune to physical will no longer be immune
     //   to the "Recently Bandaged" effect from First Aid.
-    if (/* pVictim != this && */ /* commented out due to above patch notes */
-        !spell->HasAttribute(SPELL_ATTR_NO_IMMUNITIES) &&
-        pVictim->IsImmuneToSpell(spell, pVictim == this))
+    if (pVictim->IsImmuneToSpell(spell, pVictim == this))
         return SPELL_MISS_IMMUNE;
+
+    if (pVictim == this)
+        return SPELL_MISS_NONE;
 
     // All positive spells can`t miss
     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
@@ -191,9 +192,7 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     else
         schoolMask = spell->GetSpellSchoolMask();
 
-    if (pVictim != this
-        && !spell->IsIgnoringCasterAndTargetRestrictions()
-        && pVictim->IsImmuneToDamage(schoolMask, spell))
+    if (pVictim->IsImmuneToDamage(schoolMask, spell))
         return SPELL_MISS_IMMUNE;
 
     // Try victim reflect spell

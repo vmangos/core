@@ -296,7 +296,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
     uint32 limit = sWorld.getConfig(CONFIG_UINT32_ACCOUNT_CONCURRENT_AUCTION_LIMIT);
     if (!!limit && auctionHouse->GetAccountAuctionCount(GetAccountId()) >= limit)
     {
-        ChatHandler(this).SendSysMessage("You have reached the limit of active auctions on your account.");
+        pl->SendSysMessage("You have reached the limit of active auctions on your account.");
         SendAuctionCommandResult(nullptr, AUCTION_STARTED, AUCTION_ERR_DATABASE);
         return;
     }

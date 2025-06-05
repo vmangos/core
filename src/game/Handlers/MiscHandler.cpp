@@ -422,23 +422,6 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleSetTargetOpcode(WorldPacket& recv_data)
-{
-    // When this packet send?
-    ObjectGuid guid ;
-    recv_data >> guid;
-
-    _player->SetTargetGuid(guid);
-
-    // update reputation list if need
-    Unit* unit = ObjectAccessor::GetUnit(*_player, guid);   // can select group members at diff maps
-    if (!unit)
-        return;
-
-    if (FactionTemplateEntry const* factionTemplateEntry = sObjectMgr.GetFactionTemplateEntry(unit->GetFactionTemplateId()))
-        _player->GetReputationMgr().SetVisible(factionTemplateEntry);
-}
-
 void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
@@ -450,8 +433,9 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
     Unit* unit = ObjectAccessor::GetUnit(*_player, guid);   // can select group members at diff maps
 
     if (unit)
-        if (FactionTemplateEntry const* factionTemplateEntry = sObjectMgr.GetFactionTemplateEntry(unit->GetFactionTemplateId()))
-            _player->GetReputationMgr().SetVisible(factionTemplateEntry);
+        if (FactionTemplateEntry const* factionTemplateEntry = unit->GetFactionTemplateEntry())
+            if (!factionTemplateEntry->IsHostileToPlayerTeam(*_player->GetFactionTemplateEntry()))
+                _player->GetReputationMgr().SetVisible(factionTemplateEntry);
 
     // Drop combo points only for rogues and druids
     // Warriors use combo points internally, do no reset for everyone
@@ -834,7 +818,11 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
 
     if (!pPlayer->IsGameMaster() && !pPlayer->HasCheatOption(PLAYER_CHEAT_TRIGGER_PASS))
     {
-        bool const bLevelCheck = pPlayer->GetLevel() < pTeleTrigger->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL);
+        // World of Warcraft Client Patch 1.4.1 (2005-05-03)
+        // - Added minimum level requirements to all instances to prevent 
+        //   exploitive behavior.The minimum levels are very generous and should
+        //   not affect the normal course of gameplay.
+        bool const bLevelCheck = pPlayer->GetLevel() < pTeleTrigger->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL) && sWorld.GetWowPatch() >= WOW_PATCH_104;
         bool const bConditionCheck = pTeleTrigger->requiredCondition && !IsConditionSatisfied(pTeleTrigger->requiredCondition, pPlayer, pPlayer->GetMap(), pPlayer, CONDITION_FROM_AREATRIGGER);
         
         if (bLevelCheck || bConditionCheck)

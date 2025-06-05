@@ -580,13 +580,13 @@ void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
     // Player is ported to center of c'thun with a small, random, offset to knock the player in a random direction.
     AreaTriggerEntry const* cthunAreaTrigger = sObjectMgr.GetAreaTrigger(AREATRIGGER_CTHUN_KNOCKBACK);
     if (cthunAreaTrigger) {
-        float x = cthunAreaTrigger->x + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-        float y = cthunAreaTrigger->y + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        float x = cthunAreaTrigger->x + cos(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
+        float y = cthunAreaTrigger->y + sin(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
         pPlayer->NearTeleportTo(x, y, cthunAreaTrigger->z, pPlayer->GetOrientation());
     }
     else {
-        float x = -8578.0f + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-        float y = 1986.8f + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        float x = -8578.0f + cos(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
+        float y = 1986.8f + sin(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
         pPlayer->NearTeleportTo(x, y, 100.4f, pPlayer->GetOrientation());
         sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
             AREATRIGGER_CTHUN_KNOCKBACK);

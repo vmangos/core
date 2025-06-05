@@ -26,6 +26,7 @@
 #include "CreatureAI.h"
 #include "InstanceData.h"
 #include "ObjectAccessor.h"
+#include "Map.h"
 
 Totem::Totem() : Creature(CREATURE_SUBTYPE_TOTEM)
 {

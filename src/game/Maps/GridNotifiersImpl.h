@@ -44,14 +44,12 @@ inline void MaNGOS::VisibleNotifier::Visit(GridRefManager<T>& m)
     }
 }
 
-inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType& m)
+inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType &m)
 {
-    std::vector<Creature*> creaturesToUpdate;
-    for (const auto& iter : m)
-        creaturesToUpdate.push_back(iter.getSource());
-    for (const auto& it : creaturesToUpdate)
+    for (CreatureMapType::iterator iter = m.begin(); iter != m.end();)
     {
-        WorldObject::UpdateHelper helper(it);
+        WorldObject::UpdateHelper helper(iter->getSource());
+        ++iter;
         helper.UpdateRealTime(i_now, i_timeDiff);
     }
 }

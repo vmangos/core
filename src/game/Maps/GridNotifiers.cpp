@@ -23,15 +23,11 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "UpdateData.h"
-#include "Item.h"
 #include "Map.h"
 #include "Transport.h"
 #include "ObjectAccessor.h"
 #include "BattleGroundMgr.h"
-
-#include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
-#include "World.h"
 
 using namespace MaNGOS;
 

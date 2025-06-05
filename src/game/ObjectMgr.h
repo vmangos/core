@@ -223,7 +223,7 @@ typedef std::unordered_map<uint32, FactionTemplateEntry> FactionTemplatesMap;
 typedef std::unordered_map<uint32, SoundEntriesEntry> SoundEntryMap;
 typedef std::unordered_map<uint32, ItemPrototype> ItemPrototypeMap;
 typedef std::unordered_map<uint32, std::unique_ptr<CreatureInfo>> CreatureInfoMap;
-
+typedef std::unordered_map<uint32, std::unique_ptr<GameObjectInfo>> GameObjectInfoMap;
 typedef std::unordered_map<uint32,GameObjectData> GameObjectDataMap;
 typedef GameObjectDataMap::value_type GameObjectDataPair;
 
@@ -630,10 +630,23 @@ class ObjectMgr
         static Player* GetPlayer(char const* name) { return ObjectAccessor::FindPlayerByName(name);}
         static Player* GetPlayer(ObjectGuid guid) { return ObjectAccessor::FindPlayer(guid); }
 
-        static GameObjectInfo const* GetGameObjectInfo(uint32 id) { return sGOStorage.LookupEntry<GameObjectInfo>(id); }
+        std::set<uint32> GetTransportDisplayIds() const;
+        void LoadGameObjectTemplates();
+        void LoadGameObjectTemplate(uint32 entry);
+        void CheckGameObjectTemplate(GameObjectInfo* goInfo);
+        GameObjectInfo const* GetGameObjectTemplate(uint32 id) const
+        {
+            auto itr = m_gameObjectInfoMap.find(id);
+            if (itr != m_gameObjectInfoMap.end())
+                return itr->second.get();
 
-        std::set<uint32> LoadGameobjectInfo();
-        std::set<uint32> CheckGameObjectInfos();
+            return nullptr;
+        }
+        GameObjectInfoMap const& GetGameObjectInfoMap() const
+        {
+            return m_gameObjectInfoMap;
+        }
+
         void AddGameobjectInfo(GameObjectInfo* goinfo);
         void LoadGameObjectDisplayInfoAddon();
         void LoadGameobjectsRequirements();
@@ -1516,6 +1529,7 @@ class ObjectMgr
         uint32 m_OldMailCounter;
 
     private:
+        void LoadGameObjectInfo(Field* result);
         void LoadCreatureInfo(Field* result);
         void LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment);
         void LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table);
@@ -1586,6 +1600,7 @@ class ObjectMgr
 
         SoundEntryMap m_SoundEntriesMap;
         CreatureInfoMap m_creatureInfoMap;
+        GameObjectInfoMap m_gameObjectInfoMap;
         ItemPrototypeMap m_itemPrototypesMap;
 
         typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;

@@ -35,6 +35,4 @@ extern SQLStorage sAreaStorage;
 extern SQLStorage sMailTemplateStorage;
 extern SQLStorage sCreatureSpellDataStorage;
 
-extern SQLHashStorage sGOStorage;
-
 #endif

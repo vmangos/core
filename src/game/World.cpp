@@ -1432,7 +1432,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadPageTexts();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Game Object Templates...");     // must be after LoadPageTexts
-    std::set<uint32> transportDisplayIds = sObjectMgr.LoadGameobjectInfo();
+    sObjectMgr.LoadGameObjectTemplates();
+
+    std::set<uint32> transportDisplayIds = sObjectMgr.GetTransportDisplayIds();
     MMAP::MMapFactory::createOrGetMMapManager()->loadAllGameObjectModels(transportDisplayIds);
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Transport templates...");
@@ -2313,7 +2315,7 @@ void World::SendGMTicketText(char const* text)
             {
                 Player* player = session->GetPlayer();
                 if (player && player->IsInWorld() && player->IsAcceptTickets())
-                    ChatHandler(player).SendSysMessage(text);
+                    player->SendSysMessage(text);
             }
         }
     }
