@@ -3058,7 +3058,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 if (m_casterUnit && m_casterUnit != pUnitTarget && std::find(tempTargetUnitMap.begin(), tempTargetUnitMap.end(), m_casterUnit) == tempTargetUnitMap.end())
                     tempTargetUnitMap.push_front(m_casterUnit);
 
-                tempTargetUnitMap.sort(TargetDistanceOrderNear(pUnitTarget));
+                tempTargetUnitMap.sort(ChainHealingOrder(pUnitTarget));
 
                 if (tempTargetUnitMap.empty())
                     break;
@@ -3091,7 +3091,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     prev = *next;
                     targetUnitMap.push_back(prev);
                     tempTargetUnitMap.erase(next);
-                    tempTargetUnitMap.sort(TargetDistanceOrderNear(prev));
+                    tempTargetUnitMap.sort(ChainHealingOrder(prev));
                     next = tempTargetUnitMap.begin();
 
                     --t;
