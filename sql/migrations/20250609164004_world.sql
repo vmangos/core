@@ -435,7 +435,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+0, 8101, 0, 'Silverpine Forest - Beren\'s Peril - Copper Veins', 0),
 (@PTEMPLATE+1, 8101, 0, 'Silverpine Forest - Beren\'s Peril - Copper Veins', 0);
 
-UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `id` IN (1731, 3763, 2055, 103713);
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 900 WHERE `id` IN (1731, 3763, 2055, 103713) AND `map` IN (0, 1);
 
 
 -- End of migration.
