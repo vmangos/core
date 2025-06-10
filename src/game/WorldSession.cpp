@@ -1108,6 +1108,12 @@ void WorldSession::SaveTutorialsData()
     m_tutorialState = TUTORIALDATA_UNCHANGED;
 }
 
+uint32 WorldSession::GetTutorialInt(uint32 intId) const
+{
+    ASSERT(intId < ACCOUNT_TUTORIALS_COUNT);
+    return m_tutorials[intId];
+}
+
 void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* packet)
 {
     // need prevent do internal far teleports in handlers because some handlers do lot steps

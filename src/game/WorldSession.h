@@ -390,11 +390,7 @@ class WorldSession
         void LoadTutorialsData();
         void SendTutorialsData();
         void SaveTutorialsData();
-        uint32 GetTutorialInt(uint32 intId) const
-        {
-            ASSERT(intId < ACCOUNT_TUTORIALS_COUNT);
-            return m_tutorials[intId];
-        }
+        uint32 GetTutorialInt(uint32 intId) const;
         void SetTutorialInt(uint32 intId, uint32 value)
         {
             if (m_tutorials[intId] != value)
