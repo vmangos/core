@@ -558,7 +558,7 @@ bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map cons
     for (int i = 0; i < 12; i++)
     {
         Vector3 newPos;
-        Geometry::GetNearPoint2DAroundPosition(currentPos.x, currentPos.y, newPos.x, newPos.y, STEP_SIZE, Geometry::ClampOrientation(angle + ORIENTATION_OFFSETS[i]));
+        Geometry::GetNearPoint2DAroundPosition(currentPos.x, currentPos.y, newPos.x, newPos.y, STEP_SIZE, Geometry::NormalizeOrientation(angle + ORIENTATION_OFFSETS[i]));
         newPos.z = pMap->GetHeight(newPos.x, newPos.y, currentPos.z + 0.1f, true);
 
         float const zdiff = newPos.z - currentPos.z;

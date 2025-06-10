@@ -1090,7 +1090,7 @@ CreatureAI* GetAI_boss_thaddius(Creature* pCreature)
 // 28062 - Positive Charge (Thaddius)
 struct ThaddiusPositiveChargeScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -1098,6 +1098,7 @@ struct ThaddiusPositiveChargeScript : public SpellScript
             if (spell->GetUnitTarget()->HasAura(28059))
                 spell->damage = 0;
         }
+        return true;
     }
 };
 
@@ -1109,7 +1110,7 @@ SpellScript* GetScript_ThaddiusPositiveCharge(SpellEntry const*)
 // 28085 - Negative Charge (Thaddius)
 struct ThaddiusNegativeChargeScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -1117,12 +1118,34 @@ struct ThaddiusNegativeChargeScript : public SpellScript
             if (spell->GetUnitTarget()->HasAura(28084))
                 spell->damage = 0;
         }
+        return true;
     }
 };
 
 SpellScript* GetScript_ThaddiusNegativeCharge(SpellEntry const*)
 {
     return new ThaddiusNegativeChargeScript();
+}
+
+// 28337 - Magnetic Pull (Thaddius)
+struct ThaddiusMagneticPullScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            float speedXY = float(spell->m_spellInfo->EffectMiscValue[effIdx]) * 0.1f;
+            float speedZ = spell->GetUnitTarget()->GetDistance(spell->m_caster) / speedXY * 0.5f * 20.0f;
+            spell->GetUnitTarget()->KnockBackFrom(spell->m_caster, -speedXY, speedZ);
+            return false;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_ThaddiusMagneticPull(SpellEntry const*)
+{
+    return new ThaddiusMagneticPullScript();
 }
 
 void AddSC_boss_thaddius()
@@ -1157,5 +1180,10 @@ void AddSC_boss_thaddius()
     pNewScript = new Script;
     pNewScript->Name = "spell_thaddius_negative_charge";
     pNewScript->GetSpellScript = &GetScript_ThaddiusNegativeCharge;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_thaddius_magnetic_pull";
+    pNewScript->GetSpellScript = &GetScript_ThaddiusMagneticPull;
     pNewScript->RegisterSelf();
 }

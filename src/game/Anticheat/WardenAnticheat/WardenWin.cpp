@@ -28,15 +28,12 @@
 #include "WardenScan.hpp"
 #include "../Anticheat.h"
 #include "World.h"
-
-#include "Unit.h"
-#include "Chat.h"
 #include "WorldSession.h"
+#include "Util.h"
 #include "Crypto/BigNumber.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"
-#include "Player.h"
 #include "Progression.h"
 
 #include <string>
@@ -180,40 +177,40 @@ static auto constexpr HypervisorCount = sizeof(Hypervisors) / sizeof(Hypervisors
 
 enum WorldEnables
 {
-    TerrainDoodads                  = 0x1,              // default, toggled by sub at 0x673130, which is never called.  should always be set
-    Terrain                         = 0x2,              // default, toggled by sub at 0x6730F0, which is never called.  should always be set
+    TerrainDoodads                  = 0x1,              // default, showDoodads console command, toggled by sub at 0x673130, which is never called.  should always be set
+    Terrain                         = 0x2,              // default, showTerrain console command, toggled by sub at 0x6730F0, which is never called.  should always be set
     TerrainLOD                      = 0x4,              // lod console var
     Unk10                           = 0x10,             // default
     TerrainCulling                  = 0x20,             // default, showCull console command
     TerrainShadows                  = 0x40,             // default, mapShadows console var, showShadow console command
-    TerrainDoodadCollisionVisuals   = 0x80,             // toggled by sub at 0x6731C0, which is never called.  should never be set
-    MapObjects                      = 0x100,            // default, toggled by sub at 0x673430, which is never called.  should always be set
-    MapObjectLighting               = 0x200,            // default, toggled by sub at 0x673360, which is never called.  should always be set
+    TerrainDoodadCollisionVisuals   = 0x80,             // showCollision console command, toggled by sub at 0x6731C0, which is never called.  should never be set
+    MapObjects                      = 0x100,            // default, showMapObjs console command, toggled by sub at 0x673430, which is never called.  should always be set
+    MapObjectLighting               = 0x200,            // default, showMapObjLight console command, toggled by sub at 0x673360, which is never called.  should always be set
     FootPrints                      = 0x400,            // showfootprints console var
-    MapObjectTextures               = 0x800,            // default, toggled by sub at 0x6733A0, which is never called.  should always be set
-    PortalDisplay                   = 0x1000,           // toggled by sub at 0x673470, which is never called.  should never be set
-    PortalVisual                    = 0x2000,           // toggled by sub at 0x6734B0, which is never called.  should never be set
+    MapObjectTextures               = 0x800,            // default, showMapObjTex console command, toggled by sub at 0x6733A0, which is never called.  should always be set
+    PortalDisplay                   = 0x1000,           // showPortals console command, toggled by sub at 0x673470, which is never called.  should never be set
+    PortalVisual                    = 0x2000,           // portalVis console command, toggled by sub at 0x6734B0, which is never called.  should never be set
     DisableDoodadFullAlpha          = 0x4000,           // fullAlpha console var
     DoodadAnimation                 = 0x8000,           // doodadAnim console var
     TriangleStrips                  = 0x10000,          // triangleStrips console var
-    CrappyBatches                   = 0x20000,          // toggled by sub at 0x6733E0, which is never called.  should never be set
+    CrappyBatches                   = 0x20000,          // showCrappyBatches console command, toggled by sub at 0x6733E0, which is never called.  should never be set
     ZoneBoundaryVisuals             = 0x40000,          // zoneBoundary disabled console command (should never be set, also sends CMSG_ZONE_MAP, sub at 0x673850)
-    BSPRender                       = 0x80000,          // toggled by sub at 0x6730A0, which is never called.  should never be set
+    BSPRender                       = 0x80000,          // showMapObjBSP console command, toggled by sub at 0x6730A0, which is never called.  should never be set
     DetailDoodads                   = 0x100000,         // default, showDetailDoodads console command
     ShowQuery                       = 0x200000,         // showQuery disabled console command (should never be set)
-    TerrainDoodadAABoxVisuals       = 0x400000,         // toggled by sub at 0x673170, which is never called.  should never be set
+    TerrainDoodadAABoxVisuals       = 0x400000,         // showAABoxes console command, toggled by sub at 0x673170, which is never called.  should never be set
     TrilinearFiltering              = 0x800000,         // trilinear console var
-    Water                           = 0x1000000,        // default, toggled by sub at 0x673670, which is never called.  should always be set
+    Water                           = 0x1000000,        // default, showWater and waterShow console commands, toggled by sub at 0x673670, which is never called.  should always be set
     WaterParticulates               = 0x2000000,        // default, waterParticulates console command
     TerrainLowDetail                = 0x4000000,        // default, showLowDetail console command
     Specular                        = 0x8000000,        // specular console var
     PixelShaders                    = 0x10000000,       // pixelShaders console var
-    Unknown6737F9                   = 0x20000000,       // unknown, set by sub at 0x6737F0, should never be set
-    Unknown673820                   = 0x40000000,       // unknown, set by sub at 0x673820, should never be set
+    Tris                            = 0x20000000,       // showTris console command, set by sub at 0x6737F0, should never be set
+    Normals                         = 0x40000000,       // showNormals console command, set by sub at 0x673820, should never be set
     Anisotropic                     = 0x80000000,       // anisotropic console var
 
     Required = (TerrainDoodads|Terrain| MapObjects| MapObjectLighting| MapObjectTextures| Water),
-    Prohibited = (TerrainDoodadCollisionVisuals|CrappyBatches|ZoneBoundaryVisuals|BSPRender|ShowQuery|TerrainDoodadAABoxVisuals|Unknown6737F9|Unknown673820),
+    Prohibited = (TerrainDoodadCollisionVisuals|CrappyBatches|ZoneBoundaryVisuals|BSPRender|ShowQuery|TerrainDoodadAABoxVisuals|Tris|Normals),
 };
 
 ClientOffsets const* GetClientOffets(uint32 build)

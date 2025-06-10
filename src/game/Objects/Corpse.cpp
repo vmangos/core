@@ -27,6 +27,7 @@
 #include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "ObjectMgr.h"
+#include "MapManager.h"
 
 Corpse::Corpse(CorpseType type) : WorldObject(), loot(this), lootRecipient(nullptr), m_faction(nullptr)
 {
@@ -189,7 +190,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
     uint8 facialhair = fields[17].GetUInt8();
 
     uint32 guildId      = fields[19].GetUInt32();
-    uint32 playerFlags  = fields[20].GetUInt32();
+    uint32 charFlags    = fields[20].GetUInt32();
 
     ObjectGuid guid = ObjectGuid(HIGHGUID_CORPSE, lowguid);
     ObjectGuid playerGuid = ObjectGuid(HIGHGUID_PLAYER, playerLowGuid);
@@ -230,9 +231,9 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
     SetUInt32Value(CORPSE_FIELD_GUILD, guildId);
 
     uint32 flags = CORPSE_FLAG_UNK2;
-    if (playerFlags & PLAYER_FLAGS_HIDE_HELM)
+    if (charFlags & CHARACTER_FLAG_HIDE_HELM)
         flags |= CORPSE_FLAG_HIDE_HELM;
-    if (playerFlags & PLAYER_FLAGS_HIDE_CLOAK)
+    if (charFlags & CHARACTER_FLAG_HIDE_CLOAK)
         flags |= CORPSE_FLAG_HIDE_CLOAK;
     SetUInt32Value(CORPSE_FIELD_FLAGS, flags);
 

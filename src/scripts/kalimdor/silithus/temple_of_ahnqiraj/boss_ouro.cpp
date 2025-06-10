@@ -377,7 +377,7 @@ struct boss_ouroAI : public ScriptedAI
                     m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-                    std::list<Unit*> lGroundRuptureTargets;
+                    std::vector<Unit*> lGroundRuptureTargets;
                     ThreatList const& lThreat = m_creature->GetThreatManager().getThreatList();
                     for (const auto i : lThreat)
                     {

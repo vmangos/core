@@ -736,10 +736,10 @@ enum MangosStrings
     LANG_YOUR_DEBUG_TARGET_INFO_SET     = 697,
 
     LANG_RESTORED_ITEM                  = 699,
-    //LANG_ARENA_ONE_TOOLOW             = 700,
-    //LANG_ARENA_ONE_MINUTE             = 701,
-    //LANG_ARENA_THIRTY_SECONDS         = 702,
-    //LANG_ARENA_FIFTEEN_SECONDS        = 703,
+    LANG_YOU_SET_BEASTMASTER            = 700,
+    LANG_YOUR_BEASTMASTER_SET           = 701,
+    LANG_CHEAT_BEASTMASTER_ON           = 702,
+    LANG_CHEAT_BEASTMASTER_OFF          = 703,
     //LANG_ARENA_BEGUN                  = 704,
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,

@@ -514,7 +514,7 @@ CreatureAI* GetAI_mob_eyeStalk(Creature* pCreature)
 // 29201 - Corrupted Mind (Loatheb)
 struct LoathebCorruptedMindAoEScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -528,10 +528,11 @@ struct LoathebCorruptedMindAoEScript : public SpellScript
                 case CLASS_DRUID:   spellid = 29194; break;
                 case CLASS_PALADIN: spellid = 29196; break;
                 case CLASS_SHAMAN:  spellid = 29198; break;
-                default: return;
+                default: return false;
             }
             spell->m_caster->CastSpell(spell->GetUnitTarget(), spellid, true);
         }
+        return true;
     }
 };
 

@@ -7,6 +7,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "CreatureGroups.h"
+#include "Chat.h"
 
 /*
 Vanndar: Thunderclap (about 200-300 nature damage per player in range not been upgraded since vanilla, Time between attacks increased by 33%, movement speed reduced by 40%.) Storm Bolt (about 450 nature damage, stuns for 8 seconds, dispellable, used on non tanks) Avatar (50% increased damage and armor, up for 15 seconds, comes back up about 15-20 seconds later) Drek'thar: Whirlwind (2 second cast time, weapon damage to all in range) Frenzy (167% damage increase and attack speed increase by 50%, lasts 2 minutes, goes up after about 15-20 seconds from the start of fight) Knockdown (Infli
@@ -4987,7 +4988,11 @@ struct AV_mineNpcAI : public ScriptedAI
         Map* m = m_creature->GetMap();
         if (!m->IsBattleGround())
             return 0;
+
         BattleGroundAV* bgAv = dynamic_cast<BattleGroundAV*>(((BattleGroundMap*)m)->GetBG());
+        if (!bgAv)
+            return 0;
+
         uint32 m_factionId;
         if (m_creature->GetFactionTemplateId() == 85)
             m_factionId = 1;
@@ -5153,6 +5158,23 @@ CreatureAI* GetAI_npc_av_trigger_for_quest(Creature* creature)
     return new npc_av_trigger_for_questAI(creature);
 }
 
+// 21544, 21565 - Create Shredder
+struct AVCreateShredderScript : SpellScript
+{
+    void OnSummon(Spell* spell, Creature* summon) const final
+    {
+        // Exception for Alterac Shredder. The second effect of the spell (possess) can't target the shredder
+        // because it is not summoned at target selection phase.
+        summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spell->m_spellInfo->EffectTriggerSpell[1]);
+        summon->SetCreatorGuid(spell->m_caster->GetObjectGuid());
+    }
+};
+
+SpellScript* GetScript_AVCreateShredder(SpellEntry const*)
+{
+    return new AVCreateShredderScript();
+}
+
 void AddSC_bg_alterac()
 {
     Script* newscript;
@@ -5280,5 +5302,10 @@ void AddSC_bg_alterac()
     newscript = new Script;
     newscript->Name = "npc_av_trigger_for_quest";
     newscript->GetAI = &GetAI_npc_av_trigger_for_quest;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_av_create_shredder";
+    newscript->GetSpellScript = &GetScript_AVCreateShredder;
     newscript->RegisterSelf();
 }

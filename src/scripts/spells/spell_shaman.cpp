@@ -19,14 +19,14 @@
 // 8026, 8028, 8029, 8248, 8253, 10445, 10523, 16343, 16344, 16389 - Flametongue Weapon/Totem Proc
 struct ShamanFlametongueProcDummyScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
             if (!spell->m_CastItem)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell::EffectDummy: spell %i requires cast Item", spell->m_spellInfo->Id);
-                return;
+                return false;
             }
 
             // found spelldamage coefficients of 0.381% per 0.1 speed and 15.244 per 4.0 speed
@@ -37,6 +37,7 @@ struct ShamanFlametongueProcDummyScript : SpellScript
 
             spell->m_caster->CastCustomSpell(spell->GetUnitTarget(), 10444, dither(totalDamage), {}, {}, true, spell->m_CastItem);
         }
+        return true;
     }
 };
 

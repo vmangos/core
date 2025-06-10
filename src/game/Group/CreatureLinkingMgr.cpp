@@ -90,12 +90,12 @@ void CreatureLinkingMgr::LoadFromDB()
 
             CreatureLinkingInfo tmp;
 
-            uint32 entry = fields[0].GetUInt32();
-            tmp.mapId = fields[1].GetUInt32();
-            tmp.masterId = fields[2].GetUInt32();
-            tmp.linkingFlag = fields[3].GetUInt16();
-            tmp.searchRange = fields[4].GetUInt16();
-            tmp.masterDBGuid = 0;                        // Will be initialized for unique mobs in IsLinkingEntryValid (only for spawning dependend)
+            uint32 entry 	= fields[0].GetUInt32();
+            tmp.mapId 		= fields[1].GetUInt32();
+            tmp.masterId 	= fields[2].GetUInt32();
+            tmp.linkingFlag 	= fields[3].GetUInt16();
+            tmp.searchRange 	= fields[4].GetUInt16();
+            tmp.masterDBGuid 	= 0;                        // Will be initialized for unique mobs in IsLinkingEntryValid (only for spawning dependend)
 
             if (!IsLinkingEntryValid(entry, &tmp, true))
                 continue;
@@ -135,12 +135,12 @@ void CreatureLinkingMgr::LoadFromDB()
         Field* fields = result->Fetch();
         CreatureLinkingInfo tmp;
 
-        uint32 guid = fields[0].GetUInt32();
-        tmp.mapId = INVALID_MAP_ID;           // some invalid value, this marks the guid-linking
-        tmp.masterId = fields[1].GetUInt32();
-        tmp.linkingFlag = fields[2].GetUInt16();
-        tmp.masterDBGuid = tmp.masterId;
-        tmp.searchRange = 0;
+        uint32 guid 		= fields[0].GetUInt32();
+        tmp.mapId 		= INVALID_MAP_ID;           // some invalid value, this marks the guid-linking
+        tmp.masterId 		= fields[1].GetUInt32();
+        tmp.linkingFlag 	= fields[2].GetUInt16();
+        tmp.masterDBGuid 	= tmp.masterId;
+        tmp.searchRange 	= 0;
 
         if (!IsLinkingEntryValid(guid, &tmp, false))
             continue;
@@ -258,12 +258,12 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
 // Linked actions and corresponding flags
 enum EventMask
 {
-    EVENT_MASK_ON_AGGRO = FLAG_AGGRO_ON_AGGRO,
-    EVENT_MASK_ON_EVADE = FLAG_RESPAWN_ON_EVADE | FLAG_DESPAWN_ON_EVADE,
-    EVENT_MASK_ON_DIE = FLAG_DESPAWN_ON_DEATH | FLAG_SELFKILL_ON_DEATH | FLAG_RESPAWN_ON_DEATH | FLAG_FOLLOW,
-    EVENT_MASK_ON_RESPAWN = FLAG_RESPAWN_ON_RESPAWN | FLAG_DESPAWN_ON_RESPAWN | FLAG_FOLLOW,
-    EVENT_MASK_TRIGGER_TO = FLAG_TO_AGGRO_ON_AGGRO | FLAG_TO_RESPAWN_ON_EVADE | FLAG_FOLLOW,
-    EVENT_MASK_ON_DESPAWN = FLAG_DESPAWN_ON_DESPAWN,
+    EVENT_MASK_ON_AGGRO 	= FLAG_AGGRO_ON_AGGRO,
+    EVENT_MASK_ON_EVADE 	= FLAG_RESPAWN_ON_EVADE | FLAG_DESPAWN_ON_EVADE | FLAG_EVADE_ON_EVADE,
+    EVENT_MASK_ON_DIE 		= FLAG_DESPAWN_ON_DEATH | FLAG_SELFKILL_ON_DEATH | FLAG_RESPAWN_ON_DEATH | FLAG_FOLLOW,
+    EVENT_MASK_ON_RESPAWN 	= FLAG_RESPAWN_ON_RESPAWN | FLAG_DESPAWN_ON_RESPAWN | FLAG_FOLLOW,
+    EVENT_MASK_TRIGGER_TO 	= FLAG_TO_AGGRO_ON_AGGRO | FLAG_TO_RESPAWN_ON_EVADE | FLAG_FOLLOW,
+    EVENT_MASK_ON_DESPAWN 	= FLAG_DESPAWN_ON_DESPAWN,
 };
 
 // This functions checks if the NPC has linked NPCs for dynamic action
@@ -418,11 +418,11 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
 
     switch (eventType)
     {
-    case LINKING_EVENT_AGGRO:   eventFlagFilter = EVENT_MASK_ON_AGGRO;   reverseEventFlagFilter = FLAG_TO_AGGRO_ON_AGGRO;   break;
-    case LINKING_EVENT_EVADE:   eventFlagFilter = EVENT_MASK_ON_EVADE;   reverseEventFlagFilter = FLAG_TO_RESPAWN_ON_EVADE; break;
-    case LINKING_EVENT_DIE:     eventFlagFilter = EVENT_MASK_ON_DIE;     reverseEventFlagFilter = 0;                        break;
-    case LINKING_EVENT_RESPAWN: eventFlagFilter = EVENT_MASK_ON_RESPAWN; reverseEventFlagFilter = FLAG_FOLLOW;              break;
-    case LINKING_EVENT_DESPAWN: eventFlagFilter = EVENT_MASK_ON_DESPAWN; reverseEventFlagFilter = 0;                        break;
+        case LINKING_EVENT_AGGRO:   eventFlagFilter = EVENT_MASK_ON_AGGRO;   reverseEventFlagFilter = FLAG_TO_AGGRO_ON_AGGRO;   break;
+        case LINKING_EVENT_EVADE:   eventFlagFilter = EVENT_MASK_ON_EVADE;   reverseEventFlagFilter = FLAG_TO_RESPAWN_ON_EVADE; break;
+        case LINKING_EVENT_DIE:     eventFlagFilter = EVENT_MASK_ON_DIE;     reverseEventFlagFilter = 0;                        break;
+        case LINKING_EVENT_RESPAWN: eventFlagFilter = EVENT_MASK_ON_RESPAWN; reverseEventFlagFilter = FLAG_FOLLOW;              break;
+        case LINKING_EVENT_DESPAWN: eventFlagFilter = EVENT_MASK_ON_DESPAWN; reverseEventFlagFilter = 0;                        break;
     }
 
     // Process Slaves (by entry)
@@ -532,7 +532,8 @@ void CreatureLinkingHolder::ProcessSlave(CreatureLinkingEvent eventType, Creatur
                 else
                     pSlave->SetInCombatWith(pEnemy);
             }
-            else {
+            else if (pSlave->IsAlive())
+            {
                 pSlave->AI()->AttackStart(pEnemy);
                 if (pSource->GetMap()->IsDungeon() && pSource->HasStaticFlag(CREATURE_STATIC_FLAG_2_FORCE_RAID_COMBAT))
                     pSlave->SetInCombatWithZone();
@@ -542,6 +543,8 @@ void CreatureLinkingHolder::ProcessSlave(CreatureLinkingEvent eventType, Creatur
     case LINKING_EVENT_EVADE:
         if (flag & FLAG_DESPAWN_ON_EVADE && pSlave->IsAlive())
             pSlave->ForcedDespawn();
+        if (flag & FLAG_EVADE_ON_EVADE && pSlave->IsAlive())
+            pSlave->AI()->EnterEvadeMode();
         if (flag & FLAG_RESPAWN_ON_EVADE && !pSlave->IsAlive())
             pSlave->Respawn();
         break;

@@ -19,7 +19,7 @@
 // 28598 - Touch of Weakness
 struct PriestTouchOfWeaknessScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget() && spell->m_triggeredByAuraSpell)
         {
@@ -46,10 +46,11 @@ struct PriestTouchOfWeaknessScript : SpellScript
                     break; // Rank 6
                 default:
                     sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Spell::EffectDummy: Spell 28598 triggered by unhandeled spell %u", spell->m_triggeredByAuraSpell->Id);
-                    return;
+                    return false;
             }
             spell->m_caster->CastSpell(spell->GetUnitTarget(), spellId, true, nullptr);
         }
+        return true;
     }
 };
 

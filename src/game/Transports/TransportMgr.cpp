@@ -19,10 +19,12 @@
 #include "Policies/SingletonImp.h"
 #include "TransportMgr.h"
 #include "Transport.h"
-#include "MapManager.h"
-#include "ObjectMgr.h"
+#include "Geometry.h"
 #include "MoveMap.h"
-#include "World.h"
+#include "SQLStorages.h"
+#include "MoveSplineInitArgs.h"
+#include "Map.h"
+#include "MapManager.h"
 
 INSTANTIATE_SINGLETON_1(TransportMgr);
 
@@ -44,14 +46,15 @@ TransportTemplate* TransportMgr::GetTransportTemplate(uint32 entry)
 
 void TransportMgr::LoadTransportTemplates()
 {
-    for (uint32 entry = 1; entry <= sGOStorage.GetMaxEntry(); ++entry)
+    for (auto const& itr : sObjectMgr.GetGameObjectInfoMap())
     {
-        auto data = sGOStorage.LookupEntry<GameObjectInfo>(entry);
+        uint32 entry = itr.first;
+        auto const& data = itr.second;
         if (data && data->type == GAMEOBJECT_TYPE_MO_TRANSPORT)
         {
             TransportTemplate& transportTemplate = m_transportTemplates[entry];
             transportTemplate.entry = entry;
-            if (!GenerateWaypoints(data, transportTemplate))
+            if (!GenerateWaypoints(data.get(), transportTemplate))
                 m_transportTemplates.erase(entry);
         }
     }
@@ -113,7 +116,7 @@ bool TransportMgr::GenerateWaypoints(GameObjectInfo const* goinfo, TransportTemp
                 KeyFrame k(node_i);
                 G3D::Vector3 h;
                 orientationSpline.evaluate_derivative(i + 1, 0.0f, h);
-                k.InitialOrientation = MapManager::NormalizeOrientation(atan2(h.y, h.x) + M_PI);
+                k.InitialOrientation = Geometry::NormalizeOrientation(atan2(h.y, h.x) + M_PI);
 
                 keyFrames.push_back(k);
                 splinePath.push_back(G3D::Vector3(node_i.x, node_i.y, node_i.z));
@@ -390,7 +393,7 @@ void TransportMgr::SpawnContinentTransports()
 
     uint32 oldMSTime = WorldTimer::getMSTime();
 
-    std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT `entry`, `period` FROM `transports`");
+    std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT `entry`, `period` FROM `transports` t1 WHERE `build`=(SELECT max(`build`) FROM `transports` t2 WHERE t1.`entry`=t2.`entry` && `build` <= %u)", SUPPORTED_CLIENT_BUILD);
 
     uint32 count = 0;
     if (result)

@@ -19,7 +19,7 @@
 // 18788 - Demonic Sacrifice
 struct WarlockDemonicSacrificeScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit && spell->GetUnitTarget())
         {
@@ -41,11 +41,12 @@ struct WarlockDemonicSacrificeScript : SpellScript
                     break;               // succubus
                 default:
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Demonic Sacrifice: Unhandled creature entry (%u) case.", entry);
-                    return;
+                    return true;
             }
 
             spell->m_casterUnit->CastSpell(spell->m_casterUnit, spellId, true);
         }
+        return true;
     }
 };
 
@@ -57,7 +58,7 @@ SpellScript* GetScript_WarlockDemonicSacrifice(SpellEntry const*)
 // 17962, 18930, 18931, 18932 - Conflagrate
 struct WarlockConflagrateScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -74,6 +75,7 @@ struct WarlockConflagrateScript : SpellScript
                 }
             }
         }
+        return true;
     }
 };
 
@@ -85,7 +87,7 @@ SpellScript* GetScript_WarlockConflagrate(SpellEntry const*)
 // 1454, 1455, 1456, 11687, 11688, 11689 - Life Tap
 struct WarlockLifeTapScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
         {
@@ -117,6 +119,7 @@ struct WarlockLifeTapScript : SpellScript
             else
                 spell->SendCastResult(SPELL_FAILED_FIZZLE);
         }
+        return true;
     }
 };
 
@@ -128,7 +131,7 @@ SpellScript* GetScript_WarlockLifeTap(SpellEntry const*)
 // 18280 - Curse of Agony Dummy
 struct WarlockCurseOfAgonyDummyScript : SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
@@ -146,12 +149,180 @@ struct WarlockCurseOfAgonyDummyScript : SpellScript
             }
         }
 #endif
+        return true;
     }
 };
 
 SpellScript* GetScript_WarlockCurseOfAgonyDummy(SpellEntry const*)
 {
     return new WarlockCurseOfAgonyDummyScript();
+}
+
+// 19505, 19731, 19734, 19736 - Devour Magic
+struct WarlockDevourMagicScript : SpellScript
+{
+    void OnSuccessfulDispel(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
+        {
+            uint32 healSpell;
+            switch (spell->m_spellInfo->Id)
+            {
+                case 19505:
+                    healSpell = 19658;
+                    break;
+                case 19731:
+                    healSpell = 19732;
+                    break;
+                case 19734:
+                    healSpell = 19733;
+                    break;
+                case 19736:
+                    healSpell = 19735;
+                    break;
+                default:
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Spell for Devour Magic %d not handled in Spell::EffectDispel", spell->m_spellInfo->Id);
+                    return;
+            }
+            spell->m_casterUnit->CastSpell(spell->m_casterUnit, healSpell, true);
+        }
+    }
+};
+
+SpellScript* GetScript_WarlockDevourMagic(SpellEntry const*)
+{
+    return new WarlockDevourMagicScript();
+}
+
+// 1122, 24670 - Inferno
+struct WarlockInfernoScript : SpellScript
+{
+    void OnSummon(Spell* spell, Creature* summon) const final
+    {
+        // Enslave demon effect, without mana cost and cooldown
+        spell->m_caster->CastSpell(summon, 20882, true);
+
+        // Short root spell on infernal from sniffs
+        summon->CastSpell(summon, 22707, true);
+
+        // Inferno effect
+        summon->CastSpell(summon, 22703, true);
+    }
+};
+
+SpellScript* GetScript_WarlockInferno(SpellEntry const*)
+{
+    return new WarlockInfernoScript();
+}
+
+// 5699 - Create Healthstone
+// 6201 - Create Healthstone (Minor)
+// 6202 - Create Healthstone (Lesser)
+// 11729 - Create Healthstone (Greater)
+// 11730 - Create Healthstone (Major)
+struct WarlockCreateHealthstoneScript : SpellScript
+{
+    enum
+    {
+        SPELL_IMPROVED_HEALTHSTONE_R1 = 18692,
+        SPELL_IMPROVED_HEALTHSTONE_R2 = 18693,
+    };
+
+    uint32 GetItemId(Unit* pCaster, uint32 spellId) const
+    {
+        uint32 rank = 0;
+        uint32 itemId;
+        Unit::AuraList const& mDummyAuras = pCaster->GetAurasByType(SPELL_AURA_DUMMY);
+        for (const auto aura : mDummyAuras)
+        {
+            if (aura->GetId() == SPELL_IMPROVED_HEALTHSTONE_R1)
+            {
+                rank = 1;
+                break;
+            }
+            else if (aura->GetId() == SPELL_IMPROVED_HEALTHSTONE_R2)
+            {
+                rank = 2;
+                break;
+            }
+        }
+
+        static uint32 const items[5][3] =
+        {
+            { 5512, 19004, 19005 },              // Minor Healthstone
+            { 5511, 19006, 19007 },              // Lesser Healthstone
+            { 5509, 19008, 19009 },              // Healthstone
+            { 5510, 19010, 19011 },              // Greater Healthstone
+            { 9421, 19012, 19013 },              // Major Healthstone
+        };
+
+        switch (spellId)
+        {
+            case  6201:
+                itemId = items[0][rank];
+                break; // Minor Healthstone
+            case  6202:
+                itemId = items[1][rank];
+                break; // Lesser Healthstone
+            case  5699:
+                itemId = items[2][rank];
+                break; // Healthstone
+            case 11729:
+                itemId = items[3][rank];
+                break; // Greater Healthstone
+            case 11730:
+                itemId = items[4][rank];
+                break; // Major Healthstone
+            default:
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Unknown rank of Create Healthstone with spell id %u.", spellId);
+                itemId = 0;
+                break;
+        }
+
+        return itemId;
+    }
+
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        Player* pCaster = spell->m_caster->ToPlayer();
+        if (!pCaster)
+            SPELL_CAST_OK;
+
+        uint32 const itemId = GetItemId(pCaster, spell->m_spellInfo->Id);
+        if (!itemId)
+            return SPELL_CAST_OK;
+
+        ItemPosCountVec dest;
+        InventoryResult msg = pCaster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+        if (msg != EQUIP_ERR_OK)
+        {
+            pCaster->SendEquipError(msg, nullptr, nullptr, itemId);
+            return SPELL_FAILED_DONT_REPORT;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx != EFFECT_INDEX_0)
+            return true;
+
+        if (!spell->GetUnitTarget())
+            return true;
+
+        uint32 const itemId = GetItemId(spell->GetUnitTarget(), spell->m_spellInfo->Id);
+        if (!itemId)
+            return true;
+        
+        spell->DoCreateItem(effIdx, itemId);
+        return true;
+    }
+};
+
+SpellScript* GetScript_WarlockCreateHealthstone(SpellEntry const*)
+{
+    return new WarlockCreateHealthstoneScript();
 }
 
 void AddSC_warlock_spell_scripts()
@@ -176,5 +347,20 @@ void AddSC_warlock_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_warlock_curse_of_agony_dummy";
     newscript->GetSpellScript = &GetScript_WarlockCurseOfAgonyDummy;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warlock_devour_magic";
+    newscript->GetSpellScript = &GetScript_WarlockDevourMagic;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warlock_inferno";
+    newscript->GetSpellScript = &GetScript_WarlockInferno;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warlock_create_healthstone";
+    newscript->GetSpellScript = &GetScript_WarlockCreateHealthstone;
     newscript->RegisterSelf();
 }

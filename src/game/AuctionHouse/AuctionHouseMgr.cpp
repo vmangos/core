@@ -397,7 +397,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
 void AuctionHouseMgr::LoadAuctions()
 {
-    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT COUNT(*) FROM auction");
+    std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT `id`, `house_id`, `item_guid`, `item_id`, `seller_guid`, `buyout_price`, `expire_time`, `buyer_guid`, `last_bid`, `start_bid`, `deposit` FROM `auction`");
     if (!result)
     {
         BarGoLink bar(1);
@@ -407,33 +407,12 @@ void AuctionHouseMgr::LoadAuctions()
         return;
     }
 
-    Field* fields = result->Fetch();
-    uint32 AuctionCount = fields[0].GetUInt32();
-
-    if (!AuctionCount)
-    {
-        BarGoLink bar(1);
-        bar.step();
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 auctions. DB table `auction` is empty.");
-        return;
-    }
-
-    result = CharacterDatabase.Query("SELECT `id`, `house_id`, `item_guid`, `item_id`, `seller_guid`, `buyout_price`, `expire_time`, `buyer_guid`, `last_bid`, `start_bid`, `deposit` FROM `auction`");
-    if (!result)
-    {
-        BarGoLink bar(1);
-        bar.step();
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 auctions. DB table `auction` is empty.");
-        return;
-    }
-
-    BarGoLink bar(AuctionCount);
+    BarGoLink bar(result->GetRowCount());
+    uint32 count = 0;
 
     do
     {
-        fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         bar.step();
 
@@ -489,12 +468,12 @@ void AuctionHouseMgr::LoadAuctions()
         }
 
         GetAuctionsMap(auction->auctionHouseEntry)->AddAuction(auction);
-
+        ++count;
     }
     while (result->NextRow());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u auctions", AuctionCount);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u auctions", count);
 }
 
 void AuctionHouseMgr::AddAItem(Item* it)

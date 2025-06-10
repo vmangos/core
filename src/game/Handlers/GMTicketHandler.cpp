@@ -24,7 +24,6 @@
 #include "WorldPacket.h"
 #include "Log.h"
 #include "GMTicketMgr.h"
-#include "ObjectAccessor.h"
 #include "Player.h"
 #include "Chat.h"
 #include "World.h"

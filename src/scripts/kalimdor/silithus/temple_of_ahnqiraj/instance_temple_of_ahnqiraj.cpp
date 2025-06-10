@@ -469,8 +469,7 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (!pCthun)
         return;
 
-    std::list<Player*> candidates;
-    std::list<Player*>::iterator j;
+    std::vector<Player*> candidates;
     Map::PlayerList const& PlayerList = GetMap()->GetPlayers();
     if (PlayerList.isEmpty())
         return;
@@ -479,10 +478,12 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     {
         if (Player* player = itr.getSource())
         {
-            if (!player->IsDead()) {
+            if (!player->IsDead())
+            {
                 auto find_it = std::find_if(cthunWhisperMutes.begin(), cthunWhisperMutes.end(), 
                     [player](std::pair<ObjectGuid, uint32> const& e) {return e.first == player->GetObjectGuid(); });
-                if (find_it == cthunWhisperMutes.end()) {
+                if (find_it == cthunWhisperMutes.end())
+                {
                     candidates.push_back(player);
                 }
             }
@@ -492,9 +493,8 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (candidates.empty())
         return;
 
-    j = candidates.begin();
-    std::advance(j, urand(0, candidates.size() - 1));
-    Player* targetPlayer = *j;
+    Player* targetPlayer = SelectRandomContainerElement(candidates);
+
     // ToDo: also cast the C'thun Whispering charm spell - requires additional research
     DoScriptText(irand(SAY_CTHUN_WHISPER_8, SAY_CTHUN_WHISPER_1), pCthun, targetPlayer);
 
@@ -580,13 +580,13 @@ void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
     // Player is ported to center of c'thun with a small, random, offset to knock the player in a random direction.
     AreaTriggerEntry const* cthunAreaTrigger = sObjectMgr.GetAreaTrigger(AREATRIGGER_CTHUN_KNOCKBACK);
     if (cthunAreaTrigger) {
-        float x = cthunAreaTrigger->x + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-        float y = cthunAreaTrigger->y + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        float x = cthunAreaTrigger->x + cos(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
+        float y = cthunAreaTrigger->y + sin(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
         pPlayer->NearTeleportTo(x, y, cthunAreaTrigger->z, pPlayer->GetOrientation());
     }
     else {
-        float x = -8578.0f + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-        float y = 1986.8f + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        float x = -8578.0f + cos(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
+        float y = 1986.8f + sin(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
         pPlayer->NearTeleportTo(x, y, 100.4f, pPlayer->GetOrientation());
         sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
             AREATRIGGER_CTHUN_KNOCKBACK);

@@ -537,46 +537,42 @@ enum UnitVisibility
     VISIBILITY_RESPAWN            = 5                       // special totally not detectable visibility for force delete object at respawn command
 };
 
-// [-ZERO] Need recheck values
 // Value masks for UNIT_FIELD_FLAGS
 enum UnitFlags
 {
     UNIT_FLAG_NONE                  = 0x00000000,
-    UNIT_FLAG_UNK_0                 = 0x00000001,           // Movement checks disabled, likely paired with loss of client control packet.
-    UNIT_FLAG_SPAWNING              = 0x00000002,           // not attackable
-    UNIT_FLAG_DISABLE_MOVE          = 0x00000004,
-    UNIT_FLAG_PLAYER_CONTROLLED     = 0x00000008,           // players, pets, totems, guardians, companions, charms, any units associated with players
-    UNIT_FLAG_PET_RENAME            = 0x00000010,           // Old pet rename: moved to UNIT_FIELD_BYTES_2,2 in TBC+
-    UNIT_FLAG_PET_ABANDON           = 0x00000020,           // Old pet abandon: moved to UNIT_FIELD_BYTES_2,2 in TBC+
-    UNIT_FLAG_UNK_6                 = 0x00000040,
-    UNIT_FLAG_IMMUNE_TO_PLAYER      = 0x00000100,           // Target is immune to players
-    UNIT_FLAG_IMMUNE_TO_NPC         = 0x00000200,           // Target is immune to creatures
-    UNIT_FLAG_PVP                   = 0x00001000,
-    UNIT_FLAG_SILENCED              = 0x00002000,           // silenced, 2.1.1
-    UNIT_FLAG_UNK_14                = 0x00004000,
-    UNIT_FLAG_USE_SWIM_ANIMATION    = 0x00008000,
-    UNIT_FLAG_NON_ATTACKABLE_2      = 0x00010000,           // removes attackable icon, if on yourself, cannot assist self but can cast TARGET_UNIT_CASTER spells - added by SPELL_AURA_MOD_UNATTACKABLE
-    UNIT_FLAG_PACIFIED              = 0x00020000,
-    UNIT_FLAG_STUNNED               = 0x00040000,           // Unit is a subject to stun, turn and strafe movement disabled
-    UNIT_FLAG_IN_COMBAT             = 0x00080000,
-    UNIT_FLAG_TAXI_FLIGHT           = 0x00100000,           // Unit is on taxi, paired with a duplicate loss of client control packet (likely a legacy serverside hack). Disables any spellcasts not allowed in taxi flight client-side.
+    UNIT_FLAG_SERVER_CONTROLLED     = 0x00000001,           // Set only when unit movement is moved by server together with UNIT_FLAG_STUNNED. Only set to units controlled by client. Client function CGUnit_C::IsClientControlled returns false when set for owner.
+    UNIT_FLAG_SPAWNING              = 0x00000002,           // Not attackable, set when creature starts to cast spells with SPELL_EFFECT_SPAWN and cast time, removed when spell hits caster.
+    UNIT_FLAG_REMOVE_CLIENT_CONTROL = 0x00000004,           // This is a legacy flag used to disable player movement while controlling other units, SMSG_CLIENT_CONTROL replaces this functionality clientside now. Always paired with UNIT_FLAG_TAXI_FLIGHT.
+    UNIT_FLAG_PLAYER_CONTROLLED     = 0x00000008,           // Added to players, pets, totems, guardians, companions, charms, any units associated with players.
+    UNIT_FLAG_PET_RENAME            = 0x00000010,           // Pet can be renamed by owner. Moved to UNIT_FIELD_BYTES_2,2 in TBC+.
+    UNIT_FLAG_PET_ABANDON           = 0x00000020,           // Pet can be abandoned by owner. Moved to UNIT_FIELD_BYTES_2,2 in TBC+.
+    UNIT_FLAG_PLUS_MOB              = 0x00000040,           // Creature rank > 0, confirmed in 1.8 sniffs, client uses it in Script::UnitIsPlusMob.
+    UNIT_FLAG_NOT_ATTACKABLE_1      = 0x00000080,           // Most likely used by Beastmaster cheat.
+    UNIT_FLAG_IMMUNE_TO_PLAYER      = 0x00000100,           // Cannot be attacked by players. It also prevents the unit from attacking other players.
+    UNIT_FLAG_IMMUNE_TO_NPC         = 0x00000200,           // Cannot be attacked by creatures. It also prevents the unit from attacking other creatures.
+    UNIT_FLAG_LOOTING               = 0x00000400,           // Displays loot animation.
+    UNIT_FLAG_PET_IN_COMBAT         = 0x00000800,           // Something to do with combat but it's not clear what.
+    UNIT_FLAG_PVP                   = 0x00001000,           // Makes player attackable by enemy faction players. Creatures can be assisted by friendly players and will flag attackers for PvP as well.
+    UNIT_FLAG_SILENCED              = 0x00002000,           // Prevents casting spells that have SPELL_PREVENTION_TYPE_SILENCE. Added by SPELL_AURA_MOD_SILENCE.
+    UNIT_FLAG_UNK_14                = 0x00004000,           // Never seen in sniffs.
+    UNIT_FLAG_USE_SWIM_ANIMATION    = 0x00008000,           // Without it units walk on the sea floor instead of swimming.
+    UNIT_FLAG_NON_ATTACKABLE_2      = 0x00010000,           // Removes attackable icon, if on yourself, cannot assist self but can cast TARGET_UNIT_CASTER spells. Added by SPELL_AURA_MOD_UNATTACKABLE.
+    UNIT_FLAG_PACIFIED              = 0x00020000,           // Prevents melee attacks and casting spells that have SPELL_PREVENTION_TYPE_PACIFY. Added by SPELL_AURA_MOD_PACIFY.
+    UNIT_FLAG_STUNNED               = 0x00040000,           // Turn and strafe movement disabled. Added by SPELL_AURA_MOD_STUN.
+    UNIT_FLAG_IN_COMBAT             = 0x00080000,           // Unit is engaged in combat.
+    UNIT_FLAG_TAXI_FLIGHT           = 0x00100000,           // Unit is on taxi, paired with a duplicate loss of client control packet (likely a legacy serverside hack). Disables any spell casts not allowed in taxi flight client-side.
+    UNIT_FLAG_DISARMED              = 0x00200000,           // Prevents using abilities that require a weapon. Added by SPELL_AURA_MOD_DISARM.
     UNIT_FLAG_CONFUSED              = 0x00400000,           // Unit is a subject to confused movement, movement checks disabled, paired with loss of client control packet.
     UNIT_FLAG_FLEEING               = 0x00800000,           // Unit is a subject to fleeing movement, movement checks disabled, paired with loss of client control packet.
     UNIT_FLAG_POSSESSED             = 0x01000000,           // Unit is under remote control by another unit, movement checks disabled, paired with loss of client control packet. New master is allowed to use melee attack and can't select this unit via mouse in the world (as if it was own character).
-    UNIT_FLAG_NOT_SELECTABLE        = 0x02000000,
-    UNIT_FLAG_SKINNABLE             = 0x04000000,
-    UNIT_FLAG_AURAS_VISIBLE         = 0x08000000,           // magic detect
-    UNIT_FLAG_PREVENT_ANIM          = 0x20000000,           // Prevent automatically playing emotes from parsing chat text, for example "lol" in /say, ending message with ? or !, or using /yell
-    UNIT_FLAG_SHEATHE               = 0x40000000,
-    UNIT_FLAG_IMMUNE                = 0x80000000,           // Immune to damage
-
-    // [-ZERO] TBC enumerations [?]
-    UNIT_FLAG_NOT_ATTACKABLE_1      = 0x00000080,           // ?? (UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_NOT_ATTACKABLE_1) is NON_PVP_ATTACKABLE
-    UNIT_FLAG_LOOTING               = 0x00000400,           // loot animation
-    UNIT_FLAG_PET_IN_COMBAT         = 0x00000800,           // in combat?, 2.0.8
-    UNIT_FLAG_DISARMED              = 0x00200000,           // disable melee spells casting..., "Required melee weapon" added to melee spells tooltip.
-
-    UNIT_FLAG_UNK_28                = 0x10000000,
+    UNIT_FLAG_NOT_SELECTABLE        = 0x02000000,           // Unit cannot be selected, targeted with negative spells, attacked or interacted with. Can still be targeted with positive spells.
+    UNIT_FLAG_SKINNABLE             = 0x04000000,           // Unit can be skinned and then looted. Can be applied to players too inside battlegrounds.
+    UNIT_FLAG_AURAS_VISIBLE         = 0x08000000,           // Detect Magic. Added by SPELL_AURA_AURAS_VISIBLE.
+    UNIT_FLAG_UNK_28                = 0x10000000,           // Never seen in sniffs.
+    UNIT_FLAG_PREVENT_ANIM          = 0x20000000,           // Prevent automatically playing emotes from parsing chat text, for example "lol" in /say, ending message with ? or !, or using /yell.
+    UNIT_FLAG_SHEATHE               = 0x40000000,           // Never seen in sniffs.
+    UNIT_FLAG_IMMUNE                = 0x80000000,           // Immune to damage. It prevents interacting with some GameObjects like the WSG flag.
 };
 
 static char const* UnitFlagToString(uint32 flag)
@@ -585,20 +581,20 @@ static char const* UnitFlagToString(uint32 flag)
     {
         case UNIT_FLAG_NONE:
             return "None";
-        case UNIT_FLAG_UNK_0:
-            return "Unk0";
+        case UNIT_FLAG_SERVER_CONTROLLED:
+            return "Server Controlled";
         case UNIT_FLAG_SPAWNING:
             return "Spawning";
-        case UNIT_FLAG_DISABLE_MOVE:
-            return "Disable Move";
+        case UNIT_FLAG_REMOVE_CLIENT_CONTROL:
+            return "Remove Client Control";
         case UNIT_FLAG_PLAYER_CONTROLLED:
             return "Player Controlled";
         case UNIT_FLAG_PET_RENAME:
             return "Pet Rename";
         case UNIT_FLAG_PET_ABANDON:
             return "Pet Abandon";
-        case UNIT_FLAG_UNK_6:
-            return "Unk6";
+        case UNIT_FLAG_PLUS_MOB:
+            return "Plus Mob";
         case UNIT_FLAG_NOT_ATTACKABLE_1:
             return "Not Attackable 1";
         case UNIT_FLAG_IMMUNE_TO_PLAYER:
@@ -644,7 +640,7 @@ static char const* UnitFlagToString(uint32 flag)
         case UNIT_FLAG_UNK_28:
             return "Unk28";
         case UNIT_FLAG_PREVENT_ANIM:
-            return "Prvent Anim";
+            return "Prevent Anim";
         case UNIT_FLAG_SHEATHE:
             return "Sheathe";
         case UNIT_FLAG_IMMUNE:

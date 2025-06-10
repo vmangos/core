@@ -167,7 +167,7 @@ enum Powers
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
 
-#define MAX_POWERS                        5                 // not count POWER_RUNES for now
+#define MAX_POWERS                        5
 
 static char const* PowerToString(uint32 power)
 {
@@ -1714,6 +1714,7 @@ enum MailResponseResult
 // in fact, these are also used elsewhere
 enum PetTameFailureReason
 {
+    PETTAME_NONE                    = 0,                    // no error, don't send to client
     PETTAME_INVALIDCREATURE         = 1,
     PETTAME_TOOMANY                 = 2,
     PETTAME_CREATUREALREADYOWNED    = 3,

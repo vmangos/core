@@ -39,6 +39,7 @@
 #include "AuraRemovalMgr.h"
 #include "AutoBroadCastMgr.h"
 #include "SpellModMgr.h"
+#include "MapManager.h"
 #include "CreatureGroups.h"
 #include "HardcodedEvents.h"
 
@@ -1066,23 +1067,6 @@ bool ChatHandler::HandleReloadCreatureQuestInvRelationsCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleReloadCreatureTemplatesCommand(char* args)
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `creature_template` Table!");
-    uint32 entry;
-    if (ExtractUInt32(&args, entry))
-    {
-        sObjectMgr.LoadCreatureTemplate(entry);
-        PSendSysMessage("Creature template %u reloaded.", entry);
-    }
-    else
-    {
-        sObjectMgr.LoadCreatureTemplates();
-        SendSysMessage("DB table `creature_template` reloaded.");
-    }
-    return true;
-}
-
 bool ChatHandler::HandleReloadGossipMenuCommand(char* /*args*/)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `gossip_menu` Table!");
@@ -1746,13 +1730,6 @@ bool ChatHandler::HandleReloadGameObjectCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleReloadCreatureTemplate(char*)
-{
-    sObjectMgr.LoadCreatureTemplates();
-    SendSysMessage(">> Table `creature_template` reloaded.");
-    return true;
-}
-
 bool ChatHandler::HandleReloadItemTemplate(char*)
 {
     sObjectMgr.LoadItemPrototypes();
@@ -1767,10 +1744,37 @@ bool ChatHandler::HandleReloadMapTemplate(char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadGameObjectTemplate(char*)
+bool ChatHandler::HandleReloadCreatureTemplatesCommand(char* args)
 {
-    sObjectMgr.LoadGameobjectInfo();
-    SendSysMessage(">> Table `gameobject_template` reloaded.");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `creature_template` Table!");
+    uint32 entry;
+    if (ExtractUInt32(&args, entry))
+    {
+        sObjectMgr.LoadCreatureTemplate(entry);
+        PSendSysMessage("Creature template %u reloaded.", entry);
+    }
+    else
+    {
+        sObjectMgr.LoadCreatureTemplates();
+        SendSysMessage("DB table `creature_template` reloaded.");
+    }
+    return true;
+}
+
+bool ChatHandler::HandleReloadGameObjectTemplatesCommand(char* args)
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `gameobject_template` Table!");
+    uint32 entry;
+    if (ExtractUInt32(&args, entry))
+    {
+        sObjectMgr.LoadGameObjectTemplate(entry);
+        PSendSysMessage("GameObject template %u reloaded.", entry);
+    }
+    else
+    {
+        sObjectMgr.LoadGameObjectTemplates();
+        SendSysMessage("DB table `gameobject_template` reloaded.");
+    }
     return true;
 }
 

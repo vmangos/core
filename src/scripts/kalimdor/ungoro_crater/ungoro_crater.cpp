@@ -402,7 +402,7 @@ struct mob_captured_felwood_oozeAI : public ScriptedAI
         if (type == FOLLOW_MOTION_TYPE && !mergeDone)
         {
             if (Creature* primalOoze = m_creature->FindNearestCreature(NPC_PRIMAL_OOZE, 5.0f))
-                if (DoCastSpellIfCan(primalOoze, SPELL_MERGING_OOZES))
+                if (DoCastSpellIfCan(primalOoze, SPELL_MERGING_OOZES) == CAST_OK)
                     mergeDone = true;
         }
     }
@@ -915,7 +915,7 @@ CreatureAI* GetAI_npc_simone_the_inconspicuous(Creature* pCreature)
 // 23206 - Chain Lightning (Simone the Seductress)
 struct SimoneSeductressChainLightningScript : public SpellScript
 {
-    void OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
@@ -923,6 +923,7 @@ struct SimoneSeductressChainLightningScript : public SpellScript
             if (spell->GetUnitTarget()->HasAura(20190))
                 spell->damage *= 0.25;
         }
+        return true;
     }
 };
 

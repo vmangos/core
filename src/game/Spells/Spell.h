@@ -379,6 +379,7 @@ class Spell
 
         bool CheckTarget(Unit* target, SpellEffectIndex eff);
         bool CanAutoCast(Unit* target);
+        PetTameFailureReason CheckTamingSpell(Player* caster, bool gm);
 
         static void SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result);
         void SendCastResult(SpellCastResult result);
@@ -404,6 +405,7 @@ class Spell
         Item* m_CastItem = nullptr;
         SpellCastTargets m_targets;
 
+        void SetCastTime(int32 castTime) { m_casttime = castTime; }
         int32 GetCastTime() const { return m_casttime; }
         uint32 GetCastedTime() const { return m_timer; }
         bool IsChanneled() const { return m_channeled; }

@@ -1050,7 +1050,7 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_NEARBY_GAMEOBJECT:
         {
-            if (!sObjectMgr.GetGameObjectInfo(m_value1))
+            if (!sObjectMgr.GetGameObjectTemplate(m_value1))
             {
                 if (!sObjectMgr.IsExistingGameObjectId(m_value1))
                 {
@@ -1106,7 +1106,7 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_SOURCE_ENTRY:
         {
-            if (!sObjectMgr.GetCreatureTemplate(m_value1) && !sObjectMgr.GetGameObjectInfo(m_value1))
+            if (!sObjectMgr.GetCreatureTemplate(m_value1) && !sObjectMgr.GetGameObjectTemplate(m_value1))
             {
                 if (!sObjectMgr.IsExistingCreatureId(m_value1) && !sObjectMgr.IsExistingGameObjectId(m_value1))
                 {

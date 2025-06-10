@@ -573,7 +573,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (tList.empty())
             return nullptr;
 
-        std::list<Player*> candidates;
+        std::vector<Player*> candidates;
         ThreatList::const_iterator i = tList.begin();
 
         // skipping top-aggro if there are more than 1 person on threat list
@@ -594,9 +594,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (candidates.empty())
             return nullptr;
 
-        auto candIt = candidates.begin();
-        std::advance(candIt, urand(0, candidates.size() - 1));
-        return *candIt;
+        return SelectRandomContainerElement(candidates);
     }
 };
 

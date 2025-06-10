@@ -2877,93 +2877,6 @@ CreatureAI* GetAI_npc_Shai(Creature* pCreature)
     return new npc_ShaiAI(pCreature);
 }
 
-/** EVENT NOSTALRIUS VAM ,SAND PRINCE */
-
-enum
-{
-    SPELL_CHARGE_VAM     = 26561,
-    SPELL_IMPALE         = 28783,
-    SPELL_ENRAGE         = 34624,
-};
-
-struct boss_vamAI : public ScriptedAI
-{
-    boss_vamAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 Charge_Timer;
-    uint32 KnockBack_Timer;
-    uint32 Enrage_Timer;
-
-    bool Enraged;
-
-    void Reset() override
-    {
-        Charge_Timer = urand(15000, 27000);
-        KnockBack_Timer = urand(8000, 20000);
-        Enrage_Timer = 240000;
-
-        Enraged = false;
-    }
-
-    void Aggro(Unit *who) override
-    {
-    }
-
-    void JustDied(Unit* Killer) override
-    {
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        //Charge_Timer
-        if (Charge_Timer < diff)
-        {
-            Charge_Timer = 10000;
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(target, SPELL_CHARGE_VAM) == CAST_OK)
-                    Charge_Timer = urand(8000, 16000);
-            }
-        }
-        else Charge_Timer -= diff;
-
-        //KnockBack_Timer
-        if (KnockBack_Timer < diff)
-        {
-            KnockBack_Timer = 15000;
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(target, SPELL_IMPALE) == CAST_OK)
-                    KnockBack_Timer = urand(15000, 25000);
-            }
-        }
-        else KnockBack_Timer -= diff;
-
-        //Enrage_Timer
-        if (!Enraged && Enrage_Timer < diff)
-            Enraged = true;
-        else if (Enraged)
-            DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CF_AURA_NOT_PRESENT);
-        else
-            Enrage_Timer -= diff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_boss_vamAI(Creature* pCreature)
-{
-    return new boss_vamAI(pCreature);
-}
-
-
 void AddSC_silithus()
 {
     Script* pNewScript;
@@ -3017,14 +2930,6 @@ void AddSC_silithus()
     pNewScript->Name = "npc_Shai";
     pNewScript->GetAI = &GetAI_npc_Shai;
     pNewScript->RegisterSelf();
-
-    /** Event Nostalrius */
-    pNewScript = new Script;
-    pNewScript->Name = "npc_boss_vam";
-    pNewScript->GetAI = &GetAI_boss_vamAI;
-    pNewScript->RegisterSelf();
-
-    // End Nostalrius
 
     pNewScript = new Script;
     pNewScript->Name = "npc_anachronos_the_ancient";

@@ -1443,9 +1443,9 @@ void LoadLootTemplates_Gameobject()
     LootTemplates_Gameobject.LoadAndCollectLootIds(ids_set);
 
     // remove real entries and check existence loot
-    for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr < sGOStorage.end<GameObjectInfo>(); ++itr)
+    for (auto const& itr : sObjectMgr.GetGameObjectInfoMap())
     {
-        if (uint32 lootid = itr->GetLootId())
+        if (uint32 lootid = itr.second->GetLootId())
         {
             if (ids_set.find(lootid) == ids_set.end())
                 LootTemplates_Gameobject.ReportNotExistedId(lootid);

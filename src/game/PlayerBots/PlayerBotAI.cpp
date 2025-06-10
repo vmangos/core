@@ -21,6 +21,7 @@
 #include "SocialMgr.h"
 #include "MotionMaster.h"
 #include "ObjectMgr.h"
+#include "MapManager.h"
 #include "MoveSpline.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"

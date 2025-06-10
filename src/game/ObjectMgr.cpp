@@ -40,7 +40,6 @@
 #include "PoolManager.h"
 #include "GameEventMgr.h"
 #include "Spell.h"
-#include "Chat.h"
 #include "AccountMgr.h"
 #include "MapPersistentStateMgr.h"
 #include "SpellAuras.h"
@@ -1620,6 +1619,12 @@ void ObjectMgr::CheckCreatureTemplate(CreatureInfo* cInfo)
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) with despawn instantly flag has skinning loot assigned. It will never be lootable.", cInfo->entry);
     }
 
+    if (cInfo->level_min > cInfo->level_max)
+    {
+        std::swap(cInfo->level_min, cInfo->level_max);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has level_min (%u) greater than level_max (%u), values have been swapped.", cInfo->entry, cInfo->level_max, cInfo->level_min);
+    }
+
     ConvertCreatureAurasField<CreatureInfo>(cInfo, "creature_template", "Entry", cInfo->entry);
 }
 
@@ -2539,7 +2544,7 @@ void ObjectMgr::LoadGameobjects(bool reload)
         if (!((sWorld.GetWowPatch() >= patch_min) && (sWorld.GetWowPatch() <= patch_max)))
             continue;
 
-        GameObjectInfo const* gInfo = GetGameObjectInfo(entry);
+        GameObjectInfo const* gInfo = GetGameObjectTemplate(entry);
         if (!gInfo)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `gameobject` has gameobject (GUID: %u) with non existing gameobject entry %u, skipped.", guid, entry);
@@ -5681,7 +5686,7 @@ void ObjectMgr::LoadQuests()
         for (int j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)
         {
             int32 id = qinfo->ReqCreatureOrGOId[j];
-            if (id < 0 && !sGOStorage.LookupEntry<GameObjectInfo>(-id))
+            if (id < 0 && !GetGameObjectTemplate(-id))
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Quest %u has `ReqCreatureOrGOId%d` = %i but gameobject %u does not exist, quest can't be done.",
                                 qinfo->GetQuestId(), j + 1, id, uint32(-id));
@@ -7750,7 +7755,7 @@ void ObjectMgr::LoadGameObjectLocales()
 
         uint32 entry = fields[0].GetUInt32();
 
-        if (!GetGameObjectInfo(entry))
+        if (!GetGameObjectTemplate(entry))
         {
             if (!IsExistingGameObjectId(entry))
             {
@@ -7785,15 +7790,6 @@ void ObjectMgr::LoadGameObjectLocales()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %lu gameobject locale strings", (unsigned long)m_GameObjectLocaleMap.size());
 }
 
-struct SQLGameObjectLoader : public SQLStorageLoaderBase<SQLGameObjectLoader, SQLHashStorage>
-{
-    template<class D>
-    void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
-    {
-        dst = D(sScriptMgr.GetScriptId(src));
-    }
-};
-
 inline void CheckGOLockId(GameObjectInfo const* goInfo, uint32 dataN, uint32 N)
 {
     if (sLockStore.LookupEntry(dataN))
@@ -7805,7 +7801,7 @@ inline void CheckGOLockId(GameObjectInfo const* goInfo, uint32 dataN, uint32 N)
 
 inline void CheckGOLinkedTrapId(GameObjectInfo const* goInfo, uint32 dataN, uint32 N)
 {
-    if (GameObjectInfo const* trapInfo = sGOStorage.LookupEntry<GameObjectInfo>(dataN))
+    if (GameObjectInfo const* trapInfo = sObjectMgr.GetGameObjectTemplate(dataN))
     {
         if (trapInfo->type != GAMEOBJECT_TYPE_TRAP)
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (Entry: %u GoType: %u) have data%d=%u but GO (Entry %u) have not GAMEOBJECT_TYPE_TRAP (%u) type.",
@@ -7826,7 +7822,7 @@ inline void CheckGOSpellId(GameObjectInfo const* goInfo, uint32 dataN, uint32 N)
                     goInfo->id, goInfo->type, N, dataN, dataN);
 }
 
-inline void CheckAndFixGOChairHeightId(GameObjectInfo const* goInfo, uint32 const& dataN, uint32 N)
+inline void CheckAndFixGOChairHeightId(GameObjectInfo const* goInfo, uint32& dataN, uint32 N)
 {
     if (dataN <= (UNIT_STAND_STATE_SIT_HIGH_CHAIR - UNIT_STAND_STATE_SIT_LOW_CHAIR))
         return;
@@ -7835,7 +7831,7 @@ inline void CheckAndFixGOChairHeightId(GameObjectInfo const* goInfo, uint32 cons
                     goInfo->id, goInfo->type, N, dataN, UNIT_STAND_STATE_SIT_HIGH_CHAIR - UNIT_STAND_STATE_SIT_LOW_CHAIR);
 
     // prevent client and server unexpected work
-    const_cast<uint32&>(dataN) = 0;
+    dataN = 0;
 }
 
 inline void CheckGONoDamageImmuneId(GameObjectInfo const* goInfo, uint32 dataN, uint32 N)
@@ -7858,183 +7854,250 @@ inline void CheckGOConsumable(GameObjectInfo const* goInfo, uint32 dataN, uint32
                     goInfo->id, goInfo->type, N, dataN);
 }
 
-std::set<uint32> ObjectMgr::LoadGameobjectInfo()
+void ObjectMgr::LoadGameObjectTemplates()
 {
-    SQLGameObjectLoader loader;
-    loader.LoadProgressive(sGOStorage, sWorld.GetWowPatch());
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u game object templates", sGOStorage.GetRecordCount());
+    //                                                                0        1       2            3       4          5        6       7        8        9        10       11       12       13       14       15       16       17        18        19        20        21        22        23        24        25        26        27        28        29        30        31         32         33
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name` FROM `gameobject_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `gameobject_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
+
+    if (!result)
+        return;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        LoadGameObjectInfo(fields);
+
+    } while (result->NextRow());
+
+    for (auto& itr : m_gameObjectInfoMap)
+        if (itr.second)
+            CheckGameObjectTemplate(itr.second.get());
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u gameobject definitions", m_gameObjectInfoMap.size());
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-    return CheckGameObjectInfos();
 }
 
-std::set<uint32> ObjectMgr::CheckGameObjectInfos()
+void ObjectMgr::LoadGameObjectTemplate(uint32 entry)
+{
+    //                                                                0        1       2            3       4          5        6       7        8        9        10       11       12       13       14       15       16       17        18        19        20        21        22        23        24        25        26        27        28        29        30        31         32         33
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name` FROM `gameobject_template` t1 WHERE `entry`=%u && `patch`=(SELECT max(`patch`) FROM `gameobject_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", entry, sWorld.GetWowPatch()));
+
+    if (!result)
+        return;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        LoadGameObjectInfo(fields);
+
+    } while (result->NextRow());
+
+    if (GameObjectInfo const* goInfo = GetGameObjectTemplate(entry))
+        CheckGameObjectTemplate(const_cast<GameObjectInfo*>(goInfo));
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u gameobject definitions", result->GetRowCount());
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+}
+
+void ObjectMgr::LoadGameObjectInfo(Field* fields)
+{
+    uint32 entry = fields[0].GetUInt32();
+    std::unique_ptr<GameObjectInfo>& pInfo = m_gameObjectInfoMap[entry];
+    if (!pInfo)
+        pInfo = std::make_unique<GameObjectInfo>();
+
+    pInfo->id = entry;
+    pInfo->type = fields[1].GetUInt32();
+    pInfo->displayId = fields[2].GetUInt32();
+    pInfo->name = fields[3].GetCppString();
+    pInfo->faction = fields[4].GetUInt32();
+    pInfo->flags = fields[5].GetUInt32();
+    pInfo->size = fields[6].GetFloat();
+    for (uint32 i = 0; i < 24; ++i)
+        pInfo->raw.data[i] = fields[7 + i].GetInt32();
+    pInfo->MinMoneyLoot = fields[31].GetUInt32();
+    pInfo->MaxMoneyLoot = fields[32].GetUInt32();
+    pInfo->ScriptId = sScriptMgr.GetScriptId(fields[33].GetString());
+}
+
+void ObjectMgr::CheckGameObjectTemplate(GameObjectInfo* goInfo)
+{
+    if (goInfo->size <= 0.0f)                           // prevent use too small scales
+    {
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have too small size=%f",
+            goInfo->id, goInfo->type, goInfo->size);
+        goInfo->size =  DEFAULT_OBJECT_SCALE;
+    }
+
+    if (goInfo->type >= GAMEOBJECT_TYPE_MAX)
+    {
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u) have invalid type=%u in template, forcing it to type GENERIC (5) instead.",
+                        goInfo->id, goInfo->type);
+        goInfo->type = GAMEOBJECT_TYPE_GENERIC;
+        memset(goInfo->raw.data, 0, sizeof(GameObjectInfo::raw.data));
+    }
+
+    switch (goInfo->type)
+    {
+        case GAMEOBJECT_TYPE_DOOR:                      //0
+        {
+            if (goInfo->door.lockId)
+                CheckGOLockId(goInfo, goInfo->door.lockId, 1);
+            CheckGONoDamageImmuneId(goInfo, goInfo->door.noDamageImmune, 3);
+            break;
+        }
+        case GAMEOBJECT_TYPE_BUTTON:                    //1
+        {
+            if (goInfo->button.lockId)
+                CheckGOLockId(goInfo, goInfo->button.lockId, 1);
+            if (goInfo->button.linkedTrapId)              // linked trap
+                CheckGOLinkedTrapId(goInfo, goInfo->button.linkedTrapId, 3);
+            CheckGONoDamageImmuneId(goInfo, goInfo->button.noDamageImmune, 4);
+            break;
+        }
+        case GAMEOBJECT_TYPE_QUESTGIVER:                //2
+        {
+            if (goInfo->questgiver.lockId)
+                CheckGOLockId(goInfo, goInfo->questgiver.lockId, 0);
+            CheckGONoDamageImmuneId(goInfo, goInfo->questgiver.noDamageImmune, 5);
+            break;
+        }
+        case GAMEOBJECT_TYPE_CHEST:                     //3
+        {
+            if (goInfo->chest.lockId)
+                CheckGOLockId(goInfo, goInfo->chest.lockId, 0);
+
+            CheckGOConsumable(goInfo, goInfo->chest.consumable, 3);
+
+            if (goInfo->chest.linkedTrapId)              // linked trap
+                CheckGOLinkedTrapId(goInfo, goInfo->chest.linkedTrapId, 7);
+            break;
+        }
+        case GAMEOBJECT_TYPE_TRAP:                      //6
+        {
+            if (goInfo->trap.lockId)
+                CheckGOLockId(goInfo, goInfo->trap.lockId, 0);
+            /* disable check for while, too many nonexistent spells
+            if (goInfo->trap.spellId)                   // spell
+                CheckGOSpellId(goInfo,goInfo->trap.spellId,3);
+            */
+            break;
+        }
+        case GAMEOBJECT_TYPE_CHAIR:                     //7
+            CheckAndFixGOChairHeightId(goInfo, goInfo->chair.height, 1);
+            break;
+        case GAMEOBJECT_TYPE_SPELL_FOCUS:               //8
+        {
+            if (goInfo->spellFocus.focusId)
+            {
+                if (!sSpellFocusObjectStore.LookupEntry(goInfo->spellFocus.focusId))
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data0=%u but SpellFocus (Id: %u) not exist.",
+                        goInfo->id, goInfo->type, goInfo->spellFocus.focusId, goInfo->spellFocus.focusId);
+            }
+
+            if (goInfo->spellFocus.linkedTrapId)        // linked trap
+                CheckGOLinkedTrapId(goInfo, goInfo->spellFocus.linkedTrapId, 2);
+            break;
+        }
+        case GAMEOBJECT_TYPE_GOOBER:                    //10
+        {
+            if (goInfo->goober.lockId)
+                CheckGOLockId(goInfo, goInfo->goober.lockId, 0);
+
+            CheckGOConsumable(goInfo, goInfo->goober.consumable, 3);
+
+            if (goInfo->goober.pageId)                  // pageId
+            {
+                if (!sPageTextStore.LookupEntry<PageText>(goInfo->goober.pageId))
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data7=%u but PageText (Entry %u) not exist.",
+                        goInfo->id, goInfo->type, goInfo->goober.pageId, goInfo->goober.pageId);
+            }
+            /* disable check for while, too many nonexistent spells
+            if (goInfo->goober.spellId)                 // spell
+                CheckGOSpellId(goInfo,goInfo->goober.spellId,10);
+            */
+            CheckGONoDamageImmuneId(goInfo, goInfo->goober.noDamageImmune, 11);
+            if (goInfo->goober.linkedTrapId)            // linked trap
+                CheckGOLinkedTrapId(goInfo, goInfo->goober.linkedTrapId, 12);
+            break;
+        }
+        case GAMEOBJECT_TYPE_TRANSPORT:                 //11
+            break;
+        case GAMEOBJECT_TYPE_AREADAMAGE:                //12
+        {
+            if (goInfo->areadamage.lockId)
+                CheckGOLockId(goInfo, goInfo->areadamage.lockId, 0);
+            break;
+        }
+        case GAMEOBJECT_TYPE_CAMERA:                    //13
+        {
+            if (goInfo->camera.lockId)
+                CheckGOLockId(goInfo, goInfo->camera.lockId, 0);
+            break;
+        }
+        case GAMEOBJECT_TYPE_MO_TRANSPORT:              //15
+        {
+            if (goInfo->moTransport.taxiPathId)
+            {
+                if (goInfo->moTransport.taxiPathId >= sTaxiPathNodesByPath.size() || sTaxiPathNodesByPath[goInfo->moTransport.taxiPathId].empty())
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data0=%u but TaxiPath (Id: %u) not exist.",
+                        goInfo->id, goInfo->type, goInfo->moTransport.taxiPathId, goInfo->moTransport.taxiPathId);
+            }
+            break;
+        }
+        case GAMEOBJECT_TYPE_SUMMONING_RITUAL:          //18
+        {
+            /* disable check for while, too many nonexistent spells
+            // always must have spell
+            CheckGOSpellId(goInfo,goInfo->summoningRitual.spellId,1);
+            */
+            break;
+        }
+        case GAMEOBJECT_TYPE_SPELLCASTER:               //22
+        {
+            // always must have spell
+            CheckGOSpellId(goInfo, goInfo->spellcaster.spellId, 0);
+            break;
+        }
+        case GAMEOBJECT_TYPE_FLAGSTAND:                 //24
+        {
+            if (goInfo->flagstand.lockId)
+                CheckGOLockId(goInfo, goInfo->flagstand.lockId, 0);
+            CheckGONoDamageImmuneId(goInfo, goInfo->flagstand.noDamageImmune, 5);
+            break;
+        }
+        case GAMEOBJECT_TYPE_FISHINGHOLE:               //25
+        {
+            if (goInfo->fishinghole.lockId)
+                CheckGOLockId(goInfo, goInfo->fishinghole.lockId, 4);
+            break;
+        }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        case GAMEOBJECT_TYPE_FLAGDROP:                  //26
+        {
+            if (goInfo->flagdrop.lockId)
+                CheckGOLockId(goInfo, goInfo->flagdrop.lockId, 0);
+            CheckGONoDamageImmuneId(goInfo, goInfo->flagdrop.noDamageImmune, 3);
+            break;
+        }
+#endif
+    }
+}
+
+std::set<uint32> ObjectMgr::GetTransportDisplayIds() const
 {
     std::set<uint32> transportDisplayIds;
-
-    // some checks
-    for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr != sGOStorage.end<GameObjectInfo>(); ++itr)
+    for (auto const& itr : m_gameObjectInfoMap)
     {
-        if (itr->size <= 0.0f)                           // prevent use too small scales
+        if (!itr.second)
+            continue;
+
+        switch (itr.second->type)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have too small size=%f",
-                itr->id, itr->type, itr->size);
-            const_cast<GameObjectInfo*>(*itr)->size =  DEFAULT_OBJECT_SCALE;
-        }
-
-        if (itr->type >= GAMEOBJECT_TYPE_MAX)
-        {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u) have invalid type=%u in template, forcing it to type GENERIC (5) instead.",
-                            itr->id, itr->type);
-            const_cast<GameObjectInfo*>(*itr)->type = GAMEOBJECT_TYPE_GENERIC;
-            memset(const_cast<GameObjectInfo*>(*itr)->raw.data, 0, sizeof(GameObjectInfo::raw.data));
-        }
-
-        switch (itr->type)
-        {
-            case GAMEOBJECT_TYPE_DOOR:                      //0
-            {
-                if (itr->door.lockId)
-                    CheckGOLockId(*itr, itr->door.lockId, 1);
-                CheckGONoDamageImmuneId(*itr, itr->door.noDamageImmune, 3);
-                break;
-            }
-            case GAMEOBJECT_TYPE_BUTTON:                    //1
-            {
-                if (itr->button.lockId)
-                    CheckGOLockId(*itr, itr->button.lockId, 1);
-                if (itr->button.linkedTrapId)              // linked trap
-                    CheckGOLinkedTrapId(*itr, itr->button.linkedTrapId, 3);
-                CheckGONoDamageImmuneId(*itr, itr->button.noDamageImmune, 4);
-                break;
-            }
-            case GAMEOBJECT_TYPE_QUESTGIVER:                //2
-            {
-                if (itr->questgiver.lockId)
-                    CheckGOLockId(*itr, itr->questgiver.lockId, 0);
-                CheckGONoDamageImmuneId(*itr, itr->questgiver.noDamageImmune, 5);
-                break;
-            }
-            case GAMEOBJECT_TYPE_CHEST:                     //3
-            {
-                if (itr->chest.lockId)
-                    CheckGOLockId(*itr, itr->chest.lockId, 0);
-
-                CheckGOConsumable(*itr, itr->chest.consumable, 3);
-
-                if (itr->chest.linkedTrapId)              // linked trap
-                    CheckGOLinkedTrapId(*itr, itr->chest.linkedTrapId, 7);
-                break;
-            }
-            case GAMEOBJECT_TYPE_TRAP:                      //6
-            {
-                if (itr->trap.lockId)
-                    CheckGOLockId(*itr, itr->trap.lockId, 0);
-                /* disable check for while, too many nonexistent spells
-                if (goInfo->trap.spellId)                   // spell
-                    CheckGOSpellId(goInfo,goInfo->trap.spellId,3);
-                */
-                break;
-            }
-            case GAMEOBJECT_TYPE_CHAIR:                     //7
-                CheckAndFixGOChairHeightId(*itr, itr->chair.height, 1);
-                break;
-            case GAMEOBJECT_TYPE_SPELL_FOCUS:               //8
-            {
-                if (itr->spellFocus.focusId)
-                {
-                    if (!sSpellFocusObjectStore.LookupEntry(itr->spellFocus.focusId))
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data0=%u but SpellFocus (Id: %u) not exist.",
-                            itr->id, itr->type, itr->spellFocus.focusId, itr->spellFocus.focusId);
-                }
-
-                if (itr->spellFocus.linkedTrapId)        // linked trap
-                    CheckGOLinkedTrapId(*itr, itr->spellFocus.linkedTrapId, 2);
-                break;
-            }
-            case GAMEOBJECT_TYPE_GOOBER:                    //10
-            {
-                if (itr->goober.lockId)
-                    CheckGOLockId(*itr, itr->goober.lockId, 0);
-
-                CheckGOConsumable(*itr, itr->goober.consumable, 3);
-
-                if (itr->goober.pageId)                  // pageId
-                {
-                    if (!sPageTextStore.LookupEntry<PageText>(itr->goober.pageId))
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data7=%u but PageText (Entry %u) not exist.",
-                            itr->id, itr->type, itr->goober.pageId, itr->goober.pageId);
-                }
-                /* disable check for while, too many nonexistent spells
-                if (goInfo->goober.spellId)                 // spell
-                    CheckGOSpellId(goInfo,goInfo->goober.spellId,10);
-                */
-                CheckGONoDamageImmuneId(*itr, itr->goober.noDamageImmune, 11);
-                if (itr->goober.linkedTrapId)            // linked trap
-                    CheckGOLinkedTrapId(*itr, itr->goober.linkedTrapId, 12);
-                break;
-            }
             case GAMEOBJECT_TYPE_TRANSPORT:
-                transportDisplayIds.insert(itr->displayId);
+            case GAMEOBJECT_TYPE_MO_TRANSPORT:
+                transportDisplayIds.insert(itr.second->displayId);
                 break;
-            case GAMEOBJECT_TYPE_AREADAMAGE:                //12
-            {
-                if (itr->areadamage.lockId)
-                    CheckGOLockId(*itr, itr->areadamage.lockId, 0);
-                break;
-            }
-            case GAMEOBJECT_TYPE_CAMERA:                    //13
-            {
-                if (itr->camera.lockId)
-                    CheckGOLockId(*itr, itr->camera.lockId, 0);
-                break;
-            }
-            case GAMEOBJECT_TYPE_MO_TRANSPORT:              //15
-            {
-                if (itr->moTransport.taxiPathId)
-                {
-                    if (itr->moTransport.taxiPathId >= sTaxiPathNodesByPath.size() || sTaxiPathNodesByPath[itr->moTransport.taxiPathId].empty())
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data0=%u but TaxiPath (Id: %u) not exist.",
-                            itr->id, itr->type, itr->moTransport.taxiPathId, itr->moTransport.taxiPathId);
-                }
-                transportDisplayIds.insert(itr->displayId);
-                break;
-            }
-            case GAMEOBJECT_TYPE_SUMMONING_RITUAL:          //18
-            {
-                /* disable check for while, too many nonexistent spells
-                // always must have spell
-                CheckGOSpellId(goInfo,goInfo->summoningRitual.spellId,1);
-                */
-                break;
-            }
-            case GAMEOBJECT_TYPE_SPELLCASTER:               //22
-            {
-                // always must have spell
-                CheckGOSpellId(*itr, itr->spellcaster.spellId, 0);
-                break;
-            }
-            case GAMEOBJECT_TYPE_FLAGSTAND:                 //24
-            {
-                if (itr->flagstand.lockId)
-                    CheckGOLockId(*itr, itr->flagstand.lockId, 0);
-                CheckGONoDamageImmuneId(*itr, itr->flagstand.noDamageImmune, 5);
-                break;
-            }
-            case GAMEOBJECT_TYPE_FISHINGHOLE:               //25
-            {
-                if (itr->fishinghole.lockId)
-                    CheckGOLockId(*itr, itr->fishinghole.lockId, 4);
-                break;
-            }
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-            case GAMEOBJECT_TYPE_FLAGDROP:                  //26
-            {
-                if (itr->flagdrop.lockId)
-                    CheckGOLockId(*itr, itr->flagdrop.lockId, 0);
-                CheckGONoDamageImmuneId(*itr, itr->flagdrop.noDamageImmune, 3);
-                break;
-            }
-#endif
         }
     }
 
@@ -8276,7 +8339,7 @@ void ObjectMgr::LoadCorpses()
     //                                                                            0       1                       2                      3                      4                      5                       6
     std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `corpse`.`guid`, `player_guid`, `corpse`.`position_x`, `corpse`.`position_y`, `corpse`.`position_z`, `corpse`.`orientation`, `corpse`.`map`, "
     //                      7       8                       9           10        11      12       13      14      15            16            17             18                 19          20
-                          "`time`, `corpse_type`, `corpse`.`instance`, `gender`, `race`, `class`, `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `equipment_cache`, `guild_id`, `player_flags` FROM `corpse` "
+                          "`time`, `corpse_type`, `corpse`.`instance`, `gender`, `race`, `class`, `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `equipment_cache`, `guild_id`, `character_flags` FROM `corpse` "
                           "JOIN `characters` ON `player_guid` = `characters`.`guid` "
                           "LEFT JOIN `guild_member` ON `player_guid`=`guild_member`.`guid` WHERE `corpse_type` <> 0"));
 
@@ -8867,7 +8930,7 @@ void ObjectMgr::LoadGameobjectQuestRelations()
 
     for (const auto& itr : m_GOQuestRelations)
     {
-        GameObjectInfo const* goInfo = GetGameObjectInfo(itr.first);
+        GameObjectInfo const* goInfo = GetGameObjectTemplate(itr.first);
         if (!goInfo)
         {
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `gameobject_questrelation` have data for nonexistent gameobject entry (%u) and existing quest %u", itr.first, itr.second);
@@ -8886,7 +8949,7 @@ void ObjectMgr::LoadGameobjectInvolvedRelations()
 
     for (const auto& itr : m_GOQuestInvolvedRelations)
     {
-        GameObjectInfo const* goInfo = GetGameObjectInfo(itr.first);
+        GameObjectInfo const* goInfo = GetGameObjectTemplate(itr.first);
         if (!goInfo)
             sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `gameobject_involvedrelation` have data for nonexistent gameobject entry (%u) and existing quest %u", itr.first, itr.second);
         else if (goInfo->type != GAMEOBJECT_TYPE_QUESTGIVER)
@@ -9089,7 +9152,7 @@ ObjectGuid ObjectMgr::GetFullTransportGuidFromLowGuid(uint32 lowGuid)
 
     if (GameObjectData const* data = GetGOData(lowGuid))
     {
-        if (GameObjectInfo const* pInfo = GetGameObjectInfo(data->id))
+        if (GameObjectInfo const* pInfo = GetGameObjectTemplate(data->id))
             if (pInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
                 guid = ObjectGuid(HIGHGUID_TRANSPORT, data->id, lowGuid);
     }
@@ -9330,7 +9393,7 @@ void ObjectMgr::LoadGameObjectForQuests()
 {
     m_GameObjectForQuestSet.clear();                         // need for reload case
 
-    if (!sGOStorage.GetMaxEntry())
+    if (GetGameObjectInfoMap().empty())
     {
         BarGoLink bar(1);
         bar.step();
@@ -9340,22 +9403,23 @@ void ObjectMgr::LoadGameObjectForQuests()
         return;
     }
 
-    BarGoLink bar(sGOStorage.GetRecordCount());
+    BarGoLink bar(GetGameObjectInfoMap().size());
     uint32 count = 0;
 
     // collect GO entries for GO that must activated
-    for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr < sGOStorage.end<GameObjectInfo>(); ++itr)
+    for (auto const& itr : GetGameObjectInfoMap())
     {
         bar.step();
+        auto const& goInfo = itr.second;
 
-        switch (itr->type)
+        switch (goInfo->type)
         {
             case GAMEOBJECT_TYPE_QUESTGIVER:
             {
-                if (m_GOQuestRelations.find(itr->id) != m_GOQuestRelations.end() ||
-                        m_GOQuestInvolvedRelations.find(itr->id) != m_GOQuestInvolvedRelations.end())
+                if (m_GOQuestRelations.find(goInfo->id) != m_GOQuestRelations.end() ||
+                        m_GOQuestInvolvedRelations.find(goInfo->id) != m_GOQuestInvolvedRelations.end())
                 {
-                    m_GameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(goInfo->id);
                     ++count;
                 }
 
@@ -9364,39 +9428,39 @@ void ObjectMgr::LoadGameObjectForQuests()
             case GAMEOBJECT_TYPE_CHEST:
             {
                 // scan GO chest with loot including quest items
-                uint32 loot_id = itr->GetLootId();
+                uint32 loot_id = goInfo->GetLootId();
 
                 // always activate to quest, GO may not have loot, OR find if GO has loot for quest.
-                if (itr->chest.questId || LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
+                if (goInfo->chest.questId || LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
                 {
-                    m_GameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(goInfo->id);
                     ++count;
                 }
                 break;
             }
             case GAMEOBJECT_TYPE_GENERIC:
             {
-                if (itr->_generic.questID)               // quest related objects, has visual effects
+                if (goInfo->_generic.questID)               // quest related objects, has visual effects
                 {
-                    m_GameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(goInfo->id);
                     count++;
                 }
                 break;
             }
             case GAMEOBJECT_TYPE_SPELL_FOCUS:
             {
-                if (itr->spellFocus.questID)             // quest related objects, has visual effect
+                if (goInfo->spellFocus.questID)             // quest related objects, has visual effect
                 {
-                    m_GameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(goInfo->id);
                     count++;
                 }
                 break;
             }
             case GAMEOBJECT_TYPE_GOOBER:
             {
-                if (itr->goober.questId > 0)                 //quests objects
+                if (goInfo->goober.questId > 0)             //quests objects
                 {
-                    m_GameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(goInfo->id);
                     count++;
                 }
                 break;
@@ -9931,7 +9995,7 @@ bool ObjectMgr::LoadQuestGreetings()
             }
             case QUESTGIVER_GAMEOBJECT:
             {
-                if (!ObjectMgr::GetGameObjectInfo(entry))
+                if (!sObjectMgr.GetGameObjectTemplate(entry))
                 {
                     sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `quest_greeting` have entry for nonexistent gameobject template (Entry: %u), ignore", entry);
                     continue;
@@ -10651,10 +10715,10 @@ void ObjectMgr::LoadGossipMenu(std::set<uint32>& gossipScriptSet)
                 if (m_GossipMenusMap.find(cInfo->gossip_menu_id) == m_GossipMenusMap.end())
                     sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Creature (Entry: %u) has gossip_menu_id = %u for nonexistent menu", cInfo->entry, cInfo->gossip_menu_id);
 
-    for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr < sGOStorage.end<GameObjectInfo>(); ++itr)
-        if (uint32 menuid = itr->GetGossipMenuId())
+    for (auto const& itr : GetGameObjectInfoMap())
+        if (uint32 menuid = itr.second->GetGossipMenuId())
             if (m_GossipMenusMap.find(menuid) == m_GossipMenusMap.end())
-                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (Entry: %u) has gossip_menu_id = %u for nonexistent menu", itr->id, menuid);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (Entry: %u) has gossip_menu_id = %u for nonexistent menu", itr.second->id, menuid);
 }
 
 void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
@@ -10685,8 +10749,8 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
             if (itr.first)
                 menu_ids.insert(itr.first);
 
-        for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr < sGOStorage.end<GameObjectInfo>(); ++itr)
-            if (uint32 menuid = itr->GetGossipMenuId())
+        for (auto const& itr : GetGameObjectInfoMap())
+            if (uint32 menuid = itr.second->GetGossipMenuId())
                 menu_ids.erase(menuid);
     }
 
@@ -10885,7 +10949,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
         if (!cInfo)
         {
             if (pl)
-                ChatHandler(pl).SendSysMessage(LANG_COMMAND_VENDORSELECTION);
+                pl->SendSysMessage(LANG_COMMAND_VENDORSELECTION);
             else if (!IsExistingCreatureId(vendor_entry))
                 sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` has data for nonexistent creature (Entry: %u), ignoring", tableName, vendor_entry);
             return false;
@@ -10897,7 +10961,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     else
     {
         if (pl)
-            ChatHandler(pl).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
+            pl->PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
         else if (!IsExistingItemId(item_id))
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` for %s %u contain nonexistent item (%u), ignoring",
                             tableName, idStr, vendor_entry, item_id);
@@ -10907,7 +10971,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     if (maxcount > 0 && incrtime == 0)
     {
         if (pl)
-            ChatHandler(pl).PSendSysMessage("MaxCount!=0 (%u) but IncrTime==0", maxcount);
+            pl->PSendSysMessage("MaxCount!=0 (%u) but IncrTime==0", maxcount);
         else
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has `maxcount` (%u) for item %u of %s %u but `incrtime`=0, ignoring",
                             tableName, maxcount, item_id, idStr, vendor_entry);
@@ -10916,7 +10980,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     else if (maxcount == 0 && incrtime > 0)
     {
         if (pl)
-            ChatHandler(pl).PSendSysMessage("MaxCount==0 but IncrTime<>=0");
+            pl->PSendSysMessage("MaxCount==0 but IncrTime<>=0");
         else
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has `maxcount`=0 for item %u of %s %u but `incrtime`<>0, ignoring",
                             tableName, item_id, idStr, vendor_entry);
@@ -10938,7 +11002,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     if (vItems && vItems->FindItem(item_id))
     {
         if (pl)
-            ChatHandler(pl).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id);
+            pl->PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id);
         else
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has duplicate items %u for %s %u, ignoring",
                             tableName, item_id, idStr, vendor_entry);
@@ -10952,7 +11016,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
         if (tItems && tItems->GetItem(item_id))
         {
             if (pl)
-                ChatHandler(pl).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id);
+                pl->PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id);
             else
             {
                 if (!cInfo->vendor_id)
@@ -10972,7 +11036,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     if (countItems >= UINT8_MAX)
     {
         if (pl)
-            ChatHandler(pl).SendSysMessage(LANG_COMMAND_ADDVENDORITEMITEMS);
+            pl->SendSysMessage(LANG_COMMAND_ADDVENDORITEMITEMS);
         else
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has too many items (%u >= %i) for %s %u, ignoring",
                             tableName, countItems, UINT8_MAX, idStr, vendor_entry);
@@ -11094,7 +11158,7 @@ GameObjectDataPair const* FindGOData::GetResult() const
 
 uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay, float rotation0, float rotation1, float rotation2, float rotation3)
 {
-    GameObjectInfo const* goinfo = GetGameObjectInfo(entry);
+    GameObjectInfo const* goinfo = GetGameObjectTemplate(entry);
     if (!goinfo)
         return 0;
 

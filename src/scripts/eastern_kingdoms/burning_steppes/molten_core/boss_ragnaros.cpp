@@ -536,12 +536,8 @@ struct boss_ragnarosAI : ScriptedAI
 
                 if (target)
                 {
-                    auto canCastResult = DoCastSpellIfCan(target, SPELL_MAGMA_BLAST);
-
-                    if (!canCastResult)
+                    if (DoCastSpellIfCan(target, SPELL_MAGMA_BLAST) == SPELL_CAST_OK)
                         m_uiMagmaBlastTimer = 2500;
-                    else
-                        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Magma Blast failed with reason <%u>.", canCastResult);
 
                     return;
                 }

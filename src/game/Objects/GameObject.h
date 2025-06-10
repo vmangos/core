@@ -59,7 +59,7 @@ class GameObject : public SpellCaster
         void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
         QuaternionData const GetLocalRotation() const;
 
-        char const* GetName() const final { return GetGOInfo()->name; }
+        char const* GetName() const final { return GetGOInfo()->name.c_str(); }
         // overwrite WorldObject function for proper name localization
         char const* GetNameForLocaleIdx(int32 locale_idx) const final;
 
