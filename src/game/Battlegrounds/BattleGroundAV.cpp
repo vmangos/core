@@ -1079,7 +1079,7 @@ void BattleGroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: player destroyed point node %i", node);
 
-    MANGOS_ASSERT(m_nodes[node].owner != BG_AV_TEAM_NEUTRAL)
+    MANGOS_ASSERT(m_nodes[node].owner != BG_AV_TEAM_NEUTRAL);
     BattleGroundTeamIndex ownerTeamIdx = BattleGroundTeamIndex(m_nodes[node].owner);
     Team ownerTeam = ownerTeamIdx == BG_TEAM_ALLIANCE ? ALLIANCE : HORDE;
 

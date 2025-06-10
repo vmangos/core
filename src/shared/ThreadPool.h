@@ -80,11 +80,10 @@ public:
 
     /**
      * @brief ThreadPool allocates memory, use ThreadPool::start() to spawn the threads.
+     * @param name the name of the pool
      * @param numThreads the number of threads that will be created.
      */
-    ThreadPool(int numThreads, ClearMode when = ClearMode::AT_NEXT_WORKLOAD, ErrorHandling mode = ErrorHandling::NONE);
-
-    ThreadPool() = delete;
+    explicit ThreadPool(std::string const& name, int numThreads, ClearMode when = ClearMode::AT_NEXT_WORKLOAD, ErrorHandling mode = ErrorHandling::NONE);
 
     ~ThreadPool();
 
@@ -150,7 +149,7 @@ public:
 
 private:
     struct worker {
-        worker(ThreadPool *pool, int id, ErrorHandling mode);
+        explicit worker(ThreadPool *pool, int id, ErrorHandling mode);
         virtual ~worker();
 
         void loop_wrapper();
@@ -194,6 +193,7 @@ private:
     using workers_t = std::vector<std::unique_ptr<worker>>;
 
     Status m_status = Status::STOPPED;
+    std::string m_poolName;
     ErrorHandling m_errorHandling;
     size_t m_size;
     std::shared_timed_mutex m_mutex;

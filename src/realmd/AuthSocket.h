@@ -19,10 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-// \addtogroup realmd
-// @{
-// \file
-
 #ifndef _AUTHSOCKET_H
 #define _AUTHSOCKET_H
 
@@ -31,14 +27,11 @@
 #include "Crypto/Hash/SHA1.h"
 #include "Crypto/Authentication/SRP6.h"
 #include "ByteBuffer.h"
-
-#include "BufferedSocket.h"
-
-struct PINData
-{
-    uint8 salt[16];
-    uint8 hash[20];
-};
+#include "IO/Networking/AsyncSocket.h"
+#include "IO/Timer/TimerHandle.h"
+#include "IO/Filesystem/FileHandle.h"
+#include "Policies/ObjectConstructorTraits.h"
+#include "AuthPackets.h"
 
 enum LockFlag
 {
@@ -51,32 +44,43 @@ enum LockFlag
     GEO_CITY        = 0x20
 };
 
-// Handle login commands
-class AuthSocket: public BufferedSocket
+struct sAuthLogonProof_C;
+
+/// Handle login commands
+class AuthSocket : public std::enable_shared_from_this<AuthSocket>, MaNGOS::Policies::NoCopyNoMove
 {
     public:
-        const static int s_BYTE_SIZE = 32;
-
-        AuthSocket() = default;
+        explicit AuthSocket(IO::Networking::AsyncSocket socket);
         ~AuthSocket();
 
-        void OnAccept();
-        void OnRead();
-        void SendProof(Crypto::Hash::SHA1::Digest sha);
-        void LoadRealmlist(ByteBuffer &pkt);
-        bool VerifyPinData(uint32 pin, const PINData& clientData);
-        uint32 GenerateTotpPin(const std::string& secret, int interval);
+        void Start();
 
-        bool _HandleLogonChallenge();
-        bool _HandleLogonProof();
-        bool _HandleReconnectChallenge();
-        bool _HandleReconnectProof();
-        bool _HandleRealmList();
+        void DoRecvIncomingData();
+        std::shared_ptr<ByteBuffer> GenerateLogonProofResponse(Crypto::Hash::SHA1::Digest const& shaDigest);
+        void LoadRealmlistAndWriteIntoBuffer(ByteBuffer& pkt);
+        bool VerifyPinData(uint32 pin, PINData const& clientData);
+        uint32 GenerateTotpPin(std::string const& secret, int interval);
+
+        void _HandleLogonChallenge();
+        void _HandleLogonProof();
+        void _HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C const> const& lp, std::shared_ptr<PINData const> const& pinData);
+        void _HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_ptr<sAuthLogonProof_C const> const& lp);
+        void _HandleReconnectChallenge();
+        void _HandleReconnectProof();
+        void _HandleRealmList();
+
         //data transfer handle for patch
+        void _HandleXferAccept();
+        void _HandleXferResume();
+        void _HandleXferCancel();
 
-        bool _HandleXferResume();
-        bool _HandleXferCancel();
-        bool _HandleXferAccept();
+        /// Returns the IP of the peer e.g. "192.168.13.37"
+        inline std::string const& GetRemoteIpString() const { return m_remoteIpAddressStringAfterProxy; }
+        void CloseSocket();
+
+    public: // A bit hacky, that this is public. In WorldSocket we have WorldSocketMgr as friend, this is not possible here
+        IO::Networking::AsyncSocket m_socket;
+        std::string m_remoteIpAddressStringAfterProxy; // might differ from `m_socket.m_descriptor` if behind proxy
 
     private:
         enum eStatus
@@ -84,13 +88,12 @@ class AuthSocket: public BufferedSocket
             STATUS_CHALLENGE,
             STATUS_LOGON_PROOF,
             STATUS_RECON_PROOF,
-            STATUS_PATCH,      // unused in CMaNGOS
+            STATUS_PATCH,
             STATUS_AUTHED,
-            STATUS_CLOSED
+            STATUS_INVALID,
         };
 
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
-        std::string GetRealmAddress(Realm const& realm) const;
 
         SRP6 srp;
         BigNumber m_reconnectProof;
@@ -116,10 +119,10 @@ class AuthSocket: public BufferedSocket
         static constexpr uint32 X86 = 'x86';
         static constexpr uint32 PPC = 'PPC';
 
-        uint32 m_os = 0;
-        uint32 m_platform = 0;
+        std::string m_os;
+        std::string m_platform;
         uint32 m_accountId = 0;
-        uint32 m_lastRealmListRequest = 0;
+        nonstd::optional<std::chrono::steady_clock::time_point> m_lastRealmListRequest;
 
         // Since GetLocaleByName() is _NOT_ bijective, we have to store the locale as a string. Otherwise we can't differ
         // between enUS and enGB, which is important for the patch system
@@ -134,9 +137,14 @@ class AuthSocket: public BufferedSocket
         typedef std::map<uint32, AccountTypes> AccountSecurityMap;
         AccountSecurityMap m_accountSecurityOnRealm;
 
-        ACE_HANDLE m_patch = ACE_INVALID_HANDLE;
+        // Auto kick realmd client connection after some time
+        std::shared_ptr<IO::Timer::TimerHandle> m_sessionDurationTimeout = nullptr;
 
-        void InitPatch();
+        // Patching stuff
+        void InitAndHandOverControlToPatchHandler();
+        std::unique_ptr<IO::Filesystem::FileHandleReadonly> m_pendingPatchFile = nullptr;
+
+        void RepeatInternalXferLoop(std::shared_ptr<XFER_DATA_CHUNK> const& chunkSharedPtr);
 };
+
 #endif
-// @}

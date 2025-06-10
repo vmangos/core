@@ -3,7 +3,7 @@
 ############################################
 
 [RealmdConf]
-ConfVersion=2020010501
+ConfVersion=2024091701
 
 ###################################################################################################################
 # REALMD SETTINGS
@@ -39,15 +39,30 @@ ConfVersion=2020010501
 #         on different IP addresses using default ports.
 #         DO NOT CHANGE THIS UNLESS YOU _REALLY_ KNOW WHAT YOU'RE DOING
 #
+#    TrustedProxyServers
+#        Description: Enables the parsing of Proxy Protocol v2 for specific IPs.
+#                     You can use this feature when your server is behind a proxy, load balancer, or similar component,
+#                     to retrieve the real IP address of players.
+#                     You need to enable Proxy Protocol v2 on both this server and the proxy/load balancer.
+#                     For example see HaProxy "send-proxy-v2" option.
+#                     Multiple servers can be separated with ','
+#        Default:     ""                      - (Disabled, no proxy)
+#        Example      "10.13.37.1,10.13.37.2" - (to allow multiple proxy servers)
+#
 #    PidFile
 #        Realmd daemon PID file
 #        Default: ""             - do not create PID file
 #                 "./realmd.pid" - create PID file (recommended name)
 #
-#    LogLevel
+#    LogLevel.Console
 #        Server console level of logging
-#        0 = Minimum; 1 = Error; 2 = Detail; 3 = Full/Debug
-#        Default: 0
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
+#
+#    LogLevel.File
+#        Server file level of logging
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
 #
 #    LogTime
 #        Include time in server console output [hh:mm:ss]
@@ -82,7 +97,8 @@ ConfVersion=2020010501
 #    WaitAtStartupError
 #        After startup error report wait <Enter> or some time before continue (and possible close console window)
 #                 -1 (wait until <Enter> press)
-#        Default:  0 (not wait)
+#                  0 (no wait)
+#         Default: 5 (wait 5 sec)
 #                  N (>0, wait N secs)
 #
 #    MinRealmListDelay
@@ -160,15 +176,17 @@ PatchesDir = "./patches"
 MaxPingTime = 30
 RealmServerPort = 3724
 BindIP = "0.0.0.0"
+TrustedProxyServers = ""
 PidFile = ""
-LogLevel = 0
-LogTime = 0
+LogLevel.Console = 2
+LogLevel.File = 2
+LogTime = 1
 LogFile = "Realmd.log"
 LogTimestamp = 0
 LogFileLevel = 0
 UseProcessors = 0
 ProcessPriority = 1
-WaitAtStartupError = 0
+WaitAtStartupError = 5 # consider fixing your actual problem before changing this value!
 MinRealmListDelay = 1
 RealmsStateUpdateDelay = 20
 WrongPass.MaxCount = 0

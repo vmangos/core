@@ -18,6 +18,7 @@
 
 #include "DatabaseEnv.h"
 #include "Log.h"
+#include "Errors.h"
 
 bool SqlStmtFieldData::toBool() const { MANGOS_ASSERT(m_type == FIELD_BOOL); return m_binaryData.boolean; }
 uint8 SqlStmtFieldData::toUint8() const { MANGOS_ASSERT(m_type == FIELD_UI8); return m_binaryData.ui8; }

@@ -15,6 +15,7 @@
 */
 
 #include "Anticheat.h"
+#include "IO/Multithreading/CreateThread.h"
 
 AnticheatManager* AnticheatManager::instance()
 {
@@ -93,7 +94,7 @@ Warden* AnticheatManager::CreateWardenFor(WorldSession* client, BigNumber* K)
 
 void AnticheatManager::StartWardenUpdateThread()
 {
-   m_wardenUpdateThread = std::thread(&AnticheatManager::UpdateWardenSessions, this);
+   m_wardenUpdateThread = IO::Multithreading::CreateThread("WardenSessions", [this]() { UpdateWardenSessions(); });
 }
 
 void AnticheatManager::StopWardenUpdateThread()

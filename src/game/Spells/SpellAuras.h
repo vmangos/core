@@ -76,6 +76,7 @@ struct HeartBeatData
 };
 
 class Unit;
+class Player;
 class Item;
 class WorldObject;
 class DynamicObject;
@@ -511,8 +512,8 @@ class Aura
         bool IsApplied() const { return m_applied; }
         // Results :
         // - 0 : Not in the same category.
-        // - 1 : I am more important. I apply myself. 
-        // - 2 : Other aura is more important. It applies. 
+        // - 1 : I am more important. I apply myself.
+        // - 2 : Other aura is more important. It applies.
         int CheckExclusiveWith(Aura const* other) const;
         bool ExclusiveAuraCanApply();
         void ExclusiveAuraUnapply();
