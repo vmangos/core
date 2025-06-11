@@ -239,6 +239,7 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
     uint32 nextDelay = 0;
     float nextOrientation = 0.f;
     uint32 loops = 0;
+    bool pathFinished = false;
 
     do
     {
@@ -284,7 +285,10 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
         if (currPoint == i_path->end())
         {
             if (!m_repeating)
+            {
+                pathFinished = true;
                 break;
+            }
 
             currPoint = i_path->begin();
             ++loops;
@@ -302,8 +306,8 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
     creature.SetWalk(!creature.HasUnitState(UNIT_STATE_RUNNING) && !creature.IsLevitating(), false);
     m_pathDuration = init.Launch();
 
-    // remove presend time if next node have no delay
-    if (nextDelay == 0)
+    // remove presend time if next node have no delay and path is not finished
+    if (nextDelay == 0 && !pathFinished)
         m_pathDuration -= PreSendTime;
 }
 
