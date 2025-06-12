@@ -70,7 +70,7 @@ class WaypointMovementGenerator<Creature>
   public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
-        WaypointMovementGenerator(Creature &, bool repeating = true) : i_nextMoveTime(0), m_repeating(repeating), m_isWandering(false), m_lastReachedWaypoint(0), m_pathDuration(0), m_creatureSpeed(0.f) {}
+        WaypointMovementGenerator(Creature &, bool repeating = true) : i_nextMoveTime(0), m_repeating(repeating), m_isWandering(false), m_lastReachedWaypoint(0), m_pathDuration(0), m_creatureSpeed(0.f), m_lastSplineId(0) {}
         ~WaypointMovementGenerator() { i_path = nullptr; }
         void Initialize(Creature &u);
         void Interrupt(Creature &);
@@ -88,6 +88,7 @@ class WaypointMovementGenerator<Creature>
         void GetPathInformation(std::ostringstream& oss) const;
         bool SetNextWaypoint(uint32 pointId);
         std::list<int32> const& GetNodeIndexes() const { return m_nodeIndexes; }
+        uint32 GetLastSplineId() const { return m_lastSplineId; }
 
         void AddPauseTime(int32 waitTimeDiff)
         {
@@ -123,6 +124,7 @@ class WaypointMovementGenerator<Creature>
         int32 m_pathDuration;
         float m_creatureSpeed;
         std::list<int32> m_nodeIndexes;
+        uint32 m_lastSplineId;
 
         WaypointPathOrigin m_PathOrigin;
 };

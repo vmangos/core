@@ -305,6 +305,7 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
 
     creature.SetWalk(!creature.HasUnitState(UNIT_STATE_RUNNING) && !creature.IsLevitating(), false);
     m_pathDuration = init.Launch();
+    m_lastSplineId = creature.movespline->GetId();
 
     // remove presend time if next node have no delay and path is not finished
     if (nextDelay == 0 && !pathFinished)
@@ -679,7 +680,7 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
         return;
 
     WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(leader->GetMotionMaster()->GetCurrent());
-    if (wpMMGen && !wpMMGen->GetNodeIndexes().empty())
+    if (wpMMGen && !wpMMGen->GetNodeIndexes().empty() && wpMMGen->GetLastSplineId() == leader->movespline->GetId())
     {
         std::list<int32> nodeIndexes;
         for (int32 idx : wpMMGen->GetNodeIndexes())
