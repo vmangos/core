@@ -56,7 +56,7 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
         path.calculate(x, y, z, true);
         if (path.getPathType() & PATHFIND_NORMAL)
         {
-            Movement::MoveSplineInit init(owner, "HomeMovementGenerator<Creature>::_setTargetLocation");
+            Movement::MoveSplineInit init(owner, "HomeMovementGenerator");
 
             if (setFacing)
                 init.SetFacing(o);

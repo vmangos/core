@@ -54,6 +54,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "packet_builder.h"
+#include "Chat.h"
 #include "Anticheat.h"
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
@@ -3104,7 +3105,8 @@ bool Unit::ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, 
     }
 
     // Not currently handled cases.
-    if ((mi.moveFlags & (MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_FALLINGFAR | MOVEFLAG_ONTRANSPORT)) || (mi.ctime == 0) || !IsMovedByPlayer())
+    if ((mi.moveFlags & (MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_FALLINGFAR | MOVEFLAG_ONTRANSPORT)) ||
+        !movespline->Finalized() || (mi.ctime == 0) || !IsMovedByPlayer())
         return false;
 
     x = mi.pos.x;
@@ -3718,6 +3720,8 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
         bool is_spellSpecPerTargetPerCaster = Spells::IsSingleFromSpellSpecificPerTargetPerCaster(spellId_spec, i_spellId_spec);
 
         bool is_spellSpecPerTarget = Spells::IsSingleFromSpellSpecificPerTarget(spellId_spec, i_spellId_spec);
+        if (m_stackTrackers && is_spellSpecPerTarget && spellId_spec == SPELL_TRACKER)
+            is_spellSpecPerTarget = false;
 
         // HoTs in 1.x must be per target also
         if (!is_spellSpecPerTarget && firstInChain && firstInChain == sSpellMgr.GetFirstSpellInChain(i_spellId))
@@ -5661,7 +5665,7 @@ bool Unit::IsImmuneToDamage(SpellSchoolMask shoolMask, SpellEntry const* spellIn
 
 bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) const
 {
-    if (!spellInfo || spellInfo->HasAttribute(SPELL_ATTR_NO_IMMUNITIES) || spellInfo->IsIgnoringCasterAndTargetRestrictions())
+    if (!spellInfo || spellInfo->IsIgnoringCasterAndTargetRestrictions())
         return false;
 
     // Venomhide Ravasaur (6508) is immune to being poisoned by others, but has passive poison aura 14108.
@@ -5686,7 +5690,8 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
         }
     }
 
-    if (!spellInfo->HasAttribute(SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT) // can remove immune (by dispell or immune it)
+    if (!spellInfo->HasAttribute(SPELL_ATTR_NO_IMMUNITIES)             // ignore invulnerability
+     && !spellInfo->HasAttribute(SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT) // can remove immune (by dispell or immune it)
      && !spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_SCHOOL_IMMUNITIES))
     {
         SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
@@ -7133,9 +7138,11 @@ bool Unit::IsMovedByPlayer() const
         if (pPossessor->GetCharmGuid() == GetObjectGuid())
             return true;
 
-    return IsPlayer() &&
-           static_cast<Player const*>(this)->IsControlledByOwnClient() &&
-           !static_cast<Player const*>(this)->IsBot();
+    //return IsPlayer() &&
+    //       static_cast<Player const*>(this)->IsControlledByOwnClient() &&
+    //       !static_cast<Player const*>(this)->IsBot();
+
+    return IsPlayer() && static_cast<Player const*>(this)->IsControlledByOwnClient();
 }
 
 PlayerMovementPendingChange::PlayerMovementPendingChange()
@@ -10455,23 +10462,18 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
 
     angle += (attackerCount ? ((float(M_PI / 2) - float(M_PI) * rand_norm_f()) * attackerCount / sizeFactor) * 0.3f : 0);
 
-    float dist;
-    Position initialPos;
-    GetPosition(initialPos.x, initialPos.y, initialPos.z);
+    float dist = GetCombatReachToTarget(attacker, false, 0.0f, true) - 0.5f;
+    float initialPosX, initialPosY, initialPosZ, o;
+    GetPosition(initialPosX, initialPosY, initialPosZ);
 
-    // Moving unit: try to extrapolate movement a bit
-    if (IsMoving())
-    {
-        dist = DEFAULT_COMBAT_REACH;
-        if (!ExtrapolateMovement(m_movementInfo, 200, initialPos.x, initialPos.y, initialPos.z, initialPos.o))
-            GetPosition(initialPos.x, initialPos.y, initialPos.z);
-    }
-    else
-        dist = GetCombatReachToTarget(attacker, false, 0.0f, true) - 0.5f;
+    // Moving player: try to extrapolate movement a bit
+    if (IsPlayer() && IsMoving())
+        if (!ExtrapolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
+            GetPosition(initialPosX, initialPosY, initialPosZ);
 
-    float attackerTargetDistance = sqrt(pow(initialPos.x - attacker->GetPositionX(), 2) +
-        pow(initialPos.y - attacker->GetPositionY(), 2) +
-        pow(initialPos.z - attacker->GetPositionZ(), 2));
+    float attackerTargetDistance = sqrt(pow(initialPosX - attacker->GetPositionX(), 2) +
+        pow(initialPosY - attacker->GetPositionY(), 2) +
+        pow(initialPosZ - attacker->GetPositionZ(), 2));
     if (dist > attackerTargetDistance)
     {
         // We're not moving, we're already within range. 
@@ -10479,15 +10481,15 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
         return true;
     }
 
-    float normalizedVectZ = (attacker->GetPositionZ() - initialPos.z) / attackerTargetDistance;
+    float normalizedVectZ = (attacker->GetPositionZ() - initialPosZ) / attackerTargetDistance;
     float normalizedVectXY = sqrt(1 - normalizedVectZ * normalizedVectZ);
-    x = initialPos.x + dist * cos(angle) * normalizedVectXY;
-    y = initialPos.y + dist * sin(angle) * normalizedVectXY;
-    z = initialPos.z + dist * normalizedVectZ;
+    x = initialPosX + dist * cos(angle) * normalizedVectXY;
+    y = initialPosY + dist * sin(angle) * normalizedVectXY;
+    z = initialPosZ + dist * normalizedVectZ;
 
     if (attacker->CanFly() || (attacker->CanSwim() && reachableBySwiming) || !HasMMapsForCurrentMap())
     {
-        GetMap()->GetLosHitPosition(initialPos.x, initialPos.y, initialPos.z, x, y, z, -0.2f);
+        GetMap()->GetLosHitPosition(initialPosX, initialPosY, initialPosZ, x, y, z, -0.2f);
         if (attacker->CanSwim() && reachableBySwiming)
         {
             float ground = 0.0f;
@@ -10531,7 +10533,7 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
             nav |= NAV_MAGMA | NAV_SLIME;
 
         // Try mmaps. On fail, use target position (but should not fail)
-        if (GetMap()->GetWalkHitPosition(GetTransport(), initialPos.x, initialPos.y, initialPos.z, x, y, z, nav))
+        if (GetMap()->GetWalkHitPosition(GetTransport(), initialPosX, initialPosY, initialPosZ, x, y, z, nav))
             return true;
     }
 

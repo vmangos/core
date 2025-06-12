@@ -45,7 +45,7 @@ void FearMovementGenerator<T>::_setTargetLocation(T &owner)
         return;
     }
 
-    Movement::MoveSplineInit init(owner, "FearMovementGenerator<T>::_setTargetLocation");
+    Movement::MoveSplineInit init(owner, "FearMovementGenerator");
     init.Move(&path);
     init.SetWalk(_forceWalking);
     if (_customSpeed > 0)

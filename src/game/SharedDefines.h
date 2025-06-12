@@ -120,6 +120,22 @@ enum CombatBotRoles
     ROLE_HEALER,
 };
 
+static char const* BotRoleToString(uint32 role)
+{
+    switch (role)
+    {
+        case ROLE_MELEE_DPS:
+                return "Melee DPS";
+        case ROLE_RANGE_DPS:
+                return "Ranged DPS";
+        case ROLE_TANK:
+                return "Tank";
+        case ROLE_HEALER:
+                return "Healer";
+    }
+    return "UNKNOWN";
+}
+
 #define PLAYER_MAX_BATTLEGROUND_QUEUES 3
 
 enum ReputationRank : uint32

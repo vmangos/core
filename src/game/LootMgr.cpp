@@ -39,6 +39,7 @@ static eConfigFloatValues const qualityToRate[MAX_ITEM_QUALITY] =
     CONFIG_FLOAT_RATE_DROP_ITEM_LEGENDARY,                               // ITEM_QUALITY_LEGENDARY
     CONFIG_FLOAT_RATE_DROP_ITEM_ARTIFACT,                                // ITEM_QUALITY_ARTIFACT
 };
+static bool alwaysPartyLootQuestItems = false; // TODO: config file
 
 LootStore LootTemplates_Creature(     "creature_loot_template",      "creature entry",                     true);
 LootStore LootTemplates_Disenchant(   "disenchant_loot_template",    "item disenchant id",                 true);
@@ -344,6 +345,9 @@ LootItem::LootItem(LootStoreItem const& li)
 
     ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemid);
     freeforall  = proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT);
+    // Always use ITEM_FLAG_PARTY_LOOT for quest items...
+    if (alwaysPartyLootQuestItems && proto && li.needs_quest)
+        freeforall = true;
 
     needs_quest = li.needs_quest;
 
@@ -362,6 +366,9 @@ LootItem::LootItem(uint32 itemid_, uint32 count_, int32 randomPropertyId_)
 
     ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemid);
     freeforall  = proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT);
+    // Always use ITEM_FLAG_PARTY_LOOT for quest items...
+    if (alwaysPartyLootQuestItems && proto && proto->Class == ITEM_CLASS_QUEST)
+        freeforall = true;
 
     needs_quest = false;
 
@@ -470,6 +477,9 @@ void Loot::AddItem(LootStoreItem const& item)
         proto->Discovered = true;
 
     if (item.needs_quest && proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT))
+        m_hasFFAQuestItems = true;
+    // Always use ITEM_FLAG_PARTY_LOOT for quest items...
+    if (alwaysPartyLootQuestItems && item.needs_quest && proto)
         m_hasFFAQuestItems = true;
 
     if (item.needs_quest)                                   // Quest drop

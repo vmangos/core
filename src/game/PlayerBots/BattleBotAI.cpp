@@ -1279,7 +1279,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Paladin()
 
     if (m_spells.paladin.pBlessingBuff)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.paladin.pBlessingBuff))
+        if (Unit* pTarget = SelectBuffTarget(m_spells.paladin.pBlessingBuff))
         {
             if (CanTryToCastSpell(pTarget, m_spells.paladin.pBlessingBuff))
             {
@@ -1964,7 +1964,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
     {
         if (m_spells.priest.pPrayerofFortitude)
         {
-            if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofFortitude))
+            if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofFortitude))
             {
                 if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofFortitude))
                 {
@@ -1979,7 +1979,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
 
         if (m_spells.priest.pPrayerofSpirit)
         {
-            if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofSpirit))
+            if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofSpirit))
             {
                 if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofSpirit))
                 {
@@ -1994,7 +1994,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
 
         if (m_spells.priest.pShadowProtection)
         {
-            if (Player* pTarget = SelectBuffTarget(m_spells.priest.pShadowProtection))
+            if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pShadowProtection))
             {
                 if (CanTryToCastSpell(pTarget, m_spells.priest.pShadowProtection))
                 {
@@ -2226,7 +2226,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Warlock()
     {
         if (m_spells.warlock.pDetectInvisibility)
         {
-            if (Player* pTarget = SelectBuffTarget(m_spells.warlock.pDetectInvisibility))
+            if (Unit* pTarget = SelectBuffTarget(m_spells.warlock.pDetectInvisibility))
             {
                 if (CanTryToCastSpell(pTarget, m_spells.warlock.pDetectInvisibility))
                 {
@@ -2919,7 +2919,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
     {
         if (m_spells.druid.pGiftoftheWild)
         {
-            if (Player* pTarget = SelectBuffTarget(m_spells.druid.pGiftoftheWild))
+            if (Unit* pTarget = SelectBuffTarget(m_spells.druid.pGiftoftheWild))
             {
                 if (CanTryToCastSpell(pTarget, m_spells.druid.pGiftoftheWild))
                 {
@@ -2934,7 +2934,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
 
         if (m_spells.druid.pThorns)
         {
-            if (Player* pTarget = SelectBuffTarget(m_spells.druid.pThorns))
+            if (Unit* pTarget = SelectBuffTarget(m_spells.druid.pThorns))
             {
                 if (CanTryToCastSpell(pTarget, m_spells.druid.pThorns))
                 {

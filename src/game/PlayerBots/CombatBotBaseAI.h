@@ -82,11 +82,13 @@ public:
     }
 
     virtual void OnPacketReceived(WorldPacket const* packet) override;
+    virtual void OnPacketSentFromClient(WorldPacket const* packet);
     void SendBattlefieldPortPacket();
     void SendBattlemasterJoinPacket(uint8 battlegroundId);
     void SendAreaTriggerPacket(uint32 areaTriggerId);
     void ActivateNearbyAreaTrigger();
 
+    CombatBotRoles GuessRole(Player* pPlayer) const;
     void AutoAssignRole();
     void PopulateSpellData();
     void ResetSpellData();
@@ -98,21 +100,41 @@ public:
     void EquipRandomGearInEmptySlots();
     void AutoEquipGear(uint32 option);
     void LearnRandomTalents();
-    
+
+    template <typename Func>
+    void ForEachCombatBotInGroup(bool mustBeAlive, Func&& func) const;
+    template <typename Func>
+    CombatBotBaseAI* FindFirstCombatBotInGroupByCondition(bool mustBeAlive, Func&& func) const;
+    bool RecentSpellExistsForGroup(uint32 targetId, uint32 spellEntryId) const;
+
+    void RecentSpellsUpdate(uint32 diff);
+    bool RecentSpellsContains(uint32 targetId, uint32 spellEntryId) const;
+    void RecentSpellsAdd(uint32 targetId, uint32 spellEntryId);
+    void SafeSpotsUpdate();
+    bool SafeSpotsFind(Unit* pUnit, float distance, float& outX, float& outY, float& outZ);
+    bool SafeSpotsFind(float fromX, float fromY, float distance, float& outX, float& outY, float& outZ);
+
     uint8 GetAttackersInRangeCount(float range) const;
     Unit* SelectAttackerDifferentFrom(Unit const* pExcept) const;
     Unit* SelectHealTarget(float selfHealPercent = 100.0f, float groupHealPercent = 100.0f) const;
     Unit* SelectPeriodicHealTarget(float selfHealPercent = 100.0f, float groupHealPercent = 100.0f) const;
-    Player* SelectBuffTarget(SpellEntry const* pSpellEntry) const;
-    Player* SelectDispelTarget(SpellEntry const* pSpellEntry) const;
+    Unit* SelectBuffTarget(SpellEntry const* pSpellEntry) const;
+    Unit* SelectRebuffTarget(SpellEntry const* pSpellEntry) const;
+    Unit* SelectDispelTarget(SpellEntry const* pSpellEntry) const;
     bool IsValidBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
+    bool IsValidSelectBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry, bool rebuff = false) const;
     bool IsValidHealTarget(Unit const* pTarget, float healthPercent = 100.0f) const;
     bool IsValidHostileTarget(Unit const* pTarget) const;
+    bool IsValidDispelFriendlyTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool FindAndPreHealTarget();
     bool FindAndHealInjuredAlly(float selfHealPercent = 100.0f, float groupHealPercent = 100.0f);
+    float CalculateHealValue(Player const* me, Unit const* pVictim, SpellEntry const* pSpellEntry, bool ignorePeriodic = false) const;
     bool HealInjuredTarget(Unit* pTarget);
+    bool HealInjuredTargetDirect(Unit* pTarget, std::set<SpellEntry const*, HealSpellCompare> spells);
     bool HealInjuredTargetDirect(Unit* pTarget);
+    bool HealInjuredTargetDirectFast(Unit* pTarget);
+    bool HealInjuredTargetDirectSlow(Unit* pTarget);
     bool HealInjuredTargetPeriodic(Unit* pTarget);
     template <class T>
     SpellEntry const* SelectMostEfficientHealingSpell(Unit const* pTarget, std::set<SpellEntry const*, T>& spellList) const;
@@ -121,15 +143,27 @@ public:
     int32 GetIncomingdamage(Unit const* pTarget) const;
     bool AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee = true, bool checkSpells = true) const;
 
+    bool DoNotRotate();
+    bool FaceObject(WorldObject const* pObject);
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
-    virtual bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
+    virtual bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry, bool reapplyAura = false, bool checkAuraCaster = false, bool ignoreStacks = false) const;
     bool IsWearingShield(Player* pPlayer) const;
     bool IsInDuel() const;
     CombatBotRoles GetRole() const;
+    CombatBotRoles GetRoleByMember(Player* pMember) const;
+    CombatBotRoles GetRoleByPet(Player* pMember, Pet* pPet) const;
 
     void EquipOrUseNewItem();
     void AddItemToInventory(uint32 itemId, uint32 count = 1);
     void AddHunterAmmo();
+    Item* GetHealthStone();
+    uint32 CountInventoryItem(uint32 entry);
+    uint32 CountInventoryItem(SpellEntry const* spellEntry);
+    Item* GetInventoryItem(uint32 entry);
+    Item* GetInventoryItem(SpellEntry const* spellEntry);
+    bool CanTryToCastItemUseSpell(Item* pItem);
+    bool CanTryToCastItemUseSpell(Item* pItem, Unit* pTarget);
+    void UseConsumable(Item* pItem, Unit* pTarget);
     uint8 GetHighestHonorRankFromEquippedItems() const;
     void UpdateVisualHonorRankBasedOnItems();
 
@@ -278,20 +312,27 @@ public:
     }
 
     SpellEntry const* m_resurrectionSpell = nullptr;
-    std::vector<SpellEntry const*> m_spellListTaunt;
+    SpellEntry const* m_tauntSpell = nullptr;   // Full
+    std::vector<SpellEntry const*> m_spellListTaunt;    // Full & temporary
     std::set<SpellEntry const*, HealAuraCompare> m_spellListPeriodicHeal;
     std::set<SpellEntry const*, HealSpellCompare> m_spellListDirectHeal;
+    std::set<SpellEntry const*, HealSpellCompare> m_spellListDirectHealFast;
+    std::set<SpellEntry const*, HealSpellCompare> m_spellListDirectHealSlow;
+    std::set<SpellEntry const*, HealSpellCompare> m_spellListGroupHeal;
     union
     {
         struct
         {
-            SpellEntry const* spells[45];
+            SpellEntry const* spells[50];
         } raw;
         struct
         {
             SpellEntry const* pAura;
             SpellEntry const* pSeal;
             SpellEntry const* pBlessingBuff;
+            SpellEntry const* pBlessingBuffMelee;
+            SpellEntry const* pBlessingBuffRanged;
+            SpellEntry const* pBlessingBuffTank;
             SpellEntry const* pBlessingOfProtection;
             SpellEntry const* pBlessingOfFreedom;
             SpellEntry const* pBlessingOfSacrifice;
@@ -300,6 +341,7 @@ public:
             SpellEntry const* pExorcism;
             SpellEntry const* pConsecration;
             SpellEntry const* pHammerOfWrath;
+            SpellEntry const* pPurify;
             SpellEntry const* pCleanse;
             SpellEntry const* pDivineShield;
             SpellEntry const* pLayOnHands;
@@ -309,6 +351,33 @@ public:
             SpellEntry const* pHolyWrath;
             SpellEntry const* pTurnEvil;
             SpellEntry const* pHolyShield;
+            // Paladin Seals
+            SpellEntry const* pSealOfRighteousness;
+            SpellEntry const* pSealOfCommand;
+            SpellEntry const* pSealOfFury;
+            SpellEntry const* pSealOfLight;
+            SpellEntry const* pSealOfWisdom;
+            // Paladin Blessings
+            SpellEntry const* pBlessingOfLight;
+            SpellEntry const* pBlessingOfMight;
+            SpellEntry const* pBlessingOfWisdom;
+            SpellEntry const* pBlessingOfKings;
+            SpellEntry const* pBlessingOfSanctuary;
+            SpellEntry const* pBlessingOfSalvation;
+            SpellEntry const* pGreaterBlessingOfLight;
+            SpellEntry const* pGreaterBlessingOfMight;
+            SpellEntry const* pGreaterBlessingOfWisdom;
+            SpellEntry const* pGreaterBlessingOfKings;
+            SpellEntry const* pGreaterBlessingOfSanctuary;
+            SpellEntry const* pGreaterBlessingOfSalvation;
+            // Paladin Auras
+            SpellEntry const* pDevotionAura;
+            SpellEntry const* pConcentrationAura;
+            SpellEntry const* pRetributionAura;
+            SpellEntry const* pSanctityAura;
+            SpellEntry const* pShadowResistanceAura;
+            SpellEntry const* pFrostResistanceAura;
+            SpellEntry const* pFireResistanceAura;
         } paladin;
         struct
         {
@@ -333,7 +402,9 @@ public:
         } shaman;
         struct
         {
+            SpellEntry const* pTrueshotAura;
             SpellEntry const* pAspectOfTheCheetah;
+            SpellEntry const* pAspectOfThePack;
             SpellEntry const* pAspectOfTheMonkey;
             SpellEntry const* pAspectOfTheHawk;
             SpellEntry const* pSerpentSting;
@@ -349,16 +420,22 @@ public:
             SpellEntry const* pFeignDeath;
             SpellEntry const* pScareBeast;
             SpellEntry const* pVolley;
+            SpellEntry const* pDismissPet;
+            SpellEntry const* pTranquilizingShot;
+            SpellEntry const* pRapidFire;
+            SpellEntry const* pViperSting;
         } hunter;
         struct
         {
             SpellEntry const* pIceArmor;
+            SpellEntry const* pMageArmor;
             SpellEntry const* pArcaneIntellect;
             SpellEntry const* pArcaneBrilliance;
             SpellEntry const* pIceBarrier;
             SpellEntry const* pManaShield;
             SpellEntry const* pPolymorph;
             SpellEntry const* pFrostbolt;
+            SpellEntry const* pFrostboltLow;
             SpellEntry const* pFireBlast;
             SpellEntry const* pFireball;
             SpellEntry const* pArcaneExplosion;
@@ -374,13 +451,25 @@ public:
             SpellEntry const* pEvocation;
             SpellEntry const* pIceBlock;
             SpellEntry const* pBlizzard;
+            SpellEntry const* pBlizzardLow;
             SpellEntry const* pBlastWave;
             SpellEntry const* pCombustion;
+            SpellEntry const* pAmplifyMagic;
+            SpellEntry const* pFireWard;
+            SpellEntry const* pFrostWard;
+            SpellEntry const* pConjureManaAgate;
+            SpellEntry const* pConjureManaJade;
+            SpellEntry const* pConjureManaCitrine;
+            SpellEntry const* pConjureManaRuby;
+            SpellEntry const* pConjureWater;
+            SpellEntry const* pConjureFood;
+            SpellEntry const* pArcaneMissiles;
         } mage;
         struct
         {
             SpellEntry const* pPowerWordFortitude;
             SpellEntry const* pDivineSpirit;
+            SpellEntry const* pPrayerofHealing;
             SpellEntry const* pPrayerofSpirit;
             SpellEntry const* pPrayerofFortitude;
             SpellEntry const* pPrayerofShadowProtection;
@@ -393,6 +482,7 @@ public:
             SpellEntry const* pMindFlay;
             SpellEntry const* pShadowWordPain;
             SpellEntry const* pInnerFocus;
+            SpellEntry const* pCureDisease;
             SpellEntry const* pAbolishDisease;
             SpellEntry const* pDispelMagic;
             SpellEntry const* pManaBurn;
@@ -404,11 +494,16 @@ public:
             SpellEntry const* pFade;
             SpellEntry const* pShackleUndead;
             SpellEntry const* pSmite;
+            SpellEntry const* pFearWard;
+            SpellEntry const* pRenew;
         } priest;
         struct
         {
+            SpellEntry const* pDemonSkin;
             SpellEntry const* pDemonArmor;
             SpellEntry const* pDeathCoil;
+            SpellEntry const* pUnendingBreath;
+            SpellEntry const* pDetectLesserInvisibility;
             SpellEntry const* pDetectInvisibility;
             SpellEntry const* pShadowWard;
             SpellEntry const* pShadowBolt;
@@ -419,11 +514,14 @@ public:
             SpellEntry const* pImmolate;
             SpellEntry const* pRainOfFire;
             SpellEntry const* pDemonicSacrifice;
+            SpellEntry const* pDrainSoul;
             SpellEntry const* pDrainLife;
             SpellEntry const* pSiphonLife;
+            SpellEntry const* pDrainMana;
             SpellEntry const* pBanish;
             SpellEntry const* pFear;
             SpellEntry const* pHowlofTerror;
+            SpellEntry const* pCurseofWeakness;
             SpellEntry const* pCurseofAgony;
             SpellEntry const* pCurseofDoom;
             SpellEntry const* pCurseoftheElements;
@@ -432,6 +530,9 @@ public:
             SpellEntry const* pCurseofTongues;
             SpellEntry const* pCurseofExhaustion;
             SpellEntry const* pLifeTap;
+            SpellEntry const* pRitualOfSummoning;
+            SpellEntry const* pCreateSoulstone;
+            SpellEntry const* pCreateHealthstone;
         } warlock;
         struct
         {
@@ -469,6 +570,10 @@ public:
             SpellEntry const* pSunderArmor;
             SpellEntry const* pConcussionBlow;
             SpellEntry const* pPiercingHowl;
+            SpellEntry const* pRevenge;
+            SpellEntry const* pShootGun;
+            SpellEntry const* pShootBow;
+            SpellEntry const* pShootCrossbow;
         } warrior;
         struct
         {
@@ -497,6 +602,8 @@ public:
             SpellEntry const* pRiposte;
             SpellEntry const* pKick;
             SpellEntry const* pSprint;
+            SpellEntry const* pFeint;
+            SpellEntry const* pPickPocket;
             SpellEntry const* pMainHandPoison;
             SpellEntry const* pOffHandPoison;
         } rogue;
@@ -553,10 +660,48 @@ public:
     } m_spells;
 
     bool m_initialized = false;
+    ObjectGuid m_leaderGuid;
+    bool m_temporaryCharacter = true;
+    bool m_noClient = true;
+    bool m_noGenerateItems = false;
+    bool m_noTeleport = false;
     bool m_isBuffing = false;
     bool m_receivedBgInvite = false;
     uint8 m_visualHonorRank = 0;
     CombatBotRoles m_role = ROLE_INVALID;
+    ShortTimeTracker m_clientMovementTimer;
+
+    struct RecentSpell
+    {
+        uint32 spellEntryId; // pSpellEntry->Id
+        uint32 targetId; // pTarget->GetGUIDLow()
+        uint32 age;
+        RecentSpell() = default;
+        RecentSpell(uint32 s, uint32 t) : spellEntryId(s), targetId(t), age(0) {}
+    };
+    static constexpr uint8 RECENT_SPELLS_SIZE = 3;
+    static constexpr uint32 RECENT_SPELLS_THRESHOLD_MS = 2000; // 2 seconds
+    std::array<RecentSpell, RECENT_SPELLS_SIZE> m_recentSpells; // TODO: Generic circular buffer
+
+    struct RecentSafeSpot
+    {
+        bool valid;
+        float x, y, z;
+        RecentSafeSpot() : valid(false), x(0.0f), y(0.0f), z(0.0f) {}
+        RecentSafeSpot(float x, float y, float z) : valid(true), x(x), y(y), z(z) {}
+    };
+    static constexpr uint8 RECENT_SAFE_SPOT_SIZE = 30;
+    static constexpr float RECENT_SAFE_SPOT_DISTANCE_STORE = 2.0f;
+    std::array<RecentSafeSpot, RECENT_SAFE_SPOT_SIZE> m_recentSafeSpots; // TODO: Generic circular buffer
+    uint8 m_recentSafeSpotsIndex = 0;
+
+    struct GroupData
+    {
+        Position losPosition;
+    };
+    static std::map<uint32, GroupData> groupIdToDataMap;
+    static GroupData* GetGroupData(Player* player);
+    GroupData* m_groupData;
 };
 
 #endif

@@ -39,7 +39,15 @@ public:
         m_role = ROLE_INVALID;
         m_leaderGuid = pLeader->GetObjectGuid();
         m_updateTimer.Reset(2000);
+        m_temporaryCharacter = false;
     }
+
+    struct RebuffCandidate
+    {
+        Unit* target = nullptr;
+        SpellEntry const* spell = nullptr;
+        int32 auraDuration = 0;
+    };
 
     bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) final;
     void OnPlayerLogin() final;
@@ -49,20 +57,52 @@ public:
     void CloneFromPlayer(Player const* pPlayer);
     void AddToPlayerGroup();
 
-    bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const final;
+    bool IsTargetDeathWithinSeconds(Unit* pTarget, float seconds) const;
+    template <typename Func>
+    void ForEachPlayerInGroup(bool mustBeAlive, Func&& func) const;
+    template <typename Func>
+    Player* FindFirstPlayerInGroupByCondition(bool mustBeAlive, Func&& func) const;
+    template <typename Func>
+    std::set<Player*> FindAllPlayersInGroupByCondition(bool mustBeAlive, Func&& func) const;
+    std::set<Player*> FindAllPlayersInGroup(bool mustBeAlive) const;
+    std::set<Player*> FindAllPlayersInGroupByRole(CombatBotRoles role, bool mustBeAlive) const;
+    std::set<Player*> FindAllPlayersInGroupByClass(Classes unitClass, bool mustBeAlive) const;
+    Player* FindFirstPlayerInGroupByRole(CombatBotRoles role, bool mustBeAlive) const;
+    Player* FindFirstPlayerInGroupByClass(Classes unitClass, bool mustBeAlive) const;
+    bool ExistsAsPlayerInGroupByRole(CombatBotRoles role, bool mustBeAlive) const;
+    bool ExistsAsTankInGroupForThreatCheck() const;
+    bool ExistsAsHealerInGroupForOffHealCheck() const;
+    CombatBotRoles FindMajorityRoleForClass(Classes unitClass) const;
+
+    bool CheckThreatOK(Unit const* pTarget, SpellEntry const* pSpellEntry = nullptr) const;
+    bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry, bool ignoreAppliesAuraCheck = false, bool checkAuraCaster = false, bool ignoreStacks = false) const final;
     Player* GetPartyLeader() const;
     bool AttackStart(Unit* pVictim);
     Unit* SelectAttackTarget(Player* pLeader) const;
     Unit* SelectPartyAttackTarget() const;
+    Unit* SelectDispelAttackerTarget(SpellEntry const* pSpellEntry) const;
+    Unit* SelectPartyDefendTarget(Unit* pSelectingFor) const;
     Player* SelectResurrectionTarget() const;
     Player* SelectShieldTarget() const;
+    Unit* SelectBuffTargetByRole(SpellEntry const* pSpellEntry, CombatBotRoles role) const;
+    void EvaluateRebuffTarget(SpellEntry const* spell, RebuffCandidate& bestCandidate, bool asCaster = false, Unit* pTarget = nullptr);
+    void EvaluateRebuffTargetForAuraHolder(SpellEntry const* pSpellEntry, RebuffCandidate& bestCandidate, SpellAuraHolder* auraHolder);
     Unit* GetMarkedTarget(RaidTargetIcon mark) const;
     bool CanUseCrowdControl(SpellEntry const* pSpellEntry, Unit* pTarget) const;
+    bool CrowdControledMarkedTargetsExistNear(Unit const* pTarget, float radius = 15.0f) const;
+    Aura* GetAura(AuraType type, int32 maxDuration);
     bool DrinkAndEat();
     bool ShouldAutoRevive() const;
     bool IsValidDistancingTarget(Unit* pTarget, Unit* pEnemy);
     Unit* GetDistancingTarget(Unit* pEnemy);
+    bool RunAwayFromTarget(Unit* pEnemy, float distance);
     bool RunAwayFromTarget(Unit* pEnemy);
+    bool DoNotMove();
+    void MoveChase(Unit* target, float dist = 0.0f, float angle = 0.0f);
+    void MoveFollow(Unit* pLeader);
+    void MovePoint(float x, float y, float z, Unit* pVictim = nullptr);
+    void MovePointNear(float x, float y, float z, Unit* pVictim = nullptr);
+    bool StayBehind(Unit* pVictim);
     bool CrowdControlMarkedTargets();
     bool EnterCombatDruidForm();
     bool ShouldEnterStealth() const;
@@ -88,11 +128,12 @@ public:
     void UpdateOutOfCombatAI_Rogue() final;
     void UpdateInCombatAI_Druid() final;
     void UpdateOutOfCombatAI_Druid() final;
+    void UpdateInCombatPetAI();
 
     std::vector<RaidTargetIcon> m_marksToCC;
     std::vector<RaidTargetIcon> m_marksToFocus;
     ShortTimeTracker m_updateTimer;
-    ObjectGuid m_leaderGuid;
+    ShortTimeTracker m_buffTimer;
     ObjectGuid m_cloneGuid;
     uint8 m_race = 0;
     uint8 m_class = 0;
@@ -104,6 +145,7 @@ public:
     float m_z = 0.0f;
     float m_o = 0.0f;
     bool m_resetSpellData = false;
+    bool m_stay = false;
 };
 
 #endif

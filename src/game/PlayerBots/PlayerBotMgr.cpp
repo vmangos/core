@@ -14,9 +14,9 @@
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
 #include "BattleGroundMgr.h"
-#include "MapManager.h"
 #include "Language.h"
 #include "Spell.h"
+#include "MoveMapSharedDefines.h"
 
 INSTANTIATE_SINGLETON_1(PlayerBotMgr);
 
@@ -234,13 +234,25 @@ void PlayerBotMgr::Update(uint32 diff)
         {
             if (iter->second->requestRemoval)
             {
-                if (iter->second->ai && iter->second->ai->me)
+                bool keepLoggedIn = false;
+                if (iter->second->ai)
+                {
+                    if (CombatBotBaseAI* partyBot = dynamic_cast<CombatBotBaseAI*>(iter->second->ai.get()))
+                        keepLoggedIn = partyBot->m_leaderGuid == partyBot->me->GetObjectGuid();
+                }
+
+                if (iter->second->ai && iter->second->ai->me && !keepLoggedIn)
                     iter->second->ai->me->RemoveFromGroup();
 
                 DeleteBot(iter);
 
                 if (WorldSession* sess = sWorld.FindSession(iter->second->accountId))
-                    sess->LogoutPlayer(m_confAllowSaving);
+                {
+                    if (!keepLoggedIn)
+                        sess->LogoutPlayer(m_confAllowSaving);
+                    else
+                        sess->SetBot(nullptr);
+                }
 
                 iter->second->requestRemoval = false;
 
@@ -268,10 +280,14 @@ void PlayerBotMgr::Update(uint32 diff)
             continue;
         }
 
-        if (iter->second->ai->OnSessionLoaded(iter->second.get(), sess))
+        Player* pPlayer = sess->GetPlayer();
+        if (pPlayer || iter->second->ai->OnSessionLoaded(iter->second.get(), sess))
         {
             OnBotLogin(iter->second.get());
             m_stats.loadingCount--;
+
+            if (pPlayer)
+                OnPlayerInWorld(pPlayer);
 
             if (iter->second->isChatBot)
                 m_stats.onlineChat++;
@@ -411,10 +427,12 @@ bool PlayerBotMgr::AddBot(uint32 playerGUID, bool chatBot, PlayerBotAI* pAI)
         return false;
     }
 
-    if (sWorld.FindSession(accountId))
+    WorldSession* session = sWorld.FindSession(accountId);
+    if (session)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PlayerBotMgr] Account %u is already online!", accountId);
-        return false;
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "[PlayerBotMgr] Account %u is already online! Assuming direct control", accountId);
+        //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PlayerBotMgr] Account %u is already online!", accountId);
+        //return false;
     }
 
     std::shared_ptr<PlayerBotEntry> e;
@@ -452,9 +470,12 @@ bool PlayerBotMgr::AddBot(uint32 playerGUID, bool chatBot, PlayerBotAI* pAI)
 
     e->ai->botEntry = e.get();
     e->state = PB_STATE_LOADING;
-    WorldSession* session = new WorldSession(accountId, nullptr, sAccountMgr.GetSecurity(accountId), 0, LOCALE_enUS);
+    if (!session)
+    {
+        session = new WorldSession(accountId, nullptr, sAccountMgr.GetSecurity(accountId), 0, LOCALE_enUS);
+        sWorld.AddSession(session);
+    }
     session->SetBot(e);
-    sWorld.AddSession(session);
     m_stats.loadingCount++;
     if (chatBot)
         AddTempBot(accountId, 20000);
@@ -937,11 +958,11 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
 
     PartyBotAI* ai = new PartyBotAI(pPlayer, nullptr, botRole, botRace, botClass, botLevel, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
+
     if (sPlayerBotMgr.AddBot(ai))
         SendSysMessage("New party bot added.");
     else
     {
-        delete ai;
         SendSysMessage("Error spawning bot.");
         SetSentErrorMessage(true);
         return false;
@@ -981,7 +1002,48 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
         SendSysMessage("New party bot added.");
     else
     {
-        delete ai;
+        SendSysMessage("Error spawning bot.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotLoadHelper(Player* pPlayer, std::string name, bool warnAlreadyBot)
+{
+    ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(name).GetCounter();
+    if (!guid)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (Player* pPlayer = sObjectAccessor.FindPlayerNotInWorld(guid))
+    {
+        if (pPlayer->GetSession()->GetBot())
+        {
+            if (warnAlreadyBot)
+            {
+                SendSysMessage("Player is already a bot!");
+                SetSentErrorMessage(true);
+            }
+            return false;
+        }
+        //SendSysMessage("Player is already online!");
+        //SetSentErrorMessage(true);
+        //return false;
+    }
+
+    float x, y, z;
+    pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
+
+    PartyBotAI* pAI = new PartyBotAI(pPlayer, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
+
+    if (!sPlayerBotMgr.AddBot(guid, false, pAI))
+    {
+        delete pAI;
         SendSysMessage("Error spawning bot.");
         SetSentErrorMessage(true);
         return false;
@@ -999,41 +1061,59 @@ bool ChatHandler::HandlePartyBotLoadCommand(char* args)
     std::string name = ExtractPlayerNameFromLink(&args);
     if (name.empty())
     {
-        SendSysMessage(LANG_PLAYER_NOT_FOUND);
-        SetSentErrorMessage(true);
-        return false;
+        name = pPlayer->GetName();
+        SendSysMessage("Using current player as bot name to load");
+        //SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        //SetSentErrorMessage(true);
+        //return false;
     }
 
-    ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(name).GetCounter();
-    if (!guid)
+    if (HandlePartyBotLoadHelper(pPlayer, name))
     {
-        SendSysMessage(LANG_PLAYER_NOT_FOUND);
-        SetSentErrorMessage(true);
-        return false;
+        PSendSysMessage("Loading %s as party bot.", name.c_str());
+        return true;
     }
 
-    if (sObjectAccessor.FindPlayerNotInWorld(guid))
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotLoadPartyCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    if (!pPlayer)
+        return false;
+
+    int32 count = 40;
+    ExtractInt32(&args, count);
+    if (count == 0)
     {
-        SendSysMessage("Player is already online!");
+        SendSysMessage("Provide batch size greater than 0.");
         SetSentErrorMessage(true);
         return false;
     }
 
-    float x, y, z;
-    pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
-
-    PartyBotAI* pAI = new PartyBotAI(pPlayer, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
-
-    if (!sPlayerBotMgr.AddBot(guid, false, pAI))
+    if (Group* pGroup = pPlayer->GetGroup())
     {
-        delete pAI;
-        SendSysMessage("Error spawning bot.");
-        SetSentErrorMessage(true);
-        return false;
+        for (Group::member_citerator itr = pGroup->GetMemberSlots().begin(); itr != pGroup->GetMemberSlots().end(); ++itr)
+        {
+            if (itr->guid != pGroup->GetLeaderGuid())
+            {
+                if (HandlePartyBotLoadHelper(pPlayer, itr->name, false))
+                {
+                    count = count - 1;
+                    if (count == 0)
+                        break;
+                }
+            }
+        }
+
+        SendSysMessage("Loading party as party bots.");
+        return true;
     }
 
-    PSendSysMessage("Loading %s as party bot.", name.c_str());
-    return true;
+    SendSysMessage("You are not in a group.");
+    SetSentErrorMessage(true);
+    return false;
 }
 
 bool ChatHandler::HandlePartyBotSetRoleCommand(char* args)
@@ -1102,25 +1182,19 @@ bool ChatHandler::HandlePartyBotAttackStartCommand(char* args)
         return false;
     }
 
-    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    for (PartyBotAI* pAI : matchingBots)
     {
-        if (Player* pMember = itr->getSource())
+        if (Player* pMember = pAI->me)
         {
-            if (pMember == pPlayer)
-                continue;
-
-            if (pMember->AI())
+            if (pMember->IsValidAttackTarget(pTarget))
             {
-                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
-                {
-                    if (pMember->IsValidAttackTarget(pTarget))
-                        pAI->AttackStart(pTarget);
-                }
+                pAI->AttackStart(pTarget);
             }
         }
     }
 
-    PSendSysMessage("All party bots are now attacking %s.", pTarget->GetName());
+    PSendSysMessage("%d party bots are now attacking %s.", matchingBots.size(), pTarget->GetName());
     return true;
 }
 
@@ -1140,40 +1214,24 @@ bool ChatHandler::HandlePartyBotAttackStopCommand(char* args)
 {
     Player* pPlayer = GetSession()->GetPlayer();
     Unit* pTarget = GetSelectedUnit();
-    if (!pTarget || (pTarget == pPlayer))
-    {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        SetSentErrorMessage(true);
-        return false;
-    }
 
-    Group* pGroup = pPlayer->GetGroup();
-    if (!pGroup)
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    for (PartyBotAI* pAI : matchingBots)
     {
-        SendSysMessage("You are not in a group.");
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-    {
-        if (Player* pMember = itr->getSource())
+        if (Player* pMember = pAI->me)
         {
-            if (pMember == pPlayer)
-                continue;
-
-            if (pMember->AI())
+            if (pTarget == nullptr || !pMember->IsValidAttackTarget(pTarget) || pMember->GetVictim() == pTarget)
             {
-                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
-                {
-                    if (pMember->GetVictim() == pTarget)
-                        StopPartyBotAttackHelper(pAI, pMember);
-                }
+                StopPartyBotAttackHelper(pAI, pMember);
             }
         }
     }
 
-    PSendSysMessage("All party bots have stopped attacking %s.", pTarget->GetName());
+    // TODO: valid attack targets can be different per member (e.g. MC on pPlayer).  Size represents those considered, not stopped.
+    if (pTarget && pPlayer->IsValidAttackTarget(pTarget))
+        PSendSysMessage("%d party bots have stopped attacking %s.", matchingBots.size() , pTarget->GetName());
+    else
+        PSendSysMessage("%d party bots have stopped attacking.", matchingBots.size());
     return true;
 }
 
@@ -1207,10 +1265,12 @@ bool ChatHandler::HandlePartyBotAoECommand(char* args)
             {
                 if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
                 {
+
                     for (auto const& pSpell : pAI->m_spells.raw.spells)
                     {
                         if (pSpell && pSpell->IsAreaOfEffectSpell() &&
                            !pSpell->IsPositiveSpell() &&
+                           !pSpell->HasAura(AuraType::SPELL_AURA_MOD_FEAR) &&
                             pSpell->IsTargetInRange(pMember, pTarget))
                         {
                             if (pMember->GetCurrentSpell(CURRENT_GENERIC_SPELL) &&
@@ -1423,7 +1483,7 @@ bool ChatHandler::HandlePartyBotClearMarksCommand(char* args)
     return true;
 }
 
-bool HandlePartyBotComeToMeHelper(Player* pBot, Player* pPlayer)
+bool HandlePartyBotComeToMeHelper(Player* pBot, Player* pPlayer, bool pathing)
 {
     if (pBot->AI() && pBot->IsAlive() && pBot->IsInMap(pPlayer) && !pBot->HasUnitState(UNIT_STATE_NO_FREE_MOVE))
     {
@@ -1436,7 +1496,10 @@ bool HandlePartyBotComeToMeHelper(Player* pBot, Player* pPlayer)
                 pBot->SetStandState(UNIT_STAND_STATE_STAND);
 
             pBot->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
-            pBot->MonsterMove(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
+            if (pathing)
+                pBot->MonsterMoveWithSpeed(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), -10.0f, pBot->GetSpeed(MOVE_RUN), MOVE_PATHFINDING | MOVE_RUN_MODE);
+            else
+                pBot->MonsterMove(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
             return true;
         }
     }
@@ -1447,42 +1510,31 @@ bool HandlePartyBotComeToMeHelper(Player* pBot, Player* pPlayer)
 bool ChatHandler::HandlePartyBotComeToMeCommand(char* args)
 {
     Player* pPlayer = GetSession()->GetPlayer();
-    Player* pTarget = GetSelectedPlayer();
-
-    bool ok = false;
-
-    if (pTarget && pTarget != pPlayer)
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    for (PartyBotAI* pAI : matchingBots)
     {
-        if (ok = HandlePartyBotComeToMeHelper(pTarget, pPlayer))
-            PSendSysMessage("%s is coming to your position.", pTarget->GetName());
-        else
-            PSendSysMessage("%s is not a party bot or it cannot move.", pTarget->GetName());
-        return ok;
-    }
-    else if (Group* pGroup = pPlayer->GetGroup())
-    {
-        bool ok = false;
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        if (Player* pMember = pAI->me)
         {
-            if (Player* pMember = itr->getSource())
-            {
-                if (pMember == pPlayer)
-                    continue;
-
-                ok = HandlePartyBotComeToMeHelper(pMember, pPlayer) || ok;
-            }
+            HandlePartyBotComeToMeHelper(pMember, pPlayer, false);
         }
-
-        if (ok)
-            SendSysMessage("All party bots are coming to your position.");
-        else
-            SendSysMessage("There are no party bots in the group or they cannot move.");
-        return ok;
     }
+    PSendSysMessage("%d party bots are coming to your position.", matchingBots.size());
+    return true;
+}
 
-    SendSysMessage("You are not in a group.");
-    SetSentErrorMessage(true);
-    return false;
+bool ChatHandler::HandlePartyBotPathToMeCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    for (PartyBotAI* pAI : matchingBots)
+    {
+        if (Player* pMember = pAI->me)
+        {
+            HandlePartyBotComeToMeHelper(pMember, pPlayer, true);
+        }
+    }
+    PSendSysMessage("%d party bots are pathing to your position.", matchingBots.size());
+    return true;
 }
 
 bool HandlePartyBotUseGObjectHelper(Player* pTarget, GameObject* pGo)
@@ -1544,6 +1596,431 @@ bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
     return false;
 }
 
+static uint8 ClassFromString(const std::string& optionStr)
+{
+    if (optionStr == "warrior")
+        return CLASS_WARRIOR;
+    if (optionStr == "paladin")
+        return CLASS_PALADIN;
+    if (optionStr == "hunter")
+        return CLASS_HUNTER;
+    if (optionStr == "rogue")
+        return CLASS_ROGUE;
+    if (optionStr == "priest")
+        return CLASS_PRIEST;
+    if (optionStr == "shaman")
+        return CLASS_SHAMAN;
+    if (optionStr == "mage")
+        return CLASS_MAGE;
+    if (optionStr == "warlock")
+        return CLASS_WARLOCK;
+    if (optionStr == "druid")
+        return CLASS_DRUID;
+    return 0;
+}
+
+static std::set<CombatBotRoles> RolesFromString(const std::string& optionStr)
+{
+    std::set<CombatBotRoles> roles;
+
+    if (optionStr == "tank")
+        roles.insert(ROLE_TANK);
+    else if (optionStr == "meleedps")
+        roles.insert(ROLE_MELEE_DPS);
+    else if (optionStr == "melee")
+    {
+        roles.insert(ROLE_TANK);
+        roles.insert(ROLE_MELEE_DPS);
+    }
+    else if (optionStr == "healer")
+        roles.insert(ROLE_HEALER);
+    else if (optionStr == "rangedps")
+        roles.insert(ROLE_RANGE_DPS);
+    else if (optionStr == "ranged")
+    {
+        roles.insert(ROLE_HEALER);
+        roles.insert(ROLE_RANGE_DPS);
+    }
+
+    return roles;
+}
+
+std::set<PartyBotAI*> ChatHandler::MembersFromString(char* args)
+{
+    std::set<PartyBotAI*> matchedMembers;
+
+    // Get the selected target and AI
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pPlayerTarget = nullptr;
+    if (pPlayer->GetSelectionGuid())
+        pPlayerTarget = GetSelectedPlayer();
+    Player* pTarget = nullptr;
+
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        // SendSysMessage("You are not in a group.");
+        // SetSentErrorMessage(true);
+        return matchedMembers;
+    }
+
+    bool matchAll = false;
+    bool matchSelected = false;
+    bool matchUnselected = false;
+    uint8 matchClassValue = 0;
+    std::set<CombatBotRoles> matchRoleValues;
+    bool matchSomething = false;
+
+    std::string optionStr = (args ? std::string(args) : "");
+    if (optionStr.empty())
+        pTarget = pPlayerTarget;
+    else
+    {
+        if (optionStr == "all")
+            matchAll = true;
+        else if (optionStr == "me")
+            pTarget = pPlayer;
+        else if (optionStr == "target")
+        {
+            if (!pPlayerTarget)
+            {
+                // SendSysMessage("Option invalid, select a target.");
+                // SetSentErrorMessage(true);
+                return matchedMembers;
+            }
+            else
+                pTarget = pPlayerTarget;
+        }
+        else if (optionStr == "selected")
+            matchSelected = true;
+        else if (optionStr == "unselected")
+            matchUnselected = true;
+        else
+        {
+            matchClassValue = ClassFromString(optionStr);
+            matchRoleValues = RolesFromString(optionStr);
+
+            matchSomething = (matchClassValue || !matchRoleValues.empty());
+            if (!matchSomething)
+            {
+                Player* pMatchTarget = nullptr;
+                if (pPlayer->GetSelectionGuid())
+                    pMatchTarget = GetSelectedPlayer();
+
+                if (pMatchTarget == nullptr)
+                {
+                    // SendSysMessage("Option invalid, select a target or use warrior||paladin||etc||tank||meleedps||rangedps||healer||all.");
+                    // SetSentErrorMessage(true);
+                    return matchedMembers;
+                }
+                else
+                {
+                    bool classAndRole = optionStr == "cr" || optionStr == "classrole" || optionStr == "roleclass";
+                    if (optionStr == "c" || optionStr == "class" || classAndRole)
+                        matchClassValue = pMatchTarget->GetClass();
+                    if (optionStr == "r" || optionStr == "role" || classAndRole)
+                    {
+                        if (pMatchTarget->AI())
+                        {
+                            PartyBotAI* pMatchAI = dynamic_cast<PartyBotAI*>(pMatchTarget->AI()); // TODO: Unchecked
+                            matchRoleValues = {pMatchAI->GetRole()};
+                        }
+                        else
+                        {
+                            // SendSysMessage("Unable to match role when target is not a party bot.");
+                            // SetSentErrorMessage(true);
+                            return matchedMembers;
+                        }
+                    }
+                    matchSomething = (matchClassValue || !matchRoleValues.empty());
+                    if (!matchSomething)
+                    {
+                        // SendSysMessage("Option invalid and ignored, provide c||r||cr to match selected target on class||role||both.");
+                        // SetSentErrorMessage(true);
+                        return matchedMembers;
+                    }
+                }
+            }
+        }
+    }
+
+    if (pTarget)
+    {
+        if (pTarget->AI())
+        {
+            PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()); // TODO: Unchecked
+            matchedMembers.insert(pAI);
+        }
+        //PSendSysMessage("Added %s, selected size now %d.", pTarget->GetName(), selectedBots.size());
+        return matchedMembers;
+    }
+
+    std::set<uint32 /*bot guid*/>& selectedBots = sPlayerBotMgr.m_selectedBots[pPlayer->GetGUIDLow()];
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            // If "me" was specified then that's resolved above
+            if (pMember == pPlayer)
+                continue;
+                    
+            if (matchSelected && selectedBots.find(pMember->GetGUIDLow()) == selectedBots.end())
+                continue;
+
+            if (matchUnselected && selectedBots.find(pMember->GetGUIDLow()) != selectedBots.end())
+                continue;
+
+            if (matchClassValue && pMember->GetClass() != matchClassValue)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    if (!matchRoleValues.empty() && matchRoleValues.find(pAI->GetRole()) == matchRoleValues.end())
+                        continue;
+
+                    matchedMembers.insert(pAI);
+                }
+            }
+        }
+    }
+
+    return matchedMembers;
+}
+
+bool ChatHandler::HandlePartyBotSelectHelper(char* args, bool add)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    std::set<uint32>& selectedBots = sPlayerBotMgr.m_selectedBots[pPlayer->GetGUIDLow()];
+    int8 count = 0;
+
+    // Extract the matching set of PartyBotAIs based on args
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    
+    // Handle "unselect all" and "select unselected" cases separately
+    bool matchAll = (std::string(args) == "all");
+    bool matchUnselected = (std::string(args) == "unselected");
+    if ((matchAll && !add) || (matchUnselected && add))
+        selectedBots.clear();
+    if (matchAll && !add)
+    {
+        PSendSysMessage("Removed all party bots, selected size now 0.");
+        return true;
+    }
+
+    // Add or remove matching bots
+    for (auto pAI : matchingBots)
+    {
+        if (add)
+            selectedBots.insert(pAI->me->GetObjectGuid());
+        else
+            selectedBots.erase(pAI->me->GetObjectGuid());
+    }
+
+    // Send feedback to user
+    PSendSysMessage("Considered %d party bots, selected size now %d.", matchingBots.size(), selectedBots.size());
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotStayHelper(char* args, bool stay)
+{
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    for (PartyBotAI* pAI : matchingBots)
+    {
+        if (Player* pMember = pAI->me)
+        {
+            pAI->m_stay = stay;
+            pMember->StopMoving();
+            pMember->GetMotionMaster()->MoveIdle();
+        }
+    }
+
+    if (stay)
+        PSendSysMessage("Staying %d party bots.", matchingBots.size());
+    else
+        PSendSysMessage("Unstaying %d party bots.", matchingBots.size());
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotSelectCommand(char* args)
+{
+    return HandlePartyBotSelectHelper(args, true);
+}
+
+bool ChatHandler::HandlePartyBotUnselectCommand(char* args)
+{
+    return HandlePartyBotSelectHelper(args, false);
+}
+
+bool ChatHandler::HandlePartyBotMoveSectorCommand(char* args)
+{
+    float r1, r2, arcangle;
+
+    // Extract arguments
+    if (sscanf(args, "%f %f %f", &r1, &r2, &arcangle) != 3)
+    {
+        SendSysMessage("Usage: .partybot movesector <r1> <r2> <arcangle>");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* pPlayer = GetSession()->GetPlayer();
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    std::set<uint32 /*bot guid*/>& selectedBots = sPlayerBotMgr.m_selectedBots[pPlayer->GetGUIDLow()];
+    uint32 botCount = static_cast<uint32>(selectedBots.size());
+    if (botCount == 0)
+    {
+        SendSysMessage("No bots selected.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // --- Generate spaced points in arcsector ---
+    std::vector<std::pair<float, float>> arcPoints;
+
+    auto generateArcSectorPoints = [&](uint32 n)
+    {
+        std::vector<std::pair<float, float>> result;
+        if (n == 0)
+            return result;
+
+        uint32 radialSteps = static_cast<uint32>(std::ceil(std::sqrt(n)));
+        uint32 angularSteps = static_cast<uint32>(std::ceil(static_cast<float>(n) / radialSteps));
+
+        float radiusStep = (r2 - r1) / std::max(1u, radialSteps);
+        float angleStep = arcangle / std::max(1u, angularSteps);
+
+        float baseAngle = pPlayer->GetOrientation();
+
+        for (uint32 r = 0; r < radialSteps; ++r)
+        {
+            for (uint32 a = 0; a < angularSteps; ++a)
+            {
+                float radius = r1 + (r + frand(0.0f, 1.0f)) * radiusStep;
+                float angle = baseAngle - arcangle / 2.0f + (a + frand(0.0f, 1.0f)) * angleStep;
+
+                float x = pPlayer->GetPositionX() + radius * std::cos(angle);
+                float y = pPlayer->GetPositionY() + radius * std::sin(angle);
+
+                result.emplace_back(x, y);
+            }
+        }
+
+        // Truncate if we have more than needed
+        if (result.size() > n)
+            result.resize(n);
+
+        return result;
+    };
+
+
+    arcPoints = generateArcSectorPoints(botCount);
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "PartyBot move sector: generated %d points for %d selected bots.", arcPoints.size(), botCount);
+
+    // --- Assign points to bots ---
+    uint32 index = 0;
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (selectedBots.find(pMember->GetGUIDLow()) != selectedBots.end())
+            {
+                if (pMember->AI() && pMember->IsAlive() && pMember->IsInMap(pPlayer) && !pMember->HasUnitState(UNIT_STATE_NO_FREE_MOVE))
+                {
+                    if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                    {
+                        if (index >= arcPoints.size())
+                            break;
+
+                        float x = arcPoints[index].first;
+                        float y = arcPoints[index].second;
+                        float z = pPlayer->GetPositionZ();
+
+                        pPlayer->UpdateAllowedPositionZ(x, y, z);
+                        pMember->GetMap()->GetWalkHitPosition(nullptr, pMember->GetPositionX(), pMember->GetPositionY(), pMember->GetPositionZ(), x, y, z, NAV_GROUND | NAV_WATER, r2);
+                        pMember->GetMotionMaster()->MovePoint(pMember->GetGUIDLow(), x, y, z, MOVE_PATHFINDING, pMember->GetSpeed(MOVE_RUN));
+                        ++index;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotMoveFollowCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    for (PartyBotAI* pAI : matchingBots)
+    {
+        if (Player* pMember = pAI->me)
+        {
+            if (pMember->IsAlive() && pMember->IsInMap(pPlayer) && !pMember->HasUnitState(UNIT_STATE_NO_FREE_MOVE))
+            {
+                if (pMember->GetVictim())
+                    StopPartyBotAttackHelper(pAI, pMember);
+
+                if (pMember->GetStandState() != UNIT_STAND_STATE_STAND)
+                    pMember->SetStandState(UNIT_STAND_STATE_STAND);
+
+                pMember->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+                if (pAI->GetRole() == ROLE_TANK)
+                    pMember->GetMotionMaster()->MoveFollow(pPlayer, frand(2.0f, 2.5f), frand(-1.0f, 1.0f));
+                else if (pAI->GetRole() == ROLE_MELEE_DPS)
+                    pMember->GetMotionMaster()->MoveFollow(pPlayer, frand(3.0f, 4.0f), M_PI_F + frand(-0.5f, 0.5f));
+                else
+                    pMember->GetMotionMaster()->MoveFollow(pPlayer, frand(5.0f, 6.0f), M_PI_F + frand(-0.5f, 0.5f));
+            }
+        }
+    }
+    PSendSysMessage("%d party bots are following you.", matchingBots.size());
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotLosCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    if (CombatBotBaseAI::GroupData* data = CombatBotBaseAI::GetGroupData(pPlayer))
+    {
+        if (data->losPosition.IsEmpty())
+        {
+            data->losPosition = pPlayer->GetPosition();
+            SendSysMessage("LoS position set.");
+        }
+        else
+        {
+            data->losPosition = Position();
+            SendSysMessage("LoS position cleared.");
+        }
+        return true;
+    }
+
+    SendSysMessage("LoS position not updated");
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotStayCommand(char* args)
+{
+    return HandlePartyBotStayHelper(args, true);
+}
+
+bool ChatHandler::HandlePartyBotUnstayCommand(char* args)
+{
+    return HandlePartyBotStayHelper(args, false);
+}
+
 bool HandlePartyBotPauseApplyHelper(Player* pTarget, uint32 duration)
 {
     if (pTarget->AI())
@@ -1554,8 +2031,17 @@ bool HandlePartyBotPauseApplyHelper(Player* pTarget, uint32 duration)
 
             if (duration)
             {
-                pTarget->StopMoving();
-                pTarget->GetMotionMaster()->MoveIdle();
+                if (!pTarget->IsTaxiFlying())
+                {
+                    pTarget->StopMoving();
+                    pTarget->GetMotionMaster()->MoveIdle();
+                }
+
+                if (Pet* pPet = pTarget->GetPet())
+                {
+                    pPet->GetCharmInfo()->SetReactState(REACT_PASSIVE);
+                    pPet->AttackStop();
+                }
             }
 
             return true;
@@ -1567,80 +2053,51 @@ bool HandlePartyBotPauseApplyHelper(Player* pTarget, uint32 duration)
 
 bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
 {
-    bool all = false;
+    // Default values
+    char* switchStr = nullptr;
+    char* durationArg = nullptr;
     uint32 duration = 0;
-    if (char* arg1 = ExtractArg(&args))
-    {
-        if (!(all = (strcmp(arg1, "all") == 0)) && pause)
-            duration = atoi(arg1);
+    const uint32 DEFAULT_DURATION = 5 * MINUTE * IN_MILLISECONDS;
 
-        if (char* arg2 = ExtractArg(&args))
-        {
-            if (!duration && pause)
-                duration = atoi(arg2);
-            else if (!all)
-                all = strcmp(arg2, "all") == 0;
-        }
+    // Extract the first argument (potentially the switch)
+    char* arg1 = ExtractArg(&args);
+
+    // Check if the first argument is non-numeric (i.e., it's the switch)
+    if (arg1 && !isdigit(arg1[0]))
+    {
+        // If it's non-numeric, assign it to the switch
+        switchStr = arg1;
+
+        // Extract the second argument (duration) if it exists
+        durationArg = ExtractArg(&args);
+    }
+    else if (arg1)
+    {
+        // If the first argument is numeric, it's the duration
+        durationArg = arg1;
     }
 
-    if (pause && !duration)
-        duration = 5 * MINUTE * IN_MILLISECONDS;
-
-    if (all)
-    {
-        Player* pPlayer = GetSession()->GetPlayer();
-        Group* pGroup = pPlayer->GetGroup();
-        if (!pGroup)
-        {
-            SendSysMessage("You are not in a group.");
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        bool success = false;
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            if (Player* pMember = itr->getSource())
-            {
-                if (pMember == pPlayer)
-                    continue;
-
-                if (HandlePartyBotPauseApplyHelper(pMember, duration))
-                    success = true;
-            }
-        }
-
-        if (success)
-        {
-            if (pause)
-                PSendSysMessage("All party bots paused for %u seconds.", (duration / IN_MILLISECONDS));
-            else
-                SendSysMessage("All party bots unpaused.");
-        }
-        else
-            SendSysMessage("No party bots in group.");
-    }
+    if (durationArg && isdigit(durationArg[0]))
+        duration = std::stoul(durationArg); // Convert string to uint32
     else
+        duration = DEFAULT_DURATION;
+
+    if (!pause)
+        duration = 0;
+
+    std::set<PartyBotAI*> matchingBots = MembersFromString(switchStr);
+    for (PartyBotAI* pAI : matchingBots)
     {
-        Player* pTarget = GetSelectedPlayer();
-        if (!pTarget)
+        if (Player* pMember = pAI->me)
         {
-            SendSysMessage(LANG_NO_CHAR_SELECTED);
-            SetSentErrorMessage(true);
-            return false;
+            HandlePartyBotPauseApplyHelper(pMember, duration);
         }
-
-        if (HandlePartyBotPauseApplyHelper(pTarget, duration))
-        {
-            if (pause)
-                PSendSysMessage("%s paused for %u seconds.", pTarget->GetName(), (duration / IN_MILLISECONDS));
-            else
-                PSendSysMessage("%s unpaused.", pTarget->GetName());
-        }
-
-        else
-            SendSysMessage("Target is not a party bot.");
     }
+
+    if (pause)
+        PSendSysMessage("%d party bots paused for %u seconds.", matchingBots.size(), (duration / IN_MILLISECONDS));
+    else
+        PSendSysMessage("%d party bots unpaused.", matchingBots.size());
 
     return true;
 }
@@ -1708,6 +2165,90 @@ bool ChatHandler::HandlePartyBotPullCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandlePartyBotChangeSealCommand(char* args)
+{
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    for (PartyBotAI* pAI : matchingBots)
+    {
+        if (Player* pMember = pAI->me)
+        {
+            if (pMember->GetClass() == CLASS_PALADIN)
+            {
+                SpellEntry const* currentSeal = pAI->m_spells.paladin.pSeal;
+
+                auto const& seals = std::vector<SpellEntry const*>{
+                    pAI->m_spells.paladin.pSealOfFury,
+                    pAI->m_spells.paladin.pSealOfRighteousness,
+                    pAI->m_spells.paladin.pSealOfCommand,
+                    pAI->m_spells.paladin.pSealOfLight,
+                    pAI->m_spells.paladin.pSealOfWisdom,
+                };
+
+                auto it = std::find(seals.begin(), seals.end(), currentSeal);
+                if (it == seals.end())
+                    it = seals.begin();
+
+                std::size_t count = seals.size();
+                for (std::size_t i = 1; i <= count; ++i)
+                {
+                    auto nextIndex = (std::distance(seals.begin(), it) + i) % count;
+                    if (seals[nextIndex])
+                    {
+                        pAI->m_spells.paladin.pSeal = seals[nextIndex];
+                        pMember->PMonsterSay("Now using %s", pAI->m_spells.paladin.pSeal->SpellName[0].c_str());
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotChangeAuraCommand(char* args)
+{
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    for (PartyBotAI* pAI : matchingBots)
+    {
+        if (Player* pMember = pAI->me)
+        {
+            if (pMember->GetClass() == CLASS_PALADIN)
+            {
+                SpellEntry const* currentAura = pAI->m_spells.paladin.pAura;
+
+                auto const& auras = std::vector<SpellEntry const*>{
+                    pAI->m_spells.paladin.pDevotionAura,
+                    pAI->m_spells.paladin.pConcentrationAura,
+                    pAI->m_spells.paladin.pRetributionAura,
+                    pAI->m_spells.paladin.pSanctityAura,
+                    pAI->m_spells.paladin.pShadowResistanceAura,
+                    pAI->m_spells.paladin.pFrostResistanceAura,
+                    pAI->m_spells.paladin.pFireResistanceAura,
+                };
+
+                auto it = std::find(auras.begin(), auras.end(), currentAura);
+                if (it == auras.end())
+                    it = auras.begin();
+
+                std::size_t count = auras.size();
+                for (std::size_t i = 1; i <= count; ++i)
+                {
+                    auto nextIndex = (std::distance(auras.begin(), it) + i) % count;
+                    if (auras[nextIndex])
+                    {
+                        pAI->m_spells.paladin.pAura = auras[nextIndex];
+                        pMember->PMonsterSay("Now using %s", pAI->m_spells.paladin.pAura->SpellName[0].c_str());
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 bool ChatHandler::HandlePartyBotUnequipCommand(char* args)
 {
     Player* pTarget = GetSelectedPlayer();
@@ -1750,26 +2291,14 @@ bool ChatHandler::HandlePartyBotUnequipCommand(char* args)
 
 bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
 {
-    Player* pTarget = GetSelectedPlayer();
-    if (!pTarget)
+    std::set<PartyBotAI*> matchingBots = MembersFromString(args);
+    for (PartyBotAI* pAI : matchingBots)
     {
-        SendSysMessage(LANG_NO_CHAR_SELECTED);
-        SetSentErrorMessage(true);
-        return false;
+        pAI->botEntry->requestRemoval = true;
     }
 
-    if (pTarget->AI())
-    {
-        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
-        {
-            pAI->botEntry->requestRemoval = true;
-            return true;
-        }
-    }
-
-    SendSysMessage("Target is not a party bot.");
-    SetSentErrorMessage(true);
-    return false;
+    PSendSysMessage("%d party bots removed.", matchingBots.size());
+    return true;
 }
 
 bool ChatHandler::HandleBattleBotAddAlteracCommand(char* args)

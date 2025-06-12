@@ -107,6 +107,7 @@ class PlayerBotMgr
         uint32 GenBotAccountId() { return ++m_maxAccountId; }
         PlayerBotStats& GetStats(){ return m_stats; }
         void Start() { m_confEnableRandomBots = true; }
+        std::map<uint32 /*player guid*/, std::set<uint32 /*bot guid*/>> m_selectedBots;
     protected:
         // How long since last update?
         uint32 m_elapsedTime;

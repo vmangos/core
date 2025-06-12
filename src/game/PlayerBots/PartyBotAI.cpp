@@ -26,6 +26,7 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Chat.h"
+#include "Totem.h"
 #include <random>
 
 enum PartyBotSpells
@@ -38,6 +39,7 @@ enum PartyBotSpells
 };
 
 #define PB_UPDATE_INTERVAL 1000
+#define PB_BUFFING_INTERVAL 2000
 #define PB_MIN_FOLLOW_DIST 3.0f
 #define PB_MAX_FOLLOW_DIST 6.0f
 #define PB_MIN_FOLLOW_ANGLE 0.0f
@@ -104,6 +106,9 @@ void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
 
 Player* PartyBotAI::GetPartyLeader() const
 {
+    if (m_leaderGuid == me->GetObjectGuid())
+        return me;
+
     Group* pGroup = me->GetGroup();
     if (!pGroup)
         return nullptr;
@@ -124,6 +129,7 @@ Player* PartyBotAI::GetPartyLeader() const
 
         return originalLeader;
     }
+
     return nullptr;
 }
 
@@ -169,22 +175,99 @@ Unit* PartyBotAI::GetDistancingTarget(Unit* pEnemy)
     return pNonTank;
 }
 
-bool PartyBotAI::RunAwayFromTarget(Unit* pEnemy)
+bool PartyBotAI::RunAwayFromTarget(Unit* pEnemy, float distance)
 {
+    if (DoNotMove())
+        return false;
+
+    float ox, oy, oz;
+    pEnemy->GetLosCheckPosition(ox, oy, oz);
+    float x, y, z;
+    if (SafeSpotsFind(pEnemy, distance, x, y, z))
+    {
+        if (me->IsWithinLOSAtPosition(x, y, z, ox, oy, oz, true, 0.0f)) // me->GetCollisionHeight()))
+        {
+            MovePointNear(x, y, z, pEnemy);
+            return true;
+        }
+    }
+
     if (Unit* pTarget = GetDistancingTarget(pEnemy))
     {
         me->MonsterMove(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
         return true;
     }
 
-    return me->GetMotionMaster()->MoveDistance(pEnemy, 15.0f);
+    return me->GetMotionMaster()->MoveDistance(pEnemy, distance);
+}
+
+bool PartyBotAI::RunAwayFromTarget(Unit* pEnemy)
+{
+    return RunAwayFromTarget(pEnemy, 15.0f);
+}
+
+bool PartyBotAI::DoNotMove()
+{
+    return m_stay || !m_clientMovementTimer.Passed() || me->HasUnitState(UNIT_STATE_CAN_NOT_MOVE);
+}
+
+void PartyBotAI::MoveChase(Unit* target, float dist, float angle)
+{
+    if (!DoNotMove())
+        me->GetMotionMaster()->MoveChase(target, dist, angle);
+}
+
+void PartyBotAI::MoveFollow(Unit* pLeader)
+{
+    if (!DoNotMove())
+        me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
+}
+
+void PartyBotAI::MovePoint(float x, float y, float z, Unit* pVictim)
+{
+    if (DoNotMove())
+        return;
+
+    float finalOrientation = -10;
+    if (pVictim)
+        finalOrientation = fmodf(M_PI_F + pVictim->GetAngle(x, y), 2 * M_PI_F);
+    //me->UpdateAllowedPositionZ(x, y, z);
+    me->GetMotionMaster()->MovePoint(me->GetGUIDLow(), x, y, z, MOVE_PATHFINDING, me->GetSpeed(MOVE_RUN), finalOrientation);
+}
+
+void PartyBotAI::MovePointNear(float x, float y, float z, Unit* pVictim)
+{
+    me->GetMap()->GetWalkHitPosition(nullptr, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), x, y, z);
+    MovePoint(x, y, z, pVictim);
+}
+
+bool PartyBotAI::StayBehind(Unit* pVictim)
+{
+    if (DoNotMove())
+        return false;
+
+    if (!me->IsMoving() && me->CanReachWithMeleeAutoAttack(pVictim) && pVictim->HasInArc(me) && !me->HasUnitState(UNIT_STATE_NO_FREE_MOVE))
+    {
+        float x, y, z;
+        pVictim->GetRelativePositions(-1.0f, 0.0f, 0.0f, x, y, z);
+        MovePointNear(x, y, z, pVictim);
+        return true;
+    }
+    return false;
+}
+
+Aura* PartyBotAI::GetAura(AuraType type, int32 maxDuration)
+{
+    auto const& auras = me->GetAurasByType(type);
+    for (const auto& i : auras)
+        if (i->GetAuraMaxDuration() == maxDuration)
+            return i;
+
+    return nullptr;
 }
 
 bool PartyBotAI::DrinkAndEat()
 {
-    if (m_isBuffing)
-        return false;
-
     if (me->GetVictim())
         return false;
 
@@ -194,11 +277,14 @@ bool PartyBotAI::DrinkAndEat()
     if (!needToEat && !needToDrink)
         return false;
 
-    bool const isEating = me->HasAura(PB_SPELL_FOOD);
-    bool const isDrinking = me->HasAura(PB_SPELL_DRINK);
+    bool const isEating = GetAura(SPELL_AURA_MOD_REGEN, 30000) != nullptr;
+    bool const isDrinking = GetAura(SPELL_AURA_MOD_POWER_REGEN, 30000) != nullptr;
 
-    if (!isEating && needToEat)
+    if (!isEating && needToEat && !m_noGenerateItems)
     {
+        if (m_isBuffing || GetPartyLeader()->IsMoving())
+            return false;
+
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
             me->StopMoving();
@@ -213,8 +299,11 @@ bool PartyBotAI::DrinkAndEat()
         return true;
     }
 
-    if (!isDrinking && needToDrink)
+    if (!isDrinking && needToDrink && !m_noGenerateItems)
     {
+        if (m_isBuffing || GetPartyLeader()->IsMoving())
+            return false;
+
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
             me->StopMoving();
@@ -229,11 +318,17 @@ bool PartyBotAI::DrinkAndEat()
         return true;
     }
 
-    return needToEat || needToDrink;
+    if (!m_noGenerateItems)
+        return needToEat || needToDrink;
+    else
+        return isEating || isDrinking;
 }
 
 bool PartyBotAI::ShouldAutoRevive() const
 {
+    if (!m_noClient)
+        return false;
+
     if (me->GetDeathState() == DEAD)
         return true;
 
@@ -263,18 +358,252 @@ bool PartyBotAI::ShouldAutoRevive() const
     return alivePlayerNearby;
 }
 
-bool PartyBotAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const
+bool PartyBotAI::IsTargetDeathWithinSeconds(Unit* pTarget, float seconds) const
 {
-    if (!CombatBotBaseAI::CanTryToCastSpell(pTarget, pSpellEntry))
+    // 30 ~ Lvl * 0.7 * 1.6
+    uint32 memberCount = pTarget->GetAttackers().size();
+    float effectiveMemberCount = memberCount * 0.7f;  // 5 members ~ 3 full dps, 1 half dps, 1 no dps = 3.5/5.0 = 0.7
+    float memberDps = me->GetLevel() * 1.6f;
+    float groupDps = memberDps * effectiveMemberCount;
+    uint32 totalDamage = static_cast<uint32>(groupDps * seconds);
+    uint32 targetHealth = pTarget->GetHealth();
+
+    return targetHealth < totalDamage;
+}
+
+template <typename Func>
+void PartyBotAI::ForEachPlayerInGroup(bool mustBeAlive, Func&& func) const
+{
+    Group* pGroup = me->GetGroup();
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (mustBeAlive && !pMember->IsAlive())
+                continue;
+
+            if (func(pMember))
+                return;
+        }
+    }
+}
+
+template <typename Func>
+Player* PartyBotAI::FindFirstPlayerInGroupByCondition(bool mustBeAlive, Func&& func) const
+{
+    Player* found = nullptr;
+    ForEachPlayerInGroup(mustBeAlive,
+        [&](Player* pMember) -> bool
+        {
+            if (func(pMember))
+            {
+                found = pMember;
+                return true; // stop iteration
+            }
+            return false; // continue
+        });
+    return found;
+}
+
+template <typename Func>
+std::set<Player*> PartyBotAI::FindAllPlayersInGroupByCondition(bool mustBeAlive, Func&& func) const
+{
+    std::set<Player*> result;
+    ForEachPlayerInGroup(mustBeAlive,
+        [&](Player* pMember) -> bool
+        {
+            if (func(pMember))
+                result.insert(pMember);
+            return false; // never early-exit
+        });
+    return result;
+}
+
+std::set<Player*> PartyBotAI::FindAllPlayersInGroup(bool mustBeAlive) const
+{
+    return FindAllPlayersInGroupByCondition(mustBeAlive, [&](Player* pMember) -> bool { return true; });
+}
+
+std::set<Player*> PartyBotAI::FindAllPlayersInGroupByRole(CombatBotRoles role, bool mustBeAlive) const
+{
+    return FindAllPlayersInGroupByCondition(mustBeAlive,
+        [&](Player* pMember) -> bool
+        {
+            return GetRoleByMember(pMember) == role;
+        });
+}
+
+std::set<Player*> PartyBotAI::FindAllPlayersInGroupByClass(Classes unitClass, bool mustBeAlive) const
+{
+    return FindAllPlayersInGroupByCondition(mustBeAlive,
+        [&](Player* pMember) -> bool
+        {
+            return pMember->GetClass() == unitClass;
+        });
+}
+
+Player* PartyBotAI::FindFirstPlayerInGroupByRole(CombatBotRoles role, bool mustBeAlive) const
+{
+    return FindFirstPlayerInGroupByCondition(mustBeAlive,
+        [&](Player* pMember) -> bool
+        {
+            return GetRoleByMember(pMember) == role;
+        });
+}
+
+Player* PartyBotAI::FindFirstPlayerInGroupByClass(Classes unitClass, bool mustBeAlive) const
+{
+    return FindFirstPlayerInGroupByCondition(mustBeAlive,
+        [&](Player* pMember) -> bool
+        {
+            return pMember->GetClass() == unitClass;
+        });
+}
+
+bool PartyBotAI::ExistsAsPlayerInGroupByRole(CombatBotRoles role, bool mustBeAlive) const
+{
+    return FindFirstPlayerInGroupByRole(role, mustBeAlive) != nullptr;
+}
+
+bool PartyBotAI::ExistsAsTankInGroupForThreatCheck() const
+{
+    return FindFirstPlayerInGroupByCondition(true,
+        [&](Player* pMember) -> bool
+        {
+            return GetRoleByMember(pMember) == ROLE_TANK;   // TBC: Include pets
+        });
+}
+
+bool PartyBotAI::ExistsAsHealerInGroupForOffHealCheck() const
+{
+    return FindFirstPlayerInGroupByCondition(true,
+        [&](Player* pMember) -> bool
+        {
+            return GetRoleByMember(pMember) == ROLE_HEALER && pMember->GetPowerPercent(POWER_MANA) > 15.0f;
+        });
+}
+
+CombatBotRoles PartyBotAI::FindMajorityRoleForClass(Classes unitClass) const
+{
+    std::map<CombatBotRoles, uint32> roleCount;
+    auto players = FindAllPlayersInGroupByClass(unitClass, false);
+
+    for (Player* pPlayer : players)
+    {
+        CombatBotRoles role = GetRoleByMember(pPlayer);
+        ++roleCount[role];
+    }
+
+    CombatBotRoles majorityRole = CombatBotRoles::ROLE_INVALID;
+    uint32 maxCount = 0;
+
+    for (const auto& pair : roleCount)
+    {
+        if (pair.second > maxCount)
+        {
+            maxCount = pair.second;
+            majorityRole = pair.first;
+        }
+    }
+
+    return majorityRole;
+}
+
+bool static CheckThreatForMember(Unit* pMember, Unit const* pTarget)
+{
+    bool m_checkThreat = pMember->GetMap()->GetId() > 1;
+    if (m_checkThreat)
+    {
+        auto pEnemy = pMember->GetMap()->GetUnit(pTarget->GetObjectGuid());
+        if (!pEnemy)
+            return true;
+
+        float myThreat = pEnemy->GetThreatManager().getThreat(pMember);
+        Unit* pTargetVictim = pTarget->GetVictim();
+        if (HostileReference* currentVictim = pEnemy->GetThreatManager().getCurrentVictim())
+            pTargetVictim = currentVictim->getTarget();
+        if (pTargetVictim)
+        {
+            if (pTargetVictim == pMember)
+                return false;
+
+            float const targetVictimThreat = pEnemy->GetThreatManager().getThreat(pTargetVictim);
+            myThreat += pMember->GetLevel() * 4.0f;
+            return myThreat < targetVictimThreat * 90.0f / 100.0f;
+        }
+        return myThreat > 0;
+    }
+
+    return true;
+}
+
+bool PartyBotAI::CheckThreatOK(Unit const* pTarget, SpellEntry const* pSpellEntry) const
+{
+    if (GetRole() == ROLE_TANK || GetRole() == ROLE_HEALER)
+        return true;
+
+    if (pTarget == me || pTarget->IsPlayer() || IsInDuel() || !pTarget->CanHaveThreatList() || pTarget->IsFriendlyTo(me))
+        return true;
+
+    if (pTarget->GetHealth() < me->GetMaxHealth() / 2)
+        return true;
+    if (pSpellEntry)
+    {
+        if (pSpellEntry->IsPositiveSpell() || pSpellEntry->IsCCSpell() || pSpellEntry->IsAreaOfEffectSpell())
+            return true;
+
+        for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if (Spells::IsThreatEffect(pSpellEntry->Effect[i]) && pSpellEntry->EffectBasePoints[i] < 0)
+                return true;
+        }
+    }
+    else
+    {
+        if (me->GetClass() == CLASS_ROGUE && m_spells.rogue.pFeint)
+            return true;
+
+        if (me->GetClass() == CLASS_DRUID && GetRole() == ROLE_MELEE_DPS && m_spells.druid.pCower)
+            return true;
+    }
+
+    if (!ExistsAsTankInGroupForThreatCheck())
+        return true;
+
+    return CheckThreatForMember(me, pTarget);
+}
+
+bool PartyBotAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry, bool ignoreAppliesAuraCheck, bool checkAuraCaster, bool ignoreStacks) const
+{
+    if (!CheckThreatOK(pTarget, pSpellEntry))
         return false;
 
-    if (pSpellEntry->IsAreaOfEffectSpell() && !pSpellEntry->IsPositiveSpell() && !IsInDuel())
+    if (pSpellEntry->IsChanneledSpell() && me->IsMoving() && me->IsMovedByPlayer())
+        return false;
+
+    if (!CombatBotBaseAI::CanTryToCastSpell(pTarget, pSpellEntry, ignoreAppliesAuraCheck, checkAuraCaster, ignoreStacks))
+        return false;
+
+    if (pTarget->GetMap()->IsBattleGround() || IsInDuel() || pTarget->IsPlayer())
+        return true;
+
+    if (pSpellEntry->IsAreaOfEffectSpell() && !pSpellEntry->IsPositiveSpell())
     {
-        if (!m_marksToCC.empty())
+        bool doesDamage = false;
+        for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if (Spells::IsDirectDamageEffect(pSpellEntry->Effect[i]) || pSpellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_DAMAGE)
+            {
+                doesDamage = true;
+                break;
+            }
+        }
+
+        if (doesDamage && CrowdControledMarkedTargetsExistNear(pTarget))
             return false;
 
         // do not cast aoe if it will pull aggro
-        if (m_role != ROLE_TANK)
+        if (m_role != ROLE_TANK && doesDamage && ExistsAsTankInGroupForThreatCheck())
         {
             float radius;
             if (pSpellEntry->EffectRadiusIndex[0])
@@ -285,24 +614,24 @@ bool PartyBotAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpell
                 radius = Spells::GetSpellRadius(sSpellRadiusStore.LookupEntry(pSpellEntry->EffectRadiusIndex[2]));
             else
                 radius = 10.0f;
+            if (radius > 10.0f)
+                radius = 10.0f;
 
             std::list<Unit*> targets;
             me->GetEnemyListInRadiusAround(pTarget, radius, targets);
 
             for (auto const& pEnemy : targets)
             {
-                if (((pEnemy->GetLevel() + 5) > me->GetLevel()) &&
-                    ((pEnemy->GetHealth() * 4) > me->GetHealth()) &&
-                    pEnemy->GetVictim() && pEnemy->GetVictim() != me &&
-                    pEnemy->IsValidAttackTarget(me) &&
-                    pEnemy->CanHaveThreatList())
-                {
-                    float const myThreat = pEnemy->GetThreatManager().getThreat(me);
-                    float const victimThreat = pEnemy->GetThreatManager().getThreat(pEnemy->GetVictim());
-                    
-                    if (victimThreat < (myThreat + me->GetMaxHealth()))
-                        return false;
-                }
+                if ((pEnemy->GetLevel() + 5) <= me->GetLevel() || !pEnemy->IsValidAttackTarget(me) || !pEnemy->CanHaveThreatList())
+                    continue;
+
+                if (pEnemy->GetThreatManager().getThreatList().empty())
+                    return false;
+
+                float const myThreat = pEnemy->GetThreatManager().getThreat(me);
+                float const victimThreat = pEnemy->GetThreatManager().getThreat(pEnemy->GetVictim());
+                if (victimThreat < (myThreat + me->GetLevel() * 5.0f))
+                    return false;
             }
         }
     }
@@ -329,6 +658,25 @@ bool PartyBotAI::CanUseCrowdControl(SpellEntry const* pSpellEntry, Unit* pTarget
     return true;
 }
 
+bool PartyBotAI::CrowdControledMarkedTargetsExistNear(Unit const* pEnemy, float radius) const
+{
+    for (auto mark : m_marksToCC)
+    {
+        if (Unit* pMarkedTarget = GetMarkedTarget(mark))
+        {
+            if (pMarkedTarget->IsDead())
+            {
+                continue;
+            }
+            if (pMarkedTarget->GetDistance(pEnemy) < radius)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool PartyBotAI::AttackStart(Unit* pVictim)
 {
     m_isBuffing = false;
@@ -338,14 +686,12 @@ bool PartyBotAI::AttackStart(Unit* pVictim)
 
     if (me->Attack(pVictim, true))
     {
-        if (GetRole() == ROLE_RANGE_DPS &&
-            me->GetPowerPercent(POWER_MANA) > 10.0f &&
-            me->GetCombatDistance(pVictim) > 8.0f)
+        if ((GetRole() == ROLE_RANGE_DPS || GetRole() == ROLE_HEALER)) // && me->GetPowerPercent(POWER_MANA) > 10.0f && me->GetCombatDistance(pVictim) > 8.0f)
             me->SetCasterChaseDistance(25.0f);
         else if (me->HasDistanceCasterMovement())
             me->SetCasterChaseDistance(0.0f);
 
-        me->GetMotionMaster()->MoveChase(pVictim, 1.0f, GetRole() == ROLE_MELEE_DPS ? 3.0f : 0.0f);
+        MoveChase(pVictim, 1.0f, GetRole() == ROLE_MELEE_DPS ? 3.0f : 0.0f);
         return true;
     }
 
@@ -367,9 +713,52 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
     {
         if (me->m_duel->opponent && IsValidHostileTarget(me->m_duel->opponent))
             return me->m_duel->opponent;
+
+        // Who is attacking me.
+        for (const auto pAttacker : me->GetAttackers())
+        {
+            if (IsValidHostileTarget(pAttacker) && CheckThreatOK(pAttacker))
+                return pAttacker;
+        }
     }
     else
     {
+        // Totems
+        if (GetRole() != ROLE_HEALER)
+        {
+            Group* pGroup = me->GetGroup();
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* pMember = itr->getSource())
+                {
+                    auto tryFindTotem = [&](Unit* source) -> Totem*
+                    {
+                        for (Unit* pAttacker : source->GetAttackers())
+                        {
+                            for (int i = 0; i < MAX_TOTEM_SLOT; ++i)
+                            {
+                                if (Totem* pTotem = pAttacker->GetTotem(static_cast<TotemSlot>(i)))
+                                {
+                                    if (pTotem->GetAttackers().empty() || me->GetVictim() == pTotem)
+                                        return pTotem;
+                                }
+                            }
+                        }
+                        return nullptr;
+                    };
+
+                    if (Totem* totem = tryFindTotem(pMember))
+                        return totem;
+
+                    if (Pet* pPet = pMember->GetPet())
+                    {
+                        if (Totem* totem = tryFindTotem(pPet))
+                            return totem;
+                    }
+                }
+            }
+        }
+
         // Stick to marked target in combat.
         if (me->IsInCombat() || pLeader->GetVictim())
         {
@@ -378,28 +767,28 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
                 ObjectGuid targetGuid = me->GetGroup()->GetTargetWithIcon(markId);
                 if (targetGuid.IsUnit())
                     if (Unit* pVictim = me->GetMap()->GetUnit(targetGuid))
-                        if (IsValidHostileTarget(pVictim))
+                        if (IsValidHostileTarget(pVictim) && me->GetDistance2d(pVictim) < 50.0f && CheckThreatOK(pVictim))
                             return pVictim;
             }
         }
 
         // Who is the leader attacking.
-        if (Unit* pVictim = pLeader->GetVictim())
+        if (pLeader != me)
         {
-            if (IsValidHostileTarget(pVictim))
+            if (Unit* pVictim = pLeader->GetVictim())
+            {
+                if (IsValidHostileTarget(pVictim) && CheckThreatOK(pVictim))
+                    return pVictim;
+            }
+        }
+
+        // Who am I attacking.
+        if (Unit* pVictim = me->GetVictim())
+        {
+            if (IsValidHostileTarget(pVictim) && CheckThreatOK(pVictim))
                 return pVictim;
         }
-    }
 
-    // Who is attacking me.
-    for (const auto pAttacker : me->GetAttackers())
-    {
-        if (IsValidHostileTarget(pAttacker))
-            return pAttacker;
-    }
-
-    if (!IsInDuel())
-    {
         // Check if other group members are under attack.
         if (Unit* pPartyAttacker = SelectPartyAttackTarget())
             return pPartyAttacker;
@@ -409,7 +798,7 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
     if (Pet* pPet = me->GetPet())
     {
         if (Unit* pPetAttacker = pPet->GetAttackerForHelper())
-            if (IsValidHostileTarget(pPetAttacker))
+            if (IsValidHostileTarget(pPetAttacker) && CheckThreatOK(pPetAttacker))
                 return pPetAttacker;
     }
 
@@ -418,25 +807,185 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
 
 Unit* PartyBotAI::SelectPartyAttackTarget() const
 {
+    Unit* pPartyAttacker = nullptr;
+
     Group* pGroup = me->GetGroup();
     for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         if (Player* pMember = itr->getSource())
         {
-            // We already checked self.
-            if (pMember == me)
-                continue;
-
             for (const auto pAttacker : pMember->GetAttackers())
             {
-                if (IsValidHostileTarget(pAttacker) &&
-                    me->IsWithinDist(pAttacker, 50.0f))
+                if (pPartyAttacker && pPartyAttacker->GetHealth() <= pAttacker->GetHealth())
+                    continue;
+
+                if (IsValidHostileTarget(pAttacker) && CheckThreatOK(pAttacker))
+                    pPartyAttacker = pAttacker;
+            }
+
+            if (Pet* pPet = pMember->GetPet())
+            {
+                for (const auto pAttacker : pPet->GetAttackers())
+                {
+                    if (pPartyAttacker && pPartyAttacker->GetHealth() <= pAttacker->GetHealth())
+                        continue;
+
+                    if (IsValidHostileTarget(pAttacker) && CheckThreatOK(pAttacker))
+                        pPartyAttacker = pAttacker;
+                }
+            }
+        }
+    }
+
+    return pPartyAttacker;
+}
+
+Unit* PartyBotAI::SelectDispelAttackerTarget(SpellEntry const* pSpellEntry) const
+{
+    Group* pGroup = me->GetGroup();
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            for (const auto pAttacker : pMember->GetAttackers())
+            {
+                if (IsValidDispelTarget(pAttacker, pSpellEntry) && CheckThreatOK(pAttacker))
                     return pAttacker;
             }
         }
     }
 
     return nullptr;
+}
+
+Unit* PartyBotAI::SelectPartyDefendTarget(Unit* pSelectingFor) const
+{
+    Group* pGroup = me->GetGroup();
+    std::set<Unit*> otherTankVictims;
+    // TODO: Replace sets with priority list
+    std::set<Unit*> attackingHealer;
+    std::set<Unit*> attackingNonTank;
+    std::set<Unit*> attackingOtherTank;
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pSelectingFor)
+                continue;
+
+            CombatBotRoles role = GetRoleByMember(pMember);
+            bool isTank = role == ROLE_TANK;
+            bool isHealer = role == ROLE_HEALER;
+            if (isTank)
+            {
+                if (Unit* pTankVictim = pMember->GetVictim())
+                    otherTankVictims.insert(pTankVictim);
+            }
+
+            for (const auto pAttacker : pMember->GetAttackers())
+            {
+                if (isTank)
+                    attackingOtherTank.insert(pAttacker);
+                else if (isHealer)
+                    attackingHealer.insert(pAttacker);
+                else
+                    attackingNonTank.insert(pAttacker);
+            }
+
+            if (Pet* pPet = pMember->GetPet())
+            {
+                if (pPet == pSelectingFor)
+                    continue;
+
+                bool petIsTank = GetRoleByPet(pMember, pPet) == ROLE_TANK;
+                if (petIsTank)
+                {
+                    if (Unit* pTankVictim = pPet->GetVictim())
+                        otherTankVictims.insert(pTankVictim);
+                }
+
+                for (const auto pAttacker : pPet->GetAttackers())
+                {
+                    if (petIsTank)
+                        attackingOtherTank.insert(pAttacker);
+                    else
+                        attackingNonTank.insert(pAttacker);
+                }
+            }
+        }
+    }
+
+    // Attackers attacking members that are healers, and aren't the victim of another tank
+    for (Unit* pAttacker : attackingHealer)
+    {
+        if (otherTankVictims.count(pAttacker) == 0 && IsValidHostileTarget(pAttacker))
+            return pAttacker;
+    }
+
+    // Attackers attacking members that aren't tanks/healers, and aren't the victim of another tank
+    for (Unit* pAttacker : attackingNonTank)
+    {
+        if (otherTankVictims.count(pAttacker) == 0 && IsValidHostileTarget(pAttacker))
+            return pAttacker;
+    }
+
+    // Attackers attacking members that are other tanks, and aren't the victim of another tank - with load balancing
+    uint32 attackingMe = static_cast<uint32>(me->GetAttackers().size());
+    Unit* bestCandidate = nullptr; // The one that helps balance the most
+    uint32 bestDelta = 1; // how many more mobs the other tank has
+    for (Unit* pAttacker : attackingOtherTank)
+    {
+        if (otherTankVictims.count(pAttacker) > 0)
+            continue;
+
+        Unit* victimTank = pAttacker->GetVictim();
+        uint32 attackingTank = static_cast<uint32>(victimTank->GetAttackers().size());
+
+        // Look for the attacker that closes the biggest attacker difference
+        if ((attackingTank > bestDelta + attackingMe) && IsValidHostileTarget(pAttacker))
+        {
+            bestDelta = attackingTank - attackingMe;
+            bestCandidate = pAttacker;
+        }
+    }
+    if (bestCandidate)
+        return bestCandidate;
+
+    // Attackers attacking pSelectingFor, and aren't the victim of another tank
+    Unit* pFound = nullptr;
+    uint32 lowThreatDiff = 0.0f;
+    for (Unit* pAttacker : pSelectingFor->GetAttackers())
+    {
+        if (otherTankVictims.count(pAttacker) > 0)
+            continue;
+
+        float myThreat = pAttacker->GetThreatManager().getThreat(pSelectingFor);
+        float otherThreat = 0.0f;
+        ThreatList const& threatlist = pAttacker->GetThreatManager().getThreatList();
+        if (!threatlist.empty())
+        {
+            for (HostileReference* pHostile : threatlist)
+            {
+                if (pHostile->getTarget() == pSelectingFor)
+                    continue;
+                else
+                {
+                    otherThreat = pHostile->getThreat();
+                    break;
+                }
+            }
+        }
+        float threatDiff = myThreat - otherThreat;
+        if (!pFound || threatDiff < lowThreatDiff)
+        {
+            if (IsValidHostileTarget(pAttacker))
+            {
+                pFound = pAttacker;
+                lowThreatDiff = threatDiff;
+            }
+        }
+    }
+    return pFound;
 }
 
 Player* PartyBotAI::SelectResurrectionTarget() const
@@ -481,7 +1030,7 @@ Player* PartyBotAI::SelectShieldTarget() const
             if (pMember == me)
                 continue;
 
-            if ((pMember->GetHealthPercent() < 90.0f) &&
+            if ((pMember->GetHealthPercent() < 40.0f) &&
                 !pMember->GetAttackers().empty() &&
                 !pMember->IsImmuneToMechanic(MECHANIC_SHIELD))
                 return pMember;
@@ -489,6 +1038,57 @@ Player* PartyBotAI::SelectShieldTarget() const
     }
 
     return nullptr;
+}
+
+Unit* PartyBotAI::SelectBuffTargetByRole(SpellEntry const* pSpellEntry, CombatBotRoles role) const
+{
+    for (Player* pMember : FindAllPlayersInGroupByRole(role, true))
+    {
+        if (me->IsValidHelpfulTarget(pMember) &&
+            !pMember->IsGameMaster() &&
+            IsValidBuffTarget(pMember, pSpellEntry) &&
+            me->IsWithinLOSInMap(pMember) &&
+            me->IsWithinDist(pMember, 30.0f, true, SizeFactor::CombatReach))
+            return pMember;
+    }
+
+    return nullptr;
+}
+
+void PartyBotAI::EvaluateRebuffTarget(SpellEntry const* pSpellEntry, RebuffCandidate& bestCandidate, bool asCaster, Unit* pTarget)
+{
+    if (me->GetPowerPercent(POWER_MANA) == 100.0f)
+    {
+        if (!pTarget)
+            pTarget = SelectRebuffTarget(pSpellEntry);
+
+        if (pTarget)
+        {
+            SpellAuraHolder* auraHolder;
+            if (asCaster)
+                auraHolder = pTarget->GetSpellAuraHolder(pSpellEntry->Id, me->GetObjectGuid());
+            else
+                auraHolder = pTarget->GetSpellAuraHolder(pSpellEntry->Id);
+
+            if (auraHolder && auraHolder->GetAuraDuration() < auraHolder->GetAuraMaxDuration() / 2)
+            {
+                int32 duration = auraHolder->GetAuraDuration();
+                if (bestCandidate.target == nullptr || duration < bestCandidate.auraDuration)
+                    bestCandidate = {pTarget, pSpellEntry, duration};
+            }
+        }
+    }
+}
+
+void PartyBotAI::EvaluateRebuffTargetForAuraHolder(SpellEntry const* pSpellEntry, RebuffCandidate& bestCandidate, SpellAuraHolder* auraHolder)
+{
+    if (me->GetPowerPercent(POWER_MANA) == 100.0f && auraHolder->GetAuraDuration() < auraHolder->GetAuraMaxDuration() / 2)
+    {
+        Unit* pTarget = auraHolder->GetTarget();
+        int32 duration = auraHolder->GetAuraDuration();
+        if (bestCandidate.target == nullptr || duration < bestCandidate.auraDuration)
+            bestCandidate = {pTarget, pSpellEntry, duration};
+    }
 }
 
 bool PartyBotAI::CrowdControlMarkedTargets()
@@ -521,7 +1121,7 @@ bool PartyBotAI::CrowdControlMarkedTargets()
 void PartyBotAI::AddToPlayerGroup()
 {
     Player* pPlayer = ObjectAccessor::FindPlayer(m_leaderGuid);
-    if (!pPlayer)
+    if (!pPlayer || pPlayer == me)
         return;
 
     Group* group = pPlayer->GetGroup();
@@ -579,6 +1179,14 @@ void PartyBotAI::OnPlayerLogin()
 
 void PartyBotAI::UpdateAI(uint32 const diff)
 {
+    RecentSpellsUpdate(diff);
+    m_buffTimer.Update(diff);
+    if (m_buffTimer.Passed())
+        m_buffTimer.Reset(0);
+    m_clientMovementTimer.Update(diff);
+    if (m_clientMovementTimer.Passed())
+        m_clientMovementTimer.Reset(0);
+
     m_updateTimer.Update(diff);
     if (m_updateTimer.Passed())
         m_updateTimer.Reset(PB_UPDATE_INTERVAL);
@@ -591,6 +1199,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     if (!m_initialized)
     {
         AddToPlayerGroup();
+        Player* pLeader = GetPartyLeader();
 
         if (m_race && m_class) // temporary character
         {
@@ -625,6 +1234,15 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             }
             me->UpdateSkillsToMaxSkillsForLevel();
         }
+        else if (me == pLeader)
+        {
+            if (m_role == ROLE_INVALID)
+                AutoAssignRole();
+            m_noClient = false;
+            m_noTeleport = true;
+            m_noGenerateItems = true;
+            pLeader->m_stackTrackers = true;
+        }
         else // loaded from db
         {
             if (m_role == ROLE_INVALID)
@@ -648,12 +1266,15 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         me->GetZoneAndAreaId(newzone, newarea);
         me->UpdateZone(newzone, newarea);
 
+        me->PMonsterSay("I'm a %s", BotRoleToString(this->GetRole()));
+
         m_initialized = true;
         return;
     }
 
     if (m_resetSpellData)
     {
+        me->MonsterSay("I'm learning");
         ResetSpellData();
         PopulateSpellData();
         m_resetSpellData = false;
@@ -665,6 +1286,12 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         botEntry->requestRemoval = true;
         return;
     }
+
+    if (!me->GetGroup())
+    {
+        return;
+    }
+    m_groupData = GetGroupData(me);
 
     if (!pLeader->IsInWorld())
         return;
@@ -683,7 +1310,9 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
-    if (pLeader->IsTaxiFlying())
+    if (me->IsTaxiFlying())
+        return;
+    else if (pLeader->IsTaxiFlying())
     {
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
@@ -724,20 +1353,17 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
+    // Greater blessing of salvation
+    if (GetRole() == ROLE_TANK && me->HasAura(25895))
+        me->RemoveAurasDueToSpellByCancel(25895);
+
     if (me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
     {
-        // Stop auto shot if no target.
-        if (!me->GetVictim())
-            me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
-        else if (me->GetClass() == CLASS_HUNTER)
+        // Stop auto shot if no target, too close, or too much threat
+        if (!me->GetVictim() || (me->GetClass() == CLASS_HUNTER && me->GetCombatDistance(me->GetVictim()) < 8.0f) || !CheckThreatOK(me->GetVictim()))
         {
-            if (me->GetCombatDistance(me->GetVictim()) < 8.0f)
-                me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
-            else
-                UpdateInCombatAI_Hunter();
+            me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
         }
-
-        return;
     }
 
     if (Spell* pCurrentSpell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
@@ -748,7 +1374,8 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         {
             if (Unit* pTarget = pCurrentSpell->m_targets.getUnitTarget())
             {
-                if (pTarget->GetHealth() == pTarget->GetMaxHealth())
+                float basePoints = CalculateHealValue(me, pTarget, pCurrentSpell->m_spellInfo);
+                if (pTarget->GetHealth() >= pTarget->GetMaxHealth() * 0.9f || (pTarget->GetHealth() + basePoints) >= (pTarget->GetMaxHealth() * 1.2f))
                 {
                     me->InterruptSpell(CURRENT_GENERIC_SPELL, true);
                 }
@@ -778,7 +1405,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
 
         // Teleport to leader if too far away.
-        if (!me->IsWithinDistInMap(pLeader, 100.0f) && !IsInDuel())
+        if (!m_noTeleport && !DoNotMove() && !me->IsWithinDistInMap(pLeader, 100.0f) && !IsInDuel())
         {
             if (!me->IsStopped())
                 me->StopMoving();
@@ -791,11 +1418,8 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
     }
 
-    if (me->GetStandState() != UNIT_STAND_STATE_STAND)
+    if (me->GetStandState() != UNIT_STAND_STATE_STAND && !me->IsAFK())
         me->SetStandState(UNIT_STAND_STATE_STAND);
-
-    if (me->GetSheath() == SHEATH_STATE_UNARMED && !me->IsMounted())
-        me->SetSheath(SHEATH_STATE_MELEE);
 
     if (!me->IsInCombat() && !me->IsMounted())
     {
@@ -808,20 +1432,70 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             return;
     }
 
-    Unit* pVictim = me->GetVictim();
-
-    if (GetRole() != ROLE_HEALER)
+    bool moveToLos = false;
+    if (!m_groupData->losPosition.IsEmpty() && !me->HasUnitState(UNIT_STATE_CAN_NOT_MOVE) && me->GetDistance2d(m_groupData->losPosition) < 60.0f)
     {
-        if (!pVictim || !IsValidHostileTarget(pVictim))
+        for (auto const& pAttacker : me->GetAttackers())
         {
-            if (pVictim)
-                me->AttackStop();
-
-            if (Unit* pVictim = SelectAttackTarget(pLeader))
+            if (!pAttacker->IsWithinLOS(m_groupData->losPosition.x, m_groupData->losPosition.y, m_groupData->losPosition.z))
             {
-                AttackStart(pVictim);
-                return;
+                moveToLos = true;
+                break;
             }
+        }
+        if (!moveToLos)
+        {
+            if (Pet* pPet = me->GetPet())
+            {
+                for (auto const& pAttacker : pPet->GetAttackers())
+                {
+                    if (!pAttacker->IsWithinLOS(m_groupData->losPosition.x, m_groupData->losPosition.y, m_groupData->losPosition.z))
+                    {
+                        moveToLos = true;
+                        pPet->GetCharmInfo()->SetReactState(REACT_PASSIVE);
+                        pPet->HandlePetCommand(COMMAND_FOLLOW, nullptr);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    if (moveToLos)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "UpdateAI - %s moveToLos", me->GetName());
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "UpdateAI - %s moveToLos set", me->GetName());
+            if (!me->IsStopped())
+                me->StopMoving();
+            me->GetMotionMaster()->Clear();
+        }
+        MovePoint(m_groupData->losPosition.x, m_groupData->losPosition.y, m_groupData->losPosition.z);
+        return;
+    }
+
+    Unit* pVictim = me->GetVictim();
+    if (pVictim)
+    {
+        if (GetRole() != ROLE_TANK)
+        {
+            if (Unit* pTarget = SelectAttackTarget(pLeader))
+            {
+                if (pVictim != pTarget)
+                {
+                    me->AttackStop();
+                    AttackStart(pTarget);
+                    return;
+                }
+            }
+        }
+    }
+    else
+    {
+        if (Unit* pTarget = SelectAttackTarget(pLeader))
+        {
+            AttackStart(pTarget);
+            return;
         }
     }
 
@@ -855,17 +1529,18 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
     }
 
-    if (!me->IsMoving())
+    if (!me->IsMoving() || me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE)
     {
         if (!pVictim)
         {
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
-                me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE && me != pLeader)
+                MoveFollow(pLeader);
         }
         else
         {
             if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING) &&
                (GetRole() == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
+                !me->HasAuraType(SPELL_AURA_MOD_STEALTH) &&
                 IsValidHostileTarget(pVictim) &&
                 AttackStart(pVictim))
                 return;
@@ -874,10 +1549,36 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             {
                 case IDLE_MOTION_TYPE:
                 case FOLLOW_MOTION_TYPE:
-                    me->GetMotionMaster()->MoveChase(pVictim);
+                    {
+                        bool chase = GetRole() == ROLE_MELEE_DPS || GetRole() == ROLE_TANK || me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE || !me->IsWithinLOSInMap(pVictim);
+                        if ((GetRole() == ROLE_MELEE_DPS || GetRole() == ROLE_TANK) && me->CanReachWithMeleeAutoAttack(pVictim))
+                            chase = false;
+                        if (chase)
+                        {
+                            MoveChase(pVictim, 1.0f, GetRole() == ROLE_MELEE_DPS ? 3.0f : 0.0f);
+                        }
+                    }
+                    break;
+                default:
+                    if (!me->IsWithinLOSInMap(pVictim))
+                    {
+                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+                            me->SetCasterChaseDistance(3.0f * me->GetDistance2d(pVictim) / 4.0f);
+                        else
+                            MoveChase(pVictim);
+                    }
                     break;
             }
+
+            if ((GetRole() == ROLE_MELEE_DPS || m_role == ROLE_TANK) && pVictim->GetVictim() != me)
+                StayBehind(pVictim);
         }
+    }
+
+    if (Pet* pPet = me->GetPet())
+    {
+        if (me->IsInCombat() || pPet->IsInCombat())
+            UpdateInCombatPetAI();
     }
 
     if (me->IsInCombat())
@@ -887,6 +1588,8 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
 void PartyBotAI::UpdateOutOfCombatAI()
 {
+    SafeSpotsUpdate();
+
     if (!IsInDuel())
     {
         if (m_resurrectionSpell)
@@ -929,6 +1632,8 @@ void PartyBotAI::UpdateOutOfCombatAI()
             UpdateOutOfCombatAI_Druid();
             break;
     }
+
+    m_isBuffing = !m_buffTimer.Passed();
 }
 
 void PartyBotAI::UpdateInCombatAI()
@@ -940,13 +1645,11 @@ void PartyBotAI::UpdateInCombatAI()
             Unit* pVictim = me->GetVictim();
 
             // Defend party members.
-            if (!pVictim || pVictim->GetVictim() == me)
+            if (Unit* pTarget = SelectPartyDefendTarget(me))
             {
-                if (pVictim = SelectPartyAttackTarget())
-                {
-                    me->AttackStop(true);
-                    AttackStart(pVictim);
-                }
+                me->AttackStop(true);
+                AttackStart(pTarget);
+                pVictim = pTarget;
             }
 
             // Taunt target if its attacking someone else.
@@ -1003,11 +1706,57 @@ void PartyBotAI::UpdateInCombatAI()
 
 void PartyBotAI::UpdateOutOfCombatAI_Paladin()
 {
-    if (m_spells.paladin.pAura &&
-        CanTryToCastSpell(me, m_spells.paladin.pAura))
+    RebuffCandidate bestCandidate;
+
+    if (m_spells.paladin.pCleanse)
     {
-        if (DoCastSpell(me, m_spells.paladin.pAura) == SPELL_CAST_OK)
+        if (Unit* pFriend = SelectDispelTarget(m_spells.paladin.pCleanse))
+        {
+            if (CanTryToCastSpell(pFriend, m_spells.paladin.pCleanse))
+            {
+                if (DoCastSpell(pFriend, m_spells.paladin.pCleanse) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+    }
+    else if (m_spells.paladin.pPurify)
+    {
+        if (Unit* pFriend = SelectDispelTarget(m_spells.paladin.pPurify))
+        {
+            if (CanTryToCastSpell(pFriend, m_spells.paladin.pPurify))
+            {
+                if (DoCastSpell(pFriend, m_spells.paladin.pPurify) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+    }
+
+    std::vector<SpellEntry const*> auras = {m_spells.paladin.pAura, m_spells.paladin.pDevotionAura, m_spells.paladin.pRetributionAura, m_spells.paladin.pSanctityAura, m_spells.paladin.pConcentrationAura};
+    for (SpellEntry const* spell : auras)
+    {
+        if (!spell)
+            continue;
+
+        if (me->GetSpellAuraHolder(spell->Id, me->GetGUIDLow()))
+            break; // I'm already providing an aura
+
+        if (me->GetSpellAuraHolder(spell->Id))
+            continue;
+
+        if (CanTryToCastSpell(me, spell) && DoCastSpell(me, spell) == SPELL_CAST_OK)
+        {
+            m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+            me->ClearTarget();
             return;
+        }
     }
 
     if (m_role == ROLE_TANK &&
@@ -1015,35 +1764,121 @@ void PartyBotAI::UpdateOutOfCombatAI_Paladin()
         CanTryToCastSpell(me, m_spells.paladin.pRighteousFury))
     {
         if (DoCastSpell(me, m_spells.paladin.pRighteousFury) == SPELL_CAST_OK)
+        {
+            m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+            me->ClearTarget();
             return;
+        }
     }
 
-    if (m_spells.paladin.pBlessingBuff)
+    // TODO: Cache lists
+    std::vector<SpellEntry const*> blessingsTank = {
+        m_spells.paladin.pGreaterBlessingOfKings, m_spells.paladin.pBlessingOfKings,
+        m_spells.paladin.pGreaterBlessingOfMight, m_spells.paladin.pBlessingOfMight,
+        m_spells.paladin.pGreaterBlessingOfSanctuary, m_spells.paladin.pBlessingOfSanctuary,
+        m_spells.paladin.pGreaterBlessingOfLight, m_spells.paladin.pBlessingOfLight,
+        m_spells.paladin.pGreaterBlessingOfWisdom, m_spells.paladin.pBlessingOfWisdom};
+    std::vector<SpellEntry const*> blessingsMeleeDps = {
+        m_spells.paladin.pGreaterBlessingOfSalvation, m_spells.paladin.pBlessingOfSalvation,
+        m_spells.paladin.pGreaterBlessingOfMight, m_spells.paladin.pBlessingOfMight,
+        m_spells.paladin.pGreaterBlessingOfKings, m_spells.paladin.pBlessingOfKings,
+        m_spells.paladin.pGreaterBlessingOfLight, m_spells.paladin.pBlessingOfLight,
+        m_spells.paladin.pGreaterBlessingOfWisdom, m_spells.paladin.pBlessingOfWisdom};
+    std::vector<SpellEntry const*> blessingsRangedDps = {
+        m_spells.paladin.pGreaterBlessingOfSalvation, m_spells.paladin.pBlessingOfSalvation,
+        m_spells.paladin.pGreaterBlessingOfKings, m_spells.paladin.pBlessingOfKings,
+        m_spells.paladin.pGreaterBlessingOfWisdom, m_spells.paladin.pBlessingOfWisdom,
+        m_spells.paladin.pGreaterBlessingOfLight, m_spells.paladin.pBlessingOfLight,
+        m_spells.paladin.pGreaterBlessingOfMight, m_spells.paladin.pBlessingOfMight};
+    std::vector<SpellEntry const*> blessingsHealer = {
+        m_spells.paladin.pGreaterBlessingOfWisdom, m_spells.paladin.pBlessingOfWisdom,
+        m_spells.paladin.pGreaterBlessingOfSalvation, m_spells.paladin.pBlessingOfSalvation,
+        m_spells.paladin.pGreaterBlessingOfKings, m_spells.paladin.pBlessingOfKings,
+        m_spells.paladin.pGreaterBlessingOfLight, m_spells.paladin.pBlessingOfLight,
+        m_spells.paladin.pGreaterBlessingOfMight, m_spells.paladin.pBlessingOfMight};
+    for (Player* pMember : FindAllPlayersInGroup(true))
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.paladin.pBlessingBuff))
+        CombatBotRoles role = GetRoleByMember(pMember);
+
+        std::vector<SpellEntry const*> const& blessings =
+            (role == ROLE_TANK         ? blessingsTank :
+             role == ROLE_MELEE_DPS    ? blessingsMeleeDps :
+             role == ROLE_RANGE_DPS    ? blessingsRangedDps :
+                                         blessingsHealer);
+        for (SpellEntry const* spell : blessings)
         {
-            if (CanTryToCastSpell(pTarget, m_spells.paladin.pBlessingBuff))
+            if (!spell)
+                continue;
+
+            CombatBotRoles majorityRoleForClass = FindMajorityRoleForClass(static_cast<Classes>(pMember->GetClass()));
+            if (role != majorityRoleForClass && spell->GetMaxDuration() > 300000)
+                continue;
+
+            if (SpellAuraHolder * auraHolder = pMember->GetSpellAuraHolder(spell->Id, me->GetGUIDLow()))
             {
-                if (DoCastSpell(pTarget, m_spells.paladin.pBlessingBuff) == SPELL_CAST_OK)
+                EvaluateRebuffTargetForAuraHolder(spell, bestCandidate, auraHolder);
+                break; // already blessed by me
+            }
+
+            if (IsValidSelectBuffTarget(pMember, spell) && CanTryToCastSpell(pMember, spell))
+            {
+                SpellCastResult result = DoCastSpell(pMember, spell);
+                if (result == SPELL_CAST_OK || (result == SPELL_FAILED_ITEM_NOT_READY && spell->Reagent[0] && !m_noGenerateItems))
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
+                }
+            }
+        }
+
+        if (Pet* pPet = pMember->GetPet())
+        {
+            CombatBotRoles petRole = GetRoleByPet(pMember, pPet);
+            std::vector<SpellEntry const*> const& petBlessings =
+                (petRole == ROLE_TANK      ? blessingsTank :
+                 petRole == ROLE_MELEE_DPS ? blessingsMeleeDps :
+                 petRole == ROLE_RANGE_DPS ? blessingsRangedDps :
+                                             blessingsHealer);
+            for (SpellEntry const* spell : petBlessings)
+            {
+                if (!spell)
+                    continue;
+
+                if (SpellAuraHolder* auraHolder = pPet->GetSpellAuraHolder(spell->Id, me->GetGUIDLow()))
+                {
+                    EvaluateRebuffTargetForAuraHolder(spell, bestCandidate, auraHolder);
+                    break; // already blessed by me
+                }
+
+                if (IsValidSelectBuffTarget(pPet, spell) && CanTryToCastSpell(pPet, spell))
+                {
+                    SpellCastResult result = DoCastSpell(pPet, spell);
+                    if (result == SPELL_CAST_OK || (result == SPELL_FAILED_ITEM_NOT_READY && spell->Reagent[0] && !m_noGenerateItems))
+                    {
+                        m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                        me->ClearTarget();
+                        return;
+                    }
                 }
             }  
         }
     }
 
-    if (m_isBuffing &&
-       (!m_spells.paladin.pBlessingBuff ||
-        !me->HasGCD(m_spells.paladin.pBlessingBuff)))
+    if (bestCandidate.target && bestCandidate.spell)
     {
-        m_isBuffing = false;
+        if (DoCastSpell(bestCandidate.target, bestCandidate.spell) == SPELL_CAST_OK)
+        {
+            me->ClearTarget();
+            return;
+        }
     }
 
-    if (m_role == ROLE_HEALER &&
-        FindAndHealInjuredAlly())
-        return;
+    if (m_role == ROLE_HEALER && !me->IsMoving())
+    {
+        if (FindAndHealInjuredAlly())
+            return;
+    }
 }
 
 void PartyBotAI::UpdateInCombatAI_Paladin()
@@ -1089,6 +1924,17 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
             if (CanTryToCastSpell(pFriend, m_spells.paladin.pCleanse))
             {
                 if (DoCastSpell(pFriend, m_spells.paladin.pCleanse) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
+    else if (m_spells.paladin.pPurify)
+    {
+        if (Unit* pFriend = SelectDispelTarget(m_spells.paladin.pPurify))
+        {
+            if (CanTryToCastSpell(pFriend, m_spells.paladin.pPurify))
+            {
+                if (DoCastSpell(pFriend, m_spells.paladin.pPurify) == SPELL_CAST_OK)
                     return;
             }
         }
@@ -1147,6 +1993,14 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
             if (DoCastSpell(me, m_spells.paladin.pLayOnHands) == SPELL_CAST_OK)
                 return;
         }
+
+        float healAt = 25.0;
+        if (!ExistsAsHealerInGroupForOffHealCheck())
+            healAt += 20.0;
+        if (!me->GetAttackers().empty())
+            healAt -= 20.0;
+        if (FindAndHealInjuredAlly(healAt, healAt))
+            return;
 
         bool const hasSeal = m_spells.paladin.pSeal && me->HasAura(m_spells.paladin.pSeal->Id);
 
@@ -1221,7 +2075,7 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
                 && !me->CanReachWithMeleeAutoAttack(pVictim))
             {
-                me->GetMotionMaster()->MoveChase(pVictim);
+                MoveChase(pVictim);
             }
         }
     }
@@ -1241,6 +2095,30 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
 
 void PartyBotAI::UpdateOutOfCombatAI_Shaman()
 {
+    if (m_spells.shaman.pCureDisease)
+    {
+        if (Unit* pFriend = SelectDispelTarget(m_spells.shaman.pCureDisease))
+        {
+            if (CanTryToCastSpell(pFriend, m_spells.shaman.pCureDisease))
+            {
+                if (DoCastSpell(pFriend, m_spells.shaman.pCureDisease) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
+
+    if (m_spells.shaman.pCurePoison)
+    {
+        if (Unit* pFriend = SelectDispelTarget(m_spells.shaman.pCurePoison))
+        {
+            if (CanTryToCastSpell(pFriend, m_spells.shaman.pCurePoison))
+            {
+                if (DoCastSpell(pFriend, m_spells.shaman.pCurePoison) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
+
     if (m_spells.shaman.pWeaponBuff &&
         CanTryToCastSpell(me, m_spells.shaman.pWeaponBuff))
     {
@@ -1393,10 +2271,15 @@ void PartyBotAI::UpdateOutOfCombatAI_Hunter()
             return;
     }
 
+    //if (m_spells.hunter.pTrueshotAura && CanTryToCastSpell(me, m_spells.hunter.pTrueshotAura))
+    //{
+    //    if (DoCastSpell(me, m_spells.hunter.pTrueshotAura) == SPELL_CAST_OK)
+    //        return;
+    //}
+
     if (Unit* pVictim = me->GetVictim())
     {
-        if (m_spells.hunter.pHuntersMark &&
-            CanTryToCastSpell(pVictim, m_spells.hunter.pHuntersMark))
+        if (m_spells.hunter.pHuntersMark && !IsTargetDeathWithinSeconds(pVictim, 10.0f) && CanTryToCastSpell(pVictim, m_spells.hunter.pHuntersMark))
         {
             if (DoCastSpell(pVictim, m_spells.hunter.pHuntersMark) == SPELL_CAST_OK)
                 return;
@@ -1408,6 +2291,8 @@ void PartyBotAI::UpdateOutOfCombatAI_Hunter()
             {
                 pPet->GetCharmInfo()->SetIsCommandAttack(true);
                 pPet->AI()->AttackStart(pVictim);
+                if (!m_noClient && pPet->GetHappinessState() != HappinessState::HAPPY)
+                    me->MonsterSay("Pet is not happy");
             }
         }
 
@@ -1417,6 +2302,30 @@ void PartyBotAI::UpdateOutOfCombatAI_Hunter()
         SummonPetIfNeeded();
 }
 
+void PartyBotAI::UpdateInCombatPetAI()
+{
+    if (Pet* pPet = me->GetPet())
+    {
+        if (!pPet->IsDead())
+        {
+            Unit* pNewPetVictim = nullptr;
+            if (GetRoleByPet(me, pPet) == ROLE_TANK)
+                pNewPetVictim = SelectPartyDefendTarget(pPet);
+            if (!pNewPetVictim)
+                pNewPetVictim = SelectAttackTarget(me);
+
+            if (pNewPetVictim && pNewPetVictim != pPet->GetVictim())
+            {
+                if (pPet->GetVictim())
+                    pPet->AttackStop();
+                pPet->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
+                pPet->GetCharmInfo()->SetIsCommandAttack(true);
+                pPet->AI()->AttackStart(pNewPetVictim);
+            }
+        }
+    }
+}
+
 void PartyBotAI::UpdateInCombatAI_Hunter()
 {
     if (Unit* pVictim = me->GetVictim())
@@ -1424,7 +2333,13 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
-            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+            MoveChase(pVictim, 25.0f);
+        }
+
+        if (m_spells.hunter.pHuntersMark && !IsTargetDeathWithinSeconds(pVictim, 10.0f) && CanTryToCastSpell(pVictim, m_spells.hunter.pHuntersMark))
+        {
+            if (DoCastSpell(pVictim, m_spells.hunter.pHuntersMark) == SPELL_CAST_OK)
+                return;
         }
 
         if (m_spells.hunter.pVolley &&
@@ -1440,6 +2355,9 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
             (me->GetCombatDistance(pVictim) > 8.0f) &&
             !me->IsNonMeleeSpellCasted())
         {
+            if (FaceObject(pVictim))
+                return;
+
             switch (me->CastSpell(pVictim, PB_SPELL_AUTO_SHOT, false))
             {
                 case SPELL_FAILED_NEED_AMMO:
@@ -1473,8 +2391,7 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
                 return;
         }
 
-        if (m_spells.hunter.pSerpentSting &&
-            CanTryToCastSpell(pVictim, m_spells.hunter.pSerpentSting))
+        if (m_spells.hunter.pSerpentSting && !IsTargetDeathWithinSeconds(pVictim, 10.0f) && CanTryToCastSpell(pVictim, m_spells.hunter.pSerpentSting, false, true))
         {
             if (DoCastSpell(pVictim, m_spells.hunter.pSerpentSting) == SPELL_CAST_OK)
                 return;
@@ -1485,6 +2402,11 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
         {
             if (DoCastSpell(pVictim, m_spells.hunter.pMultiShot) == SPELL_CAST_OK)
                 return;
+        }
+
+        if (m_spells.hunter.pRapidFire && CheckThreatOK(pVictim) && CanTryToCastSpell(me, m_spells.hunter.pRapidFire))
+        {
+            DoCastSpell(me, m_spells.hunter.pRapidFire);
         }
 
         if (GetAttackersInRangeCount(8.0f))
@@ -1551,6 +2473,10 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
             }
         }
 
+        // Don't both getting distance if they're about to die, unless there's more of em
+        if (GetRole() != ROLE_MELEE_DPS && me->CanReachWithMeleeAutoAttack(pVictim) && IsTargetDeathWithinSeconds(pVictim, 3.0f) && me->GetEnemyCountInRadiusAround(me, 8.0f) < 2)
+            return;
+
         if (!me->HasUnitState(UNIT_STATE_ROOT) &&
             (me->GetCombatDistance(pVictim) < 8.0f) &&
             (GetRole() != ROLE_MELEE_DPS) &&
@@ -1559,7 +2485,7 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
             if (!me->IsStopped())
                 me->StopMoving();
             me->GetMotionMaster()->Clear();
-            if (RunAwayFromTarget(pVictim))
+            if (RunAwayFromTarget(pVictim, 9.0f + me->GetSizeFactorForDistance(pVictim, SizeFactor::CombatReach)))
                 return;
         }
     }
@@ -1567,27 +2493,17 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
 
 void PartyBotAI::UpdateOutOfCombatAI_Mage()
 {
-    if (m_spells.mage.pArcaneBrilliance)
+    RebuffCandidate bestCandidate;
+
+    if (m_spells.mage.pRemoveLesserCurse)
     {
-        if (CanTryToCastSpell(me, m_spells.mage.pArcaneBrilliance))
+        if (Unit* pFriend = SelectDispelTarget(m_spells.mage.pRemoveLesserCurse))
         {
-            if (DoCastSpell(me, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+            if (CanTryToCastSpell(pFriend, m_spells.mage.pRemoveLesserCurse))
             {
-                m_isBuffing = true;
-                me->ClearTarget();
-                return;
-            }
-        }
-    }
-    else if (m_spells.mage.pArcaneIntellect)
-    {
-        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneIntellect))
-        {
-            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneIntellect))
-            {
-                if (DoCastSpell(pTarget, m_spells.mage.pArcaneIntellect) == SPELL_CAST_OK)
+                if (DoCastSpell(pFriend, m_spells.mage.pRemoveLesserCurse) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
@@ -1595,15 +2511,61 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
         }
     }
 
-    if (m_spells.mage.pIceArmor &&
-        CanTryToCastSpell(me, m_spells.mage.pIceArmor))
+    if (m_spells.mage.pArcaneBrilliance)
     {
-        if (DoCastSpell(me, m_spells.mage.pIceArmor) == SPELL_CAST_OK)
+        if (CanTryToCastSpell(me, m_spells.mage.pArcaneBrilliance))
         {
-            m_isBuffing = true;
-            me->ClearTarget();
-            return;
+            if (DoCastSpell(me, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
         }
+        //EvaluateRebuffTarget(m_spells.mage.pArcaneBrilliance, bestCandidate);
+    }
+    else if (m_spells.mage.pArcaneIntellect)
+    {
+        if (Unit* pTarget = SelectBuffTarget(m_spells.mage.pArcaneIntellect))
+        {
+            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneIntellect))
+            {
+                if (DoCastSpell(pTarget, m_spells.mage.pArcaneIntellect) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+        EvaluateRebuffTarget(m_spells.mage.pArcaneIntellect, bestCandidate);
+    }
+
+    if (m_spells.mage.pMageArmor)
+    {
+        if (CanTryToCastSpell(me, m_spells.mage.pMageArmor))
+        {
+            if (DoCastSpell(me, m_spells.mage.pMageArmor) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
+        }
+        EvaluateRebuffTarget(m_spells.mage.pMageArmor, bestCandidate, false, me);
+    }
+    else if (m_spells.mage.pIceArmor && (!m_spells.mage.pMageArmor || !me->HasAura(m_spells.mage.pMageArmor->Id)))
+    {
+        if (CanTryToCastSpell(me, m_spells.mage.pIceArmor))
+        {
+            if (DoCastSpell(me, m_spells.mage.pIceArmor) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
+        }
+        EvaluateRebuffTarget(m_spells.mage.pIceArmor, bestCandidate, false, me);
     }
 
     if (m_spells.mage.pIceBarrier &&
@@ -1611,17 +2573,69 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
     {
         if (DoCastSpell(me, m_spells.mage.pIceBarrier) == SPELL_CAST_OK)
         {
-            m_isBuffing = true;
+            m_buffTimer.Reset(PB_BUFFING_INTERVAL);
             me->ClearTarget();
             return;
         }
     }
 
-    if (m_isBuffing &&
-       (!m_spells.mage.pArcaneIntellect ||
-        !me->HasGCD(m_spells.mage.pArcaneIntellect)))
+    if (!me->IsMoving() && me->GetPowerPercent(POWER_MANA) == 100.0f)
     {
-        m_isBuffing = false;
+        if (m_noGenerateItems && m_spells.mage.pConjureWater && CanTryToCastSpell(me, m_spells.mage.pConjureWater) && CountInventoryItem(m_spells.mage.pConjureWater) < 40)
+        {
+            if (DoCastSpell(me, m_spells.mage.pConjureWater) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
+        }
+
+        if (m_spells.mage.pConjureManaRuby && CanTryToCastSpell(me, m_spells.mage.pConjureManaRuby) && !GetInventoryItem(m_spells.mage.pConjureManaRuby))
+        {
+            if (DoCastSpell(me, m_spells.mage.pConjureManaRuby) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
+        }
+        if (m_spells.mage.pConjureManaCitrine && CanTryToCastSpell(me, m_spells.mage.pConjureManaCitrine) && !GetInventoryItem(m_spells.mage.pConjureManaCitrine))
+        {
+            if (DoCastSpell(me, m_spells.mage.pConjureManaCitrine) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
+        }
+        if (m_spells.mage.pConjureManaJade && CanTryToCastSpell(me, m_spells.mage.pConjureManaJade) && !GetInventoryItem(m_spells.mage.pConjureManaJade))
+        {
+            if (DoCastSpell(me, m_spells.mage.pConjureManaJade) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
+        }
+        if (m_spells.mage.pConjureManaAgate && CanTryToCastSpell(me, m_spells.mage.pConjureManaAgate) && !GetInventoryItem(m_spells.mage.pConjureManaAgate))
+        {
+            if (DoCastSpell(me, m_spells.mage.pConjureManaAgate) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
+        }
+    }
+
+    if (bestCandidate.target && bestCandidate.spell)
+    {
+        if (DoCastSpell(bestCandidate.target, bestCandidate.spell) == SPELL_CAST_OK)
+        {
+            me->ClearTarget();
+            return;
+        }
     }
 
     if (me->GetVictim())
@@ -1659,7 +2673,7 @@ void PartyBotAI::UpdateInCombatAI_Mage()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
-            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+            MoveChase(pVictim, 25.0f);
         }
         else if (GetAttackersInRangeCount(10.0f))
         {
@@ -1705,7 +2719,9 @@ void PartyBotAI::UpdateInCombatAI_Mage()
             }
         }
 
-        if (me->GetEnemyCountInRadiusAround(me, 10.0f) > 1)
+        uint8 enemyCountAroundMe = me->GetEnemyCountInRadiusAround(me, 10.0f);
+        uint8 enemyCountAroundVictim = me->GetEnemyCountInRadiusAround(pVictim, 10.0f);
+        if (enemyCountAroundMe > 2 && enemyCountAroundMe > enemyCountAroundVictim)
         {
             if (m_spells.mage.pConeofCold && !me->IsMoving() &&
                 CanTryToCastSpell(me, m_spells.mage.pConeofCold))
@@ -1752,9 +2768,8 @@ void PartyBotAI::UpdateInCombatAI_Mage()
             }
         }
 
-        if (m_spells.mage.pBlizzard &&
-           (me->GetEnemyCountInRadiusAround(pVictim, 10.0f) > 2) &&
-            CanTryToCastSpell(pVictim, m_spells.mage.pBlizzard))
+        if (m_spells.mage.pBlizzard && (enemyCountAroundVictim > 2) &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pBlizzard, true))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pBlizzard) == SPELL_CAST_OK)
                 return;
@@ -1770,6 +2785,50 @@ void PartyBotAI::UpdateInCombatAI_Mage()
                 {
                     if (DoCastSpell(pTarget, m_spells.mage.pPolymorph) == SPELL_CAST_OK)
                         return;
+                }
+            }
+        }
+
+        if (me->GetPowerPercent(POWER_MANA) < 60.0f)
+        {
+            if (m_spells.mage.pConjureManaRuby)
+            {
+                if (Item* pItem = GetInventoryItem(m_spells.mage.pConjureManaRuby->EffectItemType[0]))
+                {
+                    if (CanTryToCastItemUseSpell(pItem))
+                    {
+                        UseConsumable(pItem, me);
+                    }
+                }
+            }
+            if (m_spells.mage.pConjureManaCitrine)
+            {
+                if (Item* pItem = GetInventoryItem(m_spells.mage.pConjureManaCitrine->EffectItemType[0]))
+                {
+                    if (CanTryToCastItemUseSpell(pItem))
+                    {
+                        UseConsumable(pItem, me);
+                    }
+                }
+            }
+            if (m_spells.mage.pConjureManaJade)
+            {
+                if (Item* pItem = GetInventoryItem(m_spells.mage.pConjureManaJade->EffectItemType[0]))
+                {
+                    if (CanTryToCastItemUseSpell(pItem))
+                    {
+                        UseConsumable(pItem, me);
+                    }
+                }
+            }
+            if (m_spells.mage.pConjureManaAgate)
+            {
+                if (Item* pItem = GetInventoryItem(m_spells.mage.pConjureManaAgate->EffectItemType[0]))
+                {
+                    if (CanTryToCastItemUseSpell(pItem))
+                    {
+                        UseConsumable(pItem, me);
+                    }
                 }
             }
         }
@@ -1791,7 +2850,7 @@ void PartyBotAI::UpdateInCombatAI_Mage()
         } 
 
         if (m_spells.mage.pScorch &&
-           (pVictim->GetHealthPercent() < 20.0f) &&
+           (pVictim->GetHealth() < me->GetHealth() / 5) &&
             CanTryToCastSpell(pVictim, m_spells.mage.pScorch))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pScorch) == SPELL_CAST_OK)
@@ -1799,21 +2858,21 @@ void PartyBotAI::UpdateInCombatAI_Mage()
         }
 
         if (m_spells.mage.pFrostbolt &&
-            CanTryToCastSpell(pVictim, m_spells.mage.pFrostbolt))
+            CanTryToCastSpell(pVictim, m_spells.mage.pFrostbolt, true))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pFrostbolt) == SPELL_CAST_OK)
                 return;
         }
 
         if (m_spells.mage.pFireBlast &&
-            CanTryToCastSpell(pVictim, m_spells.mage.pFireBlast))
+            CanTryToCastSpell(pVictim, m_spells.mage.pFireBlast, true))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pFireBlast) == SPELL_CAST_OK)
                 return;
         }
 
         if (m_spells.mage.pFireball &&
-            CanTryToCastSpell(pVictim, m_spells.mage.pFireball))
+            CanTryToCastSpell(pVictim, m_spells.mage.pFireball, true))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pFireball) == SPELL_CAST_OK)
                 return;
@@ -1830,128 +2889,200 @@ void PartyBotAI::UpdateInCombatAI_Mage()
 
         if (me->HasSpell(PB_SPELL_SHOOT_WAND) &&
            !me->IsMoving() &&
-           (me->GetPowerPercent(POWER_MANA) < 5.0f) &&
-           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+           //(me->GetPowerPercent(POWER_MANA) < 5.0f) &&
+           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL) &&
+            CheckThreatOK(pVictim))
+        {
+            if (FaceObject(pVictim))
+                return;
             me->CastSpell(pVictim, PB_SPELL_SHOOT_WAND, false);
+        }
     }
 }
 
 void PartyBotAI::UpdateOutOfCombatAI_Priest()
 {
+    RebuffCandidate bestCandidate;
+
+    if (m_spells.priest.pDispelMagic)
+    {
+        if (Unit* pFriend = SelectDispelTarget(m_spells.priest.pDispelMagic))
+        {
+            if (CanTryToCastSpell(pFriend, m_spells.priest.pDispelMagic))
+            {
+                if (DoCastSpell(pFriend, m_spells.priest.pDispelMagic) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+    }
+    if (true)
+    {
+        SpellEntry const* cureDisease = m_spells.priest.pAbolishDisease ? m_spells.priest.pAbolishDisease : m_spells.priest.pCureDisease;
+        if (cureDisease)
+        {
+            if (Unit* pFriend = SelectDispelTarget(cureDisease))
+            {
+                if (CanTryToCastSpell(pFriend, cureDisease))
+                {
+                    if (DoCastSpell(pFriend, cureDisease) == SPELL_CAST_OK)
+                    {
+                        m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                        me->ClearTarget();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     if (m_spells.priest.pPrayerofFortitude)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofFortitude))
+        if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofFortitude))
         {
             if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofFortitude))
             {
                 if (DoCastSpell(pTarget, m_spells.priest.pPrayerofFortitude) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
             }
         }
+        //EvaluateRebuffTarget(m_spells.priest.pPrayerofFortitude, bestCandidate);
     }
     else if (m_spells.priest.pPowerWordFortitude)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPowerWordFortitude))
+        if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pPowerWordFortitude))
         {
             if (CanTryToCastSpell(pTarget, m_spells.priest.pPowerWordFortitude))
             {
                 if (DoCastSpell(pTarget, m_spells.priest.pPowerWordFortitude) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
             }
         }
+        EvaluateRebuffTarget(m_spells.priest.pPowerWordFortitude, bestCandidate);
     }
 
     if (m_spells.priest.pPrayerofSpirit)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofSpirit))
+        if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofSpirit))
         {
             if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofSpirit))
             {
                 if (DoCastSpell(pTarget, m_spells.priest.pPrayerofSpirit) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
             }
         }
+        EvaluateRebuffTarget(m_spells.priest.pPrayerofSpirit, bestCandidate);
     }
     else if (m_spells.priest.pDivineSpirit)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pDivineSpirit))
+        if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pDivineSpirit))
         {
-            if (CanTryToCastSpell(me, m_spells.priest.pDivineSpirit))
+            if (CanTryToCastSpell(pTarget, m_spells.priest.pDivineSpirit))
             {
-                if (DoCastSpell(me, m_spells.priest.pDivineSpirit) == SPELL_CAST_OK)
+                if (DoCastSpell(pTarget, m_spells.priest.pDivineSpirit) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
             }
         }
+        EvaluateRebuffTarget(m_spells.priest.pDivineSpirit, bestCandidate);
     }
 
     if (m_spells.priest.pPrayerofShadowProtection)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofShadowProtection))
+        if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofShadowProtection))
         {
             if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofShadowProtection))
             {
                 if (DoCastSpell(pTarget, m_spells.priest.pPrayerofShadowProtection) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
             }
         }
+        EvaluateRebuffTarget(m_spells.priest.pPrayerofShadowProtection, bestCandidate);
     }
     else if (m_spells.priest.pShadowProtection)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pShadowProtection))
+        if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pShadowProtection))
         {
             if (CanTryToCastSpell(pTarget, m_spells.priest.pShadowProtection))
             {
                 if (DoCastSpell(pTarget, m_spells.priest.pShadowProtection) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
             }
         }
+        EvaluateRebuffTarget(m_spells.priest.pShadowProtection, bestCandidate);
     }
 
-    if (m_spells.priest.pInnerFire &&
-        CanTryToCastSpell(me, m_spells.priest.pInnerFire))
+    if (m_spells.priest.pFearWard)
     {
-        if (DoCastSpell(me, m_spells.priest.pInnerFire) == SPELL_CAST_OK)
+        if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pFearWard))
         {
-            m_isBuffing = true;
+            if (CanTryToCastSpell(pTarget, m_spells.priest.pFearWard))
+            {
+                if (DoCastSpell(pTarget, m_spells.priest.pFearWard) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+        EvaluateRebuffTarget(m_spells.priest.pFearWard, bestCandidate);
+    }
+
+    if (m_spells.priest.pInnerFire)
+    {
+        if (CanTryToCastSpell(me, m_spells.priest.pInnerFire))
+        {
+            if (DoCastSpell(me, m_spells.priest.pInnerFire) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
+        }
+        EvaluateRebuffTarget(m_spells.priest.pInnerFire, bestCandidate, false, me);
+    }
+
+    if (bestCandidate.target && bestCandidate.spell)
+    {
+        if (DoCastSpell(bestCandidate.target, bestCandidate.spell) == SPELL_CAST_OK)
+        {
             me->ClearTarget();
             return;
         }
     }
 
-    if (m_isBuffing &&
-       (!m_spells.priest.pPowerWordFortitude ||
-        !me->HasGCD(m_spells.priest.pPowerWordFortitude)))
+    if (m_role == ROLE_HEALER && !me->IsMoving())
     {
-        m_isBuffing = false;
+        if (FindAndHealInjuredAlly())
+            return;
     }
-
-    if (m_role == ROLE_HEALER &&
-        FindAndHealInjuredAlly())
-        return;
 
     if (me->GetVictim())
         UpdateInCombatAI_Priest();
@@ -1959,11 +3090,18 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
 
 void PartyBotAI::UpdateInCombatAI_Priest()
 {
-    if (m_spells.priest.pPowerWordShield &&
-        CanTryToCastSpell(me, m_spells.priest.pPowerWordShield))
+    if (m_spells.priest.pFearWard)
     {
-        if (DoCastSpell(me, m_spells.priest.pPowerWordShield) == SPELL_CAST_OK)
-            return;
+        if (Unit* pTarget = SelectBuffTarget(m_spells.priest.pFearWard))
+        {
+            if (CanTryToCastSpell(pTarget, m_spells.priest.pFearWard))
+            {
+                if (DoCastSpell(pTarget, m_spells.priest.pFearWard) == SPELL_CAST_OK)
+                {
+                    return;
+                }
+            }
+        }
     }
 
     if (!me->GetAttackers().empty() &&
@@ -1973,6 +3111,13 @@ void PartyBotAI::UpdateInCombatAI_Priest()
             CanTryToCastSpell(me, m_spells.priest.pFade))
         {
             if (DoCastSpell(me, m_spells.priest.pFade) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.priest.pPowerWordShield &&
+            CanTryToCastSpell(me, m_spells.priest.pPowerWordShield))
+        {
+            if (DoCastSpell(me, m_spells.priest.pPowerWordShield) == SPELL_CAST_OK)
                 return;
         }
 
@@ -2012,14 +3157,33 @@ void PartyBotAI::UpdateInCombatAI_Priest()
         }
 
         // Direct heal more seriously injured.
-        if (Unit* pTarget = SelectHealTarget(60.0f, 80.0f))
-            if (HealInjuredTargetDirect(pTarget))
+        if (Unit* pTarget = SelectHealTarget(30.0f, 40.0f))
+            if (HealInjuredTargetDirectFast(pTarget))
+                return;
+        if (Unit* pTarget = SelectHealTarget(60.0f, 70.0f))
+            if (HealInjuredTargetDirectSlow(pTarget))
                 return;
 
+        // Dispel attackers
+        if (m_spells.priest.pDispelMagic)
+        {
+            if (Unit* pTarget = SelectDispelAttackerTarget(m_spells.priest.pDispelMagic))
+            {
+                if (CanTryToCastSpell(pTarget, m_spells.priest.pDispelMagic))
+                {
+                    if (DoCastSpell(pTarget, m_spells.priest.pDispelMagic) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+        }
+
         // Apply HoT aura for small injuries.
-        if (Unit* pTarget = SelectPeriodicHealTarget(80.0f, 90.0f))
-            if (HealInjuredTargetPeriodic(pTarget))
-                return;
+        if (me->GetLevel() > 50 || me->GetPowerPercent(POWER_MANA) > 90.0f)
+        {
+            if (Unit* pTarget = SelectPeriodicHealTarget(80.0f, 90.0f))
+                if (HealInjuredTargetPeriodic(pTarget))
+                    return;
+        }
 
         // Dispels
         if (m_spells.priest.pDispelMagic)
@@ -2033,13 +3197,14 @@ void PartyBotAI::UpdateInCombatAI_Priest()
                 }
             }
         }
-        if (m_spells.priest.pAbolishDisease)
+        SpellEntry const* cureDisease = m_spells.priest.pAbolishDisease ? m_spells.priest.pAbolishDisease : m_spells.priest.pCureDisease;
+        if (cureDisease)
         {
-            if (Unit* pFriend = SelectDispelTarget(m_spells.priest.pAbolishDisease))
+            if (Unit* pFriend = SelectDispelTarget(cureDisease))
             {
-                if (CanTryToCastSpell(pFriend, m_spells.priest.pAbolishDisease))
+                if (CanTryToCastSpell(pFriend, cureDisease))
                 {
-                    if (DoCastSpell(pFriend, m_spells.priest.pAbolishDisease) == SPELL_CAST_OK)
+                    if (DoCastSpell(pFriend, cureDisease) == SPELL_CAST_OK)
                         return;
                 }
             }
@@ -2050,6 +3215,17 @@ void PartyBotAI::UpdateInCombatAI_Priest()
     }
     else if (Unit* pVictim = me->GetVictim())
     {
+        float healAt = 25.0;
+        if (me->GetShapeshiftForm() == FORM_NONE)
+            healAt += 20.0;
+        if (!ExistsAsHealerInGroupForOffHealCheck())
+            healAt += 20.0;
+        if (!me->GetAttackers().empty())
+            healAt -= 20.0;
+        if (Unit* pTarget = SelectHealTarget(healAt, healAt))
+            if (HealInjuredTargetDirect(pTarget))
+                return;
+
         if (m_spells.priest.pShadowform &&
             CanTryToCastSpell(me, m_spells.priest.pShadowform))
         {
@@ -2065,7 +3241,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
                 return;
         }
 
-        if (m_spells.priest.pVampiricEmbrace &&
+        if (m_spells.priest.pVampiricEmbrace && !IsTargetDeathWithinSeconds(pVictim, 10.0f) &&
             CanTryToCastSpell(pVictim, m_spells.priest.pVampiricEmbrace))
         {
             if (DoCastSpell(pVictim, m_spells.priest.pVampiricEmbrace) == SPELL_CAST_OK)
@@ -2079,7 +3255,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
                 return;
         }
 
-        if (m_spells.priest.pShadowWordPain &&
+        if (m_spells.priest.pShadowWordPain && !IsTargetDeathWithinSeconds(pVictim, 7.0f) &&
             CanTryToCastSpell(pVictim, m_spells.priest.pShadowWordPain))
         {
             if (DoCastSpell(pVictim, m_spells.priest.pShadowWordPain) == SPELL_CAST_OK)
@@ -2109,9 +3285,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
                 return;
         }
 
-        if (m_spells.priest.pMindFlay &&
-           (!GetAttackersInRangeCount(10.0f) || me->HasAuraType(SPELL_AURA_SCHOOL_ABSORB)) &&
-            CanTryToCastSpell(pVictim, m_spells.priest.pMindFlay))
+        if (m_spells.priest.pMindFlay && (!GetAttackersInRangeCount(10.0f) || me->HasAuraType(SPELL_AURA_SCHOOL_ABSORB)) && CanTryToCastSpell(pVictim, m_spells.priest.pMindFlay))
         {
             if (DoCastSpell(pVictim, m_spells.priest.pMindFlay) == SPELL_CAST_OK)
                 return;
@@ -2120,7 +3294,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
-            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+            MoveChase(pVictim, 25.0f);
         }
 
         if (me->GetShapeshiftForm() == FORM_NONE)
@@ -2140,49 +3314,167 @@ void PartyBotAI::UpdateInCombatAI_Priest()
                     return;
             }
         }
-
+    }
+    if (Unit* pVictim = me->GetVictim())
+    {
         if (me->HasSpell(PB_SPELL_SHOOT_WAND) &&
            !me->IsMoving() &&
-           (me->GetPowerPercent(POWER_MANA) < 10.0f) &&
-           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+           //(me->GetPowerPercent(POWER_MANA) < 10.0f) &&
+           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL) &&
+            CheckThreatOK(pVictim))
+        {
+            if (FaceObject(pVictim))
+                return;
             me->CastSpell(pVictim, PB_SPELL_SHOOT_WAND, false);
+        }
     }
 }
 
 void PartyBotAI::UpdateOutOfCombatAI_Warlock()
 {
+    RebuffCandidate bestCandidate;
+
     if (m_spells.warlock.pDetectInvisibility)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.warlock.pDetectInvisibility))
+        if (Unit* pTarget = SelectBuffTarget(m_spells.warlock.pDetectInvisibility))
         {
             if (CanTryToCastSpell(pTarget, m_spells.warlock.pDetectInvisibility))
             {
                 if (DoCastSpell(pTarget, m_spells.warlock.pDetectInvisibility) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
             }
         }
+        EvaluateRebuffTarget(m_spells.warlock.pDetectInvisibility, bestCandidate);
+    }
+    else if (m_spells.warlock.pDetectLesserInvisibility)
+    {
+        if (Unit* pTarget = SelectBuffTarget(m_spells.warlock.pDetectLesserInvisibility))
+        {
+            if (CanTryToCastSpell(pTarget, m_spells.warlock.pDetectLesserInvisibility))
+            {
+                if (DoCastSpell(pTarget, m_spells.warlock.pDetectLesserInvisibility) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+        EvaluateRebuffTarget(m_spells.warlock.pDetectLesserInvisibility, bestCandidate);
     }
 
-    if (m_spells.warlock.pDemonArmor &&
-        CanTryToCastSpell(me, m_spells.warlock.pDemonArmor))
+    if (m_spells.warlock.pUnendingBreath)
     {
-        if (DoCastSpell(me, m_spells.warlock.pDemonArmor) == SPELL_CAST_OK)
+        if (Unit* pTarget = SelectBuffTarget(m_spells.warlock.pUnendingBreath))
         {
-            m_isBuffing = true;
+            if (CanTryToCastSpell(pTarget, m_spells.warlock.pUnendingBreath))
+            {
+                if (DoCastSpell(pTarget, m_spells.warlock.pUnendingBreath) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+        EvaluateRebuffTarget(m_spells.warlock.pUnendingBreath, bestCandidate);
+    }
+
+    if (m_spells.warlock.pDemonArmor)
+    {
+        if (CanTryToCastSpell(me, m_spells.warlock.pDemonArmor) && DoCastSpell(me, m_spells.warlock.pDemonArmor) == SPELL_CAST_OK)
+        {
+            m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+            me->ClearTarget();
+            return;
+        }
+        EvaluateRebuffTarget(m_spells.warlock.pDemonArmor, bestCandidate, false, me);
+    }
+    else if (m_spells.warlock.pDemonSkin)
+    {
+        if (CanTryToCastSpell(me, m_spells.warlock.pDemonSkin) && DoCastSpell(me, m_spells.warlock.pDemonSkin) == SPELL_CAST_OK)
+        {
+            m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+            me->ClearTarget();
+            return;
+        }
+        EvaluateRebuffTarget(m_spells.warlock.pDemonArmor, bestCandidate, false, me);
+    }
+
+    if (m_spells.warlock.pLifeTap &&
+        (me->GetPowerPercent(POWER_MANA) < 90.0f) &&
+        (me->GetHealthPercent() > 90.0f) &&
+        me->HasAuraType(SPELL_AURA_PERIODIC_HEAL) &&
+        CanTryToCastSpell(me, m_spells.warlock.pLifeTap))
+    {
+        if (DoCastSpell(me, m_spells.warlock.pLifeTap) == SPELL_CAST_OK)
+        {
+            m_buffTimer.Reset(PB_BUFFING_INTERVAL);
             me->ClearTarget();
             return;
         }
     }
 
-    if (m_isBuffing &&
-       (!m_spells.warlock.pDetectInvisibility ||
-        !me->HasGCD(m_spells.warlock.pDetectInvisibility)))
+    if (!me->IsMoving())
     {
-        m_isBuffing = false;
+        if (m_spells.warlock.pCreateSoulstone)
+        {
+            if (CanTryToCastSpell(me, m_spells.warlock.pCreateSoulstone) && !GetInventoryItem(m_spells.warlock.pCreateSoulstone))
+            {
+                if (DoCastSpell(me, m_spells.warlock.pCreateSoulstone) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+
+            if (Item* pItem = GetInventoryItem(m_spells.warlock.pCreateSoulstone))
+            {
+                if (CanTryToCastItemUseSpell(pItem))
+                {
+                    // TODO: Check if already stoned
+                    Player* pTarget = FindFirstPlayerInGroupByClass(CLASS_PRIEST, true);
+                    if (!pTarget)
+                        pTarget = FindFirstPlayerInGroupByClass(CLASS_PALADIN, true);
+                    if (!pTarget)
+                        pTarget = FindFirstPlayerInGroupByClass(CLASS_SHAMAN, true);
+                    if (!pTarget)
+                        pTarget = FindFirstPlayerInGroupByClass(CLASS_DRUID, true);
+                    if (pTarget && CanTryToCastItemUseSpell(pItem, pTarget))
+                    {
+                        UseConsumable(pItem, pTarget);  // TODO: Fails?
+                        m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                        me->ClearTarget();
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (m_spells.warlock.pCreateHealthstone && CanTryToCastSpell(me, m_spells.warlock.pCreateHealthstone) && !GetHealthStone())
+        {
+            if (DoCastSpell(me, m_spells.warlock.pCreateHealthstone) == SPELL_CAST_OK)
+            {
+                m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                me->ClearTarget();
+                return;
+            }
+        }
+    }
+
+    if (bestCandidate.target && bestCandidate.spell)
+    {
+        // sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "UpdateOutOfCombatAI_Warlock - %s found %s for %s duration %d", me->GetName(), bestCandidate.target->GetName(), bestCandidate.spell->SpellName[0].c_str(), bestCandidate.auraDuration / 60000);
+        if (DoCastSpell(bestCandidate.target, bestCandidate.spell) == SPELL_CAST_OK)
+        {
+            me->ClearTarget();
+            return;
+        }
     }
 
     if (Unit* pVictim = me->GetVictim())
@@ -2206,6 +3498,20 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
 {
     if (Unit* pVictim = me->GetVictim())
     {
+        if (me->GetHealthPercent() < 50.0f)
+        {
+            if (m_spells.warlock.pCreateHealthstone)
+            {
+                if (Item* pItem = GetHealthStone())
+                {
+                    if (CanTryToCastItemUseSpell(pItem))
+                    {
+                        UseConsumable(pItem, me);
+                    }
+                }
+            }
+        }
+
         if (m_spells.warlock.pDeathCoil &&
            (pVictim->CanReachWithMeleeAutoAttack(me) || pVictim->IsNonMeleeSpellCasted()) &&
             CanTryToCastSpell(pVictim, m_spells.warlock.pDeathCoil))
@@ -2214,12 +3520,20 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
                 return;
         }
 
-        if (m_spells.warlock.pShadowburn &&
-           (pVictim->GetHealthPercent() < 10.0f) &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pShadowburn))
+        if (IsTargetDeathWithinSeconds(pVictim, 3.0f))
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pShadowburn) == SPELL_CAST_OK)
-                return;
+            uint32 soulShads = CountInventoryItem(6265);
+            if (m_spells.warlock.pShadowburn && soulShads >= 4 && CanTryToCastSpell(pVictim, m_spells.warlock.pShadowburn))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pShadowburn) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pDrainSoul && soulShads < 4 && CanTryToCastSpell(pVictim, m_spells.warlock.pDrainSoul))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pDrainSoul) == SPELL_CAST_OK)
+                    return;
+            }
         }
 
         if (m_spells.warlock.pSearingPain &&
@@ -2263,25 +3577,34 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
             }
         }
 
-        if (m_spells.warlock.pImmolate &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pImmolate))
+        if (!IsTargetDeathWithinSeconds(pVictim, 15.0f))
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pImmolate) == SPELL_CAST_OK)
-                return;
+            if (m_spells.warlock.pImmolate &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pImmolate, false, true))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pImmolate) == SPELL_CAST_OK)
+                    return;
+            }
+
+            if (m_spells.warlock.pCorruption &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pCorruption, false, true))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pCorruption) == SPELL_CAST_OK)
+                    return;
+            }
         }
 
-        if (m_spells.warlock.pConflagrate &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pConflagrate))
+        if (m_spells.warlock.pConflagrate && m_spells.warlock.pImmolate)
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pConflagrate) == SPELL_CAST_OK)
-                return;
-        }
-
-        if (m_spells.warlock.pCorruption &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pCorruption))
-        {
-            if (DoCastSpell(pVictim, m_spells.warlock.pCorruption) == SPELL_CAST_OK)
-                return;
+            // TODO: Early vs late vs finnisher
+            if (SpellAuraHolder* pAuraHolder = pVictim->GetSpellAuraHolder(m_spells.warlock.pImmolate->Id, me->GetObjectGuid()))
+            {
+                if (pAuraHolder->GetAuraDuration() < 5000)
+                {
+                    if (CanTryToCastSpell(pVictim, m_spells.warlock.pConflagrate) && DoCastSpell(pVictim, m_spells.warlock.pConflagrate) == SPELL_CAST_OK)
+                        return;
+                }
+            }
         }
 
         if (m_spells.warlock.pSiphonLife &&
@@ -2294,7 +3617,7 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
 
         if (m_spells.warlock.pDrainLife &&
            (me->GetHealthPercent() < 30.0f) &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pDrainLife))
+            CanTryToCastSpell(pVictim, m_spells.warlock.pDrainLife, true))
         {
             if (DoCastSpell(pVictim, m_spells.warlock.pDrainLife) == SPELL_CAST_OK)
                 return;
@@ -2308,17 +3631,94 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
                 return;
         }
 
-        if (m_spells.warlock.pCurseofAgony &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofAgony))
+        if (m_spells.warlock.pLifeTap &&
+           (me->GetPowerPercent(POWER_MANA) < 90.0f) &&
+           (me->GetHealthPercent() > 90.0f) &&
+            CanTryToCastSpell(me, m_spells.warlock.pLifeTap))
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pCurseofAgony) == SPELL_CAST_OK)
+            if (DoCastSpell(me, m_spells.warlock.pLifeTap) == SPELL_CAST_OK)
                 return;
+        }
+
+        // TODO: Prioritise given group composition
+        if (!IsTargetDeathWithinSeconds(pVictim, 15.0f))
+        {
+            bool hasMyCurse = false;
+            if (m_spells.warlock.pCurseoftheElements && pVictim->GetLevel() >= me->GetLevel())
+            {
+                if (pVictim->GetSpellAuraHolder(m_spells.warlock.pCurseoftheElements->Id, me->GetGUIDLow()))
+                    hasMyCurse = true;
+                else if (CanTryToCastSpell(pVictim, m_spells.warlock.pCurseoftheElements))
+                {
+                    if (DoCastSpell(pVictim, m_spells.warlock.pCurseoftheElements) == SPELL_CAST_OK)
+                    {
+                        hasMyCurse = true;
+                        return;
+                    }
+                }
+            }
+
+            if (!hasMyCurse && m_spells.warlock.pCurseofShadow && pVictim->GetLevel() >= me->GetLevel())
+            {
+                if (pVictim->GetSpellAuraHolder(m_spells.warlock.pCurseofShadow->Id, me->GetGUIDLow()))
+                    hasMyCurse = true;
+                else if (CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofShadow))
+                {
+                    if (DoCastSpell(pVictim, m_spells.warlock.pCurseofShadow) == SPELL_CAST_OK)
+                    {
+                        hasMyCurse = true;
+                        return;
+                    }
+                }
+            }
+
+            if (!hasMyCurse && m_spells.warlock.pCurseofTongues && pVictim->GetLevel() >= me->GetLevel() && pVictim->GetPowerType() == POWER_MANA)
+            {
+                if (pVictim->GetSpellAuraHolder(m_spells.warlock.pCurseofTongues->Id, me->GetGUIDLow()))
+                    hasMyCurse = true;
+                else if (CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofTongues))
+                {
+                    if (DoCastSpell(pVictim, m_spells.warlock.pCurseofTongues) == SPELL_CAST_OK)
+                    {
+                        hasMyCurse = true;
+                        return;
+                    }
+                }
+            }
+
+            if (!hasMyCurse && m_spells.warlock.pCurseofAgony && pVictim->GetLevel() >= me->GetLevel())
+            {
+                if (pVictim->GetSpellAuraHolder(m_spells.warlock.pCurseofAgony->Id, me->GetGUIDLow()))
+                    hasMyCurse = true;
+                else if (CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofAgony))
+                {
+                    if (DoCastSpell(pVictim, m_spells.warlock.pCurseofAgony) == SPELL_CAST_OK)
+                    {
+                        hasMyCurse = true;
+                        return;
+                    }
+                }
+            }
+
+            if (!hasMyCurse && m_spells.warlock.pCurseofWeakness && pVictim->GetLevel() >= me->GetLevel())
+            {
+                if (pVictim->GetSpellAuraHolder(m_spells.warlock.pCurseofWeakness->Id, me->GetGUIDLow()))
+                    hasMyCurse = true;
+                else if (CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofWeakness))
+                {
+                    if (DoCastSpell(pVictim, m_spells.warlock.pCurseofWeakness) == SPELL_CAST_OK)
+                    {
+                        hasMyCurse = true;
+                        return;
+                    }
+                }
+            }
         }
 
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
-            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+            MoveChase(pVictim, 25.0f);
         }
 
         if (m_spells.warlock.pHowlofTerror &&
@@ -2336,20 +3736,16 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
                 return;
         }
 
-        if (m_spells.warlock.pLifeTap &&
-           (me->GetPowerPercent(POWER_MANA) < 10.0f) &&
-           (me->GetHealthPercent() > 70.0f) &&
-            CanTryToCastSpell(me, m_spells.warlock.pLifeTap))
-        {
-            if (DoCastSpell(me, m_spells.warlock.pLifeTap) == SPELL_CAST_OK)
-                return;
-        }
-
         if (me->HasSpell(PB_SPELL_SHOOT_WAND) &&
            !me->IsMoving() &&
-           (me->GetPowerPercent(POWER_MANA) < 5.0f) &&
-           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+           //(me->GetPowerPercent(POWER_MANA) < 5.0f) &&
+           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL) &&
+            CheckThreatOK(pVictim))
+        {
+            if (FaceObject(pVictim))
+                return;
             me->CastSpell(pVictim, PB_SPELL_SHOOT_WAND, false);
+        }
     }
 }
 
@@ -2468,6 +3864,12 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
             }
         }
 
+        if (m_spells.warrior.pRevenge && CanTryToCastSpell(pVictim, m_spells.warrior.pRevenge))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pRevenge) == SPELL_CAST_OK)
+                return;
+        }
+
         if (m_spells.warrior.pThunderClap &&
             m_role == ROLE_TANK &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pThunderClap))
@@ -2478,7 +3880,7 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
 
         if (m_spells.warrior.pSunderArmor &&
             m_role == ROLE_TANK &&
-            CanTryToCastSpell(pVictim, m_spells.warrior.pSunderArmor))
+            CanTryToCastSpell(pVictim, m_spells.warrior.pSunderArmor, false, false, true))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pSunderArmor) == SPELL_CAST_OK)
                 return;
@@ -2495,7 +3897,7 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (m_spells.warrior.pRend &&
-            CanTryToCastSpell(pVictim, m_spells.warrior.pRend))
+            CanTryToCastSpell(pVictim, m_spells.warrior.pRend, false, true))    // TODO: Double check
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pRend) == SPELL_CAST_OK)
                 return;
@@ -2520,7 +3922,7 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
 
         if (m_spells.warrior.pSweepingStrikes &&
             CanTryToCastSpell(me, m_spells.warrior.pSweepingStrikes) &&
-           (me->GetEnemyCountInRadiusAround(pVictim, 10.0f) > 2))
+           (me->GetEnemyCountInRadiusAround(pVictim, 10.0f) > 1))
         {
             if (DoCastSpell(me, m_spells.warrior.pSweepingStrikes) == SPELL_CAST_OK)
                 return;
@@ -2561,7 +3963,7 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
         }
 
         if ((me->GetHealthPercent() < 20.0f) ||
-            (m_role == ROLE_TANK && pVictim->GetLevel() >= me->GetLevel()))
+            (m_role == ROLE_TANK && (pVictim->GetLevel() >= me->GetLevel() || IsWearingShield(me))))
         {
             if (m_spells.warrior.pDefensiveStance &&
                 CanTryToCastSpell(me, m_spells.warrior.pDefensiveStance))
@@ -2611,7 +4013,7 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && !me->CanReachWithMeleeAutoAttack(pVictim))
         {
-            me->GetMotionMaster()->MoveChase(pVictim);
+            MoveChase(pVictim);
         }
 
         if (me->GetPower(POWER_RAGE) > 30)
@@ -2750,6 +4152,18 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
                     if (DoCastSpell(pVictim, m_spells.rogue.pCheapShot) == SPELL_CAST_OK)
                         return;
                 }
+
+                if (m_spells.rogue.pBackstab &&
+                    CanTryToCastSpell(pVictim, m_spells.rogue.pBackstab))
+                {
+                    if (DoCastSpell(pVictim, m_spells.rogue.pBackstab) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+
+            if (me->IsMoving() && (m_spells.rogue.pGarrote || m_spells.rogue.pAmbush || m_spells.rogue.pBackstab))
+            {
+                return;
             }
         }
         else
@@ -2773,6 +4187,17 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
                             return;
                     }
                 }
+            }
+        }
+
+        if (m_spells.rogue.pFeint && me->GetPower(POWER_ENERGY) >= 80 && !CheckThreatOK(pVictim))
+        {
+            float const myThreat = pVictim->GetThreatManager().getThreat(me);
+            if (myThreat > me->GetLevel() * 2.0f && CanTryToCastSpell(pVictim, m_spells.rogue.pFeint))
+            {
+                SpellCastResult result = DoCastSpell(pVictim, m_spells.rogue.pFeint);
+                if (result == SPELL_CAST_OK)
+                    return;
             }
         }
 
@@ -2825,8 +4250,7 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
             }
         }
 
-        if (m_spells.rogue.pAdrenalineRush &&
-           !me->GetPower(POWER_ENERGY) &&
+        if (m_spells.rogue.pAdrenalineRush && me->GetPower(POWER_ENERGY) < 20 && pVictim->GetHealthPercent() > 40.0f &&
             CanTryToCastSpell(me, m_spells.rogue.pAdrenalineRush))
         {
             if (DoCastSpell(me, m_spells.rogue.pAdrenalineRush) == SPELL_CAST_OK)
@@ -2882,25 +4306,29 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
                 return;
         }
 
-        if (m_spells.rogue.pGhostlyStrike &&
-            CanTryToCastSpell(pVictim, m_spells.rogue.pGhostlyStrike))
+        bool didNotBackstab = me->GetPower(POWER_ENERGY) > 60; // We have energy for backstab but didn't.
+        if (didNotBackstab)
         {
-            if (DoCastSpell(pVictim, m_spells.rogue.pGhostlyStrike) == SPELL_CAST_OK)
-                return;
-        }
+            if (m_spells.rogue.pGhostlyStrike &&
+                CanTryToCastSpell(pVictim, m_spells.rogue.pGhostlyStrike))
+            {
+                if (DoCastSpell(pVictim, m_spells.rogue.pGhostlyStrike) == SPELL_CAST_OK)
+                    return;
+            }
 
-        if (m_spells.rogue.pHemorrhage &&
-            CanTryToCastSpell(pVictim, m_spells.rogue.pHemorrhage))
-        {
-            if (DoCastSpell(pVictim, m_spells.rogue.pHemorrhage) == SPELL_CAST_OK)
-                return;
-        }
+            if (m_spells.rogue.pHemorrhage &&
+                CanTryToCastSpell(pVictim, m_spells.rogue.pHemorrhage))
+            {
+                if (DoCastSpell(pVictim, m_spells.rogue.pHemorrhage) == SPELL_CAST_OK)
+                    return;
+            }
 
-        if (m_spells.rogue.pSinisterStrike &&
-            CanTryToCastSpell(pVictim, m_spells.rogue.pSinisterStrike))
-        {
-            if (DoCastSpell(pVictim, m_spells.rogue.pSinisterStrike) == SPELL_CAST_OK)
-                return;
+            if (m_spells.rogue.pSinisterStrike &&
+                CanTryToCastSpell(pVictim, m_spells.rogue.pSinisterStrike))
+            {
+                if (DoCastSpell(pVictim, m_spells.rogue.pSinisterStrike) == SPELL_CAST_OK)
+                    return;
+            }
         }
 
         if (m_spells.rogue.pSprint &&
@@ -2945,38 +4373,29 @@ bool PartyBotAI::EnterCombatDruidForm()
 
 void PartyBotAI::UpdateOutOfCombatAI_Druid()
 {
+    RebuffCandidate bestCandidate;
+
     // Make sure bot leaves combat form if his role is changed to healer.
-    if (GetRole() == ROLE_HEALER && me->GetShapeshiftForm() != FORM_NONE &&
+    if ((GetRole() == ROLE_HEALER || (GetRole() == ROLE_TANK && me->GetPowerPercent(POWER_RAGE) == 0) && !me->GetVictim()) &&
+        me->GetShapeshiftForm() != FORM_NONE &&
         me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
     {
         me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
         return;
     }
 
-    if (m_spells.druid.pGiftoftheWild)
+    bool foundBuffTarget = false;
+    SpellEntry const* pDispelSpell = m_spells.druid.pAbolishPoison ? m_spells.druid.pAbolishPoison : m_spells.druid.pCurePoison;
+    if (pDispelSpell)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.druid.pGiftoftheWild))
+        if (Unit* pFriend = SelectDispelTarget(pDispelSpell))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.druid.pGiftoftheWild))
+            foundBuffTarget = true;
+            if (CanTryToCastSpell(pFriend, pDispelSpell))
             {
-                if (DoCastSpell(pTarget, m_spells.druid.pGiftoftheWild) == SPELL_CAST_OK)
+                if (DoCastSpell(pFriend, pDispelSpell) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
-            }
-        }
-    }
-    else if (m_spells.druid.pMarkoftheWild)
-    {
-        if (Player* pTarget = SelectBuffTarget(m_spells.druid.pMarkoftheWild))
-        {
-            if (CanTryToCastSpell(pTarget, m_spells.druid.pMarkoftheWild))
-            {
-                if (DoCastSpell(pTarget, m_spells.druid.pMarkoftheWild) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
@@ -2984,44 +4403,112 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
         }
     }
 
-    if (m_spells.druid.pThorns)
+    if (m_spells.druid.pRemoveCurse)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.druid.pThorns))
+        if (Unit* pFriend = SelectDispelTarget(m_spells.druid.pRemoveCurse))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.druid.pThorns))
+            foundBuffTarget = true;
+            if (CanTryToCastSpell(pFriend, m_spells.druid.pRemoveCurse))
             {
-                if (DoCastSpell(pTarget, m_spells.druid.pThorns) == SPELL_CAST_OK)
+                if (DoCastSpell(pFriend, m_spells.druid.pRemoveCurse) == SPELL_CAST_OK)
                 {
-                    m_isBuffing = true;
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
                     me->ClearTarget();
                     return;
                 }
             }
         }
+    }
+
+    if (m_spells.druid.pGiftoftheWild)
+    {
+        if (Unit* pTarget = SelectBuffTarget(m_spells.druid.pGiftoftheWild))
+        {
+            foundBuffTarget = true;
+            if (CanTryToCastSpell(pTarget, m_spells.druid.pGiftoftheWild))
+            {
+                if (DoCastSpell(pTarget, m_spells.druid.pGiftoftheWild) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+        //EvaluateRebuffTarget(m_spells.druid.pGiftoftheWild, bestCandidate);
+    }
+    else if (m_spells.druid.pMarkoftheWild)
+    {
+        if (Unit* pTarget = SelectBuffTarget(m_spells.druid.pMarkoftheWild))
+        {
+            foundBuffTarget = true;
+            if (CanTryToCastSpell(pTarget, m_spells.druid.pMarkoftheWild))
+            {
+                if (DoCastSpell(pTarget, m_spells.druid.pMarkoftheWild) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+        EvaluateRebuffTarget(m_spells.druid.pMarkoftheWild, bestCandidate);
+    }
+
+    if (m_spells.druid.pThorns)
+    {
+        if (Unit* pTarget = SelectBuffTarget(m_spells.druid.pThorns))
+        {
+            foundBuffTarget = true;
+            if (CanTryToCastSpell(pTarget, m_spells.druid.pThorns))
+            {
+                if (DoCastSpell(pTarget, m_spells.druid.pThorns) == SPELL_CAST_OK)
+                {
+                    m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+                    me->ClearTarget();
+                    return;
+                }
+            }
+        }
+        EvaluateRebuffTarget(m_spells.druid.pThorns, bestCandidate);
     }
 
     if (m_spells.druid.pNaturesGrasp &&
         CanTryToCastSpell(me, m_spells.druid.pNaturesGrasp))
     {
         if (DoCastSpell(me, m_spells.druid.pNaturesGrasp) == SPELL_CAST_OK)
+        {
+            m_buffTimer.Reset(PB_BUFFING_INTERVAL);
+            me->ClearTarget();
             return;
+        }
     }
 
-    if (m_isBuffing &&
-       (!m_spells.druid.pMarkoftheWild ||
-        !me->HasGCD(m_spells.druid.pMarkoftheWild)))
+    if (bestCandidate.target && bestCandidate.spell)
     {
-        m_isBuffing = false;
+        if (DoCastSpell(bestCandidate.target, bestCandidate.spell) == SPELL_CAST_OK)
+        {
+            me->ClearTarget();
+            return;
+        }
+    }
+
+    if (foundBuffTarget && me->GetShapeshiftForm() != FORM_NONE && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+    {
+        me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+        return;
     }
 
     if (me->GetShapeshiftForm() == FORM_NONE)
     {
-        if (EnterCombatDruidForm())
+        if (me->GetVictim() && EnterCombatDruidForm())  // If we don't need to talk to NPCs then shift in to an appropriate form
             return;
 
-        if ((me->GetPowerPercent(POWER_MANA) > 80.0f) &&
-            FindAndHealInjuredAlly())
-            return;
+        if ((GetRole() == ROLE_HEALER || me->GetPowerPercent(POWER_MANA) > 80.0f) && !me->IsMoving())
+        {
+            if (FindAndHealInjuredAlly())
+                return;
+        }
     }
     else if (me->GetShapeshiftForm() == FORM_CAT)
     {
@@ -3036,6 +4523,30 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
 void PartyBotAI::UpdateInCombatAI_Druid()
 {
     ShapeshiftForm const form = me->GetShapeshiftForm();
+    bool inDesiredForm = true;
+    switch (GetRole())
+    {
+        case ROLE_TANK:
+        {
+            inDesiredForm = form == FORM_BEAR || form == FORM_DIREBEAR;
+            break;
+        }
+        case ROLE_MELEE_DPS:
+        {
+            inDesiredForm = form == FORM_CAT;
+            break;
+        }
+        case ROLE_RANGE_DPS:
+        {
+            inDesiredForm = m_spells.druid.pMoonkinForm ? form == FORM_MOONKIN : form == FORM_NONE;
+            break;
+        }
+        case ROLE_HEALER:
+        {
+            inDesiredForm = form == FORM_NONE;
+            break;
+        }
+    }
 
     if (m_spells.druid.pBarkskin &&
         (form == FORM_NONE || form == FORM_MOONKIN) &&
@@ -3045,8 +4556,36 @@ void PartyBotAI::UpdateInCombatAI_Druid()
         if (DoCastSpell(me, m_spells.druid.pBarkskin) == SPELL_CAST_OK)
             return;
     }
-    
-    if (form == FORM_NONE)
+
+    if (GetRole() != ROLE_HEALER && me->GetPowerPercent(POWER_MANA) > 35.0f)
+    {
+        float healAt = 25.0;
+        if (me->GetShapeshiftForm() == FORM_NONE)
+            healAt += 20.0;
+        if (!ExistsAsHealerInGroupForOffHealCheck())
+            healAt += 20.0;
+        if (!me->GetAttackers().empty())
+            healAt -= 20.0;
+        if (Unit* pTarget = SelectHealTarget(healAt, healAt))
+        {
+            if (me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+            {
+                me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+                return;
+            }
+            if (HealInjuredTargetDirect(pTarget))
+                return;
+        }
+    }
+
+    // Make sure bot leaves combat form if its role is changed to healer.
+    if (!inDesiredForm && me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+    {
+        me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+        return;
+    }
+
+    if (form == FORM_NONE && (GetRole() == ROLE_HEALER || me->GetPowerPercent(POWER_MANA) > 50.0f))
     {
         if (m_spells.druid.pHibernate &&
             m_role != ROLE_TANK &&
@@ -3062,13 +4601,19 @@ void PartyBotAI::UpdateInCombatAI_Druid()
         }
 
         // Prioritize applying HoTs.
-        if (Unit* pTarget = SelectPeriodicHealTarget(80.0f, 90.0f))
-            if (HealInjuredTargetPeriodic(pTarget))
-                return;
+        if (me->GetLevel() > 50 || me->GetPowerPercent(POWER_MANA) > 90.0f)
+        {
+            if (Unit* pTarget = SelectPeriodicHealTarget(80.0f, 90.0f))
+                if (HealInjuredTargetPeriodic(pTarget))
+                    return;
+        }
 
         // Direct heal.
+        if (Unit* pTarget = SelectHealTarget(30.0f, 40.0f))
+            if (HealInjuredTargetDirectFast(pTarget))
+                return;
         if (Unit* pTarget = SelectHealTarget(60.0f, 70.0f))
-            if (HealInjuredTargetDirect(pTarget))
+            if (HealInjuredTargetDirectSlow(pTarget))
                 return;
 
         // Dispels
@@ -3111,7 +4656,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
         if (GetRole() == ROLE_HEALER && FindAndPreHealTarget())
             return;
 
-        if (EnterCombatDruidForm())
+        if (me->GetVictim() && EnterCombatDruidForm())
             return;
     }
 
@@ -3138,7 +4683,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
                 && !me->CanReachWithMeleeAutoAttack(pVictim))
             {
-                me->GetMotionMaster()->MoveChase(pVictim);
+                MoveChase(pVictim);
             }
 
             if (me->HasAuraType(SPELL_AURA_MOD_STEALTH))
@@ -3164,13 +4709,13 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                 return;
             }
 
-            if (m_spells.druid.pCower &&
-                GetAttackersInRangeCount(8.0f))
+            if (m_spells.druid.pCower && me->GetPower(POWER_ENERGY) >= 80 && !CheckThreatOK(pVictim))
             {
-                Unit* pAttacker = *me->GetAttackers().begin();
-                if (CanTryToCastSpell(me, m_spells.druid.pCower))
+                float const myThreat = pVictim->GetThreatManager().getThreat(me);
+                if (myThreat > me->GetLevel() * 2.0f && CanTryToCastSpell(pVictim, m_spells.druid.pCower))
                 {
-                    if (DoCastSpell(me, m_spells.druid.pCower) == SPELL_CAST_OK)
+                    SpellCastResult result = DoCastSpell(pVictim, m_spells.druid.pCower);
+                    if (result == SPELL_CAST_OK)
                         return;
                 }
             }
@@ -3209,7 +4754,6 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                         return;
                 }
             }
-
             if (m_spells.druid.pShred &&
                 CanTryToCastSpell(pVictim, m_spells.druid.pShred))
             {
@@ -3217,18 +4761,20 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                     return;
             }
 
-            if (m_spells.druid.pRake &&
-                CanTryToCastSpell(pVictim, m_spells.druid.pRake))
+            bool didNotShred = me->GetPower(POWER_ENERGY) > 60; // We have energy for shred but didn't.
+            if (didNotShred)
             {
-                if (DoCastSpell(pVictim, m_spells.druid.pRake) == SPELL_CAST_OK)
-                    return;
-            }
+                if (m_spells.druid.pRake && CanTryToCastSpell(pVictim, m_spells.druid.pRake, false, true))
+                {
+                    if (DoCastSpell(pVictim, m_spells.druid.pRake) == SPELL_CAST_OK)
+                        return;
+                }
 
-            if (m_spells.druid.pClaw &&
-                CanTryToCastSpell(pVictim, m_spells.druid.pClaw))
-            {
-                if (DoCastSpell(pVictim, m_spells.druid.pClaw) == SPELL_CAST_OK)
-                    return;
+                if (m_spells.druid.pClaw && CanTryToCastSpell(pVictim, m_spells.druid.pClaw))
+                {
+                    if (DoCastSpell(pVictim, m_spells.druid.pClaw) == SPELL_CAST_OK)
+                        return;
+                }
             }
                 
             break;
@@ -3242,7 +4788,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
                 && !me->CanReachWithMeleeAutoAttack(pVictim))
             {
-                me->GetMotionMaster()->MoveChase(pVictim);
+                MoveChase(pVictim);
             }
 
             if (m_spells.druid.pFeralCharge &&
@@ -3306,7 +4852,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE &&
                 me->GetDistance(pVictim) > 30.0f)
             {
-                me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+                MoveChase(pVictim, 25.0f);
             }
             else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
                     (pVictim->GetVictim() == me) &&
@@ -3323,6 +4869,10 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                 if (RunAwayFromTarget(pVictim))
                     return;
             }
+
+            // We're in the wrong form, conserve mana so we can shift
+            if (!inDesiredForm && me->GetPowerPercent(POWER_MANA) < 50.0f)
+                return;
 
             if (m_spells.druid.pFaerieFire &&
                (pVictim->GetClass() == CLASS_ROGUE) &&
@@ -3351,7 +4901,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             }
 
             if (m_spells.druid.pMoonfire &&
-                CanTryToCastSpell(pVictim, m_spells.druid.pMoonfire))
+                CanTryToCastSpell(pVictim, m_spells.druid.pMoonfire, false, true))
             {
                 if (DoCastSpell(pVictim, m_spells.druid.pMoonfire) == SPELL_CAST_OK)
                     return;

@@ -662,6 +662,8 @@ class Unit : public SpellCaster
         void _UpdateAutoRepeatSpell();
 
     public:
+        bool m_stackTrackers = false;
+
         /**
          * Gets the current DiminishingLevels for the given group
          * @param group The group that you would like to know the current diminishing return level for

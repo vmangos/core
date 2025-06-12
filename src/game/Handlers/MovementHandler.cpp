@@ -25,6 +25,7 @@
 #include "Opcodes.h"
 #include "Log.h"
 #include "Player.h"
+#include "CombatBotBaseAI.h"
 #include "MapManager.h"
 #include "Transport.h"
 #include "BattleGround.h"
@@ -298,12 +299,19 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (pMover->HasPendingSplineDone())
         return;
 
+    Player* pPlayerMover = pMover->ToPlayer();
+    if (pPlayerMover && pPlayerMover->AI())
+    {
+        if (CombatBotBaseAI* pAI = dynamic_cast<CombatBotBaseAI*>(pPlayerMover->AI()))
+        {
+            pAI->OnPacketSentFromClient(&recvData);
+        }
+    }
+
     // currently being moved by server
     if (!pMover->movespline->Finalized())
         return;
         
-    Player* pPlayerMover = pMover->ToPlayer();
-
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (pPlayerMover && pPlayerMover->IsBeingTeleported())
         return;

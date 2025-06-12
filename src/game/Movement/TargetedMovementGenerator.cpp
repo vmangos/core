@@ -177,8 +177,10 @@ void ChaseMovementGenerator<T>::_setTargetLocation(T &owner)
                 i_target->GetSafePosition(x, y, z);
     }
 
-    Movement::MoveSplineInit init(owner, "ChaseMovementGenerator<T>::_setTargetLocation");
     PathFinder path(&owner);
+
+    // allow pets following their master to cheat while generating paths
+    Movement::MoveSplineInit init(owner, "ChaseMovementGenerator");
     path.SetTransport(transport);
     path.calculate(x, y, z, false);
 
@@ -431,7 +433,7 @@ void ChaseMovementGenerator<T>::DoBackMovement(T &owner, Unit* target)
         return;
 
     m_bIsSpreading = true;
-    Movement::MoveSplineInit init(owner, "ChaseMovementGenerator<T>::DoBackMovement");
+    Movement::MoveSplineInit init(owner, "ChaseMovementGenerator");
     init.MoveTo(x, y, z, MOVE_WALK_MODE);
     init.SetWalk(true);
     init.Launch();
@@ -483,7 +485,7 @@ void ChaseMovementGenerator<T>::DoSpreadIfNeeded(T &owner, Unit* target)
     if (m_uiSpreadAttempts >= MAX_SPREAD_ATTEMPTS)
         m_bCanSpread = false;
 
-    Movement::MoveSplineInit init(owner, "ChaseMovementGenerator<T>::DoSpreadIfNeeded");
+    Movement::MoveSplineInit init(owner, "ChaseMovementGenerator");
     init.MoveTo(x, y, z, MOVE_WALK_MODE);
     init.SetWalk(true);
     init.Launch();
@@ -639,7 +641,7 @@ void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
     PathFinder path(&owner);
 
     // allow pets following their master to cheat while generating paths
-    Movement::MoveSplineInit init(owner, "FollowMovementGenerator<T>::_setTargetLocation");
+    Movement::MoveSplineInit init(owner, "FollowMovementGenerator");
     path.SetTransport(transport);
     path.calculate(x, y, z, true);
 
