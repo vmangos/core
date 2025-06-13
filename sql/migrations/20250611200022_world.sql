@@ -928,6 +928,21 @@ UPDATE `pool_gameobject` SET `description`='Tin Vein / Silver Vein - Dustwallow 
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `id` IN (1735, 73939) AND `map` IN (0, 1);
 
+DELETE FROM `gameobject` WHERE `guid` IN (7252, 7264, 7276);
+DELETE FROM `pool_template` WHERE `entry` = 2561;
+DELETE FROM `pool_gameobject` WHERE  `guid` IN (7252, 7264, 7276);
+DELETE FROM `pool_pool` WHERE `pool_id` = 2561;
+
+DELETE FROM `gameobject` WHERE `guid` IN (7253, 7265, 7277);
+DELETE FROM `pool_template` WHERE `entry` = 2562;
+DELETE FROM `pool_gameobject` WHERE  `guid` IN (7253, 7265, 7277);
+DELETE FROM `pool_pool` WHERE `pool_id` = 2562;
+
+DELETE FROM `gameobject` WHERE `guid` IN (6137, 6144, 6151);
+DELETE FROM `pool_template` WHERE `entry` = 2594;
+DELETE FROM `pool_gameobject` WHERE  `guid` IN (6137, 6144, 6151);
+DELETE FROM `pool_pool` WHERE `pool_id` = 2594;
+
 
 -- End of migration.
 END IF;
