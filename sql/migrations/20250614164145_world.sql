@@ -408,6 +408,8 @@ DELETE FROM `pool_gameobject` WHERE `guid` IN (5309, 5302, 5295);
 DELETE FROM `pool_template` WHERE `entry` = 1571;
 DELETE FROM `pool_pool` WHERE `pool_id` = 1571;
 
+UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 2700 WHERE `id` IN (324, 175404, 150082, 176643) AND `map` IN (0, 1);
+
 
 -- End of migration.
 END IF;
