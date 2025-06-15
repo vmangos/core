@@ -242,7 +242,7 @@ bool DynamicMapTree::getObjectHitPos(Vector3 const& pPos1, Vector3 const& pPos2,
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
     MANGOS_ASSERT(maxDist < std::numeric_limits<float>::max());
     // prevent NaN values which can cause BIH intersection to enter infinite loop
-    if (maxDist < 1e-10f)
+    if (maxDist < 1e-10f || pPos1 == pPos2)
     {
         pResultHitPos = pPos2;
         return false;
