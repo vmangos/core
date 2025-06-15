@@ -140,7 +140,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 -- Mazthoril
 SET @GGUID = 2452;
-SET @PTEMPLATE = 1467;
+SET @PTEMPLATE = 1634;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@GGUID+0, 2047, 1, 6208.8, -4311.59, 661.415, 0.0174525, 0, 0, 0.00872612, 0.999962, 300, 300, 100, 1, 0, 0, 0, 10),
 (@GGUID+1, 324, 1, 6208.8, -4311.59, 661.415, 0.0174525, 0, 0, 0.00872612, 0.999962, 300, 300, 100, 1, 0, 0, 0, 10);
