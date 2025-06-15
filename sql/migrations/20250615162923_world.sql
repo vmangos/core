@@ -341,6 +341,22 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `f
 
 UPDATE `gameobject` SET `id` = 153473 WHERE `guid` = 38981;
 
+-- Should be Tin / Silver
+UPDATE `pool_pool` SET `description`='Alterac Mountains - Tin Vein / Silver Vein' WHERE `pool_id` IN (5094, 5086, 5087, 5088, 5089, 5090, 5091, 5092, 5093, 5095, 5096, 5097);
+UPDATE `pool_template` SET `description`='Alterac Mountains - Tin Vein / Silver Vein (Master Pool)' WHERE `entry` = 9902;
+DELETE FROM `pool_gameobject` WHERE `guid` IN (396411, 220423, 220424, 220425, 220426, 220427, 220428, 85248, 85249, 220422, 85251, 85252);
+DELETE FROM `gameobject` WHERE `guid` IN (396411, 220423, 220424, 220425, 220426, 220427, 220428, 85248, 85249, 220422, 85251, 85252);
+UPDATE `pool_gameobject` SET `description`='Tin Vein / Silver Vein - Alterac Mountains' WHERE `guid` IN (2406, 42202, 42204, 33198, 42203, 33196, 42200, 42201, 2405, 2407, 396412, 31523, 85242, 85243, 85244, 85245, 85246, 85247, 31521, 31522, 2408, 85250, 427073);
+UPDATE `pool_gameobject` SET `chance` = 5 WHERE `description` = "Tin Vein / Silver Vein - Alterac Mountains" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1733);
+UPDATE `pool_gameobject` SET `chance` = 95 WHERE `description` = "Tin Vein / Silver Vein - Alterac Mountains" && `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` = 1732);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Alterac Mountains' WHERE `entry` IN (5086, 5087, 5088, 5089, 5090, 5091, 5094, 5092, 5093, 5095, 5096, 5097);
+DELETE FROM `pool_template` WHERE `entry` = 9728;
+DELETE FROM `pool_pool` WHERE `pool_id` = 9728;
+DELETE FROM `pool_gameobject` WHERE `guid` = 325671;
+DELETE FROM `gameobject` WHERE `guid` = 325671;
+UPDATE `pool_gameobject` SET `pool_entry` = 5097 WHERE `guid` = 325628;
+UPDATE `pool_gameobject` SET `description`='Tin Vein / Silver Vein - Alterac Mountains' WHERE `guid` = 325628;
+
 
 -- End of migration.
 END IF;
