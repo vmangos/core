@@ -2474,6 +2474,92 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (62523, 13776, 0, 0, 0, 30, -1234.82, -358.229, 60.0128, 3.45987, 3600, 3600, 0, 100, 100, 0, 0, 0, 3, 10),
 (62524, 13777, 0, 0, 0, 30, 610.141, -54.4288, 41.2541, 0, 3600, 3600, 0, 100, 100, 0, 0, 0, 3, 10);
 
+-- Dun Baldar ally guards co2
+UPDATE `creature` SET `position_x` = 623.811, `position_y` = -32.5688, `position_z` = 44.2799, `orientation` = 3.97935 WHERE `guid` = 62453;
+UPDATE `creature` SET `position_x` = 623.811, `position_y` = -32.5688, `position_z` = 44.2799, `orientation` = 3.97935 WHERE `guid` = 62454;
+UPDATE `creature` SET `position_x` = 623.811, `position_y` = -32.5688, `position_z` = 44.2799, `orientation` = 3.97935 WHERE `guid` = 62455;
+UPDATE `creature` SET `position_x` = 623.811, `position_y` = -32.5688, `position_z` = 44.2799, `orientation` = 3.97935 WHERE `guid` = 62456;
+
+UPDATE `creature` SET `position_x` = 620.443, `position_y` = -60.2866, `position_z` = 40.9047, `orientation` = 0.226893 WHERE `guid` = 62449;
+UPDATE `creature` SET `position_x` = 620.443, `position_y` = -60.2866, `position_z` = 40.9047, `orientation` = 0.226893 WHERE `guid` = 62450;
+UPDATE `creature` SET `position_x` = 620.443, `position_y` = -60.2866, `position_z` = 40.9047, `orientation` = 0.226893 WHERE `guid` = 62451;
+UPDATE `creature` SET `position_x` = 620.443, `position_y` = -60.2866, `position_z` = 40.9047, `orientation` = 0.226893 WHERE `guid` = 62452;
+
+UPDATE `creature` SET `position_x` = 605.623, `position_y` = -39.3602, `position_z` = 40.7838, `orientation` = 5.8294 WHERE `guid` = 62457;
+UPDATE `creature` SET `position_x` = 605.623, `position_y` = -39.3602, `position_z` = 40.7838, `orientation` = 5.8294 WHERE `guid` = 62458;
+UPDATE `creature` SET `position_x` = 605.623, `position_y` = -39.3602, `position_z` = 40.7838, `orientation` = 5.8294 WHERE `guid` = 62459;
+UPDATE `creature` SET `position_x` = 605.623, `position_y` = -39.3602, `position_z` = 40.7838, `orientation` = 5.8294 WHERE `guid` = 62460;
+
+UPDATE `creature` SET `position_x` = 619.244, `position_y` = -82.9365, `position_z` = 40.3634, `orientation` = 3.87463 WHERE `guid` = 62433;
+UPDATE `creature` SET `position_x` = 619.244, `position_y` = -82.9365, `position_z` = 40.3634, `orientation` = 3.87463 WHERE `guid` = 62434;
+UPDATE `creature` SET `position_x` = 619.244, `position_y` = -82.9365, `position_z` = 40.3634, `orientation` = 3.87463 WHERE `guid` = 62435;
+UPDATE `creature` SET `position_x` = 619.244, `position_y` = -82.9365, `position_z` = 40.3634, `orientation` = 3.87463 WHERE `guid` = 62436;
+
+UPDATE `creature` SET `position_x` = 605.483, `position_y` = -97.0067, `position_z` = 39.3913, `orientation` = 2.00713 WHERE `guid` = 62425;
+UPDATE `creature` SET `position_x` = 605.483, `position_y` = -97.0067, `position_z` = 39.3913, `orientation` = 2.00713 WHERE `guid` = 62426;
+UPDATE `creature` SET `position_x` = 605.483, `position_y` = -97.0067, `position_z` = 39.3913, `orientation` = 2.00713 WHERE `guid` = 62427;
+UPDATE `creature` SET `position_x` = 605.483, `position_y` = -97.0067, `position_z` = 39.3913, `orientation` = 2.00713 WHERE `guid` = 62428;
+
+UPDATE `creature` SET `position_x` = 646.041, `position_y` = -106.446, `position_z` = 49.4266, `orientation` = 3.82227 WHERE `guid` = 60606;
+UPDATE `creature` SET `position_x` = 646.041, `position_y` = -106.446, `position_z` = 49.4266, `orientation` = 3.82227 WHERE `guid` = 61159;
+UPDATE `creature` SET `position_x` = 646.041, `position_y` = -106.446, `position_z` = 49.4266, `orientation` = 3.82227 WHERE `guid` = 61180;
+UPDATE `creature` SET `position_x` = 646.041, `position_y` = -106.446, `position_z` = 49.4266, `orientation` = 3.82227 WHERE `guid` = 61203;
+
+UPDATE `creature` SET `position_x` = 638.345, `position_y` = -68.8717, `position_z` = 41.7232, `orientation` = 3.22886 WHERE `guid` = 62437;
+UPDATE `creature` SET `position_x` = 638.345, `position_y` = -68.8717, `position_z` = 41.7232, `orientation` = 3.22886 WHERE `guid` = 62438;
+UPDATE `creature` SET `position_x` = 638.345, `position_y` = -68.8717, `position_z` = 41.7232, `orientation` = 3.22886 WHERE `guid` = 62439;
+UPDATE `creature` SET `position_x` = 638.345, `position_y` = -68.8717, `position_z` = 41.7232, `orientation` = 3.22886 WHERE `guid` = 62440;
+
+-- Rams co2
+UPDATE `creature` SET `position_x` = 701.9, `position_y` = -260.469, `position_z` = 26.0565, `orientation` = 1.06046 WHERE `guid` = 60382;
+UPDATE `creature` SET `position_x` = 517.279, `position_y` = -297.652, `position_z` = -9.46027, `orientation` = 0.60419 WHERE `guid` = 60389;
+UPDATE `creature` SET `position_x` = 450.322, `position_y` = -318.41, `position_z` = -37.9495, `orientation` = 5.88901 WHERE `guid` = 60378;
+UPDATE `creature` SET `position_x` = 384.059, `position_y` = -351.295, `position_z` = -27.9058, `orientation` = 3.61283 WHERE `guid` = 60368;
+UPDATE `creature` SET `position_x` = 229.486, `position_y` = -424.403, `position_z` = 39.4983, `orientation` = 3.63813 WHERE `guid` = 60386;
+UPDATE `creature` SET `position_x` = 165.435, `position_y` = -407.63, `position_z` = 45.1815, `orientation` = 1.46673 WHERE `guid` = 60388;
+UPDATE `creature` SET `position_x` = 105.457, `position_y` = -328.949, `position_z` = 38.7395, `orientation` = 6.26564 WHERE `guid` = 60390;
+
+-- Frostwolves co2
+UPDATE `creature` SET `position_x` = -848.151, `position_y` = -456.902, `position_z` = 47.3774, `orientation` = 1.04199 WHERE `guid` = 60665;
+UPDATE `creature` SET `position_x` = -1027.55, `position_y` = -399.984, `position_z` = 51.5779, `orientation` = 3.01596 WHERE `guid` = 60355;
+UPDATE `creature` SET `position_x` = -1084.4, `position_y` = -418.69, `position_z` = 53.4691, `orientation` = 5.24979 WHERE `guid` = 60352;
+
+-- Frostwolf horde guards co2
+UPDATE `creature` SET `position_x` = -1211.23, `position_y` = -353.914, `position_z` = 56.4234, `orientation` = 2.44346 WHERE `guid` = 62071;
+UPDATE `creature` SET `position_x` = -1211.23, `position_y` = -353.914, `position_z` = 56.4234, `orientation` = 2.44346 WHERE `guid` = 62072;
+UPDATE `creature` SET `position_x` = -1211.23, `position_y` = -353.914, `position_z` = 56.4234, `orientation` = 2.44346 WHERE `guid` = 62073;
+UPDATE `creature` SET `position_x` = -1211.23, `position_y` = -353.914, `position_z` = 56.4234, `orientation` = 2.44346 WHERE `guid` = 62074;
+
+UPDATE `creature` SET `position_x` = -1207.95, `position_y` = -341.186, `position_z` = 54.2944, `orientation` = 3.56047 WHERE `guid` = 62075;
+UPDATE `creature` SET `position_x` = -1207.95, `position_y` = -341.186, `position_z` = 54.2944, `orientation` = 3.56047 WHERE `guid` = 62076;
+UPDATE `creature` SET `position_x` = -1207.95, `position_y` = -341.186, `position_z` = 54.2944, `orientation` = 3.56047 WHERE `guid` = 62077;
+UPDATE `creature` SET `position_x` = -1207.95, `position_y` = -341.186, `position_z` = 54.2944, `orientation` = 3.56047 WHERE `guid` = 62078;
+
+UPDATE `creature` SET `position_x` = -1271.81, `position_y` = -377.379, `position_z` = 59.8225, `orientation` = 4.86947 WHERE `guid` = 61074;
+UPDATE `creature` SET `position_x` = -1271.81, `position_y` = -377.379, `position_z` = 59.8225, `orientation` = 4.86947 WHERE `guid` = 61438;
+UPDATE `creature` SET `position_x` = -1271.81, `position_y` = -377.379, `position_z` = 59.8225, `orientation` = 4.86947 WHERE `guid` = 61462;
+UPDATE `creature` SET `position_x` = -1271.81, `position_y` = -377.379, `position_z` = 59.8225, `orientation` = 4.86947 WHERE `guid` = 61486;
+
+UPDATE `creature` SET `position_x` = -1277.85, `position_y` = -379.222, `position_z` = 59.8436, `orientation` = 0.261799 WHERE `guid` = 61075;
+UPDATE `creature` SET `position_x` = -1277.85, `position_y` = -379.222, `position_z` = 59.8436, `orientation` = 0.261799 WHERE `guid` = 61439;
+UPDATE `creature` SET `position_x` = -1277.85, `position_y` = -379.222, `position_z` = 59.8436, `orientation` = 0.261799 WHERE `guid` = 61463;
+UPDATE `creature` SET `position_x` = -1277.85, `position_y` = -379.222, `position_z` = 59.8436, `orientation` = 0.261799 WHERE `guid` = 61487;
+
+UPDATE `creature` SET `position_x` = -1272.75, `position_y` = -387.629, `position_z` = 59.8675, `orientation` = 5.20108 WHERE `guid` = 62101;
+UPDATE `creature` SET `position_x` = -1272.75, `position_y` = -387.629, `position_z` = 59.8675, `orientation` = 5.20108 WHERE `guid` = 62102;
+UPDATE `creature` SET `position_x` = -1272.75, `position_y` = -387.629, `position_z` = 59.8675, `orientation` = 5.20108 WHERE `guid` = 62103;
+UPDATE `creature` SET `position_x` = -1272.75, `position_y` = -387.629, `position_z` = 59.8675, `orientation` = 5.20108 WHERE `guid` = 62104;
+
+UPDATE `creature` SET `position_x` = -1326.07, `position_y` = -283.957, `position_z` = 91.3501, `orientation` = 5.51524 WHERE `guid` = 62369;
+UPDATE `creature` SET `position_x` = -1326.07, `position_y` = -283.957, `position_z` = 91.3501, `orientation` = 5.51524 WHERE `guid` = 62370;
+UPDATE `creature` SET `position_x` = -1326.07, `position_y` = -283.957, `position_z` = 91.3501, `orientation` = 5.51524 WHERE `guid` = 62371;
+UPDATE `creature` SET `position_x` = -1326.07, `position_y` = -283.957, `position_z` = 91.3501, `orientation` = 5.51524 WHERE `guid` = 62372;
+
+UPDATE `creature` SET `position_x` = -1335.02, `position_y` = -298.47, `position_z` = 91.2537, `orientation` = 0.471239 WHERE `guid` = 62365;
+UPDATE `creature` SET `position_x` = -1335.02, `position_y` = -298.47, `position_z` = 91.2537, `orientation` = 0.471239 WHERE `guid` = 62366;
+UPDATE `creature` SET `position_x` = -1335.02, `position_y` = -298.47, `position_z` = 91.2537, `orientation` = 0.471239 WHERE `guid` = 62367;
+UPDATE `creature` SET `position_x` = -1335.02, `position_y` = -298.47, `position_z` = 91.2537, `orientation` = 0.471239 WHERE `guid` = 62368;
+
 INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES
 (62477, 3, 0, -1, -1, 1, 1, 0, NULL),
 (62478, 3, 0, -1, -1, 1, 1, 0, NULL),
