@@ -11421,6 +11421,60 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (61026, 161489, 30, 360.38, -527.549, 71.1205, 4.23242, 0, 0, -0.854912, 0.518773, 60, 60, 0, 0, 0, 0, 3, 10),
 (61027, 179945, 30, -1070.53, -617.908, 51.3249, 5.83813, 0, 0, -0.220697, 0.975342, 60, 60, 0, 0, 0, 0, 3, 10);
 
+-- South Dun Baldar Bunker (A1 Tower)
+UPDATE `gameobject` SET `position_x` = 557.227, `position_y` = -86.8521, `position_z` = 62.1767, `orientation` = 6.03884, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.121869, `rotation3` = 0.992546 WHERE `guid` = 60706;
+UPDATE `gameobject` SET `position_x` = 555.848, `position_y` = -84.4151, `position_z` = 64.4397, `orientation` = 3.12412, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.999962, `rotation3` = 0.00873464 WHERE `guid` = 60730;
+UPDATE `gameobject` SET `position_x` = 557.227, `position_y` = -86.8521, `position_z` = 62.1767, `orientation` = 6.03884, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.121869, `rotation3` = 0.992546 WHERE `guid` = 60707;
+UPDATE `gameobject` SET `position_x` = 555.848, `position_y` = -84.4151, `position_z` = 64.4397, `orientation` = 3.12412, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.999962, `rotation3` = 0.00873464 WHERE `guid` = 60731;
+
+-- North Dun Baldar Bunker (A2 Tower)
+-- Fixed object entries from 178927 to 178932 and 179436 to 179440
+UPDATE `gameobject` SET `position_x` = 679.339, `position_y` = -136.468, `position_z` = 73.9626, `orientation` = 4.11898, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.882947, `rotation3` = 0.469473, `id` = 178932 WHERE `guid` = 60708;
+UPDATE `gameobject` SET `position_x` = 677.592, `position_y` = -139.034, `position_z` = 76.2196, `orientation` = 4.29351, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.83867, `rotation3` = 0.54464, `id` = 179440 WHERE `guid` = 60732;
+UPDATE `gameobject` SET `position_x` = 679.339, `position_y` = -136.468, `position_z` = 73.9626, `orientation` = 4.11898, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.882947, `rotation3` = 0.469473 WHERE `guid` = 60709;
+UPDATE `gameobject` SET `position_x` = 677.592, `position_y` = -139.034, `position_z` = 76.2196, `orientation` = 4.29351, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.83867, `rotation3` = 0.54464 WHERE `guid` = 60733;
+
+-- Icewing Bunker (A3 Tower)
+-- Fixed object entries from 178927 to 178947 and 179436 to 179442
+UPDATE `gameobject` SET `position_x` = 208.973, `position_y` = -365.971, `position_z` = 66.7409, `orientation` = 6.03884, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.121869, `rotation3` = 0.992546, `id` = 178947 WHERE `guid` = 60710;
+UPDATE `gameobject` SET `position_x` = 202.541, `position_y` = -361.858, `position_z` = 67.7371, `orientation` = 0.610863, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.300705, `rotation3` = 0.953717, `id` = 179442 WHERE `guid` = 60734;
+UPDATE `gameobject` SET `position_x` = 208.973, `position_y` = -365.971, `position_z` = 66.7409, `orientation` = 6.03884, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.121869, `rotation3` = 0.992546 WHERE `guid` = 60711;
+UPDATE `gameobject` SET `position_x` = 202.541, `position_y` = -361.858, `position_z` = 67.7371, `orientation` = 0.610863, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.300705, `rotation3` = 0.953717 WHERE `guid` = 60735;
+
+-- Stonehearth Bunker (A4 Tower)
+-- Fixed object entries from 178927 to 178948 and 179436 to 179444
+UPDATE `gameobject` SET `position_x` = -156.47, `position_y` = -449.953, `position_z` = 50.6682, `orientation` = 6.03884, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.121869, `rotation3` = 0.992546, `id` = 178948 WHERE `guid` = 60712;
+UPDATE `gameobject` SET `position_x` = -155.832, `position_y` = -449.401, `position_z` = 52.7306, `orientation` = 0.610863, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.300705, `rotation3` = 0.953717, `id` = 179444 WHERE `guid` = 60736;
+UPDATE `gameobject` SET `position_x` = -156.47, `position_y` = -449.953, `position_z` = 50.6682, `orientation` = 6.03884, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.121869, `rotation3` = 0.992546 WHERE `guid` = 60713;
+UPDATE `gameobject` SET `position_x` = -155.832, `position_y` = -449.401, `position_z` = 52.7306, `orientation` = 0.610863, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.300705, `rotation3` = 0.953717 WHERE `guid` = 60737;
+
+-- West Frostwolf Tower (H1 Tower)
+UPDATE `gameobject` SET `position_x` = -1297.79, `position_y` = -266.743, `position_z` = 127.79, `orientation` = 0.0698117, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0348988, `rotation3` = 0.999391 WHERE `guid` = 60720;
+UPDATE `gameobject` SET `position_x` = -1297.87, `position_y` = -266.762, `position_z` = 127.796, `orientation` = 0.0698117, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0348988, `rotation3` = 0.999391 WHERE `guid` = 60728;
+UPDATE `gameobject` SET `position_x` = -1297.79, `position_y` = -266.743, `position_z` = 127.79, `orientation` = 0.0698117, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0348988, `rotation3` = 0.999391 WHERE `guid` = 60721;
+UPDATE `gameobject` SET `position_x` = -1297.87, `position_y` = -266.762, `position_z` = 127.796, `orientation` = 0.0698117, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0348988, `rotation3` = 0.999391 WHERE `guid` = 60729;
+
+-- East Frostwolf Tower (H2 Tower)
+-- Fixed object entries from 178955 to 178956 and 179446 to 179450
+UPDATE `gameobject` SET `position_x` = -1302.73, `position_y` = -316.63, `position_z` = 127.503, `orientation` = 0.122173, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0610485, `rotation3` = 0.998135, `id` = 178956 WHERE `guid` = 60718;
+UPDATE `gameobject` SET `position_x` = -1302.84, `position_y` = -316.582, `position_z` = 127.516, `orientation` = 0.122173, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0610485, `rotation3` = 0.998135, `id` = 179450 WHERE `guid` = 60726;
+UPDATE `gameobject` SET `position_x` = -1302.73, `position_y` = -316.63, `position_z` = 127.503, `orientation` = 0.122173, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0610485, `rotation3` = 0.998135 WHERE `guid` = 60719;
+UPDATE `gameobject` SET `position_x` = -1302.84, `position_y` = -316.582, `position_z` = 127.516, `orientation` = 0.122173, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0610485, `rotation3` = 0.998135 WHERE `guid` = 60727;
+
+-- Tower Point (H3 Tower)
+-- Fixed object entries from 178955 to 178957 and 179446 to 179454
+UPDATE `gameobject` SET `position_x` = -768.199, `position_y` = -363.105, `position_z` = 104.537, `orientation` = 0.104719, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0523357, `rotation3` = 0.99863, `id` = 178957 WHERE `guid` = 60716;
+UPDATE `gameobject` SET `position_x` = -768.154, `position_y` = -363.102, `position_z` = 104.535, `orientation` = 0.122173, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0610485, `rotation3` = 0.998135, `id` = 179454 WHERE `guid` = 60724;
+UPDATE `gameobject` SET `position_x` = -768.199, `position_y` = -363.105, `position_z` = 104.537, `orientation` = 0.104719, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0523357, `rotation3` = 0.99863 WHERE `guid` = 60717;
+UPDATE `gameobject` SET `position_x` = -768.154, `position_y` = -363.102, `position_z` = 104.535, `orientation` = 0.122173, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.0610485, `rotation3` = 0.998135 WHERE `guid` = 60725;
+
+-- Iceblood Tower (H4 Tower)
+-- Fixed object entries from 178955 to 178958 and 179446 to 179458
+UPDATE `gameobject` SET `position_x` = -572.329, `position_y` = -262.476, `position_z` = 88.6496, `orientation` = 5.70723, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.284015, `rotation3` = 0.95882, `id` = 178958 WHERE `guid` = 60714;
+UPDATE `gameobject` SET `position_x` = -572.205, `position_y` = -262.476, `position_z` = 88.6647, `orientation` = 5.68977, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.292372, `rotation3` = 0.956305, `id` = 179458 WHERE `guid` = 60722;
+UPDATE `gameobject` SET `position_x` = -572.329, `position_y` = -262.476, `position_z` = 88.6496, `orientation` = 5.70723, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.284015, `rotation3` = 0.95882 WHERE `guid` = 60715;
+UPDATE `gameobject` SET `position_x` = -572.205, `position_y` = -262.476, `position_z` = 88.6647, `orientation` = 5.68977, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.292372, `rotation3` = 0.956305 WHERE `guid` = 60723;
+
 INSERT INTO `gameobject_battleground` (`guid`, `event1`, `event2`) VALUES
 (60588, 50, 2),
 (60589, 50, 2),
