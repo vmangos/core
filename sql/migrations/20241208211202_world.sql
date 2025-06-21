@@ -899,6 +899,13 @@ DELETE FROM `npc_gossip` WHERE `npc_guid` IN (42301, 53646, 86167, 86184, 89359,
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Gaffer Jacks Requires Fishing 30
 UPDATE `quest_template` SET `RequiredSkillValue` = 30 WHERE `entry`= 1579;
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Events list for Ancient Equine Spirit
+UPDATE `creature_template` SET `auras` = '17327', `ai_name` = 'EventAI' WHERE `entry` = 14566;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(1456601, 14566, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1456601, 0, 0, 'Ancient Equine Spirit - Talk on Spawn');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1456601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9763, 0, 0, 0, 0, 0, 0, 0, 0, 'Ancient Equine Spirit - Talk');
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
