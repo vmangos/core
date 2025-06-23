@@ -8,7 +8,7 @@
 ## npc_narm_faulk
 ######*/
 
-#define SAY_HEAL 6177
+#define SAY_HEAL 2281
 
 struct npc_narm_faulkAI : ScriptedAI
 {
