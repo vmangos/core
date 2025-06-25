@@ -906,6 +906,26 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 (1456601, 14566, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1456601, 0, 0, 'Ancient Equine Spirit - Talk on Spawn');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1456601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9763, 0, 0, 0, 0, 0, 0, 0, 0, 'Ancient Equine Spirit - Talk');
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Events list for Summoned Voidwalker
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 5676;
+DELETE FROM `creature_ai_events` WHERE `creature_id`=5676;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(567601, 5676, 0, 11, 0, 100, 0, 0, 0, 0, 0, 567601, 0, 0, 'Summoned Voidwalker - Start Script on Spawn'),
+(567602, 5676, 0, 2, 0, 100, 0, 30, 0, 1, 1, 567602, 0, 0, 'Summoned Voidwalker - Cast Consuming Rage at 30% HP');
+DELETE FROM `creature_ai_scripts` WHERE `id`=567601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(567601, 0, 0, 39, 567601, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Voidwalker - Start Script on Spawn');
+DELETE FROM `generic_scripts` WHERE `id`=567601;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(567601, 1, 0, 15, 7741, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Voidwalker - Cast Spell'),
+(567601, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1986, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Voidwalker - Talk'),
+(567601, 1, 3, 81, 42881, 30, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Voidwalker - Despawn GameObject'),
+(567601, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1987, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Voidwalker - Talk'),
+(567601, 7, 0, 26, 0, 0, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Voidwalker - Start Attack');
+DELETE FROM `creature_ai_scripts` WHERE `id`=567602;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(567602, 0, 0, 15, 7750, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoned Voidwalker - Cast Consuming Rage');
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
