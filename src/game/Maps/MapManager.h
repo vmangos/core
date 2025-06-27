@@ -66,6 +66,8 @@ struct InstantiatedContinentBoundary
 
 inline InstantiatedContinentBoundary MakeBoundary(float const* pts, int count)
 {
+    assert(pts[1] < pts[count * 2 - 1] && "Boundary must be defined from west to east (first X < last X)");
+
     float minX = pts[0], maxX = pts[0];
     float minY = pts[1], maxY = pts[1];
 
