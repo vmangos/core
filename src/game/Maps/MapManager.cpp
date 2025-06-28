@@ -644,7 +644,7 @@ static float const topNorthSouthLimit[] = { 2032.048340f, -6927.750000f,
                                             1577.923706f, 1293.419922f,
                                             1458.520264f, 1727.373291f,
                                             1591.916138f, 3728.139404f};
-static const InstantiatedContinentBoundary topNorthSouthBoundary(MakeBoundary(topNorthSouthLimit, sizeof(topNorthSouthLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const topNorthSouthBoundary(MakeBoundary(topNorthSouthLimit, sizeof(topNorthSouthLimit) / (2 * sizeof(float))));
 
 static float const ironforgeAreaSouthLimit[] = {-5806.26f, -5864.11f,
                                                 -5989.37f, -4312.29f,
@@ -657,7 +657,7 @@ static float const ironforgeAreaSouthLimit[] = {-5806.26f, -5864.11f,
                                                 -6366.68f, -730.10f,
                                                 -7472.04f, -391.88f,
                                                 -7491.33f, 3093.74f};
-static const InstantiatedContinentBoundary ironforgeAreaSouthBoundary(MakeBoundary(ironforgeAreaSouthLimit, sizeof(ironforgeAreaSouthLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const ironforgeAreaSouthBoundary(MakeBoundary(ironforgeAreaSouthLimit, sizeof(ironforgeAreaSouthLimit) / (2 * sizeof(float))));
 
 static float const stormwindAreaNorthLimit[] = {-12863.23f, -4798.42f,
                                                 -13006.40f, -1622.80f,
@@ -675,7 +675,7 @@ static float const stormwindAreaNorthLimit[] = {-12863.23f, -4798.42f,
                                                 -8638.00f, 169.00f,
                                                 -8075.00f, -179.00f,
                                                 -8004.25f, 3714.11f};
-static const InstantiatedContinentBoundary stormwindAreaNorthBoundary(MakeBoundary(stormwindAreaNorthLimit, sizeof(stormwindAreaNorthLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const stormwindAreaNorthBoundary(MakeBoundary(stormwindAreaNorthLimit, sizeof(stormwindAreaNorthLimit) / (2 * sizeof(float))));
 
 static float const stormwindAreaSouthLimit[] = {-7910.859375f, -5855.578125f,
                                                 -7949.329590f, -4081.389404f,
@@ -697,7 +697,7 @@ static float const stormwindAreaSouthLimit[] = {-7910.859375f, -5855.578125f,
                                                 -9796.953125f, 839.069580f,
                                                 -9525.699219f, 910.132568f,
                                                 -8725.337891f, 3535.624023f};
-static const InstantiatedContinentBoundary stormwindAreaSouthBoundary(MakeBoundary(stormwindAreaSouthLimit, sizeof(stormwindAreaSouthLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const stormwindAreaSouthBoundary(MakeBoundary(stormwindAreaSouthLimit, sizeof(stormwindAreaSouthLimit) / (2 * sizeof(float))));
 
 static float const northMiddleLimit[] = {1368.00f, -8530.00f,
                                         1497.59f, -6376.56f,
@@ -732,7 +732,7 @@ static float const northMiddleLimit[] = {1368.00f, -8530.00f,
                                         -2432.00f, 1338.00f,
                                         -2401.00f, 2365.00f,
                                         -2280.00f, 4054.00f};
-static const InstantiatedContinentBoundary northMiddleBoundary(MakeBoundary(northMiddleLimit, sizeof(northMiddleLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const northMiddleBoundary(MakeBoundary(northMiddleLimit, sizeof(northMiddleLimit) / (2 * sizeof(float))));
 
 static float const durotarSouthLimit[] = {-2243.00f, -6046.00f,
                                         -1387.00f, -4674.00f,
@@ -755,7 +755,7 @@ static float const durotarSouthLimit[] = {-2243.00f, -6046.00f,
                                         1762.00f, -3746.00f,
                                         2225.00f, -3596.00f,
                                         2755.00f, -3766.00f};
-static const InstantiatedContinentBoundary durotarSouthBoundary(MakeBoundary(durotarSouthLimit, sizeof(durotarSouthLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const durotarSouthBoundary(MakeBoundary(durotarSouthLimit, sizeof(durotarSouthLimit) / (2 * sizeof(float))));
 
 static float const valleyoftrialsSouthLimit[] = {-521.00f, -4582.00f,
                                                 -661.00f, -4541.00f,
@@ -764,7 +764,7 @@ static float const valleyoftrialsSouthLimit[] = {-521.00f, -4582.00f,
                                                 -965.00f, -4290.00f,
                                                 -774.00f, -3992.00f,
                                                 -324.00f, -3869.00f};
-static const InstantiatedContinentBoundary valleyoftrialsSouthBoundary(MakeBoundary(valleyoftrialsSouthLimit, sizeof(valleyoftrialsSouthLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const valleyoftrialsSouthBoundary(MakeBoundary(valleyoftrialsSouthLimit, sizeof(valleyoftrialsSouthLimit) / (2 * sizeof(float))));
 
 static float const middleToSouthLimit[] = {- 5437.00f, -5863.00f,
                                             -5459.449707f, -4920.155273f, -5246.920898f, -3339.139893f, -5248.286621f, -3034.536377f, -5102.913574f, -2647.062744f, -4824.16f, -2310.11f, // Tanaris
@@ -774,7 +774,7 @@ static float const middleToSouthLimit[] = {- 5437.00f, -5863.00f,
                                             -2826.438965f, 403.824738f, -2344.124023f, 1756.164307f, // Mulgore
                                             -2475.933105f, 3199.568359f, -2402.01f, 4255.70f // Desolace
 };
-static const InstantiatedContinentBoundary middleToSouthBoundary(MakeBoundary(middleToSouthLimit, sizeof(middleToSouthLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const middleToSouthBoundary(MakeBoundary(middleToSouthLimit, sizeof(middleToSouthLimit) / (2 * sizeof(float))));
 
 static float const orgrimmarSouthLimit[] = {2219.1562f, -4854.3330f,
                                             1979.7647f, -4883.4585f,
@@ -792,7 +792,7 @@ static float const orgrimmarSouthLimit[] = {2219.1562f, -4854.3330f,
                                             1735.6906f, -3834.2417f,
                                             1944.4298f, -3855.2583f,
                                             2132.5076f, -3912.2478f};
-static const InstantiatedContinentBoundary orgrimmarSouthBoundary(MakeBoundary(orgrimmarSouthLimit, sizeof(orgrimmarSouthLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const orgrimmarSouthBoundary(MakeBoundary(orgrimmarSouthLimit, sizeof(orgrimmarSouthLimit) / (2 * sizeof(float))));
 
 static float const feralasThousandNeedlesSouthLimit[] = {-6495.4995f, -4711.981f,
                                                          -6674.9995f, -4515.0019f,
@@ -813,7 +813,7 @@ static float const feralasThousandNeedlesSouthLimit[] = {-6495.4995f, -4711.981f
                                                          -6973.8608f, 3077.0281f,
                                                          -7068.7241f, 4376.2304f,
                                                          -7142.1211f, 4808.4331f};
-static const InstantiatedContinentBoundary feralasThousandNeedlesSouthBoundary(MakeBoundary(feralasThousandNeedlesSouthLimit, sizeof(feralasThousandNeedlesSouthLimit) / (2 * sizeof(float))));
+static InstantiatedContinentBoundary const feralasThousandNeedlesSouthBoundary(MakeBoundary(feralasThousandNeedlesSouthLimit, sizeof(feralasThousandNeedlesSouthLimit) / (2 * sizeof(float))));
 
 bool IsNorthTo(float x, float y, InstantiatedContinentBoundary const& icb)
 {
