@@ -907,6 +907,9 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1456601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9763, 0, 0, 0, 0, 0, 0, 0, 0, 'Ancient Equine Spirit - Talk');
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Add Missing Aura
+UPDATE `creature_template` SET `auras` = '17327' WHERE `entry` = 14306
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Two Cliff Walker Paths (credit cmangos)
 -- 35158
 UPDATE `creature` SET `position_x` = 3516.5552, `position_y` = -4615.619, `position_z` = 102.81993, `orientation` = 5.8294 WHERE `guid`= 35158;
