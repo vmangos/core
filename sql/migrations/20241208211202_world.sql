@@ -908,7 +908,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 (1456601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9763, 0, 0, 0, 0, 0, 0, 0, 0, 'Ancient Equine Spirit - Talk');
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Missing Aura
-UPDATE `creature_template` SET `auras` = '17327' WHERE `entry` = 14306
+UPDATE `creature_template` SET `auras` = '17327' WHERE `entry` = 14306;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Two Cliff Walker Paths (credit cmangos)
 -- 35158
