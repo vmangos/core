@@ -11421,6 +11421,69 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (61026, 161489, 30, 360.38, -527.549, 71.1205, 4.23242, 0, 0, -0.854912, 0.518773, 60, 60, 0, 0, 0, 0, 3, 10),
 (61027, 179945, 30, -1070.53, -617.908, 51.3249, 5.83813, 0, 0, -0.220697, 0.975342, 60, 60, 0, 0, 0, 0, 3, 10);
 
+-- Aid GY Flag Updates
+UPDATE `gameobject` SET `id`=179465, `position_x`=638.592, `position_y`=-32.422, `position_z`=46.0608, `orientation`=4.66003, `rotation0`=0, `rotation1`=0, `rotation2`=-0.725374, `rotation3`=0.688355, `patch_min`=6 WHERE `guid`=60738;
+UPDATE `gameobject_template` SET `flags`=0 WHERE `entry`=179465;
+UPDATE `gameobject` SET `id`=180100, `position_x`=638.592, `position_y`=-32.422, `position_z`=46.0608, `orientation`=4.66003, `rotation0`=0, `rotation1`=0, `rotation2`=-0.725374, `rotation3`=0.688355, `patch_min`=6 WHERE `guid`=60739;
+UPDATE `gameobject` SET `id`=179467, `position_x`=638.606, `position_y`=-32.1506, `position_z`=46.0993, `orientation`=4.67748, `rotation0`=0, `rotation1`=0, `rotation2`=-0.719339, `rotation3`=0.694659, `patch_min`=6 WHERE `guid`=60752;
+UPDATE `gameobject` SET `id`=180101, `position_x`=638.606, `position_y`=-32.1506, `position_z`=46.0993, `orientation`=4.67748, `rotation0`=0, `rotation1`=0, `rotation2`=-0.719339, `rotation3`=0.694659, `patch_min`=6 WHERE `guid`=60753;
+UPDATE `gameobject` SET `id`=179466, `position_x`=638.657, `position_y`=-32.2294, `position_z`=46.0904, `orientation`=4.66003, `rotation0`=0, `rotation1`=0, `rotation2`=-0.725374, `rotation3`=0.688355, `patch_min`=6 WHERE `guid`=60766;
+UPDATE `gameobject_template` SET `flags`=0 WHERE `entry`=179468;
+UPDATE `gameobject` SET `id`=180102, `position_x`=638.657, `position_y`=-32.2294, `position_z`=46.0904, `orientation`=4.66003, `rotation0`=0, `rotation1`=0, `rotation2`=-0.725374, `rotation3`=0.688355, `patch_min`=6 WHERE `guid`=60767;
+UPDATE `gameobject` SET `id`=179468, `position_x`=638.479, `position_y`=-31.2174, `position_z`=46.2417, `orientation`=1.62316, `rotation0`=0, `rotation1`=0, `rotation2`=0.725374, `rotation3`=0.688355, `patch_min`=6 WHERE `guid`=60780;
+UPDATE `gameobject` SET `id`=180102, `position_x`=638.479, `position_y`=-31.2174, `position_z`=46.2417, `orientation`=1.62316, `rotation0`=0, `rotation1`=0, `rotation2`=0.725374, `rotation3`=0.688355, `patch_min`=6 WHERE `guid`=60781;
+
+-- SP GY Flag Updates
+UPDATE `gameobject` SET `id`=178389, `position_x`=669.007, `position_y`=-294.078, `position_z`=30.2909, `orientation`=2.77507, `rotation0`=0, `rotation1`=0, `rotation2`=0.983254, `rotation3`=0.182238, `patch_min`=6 WHERE `guid`=60740;
+UPDATE `gameobject` SET `id`=180100, `position_x`=669.007, `position_y`=-294.078, `position_z`=30.2909, `orientation`=2.77507, `rotation0`=0, `rotation1`=0, `rotation2`=0.983254, `rotation3`=0.182238, `patch_min`=6 WHERE `guid`=60741;
+UPDATE `gameobject` SET `id`=178388, `position_x`=669.317, `position_y`=-294.055, `position_z`=30.2897, `orientation`=5.91667, `rotation0`=0, `rotation1`=0, `rotation2`=-0.182235, `rotation3`=0.983255, `patch_min`=6 WHERE `guid`=60754;
+UPDATE `gameobject_template` SET `flags`=0 WHERE  `entry`=178388;
+UPDATE `gameobject` SET `id`=180101, `position_x`=669.317, `position_y`=-294.055, `position_z`=30.2897, `orientation`=5.91667, `rotation0`=0, `rotation1`=0, `rotation2`=-0.182235, `rotation3`=0.983255, `patch_min`=6 WHERE `guid`=60755;
+UPDATE `gameobject` SET `id`=179286, `position_x`=669.032, `position_y`=-294.06, `position_z`=30.2909, `orientation`=2.77507, `rotation0`=0, `rotation1`=0, `rotation2`=0.983254, `rotation3`=0.182238, `patch_min`=6 WHERE `guid`=60768;
+UPDATE `gameobject` SET `id`=180102, `position_x`=669.032, `position_y`=-294.06, `position_z`=30.2909, `orientation`=2.77507, `rotation0`=0, `rotation1`=0, `rotation2`=0.983254, `rotation3`=0.182238, `patch_min`=6 WHERE `guid`=60769;
+UPDATE `gameobject` SET `id`=179287, `position_x`=669.295, `position_y`=-294.038, `position_z`=30.2897, `orientation`=5.91667, `rotation0`=0, `rotation1`=0, `rotation2`=-0.182235, `rotation3`=0.983255, `patch_min`=6 WHERE `guid`=60782;
+UPDATE `gameobject` SET `id`=180102, `position_x`=669.295, `position_y`=-294.038, `position_z`=30.2897, `orientation`=5.91667, `rotation0`=0, `rotation1`=0, `rotation2`=-0.182235, `rotation3`=0.983255, `patch_min`=6 WHERE `guid`=60783;
+
+-- SH GY Flag Updates
+UPDATE `gameobject` SET `id`=179284, `position_x`=77.5044, `position_y`=-404.587, `position_z`=46.8242, `orientation`=2.28638, `rotation0`=0, `rotation1`=0, `rotation2`=0.909961, `rotation3`=0.414694, `patch_min`=6 WHERE `guid`=60742;
+UPDATE `gameobject` SET `id`=180100, `position_x`=77.5044, `position_y`=-404.587, `position_z`=46.8242, `orientation`=2.28638, `rotation0`=0, `rotation1`=0, `rotation2`=0.909961, `rotation3`=0.414694, `patch_min`=6 WHERE `guid`=60743;
+UPDATE `gameobject` SET `id`=179285, `position_x`=77.7979, `position_y`=-404.696, `position_z`=46.9128, `orientation`=5.42797, `rotation0`=0, `rotation1`=0, `rotation2`=-0.414693, `rotation3`=0.909961, `patch_min`=6 WHERE `guid`=60756;
+UPDATE `gameobject` SET `id`=180101, `position_x`=77.7979, `position_y`=-404.696, `position_z`=46.9128, `orientation`=5.42797, `rotation0`=0, `rotation1`=0, `rotation2`=-0.414693, `rotation3`=0.909961, `patch_min`=6 WHERE `guid`=60757;
+UPDATE `gameobject` SET `id`=179308, `position_x`=78.3855, `position_y`=-405.451, `position_z`=47.2096, `orientation`=5.42797, `rotation0`=0, `rotation1`=0, `rotation2`=-0.414693, `rotation3`=0.909961, `patch_min`=6 WHERE `guid`=60770;
+UPDATE `gameobject` SET `id`=180102, `position_x`=78.3855, `position_y`=-405.451, `position_z`=47.2096, `orientation`=5.42797, `rotation0`=0, `rotation1`=0, `rotation2`=-0.414693, `rotation3`=0.909961, `patch_min`=6 WHERE `guid`=60771;
+UPDATE `gameobject` SET `id`=179310, `position_x`=77.8013, `position_y`=-404.7, `position_z`=46.9147, `orientation`=5.41052, `rotation0`=0, `rotation1`=0, `rotation2`=-0.422618, `rotation3`=0.906308, `patch_min`=6 WHERE `guid`=60784;
+UPDATE `gameobject` SET `id`=180102, `position_x`=77.8013, `position_y`=-404.7, `position_z`=46.9147, `orientation`=5.41052, `rotation0`=0, `rotation1`=0, `rotation2`=-0.422618, `rotation3`=0.906308, `patch_min`=6 WHERE `guid`=60785;
+
+-- IB GY Flag Updates
+UPDATE `gameobject` SET `id`=179481, `position_x`=-612.914, `position_y`=-396.838, `position_z`=60.8584, `orientation`=3.10665, `rotation0`=0, `rotation1`=0, `rotation2`=0.999847, `rotation3`=0.0174693, `patch_min`=6 WHERE `guid`=60746;
+UPDATE `gameobject` SET `id`=180100, `position_x`=-612.914, `position_y`=-396.838, `position_z`=60.8584, `orientation`=3.10665, `rotation0`=0, `rotation1`=0, `rotation2`=0.999847, `rotation3`=0.0174693, `patch_min`=6 WHERE `guid`=60747;
+UPDATE `gameobject` SET `id`=179483, `position_x`=-612.672, `position_y`=-396.693, `position_z`=60.8584, `orientation`=3.08918, `rotation0`=0, `rotation1`=0, `rotation2`=0.999657, `rotation3`=0.0262016, `patch_min`=6 WHERE `guid`=60760;
+UPDATE `gameobject` SET `id`=180101, `position_x`=-612.672, `position_y`=-396.693, `position_z`=60.8584, `orientation`=3.08918, `rotation0`=0, `rotation1`=0, `rotation2`=0.999657, `rotation3`=0.0262016, `patch_min`=6 WHERE `guid`=60761;
+UPDATE `gameobject` SET `id`=179482, `position_x`=-611.523, `position_y`=-396.819, `position_z`=60.8584, `orientation`=6.24828, `rotation0`=0, `rotation1`=0, `rotation2`=-0.0174522, `rotation3`=0.999848, `patch_min`=6 WHERE `guid`=60774;
+UPDATE `gameobject` SET `id`=180102, `position_x`=-611.523, `position_y`=-396.819, `position_z`=60.8584, `orientation`=6.24828, `rotation0`=0, `rotation1`=0, `rotation2`=-0.0174522, `rotation3`=0.999848, `patch_min`=6 WHERE `guid`=60775;
+UPDATE `gameobject` SET `id`=179484, `position_x`=-612.661, `position_y`=-396.699, `position_z`=60.8584, `orientation`=6.24828, `rotation0`=0, `rotation1`=0, `rotation2`=-0.0174522, `rotation3`=0.999848, `patch_min`=6 WHERE `guid`=60788;
+UPDATE `gameobject` SET `id`=180102, `position_x`=-612.661, `position_y`=-396.699, `position_z`=60.8584, `orientation`=6.24828, `rotation0`=0, `rotation1`=0, `rotation2`=-0.0174522, `rotation3`=0.999848, `patch_min`=6 WHERE `guid`=60789;
+
+-- FW GY Flag Updates
+UPDATE `gameobject` SET `id`=178394, `position_x`=-1082.43, `position_y`=-346.792, `position_z`=54.9265, `orientation`=4.76475, `rotation0`=0, `rotation1`=0, `rotation2`=-0.688354, `rotation3`=0.725374, `patch_min`=6 WHERE `guid`=60748;
+UPDATE `gameobject` SET `id`=180100, `position_x`=-1082.43, `position_y`=-346.792, `position_z`=54.9265, `orientation`=4.76475, `rotation0`=0, `rotation1`=0, `rotation2`=-0.688354, `rotation3`=0.725374, `patch_min`=6 WHERE `guid`=60749;
+UPDATE `gameobject` SET `id`=178393, `position_x`=-1082.53, `position_y`=-346.567, `position_z`=54.9771, `orientation`=4.72984, `rotation0`=0, `rotation1`=0, `rotation2`=-0.700909, `rotation3`=0.713251, `patch_min`=6 WHERE `guid`=60762;
+UPDATE `gameobject` SET `id`=180101, `position_x`=-1082.53, `position_y`=-346.567, `position_z`=54.9771, `orientation`=4.72984, `rotation0`=0, `rotation1`=0, `rotation2`=-0.700909, `rotation3`=0.713251, `patch_min`=6 WHERE `guid`=60763;
+UPDATE `gameobject` SET `id`=179304, `position_x`=-1082.54, `position_y`=-346.567, `position_z`=54.9772, `orientation`=4.72984, `rotation0`=0, `rotation1`=0, `rotation2`=-0.700909, `rotation3`=0.713251, `patch_min`=6 WHERE `guid`=60776;
+UPDATE `gameobject` SET `id`=180102, `position_x`=-1082.54, `position_y`=-346.567, `position_z`=54.9772, `orientation`=4.72984, `rotation0`=0, `rotation1`=0, `rotation2`=-0.700909, `rotation3`=0.713251, `patch_min`=6 WHERE `guid`=60777;
+UPDATE `gameobject` SET `id`=179305, `position_x`=-1082.45, `position_y`=-346.823, `position_z`=54.9219, `orientation`=4.7473, `rotation0`=0, `rotation1`=0, `rotation2`=-0.694658, `rotation3`=0.71934, `patch_min`=6 WHERE `guid`=60790;
+UPDATE `gameobject` SET `id`=180102, `position_x`=-1082.45, `position_y`=-346.823, `position_z`=54.9219, `orientation`=4.7473, `rotation0`=0, `rotation1`=0, `rotation2`=-0.694658, `rotation3`=0.71934, `patch_min`=6 WHERE `guid`=60791;
+
+-- RH GY Flag Updates
+UPDATE `gameobject` SET `id`=179470, `position_x`=-1402.21, `position_y`=-307.431, `position_z`=89.4424, `orientation`=0.191985, `rotation0`=0, `rotation1`=0, `rotation2`=0.0958452, `rotation3`=0.995396, `patch_min`=6 WHERE `guid`=60750;
+UPDATE `gameobject` SET `id`=180100, `position_x`=-1402.21, `position_y`=-307.431, `position_z`=89.4424, `orientation`=0.191985, `rotation0`=0, `rotation1`=0, `rotation2`=0.0958452, `rotation3`=0.995396, `patch_min`=6 WHERE `guid`=60751;
+UPDATE `gameobject` SET `id`=179472, `position_x`=-1402.19, `position_y`=-307.467, `position_z`=89.4419, `orientation`=0.191985, `rotation0`=0, `rotation1`=0, `rotation2`=0.0958452, `rotation3`=0.995396, `patch_min`=6 WHERE `guid`=60764;
+UPDATE `gameobject` SET `id`=180101, `position_x`=-1402.19, `position_y`=-307.467, `position_z`=89.4419, `orientation`=0.191985, `rotation0`=0, `rotation1`=0, `rotation2`=0.0958452, `rotation3`=0.995396, `patch_min`=6 WHERE `guid`=60765;
+UPDATE `gameobject` SET `id`=179471, `position_x`=-1402.28, `position_y`=-307.38, `position_z`=89.442, `orientation`=0.191985, `rotation0`=0, `rotation1`=0, `rotation2`=0.0958452, `rotation3`=0.995396, `patch_min`=6 WHERE `guid`=60778;
+UPDATE `gameobject` SET `id`=180102, `position_x`=-1402.28, `position_y`=-307.38, `position_z`=89.442, `orientation`=0.191985, `rotation0`=0, `rotation1`=0, `rotation2`=0.0958452, `rotation3`=0.995396, `patch_min`=6 WHERE `guid`=60779;
+UPDATE `gameobject` SET `id`=179473, `position_x`=-1402.18, `position_y`=-307.306, `position_z`=89.447, `orientation`=0.191985, `rotation0`=0, `rotation1`=0, `rotation2`=0.0958452, `rotation3`=0.995396, `patch_min`=6 WHERE `guid`=60792;
+UPDATE `gameobject` SET `id`=180102, `position_x`=-1402.18, `position_y`=-307.306, `position_z`=89.447, `orientation`=0.191985, `rotation0`=0, `rotation1`=0, `rotation2`=0.0958452, `rotation3`=0.995396, `patch_min`=6 WHERE `guid`=60793;
+
 -- South Dun Baldar Bunker banner (A1 Tower)
 UPDATE `gameobject` SET `position_x` = 557.227, `position_y` = -86.8521, `position_z` = 62.1767, `orientation` = 6.03884, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.121869, `rotation3` = 0.992546 WHERE `guid` = 60706;
 UPDATE `gameobject` SET `position_x` = 555.848, `position_y` = -84.4151, `position_z` = 64.4397, `orientation` = 3.12412, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.999962, `rotation3` = 0.00873464 WHERE `guid` = 60730;
