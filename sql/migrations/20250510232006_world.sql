@@ -12511,123 +12511,523 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (60973, 2),
 (60974, 2);
 
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES 
-(60127, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60128, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60129, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60130, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60131, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60132, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60133, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60134, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60135, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60136, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60137, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60139, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60140, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60141, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60142, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60143, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60144, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60145, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60146, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60147, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60148, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60149, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60150, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60151, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60152, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60153, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60154, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60155, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60156, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60157, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60158, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60159, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60160, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60161, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60162, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60163, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60164, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60165, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60166, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60167, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60168, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60169, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60170, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60171, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60172, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60173, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60174, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60175, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60176, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60177, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60178, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60179, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60180, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60181, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60182, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60183, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60184, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60185, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60186, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60187, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60188, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60189, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60190, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60191, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60192, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60193, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60194, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60195, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60196, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60197, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60198, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60199, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60200, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60976, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60977, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60978, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60979, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60980, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60981, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60982, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60983, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60984, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60985, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60986, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60987, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60988, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60989, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60990, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60991, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60992, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60993, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60994, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60995, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60996, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60997, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60998, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(60999, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61000, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61001, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61002, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61003, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61004, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61005, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61006, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61007, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61008, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61009, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61010, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61011, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61012, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61013, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61014, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61015, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61016, 1334, 0, 'AV Mining / Herbs', 0, 3, 10),
-(61017, 1334, 0, 'AV Mining / Herbs', 0, 3, 10);
+-- Pooling for mining nodes in Alterac Valley
+DELETE FROM `gameobject_battleground` WHERE `guid` IN (SELECT `guid` FROM `gameobject` WHERE `map` = 30 AND `id` IN (324, 1734, 2040, 2047, 175404));
+DELETE FROM `pool_gameobject` WHERE `guid` IN (SELECT `guid` FROM `gameobject` WHERE `map` = 30 AND `id` IN (324, 1734, 2040, 2047, 175404));
+DELETE FROM `gameobject` WHERE `map` = 30 AND `id` IN (324, 1734, 2040, 2047, 175404);
+UPDATE `pool_gameobject` SET `description` = 'Mining nodes in Alterac Valley' WHERE `pool_entry` = 1334;
+UPDATE `pool_template` SET `description` = 'Mining nodes in Alterac Valley' WHERE  `entry` = 1334;
 
+-- Gold / Mithril / Truesilver
+-- Wildpaw Cavern
+SET @GGUID = 5599;
+SET @PTEMPLATE = 3554;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, 1734, 30, -1675.41, -418.78, 44.5371, 4.50295, 0, 0, -0.777145, 0.629321, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+1, 1734, 30, -1622.11, -441.983, 82.2887, 2.53072, 0, 0, 0.953716, 0.300708, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+2, 1734, 30, -1534.55, -353.013, 65.7947, 1.67551, 0, 0, 0.743144, 0.669131, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+3, 1734, 30, -1482.01, -480.585, 69.4501, 2.98451, 0, 0, 0, 1, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+4, 1734, 30, -1575.25, -498.691, 53.5541, 2.35619, 0, 0, 0.92388, 0.382683, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+5, 2040, 30, -1675.41, -418.78, 44.5371, 4.50295, 0, 0, -0.777145, 0.629321, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+6, 2040, 30, -1622.11, -441.983, 82.2887, 2.53072, 0, 0, 0.953716, 0.300708, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+7, 2040, 30, -1534.55, -353.013, 65.7947, 1.67551, 0, 0, 0.743144, 0.669131, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+8, 2040, 30, -1482.01, -480.585, 69.4501, 2.98451, 0, 0, 0, 1, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+9, 2040, 30, -1575.25, -498.691, 53.5541, 2.35619, 0, 0, 0.92388, 0.382683, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+10, 2047, 30, -1675.41, -418.78, 44.5371, 4.50295, 0, 0, -0.777145, 0.629321, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+11, 2047, 30, -1622.11, -441.983, 82.2887, 2.53072, 0, 0, 0.953716, 0.300708, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+12, 2047, 30, -1534.55, -353.013, 65.7947, 1.67551, 0, 0, 0.743144, 0.669131, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+13, 2047, 30, -1482.01, -480.585, 69.4501, 2.98451, 0, 0, 0, 1, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+14, 2047, 30, -1575.25, -498.691, 53.5541, 2.35619, 0, 0, 0.92388, 0.382683, 600, 2700, 100, 1, 0, 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+0, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+1, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+2, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+3, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+4, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 0, 3, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, @PTEMPLATE+0, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+1, @PTEMPLATE+1, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+2, @PTEMPLATE+2, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+3, @PTEMPLATE+3, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+4, @PTEMPLATE+4, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+5, @PTEMPLATE+0, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+6, @PTEMPLATE+1, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+7, @PTEMPLATE+2, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+8, @PTEMPLATE+3, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+9, @PTEMPLATE+4, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+10, @PTEMPLATE+0, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+11, @PTEMPLATE+1, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+12, @PTEMPLATE+2, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+13, @PTEMPLATE+3, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+14, @PTEMPLATE+4, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Wildpaw Cavern - Alterac Valley', 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+5, 3, 'Wildpaw Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit (Master Pool)', 0, 0, 3, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+0, @PTEMPLATE+5, 0, 'Wildpaw Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+1, @PTEMPLATE+5, 0, 'Wildpaw Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+2, @PTEMPLATE+5, 0, 'Wildpaw Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+3, @PTEMPLATE+5, 0, 'Wildpaw Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+4, @PTEMPLATE+5, 0, 'Wildpaw Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+-- Icewing Cavern
+SET @GGUID = 6295;
+SET @PTEMPLATE = 3589;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, 1734, 30, -10.4209, 26.0035, 18.1858, 0.523598, 0, 0, 0.258819, 0.965926, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+1, 1734, 30, 4.6925, 178.257, 10.9804, 1.83259, 0, 0, 0.793353, 0.608762, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+2, 1734, 30, 12.6315, -0.590875, -4.63091, 5.98648, 0, 0, -0.147809, 0.989016, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+3, 1734, 30, 33.8065, 109.527, 22.8486, 2.42601, 0, 0, 0.936672, 0.350207, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+4, 1734, 30, 88.7282, 81.4603, 3.33013, 2.61799, 0, 0, 0.965925, 0.258821, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+5, 2040, 30, -10.4209, 26.0035, 18.1858, 0.523598, 0, 0, 0.258819, 0.965926, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+6, 2040, 30, 4.6925, 178.257, 10.9804, 1.83259, 0, 0, 0.793353, 0.608762, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+7, 2040, 30, 12.6315, -0.590875, -4.63091, 5.98648, 0, 0, -0.147809, 0.989016, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+8, 2040, 30, 33.8065, 109.527, 22.8486, 2.42601, 0, 0, 0.936672, 0.350207, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+9, 2040, 30, 88.7282, 81.4603, 3.33013, 2.61799, 0, 0, 0.965925, 0.258821, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+10, 2047, 30, -10.4209, 26.0035, 18.1858, 0.523598, 0, 0, 0.258819, 0.965926, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+11, 2047, 30, 4.6925, 178.257, 10.9804, 1.83259, 0, 0, 0.793353, 0.608762, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+12, 2047, 30, 12.6315, -0.590875, -4.63091, 5.98648, 0, 0, -0.147809, 0.989016, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+13, 2047, 30, 33.8065, 109.527, 22.8486, 2.42601, 0, 0, 0.936672, 0.350207, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+14, 2047, 30, 88.7282, 81.4603, 3.33013, 2.61799, 0, 0, 0.965925, 0.258821, 600, 2700, 100, 1, 0, 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+0, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+1, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+2, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+3, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+4, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 0, 3, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, @PTEMPLATE+0, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+1, @PTEMPLATE+1, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+2, @PTEMPLATE+2, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+3, @PTEMPLATE+3, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+4, @PTEMPLATE+4, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+5, @PTEMPLATE+0, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+6, @PTEMPLATE+1, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+7, @PTEMPLATE+2, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+8, @PTEMPLATE+3, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+9, @PTEMPLATE+4, 90, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+10, @PTEMPLATE+0, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+11, @PTEMPLATE+1, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+12, @PTEMPLATE+2, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+13, @PTEMPLATE+3, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10),
+(@GGUID+14, @PTEMPLATE+4, 5, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Icewing Cavern - Alterac Valley', 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+5, 3, 'Icewing Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit (Master Pool)', 0, 0, 3, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+0, @PTEMPLATE+5, 0, 'Icewing Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+1, @PTEMPLATE+5, 0, 'Icewing Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+2, @PTEMPLATE+5, 0, 'Icewing Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+3, @PTEMPLATE+5, 0, 'Icewing Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(@PTEMPLATE+4, @PTEMPLATE+5, 0, 'Icewing Cavern - Alterac Valley - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+-- Small Thorium Vein / Truesilver Deposit
+-- Coldtooth Mine
+SET @GGUID = 6316;
+SET @PTEMPLATE = 3602;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, 324, 30, -975.421, -52.6895, 76.8137, 5.91667, 0, 0, -0.182235, 0.983255, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+1, 324, 30, -942.715, -109.117, 80.5856, 5.5676, 0, 0, -0.350207, 0.936672, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+2, 324, 30, -929.023, -152.324, 62.4066, 2.77507, 0, 0, 0.983254, 0.182238, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+3, 324, 30, -923.314, -151.76, 77.4325, 3.4034, 0, 0, -0.991445, 0.130528, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+4, 324, 30, -850.092, -71.7584, 74.1848, 1.44862, 0, 0, 0.66262, 0.748956, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+5, 324, 30, -848.121, -0.675835, 72.3406, 5.67232, 0, 0, -0.300705, 0.953717, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+6, 324, 30, -817.805, -161.449, 62.3541, 5.3058, 0, 0, -0.469471, 0.882948, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+7, 324, 30, -870.788, -72.9014, 72.9984, 3.78737, 0, 0, -0.948323, 0.317306, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+8, 2047, 30, -975.421, -52.6895, 76.8137, 5.91667, 0, 0, -0.182235, 0.983255, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+9, 2047, 30, -942.715, -109.117, 80.5856, 5.5676, 0, 0, -0.350207, 0.936672, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+10, 2047, 30, -929.023, -152.324, 62.4066, 2.77507, 0, 0, 0.983254, 0.182238, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+11, 2047, 30, -923.314, -151.76, 77.4325, 3.4034, 0, 0, -0.991445, 0.130528, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+12, 2047, 30, -850.092, -71.7584, 74.1848, 1.44862, 0, 0, 0.66262, 0.748956, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+13, 2047, 30, -848.121, -0.675835, 72.3406, 5.67232, 0, 0, -0.300705, 0.953717, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+14, 2047, 30, -817.805, -161.449, 62.3541, 5.3058, 0, 0, -0.469471, 0.882948, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+15, 2047, 30, -870.788, -72.9014, 72.9984, 3.78737, 0, 0, -0.948323, 0.317306, 600, 2700, 100, 1, 0, 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+0, 1, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+1, 1, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+2, 1, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+3, 1, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+4, 1, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+5, 1, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+6, 1, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+7, 1, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 0, 3, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, @PTEMPLATE+0, 95, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+1, @PTEMPLATE+1, 95, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+2, @PTEMPLATE+2, 95, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+3, @PTEMPLATE+3, 95, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+4, @PTEMPLATE+4, 95, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+5, @PTEMPLATE+5, 95, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+6, @PTEMPLATE+6, 95, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+7, @PTEMPLATE+7, 95, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+8, @PTEMPLATE+0, 5, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+9, @PTEMPLATE+1, 5, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+10, @PTEMPLATE+2, 5, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+11, @PTEMPLATE+3, 5, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+12, @PTEMPLATE+4, 5, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+13, @PTEMPLATE+5, 5, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+14, @PTEMPLATE+6, 5, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10),
+(@GGUID+15, @PTEMPLATE+7, 5, 'Truesilver Deposit / Small Thorium Vein - Coldtooth Mine - Alterac Valley', 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+8, 3, 'Coldtooth Mine - Alterac Valley - Truesilver Deposit / Small Thorium Vein (Master Pool)', 0, 0, 3, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+0, @PTEMPLATE+8, 0, 'Coldtooth Mine - Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+1, @PTEMPLATE+8, 0, 'Coldtooth Mine - Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+2, @PTEMPLATE+8, 0, 'Coldtooth Mine - Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+3, @PTEMPLATE+8, 0, 'Coldtooth Mine - Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+4, @PTEMPLATE+8, 0, 'Coldtooth Mine - Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+5, @PTEMPLATE+8, 0, 'Coldtooth Mine - Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+6, @PTEMPLATE+8, 0, 'Coldtooth Mine - Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+7, @PTEMPLATE+8, 0, 'Coldtooth Mine - Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0);
+
+-- Alterac Valley
+SET @GGUID = 6339;
+SET @PTEMPLATE = 3648;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, 324, 30, -1325.63, -584.733, 63.8735, 2.35619, 0, 0, 0.92388, 0.382683, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+1, 324, 30, -1160.23, -651.2, 67.6332, 0.698131, 0, 0, 0.34202, 0.939693, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+2, 324, 30, -1013.92, -646.647, 82.7925, 5.61996, 0, 0, -0.325567, 0.945519, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+3, 324, 30, -843.856, -243.481, 77.6562, 4.10153, 0, 0, -0.887011, 0.461749, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+4, 324, 30, 273.566, -24.2757, 19.2504, 3.94445, 0, 0, -0.920505, 0.390732, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+5, 324, 30, 295.83, -220.255, -12.2706, 0.663223, 0, 0, 0.325567, 0.945519, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+6, 324, 30, 369.763, -196.276, -18.841, 1.23918, 0, 0, 0.580703, 0.814116, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+7, 324, 30, 391.103, -20.6558, 25.9423, 2.60054, 0, 0, 0.96363, 0.267241, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+8, 2047, 30, -1325.63, -584.733, 63.8735, 2.35619, 0, 0, 0.92388, 0.382683, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+9, 2047, 30, -1160.23, -651.2, 67.6332, 0.698131, 0, 0, 0.34202, 0.939693, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+10, 2047, 30, -1013.92, -646.647, 82.7925, 5.61996, 0, 0, -0.325567, 0.945519, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+11, 2047, 30, -843.856, -243.481, 77.6562, 4.10153, 0, 0, -0.887011, 0.461749, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+12, 2047, 30, 273.566, -24.2757, 19.2504, 3.94445, 0, 0, -0.920505, 0.390732, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+13, 2047, 30, 295.83, -220.255, -12.2706, 0.663223, 0, 0, 0.325567, 0.945519, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+14, 2047, 30, 369.763, -196.276, -18.841, 1.23918, 0, 0, 0.580703, 0.814116, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+15, 2047, 30, 391.103, -20.6558, 25.9423, 2.60054, 0, 0, 0.96363, 0.267241, 600, 2700, 100, 1, 0, 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+0, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+1, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+2, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+3, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+4, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+5, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+6, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 0, 3, 10),
+(@PTEMPLATE+7, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 0, 3, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, @PTEMPLATE+0, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+1, @PTEMPLATE+1, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+2, @PTEMPLATE+2, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+3, @PTEMPLATE+3, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+4, @PTEMPLATE+4, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+5, @PTEMPLATE+5, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+6, @PTEMPLATE+6, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+7, @PTEMPLATE+7, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+8, @PTEMPLATE+0, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+9, @PTEMPLATE+1, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+10, @PTEMPLATE+2, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+11, @PTEMPLATE+3, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+12, @PTEMPLATE+4, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+13, @PTEMPLATE+5, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+14, @PTEMPLATE+6, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10),
+(@GGUID+15, @PTEMPLATE+7, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley', 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+8, 3, 'Alterac Valley - Truesilver Deposit / Small Thorium Vein (Master Pool)', 0, 0, 3, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+0, @PTEMPLATE+8, 0, 'Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+1, @PTEMPLATE+8, 0, 'Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+2, @PTEMPLATE+8, 0, 'Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+3, @PTEMPLATE+8, 0, 'Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+4, @PTEMPLATE+8, 0, 'Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+5, @PTEMPLATE+8, 0, 'Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+6, @PTEMPLATE+8, 0, 'Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+7, @PTEMPLATE+8, 0, 'Alterac Valley - Truesilver Deposit / Small Thorium Vein', 0);
+
+-- Irondeep Mine
+SET @GGUID = 6389;
+SET @PTEMPLATE = 3942;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, 324, 30, 814.139, -331.047, 51.2323, 2.05949, 0, 0, 0.857167, 0.515038, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+1, 324, 30, 824.474, -468.507, 49.425, 4.67748, 0, 0, -0.71934, 0.694658, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+2, 324, 30, 833.286, -362.942, 63.4969, 3.927, 0, 0, -0.923879, 0.382683, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+3, 324, 30, 879.539, -414.967, 53.5433, 5.72468, 0, 0, -0.275637, 0.961262, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+4, 324, 30, 882.239, -350.298, 66.902, 2.72271, 0, 0, 0.978148, 0.207912, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+5, 324, 30, 911.367, -469.564, 59.5398, 1.91986, 0, 0, 0.819152, 0.573577, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+6, 324, 30, 963.207, -335.908, 65.3194, 3.59538, 0, 0, -0.97437, 0.224951, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+7, 324, 30, 972.969, -441.89, 58.5453, 2.72271, 0, 0, 0.978148, 0.207912, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+8, 324, 30, 847.683, -373.587, 48.7671, 6.0912, 0, 0, -0.0958452, 0.995396, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+9, 2047, 30, 814.139, -331.047, 51.2323, 2.05949, 0, 0, 0.857167, 0.515038, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+10, 2047, 30, 824.474, -468.507, 49.425, 4.67748, 0, 0, -0.71934, 0.694658, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+11, 2047, 30, 833.286, -362.942, 63.4969, 3.927, 0, 0, -0.923879, 0.382683, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+12, 2047, 30, 879.539, -414.967, 53.5433, 5.72468, 0, 0, -0.275637, 0.961262, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+13, 2047, 30, 882.239, -350.298, 66.902, 2.72271, 0, 0, 0.978148, 0.207912, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+14, 2047, 30, 911.367, -469.564, 59.5398, 1.91986, 0, 0, 0.819152, 0.573577, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+15, 2047, 30, 963.207, -335.908, 65.3194, 3.59538, 0, 0, -0.97437, 0.224951, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+16, 2047, 30, 972.969, -441.89, 58.5453, 2.72271, 0, 0, 0.978148, 0.207912, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+17, 2047, 30, 847.683, -373.587, 48.7671, 6.0912, 0, 0, -0.0958452, 0.995396, 600, 2700, 100, 1, 0, 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+0, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 0, 3, 10),
+(@PTEMPLATE+1, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 0, 3, 10),
+(@PTEMPLATE+2, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 0, 3, 10),
+(@PTEMPLATE+3, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 0, 3, 10),
+(@PTEMPLATE+4, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 0, 3, 10),
+(@PTEMPLATE+5, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 0, 3, 10),
+(@PTEMPLATE+6, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 0, 3, 10),
+(@PTEMPLATE+7, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 0, 3, 10),
+(@PTEMPLATE+8, 1, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 0, 3, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, @PTEMPLATE+0, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+1, @PTEMPLATE+1, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+2, @PTEMPLATE+2, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+3, @PTEMPLATE+3, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+4, @PTEMPLATE+4, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+5, @PTEMPLATE+5, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+6, @PTEMPLATE+6, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+7, @PTEMPLATE+7, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+8, @PTEMPLATE+8, 95, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+9, @PTEMPLATE+0, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+10, @PTEMPLATE+1, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+11, @PTEMPLATE+2, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+12, @PTEMPLATE+3, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+13, @PTEMPLATE+4, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+14, @PTEMPLATE+5, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+15, @PTEMPLATE+6, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+16, @PTEMPLATE+7, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10),
+(@GGUID+17, @PTEMPLATE+8, 5, 'Truesilver Deposit / Small Thorium Vein - Alterac Valley - Irondeep Mine', 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+9, 3, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein (Master Pool)', 0, 0, 3, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+0, @PTEMPLATE+9, 0, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+1, @PTEMPLATE+9, 0, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+2, @PTEMPLATE+9, 0, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+3, @PTEMPLATE+9, 0, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+4, @PTEMPLATE+9, 0, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+5, @PTEMPLATE+9, 0, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+6, @PTEMPLATE+9, 0, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+7, @PTEMPLATE+9, 0, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein', 0),
+(@PTEMPLATE+8, @PTEMPLATE+9, 0, 'Alterac Valley - Irondeep Mine - Truesilver Deposit / Small Thorium Vein', 0);
+
+-- Rich Thorium Vein / Truesilver Deposit
+-- Wildpaw Ridge
+SET @GGUID = 3866;
+SET @PTEMPLATE = 3536;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, 175404, 30, -487.913, -496.018, 88.6213, 1.46608, 0, 0, 0.66913, 0.743145, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+1, 175404, 30, -418.211, -510.801, 86.6501, 0.977383, 0, 0, 0.469471, 0.882948, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+2, 175404, 30, -237.286, -575.165, 72.2059, 2.26893, 0, 0, 0.906307, 0.422619, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+3, 2047, 30, -487.913, -496.018, 88.6213, 1.46608, 0, 0, 0.66913, 0.743145, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+4, 2047, 30, -418.211, -510.801, 86.6501, 0.977383, 0, 0, 0.469471, 0.882948, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+5, 2047, 30, -237.286, -575.165, 72.2059, 2.26893, 0, 0, 0.906307, 0.422619, 600, 2700, 100, 1, 0, 0, 3, 5);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+0, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Wildpaw Ridge', 0, 0, 3, 5),
+(@PTEMPLATE+1, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Wildpaw Ridge', 0, 0, 3, 5),
+(@PTEMPLATE+2, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Wildpaw Ridge', 0, 0, 3, 5);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, @PTEMPLATE+0, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Wildpaw Ridge', 0, 3, 5),
+(@GGUID+1, @PTEMPLATE+1, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Wildpaw Ridge', 0, 3, 5),
+(@GGUID+2, @PTEMPLATE+2, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Wildpaw Ridge', 0, 3, 5),
+(@GGUID+3, @PTEMPLATE+0, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Wildpaw Ridge', 0, 3, 5),
+(@GGUID+4, @PTEMPLATE+1, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Wildpaw Ridge', 0, 3, 5),
+(@GGUID+5, @PTEMPLATE+2, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Wildpaw Ridge', 0, 3, 5);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+3, 1, 'Alterac Valley - Wildpaw Ridge - Truesilver Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 3, 5);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+0, @PTEMPLATE+3, 0, 'Alterac Valley - Wildpaw Ridge - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+1, @PTEMPLATE+3, 0, 'Alterac Valley - Wildpaw Ridge - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+2, @PTEMPLATE+3, 0, 'Alterac Valley - Wildpaw Ridge - Truesilver Deposit / Rich Thorium Vein', 0);
+
+-- Winterax Hold
+SET @GGUID = 18945;
+SET @PTEMPLATE = 4060;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, 175404, 30, -19.8654, -128.063, 51.9998, 6.10865, 0, 0, -0.087155, 0.996195, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+1, 175404, 30, -323.448, 18.7073, 69.1165, 3.22886, 0, 0, -0.999048, 0.0436193, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+2, 175404, 30, -274.229, 195.321, 79.9616, 4.72984, 0, 0, -0.700909, 0.713251, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+3, 175404, 30, -243.864, 249.429, 80.7919, 5.60251, 0, 0, -0.333807, 0.942641, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+4, 175404, 30, -231.996, 206.396, 81.0856, 5.14872, 0, 0, -0.537299, 0.843392, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+5, 175404, 30, -191.643, 121.784, 80.9644, 5.25344, 0, 0, -0.492423, 0.870356, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+6, 175404, 30, -178.702, 153.701, 77.3139, 2.30383, 0, 0, 0.913545, 0.406738, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+7, 175404, 30, -164.662, 189.003, 76.9059, 0.087266, 0, 0, 0.0436192, 0.999048, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+8, 175404, 30, -149.764, 175.569, 89.0594, 2.26893, 0, 0, 0.906307, 0.422619, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+9, 175404, 30, -141.951, 117.204, 88.076, 3.42085, 0, 0, -0.990268, 0.139175, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+10, 175404, 30, -119.947, 278.355, 75.7435, 3.15906, 0, 0, -0.999962, 0.008735, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+11, 175404, 30, -119.12, 55.1759, 83.9993, 5.49779, 0, 0, -0.382683, 0.92388, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+12, 175404, 30, -115.174, 178.588, 89.0375, 4.79966, 0, 0, -0.67559, 0.737278, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+13, 175404, 30, -231.906, 288.89, 83.8748, 1.32645, 0, 0, 0.615661, 0.788011, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+14, 175404, 30, -135.621, 208.368, 76.0969, 3.38594, 0, 0, -0.992546, 0.12187, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+15, 2047, 30, -19.8654, -128.063, 51.9998, 6.10865, 0, 0, -0.087155, 0.996195, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+16, 2047, 30, -323.448, 18.7073, 69.1165, 3.22886, 0, 0, -0.999048, 0.0436193, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+17, 2047, 30, -274.229, 195.321, 79.9616, 4.72984, 0, 0, -0.700909, 0.713251, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+18, 2047, 30, -243.864, 249.429, 80.7919, 5.60251, 0, 0, -0.333807, 0.942641, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+19, 2047, 30, -231.996, 206.396, 81.0856, 5.14872, 0, 0, -0.537299, 0.843392, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+20, 2047, 30, -191.643, 121.784, 80.9644, 5.25344, 0, 0, -0.492423, 0.870356, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+21, 2047, 30, -178.702, 153.701, 77.3139, 2.30383, 0, 0, 0.913545, 0.406738, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+22, 2047, 30, -164.662, 189.003, 76.9059, 0.087266, 0, 0, 0.0436192, 0.999048, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+23, 2047, 30, -149.764, 175.569, 89.0594, 2.26893, 0, 0, 0.906307, 0.422619, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+24, 2047, 30, -141.951, 117.204, 88.076, 3.42085, 0, 0, -0.990268, 0.139175, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+25, 2047, 30, -119.947, 278.355, 75.7435, 3.15906, 0, 0, -0.999962, 0.008735, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+26, 2047, 30, -119.12, 55.1759, 83.9993, 5.49779, 0, 0, -0.382683, 0.92388, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+27, 2047, 30, -115.174, 178.588, 89.0375, 4.79966, 0, 0, -0.67559, 0.737278, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+28, 2047, 30, -231.906, 288.89, 83.8748, 1.32645, 0, 0, 0.615661, 0.788011, 600, 2700, 100, 1, 0, 0, 3, 5),
+(@GGUID+29, 2047, 30, -135.621, 208.368, 76.0969, 3.38594, 0, 0, -0.992546, 0.12187, 600, 2700, 100, 1, 0, 0, 3, 5);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+0, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+1, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+2, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+3, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+4, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+5, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+6, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+7, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+8, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+9, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+10, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+11, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+12, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+13, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5),
+(@PTEMPLATE+14, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 0, 3, 5);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, @PTEMPLATE+0, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+1, @PTEMPLATE+1, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+2, @PTEMPLATE+2, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+3, @PTEMPLATE+3, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+4, @PTEMPLATE+4, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+5, @PTEMPLATE+5, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+6, @PTEMPLATE+6, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+7, @PTEMPLATE+7, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+8, @PTEMPLATE+8, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+9, @PTEMPLATE+9, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+10, @PTEMPLATE+10, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+11, @PTEMPLATE+11, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+12, @PTEMPLATE+12, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+13, @PTEMPLATE+13, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+14, @PTEMPLATE+14, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+15, @PTEMPLATE+0, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+16, @PTEMPLATE+1, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+17, @PTEMPLATE+2, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+18, @PTEMPLATE+3, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+19, @PTEMPLATE+4, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+20, @PTEMPLATE+5, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+21, @PTEMPLATE+6, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+22, @PTEMPLATE+7, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+23, @PTEMPLATE+8, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+24, @PTEMPLATE+9, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+25, @PTEMPLATE+10, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+26, @PTEMPLATE+11, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+27, @PTEMPLATE+12, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+28, @PTEMPLATE+13, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5),
+(@GGUID+29, @PTEMPLATE+14, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Winterax Hold', 0, 3, 5);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+15, 3, 'Alterac Valley -  Winterax Hold - Truesilver Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 3, 5);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+0, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+1, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+2, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+3, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+4, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+5, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+6, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+7, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+8, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+9, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+10, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+11, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+12, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+13, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+14, @PTEMPLATE+15, 0, 'Alterac Valley - Winterax Hold - Truesilver Deposit / Rich Thorium Vein', 0);
+
+-- Field of Strife
+SET @GGUID = 20031;
+SET @PTEMPLATE = 4076;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, 175404, 30, -337.025, -157.087, 12.883, 1.76278, 0, 0, 0.771625, 0.636078, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+1, 175404, 30, -288.885, -317.103, 7.62015, 2.41366, 0, 0, 0.934492, 0.355984, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+2, 175404, 30, -281.102, -322.135, 6.01687, 4.16553, 0, 0, 0.871781, -0.489896, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+3, 175404, 30, -276.279, -314.212, 7.73298, 4.15113, 0, 0, 0.875286, -0.483607, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+4, 175404, 30, -242.328, -255.974, 6.46338, 2.85043, 0, 0, 0.989422, 0.145069, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+5, 175404, 30, -234.705, -188.901, 11.9317, 1.0821, 0, 0, 0.515038, 0.857168, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+6, 175404, 30, -233.176, -261.718, 6.49885, 0.30661, 0, 0, 0.152705, 0.988272, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+7, 175404, 30, -232.179, -253.279, 8.07145, 4.98147, 0, 0, 0.605868, -0.795565, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+8, 175404, 30, -230.483, -179.221, 15.9494, 1.38654, 0, 0, 0.639054, 0.769162, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+9, 175404, 30, -213.652, -417.195, 21.2952, 0.393006, 0, 0, 0.195241, 0.980755, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+10, 175404, 30, -190.136, -123.156, 81.3712, 0.18662, 0, 0, 0.0931745, 0.99565, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+11, 175404, 30, -156.146, -324.142, 12.5938, 1.85005, 0, 0, 0.798635, 0.601815, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+12, 175404, 30, -94.24, -363.501, 23.9596, 1.71291, 0, 0, 0.755526, 0.655119, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+13, 175404, 30, -25.7472, -204.121, 21.7894, 0.776981, 0, 0, 0.378792, 0.925482, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+14, 175404, 30, -259.818, -389.918, 14.1998, -0.523599, 0, 0, 0, 1, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+15, 2047, 30, -337.025, -157.087, 12.883, 1.76278, 0, 0, 0.771625, 0.636078, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+16, 2047, 30, -288.885, -317.103, 7.62015, 2.41366, 0, 0, 0.934492, 0.355984, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+17, 2047, 30, -281.102, -322.135, 6.01687, 4.16553, 0, 0, 0.871781, -0.489896, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+18, 2047, 30, -276.279, -314.212, 7.73298, 4.15113, 0, 0, 0.875286, -0.483607, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+19, 2047, 30, -242.328, -255.974, 6.46338, 2.85043, 0, 0, 0.989422, 0.145069, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+20, 2047, 30, -234.705, -188.901, 11.9317, 1.0821, 0, 0, 0.515038, 0.857168, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+21, 2047, 30, -233.176, -261.718, 6.49885, 0.30661, 0, 0, 0.152705, 0.988272, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+22, 2047, 30, -232.179, -253.279, 8.07145, 4.98147, 0, 0, 0.605868, -0.795565, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+23, 2047, 30, -230.483, -179.221, 15.9494, 1.38654, 0, 0, 0.639054, 0.769162, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+24, 2047, 30, -213.652, -417.195, 21.2952, 0.393006, 0, 0, 0.195241, 0.980755, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+25, 2047, 30, -190.136, -123.156, 81.3712, 0.18662, 0, 0, 0.0931745, 0.99565, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+26, 2047, 30, -156.146, -324.142, 12.5938, 1.85005, 0, 0, 0.798635, 0.601815, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+27, 2047, 30, -94.24, -363.501, 23.9596, 1.71291, 0, 0, 0.755526, 0.655119, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+28, 2047, 30, -25.7472, -204.121, 21.7894, 0.776981, 0, 0, 0.378792, 0.925482, 600, 2700, 100, 1, 0, 0, 3, 10),
+(@GGUID+29, 2047, 30, -259.818, -389.918, 14.1998, -0.523599, 0, 0, 0, 1, 600, 2700, 100, 1, 0, 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+0, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+1, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+2, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+3, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+4, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+5, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+6, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+7, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+8, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+9, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+10, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+11, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+12, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+13, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10),
+(@PTEMPLATE+14, 1, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 0, 3, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, @PTEMPLATE+0, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+1, @PTEMPLATE+1, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+2, @PTEMPLATE+2, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+3, @PTEMPLATE+3, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+4, @PTEMPLATE+4, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+5, @PTEMPLATE+5, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+6, @PTEMPLATE+6, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+7, @PTEMPLATE+7, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+8, @PTEMPLATE+8, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+9, @PTEMPLATE+9, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+10, @PTEMPLATE+10, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+11, @PTEMPLATE+11, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+12, @PTEMPLATE+12, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+13, @PTEMPLATE+13, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+14, @PTEMPLATE+14, 95, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+15, @PTEMPLATE+0, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+16, @PTEMPLATE+1, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+17, @PTEMPLATE+2, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+18, @PTEMPLATE+3, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+19, @PTEMPLATE+4, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+20, @PTEMPLATE+5, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+21, @PTEMPLATE+6, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+22, @PTEMPLATE+7, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+23, @PTEMPLATE+8, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+24, @PTEMPLATE+9, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+25, @PTEMPLATE+10, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+26, @PTEMPLATE+11, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+27, @PTEMPLATE+12, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+28, @PTEMPLATE+13, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10),
+(@GGUID+29, @PTEMPLATE+14, 5, 'Truesilver Deposit / Rich Thorium Vein - Alterac Valley - Field of Strife', 0, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+15, 2, 'Alterac Valley -  Field of Strife - Truesilver Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 3, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+0, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+1, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+2, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+3, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+4, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+5, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+6, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+7, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+8, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+9, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+10, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+11, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+12, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+13, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0),
+(@PTEMPLATE+14, @PTEMPLATE+15, 0, 'Alterac Valley - Field of Strife - Truesilver Deposit / Rich Thorium Vein', 0);
 
 -- End of migration.
 END IF;
