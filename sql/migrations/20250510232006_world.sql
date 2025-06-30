@@ -11551,6 +11551,68 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (61120, 176588, 30, -433.388, -356.195, 31.8738, -1.64061, 0, 0, 0, 1, 600, 2700, 0, 0, 0, 0, 3, 5),
 (61121, 176588, 30, -159.557, -387.546, 11.6109, -1.79769, 0, 0, 0, 1, 600, 2700, 0, 0, 0, 0, 3, 5);
 
+-- Correct orientation and rotations for bunker/tower fires
+UPDATE `gameobject` SET `orientation` = 4.43314, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.798635, `rotation3` = 0.601815 WHERE `guid` = 60677;
+UPDATE `gameobject` SET `orientation` = 5.72468, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.275637, `rotation3` = 0.961262 WHERE `guid` = 60672;
+UPDATE `gameobject` SET `orientation` = 5.60251, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.333807, `rotation3` = 0.942641 WHERE `guid` = 60670;
+UPDATE `gameobject` SET `orientation` = 5.88176, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.199368, `rotation3` = 0.979925 WHERE `guid` = 60679;
+UPDATE `gameobject` SET `orientation` = 4.60767, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.743144, `rotation3` = 0.669131 WHERE `guid` = 60673;
+UPDATE `gameobject` SET `orientation` = 6.23083, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.0261765, `rotation3` = 0.999657 WHERE `guid` = 60612;
+UPDATE `gameobject` SET `orientation` = 5.09636, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.559193, `rotation3` = 0.829038 WHERE `guid` = 60653;
+UPDATE `gameobject` SET `orientation` = 5.39307, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.430511, `rotation3` = 0.902586 WHERE `guid` = 60656;
+UPDATE `gameobject` SET `orientation` = 3.38594, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.992546, `rotation3` = 0.12187 WHERE `guid` = 60638;
+UPDATE `gameobject` SET `orientation` = 5.58505, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.34202, `rotation3` = 0.939693 WHERE `guid` = 60635;
+UPDATE `gameobject` SET `orientation` = 6.02139, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.130526, `rotation3` = 0.991445 WHERE `guid` = 60636;
+UPDATE `gameobject` SET `orientation` = 4.41568, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.803857, `rotation3` = 0.594823 WHERE `guid` = 60644;
+UPDATE `gameobject` SET `orientation` = 4.18879, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.866025, `rotation3` = 0.500001 WHERE `guid` = 60645;
+UPDATE `gameobject` SET `orientation` = 4.41568, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.803857, `rotation3` = 0.594823 WHERE `guid` = 60642;
+UPDATE `gameobject` SET `orientation` = 4.55531, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.760406, `rotation3` = 0.649449 WHERE `guid` = 60649;
+UPDATE `gameobject` SET `orientation` = 3.78737, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.948323, `rotation3` = 0.317306 WHERE `guid` = 60686;
+UPDATE `gameobject` SET `orientation` = 6.14356, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.0697556, `rotation3` = 0.997564 WHERE `guid` = 60680;
+UPDATE `gameobject` SET `orientation` = 5.044, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.580703, `rotation3` = 0.814116 WHERE `guid` = 60684;
+UPDATE `gameobject` SET `orientation` = 0.418879, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.207911, `rotation3` = 0.978148 WHERE `guid` = 60681;
+UPDATE `gameobject` SET `orientation` = 3.83973, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.939692, `rotation3` = 0.34202 WHERE `guid` = 60683;
+UPDATE `gameobject` SET `orientation` = 2.23402, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.898793, `rotation3` = 0.438373 WHERE `guid` = 60682;
+UPDATE `gameobject` SET `orientation` = 0.925024, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.446198, `rotation3` = 0.894935 WHERE `guid` = 60687;
+UPDATE `gameobject` SET `orientation` = 4.7822, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.681998, `rotation3` = 0.731354 WHERE `guid` = 60688;
+UPDATE `gameobject` SET `orientation` = 4.08407, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.891006, `rotation3` = 0.453991 WHERE `guid` = 60689;
+UPDATE `gameobject` SET `orientation` = 4.55531, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.760406, `rotation3` = 0.649449 WHERE `guid` = 60616;
+UPDATE `gameobject` SET `orientation` = 1.93731, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.824125, `rotation3` = 0.566408 WHERE `guid` = 60641;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+-- Missing fires that should spawn on Vanndar death, needs script
+-- North Bunker
+(61122, 179065, 30, 676.393, -146.85, 56.5425, 2.46091, 0, 0, 0.942641, 0.333808, 0, 0, 0, 0, 0, 0, 3, 10),
+(61123, 179065, 30, 680.263, -118.592, 64.3363, 2.54818, 0, 0, 0.956305, 0.292372, 0, 0, 0, 0, 0, 0, 3, 10),
+-- South Bunker
+(61124, 179065, 30, 550.663, -79.7708, 44.8191, 1.91986, 0, 0, 0.819152, 0.573577, 0, 0, 0, 0, 0, 0, 3, 10),
+(61125, 179065, 30, 581.781, -70.9401, 38.2222, 1.6057, 0, 0, 0.719339, 0.694659, 0, 0, 0, 0, 0, 0, 3, 10),
+(61126, 179065, 30, 584.407, -40.0252, 38.6754, 3.21142, 0, 0, -0.999391, 0.0349061, 0, 0, 0, 0, 0, 0, 3, 10),
+-- Ram ranch
+(61127, 179065, 30, 601.424, -8.08735, 41.9954, 5.95157, 0, 0, -0.165047, 0.986286, 0, 0, 0, 0, 0, 0, 3, 10),
+-- Machine in middle of Dun Baldar
+(61128, 179065, 30, 618.958, -91.4493, 46.2016, 5.72468, 0, 0, -0.275637, 0.961262, 0, 0, 0, 0, 0, 0, 3, 10),
+-- Wagon near Aid GY
+(61129, 179065, 30, 619.454, -31.8742, 45.7962, 0.750491, 0, 0, 0.366501, 0.930418, 0, 0, 0, 0, 0, 0, 3, 10),
+-- Dead tank at Dun Baldar Bridge
+(61130, 179065, 30, 629.003, -137.68,39.6691, 2.1293, 0, 0, 0.874619, 0.48481, 0, 0, 0, 0, 0, 0, 3, 10),
+-- Tent near Aid Station
+(61131, 179065, 30, 637.677, -22.1296, 45.8382, 5.41052, 0, 0, -0.422618, 0.906308, 0, 0, 0, 0, 0, 0, 3, 10),
+-- Forge in Dun Baldar
+(61132, 179065, 30, 649.886, -60.9095, 41.6571, 5.8294, 0, 0, -0.224951, 0.97437, 0, 0, 0, 0, 0, 0, 3, 10),
+-- North Bunker
+(61133, 179065, 30, 658.658, -117.631, 49.6421, 3.52557, 0, 0, -0.981627, 0.190812, 0, 0, 0, 0, 0, 0, 3, 10),
+-- Vanndar Bunker
+(61134, 179065, 30, 669.279, -9.81559, 68.0828, 5.93412, 0, 0, -0.173648, 0.984808, 0, 0, 0, 0, 0, 0, 3, 10),
+(61135, 179065, 30, 672.258, -17.0869, 50.6207, 3.08918, 0, 0, 0.999657, 0.0262016, 0, 0, 0, 0, 0, 0, 3, 10),
+(61136, 179065, 30, 680.3, -48.2595, 69.041, 1.85005, 0, 0, 0.798635, 0.601815, 0, 0, 0, 0, 0, 0, 3, 10),
+(61137, 179065, 30, 683.227, -21.9344, 80.0708, 2.23402, 0, 0, 0.898793, 0.438373, 0, 0, 0, 0, 0, 0, 3, 10),
+(61138, 179065, 30, 693.917, -19.9107, 50.6213, 2.80998, 0, 0, 0.986285, 0.16505, 0, 0, 0, 0, 0, 0, 3, 10),
+(61139, 179065, 30, 697.903, -10.8285, 50.3688, 1.41372, 0, 0, 0.649447, 0.760406, 0, 0, 0, 0, 0, 0, 3, 10),
+(61140, 179065, 30, 704.494, 6.97472, 50.6213, 5.34071, 0, 0, -0.45399, 0.891007, 0, 0, 0, 0, 0, 0, 3, 10),
+(61141, 179065, 30, 716.995, -34.8137, 50.6213, 2.67035, 0, 0, 0.972369, 0.233448, 0, 0, 0, 0, 0, 0, 3, 10),
+(61142, 179065, 30, 731.684, -8.08681, 50.6213, 5.74214, 0, 0, -0.267238, 0.963631, 0, 0, 0, 0, 0, 0, 3, 10);
+
 -- Aid GY Flag Updates
 UPDATE `gameobject` SET `id`=179465, `position_x`=638.592, `position_y`=-32.422, `position_z`=46.0608, `orientation`=4.66003, `rotation0`=0, `rotation1`=0, `rotation2`=-0.725374, `rotation3`=0.688355, `patch_min`=6 WHERE `guid`=60738;
 UPDATE `gameobject_template` SET `flags`=0 WHERE `entry`=179465;
