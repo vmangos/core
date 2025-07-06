@@ -195,7 +195,7 @@ bool QuestAccept_npc_gilthares(Player* pPlayer, Creature* pCreature, Quest const
 enum
 {
     SAY_BIG_WILL_READY = 2421, 
-    SAY_TWIGGY_BEGIN   = 2310,  
+    SAY_TWIGGY_BEGIN   = 2301,  
     SAY_TWIGGY_FRAY    = 2318,  
     SAY_TWIGGY_DOWN    = 2355,  
     SAY_TWIGGY_OVER    = 2320,  
