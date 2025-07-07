@@ -3,6 +3,7 @@
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
  * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
+ * Copyright (C) 2017-2024 VMaNGOS Project <https://github.com/vmangos>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,31 +20,44 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/** \addtogroup u2w User to World Communication
- *  @{
- *  \file WorldSocketMgr.h
- *  \author Derex <derex101@gmail.com>
- */
+#ifndef MANGOS_GAME_SERVER_WORLDSOCKETMGR_H
+#define MANGOS_GAME_SERVER_WORLDSOCKETMGR_H
 
-#ifndef __WORLDSOCKETMGR_H
-#define __WORLDSOCKETMGR_H
+#include <vector>
+#include <memory>
+#include "Policies/Singleton.h"
+#include "IO/Context/IoContext.h"
+#include "IO/Networking/AsyncSocketAcceptor.h"
 
-#include "MangosSocketMgr.h"
-#include "ace/Singleton.h"
-#include "ace/Thread_Mutex.h"
 class WorldSocket;
 
-// Manages all sockets connected to peers and network threads
-class WorldSocketMgr: public MangosSocketMgr<WorldSocket>
+struct WorldSocketMgrOptions
 {
-    public:
-        friend class ACE_Singleton<WorldSocketMgr, ACE_Thread_Mutex>;
-        friend class WorldSocket;
-
-        static WorldSocketMgr* Instance();
+    std::string bindIp;
+    uint16 bindPort;
+    int socketOutByteBufferSize;
+    bool doExplicitTcpNoDelay;
+    std::vector<std::string> trustedProxyIps;
 };
 
-#define sWorldSocketMgr WorldSocketMgr::Instance()
+class WorldSocketMgr : public MaNGOS::Singleton<WorldSocketMgr, MaNGOS::ClassLevelLockable<WorldSocketMgr, std::mutex>>
+{
+public:
+    explicit WorldSocketMgr() = default;
 
-#endif
-// @}
+    /// Will return true start was okay
+    bool StartWorldNetworking(IO::IoContext* ioCtx, WorldSocketMgrOptions const& options);
+    void StopWorldNetworking();
+    void OnNewClientConnected(IO::Networking::SocketDescriptor socketDescriptor);
+
+private:
+    IO::IoContext* GetLeastUsedIoContext();
+
+    IO::IoContext* m_ioContext{nullptr};
+    std::unique_ptr<IO::Networking::AsyncSocketAcceptor> m_listener{nullptr};
+    WorldSocketMgrOptions m_settings{};
+};
+
+#define sWorldSocketMgr MaNGOS::Singleton<WorldSocketMgr>::Instance()
+
+#endif //MANGOS_GAME_SERVER_WORLDSOCKETMGR_H

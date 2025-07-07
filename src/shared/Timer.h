@@ -23,7 +23,16 @@
 #define MANGOS_TIMER_H
 
 #include "Common.h"
-#include <ace/OS_NS_sys_time.h>
+#include <chrono>
+
+inline std::chrono::steady_clock::time_point GetApplicationStartTime()
+{
+    using namespace std::chrono;
+
+    static const steady_clock::time_point ApplicationStartTime = steady_clock::now();
+
+    return ApplicationStartTime;
+}
 
 class WorldTimer
 {
@@ -56,9 +65,6 @@ public:
 private:
     WorldTimer();
     WorldTimer(WorldTimer const&);
-
-    //analogue to getMSTime() but it persists m_SystemTickTime
-    static uint32 getMSTime_internal();
 
     static uint32 m_iTime;
     static uint32 m_iPrevTime;

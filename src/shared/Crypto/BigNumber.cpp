@@ -19,6 +19,7 @@
 #include "Crypto/BigNumber.h"
 #include <openssl/bn.h>
 #include <algorithm>
+#include <cstring>
 
 BigNumber::BigNumber()
 {

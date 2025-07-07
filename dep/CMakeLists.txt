@@ -21,3 +21,12 @@ add_subdirectory(gsoap)
 if (USE_EXTRACTORS)
 	add_subdirectory(libmpq)
 endif()
+
+add_subdirectory(cpptrace)
+set_target_properties(cpptrace-lib PROPERTIES FOLDER "3rd Party")
+get_cmake_property(variables CACHE_VARIABLES) # hide "CPPTRACE_*" variables in default cmake config
+foreach(variable ${variables})
+	if(variable MATCHES "^CPPTRACE_")
+		mark_as_advanced(${variable})
+	endif()
+endforeach()

@@ -1,8 +1,6 @@
 
 # Generic boolean options
-option(USE_STD_MALLOC                 "Use standard malloc instead of TBB"                                                            OFF)
 option(BUILD_FOR_HOST_CPU             "Build specifically for the host CPU via `-march=native` (might not run on different machines)" ON)
-option(TBB_DEBUG                      "Use TBB debug libraries"                                                                       OFF)
 option(USE_SCRIPTS                    "Build scripts"                                                                                 ON)
 option(USE_EXTRACTORS                 "Build extractors"                                                                              OFF)
 option(USE_REALMMERGE                 "Build helper tool for merging character databases"                                             OFF)
@@ -56,9 +54,7 @@ message(STATUS
     CMAKE_INSTALL_PREFIX      Path where the server should be installed to
     USE_PCH                   Use precompiled headers
     USE_PCH_OLD               Use precompiled headers
-    USE_STD_MALLOC            Use standard malloc instead of TBB
     BUILD_FOR_HOST_CPU        Build specifically for the host CPU via `-march=native` (might not run on different machines)
-    TBB_DEBUG                 Use TBB debug libraries
     USE_SCRIPTS               Build scripts
     USE_EXTRACTORS            Build extractors
     USE_REALMMERGE            Build helper tool for merging character databases

@@ -36,6 +36,7 @@
 #include "Config/Config.h"
 
 #include <regex>
+#include <iterator>
 
 bool ChatHandler::HandleCharacterAIInfoCommand(char* /*args*/)
 {

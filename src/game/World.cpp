@@ -84,6 +84,8 @@
 #include "GuardMgr.h"
 #include "TransportMgr.h"
 #include "RealmZone.h"
+#include "IO/Multithreading/CreateThread.h"
+
 #include <chrono>
 
 INSTANTIATE_SINGLETON_1(World);
@@ -212,10 +214,10 @@ void World::Shutdown()
     sAnticheatMgr->StopWardenUpdateThread();
 }
 
-// Find a session by its id
-WorldSession* World::FindSession(uint32 id) const
+/// Find a session by its accountId. Might return nullptr if not found.
+WorldSession* World::FindSession(uint32 accountId) const
 {
-    SessionMap::const_iterator itr = m_sessions.find(id);
+    SessionMap::const_iterator itr = m_sessions.find(accountId);
 
     if (itr != m_sessions.end())
         return itr->second;                                 // also can return nullptr for kicked session
@@ -223,11 +225,11 @@ WorldSession* World::FindSession(uint32 id) const
     return nullptr;
 }
 
-// Remove a given session
-bool World::RemoveSession(uint32 id)
+/// Remove a given session by its accountId
+bool World::RemoveSession(uint32 accountId)
 {
     // Find the session, kick the user, but we can't delete session at this moment to prevent iterator invalidation
-    SessionMap::const_iterator itr = m_sessions.find(id);
+    SessionMap::const_iterator itr = m_sessions.find(accountId);
 
     if (itr != m_sessions.end() && itr->second)
     {
@@ -323,7 +325,7 @@ void World::AddSession_(WorldSession* s)
     packet << uint8(AUTH_OK);
     packet << uint32(0);                                    // BillingTimeRemaining
                                                             // BillingPlanFlags
-    packet << uint8(s->HasTrialRestrictions() ? (BILLING_FLAG_TRIAL | BILLING_FLAG_RESTRICTED) : BILLING_FLAG_NONE); 
+    packet << uint8(s->HasTrialRestrictions() ? (BILLING_FLAG_TRIAL | BILLING_FLAG_RESTRICTED) : BILLING_FLAG_NONE);
     packet << uint32(0);                                    // BillingTimeRested
     s->SendPacket(&packet);
 
@@ -370,7 +372,7 @@ void World::AddQueuedSession(WorldSession* sess)
     packet << uint8(AUTH_WAIT_QUEUE);
     packet << uint32(0);                                    // BillingTimeRemaining
                                                             // BillingPlanFlags
-    packet << uint8(sess->HasTrialRestrictions() ? (BILLING_FLAG_TRIAL | BILLING_FLAG_RESTRICTED) : BILLING_FLAG_NONE); 
+    packet << uint8(sess->HasTrialRestrictions() ? (BILLING_FLAG_TRIAL | BILLING_FLAG_RESTRICTED) : BILLING_FLAG_NONE);
     packet << uint32(0);                                    // BillingTimeRested
     packet << uint32(GetQueuedSessionPos(sess));            // position in queue
     sess->SendPacket(&packet);
@@ -410,7 +412,7 @@ bool World::RemoveQueuedSession(WorldSession* sess)
     uint32 loggedInSessions = uint32(m_sessions.size() - m_QueuedSessions.size());
     if (loggedInSessions > getConfig(CONFIG_UINT32_PLAYER_HARD_LIMIT))
         return found;
-    
+
     // accept first in queue
     if ((!m_playerLimit || (int32)sessions <= m_playerLimit) && !m_QueuedSessions.empty())
     {
@@ -1067,7 +1069,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_PACKET_BCAST_THREADS,                  "Network.PacketBroadcast.Threads", 0);
     setConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY,                "Network.PacketBroadcast.Frequency", 50);
     setConfig(CONFIG_UINT32_PBCAST_DIFF_LOWER_VISIBILITY_DISTANCE, "Network.PacketBroadcast.ReduceVisDistance.DiffAbove", 0);
-    
+
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "* Anticrash : options 0x%x rearm after %usec", getConfig(CONFIG_UINT32_ANTICRASH_OPTIONS), getConfig(CONFIG_UINT32_ANTICRASH_REARM_TIMER) / 1000);
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "* Pathfinding : [%s]", getConfig(CONFIG_BOOL_MMAP_ENABLED) ? "ON" : "OFF");
 
@@ -1870,10 +1872,7 @@ void World::SetInitialWorldSettings()
 
     if (GetWowPatch() >= WOW_PATCH_103 || !getConfig(CONFIG_BOOL_ACCURATE_LFG))
     {
-        m_lfgQueueThread.reset(new std::thread([&]()
-        {
-            m_lfgQueue.Update();
-        }));
+        m_lfgQueueThread = IO::Multithreading::CreateThreadPtr("LfgUpdate", [&] { m_lfgQueue.Update(); });
     }
 
     sAnticheatMgr->StartWardenUpdateThread();
@@ -1882,8 +1881,8 @@ void World::SetInitialWorldSettings()
         std::make_unique<MovementBroadcaster>(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
 
-    m_charDbWorkerThread.reset(new std::thread(&CharactersDatabaseWorkerThread));
-    m_asyncPacketsThread.reset(new std::thread(&World::ProcessAsyncPackets, this));
+    m_charDbWorkerThread = IO::Multithreading::CreateThreadPtr("CharDB", [](){ CharactersDatabaseWorkerThread(); });
+    m_asyncPacketsThread = IO::Multithreading::CreateThreadPtr("AsyncPacket", [this](){ ProcessAsyncPackets(); });
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "==========================================================");
@@ -1976,7 +1975,7 @@ void World::Update(uint32 diff)
     m_currentMSTime = WorldTimer::getMSTime();
     m_currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
     m_currentDiff = diff;
-    
+
     // Update the different timers
     for (auto& timer : m_timers)
     {
@@ -2031,14 +2030,14 @@ void World::Update(uint32 diff)
 
     // Update objects (maps, transport, creatures,...)
     uint32 updateMapSystemTime = WorldTimer::getMSTime();
-    
+
     // TODO: find a better place for this
     if (!m_updateThreads)
     {
-        m_updateThreads = std::unique_ptr<ThreadPool>( new ThreadPool(
+        m_updateThreads = std::unique_ptr<ThreadPool>(new ThreadPool(
+                    "WorldUpdate",
                     getConfig(CONFIG_UINT32_ASYNC_TASKS_THREADS_COUNT),
-                    ThreadPool::ClearMode::UPPON_COMPLETION)
-                                             );
+                    ThreadPool::ClearMode::UPPON_COMPLETION));
         m_updateThreads->start<ThreadPool::MySQL<>>();
     }
     std::unique_lock<std::mutex> lock(m_asyncTaskQueueMutex);
@@ -2046,7 +2045,7 @@ void World::Update(uint32 diff)
     std::future<void> job = m_updateThreads->processWorkload(_asyncTasksBusy);
     _asyncTasks.clear();
     lock.unlock();
-    
+
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
     sGuardMgr.Update(diff);
@@ -2481,7 +2480,7 @@ class BanQueryHolder : public SqlQueryHolder
 public:
     BanQueryHolder(BanMode mode, std::string banTarget, uint32 duration, std::string reason, uint32 realmId, std::string author,
         uint32 authorAccountId)
-        : m_mode(mode), m_duration(duration), m_reason(reason), m_realmId(realmId), 
+        : m_mode(mode), m_duration(duration), m_reason(reason), m_realmId(realmId),
           m_author(author), m_banTarget(banTarget), m_accountId(authorAccountId)
     {
     }
@@ -2817,7 +2816,7 @@ void World::UpdateSessions(uint32 diff)
         {
             if (pSession->PlayerLoading())
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] World::UpdateSession attempt to delete session %u loading a player.", pSession->GetAccountId());
-            
+
             AccountPlayHistory& history = m_accountsPlayHistory[pSession->GetAccountId()];
             if (!RemoveQueuedSession(pSession))
                 history.logoutTime = timeNow;

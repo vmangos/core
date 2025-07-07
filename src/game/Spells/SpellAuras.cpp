@@ -2227,7 +2227,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     {
                         if (apply)
                         {
-                            SpellModifier* mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, m_modifier.m_amount, GetId(), UI64LIT(0x0000000000000100));
+                            SpellModifier* mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, m_modifier.m_amount, GetId(), uint64(0x0000000000000100));
                             pPlayer->AddSpellMod(mod, true);
                         }
                         else
@@ -2246,7 +2246,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     {
                         if (apply)
                         {
-                            SpellModifier *mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, m_modifier.m_amount, GetId(), UI64LIT(0x0000000000000008));
+                            SpellModifier *mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, m_modifier.m_amount, GetId(), uint64(0x0000000000000008));
                             pPlayer->AddSpellMod(mod, true);
                         }
                         else
@@ -6887,7 +6887,7 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
     else
     {
         // remove this assert when not unit casters will be supported
-        MANGOS_ASSERT(caster->isType(TYPEMASK_UNIT))
+        MANGOS_ASSERT(caster->isType(TYPEMASK_UNIT));
         m_casterGuid = caster->GetObjectGuid();
     }
 
