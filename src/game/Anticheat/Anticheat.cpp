@@ -16,6 +16,7 @@
 
 #include "Anticheat.h"
 #include "IO/Multithreading/CreateThread.h"
+#include "Log.h"
 
 AnticheatManager* AnticheatManager::instance()
 {
