@@ -1389,6 +1389,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (32341, (@POINT := @POINT + 1), 2991.5984, -2012.574, 194.95964, 100),
 (32341, (@POINT := @POINT + 1), 2984.9797, -2043.4028, 201.1892, 100);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct Creature Position
+UPDATE `creature` SET `position_x` = -1686.72, `position_y` = -4326.52, `position_z` = 3.89036, `orientation` = 4.75596 WHERE `guid` = 14358;
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
