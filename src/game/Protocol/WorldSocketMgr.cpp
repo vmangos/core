@@ -21,6 +21,8 @@
  */
 
 #include "WorldSocketMgr.h"
+
+#include "Log.h"
 #include "WorldSocket.h"
 #include "Policies/SingletonImp.h"
 #include "IO/Networking/AsyncSocketAcceptor.h"

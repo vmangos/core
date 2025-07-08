@@ -24,6 +24,8 @@
 #ifndef __WARDENSCAN_HPP_
 #define __WARDENSCAN_HPP_
 
+#include <Errors.h>
+
 #include "ByteBuffer.h"
 #include "World.h"
 #include "Crypto/Hash/SHA1.h"

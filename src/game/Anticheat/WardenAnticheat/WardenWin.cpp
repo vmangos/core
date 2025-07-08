@@ -42,6 +42,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "Log.h"
+
 namespace
 {
 // fixed offsets for classic client(s):

@@ -41,6 +41,8 @@
 
 #include <memory>
 
+#include "Util.h"
+
 #if defined( __GNUC__ )
 #pragma pack(1)
 #else

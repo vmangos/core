@@ -24,6 +24,7 @@
 
 #include <array>
 #include "DBCStructure.h"
+#include "ItemPrototype.h"
 #include "SharedDefines.h"
 #include "SpellDefines.h"
 #include "SpellAuraDefines.h"

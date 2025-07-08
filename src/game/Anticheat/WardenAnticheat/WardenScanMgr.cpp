@@ -33,6 +33,8 @@
 #include <algorithm>
 #include <random>
 
+#include "Log.h"
+
 INSTANTIATE_SINGLETON_1(WardenScanMgr);
 
 namespace

@@ -21,6 +21,7 @@
 
 #include "Common.h"
 #include "UpdateData.h"
+#include <Errors.h>
 #include "ByteBuffer.h"
 #include "WorldPacket.h"
 #include "Log.h"
