@@ -25,7 +25,6 @@
 #define __WARDENSCAN_HPP_
 
 #include "ByteBuffer.h"
-#include "World.h"
 #include "Crypto/Hash/SHA1.h"
 
 #include <functional>
@@ -79,12 +78,7 @@ class Scan
         CheckT m_checker;
 
     protected:  // should not be called by the user
-        Scan(BuildT builder, CheckT checker, ScanFlags f, size_t req, size_t rep, uint32 minBuild, uint32 maxBuild, std::string const&c)
-            : m_builder(builder), m_checker(checker), checkId(0), flags(f), buildMin(minBuild), buildMax(maxBuild), comment(c), requestSize(req), replySize(rep)
-        { 
-            MANGOS_ASSERT(!((flags & ScanFlags::Windows) && (flags & ScanFlags::Mac)));
-            penalty = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY);
-        }
+        Scan(BuildT builder, CheckT checker, ScanFlags f, size_t req, size_t rep, uint32 minBuild, uint32 maxBuild, std::string const&c);
 
     public:
         uint32 checkId;

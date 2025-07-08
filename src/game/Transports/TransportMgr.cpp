@@ -25,6 +25,7 @@
 #include "MoveSplineInitArgs.h"
 #include "Map.h"
 #include "MapManager.h"
+#include "ObjectMgr.h"
 
 INSTANTIATE_SINGLETON_1(TransportMgr);
 

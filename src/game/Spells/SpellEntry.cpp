@@ -7,6 +7,7 @@
 #include "Spell.h"
 #include "ScriptMgr.h"
 #include "TradeData.h"
+#include "ItemPrototype.h"
 
 using namespace Spells;
 
@@ -1116,4 +1117,15 @@ bool SpellEntry::HasAuraOrTriggersAnotherSpellWithAura(AuraType aura) const
                     return true;
     }
     return false;
+}
+
+bool SpellEntry::CanTriggerWeaponProcs() const
+{
+    // All weapon based abilities can trigger weapon procs,
+    // even if they do no damage, or break on damage, like Sap.
+    // https://www.youtube.com/watch?v=klMsyF_Kz5o
+    if (EquippedItemClass == ITEM_CLASS_WEAPON && rangeIndex == SPELL_RANGE_IDX_COMBAT)
+        return true;
+
+    return HasAttribute(SPELL_CUSTOM_TRIGGER_WEAPON_PROCS);
 }

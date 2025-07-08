@@ -27,6 +27,7 @@
 #include "Opcodes.h"
 #include "World.h"
 #include "ObjectGuid.h"
+#include "Errors.h"
 #include <zlib.h>
 
 #define MAX_UNCOMPRESSED_PACKET_SIZE 0x8000 // 32ko

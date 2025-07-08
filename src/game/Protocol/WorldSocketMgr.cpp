@@ -22,6 +22,7 @@
 
 #include "WorldSocketMgr.h"
 #include "WorldSocket.h"
+#include "Log.h"
 #include "Policies/SingletonImp.h"
 #include "IO/Networking/AsyncSocketAcceptor.h"
 #include "IO/Multithreading/CreateThread.h"
