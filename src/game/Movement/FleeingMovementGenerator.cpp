@@ -62,7 +62,7 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T &owner)
         return;
     }
 
-    Movement::MoveSplineInit init(owner, "FleeingMovementGenerator");
+    Movement::MoveSplineInit init(owner, "FleeingMovementGenerator<T>::_setTargetLocation");
     init.Move(&path);
     init.SetWalk(_forceWalking);
     if (_customSpeed > 0)

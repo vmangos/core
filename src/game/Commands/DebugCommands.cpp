@@ -2079,7 +2079,7 @@ bool ChatHandler::HandleVideoTurn(char*)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%f %f %f", angle, d, z);
         a.push_back(Vector3(x + d * cos(angle), y + d * sin(angle), posZ));
     }
-    Movement::MoveSplineInit init(*m_session->GetPlayer());
+    Movement::MoveSplineInit init(*m_session->GetPlayer(), "HandleVideoTurn");
     init.MovebyPath(a);
     init.SetFly();
     init.SetVelocity(moveSpeed);
@@ -2127,7 +2127,7 @@ bool ChatHandler::HandleDebugExp(char*)
             a.push_back(Vector3(currx, curry, currz));
         }
 
-        Movement::MoveSplineInit init(*target);
+        Movement::MoveSplineInit init(*target, "HandleDebugExp");
         init.MovebyPath(a);
         init.SetWalk(true);
         init.SetVelocity(moveSpeed);
@@ -2649,7 +2649,7 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
             if (transport)
             {
                 transport->AddPassenger(wp);
-                Movement::MoveSplineInit init(*wp);
+                Movement::MoveSplineInit init(*wp, "HandleMmapPathCommand");
                 init.SetTransport(transport->GetGUIDLow());
                 init.SetFacing(wp->GetOrientation());
                 init.Launch();

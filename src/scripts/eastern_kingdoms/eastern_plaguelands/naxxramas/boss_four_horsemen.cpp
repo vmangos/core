@@ -40,7 +40,6 @@ enum FourHorsemenData
     SAY_BLAU_SPECIAL         = 13013,
     SAY_BLAU_SLAY            = 13012,
     SAY_BLAU_DEATH           = 13011,
-    // SAY_BLAU_UNYIELDING_PAIN = -1533156, // todo: add use (need bct id, check whether this text was in vanilla)
 
     SPELL_MARK_OF_BLAUMEUX   = 28833,
     SPELL_SPIRIT_OF_BLAUMEUX = 28931,
@@ -76,7 +75,6 @@ enum FourHorsemenData
     SPELL_METEOR             = 28884, // wowhead dmg amount suggests spell 26558, but 28884 makes way more sense due to the id range
 
     // Sir Zeliek
-    // EMOTE_ZELI_CONDEMNATION = -1533157, // todo: add usage (need bct id, check whether this text was in vanilla)
     SAY_ZELI_AGGRO          = 13097,
     
     // SAY_ZELI_TAUNT1         = 13101, // called by instance script after gothik kill

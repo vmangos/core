@@ -32,7 +32,7 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
         static uint32 const nbCyclesPerPacket = 1;
         for (uint32 i = 0; i <= nbCyclesPerPacket * ptsPerCycle; ++i)
             path.emplace_back(i_startPosition.x + i_wanderDistance * cos(i * 2 * M_PI / ptsPerCycle), i_startPosition.y + i_wanderDistance * sin(i * 2 * M_PI / ptsPerCycle), i_startPosition.z);
-        Movement::MoveSplineInit init(creature, "RandomMovementGenerator (CanFly)");
+        Movement::MoveSplineInit init(creature, "RandomMovementGenerator::_setRandomLocation (CanFly)");
         init.SetFly();
         init.SetWalk(false);
         init.MovebyPath(path);
@@ -47,7 +47,7 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
         return;
 
     creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
-    Movement::MoveSplineInit init(creature, "RandomMovementGenerator");
+    Movement::MoveSplineInit init(creature, "RandomMovementGenerator::_setRandomLocation");
     init.MoveTo(destX, destY, destZ, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
     init.SetWalk(!creature.HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_RUN));
     init.Launch();

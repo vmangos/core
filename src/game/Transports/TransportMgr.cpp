@@ -337,7 +337,7 @@ TransportAnimationEntry const* TransportAnimation::GetNextAnimNode(uint32 time) 
     return nullptr;
 }
 
-Transport* TransportMgr::CreateTransport(uint32 entry, Map* map /*= nullptr*/)
+ShipTransport* TransportMgr::CreateTransport(uint32 entry, Map* map /*= nullptr*/)
 {
     // instance case, execute GetGameObjectEntry hook
     if (map && !entry)
@@ -351,7 +351,7 @@ Transport* TransportMgr::CreateTransport(uint32 entry, Map* map /*= nullptr*/)
     }
 
     // create transport...
-    Transport* trans = new Transport(*tInfo);
+    ShipTransport* trans = new ShipTransport(*tInfo);
 
     // ...at first waypoint
     TaxiPathNodeEntry const* startNode = tInfo->keyFrames.begin()->Node;
@@ -383,7 +383,7 @@ Transport* TransportMgr::CreateTransport(uint32 entry, Map* map /*= nullptr*/)
     trans->SetMap(map ? map : sMapMgr.CreateMap(mapId, trans));
 
     // Passengers will be loaded once a player is near
-    trans->GetMap()->Add<Transport>(trans);
+    trans->GetMap()->Add<ShipTransport>(trans);
     return trans;
 }
 

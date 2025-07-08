@@ -1326,11 +1326,6 @@ enum PetDiet
 
 #define CHAIN_SPELL_JUMP_RADIUS 10
 
-// Max values for Guild
-#define GUILD_EVENTLOG_MAX_RECORDS  100
-#define GUILD_RANKS_MIN_COUNT       5
-#define GUILD_RANKS_MAX_COUNT       10
-
 enum AiReaction
 {
     AI_REACTION_ALERT    = 0,                               // pre-aggro (used in client packet handler)

@@ -757,6 +757,16 @@ void Guild::Disband()
     sGuildMgr.RemoveGuild(m_Id);
 }
 
+inline uint8 GetGuildRosterFlagsForPlayer(Player* pPlayer)
+{
+    uint8 flags = GRF_ONLINE;
+    if (pPlayer->IsAFK())
+        flags |= GRF_AFK;
+    if (pPlayer->IsDND())
+        flags |= GRF_DND;
+    return flags;
+}
+
 void Guild::Roster(WorldSession* session /*= nullptr*/)
 {
     // we can only guess size
@@ -805,7 +815,7 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
         if (Player* pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr.first)))
         {
             data << pl->GetObjectGuid();
-            data << uint8(1);
+            data << uint8(GetGuildRosterFlagsForPlayer(pl));
             data << itr.second.Name;
             data << uint32(itr.second.RankId);
             data << uint8(pl->GetLevel());

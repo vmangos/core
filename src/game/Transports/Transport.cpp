@@ -34,7 +34,7 @@
 
 #include <G3D/Quat.h>
 
-Transport::Transport(TransportTemplate const& transportTemplate) : GenericTransport(), m_transportTemplate(transportTemplate), m_isMoving(true), m_pendingStop(false)
+ShipTransport::ShipTransport(TransportTemplate const& transportTemplate) : GenericTransport(), m_transportTemplate(transportTemplate), m_isMoving(true), m_pendingStop(false)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT;
 
@@ -45,7 +45,7 @@ Transport::Transport(TransportTemplate const& transportTemplate) : GenericTransp
     SetPeriod(transportTemplate.pathTime);
 }
 
-bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)
+bool ShipTransport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)
 {
     Relocate(x, y, z, ang);
 
@@ -104,21 +104,21 @@ void GenericTransport::CleanupsBeforeDelete()
     GameObject::CleanupsBeforeDelete();
 }
 
-void Transport::MoveToNextWayPoint()
+void ShipTransport::MoveToNextWayPoint()
 {
     m_currentFrame = m_nextFrame++;
     if (m_nextFrame == GetKeyFrames().end())
         m_nextFrame = GetKeyFrames().begin();
 }
 
-bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, float o)
+bool ShipTransport::TeleportTransport(uint32 newMapid, float x, float y, float z, float o)
 {
     Map const* oldMap = GetMap();
 
     uint32 newInstanceId = sMapMgr.GetContinentInstanceId(newMapid, x, y);
     SetLocationInstanceId(newInstanceId);
     Map* newMap = sMapMgr.CreateMap(newMapid, this);
-    GetMap()->Remove<Transport>(this, false);
+    GetMap()->Remove<ShipTransport>(this, false);
     SetMap(newMap);
 
     for (m_passengerTeleportItr = m_passengers.begin(); m_passengerTeleportItr != m_passengers.end();)
@@ -196,15 +196,19 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
     }
 
     Relocate(x, y, z, o);
-    GetMap()->Add<Transport>(this);
+    GetMap()->Add<ShipTransport>(this);
 
     return newMap != oldMap;
 }
 
 void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
 {
-    std::lock_guard<std::mutex> lock(m_passengerMutex);
-    if (m_passengers.insert(passenger).second)
+    // we need to unlock right away because SetTransport can dismount and resummon pet, which will call AddPassanger again
+    std::unique_lock<std::mutex> lock(m_passengerMutex);
+    bool const boarded = m_passengers.insert(passenger).second;
+    lock.unlock();
+
+    if (boarded)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Unit %s boarded transport %s.", passenger->GetName(), GetName());
         passenger->SetTransport(this);
@@ -226,7 +230,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
 {
     bool erased = false;
 
-    std::lock_guard<std::mutex> lock(m_passengerMutex);
+    std::unique_lock<std::mutex> lock(m_passengerMutex);
     if (m_passengerTeleportItr != m_passengers.end())
     {
         PassengerSet::iterator itr = m_passengers.find(passenger);
@@ -241,6 +245,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
     }
     else
         erased = m_passengers.erase(passenger) > 0;
+    lock.unlock();
 
     if (erased)
     {
@@ -275,7 +280,7 @@ void GenericTransport::RemoveFollowerFromTransport(Unit* passenger, Unit* follow
     }
 }
 
-void Transport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
+void ShipTransport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
 {
     uint32 const positionUpdateDelay = 50;
 
@@ -342,7 +347,7 @@ void Transport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
     }
 }
 
-float Transport::CalculateSegmentPos(float now)
+float ShipTransport::CalculateSegmentPos(float now)
 {
     KeyFrame const& frame = *m_currentFrame;
     float const speed = float(m_goInfo->moTransport.moveSpeed);

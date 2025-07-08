@@ -326,5 +326,5 @@ template <class T> std::shared_timed_mutex HashMapHolder<T>::i_lock;
 
 template class HashMapHolder<Player>;
 template class HashMapHolder<Corpse>;
-template class HashMapHolder<Transport>;
+template class HashMapHolder<ShipTransport>;
 template class HashMapHolder<MasterPlayer>;

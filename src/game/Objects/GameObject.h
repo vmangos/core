@@ -33,7 +33,7 @@
 class Unit;
 class GameObjectAI;
 class GameObjectModel;
-class Transport;
+class ShipTransport;
 struct TransportAnimation;
 
 struct GameObjectDisplayInfoEntry;

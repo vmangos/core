@@ -76,7 +76,7 @@ void CyclicMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
         PathFinder path(&owner);
         path.calculate(firstNode.x, firstNode.y, firstNode.z, true);
 
-        Movement::MoveSplineInit init(owner, "CyclicMovementGenerator");
+        Movement::MoveSplineInit init(owner, "CyclicMovementGenerator<Creature>::_setTargetLocation (going to first node)");
         if (owner.CanFly())
             init.SetFly();
         init.SetWalk(!owner.HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_RUN));
@@ -90,7 +90,7 @@ void CyclicMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
         for (auto const& node : *i_path)
             genPath[node.first] = G3D::Vector3(node.second.x, node.second.y, node.second.z);
 
-        Movement::MoveSplineInit init(owner, "CyclicMovementGenerator");
+        Movement::MoveSplineInit init(owner, "CyclicMovementGenerator<Creature>::_setTargetLocation (looping)");
         if (owner.CanFly())
             init.SetFly();
         init.SetWalk(!owner.HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_RUN));

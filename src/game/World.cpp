@@ -40,6 +40,7 @@
 #include "AuctionHouseMgr.h"
 #include "ObjectMgr.h"
 #include "CreatureEventAIMgr.h"
+#include "Guild.h"
 #include "GuildMgr.h"
 #include "SpellMgr.h"
 #include "Chat.h"

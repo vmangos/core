@@ -36,24 +36,18 @@ Enrages 26527*/
 
 enum GrobbulusData
 {
-    // EMOTE_SPRAY_SLIME   = -1533021, // todo: not working, should it?
-    // EMOTE_INJECTION     = -1533158, // todo: not working, should it?
-
-    SPELL_SLIME_STREAM = 28137,
+    SPELL_SLIME_STREAM       = 28137,
     SPELL_MUTATING_INJECTION = 28169,
-    SPELL_SLIME_SPRAY = 28157,
-    SPELL_BERSERK = 26662,
-
-    SPELL_POISON_CLOUD          = 28240, // Summons a poison cloud npc
-    SPELL_MUTAGEN_EXPLOSION     = 28206,
+    SPELL_SLIME_SPRAY        = 28157,
+    SPELL_BERSERK            = 26662,
+    SPELL_POISON_CLOUD       = 28240, // Summons a poison cloud npc
+    SPELL_MUTAGEN_EXPLOSION  = 28206,
     //SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud, triggers 28241 every second
+    //SPELL_DISEASE_CLOUD         = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes EventAI
+    SPELL_BOMBARD_SLIME      = 28280, // todo: should spawn a slime at the room before patch every patroll round, if any are dead.
 
-    //SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes EventAI
-
-    SPELL_BOMBARD_SLIME = 28280, // todo: should spawn a slime at the room before patch every patroll round, if any are dead.
-
-    NPC_FALLOUT_SLIME   = 16290,
-    NPC_POISON_CLOUD    = 16363
+    NPC_FALLOUT_SLIME        = 16290,
+    NPC_POISON_CLOUD         = 16363
 };
 
 enum eGrobbulusEvents

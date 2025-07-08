@@ -314,7 +314,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
     WorldObject::Update(update_diff, update_diff);
     if (GetObjectGuid().IsMOTransport())
     {
-        //((Transport*)this)->Update(p_time);
+        //((ShipTransport*)this)->Update(p_time);
         return;
     }
 

@@ -1484,7 +1484,7 @@ void WorldObject::Relocate(float x, float y, float z, float orientation)
 
     m_movementInfo.ChangePosition(x, y, z, orientation);
     m_movementInfo.UpdateTime(WorldTimer::getMSTime());
-    /*if (Transport* t = GetTransport())
+    /*if (ShipTransport* t = GetTransport())
     {
         t->CalculatePassengerOffset(x, y, z);
         m_movementInfo.t_pos.x = x;

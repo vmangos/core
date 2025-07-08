@@ -968,6 +968,7 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAllSpellCommand(char* /*args*/)
 {
+    HandleReloadSpellTemplateCommand((char*)"a");
     HandleReloadSpellAreaCommand((char*)"a");
     HandleReloadSpellChainCommand((char*)"a");
     HandleReloadSpellElixirCommand((char*)"a");
@@ -1402,6 +1403,16 @@ bool ChatHandler::HandleReloadSpellTargetPositionCommand(char* /*args*/)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading spell target destination coordinates...");
     sSpellMgr.LoadSpellTargetPositions();
     SendSysMessage("DB table `spell_target_position` (destination coordinates for spell targets) reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadSpellTemplateCommand(char* /*args*/)
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading Spell Definitions...");
+    sSpellMgr.LoadSpells();
+    SendSysMessage("DB table `spell_template` reloaded.");
+    sSpellModMgr.LoadSpellMods();
+    SendSysMessage("DB table `spell_mod` reloaded.");
     return true;
 }
 

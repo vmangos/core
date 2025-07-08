@@ -63,7 +63,7 @@ class BattleGround;
 class WeatherSystem;
 class GenericTransport;
 class ElevatorTransport;
-class Transport;
+class ShipTransport;
 
 namespace VMAP
 {

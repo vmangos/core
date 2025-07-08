@@ -1385,7 +1385,7 @@ void WarEffortEvent::Update()
             // mobs spawn
             UpdateStageTransitionTime();
 
-            sWorld.SendWorldText(WAR_EFFORT_TEXT_CRYSTALS);
+            sWorld.SendBroadcastTextToWorld(WAR_EFFORT_TEXT_CRYSTALS);
 
             BeginWar();
 
@@ -1416,7 +1416,7 @@ void WarEffortEvent::Update()
             // 10 hours have passed, it's all over
             if (now - gongRingTime > WAR_EFFORT_GONG_DURATION)
             {
-                sWorld.SendWorldText(WAR_EFFORT_TEXT_BATTLE_OVER);
+                sWorld.SendBroadcastTextToWorld(WAR_EFFORT_TEXT_BATTLE_OVER);
 
                 stage = WAR_EFFORT_STAGE_COMPLETE;
                 UpdateStageTransitionTime();

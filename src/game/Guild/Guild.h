@@ -27,11 +27,14 @@
 
 class Petition;
 
+#define GUILD_EVENTLOG_MAX_RECORDS  100
 #define GUILD_RANKS_MIN_COUNT   5
 #define GUILD_RANKS_MAX_COUNT   10
 
 enum
 {
+    GUILD_RANK_MAX_LENGTH       = 15,
+    GUILD_NAME_MAX_LENGTH       = 24,
     GUILD_NOTE_MAX_LENGTH       = 31,
     GUILD_INFO_MAX_LENGTH       = 500,
     GUILD_MOTD_MAX_LENGTH       = 128,
@@ -127,10 +130,17 @@ enum GuildEvents
     GE_LEADER_CHANGED               = 0x07,
     GE_DISBANDED                    = 0x08,
     GE_TABARDCHANGE                 = 0x09,
-    GE_UNK1                         = 0x0A,                 // string, string EVENT_GUILD_ROSTER_UPDATE tab content change?
-    GE_UNK2                         = 0x0B,                 // EVENT_GUILD_ROSTER_UPDATE
+    GE_UPDATE_RANK_NAME             = 0x0A,                 // Arg1: RankID, Arg2: NewRankName
+    GE_UPDATE_ROSTER                = 0x0B,                 // EVENT_GUILD_ROSTER_UPDATE
     GE_SIGNED_ON                    = 0x0C,                 // ERR_FRIEND_ONLINE_SS
     GE_SIGNED_OFF                   = 0x0D,                 // ERR_FRIEND_OFFLINE_S
+};
+
+enum GuildRosterFlags
+{
+    GRF_ONLINE                      = 0x01,
+    GRF_AFK                         = 0x02,
+    GRF_DND                         = 0x04
 };
 
 enum PetitionSigns

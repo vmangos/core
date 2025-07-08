@@ -67,7 +67,7 @@ bool MapSessionFilter::Process(std::unique_ptr<WorldPacket> const& packet)
     return MapSessionFilterHelper(m_pSession, opHandle);
 }
 
-static uint32 g_sessionCounter = 0;
+static uint32 g_sessionCounter = 1;
 
 // WorldSession constructor
 WorldSession::WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, AccountTypes sec, time_t mute_time, LocaleConstant locale) :
