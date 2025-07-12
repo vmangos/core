@@ -70,10 +70,26 @@ void IO::IoContext::PostForImmediateInvocation(IO::SystemIoEventReceiver* eventR
     struct kevent addedEvent{};
 
     // Create and trigger a one-time event
+#if defined(__APPLE__)
+    // Apple allow this in just one system call
     EV_SET(&addedEvent, (uint64_t)(eventReceiver), EVFILT_USER, EV_ADD | EV_ONESHOT, NOTE_TRIGGER, 0, eventReceiver);
-
     if (::kevent(m_kqueueDescriptor, &addedEvent, 1, nullptr, 0, nullptr) == -1)
     {
-        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "PostKqueueEventForImmediateExecution() -> ::kevent(...) Error: %s", SystemErrorToString(errno).c_str());
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "PostForImmediateInvocation() -> ::kevent(...) Error: %s", SystemErrorToString(errno).c_str());
     }
+#else
+    // On BSD we have to make two system calls, one to post the event, one to trigger it :/
+    EV_SET(&addedEvent, (uint64_t)(eventReceiver), EVFILT_USER, EV_ADD | EV_ONESHOT, 0, 0, eventReceiver);
+    if (::kevent(m_kqueueDescriptor, &addedEvent, 1, nullptr, 0, nullptr) == -1)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "PostForImmediateInvocation() -> ::kevent(post, ...) Error: %s", SystemErrorToString(errno).c_str());
+    }
+
+    // trigger it
+    EV_SET(&addedEvent, (uint64_t)(eventReceiver), EVFILT_USER, 0, NOTE_TRIGGER, 0, eventReceiver);
+    if (::kevent(m_kqueueDescriptor, &addedEvent, 1, nullptr, 0, nullptr) == -1)
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "PostForImmediateInvocation() -> ::kevent(trigger, ...) Error: %s", SystemErrorToString(errno).c_str());
+    }
+#endif
 }
