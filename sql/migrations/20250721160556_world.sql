@@ -288,6 +288,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 
 
 
+
 -- End of migration.
 END IF;
 END??
