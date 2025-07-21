@@ -237,7 +237,55 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 
 -- Quest 1103 End Script
+
 UPDATE `quest_template` SET `PrevQuestId` = 220 WHERE `entry` = 972;
+UPDATE `quest_template` SET `PrevQuestId` = 63 WHERE `entry` = 1103;
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES 
+(9735, 0, 101750, 0, 0, 0, 5875);
+
+DELETE FROM `quest_end_scripts` WHERE `id`=1103;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1103, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Remove Standstate'),
+(1103, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3069, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Talk'),
+(1103, 3, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 7007, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Start Waypoints');
+
+
+
+
+
+
+
+
+
+
+
+
+DELETE FROM `creature_movement_special` WHERE `id` = 7007;
+INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`, `path_id`) VALUES
+(7007, 1, 431.493, 1869.76, 10.9623, 100, 6000, 0, 700700, 0),
+(7007, 2, 433.69, 1865.99, 10.5627, 100, 0, 0, 0, 0),
+(7007, 3, 435.59, 1863.4, 10.6, 100, 0, 0, 0, 0),
+(7007, 4, 419.184, 1849.87, 11.6537, 100, 0, 0, 0, 0),
+(7007, 5, 419.108, 1845.34, 11.9373, 100, 15000, 0, 0, 0),
+(7007, 6, 418.881, 1834.54, 10.5858, 100, 0, 0, 0, 0),
+(7007, 7, 416.736, 1827.01, 11.6469, 100, 16000, 0, 0, 0),
+(7007, 8, 424.093, 1833.23, 9.8055, 100, 0, 0, 0, 0),
+(7007, 9, 435.794, 1853.76, 10.9224, 100, 0, 0, 0, 0),
+(7007, 10, 434.792, 1868.7, 10.2297, 100, 0, 0, 0, 0),
+(7007, 11, 430.836, 1880.7, 15.1794, 100, 0, 0, 0, 0),
+(7007, 12, 430.385, 1881.86, 15.4235, 100, 0, 0, 0, 0),
+(7007, 13, 430.385, 1881.86, 15.4235, 5.131, 4000, 0, 0, 0);
+
+
+
+
+
+DELETE FROM `creature_movement_scripts` WHERE `id`=700700;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(700700, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3070, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Talk'),
+(700700, 3, 0, 35, 0, 0, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Set Orientation'),
+(700700, 3, 1, 15, 9735, 0, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Cast Spell');
+
 
 
 -- End of migration.
