@@ -199,7 +199,7 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 DELETE FROM `generic_scripts` WHERE `id` = 100;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(100, 0, 1, 68, 5897, 2, 5897, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Corrupt Water Spirit - Start Script For All '),
+(100, 0, 1, 68, 5897, 2, 5897, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Corrupt Water Spirit - Start Script For All'),
 (100, 1, 0, 9, 15176, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Gameobject'),
 (100, 12, 0, 9, 15175, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Gameobject'),
 (100, 15, 0, 10, 5895, 360000, 0, 0, 0, 0, 0, 0, 4, 0, -1, 1, 417.04, 1822.66, 12.61, 1.483, 0, 'Call of Water - Summon Minor Manifestation of Water'),
