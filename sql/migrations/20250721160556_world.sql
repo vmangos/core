@@ -285,6 +285,12 @@ DELETE FROM `creature_movement_scripts` WHERE `id`=700703;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (700703, 0, 0, 28, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Set Standstate');
 
+-- Misc
+UPDATE `quest_template` SET `OfferRewardText` = 'The wind approaches you quickly from the horizon; the earth is steady beneath your feet; and your spirit is already warmed by fire--I would say it is time for you to learn about the purity of water.$B$BYour path has led you this far, and your spirit will give you the strength to carry on even further. But the first step is yours to take.' WHERE `entry` = 2986;
+INSERT INTO `creature_questrelation` (`id`, `quest`) VALUES
+(3066, 2986),
+(3173, 2985);
+
 
 -- End of migration.
 END IF;
