@@ -254,6 +254,7 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { "fly",            SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatFlyCommand,               "", nullptr },
         { "fixedz",         SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatFixedZCommand,            "", nullptr },
+        { "beastmaster",    SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatBeastmasterCommand,       "", nullptr },
         { "god",            SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatGodCommand,               "", nullptr },
         { "cooldown",       SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatCooldownCommand,          "", nullptr },
         { "casttime",       SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatCastTimeCommand,          "", nullptr },
@@ -447,6 +448,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "uninvite",       SEC_GAMEMASTER,     true,  &ChatHandler::HandleGuildUninviteCommand,       "", nullptr },
         { "rank",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleGuildRankCommand,           "", nullptr },
         { "rename",         SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleGuildRenameCommand,         "", nullptr },
+        { "showlog",        SEC_GAMEMASTER,     true,  &ChatHandler::HandleGuildShowLogCommand,        "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
@@ -473,6 +475,7 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { "continents",     SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleInstanceContinentsCommand,  "", nullptr },
         { "getdata",        SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceGetDataCommand,     "", nullptr },
+        { "setdata",        SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceSetDataCommand,     "", nullptr },
         { "listbinds",      SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceListBindsCommand,   "", nullptr },
         { "unbind",         SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceUnbindCommand,      "", nullptr },
         { "groupunbind",    SEC_BASIC_ADMIN,    false, &ChatHandler::HandleInstanceGroupUnbindCommand, "", nullptr },
@@ -524,6 +527,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "movegens",       SEC_TICKETMASTER,  false, &ChatHandler::HandleListMoveGensCommand,       "", nullptr },
         { "hostilerefs",    SEC_TICKETMASTER,  false, &ChatHandler::HandleListHostileRefsCommand,    "", nullptr },
         { "threat",         SEC_TICKETMASTER,  false, &ChatHandler::HandleListThreatCommand,         "", nullptr },
+        { "visibleguids",   SEC_TICKETMASTER,  false, &ChatHandler::HandleListVisibleGuidsCommand,   "", nullptr },
         { nullptr,          0,                 false, nullptr,                                       "", nullptr }
     };
 
@@ -798,41 +802,52 @@ ChatCommand * ChatHandler::getCommandTable()
         { "anticheat",      SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadAnticheatCommand,     "", nullptr },
         { "config",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadConfigCommand,        "", nullptr },
 
+        { "account_banned",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadAccountBanList,                 "", nullptr },
         { "areatrigger_involvedrelation", SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadQuestAreaTriggersCommand,       "", nullptr },
         { "areatrigger_tavern",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadAreaTriggerTavernCommand,       "", nullptr },
         { "areatrigger_teleport",         SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadAreaTriggerTeleportCommand,     "", nullptr },
+        { "autobroadcast",                SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadAutoBroadcastCommand,           "", nullptr },
         { "character_pet",                SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadCharacterPetCommand,            "", nullptr },
+        { "cinematic_waypoints",          SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCinematicWaypointsCommand,      "", nullptr },
         { "command",                      SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadCommandCommand,                 "", nullptr },
         { "conditions",                   SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadConditionsCommand,              "", nullptr },
         { "creature",                     SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureCommand,                "", nullptr },
         { "creature_ai_events",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadEventAIEventsCommand,           "", nullptr },
         { "creature_battleground",        SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadBattleEventCommand,             "", nullptr },
+        { "creature_display_info_addon",  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureDisplayInfoAddon,       "", nullptr },
+        { "creature_groups",              SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureGroupsCommand,          "", nullptr },
         { "creature_involvedrelation",    SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureQuestInvRelationsCommand, "", nullptr },
         { "creature_loot_template",       SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesCreatureCommand,   "", nullptr },
+        { "creature_onkill_reputation",   SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureOnKillReputation,       "", nullptr },
         { "creature_questrelation",       SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureQuestRelationsCommand,  "", nullptr },
         { "creature_spells",              SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureSpellsCommand,          "", nullptr },
         { "creature_spells_scripts",      SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureSpellScriptsCommand,    "", nullptr },
         { "creature_template",            SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureTemplatesCommand,       "", nullptr },
         { "disenchant_loot_template",     SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesDisenchantCommand, "", nullptr },
         { "event_scripts",                SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadEventScriptsCommand,            "", nullptr },
+        { "exploration_basexp",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadExplorationBaseXp,              "", nullptr },
         { "fishing_loot_template",        SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesFishingCommand,    "", nullptr },
         { "game_graveyard_zone",          SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGameGraveyardZoneCommand,       "", nullptr },
         { "game_tele",                    SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGameTeleCommand,                "", nullptr },
-        { "taxi_path_transitions",        SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadTaxiPathTransitionsCommand,     "", nullptr },
+        { "game_weather",                 SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGameWeather,                    "", nullptr },
         { "gameobject",                   SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGameObjectCommand,              "", nullptr },
+        { "gameobject_battleground",      SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadBattleEventCommand,             "", nullptr },
         { "gameobject_involvedrelation",  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGOQuestInvRelationsCommand,     "", nullptr },
         { "gameobject_loot_template",     SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesGameobjectCommand, "", nullptr },
         { "gameobject_questrelation",     SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGOQuestRelationsCommand,        "", nullptr },
         { "gameobject_requirement",       SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGORequirementsCommand,          "", nullptr },
         { "gameobject_scripts",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGameObjectScriptsCommand,       "", nullptr },
-        { "gameobject_battleground",      SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadBattleEventCommand,             "", nullptr },
+        { "gameobject_template",          SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGameObjectTemplatesCommand,     "", nullptr },
+        { "generic_scripts",              SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGenericScriptsCommand,          "", nullptr },
         { "gossip_menu",                  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGossipMenuCommand,              "", nullptr },
         { "gossip_menu_option",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGossipMenuOptionCommand,        "", nullptr },
-        { "generic_scripts",              SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGenericScriptsCommand,          "", nullptr },
         { "gossip_scripts",               SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGossipScriptsCommand,           "", nullptr },
+        { "instance_buff_removal",        SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadInstanceBuffRemoval,            "", nullptr },
+        { "ip_banned",                    SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadIPBanList,                      "", nullptr },
         { "item_enchantment_template",    SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadItemEnchantementsCommand,       "", nullptr },
         { "item_loot_template",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesItemCommand,       "", nullptr },
         { "item_required_target",         SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadItemRequiredTragetCommand,      "", nullptr },
+        { "item_template",                SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadItemTemplate,                   "", nullptr },
         { "locales_creature",             SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLocalesCreatureCommand,         "", nullptr },
         { "locales_gameobject",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLocalesGameobjectCommand,       "", nullptr },
         { "locales_gossip_menu_option",   SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLocalesGossipMenuOptionCommand, "", nullptr },
@@ -842,63 +857,52 @@ ChatCommand * ChatHandler::getCommandTable()
         { "locales_quest",                SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLocalesQuestCommand,            "", nullptr },
         { "mail_loot_template",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesMailCommand,       "", nullptr },
         { "mangos_string",                SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadMangosStringCommand,            "", nullptr },
+        { "map_loot_disabled",            SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadMapLootDisabledCommand,         "", nullptr },
+        { "map_template",                 SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadMapTemplate,                    "", nullptr },
         { "npc_gossip",                   SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadNpcGossipCommand,               "", nullptr },
         { "npc_text",                     SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadNpcTextCommand,                 "", nullptr },
         { "npc_trainer",                  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadNpcTrainerCommand,              "", nullptr },
         { "npc_vendor",                   SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadNpcVendorCommand,               "", nullptr },
         { "page_text",                    SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadPageTextsCommand,               "", nullptr },
-        { "pickpocketing_loot_template",  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesPickpocketingCommand, "", nullptr},
+        { "pet_name_generation",          SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadPetNameGeneration,              "", nullptr },
+        { "petitions",                    SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadPetitions,                      "", nullptr },
+        { "pickpocketing_loot_template",  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesPickpocketingCommand, "", nullptr },
+        { "player_factionchange_items",   SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadFactionChangeItems,             "", nullptr },
+        { "player_factionchange_mounts",  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadFactionChangeMounts,            "", nullptr },
+        { "player_factionchange_quests",  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadFactionChangeQuests,            "", nullptr },
+        { "player_factionchange_reputations", SEC_DEVELOPER, true,  &ChatHandler::HandleReloadFactionChangeReputations,       "", nullptr },
+        { "player_factionchange_spells",  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadFactionChangeSpells,            "", nullptr },
         { "points_of_interest",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadPointsOfInterestCommand,        "", nullptr },
         { "quest_end_scripts",            SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadQuestEndScriptsCommand,         "", nullptr },
+        { "quest_greeting",               SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadQuestGreetingCommand,           "", nullptr },
         { "quest_start_scripts",          SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadQuestStartScriptsCommand,       "", nullptr },
         { "quest_template",               SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadQuestTemplateCommand,           "", nullptr },
-        { "quest_greeting",               SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadQuestGreetingCommand,           "", nullptr },
-        { "trainer_greeting",             SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadTrainerGreetingCommand,         "", nullptr },
         { "reference_loot_template",      SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesReferenceCommand,  "", nullptr },
-        { "reserved_name",                SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReservedNameCommand,            "", nullptr },
         { "reputation_reward_rate",       SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadReputationRewardRateCommand,    "", nullptr },
         { "reputation_spillover_template", SEC_DEVELOPER,    true, &ChatHandler::HandleReloadReputationSpilloverTemplateCommand, "", nullptr },
+        { "reserved_name",                SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReservedNameCommand,            "", nullptr },
         { "skill_fishing_base_level",     SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSkillFishingBaseLevelCommand,   "", nullptr },
         { "skinning_loot_template",       SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadLootTemplatesSkinningCommand,   "", nullptr },
         { "spell_area",                   SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellAreaCommand,               "", nullptr },
         { "spell_chain",                  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellChainCommand,              "", nullptr },
+        { "spell_disabled",               SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellDisabledCommand,           "", nullptr },
         { "spell_elixir",                 SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellElixirCommand,             "", nullptr },
+        { "spell_group",                  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellGroupCommand,              "", nullptr },
+        { "spell_group_stack_rules",      SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellGroupStackRulesCommand,    "", nullptr },
         { "spell_learn_spell",            SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellLearnSpellCommand,         "", nullptr },
+        { "spell_mod",                    SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellModsCommand,               "", nullptr },
         { "spell_pet_auras",              SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellPetAurasCommand,           "", nullptr },
         { "spell_proc_event",             SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellProcEventCommand,          "", nullptr },
         { "spell_proc_item_enchant",      SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellProcItemEnchantCommand,    "", nullptr },
         { "spell_script_target",          SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellScriptTargetCommand,       "", nullptr },
         { "spell_scripts",                SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellScriptsCommand,            "", nullptr },
         { "spell_target_position",        SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellTargetPositionCommand,     "", nullptr },
+        { "spell_template",               SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellTemplateCommand,           "", nullptr },
         { "spell_threats",                SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellThreatsCommand,            "", nullptr },
-        { "spell_disabled",               SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellDisabledCommand,           "", nullptr },
-        { "autobroadcast",                SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadAutoBroadcastCommand,           "", nullptr },
-        { "spell_mod",                    SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellModsCommand,               "", nullptr },
-        { "map_loot_disabled",            SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadMapLootDisabledCommand,         "", nullptr },
-        { "cinematic_waypoints",          SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCinematicWaypointsCommand,      "", nullptr },
+        { "taxi_path_transitions",        SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadTaxiPathTransitionsCommand,     "", nullptr },
+        { "trainer_greeting",             SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadTrainerGreetingCommand,         "", nullptr },
         { "variables",                    SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadVariablesCommand,               "", nullptr },
-        { "spell_group",                  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellGroupCommand,              "", nullptr },
-        { "spell_group_stack_rules",      SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadSpellGroupStackRulesCommand,    "", nullptr },
-        { "creature_groups",              SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureGroupsCommand,          "", nullptr },
-        { "creature_template",           SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureTemplate,               "", nullptr },
-        { "item_template",               SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadItemTemplate,                   "", nullptr },
-        { "map_template",                SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadMapTemplate,                    "", nullptr },
-        { "gameobject_template",         SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGameObjectTemplate,             "", nullptr },
-        { "exploration_basexp",          SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadExplorationBaseXp,              "", nullptr },
-        { "pet_name_generation",         SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadPetNameGeneration,              "", nullptr },
-        { "creature_onkill_reputation",  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureOnKillReputation,       "", nullptr },
-        { "game_weather",                SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadGameWeather,                    "", nullptr },
-        { "player_factionchange_reputations", SEC_DEVELOPER,  true,  &ChatHandler::HandleReloadFactionChangeReputations,     "", nullptr },
-        { "player_factionchange_spells", SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadFactionChangeSpells,            "", nullptr },
-        { "player_factionchange_items",  SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadFactionChangeItems,             "", nullptr },
-        { "player_factionchange_quests", SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadFactionChangeQuests,            "", nullptr },
-        { "player_factionchange_mounts", SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadFactionChangeMounts,            "", nullptr },
-        { "creature_display_info_addon", SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadCreatureDisplayInfoAddon,       "", nullptr },
-        { "ip_banned",                   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadIPBanList,                      "", nullptr },
-        { "account_banned",              SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadAccountBanList,                 "", nullptr },
-        { "instance_buff_removal",       SEC_DEVELOPER,     true,  &ChatHandler::HandleReloadInstanceBuffRemoval,            "", nullptr },
-        { "petitions",                   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadPetitions,                      "", nullptr },
-        { nullptr,                       0,                 false, nullptr,                                                  "", nullptr }
+        { nullptr,                        0,                 false, nullptr,                                                  "", nullptr }
     };
 
     static ChatCommand resetCommandTable[] =
@@ -3601,7 +3605,7 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
             if (!ExtractUInt32(&idS, id))
                 return false;
 
-            if (ObjectMgr::GetGameObjectInfo(id))
+            if (sObjectMgr.GetGameObjectTemplate(id))
             {
                 FindGOData worker(id, m_session ? m_session->GetPlayer() : nullptr);
 
@@ -3889,6 +3893,15 @@ bool ChatHandler::ExtractRaceMask(char** text, uint32& raceMask, char const** ma
 std::string ChatHandler::GetNameLink(Player* chr) const
 {
     return playerLink(chr->GetName());
+}
+
+std::string ChatHandler::GetNameLink(uint32 guidLow) const
+{
+    std::string name;
+    if (sObjectMgr.GetPlayerNameByGUID(ObjectGuid(HIGHGUID_PLAYER, guidLow), name))
+        return playerLink(name);
+    else
+        return playerLink(std::to_string(guidLow));
 }
 
 std::string ChatHandler::GetItemLink(ItemPrototype const* pItem) const

@@ -202,24 +202,52 @@ struct instance_scarlet_monastery : ScriptedInstance
         return 0;
     }
 
+    bool IsMograineOrWhitemaneDead()
+    {
+        Creature* pMograine = GetCreature(m_uiMograineGUID);
+        Creature* pWhitemane = GetCreature(m_uiWhitemaneGUID);
+
+        // If they are despawned, consider them dead.
+        if (!pMograine || !pWhitemane)
+            return true;
+
+        return pMograine->IsDead() || pWhitemane->IsDead();
+    }
+
     void SetData(uint32 uiType, uint32 uiData) override
     {
         if (uiType == TYPE_MOGRAINE_AND_WHITE_EVENT)
         {
-            if (uiData == STAGE_MOGRAINE_NOT_STARTED || uiData == STAGE_MOGRAINE_IN_PROGRESS)
+            uint32& currentState = m_auiEncounter[0];
+
+            // If boss was already killed, it's not allowed to do encounter again.
+            if (uiData == STAGE_MOGRAINE_NOT_STARTED && IsMograineOrWhitemaneDead())
+            {
+                if (Creature* pWhitemane = GetCreature(m_uiWhitemaneGUID))
+                    pWhitemane->AddObjectToRemoveList();
+
+                if (Creature* pMograine = GetCreature(m_uiMograineGUID))
+                    pMograine->AddObjectToRemoveList();
+
+                uiData = STAGE_MOGRAINE_DONE;
+            }
+            else if (uiData == STAGE_MOGRAINE_NOT_STARTED || uiData == STAGE_MOGRAINE_IN_PROGRESS)
             {
                 if (GameObject* pDoor = GetGameObject(m_uiDoorHighInquisitorGUID))
                     pDoor->SetGoState(GO_STATE_READY);
 
-                if (Creature* pWhitemane = GetCreature(m_uiWhitemaneGUID))
-                    if (pWhitemane->IsDead())
+                // If Whitemane was currently on the way to revive Mograine she needs to be reset.
+                if (uiData == STAGE_MOGRAINE_NOT_STARTED && currentState == STAGE_MOGRAINE_DIED_ONCE)
+                {
+                    if (Creature* pWhitemane = GetCreature(m_uiWhitemaneGUID))
+                    {
+                        pWhitemane->SetDeathState(JUST_DIED);
                         pWhitemane->Respawn();
+                    }
+                }
 
                 if (Creature* pMograine = GetCreature(m_uiMograineGUID))
                 {
-                    if (pMograine->IsDead())
-                        pMograine->Respawn();
-
                     if (uiData == STAGE_MOGRAINE_IN_PROGRESS && pMograine->GetVictim())
                     {
                         std::list<Creature*> mograinesAssist;
@@ -257,7 +285,7 @@ struct instance_scarlet_monastery : ScriptedInstance
             else if (uiData == STAGE_MOGRAINE_REVIVED)
             {
                 if (Creature* pMograine = GetCreature(m_uiMograineGUID))
-                    if (pMograine->IsAlive() &&!pMograine->IsInCombat())
+                    if (pMograine->IsAlive() && !pMograine->IsInCombat())
                         pMograine->SetInCombatWithZone();
 
                 if (Creature* pWhitemane = GetCreature(m_uiWhitemaneGUID))
@@ -265,7 +293,7 @@ struct instance_scarlet_monastery : ScriptedInstance
                         pWhitemane->SetInCombatWithZone();
             }
 
-            m_auiEncounter[0] = uiData;
+            currentState = uiData;
 
             if (uiData == STAGE_MOGRAINE_DONE)
             {

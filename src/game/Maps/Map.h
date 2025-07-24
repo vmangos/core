@@ -34,7 +34,7 @@
 #include "Utilities/TypeList.h"
 #include "vmap/DynamicTree.h"
 #include "MoveSplineInitArgs.h"
-#include "WorldSession.h"
+#include "PacketProcessing.h"
 #include "SQLStorages.h"
 #include "ScriptCommands.h"
 #include "CreatureLinkingMgr.h"
@@ -63,7 +63,7 @@ class BattleGround;
 class WeatherSystem;
 class GenericTransport;
 class ElevatorTransport;
-class Transport;
+class ShipTransport;
 
 namespace VMAP
 {
@@ -100,7 +100,7 @@ struct MapEntry
     bool IsContinent() const { return id == 0 || id == 1; }
 };
 
-typedef std::map<uint32, uint32> AreaFlagByMapId;
+typedef std::unordered_map<uint32, uint32> AreaFlagByMapId;
 static AreaFlagByMapId sAreaFlagByMapId;
 
 struct AreaEntry
@@ -231,7 +231,7 @@ struct ScriptedEvent
     uint32 m_uiSuccessCondition;
     uint32 m_uiSuccessScript;
 
-    std::map<uint32, uint32> m_mData;
+    std::unordered_map<uint32, uint32> m_mData;
     std::vector<ScriptedEventTarget> m_vTargets;
 
     // Returns true when event has expired.
@@ -567,9 +567,9 @@ class Map : public GridRefManager<NGridType>
         GameObjectModel const* FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
 
         void Balance() { m_dynamicTree.balance(); }
-        void RemoveGameObjectModel(const GameObjectModel& model);
-        void InsertGameObjectModel(const GameObjectModel& model);
-        bool ContainsGameObjectModel(const GameObjectModel& model) const;
+        void RemoveGameObjectModel(GameObjectModel const& model);
+        void InsertGameObjectModel(GameObjectModel const& model);
+        bool ContainsGameObjectModel(GameObjectModel const& model) const;
         bool GetDynamicObjectHitPos(Vector3 start, Vector3 end, Vector3& out, float finalDistMod) const;
         float GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const;
         bool CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2, bool ignoreM2Model) const;

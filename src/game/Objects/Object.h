@@ -623,10 +623,10 @@ class WorldObject : public Object
         float GetLeewayBonusRadius() const;
 
         // Gestion des positions
-        void GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z);
-        void GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o);
-        void GetNearRandomPositions(float distance, float &x, float &y, float &z);
-        void GetFirstCollision(float dist, float angle, float &x, float &y, float &z);
+        void GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z) const;
+        void GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o) const;
+        void GetNearRandomPositions(float distance, float &x, float &y, float &z) const;
+        void GetFirstCollision(float dist, float angle, float &x, float &y, float &z) const;
 
         // for use only in LoadHelper, Map::Add Map::CreatureCellRelocation
         Cell const& GetCurrentCell() const { return m_currentCell; }

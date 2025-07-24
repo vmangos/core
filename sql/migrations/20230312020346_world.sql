@@ -25,13 +25,6 @@ Seen in TBC on map:
 DELETE FROM `gameobject_template` WHERE `entry`=2846;
 
 /*
-The Toxic Fogger
-Seen in TBC on map:
--- Kalimdor (1)
-*/
-DELETE FROM `gameobject_template` WHERE `entry`=19586;
-
-/*
 Wooden Chair
 Seen in TBC on map:
 -- The Escape From Durnholde (560)
@@ -1436,7 +1429,6 @@ DELETE FROM `locales_gameobject` WHERE `entry` = 188123;
 DELETE FROM `locales_gameobject` WHERE `entry` = 188132;
 DELETE FROM `locales_gameobject` WHERE `entry` = 188214;
 DELETE FROM `locales_gameobject` WHERE `entry` = 190395;
-DELETE FROM `locales_gameobject` WHERE `entry` = 19586;
 DELETE FROM `locales_gameobject` WHERE `entry` = 186253;
 DELETE FROM `locales_gameobject` WHERE `entry` = 184658;
 DELETE FROM `locales_gameobject` WHERE `entry` = 181448;

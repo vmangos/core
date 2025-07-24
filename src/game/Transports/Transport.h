@@ -21,7 +21,6 @@
 
 #include "GameObject.h"
 #include "TransportMgr.h"
-#include "MapManager.h"
 
 #include <map>
 #include <set>
@@ -76,6 +75,7 @@ protected:
     uint32 m_pathProgress; // for MO transport its full time since start for normal time in cycle
 };
 
+// Elevators and Trams (type 11)
 class ElevatorTransport : public GenericTransport
 {
 public:
@@ -88,10 +88,11 @@ private:
     uint32 m_currentSeg;
 };
 
-class Transport : public GenericTransport
+// Ships and Zeppelins (type 15)
+class ShipTransport : public GenericTransport
 {
 public:
-    explicit Transport(TransportTemplate const& transportTemplate);
+    explicit ShipTransport(TransportTemplate const& transportTemplate);
 
     bool Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
     void Update(uint32 update_diff, uint32 /*time_diff*/) override;

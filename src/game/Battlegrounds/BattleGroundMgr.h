@@ -106,6 +106,11 @@ class BattleGroundQueue
         QueuedPlayersMap m_queuedPlayers;
 
     private:
+        void RemoveOfflinePlayer();
+        bool HasPlayersInQueue(BattleGroundBracketId bracketId);
+        void CheckFreeSlots(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId);
+        bool CheckCreateNewBg(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId);
+
         // we need constant add to begin and constant remove / add from the end, therefore deque suits our problem well
         typedef std::vector<GroupQueueInfo*> GroupsQueueType;
 

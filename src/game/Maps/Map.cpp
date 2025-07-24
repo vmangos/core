@@ -86,7 +86,7 @@ Map::~Map()
 
 GenericTransport* Map::GetTransport(ObjectGuid guid)
 {
-    if (Transport* transport = HashMapHolder<Transport>::Find(guid))
+    if (ShipTransport* transport = HashMapHolder<ShipTransport>::Find(guid))
         return transport;
 
     if (guid.GetEntry())
@@ -446,7 +446,11 @@ bool Map::Add(Player* player)
     sAuraRemovalMgr.PlayerEnterMap(m_id, player);
 
     player->SetSplineDonePending(false);
-    player->GetSession()->ClearIncomingPacketsByType(PACKET_PROCESS_MOVEMENT);
+
+    // don't clear movement packets during login or we might discard CMSG_SET_ACTIVE_MOVER
+    if (!player->GetSession()->PlayerLoading())
+        player->GetSession()->ClearIncomingPacketsByType(PACKET_PROCESS_MOVEMENT);
+
     player->m_broadcaster->SetInstanceId(GetInstanceId());
     return true;
 }
@@ -546,7 +550,7 @@ void Map::Add(GenericTransport* obj)
 }
 
 template<>
-void Map::Add(Transport* obj)
+void Map::Add(ShipTransport* obj)
 {
     Add<GenericTransport>(obj);
 }
@@ -569,7 +573,7 @@ void Map::LoadElevatorTransports()
             continue;
         }
 
-        GameObjectInfo const* pInfo = sObjectMgr.GetGameObjectInfo(pData->id);
+        GameObjectInfo const* pInfo = sObjectMgr.GetGameObjectTemplate(pData->id);
         if (!pInfo)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Map::LoadElevatorTransports] Missing gameobject template %u for guid %u!", pData->id, itr->second);
@@ -1355,7 +1359,7 @@ void Map::Remove(GenericTransport* obj, bool remove)
 }
 
 template<>
-void Map::Remove(Transport* obj, bool remove)
+void Map::Remove(ShipTransport* obj, bool remove)
 {
     Remove<GenericTransport>(obj, remove);
 }
@@ -3402,8 +3406,13 @@ GameObjectModel const* Map::FindDynamicObjectCollisionModel(float x1, float y1, 
     ASSERT(MaNGOS::IsValidMapCoord(x2, y2, z2));
     Vector3 const pos1 = Vector3(x1, y1, z1);
     Vector3 const pos2 = Vector3(x2, y2, z2);
-    std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
-    return m_dynamicTree.getObjectHit(pos1, pos2);
+    GameObjectModel const* result = nullptr;
+    if (pos1 != pos2)
+    {
+        std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+        result = m_dynamicTree.getObjectHit(pos1, pos2);
+    }
+    return result;
 }
 
 void Map::RemoveGameObjectModel(const GameObjectModel &model)
@@ -3690,7 +3699,7 @@ void Map::RemoveOldBones(uint32 const diff)
 
 GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, uint32 worldMask)
 {
-    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectInfo(entry);
+    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectTemplate(entry);
     if (!goinfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject template %u not found in database!", entry);

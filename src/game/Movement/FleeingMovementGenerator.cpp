@@ -24,6 +24,7 @@
 #include "MoveSpline.h"
 #include "PathFinder.h"
 #include "MoveMap.h"
+#include "Map.h"
 
 #define SEARCH_RANDOM_RADIUS 5.0f
 #define MIN_QUIET_DISTANCE 28.0f
@@ -61,7 +62,7 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T &owner)
         return;
     }
 
-    Movement::MoveSplineInit init(owner, "FleeingMovementGenerator");
+    Movement::MoveSplineInit init(owner, "FleeingMovementGenerator<T>::_setTargetLocation");
     init.Move(&path);
     init.SetWalk(_forceWalking);
     if (_customSpeed > 0)

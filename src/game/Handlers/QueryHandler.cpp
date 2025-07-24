@@ -243,10 +243,10 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(entryID);
+    GameObjectInfo const* info = sObjectMgr.GetGameObjectTemplate(entryID);
     if (info)
     {
-        char const* name = info->name;
+        char const* name = info->name.c_str();
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {

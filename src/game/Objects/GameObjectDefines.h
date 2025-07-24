@@ -209,7 +209,7 @@ struct GameObjectInfo
     uint32  id;
     uint32  type;
     uint32  displayId;
-    char  * name;
+    std::string name;
     uint32  faction;
     uint32  flags;
     float   size;

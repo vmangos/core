@@ -25,7 +25,7 @@
 #include <map>
 
 class Map;
-class Transport;
+class ShipTransport;
 struct GameObjectInfo;
 
 typedef std::map<uint32, TransportAnimationEntry const*> TransportPathContainer;
@@ -117,7 +117,7 @@ public:
 
     void LoadTransportTemplates();
     void SpawnContinentTransports();
-    Transport* CreateTransport(uint32 entry, Map* map = nullptr);
+    ShipTransport* CreateTransport(uint32 entry, Map* map = nullptr);
 
     // elevator transports
     ElevatorTransportMapBounds GetElevatorTransportsForMap(uint32 mapId) const

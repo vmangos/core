@@ -101,6 +101,16 @@ SpellScript* GetScript_DruidEnrage(SpellEntry const*)
 // 18562 - Swiftmend
 struct DruidSwiftmendScript : SpellScript
 {
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        if (Unit* target = spell->m_targets.getUnitTarget())
+            if (!target->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, UI64LIT(0x50)))
+                return SPELL_FAILED_TARGET_AURASTATE;
+#endif
+        return SPELL_CAST_OK;
+    }
+
     bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2

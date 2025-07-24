@@ -39,6 +39,7 @@
 #include "AuraRemovalMgr.h"
 #include "AutoBroadCastMgr.h"
 #include "SpellModMgr.h"
+#include "MapManager.h"
 #include "CreatureGroups.h"
 #include "HardcodedEvents.h"
 
@@ -967,6 +968,7 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAllSpellCommand(char* /*args*/)
 {
+    HandleReloadSpellTemplateCommand((char*)"a");
     HandleReloadSpellAreaCommand((char*)"a");
     HandleReloadSpellChainCommand((char*)"a");
     HandleReloadSpellElixirCommand((char*)"a");
@@ -1063,23 +1065,6 @@ bool ChatHandler::HandleReloadCreatureQuestInvRelationsCommand(char* /*args*/)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Quests Relations... (`creature_involvedrelation`)");
     sObjectMgr.LoadCreatureInvolvedRelations();
     SendSysMessage("DB table `creature_involvedrelation` (creature quest takers) reloaded.");
-    return true;
-}
-
-bool ChatHandler::HandleReloadCreatureTemplatesCommand(char* args)
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `creature_template` Table!");
-    uint32 entry;
-    if (ExtractUInt32(&args, entry))
-    {
-        sObjectMgr.LoadCreatureTemplate(entry);
-        PSendSysMessage("Creature template %u reloaded.", entry);
-    }
-    else
-    {
-        sObjectMgr.LoadCreatureTemplates();
-        SendSysMessage("DB table `creature_template` reloaded.");
-    }
     return true;
 }
 
@@ -1421,6 +1406,16 @@ bool ChatHandler::HandleReloadSpellTargetPositionCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleReloadSpellTemplateCommand(char* /*args*/)
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading Spell Definitions...");
+    sSpellMgr.LoadSpells();
+    SendSysMessage("DB table `spell_template` reloaded.");
+    sSpellModMgr.LoadSpellMods();
+    SendSysMessage("DB table `spell_mod` reloaded.");
+    return true;
+}
+
 bool ChatHandler::HandleReloadSpellThreatsCommand(char* /*args*/)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading Aggro Spells Definitions...");
@@ -1746,13 +1741,6 @@ bool ChatHandler::HandleReloadGameObjectCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleReloadCreatureTemplate(char*)
-{
-    sObjectMgr.LoadCreatureTemplates();
-    SendSysMessage(">> Table `creature_template` reloaded.");
-    return true;
-}
-
 bool ChatHandler::HandleReloadItemTemplate(char*)
 {
     sObjectMgr.LoadItemPrototypes();
@@ -1767,10 +1755,37 @@ bool ChatHandler::HandleReloadMapTemplate(char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadGameObjectTemplate(char*)
+bool ChatHandler::HandleReloadCreatureTemplatesCommand(char* args)
 {
-    sObjectMgr.LoadGameobjectInfo();
-    SendSysMessage(">> Table `gameobject_template` reloaded.");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `creature_template` Table!");
+    uint32 entry;
+    if (ExtractUInt32(&args, entry))
+    {
+        sObjectMgr.LoadCreatureTemplate(entry);
+        PSendSysMessage("Creature template %u reloaded.", entry);
+    }
+    else
+    {
+        sObjectMgr.LoadCreatureTemplates();
+        SendSysMessage("DB table `creature_template` reloaded.");
+    }
+    return true;
+}
+
+bool ChatHandler::HandleReloadGameObjectTemplatesCommand(char* args)
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `gameobject_template` Table!");
+    uint32 entry;
+    if (ExtractUInt32(&args, entry))
+    {
+        sObjectMgr.LoadGameObjectTemplate(entry);
+        PSendSysMessage("GameObject template %u reloaded.", entry);
+    }
+    else
+    {
+        sObjectMgr.LoadGameObjectTemplates();
+        SendSysMessage("DB table `gameobject_template` reloaded.");
+    }
     return true;
 }
 

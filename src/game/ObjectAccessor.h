@@ -144,11 +144,11 @@ class ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, MaNGOS::ClassLev
         // For call from Player/Corpse AddToWorld/RemoveFromWorld only
         void AddObject(Corpse* object) { HashMapHolder<Corpse>::Insert(object); }
         void AddObject(Player* object);
-        void AddObject(Transport* object) { HashMapHolder<Transport>::Insert(object); }
+        void AddObject(ShipTransport* object) { HashMapHolder<ShipTransport>::Insert(object); }
         void AddObject(MasterPlayer* object);
         void RemoveObject(Corpse* object) { HashMapHolder<Corpse>::Remove(object); }
         void RemoveObject(Player* object);
-        void RemoveObject(Transport* object) { HashMapHolder<Transport>::Remove(object); }
+        void RemoveObject(ShipTransport* object) { HashMapHolder<ShipTransport>::Remove(object); }
         void RemoveObject(MasterPlayer* object);
 
     private:

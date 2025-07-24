@@ -31,6 +31,7 @@
 #include "GossipDef.h"
 #include "SocialMgr.h"
 #include "Language.h"
+#include "Anticheat.h"
 
 void WorldSession::HandleGuildQueryOpcode(WorldPacket& recvPacket)
 {
@@ -60,6 +61,12 @@ void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    if (gname.size() > GUILD_NAME_MAX_LENGTH)
+    {
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild name to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
+        return;
+    }
+
     Guild *guild = new Guild;
     if (!guild->Create(GetPlayer(), gname))
     {
@@ -72,17 +79,16 @@ void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
 {
-    std::string Invitedname, plname;
+    std::string invitedName;
+    recvPacket >> invitedName;
+
     Player* player = nullptr;
-
-    recvPacket >> Invitedname;
-
-    if (normalizePlayerName(Invitedname))
-        player = ObjectAccessor::FindPlayerByName(Invitedname.c_str());
+    if (normalizePlayerName(invitedName))
+        player = ObjectAccessor::FindPlayerByName(invitedName.c_str());
 
     if (!player)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, Invitedname, ERR_GUILD_PLAYER_NOT_FOUND_S);
+        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_GUILD_PLAYER_NOT_FOUND_S);
         return;
     }
 
@@ -102,29 +108,26 @@ void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
     // OK result but not send invite
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {
-        plname = player->GetName();
-        SendGuildCommandResult(GUILD_INVITE_S, plname, ERR_GUILD_IGNORING_YOU_S);
+        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_GUILD_IGNORING_YOU_S);
         return;
     }
 
     // not let enemies sign guild charter
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GUILD) && player->GetTeam() != GetPlayer()->GetTeam())
     {
-        SendGuildCommandResult(GUILD_INVITE_S, Invitedname, ERR_GUILD_NOT_ALLIED);
+        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_GUILD_NOT_ALLIED);
         return;
     }
 
     if (player->GetGuildId())
     {
-        plname = player->GetName();
-        SendGuildCommandResult(GUILD_INVITE_S, plname, ERR_ALREADY_IN_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_ALREADY_IN_GUILD_S);
         return;
     }
 
     if (player->GetGuildIdInvited())
     {
-        plname = player->GetName();
-        SendGuildCommandResult(GUILD_INVITE_S, plname, ERR_ALREADY_INVITED_TO_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_ALREADY_INVITED_TO_GUILD_S);
         return;
     }
 
@@ -134,7 +137,7 @@ void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %s Invited %s to Join his Guild", GetPlayer()->GetName(), Invitedname.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %s Invited %s to Join his Guild", GetPlayer()->GetName(), invitedName.c_str());
 
     player->SetGuildIdInvited(GetPlayer()->GetGuildId());
     // Put record into guildlog
@@ -493,7 +496,10 @@ void WorldSession::HandleGuildMOTDOpcode(WorldPacket& recvPacket)
         MOTD.clear();
 
     if (MOTD.size() > GUILD_MOTD_MAX_LENGTH)
+    {
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild motd to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
+    }
 
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
     if (!guild)
@@ -542,7 +548,10 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPacket& recvPacket)
 
     recvPacket >> PNOTE;
     if (PNOTE.size() > GUILD_NOTE_MAX_LENGTH)
+    {
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild player note to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
+    }
 
     slot->SetPNOTE(PNOTE);
 
@@ -579,7 +588,10 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket)
 
     recvPacket >> OFFNOTE;
     if (OFFNOTE.size() > GUILD_NOTE_MAX_LENGTH)
+    {
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild officer note to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
+    }
 
     slot->SetOFFNOTE(OFFNOTE);
 
@@ -588,7 +600,7 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildRankOpcode(WorldPacket& recvPacket)
 {
-    std::string rankname;
+    std::string rankName;
     uint32 rankId;
     uint32 rights;
 
@@ -609,9 +621,15 @@ void WorldSession::HandleGuildRankOpcode(WorldPacket& recvPacket)
 
     recvPacket >> rankId;
     recvPacket >> rights;
-    recvPacket >> rankname;
+    recvPacket >> rankName;
 
-    guild->SetRankName(rankId, rankname);
+    if (rankName.size() > GUILD_RANK_MAX_LENGTH)
+    {
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild rank name to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
+        return;
+    }
+
+    guild->SetRankName(rankId, rankName);
 
     if (rankId == GR_GUILDMASTER)                           // prevent loss leader rights
         rights = GR_RIGHT_ALL;
@@ -624,8 +642,14 @@ void WorldSession::HandleGuildRankOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildAddRankOpcode(WorldPacket& recvPacket)
 {
-    std::string rankname;
-    recvPacket >> rankname;
+    std::string rankName;
+    recvPacket >> rankName;
+
+    if (rankName.size() > GUILD_RANK_MAX_LENGTH)
+    {
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild rank name to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
+        return;
+    }
 
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
     if (!guild)
@@ -643,7 +667,7 @@ void WorldSession::HandleGuildAddRankOpcode(WorldPacket& recvPacket)
     if (guild->GetRanksSize() >= GUILD_RANKS_MAX_COUNT)     // client not let create more 10 than ranks
         return;
 
-    guild->CreateRank(rankname, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
+    guild->CreateRank(rankName, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
 
     guild->Query(this);
     guild->Roster();                                        // broadcast for tab rights update
@@ -683,8 +707,12 @@ void WorldSession::HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket)
 {
     std::string GINFO;
     recvPacket >> GINFO;
+
     if (GINFO.size() > GUILD_INFO_MAX_LENGTH)
+    {
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild info to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
+    }
 
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
     if (!guild)

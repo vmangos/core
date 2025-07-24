@@ -16,7 +16,6 @@
 
 #include "BasicAI.h"
 #include "Creature.h"
-#include "Player.h"
 #include "Map.h"
 #include "GuardMgr.h"
 

@@ -26,13 +26,15 @@
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
 #include "AuctionHouseMgr.h"
-#include "Item.h"
+#include "ItemDefines.h"
 #include "GossipDef.h"
 #include "Chat/AbstractPlayer.h"
 #include "SniffFile.h"
 #include "ClientDefines.h"
 #include "Crypto/BigNumber.h"
 #include "AccountData.h"
+#include "PacketProcessing.h"
+#include "UpdateData.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -122,105 +124,6 @@ enum AntifloodOpcodeExecutionSpeed
     FLOOD_SLOW_OPCODES,
     FLOOD_VERY_SLOW_OPCODES,
     FLOOD_MAX_OPCODES_TYPE,
-};
-
-enum PacketProcessing
-{
-    /*
-     * Global systems safety.
-     * Anywhere, it is safe to :
-     * - Items: Generate new item GUID
-     * On a single map (one thread), it is safe to:
-     * - Call Player::TeleportTo
-     * - Add a global Corpse in ObjectAccessor ON THE CURRENT MAP
-    /*
-     * PACKET_PROCESS_WORLD
-     * Thread safe environment for this packet.
-     */
-    PACKET_PROCESS_WORLD = 0,                               //packet is not thread-safe - process it in World::UpdateSessions()
-    /*
-     * PACKET_PROCESS_MAP
-     * Unsafe:
-     * - Add / Remove players from other Maps
-     * - Write Groups / Guilds / Loots
-     * - Write any Object located in another Map
-     * - Write Database global cache
-     * Safe:
-     * - Read current Map objects
-     * - Read Groups / Guilds / Loots
-     * - Iterate Groups / Guilds / Loots ...
-     * - Call player->GetSession()->SendPacket() for any player
-     * - Remove / Add players to current Map
-     */
-    PACKET_PROCESS_MAP,
-    /*
-     * PACKET_PROCESS_SPELLS
-     * Same safety as PACKET_PROCESS_MAP
-     * but is checked more frequently
-     */
-    PACKET_PROCESS_SPELLS,
-    /*
-     * PACKET_PROCESS_MOVEMENT
-     * Same safety as PACKET_PROCESS_MAP
-     * but is checked more frequently
-     */
-    PACKET_PROCESS_MOVEMENT,
-    /*
-     * PACKET_PROCESS_ASYNC
-     * Handled whenever session update is not running.
-     * Never at the same time as PACKET_PROCESS_WORLD.
-     * Never while cli and gm commands are being executed.
-     * Can be at the same time as maps are being updated.
-     * Be careful touching the player.
-     * Never touch the map.
-     */
-    PACKET_PROCESS_ASYNC,
-    PACKET_PROCESS_MAX_TYPE,                                // no handler for this packet (server side, or not implemented)
-    /*
-     * PACKET_PROCESS_SELF_ITEMS
-     * Only affects current player items.
-     * Self:
-     * - Write (and create) items
-     * - Write quests
-     * Map:
-     * - Can modify shared items (loots for example)
-     * Cross Maps:
-     * - Read Groups
-     * - No other modification / no read allowed
-     */
-    PACKET_PROCESS_SELF_ITEMS = PACKET_PROCESS_MAP,
-    /*
-    * PACKET_PROCESS_DB_QUERY
-    * Does not write anything. Can be processed as long as containers are not being reloaded.
-    * Reads static data (usually data from World DB)
-    */
-    PACKET_PROCESS_DB_QUERY = PACKET_PROCESS_ASYNC,
-    /*
-     * PACKET_PROCESS_CHANNEL
-     * Allowed:
-     * - Read / Iterate channels
-     * - Modify channels
-     * - Add / Remove channels
-     */
-    PACKET_PROCESS_CHANNEL = PACKET_PROCESS_WORLD,
-    /*
-     * PACKET_PROCESS_CHANNEL
-     * Allowed:
-     * - Read / Lookup Groups
-     * - Modify Groups
-     * - Add / Remove Groups
-     * - Remove Group from any Player
-     */
-    PACKET_PROCESS_GROUP = PACKET_PROCESS_WORLD,
-    /*
-     * PACKET_PROCESS_CHANNEL
-     * Allowed:
-     * - Read / Lookup Guilds
-     * - Modify Guilds
-     * - Add / Remove Guilds
-     * - Remove Guilds from any Player
-     */
-    PACKET_PROCESS_GUILD = PACKET_PROCESS_WORLD,
 };
 
 enum AccountFlags
@@ -597,7 +500,6 @@ class WorldSession
 
         void HandleTogglePvP(WorldPacket& recvPacket);
         void HandleZoneUpdateOpcode(WorldPacket& recvPacket);
-        void HandleSetTargetOpcode(WorldPacket& recvPacket);
         void HandleSetSelectionOpcode(WorldPacket& recvPacket);
         void HandleStandStateChangeOpcode(WorldPacket& recvPacket);
         void HandleEmoteOpcode(WorldPacket& recvPacket);

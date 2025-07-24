@@ -22,6 +22,8 @@
 #include "TemporarySummon.h"
 #include "Log.h"
 #include "CreatureAI.h"
+#include "ObjectAccessor.h"
+#include "Map.h"
 
 TemporarySummon::TemporarySummon(ObjectGuid summoner) :
     Creature(CREATURE_SUBTYPE_TEMPORARY_SUMMON), m_type(TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN), m_timer(0), m_lifetime(0), m_summoner(summoner), m_unSummonInformed(false)
@@ -258,6 +260,11 @@ void TemporarySummon::UnSummon(uint32 delayDespawnTime /*= 0*/)
 
         AddObjectToRemoveList();
     }
+}
+
+Unit* TemporarySummon::GetSummoner() const
+{
+    return ObjectAccessor::GetUnit(*this, m_summoner);
 }
 
 void TemporarySummon::InformSummonerOfDespawn()

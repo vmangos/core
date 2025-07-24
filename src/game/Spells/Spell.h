@@ -411,6 +411,7 @@ class Spell
         Item* m_CastItem = nullptr;
         SpellCastTargets m_targets;
 
+        void SetCastTime(int32 castTime) { m_casttime = castTime; }
         int32 GetCastTime() const { return m_casttime; }
         uint32 GetCastedTime() const { return m_timer; }
         bool IsChanneled() const { return m_channeled; }

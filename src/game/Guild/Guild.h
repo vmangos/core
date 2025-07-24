@@ -27,11 +27,14 @@
 
 class Petition;
 
+#define GUILD_EVENTLOG_MAX_RECORDS  100
 #define GUILD_RANKS_MIN_COUNT   5
 #define GUILD_RANKS_MAX_COUNT   10
 
 enum
 {
+    GUILD_RANK_MAX_LENGTH       = 15,
+    GUILD_NAME_MAX_LENGTH       = 24,
     GUILD_NOTE_MAX_LENGTH       = 31,
     GUILD_INFO_MAX_LENGTH       = 500,
     GUILD_MOTD_MAX_LENGTH       = 128,
@@ -127,10 +130,17 @@ enum GuildEvents
     GE_LEADER_CHANGED               = 0x07,
     GE_DISBANDED                    = 0x08,
     GE_TABARDCHANGE                 = 0x09,
-    GE_UNK1                         = 0x0A,                 // string, string EVENT_GUILD_ROSTER_UPDATE tab content change?
-    GE_UNK2                         = 0x0B,                 // EVENT_GUILD_ROSTER_UPDATE
+    GE_UPDATE_RANK_NAME             = 0x0A,                 // Arg1: RankID, Arg2: NewRankName
+    GE_UPDATE_ROSTER                = 0x0B,                 // EVENT_GUILD_ROSTER_UPDATE
     GE_SIGNED_ON                    = 0x0C,                 // ERR_FRIEND_ONLINE_SS
     GE_SIGNED_OFF                   = 0x0D,                 // ERR_FRIEND_OFFLINE_S
+};
+
+enum GuildRosterFlags
+{
+    GRF_ONLINE                      = 0x01,
+    GRF_AFK                         = 0x02,
+    GRF_DND                         = 0x04
 };
 
 enum PetitionSigns
@@ -152,6 +162,27 @@ enum GuildEventLogTypes
     GUILD_EVENT_LOG_UNINVITE_PLAYER   = 5,
     GUILD_EVENT_LOG_LEAVE_GUILD       = 6,
 };
+
+inline char const* GuildEventLogTypeToString(uint8 type)
+{
+    switch (type)
+    {
+        case GUILD_EVENT_LOG_INVITE_PLAYER:
+            return "Invite";
+        case GUILD_EVENT_LOG_JOIN_GUILD:
+            return "Join";
+        case GUILD_EVENT_LOG_PROMOTE_PLAYER:
+            return "Promote";
+        case GUILD_EVENT_LOG_DEMOTE_PLAYER:
+            return "Demote";
+        case GUILD_EVENT_LOG_UNINVITE_PLAYER:
+            return "Uninvite";
+        case GUILD_EVENT_LOG_LEAVE_GUILD:
+            return "Leave";
+    }
+    return "UNKNOWN";
+}
+
 
 enum GuildEmblem
 {
@@ -313,6 +344,7 @@ class Guild
         void   LoadGuildEventLogFromDB();
         void   DisplayGuildEventLog(WorldSession* session);
         void   LogGuildEvent(uint8 eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
+        std::list<GuildEventLogEntry> const& GetGuildEventLog() const { return m_GuildEventLog; }
         ObjectGuid GetGuildInviter(ObjectGuid playerGuid) const;
 
     protected:

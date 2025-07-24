@@ -37,11 +37,11 @@
 #include "SocialMgr.h"
 #include "Util.h"
 #include "Language.h"
-#include "Chat.h"
 #include "Anticheat.h"
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 #include "PlayerBotMgr.h"
+#include "MapManager.h"
 #include "AccountMgr.h"
 
 class LoginQueryHolder : public SqlQueryHolder
@@ -76,11 +76,11 @@ bool LoginQueryHolder::Initialize()
 
     // NOTE: all fields in `characters` must be read to prevent lost character data at next save in case wrong DB structure.
     // !!! NOTE: including unused `zone`,`online`
-    res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADFROM,            "SELECT `guid`, `account`, `name`, `race`, `class`, `gender`, `level`, `xp`, `money`, `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `bank_bag_slots`, `player_flags`, "
-                     "`position_x`, `position_y`, `position_z`, `map`, `orientation`, `known_taxi_mask`, `played_time_total`, `played_time_level`, `rest_bonus`, `logout_time`, `is_logout_resting`, `reset_talents_multiplier`, "
-                     "`reset_talents_time`, `transport_guid`, `transport_x`, `transport_y`, `transport_z`, `transport_o`, `extra_flags`, `stable_slots`, `at_login_flags`, `zone`, `online`, `death_expire_time`, `current_taxi_path`, "
+    res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADFROM,            "SELECT `guid`, `account`, `name`, `race`, `class`, `gender`, `level`, `xp`, `money`, `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `bank_bag_slots`, `character_flags`, "
+                     "`position_x`, `position_y`, `position_z`, `map`, `orientation`, `known_taxi_mask`, `played_time_total`, `played_time_level`, `rest_bonus`, `logout_time`, `reset_talents_multiplier`, "
+                     "`reset_talents_time`, `transport_guid`, `transport_x`, `transport_y`, `transport_z`, `transport_o`, `extra_flags`, `stable_slots`, `death_expire_time`, `current_taxi_path`, "
                      "`honor_rank_points`, `honor_highest_rank`, `honor_standing`, `honor_last_week_hk`, `honor_last_week_cp`, `honor_stored_hk`, `honor_stored_dk`, "
-                     "`watched_faction`, `drunk`, `health`, `power1`, `power2`, `power3`, `power4`, `power5`, `explored_zones`, `equipment_cache`, `ammo_id`, `action_bars`, "
+                     "`watched_faction`, `drunk`, `health`, `power1`, `power2`, `power3`, `power4`, `power5`, `explored_zones`, `ammo_id`, `action_bars`, "
                      "`world_phase_mask`, `create_time`, `instance` FROM `characters` WHERE `guid` = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGROUP,           "SELECT `group_id` FROM `group_member` WHERE `member_guid` ='%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES,  "SELECT `id`, `permanent`, `map`, `reset_time` FROM `character_instance` LEFT JOIN `instance` ON `instance` = `id` WHERE `guid` = '%u'", m_guid.GetCounter());
@@ -172,9 +172,9 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
                                   //           0                    1                    2                    3                     4                      5                    6                    7                          8                          9                           10
                                   "SELECT `characters`.`guid`, `characters`.`name`, `characters`.`race`, `characters`.`class`, `characters`.`gender`, `characters`.`skin`, `characters`.`face`, `characters`.`hair_style`, `characters`.`hair_color`, `characters`.`facial_hair`, `characters`.`level`, "
                                   //    11                   12                  13                         14                         15                         16                         17
-                                  "`characters`.`zone`, `characters`.`map`, `characters`.`position_x`, `characters`.`position_y`, `characters`.`position_z`, `guild_member`.`guild_id`, `characters`.`player_flags`, "
-                                  //    18                             19                       20                            21                       22
-                                  "`characters`.`at_login_flags`, `character_pet`.`entry`, `character_pet`.`display_id`, `character_pet`.`level`, `characters`.`equipment_cache` "
+                                  "`characters`.`zone`, `characters`.`map`, `characters`.`position_x`, `characters`.`position_y`, `characters`.`position_z`, `guild_member`.`guild_id`, `characters`.`character_flags`, "
+                                  //    18                                19                       20                            21                       22
+                                  "`characters`.`played_time_total`, `character_pet`.`entry`, `character_pet`.`display_id`, `character_pet`.`level`, `characters`.`equipment_cache` "
                                   "FROM `characters` LEFT JOIN `character_pet` ON `characters`.`guid`=`character_pet`.`owner_guid` AND `character_pet`.`slot`='%u' "
                                   "LEFT JOIN `guild_member` ON `characters`.`guid` = `guild_member`.`guid` "
                                   "WHERE `characters`.`account` = '%u' ORDER BY `characters`.`guid` "
@@ -570,7 +570,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         {
             if (nextpos != pos)
             {
-                ChatHandler(pCurrChar).PSendSysMessage(str_motd.substr(pos, nextpos - pos).c_str());
+                pCurrChar->PSendSysMessage(str_motd.substr(pos, nextpos - pos).c_str());
                 ++linecount;
             }
             pos = nextpos + 1;
@@ -578,7 +578,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
         if (pos < str_motd.length())
         {
-            ChatHandler(pCurrChar).PSendSysMessage(str_motd.substr(pos).c_str());
+            pCurrChar->PSendSysMessage(str_motd.substr(pos).c_str());
             ++linecount;
         }
     }
@@ -596,7 +596,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     if (char const* warning = sAccountMgr.GetWarningText(GetAccountId()))
     {
-        ChatHandler(pCurrChar).PSendSysMessage(LANG_ACCOUNT_WARNED, warning);
+        pCurrChar->PSendSysMessage(LANG_ACCOUNT_WARNED, warning);
         SendNotification("WARNING: %s", warning);
     }
 
@@ -607,7 +607,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     GetMasterPlayer()->SendInitialActionButtons();
 
     // Show cinematic at the first time that player login
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST) && !sWorld.getConfig(CONFIG_BOOL_SKIP_CINEMATICS))
+    if (pCurrChar->m_playedTime[PLAYED_TIME_TOTAL] == 0 && !sWorld.getConfig(CONFIG_BOOL_SKIP_CINEMATICS))
     {
         if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->GetRace()))
             pCurrChar->SendCinematicStart(rEntry->CinematicSequence);
@@ -694,21 +694,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     if (pCurrChar->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
         pCurrChar->UpdatePvPContested(true);
 
-    // Apply at_login_flags requests
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_RESET_SPELLS))
-    {
-        pCurrChar->ResetSpells();
-        SendNotification(LANG_RESET_SPELLS);
-    }
-
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
+    if (pCurrChar->HasCharacterFlag(CHARACTER_FLAG_RESET_TALENTS_ON_LOGIN))
     {
         pCurrChar->ResetTalents(true);
         SendNotification(LANG_RESET_TALENTS);               // we can use SMSG_TALENTS_INVOLUNTARILY_RESET here
     }
-
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
-        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 
     // show time before shutdown if shutdown planned.
     if (sWorld.IsShutdowning())
@@ -863,8 +853,8 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recv_data)
     // and that there is no character with the desired new name
     CharacterDatabase.AsyncPQuery(&WorldSession::HandleChangePlayerNameOpcodeCallBack,
                                   GetAccountId(), newname,
-                                  "SELECT `guid`, `name` FROM `characters` WHERE `guid` = %u AND `account` = %u AND (`at_login_flags` & %u) = %u AND NOT EXISTS (SELECT NULL FROM `characters` WHERE `name` = '%s')",
-                                  guid.GetCounter(), GetAccountId(), AT_LOGIN_RENAME, AT_LOGIN_RENAME, escaped_newname.c_str()
+                                  "SELECT `guid`, `name` FROM `characters` WHERE `guid` = %u AND `account` = %u AND (`character_flags` & %u) = %u AND NOT EXISTS (SELECT NULL FROM `characters` WHERE `name` = '%s')",
+                                  guid.GetCounter(), GetAccountId(), CHARACTER_FLAG_RENAME, CHARACTER_FLAG_RENAME, escaped_newname.c_str()
                                  );
 }
 
@@ -889,7 +879,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(std::unique_ptr<QueryRes
     std::string oldname = result->Fetch()[1].GetCppString();
 
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("UPDATE `characters` SET `name` = '%s', `at_login_flags` = `at_login_flags` & ~ %u WHERE `guid` ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME), guidLow);
+    CharacterDatabase.PExecute("UPDATE `characters` SET `name` = '%s', `character_flags` = (`character_flags` & ~ %u), `character_flags` = (`character_flags` | %u) WHERE `guid` ='%u'", newname.c_str(), uint32(CHARACTER_FLAG_RENAME), uint32(CHARACTER_FLAG_RENAME_NEEDS_GM_REVIEW), guidLow);
     CharacterDatabase.CommitTransaction();
 
     sLog.Player(session->GetAccountId(), LOG_CHAR, LOG_LVL_BASIC,

@@ -40,7 +40,6 @@ enum
     SAY_ARRIVAL5_RAG          = 7685,
 
     SPELL_ELEMENTAL_FIRE_KILL = 19773, // Kill Majordomo
-
     SPELL_ELEMENTAL_FIRE_AURA = 20563, // Aura: trigger Elemental Fire (20564) on every hit
     SPELL_MELT_WEAPON_AURA    = 21387, // Aura: trigger Melt Weapon (21388) on melee damage taken
     SPELL_WRATH_OF_RAGNAROS   = 20566, // PBAOE Knockback
@@ -49,15 +48,12 @@ enum
     SPELL_INTENSE_HEAT        = 21155, // Knockback cast by Might of Ragnaros triggers
     SPELL_LAVASHIELD          = 21857, // Son of Flame mana drain aura -- this is applied in creature_template_addon
 
-    SPELL_SUBMERGE_VISUAL     = 26234,
-    SPELL_SUBMERGE_FADE       = 21107, // Stealth aura
+    SPELL_SUBMERGE_VISUAL     = 20567,
     SPELL_SUBMERGE_EFFECT     = 21859,
     SPELL_EMERGE_VISUAL       = 20568,
 
     NPC_FLAME_OF_RAGNAROS     = 13148,
     NPC_SON_OF_FLAME          = 12143,
-
-    NPC_SUBMERGED_VISUAL      = 21000, // dummy visual for flames/sound in lava pool where Rag submerges
 
     GO_LAVA_BURST             = 178088,
 
@@ -79,16 +75,16 @@ float PositionOfLavaBursts[9][3]=
 };
 
 // Sons of Ragnaros spawn positions
-float PositionOfAdds[8][4]=
+Position const PositionOfAdds[8] =
 {
-    {848.740356f, -816.103455f, -229.743270f, 2.615287f},
-    {852.560791f, -849.861511f, -228.560974f, 2.836073f},
-    {808.710632f, -852.845764f, -227.914963f, 0.964207f},
-    {786.597107f, -821.132874f, -226.350128f, 0.949377f},
-    {796.219116f, -800.948059f, -226.010361f, 0.560603f},
-    {821.602539f, -782.744109f, -226.023575f, 6.157440f},
-    {844.924744f, -769.453735f, -225.521698f, 4.4539958f},
-    {839.823364f, -810.869385f, -229.683182f, 4.693108f}
+    { 811.448f, -814.058f, -233.177f, 0.0f },
+    { 819.699f, -894.288f, -231.258f, 1.28281f },
+    { 825.412f, -869.328f, -231.759f, 1.24253f },
+    { 842.542f, -797.822f, -233.340f, 0.0f },
+    { 866.345f, -891.080f, -231.449f, 2.01042f },
+    { 870.668f, -821.862f, -232.938f, 0.0f },
+    { 871.282f, -858.217f, -231.855f, 2.46003f },
+    { 887.501f, -791.383f, -231.108f, 3.54988f }
 };
 
 class ThreatListCopier : public ThreatListProcesser
@@ -124,10 +120,7 @@ struct boss_ragnarosAI : ScriptedAI
     uint32 m_uiRestoreTargetTimer;
     uint32 m_uiSubmergeTimer;
     uint32 m_uiAttackTimer;
-
-    uint32 m_uiSubmergeStateTimer;
     uint32 m_uiEmergeStateTimer;
-
     uint32 m_uiEnterCombatTimer;
 
     bool HasYelledAggro;
@@ -152,9 +145,7 @@ struct boss_ragnarosAI : ScriptedAI
 
         m_uiSubmergeTimer           = 3*MINUTE*IN_MILLISECONDS;   // P1
         m_uiAttackTimer             = 1.5*MINUTE*IN_MILLISECONDS; // P2
-        m_uiSubmergeStateTimer      = 0;
         m_uiEmergeStateTimer        = 0;
-
         m_uiEnterCombatTimer        = 0;
 
         HasYelledMagmaBlast         = false;
@@ -168,10 +159,6 @@ struct boss_ragnarosAI : ScriptedAI
 
         if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_RAGNAROS, NOT_STARTED);
-
-        // clean up dummy visual if raid wiped during P2
-        if (Creature* pVisual = m_creature->FindNearestCreature(NPC_SUBMERGED_VISUAL, 50.0f, true))
-            pVisual->RemoveFromWorld();
     }
 
     void Aggro(Unit* pWho) override
@@ -215,18 +202,16 @@ struct boss_ragnarosAI : ScriptedAI
         for (const auto& position : PositionOfAdds)
         {
             ThreatListCopier* dataCopier = new ThreatListCopier(m_creature);
-            if (Creature* Crea = m_creature->SummonCreature(NPC_SON_OF_FLAME, 
-                position[0],
-                position[1],
-                position[2],
-                position[3], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
+            if (Creature* pSonOfFlame = m_creature->SummonCreature(NPC_SON_OF_FLAME, 
+                position.x, position.y, position.z, position.o,
+                TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
             {
                 m_creature->ProcessThreatList(dataCopier);
                 if (Unit* randomTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
-                    Crea->GetThreatManager().modifyThreatPercent(randomTarget, 90);
-                    Crea->AI()->AttackStart(randomTarget);
-                    Crea->GetMotionMaster()->MoveChase(randomTarget);
+                    pSonOfFlame->GetThreatManager().modifyThreatPercent(randomTarget, 90);
+                    pSonOfFlame->AI()->AttackStart(randomTarget);
+                    pSonOfFlame->GetMotionMaster()->MoveChase(randomTarget);
                 }
             }
             delete dataCopier;
@@ -334,80 +319,59 @@ struct boss_ragnarosAI : ScriptedAI
 
         // Phase 2 -----------------------------------------------------------------------------------
 
-        if (IsBanished && m_uiAttackTimer < diff)
+        if (IsBanished)
         {
-            m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_FADE);
-            m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_EFFECT);
-            m_creature->SetFactionTemplateId(14);
-            m_creature->SetVisibility(VISIBILITY_ON);
-
-            if (DoCastSpellIfCan(m_creature, SPELL_EMERGE_VISUAL) == CAST_OK)
+            if (m_uiAttackTimer < diff)
             {
-                // remove dummy visual
-                if (Creature* pVisual = m_creature->FindNearestCreature(NPC_SUBMERGED_VISUAL, 50.0f, true))
-                    pVisual->RemoveFromWorld();
+                m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
+                m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_EFFECT);
+                m_creature->SetStandState(UNIT_STAND_STATE_STAND);
 
-                // Become unbanished again
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                IsBanished = false;
-                m_uiMagmaBlastTimer = 3000;
-                HasYelledMagmaBlast = false;
-                m_uiEmergeStateTimer = 2900;
-                return;
-            }
-
-            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Cast %u impossible.", SPELL_EMERGE_VISUAL);
-        }
-        else if (IsBanished)
-        {
-            m_uiAttackTimer -= diff;
-            if (m_uiAttackTimer > 1500)
-            {
-                bool Allbanished = true;
-                std::list<Creature*> FilsListe;
-                GetCreatureListWithEntryInGrid(FilsListe, m_creature, NPC_SON_OF_FLAME, 150.0f);
-
-                for (const auto& itr : FilsListe)
+                if (DoCastSpellIfCan(m_creature, SPELL_EMERGE_VISUAL) == CAST_OK)
                 {
-                    if (itr->IsAlive())
+                    // Become unbanished again
+                    IsBanished = false;
+                    m_uiMagmaBlastTimer = 3000;
+                    HasYelledMagmaBlast = false;
+                    m_uiEmergeStateTimer = 2900;
+                    return;
+                }
+
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Emerge failed.");
+            }
+            else
+            {
+                m_uiAttackTimer -= diff;
+                if (m_uiAttackTimer > 1500)
+                {
+                    bool Allbanished = true;
+                    std::list<Creature*> FilsListe;
+                    GetCreatureListWithEntryInGrid(FilsListe, m_creature, NPC_SON_OF_FLAME, 150.0f);
+
+                    for (const auto& itr : FilsListe)
                     {
-                        if (!itr->HasUnitState(UNIT_STATE_ISOLATED)) // banished
+                        if (itr->IsAlive())
                         {
-                            Allbanished = false;
-                            break;
+                            if (!itr->HasUnitState(UNIT_STATE_ISOLATED)) // banished
+                            {
+                                Allbanished = false;
+                                break;
+                            }
                         }
                     }
+                    if (Allbanished)
+                        m_uiAttackTimer = 0;
                 }
-                if (Allbanished)
-                    m_uiAttackTimer = 0;
+
+                if (!m_creature->HasAura(SPELL_SUBMERGE_VISUAL))
+                    m_creature->AddAura(SPELL_SUBMERGE_VISUAL);
+
+                if (!m_creature->HasAura(SPELL_SUBMERGE_EFFECT))
+                    m_creature->AddAura(SPELL_SUBMERGE_EFFECT);
+
+                UpdateLavaBurstAI(diff);
+                return;
             }
-
-            if (m_uiSubmergeStateTimer)
-            {
-                if (m_uiSubmergeStateTimer <= diff)
-                {
-                    // create dummy to handle sound and lava flame visual
-                    if (Creature* pVisual = m_creature->SummonCreature(NPC_SUBMERGED_VISUAL, 
-                        m_creature->GetPositionX(), 
-                        m_creature->GetPositionY(), 
-                        m_creature->GetPositionZ(), 
-                        m_creature->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 95000))
-                    {
-                       pVisual->HandleEmoteState(EMOTE_STATE_SUBMERGED);                        
-                    }
-
-                    m_creature->SetVisibility(VISIBILITY_OFF);
-                    m_creature->SetFactionTemplateId(35);
-                    m_uiSubmergeStateTimer = 0;
-                }
-                else
-                    m_uiSubmergeStateTimer -= diff;
-            }
-            else if (!m_creature->HasAura(SPELL_SUBMERGE_FADE))
-                m_creature->CastSpell(m_creature, SPELL_SUBMERGE_FADE, false);
-
-            UpdateLavaBurstAI(diff);
-            return;
         }
 
         // Return since we have no target
@@ -437,28 +401,23 @@ struct boss_ragnarosAI : ScriptedAI
         // Timer to Phase 2
         if (!IsBanished && m_uiSubmergeTimer < diff)
         {
-            //Creature spawning and ragnaros becomming unattackable
-            //is not very well supported in the core
-            //so added normaly spawning and banish workaround and attack again after 90 secs.
-
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-
-            if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL, CF_INTERRUPT_PREVIOUS) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_EFFECT, CF_TRIGGERED) == CAST_OK)
             {
-                //Root self
-                DoCastSpellIfCan(m_creature, 17507);
+                if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL, CF_TRIGGERED) == CAST_OK)
+                {
+                    DoScriptText(HasSubmergedOnce ? SAY_REINFORCEMENTS2 : SAY_REINFORCEMENTS1, m_creature);
+                    m_creature->SetStandState(UNIT_STAND_STATE_CUSTOM);
+                    SummonSonsOfFlame();
 
-                DoScriptText(HasSubmergedOnce ? SAY_REINFORCEMENTS2 : SAY_REINFORCEMENTS1, m_creature);
-
-                SummonSonsOfFlame();
-
-                HasSubmergedOnce  = true;
-                IsBanished        = true;
-                m_uiSubmergeTimer = 3*MINUTE*IN_MILLISECONDS;
-                m_uiAttackTimer   = 1.5*MINUTE*IN_MILLISECONDS;
-                m_uiSubmergeStateTimer = 1500;
-                return;
+                    HasSubmergedOnce = true;
+                    IsBanished = true;
+                    m_uiSubmergeTimer = 3 * MINUTE*IN_MILLISECONDS;
+                    m_uiAttackTimer = 1.5*MINUTE*IN_MILLISECONDS;
+                    return;
+                }
             }
+
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "[MoltenCore.Ragnaros] Submerge failed.");
         }
         else if (m_uiSubmergeTimer >= diff)
             m_uiSubmergeTimer -= diff;
@@ -638,8 +597,6 @@ CreatureAI* GetAI_boss_ragnaros(Creature* pCreature)
 {
     return new boss_ragnarosAI(pCreature);
 }
-
-
 
 void AddSC_boss_ragnaros()
 {

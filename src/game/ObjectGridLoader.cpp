@@ -223,12 +223,19 @@ ObjectGridLoader::Visit(GameObjectMapType& m)
     uint32 y = (i_cell.GridY() * MAX_NUMBER_OF_CELLS) + i_cell.CellY();
     CellPair cell_pair(x, y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
-
-    CellObjectGuids const& cell_guids = sObjectMgr.GetCellObjectGuids(i_map->GetId(), cell_id);
-
     GridType& grid = (*i_map->getNGrid(i_cell.GridX(), i_cell.GridY()))(i_cell.CellX(), i_cell.CellY());
-    LoadHelper(cell_guids.gameobjects, cell_pair, m, i_gameObjects, i_map, grid);
-    LoadHelper(i_map->GetPersistentState()->GetCellObjectGuids(cell_id).gameobjects, cell_pair, m, i_gameObjects, i_map, grid);
+
+    {
+        std::shared_lock<std::shared_timed_mutex> lock(sObjectMgr.GetCellLoadingObjectsMutex());
+        if (auto const& cellGuids = sObjectMgr.GetCellObjectGuids(i_map->GetId(), cell_id))
+            LoadHelper(cellGuids->gameobjects, cell_pair, m, i_gameObjects, i_map, grid);
+    }
+    
+    {
+        std::shared_lock<std::shared_timed_mutex> lock(i_map->GetPersistentState()->GetCellObjectGuidsMutex());
+        if (auto const& cellGuids = i_map->GetPersistentState()->GetCellObjectGuids(cell_id))
+            LoadHelper(cellGuids->gameobjects, cell_pair, m, i_gameObjects, i_map, grid);
+    }
 }
 
 void
@@ -238,12 +245,19 @@ ObjectGridLoader::Visit(CreatureMapType& m)
     uint32 y = (i_cell.GridY() * MAX_NUMBER_OF_CELLS) + i_cell.CellY();
     CellPair cell_pair(x, y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
-
-    CellObjectGuids const& cell_guids = sObjectMgr.GetCellObjectGuids(i_map->GetId(), cell_id);
-
     GridType& grid = (*i_map->getNGrid(i_cell.GridX(), i_cell.GridY()))(i_cell.CellX(), i_cell.CellY());
-    LoadHelper(cell_guids.creatures, cell_pair, m, i_creatures, i_map, grid);
-    LoadHelper(i_map->GetPersistentState()->GetCellObjectGuids(cell_id).creatures, cell_pair, m, i_creatures, i_map, grid);
+    
+    {
+        std::shared_lock<std::shared_timed_mutex> lock(sObjectMgr.GetCellLoadingObjectsMutex());
+        if (auto const& cellGuids = sObjectMgr.GetCellObjectGuids(i_map->GetId(), cell_id))
+            LoadHelper(cellGuids->creatures, cell_pair, m, i_creatures, i_map, grid);
+    }
+
+    {
+        std::shared_lock<std::shared_timed_mutex> lock(i_map->GetPersistentState()->GetCellObjectGuidsMutex());
+        if (auto const& cellGuids = i_map->GetPersistentState()->GetCellObjectGuids(cell_id))
+            LoadHelper(cellGuids->creatures, cell_pair, m, i_creatures, i_map, grid);
+    }
 }
 
 void
@@ -253,10 +267,13 @@ ObjectWorldLoader::Visit(CorpseMapType& m)
     uint32 y = (i_cell.GridY() * MAX_NUMBER_OF_CELLS) + i_cell.CellY();
     CellPair cell_pair(x, y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
-
-    CellObjectGuids const& cell_guids = sObjectMgr.GetCellObjectGuids(i_map->GetId(), cell_id);
     GridType& grid = (*i_map->getNGrid(i_cell.GridX(), i_cell.GridY()))(i_cell.CellX(), i_cell.CellY());
-    LoadHelper(cell_guids.corpses, cell_pair, m, i_corpses, i_map, grid);
+
+    {
+        std::shared_lock<std::shared_timed_mutex> lock(sObjectMgr.GetCellLoadingObjectsMutex());
+        if (auto const& cellGuids = sObjectMgr.GetCellObjectGuids(i_map->GetId(), cell_id))
+            LoadHelper(cellGuids->corpses, cell_pair, m, i_corpses, i_map, grid);
+    }
 }
 
 void

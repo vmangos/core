@@ -183,6 +183,14 @@ class Creature : public Unit
         bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr) const override;
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
 
+        bool IsPlusMob() const
+        {
+            if (IsPet())
+                return false;
+
+            return GetCreatureInfo()->rank > CREATURE_ELITE_NORMAL;
+        }
+
         bool IsElite() const
         {
             if (IsPet())
@@ -228,6 +236,7 @@ class Creature : public Unit
         void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) final;
         void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0) final;
         void StartCooldownForSummoner();
+        void CancelSummonPossessedCharm();
         bool UpdateEntry(uint32 entry, GameEventCreatureData const* eventData = nullptr, bool preserveHPAndPower = true);
 
         void ApplyGameEventSpells(GameEventCreatureData const* eventData, bool activated);
@@ -542,14 +551,21 @@ class Creature : public Unit
 
         bool IsLootAllowedDueToDamageOrigin() const
         {
+            if (HasStaticFlag(CREATURE_STATIC_FLAG_CORPSE_RAID))
+                return true;
+
             return 65 * m_playerDamageTaken > 35 * m_nonPlayerDamageTaken;
         }
 
         float GetXPModifierDueToDamageOrigin() const
         {
+            if (HasStaticFlag(CREATURE_STATIC_FLAG_CORPSE_RAID))
+                return 1.0f;
+
             // If players dealt less than 35% of the damage, no XP and no loot - or both=0
             if (!IsLootAllowedDueToDamageOrigin())
                 return 0.0f;
+
             return float(m_playerDamageTaken) / (m_playerDamageTaken + m_nonPlayerDamageTaken);
         }
 

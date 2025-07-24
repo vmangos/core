@@ -33,7 +33,7 @@ namespace Movement
     {
         public:
 
-            explicit MoveSplineInit(Unit& m, char const* movementType = "Unknown");
+            explicit MoveSplineInit(Unit& m, char const* movementType);
 
             /* Final pass of initialization that launches spline movement.
              * @return duration - estimated travel time

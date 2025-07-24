@@ -223,7 +223,7 @@ typedef std::unordered_map<uint32, FactionTemplateEntry> FactionTemplatesMap;
 typedef std::unordered_map<uint32, SoundEntriesEntry> SoundEntryMap;
 typedef std::unordered_map<uint32, ItemPrototype> ItemPrototypeMap;
 typedef std::unordered_map<uint32, std::unique_ptr<CreatureInfo>> CreatureInfoMap;
-
+typedef std::unordered_map<uint32, std::unique_ptr<GameObjectInfo>> GameObjectInfoMap;
 typedef std::unordered_map<uint32,GameObjectData> GameObjectDataMap;
 typedef GameObjectDataMap::value_type GameObjectDataPair;
 
@@ -630,10 +630,23 @@ class ObjectMgr
         static Player* GetPlayer(char const* name) { return ObjectAccessor::FindPlayerByName(name);}
         static Player* GetPlayer(ObjectGuid guid) { return ObjectAccessor::FindPlayer(guid); }
 
-        static GameObjectInfo const* GetGameObjectInfo(uint32 id) { return sGOStorage.LookupEntry<GameObjectInfo>(id); }
+        std::set<uint32> GetTransportDisplayIds() const;
+        void LoadGameObjectTemplates();
+        void LoadGameObjectTemplate(uint32 entry);
+        void CheckGameObjectTemplate(GameObjectInfo* goInfo);
+        GameObjectInfo const* GetGameObjectTemplate(uint32 id) const
+        {
+            auto itr = m_gameObjectInfoMap.find(id);
+            if (itr != m_gameObjectInfoMap.end())
+                return itr->second.get();
 
-        std::set<uint32> LoadGameobjectInfo();
-        std::set<uint32> CheckGameObjectInfos();
+            return nullptr;
+        }
+        GameObjectInfoMap const& GetGameObjectInfoMap() const
+        {
+            return m_gameObjectInfoMap;
+        }
+
         void AddGameobjectInfo(GameObjectInfo* goinfo);
         void LoadGameObjectDisplayInfoAddon();
         void LoadGameobjectsRequirements();
@@ -1163,13 +1176,18 @@ class ObjectMgr
         }
 
         // global grid objects state (static DB spawns, global spawn mods from gameevent system)
-        CellObjectGuids const& GetCellObjectGuids(uint16 mapid, uint32 cell_id)
+        CellObjectGuids const* GetCellObjectGuids(uint16 mapid, uint32 cell_id) const
         {
-            std::unique_lock<std::mutex> lock(m_MapObjectGuids_lock);
-            CellObjectGuids const& guids = m_MapObjectGuids[mapid][cell_id];
-            return guids;
+            auto itr = m_MapObjectGuids.find(mapid);
+            if (itr != m_MapObjectGuids.end())
+            {
+                auto itr2 = itr->second.find(cell_id);
+                if (itr2 != itr->second.end())
+                    return &itr2->second;
+            }
+            return nullptr;
         }
-        std::mutex& GetCellLoadingObjectsMutex() // TODO: Mutex per cell?
+        std::shared_timed_mutex& GetCellLoadingObjectsMutex() // TODO: Mutex per cell?
         {
             return m_MapObjectGuids_lock;
         }
@@ -1516,6 +1534,7 @@ class ObjectMgr
         uint32 m_OldMailCounter;
 
     private:
+        void LoadGameObjectInfo(Field* result);
         void LoadCreatureInfo(Field* result);
         void LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment);
         void LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table);
@@ -1559,7 +1578,7 @@ class ObjectMgr
         HalfNameMap m_PetHalfNameMap1;
 
         MapObjectGuids m_MapObjectGuids;
-        std::mutex m_MapObjectGuids_lock;
+        std::shared_timed_mutex m_MapObjectGuids_lock;
 
         AreaTriggerLocaleMap m_AreaTriggerLocaleMap;
         CreatureDataMap m_CreatureDataMap;
@@ -1586,6 +1605,7 @@ class ObjectMgr
 
         SoundEntryMap m_SoundEntriesMap;
         CreatureInfoMap m_creatureInfoMap;
+        GameObjectInfoMap m_gameObjectInfoMap;
         ItemPrototypeMap m_itemPrototypesMap;
 
         typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;

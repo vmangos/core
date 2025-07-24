@@ -5,13 +5,14 @@
 #include "HardcodedEvents.h"
 #include "World.h"
 #include "MapManager.h"
+#include "WaypointManager.h"
+#include "Chat.h"
+#include "GridSearchers.h"
 #include "world/scourge_invasion.h"
 #include "world/world_event_wareffort.h"
-#include "GridSearchers.h"
 #include <chrono>
 #include <random>
 #include <limits>
-#include "WaypointManager.h"
 
 /*
  * Elemental Invasion
@@ -1384,7 +1385,7 @@ void WarEffortEvent::Update()
             // mobs spawn
             UpdateStageTransitionTime();
 
-            sWorld.SendWorldText(WAR_EFFORT_TEXT_CRYSTALS);
+            sWorld.SendBroadcastTextToWorld(WAR_EFFORT_TEXT_CRYSTALS);
 
             BeginWar();
 
@@ -1415,7 +1416,7 @@ void WarEffortEvent::Update()
             // 10 hours have passed, it's all over
             if (now - gongRingTime > WAR_EFFORT_GONG_DURATION)
             {
-                sWorld.SendWorldText(WAR_EFFORT_TEXT_BATTLE_OVER);
+                sWorld.SendBroadcastTextToWorld(WAR_EFFORT_TEXT_BATTLE_OVER);
 
                 stage = WAR_EFFORT_STAGE_COMPLETE;
                 UpdateStageTransitionTime();

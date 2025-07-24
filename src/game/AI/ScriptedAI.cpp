@@ -2,11 +2,7 @@
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
-#include "Item.h"
-#include "SpellMgr.h"
-#include "Spell.h"
 #include "WorldPacket.h"
-#include "ObjectMgr.h"
 #include "ScriptedAI.h"
 #include "GridSearchers.h"
 
@@ -96,12 +92,6 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* pSource, uint32 uiSoundId)
 {
     if (!pSource)
         return;
-
-    if (!sObjectMgr.GetSoundEntry(uiSoundId))
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", uiSoundId, pSource->GetTypeId(), pSource->GetGUIDLow());
-        return;
-    }
 
     pSource->PlayDirectSound(uiSoundId);
 }

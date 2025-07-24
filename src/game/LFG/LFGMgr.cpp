@@ -23,7 +23,6 @@
 #include "Player.h"
 #include "Map.h"
 #include "ObjectMgr.h"
-#include "Chat.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"

@@ -167,7 +167,7 @@ enum Powers
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
 
-#define MAX_POWERS                        5                 // not count POWER_RUNES for now
+#define MAX_POWERS                        5
 
 static char const* PowerToString(uint32 power)
 {
@@ -1325,11 +1325,6 @@ enum PetDiet
 #define MAX_PET_DIET 9
 
 #define CHAIN_SPELL_JUMP_RADIUS 10
-
-// Max values for Guild
-#define GUILD_EVENTLOG_MAX_RECORDS  100
-#define GUILD_RANKS_MIN_COUNT       5
-#define GUILD_RANKS_MAX_COUNT       10
 
 enum AiReaction
 {

@@ -20,7 +20,6 @@
  */
 
 #include "CreatureAI.h"
-#include "Spell.h"
 #include "Creature.h"
 #include "DBCStores.h"
 #include "Totem.h"

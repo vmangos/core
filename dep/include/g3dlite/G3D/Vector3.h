@@ -236,13 +236,13 @@ public:
      */
     inline Vector3 directionOrZero() const {
         float mag = magnitude();
-        if (mag < 0.0000001f) {
+        if (mag < 0.0000001f) 
             return Vector3::zero();
-        } else if (mag < 1.00001f && mag > 0.99999f) {
+        if (mag < 1.00001f && mag > 0.99999f) 
             return *this;
-        } else {
-            return *this * (1.0f / mag);
-        }
+
+        return *this * (1.0f / mag);
+
     }
 
     /**
@@ -424,6 +424,8 @@ public:
     static const Vector3& unitZ();
     static const Vector3& inf();
     static const Vector3& nan();
+    static const Vector3& up();
+    static const Vector3& down();
     
     /** Smallest (most negative) representable vector */
     static const Vector3& minFinite();
@@ -597,7 +599,7 @@ std::ostream& operator<<(std::ostream& os, const Vector3&);
 
 
 void serialize(const Vector3::Axis& a, class BinaryOutput& bo);
-void deserialize(Vector3::Axis& a, class BinaryInput& bo);
+void deserialize(Vector3::Axis& a, class BinaryInput& bi);
 
 
 //----------------------------------------------------------------------------

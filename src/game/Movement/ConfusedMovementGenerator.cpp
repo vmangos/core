@@ -80,7 +80,7 @@ bool ConfusedMovementGenerator<T>::Update(T &unit, uint32 const& diff)
     path.calculate(x, y, z, false, true);
     path.CutPathWithDynamicLoS();
 
-    Movement::MoveSplineInit init(unit, "ConfusedMovementGenerator");
+    Movement::MoveSplineInit init(unit, "ConfusedMovementGenerator<T>::Update");
     init.Move(&path);
     init.SetWalk(true);
     init.Launch();
