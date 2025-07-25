@@ -1391,7 +1391,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct Creature Position
 UPDATE `creature` SET `position_x` = -1686.72, `position_y` = -4326.52, `position_z` = 3.89036, `orientation` = 4.75596 WHERE `guid` = 14358;
-
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Rok Orhan 7777 correct path (credit cmangos)
 SET @POINT := 0;
@@ -1465,6 +1464,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (7777,(@POINT := @POINT + 1),-4359.996,127.70117,30.779827,100,0,0),
 (7777,(@POINT := @POINT + 1),-4354.757,136.97896,32.395763,100,0,0),
 (7777,(@POINT := @POINT + 1),-4353.4795,147.17014,33.70603,100,0,0);
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Correct Creature Position
+UPDATE `creature` SET `position_x`=-12358.4, `position_y`=-977.508, `position_z`=14.1008, `orientation`=1.2761 WHERE  `guid`=855;
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
