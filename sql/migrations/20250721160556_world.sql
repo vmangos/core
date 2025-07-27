@@ -21,7 +21,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5895, 6, 459.398, 1923.79, -10.2403, 100, 1000, 0, 4, 0);
 DELETE FROM `creature_movement_scripts` WHERE `id` = 589500;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(589500, 0, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Minor Manifestation of Water - Modify Flags');
+(589500, 0, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Minor Manifestation of Water - Modify Flags');
 
 -- Corrupt Water Spirit
 UPDATE `creature` SET `spawntimesecsmin` = 450, `spawntimesecsmax` = 450 WHERE `id` = 5897;
@@ -194,46 +194,46 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- Quest 100 Start Script
 DELETE FROM `quest_start_scripts` WHERE `id` = 100;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(100, 0, 0, 31, 5895, 20, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Terminate Script'),
-(100, 0, 1, 39, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Start Script');
+(100, 0, 0, 31, 5895, 20, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Terminate Script'),
+(100, 0, 1, 39, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Start Script');
 
 DELETE FROM `generic_scripts` WHERE `id` = 100;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(100, 0, 1, 68, 5897, 2, 5897, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Corrupt Water Spirit - Start Script For All'),
-(100, 1, 0, 9, 15176, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Gameobject'),
-(100, 12, 0, 9, 15175, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Gameobject'),
-(100, 15, 0, 10, 5895, 360000, 0, 0, 0, 0, 0, 0, 4, 0, -1, 1, 417.04, 1822.66, 12.61, 1.483, 0, 'Call of Water - Summon Minor Manifestation of Water'),
-(100, 19, 1, 91, 10997, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 19, 1, 91, 10998, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 19, 1, 91, 10999, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 20, 1, 91, 11001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 20, 1, 91, 11002, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 22, 1, 91, 11003, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 22, 1, 91, 11004, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 22, 1, 91, 11005, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 24, 1, 91, 11006, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 24, 1, 91, 11007, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 25, 1, 91, 11008, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit'),
-(100, 25, 1, 91, 11009, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Respawn Water Spirit');
+(100, 0, 1, 68, 5897, 2, 5897, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Corrupt Water Spirit - Start Script For All'),
+(100, 1, 0, 9, 15176, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Gameobject'),
+(100, 12, 0, 9, 15175, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Gameobject'),
+(100, 15, 0, 10, 5895, 360000, 0, 0, 0, 0, 0, 0, 4, 0, -1, 1, 417.04, 1822.66, 12.61, 1.483, 0, 'Call of Water: Summon Minor Manifestation of Water'),
+(100, 19, 1, 91, 10997, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 19, 1, 91, 10998, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 19, 1, 91, 10999, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 20, 1, 91, 11001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 20, 1, 91, 11002, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 22, 1, 91, 11003, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 22, 1, 91, 11004, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 22, 1, 91, 11005, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 24, 1, 91, 11006, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 24, 1, 91, 11007, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 25, 1, 91, 11008, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit'),
+(100, 25, 1, 91, 11009, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Respawn Water Spirit');
 
 -- Quest 96 Start Script
 UPDATE `quest_template` SET `StartScript` = 96 WHERE `entry` = 96;
 
 DELETE FROM `quest_start_scripts` WHERE `id` = 96;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(96, 12, 0, 60, 2, 2, 0, 0, 0, 0, 0, 0, 0, 5895, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Minor Manifestation of Water -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 11006, 0, 11, 2, 11006, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 11008, 0, 11, 2, 11008, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 10997, 0, 11, 2, 10997, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 10998, 0, 11, 2, 10998, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 10999, 0, 11, 2, 10999, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 11001, 0, 11, 2, 11001, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 11002, 0, 11, 2, 11002, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 11003, 0, 11, 2, 11003, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 11004, 0, 11, 2, 11004, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 11005, 0, 11, 2, 11005, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 11009, 0, 11, 2, 11009, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints'),
-(96, 13, 0, 60, 1, 2, 0, 0, 11007, 0, 11, 2, 11007, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Water Spirit -Start Waypoints');
+(96, 12, 0, 60, 2, 2, 0, 0, 0, 0, 0, 0, 0, 5895, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Minor Manifestation of Water -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 11006, 0, 11, 2, 11006, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 11008, 0, 11, 2, 11008, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 10997, 0, 11, 2, 10997, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 10998, 0, 11, 2, 10998, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 10999, 0, 11, 2, 10999, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 11001, 0, 11, 2, 11001, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 11002, 0, 11, 2, 11002, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 11003, 0, 11, 2, 11003, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 11004, 0, 11, 2, 11004, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 11005, 0, 11, 2, 11005, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 11009, 0, 11, 2, 11009, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints'),
+(96, 13, 0, 60, 1, 2, 0, 0, 11007, 0, 11, 2, 11007, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Water Spirit -Start Waypoints');
 
 -- Quest 1103 End Script
 UPDATE `quest_template` SET `PrevQuestId` = 220 WHERE `entry` = 972;
@@ -243,9 +243,9 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 
 DELETE FROM `quest_end_scripts` WHERE `id`=1103;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1103, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Set Standstate'),
-(1103, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3069, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Talk'),
-(1103, 3, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 7007, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Start Waypoints');
+(1103, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Set Standstate'),
+(1103, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3069, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Talk'),
+(1103, 3, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 7007, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Start Waypoints');
 
 DELETE FROM `creature_movement_special` WHERE `id` = 7007;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`, `path_id`) VALUES
@@ -265,25 +265,25 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 
 DELETE FROM `creature_movement_scripts` WHERE `id`=700700;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(700700, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3070, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Talk'),
-(700700, 3, 0, 35, 0, 0, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Set Orientation'),
-(700700, 3, 1, 15, 9735, 0, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Cast Spell');
+(700700, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3070, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Talk'),
+(700700, 3, 0, 35, 0, 0, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Set Orientation'),
+(700700, 3, 1, 15, 9735, 0, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Cast Spell');
 
 DELETE FROM `creature_movement_scripts` WHERE `id`=700701;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(700701, 0, 0, 35, 0, 0, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Set Orientation'),
-(700701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3071, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Talk'),
-(700701, 2, 0, 1, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Emote'),
-(700701, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3072, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Talk'),
-(700701, 6, 0, 39, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Start Script');
+(700701, 0, 0, 35, 0, 0, 0, 0, 10, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Set Orientation'),
+(700701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3071, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Talk'),
+(700701, 2, 0, 1, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Emote'),
+(700701, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3072, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Talk'),
+(700701, 6, 0, 39, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Start Script');
 
 DELETE FROM `creature_movement_scripts` WHERE `id`=700702;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(700702, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3073, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Talk');
+(700702, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3073, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Talk');
 
 DELETE FROM `creature_movement_scripts` WHERE `id`=700703;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(700703, 0, 0, 28, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water - Tiev Mordune - Set Standstate');
+(700703, 0, 0, 28, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Call of Water: Tiev Mordune - Set Standstate');
 
 -- Misc
 UPDATE `quest_template` SET `OfferRewardText` = 'The wind approaches you quickly from the horizon; the earth is steady beneath your feet; and your spirit is already warmed by fire--I would say it is time for you to learn about the purity of water.$B$BYour path has led you this far, and your spirit will give you the strength to carry on even further. But the first step is yours to take.' WHERE `entry` = 2986;
