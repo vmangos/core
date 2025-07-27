@@ -1467,6 +1467,10 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct Creature Position
 UPDATE `creature` SET `position_x`=-12358.4, `position_y`=-977.508, `position_z`=14.1008, `orientation`=1.2761 WHERE  `guid`=855;
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Creatures Should Wander
+UPDATE `creature` SET `wander_distance` = 2, `movement_type` = 1 WHERE `guid` IN (2488, 2161, 2173, 2163, 2165, 2176, 2488, 2491, 2511);
+
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
