@@ -797,10 +797,10 @@ struct WorldSafeLocsEntry
 #pragma pack(pop)
 #endif
 
-typedef std::set<uint32> SpellCategorySet;
-typedef std::map<uint32,SpellCategorySet > SpellCategoriesStore;
-typedef std::set<uint32> PetFamilySpellsSet;
-typedef std::map<uint32,PetFamilySpellsSet > PetFamilySpellsStore;
+typedef std::unordered_set<uint32> SpellCategorySet;
+typedef std::unordered_map<uint32,SpellCategorySet > SpellCategoriesStore;
+typedef std::unordered_set<uint32> PetFamilySpellsSet;
+typedef std::unordered_map<uint32,PetFamilySpellsSet > PetFamilySpellsStore;
 
 // Structures not used for casting to loaded DBC data and not required then packing
 struct TalentSpellPos

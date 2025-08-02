@@ -204,8 +204,7 @@ struct boss_ayamissAI : public ScriptedAI
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (const auto i : tList)
             {
-                Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
-                if (pUnit && (pUnit->GetTypeId() == TYPEID_PLAYER))
+                if (Player* pUnit = i->getTarget()->ToPlayer())
                     m_creature->GetThreatManager().modifyThreatPercent(pUnit, -100);
             }
         }

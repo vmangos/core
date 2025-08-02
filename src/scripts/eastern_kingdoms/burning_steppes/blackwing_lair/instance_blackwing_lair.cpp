@@ -112,10 +112,10 @@ public:
         ThreatList threatList = pTechnician->GetThreatManager().getThreatList();
         for (const auto& i : threatList)
         {
-            if (Unit* pUnit = m_pInstance->instance->GetCreature(i->getUnitGuid()))
+            if (Creature* pCreature = i->getTarget()->ToCreature())
             {
-                m_mThreatGuid[pUnit->GetObjectGuid()] += i->getThreat();
-                pTechnician->GetThreatManager().modifyThreatPercent(pUnit, -100);
+                m_mThreatGuid[pCreature->GetObjectGuid()] += i->getThreat();
+                pTechnician->GetThreatManager().modifyThreatPercent(pCreature, -100);
             }
         }
     }
@@ -187,7 +187,7 @@ public:
                     ThreatList threatList = pCreature->GetThreatManager().getThreatList();
                     for (const auto& i : threatList)
                     {
-                        if (Unit* pUnit = m_pInstance->instance->GetUnit(i->getUnitGuid()))
+                        if (Unit* pUnit = i->getTarget())
                         {
                             m_mThreatGuid[pUnit->GetObjectGuid()] += i->getThreat();
                             pCreature->GetThreatManager().modifyThreatPercent(pUnit, -100);

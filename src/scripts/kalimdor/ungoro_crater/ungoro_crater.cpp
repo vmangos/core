@@ -634,7 +634,7 @@ struct npc_simone_seductressAI : public ScriptedAI
                 
                 for (const auto itr : SimonetList)
                 {
-                    if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
+                    if (Unit* pUnit = itr->getTarget())
                     {
                         if (pUnit->IsAlive())
                         {
@@ -651,7 +651,7 @@ struct npc_simone_seductressAI : public ScriptedAI
                 
                     for (const auto itr : PrecioustList)
                     {
-                        if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
+                        if (Unit* pUnit = itr->getTarget())
                         {
                             if (pUnit->IsAlive())
                             {

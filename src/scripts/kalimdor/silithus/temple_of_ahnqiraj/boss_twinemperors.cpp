@@ -582,7 +582,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         for (i; i != tList.end(); ++i)
         {
-            Player* pPlayer = m_creature->GetMap()->GetPlayer((*i)->getUnitGuid());
+            Player* pPlayer = (*i)->getTarget()->ToPlayer();
             if (!pPlayer) continue;
 
             if (m_creature->IsInRange(pPlayer, min, max))
@@ -939,7 +939,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
 
         for (const auto i : tList)
         {
-            Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
+            Unit* pUnit = i->getTarget();
             if (!pUnit) continue;
 
             if (m_creature->CanReachWithMeleeAutoAttack(pUnit))
@@ -953,7 +953,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
 
         auto it = candidates.begin();
         std::advance(it, candidates.size() - 1);
-        return m_creature->GetMap()->GetUnit((*it)->getUnitGuid());
+        return (*it)->getTarget();
     }
     
     void UpdateEmperor(uint32 diff) override

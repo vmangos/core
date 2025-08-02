@@ -351,7 +351,7 @@ struct boss_vaelAI : public ScriptedAI
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (const auto itr : tList)
             {
-                Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
+                Player* pPlayer = itr->getTarget()->ToPlayer();
                 if (pPlayer && pPlayer->IsAlive() && pPlayer->GetPowerType() == POWER_MANA && !pPlayer->HasAura(SPELL_BURNING_ADRENALINE, EFFECT_INDEX_0))
                     vPossibleVictim.push_back(pPlayer->GetObjectGuid());
             }

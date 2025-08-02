@@ -59,6 +59,28 @@ SpellScript* GetScript_PriestTouchOfWeakness(SpellEntry const*)
     return new PriestTouchOfWeaknessScript();
 }
 
+// 17, 592, 600, 3747, 6065, 6066, 10898, 10899, 10900, 10901, 27607 - Power Word: Shield
+struct PriestPowerWordShieldScript : SpellScript
+{
+    enum
+    {
+        SPELL_WEAKENED_SOUL = 6788,
+    };
+
+    void OnHit(Spell* spell, SpellMissInfo missInfo) const final
+    {
+        if (missInfo == SPELL_MISS_NONE && spell->GetUnitTarget())
+        {
+            spell->m_caster->CastSpell(spell->GetUnitTarget(), SPELL_WEAKENED_SOUL, true);
+        }
+    }
+};
+
+SpellScript* GetScript_PriestPowerWordShield(SpellEntry const*)
+{
+    return new PriestPowerWordShieldScript();
+}
+
 void AddSC_priest_spell_scripts()
 {
     Script* newscript;
@@ -66,5 +88,10 @@ void AddSC_priest_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_priest_touch_of_weakness";
     newscript->GetSpellScript = &GetScript_PriestTouchOfWeakness;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_priest_power_word_shield";
+    newscript->GetSpellScript = &GetScript_PriestPowerWordShield;
     newscript->RegisterSelf();
 }

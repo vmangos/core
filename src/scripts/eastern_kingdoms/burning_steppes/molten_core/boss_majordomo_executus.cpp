@@ -309,32 +309,32 @@ struct boss_majordomoAI : public ScriptedAI
                 // World of Warcraft Client Patch 1.4.0 (2005-04-19)
                 // - Ragnaros now stays up 2 hours rather than 1 after being summoned. 
                 uint32 const despawnTime = (sWorld.GetWowPatch() >= WOW_PATCH_104) ? (2 * HOUR * IN_MILLISECONDS) : (1 * HOUR * IN_MILLISECONDS);
-                if (Creature* Ragnaros = m_creature->SummonCreature(NPC_RAGNAROS, 838.308f, -831.466f, -232.185f, 2.19911f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, despawnTime))
-                    m_creature->SetFacingToObject(Ragnaros);
+                if (Creature* pRagnaros = m_creature->SummonCreature(NPC_RAGNAROS, 838.308f, -831.466f, -232.185f, 2.19911f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, despawnTime))
+                    m_creature->SetFacingToObject(pRagnaros);
                 break;
             }
             case 36:
-                if (Creature* Ragnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
+                if (Creature* pRagnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
                 {
-                    DoScriptText(SAY_ARRIVAL1_RAG, Ragnaros);
-                    Ragnaros->HandleEmote(EMOTE_ONESHOT_ROAR);
+                    DoScriptText(SAY_ARRIVAL1_RAG, pRagnaros);
+                    pRagnaros->HandleEmote(EMOTE_ONESHOT_ROAR);
                 }
                 break;
             case 50:
                 DoScriptText(SAY_ARRIVAL2_MAJ, m_creature);
                 break;
             case 60:
-                if (Creature* Ragnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
+                if (Creature* pRagnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
                 {
-                    Ragnaros->SetTargetGuid(m_creature->GetGUID());
-                    DoScriptText(SAY_ARRIVAL3_RAG, Ragnaros);
-                    Ragnaros->HandleEmote(EMOTE_ONESHOT_ROAR);
+                    pRagnaros->SetTargetGuid(m_creature->GetGUID());
+                    DoScriptText(SAY_ARRIVAL3_RAG, pRagnaros);
+                    pRagnaros->HandleEmote(EMOTE_ONESHOT_ROAR);
                 }
                 break;
             case 76:
                 m_creature->SetInvincibilityHpThreshold(0);
-                if (Creature* Ragnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
-                    Ragnaros->CastSpell(m_creature, SPELL_ELEMENTAL_FIRE, false);
+                if (Creature* pRagnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
+                    pRagnaros->CastSpell(m_creature, SPELL_ELEMENTAL_FIRE, false);
                 // Handle rest in Ragnaros script
                 break;
             }

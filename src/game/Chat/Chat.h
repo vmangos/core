@@ -127,6 +127,7 @@ class ChatHandler
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
         std::string GetNameLink(Player* chr) const;
+        std::string GetNameLink(uint32 guidLow) const;
         std::string GetItemLink(ItemPrototype const* pItem) const;
 
         GameObject* GetGameObjectWithGuid(uint32 lowguid,uint32 entry);
@@ -542,6 +543,7 @@ class ChatHandler
         bool HandleGuildRankCommand(char* args);
         bool HandleGuildDeleteCommand(char* args);
         bool HandleGuildRenameCommand(char* args);
+        bool HandleGuildShowLogCommand(char* args);
 
         bool HandleGroupAddItemCommand(char* args);
         bool HandleGroupReviveCommand(char* args);

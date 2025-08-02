@@ -520,6 +520,47 @@ bool ChatHandler::HandleGuildRenameCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleGuildShowLogCommand(char* args)
+{
+    if (!args || !*args)
+        return false;
+
+    char* guildName = ExtractQuotedArg(&args);
+    if (!guildName)
+        return false;
+
+    Guild* target = sGuildMgr.GetGuildByName(guildName);
+    if (!target)
+    {
+        SendSysMessage(LANG_GUILD_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (target->GetGuildEventLog().empty())
+    {
+        SendSysMessage("Guild log is empty.");
+        return true;
+    }
+
+    time_t now = time(nullptr);
+    SendSysMessage("Showing guild log:");
+    for (auto const& itr : target->GetGuildEventLog())
+    {
+        time_t timeSinceEvent = now - itr.timestamp;
+        PSendSysMessage("- Type: %s%s%s, Player1: %s, Player2: %s, Time: %s%s%s ago",
+            m_session ? "|cff00ff00" : "",
+            GuildEventLogTypeToString(itr.eventType),
+            m_session ? "|r" : "",
+            GetNameLink(itr.playerGuid1).c_str(),
+            GetNameLink(itr.playerGuid2).c_str(),
+            m_session ? "|cffffffff" : "",
+            secsToTimeString(timeSinceEvent, true).c_str(),
+            m_session ? "|r" : "");
+    }
+    return true;
+}
+
 bool ChatHandler::HandleInstanceBindingMode(char* args)
 {
     Player* player = GetSession()->GetPlayer();

@@ -838,6 +838,17 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         me->ClearTarget();
 
     Unit* pVictim = me->GetVictim();
+    
+    // Prevent battelbot from chasing target entered stealth mode
+    if (pVictim && !pVictim->IsVisibleForOrDetect(me, me, false))
+    {
+        me->AttackStop();
+        me->ClearTarget();
+        me->StopMoving();
+        if (pVictim = SelectAttackTarget(pVictim))
+            AttackStart(pVictim);
+        return;
+    }
 
     if (!me->IsInCombat())
     {

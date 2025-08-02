@@ -42,7 +42,7 @@ jobs:
         os: [ubuntu-latest]
         compiler: [gcc, clang]
         include:
-          - os: windows-latest
+          - os: windows-2022
 
     steps:
 
@@ -58,7 +58,7 @@ jobs:
         sudo apt-get -qq install build-essential cmake libmysql++-dev libtbb-dev libcurl4-openssl-dev openssl
       #windows dependencies
     - name: windows dependencies
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2022'
       #Sets versions TBB
       env:
         TBB_VERSION: 2020.3
@@ -85,7 +85,7 @@ jobs:
         make install
     #windows
     - name: windows build & install
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2022'
       run: |
         # Build CURL
         cd $GITHUB_WORKSPACE/dep/windows/optional_dependencies/

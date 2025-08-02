@@ -11000,9 +11000,9 @@ void Unit::DoResetThreat()
     ThreatList const& tList = GetThreatManager().getThreatList();
     for (const auto itr : tList)
     {
-        Unit* pUnit = GetMap()->GetUnit(itr->getUnitGuid());
+        Unit* pUnit = itr->getTarget();
 
-        if (pUnit && GetThreatManager().getThreat(pUnit))
+        if (pUnit && itr->getThreat())
             GetThreatManager().modifyThreatPercent(pUnit, -100);
     }
 }

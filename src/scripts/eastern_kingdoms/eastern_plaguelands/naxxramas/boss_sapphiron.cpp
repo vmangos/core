@@ -351,7 +351,8 @@ struct boss_sapphironAI : public ScriptedAI
 
         std::vector<Unit*> suitableUnits;
         for (const auto itr : threatlist)
-            if (Unit* pTarget = m_creature->GetMap()->GetPlayer(itr->getUnitGuid()))
+        {
+            if (Player* pTarget = itr->getTarget()->ToPlayer())
             {
                 if (pTarget->IsDead())
                     continue;
@@ -361,7 +362,7 @@ struct boss_sapphironAI : public ScriptedAI
 
                 suitableUnits.push_back(pTarget);
             }
-
+        }
         if (suitableUnits.empty())
         {
             RescheduleIcebolt();
@@ -713,10 +714,8 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         ++it; // skip tank
         for (it; it != threatlist.end(); ++it)
         {
-            if (Unit* pTarget = m_pInstance->GetMap()->GetUnit((*it)->getUnitGuid()))
+            if (Player* pTarget = (*it)->getTarget()->ToPlayer())
             {
-                if (!pTarget->IsPlayer())
-                    continue;
                 if (std::find(previousTargets.begin(), previousTargets.end(), pTarget->GetObjectGuid()) != previousTargets.end())
                     continue;
                 // want to encourage the blizzard to move towards a semi-far-away target to make it spread out

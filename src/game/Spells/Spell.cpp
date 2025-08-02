@@ -3875,11 +3875,6 @@ void Spell::cast(bool skipCheck)
             break;
         case SPELLFAMILY_PRIEST:
         {
-            // Power Word: Shield
-            // Nostalrius : Ivina : removed 27779 from cases = priest T0/T0.5 shield proc.
-            if (m_spellInfo->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_POWER_WORD_SHIELD>() && (m_spellInfo->Id != 27779))
-                AddPrecastSpell(6788);                      // Weakened Soul
-
             switch (m_spellInfo->Id)
             {
                 case 15237:

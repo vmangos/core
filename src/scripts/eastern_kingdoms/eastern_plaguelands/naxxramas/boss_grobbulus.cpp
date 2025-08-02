@@ -128,9 +128,9 @@ struct boss_grobbulusAI : public ScriptedAI
 
         for (const auto itr : threatList)
         {
-            if (Unit* pTarget = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
+            if (Player* pTarget = itr->getTarget()->ToPlayer())
             {
-                if (pTarget->GetTypeId() == TYPEID_PLAYER && !pTarget->HasAura(SPELL_MUTATING_INJECTION))
+                if (!pTarget->HasAura(SPELL_MUTATING_INJECTION))
                     suitableTargets.push_back(pTarget);
             }
         }

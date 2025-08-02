@@ -180,8 +180,7 @@ enum eScriptCommand
     SCRIPT_COMMAND_REMOVE_ITEM              = 40,           // source = Player (from provided source or target)
                                                             // datalong = item_id
                                                             // datalong2 = amount
-    SCRIPT_COMMAND_REMOVE_OBJECT            = 41,           // source = GameObject
-                                                            // target = Unit
+    SCRIPT_COMMAND_REMOVE_OBJECT            = 41,           // source = GameObject or Creature
     SCRIPT_COMMAND_SET_MELEE_ATTACK         = 42,           // source = Creature
                                                             // datalong = (bool) 0 = off, 1 = on
     SCRIPT_COMMAND_SET_COMBAT_MOVEMENT      = 43,           // source = Creature

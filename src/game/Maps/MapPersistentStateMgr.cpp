@@ -157,6 +157,7 @@ void MapPersistentState::AddCreatureToGrid(uint32 guid, CreatureData const* data
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->position.x, data->position.y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
+    std::unique_lock<std::shared_timed_mutex> lock(m_cellObjectGuidsMutex);
     m_gridObjectGuids[cell_id].creatures.insert(guid);
 }
 
@@ -165,6 +166,7 @@ void MapPersistentState::RemoveCreatureFromGrid(uint32 guid, CreatureData const*
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->position.x, data->position.y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
+    std::unique_lock<std::shared_timed_mutex> lock(m_cellObjectGuidsMutex);
     m_gridObjectGuids[cell_id].creatures.erase(guid);
 }
 
@@ -173,6 +175,7 @@ void MapPersistentState::AddGameobjectToGrid(uint32 guid, GameObjectData const* 
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->position.x, data->position.y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
+    std::unique_lock<std::shared_timed_mutex> lock(m_cellObjectGuidsMutex);
     m_gridObjectGuids[cell_id].gameobjects.insert(guid);
 }
 
@@ -181,6 +184,7 @@ void MapPersistentState::RemoveGameobjectFromGrid(uint32 guid, GameObjectData co
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->position.x, data->position.y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
+    std::unique_lock<std::shared_timed_mutex> lock(m_cellObjectGuidsMutex);
     m_gridObjectGuids[cell_id].gameobjects.erase(guid);
 }
 

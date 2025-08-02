@@ -163,6 +163,27 @@ enum GuildEventLogTypes
     GUILD_EVENT_LOG_LEAVE_GUILD       = 6,
 };
 
+inline char const* GuildEventLogTypeToString(uint8 type)
+{
+    switch (type)
+    {
+        case GUILD_EVENT_LOG_INVITE_PLAYER:
+            return "Invite";
+        case GUILD_EVENT_LOG_JOIN_GUILD:
+            return "Join";
+        case GUILD_EVENT_LOG_PROMOTE_PLAYER:
+            return "Promote";
+        case GUILD_EVENT_LOG_DEMOTE_PLAYER:
+            return "Demote";
+        case GUILD_EVENT_LOG_UNINVITE_PLAYER:
+            return "Uninvite";
+        case GUILD_EVENT_LOG_LEAVE_GUILD:
+            return "Leave";
+    }
+    return "UNKNOWN";
+}
+
+
 enum GuildEmblem
 {
     ERR_GUILDEMBLEM_SUCCESS               = 0,
@@ -323,6 +344,7 @@ class Guild
         void   LoadGuildEventLogFromDB();
         void   DisplayGuildEventLog(WorldSession* session);
         void   LogGuildEvent(uint8 eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
+        std::list<GuildEventLogEntry> const& GetGuildEventLog() const { return m_GuildEventLog; }
         ObjectGuid GetGuildInviter(ObjectGuid playerGuid) const;
 
     protected:

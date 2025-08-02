@@ -15484,10 +15484,10 @@ bool Player::_LoadInventory(std::unique_ptr<QueryResult> result, uint32 timediff
         //NOTE2: the "order by `slot`" is needed because mainhand weapons are (wrongly?)
         //expected to be equipped before offhand items (TODO: fixme)
 
-        std::set<uint32> itemGuids;
+        std::unordered_set<uint32> itemGuids;
         uint32 zone = GetZoneId();
 
-        std::list<Item*> problematicItems;
+        std::vector<Item*> problematicItems;
 
         // prevent items from being added to the queue when stored
         m_itemUpdateQueueBlocked = true;
@@ -15677,8 +15677,8 @@ bool Player::_LoadInventory(std::unique_ptr<QueryResult> result, uint32 timediff
 
             for (int i = 0; !problematicItems.empty() && i < MAX_MAIL_ITEMS; ++i)
             {
-                Item* item = problematicItems.front();
-                problematicItems.pop_front();
+                Item* item = problematicItems.back();
+                problematicItems.pop_back();
 
                 draft.AddItem(item);
             }
@@ -20456,6 +20456,9 @@ void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)
     for (uint32 i = 0; i < maxSlot; ++i)
     {
         LootItem* lootItem = loot.LootItemInSlot(i, GetGUIDLow());
+        if (!lootItem)
+            continue;
+
         // Don't bypass conditions
         if (lootItem->conditionId && !lootItem->AllowedForPlayer(this, loot.GetLootTarget()))
             continue;

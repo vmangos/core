@@ -99,8 +99,10 @@ class HostileReference : public Reference<Unit, ThreatManager>
 
         //=================================================
 
+        // enemy target on the threat list
         ObjectGuid const& getUnitGuid() const { return iUnitGuid; }
 
+        // the creature that owns the threat list
         Unit* getSourceUnit();
 
         //=================================================

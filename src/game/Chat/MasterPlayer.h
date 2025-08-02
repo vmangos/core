@@ -139,7 +139,7 @@ public:
     // GM system variables
     uint8 m_gmInvisibilityLevel;
     uint32 m_ExtraFlags;
-    std::set<ObjectGuid> m_allowedWhispers;
+    std::unordered_set<ObjectGuid> m_allowedWhispers;
 
     // TODO: Group ?
 

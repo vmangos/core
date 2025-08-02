@@ -152,11 +152,8 @@ struct boss_patchwerkAI : public ScriptedAI
             // Only top 4 players on threat in melee range are targetted.
             if (threatListPosition > 3)
                 break;
-
-            if (!iter->getUnitGuid().IsPlayer())
-                continue;
             
-            Player* pTempTarget = m_creature->GetMap()->GetPlayer(iter->getUnitGuid());
+            Player* pTempTarget = iter->getTarget()->ToPlayer();
             if (!pTempTarget)
                 continue;
 
