@@ -554,8 +554,8 @@ UPDATE `creature` SET `position_x` = -1034.05, `position_y` = -2803.35, `positio
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Missing Arin'sor and Obi 1 Spawn
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(1882, 11702, 0, 0, 0, 0, 1, -6342.67, -660.912, -179.816, 2.32129, 300, 300, 0, 100, 0, 0, 0, 0, 0, 10),
-(1885, 11884, 0, 0, 0, 0, 1, -6342.67, -660.912, -179.83, 3.59357, 300, 300, 15, 100, 0, 1, 0, 0, 0, 10);
+(1886, 11702, 0, 0, 0, 0, 1, -6342.67, -660.912, -179.816, 2.32129, 300, 300, 0, 100, 0, 0, 0, 0, 0, 10),
+(1947, 11884, 0, 0, 0, 0, 1, -6342.67, -660.912, -179.83, 3.59357, 300, 300, 15, 100, 0, 1, 0, 0, 0, 10);
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Missing Shen'dralar Zealot Spawns (credit cmangos)
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
