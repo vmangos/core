@@ -15,7 +15,6 @@ on:
       - '.github/workflows/db_check.yml'
       - '.github/workflows/db_dump.yml'
       - 'sql/**'
-      - '.drone.yml'
       - 'README.md'
       - 'LICENSE'
       - '.gitignore'
@@ -29,7 +28,6 @@ on:
       - '.github/workflows/db_check.yml'
       - '.github/workflows/db_dump.yml'
       - 'sql/**'
-      - '.drone.yml'
       - 'README.md'
       - 'LICENSE'
       - '.gitignore'
@@ -57,28 +55,18 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get -qq update
-        sudo apt-get -qq install build-essential cmake libace-dev libmysql++-dev libtbb-dev libcurl4-openssl-dev openssl
+        sudo apt-get -qq install build-essential cmake libmysql++-dev libtbb-dev libcurl4-openssl-dev openssl
       #windows dependencies
     - name: windows dependencies
       if: matrix.os == 'windows-2022'
-      #Sets versions for ACE/TBB
+      #Sets versions TBB
       env:
-        ACE_VERSION: 7.0.9
-        ACE_VERSION2: 7_0_9
         TBB_VERSION: 2020.3
 
       run: |
-        #directory variables
-        export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
+        # Setup TBB
         export TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb
-        #ACE package download
-        curl -LOJ http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
-        unzip ACE-$ACE_VERSION.zip
-        rm ACE-$ACE_VERSION.zip
-        #configuration of ACE header
-        echo "#include \"ace/config-win32.h\"" >> $ACE_ROOT/ace/config.h
-        #TBB package download
-        curl -LOJ https://github.com/uxlfoundation/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
+        curl -LOJ https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
         unzip tbb-$TBB_VERSION-win.zip
         rm tbb-$TBB_VERSION-win.zip
       #git bash shell
@@ -99,10 +87,6 @@ jobs:
     - name: windows build & install
       if: matrix.os == 'windows-2022'
       run: |
-        # Build ACE
-        export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
-        cd $GITHUB_WORKSPACE/ACE_wrappers
-        /c/Program\ Files/Microsoft\ Visual\ Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe "ACE_wrappers_vs2019.sln" //p:Configuration=Release //p:Platform=x64 //t:ACE //m:2
         # Build CURL
         cd $GITHUB_WORKSPACE/dep/windows/optional_dependencies/
         ./curl_download_and_build.bat

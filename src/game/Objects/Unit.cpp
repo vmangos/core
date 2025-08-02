@@ -57,6 +57,8 @@
 #include "Anticheat.h"
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
+#include "Errors.h"
+#include "ScriptMgr.h"
 
 //#define DEBUG_DEBUFF_LIMIT
 
@@ -142,7 +144,7 @@ Unit::Unit()
 
     m_attacking = nullptr;
     m_modSpellHitChance = 0.0f;
-    
+
     for (float & crit : m_modSpellCritChance)
         crit = 0.0f;
 
@@ -268,7 +270,7 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
                     else
                     {
                         // World of Warcraft Client Patch 1.6.1 (2005-08-02)
-                        // - Spell casting is no longer interrupted when leaving combat. 
+                        // - Spell casting is no longer interrupted when leaving combat.
 #if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_6_1
                         if (IsNonMeleeSpellCasted(false))
                             InterruptNonMeleeSpells(false);
@@ -2167,7 +2169,7 @@ void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool ext
         DealDamageMods(pVictim, damageInfo.subDamage[i].damage, &damageInfo.subDamage[i].absorb);
         damageInfo.totalDamage += damageInfo.subDamage[i].damage;
     }
-    
+
     ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.totalDamage + damageInfo.totalAbsorb + damageInfo.totalResist, damageInfo.attackType));
 
     // Damage is done after procs so it can trigger auras on the victim that affect the caster in case of killing blow.
@@ -4059,7 +4061,7 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode)
     }
     if (!foundInMap)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Crash/Auras] Removing aura holder *not* in holders map ! Aura %u on %s", holder->GetId(), GetName());
-    
+
     holder->SetRemoveMode(mode);
     holder->UnregisterSingleCastHolder();
     holder->HandleCastOnAuraRemoval();
@@ -5196,7 +5198,7 @@ Team Unit::GetTeam() const
                 return ALLIANCE;
         }
     }
-    
+
     return TEAM_NONE;
 }
 
@@ -5377,7 +5379,7 @@ void Unit::SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, 
     data << GetObjectGuid();
     data << uint8(type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
     data << uint32(damage);
-    
+
     // World of Warcraft Client Patch 1.7.0 (2005-09-13)
     // - Absorbed and resisted environmental damage is now shown in the combat log.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
@@ -5776,7 +5778,7 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
 
             if ((pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveEffect(index))
                 return true;
-            
+
             if (pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
                 return true;
         }
@@ -7521,7 +7523,7 @@ void Unit::SetDeathState(DeathState s)
         // Only unsummon totems for non-creature units (creature-owned totems should persist)
         if (GetTypeId() != TYPEID_UNIT)
             UnsummonAllTotems();
-            
+
         m_motionMaster.Clear(false, true);
         m_motionMaster.MoveIdle();
 
@@ -8941,7 +8943,7 @@ void Unit::HandlePetCommand(CommandStates command, Unit* pTarget)
             else                                    // charmed
                 pCharmer->Uncharm();
             break;
-        }  
+        }
         default:
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unit::HandlePetCommand - Unknown command state %u.", uint32(command));
     }
@@ -9428,7 +9430,7 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
 
             // you should remain in combat with pet's victim
             if (Pet* pPet = GetPet())
-            { 
+            {
                 if (pPet->IsInCombat() && pPet->GetVictim())
                     SetInCombatWithVictim(pPet->GetVictim(), false, 6000);
             }
@@ -10216,9 +10218,8 @@ void Unit::CleanupDeletedAuras()
             // - Player::SetDeathState
             // - Pet::AddObjectToRemoveList
             // Seen happening with spells like [Health Funnel], [Tainted Blood]
-            ACE_Stack_Trace st;
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Crash/Auras] Deleting aura holder %u in use (%s)", iter->GetId(), GetObjectGuid().GetString().c_str());
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", st.c_str());
+            MaNGOS::Errors::PrintStacktrace();
         }
         else
             delete iter;
@@ -10230,9 +10231,8 @@ void Unit::CleanupDeletedAuras()
     {
         if (iter->IsInUse())
         {
-            ACE_Stack_Trace st;
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[Crash/Auras] Deleting aura %u in use (%s)", iter->GetId(), GetObjectGuid().GetString().c_str());
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%s", st.c_str());
+            MaNGOS::Errors::PrintStacktrace();
         }
         else
             delete iter;
@@ -10315,7 +10315,7 @@ void Unit::HandleInterruptsOnMovement(bool positionChanged)
         InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
         InterruptSpellsWithChannelFlags(AURA_INTERRUPT_MOVING_CANCELS);
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
-        
+
         HandleEmoteState(0);
     }
     else
@@ -10383,7 +10383,7 @@ void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpe
         if (!killDelayed)
             continue;
 
-        // Interruption of spells which are no longer referenced, but for which there is still an event (not yet hit the target for example) 
+        // Interruption of spells which are no longer referenced, but for which there is still an event (not yet hit the target for example)
         auto i_Events = iter->m_Events.GetEvents().begin();
         for (; i_Events != iter->m_Events.GetEvents().end(); ++i_Events)
             if (SpellEvent* event = dynamic_cast<SpellEvent*>(i_Events->second))
@@ -10474,7 +10474,7 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
         pow(initialPos.z - attacker->GetPositionZ(), 2));
     if (dist > attackerTargetDistance)
     {
-        // We're not moving, we're already within range. 
+        // We're not moving, we're already within range.
         attacker->GetPosition(x, y, z);
         return true;
     }

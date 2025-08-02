@@ -28,6 +28,8 @@
 
 #include "Common.h"
 #include "RealmZone.h"
+#include "IO/Networking/IpAddress.h"
+
 #include <array>
 
 struct RealmBuildInfo
@@ -37,13 +39,13 @@ struct RealmBuildInfo
     uint8 bugfixVersion = 0;
     char hotfixVersion = 0;
     uint16 build = 0;
-    uint32 os = 0;
-    uint32 platform = 0;
+    std::string os;
+    std::string platform;
     std::array<uint8, 20> integrityHash = { };
 };
 
 RealmBuildInfo const* FindBuildInfo(uint16 build);
-std::vector<RealmBuildInfo const*> FindBuildInfo(uint16 build, uint32 os, uint32 platform);
+std::vector<RealmBuildInfo const*> FindBuildInfo(uint16 build, std::string const& os, std::string const& platform);
 uint8 GetRealmCategoryIdByBuildAndZone(uint16 build, RealmZone realmZone);
 extern std::vector<RealmBuildInfo> ExpectedRealmdClientBuilds;
 
@@ -53,9 +55,9 @@ typedef std::set<uint32> RealmBuilds;
 struct Realm
 {
     uint32 id = 0;
-    std::string address;
-    std::string localAddress;
-    uint32 localSubnetMask = 0;
+    IO::Networking::IpEndpoint externalAddress;
+    IO::Networking::IpEndpoint localAddress;
+    uint8 localSubnetMaskCidr = 0;                          // only valid if localAddress is IPv4
     uint8 icon = 0;
     RealmFlags realmFlags = REALM_FLAG_NONE;
     uint8 timeZone = 0;
@@ -63,6 +65,8 @@ struct Realm
     float populationLevel = 0.0f;
     RealmBuilds realmBuilds;                                // list of supported builds (updated in DB by mangosd)
     RealmBuildInfo realmBuildInfo;                          // build info for showing version in list
+
+    IO::Networking::IpEndpoint GetAddressForClient(IO::Networking::IpAddress const& clientAddr) const;
 };
 
 // Storage object for the list of realms on the server
@@ -85,7 +89,19 @@ class RealmList
         uint32 size() const { return m_realms.size(); }
     private:
         void UpdateRealms(bool init);
-        void UpdateRealm(uint32 realmId, std::string const& name, std::string const& address, std::string const& localAddress, std::string const& localSubnetMask, uint32 port, uint8 icon, RealmFlags realmFlags, uint8 timeZone, AccountTypes allowedSecurityLevel, float population, std::string const& builds);
+        void UpdateRealm(
+                uint32 realmId,
+                std::string const& name,
+                IO::Networking::IpAddress const& externalIpAddress,
+                IO::Networking::IpAddress const& localIpAddress,
+                uint8 localSubnetMaskCidr,
+                uint16 port,
+                uint8 icon,
+                RealmFlags realmFlags,
+                uint8 timeZone,
+                AccountTypes allowedSecurityLevel,
+                float population,
+                std::string const& builds);
         void LoadAllowedClients();
     private:
         RealmMap m_realms;                                  // Internal map of realms

@@ -2319,7 +2319,7 @@ void ScriptMgr::LoadEscortData()
 
     if (pResult)
     {
-        barGoLink bar(pResult->GetRowCount());
+        BarGoLink bar(pResult->GetRowCount());
         do
         {
             bar.step();
@@ -2364,7 +2364,7 @@ void ScriptMgr::LoadEscortData()
     }
     else
     {
-        barGoLink bar(1);
+        BarGoLink bar(1);
         bar.step();
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 Escort Creature Data. DB table `script_escort_data` is empty.");

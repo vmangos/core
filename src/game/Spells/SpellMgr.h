@@ -31,6 +31,7 @@
 #include "DBCStores.h"
 #include "SQLStorages.h"
 #include "SpellEntry.h"
+#include "Errors.h"
 
 #include <map>
 #include <memory>

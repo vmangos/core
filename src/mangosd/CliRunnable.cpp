@@ -30,6 +30,10 @@
 #include "CliRunnable.h"
 #include "Database/DatabaseEnv.h"
 
+#if PLATFORM == PLATFORM_APPLE
+#include <sys/select.h>
+#endif
+
 void utf8print(void* /*arg*/, const char* str)
 {
 #if PLATFORM == PLATFORM_WINDOWS

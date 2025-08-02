@@ -29,10 +29,6 @@ set(framework_SRCS
   GameSystem/TypeContainerFunctions.h
   GameSystem/TypeContainerFunctionsPtr.h
   GameSystem/TypeContainerVisitor.h
-  Network/MangosSocket.h
-  Network/MangosSocketImpl.h
-  Network/MangosSocketMgr.h
-  Network/MangosSocketMgrImpl.h
   Platform/CompilerDefs.h
   Platform/Define.h
   Policies/CreationPolicy.h
@@ -40,6 +36,7 @@ set(framework_SRCS
   Policies/Singleton.h
   Policies/SingletonImp.h
   Policies/ThreadingModel.h
+  Policies/ObjectConstructorTraits.h
   Utilities/ByteConverter.h
   Utilities/EventProcessor.h
   Utilities/EventMap.h
@@ -47,7 +44,6 @@ set(framework_SRCS
   Utilities/TypeList.h
   Utilities/LinkedReference/Reference.h
   Utilities/LinkedReference/RefManager.h
-  Policies/MemoryManagement.cpp
   Policies/ObjectLifeTime.cpp
   Utilities/EventProcessor.cpp
   Utilities/EventMap.cpp
@@ -86,7 +82,6 @@ source_group("Dynamic"
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${TBB_INCLUDE_DIRS}
-  ${ACE_INCLUDE_DIR}
   ${CMAKE_SOURCE_DIR}/src/shared
 )
 

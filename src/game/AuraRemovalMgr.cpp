@@ -41,7 +41,7 @@ void AuraRemovalManager::LoadFromDB()
     }
     else
     {
-        BarGoLink bar((int)result->GetRowCount());
+        BarGoLink bar(result->GetRowCount());
         do
         {
             bar.step();

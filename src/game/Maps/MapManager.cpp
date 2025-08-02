@@ -33,6 +33,7 @@
 #include "Map.h"
 #include "BattleGround.h"
 #include "ThreadPool.h"
+#include "IO/Multithreading/CreateThread.h"
 
 typedef MaNGOS::ClassLevelLockable<MapManager, std::recursive_mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
@@ -42,8 +43,8 @@ MapManager::MapManager()
     :
     i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN)),
     i_MaxInstanceId(RESERVED_INSTANCES_LAST),
-    m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS))),
-    m_instanceCreationThreads(new ThreadPool(1))
+    m_threads(new ThreadPool("MapManager", sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS))),
+    m_instanceCreationThreads(new ThreadPool("NewMapForPlayer", 1))
 {
     i_timer.SetInterval(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
     m_threads->start<ThreadPool::MySQL<>>();
@@ -343,13 +344,13 @@ void MapManager::Update(uint32 diff)
     instanceCreators.emplace_back([this]() {CreateNewInstancesForPlayers();});
     std::future<void> instances = m_instanceCreationThreads->processWorkload(std::move(instanceCreators),
         ThreadPool::Callable());
-    
+
     i_maxContinentThread = continentsIdx;
     i_continentUpdateFinished.store(0);
 
     if (!m_continentThreads || m_continentThreads->size() < continentsUpdaters.size())
     {
-        m_continentThreads.reset(new ThreadPool(continentsUpdaters.size()));
+        m_continentThreads.reset(new ThreadPool("MapContinent", continentsUpdaters.size()));
         m_continentThreads->start<>();
     }
     std::future<void> continents = m_continentThreads->processWorkload(std::move(continentsUpdaters),

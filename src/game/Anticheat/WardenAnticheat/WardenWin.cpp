@@ -30,11 +30,13 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "Util.h"
+#include "Log.h"
 #include "Crypto/BigNumber.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"
 #include "Progression.h"
+#include "Errors.h"
 
 #include <string>
 #include <vector>

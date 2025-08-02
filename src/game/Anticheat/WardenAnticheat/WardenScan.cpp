@@ -28,6 +28,8 @@
 #include "Util.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "Crypto/Hash/SHA1.h"
+#include "World.h"
+#include "Errors.h"
 
 #include <string>
 #include <algorithm>
@@ -58,6 +60,13 @@ bool operator&&(ScanFlags lhs, ScanFlags rhs)
 {
     return static_cast<std::underlying_type<ScanFlags>::type>(lhs) &&
            static_cast<std::underlying_type<ScanFlags>::type>(rhs);
+}
+
+Scan::Scan(BuildT builder, CheckT checker, ScanFlags f, size_t req, size_t rep, uint32 minBuild, uint32 maxBuild, std::string const&c)
+    : m_builder(builder), m_checker(checker), checkId(0), flags(f), buildMin(minBuild), buildMax(maxBuild), comment(c), requestSize(req), replySize(rep)
+{
+    MANGOS_ASSERT(!((flags & ScanFlags::Windows) && (flags & ScanFlags::Mac)));
+    penalty = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY);
 }
 
 Scan::BuildT StringHashScan::GetBuilder()
@@ -120,7 +129,7 @@ WindowsStringHashScan::WindowsStringHashScan()
     128, sizeof(uint8) + Crypto::Hash::SHA1::Digest::size() + Crypto::Hash::MD5::Digest::size(), "Maiev string hash",
     ScanFlags::Maiev, 0, UINT16_MAX)
 {
-    
+
 }
 
 MacStringHashScan::MacStringHashScan(bool moduleLoaded)

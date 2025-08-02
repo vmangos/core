@@ -30,6 +30,7 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "Log.h"
+#include "Errors.h"
 #include "Opcodes.h"
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"

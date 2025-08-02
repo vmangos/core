@@ -143,7 +143,7 @@ enum
     BCT_SILITHYST_HORDE_50     = 13477,
     BCT_SILITHYST_HORDE_75     = 13478,
     BCT_SILITHYST_HORDE_100    = 13469,
-    
+
     BCT_SILITHYST_ALLIANCE_25  = 13479,
     BCT_SILITHYST_ALLIANCE_50  = 13480,
     BCT_SILITHYST_ALLIANCE_75  = 13481,
@@ -244,7 +244,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* plr, uint32 trigger)
             return false;
     }
 
-    plr->RemoveAurasDueToSpell(SI_SILITHYST_FLAG); 
+    plr->RemoveAurasDueToSpell(SI_SILITHYST_FLAG);
     //plr->CastSpell(plr, SILLITHUS_FLAG_CAPTURE_TEST, true);
     plr->CastSpell(plr, SI_TRACES_OF_SILITHYST, true);
     plr->CastSpell(plr, HONOR_POINTS_199, true);                // Honor reward

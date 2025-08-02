@@ -35,6 +35,7 @@
 #include "AccountData.h"
 #include "PacketProcessing.h"
 #include "UpdateData.h"
+#include "LockedQueue.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -181,7 +182,7 @@ class WorldSession
 {
     friend class CharacterHandler;
     public:
-        WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale);
+        WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, AccountTypes sec, time_t mute_time, LocaleConstant locale);
         ~WorldSession();
 
         uint32 GetGUID() const { return m_guid; }
@@ -207,17 +208,19 @@ class WorldSession
         Player* GetPlayer() const { return _player; }
         char const* GetPlayerName() const;
         void SetSecurity(AccountTypes security) { m_security = security; }
-        std::string const& GetRemoteAddress() const { return m_address; }
+        /// Might return "<BOT>" if player bot
+        /// TODO rename me to GetRemoteIpString() when all the commits for native branch are done (otherwise too many files will be touched)
+        std::string const& GetRemoteAddress() const { return m_remoteIpAddress; }
         void SetPlayer(Player* plr) { _player = plr; }
         void SetMasterPlayer(MasterPlayer* plr) { m_masterPlayer = plr; }
         void LoginPlayer(ObjectGuid playerGuid);
-        WorldSocket* GetSocket() { return m_socket; }
+        std::shared_ptr<WorldSocket> GetSocket() { return m_socket; }
 
         // Session in auth.queue currently
         void SetInQueue(bool state) { m_inQueue = state; }
 
         // Player online / socket offline system
-        void SetDisconnectedSession(); // Remove from World::m_session. Used when an account gets disconnected.
+        void SetDisconnectedSession(); // Remove from World::m_Session. Used when an account gets disconnected.
         bool UpdateDisconnected(uint32 diff);
         bool IsConnected() const { return m_connected; }
         void KickDisconnectedFromWorld() { m_disconnectTimer = 0; }
@@ -387,11 +390,7 @@ class WorldSession
         void LoadTutorialsData();
         void SendTutorialsData();
         void SaveTutorialsData();
-        uint32 GetTutorialInt(uint32 intId) const
-        {
-            ASSERT(intId < ACCOUNT_TUTORIALS_COUNT);
-            return m_tutorials[intId];
-        }
+        uint32 GetTutorialInt(uint32 intId) const;
         void SetTutorialInt(uint32 intId, uint32 value)
         {
             if (m_tutorials[intId] != value)
@@ -786,8 +785,8 @@ class WorldSession
         void LogUnprocessedTail(WorldPacket* packet);
 
         uint32 const m_guid; // unique identifier for each session
-        WorldSocket* m_socket;
-        std::string m_address;
+        std::shared_ptr<WorldSocket> m_socket;
+        std::string m_remoteIpAddress; // might also be "<BOT>"
         LockedQueue<std::unique_ptr<WorldPacket>, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool m_receivedPacketType[PACKET_PROCESS_MAX_TYPE];
         uint32 m_floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
