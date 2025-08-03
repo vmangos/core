@@ -49,7 +49,7 @@
 #define MANGOS_BIGENDIAN    1
 
 #if !defined(MANGOS_ENDIAN)
-#  if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#  if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #    define MANGOS_ENDIAN MANGOS_BIGENDIAN
 #  else //__BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
 #    define MANGOS_ENDIAN MANGOS_LITTLEENDIAN
