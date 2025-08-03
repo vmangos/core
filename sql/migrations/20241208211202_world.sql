@@ -606,6 +606,9 @@ UPDATE `creature` SET `position_x`=-12358.4, `position_y`=-977.508, `position_z`
 -- Creatures Should Wander
 UPDATE `creature` SET `wander_distance` = 2, `movement_type` = 1 WHERE `guid` IN (2488, 2161, 2173, 2163, 2165, 2176, 2488, 2491, 2511);
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Low Level Creatures Should Not Be Skinnable
+UPDATE `creature_template` SET `skinning_loot_id` = 0  WHERE `skinning_loot_id` = 100008;
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
