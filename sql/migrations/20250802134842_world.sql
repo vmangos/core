@@ -93,7 +93,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (50798, (@POINT := @POINT + 1), -4465.6167, -255.44879, 56.663136, 100),
 (50798, (@POINT := @POINT + 1), -4477.75, -295.35754, 52.810394, 100);
 
-UPDATE `creature` SET `position_x` = -5150.93701171875, `position_y` = 718.4910888671875, `position_z` = 58.34488677978515625, `orientation` = 1.867502331733703613 WHERE `guid` = (50801);
+UPDATE `creature` SET `position_x` = -5150.93701171875, `position_y` = 718.4910888671875, `position_z` = 58.34488677978515625, `orientation` = 1.867502331733703613 WHERE `guid` = 50801;
 DELETE FROM `creature_movement` WHERE `id` = 50801;
 SET @POINT := 0;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
