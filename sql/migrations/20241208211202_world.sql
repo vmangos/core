@@ -609,6 +609,9 @@ UPDATE `creature` SET `wander_distance` = 2, `movement_type` = 1 WHERE `guid` IN
 -- Low Level Creatures Should Not Be Skinnable
 UPDATE `creature_template` SET `skinning_loot_id` = 0  WHERE `skinning_loot_id` = 100008;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Stop Creature Clipping Through Walls
+UPDATE `creature` SET `wander_distance` = 2 WHERE `guid` = 16985;
+
 
 -- For Future Ref: More Blizzlike Goodness From Cmangos https://github.com/cmangos/tbc-db/pull/1251
 
