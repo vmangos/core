@@ -811,7 +811,7 @@ class Map : public GridRefManager<NGridType>
         bool ScriptCommand_SetData64(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_StartScript(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_RemoveItem(ScriptInfo const& script, WorldObject* source, WorldObject* target);
-        bool ScriptCommand_RemoveGameObject(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_RemoveObject(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_SetMeleeAttack(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_SetCombatMovement(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_SetPhase(ScriptInfo const& script, WorldObject* source, WorldObject* target);
@@ -908,7 +908,7 @@ class Map : public GridRefManager<NGridType>
             &Map::ScriptCommand_SetData64,              // 38
             &Map::ScriptCommand_StartScript,            // 39
             &Map::ScriptCommand_RemoveItem,             // 40
-            &Map::ScriptCommand_RemoveGameObject,       // 41
+            &Map::ScriptCommand_RemoveObject,           // 41
             &Map::ScriptCommand_SetMeleeAttack,         // 42
             &Map::ScriptCommand_SetCombatMovement,      // 43
             &Map::ScriptCommand_SetPhase,               // 44

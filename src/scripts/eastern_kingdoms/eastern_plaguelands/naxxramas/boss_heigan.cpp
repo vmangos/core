@@ -352,10 +352,10 @@ struct boss_heiganAI : public ScriptedAI
         ++it; // skip the tank
         for (it; it != tl.end(); it++)
         {
-            if (Unit* pUnit = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
+            if (Player* pUnit = (*it)->getTarget()->ToPlayer())
             {
                 // Candidates are only alive players who have not yet been ported during this phase rotation
-                if (pUnit->IsPlayer() && pUnit->IsAlive()
+                if (pUnit->IsAlive()
                     && std::find(portedPlayersThisPhase.begin(), portedPlayersThisPhase.end(), pUnit->GetObjectGuid()) == portedPlayersThisPhase.end())
                 {
                     candidates.push_back(pUnit);
@@ -399,9 +399,9 @@ struct boss_heiganAI : public ScriptedAI
         bool found_mana_in_range = false;
         for (const auto it : tl)
         {
-            if (Unit* pTarget = m_creature->GetMap()->GetUnit(it->getUnitGuid()))
+            if (Player* pTarget = it->getTarget()->ToPlayer())
             {
-                if (pTarget->GetPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
+                if (pTarget->GetPowerType() == POWER_MANA && pTarget->IsAlive())
                 {
                     if (m_creature->GetDistance3dToCenter(it->getTarget()) < 28.0f)
                     {

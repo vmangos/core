@@ -320,7 +320,7 @@ struct npc_solenorAI : public ScriptedAI
 
                 for (const auto itr : tList)
                 {
-                    if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
+                    if (Unit* pUnit = itr->getTarget())
                     {
                         if (pUnit->IsAlive())
                         {
@@ -2364,13 +2364,10 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         for (const auto itr : tList)
         {
-            if (ObjectGuid uiTargetGuid = itr->getUnitGuid())
+            if (Player* pTarget = itr->getTarget()->ToPlayer())
             {
-                if (Unit* pTarget = m_creature->GetMap()->GetUnit(uiTargetGuid))
-                {
-                    if (pTarget->GetTypeId() == TYPEID_PLAYER && m_creature->IsInRange(pTarget, min, max))
-                        return pTarget;
-                }
+                if (m_creature->IsInRange(pTarget, min, max))
+                    return pTarget;
             }
         }
         return nullptr;

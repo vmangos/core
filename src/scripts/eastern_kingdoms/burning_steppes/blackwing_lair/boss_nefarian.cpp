@@ -423,11 +423,11 @@ struct boss_nefarianAI : ScriptedAI
                             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                             for (const auto itr2 : tList)
                             {
-                                Unit* pUnit = m_creature->GetMap()->GetUnit(itr2->getUnitGuid());
-                                if (pUnit && pUnit->IsCreature() && pUnit->ToCreature()->IsTotem())
-                                    pUnit = nullptr;
-                                if (pUnit && pUnit->GetDistance(pMage) < 60.0f && !pUnit->HasAura(SPELL_POLYMORPH))
-                                    m_vPossibleVictim.push_back(pUnit->GetObjectGuid());
+                                if (Creature* pCreature = itr2->getTarget()->ToCreature())
+                                {
+                                    if (!pCreature->IsTotem() && pCreature->GetDistance(pMage) < 60.0f && !pCreature->HasAura(SPELL_POLYMORPH))
+                                        m_vPossibleVictim.push_back(pCreature->GetObjectGuid());
+                                }
                             }
 
                             if (m_vPossibleVictim.empty())

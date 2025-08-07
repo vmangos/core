@@ -443,7 +443,7 @@ struct boss_ragnarosAI : ScriptedAI
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (const auto itr : tList)
             {
-                Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
+                Player* pPlayer = itr->getTarget()->ToPlayer();
                 if (pPlayer && pPlayer->IsAlive() && pPlayer->GetPowerType() == POWER_MANA && !pPlayer->IsGameMaster())
                     manaPlayers.push_back(pPlayer);
             }

@@ -211,7 +211,7 @@ void ThreatContainer::clearReferences()
 }
 
 //============================================================
-// Return the HostileReference of nullptr, if not found
+// Return the HostileReference or nullptr if not found
 HostileReference* ThreatContainer::getReferenceByTarget(Unit* pVictim)
 {
     if (!pVictim)

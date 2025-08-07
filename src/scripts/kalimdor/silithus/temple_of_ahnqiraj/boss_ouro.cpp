@@ -381,7 +381,7 @@ struct boss_ouroAI : public ScriptedAI
                     ThreatList const& lThreat = m_creature->GetThreatManager().getThreatList();
                     for (const auto i : lThreat)
                     {
-                        Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
+                        Unit* pUnit = i->getTarget();
                         if (pUnit && pUnit->GetDistance2d(m_creature) < 20.0f)
                             lGroundRuptureTargets.push_back(pUnit);
                     }

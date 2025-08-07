@@ -319,9 +319,9 @@ void ScriptedAI::EnterVanish()
     ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
     for (const auto itr : tList)
     {
-        Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid());
+        Unit* pUnit = itr->getTarget();
 
-        if (pUnit && m_creature->GetThreatManager().getThreat(pUnit))
+        if (pUnit && itr->getThreat())
             m_creature->GetThreatManager().modifyThreatPercent(pUnit, -100);
     }
 }

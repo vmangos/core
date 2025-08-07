@@ -20454,6 +20454,9 @@ void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)
     for (uint32 i = 0; i < maxSlot; ++i)
     {
         LootItem* lootItem = loot.LootItemInSlot(i, GetGUIDLow());
+        if (!lootItem)
+            continue;
+
         // Don't bypass conditions
         if (lootItem->conditionId && !lootItem->AllowedForPlayer(this, loot.GetLootTarget()))
             continue;

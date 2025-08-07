@@ -164,7 +164,7 @@ struct npc_artoriusAI : public ScriptedAI
                 
                 for (const auto itr : tList)
                 {
-                    if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
+                    if (Unit* pUnit = itr->getTarget())
                     {
                         if (pUnit->IsAlive())
                         {

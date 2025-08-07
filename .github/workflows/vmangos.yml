@@ -44,7 +44,7 @@ jobs:
         os: [ubuntu-latest]
         compiler: [gcc, clang]
         include:
-          - os: windows-latest
+          - os: windows-2022
 
     steps:
 
@@ -60,7 +60,7 @@ jobs:
         sudo apt-get -qq install build-essential cmake libace-dev libmysql++-dev libtbb-dev libcurl4-openssl-dev openssl
       #windows dependencies
     - name: windows dependencies
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2022'
       #Sets versions for ACE/TBB
       env:
         ACE_VERSION: 7.0.9
@@ -97,7 +97,7 @@ jobs:
         make install
     #windows
     - name: windows build & install
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2022'
       run: |
         # Build ACE
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers

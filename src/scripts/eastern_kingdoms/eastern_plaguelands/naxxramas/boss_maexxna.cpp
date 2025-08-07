@@ -242,7 +242,7 @@ struct boss_maexxnaAI : public ScriptedAI
         ++it;
         for (it; it != tList.end(); ++it)
         {
-            Player* pPlayer = m_creature->GetMap()->GetPlayer((*it)->getUnitGuid());
+            Player* pPlayer = (*it)->getTarget()->ToPlayer();
             if (!pPlayer) continue;
 
             // todo: verify that IsWithinLOSInMap does not screw anyting up. Afaik there should be nowhere

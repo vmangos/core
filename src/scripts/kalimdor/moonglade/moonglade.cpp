@@ -1236,7 +1236,7 @@ struct boss_eranikusAI : public ScriptedAI
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (const auto itr : tList)
             {
-                if (Unit* pAttacker = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
+                if (Unit* pAttacker = itr->getTarget())
                     if (m_creature->CanReachWithMeleeAutoAttack(pAttacker))
                         m_creature->GetThreatManager().modifyThreatPercent(pAttacker, 5);
             }

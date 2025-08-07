@@ -381,7 +381,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 for (const auto itr : tList)
                 {
-                    Unit* pUnit = m_creature->GetMap()->GetUnit( itr->getUnitGuid());
+                    Unit* pUnit = itr->getTarget();
 
                     if (pUnit && m_creature->GetThreatManager().getThreat(pUnit))
                         m_creature->GetThreatManager().modifyThreatPercent(pUnit, -50);

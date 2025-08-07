@@ -19,8 +19,8 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
-    
+    runs-on: windows-2022
+
     steps:
     #git checkout
     - uses: actions/checkout@v4
@@ -31,7 +31,7 @@ jobs:
         ACE_VERSION: 7.0.9
         ACE_VERSION2: 7_0_9
         TBB_VERSION: 2020.3
-        
+
       run: |
         #directory variables
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
