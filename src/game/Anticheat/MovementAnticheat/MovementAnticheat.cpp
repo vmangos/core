@@ -1167,11 +1167,21 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
         if (angleRad > (maxClimbAngle + 0.2f))
             return true;
 
+        ASSERT(MaNGOS::IsValidMapCoord(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z));
+
         // check height with and without vmaps and compare
         // if player is stepping over model like stairs, that can increase wall climb angle
-        float const height1 = me->GetMap()->GetHeight(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, false);
-        float const height2 = me->GetMap()->GetHeight(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, true);
-        if (std::abs(height1 - height2) < 0.5f)
+
+        Map* map = me->GetMap();
+        TerrainInfo const* terrain = map->GetTerrain();
+
+        float const hDyn = map->GetDynamicTreeHeight(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, DEFAULT_HEIGHT_SEARCH);
+        float const height1 = terrain->GetHeightStatic(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, /*vmap=*/false, DEFAULT_HEIGHT_SEARCH);
+        float const height2 = terrain->GetHeightStatic(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, /*vmap=*/true, DEFAULT_HEIGHT_SEARCH);
+        float const hNoVmap = std::max(height1, hDyn);
+        float const hVmap = std::max(height2, hDyn);
+
+        if (std::abs(hNoVmap - hVmap) < 0.5f)
             return true;
     }
 
