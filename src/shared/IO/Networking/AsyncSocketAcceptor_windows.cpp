@@ -126,7 +126,10 @@ void IO::Networking::AsyncSocketAcceptor::AcceptOne(std::function<void(nonstd::e
         auto localAfterAccept = std::move(afterAccept);
         auto localAddrBuffer = std::move(addrBuffer);
         auto localNativePeerSocket = std::move(nativePeerSocket);
-        this->m_currentAcceptTask.Reset(); // after we reset, the captured variables are no longer valid
+        auto wasClosed = m_wasClosed;
+
+        this->m_currentAcceptTask.Reset(); // IMPORTANT: after we reset, the captured variables are no longer valid
+        // ===== No captured variables after this point =====
 
         if (!errorCode)
         { // No error, everything is fine
@@ -147,7 +150,7 @@ void IO::Networking::AsyncSocketAcceptor::AcceptOne(std::function<void(nonstd::e
             return;
         }
 
-        if (errorCode == ERROR_OPERATION_ABORTED && m_wasClosed)
+        if (errorCode == ERROR_OPERATION_ABORTED && wasClosed)
         { // ignore "aborted" error when we are in a closing state
             localAfterAccept(nonstd::make_unexpected(IO::NetworkError(NetworkError::ErrorType::SocketClosed, 0)));
             return;
