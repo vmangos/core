@@ -27,7 +27,7 @@ UPDATE `creature` SET `position_x` = 987.2447, `position_y` = -328.64514, `posit
 UPDATE `creature` SET `position_x` = 985.87915, `position_y` = -375.4854, `position_z` = 16.126184, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 29661;
 UPDATE `creature` SET `position_x` = 953.9792, `position_y` = -257.88293, `position_z` = -3.5109515, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 29662;
 UPDATE `creature` SET `position_x` = 909.07324, `position_y` = -334.2018, `position_z` = 18.525047, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 29664;
-UPDATE `creature` SET `position_x` = 961.505127, `position_y` = -354.267487, `position_z` = 16.958834, `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 29665;
+UPDATE `creature` SET `position_x` = 961.505127, `position_y` = -354.267487, `position_z` = 16.958834, `movement_type` = 1, `wander_distance` = 3 WHERE `guid` = 29665;
 
 DELETE FROM `creature_movement` WHERE `id` IN (29646, 29648, 29660, 29661, 29662, 29664);
 -- 29646
