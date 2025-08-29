@@ -16,6 +16,9 @@
 
 using namespace Geometry;
 
+float MovementAnticheat::m_wallSlope = 0.f;
+float MovementAnticheat::m_wallSlopeHigh = 0.f;
+
 char const* GetMovementCheatName(CheatType flagId)
 {
     switch (flagId)
@@ -448,6 +451,13 @@ void MovementAnticheat::ResetJumpCounters()
     m_jumpCount = 0;
     m_jumpFlagCount = 0;
     m_jumpFlagTime = 0;
+}
+
+void MovementAnticheat::InitWallClimbLimits()
+{
+    float const A = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE);
+    m_wallSlope = tan(A);
+    m_wallSlopeHigh = tan(A + 0.2f);
 }
 
 void MovementAnticheat::OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin)
@@ -1147,9 +1157,9 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
        (GetLastMovementInfo().moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (movementInfo.moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (me->HasFlag(UNIT_FIELD_FLAGS, NO_WALL_CLIMB_CHECK_UNIT_FLAGS)) ||
-        IsInKnockBack() || me->IsTaxiFlying() || !GetLastMovementInfo().ctime)
+       IsInKnockBack() || me->IsTaxiFlying() || !GetLastMovementInfo().ctime)
         return false;
-    
+
     float const deltaXY = GetDistance2D(GetLastMovementInfo().pos, movementInfo.pos);
     if (deltaXY < 0.5f)
         return false;
@@ -1158,13 +1168,10 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
     if (deltaZ < 1.0f)
         return false;
 
-    float const angleRad = atan(deltaZ / deltaXY);
-    //float const angleDeg = angleRad * (360 / (M_PI_F * 2));
 
-    float const maxClimbAngle = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE);
-    if (angleRad > maxClimbAngle)
+    if (deltaZ > m_wallSlope * deltaXY)
     {
-        if (angleRad > (maxClimbAngle + 0.2f))
+        if (deltaZ > m_wallSlopeHigh * deltaXY)
             return true;
 
         ASSERT(MaNGOS::IsValidMapCoord(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z));
@@ -1176,8 +1183,8 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
         TerrainInfo const* terrain = map->GetTerrain();
 
         float const hDyn = map->GetDynamicTreeHeight(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, DEFAULT_HEIGHT_SEARCH);
-        float const height1 = terrain->GetHeightStatic(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, /*vmap=*/false, DEFAULT_HEIGHT_SEARCH);
-        float const height2 = terrain->GetHeightStatic(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, /*vmap=*/true, DEFAULT_HEIGHT_SEARCH);
+        float const height1 = terrain->GetHeightStatic(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, false, DEFAULT_HEIGHT_SEARCH);
+        float const height2 = terrain->GetHeightStatic(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, true, DEFAULT_HEIGHT_SEARCH);
         float const hNoVmap = std::max(height1, hDyn);
         float const hVmap = std::max(height2, hDyn);
 
