@@ -1174,8 +1174,6 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
         if (deltaZ > m_wallSlopeHigh * deltaXY)
             return true;
 
-        ASSERT(MaNGOS::IsValidMapCoord(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z));
-
         // check height with and without vmaps and compare
         // if player is stepping over model like stairs, that can increase wall climb angle
 
