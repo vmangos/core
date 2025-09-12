@@ -112,14 +112,15 @@ namespace MMAP
         TileWorker(MapBuilder* mapBuilder, bool skipLiquid, bool quick, bool enableDebug, json& jsonConfig) :
             m_mapBuilder(mapBuilder),
             m_terrainBuilder(nullptr),
-            m_workerThread(&TileWorker::WorkerThread, this),
             m_rcContext(nullptr),
             m_quick(quick),
             m_debug(enableDebug),
-            m_config(jsonConfig)
+            m_config(jsonConfig),
+            m_threadStarted(false)
         {
             m_terrainBuilder = new TerrainBuilder(skipLiquid, quick);
             m_rcContext = new rcContext(false);
+            Start();
         }
 
         ~TileWorker()
@@ -130,11 +131,21 @@ namespace MMAP
             delete m_rcContext;
         }
 
+        void Start()
+        {
+            if (!m_threadStarted)
+            {
+                m_workerThread = std::thread(&TileWorker::WorkerThread, this);
+                m_threadStarted = true;
+            }
+        }
+
         void WaitCompletion()
         {
-            if (m_workerThread.joinable())
+            if (m_threadStarted && m_workerThread.joinable())
             {
                 m_workerThread.join();
+                m_threadStarted = false;
             }
         }
 
@@ -149,9 +160,12 @@ namespace MMAP
         json getMapIdConfig(uint32 mapId);
         json getTileConfig(uint32 mapId, uint32 tileX, uint32 tileY);
 
+
+    private:
         MMAP::MapBuilder* m_mapBuilder;
         TerrainBuilder*   m_terrainBuilder;
         std::thread       m_workerThread;
+        bool              m_threadStarted;
         rcContext*        m_rcContext;
         bool              m_quick;
         bool              m_debug;
