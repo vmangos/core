@@ -257,7 +257,6 @@ namespace MMAP
         if (!navMesh)
         {
             printf("[Map %03i] Failed creating navmesh!                   \n", mapID);
-            dtFreeNavMesh(navMesh);
             return;
         }
 
