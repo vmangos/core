@@ -30,6 +30,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "Util.h"
+#include "Log.h"
 #include "Crypto/BigNumber.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "ByteBuffer.h"

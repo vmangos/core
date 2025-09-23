@@ -52,7 +52,7 @@ class Camera
         void ResetView(bool update_far_sight_field = true);
 
         template<class T>
-        void UpdateVisibilityOf(T* obj, UpdateData& d, std::set<WorldObject*>& vis);
+        void UpdateVisibilityOf(T* obj, UpdateData& d);
         void UpdateVisibilityOf(WorldObject* obj);
 
         void ReceivePacket(WorldPacket* data);

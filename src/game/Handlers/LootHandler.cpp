@@ -59,7 +59,20 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
             GameObject* go = player->GetMap()->GetGameObject(lguid);
 
             // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
-            if (!go || ((go->GetOwnerGuid() != _player->GetObjectGuid() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player, INTERACTION_DISTANCE)))
+            auto ShouldCheckDistance = [go, player = _player]()
+            {
+                if (go->GetOwnerGuid() == player->GetObjectGuid())
+                    return false;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+                if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
+                    return false;
+#endif
+
+                return true;
+            };
+            
+            if (!go || (ShouldCheckDistance() && !go->IsWithinDistInMap(_player, INTERACTION_DISTANCE)))
             {
                 player->SendLootRelease(lguid);
                 return;
@@ -479,6 +492,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                     else                                        // not vein
                         go->SetLootState(GO_JUST_DEACTIVATED);
                 }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                 else if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
                 {
                     // The fishing hole used once more
@@ -488,6 +502,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                     else
                         go->SetLootState(GO_READY);
                 }
+#endif
                 else // not chest (or vein/herb/etc)
                     go->SetLootState(GO_JUST_DEACTIVATED);
 

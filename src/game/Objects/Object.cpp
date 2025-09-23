@@ -209,13 +209,11 @@ Object::~Object()
         MANGOS_ASSERT(false);
     }
 
-    if (m_uint32Values)
-    {
-        //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Object desctr 1 check (%p)",(void*)this);
-        delete [] m_uint32Values;
-        delete [] m_uint32Values_mirror;
-        //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Object desctr 2 check (%p)",(void*)this);
-    }
+    delete[] m_uint32Values;
+    m_uint32Values = nullptr;
+    delete[] m_uint32Values_mirror;
+    m_uint32Values_mirror = nullptr;
+    m_deleted = true;
 }
 
 void Object::_InitValues()

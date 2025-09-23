@@ -28,6 +28,7 @@
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
 #include "World.h"
+#include "Log.h"
 
 #include <vector>
 #include <algorithm>

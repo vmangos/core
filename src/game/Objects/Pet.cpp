@@ -644,9 +644,11 @@ void Pet::SetDeathState(DeathState s)                       // overwrite virtual
             ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        m_corpseDecayTimer = 3600000; // Chakor : Despawn du corps au bout d'1h
-        // Despawn after 15 sec for warlock pets.
-        if (getPetType() == SUMMON_PET)
+        
+        // Despawn after 1 hour for hunter pets.
+        if (getPetType() == HUNTER_PET)
+            m_corpseDecayTimer = 3600000;
+        else
             m_corpseDecayTimer = 15000;
     }
     else if (GetDeathState() == ALIVE)

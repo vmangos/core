@@ -1648,9 +1648,8 @@ void Map::UpdateActiveObjectVisibility(Player* player)
     // Params for compressed data set - will only be compressed if packet size > 100 (multiple units)
     ObjectGuidSet guids;
     UpdateData data;
-    std::set<WorldObject*> visibleNow;
 
-    UpdateActiveObjectVisibility(player, guids, data, visibleNow);
+    UpdateActiveObjectVisibility(player, guids, data);
 
     if (data.HasData())
         data.Send(player->GetSession());
@@ -1670,14 +1669,14 @@ void Map::UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGui
 }
 
 // Support for compressed data packet
-void Map::UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGuids, UpdateData& data, std::set<WorldObject*>& visibleNow)
+void Map::UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGuids, UpdateData& data)
 {
     for (const auto obj : m_activeNonPlayers)
     {
         if (obj->IsInWorld())
         {
             // TODO: Why is this templated? Why not just base class WorldObject for the target...?
-            player->UpdateVisibilityOf(player->GetCamera().GetBody(), obj, data, visibleNow);
+            player->UpdateVisibilityOf(player->GetCamera().GetBody(), obj, data);
             visibleGuids.erase(obj->GetObjectGuid());
         }
     }

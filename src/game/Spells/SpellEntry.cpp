@@ -5,6 +5,7 @@
 #include "Spell.h"
 #include "ScriptMgr.h"
 #include "TradeData.h"
+#include "ItemPrototype.h"
 
 using namespace Spells;
 
@@ -1028,8 +1029,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
 {
     // talents that learn spells can have stance requirements that need ignore
     // (this requirement only for client-side stance show in talent description)
-    if (GetTalentSpellCost(Id) > 0 &&
-            (Effect[EFFECT_INDEX_0] == SPELL_EFFECT_LEARN_SPELL || Effect[EFFECT_INDEX_1] == SPELL_EFFECT_LEARN_SPELL || Effect[EFFECT_INDEX_2] == SPELL_EFFECT_LEARN_SPELL))
+    if (HasEffect(SPELL_EFFECT_LEARN_SPELL) && GetTalentSpellCost(Id) > 0)
         return SPELL_CAST_OK;
 
     uint32 stanceMask = (form ? 1 << (form - 1) : 0);
@@ -1049,7 +1049,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
             return SPELL_CAST_OK;
         }
-        actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells
+        actAsShifted = !(shapeInfo->flags1 & SHAPESHIFT_FLAG_STANCE);            // shapeshift acts as normal form for spells
     }
 
     if (actAsShifted)
@@ -1062,7 +1062,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
     else
     {
         // needs shapeshift
-        if (!(AttributesEx2 & SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED) && Stances != 0)
+        if (!HasAttribute(SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED) && Stances != 0)
             return SPELL_FAILED_ONLY_SHAPESHIFT;
     }
 
@@ -1114,4 +1114,15 @@ bool SpellEntry::HasAuraOrTriggersAnotherSpellWithAura(AuraType aura) const
                     return true;
     }
     return false;
+}
+
+bool SpellEntry::CanTriggerWeaponProcs() const
+{
+    // All weapon based abilities can trigger weapon procs,
+    // even if they do no damage, or break on damage, like Sap.
+    // https://www.youtube.com/watch?v=klMsyF_Kz5o
+    if (EquippedItemClass == ITEM_CLASS_WEAPON && rangeIndex == SPELL_RANGE_IDX_COMBAT)
+        return true;
+
+    return HasAttribute(SPELL_CUSTOM_TRIGGER_WEAPON_PROCS);
 }

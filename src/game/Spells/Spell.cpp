@@ -3232,7 +3232,11 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                                 // clear cooldown at fail
                                 if (m_caster->IsPlayer())
                                     m_caster->RemoveSpellCooldown(*m_spellInfo, true);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
                                 SendCastResult(SPELL_FAILED_NO_EDIBLE_CORPSES);
+#else
+                                SendCastResult(SPELL_FAILED_BAD_IMPLICIT_TARGETS);
+#endif
                                 finish(false);
                             }
                             break;
@@ -4709,8 +4713,10 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCas
                 data << uint32(sSpellMgr.GetRequiredAreaForSpell(spellInfo->Id));
                 break;
             case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
             case SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND:
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_10_2
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             case SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND:
 #endif
                 data << uint32(spellInfo->EquippedItemClass);
@@ -7630,10 +7636,12 @@ SpellCastResult Spell::CheckItems()
             if (m_IsTriggeredSpell)
                 return SPELL_FAILED_DONT_REPORT;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
             if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_REQUIRES_MAIN_HAND_WEAPON))
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
+#endif
 
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_10_2
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_REQUIRES_OFFHAND_WEAPON))
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
 #endif

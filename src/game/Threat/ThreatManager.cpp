@@ -140,8 +140,8 @@ void HostileReference::updateOnlineStatus()
     // target is no player or not gamemaster
     // target is not in flight
     if (isValid() &&
-            ((getTarget()->GetTypeId() != TYPEID_PLAYER || !((Player*)getTarget())->IsGameMaster()) ||
-             !getTarget()->IsTaxiFlying()))
+            (getTarget()->GetTypeId() != TYPEID_PLAYER || !((Player*)getTarget())->IsGameMaster()) &&
+            !getTarget()->IsTaxiFlying())
         online = true;
 
     setAccessibleState(accessible);

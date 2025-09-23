@@ -438,7 +438,7 @@ class Map : public GridRefManager<NGridType>
 
         void UpdateActiveObjectVisibility(Player* player);
         void UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGuids);
-        void UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGuids, UpdateData& data, std::set<WorldObject*>& visibleNow);
+        void UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGuids, UpdateData& data);
 
         void resetMarkedCells() { marked_cells.reset(); }
         bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }

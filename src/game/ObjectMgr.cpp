@@ -8059,6 +8059,7 @@ void ObjectMgr::CheckGameObjectTemplate(GameObjectInfo* goInfo)
             CheckGOSpellId(goInfo, goInfo->spellcaster.spellId, 0);
             break;
         }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         case GAMEOBJECT_TYPE_FLAGSTAND:                 //24
         {
             if (goInfo->flagstand.lockId)
@@ -8066,12 +8067,15 @@ void ObjectMgr::CheckGameObjectTemplate(GameObjectInfo* goInfo)
             CheckGONoDamageImmuneId(goInfo, goInfo->flagstand.noDamageImmune, 5);
             break;
         }
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         case GAMEOBJECT_TYPE_FISHINGHOLE:               //25
         {
             if (goInfo->fishinghole.lockId)
                 CheckGOLockId(goInfo, goInfo->fishinghole.lockId, 4);
             break;
         }
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         case GAMEOBJECT_TYPE_FLAGDROP:                  //26
         {

@@ -45,7 +45,6 @@ namespace MaNGOS
         Camera& i_camera;
         UpdateData i_data;
         ObjectGuidSet i_clientGUIDs;
-        std::set<WorldObject*> i_visibleNow;
 
         explicit VisibleNotifier(Camera &c) : i_camera(c), i_clientGUIDs(c.GetOwner()->m_visibleGUIDs) {}
         template<class T> void Visit(GridRefManager<T>& m);
@@ -618,11 +617,13 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return i_obj; }
             bool operator()(GameObject* go)
             {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                 if (go->GetGOInfo()->type == GAMEOBJECT_TYPE_FISHINGHOLE && go->isSpawned() && i_obj.IsWithinDistInMap(go, i_range) && i_obj.IsWithinDistInMap(go, (float)go->GetGOInfo()->fishinghole.radius))
                 {
                     i_range = i_obj.GetDistance(go);
                     return true;
                 }
+#endif
                 return false;
             }
             float GetLastRange() const { return i_range; }

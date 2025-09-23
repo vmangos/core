@@ -178,23 +178,26 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
         }
 
         constexpr size_t fixedSize =
-            sizeof(uint32) + // entry
-            sizeof(char) + // name
-            sizeof(char) + // name2
-            sizeof(char) + // name3
-            sizeof(char) + // name4
-            sizeof(char) + // subName
-            sizeof(uint32) + // type_flags
-            sizeof(uint32) + // type
-            sizeof(uint32) + // pet_family
-            sizeof(uint32) + // rank
-            sizeof(uint32) + // unknown
+            sizeof(uint32) // entry
+            + sizeof(char) // name
+            + sizeof(char) // name2
+            + sizeof(char) // name3
+            + sizeof(char) // name4
+            + sizeof(char) // subName
+            + sizeof(uint32) // type_flags
+            + sizeof(uint32) // type
+            + sizeof(uint32) // pet_family
+            + sizeof(uint32) // rank
+            + sizeof(uint32) // unknown
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-            sizeof(uint32) + // pet_spell_list_id
+            + sizeof(uint32) // pet_spell_list_id
 #endif
-            sizeof(uint32) + // display_id
-            sizeof(uint8) + // civilian
-            sizeof(uint8); // racial_leader
+            + sizeof(uint32)  // display_id
+            + sizeof(uint8)  // civilian
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            + sizeof(uint8) // racial_leader
+#endif
+            ;
 
         size_t const nameLen = name->size();
         size_t const subNameLen = subName->size();
@@ -206,23 +209,22 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data.append(subName->c_str(), subNameLen + 1);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        data << uint32(ci->GetTypeFlags());                 // flags
+        data << uint32(ci->GetTypeFlags());
 #else
-        data << uint32(ci->static_flags1);                  // flags
+        data << uint32(ci->static_flags1);
 #endif
         data << uint32(ci->type);
-
         data << uint32(ci->pet_family);                     // CreatureFamily.dbc
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
-        data << uint32(0);                                  // unknown        wdbFeild11
+        data << uint32(0);                                  // unknown
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-        data << uint32(ci->pet_spell_list_id);              // Id from CreatureSpellData.dbc    wdbField12
+        data << uint32(ci->pet_spell_list_id);              // Id from CreatureSpellData.dbc
 #endif
-
-        data << uint32(ci->display_id[0]);                 //wdbFeild13
-
-        data << uint8(ci->civilian);                       //wdbFeild14
+        data << uint32(ci->display_id[0]);
+        data << uint8(ci->civilian);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         data << uint8(ci->racial_leader);
+#endif
         SendPacket(&data);
     }
     else

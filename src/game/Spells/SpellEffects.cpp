@@ -397,8 +397,10 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     switch (m_casterGo->GetEntry())
                     {
-                        case 179785:    // Silverwing Flag
-                        case 179786:    // Warsong Flag
+                        case 179785:    // Silverwing Flag (dropped)
+                        case 179786:    // Warsong Flag (dropped)
+                        case 179830:    // Silverwing Flag (base)
+                        case 179831:    // Warsong Flag (base)
                             if (bg->GetTypeID() == BATTLEGROUND_WS)
                                 bg->EventPlayerClickedOnFlag(pPlayer, m_casterGo);
                             break;
@@ -2089,6 +2091,7 @@ void Spell::EffectOpenLock(SpellEffectIndex effIdx)
                 return;
             }
         }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         else if (goInfo->type == GAMEOBJECT_TYPE_FLAGSTAND)
         {
             //CanUseBattleGroundObject() already called in CheckCast()
@@ -2096,6 +2099,7 @@ void Spell::EffectOpenLock(SpellEffectIndex effIdx)
             if (BattleGround *bg = player->GetBattleGround())
                 return;
         }
+#endif
         lockId = goInfo->GetLockId();
         guid = gameObjTarget->GetObjectGuid();
     }
@@ -5693,10 +5697,6 @@ void Spell::EffectTransmitted(SpellEffectIndex effIdx)
             }
             break;
         }
-        case GAMEOBJECT_TYPE_FISHINGHOLE:
-        case GAMEOBJECT_TYPE_CHEST:
-        default:
-            break;
     }
 
     pGameObj->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
