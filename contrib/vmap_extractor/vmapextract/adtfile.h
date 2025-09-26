@@ -165,8 +165,8 @@ class ADTFile
 const char* GetPlainName(const char* FileName);
 char* GetPlainName(char* FileName);
 char const* GetExtension(char const* FileName);
-void fixnamen(char* name, size_t len);
-void fixname2(char* name, size_t len);
+void FixNameCase(char* name, size_t len);
+void FixNameSpaces(char* name, size_t len);
 //void fixMapNamen(char *name, size_t len);
 
 #endif
