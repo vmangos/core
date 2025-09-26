@@ -156,7 +156,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
     }
 
     // trainer list loaded at check;
-    if (!unit->IsTrainerOf(_player, true))
+    if (!unit->IsTrainerOf(_player))
         return;
 
     CreatureInfo const* ci = unit->GetCreatureInfo();
@@ -277,7 +277,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recv_data)
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
 
-    if (!unit || !unit->IsTrainerOf(_player, true) || !unit->IsWithinLOSInMap(_player))
+    if (!unit || !unit->IsTrainerOf(_player) || !unit->IsWithinLOSInMap(_player))
     {
         SendTrainingFailure(guid, spellId, TRAIN_FAIL_UNAVAILABLE);
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTrainerBuySpellOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());

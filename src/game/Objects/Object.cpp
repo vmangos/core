@@ -661,7 +661,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                     {
                         if (appendValue & UNIT_NPC_FLAG_TRAINER)
                         {
-                            if (!((Creature*)this)->IsTrainerOf(target, false))
+                            if (!((Creature*)this)->IsTrainerOf(target))
                                 appendValue &= ~UNIT_NPC_FLAG_TRAINER;
                         }
 

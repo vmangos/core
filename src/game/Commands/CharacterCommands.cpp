@@ -34,6 +34,7 @@
 #include "PlayerDump.h"
 #include "CharacterDatabaseCache.h"
 #include "Config/Config.h"
+#include "Conditions.h"
 
 #include <regex>
 
@@ -2817,21 +2818,24 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
             if (!(cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER))
                 continue;
 
-            switch (cInfo->trainer_type)
+            uint32 gossipMenuId = cInfo->gossip_menu_id;
+            if (!gossipMenuId)
+                continue;
+
+            GossipMenuItemsMapBounds bounds = sObjectMgr.GetGossipMenuItemsMapBounds(gossipMenuId);
+            bool isTrainer = false;
+            for (auto itr = bounds.first; itr != bounds.second; ++itr)
             {
-                case TRAINER_TYPE_CLASS:
-                {
-                    if (cInfo->trainer_class != pPlayer->GetClass())
-                        continue;
-                    break;
-                }
-                case TRAINER_TYPE_PETS:
-                {
-                    if (pPlayer->GetClass() != CLASS_HUNTER)
-                        continue;
-                    break;
-                }
+                GossipMenuItems const& gMenuItem = itr->second;
+                if (gMenuItem.option_id == GOSSIP_OPTION_TRAINER)
+                    if (uint32 conditionId = gMenuItem.condition_id)
+                        if (isTrainer = IsConditionSatisfied(conditionId, pPlayer, pPlayer->GetMap(), pPlayer, CONDITION_FROM_GOSSIP_OPTION))
+                            break;
+
             }
+
+            if (!isTrainer)
+                continue;
 
             if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
                 HandleLearnTrainerHelper(pPlayer, cSpells);
