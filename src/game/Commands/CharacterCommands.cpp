@@ -2827,7 +2827,7 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
             for (auto itr = bounds.first; itr != bounds.second; ++itr)
             {
                 GossipMenuItems const& gMenuItem = itr->second;
-                if (gMenuItem.option_id == GOSSIP_OPTION_TRAINER)
+                if (gMenuItem.menu_id && gMenuItem.option_id == GOSSIP_OPTION_TRAINER)
                     if (uint32 conditionId = gMenuItem.condition_id)
                     {
                         validTrainer = IsConditionSatisfied(conditionId, pPlayer, pPlayer->GetMap(), pPlayer, CONDITION_FROM_GOSSIP_OPTION);
