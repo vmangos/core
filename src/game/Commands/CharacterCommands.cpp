@@ -2823,18 +2823,24 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
                 continue;
 
             GossipMenuItemsMapBounds bounds = sObjectMgr.GetGossipMenuItemsMapBounds(gossipMenuId);
-            bool isTrainer = false;
+            bool validTrainer = false;
             for (auto itr = bounds.first; itr != bounds.second; ++itr)
             {
                 GossipMenuItems const& gMenuItem = itr->second;
                 if (gMenuItem.option_id == GOSSIP_OPTION_TRAINER)
                     if (uint32 conditionId = gMenuItem.condition_id)
-                        if (isTrainer = IsConditionSatisfied(conditionId, pPlayer, pPlayer->GetMap(), pPlayer, CONDITION_FROM_GOSSIP_OPTION))
-                            break;
-
+                    {
+                        validTrainer = IsConditionSatisfied(conditionId, pPlayer, pPlayer->GetMap(), pPlayer, CONDITION_FROM_GOSSIP_OPTION);
+                        break;
+                    }
+                    else
+                    {
+                        validTrainer = true;
+                        break;
+                    }
             }
 
-            if (!isTrainer)
+            if (!validTrainer)
                 continue;
 
             if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
