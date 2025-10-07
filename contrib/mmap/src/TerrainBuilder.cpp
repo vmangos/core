@@ -182,18 +182,8 @@ namespace MMAP
             {
                 if (!m_V8)
                     m_V8 = new float[V8_SIZE_SQ];
-                else
-                {
-                    delete[] m_V8;
-                    m_V8 = new float[V8_SIZE_SQ];
-                }
                 if (!m_V9)
                     m_V9 = new float[V9_SIZE_SQ];
-                else
-                {
-                    delete[] m_V9;
-                    m_V9 = new float[V9_SIZE_SQ];
-                }
                 memcpy(m_V8, V8, V8_SIZE_SQ * sizeof(float));
                 memcpy(m_V9, V9, V9_SIZE_SQ * sizeof(float));
             }
