@@ -1304,20 +1304,36 @@ bool Creature::IsTrainerOf(Player* pPlayer) const
     uint32 gossipMenuId = GetCreatureInfo()->gossip_menu_id;
     if (!gossipMenuId)
     {
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature %u (Entry: %u) has npc_flag UNIT_NPC_FLAG_TRAINER but does not have a gossip_menu_id assigned to it.");
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature %u (Entry: %u) has npc_flag UNIT_NPC_FLAG_TRAINER but does not have a gossip_menu_id assigned to it.",
+                        GetGUIDLow(), GetEntry());
         return false;
     }
-    
+
+    bool found = false;
+
     GossipMenuItemsMapBounds bounds = sObjectMgr.GetGossipMenuItemsMapBounds(gossipMenuId);
     for (auto itr = bounds.first; itr != bounds.second; ++itr)
     {
         GossipMenuItems const& gMenuItem = itr->second;
         if (gMenuItem.option_id == GOSSIP_OPTION_TRAINER)
         {
+            found = true;
             uint32 conditionId = gMenuItem.condition_id;
-            return IsConditionSatisfied(conditionId, pPlayer, pPlayer->GetMap(), this, CONDITION_FROM_GOSSIP_OPTION);
+            if (!conditionId)
+            {
+                return true;
+            }
+            else
+            {
+                return IsConditionSatisfied(conditionId, pPlayer, pPlayer->GetMap(), this, CONDITION_FROM_GOSSIP_OPTION);
+            }
         }
     }
+
+    if (!found)
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature %u (Entry: %u) has npc_flag UNIT_NPC_FLAG_TRAINER but does not have a GOSSIP_OPTION_TRAINER entry assigend to its gossip_menu (Entry: %u) in gossip_menu_option.",
+                        GetGUIDLow(), GetEntry(), gossipMenuId);
+
     return false;
 }
 
