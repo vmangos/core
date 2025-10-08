@@ -32,7 +32,7 @@ UPDATE `creature` SET `position_x` = 961.505127, `position_y` = -354.267487, `po
 DELETE FROM `creature_movement` WHERE `id` IN (29646, 29648, 29660, 29661, 29662, 29664);
 -- 29646
 SET @POINT := 0;
-INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Position_Z`, `Orientation`, `WaitTime`, `Script_Id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (29646,(@POINT := @POINT + 1),978.26074,-377.89606,9.0254755,100,500,0),
 (29646,(@POINT := @POINT + 1),978.54114,-385.31088,8.227136,100,0,0),
 (29646,(@POINT := @POINT + 1),971.53625,-387.9108,8.264367,100,0,0),
@@ -51,7 +51,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Pos
 (29646,(@POINT := @POINT + 1),978.54114,-385.31088,8.227136,100,0,0);
 -- 29648
 SET @POINT := 0;
-INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Position_Z`, `Orientation`, `WaitTime`, `Script_Id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (29648,(@POINT := @POINT + 1),872.80945,-292.8252,17.80613,100,500,0),
 (29648,(@POINT := @POINT + 1),885.36285,-290.37933,19.17272,100,0,0),
 (29648,(@POINT := @POINT + 1),897.8306,-285.32156,20.153763,100,0,0),
@@ -68,7 +68,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Pos
 (29648,(@POINT := @POINT + 1),885.36285,-290.37933,19.17272,100,0,0);
 -- 29660
 SET @POINT := 0;
-INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Position_Z`, `Orientation`, `WaitTime`, `Script_Id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (29660,(@POINT := @POINT + 1),987.2447,-328.64514,-0.28765878,100,500,0),
 (29660,(@POINT := @POINT + 1),987.5994,-317.40674,0.8982092,100,0,0),
 (29660,(@POINT := @POINT + 1),980.0046,-304.04227,-1.3080362,100,0,0),
@@ -83,7 +83,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Pos
 (29660,(@POINT := @POINT + 1),987.5994,-317.40674,0.8982092,100,0,0);
 -- 29661
 SET @POINT := 0;
-INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Position_Z`, `Orientation`, `WaitTime`, `Script_Id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (29661,(@POINT := @POINT + 1),985.87915,-375.4854,16.126184,100,500,0),
 (29661,(@POINT := @POINT + 1),977.4711,-366.06494,16.481733,100,0,0),
 (29661,(@POINT := @POINT + 1),980.44977,-359.77316,15.8730955,100,0,0),
@@ -106,7 +106,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Pos
 (29661,(@POINT := @POINT + 1),977.4711,-366.06494,16.481733,100,0,0);
 -- 29662
 SET @POINT := 0;
-INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Position_Z`, `Orientation`, `WaitTime`, `Script_Id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (29662,(@POINT := @POINT + 1),953.9792,-257.88293,-3.5109515,100,500,0),
 (29662,(@POINT := @POINT + 1),943.3326,-255.42464,-2.5989857,100,0,0),
 (29662,(@POINT := @POINT + 1),933.843,-259.72906,-2.1856833,100,0,0),
@@ -133,7 +133,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Pos
 (29662,(@POINT := @POINT + 1),943.3326,-255.42464,-2.5989857,100,0,0);
 -- 29664
 SET @POINT := 0;
-INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Position_Z`, `Orientation`, `WaitTime`, `Script_Id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (29664,(@POINT := @POINT + 1),909.07324,-334.2018,18.525047,100,500,0),
 (29664,(@POINT := @POINT + 1),919.23285,-329.27045,19.036795,100,0,0),
 (29664,(@POINT := @POINT + 1),923.80145,-320.73843,17.60006,100,0,0),
@@ -146,8 +146,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `Position_X`, `Position_Y`, `Pos
 
 -- misc
 UPDATE `creature` SET `wander_distance`=3 WHERE  `guid`=29647;
-UPDATE `creature` SET `wander_distance`=3 WHERE  `guid`=29665;
-UPDATE `creature` SET `id`=4003 WHERE  `guid`=29665;
+UPDATE `creature` SET `id`=4003, `mana_percent`=100 WHERE `guid`=29665;
 UPDATE `creature` SET `id`=4004, `wander_distance` = 3 WHERE  `guid`=29642;
 DELETE FROM `creature` WHERE `guid` = 29663;
 
