@@ -26,8 +26,8 @@ UPDATE `creature` SET `position_z`=42.3186 WHERE `guid`=11352;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Swifthistle to Barrens Herbs
 INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
-(2514, 2452, 20, 0, 1, 3, 0, 0, 10),
-(2515, 2452, 40, 0, 1, 3, 0, 0, 10);
+(2514, 2452, 20, 0, 1, 2, 0, 0, 10),
+(2515, 2452, 40, 0, 1, 2, 0, 0, 10);
 
 -- Barrens Herbs Should Drop Betreen 1 and 3 Herbs
 UPDATE `gameobject_loot_template` SET `mincountOrRef` = 1, `maxcount` = 3 WHERE `entry` = 2514 AND `item` = 785;
