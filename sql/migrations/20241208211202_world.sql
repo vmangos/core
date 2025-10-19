@@ -398,24 +398,24 @@ UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `PrevQuestId` IN (8795, 8792
 -- Correct Rethban Gauntlet Complete Script (credit cmangos)
 DELETE FROM `quest_end_scripts` WHERE `id`=1699;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1699, 0, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Remove NpcFlags'),
-(1699, 0, 1, 1, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Emote Shout'),
-(1699, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2308, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Say Text'),
-(1699, 0, 3, 20, 0, 0, 0, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Stop Waypoint'),
-(1699, 0, 4, 35, 0, 0, 0, 0, 379, 20, 10, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Face Player'),
-(1699, 1, 0, 1, 4, 0, 0, 0, 5620, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Bartender Wental - Emote Cheer'),
-(1699, 3, 0, 1, 21, 0, 0, 0, 346, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Barkeep Daniels - Emote OneShotApplaud'),
-(1699, 3, 1, 1, 21, 0, 0, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Emote OneShotApplaud'),
-(1699, 5, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Emote Cheer'),
-(1699, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Say Text'),
-(1699, 6, 0, 1, 4, 0, 0, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Emote OneShotCheer'),
-(1699, 6, 1, 1, 21, 0, 0, 0, 5620, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Bartender Wental - Emote OneShotApplaud'),
-(1699, 9, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Emote Cheer'),
-(1699, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Say Text'),
-(1699, 10, 0, 20, 2, 0, 12, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Darcy - Start Waypoint'),
-(1699, 13, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Emote Cheer'),
-(1699, 13, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Say Text'),
-(1699, 14, 0, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet - Yorus Barleybrew - Add NpcFlags');
+(1699, 0, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Remove NpcFlags'),
+(1699, 0, 1, 1, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Emote Shout'),
+(1699, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2308, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Say Text'),
+(1699, 0, 3, 20, 0, 0, 0, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Darcy - Stop Waypoint'),
+(1699, 0, 4, 35, 0, 0, 0, 0, 379, 20, 10, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Darcy - Face Player'),
+(1699, 1, 0, 1, 4, 0, 0, 0, 5620, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Bartender Wental - Emote Cheer'),
+(1699, 3, 0, 1, 21, 0, 0, 0, 346, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Barkeep Daniels - Emote OneShotApplaud'),
+(1699, 3, 1, 1, 21, 0, 0, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Darcy - Emote OneShotApplaud'),
+(1699, 5, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Emote Cheer'),
+(1699, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Say Text'),
+(1699, 6, 0, 1, 4, 0, 0, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Darcy - Emote OneShotCheer'),
+(1699, 6, 1, 1, 21, 0, 0, 0, 5620, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Bartender Wental - Emote OneShotApplaud'),
+(1699, 9, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Emote Cheer'),
+(1699, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Say Text'),
+(1699, 10, 0, 20, 2, 0, 12, 0, 379, 20, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Darcy - Start Waypoint'),
+(1699, 13, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Emote Cheer'),
+(1699, 13, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2309, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Say Text'),
+(1699, 14, 0, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Rethban Gauntlet: Yorus Barleybrew - Add NpcFlags');
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Missing Gossip Option (credit cmangos) (FULL BLIZZLIKE SCRIPT:https://github.com/cmangos/tbc-db/commit/96c8008958671945b39d1912645e1d80afaa8c7c)
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_script_id`, `condition_id`) VALUES
@@ -426,18 +426,18 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (5765, -1, 5763, 5764, 0, 0, 0);
 DELETE FROM `gossip_scripts` WHERE `id`=5763;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(5763, 0, 0, 15, 22943, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Doc Mixilpixil - cast Player Lost Eau d\' Mixilpixil DND');
+(5763, 0, 0, 15, 22943, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Doc Mixilpixil - Cast Spell Player Lost Eau d\' Mixilpixil DND');
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct Sully Balloo\'s Letter Complete Script (credit cmangos)
 DELETE FROM `quest_end_scripts` WHERE `id`=637;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(637, 0, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter - Sara Balloo - Remove NpcFlags'),
-(637, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 792, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter - Sara Balloo - Say EmotedText'),
-(637, 6, 0, 1, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter - Sara Balloo - Emote Roar'),
-(637, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 793, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter - Sara Balloo - Say Text'),
-(637, 10, 0, 1, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter - Sara Balloo - Emote Cry'),
-(637, 15, 0, 1, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter - Sara Balloo - Emote Beg'),
-(637, 20, 0, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter - Sara Balloo - Add NpcFlags');
+(637, 0, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter: Sara Balloo - Remove NpcFlags'),
+(637, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 792, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter: Sara Balloo - Say EmotedText'),
+(637, 6, 0, 1, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter: Sara Balloo - Emote Roar'),
+(637, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 793, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter: Sara Balloo - Say Text'),
+(637, 10, 0, 1, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter: Sara Balloo - Emote Cry'),
+(637, 15, 0, 1, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter: Sara Balloo - Emote Beg'),
+(637, 20, 0, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloo\'s Letter: Sara Balloo - Add NpcFlags');
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct The Scythe of Elune Script (credit cmangos)
 DELETE FROM `event_scripts` WHERE `id`=664;
@@ -453,8 +453,8 @@ UPDATE `quest_template` SET `CompleteScript`=705 WHERE  `entry`=705 AND `patch`=
 
 DELETE FROM `generic_scripts` WHERE `id` IN (70501, 70502);
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(70501, 1, 0, 60, 3, 1, 0, 0, 0, 0, 0, 0, 0, 601301, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Wayward Buzzard - Start Waypoints'),
-(70502, 1, 0, 60, 3, 1, 0, 0, 0, 0, 0, 0, 0, 601301, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Wayward Buzzard - Start Waypoints');
+(70501, 1, 0, 60, 3, 1, 0, 0, 0, 0, 0, 0, 0, 601301, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Wayward Buzzard - Start Waypoints'),
+(70502, 1, 0, 60, 3, 1, 0, 0, 0, 0, 0, 0, 0, 601301, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Wayward Buzzard - Start Waypoints');
 DELETE FROM `creature_movement_special` WHERE `id` = 601301;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`, `path_id`) VALUES
 (601301, 1, -6752.36, -3161.91, 244.696, 100, 0, 0, 0, 0),
@@ -469,18 +469,18 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 
 DELETE FROM `quest_end_scripts` WHERE `id`=705;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(705, 0, 0, 31, 6013, 60, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Terminate Script'),
-(705, 0, 1, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.66519, 0, 'Pearl Diving - Rigglefuzz - Set Orientation'),
-(705, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1021, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Say Text'),
-(705, 0, 3, 10, 6013, 22951, 0, 0, 0, 0, 0, 0, 0, 70502, -1, 1, -6744, -3170.58, 249.026, 2.3911, 0, 'Pearl Diving - Rigglefuzz - Summon Creature Wayward Buzzard'),
-(705, 0, 4, 10, 6013, 22951, 0, 0, 0, 0, 0, 0, 0, 70501, -1, 1, -6749.5, -3168.62, 246.617, 1.97383, 0, 'Pearl Diving - Rigglefuzz - Summon Creature Wayward Buzzard'),
-(705, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1023, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Say Text'),
-(705, 7, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.20016, 0, 'Pearl Diving - Rigglefuzz - Set Orientation'),
-(705, 7, 0, 0, 0, 0, 0, 0, 6013, 60, 10, 0, 1022, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Say Text'),
-(705, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1024, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Say Text'),
-(705, 10, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb'),
-(705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb'),
-(705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving - Rigglefuzz - Cast Spell Flash Bomb');
+(705, 0, 0, 31, 6013, 60, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Rigglefuzz - Terminate Script'),
+(705, 0, 1, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.66519, 0, 'Pearl Diving: Rigglefuzz - Set Orientation'),
+(705, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1021, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Rigglefuzz - Say Text'),
+(705, 0, 3, 10, 6013, 22951, 0, 0, 0, 0, 0, 0, 0, 70502, -1, 1, -6744, -3170.58, 249.026, 2.3911, 0, 'Pearl Diving: Rigglefuzz - Summon Creature Wayward Buzzard'),
+(705, 0, 4, 10, 6013, 22951, 0, 0, 0, 0, 0, 0, 0, 70501, -1, 1, -6749.5, -3168.62, 246.617, 1.97383, 0, 'Pearl Diving: Rigglefuzz - Summon Creature Wayward Buzzard'),
+(705, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1023, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Rigglefuzz - Say Text'),
+(705, 7, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.20016, 0, 'Pearl Diving: Rigglefuzz - Set Orientation'),
+(705, 7, 0, 0, 0, 0, 0, 0, 6013, 60, 10, 0, 1022, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Rigglefuzz - Say Text'),
+(705, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1024, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Rigglefuzz - Say Text'),
+(705, 10, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Rigglefuzz - Cast Spell Flash Bomb'),
+(705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Rigglefuzz - Cast Spell Flash Bomb'),
+(705, 11, 0, 15, 5134, 0, 0, 0, 6013, 60, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pearl Diving: Rigglefuzz - Cast Spell Flash Bomb');
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Thandol Span Script
 UPDATE `quest_template` SET `StartScript`=632 WHERE  `entry`=632;
@@ -514,9 +514,9 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 
 DELETE FROM `quest_start_scripts` WHERE `id`=632;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(632, 0, 0, 31, 4062, 50, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Thandol Span - Terminate Script'),
-(632, 0, 1, 10, 4062, 300000, 0, 0, 0, 0, 0, 0, 0, 63101, -1, 1, -2370.93, -2523.82, 74.639, 2.56563, 390, 'The Thandol Span - Summon Creature'),
-(632, 0, 2, 10, 4062, 300000, 0, 0, 0, 0, 0, 0, 0, 63102, -1, 1, -2372.22, -2483.47, 74.639, 0.174533, 390, 'The Thandol Span - Summon Creature');
+(632, 0, 0, 31, 4062, 50, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Thandol Span: Terminate Script'),
+(632, 0, 1, 10, 4062, 300000, 0, 0, 0, 0, 0, 0, 0, 63101, -1, 1, -2370.93, -2523.82, 74.639, 2.56563, 390, 'The Thandol Span: Summon Creature'),
+(632, 0, 2, 10, 4062, 300000, 0, 0, 0, 0, 0, 0, 0, 63102, -1, 1, -2372.22, -2483.47, 74.639, 0.174533, 390, 'The Thandol Span: Summon Creature');
 
 -- Events list for Dark Iron Saboteur
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1052;
