@@ -270,15 +270,18 @@ DELETE FROM `creature` WHERE `guid` IN (16672, 16722);
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 10 WHERE `guid` IN (81164, 81160, 81159, 81166, 81162, 81165, 81161, 81320, 81311, 81294, 81299, 81167, 81172, 81171, 81170, 81176, 81173);
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Soriid the Devourer Should Not Be Skinnable
-DELETE FROM `skinning_loot_template` WHERE `entry` = 100003;
+DELETE FROM `skinning_loot_template` WHERE `entry` = 8204;
 UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE `entry` = 8204;
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Other unskinnable mobs.
+UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE `entry` IN (14476, 4242, 4243, 5347, 6582, 7376, 10619, 10979, 11181, 11671, 11672, 11710, 11896, 11897, 14344, 14477, 14566, 15172, 15338, 15718, 11741, 11740, 14476, 14344);
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct Serpentbloom Spawns Ammount
 UPDATE `pool_template` SET `max_limit` = 13 WHERE `entry` = 4893;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Events list for Trade Master Kovic
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(844402, 8444, 0, 4, 0, 100, 1, 0, 0, 0, 0, 844402, 0, 0, 'Trade Master Kovic - Talk on Aggro');
+(844402, 8444, 0, 4, 0, 100, 0, 0, 0, 0, 0, 844402, 0, 0, 'Trade Master Kovic - Talk on Aggro');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (844402, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4422, 4421, 0, 0, 0, 0, 0, 0, 0, 'Trade Master Kovic - Talk on Aggro');
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -522,7 +525,7 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1052;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
 (105202, 1052, 0, 2, 0, 100, 0, 15, 0, 0, 0, 105202, 0, 0, 'Dark Iron Saboteur - Say and Text Emote then Cast Sapper Explode at 15% HP'),
-(105203, 1052, 0, 4, 0, 100, 1, 0, 0, 0, 0, 105201, 0, 0, 'Dark Iron Saboteur - Talk on Aggro');
+(105203, 1052, 0, 4, 0, 100, 0, 0, 0, 0, 0, 105201, 0, 0, 'Dark Iron Saboteur - Talk on Aggro');
 DELETE FROM `creature_ai_scripts` WHERE `id`=105201;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (105201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1935, 1934, 1936, 0, 0, 0, 0, 0, 0, 'Dark Iron Saboteur - Talk');
@@ -554,16 +557,16 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `positi
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Missing Shen'dralar Zealot Spawns (credit cmangos)
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(2026, 14369, 0, 0, 0, 0, 429, 121.172, 468.779, -48.3799, 4.67748, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
-(2070, 14369, 0, 0, 0, 0, 429, 121.754, 476.583, -48.3816, 1.58825, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
-(2072, 14369, 0, 0, 0, 0, 429, 186.675, 457.618, -48.3594, 4.79965, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
-(2080, 14369, 0, 0, 0, 0, 429, 186.983, 479.252, -48.371, 1.5708, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
-(2095, 14369, 0, 0, 0, 0, 429, 114.44, 602.178, -27.8082, 3.10669, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
-(2115, 14369, 0, 0, 0, 0, 429, 153.425, 626.966, -27.8899, 0.017453, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
-(2120, 14369, 0, 0, 0, 0, 429, 192.928, 587.385, -48.3836, 6.17846, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
-(2126, 14369, 0, 0, 0, 0, 429, 163.733, 555.391, -48.3836, 3.1765, 7200, 7200, 0, 100, 0, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
-(2196, 14369, 0, 0, 0, 0, 429, 188.172, 537.305, -48.467, 1.5966, 7200, 7200, 5, 100, 0, 1, 0, 0, 0, 10), -- Shen'dralar Zealot
-(2212, 14369, 0, 0, 0, 0, 429, 130.955, 524.283, -48.0481, 1.61341, 7200, 7200, 5, 100, 0, 1, 0, 0, 0, 10); -- Shen'dralar Zealot
+(2026, 14369, 0, 0, 0, 0, 429, 121.172, 468.779, -48.3799, 4.67748, 7200, 7200, 0, 100, 100, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2070, 14369, 0, 0, 0, 0, 429, 121.754, 476.583, -48.3816, 1.58825, 7200, 7200, 0, 100, 100, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2072, 14369, 0, 0, 0, 0, 429, 186.675, 457.618, -48.3594, 4.79965, 7200, 7200, 0, 100, 100, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2080, 14369, 0, 0, 0, 0, 429, 186.983, 479.252, -48.371, 1.5708, 7200, 7200, 0, 100, 100, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2095, 14369, 0, 0, 0, 0, 429, 114.44, 602.178, -27.8082, 3.10669, 7200, 7200, 0, 100, 100, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2115, 14369, 0, 0, 0, 0, 429, 153.425, 626.966, -27.8899, 0.017453, 7200, 7200, 0, 100, 100, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2120, 14369, 0, 0, 0, 0, 429, 192.928, 587.385, -48.3836, 6.17846, 7200, 7200, 0, 100, 100, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2126, 14369, 0, 0, 0, 0, 429, 163.733, 555.391, -48.3836, 3.1765, 7200, 7200, 0, 100, 100, 0, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2196, 14369, 0, 0, 0, 0, 429, 188.172, 537.305, -48.467, 1.5966, 7200, 7200, 5, 100, 100, 1, 0, 0, 0, 10), -- Shen'dralar Zealot
+(2212, 14369, 0, 0, 0, 0, 429, 130.955, 524.283, -48.0481, 1.61341, 7200, 7200, 5, 100, 100, 1, 0, 0, 0, 10); -- Shen'dralar Zealot
 DELETE FROM `creature` WHERE `guid` IN (84206, 84207);
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Creatures Dont Have Mana
