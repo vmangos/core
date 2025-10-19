@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20241208211202');
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Add Missing Script
-UPDATE `gameobject_template` SET `script_name` = 'go_corrupted_plant' WHERE `entry` = 174597;
+UPDATE `gameobject_template` SET `flags`=4, `script_name` = 'go_corrupted_plant' WHERE `entry` = 174597;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Creature 5469 Shares Spawns With 5470
 UPDATE `creature` SET `id2` = 5470 WHERE `id`= 5469;
