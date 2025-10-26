@@ -1232,9 +1232,24 @@ void Object::ApplyModInt32Value(uint16 index, int32 val, bool apply)
 
 void Object::ApplyModSignedFloatValue(uint16 index, float  val, bool apply)
 {
-    float cur = GetFloatValue(index);
-    cur += (apply ? val : -val);
-    SetFloatValue(index, cur);
+    const float cur = GetFloatValue(index);
+    const float delta = apply ? val : -val;
+    float next = cur + delta;
+
+    // Normalize floating-point drift for per-school damage modifiers
+    if (index >= PLAYER_FIELD_MOD_DAMAGE_DONE_PCT &&
+        index <  PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + MAX_SPELL_SCHOOL)
+    {
+        // Within 2 ULPs of 1.0 (FLT_EPSILON is 1 ULP near 1.0)
+        if (std::fabs(next - 1.0f) <= 2.0f * FLT_EPSILON)
+            next = 1.0f;
+    }
+
+    // Prevent NaN or infinity propagation
+    if (!std::isfinite(next))
+        next = cur;
+
+    SetFloatValue(index, next);
 }
 
 void Object::ApplyModPositiveFloatValue(uint16 index, float  val, bool apply)
