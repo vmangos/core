@@ -21,10 +21,9 @@
 
 #include "GameObject.h"
 #include "TransportMgr.h"
-
+#include "ace/Thread_Mutex.h"
 #include <map>
 #include <set>
-#include <mutex>
 
 typedef std::set<Unit*> PassengerSet;
 
@@ -68,7 +67,7 @@ public:
 protected:
     void UpdatePassengerPositions();
 
-    std::mutex m_passengerMutex;
+    ACE_Thread_Mutex m_passengerMutex;
     PassengerSet m_passengers;
     PassengerSet::iterator m_passengerTeleportItr;
 

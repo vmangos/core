@@ -44,7 +44,6 @@
 #include <utility>
 #include <vector>
 #include <functional>
-#include <shared_mutex>
 
 struct Mail;
 struct ItemPrototype;
@@ -1729,9 +1728,9 @@ class Player final: public Unit
 
         // currently visible objects at player client
         ObjectGuidSet m_visibleGUIDs;
-        mutable std::shared_timed_mutex m_visibleGUIDs_lock;
+        mutable ACE_Thread_Mutex m_visibleGUIDs_lock;
         std::map<ObjectGuid, bool> m_visibleGobjQuestActivated;
-        mutable std::mutex m_visibleGobjsQuestAct_lock;
+        mutable ACE_Thread_Mutex m_visibleGobjsQuestAct_lock;
 
         bool IsInVisibleList(WorldObject const* u) const;
         bool IsInVisibleList_Unsafe(WorldObject const* u) const { return this == u || m_visibleGUIDs.find(u->GetObjectGuid()) != m_visibleGUIDs.end(); }
@@ -2382,7 +2381,7 @@ class Player final: public Unit
         bool m_instanceValid;
         // permanent binds and solo binds
         BoundInstancesMap m_boundInstances;
-        mutable std::mutex m_boundInstancesMutex;
+        mutable ACE_Thread_Mutex m_boundInstancesMutex;
         InstancePlayerBind* GetBoundInstance(uint32 mapId);
         BoundInstancesMap& GetBoundInstances() { return m_boundInstances; }
         void UnbindInstance(uint32 mapId, bool unload = false);

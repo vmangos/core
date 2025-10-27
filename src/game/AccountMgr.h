@@ -25,7 +25,7 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 #include <string>
-#include <shared_mutex>
+#include "ace/Thread_Mutex.h"
 
 enum AccountOpResult
 {
@@ -137,13 +137,13 @@ class AccountMgr
         std::map<uint32, std::string> m_accountWarnings;
         uint32 m_banlistUpdateTimer;
         std::map<std::string, uint32> m_ipBanned;
-        mutable std::shared_timed_mutex m_ipBannedMutex;
+        mutable ACE_Thread_Mutex m_ipBannedMutex;
         std::map<uint32, uint32> m_accountBanned;
         typedef std::map<uint32 /* instanceId */, time_t /* enter time */> InstanceEnterTimesMap;
         typedef std::map<uint32 /* accountId */, InstanceEnterTimesMap> AccountInstanceEnterTimesMap;
         AccountInstanceEnterTimesMap m_instanceEnterTimes;
         std::map<uint32, AccountPersistentData> m_accountPersistentData;
-        std::shared_timed_mutex m_accountPersistentDataMutex;
+        ACE_Thread_Mutex m_accountPersistentDataMutex;
 };
 
 #define sAccountMgr MaNGOS::Singleton<AccountMgr>::Instance()

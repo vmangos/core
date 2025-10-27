@@ -25,6 +25,9 @@
 #include "Common.h"
 #include "Policies/ThreadingModel.h"
 #include "SharedDefines.h"
+#include "ace/RW_Thread_Mutex.h"
+#include "ace/Thread_Mutex.h"
+#include "DBCStructure.h"
 #include "GridDefines.h"
 #include "Cell.h"
 #include "Object.h"
@@ -42,8 +45,6 @@
 #include <bitset>
 #include <list>
 #include <set>
-#include <mutex>
-#include <shared_mutex>
 
 using Movement::Vector3;
 
@@ -178,7 +179,7 @@ struct AreaLocale
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
 
 typedef std::map<uint32, CreatureGroup*> CreatureGroupHolderType;
-using MapMutexType = std::mutex; // can be replaced with a null mutex
+typedef ACE_Thread_Mutex MapMutexType; // Use ACE_Null_Mutex to disable locks
 
 // Instance IDs reserved for internal use (instanced continent parts, ...)
 #define RESERVED_INSTANCES_LAST 100
@@ -315,9 +316,7 @@ struct ScriptedEvent
     ScriptedEvent(ScriptedEvent const&) = delete;
 };
 
-class ThreadPool;
-
-class Map : public GridRefManager<NGridType>
+class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
 {
     friend class MapReference;
     friend class ObjectGridLoader;
@@ -327,9 +326,7 @@ class Map : public GridRefManager<NGridType>
         Map(uint32 id, time_t, uint32 InstanceId);
 
     public:
-        Map(const Map &) = delete;
-        const Map & operator=(const Map &) = delete;
-        virtual ~Map() override;
+        ~Map() override;
         void PrintInfos(ChatHandler& handler);
         void SpawnActiveObjects();
         // currently unused for normal maps
@@ -520,28 +517,68 @@ class Map : public GridRefManager<NGridType>
 
         template <typename T> void InsertObject(ObjectGuid const& guid, T* ptr)
         {
-            std::lock_guard<std::shared_timed_mutex> lock(m_objectsStore_lock);
+            m_objectsStore_lock.acquire_write();
             m_objectsStore.insert<T>(guid, ptr);
+            m_objectsStore_lock.release();
         }
         template <typename T> void EraseObject(ObjectGuid const& guid)
         {
-            std::lock_guard<std::shared_timed_mutex> lock(m_objectsStore_lock);
+            m_objectsStore_lock.acquire_write();
             m_objectsStore.erase<T>(guid, (T*)nullptr);
+            m_objectsStore_lock.release();
         }
         template <typename T> T* GetObject(ObjectGuid const& guid)
         {
-            std::shared_lock<std::shared_timed_mutex> lock(m_objectsStore_lock);
-            return m_objectsStore.find<T>(guid, (T*)nullptr);
+            m_objectsStore_lock.acquire_read();
+            T* ptr = m_objectsStore.find<T>(guid, (T*)nullptr);
+            m_objectsStore_lock.release();
+            return ptr;
         }
-        void AddUpdateObject(Object *obj);
+        void AddUpdateObject(Object *obj)
+        {
+            if (_processingSendObjUpdates)
+                return;
+            i_objectsToClientUpdate_lock.acquire();
+            i_objectsToClientUpdate.insert(obj);
+            i_objectsToClientUpdate_lock.release();
+        }
 
-        void RemoveUpdateObject(Object *obj);
+        void RemoveUpdateObject(Object *obj)
+        {
+            ASSERT(!_processingSendObjUpdates);
+            i_objectsToClientUpdate_lock.acquire();
+            i_objectsToClientUpdate.erase(obj);
+            i_objectsToClientUpdate_lock.release();
+        }
         // May be called from a different map ...
-        void AddRelocatedUnit(Unit* obj);
-        void RemoveRelocatedUnit(Unit* obj);
+        void AddRelocatedUnit(Unit* obj)
+        {
+            if (_processingUnitsRelocation)
+                return;
+            i_unitsRelocated_lock.acquire();
+            i_unitsRelocated.insert(obj);
+            i_unitsRelocated_lock.release();
+        }
+        void RemoveRelocatedUnit(Unit* obj)
+        {
+            ASSERT(!_processingUnitsRelocation);
+            i_unitsRelocated_lock.acquire();
+            i_unitsRelocated.erase(obj);
+            i_unitsRelocated_lock.release();
+        }
 
-        void AddUnitToMovementUpdate(Unit* unit);
-        void RemoveUnitFromMovementUpdate(Unit* unit);
+        void AddUnitToMovementUpdate(Unit* unit)
+        {
+            unitsMvtUpdate_lock.acquire();
+            unitsMvtUpdate.insert(unit);
+            unitsMvtUpdate_lock.release();
+        }
+        void RemoveUnitFromMovementUpdate(Unit* unit)
+        {
+            unitsMvtUpdate_lock.acquire();
+            unitsMvtUpdate.erase(unit);
+            unitsMvtUpdate_lock.release();
+        }
         // DynObjects currently
         uint32 GenerateLocalLowGuid(HighGuid guidhigh);
 
@@ -564,7 +601,18 @@ class Map : public GridRefManager<NGridType>
         bool GetWalkRandomPosition(GenericTransport* t, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags = 0xF) const;
         bool GetSwimRandomPosition(float& x, float& y, float& z, float radius, GridMapLiquidData& liquid_status, bool randomRange = true) const;
         VMAP::ModelInstance* FindCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
-        GameObjectModel const* FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
+
+        GameObjectModel const* FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2)
+        {
+            ASSERT(MaNGOS::IsValidMapCoord(x1, y1, z1));
+            ASSERT(MaNGOS::IsValidMapCoord(x2, y2, z2));
+            Vector3 const pos1 = Vector3(x1, y1, z1);
+            Vector3 const pos2 = Vector3(x2, y2, z2);
+            _dynamicTree_lock.acquire_read();
+            GameObjectModel const* r = _dynamicTree.getObjectHit(pos1, pos2);
+            _dynamicTree_lock.release();
+            return r;
+        }
 
         void Balance() { m_dynamicTree.balance(); }
         void RemoveGameObjectModel(GameObjectModel const& model);
@@ -573,6 +621,7 @@ class Map : public GridRefManager<NGridType>
         bool GetDynamicObjectHitPos(Vector3 start, Vector3 end, Vector3& out, float finalDistMod) const;
         float GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const;
         bool CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2, bool ignoreM2Model) const;
+
         bool IsUnloading() const { return m_unloading; }
         void MarkAsCrashed() { m_crashed = true; }
         bool IsCrashed() const { return m_crashed; }
@@ -593,6 +642,8 @@ class Map : public GridRefManager<NGridType>
          * @param permanently set the weather permanently?
          */
         void SetWeather(uint32 zoneId, WeatherType type, float grade, bool permanently);
+
+        void SetMapUpdateIndex(int idx) { _updateIdx = idx; }
 
         // Get Holder for Creature Linking
         CreatureLinkingHolder* GetCreatureLinkingHolder() { return &m_creatureLinkingHolder; }
@@ -645,15 +696,15 @@ class Map : public GridRefManager<NGridType>
 
         bool                    m_processingSendObjUpdates = false;
         uint32                  m_objUpdatesThreads = 0;
-        mutable std::mutex      m_objectsToClientUpdateLock;
+        mutable MapMutexType    m_objectsToClientUpdateLock;
         std::unordered_set<Object *> m_objectsToClientUpdate;
 
         bool                    m_processingUnitsRelocation = false;
         uint32                  m_unitRelocationThreads = 0;
-        mutable std::mutex      m_unitsRelocatedLock;
+        mutable MapMutexType    m_unitsRelocatedLock;
         std::unordered_set<Unit* > m_unitsRelocated;
 
-        mutable std::mutex      m_unitsMvtUpdateLock;
+        mutable MapMutexType    m_unitsMvtUpdateLock;
         std::unordered_set<Unit*> m_unitsMvtUpdate;
 
         mutable MapMutexType    m_corpseRemovalLock;
@@ -667,23 +718,18 @@ class Map : public GridRefManager<NGridType>
         void RemoveCorpses(bool unload = false);
         void RemoveOldBones(uint32 const diff);
 
-        std::unique_ptr<ThreadPool> m_objectThreads;
-        std::unique_ptr<ThreadPool> m_motionThreads;
-        std::unique_ptr<ThreadPool> m_visibilityThreads;
-        std::unique_ptr<ThreadPool> m_cellThreads;
-
     protected:
         MapEntry const* m_mapEntry;
         uint32 m_id;
         uint32 m_instanceId;
-        uint32 m_unloadTimer = 0;
+        uint32 m_unloadTimer;
         float m_visibilityDistance;
         float m_gridActivationDistance;
 
-        mutable std::shared_timed_mutex   m_dynamicTreeLock;
+        mutable ACE_RW_Mutex   m_dynamicTreeLock;
         DynamicMapTree m_dynamicTree;
 
-        MapPersistentState* m_persistentState = nullptr;
+        MapPersistentState* m_persistentState;
 
         MapRefManager m_mapRefManager;
         MapRefManager::iterator m_mapRefIter;
@@ -693,8 +739,8 @@ class Map : public GridRefManager<NGridType>
         ActiveNonPlayers::iterator m_activeNonPlayersIter;
 
         typedef TypeUnorderedMapContainer<AllMapStoredObjectTypes, ObjectGuid> MapStoredObjectTypesContainer;
-        mutable std::shared_timed_mutex m_objectsStore_lock;
-        MapStoredObjectTypesContainer m_objectsStore;
+        ACE_RW_Mutex                    m_objectsStore_lock;
+        MapStoredObjectTypesContainer   m_objectsStore;
 
         // Objects that must update even in inactive grids without activating them
         typedef std::set<GenericTransport*> TransportsContainer;
@@ -718,19 +764,19 @@ class Map : public GridRefManager<NGridType>
 
         std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP*TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
 
-        mutable std::mutex      m_objectsToRemoveLock;
-        std::set<WorldObject *> m_objectsToRemove;
+        mutable MapMutexType    m_objectsToRemoveLock;
+        std::set<WorldObject*> m_objectsToRemove;
 
         typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
-        mutable MapMutexType      m_scriptSchedule_lock;
+        MapMutexType      m_scriptSchedule_lock;
         ScriptScheduleMap m_scriptSchedule;
         std::unordered_map<uint32, time_t> m_areaTriggerCooldowns;
 
-        InstanceData* m_data = nullptr;
-        uint32 m_scriptId = 0;
+        InstanceData* m_data;
+        uint32 m_scriptId;
 
         // Map local low guid counters
-        mutable std::mutex m_guidGenerators_lock;
+        mutable MapMutexType    m_guidGenerators_lock;
         ObjectGuidGenerator<HIGHGUID_UNIT> m_CreatureGuids;
         ObjectGuidGenerator<HIGHGUID_GAMEOBJECT> m_GameObjectGuids;
         ObjectGuidGenerator<HIGHGUID_TRANSPORT> m_transportGuids;
@@ -745,11 +791,13 @@ class Map : public GridRefManager<NGridType>
             void RemoveFromGrid(T*, NGridType*, Cell const&);
 
         // Custom
-        uint32 m_lastMapUpdate = 0;
-        uint32 m_lastPlayerLeftTime = 0;
+        uint32 m_lastMapUpdate;
+        uint32 m_lastPlayerLeftTime;
         uint32 m_lastPlayersUpdate;
-        uint32 m_inactivePlayersSkippedUpdates = 0;
+        uint32 m_inactivePlayersSkippedUpdates;
         uint32 m_lastCellsUpdate;
+
+        int8 m_updateIdx;
 
         // Elevators are not loaded normally.
         void LoadElevatorTransports();

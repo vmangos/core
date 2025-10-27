@@ -29,15 +29,6 @@
 #include <memory>
 #include <bitset>
 #include <list>
-#include <atomic>
-
-
-#define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
-#define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
-#define INVALID_HEIGHT_VALUE -200000.0f                     // for return, must be equal to VMAP_INVALID_HEIGHT_VALUE, check value for unknown height is VMAP_INVALID_HEIGHT
-#define MAX_FALL_DISTANCE     250000.0f                     // "unlimited fall" to find VMap ground if it is available, just larger than MAX_HEIGHT - INVALID_HEIGHT
-#define DEFAULT_HEIGHT_SEARCH     10.0f                     // default search distance to find height at nearby locations
-#define DEFAULT_WATER_SEARCH      50.0f                     // default search distance to case detection water level
 
 class Creature;
 class Unit;
@@ -56,11 +47,11 @@ class GridMap
         uint32 m_flags = 0;
 
         // Area data
-        uint16 m_gridArea = 0;
-        uint16* m_area_map = nullptr;
+        uint16 m_gridArea;
+        uint16* m_area_map;
 
         // Height level data
-        float m_gridHeight = INVALID_HEIGHT_VALUE;
+        float m_gridHeight;
         float m_gridIntHeightMultiplier;
         union
         {
@@ -83,9 +74,9 @@ class GridMap
         uint8 m_liquid_width;
         uint8 m_liquid_height;
         float m_liquidLevel;
-        uint16* m_liquidEntry = nullptr;
-        uint8* m_liquidFlags = nullptr;
-        float* m_liquid_map = nullptr;
+        uint16* m_liquidEntry;
+        uint8* m_liquidFlags;
+        float* m_liquid_map;
 
         bool loadAreaData(FILE* in, uint32 offset, uint32 size);
         bool loadHeightData(FILE* in, uint32 offset, uint32 size);
@@ -95,7 +86,7 @@ class GridMap
 
         // Get height functions and pointers
         typedef float(GridMap::*pGetHeightPtr)(float x, float y) const;
-        pGetHeightPtr m_gridGetHeight = &GridMap::getHeightFromFlat;
+        pGetHeightPtr m_gridGetHeight;
         float getHeightFromFloat(float x, float y) const;
         float getHeightFromUint16(float x, float y) const;
         float getHeightFromUint8(float x, float y) const;
@@ -136,7 +127,14 @@ class Referencable
         Countable m_count;
 };
 
-using AtomicLong = std::atomic<long>;
+typedef ACE_Atomic_Op<ACE_Thread_Mutex, int> AtomicLong;
+
+#define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
+#define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
+#define INVALID_HEIGHT_VALUE -200000.0f                     // for return, must be equal to VMAP_INVALID_HEIGHT_VALUE, check value for unknown height is VMAP_INVALID_HEIGHT
+#define MAX_FALL_DISTANCE     250000.0f                     // "unlimited fall" to find VMap ground if it is available, just larger than MAX_HEIGHT - INVALID_HEIGHT
+#define DEFAULT_HEIGHT_SEARCH     10.0f                     // default search distance to find height at nearby locations
+#define DEFAULT_WATER_SEARCH      50.0f                     // default search distance to case detection water level
 
 // class for sharing and managin GridMap objects
 class TerrainInfo : public Referencable<AtomicLong>
@@ -201,13 +199,14 @@ class TerrainInfo : public Referencable<AtomicLong>
         // global garbage collection timer
         ShortIntervalTimer i_timer;
 
-        using LOCK_TYPE = std::mutex ;
-        using LOCK_GUARD = std::unique_lock<LOCK_TYPE>;
+        typedef ACE_Thread_Mutex LOCK_TYPE;
+        typedef ACE_Guard<LOCK_TYPE> LOCK_GUARD;
         LOCK_TYPE m_mutex;
         LOCK_TYPE m_refMutex;
 };
 
-class TerrainManager : public MaNGOS::Singleton<TerrainManager, MaNGOS::ClassLevelLockable<TerrainManager, std::mutex> >
+// class for managing TerrainData object and all sort of geometry querying operations
+class TerrainManager : public MaNGOS::Singleton<TerrainManager, MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex> >
 {
         typedef std::unordered_map<uint32,  TerrainInfo*> TerrainDataMap;
         friend class MaNGOS::OperatorNew<TerrainManager>;
@@ -252,7 +251,7 @@ class TerrainManager : public MaNGOS::Singleton<TerrainManager, MaNGOS::ClassLev
         TerrainManager(TerrainManager const&);
         TerrainManager& operator=(TerrainManager const&);
 
-        typedef MaNGOS::ClassLevelLockable<TerrainManager, std::mutex>::Lock Guard;
+        typedef MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex>::Lock Guard;
         TerrainDataMap i_TerrainMap;
 
         typedef std::vector<std::unique_ptr<LiquidTypeEntry>> LiquidTypeStore;

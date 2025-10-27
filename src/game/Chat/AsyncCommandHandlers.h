@@ -136,27 +136,26 @@ private:
 };
 
 /* Run the display in an async task inside the main update, safe for session consistency */
-class PlayerAccountSearchDisplayTask
+class PlayerAccountSearchDisplayTask : public AsyncTask
 {
 public:
-
     PlayerAccountSearchDisplayTask(PlayerSearchQueryHolder* queryHolder)
         : holder(queryHolder) {}
 
-    void operator()();
+    void run() override;
 
 private:
     PlayerSearchQueryHolder* holder;
 };
 
 /* Run the display in an async task inside the main update, safe for session consistency */
-class PlayerCharacterLookupDisplayTask
+class PlayerCharacterLookupDisplayTask : public AsyncTask
 {
 public:
     PlayerCharacterLookupDisplayTask(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
         : unsafeResult(std::make_shared<std::unique_ptr<QueryResult>>(std::move(result))), accountId(accountId), limit(limit) {}
 
-    void operator ()();
+    void run() override;
 
 private:
     // Somehow this class is not moveable when cased to a std::function<void()> (See usage of this function)
@@ -166,13 +165,13 @@ private:
     uint32 limit;
 };
 
-class AccountSearchDisplayTask
+class AccountSearchDisplayTask : public AsyncTask
 {
 public:
     AccountSearchDisplayTask(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
         : unsafeResult(std::make_shared<std::unique_ptr<QueryResult>>(std::move(result))), accountId(accountId), limit(limit) {}
 
-    void operator ()();
+    void run() override;
 
 private:
     // Somehow this class is not moveable when cased to a std::function<void()> (See usage of this function)

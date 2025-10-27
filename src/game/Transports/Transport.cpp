@@ -204,9 +204,10 @@ bool ShipTransport::TeleportTransport(uint32 newMapid, float x, float y, float z
 void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
 {
     // we need to unlock right away because SetTransport can dismount and resummon pet, which will call AddPassanger again
-    std::unique_lock<std::mutex> lock(m_passengerMutex);
-    bool const boarded = m_passengers.insert(passenger).second;
-    lock.unlock();
+    {
+        ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
+        bool const boarded = m_passengers.insert(passenger).second;
+    }
 
     if (boarded)
     {
@@ -230,7 +231,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
 {
     bool erased = false;
 
-    std::unique_lock<std::mutex> lock(m_passengerMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
     if (m_passengerTeleportItr != m_passengers.end())
     {
         PassengerSet::iterator itr = m_passengers.find(passenger);
@@ -245,7 +246,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
     }
     else
         erased = m_passengers.erase(passenger) > 0;
-    lock.unlock();
+    lock.release();
 
     if (erased)
     {
@@ -441,7 +442,7 @@ void GenericTransport::UpdatePosition(float x, float y, float z, float o)
 
 void GenericTransport::UpdatePassengerPositions()
 {
-    std::lock_guard<std::mutex> lock(m_passengerMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
     for (const auto passenger : m_passengers)
         UpdatePassengerPosition(passenger);
 }

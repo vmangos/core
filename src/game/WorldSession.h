@@ -788,7 +788,7 @@ class WorldSession
         uint32 const m_guid; // unique identifier for each session
         WorldSocket* m_socket;
         std::string m_address;
-        LockedQueue<std::unique_ptr<WorldPacket>, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
+        ACE_Based::LockedQueue<std::unique_ptr<WorldPacket>, ACE_Thread_Mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool m_receivedPacketType[PACKET_PROCESS_MAX_TYPE];
         uint32 m_floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
         bool m_connected;
@@ -834,7 +834,7 @@ class WorldSession
         // compressed moves packet does not exist in early clients
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         MovementData m_movementPacketCompressor;
-        std::mutex m_movementPacketCompressorMutex;
+        ACE_Thread_Mutex m_movementPacketCompressorMutex;
         void SendCompressedMovementPackets();
         // dynamically decide when to enable or disable compression
         uint32 m_movePacketsSentLastInterval = 0;

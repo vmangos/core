@@ -185,9 +185,11 @@ bool Database::Initialize(char const* infoString, int nConns /*= 1*/, int nWorke
         return false;
 
     m_numAsyncWorkers = nWorkers;
-
+    m_threadsBodies.resize(m_numAsyncWorkers);
+    m_delayThreads.resize(m_numAsyncWorkers);
+    m_serialDelayQueue = new SqlQueue*[m_numAsyncWorkers];
     for (int i = 0; i < nWorkers; ++i)
-        if (!InitDelayThread(infoString))
+        if (!InitDelayThread(i, infoString))
             return false;
 
     return true;
@@ -219,19 +221,18 @@ void Database::StopServer()
 
 }
 
-bool Database::InitDelayThread(std::string const& infoString)
+bool Database::InitDelayThread(int i, std::string const& infoString)
 {
     //New delay thread for delay execute
 
     SqlConnection* threadConnection = CreateConnection();
     if(!threadConnection->Initialize(infoString.c_str()))
         return false;
+    m_threadsBodies[i] = new SqlDelayThread(this, threadConnection, i);
+    m_threadsBodies[i]->incReference();
+    m_delayThreads[i] = new ACE_Based::Thread(m_threadsBodies[i]);
 
-    std::shared_ptr<SqlDelayThread> tbody = std::make_shared<SqlDelayThread>(this, threadConnection);
-    m_threadsBodies.emplace_back(tbody);
-    m_delayThreads.emplace_back([tbody](){
-        tbody->run();
-    });
+    m_serialDelayQueue[i] = new SqlQueue();
 
     return true;
 }
@@ -242,14 +243,16 @@ void Database::HaltDelayThread()
         return;
 
     for (uint32 i = 0; i < m_numAsyncWorkers; ++i)
+    {
         m_threadsBodies[i]->Stop();
-
-    for (uint32 i = 0; i < m_numAsyncWorkers; ++i)
-        m_delayThreads[i].join();
-
-    m_threadsBodies.clear();
+        m_delayThreads[i]->wait();
+        delete m_delayThreads[i];
+        m_threadsBodies[i]->decReference();
+    }
+    delete[] m_serialDelayQueue;
     m_delayThreads.clear();
-
+    m_threadsBodies.clear();
+    m_serialDelayQueue = nullptr;
     m_numAsyncWorkers = 0;
 }
 
@@ -546,15 +549,23 @@ void Database::AddToSerialDelayQueue(SqlOperation* op)
     // TODO: Load balance, must maintain mapping of serial ID so queries are
     // executed sequentially, however
     int worker = op->GetSerialId() % m_numAsyncWorkers;
-    m_threadsBodies[worker]->addSerialOperation(op);
+    m_serialDelayQueue[worker]->add(op);
+}
+
+bool Database::NextSerialDelayedOperation(int workerId, SqlOperation*& op)
+{
+    if (workerId >= m_numAsyncWorkers)
+        return false;
+
+    return m_serialDelayQueue[workerId]->next(op);
 }
 
 bool Database::HasAsyncQuery()
 {
     bool hasQuery = !m_delayQueue->empty_unsafe();
 
-    for (uint32 i = 0; i < m_numAsyncWorkers && !hasQuery; ++i)
-        hasQuery = m_threadsBodies[i]->HasAsyncQuery();
+    for (int i = 0; i < m_numAsyncWorkers && m_serialDelayQueue && !hasQuery; ++i)
+        hasQuery = !m_serialDelayQueue[i]->empty_unsafe();
 
     return hasQuery;
 }
