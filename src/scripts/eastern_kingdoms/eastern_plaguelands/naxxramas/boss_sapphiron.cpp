@@ -351,7 +351,8 @@ struct boss_sapphironAI : public ScriptedAI
 
         std::vector<Unit*> suitableUnits;
         for (const auto itr : threatlist)
-            if (Unit* pTarget = m_creature->GetMap()->GetPlayer(itr->getUnitGuid()))
+        {
+            if (Player* pTarget = itr->getTarget()->ToPlayer())
             {
                 if (pTarget->IsDead())
                     continue;
@@ -361,7 +362,7 @@ struct boss_sapphironAI : public ScriptedAI
 
                 suitableUnits.push_back(pTarget);
             }
-
+        }
         if (suitableUnits.empty())
         {
             RescheduleIcebolt();
@@ -401,7 +402,7 @@ struct boss_sapphironAI : public ScriptedAI
             m_creature->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
             m_creature->SetHover(true);
 
-            m_creature->m_TargetNotReachableTimer = 0;
+            m_creature->m_targetNotReachableTimer = 0;
             if (m_creature->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
                 m_creature->ClearTemporaryFaction();
 
@@ -514,7 +515,7 @@ struct boss_sapphironAI : public ScriptedAI
                     if (m_creature->GetHealthPercent() > 10.0f)
                     {
                         events.Reset();
-                        m_creature->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
+                        m_creature->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
                         m_creature->InterruptNonMeleeSpells(false);
                         m_creature->GetMotionMaster()->Clear(false);
                         m_creature->GetMotionMaster()->MoveIdle();
@@ -597,9 +598,9 @@ struct boss_sapphironAI : public ScriptedAI
                 {
                     if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER_NOT_GM))
                     {
-                        int angle = urand(0, 360);
-                        float x = pUnit->GetPositionX() + cos(angle * 0.01745f) * 5.0f;
-                        float y = pUnit->GetPositionY() + sin(angle * 0.01745f) * 5.0f;
+                        float const angle = frand(0.0f, M_PI_F * 2);
+                        float const x = pUnit->GetPositionX() + cos(angle) * 5.0f;
+                        float const y = pUnit->GetPositionY() + sin(angle) * 5.0f;
                         if (!m_creature->SummonCreature(NPC_BLIZZARD, x, y, 138.0f, 0, TEMPSUMMON_TIMED_DESPAWN, 30000))
                             events.Repeat(100);
                         else
@@ -713,10 +714,8 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         ++it; // skip tank
         for (it; it != threatlist.end(); ++it)
         {
-            if (Unit* pTarget = m_pInstance->GetMap()->GetUnit((*it)->getUnitGuid()))
+            if (Player* pTarget = (*it)->getTarget()->ToPlayer())
             {
-                if (!pTarget->IsPlayer())
-                    continue;
                 if (std::find(previousTargets.begin(), previousTargets.end(), pTarget->GetObjectGuid()) != previousTargets.end())
                     continue;
                 // want to encourage the blizzard to move towards a semi-far-away target to make it spread out
@@ -760,16 +759,36 @@ CreatureAI* GetAI_npc_sapphironBlizzard(Creature* pCreature)
     return new npc_sapphiron_blizzardAI(pCreature);
 }
 
+// 28542 - Life Drain (Naxx, Sapphiron)
+struct SapphironLifeDrainScript : SpellScript
+{
+    void OnSetTargetMap(Spell* spell, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& unMaxTargets, bool& /*selectClosestTargets*/) const final
+    {
+        unMaxTargets = urand(7, 10);
+    }
+};
+
+SpellScript* GetScript_SapphironLifeDrain(SpellEntry const*)
+{
+    return new SapphironLifeDrainScript();
+}
+
 void AddSC_boss_sapphiron()
 {
-    Script* NewScript;
-    NewScript = new Script;
-    NewScript->Name = "boss_sapphiron";
-    NewScript->GetAI = &GetAI_boss_sapphiron;
-    NewScript->RegisterSelf();
+    Script* pNewScript;
 
-    NewScript = new Script;
-    NewScript->Name = "npc_sapphiron_blizzard";
-    NewScript->GetAI = &GetAI_npc_sapphironBlizzard;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_sapphiron";
+    pNewScript->GetAI = &GetAI_boss_sapphiron;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_sapphiron_blizzard";
+    pNewScript->GetAI = &GetAI_npc_sapphironBlizzard;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_sapphiron_life_drain";
+    pNewScript->GetSpellScript = &GetScript_SapphironLifeDrain;
+    pNewScript->RegisterSelf();
 }

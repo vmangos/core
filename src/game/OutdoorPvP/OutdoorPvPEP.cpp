@@ -1119,7 +1119,7 @@ public:
     {
         return 0;
     }
-    ZoneScript* GetZoneScript() const
+    ZoneScript* GetZoneScript() const override
     {
         return new OutdoorPvPEP();
     }

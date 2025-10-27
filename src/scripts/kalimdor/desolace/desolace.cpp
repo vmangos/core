@@ -59,11 +59,11 @@ enum
 
     GO_MELIZZAS_CAGE            = 177706,
 
-    SAY_MELIZZA_START           = -1000784,
-    SAY_MELIZZA_FINISH          = -1000785,
-    SAY_MELIZZA_1               = -1000786,
-    SAY_MELIZZA_2               = -1000787,
-    SAY_MELIZZA_3               = -1000788,
+    SAY_MELIZZA_START           = 7540,
+    SAY_MELIZZA_FINISH          = 7544,
+    SAY_MELIZZA_1               = 7550,
+    SAY_MELIZZA_2               = 7551,
+    SAY_MELIZZA_3               = 7552,
 
     NPC_MARAUDINE_MARAUDER      = 4659,
     NPC_MARAUDINE_BONEPAW       = 4660,

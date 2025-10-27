@@ -79,7 +79,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : BasicAI(c)
             if (i.event_type == EVENT_T_OOC_LOS)
                 c->EnableMoveInLosEvent();
 
-            m_CreatureEventAIList.push_back(CreatureEventAIHolder(i));
+            m_CreatureEventAIList.emplace_back(i);
         }
     }
     else
@@ -369,7 +369,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* 
         }
         case EVENT_T_VICTIM_ROOTED:
         {
-            if (!m_creature->GetVictim() || !m_creature->GetVictim()->HasUnitState(UNIT_STAT_ROOT))
+            if (!m_creature->GetVictim() || !m_creature->GetVictim()->HasUnitState(UNIT_STATE_ROOT))
                 return false;
 
             pHolder.UpdateRepeatTimer(m_creature, event.victim_rooted.repeatMin, event.victim_rooted.repeatMax);

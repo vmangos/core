@@ -60,7 +60,6 @@ class RandomMovementGenerator
         float i_wanderDistance;
         uint32 i_expireTime;
         uint8 i_wanderSteps;
-        std::vector<G3D::Vector3> i_randomPoints;
 };
 
 #endif

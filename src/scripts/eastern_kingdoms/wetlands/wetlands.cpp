@@ -149,7 +149,7 @@ public:
             else // not in combat
             {
                 // if not following, start follow
-                if (!m_creature->HasUnitState(UNIT_STAT_FOLLOW))
+                if (!m_creature->HasUnitState(UNIT_STATE_FOLLOW))
                     m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
         }

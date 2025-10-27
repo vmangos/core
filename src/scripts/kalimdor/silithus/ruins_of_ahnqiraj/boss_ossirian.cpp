@@ -28,14 +28,14 @@ EndScriptData */
 
 enum
 {
-    SAY_SURPREME1               =    -1509018,
-    SAY_SURPREME2               =    -1509019,
-    SAY_SURPREME3               =    -1509020,
+    // TODO: UNUSED TEXTS
+    // SAY_SURPREME1 = -1509018, // I am rejuvinated! Sound: 8593
+    // SAY_SURPREME2 = -1509019, // My powers are renewed! Sound: 8595
+    // SAY_SURPREME3 = -1509020, // My powers return! Sound: 8596
 
-    SAY_AGGRO                   =    -1509025,
-
-    SAY_SLAY                    =    -1509026,
-    SAY_DEATH                   =    -1509027,
+    SAY_AGGRO = 11449,
+    SAY_SLAY  = 11450,
+    SAY_DEATH = 11451,
 
     SPELL_CURSE_OF_TONGUES      =  25195,
     SPELL_STRENGTH_OF_OSSIRIAN  =  25176,

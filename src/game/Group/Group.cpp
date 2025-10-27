@@ -369,8 +369,8 @@ bool Group::AddMember(ObjectGuid guid, char const* name, uint8 joinMethod)
             // Compare group and player bind
             InstanceGroupBind* groupBind = GetBoundInstance(map->GetId());
             InstancePlayerBind* playerBind = player->GetBoundInstance(map->GetId());
-            if (playerBind && groupBind && !player->m_InstanceValid && playerBind->state == groupBind->state && !((DungeonMap*)map)->IsUnloadingBeforeReset())
-                player->m_InstanceValid = true;
+            if (playerBind && groupBind && !player->m_instanceValid && playerBind->state == groupBind->state && !((DungeonMap*)map)->IsUnloadingBeforeReset())
+                player->m_instanceValid = true;
         }
 
         {
@@ -623,7 +623,6 @@ void Group::Disband(bool hideDestroy, ObjectGuid initiator)
         CharacterDatabase.BeginTransaction(m_Id);
         CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `group_id`='%u'", m_Id);
         CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `group_id`='%u'", m_Id);
-        CharacterDatabase.CommitTransaction();
 
         // transfer instance save to last player in dungeon
         if (remainingPlayer)
@@ -640,6 +639,7 @@ void Group::Disband(bool hideDestroy, ObjectGuid initiator)
             }
         }
 
+        CharacterDatabase.CommitTransaction();
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, nullptr);
     }
 
@@ -1576,7 +1576,7 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
         // if the same group invites the player back, cancel the homebind timer
         if (InstanceGroupBind *bind = GetBoundInstance(player->GetMapId()))
             if (bind->state->GetInstanceId() == player->GetInstanceId())
-                player->m_InstanceValid = true;
+                player->m_instanceValid = true;
     }
 
     if (!isBGGroup() && !(player && player->IsSavingDisabled()))
@@ -1688,11 +1688,12 @@ void Group::_setLeader(ObjectGuid guid)
     if (slot == m_memberSlots.end())
         return;
 
+    MANGOS_ASSERT(guid != m_leaderGuid);
+
     if (!isBGGroup())
     {
-        uint32 slot_lowguid = slot->guid.GetCounter();
-
-        uint32 leader_lowguid = m_leaderGuid.GetCounter();
+        uint32 newLeaderLowGuid = slot->guid.GetCounter();
+        uint32 oldLeaderLowGuid = m_leaderGuid.GetCounter();
 
         // TODO: set a time limit to have this function run rarely cause it can be slow
         CharacterDatabase.BeginTransaction(m_Id);
@@ -1705,7 +1706,7 @@ void Group::_setLeader(ObjectGuid guid)
         CharacterDatabase.PExecute(
             "DELETE FROM `group_instance` WHERE `leader_guid`='%u' AND (`permanent` = 1 OR "
             "`instance` IN (SELECT `instance` FROM `character_instance` WHERE `guid` = '%u')"
-            ")", leader_lowguid, slot_lowguid);
+            ")", oldLeaderLowGuid, newLeaderLowGuid);
 
         Player* player = sObjectMgr.GetPlayer(slot->guid);
 
@@ -1718,6 +1719,18 @@ void Group::_setLeader(ObjectGuid guid)
                     itr->second.state->RemoveGroup(this);
                     m_boundInstances.erase(itr++);
                 }
+                else if (InstancePlayerBind* pPersonalBind = player->GetBoundInstance(itr->first))
+                {
+                    // if the new leader already has a personal save for this instance, then remove the current group save
+                    if (Player* pOldLeader = sObjectMgr.GetPlayer(m_leaderGuid))
+                        if (!pOldLeader->GetBoundInstance(itr->first))
+                            pOldLeader->BindToInstance(itr->second.state, itr->second.perm, false);
+
+                    CharacterDatabase.PExecute("DELETE FROM `group_instance` WHERE `leader_guid` = '%u' AND `instance` = '%u'",
+                        oldLeaderLowGuid, itr->second.state->GetInstanceId());
+                    itr->second.state->RemoveGroup(this);
+                    m_boundInstances.erase(itr++);
+                }
                 else
                     ++itr;
             }
@@ -1725,7 +1738,7 @@ void Group::_setLeader(ObjectGuid guid)
 
         // update the group's solo binds to the new leader
         CharacterDatabase.PExecute("UPDATE `group_instance` SET `leader_guid`='%u' WHERE `leader_guid` = '%u'",
-                                   slot_lowguid, leader_lowguid);
+                                   newLeaderLowGuid, oldLeaderLowGuid);
 
         // copy the permanent binds from the new leader to the group
         // overwriting the solo binds with permanent ones if necessary
@@ -1733,7 +1746,7 @@ void Group::_setLeader(ObjectGuid guid)
         Player::ConvertInstancesToGroup(player, this, slot->guid);
 
         // update the group leader
-        CharacterDatabase.PExecute("UPDATE `groups` SET `leader_guid`='%u' WHERE `group_id`='%u'", slot_lowguid, m_Id);
+        CharacterDatabase.PExecute("UPDATE `groups` SET `leader_guid`='%u' WHERE `group_id`='%u'", newLeaderLowGuid, m_Id);
         CharacterDatabase.CommitTransaction();
     }
 
@@ -2260,7 +2273,7 @@ void Group::_homebindIfInstance(Player* player)
             // unless the player is permanently saved to the instance
             InstancePlayerBind *playerBind = player->GetBoundInstance(map->GetId());
             if (!playerBind || !playerBind->perm)
-                player->m_InstanceValid = false;
+                player->m_instanceValid = false;
         }
     }
 }

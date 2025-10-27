@@ -33,7 +33,7 @@
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "Util.h"
-#include "MapManager.h"
+#include "Geometry.h"
 #include "Transport.h"
 #include "MotionMaster.h"
 #include "VMapFactory.h"
@@ -190,8 +190,8 @@ Object::Object() : m_updateFlag(0)
     m_inWorld           = false;
     m_isNewObject       = false;
     m_objectUpdated     = false;
-    _deleted            = false;
-    _delayedActions     = 0;
+    m_deleted           = false;
+    m_delayedActions    = 0;
 }
 
 Object::~Object()
@@ -209,13 +209,11 @@ Object::~Object()
         MANGOS_ASSERT(false);
     }
 
-    if (m_uint32Values)
-    {
-        //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Object desctr 1 check (%p)",(void*)this);
-        delete [] m_uint32Values;
-        delete [] m_uint32Values_mirror;
-        //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Object desctr 2 check (%p)",(void*)this);
-    }
+    delete[] m_uint32Values;
+    m_uint32Values = nullptr;
+    delete[] m_uint32Values_mirror;
+    m_uint32Values_mirror = nullptr;
+    m_deleted = true;
 }
 
 void Object::_InitValues()
@@ -281,7 +279,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     if (target == this)                                     // building packet for yourself
         updateFlags |= UPDATEFLAG_SELF;
 
-    if (IsUnit() && static_cast<Unit const*>(this)->HasUnitState(UNIT_STAT_MELEE_ATTACKING) && static_cast<Unit const*>(this)->GetVictim())
+    if (IsUnit() && static_cast<Unit const*>(this)->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && static_cast<Unit const*>(this)->GetVictim())
         updateFlags |= UPDATEFLAG_MELEE_ATTACKING;
 
     if (m_isNewObject)
@@ -310,7 +308,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     buf << uint32(0); // TimerId
 
     // VictimGuid
-    if (IsUnit() && static_cast<Unit const*>(this)->HasUnitState(UNIT_STAT_MELEE_ATTACKING) && static_cast<Unit const*>(this)->GetVictim())
+    if (IsUnit() && static_cast<Unit const*>(this)->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && static_cast<Unit const*>(this)->GetVictim())
         buf << uint64(static_cast<Unit const*>(this)->GetVictim()->GetGUID());
     else
         buf << uint64(0);
@@ -969,7 +967,7 @@ void Object::ClearUpdateMask(bool remove)
             RemoveFromClientUpdateList();
         m_objectUpdated = false;
     }
-    _delayedActions &= ~OBJECT_DELAYED_MARK_CLIENT_UPDATE;
+    m_delayedActions &= ~OBJECT_DELAYED_MARK_CLIENT_UPDATE;
 }
 
 bool Object::LoadValues(char const* data)
@@ -1393,9 +1391,9 @@ void Object::MarkForClientUpdate()
 
 void Object::ExecuteDelayedActions()
 {
-    if (_delayedActions & OBJECT_DELAYED_MARK_CLIENT_UPDATE)
+    if (m_delayedActions & OBJECT_DELAYED_MARK_CLIENT_UPDATE)
     {
-        if (m_inWorld && !_deleted)
+        if (m_inWorld && !m_deleted)
         {
             if (!m_objectUpdated)
             {
@@ -1403,13 +1401,13 @@ void Object::ExecuteDelayedActions()
                 m_objectUpdated = true;
             }
         }
-        _delayedActions &= ~OBJECT_DELAYED_MARK_CLIENT_UPDATE;
+        m_delayedActions &= ~OBJECT_DELAYED_MARK_CLIENT_UPDATE;
     }
-    if (_delayedActions & OBJECT_DELAYED_ADD_TO_REMOVE_LIST)
+    if (m_delayedActions & OBJECT_DELAYED_ADD_TO_REMOVE_LIST)
     {
         if (!IsDeleted() && IsInWorld())
             ((WorldObject*)this)->AddObjectToRemoveList();
-        _delayedActions &= ~OBJECT_DELAYED_ADD_TO_REMOVE_LIST;
+        m_delayedActions &= ~OBJECT_DELAYED_ADD_TO_REMOVE_LIST;
     }
 }
 
@@ -1454,7 +1452,7 @@ void WorldObject::SetVisibilityModifier(float f)
 
 WorldObject::WorldObject()
     :   m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
-        m_mapId(0), m_InstanceId(0), m_summonLimitAlert(0), worldMask(WORLD_DEFAULT_OBJECT), m_zoneScript(nullptr),
+        m_mapId(0), m_instanceId(0), m_summonLimitAlert(0), m_worldMask(WORLD_DEFAULT_OBJECT), m_zoneScript(nullptr),
         m_transport(nullptr)
 {
     m_movementInfo.stime = WorldTimer::getMSTime();
@@ -1485,7 +1483,7 @@ void WorldObject::Relocate(float x, float y, float z, float orientation)
 
     m_movementInfo.ChangePosition(x, y, z, orientation);
     m_movementInfo.UpdateTime(WorldTimer::getMSTime());
-    /*if (Transport* t = GetTransport())
+    /*if (ShipTransport* t = GetTransport())
     {
         t->CalculatePassengerOffset(x, y, z);
         m_movementInfo.t_pos.x = x;
@@ -1565,7 +1563,7 @@ float WorldObject::GetSizeFactorForDistance(WorldObject const* obj, SizeFactor d
     return sizefactor;
 }
 
-float WorldObject::GetDistance(const WorldObject* obj, SizeFactor distcalc) const
+float WorldObject::GetDistance(WorldObject const* obj, SizeFactor distcalc) const
 {
     ASSERT(obj);
     float dx = GetPositionX() - obj->GetPositionX();
@@ -1645,7 +1643,7 @@ bool WorldObject::IsInMap(WorldObject const* obj) const
     return IsInWorld() && obj->IsInWorld() && (FindMap() == obj->FindMap());
 }
 
-bool WorldObject::_IsWithinDist(WorldObject const* obj, float const dist2compare, const bool is3D, SizeFactor distcalc) const
+bool WorldObject::_IsWithinDist(WorldObject const* obj, float const dist2compare, bool const is3D, SizeFactor distcalc) const
 {
     ASSERT(obj);
     float const dx = GetPositionX() - obj->GetPositionX();
@@ -1853,26 +1851,21 @@ bool WorldObject::HasInArc(float const arcangle, float const x, float const y) c
     if (x == m_position.x && y == m_position.y)
         return true;
 
-    float arc = arcangle;
-
-    // move arc to range 0.. 2*pi
-    while (arc >= 2.0f * M_PI_F)
-        arc -=  2.0f * M_PI_F;
-    while (arc < 0)
-        arc +=  2.0f * M_PI_F;
+    if (arcangle <= 0.0f)
+        return false;
+    if (arcangle >= 2.0f * M_PI_F)
+        return true;
 
     float angle = GetAngle(x, y);
     angle -= m_position.o;
 
     // move angle to range -pi ... +pi
-    while (angle > M_PI_F)
+    angle = Geometry::NormalizeOrientation(angle);
+    if (angle > M_PI_F)
         angle -= 2.0f * M_PI_F;
-    while (angle < -M_PI_F)
-        angle += 2.0f * M_PI_F;
 
-    float lborder =  -1 * (arc / 2.0f);                     // in range -pi..0
-    float rborder = (arc / 2.0f);                           // in range 0..pi
-    return ((angle >= lborder) && (angle <= rborder));
+    float const halfArc = arcangle * 0.5f;
+    return std::abs(angle) <= halfArc;
 }
 
 bool WorldObject::HasInArc(WorldObject const* target, float const arcangle, float offset) const
@@ -1881,22 +1874,21 @@ bool WorldObject::HasInArc(WorldObject const* target, float const arcangle, floa
     if (target == this)
         return true;
 
-    float arc = arcangle;
-
-    // move arc to range 0.. 2*pi
-    arc = MapManager::NormalizeOrientation(arc);
+    if (arcangle <= 0.0f)
+        return false;
+    if (arcangle >= 2.0f * M_PI_F)
+        return true;
 
     float angle = GetAngle(target);
     angle -= m_position.o + offset;
 
     // move angle to range -pi ... +pi
-    angle = MapManager::NormalizeOrientation(angle);
+    angle = Geometry::NormalizeOrientation(angle);
     if (angle > M_PI_F)
         angle -= 2.0f * M_PI_F;
 
-    float lborder =  -1 * (arc / 2.0f);                     // in range -pi..0
-    float rborder = (arc / 2.0f);                           // in range 0..pi
-    return ((angle >= lborder) && (angle <= rborder));
+    float const halfArc = arcangle * 0.5f;
+    return std::abs(angle) <= halfArc;
 }
 
 bool WorldObject::IsFacingTarget(WorldObject const* target) const
@@ -2061,11 +2053,10 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     float destY = pos.y + dist * sin(angle);
     float destZ = pos.z;
 
-    GenericTransport* transport = GetTransport();
-
     float halfHeight = IsUnit() ? static_cast<Unit*>(this)->GetCollisionHeight() : 1.0f;
     if (IsUnit())
     {
+        GenericTransport* transport = GetTransport();
         PathFinder path(static_cast<Unit*>(this));
         Vector3 src(pos.x, pos.y, pos.z);
         Vector3 dest(destX, destY, destZ + halfHeight);
@@ -2088,19 +2079,15 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 
     UpdateAllowedPositionZ(destX, destY, destZ);
     destZ += halfHeight;
-    bool colPoint = GetMap()->GetLosHitPosition(pos.x, pos.y, pos.z + halfHeight, destX, destY, destZ, -0.5f);
+    bool colPoint = GetMap()->GetLosHitPosition(pos.x, pos.y, pos.z + halfHeight, destX, destY, destZ, -1.0f);
     destZ -= halfHeight;
 
     if (colPoint)
     {
-        destX -= CONTACT_DISTANCE * cos(angle);
-        destY -= CONTACT_DISTANCE * sin(angle);
         dist = sqrt((pos.x - destX) * (pos.x - destX) + (pos.y - destY) * (pos.y - destY));
     }
 
-    colPoint = GetMap()->GetLosHitPosition(destX, destY, destZ + halfHeight, destX, destY, destZ, -0.5f);
-    if (colPoint)
-        dist = sqrt((pos.x - destX) * (pos.x - destX) + (pos.y - destY) * (pos.y - destY));
+    GetMap()->GetLosHitPosition(destX, destY, destZ + halfHeight, destX, destY, destZ, -0.5f);
 
     float step = dist / 10.0f;
     Position tempPos(destX, destY, destZ, 0.f);
@@ -2109,22 +2096,20 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 
     for (int i = 0; i < 10; i++)
     {
-        if (fabs(pos.z - destZ) > ATTACK_DISTANCE)
-        {
-            previousZ = destZ;
-            destX -= step * cos(angle);
-            destY -= step * sin(angle);
-            UpdateAllowedPositionZ(destX, destY, destZ);
-            if (fabs(previousZ - destZ) > (ATTACK_DISTANCE / 2))
-                distanceZSafe = false;
-        }
-        else
+        if (fabs(pos.z - destZ) <= ATTACK_DISTANCE)
         {
             pos.x = destX;
             pos.y = destY;
             pos.z = destZ;
             break;
         }
+
+        previousZ = destZ;
+        destX -= step * cos(angle);
+        destY -= step * sin(angle);
+        UpdateAllowedPositionZ(destX, destY, destZ);
+        if (fabs(previousZ - destZ) > (ATTACK_DISTANCE * 0.5f))
+            distanceZSafe = false;
     }
 
     if (distanceZSafe)
@@ -2287,7 +2272,7 @@ void WorldObject::SetMap(Map* map)
     m_currMap = map;
     //lets save current map's Id/instanceId
     m_mapId = map->GetId();
-    m_InstanceId = map->GetInstanceId();
+    m_instanceId = map->GetInstanceId();
 
     // Order is important, must be done after m_currMap is set
     SetZoneScript();
@@ -2313,11 +2298,11 @@ TerrainInfo const* WorldObject::GetTerrain() const
 
 void WorldObject::AddObjectToRemoveList()
 {
-    if (_deleted) // Already in the remove list
+    if (m_deleted) // Already in the remove list
         return;
 
     GetMap()->AddObjectToRemoveList(this);
-    _deleted = true;
+    m_deleted = true;
 }
 
 uint32 Map::GetSummonLimitForObject(uint64 guid) const
@@ -2487,9 +2472,9 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
         GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, pCreature);
 
     pCreature->SetWorldMask(GetWorldMask());
-    // return the creature therewith the summoner has access to it
-
     IncrementSummonCounter();
+
+    // return the creature therewith the summoner has access to it
     return pCreature;
 }
 
@@ -2498,7 +2483,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     if (!IsInWorld())
         return nullptr;
 
-    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectInfo(entry);
+    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectTemplate(entry);
     if (!goinfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject template %u not found in database!", entry);
@@ -2557,7 +2542,7 @@ public:
 
         float x, y, z;
 
-        if (!c->IsAlive() || c->HasUnitState(UNIT_STAT_NOT_MOVE) ||
+        if (!c->IsAlive() || c->HasUnitState(UNIT_STATE_NOT_MOVE) ||
             !c->GetMotionMaster()->GetDestination(x, y, z))
         {
             x = c->GetPositionX();
@@ -2592,7 +2577,7 @@ public:
         float angle = Geometry::GetAngle(i_objectX, i_objectY, u->GetPositionX(), u->GetPositionY()) - i_angle;
 
         // move angle to range -pi ... +pi
-        angle = MapManager::NormalizeOrientation(angle);
+        angle = Geometry::NormalizeOrientation(angle);
 
         // dist include size of u
         float dist2d = std::max(Geometry::GetDistance2D(i_objectX, i_objectY, x, y) - i_object.GetObjectBoundingRadius(), 0.0f);
@@ -2888,7 +2873,7 @@ void Object::ForceValuesUpdateAtIndex(uint16 i)
 
 void WorldObject::SetWorldMask(uint32 newMask)
 {
-    worldMask = newMask;
+    m_worldMask = newMask;
 }
 
 bool WorldObject::CanSeeInWorld(WorldObject const* other) const
@@ -2900,7 +2885,7 @@ bool WorldObject::CanSeeInWorld(WorldObject const* other) const
     if (GetGUID() == other->GetGUID())
         return true;
 
-    return CanSeeInWorld(other->worldMask);
+    return CanSeeInWorld(other->m_worldMask);
 }
 
 bool WorldObject::CanSeeInWorld(uint32 otherPhaseMask) const
@@ -2910,9 +2895,9 @@ bool WorldObject::CanSeeInWorld(uint32 otherPhaseMask) const
             ((Player*)this)->IsGameMaster())
         return true;
     // Un monde en commun ?
-    if (worldMask & otherPhaseMask)
+    if (m_worldMask & otherPhaseMask)
         return true;
-    if (otherPhaseMask & worldMask)
+    if (otherPhaseMask & m_worldMask)
         return true;
     return false;
 }
@@ -3144,7 +3129,7 @@ uint32 WorldObject::RespawnNearCreaturesByEntry(uint32 entry, float range)
     return count;
 }
 
-void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z)
+void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z) const
 {
     float orientation = GetOrientation() + M_PI / 2.0f;
 
@@ -3159,7 +3144,7 @@ void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight,
     z = GetPositionZ() + fUpDown;
 }
 
-void WorldObject::GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o)
+void WorldObject::GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o) const
 {
     float circleAng = (float(curr) / float(total)) * (M_PI * 2);
     x = GetPositionX() + (cos(circleAng) * dist);
@@ -3168,14 +3153,14 @@ void WorldObject::GetInCirclePositions(float dist, uint32 curr, uint32 total, fl
     o = circleAng - M_PI;
 }
 
-void WorldObject::GetNearRandomPositions(float distance, float &x, float &y, float &z)
+void WorldObject::GetNearRandomPositions(float distance, float &x, float &y, float &z) const
 {
     x = rand_norm_f() * distance;
     y = rand_norm_f() * distance;
     z = GetPositionZ();
 }
 
-void WorldObject::GetFirstCollision(float dist, float angle, float &x, float &y, float &z)
+void WorldObject::GetFirstCollision(float dist, float angle, float &x, float &y, float &z) const
 {
     x = GetPositionX();
     y = GetPositionY();
@@ -3461,13 +3446,6 @@ void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
     ExecuteDelayedActions();
 }
 
-class NULLNotifier
-{
-public:
-    template<class T> void Visit(GridRefManager<T>& m) {}
-    void Visit(CameraMapType&) {}
-};
-
 void WorldObject::LoadMapCellsAround(float dist) const
 {
     ASSERT(IsInWorld());
@@ -3529,7 +3507,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
 
     // always friendly to charmer or owner
     if (IsUnit() && target->IsUnit() && 
-        ToUnit()->GetCharmerOrOwnerOrSelf() == target->ToUnit()->GetCharmerOrOwnerOrSelf())
+        static_cast<Unit const*>(this)->GetCharmerOrOwnerOrOwnGuid() == static_cast<Unit const*>(target)->GetCharmerOrOwnerOrOwnGuid())
         return REP_FRIENDLY;
 
     Player const* selfPlayerOwner = GetAffectingPlayer();
@@ -3564,7 +3542,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
                     return REP_FRIENDLY;
 
                 // duel - always hostile to opponent
-                if (selfPlayerOwner->duel && selfPlayerOwner->duel->opponent == targetPlayerOwner && selfPlayerOwner->duel->startTime != 0 && !selfPlayerOwner->duel->finished)
+                if (selfPlayerOwner->m_duel && selfPlayerOwner->m_duel->opponent == targetPlayerOwner && selfPlayerOwner->m_duel->startTime != 0 && !selfPlayerOwner->m_duel->finished)
                     return REP_HOSTILE;
 
                 // same group - checks dependant only on our faction - skip FFA_PVP for example
@@ -3572,10 +3550,6 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
                     return REP_FRIENDLY; // return true to allow config option AllowTwoSide.Interaction.Group to work
                                          // however client seems to allow mixed group parties, because in 13850 client it works like:
                                          // return GetFactionReactionTo(GetFactionTemplateEntry(), target);
-
-                                         // Sanctuary
-                if (selfPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY) && targetPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY))
-                    return REP_FRIENDLY;
 
                 // Nostalrius: Hackfix because UNIT_BYTE2_FLAG_FFA_PVP is not implemented yet.
                 if (selfPlayerOwner->IsFFAPvP() && targetPlayerOwner->IsFFAPvP())
@@ -3716,7 +3690,7 @@ bool WorldObject::IsValidAttackTarget(Unit const* target, bool checkAlive) const
     // PvP checks
     if (playerAffectingAttacker && playerAffectingTarget)
     {
-        if (playerAffectingAttacker->duel && playerAffectingAttacker->duel->opponent == playerAffectingTarget && playerAffectingAttacker->duel->startTime != 0)
+        if (playerAffectingAttacker->m_duel && playerAffectingAttacker->m_duel->opponent == playerAffectingTarget && playerAffectingAttacker->m_duel->startTime != 0)
             return true;
 
         if (playerAffectingTarget->IsPvP())
@@ -3764,7 +3738,7 @@ bool WorldObject::IsValidHelpfulTarget(Unit const* target, bool checkAlive) cons
             return true;
 
         // cannot help others in duels
-        if (playerAffectingTarget->duel && playerAffectingTarget->duel->startTime != 0)
+        if (playerAffectingTarget->m_duel && playerAffectingTarget->m_duel->startTime != 0)
             return false;
 
         // group forces friendly relations in ffa pvp

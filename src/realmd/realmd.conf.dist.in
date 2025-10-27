@@ -128,7 +128,7 @@ ConfVersion=2020010501
 #
 #    SendMail
 #        Whether the server is allowed to send emails
-#        The server must have been compiled with USE_SENDGRID
+#        The server must have been compiled with ENABLE_MAILSENDER
 #        Default: 0 (Do not send mail)
 #
 #    MailFrom

@@ -36,11 +36,11 @@ EndContentData */
 
 enum
 {
-    SAY_LAKO_START              = -1000365,
-    SAY_LAKO_LOOK_OUT           = -1000366,
-    SAY_LAKO_HERE_COME          = -1000367,
-    SAY_LAKO_MORE               = -1000368,
-    SAY_LAKO_END                = -1000369,
+    SAY_LAKO_START              = 5926,
+    SAY_LAKO_LOOK_OUT           = 5927,
+    SAY_LAKO_HERE_COME          = 5928,
+    SAY_LAKO_MORE               = 5929,
+    SAY_LAKO_END                = 5930,
 
     QUEST_FREE_AT_LAST          = 4904,
     NPC_GRIM_BANDIT             = 10758,
@@ -137,9 +137,9 @@ bool QuestAccept_npc_lakota_windsong(Player* pPlayer, Creature* pCreature, Quest
 
 enum
 {
-    SAY_START           = -1000362,
-    SAY_WYVERN          = -1000363,
-    SAY_COMPLETE        = -1000364,
+    SAY_START           = 5648,
+    SAY_WYVERN          = 5654,
+    SAY_COMPLETE        = 5683,
 
     QUEST_HOMEWARD      = 4770,
     NPC_WYVERN          = 4107

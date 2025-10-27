@@ -57,8 +57,6 @@ struct boss_azshir_the_sleeplessAI : public ScriptedAI
             if (SoulSiphon_Timer < diff)
             {
                 DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SOULSIPHON);
-                return;
-
                 SoulSiphon_Timer = 20000;
             }
             else SoulSiphon_Timer -= diff;

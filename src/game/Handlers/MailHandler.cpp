@@ -39,6 +39,7 @@
 #include "Chat.h"
 #include "Anticheat.h"
 #include "AccountMgr.h"
+#include "TransactionLog.h"
 #include "Database/DatabaseImpl.h"
 
 void WorldSession::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, uint32 item_guid, uint32 item_count)
@@ -147,7 +148,7 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
         return;
     }
 
-    WorldSession::AsyncMailSendRequest* req = new WorldSession::AsyncMailSendRequest();
+    std::unique_ptr<WorldSession::AsyncMailSendRequest> req = std::make_unique<WorldSession::AsyncMailSendRequest>();
     req->accountId = GetAccountId();
     req->senderGuid = GetMasterPlayer()->GetObjectGuid();
 
@@ -168,22 +169,15 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
 
     // packet read complete, now do check
     if (req->subject.size() > 64)
-    {
-        delete req;
         return;
-    }
 
     if (req->body.size() > 500)
-    {
-        delete req;
         return;
-    }
 
     // client interface limit
     if (req->COD > 100000000)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to send more than 10000g COD mail", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
-        delete req;
         return;
     }
 
@@ -195,17 +189,11 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
     if (!sWorld.getConfig(CONFIG_BOOL_GM_ALLOW_TRADES) && GetSecurity() > SEC_PLAYER)
     {
         if (!req->itemGuid.IsEmpty() || req->money)
-        {
-            delete req;
             return;
-        }
     }
 
     if (req->receiverName.empty())
-    {
-        delete req;
         return;
-    }
 
     MasterPlayer* pl = GetMasterPlayer();
 
@@ -217,7 +205,6 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "%s is sending mail to %s (GUID: nonexistent!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
                    pl->GetGuidStr().c_str(), req->receiverName.c_str(), req->subject.c_str(), req->body.c_str(), req->itemGuid ? 1 : 0, req->money, req->COD, unk1, unk2);
         SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
-        delete req;
         return;
     }
 
@@ -227,12 +214,17 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
     if (pl->GetObjectGuid() == req->receiver)
     {
         SendMailResult(0, MAIL_SEND, MAIL_ERR_CANNOT_SEND_TO_SELF);
-        delete req;
         return;
     }
 
     req->receiverPtr = sObjectMgr.GetPlayer(req->receiver);
 
+    // release ownership now cause we need to pass it to the query callback
+    HandleSendMailRequest(req.release());
+}
+
+void WorldSession::HandleSendMailRequest(AsyncMailSendRequest* req)
+{
     if (req->receiverPtr)
     {
         // check trial account restrictions for online receiver
@@ -733,6 +725,13 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recv_data)
         return;
     }
 
+    // prevent losing money due to reaching gold cap
+    if (int64(loadedPlayer->GetMoney()) + int64(m->money) > int64(loadedPlayer->GetMaxMoney()))
+    {
+        SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_ERR_INTERNAL_ERROR);
+        return;
+    }
+
     SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_OK);
 
     loadedPlayer->LogModifyMoney(m->money, "Mail", ObjectGuid(HIGHGUID_PLAYER, m->sender));
@@ -821,7 +820,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
 
         data << (*itr)->subject;                            // Subject string - once 00, when mail type = 3
         data << uint32((*itr)->itemTextId);                 // sure about this
-        data << uint32(0);                                  // unknown
+        data << uint32(0);                                  // package (Package.dbc)
         data << uint32((*itr)->stationery);                 // stationery (Stationery.dbc)
 
         // 1.12.1 can have only single item

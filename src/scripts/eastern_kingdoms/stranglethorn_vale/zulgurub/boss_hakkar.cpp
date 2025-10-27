@@ -32,10 +32,10 @@ enum
     // Emotes
     // ------
 
-    SAY_AGGRO                   = -1309020,
-    SAY_FLEEING                 = -1309021,
-    SAY_MINION_DESTROY          = -1309022,                //where does it belong?
-    SAY_PROTECT_ALTAR           = -1309023,                //where does it belong?
+    SAY_AGGRO                   = 10447,
+    SAY_FLEEING                 = 10635,
+    SAY_MINION_DESTROY          = 10594,                //where does it belong?
+    SAY_PROTECT_ALTAR           = 10546,                //where does it belong?
     /*
     /run PlaySoundFile("SOUND\\CREATURE\\HAKKAR\\VO_ZG2_HAKKAR_DEFEAT_01.ogg");
     /run PlaySoundFile("SOUND\\CREATURE\\HAKKAR\\VO_ZG2_HAKKAR_DEFEAT_02.ogg");
@@ -48,7 +48,7 @@ enum
 
     SPELL_BLOODSIPHON_STUN       = 24324, // Joueur assomme
     SPELL_BLOODSIPHON_DAMAGE     = 24323, // "Votre sang est empoisonne"
-    SPELL_BLOODSIPHON_HEAL       = 24322, // "Inflige 200 points de dégâts par seconde. Donne à Hakkar 1000 points de vie par seconde." -> Rend de la vie aux joueurs ...
+    SPELL_BLOODSIPHON_HEAL       = 24322, // "Inflige 200 points de dÃ©gÃ¢ts par seconde. Donne Ã  Hakkar 1000 points de vie par seconde." -> Rend de la vie aux joueurs ...
     SPELL_CORRUPTEDBLOOD         = 24328,
     SPELL_CAUSEINSANITY          = 24327,
     SPELL_WILLOFHAKKAR           = 24178,
@@ -60,7 +60,7 @@ enum
 
     SPELL_ASPECT_OF_JEKLIK       = 24687, // silence 4 sec
     SPELL_ASPECT_OF_VENOXIS      = 24688, // poison
-    SPELL_ASPECT_OF_MARLI        = 24686, // étourdi 5 sec
+    SPELL_ASPECT_OF_MARLI        = 24686, // Ã©tourdi 5 sec
     SPELL_ASPECT_OF_THEKAL       = 24689, // enrage qqs sec
     SPELL_ASPECT_OF_ARLOKK       = 24690, // vanish qqs secs
 

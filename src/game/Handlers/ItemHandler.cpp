@@ -416,11 +416,15 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->Block;
         data << pProto->ItemSet;
         data << pProto->MaxDurability;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         data << pProto->Area;
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-        data << pProto->Map;                                // Added in 1.12.x & 2.0.1 client branch
 #endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        data << pProto->Map;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << pProto->BagFamily;
+#endif
         SendPacket(&data);
     }
     else
@@ -494,7 +498,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recv_data)
     }
 
     // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+    if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Item *pItem = _player->GetItemByGuid(itemGuid);
@@ -665,7 +669,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recv_data)
     }
 
     // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+    if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Item *pItem = _player->GetItemFromBuyBackSlot(slot);
@@ -765,7 +769,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
     }
 
     // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+    if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     // Stop the npc if moving

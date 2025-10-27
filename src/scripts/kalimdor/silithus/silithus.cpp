@@ -174,7 +174,7 @@ enum
     SPELL_CREEPING_DOOM             = 23589,
     SPELL_CRIPPLING_CLIP            = 23279,
 
-    EMOTE_IMMOBILIZED               = -1000650,
+    EMOTE_IMMOBILIZED               = 9785,
 
     SPELL_FROST_TRAP                = 13810,
 
@@ -320,7 +320,7 @@ struct npc_solenorAI : public ScriptedAI
 
                 for (const auto itr : tList)
                 {
-                    if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
+                    if (Unit* pUnit = itr->getTarget())
                     {
                         if (pUnit->IsAlive())
                         {
@@ -452,11 +452,13 @@ struct npc_creeping_doomAI : public ScriptedAI
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
-        Unit* pOwner = m_creature->GetCharmerOrOwner();
-        if (pDoneBy && pOwner)
+        if (pDoneBy)
         {
-            pOwner->AddThreat(pDoneBy);
-            pOwner->SetInCombatWith(pDoneBy);
+            if (Unit* pOwner = m_creature->GetCharmerOrOwner())
+            {
+                pOwner->AddThreat(pDoneBy);
+                pOwner->SetInCombatWith(pDoneBy);
+            }
         }
         ScriptedAI::DamageTaken(pDoneBy, uiDamage);
     }
@@ -466,91 +468,6 @@ CreatureAI* GetAI_npc_creeping_doom(Creature* pCreature)
 {
     return new npc_creeping_doomAI(pCreature);
 }
-
-/*#####
- ## npc_prince_thunderaan
- ######*/
-
-enum
-{
-    SPELL_TENDRILS_OF_AIR           = 23009, // KB
-    SPELL_TEARS_OF_THE_WIND_SEEKER    = 23011
-};
-
-struct npc_prince_thunderaanAI : public ScriptedAI
-{
-    npc_prince_thunderaanAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        engaged = false;
-        emerged = false;
-        Reset();
-    }
-
-    uint32 m_uiTendrilsTimer;
-    uint32 m_uiTearsTimer;
-    bool engaged;
-    bool emerged;
-
-    void Reset() override
-    {
-        m_uiTendrilsTimer   = 8000;
-        m_uiTearsTimer      = 15000;
-    }
-
-    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
-    {
-        if (pCaster->GetTypeId() != TYPEID_PLAYER)
-            return;
-
-        if (pSpell->Id == SPELL_TENDRILS_OF_AIR)
-            m_creature->GetThreatManager().modifyThreatPercent(pCaster, -100);
-    }
-
-    void Aggro(Unit* pWho) override
-    {
-        if (!engaged)
-        {
-            m_creature->MonsterYell("My power is discombobulatingly devastating! It is ludicrous that these mortals even attempt to enter my realm!", 0);
-            engaged = true;
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!emerged)
-        {
-            m_creature->CastSpell(m_creature, 20568, false);     // Ragnaros Emerge
-            emerged = true;
-        }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (m_uiTendrilsTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_TENDRILS_OF_AIR) == CAST_OK) // KB
-                m_uiTendrilsTimer = urand(12000, 20000);
-        }
-        else
-            m_uiTendrilsTimer -= uiDiff;
-
-        if (m_uiTearsTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_TEARS_OF_THE_WIND_SEEKER) == CAST_OK)
-                m_uiTearsTimer = urand(8000, 11000);
-        }
-        else
-            m_uiTearsTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_prince_thunderaan(Creature* pCreature)
-{
-    return new npc_prince_thunderaanAI(pCreature);
-}
-
 
 /*#####
  ## npc_colossus
@@ -702,7 +619,6 @@ CreatureAI* GetAI_npc_colossus(Creature* pCreature)
 enum
 {
     GO_GLYPHED_CRYSTAL      = 180514,
-    GO_GLYPHED_CRYSTAL_BIG  = 210342
 };
 
 struct npc_Geologist_LarksbaneAI : public ScriptedAI
@@ -730,11 +646,11 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-        if (GameObject* pGo = m_creature->SummonGameObject(GO_GLYPHED_CRYSTAL, -6826.51f, 809.082f, 51.8577f, 0.259445f))
+        if (GameObject* pGo = m_creature->SummonGameObject(GO_GLYPHED_CRYSTAL, -6825.29f, 809.125f, 51.8699f, 0.349065f, 0, 0, 0.173648f, 0.984808f))
             lCrystalGUIDs.push_back(pGo->GetGUID());
-        if (GameObject* pGo = m_creature->SummonGameObject(GO_GLYPHED_CRYSTAL, -6827.54f, 806.711f, 51.9809f, 2.2241f))
+        if (GameObject* pGo = m_creature->SummonGameObject(GO_GLYPHED_CRYSTAL, -6822.21f, 808.584f, 51.5885f, 2.77507f, 0, 0, 0.983254f, 0.182238f))
             lCrystalGUIDs.push_back(pGo->GetGUID());
-        if (GameObject* pGo = m_creature->SummonGameObject(GO_GLYPHED_CRYSTAL_BIG, -6825.31f, 805.146f, 51.9435f, -1.255528f))
+        if (GameObject* pGo = m_creature->SummonGameObject(GO_GLYPHED_CRYSTAL, -6823.57f, 811.977f, 51.4426f, 4.41568f, 0, 0, -0.803857f, 0.594823f))
             lCrystalGUIDs.push_back(pGo->GetGUID());
 
         uiCurrAction = 1;
@@ -1174,40 +1090,40 @@ enum
     QUEST_A_PAWN_ON_THE_ETERNAL_BOARD = 8519,
 
     // Yells -> in chronological order
-    SAY_ANACHRONOS_INTRO_1 = -1000753,
-    SAY_FANDRAL_INTRO_2 = -1000754,
-    SAY_MERITHRA_INTRO_3 = -1000755,
-    EMOTE_ARYGOS_NOD = -1000756,
-    SAY_CAELESTRASZ_INTRO_4 = -1000757,
-    EMOTE_MERITHRA_GLANCE = -1000758,
-    SAY_MERITHRA_INTRO_5 = -1000759,
+    SAY_ANACHRONOS_INTRO_1 = 10909,
+    SAY_FANDRAL_INTRO_2 = 10910,
+    SAY_MERITHRA_INTRO_3 = 10911,
+    EMOTE_ARYGOS_NOD = 10913,
+    SAY_CAELESTRASZ_INTRO_4 = 10914,
+    EMOTE_MERITHRA_GLANCE = 10912,
+    SAY_MERITHRA_INTRO_5 = 10908,
 
-    SAY_MERITHRA_ATTACK_1 = -1000760,
-    SAY_ARYGOS_ATTACK_2 = -1000761,
-    SAY_ARYGOS_ATTACK_3 = -1000762,
-    SAY_CAELESTRASZ_ATTACK_4 = -1000763,
-    SAY_CAELESTRASZ_ATTACK_5 = -1000764,
+    SAY_MERITHRA_ATTACK_1 = 10903,
+    SAY_ARYGOS_ATTACK_2 = 10904,
+    SAY_ARYGOS_ATTACK_3 = 10901,
+    SAY_CAELESTRASZ_ATTACK_4 = 10907,
+    SAY_CAELESTRASZ_ATTACK_5 = 10902,
 
-    SAY_ANACHRONOS_SEAL_1 = -1000765,
-    SAY_FANDRAL_SEAL_2 = -1000766,
-    SAY_ANACHRONOS_SEAL_3 = -1000767,
-    SAY_ANACHRONOS_SEAL_4 = -1000768,
-    SAY_ANACHRONOS_SEAL_5 = -1000769,
-    SAY_FANDRAL_SEAL_6 = -1000770,
+    SAY_ANACHRONOS_SEAL_1 = 10915,
+    SAY_FANDRAL_SEAL_2 = 10916,
+    SAY_ANACHRONOS_SEAL_3 = 10917,
+    SAY_ANACHRONOS_SEAL_4 = 10930,
+    SAY_ANACHRONOS_SEAL_5 = 10920,
+    SAY_FANDRAL_SEAL_6 = 10921,
 
-    EMOTE_FANDRAL_EXHAUSTED = -1000771,
-    SAY_ANACHRONOS_EPILOGUE_1 = -1000772,
-    SAY_ANACHRONOS_EPILOGUE_2 = -1000773,
-    SAY_ANACHRONOS_EPILOGUE_3 = -1000774,
-    EMOTE_ANACHRONOS_SCEPTER = -1000775,
-    SAY_FANDRAL_EPILOGUE_4 = -1000776,
-    SAY_FANDRAL_EPILOGUE_5 = -1000777,
-    EMOTE_FANDRAL_SHATTER = -1000778,
-    SAY_ANACHRONOS_EPILOGUE_6 = -1000779,
-    SAY_FANDRAL_EPILOGUE_7 = -1000780,
-    EMOTE_ANACHRONOS_DISPPOINTED = -1000781,
-    EMOTE_ANACHRONOS_PICKUP = -1000782,
-    SAY_ANACHRONOS_EPILOGUE_8 = -1000783,
+    EMOTE_FANDRAL_EXHAUSTED = 10922,
+    SAY_ANACHRONOS_EPILOGUE_1 = 10923,
+    SAY_ANACHRONOS_EPILOGUE_2 = 10924,
+    SAY_ANACHRONOS_EPILOGUE_3 = 10925,
+    EMOTE_ANACHRONOS_SCEPTER = 10926,
+    SAY_FANDRAL_EPILOGUE_4 = 10927,
+    SAY_FANDRAL_EPILOGUE_5 = 10928,
+    EMOTE_FANDRAL_SHATTER = 10929,
+    SAY_ANACHRONOS_EPILOGUE_6 = 10931,
+    SAY_FANDRAL_EPILOGUE_7 = 10932,
+    EMOTE_ANACHRONOS_DISPPOINTED = 10933,
+    EMOTE_ANACHRONOS_PICKUP = 10934,
+    SAY_ANACHRONOS_EPILOGUE_8 = 10935,
 
     ITEM_SCEPTER_OF_THE_SHIFTING_SANDS = 20738,
 
@@ -2133,7 +2049,7 @@ enum
 {
     QUEST_BANG_A_GONG       = 8743,
 
-    GLOBAL_TEXT_CHAMPION    = -1000007,
+    GLOBAL_TEXT_CHAMPION    = 11427,
 
     STAGE_OPEN_GATES        = 0,
     STAGE_WAR               = 1,
@@ -2255,7 +2171,7 @@ struct scarab_gongAI: public GameObjectAI
             return;
 
         // Announce Champion to the world
-        sWorld.SendWorldText(GLOBAL_TEXT_CHAMPION, player->GetName());
+        sWorld.SendBroadcastTextToWorld(GLOBAL_TEXT_CHAMPION, player->GetObjectGuid());
 
         eventTimer += 1000;
         eventStage = STAGE_OPEN_GATES;
@@ -2391,7 +2307,7 @@ enum
     NPC_ORGRIMMAR_LEGION_GRUNT = 15616,
 
     /* Emotes */
-    SAY_LINE_1 = -1780131, //Spawn
+    SAY_LINE_1 = -1780131, // NO SNIFFED BROADCAST_TEXT DATA FOR THESE EXISTS!!
     SAY_LINE_2 = -1780132,
     SAY_LINE_3 = -1780133,
     SAY_LINE_4 = -1780134,
@@ -2448,13 +2364,10 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         for (const auto itr : tList)
         {
-            if (ObjectGuid uiTargetGuid = itr->getUnitGuid())
+            if (Player* pTarget = itr->getTarget()->ToPlayer())
             {
-                if (Unit* pTarget = m_creature->GetMap()->GetUnit(uiTargetGuid))
-                {
-                    if (pTarget->GetTypeId() == TYPEID_PLAYER && m_creature->IsInRange(pTarget, min, max))
-                        return pTarget;
-                }
+                if (m_creature->IsInRange(pTarget, min, max))
+                    return pTarget;
             }
         }
         return nullptr;
@@ -2961,93 +2874,6 @@ CreatureAI* GetAI_npc_Shai(Creature* pCreature)
     return new npc_ShaiAI(pCreature);
 }
 
-/** EVENT NOSTALRIUS VAM ,SAND PRINCE */
-
-enum
-{
-    SPELL_CHARGE_VAM     = 26561,
-    SPELL_IMPALE         = 28783,
-    SPELL_ENRAGE         = 34624,
-};
-
-struct boss_vamAI : public ScriptedAI
-{
-    boss_vamAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 Charge_Timer;
-    uint32 KnockBack_Timer;
-    uint32 Enrage_Timer;
-
-    bool Enraged;
-
-    void Reset() override
-    {
-        Charge_Timer = urand(15000, 27000);
-        KnockBack_Timer = urand(8000, 20000);
-        Enrage_Timer = 240000;
-
-        Enraged = false;
-    }
-
-    void Aggro(Unit *who) override
-    {
-    }
-
-    void JustDied(Unit* Killer) override
-    {
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        //Charge_Timer
-        if (Charge_Timer < diff)
-        {
-            Charge_Timer = 10000;
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(target, SPELL_CHARGE_VAM) == CAST_OK)
-                    Charge_Timer = urand(8000, 16000);
-            }
-        }
-        else Charge_Timer -= diff;
-
-        //KnockBack_Timer
-        if (KnockBack_Timer < diff)
-        {
-            KnockBack_Timer = 15000;
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(target, SPELL_IMPALE) == CAST_OK)
-                    KnockBack_Timer = urand(15000, 25000);
-            }
-        }
-        else KnockBack_Timer -= diff;
-
-        //Enrage_Timer
-        if (!Enraged && Enrage_Timer < diff)
-            Enraged = true;
-        else if (Enraged)
-            DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CF_AURA_NOT_PRESENT);
-        else
-            Enrage_Timer -= diff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_boss_vamAI(Creature* pCreature)
-{
-    return new boss_vamAI(pCreature);
-}
-
-
 void AddSC_silithus()
 {
     Script* pNewScript;
@@ -3060,11 +2886,6 @@ void AddSC_silithus()
     /*########################
     ##      Nostalrius      ##
     ########################*/
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_prince_thunderaan";
-    pNewScript->GetAI = &GetAI_npc_prince_thunderaan;
-    pNewScript->RegisterSelf();
 
     // AQ WAR
     pNewScript = new Script;
@@ -3106,14 +2927,6 @@ void AddSC_silithus()
     pNewScript->Name = "npc_Shai";
     pNewScript->GetAI = &GetAI_npc_Shai;
     pNewScript->RegisterSelf();
-
-    /** Event Nostalrius */
-    pNewScript = new Script;
-    pNewScript->Name = "npc_boss_vam";
-    pNewScript->GetAI = &GetAI_boss_vamAI;
-    pNewScript->RegisterSelf();
-
-    // End Nostalrius
 
     pNewScript = new Script;
     pNewScript->Name = "npc_anachronos_the_ancient";

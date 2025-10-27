@@ -106,7 +106,7 @@ struct boss_huhuranAI : public ScriptedAI
             return;
 
         //m_uiFrenzyTimer
-        if (m_uiFrenzyTimer < uiDiff)
+        if (m_uiFrenzyTimer < uiDiff && !m_creature->HasAura(SPELL_FRENZY))
         {
             if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
             {
@@ -168,11 +168,50 @@ CreatureAI* GetAI_boss_huhuran(Creature* pCreature)
     return new boss_huhuranAI(pCreature);
 }
 
+// 26180 - Wyvern Sting (AQ40, Princess Huhuran)
+struct HuhuranWyvernStingScript : SpellScript
+{
+    void OnSetTargetMap(Spell* /*spell*/, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& /*unMaxTargets*/, bool& selectClosestTargets) const final
+    {
+        selectClosestTargets = true;
+    }
+};
+
+SpellScript* GetScript_HuhuranWyvernSting(SpellEntry const*)
+{
+    return new HuhuranWyvernStingScript();
+}
+
+// 26052 - Poison Bolt Volley (AQ40, Princess Huhuran)
+struct HuhuranPoisonBoltVolleyScript : SpellScript
+{
+    void OnSetTargetMap(Spell* /*spell*/, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& /*unMaxTargets*/, bool& selectClosestTargets) const final
+    {
+        selectClosestTargets = true;
+    }
+};
+
+SpellScript* GetScript_HuhuranPoisonBoltVolley(SpellEntry const*)
+{
+    return new HuhuranPoisonBoltVolleyScript();
+}
+
 void AddSC_boss_huhuran()
 {
     Script* newscript;
+
     newscript = new Script;
     newscript->Name = "boss_huhuran";
     newscript->GetAI = &GetAI_boss_huhuran;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_huhuran_wyvern_sting";
+    newscript->GetSpellScript = &GetScript_HuhuranWyvernSting;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_huhuran_poison_bolt_volley";
+    newscript->GetSpellScript = &GetScript_HuhuranPoisonBoltVolley;
     newscript->RegisterSelf();
 }

@@ -148,7 +148,7 @@ struct boss_herodAI : ScriptedAI
 
     void EnterEvadeMode() override
     {
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         DespawnMyrmidons();
         ScriptedAI::EnterEvadeMode();
     }
@@ -188,7 +188,7 @@ struct boss_herodAI : ScriptedAI
         {
             if (m_uiRootTimer < diff)
             {
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                 m_bWhirlwind = false;
             }
             else
@@ -237,7 +237,7 @@ struct boss_herodAI : ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WHIRLWIND) == CAST_OK)
             {
-                m_creature->AddUnitState(UNIT_STAT_ROOT);
+                m_creature->AddUnitState(UNIT_STATE_ROOT);
                 m_bWhirlwind = true;
                 m_uiRootTimer = 11000;
                 DoScriptText(SAY_WHIRLWIND, m_creature);

@@ -96,7 +96,7 @@ bool PathInfo::calculate(Vector3 const& start, Vector3 dest, bool forceDest, boo
 
     // make sure navMesh works - we can run on map w/o mmap
     // check if the start and end point have a .mmtile loaded (can we pass via not loaded tile on the way?)
-    if (!m_navMesh || !m_navMeshQuery || m_sourceUnit->HasUnitState(UNIT_STAT_IGNORE_PATHFINDING) ||
+    if (!m_navMesh || !m_navMeshQuery || m_sourceUnit->HasUnitState(UNIT_STATE_IGNORE_PATHFINDING) ||
         !HaveTiles(start) || !HaveTiles(dest))
     {
         BuildShortcut();
@@ -430,7 +430,11 @@ void PathInfo::BuildPointPath(float const* startPoint, float const* endPoint, fl
 
     m_pathPoints.resize(pointCount);
     for (uint32 i = 0; i < pointCount; ++i)
-        m_pathPoints[i] = Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
+    {
+        Vector3 p = Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
+        m_sourceUnit->UpdateAllowedPositionZ(p.x, p.y, p.z);
+        m_pathPoints[i] = p;
+    }
 
     // first point is always our current location - we need the next one
     setActualEndPosition(m_pathPoints[pointCount - 1]);
@@ -554,7 +558,7 @@ bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map cons
     for (int i = 0; i < 12; i++)
     {
         Vector3 newPos;
-        Geometry::GetNearPoint2DAroundPosition(currentPos.x, currentPos.y, newPos.x, newPos.y, STEP_SIZE, Geometry::ClampOrientation(angle + ORIENTATION_OFFSETS[i]));
+        Geometry::GetNearPoint2DAroundPosition(currentPos.x, currentPos.y, newPos.x, newPos.y, STEP_SIZE, Geometry::NormalizeOrientation(angle + ORIENTATION_OFFSETS[i]));
         newPos.z = pMap->GetHeight(newPos.x, newPos.y, currentPos.z + 0.1f, true);
 
         float const zdiff = newPos.z - currentPos.z;

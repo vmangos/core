@@ -63,7 +63,7 @@ class ZoneScriptMgr
         void HandlePlayerLeaveZone(Player* plr, uint32 areaflag);
 
         // return assigned outdoor pvp
-        ZoneScript * GetZoneScriptToZoneId(uint32 zoneid);
+        ZoneScript* GetZoneScriptToZoneId(uint32 zoneid);
 
         // handle custom (non-exist in dbc) spell if registered
         bool HandleCustomSpell(Player* plr, uint32 spellId, GameObject* go);
@@ -71,7 +71,7 @@ class ZoneScriptMgr
         // handle custom go if registered
         bool HandleOpenGo(Player* plr, uint64 guid);
 
-        ZoneScript * GetZoneScript(uint32 zoneId);
+        ZoneScript* GetZoneScript(uint32 zoneId);
 
         void AddZone(uint32 zoneid, ZoneScript * handle);
 

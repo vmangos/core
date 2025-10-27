@@ -37,6 +37,8 @@
 
 #include <memory>
 
+
+struct SpellScript;
 class WorldSession;
 class WorldPacket;
 class DynamicObj;
@@ -359,7 +361,7 @@ class Spell
         SpellCastResult CheckCasterAuras() const;
 
         float CalculateDamage(SpellEffectIndex i, Unit* target) { return m_caster->CalculateSpellEffectValue(target, m_spellInfo, i, &m_currentBasePoints[i], this); }
-        static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell = nullptr, Item* castItem = nullptr);
+        static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell = nullptr, Item* castItem = nullptr, bool dropModCharge = true);
 
         bool HaveTargetsForEffect(SpellEffectIndex effect) const;
         void Delayed();
@@ -383,6 +385,7 @@ class Spell
 
         bool CheckTarget(Unit* target, SpellEffectIndex eff);
         bool CanAutoCast(Unit* target);
+        PetTameFailureReason CheckTamingSpell(Player* caster, bool gm);
 
         static void SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result);
         void SendCastResult(SpellCastResult result);
@@ -408,8 +411,9 @@ class Spell
         Item* m_CastItem = nullptr;
         SpellCastTargets m_targets;
 
+        void SetCastTime(int32 castTime) { m_casttime = castTime; }
         int32 GetCastTime() const { return m_casttime; }
-        uint32 GetCastedTime() { return m_timer; }
+        uint32 GetCastedTime() const { return m_timer; }
         bool IsChanneled() const { return m_channeled; }
         bool IsAutoRepeat() const { return m_autoRepeat; }
         void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
@@ -471,7 +475,7 @@ class Spell
 
         void AddChanneledAuraHolder(SpellAuraHolder* holder);
         void RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode);
-
+        void UpdateCastStartPosition();
         void Delete() const;
 
         bool HasModifierApplied(SpellModifier* mod);
@@ -487,15 +491,15 @@ class Spell
         bool IsChannelingVisual() const { return m_isChannelingVisual; }
 
         int32 GetAbsorbedDamage() const { return m_absorbed; }
-    protected:
-        void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
-        bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
-        void UpdateOriginalCasterPointer();
-        void UpdateCastStartPosition();
 
         SpellCaster* const m_caster = nullptr;
         Unit* const m_casterUnit = nullptr;
         GameObject* const m_casterGo = nullptr;
+
+    protected:
+        void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
+        bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
+        void UpdateOriginalCasterPointer();
 
         ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
                                                             // e.g. damage around area spell trigered by victim aura and damage enemies of aura caster
@@ -503,8 +507,10 @@ class Spell
 
         Spell** m_selfContainer = nullptr;                  // pointer to our spell container (if applicable)
 
-        //Spell data
+        // Spell data
+    public:
         WeaponAttackType m_attackType;                      // For weapon based attack
+    protected:
         uint32 m_powerCost = 0;                             // Calculated spell cost     initialized only in Spell::prepare
         int32 m_casttime = 0;                               // Calculated spell cast time initialized only in Spell::prepare
         int32 m_duration = 0;
@@ -549,9 +555,15 @@ class Spell
         Corpse* corpseTarget = nullptr;
         GameObject* gameObjTarget = nullptr;
         SpellAuraHolder* m_spellAuraHolder = nullptr;       // spell aura holder for current target, created only if spell has aura applying effect
-        float damage = 0;
         bool isReflected = false;
+    public:
+        Unit* GetUnitTarget() const { return unitTarget; }
+        Item* GetItemTarget() const { return itemTarget; }
+        Corpse* GetCorpseTarget() const { return corpseTarget; }
+        GameObject* GetGOTarget() const { return gameObjTarget; }
+        float damage = 0;
 
+    protected:
         // this is set in Spell Hit, but used in Apply Aura handler
         DiminishingLevels m_diminishLevel;
         DiminishingGroup m_diminishGroup;
@@ -577,6 +589,7 @@ class Spell
         // Spell target subsystem
         //*****************************************
         // Targets store structures and data
+    public:
         struct TargetInfo
         {
             ObjectGuid targetGUID;
@@ -590,7 +603,6 @@ class Spell
             bool   isCrit:1;
             bool   deleted:1;
         };
-        uint8 m_needAliveTargetMask = 0;                    // Mask req. alive targets
 
         struct GOTargetInfo
         {
@@ -607,9 +619,6 @@ class Spell
             uint8 effectMask;
             bool   deleted:1;
         };
-        bool m_destroyed = false;
-
-        SpellCastResult CheckScriptTargeting(SpellEffectIndex effIndex, uint32 chainTargets, float radius, uint32 targetMode, UnitList& tempUnitList);
 
 #ifndef USE_STANDARD_MALLOC
         typedef tbb::concurrent_vector<TargetInfo>     TargetList;
@@ -624,6 +633,11 @@ class Spell
         TargetList     m_UniqueTargetInfo;
         GOTargetList   m_UniqueGOTargetInfo;
         ItemTargetList m_UniqueItemInfo;
+
+    protected:
+        uint8 m_needAliveTargetMask = 0; // Mask req. alive targets
+        bool m_destroyed = false;
+        SpellCastResult CheckScriptTargeting(SpellEffectIndex effIndex, uint32 chainTargets, float radius, uint32 targetMode, UnitList& tempUnitList);
 
         void AddUnitTarget(Unit* target, SpellEffectIndex effIndex);
         void CheckAtDelay(TargetInfo* pInf);
@@ -640,16 +654,21 @@ class Spell
         void DoAllEffectOnTarget(ItemTargetInfo *target);
         bool HasValidUnitPresentInTargetList();
         SpellCastResult CanOpenLock(SpellEffectIndex effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);
-        uint32 GetSpellBatchingEffectDelay(SpellCaster const* pTarget) const;
+        uint32 GetSpellBatchingEffectDelay(SpellCaster const* pTarget, SpellEffectIndex effIndex) const;
         // -------------------------------------------
 
         //List For Triggered Spells
         std::vector<SpellEntry const*> m_TriggerSpells;                      // casted by caster to same targets settings in m_targets at success finish of current spell
         std::vector<SpellEntry const*> m_preCastSpells;                      // casted by caster to each target at spell hit before spell effects apply
 
+        // Scripting System
+        SpellScript* m_spellScript = nullptr;
+
         uint32 m_spellState = SPELL_STATE_NULL;
         uint32 m_timer = 0;
+    public:
         uint32 m_triggeredByAuraBasePoints = 0;
+    protected:
 
         Position m_castPosition;
         bool m_IsTriggeredSpell = false;
@@ -657,7 +676,9 @@ class Spell
         // if need this can be replaced by Aura copy
         // we can't store original aura link to prevent access to deleted auras
         // and in same time need aura data and after aura deleting.
+    public:
         SpellEntry const* m_triggeredByAuraSpell = nullptr;
+    protected:
 
         struct ExecuteLogInfo
         {
@@ -752,7 +773,7 @@ namespace MaNGOS
             if (!i_originalCaster)
                 return;
 
-            for(const auto & itr : m)
+            for (const auto & itr : m)
             {
                 Player* pPlayer = itr.getSource();
                 if (!pPlayer->IsAlive() || pPlayer->IsTaxiFlying())
@@ -790,7 +811,7 @@ class ChannelResetEvent : public BasicEvent
     public:
         ChannelResetEvent(Unit* caster) : m_caster(caster)
         {
-            caster->AddUnitState(UNIT_STAT_PENDING_CHANNEL_RESET);
+            caster->AddUnitState(UNIT_STATE_PENDING_CHANNEL_RESET);
         }
         ~ChannelResetEvent() override {}
 

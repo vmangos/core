@@ -41,20 +41,6 @@
 #pragma pack(push,1)
 #endif
 
-struct AreaTriggerEntry
-{
-    uint32    id;                                           // 0
-    uint32    mapid;                                        // 1
-    float     x;                                            // 2
-    float     y;                                            // 3
-    float     z;                                            // 4
-    float     radius;                                       // 5
-    float     box_x;                                        // 6 extent x edge
-    float     box_y;                                        // 7 extent y edge
-    float     box_z;                                        // 8 extent z edge
-    float     box_orientation;                              // 9 extent rotation by about z axis
-};
-
 struct AuctionHouseEntry
 {
     uint32    houseId;                                      // 0        m_ID
@@ -398,6 +384,11 @@ struct FactionTemplateEntry
                     return false;
         }
         return (hostileMask & entry.ourMask) != 0;
+    }
+    bool IsHostileToPlayerTeam(FactionTemplateEntry const& entry) const
+    {
+        return ((hostileMask & entry.ourMask) & (FACTION_MASK_ALLIANCE | FACTION_MASK_HORDE)) != 0 ||
+               ((ourMask & entry.hostileMask) & (FACTION_MASK_ALLIANCE | FACTION_MASK_HORDE)) != 0;
     }
     bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) !=0; }
     bool IsNeutralToAll() const
@@ -806,10 +797,10 @@ struct WorldSafeLocsEntry
 #pragma pack(pop)
 #endif
 
-typedef std::set<uint32> SpellCategorySet;
-typedef std::map<uint32,SpellCategorySet > SpellCategoriesStore;
-typedef std::set<uint32> PetFamilySpellsSet;
-typedef std::map<uint32,PetFamilySpellsSet > PetFamilySpellsStore;
+typedef std::unordered_set<uint32> SpellCategorySet;
+typedef std::unordered_map<uint32,SpellCategorySet > SpellCategoriesStore;
+typedef std::unordered_set<uint32> PetFamilySpellsSet;
+typedef std::unordered_map<uint32,PetFamilySpellsSet > PetFamilySpellsStore;
 
 // Structures not used for casting to loaded DBC data and not required then packing
 struct TalentSpellPos

@@ -68,14 +68,14 @@ private:
 class ThreatListProcesser
 {
 public:
-    ThreatListProcesser() {}
-    virtual ~ThreatListProcesser() {}
+    ThreatListProcesser() = default;
+    virtual ~ThreatListProcesser() = default;
     virtual bool Process(Unit* unit) = 0;
 };
 
 class Creature : public Unit
 {
-    CreatureAI *i_AI;
+    CreatureAI *m_AI;
 
     public:
 
@@ -126,7 +126,7 @@ class Creature : public Unit
         void SaveHomePosition() { SetHomePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
         void SetHomePosition(float x, float y, float z, float o);
         void GetHomePosition(float &x, float &y, float &z, float &o);
-        Position const& GetHomePosition() { return m_homePosition; }
+        Position const& GetHomePosition() const { return m_homePosition; }
         float GetHomePositionO() const { return m_homePosition.o; }
         void ResetHomePosition();
 
@@ -141,12 +141,12 @@ class Creature : public Unit
         void SetDefaultValuesFromStaticFlags();
 
         CreatureSubtype GetSubtype() const { return m_subtype; }
-        bool IsPet() const { return m_subtype == CREATURE_SUBTYPE_PET; }
+        bool IsPet() const override { return m_subtype == CREATURE_SUBTYPE_PET; }
         bool IsTotem() const { return m_subtype == CREATURE_SUBTYPE_TOTEM; }
         Totem const* ToTotem() const { return IsTotem() ? reinterpret_cast<Totem const*>(this) : nullptr; }
         Totem* ToTotem() { return IsTotem() ? reinterpret_cast<Totem*>(this) : nullptr; }
         bool IsTemporarySummon() const { return m_subtype == CREATURE_SUBTYPE_TEMPORARY_SUMMON; }
-        bool IsCorpse() const { return GetDeathState() ==  CORPSE; }
+        bool IsCorpse() const override { return GetDeathState() ==  CORPSE; }
         bool IsDespawned() const { return GetDeathState() ==  DEAD; }
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
         bool IsRacialLeader() const { return GetCreatureInfo()->racial_leader; }
@@ -183,6 +183,14 @@ class Creature : public Unit
         bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr) const override;
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
 
+        bool IsPlusMob() const
+        {
+            if (IsPet())
+                return false;
+
+            return GetCreatureInfo()->rank > CREATURE_ELITE_NORMAL;
+        }
+
         bool IsElite() const
         {
             if (IsPet())
@@ -203,10 +211,10 @@ class Creature : public Unit
         bool IsInEvadeMode() const;
 
         bool AIM_Initialize();
-        void SetAI(CreatureAI * ai) { i_AI = ai; }
+        void SetAI(CreatureAI * ai) { m_AI = ai; }
 
-        CreatureAI* AI() { return i_AI; }
-        CreatureAI const* AI() const { return i_AI; }
+        CreatureAI* AI() { return m_AI; }
+        CreatureAI const* AI() const { return m_AI; }
         void SetAInitializeOnRespawn(bool initialize)
         {
             if (initialize)
@@ -228,6 +236,7 @@ class Creature : public Unit
         void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) final;
         void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0) final;
         void StartCooldownForSummoner();
+        void CancelSummonPossessedCharm();
         bool UpdateEntry(uint32 entry, GameEventCreatureData const* eventData = nullptr, bool preserveHPAndPower = true);
 
         void ApplyGameEventSpells(GameEventCreatureData const* eventData, bool activated);
@@ -272,7 +281,7 @@ class Creature : public Unit
         bool FallGround();
 
         bool LoadFromDB(uint32 guid, Map* map, bool force = false);
-        void SaveToDB();
+        virtual void SaveToDB();
                                                             // overwrited in Pet
         virtual void SaveToDB(uint32 mapid);
         virtual void DeleteFromDB();                        // overwrited in Pet
@@ -336,7 +345,7 @@ class Creature : public Unit
         bool CanInitiateAttack() const;
         bool CanHaveTarget() const { return !HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET); }
 
-        uint32 GetDefaultMount() { return m_mountId; }
+        uint32 GetDefaultMount() const { return m_mountId; }
         void SetDefaultMount(uint32 id) { m_mountId = id; }
 
         MovementGeneratorType GetDefaultMovementType() const { return m_defaultMovementType; }
@@ -376,9 +385,6 @@ class Creature : public Unit
 
         void SetInCombatWithZone(bool initialPulse = true);
         void EnterCombatWithTarget(Unit* pTarget);
-        bool canStartAttack(Unit const* who, bool force) const;
-        bool _IsTargetAcceptable(Unit const* target) const;
-        bool canCreatureAttack(Unit const* pVictim, bool force) const;
 
         // Smartlog
         time_t GetCombatTime(bool total) const;
@@ -407,7 +413,6 @@ class Creature : public Unit
 
         // AI helpers
         Unit* SelectNearestHostileUnitInAggroRange(bool useLOS, bool ignoreCivilians = false) const;
-        Unit* SelectNearestTargetInAttackDistance(float dist) const;
         Creature* FindNearestFriendlyGuard(float range) const;
         void CallNearestGuard(Unit* pEnemy) const;
 
@@ -480,15 +485,15 @@ class Creature : public Unit
         void SetSummonPoint(CreatureCreatePos const& pos) { m_summonPos = pos.m_pos; }
         void GetSummonPoint(float &fX, float &fY, float &fZ, float &fOrient) const { fX = m_summonPos.x; fY = m_summonPos.y; fZ = m_summonPos.z; fOrient = m_summonPos.o; }
 
-        void SetNoXP() { AddUnitState(UNIT_STAT_NO_KILL_REWARD); }
+        void SetNoXP() { AddUnitState(UNIT_STATE_NO_KILL_REWARD); }
         void EnableMoveInLosEvent()
         {
-            if (HasUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS))
-                ClearUnitState(UNIT_STAT_NO_SEARCH_FOR_OTHERS);
-            if (HasUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS))
-                ClearUnitState(UNIT_STAT_NO_BROADCAST_TO_OTHERS);
-            if (!HasUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS))
-                AddUnitState(UNIT_STAT_AI_USES_MOVE_IN_LOS);
+            if (HasUnitState(UNIT_STATE_NO_SEARCH_FOR_OTHERS))
+                ClearUnitState(UNIT_STATE_NO_SEARCH_FOR_OTHERS);
+            if (HasUnitState(UNIT_STATE_NO_BROADCAST_TO_OTHERS))
+                ClearUnitState(UNIT_STATE_NO_BROADCAST_TO_OTHERS);
+            if (!HasUnitState(UNIT_STATE_AI_USES_MOVE_IN_LOS))
+                AddUnitState(UNIT_STATE_AI_USES_MOVE_IN_LOS);
         }
 
         void SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags = TEMPFACTION_ALL);
@@ -502,8 +507,8 @@ class Creature : public Unit
 
         // Auto evade timer (if target not reachable)
         // Tested on retail 5.4.0: Creatures evade after 3 seconds (but does not return to home position)
-        bool IsEvadeBecauseTargetNotReachable() const { return m_TargetNotReachableTimer > 3000; }
-        uint32 m_TargetNotReachableTimer;
+        bool IsEvadeBecauseTargetNotReachable() const { return m_targetNotReachableTimer > 3000; }
+        uint32 m_targetNotReachableTimer;
 
         std::shared_ptr<time_t> const& GetLastLeashExtensionTimePtr() const;
         void SetLastLeashExtensionTimePtr(std::shared_ptr<time_t> const& timer);
@@ -542,14 +547,21 @@ class Creature : public Unit
 
         bool IsLootAllowedDueToDamageOrigin() const
         {
+            if (HasStaticFlag(CREATURE_STATIC_FLAG_CORPSE_RAID))
+                return true;
+
             return 65 * m_playerDamageTaken > 35 * m_nonPlayerDamageTaken;
         }
 
         float GetXPModifierDueToDamageOrigin() const
         {
+            if (HasStaticFlag(CREATURE_STATIC_FLAG_CORPSE_RAID))
+                return 1.0f;
+
             // If players dealt less than 35% of the damage, no XP and no loot - or both=0
             if (!IsLootAllowedDueToDamageOrigin())
                 return 0.0f;
+
             return float(m_playerDamageTaken) / (m_playerDamageTaken + m_nonPlayerDamageTaken);
         }
 
@@ -571,7 +583,7 @@ class Creature : public Unit
         }
 
         // (msecs)timer used for group loot
-        uint32 GetGroupLootTimer() { return m_groupLootTimer; }
+        uint32 GetGroupLootTimer() const { return m_groupLootTimer; }
 
         void SetEscortable(bool escortable)
         {
@@ -581,8 +593,8 @@ class Creature : public Unit
                 ClearCreatureState(CSTATE_ESCORTABLE); 
         }
         bool IsEscortable() const { return HasCreatureState(CSTATE_ESCORTABLE); }
-        bool CanAssistPlayers() { return HasFactionTemplateFlag(FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS) || HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
-        bool CanSummonGuards() { return HasStaticFlag(CREATURE_STATIC_FLAG_CALLS_GUARDS); }
+        bool CanAssistPlayers() const { return HasFactionTemplateFlag(FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS) || HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
+        bool CanSummonGuards() const { return HasStaticFlag(CREATURE_STATIC_FLAG_CALLS_GUARDS); }
         uint32 GetOriginalEntry() const { return m_originalEntry; }
 
     protected:

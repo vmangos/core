@@ -198,12 +198,9 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
     if (!ExtractOptUInt32(&args, failarg2, 0))
         return false;
 
-    char* unk = strtok(nullptr, " ");
-    uint8 unkI = unk ? (uint8)atoi(unk) : 2;
-
     WorldPacket data(SMSG_CAST_RESULT, 4 + 1 + 1);
     data << uint32(133);
-    data << uint8(unkI);
+    data << uint8(2);
     data << uint8(failnum);
     if (failarg1 || failarg2)
         data << uint32(failarg1);
@@ -1624,7 +1621,7 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
     PSendSysMessage(LANG_YOU_CHANGE_SPELLMODS, opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct",
                     spellmodop, value, effidx, GetNameLink(chr).c_str());
     if (needReportToTarget(chr))
-        ChatHandler(chr).PSendSysMessage(LANG_YOURS_SPELLMODS_CHANGED, GetNameLink().c_str(),
+        chr->PSendSysMessage(LANG_YOURS_SPELLMODS_CHANGED, GetNameLink().c_str(),
                                          opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct", spellmodop, value, effidx);
 
     WorldPacket data(opcode, (1 + 1 + 2 + 2));
@@ -1643,6 +1640,12 @@ bool ChatHandler::HandleDebugLoSCommand(char*)
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        return false;
+    }
+
+    if (target->GetDistance(m_session->GetPlayer()) < 0.1f)
+    {
+        SendSysMessage("You are too close to the target.");
         return false;
     }
 
@@ -2073,7 +2076,7 @@ bool ChatHandler::HandleVideoTurn(char*)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "%f %f %f", angle, d, z);
         a.push_back(Vector3(x + d * cos(angle), y + d * sin(angle), posZ));
     }
-    Movement::MoveSplineInit init(*m_session->GetPlayer());
+    Movement::MoveSplineInit init(*m_session->GetPlayer(), "HandleVideoTurn");
     init.MovebyPath(a);
     init.SetFly();
     init.SetVelocity(moveSpeed);
@@ -2121,7 +2124,7 @@ bool ChatHandler::HandleDebugExp(char*)
             a.push_back(Vector3(currx, curry, currz));
         }
 
-        Movement::MoveSplineInit init(*target);
+        Movement::MoveSplineInit init(*target, "HandleDebugExp");
         init.MovebyPath(a);
         init.SetWalk(true);
         init.SetVelocity(moveSpeed);
@@ -2339,13 +2342,13 @@ bool ChatHandler::HandleUnitStatCommand(char *args)
     if (!pTarget)
         return false;
     uint32 unitStat = 0x0;
-    for (int i = 1; i < UNIT_STAT_IGNORE_PATHFINDING; i *= 2)
+    for (int i = 1; i < UNIT_STATE_IGNORE_PATHFINDING; i *= 2)
         if (pTarget->HasUnitState(i))
             unitStat |= i;
     PSendSysMessage("UnitState = 0x%x (%u)", unitStat, unitStat);
     if (ExtractUInt32(&args, unitStat))
     {
-        pTarget->ClearUnitState(UNIT_STAT_ALL_STATE);
+        pTarget->ClearUnitState(UNIT_STATE_ALL_STATE);
         pTarget->AddUnitState(unitStat);
         PSendSysMessage("UnitState changed to 0x%x (%u)", unitStat, unitStat);
     }
@@ -2643,7 +2646,7 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
             if (transport)
             {
                 transport->AddPassenger(wp);
-                Movement::MoveSplineInit init(*wp);
+                Movement::MoveSplineInit init(*wp, "HandleMmapPathCommand");
                 init.SetTransport(transport->GetGUIDLow());
                 init.SetFacing(wp->GetOrientation());
                 init.Launch();

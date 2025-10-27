@@ -135,8 +135,8 @@ bool ExtractSingleWmo(std::string& fname)
 
     char szLocalFile[1024];
     char* plain_name = GetPlainName(&fname[0]);
-    fixnamen(plain_name, strlen(plain_name));
-    fixname2(plain_name, strlen(plain_name));
+    FixNameCase(plain_name, strlen(plain_name));
+    FixNameSpaces(plain_name, strlen(plain_name));
     sprintf(szLocalFile, "%s/%s", szWorkDirWmo, plain_name);
 
     if (FileExists(szLocalFile))
@@ -484,7 +484,7 @@ int main(int argc, char** argv)
 
         delete dbc;
         ParsMapFiles();
-        delete [] map_ids;
+        delete[] map_ids;
         //nError = ERROR_SUCCESS;
         // Extract models, listed in DameObjectDisplayInfo.dbc
         ExtractGameobjectModels();

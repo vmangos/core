@@ -69,7 +69,6 @@ enum
         
     NPC_ONYXIAN_WHELP           = 11262,
     NPC_ONYXIAN_WARDER          = 12129,
-    NPC_ERUPTION_TRIGGER        = 20009,
 
     GO_LAVATRAP_1               = 177984,
     GO_LAVATRAP_2               = 177985,
@@ -568,7 +567,7 @@ struct boss_onyxiaAI : public ScriptedAI
     void PhaseTransition(uint32 uiDiff, bool bDebut)
     {
 //        m_creature->CombatStop(true);
-        m_creature->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
+        m_creature->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
 
         /** P2 Event to take off */
         if (m_uiPhase == PHASE_TWO)

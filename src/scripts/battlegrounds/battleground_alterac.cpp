@@ -7,6 +7,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "CreatureGroups.h"
+#include "Chat.h"
 
 /*
 Vanndar: Thunderclap (about 200-300 nature damage per player in range not been upgraded since vanilla, Time between attacks increased by 33%, movement speed reduced by 40%.) Storm Bolt (about 450 nature damage, stuns for 8 seconds, dispellable, used on non tanks) Avatar (50% increased damage and armor, up for 15 seconds, comes back up about 15-20 seconds later) Drek'thar: Whirlwind (2 second cast time, weapon damage to all in range) Frenzy (167% damage increase and attack speed increase by 50%, lasts 2 minutes, goes up after about 15-20 seconds from the start of fight) Knockdown (Infli
@@ -109,7 +110,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         m_uiAvatar_Timer = urand(12000, 20000);
         m_uiStormbolt_Timer = 8000;
         m_uiThunderclap_Timer = 5000;
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         m_bAggro = true;
         m_bLeashed = false;
         m_bCombat1 = true;
@@ -150,12 +151,12 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
 
     void UpdateAI(uint32 const diff) override
     {
-        if (m_creature->GetMapId() == 30)
+        if (m_creature->GetMapId() == MAP_ALTERAC_VALLEY)
             if (m_creature->GetDistance2d(POSITION_VANNDAR_CENTER_X, POSITION_VANNDAR_CENTER_Y) > 35.0f)
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                 m_bLeashed = true;
                 EnterEvadeMode();
                 return;
@@ -351,7 +352,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         m_uiIsInWhirlwind_Timer = 0;
         m_uiKnockDown_Timer = 18000;
         m_uiFrenzy_Timer = 1000;
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         m_bAggro = true;
         m_bLeashed = false;
         m_bCombat1 = true;
@@ -407,13 +408,13 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
     void UpdateAI(uint32 const diff) override
     {
-        if (m_creature->GetMapId() == 30)
+        if (m_creature->GetMapId() == MAP_ALTERAC_VALLEY)
         {
             if (m_creature->GetDistance2d(POSITION_DKT_CENTER_X, POSITION_DKT_CENTER_Y) > 33.0f)
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                 m_bLeashed = true;
                 EnterEvadeMode();
                 return;
@@ -441,13 +442,13 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
         if (m_uiIsInWhirlwind_Timer == 0)
         {
-            if (m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            if (m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
         }
         else
         {
-            if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->AddUnitState(UNIT_STAT_ROOT);
+            if (!m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->AddUnitState(UNIT_STATE_ROOT);
         }
 
         // SPELL_WHIRLWIND
@@ -589,7 +590,7 @@ struct npc_BalindaAI : public ScriptedAI
         m_uiConeOfCold_Timer = 1500;
         m_uiArcaneExplo_Timer = 2000;
         m_uiPolymorph_Timer = 1750;
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         if (m_bReset)
             DoScriptText(SAY_BALINDA_RESET, m_creature);
         m_bReset = true;
@@ -620,12 +621,12 @@ struct npc_BalindaAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->GetMapId() == 30)
+        if (m_creature->GetMapId() == MAP_ALTERAC_VALLEY)
             if (m_creature->GetDistance2d(POSITION_BAL_CENTER_X, POSITION_BAL_CENTER_Y) > 45.0f)
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                 EnterEvadeMode();
                 return;
             }
@@ -653,13 +654,13 @@ struct npc_BalindaAI : public ScriptedAI
         if (((m_creature->GetDistance(m_creature->GetVictim()) > 25.0f) || (m_creature->GetDistance(m_creature->GetVictim()) < 5.0f))
             || (!m_creature->IsWithinLOSInMap(m_creature->GetVictim())))
         {
-            if (m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            if (m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
         }
         else
         {
-            if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->AddUnitState(UNIT_STAT_ROOT);
+            if (!m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->AddUnitState(UNIT_STATE_ROOT);
         }
 
         // ARCANE EXPLOSION
@@ -671,14 +672,8 @@ struct npc_BalindaAI : public ScriptedAI
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 for (const auto i : tList)
                 {
-                    if (ObjectGuid uiTargetGuid = i->getUnitGuid())
-                    {
-                        if (Unit* pTarget = m_creature->GetMap()->GetUnit(uiTargetGuid))
-                        {
-                            if (m_creature->IsWithinDistInMap(pTarget, 6.0f))
-                                uiTargetInRangeCount++;
-                        }
-                    }
+                    if (m_creature->IsWithinDistInMap(i->getTarget(), 6.0f))
+                        uiTargetInRangeCount++;
                 }
                 if (urand(0, 1000) > (1000 * (3 / (uiTargetInRangeCount + 1))))
                 {
@@ -838,7 +833,7 @@ struct npc_GalvangarAI : public ScriptedAI
         m_uiMortalStrike_Timer = 7000;
         m_uiCleave_Timer = 4000;
         m_uiFrighteningShout_Timer = m_uiWhirlwind_Timer + urand(1000, 5000);
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         if (m_bReset)
             DoScriptText(SAY_GALVANGAR_RESET, m_creature);
         m_bReset = true;
@@ -861,13 +856,13 @@ struct npc_GalvangarAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->GetMapId() == 30)
+        if (m_creature->GetMapId() == MAP_ALTERAC_VALLEY)
         {
             if (m_creature->GetDistance2d(POSITION_GAL_CENTER_X, POSITION_GAL_CENTER_Y) > 45.0f)
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                 EnterEvadeMode();
                 return;
             }
@@ -901,13 +896,13 @@ struct npc_GalvangarAI : public ScriptedAI
 
         if (m_uiIsInWhirlwind_Timer == 0)
         {
-            if (m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            if (m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
         }
         else
         {
-            if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
-                m_creature->AddUnitState(UNIT_STAT_ROOT);
+            if (!m_creature->HasUnitState(UNIT_STATE_ROOT))
+                m_creature->AddUnitState(UNIT_STATE_ROOT);
         }
 
         // SPELL_WHIRLWIND_GAL
@@ -919,14 +914,8 @@ struct npc_GalvangarAI : public ScriptedAI
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 for (const auto i : tList)
                 {
-                    if (ObjectGuid uiTargetGuid = i->getUnitGuid())
-                    {
-                        if (Unit* pTarget = m_creature->GetMap()->GetUnit(uiTargetGuid))
-                        {
-                            if (m_creature->IsWithinDistInMap(pTarget, 6.0f))
-                                uiTargetInRangeCount++;
-                        }
-                    }
+                    if (m_creature->IsWithinDistInMap(i->getTarget(), 6.0f))
+                        uiTargetInRangeCount++;
                 }
                 if (urand(0, 1000) > (1000 * (3 / (uiTargetInRangeCount + 1))))
                 {
@@ -1040,7 +1029,7 @@ struct npc_WarMasterAI : public ScriptedAI
         m_uiWhirlwind_Timer = 12000;
         m_uiEnrage_Timer    = 0;
         m_uiIsInWhirlwind_Timer = 0;
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -1093,9 +1082,9 @@ struct npc_WarMasterAI : public ScriptedAI
         }
 
         if (!m_uiIsInWhirlwind_Timer)
-            m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            m_creature->ClearUnitState(UNIT_STATE_ROOT);
         else
-            m_creature->AddUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STATE_ROOT);
 
         // SPELL_WHIRLWIND_WM
         if (m_uiWhirlwind_Timer < diff)
@@ -2119,7 +2108,7 @@ struct AV_NpcEventAI : public npc_escortAI
                         it->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
                     m_RamRiderList.clear();
 
-                    m_creature->SummonGameObject(OBJECT_WB_H_INVOCATION, -360.006989f, -130.33f, 26.4321f, 5.6635f, 0, 0, 0, 0, -1, false);
+                    m_creature->SummonGameObject(OBJECT_WB_H_INVOCATION, -360.139f, -133.403f, 26.4856f, 4.41568f, 0, 0, -0.803857f, 0.594823f, -1, false);
                     m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f);
                     Stop();//SetEscortPaused(true);
                     isGobSummoned = true;
@@ -2152,7 +2141,7 @@ struct AV_NpcEventAI : public npc_escortAI
                         it->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
                     m_RamRiderList.clear();
 
-                    m_creature->SummonGameObject(OBJECT_WB_A_INVOCATION, -199.7f, -342.698f, 6.809f, 1.69646f, 0, 0, 0, 0, -1, false);
+                    m_creature->SummonGameObject(OBJECT_WB_A_INVOCATION, -199.993f, -343.217f, 6.77662f, 3.68265f, 0, 0, -0.96363f, 0.267241f, -1, false);
                     m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f);
                     Stop();//SetEscortPaused(true);
                     isGobSummoned = true;
@@ -4987,7 +4976,11 @@ struct AV_mineNpcAI : public ScriptedAI
         Map* m = m_creature->GetMap();
         if (!m->IsBattleGround())
             return 0;
+
         BattleGroundAV* bgAv = dynamic_cast<BattleGroundAV*>(((BattleGroundMap*)m)->GetBG());
+        if (!bgAv)
+            return 0;
+
         uint32 m_factionId;
         if (m_creature->GetFactionTemplateId() == 85)
             m_factionId = 1;
@@ -5153,6 +5146,23 @@ CreatureAI* GetAI_npc_av_trigger_for_quest(Creature* creature)
     return new npc_av_trigger_for_questAI(creature);
 }
 
+// 21544, 21565 - Create Shredder
+struct AVCreateShredderScript : SpellScript
+{
+    void OnSummon(Spell* spell, Creature* summon) const final
+    {
+        // Exception for Alterac Shredder. The second effect of the spell (possess) can't target the shredder
+        // because it is not summoned at target selection phase.
+        summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spell->m_spellInfo->EffectTriggerSpell[1]);
+        summon->SetCreatorGuid(spell->m_caster->GetObjectGuid());
+    }
+};
+
+SpellScript* GetScript_AVCreateShredder(SpellEntry const*)
+{
+    return new AVCreateShredderScript();
+}
+
 void AddSC_bg_alterac()
 {
     Script* newscript;
@@ -5280,5 +5290,10 @@ void AddSC_bg_alterac()
     newscript = new Script;
     newscript->Name = "npc_av_trigger_for_quest";
     newscript->GetAI = &GetAI_npc_av_trigger_for_quest;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_av_create_shredder";
+    newscript->GetSpellScript = &GetScript_AVCreateShredder;
     newscript->RegisterSelf();
 }

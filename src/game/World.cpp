@@ -34,11 +34,13 @@
 #include "WorldPacket.h"
 #include "Weather.h"
 #include "Player.h"
+#include "TransactionLog.h"
 #include "Group.h"
 #include "AccountMgr.h"
 #include "AuctionHouseMgr.h"
 #include "ObjectMgr.h"
 #include "CreatureEventAIMgr.h"
+#include "Guild.h"
 #include "GuildMgr.h"
 #include "SpellMgr.h"
 #include "Chat.h"
@@ -80,7 +82,7 @@
 #include "InstanceStatistics.h"
 #include "GuardMgr.h"
 #include "TransportMgr.h"
-
+#include "RealmZone.h"
 #include <chrono>
 
 INSTANTIATE_SINGLETON_1(World);
@@ -564,6 +566,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT, "Compression.Movement.Count", 300);
     setConfig(CONFIG_BOOL_ADDON_CHANNEL, "AddonChannel", true);
     setConfig(CONFIG_BOOL_CLEAN_CHARACTER_DB, "CleanCharacterDB", true);
+    setConfig(CONFIG_UINT32_REUSABLE_GUID_POOL_SIZE, "ReusableGuidPoolSize", 100000);
     setConfig(CONFIG_BOOL_GRID_UNLOAD, "GridUnload", true);
     setConfig(CONFIG_BOOL_CLEANUP_TERRAIN, "CleanupTerrain", true);
     setConfigPos(CONFIG_UINT32_INTERVAL_SAVE, "PlayerSave.Interval", 15 * MINUTE * IN_MILLISECONDS);
@@ -606,9 +609,9 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_STRICT_CHARTER_NAMES, "StrictCharterNames", 0);
     setConfig(CONFIG_UINT32_STRICT_PET_NAMES,     "StrictPetNames",     0);
 
-    setConfigMinMax(CONFIG_UINT32_MIN_PLAYER_NAME,  "MinPlayerName",  2, 1, MAX_PLAYER_NAME);
-    setConfigMinMax(CONFIG_UINT32_MIN_CHARTER_NAME, "MinCharterName", 2, 1, MAX_CHARTER_NAME);
-    setConfigMinMax(CONFIG_UINT32_MIN_PET_NAME,     "MinPetName",     2, 1, MAX_PET_NAME);
+    setConfigMinMax(CONFIG_UINT32_MIN_PLAYER_NAME,  "MinPlayerName",  2, 2, MAX_PLAYER_NAME);
+    setConfigMinMax(CONFIG_UINT32_MIN_CHARTER_NAME, "MinCharterName", 2, 2, MAX_CHARTER_NAME);
+    setConfigMinMax(CONFIG_UINT32_MIN_PET_NAME,     "MinPetName",     2, 2, MAX_PET_NAME);
 
     setConfig(CONFIG_BOOL_WORLD_AVAILABLE, "WorldAvailable", true);
     setConfig(CONFIG_UINT32_CHARACTERS_CREATING_DISABLED, "CharactersCreatingDisabled", 0);
@@ -1083,14 +1086,13 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_ACCURATE_PETS, "Progression.AccuratePetStatistics", true);
     setConfig(CONFIG_BOOL_ACCURATE_LFG, "Progression.AccurateLFGAvailability", true);
     setConfig(CONFIG_BOOL_ACCURATE_PVE_EVENTS, "Progression.AccuratePVEEvents", true);
-    setConfig(CONFIG_BOOL_ACCURATE_SPELL_EFFECTS, "Progression.AccurateSpellEffects", true);
     setConfig(CONFIG_BOOL_NO_RESPEC_PRICE_DECAY, "Progression.NoRespecPriceDecay", true);
     setConfig(CONFIG_BOOL_NO_QUEST_XP_TO_GOLD, "Progression.NoQuestXpToGold", true);
     setConfig(CONFIG_BOOL_RESTORE_DELETED_ITEMS, "Progression.RestoreDeletedItems", true);
     setConfig(CONFIG_BOOL_UNLINKED_AUCTION_HOUSES, "Progression.UnlinkedAuctionHouses", true);
 
     // Movement Anticheat
-    setConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED, "Anticheat.Enable", true);
+    setConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED, "Anticheat.Enable", false);
     setConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY, "Anticheat.PlayersOnly", true);
     setConfig(CONFIG_BOOL_AC_MOVEMENT_NOTIFY_CHEATERS, "Anticheat.NotifyCheaters", false);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION, "Anticheat.BanDuration", 86400);
@@ -1215,10 +1217,11 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_KEYBOARD, "Anticheat.Botting.MinTurnsKeyboard", 80);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_MIN_TURNS_ABNORMAL, "Anticheat.Botting.MinTurnsAbnormal", 5);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_BOTTING_PENALTY, "Anticheat.Botting.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
+    MovementAnticheat::InitWallClimbLimits();
 
     // Warden Anticheat
-    setConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED, "Warden.WinEnabled", true);
-    setConfig(CONFIG_BOOL_AC_WARDEN_OSX_ENABLED, "Warden.OSXEnabled", true);
+    setConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED, "Warden.WinEnabled", false);
+    setConfig(CONFIG_BOOL_AC_WARDEN_OSX_ENABLED, "Warden.OSXEnabled", false);
     setConfig(CONFIG_BOOL_AC_WARDEN_PLAYERS_ONLY, "Warden.PlayersOnly", false);
     setConfig(CONFIG_UINT32_AC_WARDEN_NUM_SCANS, "Warden.NumScans", 10);
     setConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY, "Warden.ClientResponseDelay", 30);
@@ -1374,6 +1377,9 @@ void World::SetInitialWorldSettings()
     // Remove the bones (they should not exist in DB though) and old corpses after a restart
     CharacterDatabase.PExecute("DELETE FROM `corpse` WHERE `corpse_type` = '0' OR `time` < (UNIX_TIMESTAMP()-'%u')", 3 * DAY);
 
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Script Names...");
+    sScriptMgr.LoadScriptNames();
+
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading spells ...");
     sSpellMgr.LoadSpells();
 
@@ -1412,9 +1418,6 @@ void World::SetInitialWorldSettings()
     LoadDBCStores(dbcPath);
     DetectDBCLang();
     sObjectMgr.SetDBCLocaleIndex(GetDefaultDbcLocale());    // Get once for all the locale index of DBC language (console/broadcasts)
-
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Script Names...");
-    sScriptMgr.LoadScriptNames();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading MapTemplate...");
     sObjectMgr.LoadMapTemplate();
@@ -1456,7 +1459,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadPageTexts();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Game Object Templates...");     // must be after LoadPageTexts
-    std::set<uint32> transportDisplayIds = sObjectMgr.LoadGameobjectInfo();
+    sObjectMgr.LoadGameObjectTemplates();
+
+    std::set<uint32> transportDisplayIds = sObjectMgr.GetTransportDisplayIds();
     MMAP::MMapFactory::createOrGetMMapManager()->loadAllGameObjectModels(transportDisplayIds);
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Transport templates...");
@@ -1623,9 +1628,6 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading spell target destination coordinates...");
     sSpellMgr.LoadSpellTargetPositions();
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading SpellAffect definitions...");
-    sSpellMgr.LoadSpellAffects();
-
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading spell pet auras...");
     sSpellMgr.LoadSpellPetAuras();
 
@@ -1759,6 +1761,7 @@ void World::SetInitialWorldSettings()
     sScriptMgr.LoadEventScripts();                          // must be after load Creature/Gameobject(Template/Data)
     sScriptMgr.LoadGenericScripts();
     sScriptMgr.LoadCreatureEventAIScripts();
+    sScriptMgr.LoadAreaTriggerScripts();
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">>> Scripts loaded");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
 
@@ -1960,7 +1963,7 @@ void World::DetectDBCLang()
 // Only processes packets while session update, the messager, and cli commands processing are NOT running
 void World::ProcessAsyncPackets()
 {
-    while (!sWorld.IsStopped())
+    do
     {
         do
         {
@@ -1978,7 +1981,7 @@ void World::ProcessAsyncPackets()
             if (!m_canProcessAsyncPackets)
                 break;
         }
-    }
+    } while (!IsStopped());
 }
 
 class WorldAsyncTasksExecutor : public ACE_Based::Runnable
@@ -2030,18 +2033,21 @@ void World::Update(uint32 diff)
         sAuctionMgr.Update();
     }
 
-    m_canProcessAsyncPackets = false;
+    {
+        m_canProcessAsyncPackets = false;
+        std::lock_guard<std::mutex> lock(m_asyncPacketsMutex);
 
-    GetMessager().Execute(this);
+        GetMessager().Execute(this);
 
-    // <li> Handle session updates
-    uint32 updateSessionsTime = WorldTimer::getMSTime();
-    UpdateSessions(diff);
-    updateSessionsTime = WorldTimer::getMSTimeDiffToNow(updateSessionsTime);
-    if (getConfig(CONFIG_UINT32_PERFLOG_SLOW_SESSIONS_UPDATE) && updateSessionsTime > getConfig(CONFIG_UINT32_PERFLOG_SLOW_SESSIONS_UPDATE))
-        sLog.Out(LOG_PERFORMANCE, LOG_LVL_MINIMAL, "Update sessions: %ums", updateSessionsTime);
+        // <li> Handle session updates
+        uint32 updateSessionsTime = WorldTimer::getMSTime();
+        UpdateSessions(diff);
+        updateSessionsTime = WorldTimer::getMSTimeDiffToNow(updateSessionsTime);
+        if (getConfig(CONFIG_UINT32_PERFLOG_SLOW_SESSIONS_UPDATE) && updateSessionsTime > getConfig(CONFIG_UINT32_PERFLOG_SLOW_SESSIONS_UPDATE))
+            sLog.Out(LOG_PERFORMANCE, LOG_LVL_MINIMAL, "Update sessions: %ums", updateSessionsTime);
 
-    m_canProcessAsyncPackets = true;
+        m_canProcessAsyncPackets = true;
+    }
 
     // <li> Update uptime table
     if (m_timers[WUPDATE_UPTIME].Passed())
@@ -2088,7 +2094,7 @@ void World::Update(uint32 diff)
     if (getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAPSYSTEM_UPDATE) && updateMapSystemTime > getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAPSYSTEM_UPDATE))
         sLog.Out(LOG_PERFORMANCE, LOG_LVL_MINIMAL, "Update map system: %ums [%ums for async]", updateMapSystemTime, WorldTimer::getMSTimeDiffToNow(asyncWaitBegin));
 
-    // Sauvegarde des variables internes (table variables) : MaJ par rapport a la DB
+    // Save internal variables (table variables) : DB update
     if (m_timers[WUPDATE_SAVE_VAR].Passed())
     {
         m_timers[WUPDATE_SAVE_VAR].Reset();
@@ -2142,12 +2148,15 @@ void World::Update(uint32 diff)
     // Update ban list if necessary
     sAccountMgr.Update(diff);
 
-    m_canProcessAsyncPackets = false;
+    {
+        m_canProcessAsyncPackets = false;
+        std::lock_guard<std::mutex> lock(m_asyncPacketsMutex);
 
-    // And last, but not least handle the issued cli commands
-    ProcessCliCommands();
+        // And last, but not least handle the issued cli commands
+        ProcessCliCommands();
 
-    m_canProcessAsyncPackets = true;
+        m_canProcessAsyncPackets = true;
+    }
 
     //cleanup unused GridMap objects as well as VMaps
     if (getConfig(CONFIG_BOOL_CLEANUP_TERRAIN))
@@ -2223,36 +2232,21 @@ class WorldBroadcastTextBuilder
 {
 public:
     typedef std::vector<WorldPacket*> WorldPacketList;
-    explicit WorldBroadcastTextBuilder(uint32 textId) : i_textId(textId) {}
+    explicit WorldBroadcastTextBuilder(uint32 textId, ObjectGuid senderGuid = ObjectGuid()) : i_textId(textId), i_senderGuid(senderGuid) {}
     void operator()(WorldPacketList& data_list, uint32 loc_idx)
     {
         char const* text = sObjectMgr.GetBroadcastText(i_textId, loc_idx);
-        do_helper(data_list, (char*)text);
+        WorldPacket* data = new WorldPacket();
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+        ChatHandler::BuildChatPacket(*data, CHAT_MSG_BG_SYSTEM_NEUTRAL, text, LANG_UNIVERSAL, CHAT_TAG_NONE, i_senderGuid);
+#else
+        ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, text, LANG_UNIVERSAL, CHAT_TAG_NONE, i_senderGuid);
+#endif
+        data_list.push_back(data);
     }
 private:
-    char* lineFromMessage(char*& pos)
-    {
-        char* start = strtok(pos, "\n");
-        pos = nullptr;
-        return start;
-    }
-    void do_helper(WorldPacketList& data_list, char* text)
-    {
-        char* pos = text;
-
-        while (char* line = lineFromMessage(pos))
-        {
-            WorldPacket* data = new WorldPacket();
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-            ChatHandler::BuildChatPacket(*data, CHAT_MSG_BG_SYSTEM_NEUTRAL, line);
-#else
-            ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, line);
-#endif
-            data_list.push_back(data);
-        }
-    }
-
     uint32 i_textId;
+    ObjectGuid i_senderGuid;
 };
 }                                                           // namespace MaNGOS
 
@@ -2319,9 +2313,9 @@ void World::SendWorldTextToBGAndQueue(int32 string_id, uint32 queuedPlayerLevel,
     va_end(ap);
 }
 
-void World::SendBroadcastTextToWorld(uint32 textId)
+void World::SendBroadcastTextToWorld(uint32 textId, ObjectGuid senderGuid)
 {
-    MaNGOS::WorldBroadcastTextBuilder wt_builder(textId);
+    MaNGOS::WorldBroadcastTextBuilder wt_builder(textId, senderGuid);
     MaNGOS::LocalizedPacketListDo<MaNGOS::WorldBroadcastTextBuilder> wt_do(wt_builder);
     for (const auto& itr : m_sessions)
     {
@@ -2344,7 +2338,7 @@ void World::SendGMTicketText(char const* text)
             {
                 Player* player = session->GetPlayer();
                 if (player && player->IsInWorld() && player->IsAcceptTickets())
-                    ChatHandler(player).SendSysMessage(text);
+                    player->SendSysMessage(text);
             }
         }
     }

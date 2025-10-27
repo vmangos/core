@@ -7,7 +7,7 @@
 
 enum
 {
-    SAY_TENDRIS_AGGRO          = -1900168,
+    SAY_TENDRIS_AGGRO          = 11727,
 
     SPELL_TRAMPLE              = 5568,
     SPELL_UPPERCUT             = 22916,

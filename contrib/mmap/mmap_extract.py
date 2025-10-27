@@ -103,11 +103,11 @@ def get_subprocess_config() -> SubprocessConfig:
         startup_info.dwFlags |= 0x00000001
         startup_info.wShowWindow = 7
         creation_flags = subprocess.CREATE_NEW_CONSOLE  # type: ignore
-        executable = script_directory / "MoveMapGen.exe"
+        executable = script_directory / "MoveMapGenerator.exe"
     else:
         startup_info = None
         creation_flags = 0
-        executable = script_directory / "MoveMapGen"
+        executable = script_directory / "MoveMapGenerator"
 
     return SubprocessConfig(executable, startup_info, creation_flags)
 
@@ -115,7 +115,7 @@ def get_subprocess_config() -> SubprocessConfig:
 def run_move_map_gen(map_id: int) -> None:
     config = get_subprocess_config()
     subprocess.check_call(
-        (config.executable, str(map_id), "--silent", *sys.argv[1:]),
+        (config.executable, str(map_id), "--silent", "--threads", "1", *sys.argv[1:]),
         startupinfo=config.startupinfo,
         creationflags=config.creation_flags,
         stdout=subprocess.DEVNULL,

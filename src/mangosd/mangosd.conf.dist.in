@@ -247,6 +247,10 @@ BindIP = "0.0.0.0"
 #        Default: 1 (Enable)
 #                 0 (Disabled)
 #
+#    ReusableGuidPoolSize
+#        Preload unused guids in db to reuse for new characters, items, texts and corpses.
+#        Default: 100000
+#
 ###################################################################################################################
 
 UseProcessors = 0
@@ -283,6 +287,7 @@ MaxCoreStuckTime = 0
 BanListReloadTimer = 120
 AddonChannel = 1
 CleanCharacterDB = 1
+ReusableGuidPoolSize = 100000
 
 # Optimization / load mitigation settings
 Continents.Instanciate                      = 0
@@ -406,12 +411,6 @@ Anticrash.Rearm.Timer = 60000
 #        affect quests and other scripted scenes.
 #        Default: 1
 #
-#    Progression.AccurateSpellEffects
-#        Whether to accurately portray changes in spell effects (eg. Deviate Fish). NOT applicable to effects
-#        which change their functionality (eg. spell changed) or values between patches. Only affects
-#        spells which had effects added or removed which still exist in the game client.
-#        Default: 1
-#
 #    Progression.RestoreDeletedItems
 #        Whether to automatically restore items which were previously deleted because no item template with
 #        this entry existed on that content patch. Players will receive the item in the mail once it has been
@@ -450,7 +449,6 @@ Progression.RestoreDeletedItems = 1
 Progression.AccuratePetStatistics = 1
 Progression.AccurateLFGAvailability = 1
 Progression.AccuratePVEEvents = 1
-Progression.AccurateSpellEffects = 1
 Progression.NoRespecPriceDecay = 1
 Progression.NoQuestXpToGold = 1
 Progression.UnlinkedAuctionHouses = 1
@@ -531,6 +529,11 @@ DebuffLimit = 0
 #    LogFile.Scripts
 #        Log file for script errors and debug info
 #        Default: "Scripts.log"
+#                 "" - Empty name disable creating log file
+#
+#    LogFile.Movement
+#        Log file for movement errors and debug info
+#        Default: "Movement.log"
 #                 "" - Empty name disable creating log file
 #
 #    LogFile.Chat
@@ -672,6 +675,7 @@ LogFile.Timestamp = 0
 LogFile.Basic = "Server.log"
 LogFile.Anticheat = "Anticheat.log"
 LogFile.Scripts = "Scripts.log"
+LogFile.Movement = "Movement.log"
 LogFile.Chat = "Chat.log"
 LogFile.Bg = "Bg.log"
 LogFile.Char = "Char.log"
@@ -1485,13 +1489,13 @@ Antiflood.Sanction = 8
 #
 #    Warden.WinEnabled
 #        Description: Enables Warden checks for Windows clients.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#                     1 - (Enabled)
+#        Default:     0 - (Disabled)
 #
 #    Warden.OSXEnabled
 #        Description: Enables Warden checks for OSX clients.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#                     1 - (Enabled)
+#        Default:     0 - (Disabled)
 #
 #    Warden.PlayersOnly
 #        Description: Ignore game master accounts.
@@ -1535,8 +1539,8 @@ Antiflood.Sanction = 8
 #
 ###################################################################################################
 
-Warden.WinEnabled            = 1
-Warden.OSXEnabled            = 1
+Warden.WinEnabled            = 0
+Warden.OSXEnabled            = 0
 Warden.PlayersOnly           = 0
 Warden.NumScans              = 10
 Warden.ClientResponseDelay   = 30
@@ -1551,8 +1555,8 @@ Warden.ModuleDir             = "warden_modules"
 #
 #    Anticheat.Enable
 #        Description: Enables player movement checks.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#                     1 - (Enabled)
+#        Default:     0 - (Disabled)
 #
 #    Anticheat.PlayersOnly
 #        Description: Ignore game master accounts.
@@ -2100,7 +2104,7 @@ Warden.ModuleDir             = "warden_modules"
 #
 ###################################################################################################
 
-Anticheat.Enable = 1
+Anticheat.Enable = 0
 Anticheat.PlayersOnly = 1
 Anticheat.NotifyCheaters = 0
 Anticheat.BanDuration = 86400
@@ -2899,28 +2903,26 @@ CharDelete.KeepDays = 30
 #
 #    AHBot.Enable
 #        Enable AH bot.
+#        The AH bot will automatically create listings based on the data in the 'auctionhousebot' table.
 #        Default: 0 - off
 #                 1 - on
 #
-#    AHBot.ah.id
-#        The ID of the auction house from AuctionHouse.dbc into which to put items.
-#        Default: 7 - Blackwater Auction House
-#
 #    AHBot.ah.fid
-#        The faction template ID of the virtual auctioneer.
-#        Default: 120 - Booty Bay
+#        The faction template ID used for the AH bot.
+#        This determines which auction house(s) listings are put into.
+#        Default: 120 - Neutral (Booty Bay, Gadgetzan and Everlook)
+#                  55 - Alliance (Ironforge, Stormwind and Teldrassil)
+#                  29 - Horde (Orgrimmar, Thunderbluff and Undercity)
 #
 #    AHBot.itemcount
-#        How many items to put into the auction house.
+#        How many listings to put into the auction house at most.
+#        The AH bot will add items until this number of listings is reached in the auction house (this includes potential player listings).
 #        Default: 50
 #
 ###################################################################################################################
 AHBot.Enable = 0
-AHBot.ah.id = 7
 AHBot.ah.fid = 120
 AHBot.itemcount = 50
-#AHBot.bot.guid = 1123
-#AHBot.bot.account = 32377
 
 ###################################################################################################################
 # PLAYER BOTS

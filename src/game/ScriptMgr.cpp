@@ -36,16 +36,17 @@ typedef std::vector<Script*> ScriptVector;
 int num_sc_scripts;
 ScriptVector m_scripts;
 
+ScriptMapMap sAreaTriggerScripts;
+ScriptMapMap sCreatureAIScripts;
+ScriptMapMap sCreatureMovementScripts;
+ScriptMapMap sCreatureSpellScripts;
+ScriptMapMap sEventScripts;
+ScriptMapMap sGameObjectScripts;
+ScriptMapMap sGenericScripts;
+ScriptMapMap sGossipScripts;
 ScriptMapMap sQuestEndScripts;
 ScriptMapMap sQuestStartScripts;
 ScriptMapMap sSpellScripts;
-ScriptMapMap sCreatureSpellScripts;
-ScriptMapMap sGameObjectScripts;
-ScriptMapMap sEventScripts;
-ScriptMapMap sGenericScripts;
-ScriptMapMap sGossipScripts;
-ScriptMapMap sCreatureMovementScripts;
-ScriptMapMap sCreatureAIScripts;
 
 INSTANTIATE_SINGLETON_1(ScriptMgr);
 
@@ -338,7 +339,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                         }
                     }
 
-                    GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id);
+                    GameObjectInfo const* info = sObjectMgr.GetGameObjectTemplate(data->id);
                     if (!info)
                     {
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has gameobject with invalid entry (GUID: %u Entry: %u) in SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), data->id, tmp.id);
@@ -346,7 +347,9 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     }
 
                     if (info->type == GAMEOBJECT_TYPE_FISHINGNODE ||
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                         info->type == GAMEOBJECT_TYPE_FISHINGHOLE ||
+#endif
                         info->type == GAMEOBJECT_TYPE_DOOR)
                     {
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` have gameobject type (%u) unsupported by command SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u", tablename, info->id, tmp.id);
@@ -396,7 +399,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                         }
                     }
 
-                    GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id);
+                    GameObjectInfo const* info = sObjectMgr.GetGameObjectTemplate(data->id);
                     if (!info)
                     {
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has gameobject with invalid entry (GUID: %u Entry: %u) in %s for script id %u", tablename, tmp.GetGOGuid(), data->id, (tmp.command == SCRIPT_COMMAND_OPEN_DOOR ? "SCRIPT_COMMAND_OPEN_DOOR" : "SCRIPT_COMMAND_CLOSE_DOOR"), tmp.id);
@@ -1014,7 +1017,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     {
                         if (tmp.startScriptForAll.objectEntry)
                         {
-                            if (!ObjectMgr::GetGameObjectInfo(tmp.startScriptForAll.objectEntry))
+                            if (!sObjectMgr.GetGameObjectTemplate(tmp.startScriptForAll.objectEntry))
                             {
                                 if (!sObjectMgr.IsExistingGameObjectId(tmp.startScriptForAll.objectEntry))
                                 {
@@ -1101,7 +1104,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
             }
             case SCRIPT_COMMAND_SUMMON_OBJECT:
             {
-                if (!ObjectMgr::GetGameObjectInfo(tmp.summonObject.gameobject_entry))
+                if (!sObjectMgr.GetGameObjectTemplate(tmp.summonObject.gameobject_entry))
                 {
                     if (!sObjectMgr.IsExistingGameObjectId(tmp.summonObject.gameobject_entry))
                     {
@@ -1260,6 +1263,8 @@ bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint3
         case TARGET_T_HOSTILE_LAST_AGGRO:
         case TARGET_T_HOSTILE_RANDOM:
         case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
+        case TARGET_T_HOSTILE_NEAREST:
+        case TARGET_T_HOSTILE_FARTHEST:
         {
             if (targetParam1& ~MAX_SELECT_FLAG_MASK)
             {
@@ -1302,7 +1307,7 @@ bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint3
         case TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY:
         case TARGET_T_RANDOM_GAMEOBJECT_WITH_ENTRY:
         {
-            if (!ObjectMgr::GetGameObjectInfo(targetParam1))
+            if (!sObjectMgr.GetGameObjectTemplate(targetParam1))
             {
                 if (!sObjectMgr.IsExistingGameObjectId(targetParam1))
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has target_param1 = %u for id %u, but this gameobject_template does not exist.", tableName, targetParam1, tableEntry);
@@ -1398,6 +1403,37 @@ bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint3
         }
     }
     return true;
+}
+
+void ScriptMgr::LoadAreaTriggerScripts()
+{
+    LoadScripts(sAreaTriggerScripts, "areatrigger_scripts");
+
+    std::set<uint32> usedScripts;
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT DISTINCT `script_id` FROM `areatrigger_template` WHERE `script_id` != 0"));
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 scriptId = fields[0].GetUInt32();
+            usedScripts.insert(scriptId);
+        } while (result->NextRow());
+    }
+
+    // check ids
+    for (const auto& itr : sAreaTriggerScripts)
+    {
+        if (usedScripts.find(itr.first) == usedScripts.cend())
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `areatrigger_scripts` has script (Id: %u) not referenced from anywhere", itr.first);
+        else
+            usedScripts.erase(itr.first);
+    }
+
+    for (auto const& scriptId : usedScripts)
+    {
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `areatrigger_template` has script (Id: %u) not found in `areatrigger_scripts`", scriptId);
+    }
 }
 
 void ScriptMgr::LoadGameObjectScripts()
@@ -1627,16 +1663,17 @@ void ScriptMgr::LoadCreatureEventAIScripts()
 
 void ScriptMgr::CheckAllScriptTexts()
 {
+    CheckScriptTexts(sAreaTriggerScripts);
+    CheckScriptTexts(sCreatureAIScripts);
+    CheckScriptTexts(sCreatureMovementScripts);
+    CheckScriptTexts(sCreatureSpellScripts);
+    CheckScriptTexts(sEventScripts);
+    CheckScriptTexts(sGameObjectScripts);
+    CheckScriptTexts(sGenericScripts);
+    CheckScriptTexts(sGossipScripts);
     CheckScriptTexts(sQuestEndScripts);
     CheckScriptTexts(sQuestStartScripts);
     CheckScriptTexts(sSpellScripts);
-    CheckScriptTexts(sCreatureSpellScripts);
-    CheckScriptTexts(sGameObjectScripts);
-    CheckScriptTexts(sEventScripts);
-    CheckScriptTexts(sGenericScripts);
-    CheckScriptTexts(sGossipScripts);
-    CheckScriptTexts(sCreatureMovementScripts);
-    CheckScriptTexts(sCreatureAIScripts);
 }
 
 void ScriptMgr::CheckScriptTexts(ScriptMapMap const& scripts)
@@ -1655,50 +1692,6 @@ void ScriptMgr::CheckScriptTexts(ScriptMapMap const& scripts)
             }
         }
     }
-}
-
-void ScriptMgr::LoadAreaTriggerScripts()
-{
-    m_AreaTriggerScripts.clear();                           // need for reload case
-    std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT `entry`, `script_name` FROM `scripted_areatrigger`");
-
-    uint32 count = 0;
-
-    if (!result)
-    {
-        BarGoLink bar(1);
-        bar.step();
-
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u scripted areatrigger", count);
-        return;
-    }
-
-    BarGoLink bar(result->GetRowCount());
-
-    do
-    {
-        ++count;
-        bar.step();
-
-        Field* fields = result->Fetch();
-
-        uint32 triggerId       = fields[0].GetUInt32();
-        char const* scriptName = fields[1].GetString();
-
-        if (!sObjectMgr.GetAreaTrigger(triggerId))
-        {
-            if (!sObjectMgr.IsExistingAreaTriggerId(triggerId))
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `scripted_areatrigger` has area trigger (ID: %u) not listed in `AreaTrigger.dbc`.", triggerId);
-            continue;
-        }
-
-        m_AreaTriggerScripts[triggerId] = GetScriptId(scriptName);
-    }
-    while (result->NextRow());
-
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u areatrigger scripts", count);
 }
 
 void ScriptMgr::LoadEventIdScripts()
@@ -1749,37 +1742,34 @@ void ScriptMgr::LoadEventIdScripts()
 
 void ScriptMgr::LoadScriptNames()
 {
-    m_scriptNames.push_back("");
-    std::unique_ptr<QueryResult> result = WorldDatabase.Query(
-                              "SELECT DISTINCT(`script_name`) FROM `creature_template` WHERE `script_name` <> '' "
-                              "UNION "
-                              "SELECT DISTINCT(`script_name`) FROM `gameobject_template` WHERE `script_name` <> '' "
-                              "UNION "
-                              "SELECT DISTINCT(`script_name`) FROM `scripted_areatrigger` WHERE `script_name` <> '' "
-                              "UNION "
-                              "SELECT DISTINCT(`script_name`) FROM `scripted_event_id` WHERE `script_name` <> '' "
-                              "UNION "
-                              "SELECT DISTINCT(`script_name`) FROM `map_template` WHERE `script_name` <> ''");
+    m_scriptNames.emplace_back("");
 
-    if (!result)
-    {
-        BarGoLink bar(1);
-        bar.step();
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, ">> Loaded empty set of Script Names!");
-        return;
-    }
-
-    BarGoLink bar(result->GetRowCount());
+    BarGoLink bar(6);
     uint32 count = 0;
-
-    do
+    char const* tableNames[6] =
     {
+        "areatrigger_template",
+        "creature_template",
+        "gameobject_template",
+        "scripted_event_id",
+        "spell_template",
+        "map_template"
+    };
+
+    for (uint32 i = 0; i < 6; ++i)
+    {
+        std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT DISTINCT(script_name) FROM %s WHERE script_name <> ''", tableNames[i]);
         bar.step();
-        m_scriptNames.push_back((*result)[0].GetString());
-        ++count;
+
+        if (!result)
+            continue;
+
+        do
+        {
+            ++count;
+            m_scriptNames.emplace_back((*result)[0].GetString());
+        } while (result->NextRow());
     }
-    while (result->NextRow());
 
     std::sort(m_scriptNames.begin(), m_scriptNames.end());
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -1800,15 +1790,6 @@ uint32 ScriptMgr::GetScriptId(char const* name) const
         return 0;
 
     return uint32(itr - m_scriptNames.begin());
-}
-
-uint32 ScriptMgr::GetAreaTriggerScriptId(uint32 triggerId) const
-{
-    AreaTriggerScriptMap::const_iterator itr = m_AreaTriggerScripts.find(triggerId);
-    if (itr != m_AreaTriggerScripts.end())
-        return itr->second;
-
-    return 0;
 }
 
 uint32 ScriptMgr::GetEventIdScriptId(uint32 eventId) const
@@ -1848,6 +1829,26 @@ InstanceData* ScriptMgr::CreateInstanceData(Map* pMap)
         return nullptr;
 
     return pTempScript->GetInstanceData(pMap);
+}
+
+SpellScript* ScriptMgr::GetSpellScript(SpellEntry const* pSpell)
+{
+    Script* pTempScript = m_scripts[pSpell->ScriptId];
+
+    if (!pTempScript || !pTempScript->GetSpellScript)
+        return nullptr;
+
+    return pTempScript->GetSpellScript(pSpell);
+}
+
+AuraScript* ScriptMgr::GetAuraScript(SpellEntry const* pSpell)
+{
+    Script* pTempScript = m_scripts[pSpell->ScriptId];
+
+    if (!pTempScript || !pTempScript->GetAuraScript)
+        return nullptr;
+
+    return pTempScript->GetAuraScript(pSpell);
 }
 
 bool ScriptMgr::OnGossipHello(Player* pPlayer, Creature* pCreature)
@@ -2002,10 +2003,10 @@ bool ScriptMgr::OnGameObjectOpen(Player* pPlayer, GameObject* pGameObject)
 {
     Script* pTempScript = m_scripts[pGameObject->GetGOInfo()->ScriptId];
 
-    if (!pTempScript || !pTempScript->GOOpen)
+    if (!pTempScript || !pTempScript->pGOOpen)
         return false;
 
-    return pTempScript->GOOpen(pPlayer, pGameObject);
+    return pTempScript->pGOOpen(pPlayer, pGameObject);
 }
 
 bool ScriptMgr::OnGameObjectUse(Player* pPlayer, GameObject* pGameObject)
@@ -2022,7 +2023,7 @@ bool ScriptMgr::OnGameObjectUse(Player* pPlayer, GameObject* pGameObject)
 
 bool ScriptMgr::OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry)
 {
-    Script* pTempScript = m_scripts[GetAreaTriggerScriptId(atEntry->id)];
+    Script* pTempScript = m_scripts[atEntry->script_name];
 
     if (!pTempScript || !pTempScript->pAreaTrigger)
         return false;
@@ -2069,11 +2070,6 @@ bool ScriptMgr::OnAuraDummy(Aura const* pAura, bool apply)
         return false;
 
     return pTempScript->pEffectAuraDummy(pAura, apply);
-}
-
-uint32 GetAreaTriggerScriptId(uint32 triggerId)
-{
-    return sScriptMgr.GetAreaTriggerScriptId(triggerId);
 }
 
 uint32 GetEventIdScriptId(uint32 eventId)
@@ -2379,8 +2375,9 @@ void ScriptMgr::LoadEscortData()
 
 void ScriptMgr::CollectPossibleGenericIds(std::set<uint32>& genericIds)
 {
-    char const* script_tables[10] =
+    char const* script_tables[11] =
     {
+        "areatrigger_scripts",
         "creature_ai_scripts",
         "creature_movement_scripts",
         "creature_spells_scripts",
@@ -2819,6 +2816,14 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, Map* pM
         case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
             if (Creature* pCreatureSource = ToCreature(pSource))
                 return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, pSpellEntry, param1 ? param1 : SELECT_FLAG_NO_TOTEM);
+            break;
+        case TARGET_T_HOSTILE_NEAREST:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0, pSpellEntry, param1 ? param1 : SELECT_FLAG_NO_TOTEM);
+            break;
+        case TARGET_T_HOSTILE_FARTHEST:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_FARTHEST, 0, pSpellEntry, param1 ? param1 : SELECT_FLAG_NO_TOTEM);
             break;
         case TARGET_T_OWNER_OR_SELF:
             if (Unit* pUnitSource = ToUnit(pSource))

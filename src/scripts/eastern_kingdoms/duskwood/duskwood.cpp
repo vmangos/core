@@ -111,12 +111,10 @@ struct npc_twilight_corrupterAI : ScriptedAI
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         for (const auto i : tList)
         {
-            Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
-
-            if (pUnit && pUnit->IsPlayer())
+            if (i->getUnitGuid().IsPlayer())
                 for (uint64 & guid : GUIDs)
                     if (guid == 0)
-                        guid = pUnit->GetGUID();
+                        guid = i->getUnitGuid();
         }
     }
 

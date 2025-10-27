@@ -20,16 +20,16 @@ enum
     SPELL_J_EEVEE_SUMMONS_OBJECT    = 23140,
     SPELL_J_EEVEE_TELEPORT          = 7791,
 
-    SHOUT_J_EEVEE_FREEDOM           = -1780196,
-    SAY_J_EEVEE_DREADSTEED_1        = -1780197,
-    SAY_J_EEVEE_DREADSTEED_2        = -1780198,
-    SAY_J_EEVEE_DREADSTEED_3        = -1780199,
-    SAY_J_EEVEE_DREADSTEED_4        = -1780200,
+    SHOUT_J_EEVEE_FREEDOM           = 9705,
+    SAY_J_EEVEE_DREADSTEED_1        = 9702,
+    SAY_J_EEVEE_DREADSTEED_2        = 9703,
+    SAY_J_EEVEE_DREADSTEED_3        = 9704,
+    SAY_J_EEVEE_DREADSTEED_4        = 9706,
 
-    SAY_J_EEVEE_SCHOLOMANCE_1       = -1900048,
-    SAY_J_EEVEE_SCHOLOMANCE_2       = -1900049,
-    SAY_J_EEVEE_SCHOLOMANCE_3       = -1900050,
-    SAY_J_EEVEE_SCHOLOMANCE_4       = -1900051,
+    SAY_J_EEVEE_SCHOLOMANCE_1       = 9769,
+    SAY_J_EEVEE_SCHOLOMANCE_2       = 9770,
+    SAY_J_EEVEE_SCHOLOMANCE_3       = 9771,
+    SAY_J_EEVEE_SCHOLOMANCE_4       = 9742,
 
     QUEST_IMP_DELIVERY              = 7629
 };
@@ -260,9 +260,9 @@ void npc_j_eevee_scholomanceAI::UpdateAI(uint32 const uiDiff)
 
 CreatureAI* GetAI_npc_j_eevee(Creature* pCreature)
 {
-    if (pCreature->GetMapId() == 429) //Map 429 Zone 2557. Dire Maul.
+    if (pCreature->GetMapId() == MAP_DIRE_MAUL) //Map 429 Zone 2557. Dire Maul.
         return new npc_j_eevee_dreadsteedAI(pCreature);
-    else if (pCreature->GetMapId() == 289) // Map 289, Zone 2057. Scholomance
+    else if (pCreature->GetMapId() == MAP_SCHOLOMANCE) // Map 289, Zone 2057. Scholomance
         return new npc_j_eevee_scholomanceAI(pCreature);
 
     return nullptr;

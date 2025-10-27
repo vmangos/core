@@ -21,6 +21,7 @@ enum zfEntries
     EVENT_GAHZRILLA = 2,
     EVENT_END_DOOR = 3,
     EVENT_ZUMRAH = 4,
+    EVENT_ANTUSUL = 5,
 };
 
 enum zfPyramidPhases

@@ -26,6 +26,7 @@
 #include "CreatureAI.h"
 #include "InstanceData.h"
 #include "ObjectAccessor.h"
+#include "Map.h"
 
 Totem::Totem() : Creature(CREATURE_SUBTYPE_TOTEM)
 {
@@ -65,7 +66,11 @@ bool Totem::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* 
 void Totem::Update(uint32 update_diff, uint32 time)
 {
     Unit* owner = GetOwner();
-    if (!owner || !owner->IsAlive() || !IsAlive() || !isWithinVisibilityDistanceOf(owner, owner))
+    if (!owner || 
+        // Don't unsummon if owner is a creature - let them persist after creature death
+        (owner->GetTypeId() != TYPEID_UNIT && !owner->IsAlive()) || 
+        !IsAlive() || 
+        !isWithinVisibilityDistanceOf(owner, owner))
     {
         UnSummon();                                         // remove self
         return;

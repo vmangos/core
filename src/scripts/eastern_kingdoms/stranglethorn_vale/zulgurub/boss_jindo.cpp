@@ -368,7 +368,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
         CheckTimer = 0;
 
         m_creature->AddAura(23198, ADD_AURA_PERMANENT); // Avoidance : immunity to AoE
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STATE_ROOT);
         SetCombatMovement(false);
     }
 
@@ -380,7 +380,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
             return;
         }
 
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STATE_ROOT);
 
         if (!m_creature->IsInCombat())
             m_creature->SetInCombatWithZone();

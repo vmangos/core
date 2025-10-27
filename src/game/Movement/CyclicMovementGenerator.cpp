@@ -44,7 +44,7 @@ void CyclicMovementGenerator<Creature>::LoadPath(uint32 guid, uint32 entry, Wayp
 
 void CyclicMovementGenerator<Creature>::Initialize(Creature& creature)
 {
-    creature.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    creature.AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
 }
 
 void CyclicMovementGenerator<Creature>::InitializeWaypointPath(Creature& creature, WaypointPathOrigin wpSource, uint32 overwriteGuid, uint32 overwriteEntry)
@@ -62,12 +62,12 @@ void CyclicMovementGenerator<Creature>::InitializeWaypointPath(Creature& creatur
 
 void CyclicMovementGenerator<Creature>::Reset(Creature& creature)
 {
-    creature.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    creature.AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
 }
 
 void CyclicMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 {
-    if (owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (owner.HasUnitState(UNIT_STATE_CAN_NOT_MOVE))
         return;
 
     WaypointNode const& firstNode = i_path->at(0);
@@ -76,7 +76,7 @@ void CyclicMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
         PathFinder path(&owner);
         path.calculate(firstNode.x, firstNode.y, firstNode.z, true);
 
-        Movement::MoveSplineInit init(owner, "CyclicMovementGenerator");
+        Movement::MoveSplineInit init(owner, "CyclicMovementGenerator<Creature>::_setTargetLocation (going to first node)");
         if (owner.CanFly())
             init.SetFly();
         init.SetWalk(!owner.HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_RUN));
@@ -90,7 +90,7 @@ void CyclicMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
         for (auto const& node : *i_path)
             genPath[node.first] = G3D::Vector3(node.second.x, node.second.y, node.second.z);
 
-        Movement::MoveSplineInit init(owner, "CyclicMovementGenerator");
+        Movement::MoveSplineInit init(owner, "CyclicMovementGenerator<Creature>::_setTargetLocation (looping)");
         if (owner.CanFly())
             init.SetFly();
         init.SetWalk(!owner.HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_RUN));
@@ -113,12 +113,12 @@ bool CyclicMovementGenerator<Creature>::Update(Creature &owner, uint32 const& /*
 
 void CyclicMovementGenerator<Creature>::Finalize(Creature& creature)
 {
-    creature.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    creature.SetWalk(!creature.HasUnitState(UNIT_STAT_RUNNING), false);
+    creature.ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    creature.SetWalk(!creature.HasUnitState(UNIT_STATE_RUNNING), false);
 }
 
 void CyclicMovementGenerator<Creature>::Interrupt(Creature &creature)
 {
-    creature.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    creature.SetWalk(!creature.HasUnitState(UNIT_STAT_RUNNING), false);
+    creature.ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    creature.SetWalk(!creature.HasUnitState(UNIT_STATE_RUNNING), false);
 }

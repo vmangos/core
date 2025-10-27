@@ -42,7 +42,7 @@ bool FollowerAI::AssistPlayerInCombat(Unit* pWho)
     if (!m_creature->CanAssistPlayers())
         return false;
 
-    if (m_creature->HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_FEIGN_DEATH))
+    if (m_creature->HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_FEIGN_DEATH))
         return false;
 
     //not a player

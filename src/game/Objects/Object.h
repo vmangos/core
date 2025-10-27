@@ -56,6 +56,13 @@ class GenericTransport;
 struct FactionEntry;
 struct FactionTemplateEntry;
 
+class NULLNotifier
+{
+public:
+    template<class T> void Visit(GridRefManager<T>& m) {}
+    void Visit(CameraMapType&) {}
+};
+
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 
 //use this class to measure time between world update ticks
@@ -147,7 +154,7 @@ class Object
         virtual void BuildUpdateData(UpdateDataMapType& update_players);
         void MarkForClientUpdate();
         void SendForcedObjectUpdate();
-        void AddDelayedAction(ObjectDelayedAction e) { _delayedActions |= e; }
+        void AddDelayedAction(ObjectDelayedAction e) { m_delayedActions |= e; }
         void ExecuteDelayedActions();
 
         void BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) const;
@@ -357,7 +364,7 @@ class Object
         void InitValues() { _InitValues(); }
 
         // Nostalrius
-        bool IsDeleted() const { return _deleted; }
+        bool IsDeleted() const { return m_deleted; }
 
         // Convertions
         inline bool IsWorldObject() const { return isType(TYPEMASK_WORLDOBJECT); }
@@ -384,11 +391,11 @@ class Object
         SpellCaster* ToSpellCaster();
         SpellCaster const* ToSpellCaster() const;
 
-        inline bool IsCorpse() const { return GetTypeId() == TYPEID_CORPSE; }
+        virtual inline bool IsCorpse() const { return GetTypeId() == TYPEID_CORPSE; }
         Corpse* ToCorpse();
         Corpse const* ToCorpse() const;
 
-        bool IsPet() const;
+        virtual bool IsPet() const;
         Pet* ToPet();
         Pet const* ToPet() const;
 
@@ -396,7 +403,7 @@ class Object
         virtual bool HasInvolvedQuest(uint32 /* quest_id */) const { return false; }
     protected:
 
-        Object ();
+        Object();
 
         void _InitValues();
         void _Create (uint32 guidlow, uint32 entry, HighGuid guidhigh);
@@ -421,9 +428,9 @@ class Object
 
         uint16 m_valuesCount;
 
-        bool m_objectUpdated;
-        bool _deleted;          // Object in remove list
-        uint32 _delayedActions;
+        bool m_objectUpdated;   // Marked for client update
+        bool m_deleted;         // Object in remove list or destroyed
+        uint32 m_delayedActions;
 
     private:
         bool m_inWorld;
@@ -451,7 +458,7 @@ class WorldObject : public Object
         {
             public:
                 explicit UpdateHelper(WorldObject* obj) : m_obj(obj) {}
-                ~UpdateHelper() { }
+                ~UpdateHelper() = default;
 
                 void Update(uint32 time_diff)
                 {
@@ -536,7 +543,7 @@ class WorldObject : public Object
         bool GetRandomPoint(float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z) const;
 
         uint32 GetMapId() const { return m_mapId; }
-        uint32 GetInstanceId() const { return m_InstanceId; }
+        uint32 GetInstanceId() const { return m_instanceId; }
 
         uint32 GetZoneId() const;
         uint32 GetAreaId() const;
@@ -578,14 +585,14 @@ class WorldObject : public Object
         template <class T >
         bool IsWithinDist2d(T const& position, float dist2compare, SizeFactor distcalc = SizeFactor::BoundingRadius) const { return IsWithinDist2d(position.x, position.y, dist2compare, distcalc); }
         bool IsWithinDist2d(float x, float y, float dist2compare, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
-        bool _IsWithinDist(WorldObject const* obj, float const dist2compare, const bool is3D, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
+        bool _IsWithinDist(WorldObject const* obj, float const dist2compare, bool const is3D, SizeFactor distcalc = SizeFactor::BoundingRadius) const;
 
         // use only if you will sure about placing both object at same map
-        bool IsWithinDist(WorldObject const* obj, float const& dist2compare, const bool is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
+        bool IsWithinDist(WorldObject const* obj, float const& dist2compare, bool const is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
         {
             return obj && _IsWithinDist(obj, dist2compare, is3D, distcalc);
         }
-        bool IsWithinDistInMap(WorldObject const* obj, float const& dist2compare, const bool is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
+        bool IsWithinDistInMap(WorldObject const* obj, float const& dist2compare, bool const is3D = true, SizeFactor distcalc = SizeFactor::BoundingRadius) const
         {
             return obj && IsInMap(obj) && _IsWithinDist(obj, dist2compare, is3D, distcalc);
         }
@@ -616,10 +623,10 @@ class WorldObject : public Object
         float GetLeewayBonusRadius() const;
 
         // Gestion des positions
-        void GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z);
-        void GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o);
-        void GetNearRandomPositions(float distance, float &x, float &y, float &z);
-        void GetFirstCollision(float dist, float angle, float &x, float &y, float &z);
+        void GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z) const;
+        void GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o) const;
+        void GetNearRandomPositions(float distance, float &x, float &y, float &z) const;
+        void GetFirstCollision(float dist, float angle, float &x, float &y, float &z) const;
 
         // for use only in LoadHelper, Map::Add Map::CreatureCellRelocation
         Cell const& GetCurrentCell() const { return m_currentCell; }
@@ -644,7 +651,7 @@ class WorldObject : public Object
         bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_FLYING); }
         bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE); }
         bool IsWalkingBackward() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD); }
-        bool IsMoving() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING); }
+        virtual bool IsMoving() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING); }
         bool IsSwimming() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING); }
         bool IsMovingButNotWalking() const { return IsMoving() && !(IsWalking() || IsWalkingBackward()); }
 
@@ -737,7 +744,7 @@ class WorldObject : public Object
         bool HasMMapsForCurrentMap() const;
 
         void SetZoneScript();
-        ZoneScript* GetZoneScript() const { return m_zoneScript; }
+        virtual ZoneScript* GetZoneScript() const { return m_zoneScript; }
 
         void AddToClientUpdateList() override;
         void RemoveFromClientUpdateList() override;
@@ -767,9 +774,9 @@ class WorldObject : public Object
         ViewPoint& GetViewPoint() { return m_viewPoint; }
 
         // WorldMask
-        uint32 worldMask;
+        uint32 m_worldMask;
         virtual void SetWorldMask(uint32 newMask);
-        uint32 GetWorldMask() const { return worldMask; }
+        uint32 GetWorldMask() const { return m_worldMask; }
         // Visibilite
         bool CanSeeInWorld(WorldObject const* other)  const;
         bool CanSeeInWorld(uint32 otherPhase)  const;
@@ -781,7 +788,7 @@ class WorldObject : public Object
         //use them ONLY in LoadFromDB()/Create() funcs and nowhere else!
         //mapId/instanceId should be set in SetMap() function!
         void SetLocationMapId(uint32 mapId) { m_mapId = mapId; }
-        void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
+        void SetLocationInstanceId(uint32 _instanceId) { m_instanceId = _instanceId; }
 
         bool IsWithinLootXPDist(WorldObject const* objToLoot) const;
 
@@ -804,19 +811,13 @@ class WorldObject : public Object
         // c.f. GetVisibilityModifier(). Be very conservative using this - a large
         // draw distance can be expensive for updates with lots of players
         float m_visibilityModifier;
-
         Map* m_currMap;                                     //current object's Map location
-
         uint32 m_mapId;                                     // object at map with map_id
-        uint32 m_InstanceId;                                // in map copy with instance id
-
+        uint32 m_instanceId;                                // in map copy with instance id
         Position m_position;
         Cell m_currentCell;                                 // store current cell where object listed
-
         ViewPoint m_viewPoint;
-
         WorldUpdateCounter m_updateTracker;
-
         uint32 m_summonLimitAlert;                          // Timer to alert GMs if a creature is at the summon limit
 };
 

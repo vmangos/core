@@ -18,7 +18,7 @@
 
 #include "Common.h"
 #include "Transport.h"
-#include "MapManager.h"
+#include "Geometry.h"
 #include "ObjectMgr.h"
 #include "Path.h"
 #include "WorldPacket.h"
@@ -30,10 +30,11 @@
 #include "CellImpl.h"
 #include "GameObjectModel.h"
 #include "ObjectAccessor.h"
+#include "MapManager.h"
 
 #include <G3D/Quat.h>
 
-Transport::Transport(TransportTemplate const& transportTemplate) : GenericTransport(), m_transportTemplate(transportTemplate), m_isMoving(true), m_pendingStop(false)
+ShipTransport::ShipTransport(TransportTemplate const& transportTemplate) : GenericTransport(), m_transportTemplate(transportTemplate), m_isMoving(true), m_pendingStop(false)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT;
 
@@ -44,7 +45,7 @@ Transport::Transport(TransportTemplate const& transportTemplate) : GenericTransp
     SetPeriod(transportTemplate.pathTime);
 }
 
-bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)
+bool ShipTransport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)
 {
     Relocate(x, y, z, ang);
 
@@ -57,7 +58,7 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
 
     Object::_Create(guidlow, 0, HIGHGUID_MO_TRANSPORT);
 
-    GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(guidlow);
+    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectTemplate(guidlow);
 
     if (!goinfo)
     {
@@ -103,21 +104,21 @@ void GenericTransport::CleanupsBeforeDelete()
     GameObject::CleanupsBeforeDelete();
 }
 
-void Transport::MoveToNextWayPoint()
+void ShipTransport::MoveToNextWayPoint()
 {
     m_currentFrame = m_nextFrame++;
     if (m_nextFrame == GetKeyFrames().end())
         m_nextFrame = GetKeyFrames().begin();
 }
 
-bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, float o)
+bool ShipTransport::TeleportTransport(uint32 newMapid, float x, float y, float z, float o)
 {
     Map const* oldMap = GetMap();
 
     uint32 newInstanceId = sMapMgr.GetContinentInstanceId(newMapid, x, y);
     SetLocationInstanceId(newInstanceId);
     Map* newMap = sMapMgr.CreateMap(newMapid, this);
-    GetMap()->Remove<Transport>(this, false);
+    GetMap()->Remove<ShipTransport>(this, false);
     SetMap(newMap);
 
     for (m_passengerTeleportItr = m_passengers.begin(); m_passengerTeleportItr != m_passengers.end();)
@@ -195,15 +196,20 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
     }
 
     Relocate(x, y, z, o);
-    GetMap()->Add<Transport>(this);
+    GetMap()->Add<ShipTransport>(this);
 
     return newMap != oldMap;
 }
 
 void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
-    if (m_passengers.insert(passenger).second)
+    // we need to unlock right away because SetTransport can dismount and resummon pet, which will call AddPassanger again
+    {
+        ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
+        bool const boarded = m_passengers.insert(passenger).second;
+    }
+
+    if (boarded)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Unit %s boarded transport %s.", passenger->GetName(), GetName());
         passenger->SetTransport(this);
@@ -240,6 +246,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
     }
     else
         erased = m_passengers.erase(passenger) > 0;
+    lock.release();
 
     if (erased)
     {
@@ -274,7 +281,7 @@ void GenericTransport::RemoveFollowerFromTransport(Unit* passenger, Unit* follow
     }
 }
 
-void Transport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
+void ShipTransport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
 {
     uint32 const positionUpdateDelay = 50;
 
@@ -285,7 +292,7 @@ void Transport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
     if (m_pathProgress >= currentMsTime) // map transition and update happened in same tick due to MT
         return;
 
-    const uint32 diff = currentMsTime - m_pathProgress;
+    uint32 const diff = currentMsTime - m_pathProgress;
 
     if (IsMoving() || !m_pendingStop)
         m_pathProgress = currentMsTime;
@@ -341,16 +348,16 @@ void Transport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
     }
 }
 
-float Transport::CalculateSegmentPos(float now)
+float ShipTransport::CalculateSegmentPos(float now)
 {
     KeyFrame const& frame = *m_currentFrame;
     float const speed = float(m_goInfo->moTransport.moveSpeed);
     float const accel = float(m_goInfo->moTransport.accelRate);
-    float timeSinceStop = frame.TimeFrom + (now - (1.0f / IN_MILLISECONDS) * frame.DepartureTime);
-    float timeUntilStop = frame.TimeTo - (now - (1.0f / IN_MILLISECONDS) * frame.DepartureTime);
+    float const timeSinceStop = frame.TimeFrom + (now - (1.0f / float(IN_MILLISECONDS)) * float(frame.DepartureTime));
+    float const timeUntilStop = frame.TimeTo - (now - (1.0f / float(IN_MILLISECONDS)) * float(frame.DepartureTime));
     float segmentPos, dist;
-    float accelTime = m_transportTemplate.accelTime;
-    float accelDist = m_transportTemplate.accelDist;
+    float const accelTime = m_transportTemplate.accelTime;
+    float const accelDist = m_transportTemplate.accelDist;
     // calculate from nearest stop, less confusing calculation...
     if (timeSinceStop < timeUntilStop)
     {
@@ -490,14 +497,14 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
 
 void GenericTransport::CalculatePassengerOrientation(float& o) const
 {
-    o = MapManager::NormalizeOrientation(GetOrientation() + o);
+    o = Geometry::NormalizeOrientation(GetOrientation() + o);
 }
 
 void GenericTransport::CalculatePassengerPosition(float& x, float& y, float& z, float* o, float transX, float transY, float transZ, float transO)
 {
     float inx = x, iny = y, inz = z;
     if (o)
-        *o = MapManager::NormalizeOrientation(transO + *o);
+        *o = Geometry::NormalizeOrientation(transO + *o);
 
     x = transX + inx * std::cos(transO) - iny * std::sin(transO);
     y = transY + iny * std::cos(transO) + inx * std::sin(transO);
@@ -507,14 +514,17 @@ void GenericTransport::CalculatePassengerPosition(float& x, float& y, float& z, 
 void GenericTransport::CalculatePassengerOffset(float& x, float& y, float& z, float* o, float transX, float transY, float transZ, float transO)
 {
     if (o)
-        *o = MapManager::NormalizeOrientation(*o - transO);
+        *o = Geometry::NormalizeOrientation(*o - transO);
 
+    float const dx = x - transX;
+    float const dy = y - transY;
     z -= transZ;
-    y -= transY;    // y = searchedY * std::cos(o) + searchedX * std::sin(o)
-    x -= transX;    // x = searchedX * std::cos(o) + searchedY * std::sin(o + pi)
-    float inx = x, iny = y;
-    y = (iny - inx * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
-    x = (inx + iny * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
+
+    float const sinO = std::sin(transO);
+    float const cosO = std::cos(transO);
+
+    x = dx * cosO + dy * sinO;
+    y = dy * cosO - dx * sinO;
 }
 
 void GenericTransport::SendOutOfRangeUpdateToMap()

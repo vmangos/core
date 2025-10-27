@@ -198,11 +198,11 @@ class GossipMenu
         void AddMenuItem(uint8 Icon, int32 itemText, uint32 dtSender, uint32 dtAction, int32 boxText = 0, bool Coded = false);
 
         void SetMenuId(uint32 menu_id) { m_gMenuId = menu_id; }
-        uint32 GetMenuId() { return m_gMenuId; }
+        uint32 GetMenuId() const { return m_gMenuId; }
 
         // used to avoid opening gossip menu at node discover
         void SetDiscoveredNode() { m_discoveredNode = true; }
-        bool IsJustDiscoveredNode() { return m_discoveredNode; }
+        bool IsJustDiscoveredNode() const { return m_discoveredNode; }
 
         void AddGossipMenuItemData(int32 action_menu, uint32 action_poi, uint32 action_script);
 
@@ -228,7 +228,7 @@ class GossipMenu
 
         uint32 MenuItemSender(unsigned int ItemId);
         uint32 MenuItemAction(unsigned int ItemId);
-        bool MenuItemCoded(unsigned int ItemId);
+        bool MenuItemCoded(unsigned int ItemId) const;
 
         void ClearMenu();
 
@@ -295,7 +295,7 @@ class PlayerMenu
         void ClearMenus();
         uint32 GossipOptionSender(unsigned int Selection);
         uint32 GossipOptionAction(unsigned int Selection);
-        bool GossipOptionCoded(unsigned int Selection);
+        bool GossipOptionCoded(unsigned int Selection) const;
 
         void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGuid);
         void CloseGossip();

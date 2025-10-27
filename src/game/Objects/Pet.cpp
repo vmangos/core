@@ -644,9 +644,11 @@ void Pet::SetDeathState(DeathState s)                       // overwrite virtual
             ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        m_corpseDecayTimer = 3600000; // Chakor : Despawn du corps au bout d'1h
-        // Despawn after 15 sec for warlock pets.
-        if (getPetType() == SUMMON_PET)
+        
+        // Despawn after 1 hour for hunter pets.
+        if (getPetType() == HUNTER_PET)
+            m_corpseDecayTimer = 3600000;
+        else
             m_corpseDecayTimer = 15000;
     }
     else if (GetDeathState() == ALIVE)
@@ -1202,6 +1204,10 @@ void Pet::GivePetXP(uint32 xp)
 {
     if (getPetType() != HUNTER_PET)
         return;
+
+    if (Player* pOwner = GetOwnerPlayer())
+        if (pOwner->GetPersonalXpRate() >= 0.0f)
+            xp *= pOwner->GetPersonalXpRate();
 
     if (xp < 1)
         return;
@@ -2368,13 +2374,7 @@ void Pet::CastPetAura(PetAura const* aura)
     if (!auraId)
         return;
 
-    if (auraId == 35696)                                      // Demonic Knowledge
-    {
-        int32 basePoints = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
-        CastCustomSpell(this, auraId, basePoints, {}, {}, true);
-    }
-    else
-        CastSpell(this, auraId, true);
+    CastSpell(this, auraId, true);
 }
 
 void Pet::RemoveAllCooldowns(bool sendOnly)

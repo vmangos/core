@@ -446,7 +446,7 @@ void BattleBotAI::DoGraveyardJump()
         timeOffset += point->timeDiff;
         me->m_Events.AddLambdaEventAtOffset([pBot, pAI, point, isLast]
         {
-            if (!pBot->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
+            if (!pBot->HasUnitState(UNIT_STATE_NO_FREE_MOVE))
             {
                 pBot->SetUnitMovementFlags(point->moveFlags);
                 pBot->Relocate(point->position.x, point->position.y, point->position.z, point->position.o);
@@ -516,7 +516,7 @@ void BattleBotAI::UpdateWaypointMovement()
     if (!me->IsStopped())
         return;
 
-    if (me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (me->HasUnitState(UNIT_STATE_CAN_NOT_MOVE))
         return;
 
     switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
@@ -573,31 +573,31 @@ void BattleBotAI::OnEnterBattleGround()
         if (m_waitingSpot == BB_WSG_WAIT_SPOT_RIGHT)
         {
             if (me->GetTeam() == HORDE)
-                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_HORDE_1.x, WS_WAITING_POS_HORDE_1.y, WS_WAITING_POS_HORDE_1.z, MOVE_PATHFINDING, 0, WS_WAITING_POS_HORDE_1.o);
+                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_HORDE_1.x, WS_WAITING_POS_HORDE_1.y, WS_WAITING_POS_HORDE_1.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES, 0, WS_WAITING_POS_HORDE_1.o);
             else
-                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_ALLIANCE_1.x, WS_WAITING_POS_ALLIANCE_1.y, WS_WAITING_POS_ALLIANCE_1.z, MOVE_PATHFINDING, 0, WS_WAITING_POS_ALLIANCE_1.o);
+                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_ALLIANCE_1.x, WS_WAITING_POS_ALLIANCE_1.y, WS_WAITING_POS_ALLIANCE_1.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES, 0, WS_WAITING_POS_ALLIANCE_1.o);
         }
         else if (m_waitingSpot == BB_WSG_WAIT_SPOT_LEFT)
         {
             if (me->GetTeam() == HORDE)
-                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_HORDE_2.x, WS_WAITING_POS_HORDE_2.y, WS_WAITING_POS_HORDE_2.z, MOVE_PATHFINDING, 0, WS_WAITING_POS_HORDE_2.o);
+                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_HORDE_2.x, WS_WAITING_POS_HORDE_2.y, WS_WAITING_POS_HORDE_2.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES, 0, WS_WAITING_POS_HORDE_2.o);
             else
-                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_ALLIANCE_2.x, WS_WAITING_POS_ALLIANCE_2.y, WS_WAITING_POS_ALLIANCE_2.z, MOVE_PATHFINDING, 0, WS_WAITING_POS_ALLIANCE_2.o);
+                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_ALLIANCE_2.x, WS_WAITING_POS_ALLIANCE_2.y, WS_WAITING_POS_ALLIANCE_2.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES, 0, WS_WAITING_POS_ALLIANCE_2.o);
         }
     }
     else if (bg->GetTypeID() == BATTLEGROUND_AB)
     {
         if (me->GetTeam() == HORDE)
-            me->GetMotionMaster()->MovePoint(0, AB_WAITING_POS_HORDE.x + frand(-2.0f, 2.0f), AB_WAITING_POS_HORDE.y + frand(-2.0f, 2.0f), AB_WAITING_POS_HORDE.z, MOVE_PATHFINDING, 0, AB_WAITING_POS_HORDE.o);
+            me->GetMotionMaster()->MovePoint(0, AB_WAITING_POS_HORDE.x + frand(-2.0f, 2.0f), AB_WAITING_POS_HORDE.y + frand(-2.0f, 2.0f), AB_WAITING_POS_HORDE.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES, 0, AB_WAITING_POS_HORDE.o);
         else
-            me->GetMotionMaster()->MovePoint(0, AB_WAITING_POS_ALLIANCE.x + frand(-2.0f, 2.0f), AB_WAITING_POS_ALLIANCE.y + frand(-2.0f, 2.0f), AB_WAITING_POS_ALLIANCE.z, MOVE_PATHFINDING, 0, AB_WAITING_POS_ALLIANCE.o);
+            me->GetMotionMaster()->MovePoint(0, AB_WAITING_POS_ALLIANCE.x + frand(-2.0f, 2.0f), AB_WAITING_POS_ALLIANCE.y + frand(-2.0f, 2.0f), AB_WAITING_POS_ALLIANCE.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES, 0, AB_WAITING_POS_ALLIANCE.o);
     }
     else if (bg->GetTypeID() == BATTLEGROUND_AV)
     {
         if (me->GetTeam() == HORDE)
-            me->GetMotionMaster()->MovePoint(0, AV_WAITING_POS_HORDE.x + frand(-2.0f, 2.0f), AV_WAITING_POS_HORDE.y + frand(-2.0f, 2.0f), AV_WAITING_POS_HORDE.z, MOVE_PATHFINDING, 0, AV_WAITING_POS_HORDE.o);
+            me->GetMotionMaster()->MovePoint(0, AV_WAITING_POS_HORDE.x + frand(-2.0f, 2.0f), AV_WAITING_POS_HORDE.y + frand(-2.0f, 2.0f), AV_WAITING_POS_HORDE.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES, 0, AV_WAITING_POS_HORDE.o);
         else
-            me->GetMotionMaster()->MovePoint(0, AV_WAITING_POS_ALLIANCE.x + frand(-2.0f, 2.0f), AV_WAITING_POS_ALLIANCE.y + frand(-2.0f, 2.0f), AV_WAITING_POS_ALLIANCE.z, MOVE_PATHFINDING, 0, AV_WAITING_POS_ALLIANCE.o);
+            me->GetMotionMaster()->MovePoint(0, AV_WAITING_POS_ALLIANCE.x + frand(-2.0f, 2.0f), AV_WAITING_POS_ALLIANCE.y + frand(-2.0f, 2.0f), AV_WAITING_POS_ALLIANCE.z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES, 0, AV_WAITING_POS_ALLIANCE.o);
     }
 }
 
@@ -812,7 +812,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         }
     }
 
-    if (me->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+    if (me->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL))
         return;
 
     if (me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
@@ -838,6 +838,17 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         me->ClearTarget();
 
     Unit* pVictim = me->GetVictim();
+    
+    // Prevent battelbot from chasing target entered stealth mode
+    if (pVictim && !pVictim->IsVisibleForOrDetect(me, me, false))
+    {
+        me->AttackStop();
+        me->ClearTarget();
+        me->StopMoving();
+        if (pVictim = SelectAttackTarget(pVictim))
+            AttackStart(pVictim);
+        return;
+    }
 
     if (!me->IsInCombat())
     {
@@ -847,6 +858,9 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (me->GetStandState() != UNIT_STAND_STATE_STAND)
         me->SetStandState(UNIT_STAND_STATE_STAND);
+
+    if (me->GetSheath() == SHEATH_STATE_UNARMED && !me->IsMounted())
+        me->SetSheath(SHEATH_STATE_MELEE);
 
     UpdateBattleGroundAI();
 
@@ -938,7 +952,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
             me->SendMovementPacket(MSG_MOVE_SET_FACING, false);
         }
 
-        if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
+        if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING) &&
            (m_role != ROLE_HEALER) &&
             IsValidHostileTarget(pVictim) &&
             AttackStart(pVictim))
@@ -1410,7 +1424,7 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
     }
 
     if (m_spells.paladin.pBlessingOfFreedom &&
-       (me->HasUnitState(UNIT_STAT_ROOT) || me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
+       (me->HasUnitState(UNIT_STATE_ROOT) || me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
         CanTryToCastSpell(me, m_spells.paladin.pBlessingOfFreedom))
     {
         if (DoCastSpell(me, m_spells.paladin.pBlessingOfFreedom) == SPELL_CAST_OK)
@@ -1687,7 +1701,7 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
 
         if (pVictim->CanReachWithMeleeAutoAttack(me))
         {
-            if (me->HasUnitState(UNIT_STAT_ROOT))
+            if (me->HasUnitState(UNIT_STATE_ROOT))
             {
                 if (m_spells.hunter.pMongooseBite &&
                     CanTryToCastSpell(pVictim, m_spells.hunter.pMongooseBite))
@@ -1713,7 +1727,7 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
             }
         }
 
-        if (!me->HasUnitState(UNIT_STAT_ROOT) &&
+        if (!me->HasUnitState(UNIT_STATE_ROOT) &&
             (me->GetCombatDistance(pVictim) < 8.0f) &&
              me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE)
         {
@@ -1825,7 +1839,7 @@ void BattleBotAI::UpdateInCombatAI_Mage()
             }
 
             if (m_spells.mage.pBlink &&
-               (me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE) ||
+               (me->HasUnitState(UNIT_STATE_CAN_NOT_MOVE) ||
                 me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
                 CanTryToCastSpell(me, m_spells.mage.pBlink))
             {
@@ -1836,11 +1850,11 @@ void BattleBotAI::UpdateInCombatAI_Mage()
                     return;
             }
 
-            if (!me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+            if (!me->HasUnitState(UNIT_STATE_CAN_NOT_MOVE))
             {
                 if (m_spells.mage.pFrostNova &&
-                    !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
-                    !pVictim->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) &&
+                    !pVictim->HasUnitState(UNIT_STATE_ROOT) &&
+                    !pVictim->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) &&
                     CanTryToCastSpell(me, m_spells.mage.pFrostNova))
                 {
                     DoCastSpell(me, m_spells.mage.pFrostNova);
@@ -2538,7 +2552,7 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (pVictim->IsMoving() &&
-           !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
+           !pVictim->HasUnitState(UNIT_STATE_ROOT) &&
            !pVictim->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
         {
             if (m_spells.warrior.pHamstring &&
@@ -2585,7 +2599,7 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
 
         if ((me->GetHealthPercent() > 60.0f) && (pVictim->GetHealthPercent() > 40.0f) &&
             (pVictim->GetClass() == CLASS_WARLOCK || pVictim->GetClass() == CLASS_PRIEST) &&
-            !me->HasUnitState(UNIT_STAT_ROOT) &&
+            !me->HasUnitState(UNIT_STATE_ROOT) &&
             !me->IsImmuneToMechanic(MECHANIC_FEAR))
         {
             if (m_spells.warrior.pRecklessness &&
@@ -2899,7 +2913,7 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
         }
 
         if (m_spells.rogue.pSprint &&
-           !me->HasUnitState(UNIT_STAT_ROOT) &&
+           !me->HasUnitState(UNIT_STATE_ROOT) &&
            !me->CanReachWithMeleeAutoAttack(pVictim) &&
             CanTryToCastSpell(me, m_spells.rogue.pSprint))
         {
@@ -3145,7 +3159,7 @@ void BattleBotAI::UpdateInCombatAI_Druid()
     }
     else
     {
-        if (me->HasUnitState(UNIT_STAT_ROOT) &&
+        if (me->HasUnitState(UNIT_STATE_ROOT) &&
             me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
             me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
     }
@@ -3331,7 +3345,7 @@ void BattleBotAI::UpdateInCombatAI_Druid()
                 }
                 else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
                         (pVictim->GetVictim() == me) &&
-                        !me->HasUnitState(UNIT_STAT_ROOT) &&
+                        !me->HasUnitState(UNIT_STATE_ROOT) &&
                         (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
                 {
                     if (m_spells.druid.pEntanglingRoots &&

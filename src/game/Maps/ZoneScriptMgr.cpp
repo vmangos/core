@@ -102,7 +102,7 @@ void ZoneScriptMgr::HandlePlayerLeaveZone(Player* plr, uint32 zoneid)
     //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %u left ZoneScript", plr->GetGUIDLow());
 }
 
-ZoneScript * ZoneScriptMgr::GetZoneScriptToZoneId(uint32 zoneid)
+ZoneScript* ZoneScriptMgr::GetZoneScriptToZoneId(uint32 zoneid)
 {
     ZoneScriptsMap::iterator itr = m_ZoneScriptsMap.find(zoneid);
     if (itr == m_ZoneScriptsMap.end())
@@ -135,7 +135,7 @@ bool ZoneScriptMgr::HandleCustomSpell(Player* plr, uint32 spellId, GameObject* g
     return false;
 }
 
-ZoneScript * ZoneScriptMgr::GetZoneScript(uint32 zoneId)
+ZoneScript* ZoneScriptMgr::GetZoneScript(uint32 zoneId)
 {
     ZoneScriptsMap::iterator itr = m_ZoneScriptsMap.find(zoneId);
     if (itr != m_ZoneScriptsMap.end())

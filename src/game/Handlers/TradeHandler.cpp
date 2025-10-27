@@ -31,6 +31,8 @@
 #include "SocialMgr.h"
 #include "Language.h"
 #include "Map.h"
+#include "TradeData.h"
+#include "TransactionLog.h"
 
 void WorldSession::SendTradeStatus(TradeStatus status)
 {
@@ -315,9 +317,16 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
         his_trade->SetAccepted(false, true);
         return;
     }
-    if (!sWorld.getConfig(CONFIG_BOOL_GM_ALLOW_TRADES) &&
-            (trader->GetSession()->GetSecurity() > SEC_PLAYER ||
-            GetSecurity() > SEC_PLAYER))
+
+    // prevent losing money due to reaching gold cap
+    if (((int64(_player->GetMoney()) + int64(his_trade->GetMoney()) - int64(my_trade->GetMoney())) > int64(_player->GetMaxMoney())) ||
+        ((int64(trader->GetMoney()) + int64(my_trade->GetMoney()) - int64(his_trade->GetMoney())) > int64(trader->GetMaxMoney())))
+    {
+        SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
+        return;
+    }
+
+    if (!sWorld.getConfig(CONFIG_BOOL_GM_ALLOW_TRADES) && (trader->GetSession()->GetSecurity() > SEC_PLAYER || GetSecurity() > SEC_PLAYER))
     {
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
         return;
@@ -596,7 +605,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (GetPlayer()->HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
+    if (GetPlayer()->HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_PENDING_STUNNED))
     {
         SendTradeStatus(TRADE_STATUS_YOU_STUNNED);
         return;
@@ -640,7 +649,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
+    if (pOther->HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_PENDING_STUNNED))
     {
         SendTradeStatus(TRADE_STATUS_TARGET_STUNNED);
         return;

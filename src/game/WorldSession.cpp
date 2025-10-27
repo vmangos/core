@@ -43,11 +43,9 @@
 #include "PlayerBotAI.h"
 #include "Anticheat.h"
 #include "Language.h"
-#include "Auth/Sha1.h"
 #include "Chat.h"
 #include "MasterPlayer.h"
-
-#include <openssl/md5.h>
+#include "Crypto/Hash/MD5.h"
 
 // select opcodes appropriate for processing in Map::Update context for current session state
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
@@ -69,7 +67,7 @@ bool MapSessionFilter::Process(std::unique_ptr<WorldPacket> const& packet)
     return MapSessionFilterHelper(m_pSession, opHandle);
 }
 
-static uint32 g_sessionCounter = 0;
+static uint32 g_sessionCounter = 1;
 
 // WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale) :
@@ -686,15 +684,6 @@ void WorldSession::LogoutPlayer(bool Save)
             queue->RemovePlayerFromQueue(playerGuid, PLAYER_SYSTEM_LEAVE);
         });
 
-        // Teleport to home if the player is in an invalid instance
-        if (!_player->m_InstanceValid && !_player->IsGameMaster())
-        {
-            _player->TeleportToHomebind();
-            //this is a bad place to call for far teleport because we need player to be in world for successful logout
-            //maybe we should implement delayed far teleport logout?
-            sMapMgr.ExecuteSingleDelayedTeleport(_player);
-        }
-
         // FG: finish pending transfers after starting the logout
         // this should fix players being able to logout and login back with full hp at death position
         while (_player->IsBeingTeleportedFar())
@@ -1035,9 +1024,11 @@ void WorldSession::SetAccountData(NewAccountData::AccountDataType type, const st
 
 void WorldSession::SendAccountDataTimes()
 {
+    using namespace Crypto::Hash;
+
     bool const isOldClient = GetGameBuild() <= CLIENT_BUILD_1_8_4;
     uint32 const dataCount = isOldClient ? OldAccountData::NUM_ACCOUNT_DATA_TYPES : NewAccountData::NUM_ACCOUNT_DATA_TYPES;
-    WorldPacket data(SMSG_ACCOUNT_DATA_MD5, dataCount * MD5_DIGEST_LENGTH);
+    WorldPacket data(SMSG_ACCOUNT_DATA_MD5, dataCount * MD5::Digest::size());
     for (uint32 index = 0; index < NewAccountData::NUM_ACCOUNT_DATA_TYPES; ++index)
     {
         // Skip indexes that dont exist in old clients
@@ -1048,22 +1039,9 @@ void WorldSession::SendAccountDataTimes()
                 continue;
         }
 
-        AccountData const& itr = m_accountData[index];
-        if (itr.data.empty())
-        {
-            for (int i = 0; i < MD5_DIGEST_LENGTH; i++)
-                data << uint8(0);
-        }
-        else
-        {
-            MD5_CTX md5;
-            MD5_Init(&md5);
-            MD5_Update(&md5, itr.data.c_str(), itr.data.size());
-
-            uint8 fileHash[MD5_DIGEST_LENGTH];
-            MD5_Final(fileHash, &md5);
-            data.append(fileHash, MD5_DIGEST_LENGTH);
-        }
+        std::string const& accountData = m_accountData[index].data;
+        MD5::Digest hash = accountData.empty() ? MD5::CreateEmpty() : MD5::ComputeFrom(accountData);
+        data.append(hash.data(), hash.size());
     }
     SendPacket(&data);
 }
@@ -1155,7 +1133,7 @@ void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* pac
         //we should execute delayed teleports only for alive(!) players
         //because we don't want player's ghost teleported from graveyard
         if (_player->IsHasDelayedTeleport())
-            _player->TeleportTo(_player->m_teleport_dest, _player->m_teleport_options);
+            _player->TeleportTo(_player->m_teleportDest, _player->m_teleportOptions);
     }
     if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
         LogUnprocessedTail(packet);

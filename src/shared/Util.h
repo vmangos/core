@@ -25,6 +25,7 @@
 #include "Common.h"
 #include "Duration.h"
 
+#include <cctype>
 #include <string>
 #include <vector>
 
@@ -335,12 +336,18 @@ inline bool isLeapYear(int year)
 
 inline void strToUpper(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), toupper);
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c)
+    {
+        return std::toupper(c);
+    });
 }
 
 inline void strToLower(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), tolower);
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c)
+    {
+        return std::tolower(c);
+    });
 }
 
 inline wchar_t wcharToUpper(wchar_t wchar)
@@ -434,5 +441,16 @@ inline uint32 BatchifyTimer(uint32 timer, uint32 interval)
 typedef char const*(*ValueToStringFunc) (uint32 value);
 
 std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc);
+
+inline float GetLambda(float startIndex, float endIndex, float currentIndex)
+{
+    return (currentIndex - startIndex) / (endIndex - startIndex);
+}
+
+inline float InterpolateValueAtIndex(float startIndex, float startValue, float endIndex, float endValue, float currentIndex)
+{
+    return startValue + GetLambda(startIndex, endIndex, currentIndex) * (endValue - startValue);
+}
+
 
 #endif

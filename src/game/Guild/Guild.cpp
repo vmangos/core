@@ -757,6 +757,16 @@ void Guild::Disband()
     sGuildMgr.RemoveGuild(m_Id);
 }
 
+inline uint8 GetGuildRosterFlagsForPlayer(Player* pPlayer)
+{
+    uint8 flags = GRF_ONLINE;
+    if (pPlayer->IsAFK())
+        flags |= GRF_AFK;
+    if (pPlayer->IsDND())
+        flags |= GRF_DND;
+    return flags;
+}
+
 void Guild::Roster(WorldSession* session /*= nullptr*/)
 {
     // we can only guess size
@@ -805,7 +815,7 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
         if (Player* pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr.first)))
         {
             data << pl->GetObjectGuid();
-            data << uint8(1);
+            data << uint8(GetGuildRosterFlagsForPlayer(pl));
             data << itr.second.Name;
             data << uint32(itr.second.RankId);
             data << uint8(pl->GetLevel());
@@ -826,7 +836,7 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
             data << uint8(itr.second.Level);
             data << uint8(itr.second.Class);
             data << uint32(itr.second.ZoneId);
-            data << float(float(time(nullptr) - itr.second.LogoutTime) / DAY);
+            data << float(float(time(nullptr) - itr.second.LogoutTime) / uint64(DAY));
             data << itr.second.Pnote;
             data << ((session && HasRankRight(session->GetPlayer()->GetRank(), GR_RIGHT_VIEWOFFNOTE)) ? itr.second.OFFnote : "");
         }
@@ -885,7 +895,7 @@ uint32 Guild::GetAccountsNumber()
         return m_accountsNumber;
 
     //We use a set to be sure each element will be unique
-    std::set<uint32> accountsIdSet;
+    std::unordered_set<uint32> accountsIdSet;
     for (const auto& member : members)
         accountsIdSet.insert(member.second.accountId);
 

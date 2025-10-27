@@ -22,6 +22,7 @@
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "ObjectMgr.h"
+#include "MapManager.h"
 #include "Util.h"
 
 bool ChatHandler::HandleTeleCommand(char* args)
@@ -158,7 +159,7 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
 
         PSendSysMessage(LANG_TELEPORTING_TO, plNameLink.c_str(), "", tele->name.c_str());
         if (needReportToTarget(pl))
-            ChatHandler(pl).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
+            pl->PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
 
         // stop flight if need
         if (pl->IsTaxiFlying())
@@ -248,7 +249,7 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
 
         PSendSysMessage(LANG_SUMMONING, plNameLink.c_str(), "");
         if (needReportToTarget(pl))
-            ChatHandler(pl).PSendSysMessage(LANG_SUMMONED_BY, nameLink.c_str());
+            pl->PSendSysMessage(LANG_SUMMONED_BY, nameLink.c_str());
 
         // stop flight if need
         if (pl->IsTaxiFlying())
@@ -319,7 +320,7 @@ bool ChatHandler::HandleGoTriggerCommand(char* args)
         return HandleGoHelper(pPlayer, at->destination.mapId, at->destination.x, at->destination.y, &at->destination.z);
     }
     else
-        return HandleGoHelper(pPlayer, atEntry->mapid, atEntry->x, atEntry->y, &atEntry->z);
+        return HandleGoHelper(pPlayer, atEntry->map_id, atEntry->x, atEntry->y, &atEntry->z);
 }
 
 bool ChatHandler::HandleGoGraveyardCommand(char* args)
@@ -554,7 +555,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
         if (!tEntry)
             return false;
 
-        if (!ObjectMgr::GetGameObjectInfo(tEntry))
+        if (!sObjectMgr.GetGameObjectTemplate(tEntry))
         {
             SendSysMessage(LANG_COMMAND_GOOBJNOTFOUND);
             SetSentErrorMessage(true);
@@ -689,7 +690,7 @@ bool ChatHandler::HandleTeleNameCommand(char* args)
 
         PSendSysMessage(LANG_TELEPORTING_TO, chrNameLink.c_str(), "", tele->name.c_str());
         if (needReportToTarget(target))
-            ChatHandler(target).PSendSysMessage(LANG_TELEPORTED_TO_BY, GetNameLink().c_str());
+            target->PSendSysMessage(LANG_TELEPORTED_TO_BY, GetNameLink().c_str());
 
         return HandleGoHelper(target, tele->mapId, tele->x, tele->y, &tele->z, &tele->o);
     }
@@ -1082,11 +1083,11 @@ bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
         if (SpellEntry const* pSpellEntry= sSpellMgr.GetSpellEntry(20939))
             pPlayer->AddCooldown(*pSpellEntry, nullptr, false, HOUR * IN_MILLISECONDS); // Trigger 1 Hour Cooldown
         // Get nearest graveyard.
-        WorldSafeLocsEntry const* ClosestGrave = sObjectMgr.GetClosestGraveYard(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetMapId(), pPlayer->GetTeam());
-        if (!ClosestGrave) //No nearby graveyards (stuck in void?). Send ally to Westfall, Horde to Barrens.
-            ClosestGrave = pPlayer->GetTeamId() ? sWorldSafeLocsStore.LookupEntry(10) : sWorldSafeLocsStore.LookupEntry(4);
-        if (ClosestGrave)
-            pPlayer->TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, sObjectMgr.GetWorldSafeLocFacing(ClosestGrave->ID), 0);
+        WorldSafeLocsEntry const* pClosestGrave = sObjectMgr.GetClosestGraveYard(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetMapId(), pPlayer->GetTeam());
+        if (!pClosestGrave) // No nearby graveyards (stuck in void?). Send ally to Westfall, Horde to Barrens.
+            pClosestGrave = pPlayer->GetTeamId() == TEAM_HORDE ? sWorldSafeLocsStore.LookupEntry(10) : sWorldSafeLocsStore.LookupEntry(4);
+        if (pClosestGrave)
+            pPlayer->TeleportTo(pClosestGrave->map_id, pClosestGrave->x, pClosestGrave->y, pClosestGrave->z, sObjectMgr.GetWorldSafeLocFacing(pClosestGrave->ID), 0);
         SendSysMessage(LANG_UNSTUCK_DEAD);
     }
 
@@ -1161,7 +1162,7 @@ bool ChatHandler::HandleNamegoCommand(char* args)
         }
         PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), "");
         if (needReportToTarget(pTarget))
-            ChatHandler(pTarget).PSendSysMessage(LANG_SUMMONED_BY, playerLink(pPlayer->GetName()).c_str());
+            pTarget->PSendSysMessage(LANG_SUMMONED_BY, playerLink(pPlayer->GetName()).c_str());
 
         // stop flight if need
         if (pTarget->IsTaxiFlying())
@@ -1296,7 +1297,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
 
         PSendSysMessage(LANG_APPEARING_AT_ONLINE, chrNameLink.c_str());
         if (needReportToTarget(pTarget))
-            ChatHandler(pTarget).PSendSysMessage(LANG_APPEARING_TO, GetNameLink().c_str());
+            pTarget->PSendSysMessage(LANG_APPEARING_TO, GetNameLink().c_str());
 
         // stop flight if need
         if (pPlayer->IsTaxiFlying())

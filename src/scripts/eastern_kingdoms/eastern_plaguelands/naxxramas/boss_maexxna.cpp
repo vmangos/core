@@ -242,7 +242,7 @@ struct boss_maexxnaAI : public ScriptedAI
         ++it;
         for (it; it != tList.end(); ++it)
         {
-            Player* pPlayer = m_creature->GetMap()->GetPlayer((*it)->getUnitGuid());
+            Player* pPlayer = (*it)->getTarget()->ToPlayer();
             if (!pPlayer) continue;
 
             // todo: verify that IsWithinLOSInMap does not screw anyting up. Afaik there should be nowhere
@@ -289,10 +289,7 @@ struct boss_maexxnaAI : public ScriptedAI
 
             // set immune anticheat and calculate speed
             if (Player* plr = pTarget->ToPlayer())
-            {
                 plr->SetLaunched(true);
-                plr->SetXYSpeed(horizontalSpeed);
-            }
 
             pTarget->KnockBack(angle, horizontalSpeed, verticalSpeed);
             wraps.push_back(std::make_pair(uint32(2000), pTarget->GetObjectGuid()));
@@ -434,17 +431,76 @@ CreatureAI* GetAI_boss_maexxna(Creature* pCreature)
     return new boss_maexxnaAI(pCreature);
 }
 
+// 29484 - Web Spray (Naxx, Maexxna)
+struct MaexxnaWebSprayScript : SpellScript
+{
+    bool OnCheckTarget(Spell const* /*spell*/, Unit* target, SpellEffectIndex /*eff*/) const final
+    {
+        // Maexxna Web Spray should not hit players under Web Wrap or Petrification
+        if (target->HasAura(17624) || target->HasAura(28622))
+            return false;
+        return true;
+    }
+};
+
+SpellScript* GetScript_MaexxnaWebSpray(SpellEntry const*)
+{
+    return new MaexxnaWebSprayScript();
+}
+
+// 28434 - Spider Web (Naxx, Maexxna)
+struct MaexxnaSpiderWebScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // see boss_maexxnaAI::DoCastWebWrap() for some info on this rather weird implementation
+            float dx = spell->GetUnitTarget()->GetPositionX() - spell->m_caster->GetPositionX();
+            float dy = spell->GetUnitTarget()->GetPositionY() - spell->m_caster->GetPositionY();
+            float dist = sqrt((dx * dx) + (dy * dy));
+            float yDist = spell->m_caster->GetPositionZ() - spell->GetUnitTarget()->GetPositionZ();
+            float horizontalSpeed = dist / 1.5f;
+            float verticalSpeed = 12.0f + (yDist*0.5f);
+            float angle = spell->GetUnitTarget()->GetAngle(spell->m_caster->GetPositionX(), spell->m_caster->GetPositionY());
+
+            // set immune anticheat and calculate speed
+            if (Player* plr = spell->GetUnitTarget()->ToPlayer())
+                plr->SetLaunched(true);
+
+            spell->GetUnitTarget()->KnockBack(angle, horizontalSpeed, verticalSpeed);
+            return false;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_MaexxnaSpiderWeb(SpellEntry const*)
+{
+    return new MaexxnaSpiderWebScript();
+}
+
 void AddSC_boss_maexxna()
 {
-    Script* NewScript;
+    Script* pNewScript;
 
-    NewScript = new Script;
-    NewScript->Name = "boss_maexxna";
-    NewScript->GetAI = &GetAI_boss_maexxna;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_maexxna";
+    pNewScript->GetAI = &GetAI_boss_maexxna;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "mob_webwrap";
-    NewScript->GetAI = &GetAI_mob_webwrap;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_webwrap";
+    pNewScript->GetAI = &GetAI_mob_webwrap;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_maexxna_web_spray";
+    pNewScript->GetSpellScript = &GetScript_MaexxnaWebSpray;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_maexxna_spider_web";
+    pNewScript->GetSpellScript = &GetScript_MaexxnaSpiderWeb;
+    pNewScript->RegisterSelf();
 }

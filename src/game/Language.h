@@ -193,7 +193,9 @@ enum MangosStrings
     LANG_CAN_ONLY_WHISPER_FRIENDS       = 182,
     LANG_CANT_USE_PUBLIC_CHANNELS       = 183,
     LANG_RESTRICTED_ACCOUNT             = 184,
-    // Room for more level 1              182-199 not used
+    LANG_ALLIANCE_BATTLEBOT_TEMP_ADDED  = 185,
+    LANG_HORDE_BATTLEBOT_TEMP_ADDED     = 186,
+    // Room for more level 1              187-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -734,10 +736,10 @@ enum MangosStrings
     LANG_YOUR_DEBUG_TARGET_INFO_SET     = 697,
 
     LANG_RESTORED_ITEM                  = 699,
-    //LANG_ARENA_ONE_TOOLOW             = 700,
-    //LANG_ARENA_ONE_MINUTE             = 701,
-    //LANG_ARENA_THIRTY_SECONDS         = 702,
-    //LANG_ARENA_FIFTEEN_SECONDS        = 703,
+    LANG_YOU_SET_BEASTMASTER            = 700,
+    LANG_YOUR_BEASTMASTER_SET           = 701,
+    LANG_CHEAT_BEASTMASTER_ON           = 702,
+    LANG_CHEAT_BEASTMASTER_OFF          = 703,
     //LANG_ARENA_BEGUN                  = 704,
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,

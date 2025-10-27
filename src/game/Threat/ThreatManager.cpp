@@ -101,6 +101,9 @@ void HostileReference::fireStatusChanged(ThreatRefStatusChangeEvent& pThreatRefS
 void HostileReference::addThreat(float pMod)
 {
     iThreat += pMod;
+    if (iThreat < 0)
+        iThreat = 0;
+
     // the threat is changed. Source and target unit have to be availabe
     // if the link was cut before relink it again
     if (!isOnline())
@@ -137,8 +140,8 @@ void HostileReference::updateOnlineStatus()
     // target is no player or not gamemaster
     // target is not in flight
     if (isValid() &&
-            ((getTarget()->GetTypeId() != TYPEID_PLAYER || !((Player*)getTarget())->IsGameMaster()) ||
-             !getTarget()->IsTaxiFlying()))
+            (getTarget()->GetTypeId() != TYPEID_PLAYER || !((Player*)getTarget())->IsGameMaster()) &&
+            !getTarget()->IsTaxiFlying())
         online = true;
 
     setAccessibleState(accessible);
@@ -208,7 +211,7 @@ void ThreatContainer::clearReferences()
 }
 
 //============================================================
-// Return the HostileReference of nullptr, if not found
+// Return the HostileReference or nullptr if not found
 HostileReference* ThreatContainer::getReferenceByTarget(Unit* pVictim)
 {
     if (!pVictim)
@@ -288,7 +291,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
     HostileReference* currentRef = nullptr;
     bool found = false;
     bool allowLowPriorityTargets = false;
-    bool attackerImmobilized = pAttacker->HasUnitState(UNIT_STAT_CAN_NOT_MOVE);
+    bool attackerImmobilized = pAttacker->HasUnitState(UNIT_STATE_CAN_NOT_MOVE);
 
     for (int attempt = 0; attempt < 2 && !found; ++attempt)
     {
@@ -410,8 +413,8 @@ void ThreatManager::addThreat(Unit* pVictim, float threat, bool crit, SpellSchoo
     // check for fear, blind, freezing trap, reckless charge, banish, etc.
     if (isAssistThreat)
     {
-        if (getOwner()->HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_ISOLATED) ||
-            (getOwner()->HasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
+        if (getOwner()->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_ISOLATED) ||
+            (getOwner()->HasUnitState(UNIT_STATE_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, 0)))
         {
             threat = 0.0f;
         }

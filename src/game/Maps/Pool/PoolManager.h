@@ -158,7 +158,7 @@ class PoolManager
         void LoadFromDB();
         void Initialize(MapPersistentState* state);         // called at new MapPersistentState object create
 
-        uint16 GetMaxPoolId() const { return max_pool_id; }
+        uint16 GetMaxPoolId() const { return m_maxPoolId; }
 
         template<typename T>
         uint16 IsPartOfAPool(uint32 db_guid_or_pool_id) const;
@@ -193,6 +193,7 @@ class PoolManager
         // used for calling from global systems when need spawn pool in all appropriate map instances
         void SpawnPoolInMaps(uint16 pool_id, bool instantly);
         void DespawnPoolInMaps(uint16 pool_id);
+        uint32 GetContinentInstanceIdForPool(uint16 pool_id) const;
 
         // used for calling from global systems when need initialize spawn pool state in appropriate (possible) map persistent state
         void InitSpawnPool(MapPersistentState& mapState, uint16 pool_id);
@@ -200,18 +201,18 @@ class PoolManager
         template<typename T>
         void UpdatePoolInMaps(uint16 pool_id, uint32 db_guid_or_pool_id = 0);
 
-        void RemoveAutoSpawnForPool(uint16 pool_id) { mPoolTemplate[pool_id].PoolFlags &= ~POOL_FLAG_AUTO_SPAWN; }
+        void RemoveAutoSpawnForPool(uint16 pool_id) { m_poolTemplate[pool_id].PoolFlags &= ~POOL_FLAG_AUTO_SPAWN; }
 
         typedef std::vector<PoolTemplateData> PoolTemplateDataMap;
-        PoolTemplateData const& GetPoolTemplate(uint16 pool_id) const { return mPoolTemplate[pool_id]; }
-        PoolGroup<Creature>& GetPoolCreatures(uint16 pool_id)  { return mPoolCreatureGroups[pool_id]; }
-        PoolGroup<GameObject>& GetPoolGameObjects(uint16 pool_id)  { return mPoolGameobjectGroups[pool_id]; }
-        PoolGroup<Pool> const& GetPoolPools(uint16 pool_id) const  { return mPoolPoolGroups[pool_id]; }
+        PoolTemplateData const& GetPoolTemplate(uint16 pool_id) const { return m_poolTemplate[pool_id]; }
+        PoolGroup<Creature>& GetPoolCreatures(uint16 pool_id)  { return m_poolCreatureGroups[pool_id]; }
+        PoolGroup<GameObject>& GetPoolGameObjects(uint16 pool_id)  { return m_poolGameObjectGroups[pool_id]; }
+        PoolGroup<Pool> const& GetPoolPools(uint16 pool_id) const  { return m_poolPoolGroups[pool_id]; }
     protected:
         template<typename T>
         void SpawnPoolGroup(MapPersistentState& mapState, uint16 pool_id, uint32 db_guid_or_pool_id, bool instantly);
 
-        uint16 max_pool_id;
+        uint16 m_maxPoolId;
 
         typedef std::vector<PoolGroup<Creature> >   PoolGroupCreatureMap;
         typedef std::vector<PoolGroup<GameObject> > PoolGroupGameObjectMap;
@@ -219,15 +220,15 @@ class PoolManager
         typedef std::pair<uint32, uint16> SearchPair;
         typedef std::map<uint32, uint16> SearchMap;
 
-        PoolTemplateDataMap mPoolTemplate;
-        PoolGroupCreatureMap mPoolCreatureGroups;
-        PoolGroupGameObjectMap mPoolGameobjectGroups;
-        PoolGroupPoolMap mPoolPoolGroups;
+        PoolTemplateDataMap m_poolTemplate;
+        PoolGroupCreatureMap m_poolCreatureGroups;
+        PoolGroupGameObjectMap m_poolGameObjectGroups;
+        PoolGroupPoolMap m_poolPoolGroups;
 
         // static maps DB low guid -> pool id
-        SearchMap mCreatureSearchMap;
-        SearchMap mGameobjectSearchMap;
-        SearchMap mPoolSearchMap;
+        SearchMap m_creatureSearchMap;
+        SearchMap m_gameObjectSearchMap;
+        SearchMap m_poolSearchMap;
 };
 
 #define sPoolMgr MaNGOS::Singleton<PoolManager>::Instance()
@@ -236,8 +237,8 @@ class PoolManager
 template<>
 inline uint16 PoolManager::IsPartOfAPool<Creature>(uint32 db_guid) const
 {
-    SearchMap::const_iterator itr = mCreatureSearchMap.find(db_guid);
-    if (itr != mCreatureSearchMap.end())
+    SearchMap::const_iterator itr = m_creatureSearchMap.find(db_guid);
+    if (itr != m_creatureSearchMap.end())
         return itr->second;
 
     return 0;
@@ -247,8 +248,8 @@ inline uint16 PoolManager::IsPartOfAPool<Creature>(uint32 db_guid) const
 template<>
 inline uint16 PoolManager::IsPartOfAPool<GameObject>(uint32 db_guid) const
 {
-    SearchMap::const_iterator itr = mGameobjectSearchMap.find(db_guid);
-    if (itr != mGameobjectSearchMap.end())
+    SearchMap::const_iterator itr = m_gameObjectSearchMap.find(db_guid);
+    if (itr != m_gameObjectSearchMap.end())
         return itr->second;
 
     return 0;
@@ -258,8 +259,8 @@ inline uint16 PoolManager::IsPartOfAPool<GameObject>(uint32 db_guid) const
 template<>
 inline uint16 PoolManager::IsPartOfAPool<Pool>(uint32 pool_id) const
 {
-    SearchMap::const_iterator itr = mPoolSearchMap.find(pool_id);
-    if (itr != mPoolSearchMap.end())
+    SearchMap::const_iterator itr = m_poolSearchMap.find(pool_id);
+    if (itr != m_poolSearchMap.end())
         return itr->second;
 
     return 0;

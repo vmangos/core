@@ -206,7 +206,7 @@ class Quest
     friend class ObjectMgr;
     public:
         Quest(Field* questRecord);
-        uint32 XPValue(Player* pPlayer) const;
+        uint32 XPValue(uint32 playerLevel) const;
 
         uint32 GetQuestFlags() const { return m_QuestFlags; }
         bool HasQuestFlag(QuestFlags flag) const { return (m_QuestFlags & flag) != 0; }
@@ -252,6 +252,7 @@ class Quest
         int32  GetRewOrReqMoney() const;
         uint32 GetRewMoneyMaxLevel() const { return RewMoneyMaxLevel; }
         int32 GetRewMoneyMaxLevelAtComplete() const;
+        uint8 GetRewRepSpilloverMask() const { return RewRepSpilloverMask; }
         uint32 GetRewXP() const { return RewXP; }
                                                             // use in XP calculation at client
         uint32 GetRewSpell() const { return RewSpell; }
@@ -354,6 +355,7 @@ class Quest
         std::string OfferRewardText;
         std::string RequestItemsText;
         std::string EndText;
+        uint8  RewRepSpilloverMask;
         uint32 RewXP;
         int32  RewOrReqMoney;
         uint32 RewMoneyMaxLevel;

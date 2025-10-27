@@ -45,7 +45,7 @@ char* GetPlainName(char* FileName)
     return FileName;
 }
 
-void fixnamen(char* name, size_t len)
+void FixNameCase(char* name, size_t len)
 {
     if (len < 3)
         return;
@@ -66,7 +66,7 @@ void fixnamen(char* name, size_t len)
         name[i] |= 0x20;
 }
 
-void fixname2(char* name, size_t len)
+void FixNameSpaces(char* name, size_t len)
 {
     if (len < 3)
         return;
@@ -132,7 +132,28 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
 
         size_t nextpos = ADT.getPos() + size;
 
-        if (!strcmp(fourcc, "MCIN"))
+        if (!strcmp(fourcc, "MVER"))
+        {
+        }
+        else if (!strcmp(fourcc, "MHDR"))
+        {
+        }
+        else if (!strcmp(fourcc, "MMID"))
+        {
+        }
+        else if (!strcmp(fourcc, "MWID"))
+        {
+        }
+        else if (!strcmp(fourcc, "MCNK"))
+        {
+        }
+        else if (!strcmp(fourcc, "MFBO"))
+        {
+        }
+        else if (!strcmp(fourcc, "MTXF"))
+        {
+        }
+        else if (!strcmp(fourcc, "MCIN"))
         {
         }
         else if (!strcmp(fourcc, "MTEX"))
@@ -147,10 +168,8 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
                 char* p = buf;
                 while (p < buf + size)
                 {
-                    fixnamen(p, strlen(p));
-                    char* s = GetPlainName(p);
-                    fixname2(s, strlen(s));
-                    string path(p);                         // Store copy after name fixed
+                    FixNameCase(p, strlen(p));
+                    std::string path(p); // Store copy after name fixed
 
                     std::string fixedName;
                     ExtractSingleModel(path, fixedName, failedPaths);
@@ -170,10 +189,12 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
                 char* p = buf;
                 while (p < buf + size)
                 {
-                    string path(p);
+                    std::string path(p);
+
                     char* s = GetPlainName(p);
-                    fixnamen(s, strlen(s));
-                    fixname2(s, strlen(s));
+                    FixNameCase(s, strlen(s));
+                    FixNameSpaces(s, strlen(s));
+
                     p = p + strlen(p) + 1;
                     WmoInstanceNames.emplace_back(s);
                 }
@@ -207,6 +228,12 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
                     Doodad::ExtractSet(WmoDoodads[WmoInstanceNames[id]], inst.m_wmo, map_num, tileX, tileY, dirfile);
                 }
             }
+        }
+        else
+        {
+            printf("Map=%s, Chunk='%s', Pos=%zd, Size=%d\nBad chunk data. Continue processing this tile? (y/n) ", AdtMapNumber.c_str(), fourcc, ADT.getPos(), size);
+            if (getchar() == 'n')
+                return false;
         }
         //======================
         ADT.seek(nextpos);

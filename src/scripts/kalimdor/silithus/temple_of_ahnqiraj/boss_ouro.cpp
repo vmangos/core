@@ -71,8 +71,8 @@ enum
  * https://www.youtube.com/watch?v=REmX3uRTFkQ. The video is slightly sped up, so time was counted by the ticking of buffs on the player.
  * More confirmation from classic sniffs https://i.imgur.com/YIA8veT.png
  */
-const uint32_t SUBMERGE_ANIMATION_INVIS    = 2000;
-const uint32_t SWEEP_TIMER                 = 20500;
+uint32 const SUBMERGE_ANIMATION_INVIS    = 2000;
+uint32 const SWEEP_TIMER                 = 20500;
 
 struct boss_ouroAI : public ScriptedAI
 {
@@ -111,7 +111,7 @@ struct boss_ouroAI : public ScriptedAI
     {
         // This makes the mob behave like rooted mobs etc, that is,
         // retargetting another top-threat target if current leaves melee range
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STATE_ROOT);
         m_creature->StopMoving();
         m_creature->SetRooted(true);
         
@@ -229,12 +229,12 @@ struct boss_ouroAI : public ScriptedAI
         // This is to let Ouro reset when he enters evade mode. Because rooted mobs don't reset when they evade until their root is removed.
         if (m_creature->IsInEvadeMode())
         {
-            m_creature->ClearUnitState(UNIT_STAT_ROOT);
+            m_creature->ClearUnitState(UNIT_STATE_ROOT);
             m_creature->SetRooted(false);
         }
         else
         {
-            m_creature->AddUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STATE_ROOT);
             m_creature->StopMoving();
             m_creature->SetRooted(true);
         }
@@ -377,11 +377,11 @@ struct boss_ouroAI : public ScriptedAI
                     m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-                    std::list<Unit*> lGroundRuptureTargets;
+                    std::vector<Unit*> lGroundRuptureTargets;
                     ThreatList const& lThreat = m_creature->GetThreatManager().getThreatList();
                     for (const auto i : lThreat)
                     {
-                        Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
+                        Unit* pUnit = i->getTarget();
                         if (pUnit && pUnit->GetDistance2d(m_creature) < 20.0f)
                             lGroundRuptureTargets.push_back(pUnit);
                     }
@@ -441,6 +441,7 @@ struct npc_ouro_spawnerAI : public Scripted_NoMovementAI
         m_bHasSummoned = false;
 
         DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE);
+        me->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -559,6 +560,7 @@ struct npc_ouro_scarabAI : public ScriptedAI
     void Reset() override
     {
         m_uiDespawnTimer = 45000;
+        me->EnableMoveInLosEvent();
     }
 
     void MoveInLineOfSight(Unit *who) override

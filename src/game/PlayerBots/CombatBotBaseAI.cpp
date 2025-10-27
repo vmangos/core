@@ -1859,7 +1859,7 @@ bool CombatBotBaseAI::AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee, bo
 
             if (pMember->GetTargetGuid() == guid)
             {
-                if (checkMelee && pMember->HasUnitState(UNIT_STAT_MELEE_ATTACKING))
+                if (checkMelee && pMember->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
                     return true;
 
                 if (checkSpells && pMember->IsNonMeleeSpellCasted())
@@ -3052,7 +3052,7 @@ bool CombatBotBaseAI::IsWearingShield(Player* pPlayer) const
 
 bool CombatBotBaseAI::IsInDuel() const
 {
-    return me->duel && me->duel->startTime != 0;
+    return me->m_duel && me->m_duel->startTime != 0;
 }
 
 CombatBotRoles CombatBotBaseAI::GetRole() const
@@ -3093,13 +3093,13 @@ void CombatBotBaseAI::SendBattlemasterJoinPacket(uint8 battlegroundId)
     switch (battlegroundId)
     {
         case BATTLEGROUND_QUEUE_AV:
-            data << uint32(30);
+            data << uint32(MAP_ALTERAC_VALLEY);
             break;
         case BATTLEGROUND_QUEUE_WS:
-            data << uint32(489);
+            data << uint32(MAP_WARSONG_GULCH);
             break;
         case BATTLEGROUND_QUEUE_AB:
-            data << uint32(529);
+            data << uint32(MAP_ARATHI_BASIN);
             break;
         default:
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Invalid BG queue type!");

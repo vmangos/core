@@ -165,7 +165,7 @@ void CreatureGroup::OnRespawn(Creature* member)
     RespawnAll(member);
 }
 
-void CreatureGroup::RespawnAll(Creature* except)
+void CreatureGroup::RespawnAll(Creature const* except)
 {
     if (m_deleted)
         return;
@@ -217,7 +217,7 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
     m_respawnGuard = false;
 }
 
-void CreatureGroup::MemberAssist(Creature* member, Unit* target, Creature* alliedAttacker)
+void CreatureGroup::MemberAssist(Creature* member, Unit* target, Creature const* alliedAttacker)
 {
     if (m_assistGuard)
         return;
@@ -242,7 +242,7 @@ void CreatureGroup::MemberAssist(Creature* member, Unit* target, Creature* allie
     }
 }
 
-void CreatureGroup::RemoveTemporaryLeader(Creature* pLeader)
+void CreatureGroup::RemoveTemporaryLeader(Creature const* pLeader)
 {
     if (m_deleted)
         return;

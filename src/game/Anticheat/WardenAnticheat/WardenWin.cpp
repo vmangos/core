@@ -28,15 +28,13 @@
 #include "WardenScan.hpp"
 #include "../Anticheat.h"
 #include "World.h"
-
-#include "Unit.h"
-#include "Chat.h"
 #include "WorldSession.h"
-#include "Auth/BigNumber.h"
-#include "Auth/HMACSHA1.h"
+#include "Util.h"
+#include "Log.h"
+#include "Crypto/BigNumber.h"
+#include "Crypto/Hash/HMACSHA1.h"
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"
-#include "Player.h"
 #include "Progression.h"
 
 #include <string>
@@ -84,6 +82,29 @@ static constexpr struct ClientOffsets
     // Click to move
     uint32 ClickToMovePosition;
 } Offsets[] = {
+    // scanning does not work in versions before 1.8 so no point in defining offsets for them
+    {
+        4878,
+        0x2DB9D0,
+        0x21F580, 0x220610, 0x220280, 0x22B7D0,
+        0x226E0,
+        0xBEC94C,
+        0xC60AD0,
+        0xB804E0, 0x3890, 0x0, 0xA8,
+        0xC598DC, 0x228, 0x08,
+        0xBBEFC8
+    },
+    {
+        5086,
+        0x2E82E0,
+        0x225FB0, 0x227070, 0x226CE0, 0x232170,
+        0x22580,
+        0xC01BBC,
+        0xC74844,
+        0xB95818, 0x38A0, 0x0, 0xA8,
+        0xC6EBF4, 0x228, 0x08,
+        0xBD4260
+    },
     {
         5302,
         0x2F5CE0,
@@ -157,40 +178,40 @@ static auto constexpr HypervisorCount = sizeof(Hypervisors) / sizeof(Hypervisors
 
 enum WorldEnables
 {
-    TerrainDoodads                  = 0x1,              // default, toggled by sub at 0x673130, which is never called.  should always be set
-    Terrain                         = 0x2,              // default, toggled by sub at 0x6730F0, which is never called.  should always be set
+    TerrainDoodads                  = 0x1,              // default, showDoodads console command, toggled by sub at 0x673130, which is never called.  should always be set
+    Terrain                         = 0x2,              // default, showTerrain console command, toggled by sub at 0x6730F0, which is never called.  should always be set
     TerrainLOD                      = 0x4,              // lod console var
     Unk10                           = 0x10,             // default
     TerrainCulling                  = 0x20,             // default, showCull console command
     TerrainShadows                  = 0x40,             // default, mapShadows console var, showShadow console command
-    TerrainDoodadCollisionVisuals   = 0x80,             // toggled by sub at 0x6731C0, which is never called.  should never be set
-    MapObjects                      = 0x100,            // default, toggled by sub at 0x673430, which is never called.  should always be set
-    MapObjectLighting               = 0x200,            // default, toggled by sub at 0x673360, which is never called.  should always be set
+    TerrainDoodadCollisionVisuals   = 0x80,             // showCollision console command, toggled by sub at 0x6731C0, which is never called.  should never be set
+    MapObjects                      = 0x100,            // default, showMapObjs console command, toggled by sub at 0x673430, which is never called.  should always be set
+    MapObjectLighting               = 0x200,            // default, showMapObjLight console command, toggled by sub at 0x673360, which is never called.  should always be set
     FootPrints                      = 0x400,            // showfootprints console var
-    MapObjectTextures               = 0x800,            // default, toggled by sub at 0x6733A0, which is never called.  should always be set
-    PortalDisplay                   = 0x1000,           // toggled by sub at 0x673470, which is never called.  should never be set
-    PortalVisual                    = 0x2000,           // toggled by sub at 0x6734B0, which is never called.  should never be set
+    MapObjectTextures               = 0x800,            // default, showMapObjTex console command, toggled by sub at 0x6733A0, which is never called.  should always be set
+    PortalDisplay                   = 0x1000,           // showPortals console command, toggled by sub at 0x673470, which is never called.  should never be set
+    PortalVisual                    = 0x2000,           // portalVis console command, toggled by sub at 0x6734B0, which is never called.  should never be set
     DisableDoodadFullAlpha          = 0x4000,           // fullAlpha console var
     DoodadAnimation                 = 0x8000,           // doodadAnim console var
     TriangleStrips                  = 0x10000,          // triangleStrips console var
-    CrappyBatches                   = 0x20000,          // toggled by sub at 0x6733E0, which is never called.  should never be set
+    CrappyBatches                   = 0x20000,          // showCrappyBatches console command, toggled by sub at 0x6733E0, which is never called.  should never be set
     ZoneBoundaryVisuals             = 0x40000,          // zoneBoundary disabled console command (should never be set, also sends CMSG_ZONE_MAP, sub at 0x673850)
-    BSPRender                       = 0x80000,          // toggled by sub at 0x6730A0, which is never called.  should never be set
+    BSPRender                       = 0x80000,          // showMapObjBSP console command, toggled by sub at 0x6730A0, which is never called.  should never be set
     DetailDoodads                   = 0x100000,         // default, showDetailDoodads console command
     ShowQuery                       = 0x200000,         // showQuery disabled console command (should never be set)
-    TerrainDoodadAABoxVisuals       = 0x400000,         // toggled by sub at 0x673170, which is never called.  should never be set
+    TerrainDoodadAABoxVisuals       = 0x400000,         // showAABoxes console command, toggled by sub at 0x673170, which is never called.  should never be set
     TrilinearFiltering              = 0x800000,         // trilinear console var
-    Water                           = 0x1000000,        // default, toggled by sub at 0x673670, which is never called.  should always be set
+    Water                           = 0x1000000,        // default, showWater and waterShow console commands, toggled by sub at 0x673670, which is never called.  should always be set
     WaterParticulates               = 0x2000000,        // default, waterParticulates console command
     TerrainLowDetail                = 0x4000000,        // default, showLowDetail console command
     Specular                        = 0x8000000,        // specular console var
     PixelShaders                    = 0x10000000,       // pixelShaders console var
-    Unknown6737F9                   = 0x20000000,       // unknown, set by sub at 0x6737F0, should never be set
-    Unknown673820                   = 0x40000000,       // unknown, set by sub at 0x673820, should never be set
+    Tris                            = 0x20000000,       // showTris console command, set by sub at 0x6737F0, should never be set
+    Normals                         = 0x40000000,       // showNormals console command, set by sub at 0x673820, should never be set
     Anisotropic                     = 0x80000000,       // anisotropic console var
 
     Required = (TerrainDoodads|Terrain| MapObjects| MapObjectLighting| MapObjectTextures| Water),
-    Prohibited = (TerrainDoodadCollisionVisuals|CrappyBatches|ZoneBoundaryVisuals|BSPRender|ShowQuery|TerrainDoodadAABoxVisuals|Unknown6737F9|Unknown673820),
+    Prohibited = (TerrainDoodadCollisionVisuals|CrappyBatches|ZoneBoundaryVisuals|BSPRender|ShowQuery|TerrainDoodadAABoxVisuals|Tris|Normals),
 };
 
 ClientOffsets const* GetClientOffets(uint32 build)
@@ -744,11 +765,11 @@ void WardenWin::LoadScriptedScans()
 
             scan << opcode << seed;
 
-            HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+            Crypto::Hash::HMACSHA1::Generator hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
             hash.UpdateData(hypervisor.DeviceName);
-            hash.Finalize();
+            auto digest = hash.GetDigest();
 
-            scan.append(hash.GetDigest(), hash.GetLength());
+            scan.append(digest.data(), digest.size());
             scan << static_cast<uint8>(strings.size());
         }
     },
@@ -773,7 +794,7 @@ void WardenWin::LoadScriptedScans()
         return false;
     },
     // TODO: Replace the magic number below with combined driver string lengths
-    (sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint8)) * HypervisorCount + 21,
+    (sizeof(uint8) + sizeof(uint32) + Crypto::Hash::SHA1::Digest::size() + sizeof(uint8)) * HypervisorCount + 21,
     sizeof(uint8) * HypervisorCount,
     "Hypervisor check",
     ScanFlags::InitialLogin, 0, UINT16_MAX));
@@ -798,11 +819,11 @@ void WardenWin::LoadScriptedScans()
 
         static_assert(sizeof(pattern) <= 0xFF, "pattern length must fit into 8 bits");
 
-        HMACSHA1 hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
+        Crypto::Hash::HMACSHA1::Generator hash(reinterpret_cast<uint8 const*>(&seed), sizeof(seed));
         hash.UpdateData(&pattern[0], sizeof(pattern));
-        hash.Finalize();
+        auto digest = hash.GetDigest();
 
-        scan.append(hash.GetDigest(), hash.GetLength());
+        scan.append(digest.data(), digest.size());
 
         scan << warden->GetModule()->memoryRead << static_cast<uint8>(sizeof(pattern));
     },
@@ -813,7 +834,7 @@ void WardenWin::LoadScriptedScans()
 
         // if this is not found, it means someone has tampered with the function
         return !found;
-    }, sizeof(uint8) + sizeof(uint32) + SHA_DIGEST_LENGTH + sizeof(uint32) + sizeof(uint8), sizeof(uint8),
+    }, sizeof(uint8) + sizeof(uint32) + Crypto::Hash::SHA1::Digest::size() + sizeof(uint32) + sizeof(uint8), sizeof(uint8),
     "Warden Memory Read check",
     ScanFlags::None, 0, UINT16_MAX));
 

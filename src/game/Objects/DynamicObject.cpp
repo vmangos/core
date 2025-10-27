@@ -179,7 +179,7 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
         return;
     }
 
-    if (_deleted)
+    if (m_deleted)
         return;
 
     // If this object is from the current channeled spell, do not delete it. Otherwise

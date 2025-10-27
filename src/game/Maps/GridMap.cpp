@@ -1122,7 +1122,7 @@ float TerrainInfo::GetWaterOrGroundLevel(float x, float y, float z, float* pGrou
         GridMapLiquidData liquid_status;
 
         GridMapLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
-        return res ? (swim ? liquid_status.level - 2.0f : liquid_status.level) : ground_z;
+        return std::max(res ? (swim ? liquid_status.level - 2.0f : liquid_status.level) : ground_z, ground_z);
     }
 
     return VMAP_INVALID_HEIGHT_VALUE;
@@ -1168,8 +1168,8 @@ GridMap* TerrainInfo::LoadMapAndVMap(uint32 const x, uint32 const y)
             m_GridMaps[x][y] = map;
 
             // load VMAPs for current map/grid...
-            MapEntry const* i_mapEntry = sMapStorage.LookupEntry<MapEntry>(m_mapId);
-            char const* mapName = i_mapEntry ? i_mapEntry->name : "UNNAMEDMAP\x0";
+            MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(m_mapId);
+            char const* mapName = mapEntry ? mapEntry->name : "UNNAMEDMAP\x0";
 
             int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapManager()->loadMap((sWorld.GetDataPath() + "vmaps").c_str(),  m_mapId, x, y);
             switch (vmapLoadResult)

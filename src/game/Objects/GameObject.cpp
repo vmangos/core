@@ -83,7 +83,7 @@ GameObject::GameObject() : SpellCaster(),
     m_useTimes = 0;
     m_spellId = 0;
     m_cooldownTime = 0;
-    i_AI = nullptr;
+    m_AI = nullptr;
     m_model = nullptr;
     m_rotation = 0;
     m_playerGroupId = 0;
@@ -102,7 +102,7 @@ GameObject::~GameObject()
         }
     }
 
-    delete i_AI;
+    delete m_AI;
     delete m_model;
 
     MANGOS_ASSERT(m_spellDynObjects.empty());
@@ -110,7 +110,7 @@ GameObject::~GameObject()
 
 GameObject* GameObject::CreateGameObject(uint32 entry)
 {
-    GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(entry);
+    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectTemplate(entry);
     if (goinfo && goinfo->type == GAMEOBJECT_TYPE_TRANSPORT)
         return new ElevatorTransport;
     return new GameObject;
@@ -133,7 +133,7 @@ void GameObject::AddToWorld()
     // After Object::AddToWorld so that for initial state the GO is added to the world (and hence handled correctly)
     UpdateCollisionState();
 
-    if (!i_AI)
+    if (!m_AI)
         AIM_Initialize();
 
     if (sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
@@ -142,8 +142,8 @@ void GameObject::AddToWorld()
 
 void GameObject::AIM_Initialize()
 {
-    delete i_AI;
-    i_AI = sScriptMgr.GetGameObjectAI(this);
+    delete m_AI;
+    m_AI = sScriptMgr.GetGameObjectAI(this);
 }
 
 void GameObject::RemoveFromWorld()
@@ -196,7 +196,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
 
     SetZoneScript();
 
-    GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(name_id);
+    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectTemplate(name_id);
     if (!goinfo)
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (GUID: %u) not created: Entry %u does not exist in `gameobject_template`. Map: %u  (X: %f Y: %f Z: %f) ang: %f rotation0: %f rotation1: %f rotation2: %f rotation3: %f", guidlow, name_id, map->GetId(), x, y, z, ang, rotation0, rotation1, rotation2, rotation3);
@@ -314,7 +314,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
     WorldObject::Update(update_diff, update_diff);
     if (GetObjectGuid().IsMOTransport())
     {
-        //((Transport*)this)->Update(p_time);
+        //((ShipTransport*)this)->Update(p_time);
         return;
     }
 
@@ -335,8 +335,8 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
     UpdatePendingProcs(update_diff);
 
     // UpdateAI
-    if (i_AI)
-        i_AI->UpdateAI(update_diff);
+    if (m_AI)
+        m_AI->UpdateAI(update_diff);
 
     switch (m_lootState)
     {
@@ -361,8 +361,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                     if (time(nullptr) > m_respawnTime - FISHING_BOBBER_READY_TIME)
                     {
                         // splash bobber (bobber ready now)
-                        Unit* caster = GetOwner();
-                        if (caster && caster->GetTypeId() == TYPEID_PLAYER)
+                        if (Player* caster = ::ToPlayer(GetOwner()))
                         {
                             SetGoState(GO_STATE_ACTIVE);
                             // SetUInt32Value(GAMEOBJECT_FLAGS, GO_FLAG_NODESPAWN);
@@ -413,8 +412,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                     {
                         case GAMEOBJECT_TYPE_FISHINGNODE:   // can't fish now
                         {
-                            Unit* caster = GetOwner();
-                            if (caster && caster->GetTypeId() == TYPEID_PLAYER)
+                            if (Player* caster = ::ToPlayer(GetOwner()))
                             {
                                 caster->FinishSpell(CURRENT_CHANNELED_SPELL);
 
@@ -549,7 +547,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                             //BattleGround gameobjects case
                             if (((Player*)ok)->InBattleGround())
                                 if (BattleGround* bg = ((Player*)ok)->GetBattleGround())
-                                    bg->HandleTriggerBuff(GetObjectGuid());
+                                    bg->HandleTriggerBuff(this);
                         }
 
                         // TODO: all traps can be activated, also those without spell.
@@ -588,6 +586,14 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                         m_cooldownTime = 0;
                     }
                     break;
+                case GAMEOBJECT_TYPE_CHEST:
+                {
+                    if (m_cooldownTime > 0 && m_cooldownTime < time(nullptr))
+                    {
+                        SetLootState(GO_JUST_DEACTIVATED);
+                    }
+                    break;
+                }
                 default:
                     break;
             }
@@ -779,10 +785,10 @@ void GameObject::RemoveUniqueUse(Player const* player)
             {
                 if (GetGoState() != GO_STATE_ACTIVE)
                     SetLootState(GO_JUST_DEACTIVATED);
-                else if (GetOwner())
+                else if (Unit* pOwner = GetOwner())
                     // if active it'll be destroyed in Spell::update
                     // remove it from owner's list to keep it running
-                    GetOwner()->RemoveGameObject(this, false);
+                    pOwner->RemoveGameObject(this, false);
             }
             SetGoState(GO_STATE_READY);
         }
@@ -795,9 +801,9 @@ void GameObject::FinishRitual()
     if (GameObjectInfo const* info = GetGOInfo())
     {
         // take spell cooldown
-        if (GetOwner() && GetOwner()->IsPlayer())
+        if (Player* pOwner = ::ToPlayer(GetOwner()))
             if (SpellEntry const* createBySpell = sSpellMgr.GetSpellEntry(GetSpellId()))
-                GetOwner()->AddCooldown(*createBySpell);
+                pOwner->AddCooldown(*createBySpell);
         if (!info->summoningRitual.ritualPersistent)
             SetLootState(GO_JUST_DEACTIVATED);
         // Only ritual of doom deals a second spell
@@ -1087,9 +1093,9 @@ bool GameObject::IsMoTransport() const
 
 Unit* GameObject::GetOwner() const
 {
-    if (!FindMap())
-        return nullptr;
-    return FindMap()->GetUnit(GetOwnerGuid());
+    if (ObjectGuid ownerid = GetOwnerGuid())
+        return ObjectAccessor::GetUnit(*this, ownerid);
+    return nullptr;
 }
 
 Player* GameObject::GetAffectingPlayer() const
@@ -1140,18 +1146,11 @@ bool GameObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject c
         if (GetGOInfo()->IsServerOnly())
             return false;
 
-        // special invisibility cases
-        /* TODO: implement trap stealth, take look at spell 2836
-        if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed && u->IsHostileTo(GetOwner()))
-        {
-            if (check stuff here)
-                return false;
-        }*/
         if (Unit const* pDetectorUnit = pDetector->ToUnit())
         {
             if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed && IsHostileTo(pDetectorUnit))
             {
-                if (!(pDetectorUnit->m_detectInvisibilityMask & (1 << 3))) // Detection des pieges
+                if (!(pDetectorUnit->m_detectInvisibilityMask & (1 << 3))) // Detect Trap
                     return false;
             }
         }
@@ -1283,7 +1282,7 @@ void GameObject::TriggerLinkedGameObject(Unit* target)
     if (!trapEntry)
         return;
 
-    GameObjectInfo const* trapInfo = sGOStorage.LookupEntry<GameObjectInfo>(trapEntry);
+    GameObjectInfo const* trapInfo = sObjectMgr.GetGameObjectTemplate(trapEntry);
     if (!trapInfo || trapInfo->type != GAMEOBJECT_TYPE_TRAP)
         return;
 
@@ -1320,7 +1319,7 @@ void GameObject::RespawnLinkedGameObject()
     if (!trapEntry)
         return;
 
-    GameObjectInfo const* trapInfo = sGOStorage.LookupEntry<GameObjectInfo>(trapEntry);
+    GameObjectInfo const* trapInfo = sObjectMgr.GetGameObjectTemplate(trapEntry);
     if (!trapInfo || trapInfo->type != GAMEOBJECT_TYPE_TRAP)
         return;
 
@@ -1477,8 +1476,8 @@ void GameObject::Use(Unit* user)
                 Cell::VisitAllObjects(this, searcher, 10.0f);
                 for (Unit* attacker : targets)
                 {
-                    if (!attacker->IsInCombat() && attacker->IsValidAttackTarget(user) &&
-                        attacker->IsWithinLOSInMap(user) && attacker->AI())
+                    if (!attacker->IsInCombat() && !attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) &&
+                        attacker->IsValidAttackTarget(user) && attacker->IsWithinLOSInMap(user) && attacker->AI())
                         attacker->AI()->AttackStart(user);
                 }
             }
@@ -1500,8 +1499,7 @@ void GameObject::Use(Unit* user)
 
             if (uint32 spellId = GetGOInfo()->trap.spellId)
             {
-                Unit* pOwner = GetOwner();
-                if (pOwner)
+                if (Unit* pOwner = GetOwner())
                     pOwner->CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
                 else
                     CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
@@ -1746,12 +1744,9 @@ void GameObject::Use(Unit* user)
                 return;
 
             Player* player = (Player*)user;
-
-            Unit* owner = GetOwner();
-
             GameObjectInfo const* info = GetGOInfo();
 
-            if (owner)
+            if (Unit* owner = GetOwner())
             {
                 if (owner->GetTypeId() != TYPEID_PLAYER)
                     return;
@@ -1852,6 +1847,7 @@ void GameObject::Use(Unit* user)
             // See WorldSession::HandleMeetingStoneJoinOpcode
             return;
         }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         case GAMEOBJECT_TYPE_FLAGSTAND:                     // 24
         {
             if (user->GetTypeId() != TYPEID_PLAYER)
@@ -1879,6 +1875,8 @@ void GameObject::Use(Unit* user)
             }
             break;
         }
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         case GAMEOBJECT_TYPE_FISHINGHOLE:                   // 25
         {
             if (user->GetTypeId() != TYPEID_PLAYER)
@@ -1889,6 +1887,7 @@ void GameObject::Use(Unit* user)
             player->SendLoot(GetObjectGuid(), LOOT_FISHINGHOLE);
             return;
         }
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         case GAMEOBJECT_TYPE_FLAGDROP:                      // 26
         {
@@ -2252,6 +2251,11 @@ bool GameObject::PlayerCanUse(Player* pPlayer)
 
 void GameObject::SetLootState(LootState state)
 {
+    if (state == GO_JUST_DEACTIVATED && GetGoType() == GAMEOBJECT_TYPE_CHEST)
+    {
+        m_cooldownTime = 0;
+    }
+
     m_lootState = state;
     UpdateCollisionState();
 }
@@ -2390,30 +2394,41 @@ void GameObject::GetLosCheckPosition(float& x, float& y, float& z) const
 {
     if (GameObjectDisplayInfoAddon const* displayInfo = sGameObjectDisplayInfoAddonStorage.LookupEntry<GameObjectDisplayInfoAddon>(GetDisplayId()))
     {
-        float scale = GetObjectScale();
+        if (displayInfo->min_x || displayInfo->min_y || displayInfo->min_z || displayInfo->max_x || displayInfo->max_y || displayInfo->max_z)
+        {
+            float scale = GetObjectScale();
 
-        float minX = displayInfo->min_x * scale;
-        float minY = displayInfo->min_y * scale;
-        float minZ = displayInfo->min_z * scale;
-        float maxX = displayInfo->max_x * scale;
-        float maxY = displayInfo->max_y * scale;
-        float maxZ = displayInfo->max_z * scale;
+            float minX = displayInfo->min_x * scale;
+            float minY = displayInfo->min_y * scale;
+            float minZ = displayInfo->min_z * scale;
+            float maxX = displayInfo->max_x * scale;
+            float maxY = displayInfo->max_y * scale;
+            float maxZ = displayInfo->max_z * scale;
 
-        QuaternionData worldRotation = GetLocalRotation();
-        G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
+            QuaternionData worldRotation = GetLocalRotation();
+            G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
 
-        auto pos = G3D::CoordinateFrame{ { worldRotationQuat },{ GetPositionX(), GetPositionY(), GetPositionZ() } }
-        .toWorldSpace(G3D::Box{ { minX, minY, minZ },{ maxX, maxY, maxZ } }).center();
+            auto pos = G3D::CoordinateFrame{ { worldRotationQuat },{ GetPositionX(), GetPositionY(), GetPositionZ() } }
+            .toWorldSpace(G3D::Box{ { minX, minY, minZ },{ maxX, maxY, maxZ } }).center();
 
+            x = pos.x;
+            y = pos.y;
+            z = pos.z;
+            return;
+        }
+    }
+
+    if (m_model)
+    {
+        auto pos = m_model->getBounds().center();
         x = pos.x;
         y = pos.y;
         z = pos.z;
+        return;
     }
-    else
-    {
-        GetPosition(x, y, z);
-        z += 1.0f;
-    }
+    
+    GetPosition(x, y, z);
+    z += 1.0f;
 }
 
 GameObjectData const* GameObject::GetGOData() const

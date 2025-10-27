@@ -147,7 +147,7 @@ struct mob_eyeStalkAI : public ScriptedAI
 
     void Reset() override
     {
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STATE_ROOT);
         m_creature->StopMoving();
         m_creature->SetRooted(true);
         m_creature->SetNoCallAssistance(true);
@@ -510,26 +510,62 @@ CreatureAI* GetAI_mob_eyeStalk(Creature* pCreature)
     return new mob_eyeStalkAI(pCreature);
 }
 
+
+// 29201 - Corrupted Mind (Loatheb)
+struct LoathebCorruptedMindAoEScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // Loatheb Corrupted Mind triggered sub spells
+            uint32 spellid;
+            switch (spell->GetUnitTarget()->GetClass())
+            {
+                // priests should be getting 29185, but it triggers on dmg effects as well, don't know why.
+                // stealing druid version for priests until anyone has a reason priests cant smite.s
+                case CLASS_PRIEST:  spellid = 29194; break;//29185; break;
+                case CLASS_DRUID:   spellid = 29194; break;
+                case CLASS_PALADIN: spellid = 29196; break;
+                case CLASS_SHAMAN:  spellid = 29198; break;
+                default: return false;
+            }
+            spell->m_caster->CastSpell(spell->GetUnitTarget(), spellid, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_LoathebCorruptedMindAoE(SpellEntry const*)
+{
+    return new LoathebCorruptedMindAoEScript();
+}
+
 void AddSC_boss_loatheb()
 {
-    Script* NewScript;
-    NewScript = new Script;
-    NewScript->Name = "boss_loatheb";
-    NewScript->GetAI = &GetAI_boss_loatheb;
-    NewScript->RegisterSelf();
+    Script* pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "boss_loatheb";
+    pNewScript->GetAI = &GetAI_boss_loatheb;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "mob_rotting_maggot";
-    NewScript->GetAI = &GetAI_mob_rottingMaggot;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_rotting_maggot";
+    pNewScript->GetAI = &GetAI_mob_rottingMaggot;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "mob_diseased_maggot";
-    NewScript->GetAI = &GetAI_mob_diseasedMaggot;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_diseased_maggot";
+    pNewScript->GetAI = &GetAI_mob_diseasedMaggot;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "mob_eye_stalk";
-    NewScript->GetAI = &GetAI_mob_eyeStalk;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_eye_stalk";
+    pNewScript->GetAI = &GetAI_mob_eyeStalk;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_loatheb_corrupted_mind_aoe";
+    pNewScript->GetSpellScript = &GetScript_LoathebCorruptedMindAoE;
+    pNewScript->RegisterSelf();
 }

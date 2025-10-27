@@ -119,7 +119,7 @@ class BattleGround
         BattleGroundWinner GetWinner() const { return m_winner; }
         uint32 GetBattlemasterEntry() const;
         uint32 GetBonusHonorFromKill(uint32 kills) const;
-        float GetHonorModifier();
+        float GetHonorModifier() const;
 
         // Set methods:
         void SetName(char const* name)               { m_name = name; }
@@ -288,7 +288,7 @@ class BattleGround
         void OpenDoorEvent(uint8 event1, uint8 event2 = 0);
         static bool IsDoor(uint8 event1, uint8 event2);
 
-        void HandleTriggerBuff(ObjectGuid goGuid);
+        void HandleTriggerBuff(GameObject* obj);
 
         // TODO: make this protected:
         typedef std::vector<ObjectGuid> BGObjects;

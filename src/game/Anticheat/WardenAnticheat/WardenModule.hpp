@@ -29,6 +29,8 @@
 #include <string>
 #include <vector>
 
+#include "Crypto/Hash/MD5.h"
+
 #pragma pack(push, 1)
 struct ChallengeResponseEntry
 {
@@ -62,7 +64,7 @@ public:
     std::vector<uint8> key;
 
     // md5 hash of 'm_binary'
-    std::vector<uint8> hash;
+    Crypto::Hash::MD5::Digest hash;
 
     // offset into module of the memory reading function which is modified by some hacks
     std::uint32_t memoryRead;

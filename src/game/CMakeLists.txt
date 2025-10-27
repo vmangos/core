@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-set (game_SRCS 
+set (game_SRCS
     AccountMgr.cpp
     AuraRemovalMgr.cpp
     AutoBroadCastMgr.cpp
@@ -54,7 +54,6 @@ set (game_SRCS
     AI/CreatureEventAI.cpp
     AI/CreatureEventAIMgr.cpp
     AI/CritterAI.cpp
-    AI/GenericSpellAI.cpp
     AI/GuardAI.cpp
     AI/GuardEventAI.cpp
     AI/NullCreatureAI.cpp
@@ -173,12 +172,15 @@ set (game_SRCS
     Objects/DynamicObject.cpp
     Objects/GameObject.cpp
     Objects/Item.cpp
+    Objects/MirrorTimer.cpp
     Objects/Object.cpp
     Objects/Pet.cpp
     Objects/Player.cpp
+    Objects/PlayerTaxi.cpp
     Objects/SpellCaster.cpp
     Objects/TemporarySummon.cpp
     Objects/Totem.cpp
+    Objects/TradeData.cpp
     Objects/Unit.cpp
     Objects/UpdateData.cpp
     Objects/UpdateFields.cpp
@@ -202,6 +204,7 @@ set (game_SRCS
     Spells/SpellEffects.cpp
     Spells/SpellEntry.cpp
     Spells/SpellMgr.cpp
+    Spells/SpellModifier.cpp
     Spells/SpellModMgr.cpp
     Threat/HostileRefManager.cpp
     Threat/ThreatManager.cpp
@@ -242,6 +245,7 @@ set (game_SRCS
     ObjectGuid.h
     ObjectMgr.h
     ObjectPosSelector.h
+    PacketProcessing.h
     PlayerDump.h
     QuestDef.h
     ReputationMgr.h
@@ -278,6 +282,23 @@ set (game_SRCS
     AI/ScriptedPetAI.h
     AI/TotemAI.h
     Anticheat/Anticheat.h
+    Anticheat/MovementAnticheat/MovementAnticheat.cpp
+    Anticheat/MovementAnticheat/MovementAnticheat.h
+    Anticheat/WardenAnticheat/Warden.cpp
+    Anticheat/WardenAnticheat/Warden.hpp
+    Anticheat/WardenAnticheat/WardenKeyGenerator.h
+    Anticheat/WardenAnticheat/WardenMac.cpp
+    Anticheat/WardenAnticheat/WardenMac.hpp
+    Anticheat/WardenAnticheat/WardenModule.cpp
+    Anticheat/WardenAnticheat/WardenModule.hpp
+    Anticheat/WardenAnticheat/WardenModuleMgr.cpp
+    Anticheat/WardenAnticheat/WardenModuleMgr.hpp
+    Anticheat/WardenAnticheat/WardenScan.cpp
+    Anticheat/WardenAnticheat/WardenScan.hpp
+    Anticheat/WardenAnticheat/WardenScanMgr.cpp
+    Anticheat/WardenAnticheat/WardenScanMgr.hpp
+    Anticheat/WardenAnticheat/WardenWin.cpp
+    Anticheat/WardenAnticheat/WardenWin.hpp
     AuctionHouse/AuctionHouseBotMgr.h
     AuctionHouse/AuctionHouseMgr.h
     Battlegrounds/BattleGround.h
@@ -369,15 +390,20 @@ set (game_SRCS
     Objects/GameObject.h
     Objects/GameObjectDefines.h
     Objects/Item.h
+    Objects/ItemDefines.h
     Objects/ItemPrototype.h
+    Objects/MirrorTimer.h
     Objects/MovementInfo.h
     Objects/Object.h
     Objects/ObjectDefines.h
     Objects/Pet.h
     Objects/Player.h
+    Objects/PlayerTaxi.h
     Objects/SpellCaster.h
     Objects/TemporarySummon.h
     Objects/Totem.h
+    Objects/TradeData.h
+    Objects/TransactionLog.h
     Objects/Unit.h
     Objects/UnitDefines.h
     Objects/UpdateData.h
@@ -403,6 +429,7 @@ set (game_SRCS
     Spells/SpellDefines.h
     Spells/SpellEntry.h
     Spells/SpellMgr.h
+    Spells/SpellModifier.h
     Spells/SpellModMgr.h
     Threat/HostileRefManager.h
     Threat/ThreatManager.h
@@ -455,29 +482,6 @@ else()
       ${CMAKE_SOURCE_DIR}/src/scripts/ScriptLoader.h
   )
 endif()
-
-if(USE_ANTICHEAT)
-  list(APPEND game_SRCS
-      Anticheat/MovementAnticheat/MovementAnticheat.cpp
-      Anticheat/MovementAnticheat/MovementAnticheat.h
-      Anticheat/WardenAnticheat/Warden.cpp
-      Anticheat/WardenAnticheat/Warden.hpp
-      Anticheat/WardenAnticheat/WardenKeyGeneration.h
-      Anticheat/WardenAnticheat/WardenMac.cpp
-      Anticheat/WardenAnticheat/WardenMac.hpp
-      Anticheat/WardenAnticheat/WardenModule.cpp
-      Anticheat/WardenAnticheat/WardenModule.hpp
-      Anticheat/WardenAnticheat/WardenModuleMgr.cpp
-      Anticheat/WardenAnticheat/WardenModuleMgr.hpp
-      Anticheat/WardenAnticheat/WardenScan.cpp
-      Anticheat/WardenAnticheat/WardenScan.hpp
-      Anticheat/WardenAnticheat/WardenScanMgr.cpp
-      Anticheat/WardenAnticheat/WardenScanMgr.hpp
-      Anticheat/WardenAnticheat/WardenWin.cpp
-      Anticheat/WardenAnticheat/WardenWin.hpp
-  )
-endif()
-
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}

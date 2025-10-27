@@ -200,7 +200,7 @@ bool Map::ScriptCommand_MoveTo(ScriptInfo const& script, WorldObject* source, Wo
     }
 
     // Only move if we can move.
-    if (pSource->HasUnitState(UNIT_STAT_NOT_MOVE) && !(script.moveTo.flags & SF_MOVETO_FORCED))
+    if (pSource->HasUnitState(UNIT_STATE_NOT_MOVE) && !(script.moveTo.flags & SF_MOVETO_FORCED))
         return ShouldAbortScript(script);
 
     float speed = script.moveTo.travelTime != 0 ? pSource->GetDistance(x, y, z) / ((float)script.moveTo.travelTime * 0.001f) : 0.0f;
@@ -806,7 +806,7 @@ bool Map::ScriptCommand_SetMovementType(ScriptInfo const& script, WorldObject* s
             break;
         case FOLLOW_MOTION_TYPE:
             if (pTarget)
-                pSource->GetMotionMaster()->MoveFollow(pTarget, script.x, script.o);
+                pSource->GetMotionMaster()->MoveFollow(pTarget, script.x, script.o < 0 ? frand(0, 2 * M_PI_F) : script.o);
             break;
         case CHARGE_MOTION_TYPE:
             if (pTarget)
@@ -1028,8 +1028,8 @@ bool Map::ScriptCommand_ModifyThreat(ScriptInfo const& script, WorldObject* sour
     if (script.modThreat.target == SO_MODIFYTHREAT_ALL_ATTACKERS)
     {
         ThreatList const& threatList = pSource->GetThreatManager().getThreatList();
-        for (const auto i : threatList)
-            if (Unit* Temp = pSource->GetMap()->GetUnit(i->getUnitGuid()))
+        for (auto const& itr : threatList)
+            if (Unit* Temp = itr->getTarget())
                 pSource->GetThreatManager().modifyThreatPercent(Temp, script.x);
     }
     else
@@ -1338,19 +1338,28 @@ bool Map::ScriptCommand_RemoveItem(ScriptInfo const& script, WorldObject* source
 }
 
 // SCRIPT_COMMAND_REMOVE_OBJECT (41)
-bool Map::ScriptCommand_RemoveGameObject(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+bool Map::ScriptCommand_RemoveObject(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
-    GameObject* pGo = nullptr;
-
-    if (!((pGo = ToGameObject(target)) || (pGo = ToGameObject(source))))
+    if (!source)
     {
-        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_REMOVE_OBJECT (script id %u) call for a nullptr gameobject, skipping.", script.id);
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_REMOVE_OBJECT (script id %u) call for a nullptr source, skipping.", script.id);
         return ShouldAbortScript(script);
     }
 
-    pGo->SetLootState(GO_JUST_DEACTIVATED);
-    pGo->AddObjectToRemoveList();
-    return false;
+    if (GameObject* pGo = source->ToGameObject())
+    {
+        pGo->SetLootState(GO_JUST_DEACTIVATED);
+        pGo->Delete();
+        return false;
+    }
+    else if (Creature* pCreature = source->ToCreature())
+    {
+        pCreature->AddObjectToRemoveList();
+        return false;
+    }
+
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_REMOVE_OBJECT (script id %u) call for a non-creature and non-gameobject source (TypeId: %u), skipping.", script.id, source->GetTypeId());
+    return ShouldAbortScript(script);
 }
 
 // SCRIPT_COMMAND_SET_MELEE_ATTACK (42)
@@ -2314,22 +2323,8 @@ bool Map::ScriptCommand_DespawnGameObject(ScriptInfo const& script, WorldObject*
 // SCRIPT_COMMAND_LOAD_GAMEOBJECT_SPAWN (82)
 bool Map::ScriptCommand_LoadGameObject(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
-    GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(script.loadGo.goGuid);
-
-    if (GetId() != pGameObjectData->position.mapId)
-    {
-        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_LOAD_GAMEOBJECT_SPAWN (script id %u) tried to spawn guid %u on wrong map %u.", script.id, script.loadGo.goGuid, GetId());
+    if (!LoadGameObjectSpawn(script.loadGo.goGuid))
         return ShouldAbortScript(script);
-    }
-
-    if (GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, script.loadGo.goGuid)))
-        return ShouldAbortScript(script); // already spawned
-
-    GameObject* pGameobject = GameObject::CreateGameObject(pGameObjectData->id);
-    if (!pGameobject->LoadFromDB(script.loadGo.goGuid, this, true))
-        delete pGameobject;
-    else
-        Add(pGameobject);
 
     return false;
 }

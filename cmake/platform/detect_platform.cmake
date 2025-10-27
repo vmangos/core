@@ -1,0 +1,17 @@
+# check what platform we're on 64-bit or 32-bit
+if(CMAKE_SIZEOF_VOID_P MATCHES 8)
+  set(PLATFORM X64)
+  message(STATUS "Detected 64-bit platform")
+  IF(WIN32)
+    ADD_DEFINITIONS("-D_WIN64")
+  ENDIF()
+else()
+  set(PLATFORM X86)
+  message(STATUS "Detected 32-bit platform")
+endif()
+
+if(WIN32)
+  include("${ROOT_DIR}/cmake/platform/win/settings.cmake")
+elseif(UNIX)
+  include("${ROOT_DIR}/cmake/platform/unix/settings.cmake")
+endif()

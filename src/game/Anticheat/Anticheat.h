@@ -73,10 +73,8 @@ public:
     virtual void showMuted(WorldSession* session) {}
 };
 
-#ifdef USE_ANTICHEAT
 #include "WardenAnticheat/Warden.hpp"
 #include "MovementAnticheat/MovementAnticheat.h"
-
 #include "ace/Thread_Mutex.h"
 #include "ace/Guard_T.h"
 
@@ -90,60 +88,9 @@ public:
     AnticheatManager* m_manager;
 };
 
-#else
-class Warden
-{
-protected: // forbid instantiation
-    Warden() = default;
-public:
-    ~Warden() = default;
-    void HandlePacket(WorldPacket&) {}
-    virtual void Update() {}
-    virtual void GetPlayerInfo(std::string&, std::string&, std::string&, std::string&, std::string&) const {}
-    bool HasUsedClickToMove() const { return false; }
-};
-
-class MovementAnticheat
-{
-public:
-    MovementAnticheat() = default;
-    ~MovementAnticheat() = default;
-
-    void Init() {}
-    void InitNewPlayer(Player* pPlayer) {}
-    void ResetJumpCounters() {}
-
-    bool IsInKnockBack() const { return false; }
-
-    uint32 Update(Player* pPlayer, uint32 diff, std::stringstream& reason) { return CHEAT_ACTION_NONE; }
-    uint32 Finalize(Player* pPlayer, std::stringstream& reason) { return CHEAT_ACTION_NONE; }
-    void AddCheats(uint32 cheats, uint32 count = 1) {}
-    void HandleCommand(ChatHandler* handler) const {}
-    void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin) {}
-
-    void OnUnreachable(Unit* attacker) {}
-    void OnExplore(AreaEntry const* pArea) {}
-    void OnWrongAckData() {};
-    void OnFailedToAckChange() {};
-    void OnDeath() {};
-
-    /*
-    pPlayer - player who is being moved (not necessarily same as this session's player)
-    movementInfo - new movement info that was just received
-    opcode - the packet we are checking
-    */
-    uint32 HandlePositionTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return 0; }
-    uint32 HandleFlagTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return 0; }
-    bool HandleSplineDone(Player* /*pPlayer*/, MovementInfo const& /*movementInfo*/, uint32 /*splineId*/) { return true; }
-    void LogMovementPacket(bool /*isClientPacket*/, WorldPacket const& /*packet*/) {}
-    static bool IsLoggedOpcode(uint16 /*opcode*/) { return false; }
-};
-#endif
-
 class AnticheatManager
 {
 public:
-#ifdef USE_ANTICHEAT
     friend class AnticheatManagerWorker;
     ~AnticheatManager();
     void LoadAnticheatData();
@@ -167,24 +114,6 @@ private:
     std::vector<Warden*> m_wardenSessionsToRemove;
     ACE_Thread_Mutex m_wardenSessionsMutex;
     ACE_Based::Thread* m_wardenUpdateThread = nullptr;
-#else
-    void LoadAnticheatData() {}
-
-    Warden* CreateWardenFor(WorldSession* client, BigNumber* K)
-    {
-        return nullptr;
-    }
-    MovementAnticheat* CreateAnticheatFor(Player* player)
-    {
-        return new MovementAnticheat();
-    }
-
-    void StartWardenUpdateThread() {}
-    void StopWardenUpdateThread() {}
-    void UpdateWardenSessions() {}
-    void AddWardenSession(Warden* warden) {}
-    void RemoveWardenSession(Warden* warden) {}
-#endif
 
 public:
     // Antispam wrappers

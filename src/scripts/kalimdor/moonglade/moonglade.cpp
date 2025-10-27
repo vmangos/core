@@ -1173,7 +1173,7 @@ struct boss_eranikusAI : public ScriptedAI
                         }
                         // Note: this emote was a world wide yellow emote before WotLK
                         //DoScriptText(EMOTE_ERANIKUS_REDEEM, m_creature);
-                        sWorld.SendWorldText(EMOTE_ERANIKUS_REDEEM, m_creature->GetName());
+                        sWorld.SendBroadcastTextToWorld(EMOTE_ERANIKUS_REDEEM);
                         //DoCastSpellIfCan(m_creature, SPELL_MOONGLADE_TRANQUILITY); // spell id unk for the moment
                         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
                         m_uiEventTimer = 5000;
@@ -1236,7 +1236,7 @@ struct boss_eranikusAI : public ScriptedAI
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (const auto itr : tList)
             {
-                if (Unit* pAttacker = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
+                if (Unit* pAttacker = itr->getTarget())
                     if (m_creature->CanReachWithMeleeAutoAttack(pAttacker))
                         m_creature->GetThreatManager().modifyThreatPercent(pAttacker, 5);
             }

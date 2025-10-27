@@ -69,7 +69,7 @@ class HonorMaintenancer
         void SetCityRanks();
         void CreateCalculationReport();
 
-        float GetStandingCPByPosition(HonorStandingList& standingList, uint32 position);
+        float GetStandingCPByPosition(HonorStandingList const& standingList, uint32 position);
         uint32 GetStandingPositionByGUID(uint32 guid, Team team);
         HonorStandingList& GetStandingListByTeam(Team team);
         HonorScores GenerateScores(HonorStandingList& standingList);

@@ -92,13 +92,13 @@ template <typename SessionType, typename SocketName, typename Crypt>
 class MangosSocket : public WorldHandler
 {
     public:
-        // things called by ACE framework.
+        // Things called by ACE framework.
         MangosSocket();
         virtual ~MangosSocket(void);
 
-        // Declare the acceptor for this class
+        // Declare the acceptor for this class.
         typedef ACE_Connector<SocketName,ACE_SOCK_CONNECTOR> Connector;
-        // Declare some friends
+        // Declare some friends.
         friend class ACE_Connector<SocketName, ACE_SOCK_CONNECTOR>;
         friend class ACE_NonBlocking_Connect_Handler<SocketName>;
 
@@ -122,12 +122,12 @@ class MangosSocket : public WorldHandler
         virtual int close(int);
 
         // Get address of connected peer.
-        const std::string& GetRemoteAddress () const { return m_Address; }
+        std::string const& GetRemoteAddress () const { return m_address; }
 
         // Send A packet on the socket, this function is reentrant.
         // @param pct packet to send
         // @return -1 of failure
-        int SendPacket (const WorldPacket& pct);
+        int SendPacket (WorldPacket const& pct);
 
         // Add reference to this object.
         long AddReference() { return static_cast<long>(add_reference()); }
@@ -135,16 +135,16 @@ class MangosSocket : public WorldHandler
         // Remove reference to this object.
         long RemoveReference() { return static_cast<long>(remove_reference()); }
 
-        void SetSession(SessionType* t) { m_Session = t; }
-        void SetClientSocket() { m_isServerSocket = false; }
-        /**
-         * @brief returns true iif the socket is connected TO a client (ie we are the server)
-         */
+        // Linking the socket to its world session.
+        void SetSession(SessionType* t) { m_session = t; }
+
+        // Returns true if the socket is connected TO a client (ie we are the server).
         bool IsServerSide() { return m_isServerSocket; }
+        void SetClientSocket() { m_isServerSocket = false; }
+
     protected:
-        // process one incoming packet.
-        // @param new_pct received packet ,note that you need to delete it.
-        int ProcessIncoming (WorldPacket* new_pct) { delete new_pct; return 0; }
+        // Process one incoming packet, note that you need to delete it.
+        int ProcessIncoming (WorldPacket* newPct) { delete newPct; return 0; }
         int OnSocketOpen() { return 0; }
 
         // Called when we can read from the socket.
@@ -166,67 +166,72 @@ class MangosSocket : public WorldHandler
         int handle_input_missing_data (void);
 
         // Help functions to mark/unmark the socket for output.
-        // @param g the guard is for m_OutBufferLock, the function will release it
+        // @param g the guard is for m_outBufferLock, the function will release it
         int cancel_wakeup_output (GuardType& g);
         int schedule_wakeup_output (GuardType& g);
 
-        // Try to write WorldPacket to m_OutBuffer ,return -1 if no space
-        // Need to be called with m_OutBufferLock lock held
-        int iSendPacket (const WorldPacket& pct);
+        // Try to write WorldPacket to m_outBuffer ,return -1 if no space
+        // Need to be called with m_outBufferLock lock held
+        int iSendPacket (WorldPacket const& pct);
 
-        // Flush m_PacketQueue if there are packets in it
-        // Need to be called with m_OutBufferLock lock held
+        // Flush m_packetQueue if there are packets in it
+        // Need to be called with m_outBufferLock lock held
         // @return true if it wrote to the buffer ( AKA you need
         // to mark the socket for output ).
         bool iFlushPacketQueue ();
 
-        // Time in which the last ping was received
-        ACE_Time_Value m_LastPingTime;
+        // Time at which the socket was created.
+        ACE_Time_Value m_createTime;
+
+        // Time at which the last ping was received.
+        ACE_Time_Value m_lastPingTime;
 
         // Keep track of over-speed pings ,to prevent ping flood.
-        uint32 m_OverSpeedPings;
+        uint32 m_overSpeedPings;
 
         // Address of the remote peer
-        std::string m_Address;
+        std::string m_address;
 
-        // Class used for managing encryption of the headers
-        Crypt m_Crypt;
+        // Class used for managing encryption of the headers.
+        Crypt m_crypt;
 
-        // Mutex lock to protect m_Session
-        LockType m_SessionLock;
+        // Mutex lock to protect m_session.
+        LockType m_sessionLock;
 
-        // Session to which received packets are routed
-        SessionType* m_Session;
+        // Session to which received packets are routed.
+        SessionType* m_session;
 
-        // here are stored the fragments of the received data
-        WorldPacket* m_RecvWPct;
+        // here are stored the fragments of the received data.
+        WorldPacket* m_recvWPct;
 
-        // This block actually refers to m_RecvWPct contents,
+        // This block actually refers to m_recvWPct contents,
         // which allows easy and safe writing to it.
-        // It wont free memory when its deleted. m_RecvWPct takes care of freeing.
-        ACE_Message_Block m_RecvPct;
+        // It wont free memory when its deleted. m_recvWPct takes care of freeing.
+        ACE_Message_Block m_recvPct;
 
         // Fragment of the received header.
-        ACE_Message_Block m_Header;
+        ACE_Message_Block m_header;
 
         // Mutex for protecting output related data.
-        LockType m_OutBufferLock;
+        LockType m_outBufferLock;
 
         // Buffer used for writing output.
-        ACE_Message_Block *m_OutBuffer;
+        ACE_Message_Block* m_outBuffer;
 
-        // Size of the m_OutBuffer.
-        size_t m_OutBufferSize;
+        // Size of the m_outBuffer.
+        size_t m_outBufferSize;
 
-        // Here are stored packets for which there was no space on m_OutBuffer,
+        // Here are stored packets for which there was no space on m_outBuffer,
         // this allows not-to kick player if its buffer is overflowed.
-        PacketQueueT m_PacketQueue;
+        PacketQueueT m_packetQueue;
 
-        // True if the socket is registered with the reactor for output
-        bool m_OutActive;
+        // True if the socket is registered with the reactor for output.
+        bool m_outActive;
 
-        uint32 m_Seed;
+        // Sent to client in SMSG_AUTH_CHALLENGE.
+        uint32 m_seed;
 
+        // Connecting to other server is also possible (potential clustering).
         bool m_isServerSocket;
 };
 

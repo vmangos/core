@@ -86,7 +86,7 @@ void OPvPCapturePoint::SendChangePhase()
 
 bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 mapId, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
-    GameObjectInfo const* goInfo = sObjectMgr.GetGameObjectInfo(entry);
+    GameObjectInfo const* goInfo = sObjectMgr.GetGameObjectTemplate(entry);
     if (!goInfo)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid GameObject entry %u in OPvPCapturePoint::AddObject!", entry);
@@ -147,17 +147,16 @@ bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 mapId, float x, 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Creating capture point %u", entry);
 
     // check info existence
-    GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(entry);
-    if (!goinfo || goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "OutdoorPvP: GO %u is not capture point!", entry);
-        return false;
-    }
-
-    GameObjectInfo const* goInfo = sObjectMgr.GetGameObjectInfo(entry);
+    GameObjectInfo const* goInfo = sObjectMgr.GetGameObjectTemplate(entry);
     if (!goInfo)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid GameObject entry %u in OPvPCapturePoint::SetCapturePointData!", entry);
+        return false;
+    }
+
+    if (goInfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "OutdoorPvP: GO %u is not capture point!", entry);
         return false;
     }
 
@@ -181,9 +180,9 @@ bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 mapId, float x, 
     m_capturePointGUID = pGo->GetGUIDLow();
 
     // get the needed values from goinfo
-    m_maxValue = (float)goinfo->capturePoint.maxTime;
-    m_maxSpeed = m_maxValue / (goinfo->capturePoint.minTime ? goinfo->capturePoint.minTime : 60);
-    m_neutralValuePct = goinfo->capturePoint.neutralPercent;
+    m_maxValue = (float)goInfo->capturePoint.maxTime;
+    m_maxSpeed = m_maxValue / (goInfo->capturePoint.minTime ? goInfo->capturePoint.minTime : 60);
+    m_neutralValuePct = goInfo->capturePoint.neutralPercent;
     m_minValue = m_maxValue * float(m_neutralValuePct) / 100.0f;
 
     return true;

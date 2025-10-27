@@ -20,11 +20,7 @@ struct AuctionHouseBotEntry
 struct AuctionHouseBotConfig
 {
     uint32 itemcount;
-    uint32 ahid;
     uint32 ahfid;
-
-    uint64 botguid;
-    uint32 botaccount;
 
     bool enable;
 };

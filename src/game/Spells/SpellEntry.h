@@ -33,6 +33,7 @@ class Unit;
 class WorldObject;
 class SpellEntry;
 class SpellCaster;
+struct AuraScript;
 
 namespace Spells
 {
@@ -611,7 +612,7 @@ class SpellEntry
         uint32    EffectAmplitude[MAX_EFFECT_INDEX] = {};          // 97-99
         float     EffectMultipleValue[MAX_EFFECT_INDEX] = {};      // 100-102
         uint32    EffectChainTarget[MAX_EFFECT_INDEX] = {};        // 103-105
-        uint32    EffectItemType[MAX_EFFECT_INDEX] = {};           // 106-108
+        uint64    EffectItemType[MAX_EFFECT_INDEX] = {};           // 106-108
         int32     EffectMiscValue[MAX_EFFECT_INDEX] = {};          // 109-111
         uint32    EffectTriggerSpell[MAX_EFFECT_INDEX] = {};       // 112-114
         float     EffectPointsPerComboPoint[MAX_EFFECT_INDEX] = {};// 115-117
@@ -647,6 +648,7 @@ class SpellEntry
         uint32 MinTargetLevel = 0;                                 // 162
         uint32 Custom = 0;                                         // 176
         uint32 Internal = 0;                                       // Assigned by the core.
+        uint32 ScriptId = 0;
 
         // HELPERS:
         DiminishingGroup GetDiminishingReturnsGroup(bool triggered) const;
@@ -698,6 +700,7 @@ class SpellEntry
         bool HasAttribute(SpellAttributesEx2 attribute) const { return AttributesEx2 & attribute; }
         bool HasAttribute(SpellAttributesEx3 attribute) const { return AttributesEx3 & attribute; }
         bool HasAttribute(SpellAttributesEx4 attribute) const { return AttributesEx4 & attribute; }
+        bool HasAttribute(SpellAttributesCustom attribute) const { return Custom & attribute; }
 
         bool HasSpellInterruptFlag(SpellInterruptFlags flag) const { return InterruptFlags & flag; }
         bool HasAuraInterruptFlag(SpellAuraInterruptFlags flag) const { return AuraInterruptFlags & flag; }
@@ -1066,6 +1069,8 @@ class SpellEntry
             return false;
         }
 
+        bool CanTriggerWeaponProcs() const;
+
         bool HasDirectThreatIncreaseEffect() const
         {
             for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -1167,7 +1172,7 @@ class SpellEntry
 
         int32 GetDuration() const;
         int32 GetMaxDuration() const;
-        int32 CalculateDuration(WorldObject const* caster = nullptr) const;
+        int32 CalculateDuration(WorldObject const* caster = nullptr, Unit const* target = nullptr, AuraScript* auraScript = nullptr) const;
         uint32 GetCastTime(SpellCaster const* caster, Spell* spell = nullptr) const;
         uint32 GetCastTimeForBonus(DamageEffectType damagetype) const;
         uint16 GetAuraMaxTicks() const;

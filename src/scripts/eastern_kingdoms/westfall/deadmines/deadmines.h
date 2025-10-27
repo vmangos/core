@@ -12,8 +12,8 @@ enum
     TYPE_DEFIAS_ENDDOOR     = 1,
     DATA_DEFIAS_DOOR        = 2,
 
-    INST_SAY_ALARM1         = -1036000,
-    INST_SAY_ALARM2         = -1036001,
+    INST_SAY_ALARM1         = 1148,
+    INST_SAY_ALARM2         = 1149,
 
     /** Doors which need to be opened automatically once the boss before died */
     GO_DOOR1                = 13965,

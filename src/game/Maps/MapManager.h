@@ -27,10 +27,10 @@
 #include "Policies/Singleton.h"
 #include "ace/Recursive_Thread_Mutex.h"
 #include "ace/Thread_Mutex.h"
-#include "Map.h"
 #include "GridStates.h"
 #include <condition_variable>
 
+class Map;
 class BattleGround;
 
 enum
@@ -148,21 +148,6 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
             return IsValidMapCoord(loc.mapId,loc.x,loc.y,loc.z,loc.o);
         }
 
-        // modulos a radian orientation to the range of 0..2PI
-        static float NormalizeOrientation(float o)
-        {
-            // fmod only supports positive numbers. Thus we have
-            // to emulate negative numbers
-            if (o < 0)
-            {
-                float mod = o *-1;
-                mod = fmod(mod, 2.0f*M_PI_F);
-                mod = -mod+2.0f*M_PI_F;
-                return mod;
-            }
-            return fmod(o, 2.0f*M_PI_F);
-        }
-
         void RemoveAllObjectsInRemoveList();
 
         bool CanPlayerEnter(uint32 mapid, Player* player);
@@ -232,9 +217,9 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         IntervalTimer i_timer;
 
         uint32 i_MaxInstanceId;
-        int             i_maxContinentThread;
-        volatile bool*  i_continentUpdateFinished;
-        bool asyncMapUpdating;
+        int             i_maxContinentThread = 0;
+        volatile bool*  i_continentUpdateFinished = 0;
+        bool asyncMapUpdating = false;
 
         // Instanced continent zones
         const static int LAST_CONTINENT_ID = 2;

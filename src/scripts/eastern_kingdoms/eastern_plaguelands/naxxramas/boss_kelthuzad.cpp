@@ -37,7 +37,7 @@ enum KelthuzadData
     SAY_REQUEST_AID                     = 12998,         // Master! I require aid! 
     SAY_ANSWER_REQUEST                  = 12994,         // Very well... warriors of the frozen wastes, rise up! I command you to fight, kill, and die for your master. Let none survive...
 
-    SAY_SPECIAL1_MANA_DET               = -1533106,         // (need find correct bct id!) Your petty magics are no challenge to the might of the Scourge! 
+    SAY_SPECIAL1_MANA_DET               = 13492,         
     SAY_SPECIAL3_MANA_DET               = -1533107,         // (need find correct bct id!) Enough! I grow tired of these distractions! 
     SAY_SPECIAL2_DISPELL                = -1533108,         // (need find correct bct id!) Fools, you have spread your powers too thin. Be free, my minions!
 
@@ -1119,6 +1119,29 @@ void instance_naxxramas::OnKTAreaTrigger(AreaTriggerEntry const* pAT)
     }
 }
 
+// 27812 - Void Blast (Kel'Thuzad)
+struct KelThuzadVoidBlastScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // If target has the chains of kel'thuzad aura the spell should not do any damage.
+            // This check should not be necessary as you should be friendly to the caster of
+            // the spell, but some bug caused players to take damage anyway, and even if that is fixed,
+            // this is a safetycheck.
+            if (spell->GetUnitTarget()->HasAura(28410))
+                spell->damage = 0;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_KelThuzadVoidBlast(SpellEntry const*)
+{
+    return new KelThuzadVoidBlastScript();
+}
+
 void AddSC_boss_kelthuzad()
 {
     Script* NewScript;
@@ -1151,5 +1174,10 @@ void AddSC_boss_kelthuzad()
     NewScript = new Script;
     NewScript->Name = "mob_shadow_fissure";
     NewScript->GetAI = &GetAI_mob_shadow_fissure;
+    NewScript->RegisterSelf();
+
+    NewScript = new Script;
+    NewScript->Name = "spell_kelthuzad_void_blast";
+    NewScript->GetSpellScript = &GetScript_KelThuzadVoidBlast;
     NewScript->RegisterSelf();
 }

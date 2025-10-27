@@ -46,6 +46,7 @@ uint32 const SI_TURNIN_QUEST_CM_A   = 17090;
 uint32 const SI_TURNIN_QUEST_CM_H   = 18199;
 uint32 const SI_SILITHYST_MOUND     = 181597;
 uint32 const SI_SILITHYST_GEYSER    = 181598;
+uint32 const SI_DUST_BAG            = 181962;
 
 class OutdoorPvPSI : public OutdoorPvP
 {
@@ -70,12 +71,16 @@ class OutdoorPvPSI : public OutdoorPvP
 
         void UpdateWorldState();
 
-    private:
+        void ResetResourceCount();
 
+        void SpawnDustBags(uint32 resource, std::vector<uint32> const& allBags, std::set<uint32>& spawnedBags);
+
+    private:
+        std::set<uint32> m_allianceDustBags;
+        std::set<uint32> m_hordeDustBags;
         uint32 m_Gathered_A;
         uint32 m_Gathered_H;
         uint32 m_MaxRessources;
-
         uint32 m_LastController;
 };
 

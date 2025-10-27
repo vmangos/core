@@ -38,7 +38,6 @@ struct instance_deadmines : public ScriptedInstance
     uint64 m_uiSmiteGUID;
     uint64 m_uiRhahkGUID;
     uint64 m_uiGilnidGUID;
-    uint64 m_uiDMFChestGUID;
 
     uint64 m_uiDoor1GUID;
     uint64 m_uiDoor2GUID;
@@ -143,23 +142,7 @@ struct instance_deadmines : public ScriptedInstance
             m_uiDoor3GUID = pGo->GetGUID();
 
         if (pGo->GetEntry() == GO_DMF_CHEST)
-        {
             pGo->SetVisible(false);
-            m_uiDMFChestGUID = pGo->GetGUID();
-        }
-    }
-
-    void OnPlayerEnter(Player* pPlayer) override
-    {
-        if (!pPlayer)
-            return;
-
-        // Darkmoon chest visible only for players on the quest
-        if (pPlayer->GetQuestStatus(QUEST_FORTUNE_AWAITS) == QUEST_STATUS_COMPLETE)
-        {
-            if (GameObject* pGo = instance->GetGameObject(m_uiDMFChestGUID))
-                pGo->SetVisible(true);
-        }
     }
 
     void SetData(uint32 uiType, uint32 uiData) override
@@ -309,11 +292,29 @@ InstanceData* GetInstanceData_instance_deadmines(Map* pMap)
     return new instance_deadmines(pMap);
 }
 
+bool AreaTrigger_at_dmf_chest_dm(Player* pPlayer, AreaTriggerEntry const* pAt)
+{
+    // Darkmoon chest visible only for players on the quest
+    if (pPlayer->GetQuestStatus(QUEST_FORTUNE_AWAITS) == QUEST_STATUS_COMPLETE)
+    {
+        if (GameObject* pGo = pPlayer->FindNearestGameObject(GO_DMF_CHEST, 100.0f))
+            pGo->SetVisible(true);
+    }
+
+    return false;
+}
+
 void AddSC_instance_deadmines()
 {
     Script* newscript;
+
     newscript = new Script;
     newscript->Name = "instance_deadmines";
     newscript->GetInstanceData = &GetInstanceData_instance_deadmines;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "at_dmf_chest_dm";
+    newscript->pAreaTrigger = &AreaTrigger_at_dmf_chest_dm;
     newscript->RegisterSelf();
 }

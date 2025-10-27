@@ -276,6 +276,7 @@ void MapManager::CreateNewInstancesForPlayers()
             DungeonMap* pMap = static_cast<DungeonMap*>(CreateInstance(dest.mapId, player));
             if (pMap->CanEnter(player))
             {
+                pMap->ForceLoadGridsAroundPosition(dest.x, dest.y);
                 pMap->BindPlayerOrGroupOnEnter(player);
                 player->SendNewWorld();
             } 
@@ -713,7 +714,7 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
     // Y = horizontal axis on wow ...
     switch (mapId)
     {
-        case 0:
+        case MAP_EASTERN_KINGDOMS:
         {
             static float const topNorthSouthLimit[] = {
                 2032.048340f, -6927.750000f,
@@ -798,7 +799,7 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
                 return MAP0_STORMWIND_AREA;
             return MAP0_SOUTH;
         }
-        case 1:
+        case MAP_KALIMDOR:
         {
             static float const northMiddleLimit[] = {
                   -2280.00f,  4054.00f,

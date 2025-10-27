@@ -31,7 +31,7 @@
 
 enum eCreatures
 {
-    EMOTE_WEAKENED                  = -1531011,
+    EMOTE_WEAKENED                  = 11476,
     MOB_EYE_TENTACLE                = 15726,
     MOB_CLAW_TENTACLE               = 15725,
     MOB_GIANT_CLAW_TENTACLE         = 15728,
@@ -53,7 +53,7 @@ enum eSpells
     SPELL_ROTATE_TRIGGER            = 26137,
     SPELL_ROTATE_NEGATIVE_360       = 26136,
     SPELL_ROTATE_POSITIVE_360       = 26009,
-    SPELL_DARK_GLARE                = 26029,
+    // SPELL_DARK_GLARE             = 26029,
     
     // Shared spells
     SPELL_GREEN_EYE_BEAM            = 26134,
@@ -67,8 +67,8 @@ enum eSpells
 
     // spellid 26100 has a more correct knockback effect for giant tentacles, but wrong dmg values
 
-    //SPELL_PUNT_UPWARD               = 16716, // Used to knock people up from stomach. Remove manually after port as it's the wrong spell and applies slowfall
-    SPELL_MASSIVE_GROUND_RUPTURE    = 26100, // currently unused, ~1k physical huge knockback, not sure who should do it, if any
+    // SPELL_PUNT_UPWARD            = 16716, // Used to knock people up from stomach. Remove manually after port as it's the wrong spell and applies slowfall
+    // SPELL_MASSIVE_GROUND_RUPTURE = 26100, // currently unused, ~1k physical huge knockback, not sure who should do it, if any
     SPELL_GROUND_RUPTURE_PHYSICAL   = 26139, // used by small tentacles
     SPELL_HAMSTRING                 = 26141, //26211 is in DBC with more correct ID?
     SPELL_MIND_FLAY                 = 26143, 
@@ -77,15 +77,22 @@ enum eSpells
     //C'thun spells
     
     SPELL_CARAPACE_OF_CTHUN         = 26156, // Makes C'thun invulnerable
-    SPELL_DIGESTIVE_ACID_TELEPORT   = 26220, // Not yet used, seems to port C'thun instead of player no matter what.
+    // SPELL_DIGESTIVE_ACID_TELEPORT= 26220, // Not yet used, seems to port C'thun instead of player no matter what.
     SPELL_TRANSFORM                 = 26232, // Initiates the p1->p2 transform
     SPELL_CTHUN_VULNERABLE          = 26235, // Adds the red color. Does not actually him vulnerable, need to remove carapace for that.
     SPELL_MOUTH_TENTACLE            = 26332, // Spawns the tentacle that "eats" you to stomach and mounts the player on it.
 };
 
 static std::vector<uint32> const allTentacleTypes
-({ MOB_EYE_TENTACLE, MOB_CLAW_TENTACLE, MOB_GIANT_CLAW_TENTACLE, MOB_GIANT_EYE_TENTACLE, MOB_FLESH_TENTACLE,
-    MOB_SMALL_PORTAL, MOB_GIANT_PORTAL});
+({
+    MOB_EYE_TENTACLE,
+    MOB_CLAW_TENTACLE,
+    MOB_GIANT_CLAW_TENTACLE,
+    MOB_GIANT_EYE_TENTACLE,
+    MOB_FLESH_TENTACLE,
+    MOB_SMALL_PORTAL,
+    MOB_GIANT_PORTAL
+});
 
 static constexpr uint32 CANNOT_CAST_SPELL_MASK = (UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED
                                                  | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING);
@@ -100,7 +107,6 @@ static constexpr float fleshTentaclePositions[2][4] =
     { -8571.0f, 1990.0f, -98.0f, 1.22f },
     { -8525.0f, 1994.0f, -98.0f, 2.12f }
 };
-
 
 static constexpr float eyeTentaclePositions[8][3] =
 {
@@ -187,11 +193,6 @@ public:
         return false;
     }
 
-    uint32 TimeSinceLast()
-    {
-        return timeSinceLast;
-    }
-
 protected:
     Creature* m_creature;
     uint32 spellID;
@@ -234,11 +235,6 @@ public:
         }
         return didOnce;
     }
-
-    bool DidCast()
-    {
-        return didOnce;
-    }
 private:
     bool didOnce;
     
@@ -246,9 +242,10 @@ private:
 
 static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
 {
-    if (!instance) return nullptr;
-    std::list<Player*> temp;
-    std::list<Player*>::iterator j;
+    if (!instance)
+        return nullptr;
+
+    std::vector<Player*> temp;
     Map::PlayerList const& PlayerList = instance->GetMap()->GetPlayers();
 
     if (!PlayerList.isEmpty())
@@ -268,14 +265,8 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
     if (temp.empty())
         return nullptr;
 
-    j = temp.begin();
+    return SelectRandomContainerElement(temp);
 
-    if (temp.size() > 1)
-    {
-        advance(j, urand(0, temp.size() - 1));
-    }
-
-    return (*j);
 }
 
 // Helper functions for SpellTimer users
@@ -380,7 +371,7 @@ struct cthunTentacle : public ScriptedAI
 
     void Reset() override
     {
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STATE_ROOT);
         m_creature->StopMoving();
         m_creature->SetRooted(true);
         m_creature->SetInCombatWithZone();
@@ -414,7 +405,7 @@ struct cthunTentacle : public ScriptedAI
 
         // This makes the mob behave like frostnovaed mobs etc, that is,
         // retargetting another top-threat target if current leaves melee range
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STATE_ROOT);
         m_creature->StopMoving();
         m_creature->SetRooted(true);
         return true;
@@ -493,7 +484,7 @@ struct cthunTentacle : public ScriptedAI
         if (target)
         {
             // Nostalrius : Correction bug sheep/fear
-            if (!m_creature->HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_FEIGN_DEATH | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING) 
+            if (!m_creature->HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_PENDING_STUNNED | UNIT_STATE_FEIGN_DEATH | UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING) 
                 && (!m_creature->HasAuraType(SPELL_AURA_MOD_FEAR) || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !m_creature->HasAuraType(SPELL_AURA_MOD_CONFUSE))
             {
                 m_creature->SetInFront(target);
@@ -591,6 +582,13 @@ public:
             pPortal = m_pInstance->GetCreature(portalGuid);
         if (!pPortal)
             return;
+
+        if (pPortal->AI())
+        {
+            pPortal->AI()->SetMeleeAttack(false);
+            pPortal->AI()->SetCombatMovement(false);
+        }
+
         uint32 portalEntry = pPortal->GetEntry();
         float radius;
         switch (portalEntry)
@@ -605,14 +603,14 @@ public:
         float centerX = m_creature->GetPositionX();
         float centerY = m_creature->GetPositionY();
         float useZ = m_creature->GetPositionZ();
-        float angle = 360.0f / 8.0f;
+        float angle = M_PI_F / 4.0f;
         float highZ = useZ;
         float avg_height = 0.0f;
         uint8 inliers = 0;
         for (uint8 i = 0; i < 8; i++)
         {
-            float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
-            float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
+            float x = centerX + cos((float)i * angle) * radius;
+            float y = centerY + sin((float)i * angle) * radius;
             float z = m_creature->GetMap()->GetHeight(x, y, useZ);
             float deviation = abs(useZ - z);
             // Any deviation >= 0.5 we consider outliers as we dont want to handle sloped terrain
@@ -1230,7 +1228,8 @@ struct eye_of_cthunAI : public ScriptedAI
             {
                 target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
             }
-            else
+
+            if (!target || target->IsDead())
             {
                 target = SelectRandomAliveNotStomach(m_pInstance);
             }
@@ -1372,6 +1371,7 @@ struct cthunAI : public ScriptedAI
             }
             eye_of_cthunAI* eyeAI = (eye_of_cthunAI*)pEye->AI();
             eyeAI->Pull(who);
+            ScriptedAI::AttackStart(who);
 #ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
             m_creature->SetInCombatWith(who);
             pEye->SetInCombatWith(who);
@@ -1387,6 +1387,23 @@ struct cthunAI : public ScriptedAI
         else
         {
             ScriptedAI::AttackStart(who);
+        }
+    }
+
+    void DespawnAllTentacles()
+    {
+        std::list<Creature*> creaturesToDespawn;
+        GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, allTentacleTypes, 350.0f);
+        for (const auto it : creaturesToDespawn)
+        {
+            if (auto* cpt = dynamic_cast<cthunPortalTentacle*>(it->AI()))
+            {
+                cpt->DespawnPortal();
+            }
+            if (auto* ts = dynamic_cast<TemporarySummon*>(it))
+            {
+                ts->UnSummon();
+            }
         }
     }
    
@@ -1434,15 +1451,7 @@ struct cthunAI : public ScriptedAI
             CheckRespawnEye();
 
         // Force despawn any tentacles or portals alive. 
-        std::list<Creature*> creaturesToDespawn;
-        GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, allTentacleTypes, 2000.0f);
-        for (const auto it : creaturesToDespawn)
-        {
-            if (cthunPortalTentacle* cpt = dynamic_cast<cthunPortalTentacle*>(it->AI()))
-                cpt->DespawnPortal();
-            if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(it))
-                ts->UnSummon();
-        }
+        DespawnAllTentacles();
 
         if (m_creature->IsAlive())
             m_creature->SetHealth(m_creature->GetMaxHealth());
@@ -1513,13 +1522,13 @@ struct cthunAI : public ScriptedAI
             {
                 sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Flesh tentacle summoned, but there are already %i tentacles up.", fleshTentacles.size());
             }
-            fleshTentacles.push_back(pCreature->GetGUID());
+            fleshTentacles.emplace_back(pCreature->GetGUID());
         }
     }
 
     void UpdateAI(uint32 const diff) override
     {
-        if (!m_pInstance)
+        if (!m_pInstance || m_creature->IsDead())
             return;
 
         // Delaying respawn of eye if it was a wipe so we get the re-emerge animation before spawn
@@ -1637,14 +1646,7 @@ struct cthunAI : public ScriptedAI
         {
             currentPhase = PHASE_CTHUN_DONE;
             m_pInstance->SetData(TYPE_CTHUN, DONE);
-            std::list<Creature*> creaturesToDespawn;
-            GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, MOB_FLESH_TENTACLE, 2000.0f);
-            for (const auto it : creaturesToDespawn)
-            {
-                if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(it))
-                    ts->UnSummon();
-            }
-
+            DespawnAllTentacles();
         }
     }
 

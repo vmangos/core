@@ -472,13 +472,13 @@ void Player::UpdateDamagePhysical(WeaponAttackType attType)
 
 float Player::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType auraType) const
 {
-    float chance = 0.0f;
-    AuraList const& hitAurasList = GetAurasByType(auraType);
-    if (hitAurasList.empty())
-        return chance;
+    float amount = 0.0f;
+    AuraList const& auras = GetAurasByType(auraType);
+    if (auras.empty())
+        return amount;
 
     Item* pWeapon = GetWeaponForAttack(attType);
-    for (auto const& i : hitAurasList)
+    for (auto const& i : auras)
     {
         SpellEntry const* pSpellEntry = i->GetSpellProto();
         if (pSpellEntry->EquippedItemClass >= 0)
@@ -490,9 +490,9 @@ float Player::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType aura
                 continue;
         }
 
-        chance += i->GetModifier()->m_amount;
+        amount += i->GetModifier()->m_amount;
     }
-    return chance;
+    return amount;
 }
 
 void Player::UpdateDefenseBonusesMod()
@@ -630,33 +630,6 @@ void Player::UpdateDodgePercentage()
     SetStatFloatValue(PLAYER_DODGE_PERCENTAGE, value);
 }
 
-void Player::UpdateSpellCritChance(uint32 school)
-{
-    // For normal school set zero crit chance
-    if (school == SPELL_SCHOOL_NORMAL)
-    {
-        m_SpellCritPercentage[1] = 0.0f;
-        return;
-    }
-    // For others recalculate it from:
-    float crit = 0.0f;
-    // Crit from Intellect
-    crit += GetSpellCritFromIntellect();
-    // Increase crit from SPELL_AURA_MOD_SPELL_CRIT_CHANCE
-    crit += GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_CRIT_CHANCE);
-    // Increase crit by school from SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL
-    crit += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, 1 << school);
-
-    // Store crit value
-    m_SpellCritPercentage[school] = crit;
-}
-
-void Player::UpdateAllSpellCritChances()
-{
-    for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
-        UpdateSpellCritChance(i);
-}
-
 void Player::UpdateManaRegen()
 {
     // Mana regen from spirit
@@ -754,6 +727,7 @@ bool Creature::UpdateAllStats()
     UpdateMaxHealth();
     UpdateAttackPowerAndDamage();
     UpdateAttackPowerAndDamage(true);
+    UpdateAllSpellCritChances();
 
     for (int i = POWER_MANA; i < MAX_POWERS; ++i)
         UpdateMaxPower(Powers(i));
@@ -975,9 +949,9 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
 
 float Creature::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType auraType) const
 {
-    float chance = 0.0f;
-    AuraList const& mTotalAuraList = GetAurasByType(auraType);
-    for (auto const& i : mTotalAuraList)
+    float amount = 0.0f;
+    AuraList const& auras = GetAurasByType(auraType);
+    for (auto const& i : auras)
     {
         SpellEntry const* pSpellEntry = i->GetSpellProto();
         if (pSpellEntry->EquippedItemClass >= 0)
@@ -989,9 +963,9 @@ float Creature::GetWeaponBasedAuraModifier(WeaponAttackType attType, AuraType au
                 continue;
         }
 
-        chance += i->GetModifier()->m_amount;
+        amount += i->GetModifier()->m_amount;
     }
-    return chance;
+    return amount;
 }
 
 /*#######################################
@@ -1004,6 +978,8 @@ bool Pet::UpdateAllStats()
 {
     for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
         UpdateStats(Stats(i));
+
+    UpdateAllSpellCritChances();
 
     for (int i = POWER_MANA; i < MAX_POWERS; ++i)
         UpdateMaxPower(Powers(i));

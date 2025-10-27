@@ -63,7 +63,7 @@ void MaNGOSsoapRunnable::run()
         struct soap* thread_soap = soap_copy(&soap);// make a safe copy
 
         ACE_Message_Block *mb = new ACE_Message_Block(sizeof(struct soap*));
-        ACE_OS::memcpy (mb->wr_ptr (), &thread_soap, sizeof(struct soap*));
+        ACE_OS::memcpy(mb->wr_ptr (), &thread_soap, sizeof(struct soap*));
         pool.putq(mb);
     }
     pool.msg_queue ()->deactivate ();
@@ -76,16 +76,15 @@ void SOAPWorkingThread::process_message (ACE_Message_Block *mb)
 {
     ACE_TRACE (ACE_TEXT ("SOAPWorkingThread::process_message"));
 
-    struct soap* soap;
-    ACE_OS::memcpy (&soap, mb->rd_ptr (), sizeof(struct soap*));
-    mb->release ();
+    soap* thread_soap; // local copy of the soap instance for handling this message
+    ACE_OS::memcpy(&thread_soap, mb->rd_ptr(), sizeof(soap*));
+    mb->release();
 
-    soap_serve(soap);
-    soap_destroy(soap); // dealloc C++ data
-    soap_end(soap); // dealloc data and clean up
-    soap_done(soap); // detach soap struct
-    free(soap);
+    soap_serve(thread_soap); // handle request
+
+    soap_free(thread_soap); // calls done() and clear/frees everything else
 }
+
 /*
 Code used for generating stubs:
 

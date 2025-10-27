@@ -565,7 +565,6 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_PLAG_HEIG_ENTRY_DOOR:
             UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_HEIGAN]);
             break;
-        case GO_PLAG_HEIG_EXIT_DOOR:
         case GO_PLAG_HEIG_OLD_EXIT_DOOR:
         case GO_PLAG_LOAT_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_HEIGAN]);
@@ -1031,13 +1030,13 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 // We only update the wipe counter if the boss has been in combat for at least 10 seconds
                 if (pCreature->GetCombatTime(false) > 10)
                 {
-                    sInstanceStatistics.IncrementWipeCounter(533, entry);
+                    sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, entry);
                     if (entry == NPC_ZELIEK)
                     {
                         // special case handling for these 4hm buggers
-                        sInstanceStatistics.IncrementWipeCounter(533, NPC_MOGRAINE);
-                        sInstanceStatistics.IncrementWipeCounter(533, NPC_BLAUMEUX);
-                        sInstanceStatistics.IncrementWipeCounter(533, NPC_THANE);
+                        sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, NPC_MOGRAINE);
+                        sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, NPC_BLAUMEUX);
+                        sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, NPC_THANE);
                     }
                 }
             }
@@ -1850,7 +1849,7 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
     // if rep < honored, spit on player and be done with it.
     if (argentDawnRep < BOOK_REQ_RANK)
     {
-        DoScriptText(-1999913, pCreature, pPlayer); // spit on player
+        // DoScriptText(-1999913, pCreature, pPlayer); // spit on player -- Not in sniffs. Need confirmation
         pPlayer->CLOSE_GOSSIP_MENU();
         return true;
     }
@@ -2039,6 +2038,47 @@ bool GossipHello_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreature
     */
 }
 
+// 29153 - Gargoyle Stoneform Visual
+struct GargoyleStoneformScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply)
+        {
+            // using stand state 9 in sniff
+            aura->GetTarget()->SetStandState(MAX_UNIT_STAND_STATE);
+            aura->GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+        else // on remove
+        {
+            aura->GetTarget()->SetStandState(UNIT_STAND_STATE_STAND);
+            aura->GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+    }
+};
+
+AuraScript* GetScript_GargoyleStoneform(SpellEntry const*)
+{
+    return new GargoyleStoneformScript();
+}
+
+// 27831 - Shadow Bolt Volley (Naxx, Unrelenting Rider)
+struct UnrelentingRiderShadowBoltVolleyScript : SpellScript
+{
+    bool OnCheckTarget(Spell const* /*spell*/, Unit* target, SpellEffectIndex /*eff*/) const final
+    {
+        // Shadow Bolt volley which should only target players with the Shadow Mark debuff
+        if (!target->HasAura(27825)) // Shadow Mark
+            return false;
+        return true;
+    }
+};
+
+SpellScript* GetScript_UnrelentingRiderShadowBoltVolley(SpellEntry const*)
+{
+    return new UnrelentingRiderShadowBoltVolleyScript();
+}
+
 void AddSC_instance_naxxramas()
 {
     Script* pNewScript;
@@ -2083,5 +2123,15 @@ void AddSC_instance_naxxramas()
     pNewScript->Name = "mob_craftsman_omarion";
     pNewScript->pGossipHello = &GossipHello_npc_MasterCraftsmanOmarion;
     pNewScript->pGossipSelect = &GossipSelect_npc_MasterCraftsmanOmarion;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_gargoyle_stoneform";
+    pNewScript->GetAuraScript = &GetScript_GargoyleStoneform;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_unrelenting_rider_shadow_bolt_volley";
+    pNewScript->GetSpellScript = &GetScript_UnrelentingRiderShadowBoltVolley;
     pNewScript->RegisterSelf();
 }

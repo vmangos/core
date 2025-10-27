@@ -73,13 +73,13 @@ enum
 3726 UBRS, entrance to BWL
 */
 
-static const uint32 aStadiumSpectators[12] =
+static uint32 const aStadiumSpectators[12] =
 {
     NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_ELITE, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN,
     NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_ELITE, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN
 };
 
-static const Position aSpectatorsSpawnLocs[12] =
+static Position const aSpectatorsSpawnLocs[12] =
 {
     { 163.3209f, -340.9818f, 111.0216f, 4.818223f },
     { 164.2471f, -339.0313f, 111.0368f, 1.413717f },
@@ -95,7 +95,7 @@ static const Position aSpectatorsSpawnLocs[12] =
     { 111.9971f, -363.0948f, 116.929f, 5.951573f },
 };
 
-static const Position aSpectatorsTargetLocs[12] =
+static Position const aSpectatorsTargetLocs[12] =
 {
     { 160.619f, -395.826f, 121.9752f, -1.502597f },
     { 162.1428f, -395.1175f, 121.9751f, -1.67753f },
@@ -111,7 +111,7 @@ static const Position aSpectatorsTargetLocs[12] =
     { 149.3754f, -395.7497f, 121.9753f, -1.714769f },
 };
 
-static const Position aStadiumLocs[7] =
+static Position const aStadiumLocs[7] =
 {
     {210.00f, -420.30f, 110.94f, 3.14f},                    // dragons summon location
     {211.762f,-397.58f, 111.18f, 4.74f},                    // Gyth summon location
@@ -123,7 +123,7 @@ static const Position aStadiumLocs[7] =
 };
 
 // Stadium event description
-static const uint32 aStadiumEventNpcs[MAX_STADIUM_WAVES][MAX_STADIUM_MOBS_PER_WAVE] =
+static uint32 const aStadiumEventNpcs[MAX_STADIUM_WAVES][MAX_STADIUM_MOBS_PER_WAVE] =
 {
     {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, 0},
     {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, 0},
@@ -662,7 +662,7 @@ void instance_blackrock_spire::DoSendNextStadiumWave()
 
 enum
 {
-    SAY_ROOKERY_EVENT_START = -1229020
+    SAY_ROOKERY_EVENT_START = 5538
 };
 
 void instance_blackrock_spire::Update(uint32 uiDiff)
@@ -953,6 +953,27 @@ bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, AreaTriggerEntry const* pAt)
     return false;
 }
 
+// 15748 - Freeze Rookery Egg
+// 16028 - Freeze Rookery Egg - Prototype
+struct UBRSFreezeRookeryEggScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetGOTarget())
+        {
+            if (spell->GetGOTarget()->getLootState() == GO_READY)
+                spell->GetGOTarget()->UseDoorOrButton(0, true);
+            return false;
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_UBRSFreezeRookeryEgg(SpellEntry const*)
+{
+    return new UBRSFreezeRookeryEggScript();
+}
+
 void AddSC_instance_blackrock_spire()
 {
     Script* pNewScript;
@@ -974,5 +995,10 @@ void AddSC_instance_blackrock_spire()
     pNewScript = new Script;
     pNewScript->Name = "at_ubrs_the_beast";
     pNewScript->pAreaTrigger = &AreaTrigger_at_ubrs_the_beast;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_ubrs_freeze_rookery_egg";
+    pNewScript->GetSpellScript = &GetScript_UBRSFreezeRookeryEgg;
     pNewScript->RegisterSelf();
 }

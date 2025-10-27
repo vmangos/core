@@ -303,7 +303,7 @@ void AddSC_instance_scholomance()
 
     newscript = new Script;
     newscript->Name = "go_brazier_herald";
-    newscript->GOOpen = &GOOpen_brazier_herald;
+    newscript->pGOOpen = &GOOpen_brazier_herald;
     newscript->RegisterSelf();
 
     newscript = new Script;

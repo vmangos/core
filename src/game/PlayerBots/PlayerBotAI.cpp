@@ -21,6 +21,7 @@
 #include "SocialMgr.h"
 #include "MotionMaster.h"
 #include "ObjectMgr.h"
+#include "MapManager.h"
 #include "MoveSpline.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
@@ -76,7 +77,7 @@ enum
 bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, Player* pClone)
 {
     ASSERT(botEntry);
-    std::string name = sObjectMgr.GeneratePetName(1863); // Succubus name
+    std::string name = sObjectMgr.GenerateFreePlayerName();
     normalizePlayerName(name);
     uint8 gender = pClone ? pClone->GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER) : urand(0, 1);
     uint8 skin = pClone ? pClone->GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID) : urand(0, 5);
@@ -183,7 +184,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
     if (me->IsSpellReady(SPELL_FROST_NOVA) && me->GetPower(POWER_MANA) > 50)
         if (nearTarget)
             me->CastSpell(me, SPELL_FROST_NOVA, false);
-    if (nearTarget && target->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (nearTarget && target->HasUnitState(UNIT_STATE_CAN_NOT_MOVE))
     {
         // already runing
         if (!me->movespline->Finalized())
@@ -197,7 +198,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         x += (x - target->GetPositionX()) * 5.0f / d;
         y += (y - target->GetPositionY()) * 5.0f / d;
         me->UpdateGroundPositionZ(x, y, z);
-        me->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
+        me->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
         return;
     }
 
@@ -315,7 +316,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         else
             return;
     }
-    me->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
+    me->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
 }
 
 void PopulateAreaBotAI::BeforeAddToMap(Player* player)

@@ -109,8 +109,8 @@ class NGrid
             return i_cells[x][y];
         }
 
-        const uint32& GetGridId() const { return i_gridId; }
-        void SetGridId(const uint32 id) { i_gridId = id; }
+        uint32 const& GetGridId() const { return i_gridId; }
+        void SetGridId(uint32 const id) { i_gridId = id; }
         grid_state_t GetGridState() const { return i_cellstate; }
         void SetGridState(grid_state_t s) { i_cellstate = s; }
         uint32 getX() const { return i_x; }
@@ -134,13 +134,13 @@ class NGrid
         void UpdateTimeTracker(time_t diff) { i_GridInfo.UpdateTimeTracker(diff); }
 
         template<class SPECIFIC_OBJECT>
-        void AddWorldObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT *obj)
+        void AddWorldObject(uint32 const x, uint32 const y, SPECIFIC_OBJECT *obj)
         {
             getGridType(x, y).AddWorldObject(obj);
         }
 
         template<class SPECIFIC_OBJECT>
-        void RemoveWorldObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT *obj)
+        void RemoveWorldObject(uint32 const x, uint32 const y, SPECIFIC_OBJECT *obj)
         {
             getGridType(x, y).RemoveWorldObject(obj);
         }
@@ -154,7 +154,7 @@ class NGrid
         }
 
         template<class T, class TT>
-        void Visit(const uint32 &x, const uint32 &y, TypeContainerVisitor<T, TypeMapContainer<TT> > &visitor)
+        void Visit(uint32 const &x, uint32 const &y, TypeContainerVisitor<T, TypeMapContainer<TT> > &visitor)
         {
             getGridType(x, y).Visit(visitor);
         }
@@ -170,20 +170,20 @@ class NGrid
         }
 
         template<class SPECIFIC_OBJECT>
-        bool AddGridObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT *obj)
+        bool AddGridObject(uint32 const x, uint32 const y, SPECIFIC_OBJECT *obj)
         {
             return getGridType(x, y).AddGridObject(obj);
         }
 
         template<class SPECIFIC_OBJECT>
-        bool RemoveGridObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT *obj)
+        bool RemoveGridObject(uint32 const x, uint32 const y, SPECIFIC_OBJECT *obj)
         {
             return getGridType(x, y).RemoveGridObject(obj);
         }
 
     private:
 
-        GridType& getGridType(const uint32& x, const uint32& y)
+        GridType& getGridType(uint32 const& x, uint32 const& y)
         {
             assert(x < N);
             assert(y < N);

@@ -35,6 +35,10 @@
 
 #include <ace/os_include/netinet/os_tcp.h>
 
+#include "Crypto/Hash/MD5.h"
+#include "Policies/SingletonImp.h"
+#include "Policies/ThreadingModel.h"
+
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
 #endif
@@ -161,8 +165,7 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
         return;
 
     // Calculate the MD5 hash
-    MD5_CTX ctx;
-    MD5_Init(&ctx);
+    Crypto::Hash::MD5::Generator md5Generator;
 
     const size_t check_chunk_size = 4*1024;
 
@@ -171,22 +174,21 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
     while(!feof (pPatch))
     {
         size_t read = fread(buf, 1, check_chunk_size, pPatch);
-        MD5_Update(&ctx, buf, read);
+        md5Generator.UpdateData(buf, read);
     }
 
     fclose(pPatch);
 
     // Store the result in the internal patch hash map
-    patches_[path] = new PATCH_INFO;
-    MD5_Final((ACE_UINT8 *) & patches_[path]->md5, &ctx);
+    patches_[path] = new PATCH_INFO { md5Generator.GetDigest() };
 }
 
-bool PatchCache::GetHash(const char * pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH])
+bool PatchCache::GetHash(const char * pat, ACE_UINT8 mymd5[Crypto::Hash::MD5::Digest::size()])
 {
     for (Patches::iterator i = patches_.begin (); i != patches_.end (); i++)
         if (!stricmp(pat, i->first.c_str ()))
         {
-            memcpy(mymd5, i->second->md5, MD5_DIGEST_LENGTH);
+            memcpy(mymd5, i->second->md5.data(), i->second->md5.size());
             return true;
         }
 

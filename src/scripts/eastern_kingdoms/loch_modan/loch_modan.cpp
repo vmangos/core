@@ -43,7 +43,7 @@ enum MiranData
     NPC_DARK_IRON_RAIDER  = 2149
 };
 
-static const Position m_afAmbushSpawn[] =
+static Position const m_afAmbushSpawn[] =
 {
     { -5691.93f, -3745.91f, 319.159f, 2.21f},
     { -5706.98f, -3745.39f, 318.728f, 1.04f}
@@ -135,7 +135,7 @@ enum SaeanData
     FACTION_HOSTILE        = 54
 };
 
-static const Position darkIronAmbusherSpawns[] =
+static Position const darkIronAmbusherSpawns[] =
 {
     { -5759.852051f, -3441.279053f, 305.573212f, 2.174024f },
     { -5757.629883f, -3437.680908f, 304.265106f, 2.610265f }

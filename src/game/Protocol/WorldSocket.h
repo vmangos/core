@@ -46,7 +46,7 @@ class WorldSocket: public MangosSocket<WorldSession, WorldSocket, AuthCrypt>
         int OnSocketOpen();
         int SendStartupPacket();
 
-        int ProcessIncoming (WorldPacket* new_pct);
+        int ProcessIncoming (WorldPacket* newPct);
 
         // Called by ProcessIncoming() on CMSG_AUTH_SESSION.
         int HandleAuthSession (WorldPacket& recvPacket);

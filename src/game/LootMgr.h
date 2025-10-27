@@ -150,7 +150,7 @@ struct LootItem
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
     bool AllowedForPlayer(Player const* player, WorldObject const* lootTarget) const;
-    LootSlotType GetSlotTypeForSharedLoot(PermissionTypes permission, Player* viewer, WorldObject const* lootTarget, bool condition_ok = false) const;
+    LootSlotType GetSlotTypeForSharedLoot(PermissionTypes permission, Player const* viewer, WorldObject const* lootTarget, bool condition_ok = false) const;
 };
 
 typedef std::vector<LootItem> LootItemList;
@@ -217,13 +217,13 @@ class LootTemplate
     public:
         // Adds an entry to the group (at loading stage)
         void AddEntry(LootStoreItem& item);
-        // Rolls for every item in the template and adds the rolled items the the loot
+        // Rolls for every item in the template and adds the rolled items to the loot
         void Process(Loot& loot, LootStore const& store, bool rate, uint8 GroupId = 0) const;
 
         // True if template includes at least 1 quest drop entry
-        bool HasQuestDrop(LootTemplateMap const& store, uint8 GroupId = 0) const;
+        bool HasQuestDrop(uint8 groupId = 0) const;
         // True if template includes at least 1 quest drop for an active quest of the player
-        bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player, uint8 GroupId = 0) const;
+        bool HasQuestDropForPlayer(Player const* player, uint8 groupId = 0) const;
 
         // Checks integrity of the template
         void Verify(LootStore const& store, uint32 Id) const;
@@ -238,7 +238,7 @@ class LootTemplate
 class LootValidatorRef :  public Reference<Loot, LootValidatorRef>
 {
     public:
-        LootValidatorRef() {}
+        LootValidatorRef() = default;
         void targetObjectDestroyLink() override {}
         void sourceObjectDestroyLink() override {}
 };
@@ -362,10 +362,10 @@ struct Loot
     WorldObject const* GetLootTarget() const;
 
     // TrinityCore
-    bool hasItemFor(Player* player) const;
+    bool hasItemFor(Player const* player) const;
     bool hasOverThresholdItem() const;
     bool IsAllowedLooter(ObjectGuid guid, bool doPersonalCheck = true) const;
-    bool IsOriginalLooter(ObjectGuid guid) { return IsAllowedLooter(guid, false); }
+    bool IsOriginalLooter(ObjectGuid guid) const { return IsAllowedLooter(guid, false); }
 
     void FillNotNormalLootFor(Player* player);
 
@@ -377,9 +377,9 @@ struct Loot
     QuestItemMap m_playerFFAItems;
     QuestItemMap m_playerNonQuestNonFFAConditionalItems;
     private:
-        QuestItemList* FillFFALoot(Player* player);
-        QuestItemList* FillQuestLoot(Player* player);
-        QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player);
+        QuestItemList* FillFFALoot(Player const* player);
+        QuestItemList* FillQuestLoot(Player const* player);
+        QuestItemList* FillNonQuestNonFFAConditionalLoot(Player const* player);
 
         typedef std::set<ObjectGuid> PlayersLooting;
         PlayersLooting m_playersLooting;

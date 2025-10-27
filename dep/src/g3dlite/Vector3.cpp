@@ -102,7 +102,7 @@ Any Vector3::toAny(const std::string& name) const {
     return any;
 }
 
-Vector3::Vector3(const class Color3& v) : x(v.r), y(v.g), z(v.b) {}
+Vector3::Vector3(const class Color3& c) : x(c.r), y(c.g), z(c.b) {}
 
 Vector3::Vector3(const class Vector3int32& v) : x((float)v.x), y((float)v.y), z((float)v.z) {}
 
@@ -116,11 +116,13 @@ Vector3& Vector3::ignore() {
     return v;
 }
 
-const Vector3& Vector3::zero() { static const Vector3 v(0, 0, 0); return v; }
+const Vector3& Vector3::zero()     { static const Vector3 v(0, 0, 0); return v; }
 const Vector3& Vector3::one()      { static const Vector3 v(1, 1, 1); return v; }
 const Vector3& Vector3::unitX()    { static const Vector3 v(1, 0, 0); return v; }
 const Vector3& Vector3::unitY()    { static const Vector3 v(0, 1, 0); return v; }
 const Vector3& Vector3::unitZ()    { static const Vector3 v(0, 0, 1); return v; }
+const Vector3& Vector3::up()       { return unitZ(); }
+const Vector3& Vector3::down()     { static const Vector3 v(0, 0, -1); return v; }
 const Vector3& Vector3::inf()      { static const Vector3 v((float)G3D::finf(), (float)G3D::finf(), (float)G3D::finf()); return v; }
 const Vector3& Vector3::nan()      { static const Vector3 v((float)G3D::fnan(), (float)G3D::fnan(), (float)G3D::fnan()); return v; }
 const Vector3& Vector3::minFinite(){ static const Vector3 v(-FLT_MAX, -FLT_MAX, -FLT_MAX); return v; }
@@ -303,11 +305,11 @@ Vector3 Vector3::cosPowHemiRandom(const Vector3& normal, const float k, Random& 
 Vector3 Vector3::hemiRandom(const Vector3& normal, Random& r) {
     const Vector3& V = Vector3::random(r);
 
-    if (V.dot(normal) < 0) {
+    if (V.dot(normal) < 0) 
         return -V;
-    } else {
-        return V;
-    }
+
+    return V;
+
 }
 
 //----------------------------------------------------------------------------
@@ -345,12 +347,14 @@ Vector3 Vector3::refractionDirection(
 
     float det = 1.0f - (float)square(hRatio) * (1.0f - (float)square(WdotN));
 
-    if (det < 0) {
+    if (det < 0)
+    {
         // Total internal reflection
         return Vector3::zero();
-    } else {
-        return -hRatio * (W - WdotN * N) - N * sqrt(det);
     }
+
+    return -hRatio * (W - WdotN * N) - N * sqrt(det);
+
 }
 
 //----------------------------------------------------------------------------

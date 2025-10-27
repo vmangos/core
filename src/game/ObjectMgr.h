@@ -55,6 +55,27 @@ struct GameTele
 
 typedef std::unordered_map<uint32, GameTele > GameTeleMap;
 
+struct AreaTriggerEntry
+{
+    uint32    id;
+    uint32    map_id;
+    std::string name;
+    float     x;
+    float     y;
+    float     z;
+    float     radius;
+    float     box_x;           // extent x edge
+    float     box_y;           // extent y edge
+    float     box_z;           // extent z edge
+    float     box_orientation; // extent rotation by about z axis
+    uint32    script_id;       // db script
+    uint32    condition_id;
+    uint32    cooldown;        // seconds
+    uint32    script_name;     // core script
+};
+
+bool IsPointInAreaTriggerZone(AreaTriggerEntry const* atEntry, uint32 mapid, float x, float y, float z, float delta = 0.0f);
+
 struct AreaTriggerTeleport
 {
     std::string message;
@@ -202,7 +223,7 @@ typedef std::unordered_map<uint32, FactionTemplateEntry> FactionTemplatesMap;
 typedef std::unordered_map<uint32, SoundEntriesEntry> SoundEntryMap;
 typedef std::unordered_map<uint32, ItemPrototype> ItemPrototypeMap;
 typedef std::unordered_map<uint32, std::unique_ptr<CreatureInfo>> CreatureInfoMap;
-
+typedef std::unordered_map<uint32, std::unique_ptr<GameObjectInfo>> GameObjectInfoMap;
 typedef std::unordered_map<uint32,GameObjectData> GameObjectDataMap;
 typedef GameObjectDataMap::value_type GameObjectDataPair;
 
@@ -400,7 +421,7 @@ class IdGenerator
         explicit IdGenerator(char const* _name) : m_name(_name), m_nextGuid(1) {}
 
     public:                                                 // modifiers
-        void Set(T val) { m_nextGuid = val; }
+        void SetMaxUsedGuid(T val, char const* guidType);
         T Generate();
 
     public:                                                 // accessors
@@ -585,6 +606,7 @@ class ObjectMgr
         bool IsExistingCreatureSpellsId(uint32 id) const { return (m_CreatureSpellsIdSet.find(id) != m_CreatureSpellsIdSet.end()); }
         bool IsExistingVendorTemplateId(uint32 id) const { return (m_VendorTemplateIdSet.find(id) != m_VendorTemplateIdSet.end()); }
         bool IsExistingGossipMenuId(uint32 id) const { return (m_GossipMenuIdSet.find(id) != m_GossipMenuIdSet.end()); }
+        bool IsExistingConditionId(uint32 id) const { return (m_ConditionIdSet.find(id) != m_ConditionIdSet.end()); }
 
         typedef std::unordered_map<uint32, Item*> ItemMap;
 
@@ -608,10 +630,23 @@ class ObjectMgr
         static Player* GetPlayer(char const* name) { return ObjectAccessor::FindPlayerByName(name);}
         static Player* GetPlayer(ObjectGuid guid) { return ObjectAccessor::FindPlayer(guid); }
 
-        static GameObjectInfo const* GetGameObjectInfo(uint32 id) { return sGOStorage.LookupEntry<GameObjectInfo>(id); }
+        std::set<uint32> GetTransportDisplayIds() const;
+        void LoadGameObjectTemplates();
+        void LoadGameObjectTemplate(uint32 entry);
+        void CheckGameObjectTemplate(GameObjectInfo* goInfo);
+        GameObjectInfo const* GetGameObjectTemplate(uint32 id) const
+        {
+            auto itr = m_gameObjectInfoMap.find(id);
+            if (itr != m_gameObjectInfoMap.end())
+                return itr->second.get();
 
-        std::set<uint32> LoadGameobjectInfo();
-        std::set<uint32> CheckGameObjectInfos();
+            return nullptr;
+        }
+        GameObjectInfoMap const& GetGameObjectInfoMap() const
+        {
+            return m_gameObjectInfoMap;
+        }
+
         void AddGameobjectInfo(GameObjectInfo* goinfo);
         void LoadGameObjectDisplayInfoAddon();
         void LoadGameobjectsRequirements();
@@ -916,6 +951,7 @@ class ObjectMgr
         void LoadTrainerTemplates();
         void LoadTrainers() { LoadTrainers("npc_trainer", false); }
 
+        std::string GenerateFreePlayerName();
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint32 level) const;
         uint32 GetXPForLevel(uint32 level) const;
@@ -1143,9 +1179,15 @@ class ObjectMgr
         CellObjectGuids const& GetCellObjectGuids(uint16 mapid, uint32 cell_id)
         {
             m_MapObjectGuids_lock.acquire();
-            CellObjectGuids const& guids = m_MapObjectGuids[mapid][cell_id];
+            auto itr = m_MapObjectGuids.find(mapid);
+            if (itr != m_MapObjectGuids.end())
+            {
+                auto itr2 = itr->second.find(cell_id);
+                if (itr2 != itr->second.end())
+                    return &itr2->second;
+            }
             m_MapObjectGuids_lock.release();
-            return guids;
+            return nullptr;
         }
         ACE_Thread_Mutex& GetCellLoadingObjectsMutex() // TODO: Mutex per cell?
         {
@@ -1494,6 +1536,7 @@ class ObjectMgr
         uint32 m_OldMailCounter;
 
     private:
+        void LoadGameObjectInfo(Field* result);
         void LoadCreatureInfo(Field* result);
         void LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment);
         void LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table);
@@ -1511,6 +1554,7 @@ class ObjectMgr
         std::set<uint32> m_CreatureSpellsIdSet;
         std::set<uint32> m_VendorTemplateIdSet;
         std::set<uint32> m_GossipMenuIdSet;
+        std::set<uint32> m_ConditionIdSet;
 
         typedef std::map<uint32,PetLevelInfo*> PetLevelInfoMap;
         // PetLevelInfoMap[creature_id][level]
@@ -1562,6 +1606,7 @@ class ObjectMgr
 
         SoundEntryMap m_SoundEntriesMap;
         CreatureInfoMap m_creatureInfoMap;
+        GameObjectInfoMap m_gameObjectInfoMap;
         ItemPrototypeMap m_itemPrototypesMap;
 
         typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;

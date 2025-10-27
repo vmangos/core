@@ -450,11 +450,31 @@ CreatureAI* GetAI_boss_noth(Creature* pCreature)
     return new boss_nothAI(pCreature);
 }
 
+// 29213 - Curse of the Plaguebringer (Naxxramas, Noth the Plaguebringer)
+struct NothCurseOfThePlaguebringerScript : SpellScript
+{
+    void OnSetTargetMap(Spell* /*spell*/, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& /*unMaxTargets*/, bool& selectClosestTargets) const final
+    {
+        selectClosestTargets = true;
+    }
+};
+
+SpellScript* GetScript_NothCurseOfThePlaguebringer(SpellEntry const*)
+{
+    return new NothCurseOfThePlaguebringerScript();
+}
+
 void AddSC_boss_noth()
 {
-    Script* NewScript;
-    NewScript = new Script;
-    NewScript->Name = "boss_noth";
-    NewScript->GetAI = &GetAI_boss_noth;
-    NewScript->RegisterSelf();
+    Script* pNewScript;
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_noth";
+    pNewScript->GetAI = &GetAI_boss_noth;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_noth_curse_of_the_plaguebringer";
+    pNewScript->GetSpellScript = &GetScript_NothCurseOfThePlaguebringer;
+    pNewScript->RegisterSelf();
 }

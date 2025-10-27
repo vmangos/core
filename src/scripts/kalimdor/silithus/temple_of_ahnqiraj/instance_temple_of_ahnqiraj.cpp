@@ -33,8 +33,8 @@ static constexpr uint32 CTHUN_WHISPER_FREQ_MIN      = 30000;
 static constexpr uint32 CTHUN_WHISPER_FREQ_MAX      = 60000;
 
 enum eTwinsDeathTexts {
-    SAY_VEKLOR_DEATH    = -1531024, //my brother...nO!
-    SAY_VEKNILASH_DEATH = -1531031 // Vek'loor, i feel your pain! 
+    SAY_VEKLOR_DEATH    = 11452, //my brother...nO!
+    SAY_VEKNILASH_DEATH = 11454 // Vek'loor, i feel your pain! 
 };
 static const SIDialogueEntry twinsDeathDialogue[] =
 {
@@ -45,15 +45,15 @@ static const SIDialogueEntry twinsDeathDialogue[] =
 
 enum eTwinsDialogueEntries
 {
-    EMOTE_EYE_INTRO         = -1531012,
+    EMOTE_EYE_INTRO         = 11700,
     EVENT_EYE_TURN_AROUND   = 1,
     EVENT_EMPERORS_RISE     = 2,
-    SAY_EMPERORS_INTRO_1    = -1531013, // Only flesh and bone. .. 
-    SAY_EMPERORS_INTRO_2    = -1531014, // Where are your manners...
-    SAY_EMPERORS_INTRO_3    = -1531015, // There will be pain...
-    SAY_EMPERORS_INTRO_4    = -1531016, // Oh so much pain...
-    SAY_EMPERORS_INTRO_5    = -1531017, // Come, little ones...
-    SAY_EMPERORS_INTRO_6    = -1531018, // The feast of souls...
+    SAY_EMPERORS_INTRO_1    = 11702, // Only flesh and bone. .. 
+    SAY_EMPERORS_INTRO_2    = 11706, // Where are your manners...
+    SAY_EMPERORS_INTRO_3    = 11707, // There will be pain...
+    SAY_EMPERORS_INTRO_4    = 11708, // Oh so much pain...
+    SAY_EMPERORS_INTRO_5    = 11709, // Come, little ones...
+    SAY_EMPERORS_INTRO_6    = 11710, // The feast of souls...
 };
 
 // Sources:
@@ -427,6 +427,13 @@ void instance_temple_of_ahnqiraj::Load(char const* chrIn)
     if (m_auiEncounter[TYPE_TWINS] == DONE) {
         m_twinsIntroDialogue.SetDone();
     }
+
+    // Fix Ouro after sever crash / restart
+    if (m_auiEncounter[TYPE_OURO] != DONE)
+    {
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "AQ40: Ouro spawn trigger will be restored in 3 seconds!");
+        m_uiRestoreOuroSpawnTriggerTimer = 3000;
+    }
     
     OUT_LOAD_INST_DATA_COMPLETE;
 }
@@ -462,8 +469,7 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (!pCthun)
         return;
 
-    std::list<Player*> candidates;
-    std::list<Player*>::iterator j;
+    std::vector<Player*> candidates;
     Map::PlayerList const& PlayerList = GetMap()->GetPlayers();
     if (PlayerList.isEmpty())
         return;
@@ -472,10 +478,12 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     {
         if (Player* player = itr.getSource())
         {
-            if (!player->IsDead()) {
+            if (!player->IsDead())
+            {
                 auto find_it = std::find_if(cthunWhisperMutes.begin(), cthunWhisperMutes.end(), 
                     [player](std::pair<ObjectGuid, uint32> const& e) {return e.first == player->GetObjectGuid(); });
-                if (find_it == cthunWhisperMutes.end()) {
+                if (find_it == cthunWhisperMutes.end())
+                {
                     candidates.push_back(player);
                 }
             }
@@ -485,13 +493,12 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (candidates.empty())
         return;
 
-    j = candidates.begin();
-    std::advance(j, urand(0, candidates.size() - 1));
-    Player* targetPlayer = *j;
+    Player* targetPlayer = SelectRandomContainerElement(candidates);
+
     // ToDo: also cast the C'thun Whispering charm spell - requires additional research
     DoScriptText(irand(SAY_CTHUN_WHISPER_8, SAY_CTHUN_WHISPER_1), pCthun, targetPlayer);
 
-    cthunWhisperMutes.push_back(std::make_pair(targetPlayer->GetGUID(), CTHUN_WHISPER_MUTE_DURATION));
+    cthunWhisperMutes.emplace_back(targetPlayer->GetGUID(), CTHUN_WHISPER_MUTE_DURATION);
 }
 
 void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
@@ -502,6 +509,19 @@ void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
     UpdateCThunWhisper(uiDiff);
 
     UpdateStomachOfCthun(uiDiff);
+
+    // Fix Ouro after sever crash / restart
+    if (m_uiRestoreOuroSpawnTriggerTimer)
+    {
+        if (m_uiRestoreOuroSpawnTriggerTimer < uiDiff)
+        {
+            RestoreOuroSpawnTrigger();
+        }
+        else
+        {
+            m_uiRestoreOuroSpawnTriggerTimer -= uiDiff;
+        }
+    }
 }
 
 bool instance_temple_of_ahnqiraj::TwinsDialogueStartedOrDone()
@@ -542,7 +562,7 @@ void instance_temple_of_ahnqiraj::AddPlayerToStomach(Unit * p)
 {
     if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
         pCthun->CastSpell(p, SPELL_DIGESTIVE_ACID, true);
-    playersInStomach.push_back(std::make_pair(p->GetGUID(), StomachTimers()));
+    playersInStomach.emplace_back(p->GetGUID(), StomachTimers());
 }
 
 instance_temple_of_ahnqiraj::CThunStomachList::iterator instance_temple_of_ahnqiraj::PlayerInStomachIter(Unit * unit)
@@ -560,13 +580,13 @@ void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
     // Player is ported to center of c'thun with a small, random, offset to knock the player in a random direction.
     AreaTriggerEntry const* cthunAreaTrigger = sObjectMgr.GetAreaTrigger(AREATRIGGER_CTHUN_KNOCKBACK);
     if (cthunAreaTrigger) {
-        float x = cthunAreaTrigger->x + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-        float y = cthunAreaTrigger->y + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        float x = cthunAreaTrigger->x + cos(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
+        float y = cthunAreaTrigger->y + sin(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
         pPlayer->NearTeleportTo(x, y, cthunAreaTrigger->z, pPlayer->GetOrientation());
     }
     else {
-        float x = -8578.0f + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-        float y = 1986.8f + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        float x = -8578.0f + cos(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
+        float y = 1986.8f + sin(frand(0.0f, M_PI_F * 2.f)) * 0.1f;
         pPlayer->NearTeleportTo(x, y, 100.4f, pPlayer->GetOrientation());
         sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
             AREATRIGGER_CTHUN_KNOCKBACK);
@@ -763,6 +783,17 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
     }
 }
 
+void instance_temple_of_ahnqiraj::RestoreOuroSpawnTrigger()
+{
+    if (Creature* pOuroSpawnTrigger = GetSingleCreatureFromStorage(NPC_OURO_SPAWNER))
+    {
+        // restore home coordinates from db spawn
+        pOuroSpawnTrigger->SetHomePosition(-9188.45f, 2091.56f, -64.17f, 6.01f);
+        pOuroSpawnTrigger->Respawn();
+    }
+    m_uiRestoreOuroSpawnTriggerTimer = 0;
+}
+
 struct AI_QirajiMindslayer : public ScriptedAI {
     uint32 insanityTimer;
     uint32 mindBlastTimer;
@@ -863,6 +894,29 @@ CreatureAI* GetAI_qirajiMindslayer(Creature* pCreature)
     return new AI_QirajiMindslayer(pCreature);
 }
 
+// 26457 - Drain Mana (Obsidian Eradicator)
+// 26559 - Drain Mana (Obsidian Nullifier)
+struct AQ40DrainManaScript : SpellScript
+{
+    void OnSetTargetMap(Spell* spell, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& unMaxTargets, bool& /*selectClosestTargets*/) const final
+    {
+        unMaxTargets = 12;
+    }
+
+    bool OnCheckTarget(Spell const* /*spell*/, Unit* target, SpellEffectIndex /*eff*/) const final
+    {
+        // Avoid targeting players with no mana
+        if (target->GetPowerType() != POWER_MANA || target->GetPowerPercent(POWER_MANA) < 1.0f)
+            return false;
+        return true;
+    }
+};
+
+SpellScript* GetScript_AQ40DrainMana(SpellEntry const*)
+{
+    return new AQ40DrainManaScript();
+}
+
 void AddSC_instance_temple_of_ahnqiraj()
 {
     Script* pNewScript;
@@ -882,4 +936,8 @@ void AddSC_instance_temple_of_ahnqiraj()
     pNewScript->GetAI = &GetAI_qirajiMindslayer;
     pNewScript->RegisterSelf();
 
+    pNewScript = new Script;
+    pNewScript->Name = "spell_aq40_drain_mana";
+    pNewScript->GetSpellScript = &GetScript_AQ40DrainMana;
+    pNewScript->RegisterSelf();
 }

@@ -365,8 +365,8 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
 {
     if (IsInDuel())
     {
-        if (me->duel->opponent && IsValidHostileTarget(me->duel->opponent))
-            return me->duel->opponent;
+        if (me->m_duel->opponent && IsValidHostileTarget(me->m_duel->opponent))
+            return me->m_duel->opponent;
     }
     else
     {
@@ -501,14 +501,14 @@ bool PartyBotAI::CrowdControlMarkedTargets()
     {
         if (Unit* pTarget = GetMarkedTarget(mark))
         {
-            if (!pTarget->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) &&
+            if (!pTarget->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) &&
                 IsValidHostileTarget(pTarget) && !AreOthersOnSameTarget(pTarget->GetObjectGuid()))
             {
                 if (CanTryToCastSpell(pTarget, pSpellEntry))
                 {
                     if (DoCastSpell(pTarget, pSpellEntry) == SPELL_CAST_OK)
                     {
-                        me->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
+                        me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
                         return true;
                     }
                 }
@@ -693,12 +693,12 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
-    if (me->HasUnitState(UNIT_STAT_FEIGN_DEATH) && me->HasAuraType(SPELL_AURA_FEIGN_DEATH) &&
+    if (me->HasUnitState(UNIT_STATE_FEIGN_DEATH) && me->HasAuraType(SPELL_AURA_FEIGN_DEATH) &&
        !me->IsInCombat() && (!me->GetPet() || !me->GetPet()->IsInCombat()) &&
        !me->SelectRandomUnfriendlyTarget(nullptr, 20.0f, false, true))
         me->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    if (me->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+    if (me->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL))
         return;
 
     if (me->IsDead())
@@ -794,6 +794,9 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     if (me->GetStandState() != UNIT_STAND_STATE_STAND)
         me->SetStandState(UNIT_STAND_STATE_STAND);
 
+    if (me->GetSheath() == SHEATH_STATE_UNARMED && !me->IsMounted())
+        me->SetSheath(SHEATH_STATE_MELEE);
+
     if (!me->IsInCombat() && !me->IsMounted())
     {
         UpdateOutOfCombatAI();
@@ -838,10 +841,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                 auto auraList = pLeader->GetAurasByType(SPELL_AURA_MOUNTED);
                 if (!auraList.empty())
                 {
-                    bool oldState = me->HasCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
+                    bool oldStateCastTime = me->HasCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
+                    bool oldStatePower = me->HasCheatOption(PLAYER_CHEAT_NO_POWER);
                     me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, true);
+                    me->SetCheatOption(PLAYER_CHEAT_NO_POWER, true);
                     me->CastSpell(me, (*auraList.begin())->GetId(), true);
-                    me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, oldState);
+                    me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, oldStateCastTime);
+                    me->SetCheatOption(PLAYER_CHEAT_NO_POWER, oldStatePower);
                 } 
             }
         }
@@ -858,7 +864,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
         else
         {
-            if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
+            if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING) &&
                (GetRole() == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
                 IsValidHostileTarget(pVictim) &&
                 AttackStart(pVictim))
@@ -1221,7 +1227,7 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
     }
 
     if (m_spells.paladin.pBlessingOfFreedom &&
-       (me->HasUnitState(UNIT_STAT_ROOT) || me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
+       (me->HasUnitState(UNIT_STATE_ROOT) || me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
         CanTryToCastSpell(me, m_spells.paladin.pBlessingOfFreedom))
     {
         if (DoCastSpell(me, m_spells.paladin.pBlessingOfFreedom) == SPELL_CAST_OK)
@@ -1545,7 +1551,7 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
             }
         }
 
-        if (!me->HasUnitState(UNIT_STAT_ROOT) &&
+        if (!me->HasUnitState(UNIT_STATE_ROOT) &&
             (me->GetCombatDistance(pVictim) < 8.0f) &&
             (GetRole() != ROLE_MELEE_DPS) &&
              me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE)
@@ -1669,7 +1675,7 @@ void PartyBotAI::UpdateInCombatAI_Mage()
                 (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
             {
                 if (m_spells.mage.pBlink &&
-                    (me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE) ||
+                    (me->HasUnitState(UNIT_STATE_CAN_NOT_MOVE) ||
                         me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
                     CanTryToCastSpell(me, m_spells.mage.pBlink))
                 {
@@ -1680,11 +1686,11 @@ void PartyBotAI::UpdateInCombatAI_Mage()
                         return;
                 }
 
-                if (!me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+                if (!me->HasUnitState(UNIT_STATE_CAN_NOT_MOVE))
                 {
                     if (m_spells.mage.pFrostNova &&
-                       !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
-                       !pVictim->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) &&
+                       !pVictim->HasUnitState(UNIT_STATE_ROOT) &&
+                       !pVictim->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) &&
                         CanTryToCastSpell(me, m_spells.mage.pFrostNova))
                     {
                         DoCastSpell(me, m_spells.mage.pFrostNova);
@@ -2480,7 +2486,7 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
 
         if (m_spells.warrior.pHamstring &&
             pVictim->IsMoving() &&
-           !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
+           !pVictim->HasUnitState(UNIT_STATE_ROOT) &&
            !pVictim->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED) &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pHamstring))
         {
@@ -2522,7 +2528,7 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
 
         if (m_role != ROLE_TANK &&
            (me->GetHealthPercent() > 60.0f) && (pVictim->GetHealthPercent() > 40.0f) &&
-           !me->HasUnitState(UNIT_STAT_ROOT) &&
+           !me->HasUnitState(UNIT_STATE_ROOT) &&
            !me->IsImmuneToMechanic(MECHANIC_FEAR))
         {
             if (m_spells.warrior.pRecklessness &&
@@ -2898,7 +2904,7 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
         }
 
         if (m_spells.rogue.pSprint &&
-           !me->HasUnitState(UNIT_STAT_ROOT) &&
+           !me->HasUnitState(UNIT_STATE_ROOT) &&
            !me->CanReachWithMeleeAutoAttack(pVictim) &&
             CanTryToCastSpell(me, m_spells.rogue.pSprint))
         {
@@ -3114,7 +3120,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
         return;
     
     if (form != FORM_NONE &&
-        me->HasUnitState(UNIT_STAT_ROOT) &&
+        me->HasUnitState(UNIT_STATE_ROOT) &&
         me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT) &&
         (m_role != ROLE_TANK || !me->CanReachWithMeleeAutoAttack(pVictim)))
         me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
@@ -3304,7 +3310,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             }
             else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
                     (pVictim->GetVictim() == me) &&
-                    !me->HasUnitState(UNIT_STAT_ROOT) &&
+                    !me->HasUnitState(UNIT_STATE_ROOT) &&
                     (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
             {
                 if (m_spells.druid.pEntanglingRoots &&

@@ -24,7 +24,7 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "molten_core.h"
 
-#define EMOTE_SERVICE               -1409000
+#define EMOTE_SERVICE               8253
 
 #define SPELL_INFERNO               19695
 #define SPELL_IGNITEMANA            19659
@@ -63,7 +63,7 @@ struct boss_baron_geddonAI : public ScriptedAI
         if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_GEDDON, NOT_STARTED);
 
-        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STATE_ROOT);
         SetCombatMovement(true);
     }
 
@@ -151,7 +151,7 @@ struct boss_baron_geddonAI : public ScriptedAI
                 InfCount = 0;
                 Tick = 1000;
                 m_bInferno = true;
-                m_creature->AddUnitState(UNIT_STAT_ROOT);
+                m_creature->AddUnitState(UNIT_STATE_ROOT);
             }
         }
         else
@@ -183,7 +183,7 @@ struct boss_baron_geddonAI : public ScriptedAI
                     case 7:
                         Damage = 5000;
                         m_bInferno = false;
-                        m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                        m_creature->ClearUnitState(UNIT_STATE_ROOT);
                         break;
                 }
                 m_creature->CastCustomSpell(m_creature, 19698, Damage, {}, {}, true);

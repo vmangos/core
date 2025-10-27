@@ -414,7 +414,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             break;
                         case 1:
                             m_creature->CastSpell(m_creature, SPELL_CLEANSING, false);
-                            m_creature->AddUnitState(UNIT_STAT_ROOT);
+                            m_creature->AddUnitState(UNIT_STATE_ROOT);
                             Subevent_Phase = 2;
                             Event_Timer = 15000;
                             break;
@@ -427,7 +427,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 3:
                             if (!m_creature->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                             {
-                                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                                m_creature->ClearUnitState(UNIT_STATE_ROOT);
                                 Subevent_Phase = 4;
                             }
                             Event_Timer = 1000;

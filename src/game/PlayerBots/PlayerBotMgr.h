@@ -81,7 +81,7 @@ class PlayerBotMgr
 
         bool AddBot(PlayerBotAI* ai);
         bool AddBot(uint32 playerGuid, bool chatBot = false, PlayerBotAI* pAI = nullptr);
-        bool DeleteBot(std::map<uint32, std::shared_ptr<PlayerBotEntry>>::iterator iter);
+        bool DeleteBot(std::map<uint64, std::shared_ptr<PlayerBotEntry>>::iterator iter);
         bool DeleteBot(uint32 playerGuid);
 
         bool AddRandomBot();
@@ -116,7 +116,7 @@ class PlayerBotMgr
         uint32 m_maxAccountId;
         time_t m_lastBattleBotQueueUpdate;
 
-        std::map<uint32 /*pl guid*/, std::shared_ptr<PlayerBotEntry>> m_bots;
+        std::map<uint64 /*pl guid*/, std::shared_ptr<PlayerBotEntry>> m_bots;
         std::map<uint32 /*account*/, uint32> m_tempBots;
         PlayerBotStats m_stats;
 

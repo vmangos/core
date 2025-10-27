@@ -28,9 +28,11 @@
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
 #include "World.h"
+#include "Log.h"
 
 #include <vector>
 #include <algorithm>
+#include <random>
 
 INSTANTIATE_SINGLETON_1(WardenScanMgr);
 
@@ -175,14 +177,23 @@ void WardenScanMgr::LoadFromDB()
             {
                 auto const filename = fields[2].GetCppString();
 
-                std::vector<uint8> expected;
-                if (!BuildRawData(fields[6].GetCppString(), expected))
+                // If you know a good file, you provide `str` and `result` row
+                // If you know a bad file, you provide `str` and empty `result` row
+                std::vector<uint8> expectedHashAsVector;
+                if (!BuildRawData(fields[6].GetCppString(), expectedHashAsVector) || !(expectedHashAsVector.empty() || expectedHashAsVector.size() == Crypto::Hash::SHA1::Digest::size()))
                 {
                     sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to parse expected value in Warden scan id %u", id);
                     continue;
                 }
 
-                scan = new WindowsFileHashScan(filename, &expected[0], !expected.empty(), comment, flags, buildMin, buildMax);
+                nonstd::optional<Crypto::Hash::SHA1::Digest> expectedHash;
+                if (!expectedHashAsVector.empty())
+                {
+                    expectedHash = Crypto::Hash::SHA1::CreateZero();
+                    std::copy_n(expectedHashAsVector.begin(), expectedHashAsVector.size(), expectedHash.value().begin());
+                }
+
+                scan = new WindowsFileHashScan(filename, expectedHash, !expectedHashAsVector.empty(), comment, flags, buildMin, buildMax);
                 break;
             }
 
@@ -203,15 +214,17 @@ void WardenScanMgr::LoadFromDB()
             {
                 auto const module = fields[2].GetCppString();
                 auto const proc = fields[3].GetCppString();
-                
-                std::vector<uint8> hash;
-                if (!BuildRawData(fields[6].GetCppString(), hash))
+
+                std::vector<uint8> expectedHashAsVector;
+                Crypto::Hash::SHA1::Digest expectedHash;
+                if (!BuildRawData(fields[6].GetCppString(), expectedHashAsVector) || expectedHashAsVector.size() != expectedHash.size())
                 {
                     sLog.Out(LOG_ANTICHEAT, LOG_LVL_ERROR, "Failed to parse expected value in Warden scan id %u", id);
                     continue;
                 }
+                std::copy_n(expectedHashAsVector.begin(), expectedHashAsVector.size(), expectedHash.begin());
 
-                scan = new WindowsHookScan(module, proc, &hash[0], offset, length, comment, flags, buildMin, buildMax);
+                scan = new WindowsHookScan(module, proc, expectedHash, offset, length, comment, flags, buildMin, buildMax);
                 break;
             }
 
@@ -307,7 +320,9 @@ std::vector<std::shared_ptr<Scan const>> WardenScanMgr::GetRandomScans(ScanFlags
     }
 
     // randomize the order of matching scans
-    std::random_shuffle(matches.begin(), matches.end());
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(matches.begin(), matches.end(), g);
 
     // determine how many of the identified scans we can fit into the client's request and response buffers
     size_t request = 0, reply = 0;

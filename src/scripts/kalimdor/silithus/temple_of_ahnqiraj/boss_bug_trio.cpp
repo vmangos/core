@@ -15,7 +15,7 @@ the script is using Magmadar's panic spell which has the exact same range and du
 enum
 {
     // emote
-    EMOTE_DEVOUR = -1388004,
+    EMOTE_DEVOUR = 11115,
 
     // kri
     SPELL_THRASH = 3391,
@@ -415,7 +415,7 @@ struct boss_vemAI : public boss_bug_trioAI
         // Knock Away
         if (m_uiKnockBackTimer < uiDiff)
         {
-            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()) && !m_creature->GetVictim()->HasUnitState(UNIT_STAT_STUNNED))
+            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()) && !m_creature->GetVictim()->HasUnitState(UNIT_STATE_STUNNED))
             {
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKBACK) == CAST_OK)
                     m_uiKnockBackTimer = urand(10000, 14000);
