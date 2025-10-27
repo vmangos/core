@@ -1176,9 +1176,8 @@ class ObjectMgr
         }
 
         // global grid objects state (static DB spawns, global spawn mods from gameevent system)
-        CellObjectGuids const& GetCellObjectGuids(uint16 mapid, uint32 cell_id)
+        CellObjectGuids const* GetCellObjectGuids(uint16 mapid, uint32 cell_id)
         {
-            m_MapObjectGuids_lock.acquire();
             auto itr = m_MapObjectGuids.find(mapid);
             if (itr != m_MapObjectGuids.end())
             {
@@ -1186,10 +1185,9 @@ class ObjectMgr
                 if (itr2 != itr->second.end())
                     return &itr2->second;
             }
-            m_MapObjectGuids_lock.release();
             return nullptr;
         }
-        ACE_Thread_Mutex& GetCellLoadingObjectsMutex() // TODO: Mutex per cell?
+        ACE_RW_Thread_Mutex& GetCellLoadingObjectsMutex() // TODO: Mutex per cell?
         {
             return m_MapObjectGuids_lock;
         }
@@ -1579,7 +1577,7 @@ class ObjectMgr
         HalfNameMap m_PetHalfNameMap1;
 
         MapObjectGuids m_MapObjectGuids;
-        ACE_Thread_Mutex m_MapObjectGuids_lock;
+        ACE_RW_Thread_Mutex m_MapObjectGuids_lock;
 
         AreaTriggerLocaleMap m_AreaTriggerLocaleMap;
         CreatureDataMap m_CreatureDataMap;

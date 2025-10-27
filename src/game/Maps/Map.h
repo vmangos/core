@@ -534,51 +534,15 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
             m_objectsStore_lock.release();
             return ptr;
         }
-        void AddUpdateObject(Object *obj)
-        {
-            if (_processingSendObjUpdates)
-                return;
-            i_objectsToClientUpdate_lock.acquire();
-            i_objectsToClientUpdate.insert(obj);
-            i_objectsToClientUpdate_lock.release();
-        }
+        void AddUpdateObject(Object *obj);
 
-        void RemoveUpdateObject(Object *obj)
-        {
-            ASSERT(!_processingSendObjUpdates);
-            i_objectsToClientUpdate_lock.acquire();
-            i_objectsToClientUpdate.erase(obj);
-            i_objectsToClientUpdate_lock.release();
-        }
+        void RemoveUpdateObject(Object *obj);
         // May be called from a different map ...
-        void AddRelocatedUnit(Unit* obj)
-        {
-            if (_processingUnitsRelocation)
-                return;
-            i_unitsRelocated_lock.acquire();
-            i_unitsRelocated.insert(obj);
-            i_unitsRelocated_lock.release();
-        }
-        void RemoveRelocatedUnit(Unit* obj)
-        {
-            ASSERT(!_processingUnitsRelocation);
-            i_unitsRelocated_lock.acquire();
-            i_unitsRelocated.erase(obj);
-            i_unitsRelocated_lock.release();
-        }
+        void AddRelocatedUnit(Unit* obj);
+        void RemoveRelocatedUnit(Unit* obj);
 
-        void AddUnitToMovementUpdate(Unit* unit)
-        {
-            unitsMvtUpdate_lock.acquire();
-            unitsMvtUpdate.insert(unit);
-            unitsMvtUpdate_lock.release();
-        }
-        void RemoveUnitFromMovementUpdate(Unit* unit)
-        {
-            unitsMvtUpdate_lock.acquire();
-            unitsMvtUpdate.erase(unit);
-            unitsMvtUpdate_lock.release();
-        }
+        void AddUnitToMovementUpdate(Unit* unit);
+        void RemoveUnitFromMovementUpdate(Unit* unit);
         // DynObjects currently
         uint32 GenerateLocalLowGuid(HighGuid guidhigh);
 
@@ -601,18 +565,7 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
         bool GetWalkRandomPosition(GenericTransport* t, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags = 0xF) const;
         bool GetSwimRandomPosition(float& x, float& y, float& z, float radius, GridMapLiquidData& liquid_status, bool randomRange = true) const;
         VMAP::ModelInstance* FindCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
-
-        GameObjectModel const* FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2)
-        {
-            ASSERT(MaNGOS::IsValidMapCoord(x1, y1, z1));
-            ASSERT(MaNGOS::IsValidMapCoord(x2, y2, z2));
-            Vector3 const pos1 = Vector3(x1, y1, z1);
-            Vector3 const pos2 = Vector3(x2, y2, z2);
-            _dynamicTree_lock.acquire_read();
-            GameObjectModel const* r = _dynamicTree.getObjectHit(pos1, pos2);
-            _dynamicTree_lock.release();
-            return r;
-        }
+        GameObjectModel const* FindDynamicObjectCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
 
         void Balance() { m_dynamicTree.balance(); }
         void RemoveGameObjectModel(GameObjectModel const& model);
@@ -643,7 +596,7 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
          */
         void SetWeather(uint32 zoneId, WeatherType type, float grade, bool permanently);
 
-        void SetMapUpdateIndex(int idx) { _updateIdx = idx; }
+        void SetMapUpdateIndex(int idx) { m_updateIdx = idx; }
 
         // Get Holder for Creature Linking
         CreatureLinkingHolder* GetCreatureLinkingHolder() { return &m_creatureLinkingHolder; }
@@ -726,7 +679,7 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
         float m_visibilityDistance;
         float m_gridActivationDistance;
 
-        mutable ACE_RW_Mutex   m_dynamicTreeLock;
+        mutable ACE_RW_Thread_Mutex m_dynamicTreeLock;
         DynamicMapTree m_dynamicTree;
 
         MapPersistentState* m_persistentState;

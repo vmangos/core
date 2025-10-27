@@ -845,7 +845,7 @@ inline void Map::UpdateActiveCellsSynch(uint32 now, uint32 diff)
 class UnitsMovementUpdater : public ACE_Based::Runnable
 {
 public:
-    UnitsMovementUpdater(int i, int nthreads, std::set<Unit*>& _updates, uint32 _diff) : threadIdx(i), nThreads(nthreads), updates(_updates), diff(_diff)
+    UnitsMovementUpdater(int i, int nthreads, std::unordered_set<Unit*>& _updates, uint32 _diff) : threadIdx(i), nThreads(nthreads), updates(_updates), diff(_diff)
     {
     }
 
@@ -859,7 +859,7 @@ public:
     }
     int threadIdx;
     int nThreads;
-    std::set<Unit*>& updates;
+    std::unordered_set<Unit*>& updates;
     uint32 diff;
 };
 
@@ -1026,10 +1026,10 @@ void Map::Update(uint32 t_diff)
 
     uint32 additionnalWaitTime = 0;
     uint32 additionnalUpdateCounts = 0;
-    if (_updateIdx >= 0)
+    if (m_updateIdx >= 0)
     {
         additionnalWaitTime = WorldTimer::getMSTime();
-        sMapMgr.MarkContinentUpdateFinished(_updateIdx);
+        sMapMgr.MarkContinentUpdateFinished(m_updateIdx);
         while (!sMapMgr.IsContinentUpdateFinished())
         {
             ACE_Based::Thread::Sleep(10);
@@ -1847,7 +1847,7 @@ void Map::RemoveAllObjectsInRemoveList()
                 break;
         }
     }
-    i_objectsToRemove_lock.release();
+    m_objectsToRemoveLock.release();
 }
 
 bool Map::HaveRealPlayers() const
@@ -2907,7 +2907,7 @@ void Map::RemoveUnitFromMovementUpdate(Unit *unit)
 class ObjectUpdatePacketBuilder : public ACE_Based::Runnable
 {
 public:
-    ObjectUpdatePacketBuilder(std::set<Object*>::iterator& a, std::set<Object*>::iterator& b, uint32 now) : begin(a), current(a), end(b), beginTime(now)
+    ObjectUpdatePacketBuilder(std::unordered_set<Object*>::iterator& a, std::unordered_set<Object*>::iterator& b, uint32 now) : begin(a), current(a), end(b), beginTime(now)
     {
     }
 
@@ -2932,9 +2932,9 @@ public:
         for (auto& itr : update_players)
             itr.second.Send(itr.first->GetSession());
     }
-    std::set<Object*>::iterator begin;
-    std::set<Object*>::iterator current;
-    std::set<Object*>::iterator end;
+    std::unordered_set<Object*>::iterator begin;
+    std::unordered_set<Object*>::iterator current;
+    std::unordered_set<Object*>::iterator end;
     uint32 beginTime;
 };
 
@@ -2968,8 +2968,8 @@ void Map::SendObjectUpdates()
     uint32 step = objectsCount / threads;
     ACE_Based::Thread** updaters = threads > 1 ? new ACE_Based::Thread*[threads - 1] : nullptr;
     ObjectUpdatePacketBuilder** objUpdaters = new ObjectUpdatePacketBuilder*[threads];
-    std::set<Object*>::iterator itBegin = i_objectsToClientUpdate.begin();
-    std::set<Object*>::iterator itEnd = i_objectsToClientUpdate.begin();
+    std::unordered_set<Object*>::iterator itBegin = m_objectsToClientUpdate.begin();
+    std::unordered_set<Object*>::iterator itEnd = m_objectsToClientUpdate.begin();
     ASSERT(step > 0);
     ASSERT(threads >= 1);
     for (uint32 i = 0; i < threads; ++i)
@@ -2998,7 +2998,7 @@ void Map::SendObjectUpdates()
          * Iterators, pointers and references referring to elements removed by the function are invalidated.
          * All other iterators, pointers and references keep their validity.
          */
-        i_objectsToClientUpdate.erase(objUpdaters[i]->begin, objUpdaters[i]->current);
+        m_objectsToClientUpdate.erase(objUpdaters[i]->begin, objUpdaters[i]->current);
         objUpdaters[i]->decReference();
         if (i != (threads - 1))
             delete updaters[i];
@@ -3023,7 +3023,7 @@ void Map::SendObjectUpdates()
 class VisibilityUpdater : public ACE_Based::Runnable
 {
 public:
-    VisibilityUpdater(std::set<Unit*>::iterator& a, std::set<Unit*>::iterator& b, uint32 now) : begin(a), current(a), end(b), beginTime(now)
+    VisibilityUpdater(std::unordered_set<Unit*>::iterator& a, std::unordered_set<Unit*>::iterator& b, uint32 now) : begin(a), current(a), end(b), beginTime(now)
     {
     }
 
@@ -3043,9 +3043,9 @@ public:
             (*current)->ProcessRelocationVisibilityUpdates();
         }
     }
-    std::set<Unit*>::iterator begin;
-    std::set<Unit*>::iterator current;
-    std::set<Unit*>::iterator end;
+    std::unordered_set<Unit*>::iterator begin;
+    std::unordered_set<Unit*>::iterator current;
+    std::unordered_set<Unit*>::iterator end;
     uint32 beginTime;
 };
 
@@ -3078,8 +3078,8 @@ void Map::UpdateVisibilityForRelocations()
     uint32 step = objectsCount / threads;
     ACE_Based::Thread** updaters = threads > 1 ? new ACE_Based::Thread*[threads - 1] : nullptr;
     VisibilityUpdater** visUpdaters = new VisibilityUpdater*[threads];
-    std::set<Unit*>::iterator itBegin = i_unitsRelocated.begin();
-    std::set<Unit*>::iterator itEnd = i_unitsRelocated.begin();
+    std::unordered_set<Unit*>::iterator itBegin = m_unitsRelocated.begin();
+    std::unordered_set<Unit*>::iterator itEnd = m_unitsRelocated.begin();
     ASSERT(step > 0);
     for (uint32 i = 0; i < threads; ++i)
     {
@@ -3486,7 +3486,7 @@ GameObjectModel const* Map::FindDynamicObjectCollisionModel(float x1, float y1, 
     GameObjectModel const* result = nullptr;
     if (pos1 != pos2)
     {
-        std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+        ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
         result = m_dynamicTree.getObjectHit(pos1, pos2);
     }
     return result;
@@ -3494,39 +3494,39 @@ GameObjectModel const* Map::FindDynamicObjectCollisionModel(float x1, float y1, 
 
 void Map::RemoveGameObjectModel(const GameObjectModel &model)
 {
-    std::lock_guard<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Write_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     m_dynamicTree.remove(model);
     m_dynamicTree.balance();
 }
 
 void Map::InsertGameObjectModel(const GameObjectModel &model)
 {
-    std::lock_guard<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Write_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     m_dynamicTree.insert(model);
     m_dynamicTree.balance();
 }
 
 bool Map::ContainsGameObjectModel(const GameObjectModel &model) const
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     return m_dynamicTree.contains(model);
 }
 
 bool Map::GetDynamicObjectHitPos(Movement::Vector3 start, Movement::Vector3 end, Movement::Vector3 &out, float finalDistMod) const
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     return m_dynamicTree.getObjectHitPos(start, end, out, finalDistMod);
 }
 
 float Map::GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     return m_dynamicTree.getHeight(x, y, z, maxSearchDist);
 }
 
 bool Map::CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2, bool ignoreM2Model) const
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     return m_dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, ignoreM2Model);
 }
 

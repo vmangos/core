@@ -204,10 +204,9 @@ bool ShipTransport::TeleportTransport(uint32 newMapid, float x, float y, float z
 void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
 {
     // we need to unlock right away because SetTransport can dismount and resummon pet, which will call AddPassanger again
-    {
-        ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
-        bool const boarded = m_passengers.insert(passenger).second;
-    }
+    ACE_Guard<ACE_Thread_Mutex> guard(m_passengerMutex);
+    bool const boarded = m_passengers.insert(passenger).second;
+    guard.release();
 
     if (boarded)
     {
@@ -246,7 +245,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
     }
     else
         erased = m_passengers.erase(passenger) > 0;
-    lock.release();
+    guard.release();
 
     if (erased)
     {

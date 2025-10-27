@@ -975,6 +975,7 @@ class World
 
         // This thread handles packets while the world sessions update is not running
         ACE_Based::Thread* m_asyncPacketsThread;
+        ACE_Thread_Mutex m_asyncPacketsMutex;
         bool m_canProcessAsyncPackets;
 
         // for max speed access

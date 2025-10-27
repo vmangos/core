@@ -1965,10 +1965,14 @@ void World::ProcessAsyncPackets()
 {
     do
     {
-        do
-        {
-            ACE_Based::Thread::Sleep(20);
-        } while (!m_canProcessAsyncPackets);
+        ACE_Based::Thread::Sleep(20);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_asyncPacketsMutex);
+
+        if (IsStopped())
+            return;
+
+        if (!m_canProcessAsyncPackets)
+            continue;
 
         for (auto const& itr : m_sessions)
         {
@@ -2035,7 +2039,7 @@ void World::Update(uint32 diff)
 
     {
         m_canProcessAsyncPackets = false;
-        std::lock_guard<std::mutex> lock(m_asyncPacketsMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_asyncPacketsMutex);
 
         GetMessager().Execute(this);
 
@@ -2150,7 +2154,7 @@ void World::Update(uint32 diff)
 
     {
         m_canProcessAsyncPackets = false;
-        std::lock_guard<std::mutex> lock(m_asyncPacketsMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_asyncPacketsMutex);
 
         // And last, but not least handle the issued cli commands
         ProcessCliCommands();
