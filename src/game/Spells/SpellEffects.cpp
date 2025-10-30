@@ -267,8 +267,11 @@ void Spell::EffectInstaKill(SpellEffectIndex /*effIdx*/)
     if (!unitTarget || !unitTarget->IsAlive())
         return;
 
-    if (m_caster == unitTarget)                             // prevent interrupt message
+    if (m_caster == unitTarget || (unitTarget->IsPet() && unitTarget->ToPet()->GetOwner() == m_caster))
+    {
         finish();
+        return;
+    }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     WorldPacket data(SMSG_SPELLINSTAKILLLOG, (8 + 4));

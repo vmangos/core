@@ -250,6 +250,7 @@ void AddSC_shaman_spell_scripts();
 void AddSC_special_spell_scripts();
 void AddSC_warlock_spell_scripts();
 void AddSC_warrior_spell_scripts();
+void AddSC_test_spell_scripts();
 
 void AddScripts()
 {
@@ -496,4 +497,5 @@ void AddScripts()
     AddSC_special_spell_scripts();
     AddSC_warlock_spell_scripts();
     AddSC_warrior_spell_scripts();
+    AddSC_test_spell_scripts();
 }
