@@ -1304,9 +1304,8 @@ bool Creature::IsTrainerOf(Player* pPlayer) const
     uint32 gossipMenuId = GetCreatureInfo()->gossip_menu_id;
     if (!gossipMenuId)
     {
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature %u (Entry: %u) has npc_flag UNIT_NPC_FLAG_TRAINER but does not have a gossip_menu_id assigned to it.",
-                        GetGUIDLow(), GetEntry());
-        return false;
+        // no requirement to access training menu
+        return true;
     }
 
     bool found = false;
