@@ -1952,9 +1952,12 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         rand_z = z;
         if (pMap->GetWalkRandomPosition(GetTransport(), rand_x, rand_y, rand_z, distance, moveAllowed))
         {
-            // Giant type creatures walk underwater
-            if ((pUnit && !pUnit->CanSwim()) ||
-                (IsCreature() && !pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_USE_SWIM_ANIMATION)))
+            // Can't swim, so walk
+            if ((pUnit && !pUnit->CanSwim()))
+                return true;
+
+            // Giant type creatures lack USE_SWIM_ANIMATION flag, and walk underwater
+            if (pUnit && pUnit->IsCreature() && !pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_USE_SWIM_ANIMATION))
                 return true;
 
             // The position returned by the pathfinding is at the bottom of the water. We're randomizing it a bit...
