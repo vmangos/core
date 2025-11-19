@@ -111,7 +111,7 @@ void Log::OpenWorldLogFiles()
     logFiles[LOG_MONEY_TRADES] = OpenLogFile("LogFile.Trades", "", log_file_timestamp, false);
     logFiles[LOG_GM] = sConfig.GetBoolDefault("GmLogPerAccount", false) ?
         OpenLogFile("LogFile.Gm", "", log_file_timestamp, false) : nullptr;
-    logFiles[LOG_GM_CRITICAL] = OpenLogFile("LogFile.CriticalCommands", "gm_critical.log", log_file_timestamp, false);
+    logFiles[LOG_GM_CRITICAL] = OpenLogFile("LogFile.GmCriticalCommands", "gm_critical.log", log_file_timestamp, false);
     logFiles[LOG_ANTICHEAT] = OpenLogFile("LogFile.Anticheat", "Anticheat.log", log_file_timestamp, false);
     logFiles[LOG_SCRIPTS] = OpenLogFile("LogFile.Scripts", "Scripts.log", log_file_timestamp, false);
     logFiles[LOG_MOVEMENT] = OpenLogFile("LogFile.Movement", "Movement.log", log_file_timestamp, false);

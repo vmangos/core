@@ -588,7 +588,7 @@ DebuffLimit = 0
 #        GM Log file of gm commands
 #        Default: "" (Disable)
 #
-#    LogFile.CriticalCommands
+#    LogFile.GmCriticalCommands
 #        Log file for commands marked as critical, when used on own character (same IP for example)
 #        Default: "gm_critical.log"
 #                 "" - Empty name for disable
