@@ -42,6 +42,9 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     recvPacket >> bagIndex >> slot >> spellSlot;
 
+    // CRITICAL: Always read timestamp from packet (HermesProxy always writes it)
+    uint32 packetTimestamp = recvPacket.ReadPackedTime();
+
     // TODO: add targets.read() check
     Player* pUser = _player;
 
@@ -169,7 +172,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     }
 
     // fail if we are cancelling pending request
-    if (pUser->m_pendingCasts.size())
+    if (!pUser->m_pendingCasts.empty())
     {
         PendingSpellCastRequest *request = pUser->GetCastRequest(spellInfo->StartRecoveryCategory);
         if (request && request->cancel_in_progress && request->spell_id == spellId)
@@ -186,12 +189,13 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         {
             PendingSpellCastRequest newRequest;
             newRequest.spell_id = spellId;
-            newRequest.time_requested = recvPacket.ReadPackedTime();
+            newRequest.time_requested = packetTimestamp;  // Use the timestamp we already read
             newRequest.active = true;
             newRequest.request_packet = copyPacket;
             newRequest.cancel_in_progress = false;
             newRequest.cast_count = 0;
             newRequest.is_item = true;
+            newRequest.item_guid = pItem->GetObjectGuid();  // Track which item was used
             pUser->RequestSpellCast(newRequest, spellInfo);
             return;
         }
@@ -336,6 +340,9 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     uint32 spellId;
     recvPacket >> spellId;
 
+    // CRITICAL: Always read timestamp from packet (HermesProxy always writes it)
+    uint32 packetTimestamp = recvPacket.ReadPackedTime();
+
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
     if (!spellInfo)
@@ -354,7 +361,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     }
 
     // fail if we are cancelling pending request
-    if (_player->m_pendingCasts.size())
+    if (!_player->m_pendingCasts.empty())
     {
         PendingSpellCastRequest *request = _player->GetCastRequest(spellInfo->StartRecoveryCategory);
         if (request && request->cancel_in_progress && request->spell_id == spellId)
@@ -371,7 +378,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         {
             PendingSpellCastRequest newRequest;
             newRequest.spell_id = spellId;
-            newRequest.time_requested = recvPacket.ReadPackedTime();
+            newRequest.time_requested = packetTimestamp;  // Use the timestamp we already read
             newRequest.active = true;
             newRequest.request_packet = copyPacket;
             newRequest.cancel_in_progress = false;

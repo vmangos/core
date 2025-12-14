@@ -22263,7 +22263,7 @@ uint32 Player::GetRemainingGlobalCooldown(SpellEntry const* spellEntry) const
     if (itr == m_GCDCatMap.end())
         return 0;
 
-    TimePoint now = WorldTimer::Now();
+    TimePoint now = World::GetCurrentClockTime();
     if (itr->second <= now)
         return 0;
 
@@ -22284,7 +22284,7 @@ uint32 Player::GetRemainingCooldown(SpellEntry const* spellEntry) const
     if (!itr->second->GetSpellCDExpireTime(expireTime))
         return 0;
 
-    TimePoint now = WorldTimer::Now();
+    TimePoint now = World::GetCurrentClockTime();
     if (expireTime <= now)
         return 0;
 

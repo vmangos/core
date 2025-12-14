@@ -749,6 +749,7 @@ struct PendingSpellCastRequest
     bool        cancel_in_progress = false;
     uint32      cast_count = 0;
     bool        is_item = false;
+    ObjectGuid  item_guid;
 };
 
 class Player final: public Unit
