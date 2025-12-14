@@ -35,6 +35,8 @@ using namespace Spells;
 
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
+    WorldPacket const copyPacket = recvPacket;
+
     uint8 bagIndex, slot;
     uint8 spellSlot; // the position of the spell id on the item template
 
@@ -154,6 +156,45 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid))
             Spell::SendCastResult(_player, spellInfo, itemCastCheckResult);
         return;
+    }
+
+    uint32 spellId = proto->Spells[spellSlot].SpellId;
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+
+    if (!spellInfo)
+    {
+        recvPacket.rpos(recvPacket.wpos());
+        pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
+        return;
+    }
+
+    // fail if we are cancelling pending request
+    if (pUser->m_pendingCasts.size())
+    {
+        PendingSpellCastRequest *request = pUser->GetCastRequest(spellInfo->StartRecoveryCategory);
+        if (request && request->cancel_in_progress && request->spell_id == spellId)
+        {
+            pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
+            return;
+        }
+    }
+
+    // try queue spell if it can't be executed right now
+    if (!pUser->CanExecutePendingSpellCastRequest(spellInfo, true))
+    {
+        if (pUser->CanRequestSpellCast(spellInfo))
+        {
+            PendingSpellCastRequest newRequest;
+            newRequest.spell_id = spellId;
+            newRequest.time_requested = recvPacket.ReadPackedTime();
+            newRequest.active = true;
+            newRequest.request_packet = copyPacket;
+            newRequest.cancel_in_progress = false;
+            newRequest.cast_count = 0;
+            newRequest.is_item = true;
+            pUser->RequestSpellCast(newRequest, spellInfo);
+            return;
+        }
     }
 
     pUser->CastItemUseSpell(pItem, targets);
@@ -287,6 +328,11 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
+    if (recvPacket.empty())
+        return;
+
+    WorldPacket const copyPacket = recvPacket;
+
     uint32 spellId;
     recvPacket >> spellId;
 
@@ -305,6 +351,35 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         //cheater? kick? ban?
         recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
         return;
+    }
+
+    // fail if we are cancelling pending request
+    if (_player->m_pendingCasts.size())
+    {
+        PendingSpellCastRequest *request = _player->GetCastRequest(spellInfo->StartRecoveryCategory);
+        if (request && request->cancel_in_progress && request->spell_id == spellId)
+        {
+            recvPacket.rpos(recvPacket.wpos());
+            return;
+        }
+    }
+
+    // try queue spell if it can't be executed right now
+    if (!_player->CanExecutePendingSpellCastRequest(spellInfo, true))
+    {
+        if (_player->CanRequestSpellCast(spellInfo))
+        {
+            PendingSpellCastRequest newRequest;
+            newRequest.spell_id = spellId;
+            newRequest.time_requested = recvPacket.ReadPackedTime();
+            newRequest.active = true;
+            newRequest.request_packet = copyPacket;
+            newRequest.cancel_in_progress = false;
+            newRequest.cast_count = 0;
+            newRequest.is_item = false;
+            _player->RequestSpellCast(newRequest, spellInfo);
+            return;
+        }
     }
 
     // client provided targets

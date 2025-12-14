@@ -738,6 +738,19 @@ struct ScheduledTeleportData
     std::function<void()> recover = std::function<void()>();
 };
 
+const uint32 SPELL_QUEUE_TIME_WINDOW = 400;
+
+struct PendingSpellCastRequest
+{
+    uint32      spell_id = 0;
+    uint32      time_requested = 0;
+    bool        active = false;
+    WorldPacket request_packet;
+    bool        cancel_in_progress = false;
+    uint32      cast_count = 0;
+    bool        is_item = false;
+};
+
 class Player final: public Unit
 {
     friend class WorldSession;
@@ -1353,6 +1366,8 @@ class Player final: public Unit
         void AddGCD(SpellEntry const& spellEntry, uint32 forcedDuration = 0, bool updateClient = false) final;
         void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0) final;
         void RemoveSpellCooldown(SpellEntry const& spellEntry, bool updateClient = true) final;
+        uint32 GetRemainingGlobalCooldown(SpellEntry const* spellEntry) const;
+        uint32 GetRemainingCooldown(SpellEntry const* spellEntry) const;
         void RemoveSpellCategoryCooldown(uint32 category, bool updateClient = true) final;
         void RemoveAllCooldowns(bool sendOnly = false) final;
         void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) final;
@@ -1379,6 +1394,37 @@ class Player final: public Unit
                     ++spellCDItr;
             }
         }
+
+        /*********************************************************/
+        /***                   SPELL QUEUE SYSTEM              ***/
+        /*********************************************************/
+
+        // Queues up a spell cast request that has been received via packet and processes it whenever possible.
+        PendingSpellCastRequest* GetCastRequest(SpellEntry const* spellEntry) const;
+        PendingSpellCastRequest* GetCastRequest(uint32 gcd_category) const;
+        void ClearCastRequest(SpellEntry const* spellEntry);
+        void ClearCastRequest(uint32 category);
+
+        typedef std::map<uint32 /*category*/, PendingSpellCastRequest> PendingCastList;
+        typedef std::map<uint32 /*category*/, uint32 /*time which block was set*/> SameTickQueueBlockList;
+        PendingCastList m_pendingCasts;
+        SameTickQueueBlockList m_SameTickBlockList;
+
+        void RemoveSameTickQueueBlock(uint32 category);
+        void AddSameTickQueueBlock(uint32 category);
+        bool HasSameTickQueueBlock(uint32 category, bool ignore_time) const;
+
+        void ExecuteSortedCastRequests();
+
+        bool IsSpellQueueEnabled() const;
+        void RequestSpellCast(PendingSpellCastRequest castRequest, SpellEntry const* spellEntry);
+        void SetPendingCastRequest(PendingSpellCastRequest new_request);
+        void CancelPendingCastRequest(uint32 category);
+        void CancelPendingCastRequests();
+        bool CanRequestSpellCast(SpellEntry const* spellEntry) const;
+        void ProcessPendingSpellCastRequest(uint32 gcd_category);
+        bool CanExecutePendingSpellCastRequest(SpellEntry const* spellEntry, bool without_queue = false);
+        void ExecutePendingSpellCastRequest();
 
         /*********************************************************/
         /***                   TALENT SYSTEM                   ***/

@@ -414,6 +414,7 @@ class Spell
         void SetCastTime(int32 castTime) { m_casttime = castTime; }
         int32 GetCastTime() const { return m_casttime; }
         uint32 GetCastedTime() const { return m_timer; }
+        uint32 GetCastTimeRemaining(bool force_zero_minimum) const { return (force_zero_minimum && m_timer < 0) ? 0 : m_timer; }
         bool IsChanneled() const { return m_channeled; }
         bool IsAutoRepeat() const { return m_autoRepeat; }
         void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
