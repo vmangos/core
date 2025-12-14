@@ -80,7 +80,7 @@ namespace VMAP
             return;
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-        Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
+        Vector3 zDirModel = iInvRot * Vector3::down();
         float zDist;
         if (iModel->IntersectPoint(pModel, zDirModel, zDist, info))
         {
@@ -115,9 +115,8 @@ namespace VMAP
         else if (!iBound.contains(p))
             return false;
         // child bounds are defined in object space:
-        Vector3 up(0, 0, 1);
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-        up = iInvRot * up * iInvScale;
+        Vector3 up = iInvRot * Vector3::up() * iInvScale;
 
         return iModel->IsUnderObject(pModel, up, flags & MOD_M2, outDist, inDist);
     }
@@ -139,9 +138,10 @@ namespace VMAP
             return false;
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-        Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
+        Vector3 zDirModel = iInvRot * Vector3::down();
         float zDist;
-        if (iModel->GetLocationInfo(pModel, zDirModel, zDist, info))
+        GroupLocationInfo groupInfo;
+        if (iModel->GetLocationInfo(pModel, zDirModel, zDist, groupInfo))
         {
             Vector3 modelGround = pModel + zDist * zDirModel;
             // Transform back to world space. Note that:
@@ -150,6 +150,8 @@ namespace VMAP
             float world_Z = ((modelGround * iInvRot) * iScale + iPos).z;
             if (info.ground_Z < world_Z) // hm...could it be handled automatically with zDist at intersection?
             {
+                info.rootId = groupInfo.rootId;
+                info.hitModel = groupInfo.hitModel;
                 info.ground_Z = world_Z;
                 info.hitInstance = this;
                 return true;
@@ -163,14 +165,11 @@ namespace VMAP
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
         // Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
-        float zLevel;
-        if (info.hitModel->GetLiquidLevel(pModel, zLevel))
+        float zDist;
+        if (info.hitModel->GetLiquidLevel(pModel, zDist))
         {
             // calculate world height (zDist in model coords):
-            // despite making little sense, there ARE some (slightly) tilted WMOs...
-            // we can only determine liquid height in LOCAL z-direction (heightmap data),
-            // so with increasing tilt, liquid calculation gets increasingly wrong...not my fault, really :p
-            liqHeight = (zLevel - pModel.z) * iScale + p.z;
+            liqHeight = (Vector3(pModel.x, pModel.y, zDist) * iInvRot * iScale + iPos).z;
             return true;
         }
         return false;

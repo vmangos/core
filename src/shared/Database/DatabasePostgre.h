@@ -43,19 +43,19 @@ class PostgreSQLConnection : public SqlConnection
 
         bool OpenConnection(bool reconnect);
 
-        QueryResult* Query(char const* sql);
-        QueryNamedResult* QueryNamed(char const* sql);
-        bool Execute(char const* sql);
+        std::unique_ptr<QueryResult> Query(std::string const& sql) override;
+        std::unique_ptr<QueryNamedResult> QueryNamed(std::string const& sql) override;
+        bool Execute(std::string const& sql) override;
 
         unsigned long escape_string(char* to, char const* from, unsigned long length);
 
-        bool BeginTransaction();
-        bool CommitTransaction();
-        bool RollbackTransaction();
+        bool BeginTransaction() override;
+        bool CommitTransaction() override;
+        bool RollbackTransaction() override;
 
     private:
-        bool _TransactionCmd(char const* sql);
-        bool _Query(char const* sql, PGresult** pResult, uint64* pRowCount, uint32* pFieldCount);
+        bool _TransactionCmd(std::string const& sql);
+        bool _Query(std::string const& sql, PGresult** pResult, uint64* pRowCount, uint32* pFieldCount);
 
         PGconn* mPGconn;
 };

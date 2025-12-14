@@ -18,31 +18,19 @@
 #include "blackwing_lair.h"
 
 // Razorgore Phase 2 Script
-enum
+enum Razorgore : uint32
 {
-    MOB_RAZ_TRIGGER            = 14453,
-    MOB_GRETHOK                = 12557,
-    MOB_GARDE_AILE_NOIRE       = 14456,
-    BLACKWING_LEGGIONAIRE      = 12416,
-    BLACKWING_MAGE             = 12420,
-    DEATH_TALON_DRAGONSPAWN    = 12422,
+    SAY_FREE              = 7980,
+    EMOTE_FLEE            = 9592,
 
-    SAY_EGGS_BROKEN_1          = -1469022,
-    SAY_EGGS_BROKEN_2          = -1469023,
-    SAY_EGGS_BROKEN_3          = -1469024,
-    SAY_DEATH                  = -1469025,
-    EMOTE_FLEE                 = -1469035,
+    SPELL_CLEAVE          = 19632,
+    SPELL_WARSTOMP        = 24375,
+    SPELL_FIREBALL_VOLLEY = 22425,
+    SPELL_CONFLAGRATION   = 23023,
+    SPELL_SUMMON_PLAYER   = 25104,
+    MODEL_INVISIBLE       = 11686,
 
-    SPELL_CLEAVE               = 19632,
-    SPELL_WARSTOMP             = 24375,
-    SPELL_FIREBALL_VOLLEY      = 22425,
-    SPELL_CONFLAGRATION        = 23023,
-    SPELL_SUMMON_PLAYER        = 24776,
-    MODEL_INVISIBLE            = 11686,
-
-    SPELL_EXPLOSION            = 20038,             // TODO : better use?
-    SPELL_POSSESS_ORB          = 19832,
-    SPELL_POSSESS              = 23014
+    SPELL_EXPLOSION       = 20038, // TODO : better use?
 };
 
 // North
@@ -79,9 +67,6 @@ enum
 #define SPAWN_Y4_BIS -1012.5256f
 #define SPAWN_Z4_BIS 407.206f
 
-#define DEBUG_RAZOR(...) //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[MC/Razor] "__VA_ARGS__)
-#define DEBUG_EMOTE(s)  //m_creature->MonsterTextEmote(s, nullptr);
-
 struct boss_razorgoreAI : public ScriptedAI
 {
     boss_razorgoreAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -107,7 +92,7 @@ struct boss_razorgoreAI : public ScriptedAI
     void Reset() override
     {
         SetCombatMovement(true);
-        m_uiCleaveTimer         = 9000;                       // These times are probably wrong
+        m_uiCleaveTimer         = 9000; // These times are probably wrong
         m_uiWarStompTimer       = 22000;
         m_uiConflagrationTimer  = 12000;
         m_uiFireballVolleyTimer = 7000;
@@ -126,7 +111,20 @@ struct boss_razorgoreAI : public ScriptedAI
             m_creature->GetThreatManager().modifyThreatPercent(pTarget, -30);
     }
 
-    void Aggro(Unit* /*pWho*/) override
+    void AttackStart(Unit* pVictim) override
+    {
+        CharmInfo* charmInfo = m_creature->GetCharmInfo();
+        if (charmInfo && charmInfo->IsCommandAttack())
+        {
+            charmInfo->SetIsCommandAttack(false);
+            if (m_creature->IsValidAttackTarget(pVictim))
+                m_creature->Attack(pVictim, true);
+        }
+        else
+            ScriptedAI::AttackStart(pVictim);
+    }
+
+    void EnterCombat(Unit* /*pWho*/) override
     {
         if (!m_pInstance)
             return;
@@ -142,12 +140,13 @@ struct boss_razorgoreAI : public ScriptedAI
 
     void MortPhaseUn()
     {
-        DEBUG_RAZOR("MortPhaseUn");
-        Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (const auto& i : liste)
+        Map::PlayerList const& playerList = m_creature->GetMap()->GetPlayers();
+        for (auto const& player : playerList)
         {
-            if (i.getSource() && i.getSource()->IsAlive())
-                i.getSource()->CastSpell(i.getSource(), SPELL_EXPLOSION, true);
+            if (player.getSource() && player.getSource()->IsAlive())
+            {
+                player.getSource()->CastSpell(player.getSource(), SPELL_EXPLOSION, true);
+            }
         }
 
         if (m_pInstance)
@@ -159,7 +158,6 @@ struct boss_razorgoreAI : public ScriptedAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        DEBUG_RAZOR("Razor JustDied");
         if (m_pInstance)
         {
             if (m_pInstance->GetData64(DATA_EGG) == DONE)
@@ -177,7 +175,7 @@ struct boss_razorgoreAI : public ScriptedAI
             m_pInstance->SetData(TYPE_RAZORGORE, FAIL);
 
         SituationInitiale();
-        m_creature->MonsterYell("I'm free! That device shall never torment me again!",0,0);
+        DoScriptText(SAY_FREE, m_creature);
     }
 
     void SituationInitiale()
@@ -188,9 +186,7 @@ struct boss_razorgoreAI : public ScriptedAI
         if (m_pInstance->GetData(TYPE_RAZORGORE) != IN_PROGRESS)
         {
             std::list<Creature *> lCreature;
-            m_creature->GetCreatureListWithEntryInGrid(lCreature, BLACKWING_LEGGIONAIRE, 250.0f);
-            m_creature->GetCreatureListWithEntryInGrid(lCreature, BLACKWING_MAGE, 250.0f);
-            m_creature->GetCreatureListWithEntryInGrid(lCreature, DEATH_TALON_DRAGONSPAWN, 250.0f);
+            GetCreatureListWithEntryInGrid(lCreature, m_creature, { NPC_BLACKWING_LEGGIONAIRE, NPC_BLACKWING_MAGE, NPC_DEATH_TALON_DRAGONSPAWN }, 250.0f);
 
             for (const auto& itr : lCreature)
                 itr->DeleteLater();
@@ -201,29 +197,29 @@ struct boss_razorgoreAI : public ScriptedAI
                 {
                     pCreature->AI()->EnterEvadeMode();
                     pCreature->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, m_creature->GetObjectGuid());
-                    pCreature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS);
+                    pCreature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS_VISUAL);
                     pCreature->SetDisplayId(MODEL_INVISIBLE);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 }
-                else if (Creature* pCreature = m_creature->SummonCreature(MOB_RAZ_TRIGGER, pGO->GetPositionX(), pGO->GetPositionY(), pGO->GetPositionZ(), pGO->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN, DAY * IN_MILLISECONDS))
+                else if (Creature* pCreature = m_creature->SummonCreature(NPC_ORB_OF_DOMINATION, pGO->GetPositionX(), pGO->GetPositionY(), pGO->GetPositionZ(), pGO->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN, DAY * IN_MILLISECONDS))
                 {
                     pCreature->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, m_creature->GetObjectGuid());
-                    pCreature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS);
+                    pCreature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS_VISUAL);
                     pCreature->SetDisplayId(MODEL_INVISIBLE);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 }
             }
 
             std::list<Creature*> GardesListe;
-            GetCreatureListWithEntryInGrid(GardesListe, m_creature, MOB_GARDE_AILE_NOIRE, 150.0f);
-            GetCreatureListWithEntryInGrid(GardesListe, m_creature, MOB_GRETHOK, 150.0f);
+            GetCreatureListWithEntryInGrid(GardesListe, m_creature, { NPC_BLACKWING_GUARDSMAN, NPC_GRETHOK_THE_CONTROLLER }, 150.0f);
 
             for (const auto& itr : GardesListe)
             {
                 if (!itr->IsAlive())
                     itr->Respawn();
-                if (itr->GetEntry() == MOB_GRETHOK)
-                    itr->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS_ORB);
+
+                if (itr->GetEntry() == NPC_GRETHOK_THE_CONTROLLER)
+                    itr->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS);
             }
 
             if (GameObject* pOrb = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(DATA_ORB_DOMINATION_GUID)))
@@ -233,16 +229,12 @@ struct boss_razorgoreAI : public ScriptedAI
         float x, y, z, o;
         m_creature->GetRespawnCoord(x, y, z, &o);
         m_creature->NearTeleportTo(x, y, z, o);
-
-        DEBUG_RAZOR("Initial situation");
     }
 
     void EvadeTroops()
     {
         std::list<Creature*> lCreatureNear;
-        GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, BLACKWING_LEGGIONAIRE, 250.0f);
-        GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, BLACKWING_MAGE, 250.0f);
-        GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, DEATH_TALON_DRAGONSPAWN, 250.0f);
+        GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, { NPC_BLACKWING_LEGGIONAIRE, NPC_BLACKWING_MAGE, NPC_DEATH_TALON_DRAGONSPAWN }, 250.0f);
 
         for (const auto& it : lCreatureNear)
         {
@@ -253,9 +245,9 @@ struct boss_razorgoreAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (m_creature->HasUnitState(UNIT_STAT_POSSESSED))
+        if (m_creature->HasUnitState(UNIT_STATE_POSSESSED))
         {
-            ScriptedAI::UpdateAI(uiDiff);
+            DoMeleeAttackIfReady();
             return;
         }
 
@@ -294,7 +286,6 @@ struct boss_razorgoreAI : public ScriptedAI
         {
             if (m_uiOutOfReachTimer < uiDiff)
             {
-                DEBUG_EMOTE("summon");
                 if (m_creature->TryToCast(m_creature->GetVictim(), SPELL_SUMMON_PLAYER, CF_TRIGGERED, 100) == SPELL_CAST_OK)
                     m_uiOutOfReachTimer = 10000;
             }
@@ -304,7 +295,6 @@ struct boss_razorgoreAI : public ScriptedAI
 
         if (m_uiCleaveTimer < uiDiff)
         {
-            DEBUG_EMOTE("cleave");
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(5000, 10000);
         }
@@ -314,7 +304,6 @@ struct boss_razorgoreAI : public ScriptedAI
         // War Stomp
         if (m_uiWarStompTimer < uiDiff)
         {
-            DEBUG_EMOTE("War stomp");
             if (DoCastSpellIfCan(m_creature, SPELL_WARSTOMP) == CAST_OK)
                 m_uiWarStompTimer = urand(25000, 45000);
         }
@@ -324,7 +313,6 @@ struct boss_razorgoreAI : public ScriptedAI
         // Fireball Volley
         if (m_uiFireballVolleyTimer < uiDiff)
         {
-            DEBUG_EMOTE("FB");
             if (DoCastSpellIfCan(m_creature, SPELL_FIREBALL_VOLLEY) == CAST_OK)
                 m_uiFireballVolleyTimer = urand(15000, 20000);
         }
@@ -334,7 +322,6 @@ struct boss_razorgoreAI : public ScriptedAI
         // Conflagration
         if (m_uiConflagrationTimer < uiDiff)
         {
-            DEBUG_RAZOR("confl");
             if (DoCastSpellIfCan(m_creature, SPELL_CONFLAGRATION) == CAST_OK)
                 m_uiConflagrationTimer = urand(15000, 25000);
         }
@@ -342,11 +329,6 @@ struct boss_razorgoreAI : public ScriptedAI
             m_uiConflagrationTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
-    }
-
-    void GetAIInformation(ChatHandler& handler) override
-    {
-        handler.PSendSysMessage("* CombatMovement : %s", IsCombatMovementEnabled() ? "OUI" : "NON");
     }
 };
 
@@ -366,31 +348,27 @@ struct trigger_orb_of_commandAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
 
     uint32 m_uiPopTimer;
-    uint32 m_uiCheckTimer;
     bool m_uiRazorgorePhase;
     bool m_uiCombatStarted;
     ObjectGuid m_uiPossesseurGuid;
 
     void Reset() override
     {
-        m_uiPopTimer = 45000; // Timer confirmed by BigWigs
-        m_uiCheckTimer = 5000;
+        m_uiPopTimer       = 45000; // Timer confirmed by BigWigs
         m_uiRazorgorePhase = true;
-        m_uiCombatStarted = false;
+        m_uiCombatStarted  = false;
         m_uiPossesseurGuid.Clear();
-        DEBUG_RAZOR("Reset NPC orb");
     }
 
     void PhaseSwitch()
     {
-        ASSERT(m_pInstance);
-        DEBUG_RAZOR("Passage en P2");
+        if (!m_pInstance)
+            return;
+
         DoScriptText(EMOTE_FLEE, m_creature);
 
         std::list<Creature*> lCreatureNear;
-        GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, BLACKWING_LEGGIONAIRE, 250.0f);
-        GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, BLACKWING_MAGE, 250.0f);
-        GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, DEATH_TALON_DRAGONSPAWN, 250.0f);
+        GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, { NPC_BLACKWING_LEGGIONAIRE, NPC_BLACKWING_MAGE, NPC_DEATH_TALON_DRAGONSPAWN }, 250.0f);
 
         for (const auto& it : lCreatureNear)
         {
@@ -419,7 +397,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
             {
                 pRazorgore->AI()->AttackStart(pPossesser);
                 pRazorgore->GetMotionMaster()->MoveChase(pPossesser);
-                pRazorgore->AddThreat(pPossesser, 1000000); // Endless threat
+                pRazorgore->AddThreat(pPossesser, 1000000.f); // Endless threat
             }
             pRazorgore->SetInCombatWithZone();
         }
@@ -428,7 +406,9 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
     void PopAdd(uint32 uiHow)
     {
-        ASSERT(m_pInstance);
+        if (!m_pInstance)
+            return;
+
         Creature* pRazorgore = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_RAZORGORE_GUID));
         if (!pRazorgore)
             return;
@@ -446,9 +426,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         std::list<Creature*> lOrc;
         uint32 uiType = 0;
 
-        GetCreatureListWithEntryInGrid(lDrake, m_creature, DEATH_TALON_DRAGONSPAWN, 250.0f);
-        GetCreatureListWithEntryInGrid(lOrc, m_creature, BLACKWING_LEGGIONAIRE, 250.0f);
-        GetCreatureListWithEntryInGrid(lOrc, m_creature, BLACKWING_MAGE, 250.0f);
+        GetCreatureListWithEntryInGrid(lDrake, m_creature, { NPC_DEATH_TALON_DRAGONSPAWN, NPC_BLACKWING_LEGGIONAIRE, NPC_BLACKWING_MAGE }, 250.0f);
 
         if ((lDrake.size() >= 12) && (lOrc.size() >= 40))
             return;
@@ -462,18 +440,28 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         switch (uiType)
         {
             case 1:
-                uiID = BLACKWING_LEGGIONAIRE;
-                if (rand() % 2)
+            {
+                uiID = NPC_BLACKWING_LEGGIONAIRE;
+                if (urand(0, 1))
+                {
                     bSpawnTwo = true;
+                }
                 break;
+            }
             case 2:
-                uiID = BLACKWING_MAGE;
-                if (rand() % 2)
+            {
+                uiID = NPC_BLACKWING_MAGE;
+                if (urand(0, 1))
+                {
                     bSpawnTwo = true;
+                }
                 break;
+            }
             case 3:
-                uiID = DEATH_TALON_DRAGONSPAWN;
+            {
+                uiID = NPC_DEATH_TALON_DRAGONSPAWN;
                 break;
+            }
         }
 
         if (!bSpawnTwo)
@@ -568,26 +556,26 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         {
             if (Creature* pRazorgore = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_RAZORGORE_GUID)))
             {
+                if (m_pInstance->GetData64(DATA_EGG) != DONE)
+                    m_uiRazorgorePhase = true;
+
                 m_uiCombatStarted = true;
                 m_creature->SetInCombatWithZone();
                 pRazorgore->SetInCombatWithZone();
 
                 std::list<Creature*> lGuards;
-                GetCreatureListWithEntryInGrid(lGuards, m_creature, MOB_GARDE_AILE_NOIRE, 150.0f);
-                GetCreatureListWithEntryInGrid(lGuards, m_creature, MOB_GRETHOK, 150.0f);
+                GetCreatureListWithEntryInGrid(lGuards, m_creature, { NPC_BLACKWING_GUARDSMAN, NPC_GRETHOK_THE_CONTROLLER }, 150.0f);
 
                 for (const auto& pGuard : lGuards)
                 {
                     if (!pGuard->IsInCombat())
                     {
                         pGuard->SetInCombatWithZone();
-                        if (pGuard->GetEntry() == MOB_GRETHOK)
+                        if (pGuard->GetEntry() == NPC_GRETHOK_THE_CONTROLLER)
                             pGuard->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
                     }
                 }
             }
-            else
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
         }
 
         if (m_uiRazorgorePhase && m_uiCombatStarted)
@@ -599,12 +587,11 @@ struct trigger_orb_of_commandAI : public ScriptedAI
             }
             if (Creature* pRazorgore = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_RAZORGORE_GUID)))
             {
-                if (pRazorgore->HasAura(SPELL_POSSESS_ORB))
+                if (pRazorgore->HasAura(SPELL_POSSESS))
                 {
                     if (!m_uiPossesseurGuid)
                     {
                         m_uiPossesseurGuid = pRazorgore->GetCharmerGuid();
-                        DEBUG_RAZOR("Possessed by %s", pRazorgore->GetCharmerGuid().GetString().c_str());
                         ((ScriptedAI*)pRazorgore->AI())->SetCombatMovement(false);
                         pRazorgore->GetMotionMaster()->Initialize();
                         pRazorgore->StopMoving();
@@ -616,15 +603,13 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                     {
                         if (pChanneler->IsDead())
                         {
-                            pRazorgore->RemoveAurasDueToSpell(SPELL_POSSESS_ORB);
+                            pRazorgore->RemoveAurasDueToSpell(SPELL_POSSESS);
                             if (pRazorgore->GetThreatManager().isThreatListEmpty())
                                 pRazorgore->AI()->EnterEvadeMode();
                         }
 
                         std::list<Creature*> lCreature;
-                        GetCreatureListWithEntryInGrid(lCreature, m_creature, DEATH_TALON_DRAGONSPAWN, 150.0f);
-                        GetCreatureListWithEntryInGrid(lCreature, m_creature, BLACKWING_LEGGIONAIRE, 150.0f);
-                        GetCreatureListWithEntryInGrid(lCreature, m_creature, BLACKWING_MAGE, 150.0f);
+                        GetCreatureListWithEntryInGrid(lCreature, m_creature, { NPC_DEATH_TALON_DRAGONSPAWN, NPC_BLACKWING_LEGGIONAIRE, NPC_BLACKWING_MAGE }, 150.0f);
 
                         for (const auto& itr : lCreature)
                         {
@@ -636,39 +621,37 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                         }
                     }
                 }
-                else if (!pRazorgore->HasAura(SPELL_POSSESS_ORB) && m_uiPossesseurGuid) // Possess finished
+                else if (!pRazorgore->HasAura(SPELL_POSSESS) && m_uiPossesseurGuid) // Possess finished
                 {
-                    if (pRazorgore->GetMaxHealth() != 450000)
-                        pRazorgore->SetMaxHealth(450000);
+                    if (pRazorgore->GetMaxHealth() != RAZORGORE_MAX_HEALTH_DURING_POSESSION)
+                        pRazorgore->SetMaxHealth(RAZORGORE_MAX_HEALTH_DURING_POSESSION);
 
                     pRazorgore->GetMotionMaster()->Initialize();
                     m_creature->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
                     m_creature->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+
+                    std::list<Creature*> lCreature;
+                    GetCreatureListWithEntryInGrid(lCreature, m_creature, { NPC_DEATH_TALON_DRAGONSPAWN, NPC_BLACKWING_LEGGIONAIRE, NPC_BLACKWING_MAGE }, 150.0f);
+
+                    for (const auto& itr : lCreature)
+                        itr->GetThreatManager().modifyThreatPercent(pRazorgore, -100);
+
+                    ((ScriptedAI*)pRazorgore->AI())->DoResetThreat();
+                    ((ScriptedAI*)pRazorgore->AI())->SetCombatMovement(true);
+
                     if (Unit* pPossesser = m_creature->GetMap()->GetUnit(m_uiPossesseurGuid))
                     {
-                        std::list<Creature*> lCreature;
-                        GetCreatureListWithEntryInGrid(lCreature, m_creature, DEATH_TALON_DRAGONSPAWN, 150.0f);
-                        GetCreatureListWithEntryInGrid(lCreature, m_creature, BLACKWING_LEGGIONAIRE, 150.0f);
-                        GetCreatureListWithEntryInGrid(lCreature, m_creature, BLACKWING_MAGE, 150.0f);
-
-                        for (const auto& itr : lCreature)
-                            itr->GetThreatManager().modifyThreatPercent(pRazorgore, -100);
-
                         // Razorgore must attack the possessor
-                        ((ScriptedAI*)pRazorgore->AI())->DoResetThreat();
-                        ((ScriptedAI*)pRazorgore->AI())->SetCombatMovement(true);
                         pRazorgore->AI()->AttackStart(pPossesser);
                         pRazorgore->GetMotionMaster()->MoveChase(pPossesser);
                         pRazorgore->AddThreat(pPossesser, 1000000); // Endless threat
-                        pRazorgore->SetInCombatWithZone();
-                        m_uiPossesseurGuid.Clear();
                     }
-                    else
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MC/Razor] Unable to find the controller (%s)", m_uiPossesseurGuid.GetString().c_str());
+
+                    pRazorgore->SetInCombatWithZone();
+                    m_uiPossesseurGuid.Clear();
                 }
             }
-            else
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
+
             if (m_uiPopTimer < uiDiff)
             {
                 for (uint8 i = 0; i < 4; ++i)

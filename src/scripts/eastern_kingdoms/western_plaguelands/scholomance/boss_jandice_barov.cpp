@@ -81,7 +81,7 @@ struct boss_jandicebarovAI : public ScriptedAI
             if (Creature* illusion = m_creature->GetMap()->GetCreature(*itr))
                 illusion->AddObjectToRemoveList();
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Cannot find creature %u", *itr);
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "Cannot find creature %u", *itr);
         }
         IllusionGUIDS.clear(); 
     }

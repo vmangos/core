@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "WorldStates.h"
+
 enum ScourgeInvasionSpells
 {
     SPELL_SPIRIT_PARTICLES_PURPLE               = 28126, // Purple Minions Aura.
@@ -346,24 +348,8 @@ enum ScourgeInvasionNPCEvents
     EVENT_PALLID_SUMMON_FLAMESHOCKER        = 56
 };
 
-enum ScourgeInvasionWorldStatesVariables
+enum ScourgeInvasionVariables
 {
-    // Worldstates
-    WORLDSTATE_WINTERSPRING                     = 0x08D3, // 2259 - Icon on map.
-    WORLDSTATE_AZSHARA                          = 0x08D4, // 2260 - Icon on map.
-    WORLDSTATE_EASTERN_PLAGUELANDS              = 0x08D8, // 2264 - Icon on map.
-    WORLDSTATE_BLASTED_LANDS                    = 0x08D5, // 2261 - Icon on map.
-    WORLDSTATE_BURNING_STEPPES                  = 0x08D6, // 2262 - Icon on map.
-    WORLDSTATE_TANARIS                          = 0x08D7, // 2263 - Icon on map.
-
-    WORLDSTATE_SI_BATTLES_WON                   = 2219, // We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over. & We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them. & We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
-    WORLDSTATE_SI_AZSHARA_REMAINING             = 2279, // The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
-    WORLDSTATE_SI_BLASTED_LANDS_REMAINING       = 2280, // The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
-    WORLDSTATE_SI_BURNING_STEPPES_REMAINING     = 2281, // If additional support is not soon sent to the Burning Steppes, I fear the Scourge will establish a base of operations there. If you can, you should go there to aid the defenders.$B$BNumber of Necropolises remaining: $2281W
-    WORLDSTATE_SI_EASTERN_PLAGUELANDS           = 2282, // The Scourge infestation grows in the Eastern Plaguelands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2282W
-    WORLDSTATE_SI_TANARIS                       = 2283, // It seems the army of the Scourge has come to Tanaris. A significant number of their necropolises and other forces have been dispatched there.$B$BNumber of Necropolises remaining: $2283W
-    WORLDSTATE_SI_WINTERSPRING                  = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
-
     // Variables
     VARIABLE_TANARIS_ATTACK_TIME                = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_TANARIS,
     VARIABLE_BLASTED_LANDS_ATTACK_TIME          = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_BLASTED_LANDS,

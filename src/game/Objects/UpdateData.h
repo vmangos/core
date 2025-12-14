@@ -78,7 +78,7 @@ class UpdateData
 
         void AddOutOfRangeGUID(ObjectGuidSet& guids);
         void AddOutOfRangeGUID(ObjectGuid const& guid);
-        void AddUpdateBlock(ByteBuffer const& block);
+        ByteBuffer& AddUpdateBlockAndGetBuffer();
         void Send(WorldSession* session, bool hasTransport = false);
         bool BuildPacket(WorldPacket* packet, bool hasTransport = false);
         bool BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket, bool hasTransport = false);
@@ -92,20 +92,20 @@ class UpdateData
         std::list<UpdatePacket> m_datas;
 };
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
 class MovementData
 {
     public:
-        MovementData(WorldObject* owner = nullptr) : _buffer(100), _owner(owner) {}
+        MovementData() : m_buffer(1024) {}
         ~MovementData() {}
-        void AddPacket(WorldPacket& data);
-        void SetUnitSpeed(uint32 opcode, ObjectGuid const& unit, float value);
-        void SetSplineOpcode(uint32 opcode, ObjectGuid const& unit);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        bool CanAddPacket(WorldPacket const& data);
+        void AddPacket(WorldPacket const& data);
         bool BuildPacket(WorldPacket& data);
-#endif
+        bool HasData() const { return m_buffer.wpos() != 0; }
+        void ClearBuffer() { m_buffer.clear(); }
     protected:
-        ByteBuffer _buffer;
-        WorldObject* _owner; // If not null, we dont compress data
+        ByteBuffer m_buffer;
 };
+#endif
 
 #endif

@@ -61,6 +61,9 @@ void HostileRefManager::addTempThreat(float threat, bool apply)
 
 void HostileRefManager::threatAssist(Unit* pVictim, float pThreat, SpellEntry const* pThreatSpell, bool pSingleTarget)
 {
+    if (pThreatSpell && pThreatSpell->HasAttribute(SPELL_ATTR_EX4_NO_HELPFUL_THREAT))
+        return;
+
     uint32 size = pSingleTarget ? 1 : getSize();            // if pSingleTarget do not devide threat
     float threat = pThreat / size;
     HostileReference* ref = getFirst();

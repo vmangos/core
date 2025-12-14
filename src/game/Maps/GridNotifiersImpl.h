@@ -39,19 +39,17 @@ inline void MaNGOS::VisibleNotifier::Visit(GridRefManager<T>& m)
 {
     for(typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        i_camera.UpdateVisibilityOf(iter->getSource(), i_data, i_visibleNow);
+        i_camera.UpdateVisibilityOf(iter->getSource(), i_data);
         i_clientGUIDs.erase(iter->getSource()->GetObjectGuid());
     }
 }
 
-inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType& m)
+inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType &m)
 {
-    std::vector<Creature*> creaturesToUpdate;
-    for (const auto& iter : m)
-        creaturesToUpdate.push_back(iter.getSource());
-    for (const auto& it : creaturesToUpdate)
+    for (CreatureMapType::iterator iter = m.begin(); iter != m.end();)
     {
-        WorldObject::UpdateHelper helper(it);
+        WorldObject::UpdateHelper helper(iter->getSource());
+        ++iter;
         helper.UpdateRealTime(i_now, i_timeDiff);
     }
 }
@@ -59,14 +57,14 @@ inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType& m)
 inline void CallAIMoveLOS(Creature* c, Unit* moving)
 {
     // Creature AI reaction
-    if (!c->HasUnitState(UNIT_STAT_LOST_CONTROL | UNIT_STAT_NO_SEARCH_FOR_OTHERS) && !c->IsInEvadeMode() && c->AI())
+    if (!c->HasUnitState(UNIT_STATE_LOST_CONTROL | UNIT_STATE_NO_SEARCH_FOR_OTHERS) && !c->IsInEvadeMode() && c->AI())
     {
         bool alert = false;
         if (moving->IsVisibleForOrDetect(c, c, true, false, &alert))
               c->AI()->MoveInLineOfSight(moving);
         else
             if (moving->GetTypeId() == TYPEID_PLAYER && moving->HasStealthAura() && alert)
-                c->AI()->TriggerAlert(moving);
+                c->AI()->OnMoveInStealth(moving);
     }
 }
 
@@ -127,33 +125,27 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     if (!target->CanSeeInWorld(i_check))
         return;
 
-    if (!target->IsAlive() || target->IsTaxiFlying())
-        return;
-
-    if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsImmuneToAoe())
-        return;
-
     if (!i_dynobject.IsWithinDistInMap(target, i_dynobject.GetRadius()))
         return;
 
-    //Check targets for not_selectable unit flag and remove
-    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE))
-        return;
+    if (target->IsCreature())
+    {
+        if (((Creature*)target)->IsImmuneToAoe())
+            return;
 
-    if (i_dynobject.GetCasterGuid().IsPlayer() && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
-        return;
-
-    // Evade target
-    if (target->GetTypeId()==TYPEID_UNIT && ((Creature*)target)->IsInEvadeMode())
-        return;
-
-    //Check player targets and remove if in GM mode or GM invisibility (for not self casting case)
-    if (target->GetTypeId() == TYPEID_PLAYER && target != i_check && (((Player*)target)->IsGameMaster() || ((Player*)target)->GetVisibility() == VISIBILITY_OFF))
-        return;
+        if (((Creature*)target)->IsInEvadeMode())
+            return;
+    }
+    else
+    {
+        //Check player targets and remove if in GM mode or GM invisibility (for not self casting case)
+        if (target != i_check && (((Player*)target)->IsGameMaster() || ((Player*)target)->GetVisibility() == VISIBILITY_OFF))
+            return;
+    }
 
     if (!i_positive && !i_check->IsValidAttackTarget(target))
         return;
-    if (i_positive && !i_check->IsFriendlyTo(target))
+    if (i_positive && !i_check->IsValidHelpfulTarget(target))
         return;
 
     // Must check LoS with the target to prevent casting through objects by targeting
@@ -166,14 +158,19 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
 
     Unit* pUnit = i_check->ToUnit();
 
-    // Negative AoE from non flagged players cannot target other players
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Consecration and other similar spells can no longer be used by
+    //   non-PvP flagged players to damage PvP flagged enemies.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     if (!i_positive)
     {
+        // Negative AoE from non flagged players cannot target other players
         if (Player* attackerPlayer = pUnit ? pUnit->GetCharmerOrOwnerPlayerOrPlayerItself() : nullptr)
             if (Player* attackedPlayer = target->GetCharmerOrOwnerPlayerOrPlayerItself())
                 if (!attackerPlayer->IsPvP() && !(attackerPlayer->IsFFAPvP() && attackedPlayer->IsFFAPvP()) && !attackerPlayer->IsInDuelWith(attackedPlayer))
                     return;
     }
+#endif
 
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(i_dynobject.GetSpellId());
     SpellEffectIndex eff_index  = i_dynobject.GetEffIndex();
@@ -209,7 +206,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
         {
             Unit* pCasterUnit = i_dynobject.GetUnitCaster();
 
-            PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, nullptr, holder, target, pCasterUnit);
+            PersistentAreaAura* Aur = new PersistentAreaAura(i_dynobject.GetObjectGuid(), spellInfo, eff_index, holder, target, pCasterUnit);
             holder->AddAura(Aur, eff_index);
             
             target->AddAuraToModList(Aur);
@@ -231,7 +228,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
         Unit* pCasterUnit = i_dynobject.GetUnitCaster();
 
         holder = CreateSpellAuraHolder(spellInfo, target, pCasterUnit, pCaster);
-        PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, nullptr, holder, target, pCasterUnit);
+        PersistentAreaAura* Aur = new PersistentAreaAura(i_dynobject.GetObjectGuid(), spellInfo, eff_index, holder, target, pCasterUnit);
         holder->AddAura(Aur, eff_index);
 
         // Debuff slots may be full, in which case holder is deleted or holder is not able to
@@ -601,7 +598,7 @@ void MaNGOS::LocalizedPacketDo<Builder>::operator()(Player* p)
         if (i_data_cache.size() < cache_idx + 1)
             i_data_cache.resize(cache_idx + 1);
 
-        auto data = std::unique_ptr<WorldPacket>(new WorldPacket());
+        auto data = std::make_unique<WorldPacket>();
 
         i_builder(*data, loc_idx);
 

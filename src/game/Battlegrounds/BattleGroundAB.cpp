@@ -29,15 +29,17 @@
 #include "Util.h"
 #include "WorldPacket.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+
 BattleGroundAB::BattleGroundAB()
 {
     m_buffChange = true;
     m_bgObjects.resize(BG_AB_OBJECT_MAX);
 
     m_startMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
-    m_startMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_AB_START_ONE_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_AB_START_HALF_MINUTE;
-    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_AB_HAS_BEGUN;
+    m_startMessageIds[BG_STARTING_EVENT_SECOND] = BCT_BG_AB_START_ONE_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_THIRD]  = BCT_BG_AB_START_HALF_MINUTE;
+    m_startMessageIds[BG_STARTING_EVENT_FOURTH] = BCT_BG_AB_HAS_BEGUN;
 }
 
 BattleGroundAB::~BattleGroundAB()
@@ -116,12 +118,12 @@ void BattleGroundAB::Update(uint32 diff)
                 {
                     if (team == BG_TEAM_ALLIANCE)
                     {
-                        SendMessageToAll(LANG_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                        SendMessageToAll(BCT_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
                         PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_ALLIANCE);
                     }
                     else
                     {
-                        SendMessageToAll(LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                        SendMessageToAll(BCT_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
                         PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_HORDE);
                     }
                     m_isInformedNearVictory = true;
@@ -150,7 +152,7 @@ void BattleGroundAB::StartingEventCloseDoors()
 {
     // despawn buffs
     for (int i = 0; i < BG_AB_NODES_MAX * 3; ++i)
-        SpawnBGObject(m_bgObjects[BG_AB_OBJECT_SPEEDBUFF_STABLES + i], RESPAWN_ONE_DAY);
+        SpawnBGObject(m_bgObjects[BG_AB_OBJECT_SPEEDBUFF_STABLES + i], RESPAWN_NEVER);
 }
 
 void BattleGroundAB::StartingEventOpenDoors()
@@ -162,6 +164,7 @@ void BattleGroundAB::StartingEventOpenDoors()
         SpawnBGObject(m_bgObjects[BG_AB_OBJECT_SPEEDBUFF_STABLES + buff + i * 3], RESPAWN_IMMEDIATELY);
     }
     OpenDoorEvent(BG_EVENT_DOOR);
+    SpawnEvent(BG_EVENT_GHOST_GATE, 0, false, true);
 }
 
 void BattleGroundAB::AddPlayer(Player* player)
@@ -178,22 +181,24 @@ void BattleGroundAB::RemovePlayer(Player* /*player*/, ObjectGuid /*guid*/)
 
 }
 
-void BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
+bool BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
 {
     switch (trigger)
     {
         case 3948:                                          // Arathi Basin Alliance Exit.
-            if (source->GetTeam() != ALLIANCE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_ALLIANCE_USE);
-            else
+            if (source->GetTeam() == ALLIANCE)
+            {
                 source->LeaveBattleground();
-            break;
+                return true;
+            }
+            return false;
         case 3949:                                          // Arathi Basin Horde Exit.
-            if (source->GetTeam() != HORDE)
-                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_HORDE_USE);
-            else
+            if (source->GetTeam() == HORDE)
+            {
                 source->LeaveBattleground();
-            break;
+                return true;
+            }
+            return false;
         case 3866:                                          // Stables
         case 3869:                                          // Gold Mine
         case 3867:                                          // Farm
@@ -207,6 +212,7 @@ void BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
             //source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
+    return false;
 }
 
 /*  type: 0-neutral, 1-contested, 3-occupied
@@ -449,9 +455,9 @@ bool BattleGroundAB::SetupBattleGround()
     //buffs
     for (int i = 0; i < BG_AB_NODES_MAX; ++i)
     {
-        if (!AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i, g_buffEntries[0], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY)
-                || !AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 1, g_buffEntries[1], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY)
-                || !AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 2, g_buffEntries[2], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY)
+        if (!AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i, g_buffEntries[0], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2))
+                || !AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 1, g_buffEntries[1], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2))
+                || !AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i + 2, g_buffEntries[2], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2))
            )
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "BatteGroundAB: Failed to spawn buff object!");
     }
@@ -487,6 +493,8 @@ void BattleGroundAB::Reset()
         m_activeEvents[i] = BG_AB_NODE_TYPE_NEUTRAL;
     }
 
+    // ghost gates spawned at beginning
+    m_activeEvents[BG_EVENT_GHOST_GATE] = 0;
 }
 
 void BattleGroundAB::EndBattleGround(Team winner)
@@ -574,3 +582,5 @@ void BattleGroundAB::UpdatePlayerScore(Player* source, uint32 type, uint32 value
             break;
     }
 }
+
+#endif

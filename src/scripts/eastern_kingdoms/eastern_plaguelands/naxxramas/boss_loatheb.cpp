@@ -23,6 +23,7 @@ enum LoathebData
     SPELL_POISON_AURA     = 29865,
     SPELL_INEVITABLE_DOOM = 29204,
     SPELL_REMOVE_CURSE    = 30281, // He periodically removes all curses on himself
+    SPELL_FUNGAL_BLOOM    = 29232, // Cast by spores
 
     NPC_SPORE             = 16286
 };
@@ -146,7 +147,7 @@ struct mob_eyeStalkAI : public ScriptedAI
 
     void Reset() override
     {
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STATE_ROOT);
         m_creature->StopMoving();
         m_creature->SetRooted(true);
         m_creature->SetNoCallAssistance(true);
@@ -239,6 +240,7 @@ struct boss_loathebAI : public ScriptedAI
     uint32 stalkSpawnCooldowns[20];
     std::vector<uint8> availableEyeLocs;
     EyeStalkInfo eyeStalks[MAX_STALKS_UP];
+    ObjectGuidSet m_sporeGuids;
 
     void Reset() override
     {
@@ -268,6 +270,25 @@ struct boss_loathebAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LOATHEB, FAIL);
+    }
+
+    void EnterEvadeMode() override
+    {
+        // despawn all spores on wipe
+        for (auto const& guid : m_sporeGuids)
+        {
+            if (Creature* pSpore = m_creature->GetMap()->GetCreature(guid))
+                pSpore->DespawnOrUnsummon();
+        }
+        m_sporeGuids.clear();
+
+        // remove fungal bloom buff on wipe
+        std::list<Player*> players;
+        me->GetAlivePlayerListInRange(me, players, MAX_VISIBILITY_DISTANCE);
+        for (auto const& pPlayer : players)
+            pPlayer->RemoveAurasDueToSpell(SPELL_FUNGAL_BLOOM);
+
+        ScriptedAI::EnterEvadeMode();
     }
 
     /*
@@ -301,7 +322,7 @@ struct boss_loathebAI : public ScriptedAI
                     {
                         if (availableEyeLocs.empty())
                         {
-                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_loatheb.cpp - availableEyeLocs size 0, should not happen!");
+                            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_loatheb.cpp - availableEyeLocs size 0, should not happen!");
                             return;
                         }
                         uint8 availableIndex = urand(0, availableEyeLocs.size() - 1);
@@ -314,7 +335,7 @@ struct boss_loathebAI : public ScriptedAI
                         Creature* pStalk = m_creature->SummonCreature(NPC_EyeStalk, pos[0], pos[1], pos[2], pos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                         if (!pStalk)
                         {
-                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Heigans WhackAStalk failed to summon eye stalk");
+                            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Heigans WhackAStalk failed to summon eye stalk");
                             return;
                         }
                         eyeStalk.guid = pStalk->GetObjectGuid();
@@ -421,6 +442,7 @@ struct boss_loathebAI : public ScriptedAI
                 case EVENT_SUMMON_SPORE:
                     if (Creature* pSpore = m_creature->SummonCreature(NPC_SPORE, SporeLoc[0], SporeLoc[1], SporeLoc[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                     {
+                        m_sporeGuids.insert(pSpore->GetObjectGuid());
                         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                             pSpore->AddThreat(pTarget);
                     }
@@ -488,26 +510,62 @@ CreatureAI* GetAI_mob_eyeStalk(Creature* pCreature)
     return new mob_eyeStalkAI(pCreature);
 }
 
+
+// 29201 - Corrupted Mind (Loatheb)
+struct LoathebCorruptedMindAoEScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // Loatheb Corrupted Mind triggered sub spells
+            uint32 spellid;
+            switch (spell->GetUnitTarget()->GetClass())
+            {
+                // priests should be getting 29185, but it triggers on dmg effects as well, don't know why.
+                // stealing druid version for priests until anyone has a reason priests cant smite.s
+                case CLASS_PRIEST:  spellid = 29194; break;//29185; break;
+                case CLASS_DRUID:   spellid = 29194; break;
+                case CLASS_PALADIN: spellid = 29196; break;
+                case CLASS_SHAMAN:  spellid = 29198; break;
+                default: return false;
+            }
+            spell->m_caster->CastSpell(spell->GetUnitTarget(), spellid, true);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_LoathebCorruptedMindAoE(SpellEntry const*)
+{
+    return new LoathebCorruptedMindAoEScript();
+}
+
 void AddSC_boss_loatheb()
 {
-    Script* NewScript;
-    NewScript = new Script;
-    NewScript->Name = "boss_loatheb";
-    NewScript->GetAI = &GetAI_boss_loatheb;
-    NewScript->RegisterSelf();
+    Script* pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "boss_loatheb";
+    pNewScript->GetAI = &GetAI_boss_loatheb;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "mob_rotting_maggot";
-    NewScript->GetAI = &GetAI_mob_rottingMaggot;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_rotting_maggot";
+    pNewScript->GetAI = &GetAI_mob_rottingMaggot;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "mob_diseased_maggot";
-    NewScript->GetAI = &GetAI_mob_diseasedMaggot;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_diseased_maggot";
+    pNewScript->GetAI = &GetAI_mob_diseasedMaggot;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "mob_eye_stalk";
-    NewScript->GetAI = &GetAI_mob_eyeStalk;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_eye_stalk";
+    pNewScript->GetAI = &GetAI_mob_eyeStalk;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_loatheb_corrupted_mind_aoe";
+    pNewScript->GetSpellScript = &GetScript_LoathebCorruptedMindAoE;
+    pNewScript->RegisterSelf();
 }

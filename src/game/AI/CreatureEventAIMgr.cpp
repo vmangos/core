@@ -41,7 +41,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
     m_CreatureEventAI_Event_Map.clear();
 
     // Gather event data
-    QueryResult* result = WorldDatabase.Query("SELECT id, creature_id, condition_id, event_type, event_inverse_phase_mask, event_chance, event_flags, "
+    std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT id, creature_id, condition_id, event_type, event_inverse_phase_mask, event_chance, event_flags, "
                           "event_param1, event_param2, event_param3, event_param4, "
                           "action1_script, action2_script, action3_script "
                           "FROM creature_ai_events");
@@ -82,7 +82,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
             temp.raw.param4 = fields[10].GetUInt32();
 
             //Creature does not exist in database
-            if (!sCreatureStorage.LookupEntry<CreatureInfo>(temp.creature_id))
+            if (!sObjectMgr.GetCreatureTemplate(temp.creature_id))
             {
                 if (!sObjectMgr.IsExistingCreatureId(temp.creature_id))
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI:  Event %u has script for non-existing creature entry (%u), skipping.", i, temp.creature_id);
@@ -136,6 +136,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                     }
                     break;
                 case EVENT_T_HIT_BY_SPELL:
+                case EVENT_T_SPELL_HIT_TARGET:
                     if (temp.hit_by_spell.spellId)
                     {
                         SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(temp.hit_by_spell.spellId);
@@ -205,7 +206,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                 case EVENT_T_SUMMONED_UNIT:
                 case EVENT_T_SUMMONED_JUST_DIED:
                 case EVENT_T_SUMMONED_JUST_DESPAWN:
-                    if (!sCreatureStorage.LookupEntry<CreatureInfo>(temp.summoned.creatureId))
+                    if (!sObjectMgr.GetCreatureTemplate(temp.summoned.creatureId))
                     {
                         if (!sObjectMgr.IsExistingCreatureId(temp.group_member_died.creatureId))
                             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI:  Creature %u is using event(%u) with nonexistent creature template id (%u) in param1, skipped.", temp.creature_id, i, temp.summoned.creatureId);
@@ -278,13 +279,13 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI:  Creature %u is using repeatable event(%u) with param4 < param3 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
                     break;
                 }
-                case EVENT_T_MAP_SCRIPT_EVENT:
+                case EVENT_T_SCRIPT:
                     break;
                 case EVENT_T_GROUP_MEMBER_DIED:
                 {
                     if (temp.group_member_died.creatureId)
                     {
-                        if (!sCreatureStorage.LookupEntry<CreatureInfo>(temp.group_member_died.creatureId))
+                        if (!sObjectMgr.GetCreatureTemplate(temp.group_member_died.creatureId))
                         {
                             if (!sObjectMgr.IsExistingCreatureId(temp.group_member_died.creatureId))
                                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI:  Creature %u is using event(%u) with nonexistent creature template id (%u) in param1, skipped.", temp.creature_id, i, temp.group_member_died.creatureId);
@@ -308,6 +309,12 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                     }
                     if (temp.hit_by_aura.repeatMax < temp.hit_by_aura.repeatMin)
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI:  Creature %u is using repeatable event(%u) with param4 < param3 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
+                    break;
+                }
+                case EVENT_T_STEALTH_ALERT:
+                {
+                    if (temp.stealth_alert.repeatMax < temp.stealth_alert.repeatMin)
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI:  Creature %u is using repeatable event(%u) with param2 < param1 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
                     break;
                 }
                 default:
@@ -341,8 +348,6 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
             ++Count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u CreatureEventAI events.", Count);

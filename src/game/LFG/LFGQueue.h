@@ -36,7 +36,7 @@ struct LFGPlayerQueueInfo
     bool hasQueuePriority = false;
     std::string name;
     uint8 playerClass = 0;
-    std::list<std::pair<LfgRoles, LfgRolePriority>> rolePriority;
+    std::vector<std::pair<LfgRoles, LfgRolePriority>> rolePriority;
 
     void CalculateRoles(Classes playerClass);
     void CalculateTalentRoles(Player* player);
@@ -72,7 +72,7 @@ class LFGQueue
         void AddGroup(LFGGroupQueueInfo const& groupInfo, uint32 groupId);
         void AddPlayer(LFGPlayerQueueInfo const& playerInfo, ObjectGuid playerGuid);
     private:
-        void FindInArea(std::list<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude);
+        void FindInArea(std::vector<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude);
         bool FindRoleToGroup(ObjectGuid playerGuid, uint32 groupId, LfgRoles role);
 
         typedef std::map<ObjectGuid, LFGPlayerQueueInfo> QueuedPlayersMap;

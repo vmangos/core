@@ -9,7 +9,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/blackrock_spire/blackrock_spire.h
     eastern_kingdoms/burning_steppes/blackwing_lair/blackwing_lair.h
     eastern_kingdoms/burning_steppes/molten_core/molten_core.h
-    eastern_kingdoms/dun_morogh/dun_morogh.h
     eastern_kingdoms/dun_morogh/gnomeregan/gnomeregan.h
     eastern_kingdoms/eastern_plaguelands/naxxramas/naxxramas.h
     eastern_kingdoms/eastern_plaguelands/stratholme/stratholme.h
@@ -43,7 +42,6 @@ set (SCRIPTS_SRCS
     custom/event_attack_city.cpp
     custom/gmisland.cpp
     custom/npc_escort.cpp
-    custom/zero_creatures.cpp
     custom/npc_j_eevee.cpp
     eastern_kingdoms/alterac_mountains/alterac_mountains.cpp
     eastern_kingdoms/arathi_highlands/arathi_highlands.cpp
@@ -51,7 +49,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/burning_steppes.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/arena_challenge_ai.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/blackrock_depths.cpp
-    eastern_kingdoms/burning_steppes/blackrock_depths/boss_ambassador_flamelash.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_anubshiah.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_emperor_dagran_thaurissan.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_general_angerforge.cpp
@@ -61,12 +58,9 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_magmus.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_tomb_of_seven.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/instance_blackrock_depths.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_drakkisath.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_halycon.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_highlord_omokk.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_mother_smolderweb.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_overlord_wyrmthalak.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_pyroguard_emberseer.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_shadow_hunter_voshgajin.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_the_beast.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_urok.cpp
@@ -150,7 +144,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_mandokir.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_marli.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_renataki.cpp
-    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_thekal.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_venoxis.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_wushoolay.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/instance_zulgurub.cpp
@@ -164,7 +157,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_high_inquisitor_fairbanks.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_houndmaster_loksey.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_interrogator_vishas.cpp
-    eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_mograine_and_whitemane.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/instance_scarlet_monastery.cpp
     eastern_kingdoms/uldaman/boss_archaedas.cpp
     eastern_kingdoms/uldaman/boss_ironaya.cpp
@@ -248,6 +240,17 @@ set (SCRIPTS_SRCS
     kalimdor/thousand_needles/thousand_needles.cpp
     kalimdor/ungoro_crater/ungoro_crater.cpp
     kalimdor/winterspring/winterspring.cpp
+    spells/spell_druid.cpp
+    spells/spell_hunter.cpp
+    spells/spell_item.cpp
+    spells/spell_mage.cpp
+    spells/spell_paladin.cpp
+    spells/spell_priest.cpp
+    spells/spell_rogue.cpp
+    spells/spell_shaman.cpp
+    spells/spell_special.cpp
+    spells/spell_warlock.cpp
+    spells/spell_warrior.cpp
     world/areatrigger_scripts.cpp
     world/elemental_invasions.cpp
     world/fireworks_show.cpp

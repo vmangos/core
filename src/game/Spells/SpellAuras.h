@@ -25,6 +25,8 @@
 #include "SpellAuraDefines.h"
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
+#include "SharedDefines.h"
+#include "UnitDefines.h"
 
 /**
  * Used to modify what an Aura does to a player/npc.
@@ -74,7 +76,12 @@ struct HeartBeatData
 };
 
 class Unit;
+class Item;
+class WorldObject;
+class DynamicObject;
+class SpellCaster;
 class SpellEntry;
+struct AuraScript;
 struct SpellModifier;
 struct ProcTriggerSpell;
 
@@ -111,6 +118,7 @@ class SpellAuraHolder
 
         uint32 GetId() const;
         SpellEntry const* GetSpellProto() const { return m_spellProto; }
+        AuraScript* GetAuraScript() const { return m_auraScript; }
 
         ObjectGuid const& GetCasterGuid() const { return m_casterGuid; }
         void SetCasterGuid(ObjectGuid guid) { m_casterGuid = guid; }
@@ -128,12 +136,14 @@ class SpellAuraHolder
         HeartBeatData* _pveHeartBeatData;
 
         // Debuff limit
+        void CalculateForBuffLimit();
         void CalculateForDebuffLimit();
-        bool IsAffectedByDebuffLimit() const { return m_debuffLimitAffected; }
-        void SetAffectedByDebuffLimit(bool isAffectedByDebuffLimit);
-        bool IsMoreImportantDebuffThan(SpellAuraHolder* other) const;
-        bool m_debuffLimitAffected;
-        uint32 m_debuffLimitScore; // + haut => + important
+        bool IsAffectedByVisibleSlotLimit() const { return m_visibleSlotLimitAffected; }
+        void SetAffectedByVisibleSlotLimit(bool isAffectedByDebuffLimit);
+        bool IsMoreImportantVisualAuraThan(SpellAuraHolder* other) const;
+        bool m_visibleSlotLimitAffected;
+        uint32 m_visibleSlotLimitScore; // higher means more important
+
         // Refresh de buff
         void Refresh(Unit* caster, Unit* target, SpellAuraHolder* pRefreshWithAura);
         bool CanBeRefreshedBy(SpellAuraHolder* other) const;
@@ -174,7 +184,7 @@ class SpellAuraHolder
 
         bool IsSingleTarget() const { return m_isSingleTarget; }
         void SetIsSingleTarget(bool val) { m_isSingleTarget = val; }
-        bool IsChanneled() { return m_isChanneled; }
+        bool IsChanneled() const { return m_isChanneled; }
         void UnregisterSingleCastHolder();
 
         int32 GetAuraMaxDuration() const { return m_maxDuration; }
@@ -232,8 +242,12 @@ class SpellAuraHolder
         void SetTargetSecondaryThreatFocus(bool v) { m_makesTargetSecondaryFocus = v; }
         bool IsTargetSecondaryThreatFocus() const { return m_makesTargetSecondaryFocus; }
 
-        void SetTriggered(bool t) { m_spellTriggered = t; }
+        void SetTriggered(bool triggered) { m_spellTriggered = triggered; }
         bool IsTriggered() const { return m_spellTriggered; }
+        void SetReflected(bool reflected) { m_isReflected = reflected; }
+        bool IsReflected() const { return m_isReflected; }
+        void SetAddedBySpell(bool spell) { m_addedBySpell = spell; }
+        bool IsAddedBySpell() const { return m_addedBySpell; }
 
         ~SpellAuraHolder();
     private:
@@ -246,6 +260,7 @@ class SpellAuraHolder
         time_t m_applyTime;
 
         SpellEntry const* m_spellProto;
+        AuraScript* m_auraScript;
 
         uint8 m_auraSlot;                                   // Aura slot on unit (for show in client)
         uint8 m_auraLevel;                                  // Aura level (store caster level for correct show level dep amount)
@@ -268,6 +283,8 @@ class SpellAuraHolder
         bool m_isChanneled:1;
         bool m_makesTargetSecondaryFocus;
         bool m_spellTriggered;                              // applied by a triggered spell (used in debuff priority computation)
+        bool m_isReflected;                                 // applied by a reflected spell (used to prevent death in duel)
+        bool m_addedBySpell;                                // whether aura was applied by spell cast or added directly
 
         uint32 m_in_use;                                    // > 0 while in SpellAuraHolder::ApplyModifiers call/SpellAuraHolder::Update/etc
 };
@@ -368,7 +385,6 @@ class Aura
         void HandleAuraModBlockPercent(bool Apply, bool Real);
         void HandleAuraModCritPercent(bool Apply, bool Real);
         void HandlePeriodicLeech(bool Apply, bool Real);
-        void HandleModHitChance(bool Apply, bool Real);
         void HandleModSpellHitChance(bool Apply, bool Real);
         void HandleAuraModScale(bool Apply, bool Real);
         void HandlePeriodicManaLeech(bool Apply, bool Real);
@@ -471,6 +487,12 @@ class Aura
             if (uint32 maxticks = GetAuraMaxTicks())
                 m_periodicTick = maxticks - GetAuraDuration() / m_modifier.periodictime;
         }
+        void SetPeriodicTimer(uint32 periodicTimerMs)
+        {
+            m_isPeriodic = true;
+            m_periodicTimer = periodicTimerMs;
+            m_modifier.periodictime = periodicTimerMs;
+        }
 
         bool IsPositive() const { return m_positive; }
         bool IsPersistent() const { return m_isPersistent; }
@@ -526,10 +548,11 @@ class Aura
         void TriggerSpell();
 
         // more limited that used in future versions (spell_affect table based only), so need be careful with backporting uses
-        bool isAffectedOnSpell(SpellEntry const* spell) const;
+        bool IsAffectedOnSpell(SpellEntry const* spell) const;
         bool CanProcFrom(SpellEntry const* spell, uint32 EventProcEx, uint32 procEx, bool active, bool useClassMask) const;
 
         SpellAuraHolder* GetHolder() const { return m_spellAuraHolder; }
+        AuraScript* GetAuraScript() const { return GetHolder()->GetAuraScript(); }
 
         bool IsLastAuraOnHolder();
         SpellModifier* GetSpellModifier() const { return m_spellmod; }
@@ -588,10 +611,12 @@ class AreaAura : public Aura
 class PersistentAreaAura : public Aura
 {
     public:
-        PersistentAreaAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32* currentBasePoints, SpellAuraHolder* holder, Unit* target, Unit* caster = nullptr, Item* castItem = nullptr);
+        PersistentAreaAura(ObjectGuid dynObjectGuid, SpellEntry const* spellproto, SpellEffectIndex eff, SpellAuraHolder* holder, Unit* target, Unit* caster = nullptr);
         ~PersistentAreaAura() override;
+        DynamicObject* GetDynObject() const;
     protected:
         void Update(uint32 diff) override;
+        ObjectGuid m_dynObjectGuid;
 };
 
 class SingleEnemyTargetAura : public Aura

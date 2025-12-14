@@ -144,7 +144,7 @@ struct boss_gluthAI : public ScriptedAI
     void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         // only want to do these calculations inside naxx
-        if (m_pInstance->GetMap()->GetId() != 533)
+        if (m_pInstance->GetMap()->GetId() != MAP_NAXXRAMAS)
             return;
 
         if (pSpell->Id == SPELL_DECIMATE)
@@ -375,6 +375,25 @@ CreatureAI* GetAI_mob_zombieChow(Creature* pCreature)
     return new mob_zombieChow(pCreature);
 }
 
+// 28375 - Decimate (Gluth)
+struct GluthDecimateScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
+        {
+            // damage should put target at maximum 5% hp, but not reduce it below that
+            spell->damage = std::max(0, int32(spell->GetUnitTarget()->GetHealth() - uint32(spell->GetUnitTarget()->GetMaxHealth() * 0.05f)));
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_GluthDecimate(SpellEntry const*)
+{
+    return new GluthDecimateScript();
+}
+
 void AddSC_boss_gluth()
 {
     Script* NewScript;
@@ -386,5 +405,10 @@ void AddSC_boss_gluth()
     NewScript = new Script;
     NewScript->Name = "mob_zombie_chow";
     NewScript->GetAI = &GetAI_mob_zombieChow;
+    NewScript->RegisterSelf();
+
+    NewScript = new Script;
+    NewScript->Name = "spell_gluth_decimate";
+    NewScript->GetSpellScript = &GetScript_GluthDecimate;
     NewScript->RegisterSelf();
 }

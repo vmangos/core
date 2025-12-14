@@ -140,6 +140,7 @@ struct npc_kerlonianAI : public FollowerAI
         }
 
         m_creature->SetStandState(UNIT_STAND_STATE_SLEEP);
+        m_creature->SetFactionTemplateId(35);
         m_creature->CastSpell(m_creature, SPELL_SLEEP_VISUAL, false);
     }
 
@@ -147,9 +148,9 @@ struct npc_kerlonianAI : public FollowerAI
     {
         m_creature->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-
+        m_creature->SetFactionTemplateId(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+        m_creature->EnableMoveInLosEvent();
         DoScriptText(EMOTE_KER_AWAKEN, m_creature);
-
         SetFollowPaused(false);
     }
 
@@ -192,7 +193,7 @@ bool QuestAccept_npc_kerlonian(Player* pPlayer, Creature* pCreature, Quest const
             pCreature->SetStandState(UNIT_STAND_STATE_STAND);
             pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             DoScriptText(SAY_KER_START, pCreature, pPlayer);
-            pKerlonianAI->StartFollow(pPlayer, FACTION_ESCORT_N_FRIEND_PASSIVE, pQuest);
+            pKerlonianAI->StartFollow(pPlayer, FACTION_ESCORT_A_NEUTRAL_PASSIVE, pQuest);
         }
     }
 
@@ -858,8 +859,7 @@ struct npc_rabid_thistle_bearAI : public FollowerAI
 
     void StartFollowing(Player* pPlayer)
     {
-        Captured_Timer = 180000;
-        //Captured_Timer = 10000;
+        Captured_Timer = 300000;
         StartFollow(pPlayer);
     }
 
@@ -1008,6 +1008,7 @@ struct npc_murkdeepAI : public ScriptedAI
 
     ObjectGuid m_playerGuid;
     ObjectGuid m_bonfireGuid;
+    bool m_bHasFled;
     bool m_bEventState;
     uint8 m_uiEventPhase;
     uint32 m_uiEventTimer;
@@ -1018,6 +1019,7 @@ struct npc_murkdeepAI : public ScriptedAI
     {
         m_uiEventPhase = 0;
         m_bEventState = false;
+        m_bHasFled = false;
 
         m_uiSunderArmorTimer = urand(0, 5);
         m_uiNetTimer = urand(0, 20);
@@ -1153,40 +1155,47 @@ struct npc_murkdeepAI : public ScriptedAI
                 {
                     switch (m_uiEventPhase)
                     {
-                    case 1:
-                        DoSummon();
-                        m_uiEventTimer = 30000;
-                        ++m_uiEventPhase;
-                        break;
-                    case 2:
-                        DoSummon();
-                        m_uiEventTimer = 30000;
-                        ++m_uiEventPhase;
-                        break;
-                    case 3:
-                        DoSummon();
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-                        m_creature->SetVisibility(VISIBILITY_ON);
+                        case 1:
+                            DoSummon();
+                            m_uiEventTimer = 30000;
+                            ++m_uiEventPhase;
+                            break;
+                        case 2:
+                            DoSummon();
+                            m_uiEventTimer = 30000;
+                            ++m_uiEventPhase;
+                            break;
+                        case 3:
+                            DoSummon();
+                            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                            m_creature->SetVisibility(VISIBILITY_ON);
 
-                        Player* player = GetPlayer();
-                        if (player)
-                        {
-                            AttackStart(player);
-                        }
-                        else
-                        {
-                            m_creature->ForcedDespawn();
-                            m_creature->RemoveCorpse();
-                        }
-                        m_uiEventPhase = 0;
-                        break;
+                            Player* player = GetPlayer();
+                            if (player)
+                            {
+                                AttackStart(player);
+                            }
+                            else
+                            {
+                                m_creature->ForcedDespawn();
+                                m_creature->RemoveCorpse();
+                            }
+                            m_uiEventPhase = 0;
+                            break;
                     }
                 }
                 else
                     m_uiEventTimer -= uiDiff;
             }
 
+            return;
+        }
+
+        if (!m_bHasFled && m_creature->GetHealthPercent() < 15.0f)
+        {
+            m_bHasFled = true;
+            m_creature->DoFlee();
             return;
         }
 

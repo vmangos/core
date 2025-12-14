@@ -25,6 +25,7 @@
 #include "World.h"
 #include "Creature.h"
 #include "Player.h"
+#include "Map.h"
 
 namespace MaNGOS
 {
@@ -93,13 +94,13 @@ namespace MaNGOS
             return 0;
         }
 
-        inline uint32 BaseGain(uint32 ownerLevel, uint32 unitLevel, uint32 mob_level)
+        inline float BaseGain(uint32 ownerLevel, uint32 unitLevel, uint32 mob_level)
         {
-            uint32 const nBaseExp = 45;
+            float const nBaseExp = 45;
             return (ownerLevel * 5 + nBaseExp) * BaseGainLevelFactor(unitLevel, mob_level);
         }
 
-        inline uint32 Gain(Unit* pUnit, Creature* pCreature)
+        inline uint32 Gain(Unit const* pUnit, Creature const* pCreature)
         {
             if (pCreature->GetUInt32Value(UNIT_CREATED_BY_SPELL) &&
                ((pCreature->GetCreatureInfo()->type == CREATURE_TYPE_CRITTER) ||
@@ -108,9 +109,11 @@ namespace MaNGOS
                 (pCreature->GetCreatureInfo()->health_multiplier <= 0.1f)))
                 return 0;
 
-            if (pCreature->HasUnitState(UNIT_STAT_NO_KILL_REWARD))
+            if (pCreature->HasUnitState(UNIT_STATE_NO_KILL_REWARD))
                 return 0;
 
+            if (pCreature->HasStaticFlag(CREATURE_STATIC_FLAG_NO_XP))
+                return 0;
             
             uint32 ownerLevel = pUnit->GetLevel();
             uint32 unitLevel = pUnit->GetLevel();
@@ -150,14 +153,7 @@ namespace MaNGOS
 
             xp_gain *= pCreature->GetCreatureInfo()->xp_multiplier;
             xp_gain *= pCreature->GetXPModifierDueToDamageOrigin();
-
-            Player* pPlayer = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
-            float personalRate = pPlayer ? pPlayer->GetPersonalXpRate() : -1.0f;
-
-            if (personalRate >= 0.0f)
-                xp_gain *= personalRate;
-            else
-                xp_gain *= sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL);
+            xp_gain *= sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL);
 
             return std::nearbyint(xp_gain);
         }

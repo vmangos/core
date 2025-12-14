@@ -33,7 +33,7 @@
 #include "ace/Thread_Mutex.h"
 class WorldSocket;
 
-/// Manages all sockets connected to peers and network threads
+// Manages all sockets connected to peers and network threads
 class WorldSocketMgr: public MangosSocketMgr<WorldSocket>
 {
     public:
@@ -46,4 +46,4 @@ class WorldSocketMgr: public MangosSocketMgr<WorldSocket>
 #define sWorldSocketMgr WorldSocketMgr::Instance()
 
 #endif
-/// @}
+// @}

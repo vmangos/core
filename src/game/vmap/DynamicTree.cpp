@@ -154,7 +154,7 @@ struct DynamicTreeIntersectionCallback
 {
     bool did_hit;
     DynamicTreeIntersectionCallback() : did_hit(false) {}
-    bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
+    bool operator()(const G3D::Ray& r, GameObjectModel const& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
     {
         did_hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
         return did_hit;
@@ -169,7 +169,7 @@ struct DynamicTreeIntersectionCallback_WithLogger
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Dynamic Intersection log");
     }
-    bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
+    bool operator()(const G3D::Ray& r, GameObjectModel const& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "testing intersection with %s", obj.name.c_str());
         bool hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
@@ -179,6 +179,24 @@ struct DynamicTreeIntersectionCallback_WithLogger
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "result: intersects");
         }
         return hit;
+    }
+    bool didHit() const { return did_hit; }
+};
+
+struct DynamicTreeIntersectionCallback_findCollisionObject
+{
+    bool did_hit;
+    GameObjectModel const* hitObj;
+    DynamicTreeIntersectionCallback_findCollisionObject() : did_hit(false), hitObj(nullptr) {}
+    bool operator()(G3D::Ray const &r, GameObjectModel const &obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
+    {
+        bool hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
+        if (hit)
+        {
+            hitObj = &obj;
+            did_hit = true;
+        }
+        return did_hit;
     }
     bool didHit() const { return did_hit; }
 };
@@ -224,7 +242,7 @@ bool DynamicMapTree::getObjectHitPos(Vector3 const& pPos1, Vector3 const& pPos2,
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
     MANGOS_ASSERT(maxDist < std::numeric_limits<float>::max());
     // prevent NaN values which can cause BIH intersection to enter infinite loop
-    if (maxDist < 1e-10f)
+    if (maxDist < 1e-10f || pPos1 == pPos2)
     {
         pResultHitPos = pPos2;
         return false;
@@ -274,11 +292,24 @@ bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, flo
 float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist) const
 {
     Vector3 v(x, y, z);
-    G3D::Ray r(v, Vector3(0, 0, -1));
+    G3D::Ray r(v, Vector3::down());
     DynamicTreeIntersectionCallback callback;
     impl.intersectZAllignedRay(r, callback, maxSearchDist);
 
     if (callback.didHit())
         return v.z - maxSearchDist;
     return -G3D::inf();
+}
+
+GameObjectModel const* DynamicMapTree::getObjectHit(Vector3 const& pPos1, Vector3 const& pPos2) const
+{
+    float distance = (pPos2 - pPos1).magnitude();
+    Vector3 const dir = (pPos2 - pPos1) / distance;
+    G3D::Ray const ray(pPos1, dir);
+
+    DynamicTreeIntersectionCallback_findCollisionObject callback;
+    impl.intersectRay(ray, callback, distance, pPos2, false);
+    if (callback.hitObj)
+        return callback.hitObj;
+    return nullptr;
 }

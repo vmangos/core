@@ -1,26 +1,32 @@
-#Script for making new sql migrations 
-#Python3
-
 import os
 import time
 
-#Variable Declaration
+DATE = time.strftime('%Y%m%d%H%M%S', time.gmtime()) # UTC DATE
+FPATH = f"migrations/{DATE}_world.sql"
 
-debug = 0 #Debug
+sql_content = f"""DROP PROCEDURE IF EXISTS add_migration;
+DELIMITER ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='{DATE}');
+IF v = 0 THEN
+INSERT INTO `migrations` VALUES ('{DATE}');
+-- Add your query below.
 
-DATE = time.strftime('%Y%m%d%H%M%S') #DATE
-FPATH= os.path.join("migrations",DATE + "_world.sql") #File path
-
-if (debug == 1):
-    print (DATE)
-    print (FPATH)
 
 
-print("Creating new migration")
+-- End of migration.
+END IF;
+END??
+DELIMITER ;
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
+"""
 
-with open(FPATH,"w") as file:
-    if (os.path.isfile(FPATH)):
-        file.write("DROP PROCEDURE IF EXISTS add_migration;\r\ndelimiter ??\r\nCREATE PROCEDURE \`add_migration\`()\r\nBEGIN\r\nDECLARE v INT DEFAULT 1;\r\nSET v = (SELECT COUNT(*) FROM \`migrations\` WHERE \`id\`='$DATE');\r\nIF v=0 THEN\r\nINSERT INTO \`migrations\` VALUES ('$DATE');\r\n-- Add your query below.\r\n\r\n\r\n\r\n-- End of migration.\r\nEND IF;\r\nEND??\r\ndelimiter ; \r\nCALL add_migration();\r\nDROP PROCEDURE IF EXISTS add_migration;")
-        print(FPATH,"created")
-    else:
-        print ("FAILED to create file")
+try:
+    with open(FPATH, 'w') as output_file:
+        output_file.write(sql_content)
+    print(f"File created: {FPATH}")
+except Exception as e:
+    print(f"Failed to create file: {e}")

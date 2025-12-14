@@ -19,20 +19,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup mangosd
-/// @{
-/// \file
+// \addtogroup mangosd
+// @{
+// \file
 
 #ifndef __CLIRUNNABLE_H
 #define __CLIRUNNABLE_H
 
 #include "Common.h"
 
-/// Command Line Interface handling thread
+// Command Line Interface handling thread
 class CliRunnable
 {
 public:
     void operator()();
 };
 #endif
-/// @}
+// @}

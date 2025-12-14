@@ -27,6 +27,16 @@ template<class DerivedLoader, class StorageClass>
 template<class S, class D>                                  // S source-type, D destination-type
 void SQLStorageLoaderBase<DerivedLoader, StorageClass>::convert(uint32 /*field_pos*/, S src, D& dst)
 {
+#if defined(__arm__) || defined(_M_ARM)
+    if (((unsigned)&dst) % sizeof(D))
+    {
+        // address not aligned. Use memcpy to avoid unaligned trap
+        D converted(src);
+        memcpy((void*)&dst, (void*)&converted, sizeof(D));
+
+    }
+    else
+#endif
     dst = D(src);
 }
 
@@ -66,6 +76,16 @@ template<class DerivedLoader, class StorageClass>
 template<class D>                                           // D destination-type
 void SQLStorageLoaderBase<DerivedLoader, StorageClass>::convert_from_str(uint32 /*field_pos*/, char const* /*src*/, D& dst)
 {
+#if defined(__arm__) || defined(_M_ARM)
+    if (((unsigned)&dst) % sizeof(D))
+    {
+        // address not aligned. Use memcpy to avoid unaligned trap
+        D converted(0);
+        memcpy((void*)&dst, (void*)&converted, sizeof(D));
+
+    }
+    else
+#endif
     dst = 0;
 }
 
@@ -79,6 +99,16 @@ template<class DerivedLoader, class StorageClass>
 template<class S, class D>                                  // S source-type, D destination-type
 void SQLStorageLoaderBase<DerivedLoader, StorageClass>::default_fill(uint32 /*field_pos*/, S src, D& dst)
 {
+#if defined(__arm__) || defined(_M_ARM)
+    if (((unsigned)&dst) % sizeof(D))
+    {
+        // address not aligned. Use memcpy to avoid unaligned trap
+        D converted(src);
+        memcpy((void*)&dst, (void*)&converted, sizeof(D));
+
+    }
+    else
+#endif
     dst = D(src);
 }
 
@@ -190,7 +220,7 @@ template<class DerivedLoader, class StorageClass>
 void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store, bool error_at_empty /*= true*/)
 {
     Field* fields = nullptr;
-    QueryResult* result  = WorldDatabase.PQuery("SELECT MAX(%s) FROM %s", store.EntryFieldName(), store.GetTableName());
+    std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT MAX(%s) FROM %s", store.EntryFieldName(), store.GetTableName());
     if (!result)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error loading %s table (not exist?)\n", store.GetTableName());
@@ -201,14 +231,12 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
     uint32 maxRecordId = (*result)[0].GetUInt32() + 1;
     uint32 recordCount = 0;
     uint32 recordsize = 0;
-    delete result;
 
     result = WorldDatabase.PQuery("SELECT COUNT(*) FROM %s", store.GetTableName());
     if (result)
     {
         fields = result->Fetch();
         recordCount = fields[0].GetUInt32();
-        delete result;
     }
 
     result = WorldDatabase.PQuery("SELECT * FROM %s", store.GetTableName());
@@ -228,7 +256,6 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
     {
         recordCount = 0;
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error in %s table, probably sql file format was updated (there should be %d fields in sql).\n", store.GetTableName(), store.GetSrcFieldCount());
-        delete result;
         Log::WaitBeforeContinueIfNeed();
         exit(1);                                            // Stop server at loading broken or non-compatible table.
     }
@@ -327,8 +354,6 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
         }
     }
     while (result->NextRow());
-
-    delete result;
 }
 
 template<class DerivedLoader, class StorageClass>
@@ -336,7 +361,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
 {
     // To be used on tables that need to support patch progression. Second column must be the `patch` column.
     Field* fields = nullptr;
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(%s) FROM %s t1 WHERE %s=(SELECT max(%s) FROM %s t2 WHERE t1.%s=t2.%s && %s <= %u)", store.EntryFieldName(), store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
+    std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT MAX(%s) FROM %s t1 WHERE %s=(SELECT max(%s) FROM %s t2 WHERE t1.%s=t2.%s && %s <= %u)", store.EntryFieldName(), store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
     if (!result)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error loading %s table (not exist?)\n", store.GetTableName());
@@ -347,14 +372,12 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
     uint32 maxRecordId = (*result)[0].GetUInt32() + 1;
     uint32 recordCount = 0;
     uint32 recordsize = 0;
-    delete result;
 
     result = WorldDatabase.PQuery("SELECT COUNT(*) FROM %s t1 WHERE %s=(SELECT max(%s) FROM %s t2 WHERE t1.%s=t2.%s && %s <= %u)", store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
     if (result)
     {
         fields = result->Fetch();
         recordCount = fields[0].GetUInt32();
-        delete result;
     }
 
     result = WorldDatabase.PQuery("SELECT * FROM %s t1 WHERE %s=(SELECT max(%s) FROM %s t2 WHERE t1.%s=t2.%s && %s <= %u)", store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
@@ -374,7 +397,6 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
     {
         recordCount = 0;
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error in %s table, probably sql file format was updated (there should be %d fields in sql).\n", store.GetTableName(), store.GetSrcFieldCount());
-        delete result;
         Log::WaitBeforeContinueIfNeed();
         exit(1);                                            // Stop server at loading broken or non-compatible table.
     }
@@ -478,8 +500,6 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
             ++y;
         }
     } while (result->NextRow());
-
-    delete result;
 }
 
 #endif

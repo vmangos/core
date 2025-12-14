@@ -91,7 +91,7 @@ bool GameObjectModel::initialize(GameObject const* const pGo, GameObjectDisplayI
     if (!iModel)
         return false;
 
-    if (pGo->GetGOInfo()->type != GAMEOBJECT_TYPE_DOOR &&
+    if (!pGo->GetGOInfo()->CanAlwaysBreakLoS() &&
         it->second.name.find(".m2") != std::string::npos)
         iModel->setModelFlags(VMAP::MOD_M2);
 

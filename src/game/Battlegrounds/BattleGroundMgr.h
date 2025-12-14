@@ -87,7 +87,7 @@ class BattleGroundQueue
         void Update(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId);
 
         void FillPlayersToBg(BattleGround* bg, BattleGroundBracketId bracketId);
-        bool CheckPremadeMatch(BattleGroundBracketId bracketId, uint32 maxPlayersPerTeam, uint32 minPlayersPerTeam);
+        bool CheckPremadeMatch(BattleGroundBracketId bracketId, uint32 minPlayersPerTeam, uint32 maxPlayersPerTeam);
         bool CheckNormalMatch(BattleGroundBracketId bracketId, uint32 minPlayers, uint32 maxPlayers);
         GroupQueueInfo* AddGroup(Player* leader, Group* group, BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId, bool isPremade, uint32 instanceId, std::vector<uint32>* excludedMembers);
         void RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount);
@@ -106,6 +106,11 @@ class BattleGroundQueue
         QueuedPlayersMap m_queuedPlayers;
 
     private:
+        void RemoveOfflinePlayer();
+        bool HasPlayersInQueue(BattleGroundBracketId bracketId);
+        void CheckFreeSlots(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId);
+        bool CheckCreateNewBg(BattleGroundTypeId bgTypeId, BattleGroundBracketId bracketId);
+
         // we need constant add to begin and constant remove / add from the end, therefore deque suits our problem well
         typedef std::vector<GroupQueueInfo*> GroupsQueueType;
 
@@ -199,8 +204,10 @@ class BattleGroundMgr
         void Update(uint32 diff);
 
         /* Packet Building */
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         void BuildPlayerJoinedBattleGroundPacket(WorldPacket* data, Player* player);
         void BuildPlayerLeftBattleGroundPacket(WorldPacket* data, ObjectGuid guid);
+#endif
         void BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattleGroundTypeId bgTypeId);
         void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, int32 status);
         void BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value);

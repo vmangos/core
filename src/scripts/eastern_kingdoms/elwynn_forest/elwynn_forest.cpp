@@ -31,7 +31,7 @@ EndContentData */
 ## npc_henze_faulk
 ######*/
 
-#define SAY_HEAL    -1000187
+#define SAY_HEAL    2283
 
 struct npc_henze_faulkAI : public ScriptedAI
 {
@@ -68,7 +68,6 @@ struct npc_henze_faulkAI : public ScriptedAI
     {
         if (pSpellEntry->Id == 8593 && !spellHit)
         {
-            DoCastSpellIfCan(m_creature, 32343);
             m_creature->SetStandState(UNIT_STAND_STATE_STAND);
             m_creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
             //m_creature->RemoveAllAuras();

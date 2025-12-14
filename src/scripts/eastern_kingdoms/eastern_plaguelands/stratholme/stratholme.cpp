@@ -8,9 +8,12 @@ EndContentData */
 #include "scriptPCH.h"
 #include "stratholme.h"
 
-#define SAY_CRYSTAL_DESTROYED         -1900116
-#define SAY_ALL_CRYSTALS_DESTROYED    -1900115
-#define SAY_SCOURGE_HAVE_BROKEN_IN    -1900114
+enum : uint32
+{
+    SAY_CRYSTAL_DESTROYED      = 6527,
+    SAY_ALL_CRYSTALS_DESTROYED = 6289
+};
+
 /*######
 ## go_gauntlet_gate (this is the _first_ of the gauntlet gates, two exist)
 ######*/
@@ -67,12 +70,6 @@ bool GOOpen_go_stratholme_postbox(Player* pPlayer, GameObject* pGo)
 ## mob_freed_soul
 ######*/
 
-//Possibly more of these quotes around.
-#define SAY_ZAPPED0 -1329000
-#define SAY_ZAPPED1 -1329001
-#define SAY_ZAPPED2 -1329002
-#define SAY_ZAPPED3 -1329003
-
 struct mob_freed_soulAI : public ScriptedAI
 {
     mob_freed_soulAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -82,21 +79,9 @@ struct mob_freed_soulAI : public ScriptedAI
 
     void Reset() override
     {
-        switch (urand(0, 3))
-        {
-            case 0:
-                DoScriptText(SAY_ZAPPED0, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_ZAPPED1, m_creature);
-                break;
-            case 2:
-                DoScriptText(SAY_ZAPPED2, m_creature);
-                break;
-            case 3:
-                DoScriptText(SAY_ZAPPED3, m_creature);
-                break;
-        }
+        // Possibly more of these quotes around.
+        uint32 const randomText = PickRandomValue(6451, 6452, 6453, 6454, 6455);
+        DoScriptText(randomText, m_creature);
     }
 };
 
@@ -305,7 +290,7 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
     uint32 uiUpdateTimer;
-    std::list<uint64> acolyte;
+    ObjectGuidSet m_acolytes;
 
     void Reset() override {}
 
@@ -336,17 +321,17 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
 
         uiUpdateTimer = 2000;
 
-        if (acolyte.empty())
+        if (m_acolytes.empty())
         {
             std::list<Creature*> creatures;
             std::list<Creature*>::iterator itr;
             GetCreatureListWithEntryInGrid(creatures, m_creature, 10399, 50.0f);
             for (itr = creatures.begin(); itr != creatures.end(); ++itr)
-                acolyte.push_back((*itr)->GetGUID());
+                m_acolytes.insert((*itr)->GetObjectGuid());
             return;
         }
 
-        for (const auto& guid : acolyte)
+        for (const auto& guid : m_acolytes)
             if (Creature *pCreature = m_pInstance->instance->GetCreature(guid))
                 if (pCreature && pCreature->IsAlive())
                     return;
@@ -624,255 +609,6 @@ CreatureAI* GetAI_mobs_rat_pestifere(Creature* pCreature)
 }
 
 /*######
-## EVENT POP MOBS FIN DE COULOIRS
-######*/
-
-#define NPC_DATHROHAN 10812
-#define NPC_CRIMSON_GALLANT 10424
-#define NPC_BERSERK  10391
-#define NPC_GUARDIAN 10390
-
-struct npc_couloir_trigger1AI : public ScriptedAI
-{
-    npc_couloir_trigger1AI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    uint32 m_uiScourgeTimer;
-    bool CorridorEnded;
-    bool ScourgeStarted;
-
-    void Reset() override
-    {
-        CorridorEnded = false;
-        ScourgeStarted = false;
-        m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS);
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !CorridorEnded)
-        {
-            if (Creature* Crea = m_creature->FindNearestCreature(10812, 200.0f))
-                Crea->MonsterYell("Don't let them break our lines!", 0);
-
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3516.3f, -3067.8f, 135.08f, 0.837758f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3512.3f, -3065.8f, 135.08f, 0.837758f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3506.84f, -3093.61f, 135.751f, 2.46091f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-
-            CorridorEnded = true;
-            ScourgeStarted = true;
-        }
-    }
-
-    void JustSummoned(Creature* pSummoned) override
-    {
-        if (pSummoned->GetEntry() == NPC_BERSERK || pSummoned->GetEntry() == NPC_GUARDIAN)
-            pSummoned->SetInCombatWithZone();
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (ScourgeStarted)
-        {
-            if (m_uiScourgeTimer < uiDiff)
-            {
-                m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS);
-
-                if (Creature* Crea = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_DATHROHAN)))
-                {
-                    if (Crea->IsAlive() && !Crea->IsInCombat())
-                    {
-                        //"The scourge has broken into our bastion!"
-                        Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);
-                    }
-                    else
-                        return;
-                }             
-
-                for (uint8 i = 0; i < 4; ++i)
-                {
-                    switch (urand(0, 1))
-                    {
-                        case 0:
-                            m_creature->SummonCreature(NPC_BERSERK,
-                                                       m_creature->GetPositionX() + float(urand(0, 5)), m_creature->GetPositionY() - float(urand(0, 5)), m_creature->GetPositionZ(), 0,
-                                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, m_uiScourgeTimer);
-                            break;
-                        case 1:
-                            m_creature->SummonCreature(NPC_GUARDIAN,
-                                                       m_creature->GetPositionX() + float(urand(0, 5)), m_creature->GetPositionY() - float(urand(0, 5)), m_creature->GetPositionZ(), 0,
-                                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, m_uiScourgeTimer);
-                            break;
-                    }
-                }
-            }
-            else
-                m_uiScourgeTimer -= uiDiff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_couloir_trigger1(Creature* pCreature)
-{
-    return new npc_couloir_trigger1AI(pCreature);
-}
-
-struct npc_couloir_trigger2AI : public ScriptedAI
-{
-    npc_couloir_trigger2AI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    bool CorridorEnded;
-
-    void Reset() override
-    {
-        CorridorEnded = false;
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !CorridorEnded)
-        {
-            if (Creature* Crea = m_creature->FindNearestCreature(10812, 200.0f))
-                Crea->MonsterYell("Don't let them break our lines!", 0);
-
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3470.86f, -3073.86f, 135.088f, 0.907571f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3465.61f, -3065.72f, 135.084f, 0.20944f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3467.3f, -3068.8f, 135.004f, 0.837758f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-
-            CorridorEnded = true;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_couloir_trigger2(Creature* pCreature)
-{
-    return new npc_couloir_trigger2AI(pCreature);
-}
-
-struct npc_couloir_trigger3AI : public ScriptedAI
-{
-    npc_couloir_trigger3AI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    bool CorridorEnded;
-
-    void Reset() override
-    {
-        CorridorEnded = false;
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !CorridorEnded)
-        {
-            if (Creature* Crea = m_creature->FindNearestCreature(10997, 200.0f))
-                Crea->MonsterYell("Don't let them break our lines!", 0);
-
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3569.11f, -2970.55f, 124.999f, 5.36522f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3577.11f, -2998.55f, 125.0011f, 5.36522f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CRIMSON_GALLANT, 3545.11f, -3018.55f, 124.999f, 5.36522f, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-
-            CorridorEnded = true;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_couloir_trigger3(Creature* pCreature)
-{
-    return new npc_couloir_trigger3AI(pCreature);
-}
-
-struct npc_Scourge_TriggerAI : public ScriptedAI
-{
-    npc_Scourge_TriggerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    uint32 m_uiScourgeTimer;
-    bool ScourgeStarted;
-
-    void Reset() override
-    {
-        m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS); // 15 - 30 mn urand(1000000, 1800000);
-        ScourgeStarted = false;
-        m_creature->EnableMoveInLosEvent();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !ScourgeStarted)
-            ScourgeStarted = true;
-    }
-
-    void JustSummoned(Creature* pSummoned) override
-    {
-        pSummoned->SetInCombatWithZone();
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (ScourgeStarted)
-        {
-            if (m_uiScourgeTimer < uiDiff)
-            {
-                m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS);
-
-                if (Creature* Crea = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_DATHROHAN)))
-                {
-                    if (Crea->IsAlive() && !Crea->IsInCombat())
-                    {
-                        //"The scourge has broken into our bastion!"
-                        Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);
-                    }
-                    else
-                        return;
-                }                
-
-                for (uint8 i = 0; i < 4; ++i)
-                {
-                    switch (urand(0, 1))
-                    {
-                        case 0:
-                            m_creature->SummonCreature(NPC_BERSERK,
-                                                       m_creature->GetPositionX() + float(urand(0, 5)), m_creature->GetPositionY() - float(urand(0, 5)), m_creature->GetPositionZ(), 0,
-                                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, m_uiScourgeTimer);
-                            break;
-                        case 1:
-                            m_creature->SummonCreature(NPC_GUARDIAN,
-                                                       m_creature->GetPositionX() + float(urand(0, 5)), m_creature->GetPositionY() - float(urand(0, 5)), m_creature->GetPositionZ(), 0,
-                                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, m_uiScourgeTimer);
-                            break;
-                    }
-                }
-
-            }
-            else
-                m_uiScourgeTimer -= uiDiff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_Scourge_Trigger(Creature* pCreature)
-{
-    return new npc_Scourge_TriggerAI(pCreature);
-}
-
-/*######
 ## SUPPLY CRATE
 ######*/
 
@@ -916,6 +652,54 @@ GameObjectAI* GetAIgo_supply_crate(GameObject *pGo)
     return new go_supply_crateAI(pGo);
 }
 
+// 16336 - Haunting Phantoms
+struct HauntingPhantomsScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply && aura->GetEffIndex() == EFFECT_INDEX_0)
+            aura->SetPeriodicTimer(5 * IN_MILLISECONDS);
+    }
+
+    void OnPeriodicDummy(Aura* aura) final
+    {
+        if (roll_chance_i(5)) // 5% chance every tick
+        {
+            if (urand(0, 1))
+            {
+                aura->GetTarget()->CastSpell(aura->GetTarget(), 16334, true); // Summon Spiteful Phantom
+            }
+            else
+            {
+                aura->GetTarget()->CastSpell(aura->GetTarget(), 16335, true); // Summon Wrath Phantom
+            }
+        }
+    }
+};
+
+AuraScript* GetScript_HauntingPhantoms(SpellEntry const*)
+{
+    return new HauntingPhantomsScript();
+}
+
+// 16381 - Summon Rockwing Gargoyles
+struct EyeOfNaxxramasSummonRockwingGargoylesScript : SpellScript
+{
+    void OnSummon(Spell* spell, Creature* summon) const final
+    {
+        if (spell->m_casterUnit)
+        {
+            if (Unit* pTarget = spell->m_casterUnit->GetAttackerForHelper())
+                summon->AI()->AttackStart(pTarget);
+        }
+    }
+};
+
+SpellScript* GetScript_EyeOfNaxxramasSummonRockwingGargoyles(SpellEntry const*)
+{
+    return new EyeOfNaxxramasSummonRockwingGargoylesScript();
+}
+
 void AddSC_stratholme()
 {
     Script* newscript;
@@ -927,7 +711,7 @@ void AddSC_stratholme()
 
     newscript = new Script;
     newscript->Name = "go_stratholme_postbox";
-    newscript->GOOpen = &GOOpen_go_stratholme_postbox;
+    newscript->pGOOpen = &GOOpen_go_stratholme_postbox;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -957,27 +741,17 @@ void AddSC_stratholme()
     */
 
     newscript = new Script;
-    newscript->Name = "npc_couloir_trigger1";
-    newscript->GetAI = &GetAI_npc_couloir_trigger1;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_couloir_trigger2";
-    newscript->GetAI = &GetAI_npc_couloir_trigger2;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_couloir_trigger3";
-    newscript->GetAI = &GetAI_npc_couloir_trigger3;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "go_supply_crate";
     newscript->GOGetAI = &GetAIgo_supply_crate;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "npc_scourge_trigger";
-    newscript->GetAI = &GetAI_npc_Scourge_Trigger;
+    newscript->Name = "spell_haunting_phantoms";
+    newscript->GetAuraScript = &GetScript_HauntingPhantoms;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_eye_of_naxxramas_summon_rockwing_gargoyles";
+    newscript->GetSpellScript = &GetScript_EyeOfNaxxramasSummonRockwingGargoyles;
     newscript->RegisterSelf();
 }

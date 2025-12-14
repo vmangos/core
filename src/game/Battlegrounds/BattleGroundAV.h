@@ -126,8 +126,6 @@ enum BG_AV_ASSAULT
 
 enum BG_AV_Sounds
 {
-    BG_AV_SOUND_NEAR_LOSE               = 8456,             // not confirmed yet
-
     BG_AV_SOUND_ALLIANCE_ASSAULTS       = 8212,             // tower,grave + enemy boss if someone tries to attack him
     BG_AV_SOUND_HORDE_ASSAULTS          = 8174,
     BG_AV_SOUND_ALLIANCE_GOOD           = 8173,             // if something good happens for the team:  wins(maybe only through killing the boss), captures mine or grave, destroys tower and defends grave
@@ -484,7 +482,7 @@ class BattleGroundAV : public BattleGround
         void FillInitialWorldStates(WorldPacket& data, uint32& count) override;
 
         void RemovePlayer(Player* plr, ObjectGuid guid) override;
-        void HandleAreaTrigger(Player* source, uint32 trigger) override;
+        bool HandleAreaTrigger(Player* source, uint32 trigger) override;
         void Reset() override;
 
         void ResetTamedEvent(uint32 teamIdx);

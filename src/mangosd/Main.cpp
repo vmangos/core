@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup mangosd Mangos Daemon
-/// @{
-/// \file
+// \addtogroup mangosd Mangos Daemon
+// @{
+// \file
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
@@ -52,14 +52,15 @@ int m_ServiceStatus = -1;
 #include "PosixDaemon.h"
 #endif
 
-DatabaseType WorldDatabase;                                 ///< Accessor to the world database
-DatabaseType CharacterDatabase;                             ///< Accessor to the character database
-DatabaseType LoginDatabase;                                 ///< Accessor to the realm/login database
-DatabaseType LogsDatabase;                                  ///< Accessor to the logs database
+DatabaseType WorldDatabase;                                 // Accessor to the world database
+DatabaseType CharacterDatabase;                             // Accessor to the character database
+DatabaseType LoginDatabase;                                 // Accessor to the realm/login database
+DatabaseType LogsDatabase;                                  // Accessor to the logs database
 
-uint32 realmID;                                             ///< Id of the realm
+uint32 realmID;                                             // Id of the realm
+std::string realmName;                                      // Name of the realm
 
-/// Print out the usage string for this program on the console.
+// Print out the usage string for this program on the console.
 void usage(const char *prog)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Usage: \n %s [<options>]\n"
@@ -80,13 +81,11 @@ void usage(const char *prog)
 
 char const* g_mainLogFileName = "Server.log";
 
-/// Launch the mangos server
+// Launch the mangos server
 extern int main(int argc, char **argv)
 {
-    ///- Command line parsing
+    // Command line parsing
     char const* cfg_file = _MANGOSD_CONFIG;
-
-
     char const *options = ":c:s:";
 
     ACE_Get_Opt cmd_opts(argc, argv, options);
@@ -166,6 +165,9 @@ extern int main(int argc, char **argv)
         return 1;
     }
 
+    // Reads config for file names so needs to be after we set the config.
+    sLog.OpenWorldLogFiles();
+
 #ifndef WIN32                                               // posix daemon commands need apply after config read
     switch (serviceDaemonMode)
     {
@@ -181,22 +183,18 @@ extern int main(int argc, char **argv)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [world-daemon]", _FULLVERSION);
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "<Ctrl-C> to stop." );
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "\n\n"
-        "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"
-        "MM   MM         MM   MM MMM MMM MM  MM MMM MMM\n"
-        "MMM MMM         MMM  MM MMM MMM MM  MM MMM\n"
-        "MM M MM         MMMM MM MMM     MM  MM  MMM\n"
-        "MM M MM  MMMMM  MM MMMM MMM     MM  MM   MMM\n"
-        "MM M MM M   MMM MM  MMM MMMMMMM MM  MM    MMM\n"
-        "MM   MM     MMM MM   MM MM  MMM MM  MM     MMM\n"
-        "MM   MM MMMMMMM MM   MM MMM MMM MM  MM MMM MMM\n"
-        "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM\n"
-        "        MM  MMM http://getmangos.com\n"
-        "        MMMMMM\n\n");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "VMaNGOS : https://github.com/vmangos");
+        "MM     MM MM   MM         MM   MM  MMMMM   MMMMM   MMMMM\n"
+        "MM     MM MM   MM         MM   MM MMM MMM MM   MM MMM MMM\n"
+        " MM   MM  MMM MMM         MMM  MM MMM MMM MM   MM MMM\n"
+        " MM   MM  MM M MM  MMMMM  MMMM MM MMM     MM   MM  MMM\n"
+        "  MM MM   MM M MM M   MMM MM MMMM MMM     MM   MM   MMM\n"
+        "  MM MM   MM M MM     MMM MM  MMM MMMMMMM MM   MM    MMM\n"
+        "   MMM    MM   MM MMMMMMM MM   MM MM  MMM MM   MM     MMM\n"
+        "   MMM    MM   MM MM  MMM MM   MM MMM MMM MM   MM MMM MMM\n"
+        "    M     MM   MM MM  MMM MM   MM  MMMMMM  MMMMM   MMMMM\n"
+        "                  MMMMMM\n"
+        "                          https://github.com/vmangos\n\n");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s.", cfg_file);
-
-#define STR(s) #s
-#define XSTR(s) STR(s)
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Alloc library: " MANGOS_ALLOC_LIB "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core Revision: " _FULLVERSION);
@@ -210,11 +208,11 @@ extern int main(int argc, char **argv)
 
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Using ACE: %s", ACE_VERSION);
 
-    ///- Set progress bars show mode
+    // Set progress bars show mode
     BarGoLink::SetOutputState(sConfig.GetBoolDefault("ShowProgressBars", true));
 
-    ///- and run the 'Master'
-    /// \todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?
+    // and run the 'Master'
+    // TODO: Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?
     return sMaster.Run();
 
     // at sMaster return function exist with codes
@@ -223,4 +221,4 @@ extern int main(int argc, char **argv)
     // 2 - restart command used, this code can be used by restarter for restart mangosd
 }
 
-/// @}
+// @}

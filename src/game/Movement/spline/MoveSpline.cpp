@@ -32,12 +32,44 @@ Location MoveSpline::ComputePosition() const
 {
     MANGOS_ASSERT(Initialized());
 
+    return ComputePosition(point_Idx, time_passed);
+}
+
+Location MoveSpline::ComputePositionAfterTime(int32 duration) const
+{
+    MANGOS_ASSERT(Initialized());
+
+    int32 lastIndex = point_Idx;
+    int32 const timePassed = std::max(time_passed, spline.length(lastIndex));
+
+    for (int32 i = point_Idx + 1; i <= spline.last(); ++i)
+    {
+        int32 pointReachTime = spline.length(i) - timePassed;
+        if (pointReachTime > duration)
+            break;
+
+        lastIndex = i;
+    }
+
+    if (lastIndex == spline.last())
+        return FinalDestination();
+
+    int32 desiredTime = duration + timePassed;
+    return ComputePosition(lastIndex, desiredTime);
+}
+
+Location MoveSpline::ComputePosition(int32 lastIndex, int32 desiredTime) const
+{
+    MANGOS_ASSERT(desiredTime >= spline.length(lastIndex));
+    MANGOS_ASSERT(desiredTime <= spline.length(lastIndex + 1));
+
     float u = 1.f;
-    int32 seg_time = spline.length(point_Idx, point_Idx + 1);
-    if (seg_time > 0)
-        u = (time_passed - spline.length(point_Idx)) / (float)seg_time;
+    int32 segTime = spline.length(lastIndex, lastIndex + 1);
+    if (segTime > 0)
+        u = (desiredTime - spline.length(lastIndex)) / (float)segTime;
+
     Location c;
-    spline.evaluate_percent(point_Idx, u, c);
+    spline.evaluate_percent(lastIndex, u, c);
 
     if (splineflags.falling)
         computeFallElevation(c.z);
@@ -56,6 +88,7 @@ Location MoveSpline::ComputePosition() const
         spline.evaluate_derivative(point_Idx, u, hermite);
         c.orientation = atan2(hermite.y, hermite.x);
     }
+
     return c;
 }
 

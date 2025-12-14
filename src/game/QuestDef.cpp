@@ -20,8 +20,8 @@
  */
 
 #include "QuestDef.h"
-#include "Player.h"
 #include "World.h"
+#include "Database/Field.h"
 
 Quest::Quest(Field* questRecord)
 {
@@ -104,6 +104,7 @@ Quest::Quest(Field* questRecord)
     for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
         RewRepValue[i] = questRecord[90 + i].GetInt32();
 
+    RewRepSpilloverMask = questRecord[130].GetUInt8();
     RewXP = questRecord[127].GetUInt32();
     RewOrReqMoney = questRecord[95].GetInt32();
     RewMoneyMaxLevel = questRecord[96].GetUInt32();
@@ -172,29 +173,26 @@ Quest::Quest(Field* questRecord)
     }
 }
 
-uint32 Quest::XPValue(Player* pPlayer) const
+uint32 Quest::XPValue(uint32 playerLevel) const
 {
-    if (pPlayer)
+    if (RewXP > 0)
     {
-        if (RewXP > 0)
-        {
-            uint32 pLevel = pPlayer->GetLevel();
-            uint32 qLevel = QuestLevel;
-            float fullxp = RewXP;
+        uint32 pLevel = playerLevel;
+        uint32 qLevel = QuestLevel;
+        float fullxp = RewXP;
 
-            if (pLevel <= qLevel +  5)
-                return uint32(ceilf(fullxp));
-            else if (pLevel == qLevel +  6)
-                return uint32(ceilf(fullxp * 0.8f));
-            else if (pLevel == qLevel +  7)
-                return uint32(ceilf(fullxp * 0.6f));
-            else if (pLevel == qLevel +  8)
-                return uint32(ceilf(fullxp * 0.4f));
-            else if (pLevel == qLevel +  9)
-                return uint32(ceilf(fullxp * 0.2f));
-            else
-                return uint32(ceilf(fullxp * 0.1f));
-        }
+        if (pLevel <= qLevel + 5)
+            return uint32(ceilf(fullxp));
+        else if (pLevel == qLevel + 6)
+            return uint32(ceilf(fullxp * 0.8f));
+        else if (pLevel == qLevel + 7)
+            return uint32(ceilf(fullxp * 0.6f));
+        else if (pLevel == qLevel + 8)
+            return uint32(ceilf(fullxp * 0.4f));
+        else if (pLevel == qLevel + 9)
+            return uint32(ceilf(fullxp * 0.2f));
+        else
+            return uint32(ceilf(fullxp * 0.1f));
     }
     return 0;
 }

@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `uptime` (
   `uptime` bigint(20) unsigned NOT NULL DEFAULT '0',
   `onlineplayers` smallint(5) unsigned NOT NULL DEFAULT '0',
   `maxplayers` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `revision` varchar(255) NOT NULL DEFAULT 'Trinitycore',
+  `revision` varchar(255) NOT NULL DEFAULT 'VMangos',
   PRIMARY KEY (`realmid`,`starttime`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Uptime system';
 

@@ -82,6 +82,22 @@ enum LootSlotType
     MAX_LOOT_SLOT_TYPE,
 };
 
+enum LootError
+{
+    LOOT_ERROR_DIDNT_KILL               = 0,    // You don't have permission to loot that corpse.
+    LOOT_ERROR_TOO_FAR                  = 4,    // You are too far away to loot that corpse.
+    LOOT_ERROR_BAD_FACING               = 5,    // You must be facing the corpse to loot it.
+    LOOT_ERROR_LOCKED                   = 6,    // Someone is already looting that corpse.
+    LOOT_ERROR_NOTSTANDING              = 8,    // You need to be standing up to loot something!
+    LOOT_ERROR_STUNNED                  = 9,    // You can't loot anything while stunned!
+    LOOT_ERROR_PLAYER_NOT_FOUND         = 10,   // Player not found
+    LOOT_ERROR_PLAY_TIME_EXCEEDED       = 11,   // Maximum play time exceeded
+    LOOT_ERROR_MASTER_INV_FULL          = 12,   // That player's inventory is full
+    LOOT_ERROR_MASTER_UNIQUE_ITEM       = 13,   // Player has too many of that item already
+    LOOT_ERROR_MASTER_OTHER             = 14,   // Can't assign item to that player
+    LOOT_ERROR_ALREADY_PICKPOCKETED     = 15,   // Your target has already had its pockets picked
+    LOOT_ERROR_NOT_WHILE_SHAPESHIFTED   = 16    // You can't do that while shapeshifted.
+};
 
 class Player;
 class WorldObject;
@@ -134,7 +150,7 @@ struct LootItem
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
     bool AllowedForPlayer(Player const* player, WorldObject const* lootTarget) const;
-    LootSlotType GetSlotTypeForSharedLoot(PermissionTypes permission, Player* viewer, WorldObject const* lootTarget, bool condition_ok = false) const;
+    LootSlotType GetSlotTypeForSharedLoot(PermissionTypes permission, Player const* viewer, WorldObject const* lootTarget, bool condition_ok = false) const;
 };
 
 typedef std::vector<LootItem> LootItemList;
@@ -176,7 +192,7 @@ class LootStore
 
         bool HaveLootFor(uint32 loot_id) const { return m_LootTemplates.find(loot_id) != m_LootTemplates.end(); }
         bool HaveQuestLootFor(uint32 loot_id) const;
-        bool HaveQuestLootForPlayer(uint32 loot_id,Player* player) const;
+        bool HaveQuestLootForPlayer(uint32 loot_id, Player const* player) const;
 
         LootTemplate const* GetLootFor(uint32 loot_id) const;
 
@@ -201,13 +217,13 @@ class LootTemplate
     public:
         // Adds an entry to the group (at loading stage)
         void AddEntry(LootStoreItem& item);
-        // Rolls for every item in the template and adds the rolled items the the loot
+        // Rolls for every item in the template and adds the rolled items to the loot
         void Process(Loot& loot, LootStore const& store, bool rate, uint8 GroupId = 0) const;
 
         // True if template includes at least 1 quest drop entry
-        bool HasQuestDrop(LootTemplateMap const& store, uint8 GroupId = 0) const;
+        bool HasQuestDrop(uint8 groupId = 0) const;
         // True if template includes at least 1 quest drop for an active quest of the player
-        bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player, uint8 GroupId = 0) const;
+        bool HasQuestDropForPlayer(Player const* player, uint8 groupId = 0) const;
 
         // Checks integrity of the template
         void Verify(LootStore const& store, uint32 Id) const;
@@ -222,7 +238,7 @@ class LootTemplate
 class LootValidatorRef :  public Reference<Loot, LootValidatorRef>
 {
     public:
-        LootValidatorRef() {}
+        LootValidatorRef() = default;
         void targetObjectDestroyLink() override {}
         void sourceObjectDestroyLink() override {}
 };
@@ -335,6 +351,7 @@ struct Loot
 
     void GenerateMoneyLoot(uint32 minAmount, uint32 maxAmount);
     bool FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError = false, WorldObject const* looted = nullptr);
+    void FillPlayerDependentLoot(Player* loot_owner, bool personal, WorldObject const* looted = nullptr);
 
     // Inserts the item into the loot (called by LootTemplate processors)
     void AddItem(LootStoreItem const& item);
@@ -345,10 +362,10 @@ struct Loot
     WorldObject const* GetLootTarget() const;
 
     // TrinityCore
-    bool hasItemFor(Player* player) const;
+    bool hasItemFor(Player const* player) const;
     bool hasOverThresholdItem() const;
     bool IsAllowedLooter(ObjectGuid guid, bool doPersonalCheck = true) const;
-    bool IsOriginalLooter(ObjectGuid guid) { return IsAllowedLooter(guid, false); }
+    bool IsOriginalLooter(ObjectGuid guid) const { return IsAllowedLooter(guid, false); }
 
     void FillNotNormalLootFor(Player* player);
 
@@ -360,9 +377,9 @@ struct Loot
     QuestItemMap m_playerFFAItems;
     QuestItemMap m_playerNonQuestNonFFAConditionalItems;
     private:
-        QuestItemList* FillFFALoot(Player* player);
-        QuestItemList* FillQuestLoot(Player* player);
-        QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player);
+        QuestItemList* FillFFALoot(Player const* player);
+        QuestItemList* FillQuestLoot(Player const* player);
+        QuestItemList* FillNonQuestNonFFAConditionalLoot(Player const* player);
 
         typedef std::set<ObjectGuid> PlayersLooting;
         PlayersLooting m_playersLooting;

@@ -27,7 +27,7 @@
 #include "adtfile.h"
 #undef min
 #undef max
-#include "mpq_libmpq04.h"
+#include "libmpq/mpq_libmpq.h"
 
 using namespace std;
 
@@ -92,8 +92,8 @@ bool WMORoot::open()
                 std::string path = ptr;
 
                 char* s = GetPlainName(ptr);
-                fixnamen(s, strlen(s));
-                fixname2(s, strlen(s));
+                FixNameCase(s, strlen(s));
+                FixNameSpaces(s, strlen(s));
 
                 uint32 doodadNameIndex = ptr - f.getPointer();
                 ptr += path.length() + 1;
@@ -142,7 +142,7 @@ bool WMORoot::open()
         {
         }
         */
-        f.seek((int)nextpos);
+        f.seek(nextpos);
     }
     f.close();
     return true;
@@ -249,7 +249,7 @@ bool WMOGroup::open()
         {
             liquflags |= 1;
             hlq = new WMOLiquidHeader;
-            f.read(hlq, 0x1E);
+            f.read(hlq, WMOLiquidHeaderSize);
             LiquEx_size = sizeof(WMOLiquidVert) * hlq->xverts * hlq->yverts;
             LiquEx = new WMOLiquidVert[hlq->xverts * hlq->yverts];
             f.read(LiquEx, LiquEx_size);
@@ -264,7 +264,7 @@ bool WMOGroup::open()
             llog << "\nx-/yvert: " << hlq->xverts << "/" << hlq->yverts << " size: " << size << " expected size: " << 30 + hlq->xverts*hlq->yverts*8 + hlq->xtiles*hlq->ytiles << std::endl;
             llog.close(); */
         }
-        f.seek((int)nextpos);
+        f.seek(nextpos);
     }
     f.close();
     return true;
@@ -497,7 +497,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
         llog << ":\ntype: " << hlq->type << " (root:" << rootWMO->flags << " group:" << flags << ")\n";
         llog.close(); */
 
-        fwrite(hlq, sizeof(WMOLiquidHeader), 1, output);
+        fwrite(hlq, WMOLiquidHeaderSize, 1, output);
         // only need height values, the other values are unknown anyway
         for (uint32 i = 0; i < LiquEx_size / sizeof(WMOLiquidVert); ++i)
             fwrite(&LiquEx[i].height, sizeof(float), 1, output);

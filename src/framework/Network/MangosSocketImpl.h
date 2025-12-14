@@ -16,8 +16,6 @@
 #include "SharedDefines.h"
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"
-#include "Auth/BigNumber.h"
-#include "Auth/Sha1.h"
 #include "WorldSession.h"
 #include "Log.h"
 #include "DBCStores.h"
@@ -26,16 +24,17 @@
 template <typename SessionType, typename SocketName, typename Crypt>
 MangosSocket<SessionType, SocketName, Crypt>::MangosSocket() :
     WorldHandler(),
-    m_LastPingTime(ACE_Time_Value::zero),
-    m_OverSpeedPings(0),
-    m_Session(0),
-    m_RecvWPct(0),
-    m_RecvPct(),
-    m_Header(sizeof(ClientPktHeader)),
-    m_OutBuffer(0),
-    m_OutBufferSize(65536),
-    m_OutActive(false),
-    m_Seed(static_cast<uint32>(rand32())),
+    m_createTime(ACE_OS::gettimeofday()),
+    m_lastPingTime(ACE_Time_Value::zero),
+    m_overSpeedPings(0),
+    m_session(0),
+    m_recvWPct(0),
+    m_recvPct(),
+    m_header(sizeof(ClientPktHeader)),
+    m_outBuffer(0),
+    m_outBufferSize(65536),
+    m_outActive(false),
+    m_seed(static_cast<uint32>(rand32())),
     m_isServerSocket(true)
 {
     reference_counting_policy().value(ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
@@ -44,17 +43,17 @@ MangosSocket<SessionType, SocketName, Crypt>::MangosSocket() :
 template <typename SessionType, typename SocketName, typename Crypt>
 MangosSocket<SessionType, SocketName, Crypt>::~MangosSocket(void)
 {
-    delete m_RecvWPct;
+    delete m_recvWPct;
 
-    if (m_OutBuffer)
-        m_OutBuffer->release();
+    if (m_outBuffer)
+        m_outBuffer->release();
 
     closing_ = true;
 
     peer().close();
 
     WorldPacket* pct;
-    while (m_PacketQueue.dequeue_head(pct) == 0)
+    while (m_packetQueue.dequeue_head(pct) == 0)
         delete pct;
 }
 
@@ -62,7 +61,7 @@ template <typename SessionType, typename SocketName, typename Crypt>
 void MangosSocket<SessionType, SocketName, Crypt>::CloseSocket(void)
 {
     {
-        GuardType lock(m_OutBufferLock);
+        GuardType lock(m_outBufferLock);
 
         if (closing_)
             return;
@@ -72,16 +71,16 @@ void MangosSocket<SessionType, SocketName, Crypt>::CloseSocket(void)
     }
 
     {
-        GuardType lock(m_SessionLock);
+        GuardType lock(m_sessionLock);
 
-        m_Session = nullptr;
+        m_session = nullptr;
     }
 }
 
 template <typename SessionType, typename SocketName, typename Crypt>
-int MangosSocket<SessionType, SocketName, Crypt>::SendPacket(const WorldPacket& pct)
+int MangosSocket<SessionType, SocketName, Crypt>::SendPacket(WorldPacket const& pct)
 {
-    GuardType lock(m_OutBufferLock);
+    GuardType lock(m_outBufferLock);
 
     if (closing_)
         return -1;
@@ -94,10 +93,10 @@ int MangosSocket<SessionType, SocketName, Crypt>::SendPacket(const WorldPacket& 
 
         // NOTE maybe check of the size of the queue can be good ?
         // to make it bounded instead of unbounded
-        if (m_PacketQueue.enqueue_tail(npct) == -1)
+        if (m_packetQueue.enqueue_tail(npct) == -1)
         {
             delete npct;
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MangosSocket<SessionType, SocketName, Crypt>::SendPacket: m_PacketQueue.enqueue_tail failed");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MangosSocket<SessionType, SocketName, Crypt>::SendPacket: m_packetQueue.enqueue_tail failed");
             return -1;
         }
     }
@@ -111,19 +110,19 @@ int MangosSocket<SessionType, SocketName, Crypt>::open(void *a)
     ACE_UNUSED_ARG(a);
 
     // Prevent double call to this func.
-    if (m_OutBuffer)
+    if (m_outBuffer)
         return -1;
 
     // This will also prevent the socket from being Updated
     // while we are initializing it.
-    m_OutActive = true;
+    m_outActive = true;
 
     // Hook for the manager.
     if (((SocketName*)this)->OnSocketOpen() == -1)
         return -1;
 
     // Allocate the buffer.
-    ACE_NEW_RETURN(m_OutBuffer, ACE_Message_Block(m_OutBufferSize), -1);
+    ACE_NEW_RETURN(m_outBuffer, ACE_Message_Block(m_outBufferSize), -1);
 
     // Store peer address.
     ACE_INET_Addr remote_addr;
@@ -134,7 +133,7 @@ int MangosSocket<SessionType, SocketName, Crypt>::open(void *a)
         return -1;
     }
 
-    m_Address = remote_addr.get_host_addr();
+    m_address = remote_addr.get_host_addr();
 
     if (((SocketName*)this)->SendStartupPacket() == -1)
         return -1;
@@ -204,26 +203,31 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_input(ACE_HANDLE)
 template <typename SessionType, typename SocketName, typename Crypt>
 int MangosSocket<SessionType, SocketName, Crypt>::handle_output(ACE_HANDLE)
 {
-    GuardType lock(m_OutBufferLock);
+    GuardType lock(m_outBufferLock);
 
     if (closing_)
         return -1;
 
-    const size_t send_len = m_OutBuffer->length();
+    const size_t send_len = m_outBuffer->length();
 
     if (send_len == 0)
         return cancel_wakeup_output(lock);
 
 #ifdef MSG_NOSIGNAL
-    ssize_t n = peer().send(m_OutBuffer->rd_ptr(), send_len, MSG_NOSIGNAL);
+    ssize_t n = peer().send(m_outBuffer->rd_ptr(), send_len, MSG_NOSIGNAL);
 #else
-    ssize_t n = peer().send(m_OutBuffer->rd_ptr(), send_len);
+    ssize_t n = peer().send(m_outBuffer->rd_ptr(), send_len);
 #endif // MSG_NOSIGNAL
 
     if (n == 0)
         return -1;
     else if (n == -1)
     {
+#ifdef _WIN32
+        if (WSAGetLastError() == WSAEWOULDBLOCK)
+            return schedule_wakeup_output(lock);
+#endif
+
         if (errno == EWOULDBLOCK || errno == EAGAIN)
             return schedule_wakeup_output(lock);
 
@@ -231,16 +235,16 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_output(ACE_HANDLE)
     }
     else if (n < (ssize_t)send_len) //now n > 0
     {
-        m_OutBuffer->rd_ptr(static_cast<size_t>(n));
+        m_outBuffer->rd_ptr(static_cast<size_t>(n));
 
         // move the data to the base of the buffer
-        m_OutBuffer->crunch();
+        m_outBuffer->crunch();
 
         return schedule_wakeup_output(lock);
     }
     else //now n == send_len
     {
-        m_OutBuffer->reset();
+        m_outBuffer->reset();
 
         if (!iFlushPacketQueue())
             return cancel_wakeup_output(lock);
@@ -256,7 +260,7 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_close(ACE_HANDLE h, ACE
 {
     // Critical section
     {
-        GuardType lock(m_OutBufferLock);
+        GuardType lock(m_outBufferLock);
 
         closing_ = true;
 
@@ -266,9 +270,9 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_close(ACE_HANDLE h, ACE
 
     // Critical section
     {
-        GuardType lock(m_SessionLock);
+        GuardType lock(m_sessionLock);
 
-        m_Session = nullptr;
+        m_session = nullptr;
     }
 
     reactor()->remove_handler(this, ACE_Event_Handler::DONT_CALL | ACE_Event_Handler::ALL_EVENTS_MASK);
@@ -280,8 +284,15 @@ int MangosSocket<SessionType, SocketName, Crypt>::Update(void)
 {
     if (closing_)
         return -1;
+    
+    if (!m_session && m_isServerSocket && ((ACE_OS::gettimeofday() - m_createTime) > ACE_Time_Value(10)))
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Disconnecting idle connection from %s.", m_address.c_str());
+        CloseSocket();
+        return -1;
+    }
 
-    if (m_OutActive || m_OutBuffer->length() == 0)
+    if (m_outActive || m_outBuffer->length() == 0)
         return 0;
 
     return handle_output(get_handle());
@@ -290,13 +301,13 @@ int MangosSocket<SessionType, SocketName, Crypt>::Update(void)
 template <typename SessionType, typename SocketName, typename Crypt>
 int MangosSocket<SessionType, SocketName, Crypt>::handle_input_header(void)
 {
-    MANGOS_ASSERT(m_RecvWPct == nullptr);
+    MANGOS_ASSERT(m_recvWPct == nullptr);
 
-    MANGOS_ASSERT(m_Header.length() == sizeof(ClientPktHeader));
+    MANGOS_ASSERT(m_header.length() == sizeof(ClientPktHeader));
 
-    m_Crypt.DecryptRecv((uint8*) m_Header.rd_ptr(), sizeof(ClientPktHeader));
+    m_crypt.DecryptRecv((uint8*) m_header.rd_ptr(), sizeof(ClientPktHeader));
 
-    ClientPktHeader& header = *((ClientPktHeader*) m_Header.rd_ptr());
+    ClientPktHeader& header = *((ClientPktHeader*) m_header.rd_ptr());
 
     EndianConvertReverse(header.size);
     EndianConvert(header.cmd);
@@ -312,15 +323,15 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_input_header(void)
 
     header.size -= 4;
 
-    ACE_NEW_RETURN(m_RecvWPct, WorldPacket((uint16) header.cmd, header.size), -1);
+    ACE_NEW_RETURN(m_recvWPct, WorldPacket((uint16) header.cmd, header.size), -1);
 
     if (header.size > 0)
     {
-        m_RecvWPct->resize(header.size);
-        m_RecvPct.base((char*) m_RecvWPct->contents(), m_RecvWPct->size());
+        m_recvWPct->resize(header.size);
+        m_recvPct.base((char*) m_recvWPct->contents(), m_recvWPct->size());
     }
     else
-        MANGOS_ASSERT(m_RecvPct.space() == 0);
+        MANGOS_ASSERT(m_recvPct.space() == 0);
 
     return 0;
 }
@@ -331,17 +342,17 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_input_payload(void)
     // set errno properly here on error !!!
     // now have a header and payload
 
-    MANGOS_ASSERT(m_RecvPct.space() == 0);
-    MANGOS_ASSERT(m_Header.space() == 0);
-    MANGOS_ASSERT(m_RecvWPct != nullptr);
+    MANGOS_ASSERT(m_recvPct.space() == 0);
+    MANGOS_ASSERT(m_header.space() == 0);
+    MANGOS_ASSERT(m_recvWPct != nullptr);
 
-    const int ret = ((SocketName*)this)->ProcessIncoming(m_RecvWPct);
+    const int ret = ((SocketName*)this)->ProcessIncoming(m_recvWPct);
 
-    m_RecvPct.base(nullptr, 0);
-    m_RecvPct.reset();
-    m_RecvWPct = nullptr;
+    m_recvPct.base(nullptr, 0);
+    m_recvPct.reset();
+    m_recvWPct = nullptr;
 
-    m_Header.reset();
+    m_header.reset();
 
     if (ret == -1)
         errno = EINVAL;
@@ -378,14 +389,14 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_input_missing_data(void
 
     while (message_block.length() > 0)
     {
-        if (m_Header.space() > 0)
+        if (m_header.space() > 0)
         {
             //need to receive the header
-            const size_t to_header = (message_block.length() > m_Header.space() ? m_Header.space() : message_block.length());
-            m_Header.copy(message_block.rd_ptr(), to_header);
+            const size_t to_header = (message_block.length() > m_header.space() ? m_header.space() : message_block.length());
+            m_header.copy(message_block.rd_ptr(), to_header);
             message_block.rd_ptr(to_header);
 
-            if (m_Header.space() > 0)
+            if (m_header.space() > 0)
             {
                 // Couldn't receive the whole header this time.
                 MANGOS_ASSERT(message_block.length() == 0);
@@ -403,23 +414,23 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_input_missing_data(void
 
         // Its possible on some error situations that this happens
         // for example on closing when epoll receives more chunked data and stuff
-        // hope this is not hack ,as proper m_RecvWPct is asserted around
-        if (!m_RecvWPct)
+        // hope this is not hack ,as proper m_recvWPct is asserted around
+        if (!m_recvWPct)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Forcing close on input m_RecvWPct = nullptr");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Forcing close on input m_recvWPct = nullptr");
             errno = EINVAL;
             return -1;
         }
 
         // We have full read header, now check the data payload
-        if (m_RecvPct.space() > 0)
+        if (m_recvPct.space() > 0)
         {
             //need more data in the payload
-            const size_t to_data = (message_block.length() > m_RecvPct.space() ? m_RecvPct.space() : message_block.length());
-            m_RecvPct.copy(message_block.rd_ptr(), to_data);
+            const size_t to_data = (message_block.length() > m_recvPct.space() ? m_recvPct.space() : message_block.length());
+            m_recvPct.copy(message_block.rd_ptr(), to_data);
             message_block.rd_ptr(to_data);
 
-            if (m_RecvPct.space() > 0)
+            if (m_recvPct.space() > 0)
             {
                 // Couldn't receive the whole data this time.
                 MANGOS_ASSERT(message_block.length() == 0);
@@ -442,10 +453,10 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_input_missing_data(void
 template <typename SessionType, typename SocketName, typename Crypt>
 int MangosSocket<SessionType, SocketName, Crypt>::cancel_wakeup_output(GuardType& g)
 {
-    if (!m_OutActive)
+    if (!m_outActive)
         return 0;
 
-    m_OutActive = false;
+    m_outActive = false;
 
     g.unlock();
 
@@ -463,10 +474,10 @@ int MangosSocket<SessionType, SocketName, Crypt>::cancel_wakeup_output(GuardType
 template <typename SessionType, typename SocketName, typename Crypt>
 int MangosSocket<SessionType, SocketName, Crypt>::schedule_wakeup_output(GuardType& g)
 {
-    if (m_OutActive)
+    if (m_outActive)
         return 0;
 
-    m_OutActive = true;
+    m_outActive = true;
 
     g.unlock();
 
@@ -481,9 +492,9 @@ int MangosSocket<SessionType, SocketName, Crypt>::schedule_wakeup_output(GuardTy
 }
 
 template <typename SessionType, typename SocketName, typename Crypt>
-int MangosSocket<SessionType, SocketName, Crypt>::iSendPacket(const WorldPacket& pct)
+int MangosSocket<SessionType, SocketName, Crypt>::iSendPacket(WorldPacket const& pct)
 {
-    if (m_OutBuffer->space() < pct.size() + sizeof(ServerPktHeader))
+    if (m_outBuffer->space() < pct.size() + sizeof(ServerPktHeader))
     {
         errno = ENOBUFS;
         return -1;
@@ -498,13 +509,13 @@ int MangosSocket<SessionType, SocketName, Crypt>::iSendPacket(const WorldPacket&
     EndianConvertReverse(header.size);
     EndianConvert(header.cmd);
 
-    m_Crypt.EncryptSend((uint8*) & header, sizeof(header));
+    m_crypt.EncryptSend((uint8*) & header, sizeof(header));
 
-    if (m_OutBuffer->copy((char*) & header, sizeof(header)) == -1)
+    if (m_outBuffer->copy((char*) & header, sizeof(header)) == -1)
         ACE_ASSERT(false);
 
     if (!pct.empty())
-        if (m_OutBuffer->copy((char*) pct.contents(), pct.size()) == -1)
+        if (m_outBuffer->copy((char*) pct.contents(), pct.size()) == -1)
             ACE_ASSERT(false);
 
     return 0;
@@ -516,14 +527,14 @@ bool MangosSocket<SessionType, SocketName, Crypt>::iFlushPacketQueue()
     WorldPacket *pct;
     bool haveone = false;
 
-    while (m_PacketQueue.dequeue_head(pct) == 0)
+    while (m_packetQueue.dequeue_head(pct) == 0)
     {
         if (((SocketName*)this)->iSendPacket(*pct) == -1)
         {
-            if (m_PacketQueue.enqueue_head(pct) == -1)
+            if (m_packetQueue.enqueue_head(pct) == -1)
             {
                 delete pct;
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MangosSocket<SessionType, SocketName, Crypt>::iFlushPacketQueue m_PacketQueue->enqueue_head");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MangosSocket<SessionType, SocketName, Crypt>::iFlushPacketQueue m_packetQueue->enqueue_head");
                 return false;
             }
 

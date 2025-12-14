@@ -39,9 +39,6 @@ class Player;
 class Spell;
 class Unit;
 
-// Spell affects related declarations (accessed using SpellMgr functions)
-typedef std::map<uint32, uint64> SpellAffectMap;
-
 struct SpellProcEventEntry
 {
     uint32      schoolMask;
@@ -110,10 +107,11 @@ enum SpellTargetType
 {
     SPELL_TARGET_TYPE_GAMEOBJECT = 0,
     SPELL_TARGET_TYPE_CREATURE   = 1,
-    SPELL_TARGET_TYPE_DEAD       = 2
+    SPELL_TARGET_TYPE_DEAD       = 2,
+    SPELL_TARGET_TYPE_PLAYER     = 3
 };
 
-#define MAX_SPELL_TARGET_TYPE 3
+#define MAX_SPELL_TARGET_TYPE 4
 
 struct SpellTargetEntry
 {
@@ -364,15 +362,15 @@ class SpellMgr
             return rule;
         }
 
-        // Fin Spell Groups - ameliorations Nostalrius.
-        // Gestion de "Un sort plus puissant est deja actif"
-        bool ListMorePowerfullSpells(uint32 spellId, std::list<uint32>&) const;
-        bool ListLessPowerfullSpells(uint32 spellId, std::list<uint32>&) const;
+        // End of Spell Groups - Nostalrius improvements.
+        // Handling for "A more powerful spell is already active"
+        bool ListMorePowerfulSpells(uint32 spellId, std::vector<uint32>&) const;
+        bool ListLessPowerfulSpells(uint32 spellId, std::vector<uint32>&) const;
         /**
          * Assumes that both spells are in the given group.
          * Returns true if $powerfullSpell is actually the most powerfull spell.
          */
-        bool IsMorePowerfullSpell(uint32 powerfullSpell, uint32 otherSpell, SpellGroup group) const
+        bool IsMorePowerfulSpell(uint32 powerfullSpell, uint32 otherSpell, SpellGroup group) const
         {
             // The most powerfull spell appears after less powerfull spells in the list.
             for (const auto& itr : mSpellGroupSpell)
@@ -391,9 +389,6 @@ class SpellMgr
         // Spell affects
         uint64 GetSpellAffectMask(uint32 spellId, SpellEffectIndex effectId) const
         {
-            SpellAffectMap::const_iterator itr = mSpellAffectMap.find((spellId<<8) + effectId);
-            if (itr != mSpellAffectMap.end())
-                return itr->second;
             if (SpellEntry const* spellEntry = GetSpellEntry(spellId))
                 return spellEntry->EffectItemType[effectId];
             return 0;
@@ -682,7 +677,6 @@ class SpellMgr
         void LoadSpellLearnSkills();
         void LoadSpellLearnSpells();
         void LoadSpellScriptTarget();
-        void LoadSpellAffects();
         void LoadSpellElixirs();
         void LoadSpellProcEvents();
         void LoadSpellProcItemEnchant();
@@ -700,6 +694,7 @@ class SpellMgr
 
         // SpellEntry
         void LoadSpells();
+        void LoadSpell(Field* fields);
         void AssignInternalSpellFlags();
         SpellEntry const* GetSpellEntry(uint32 spellId) const { return spellId < GetMaxSpellId() ? mSpellEntryMap[spellId].get() : nullptr; }
         uint32 GetMaxSpellId() const { return mSpellEntryMap.size(); }
@@ -729,7 +724,6 @@ class SpellMgr
         SpellLearnSkillMap mSpellLearnSkills;
         SpellLearnSpellMap mSpellLearnSpells;
         SpellTargetPositionMap mSpellTargetPositions;
-        SpellAffectMap     mSpellAffectMap;
         SpellElixirMap     mSpellElixirs;
         SpellThreatMap     mSpellThreatMap;
         SpellProcEventMap  mSpellProcEventMap;

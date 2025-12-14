@@ -67,10 +67,10 @@ class ReactorRunnable : protected ACE_Task_Base
 {
 public:
     ReactorRunnable() :
-        m_Reactor(0),
-        m_Connections(0),
-        m_ThreadId(-1),
-        m_Interval(0)
+        m_reactor(0),
+        m_connections(0),
+        m_threadId(-1),
+        m_interval(0)
     {
         ACE_Reactor_Impl* imp = 0;
 
@@ -88,7 +88,7 @@ public:
 
 #endif
 
-        m_Reactor = new ACE_Reactor(imp, 1);
+        m_reactor = new ACE_Reactor(imp, 1);
     }
 
     virtual ~ReactorRunnable()
@@ -96,22 +96,22 @@ public:
         Stop();
         Wait();
 
-        delete m_Reactor;
+        delete m_reactor;
     }
 
     void Stop()
     {
-        m_Reactor->end_reactor_event_loop();
+        m_reactor->end_reactor_event_loop();
     }
 
     int Start(int interval)
     {
-        m_Interval = interval;
+        m_interval = interval;
 
-        if (m_ThreadId != -1)
+        if (m_threadId != -1)
             return -1;
 
-        return (m_ThreadId = activate());
+        return (m_threadId = activate());
     }
 
     void Wait()
@@ -121,48 +121,48 @@ public:
 
     long Connections()
     {
-        return m_Connections;
+        return m_connections;
     }
 
     int AddSocket(SocketType* sock)
     {
-        std::unique_lock<std::mutex> lock(m_NewSockets_Lock);
+        std::unique_lock<std::mutex> lock(m_newSocketsLock);
 
-        ++m_Connections;
+        ++m_connections;
         sock->AddReference();
-        sock->reactor(m_Reactor);
-        m_NewSockets.insert(sock);
+        sock->reactor(m_reactor);
+        m_newSockets.insert(sock);
 
         return 0;
     }
 
     ACE_Reactor* GetReactor()
     {
-        return m_Reactor;
+        return m_reactor;
     }
 
 protected:
     void AddNewSockets()
     {
-        std::unique_lock<std::mutex> lock(m_NewSockets_Lock);
+        std::unique_lock<std::mutex> lock(m_newSocketsLock);
 
-        if (m_NewSockets.empty())
+        if (m_newSockets.empty())
             return;
 
-        for (typename SocketSet::const_iterator i = m_NewSockets.begin(); i != m_NewSockets.end(); ++i)
+        for (typename SocketSet::const_iterator i = m_newSockets.begin(); i != m_newSockets.end(); ++i)
         {
             SocketType* sock = (*i);
 
             if (sock->IsClosed())
             {
                 sock->RemoveReference();
-                --m_Connections;
+                --m_connections;
             }
             else
-                m_Sockets.insert(sock);
+                m_sockets.insert(sock);
         }
 
-        m_NewSockets.clear();
+        m_newSockets.clear();
     }
 
     virtual int svc()
@@ -171,22 +171,22 @@ protected:
 
         WorldDatabase.ThreadStart();
 
-        MANGOS_ASSERT(m_Reactor);
+        MANGOS_ASSERT(m_reactor);
 
         typename SocketSet::iterator i, t;
 
-        while (!m_Reactor->reactor_event_loop_done())
+        while (!m_reactor->reactor_event_loop_done())
         {
             // dont be too smart to move this outside the loop
             // the run_reactor_event_loop will modify interval
-            ACE_Time_Value interval(0, m_Interval);
+            ACE_Time_Value interval(0, m_interval);
 
-            if (m_Reactor->run_reactor_event_loop(interval) == -1)
+            if (m_reactor->run_reactor_event_loop(interval) == -1)
                 break;
 
             AddNewSockets();
 
-            for (i = m_Sockets.begin(); i != m_Sockets.end();)
+            for (i = m_sockets.begin(); i != m_sockets.end();)
             {
                 if ((*i)->Update() == -1)
                 {
@@ -194,8 +194,8 @@ protected:
                     ++i;
                     (*t)->CloseSocket();
                     (*t)->RemoveReference();
-                    --m_Connections;
-                    m_Sockets.erase(t);
+                    --m_connections;
+                    m_sockets.erase(t);
                 }
                 else
                     ++i;
@@ -213,45 +213,47 @@ private:
     using AtomicInt = std::atomic<int>;
     typedef std::set<SocketType*> SocketSet;
 
-    ACE_Reactor* m_Reactor;
-    AtomicInt m_Connections;
-    int m_ThreadId;
-    int m_Interval;
+    ACE_Reactor* m_reactor;
+    AtomicInt m_connections;
+    int m_threadId;
+    int m_interval;
 
-    SocketSet m_Sockets;
+    SocketSet m_sockets;
 
-    SocketSet m_NewSockets;
-    std::mutex m_NewSockets_Lock;
+    SocketSet m_newSockets;
+    std::mutex m_newSocketsLock;
 };
 
 template <typename SocketType>
 MangosSocketMgr<SocketType>::MangosSocketMgr():
-    m_NetThreads(0),
-    m_NetThreadsCount(0),
-    m_SockOutKBuff(-1),
-    m_SockOutUBuff(65536),
-    m_UseNoDelay(true),
-    m_Interval(10000),
+    m_netThreads(0),
+    m_netThreadsCount(0),
+    m_sockOutKBuff(-1),
+    m_sockOutUBuff(65536),
+    m_useNoDelay(true),
+    m_interval(10000),
     m_port(0),
-    m_Acceptor(0)
+    m_acceptor(0)
 {
 }
 
 template <typename SocketType>
 MangosSocketMgr<SocketType>::~MangosSocketMgr()
 {
-    delete [] m_NetThreads;
-    delete m_Acceptor;
+    Wait();
+
+    delete [] m_netThreads;
+    delete m_acceptor;
 }
 
 template <typename SocketType>
 int MangosSocketMgr<SocketType>::StartThreadsIfNeeded()
 {
-    if (m_NetThreads)
+    if (m_netThreads)
         return 0;
-    m_NetThreads = new ReactorRunnable<SocketType>[m_NetThreadsCount];
-    for (size_t i = 0; i < m_NetThreadsCount; ++i)
-        m_NetThreads[i].Start(m_Interval);
+    m_netThreads = new ReactorRunnable<SocketType>[m_netThreadsCount];
+    for (size_t i = 0; i < m_netThreadsCount; ++i)
+        m_netThreads[i].Start(m_interval);
     return 0;
 }
 
@@ -263,17 +265,17 @@ int MangosSocketMgr<SocketType>::StartReactiveIO(ACE_UINT16 port, const char* ad
 
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Max allowed socket connections %d", ACE::max_handles());
 
-    if (m_SockOutUBuff <= 0)
+    if (m_sockOutUBuff <= 0)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Network.OutUBuff is wrong in your config file");
         return -1;
     }
 
-    m_Acceptor = new MangosSocketAcceptor<SocketType>();
+    m_acceptor = new MangosSocketAcceptor<SocketType>();
 
     ACE_INET_Addr listen_addr(port, address);
 
-    if (m_Acceptor->open(listen_addr, m_NetThreads[0].GetReactor(), ACE_NONBLOCK) == -1)
+    if (m_acceptor->open(listen_addr, m_netThreads[0].GetReactor(), ACE_NONBLOCK) == -1)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to open acceptor, check if the port is free");
         return -1;
@@ -297,28 +299,23 @@ int MangosSocketMgr<SocketType>::StartNetwork(ACE_UINT16 port, std::string& addr
 template <typename SocketType>
 void MangosSocketMgr<SocketType>::StopNetwork()
 {
-    if (m_Acceptor)
-        m_Acceptor->close();
+    if (m_acceptor)
+        m_acceptor->close();
 
-    if (m_NetThreadsCount != 0)
+    if (m_netThreadsCount != 0)
     {
-        for (size_t i = 0; i < m_NetThreadsCount; ++i)
-            m_NetThreads[i].Stop();
+        for (size_t i = 0; i < m_netThreadsCount; ++i)
+            m_netThreads[i].Stop();
     }
-
-    // Avoid hanging on shutdown on some unix systems.
-#ifdef _WIN32
-    Wait();
-#endif
 }
 
 template <typename SocketType>
 void MangosSocketMgr<SocketType>::Wait()
 {
-    if (m_NetThreadsCount != 0)
+    if (m_netThreadsCount != 0)
     {
-        for (size_t i = 0; i < m_NetThreadsCount; ++i)
-            m_NetThreads[i].Wait();
+        for (size_t i = 0; i < m_netThreadsCount; ++i)
+            m_netThreads[i].Wait();
     }
 }
 
@@ -326,9 +323,9 @@ template <typename SocketType>
 int MangosSocketMgr<SocketType>::OnSocketOpen(SocketType* sock)
 {
     // set some options here
-    if (m_SockOutKBuff >= 0)
+    if (m_sockOutKBuff >= 0)
     {
-        if (sock->peer().set_option(SOL_SOCKET, SO_SNDBUF, (void*)&m_SockOutKBuff, sizeof(int)) == -1 && errno != ENOTSUP)
+        if (sock->peer().set_option(SOL_SOCKET, SO_SNDBUF, (void*)&m_sockOutKBuff, sizeof(int)) == -1 && errno != ENOTSUP)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MangosSocketMgr<SocketType>::OnSocketOpen set_option SO_SNDBUF");
             return -1;
@@ -338,7 +335,7 @@ int MangosSocketMgr<SocketType>::OnSocketOpen(SocketType* sock)
     static const int ndoption = 1;
 
     // Set TCP_NODELAY.
-    if (m_UseNoDelay)
+    if (m_useNoDelay)
     {
         if (sock->peer().set_option(ACE_IPPROTO_TCP, TCP_NODELAY, (void*)&ndoption, sizeof(int)) == -1)
         {
@@ -347,18 +344,18 @@ int MangosSocketMgr<SocketType>::OnSocketOpen(SocketType* sock)
         }
     }
 
-    sock->m_OutBufferSize = static_cast<size_t>(m_SockOutUBuff);
+    sock->m_outBufferSize = static_cast<size_t>(m_sockOutUBuff);
 
     // we skip the Acceptor Thread
     size_t min = 1;
 
-    MANGOS_ASSERT(m_NetThreadsCount >= 1);
+    MANGOS_ASSERT(m_netThreadsCount >= 1);
 
-    for (size_t i = 1; i < m_NetThreadsCount; ++i)
-        if (m_NetThreads[i].Connections() < m_NetThreads[min].Connections())
+    for (size_t i = 1; i < m_netThreadsCount; ++i)
+        if (m_netThreads[i].Connections() < m_netThreads[min].Connections())
             min = i;
 
-    return m_NetThreads[min].AddSocket(sock);
+    return m_netThreads[min].AddSocket(sock);
 }
 
 template <typename SocketType>

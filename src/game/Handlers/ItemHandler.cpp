@@ -84,6 +84,7 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recv_data)
 
     if ((_player->IsBankPos(INVENTORY_SLOT_BAG_0, srcslot) || _player->IsBankPos(INVENTORY_SLOT_BAG_0, dstslot)) && !_player->CanUseBank())
     {
+        _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, nullptr, nullptr);
         ProcessAnticheatAction("ItemsCheck", "Attempt to cheat-bank items", CHEAT_ACTION_REPORT_GMS);
         return;
     }
@@ -139,6 +140,7 @@ void WorldSession::HandleSwapItem(WorldPacket& recv_data)
 
     if ((_player->IsBankPos(srcbag, srcslot) || _player->IsBankPos(dstbag, dstslot)) && !_player->CanUseBank())
     {
+        _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, nullptr, nullptr);
         ProcessAnticheatAction("ItemsCheck", "Attempt to cheat-bank items", CHEAT_ACTION_REPORT_GMS);
         return;
     }
@@ -182,7 +184,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recv_data)
         msg = _player->CanUnequipItem(dest, !pSrcItem->IsBag());
         if (msg != EQUIP_ERR_OK)
         {
-            _player->SendEquipError(msg, pDstItem, nullptr);
+            _player->SendEquipError(msg, pDstItem, pSrcItem);
             return;
         }
 
@@ -235,6 +237,9 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recv_data)
 
         _player->AutoUnequipOffhandIfNeed();
     }
+
+    if (Player::IsBagPos(dest))
+        _player->SendOpenContainer(pSrcItem->GetObjectGuid());
 }
 
 void WorldSession::HandleDestroyItemOpcode(WorldPacket& recv_data)
@@ -289,8 +294,8 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
     ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(item);
     if (pProto && (pProto->Discovered || (GetSecurity() > SEC_PLAYER)))
     {
-        std::string Name        = pProto->Name1;
-        std::string Description = pProto->Description;
+        char const* name        = pProto->Name1;
+        char const* description = pProto->Description;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
@@ -299,9 +304,9 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
             if (il)
             {
                 if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
-                    Name = il->Name[loc_idx];
+                    name = il->Name[loc_idx].c_str();
                 if (il->Description.size() > size_t(loc_idx) && !il->Description[loc_idx].empty())
-                    Description = il->Description[loc_idx];
+                    description = il->Description[loc_idx].c_str();
             }
         }
         // guess size
@@ -310,7 +315,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->Class;
         // client known only 0 subclass (and 1-2 obsolute subclasses)
         data << (pProto->Class == ITEM_CLASS_CONSUMABLE ? uint32(0) : pProto->SubClass);
-        data << Name;                                       // max length of any of 4 names: 256 bytes
+        data << name;                                       // max length of any of 4 names: 256 bytes
         data << uint8(0x00);                                //pProto->Name2; // blizz not send name there, just uint8(0x00); <-- \0 = empty string = empty name...
         data << uint8(0x00);                                //pProto->Name3; // blizz not send name there, just uint8(0x00);
         data << uint8(0x00);                                //pProto->Name4; // blizz not send name there, just uint8(0x00);
@@ -327,12 +332,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->RequiredSkill;
         data << pProto->RequiredSkillRank;
         data << pProto->RequiredSpell;
-        // Item de style insigne
-        if (pProto->Spells[0].SpellId != 0)
-            data << uint32(0);
-        else
-            data << pProto->RequiredHonorRank;
-
+        data << pProto->RequiredHonorRank;
         data << pProto->RequiredCityRank;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         data << pProto->RequiredReputationFaction;
@@ -407,7 +407,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
             }
         }
         data << pProto->Bonding;
-        data << Description;
+        data << description;
         data << pProto->PageText;
         data << pProto->LanguageID;
         data << pProto->PageMaterial;
@@ -419,22 +419,19 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->Block;
         data << pProto->ItemSet;
         data << pProto->MaxDurability;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         data << pProto->Area;
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-        data << pProto->Map;                                // Added in 1.12.x & 2.0.1 client branch
 #endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        data << pProto->Map;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << pProto->BagFamily;
+#endif
         SendPacket(&data);
     }
     else
     {
-        if (pProto && !pProto->Discovered)
-        {
-            std::stringstream oss;
-            oss << "Requested info for undiscovered item " << pProto->ItemId;
-            ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
-        }
-        
         WorldPacket data(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 4);
         data << uint32(item | 0x80000000);
         SendPacket(&data);
@@ -504,7 +501,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recv_data)
     }
 
     // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+    if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Item *pItem = _player->GetItemByGuid(itemGuid);
@@ -675,7 +672,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recv_data)
     }
 
     // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+    if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Item *pItem = _player->GetItemFromBuyBackSlot(slot);
@@ -775,7 +772,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
     }
 
     // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+    if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     // Stop the npc if moving
@@ -831,8 +828,19 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
 
                     // when no faction required but rank > 0 will be used faction id from the vendor faction template to compare the rank
                     if (!pProto->RequiredReputationFaction && pProto->RequiredReputationRank > 0 &&
-                            ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->GetFactionId()))
+                        ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->GetFactionId()))
                         continue;
+
+                    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                    // - Argent Dawn, Timbermaw, Zandalar and Arathi Basin vendors now show
+                    //   you their entire inventory regardless of current reputation, allowing
+                    //   players to peruse their full range of wares.The items in question
+                    //   now require the appropriate reputation level to make use of them.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+                    if (pProto->RequiredReputationFaction && pProto->RequiredReputationRank > 0 &&
+                        ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pProto->RequiredReputationFaction))
+                        continue;
+#endif
 
                     if (crItem->conditionId && !IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
                         continue;
@@ -850,6 +858,9 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
                 data << uint32(price);
                 data << uint32(pProto->MaxDurability);
                 data << uint32(pProto->BuyCount);
+
+                if (count >= MAX_VENDOR_ITEMS)
+                    break;
             }
         }
     }
@@ -884,7 +895,10 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recv_data)
     if (_player->IsBankPos(srcbag, srcslot) || (dstbag >= BANK_SLOT_BAG_START && dstbag < BANK_SLOT_BAG_END))
     {
         if (!_player->CanUseBank())
+        {
+            _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, pItem, nullptr);
             return;
+        }
     }
 
     uint16 src = pItem->GetPos();
@@ -997,7 +1011,10 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket& recvPacket)
         return;
 
     if (!_player->CanUseBank())
+    {
+        _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, pItem, nullptr);
         return;
+    }
 
     ItemPosCountVec dest;
     InventoryResult msg = _player->CanBankItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
@@ -1029,7 +1046,10 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
         return;
 
     if (!_player->CanUseBank())
+    {
+        _player->SendEquipError(EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK, pItem, nullptr);
         return;
+    }
 
     if (_player->IsBankPos(srcbag, srcslot))                // moving from bank to inventory
     {
@@ -1088,12 +1108,13 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recv_data)
 
 void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid playerGuid, ObjectGuid itemGuid, uint32 slot, uint32 duration)
 {
-    // last check 2.0.10
     WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8 + 4 + 4 + 8));
     data << ObjectGuid(itemGuid);
     data << uint32(slot);
     data << uint32(duration);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     data << ObjectGuid(playerGuid);
+#endif
     SendPacket(&data);
 }
 
@@ -1106,8 +1127,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recv_data)
     ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(itemid);
     if (pProto)
     {
-        std::string Name;
-        Name = pProto->Name1;
+        char const* name = pProto->Name1;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
@@ -1116,13 +1136,15 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recv_data)
             if (il)
             {
                 if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
-                    Name = il->Name[loc_idx];
+                    name = il->Name[loc_idx].c_str();
             }
         }
-        // guess size
-        WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4 + 10));
+        
+        size_t const nameLen = strlen(name) + 1;
+
+        WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4 + nameLen));
         data << uint32(pProto->ItemId);
-        data << Name;
+        data.append(name, nameLen);
         //data << uint32(pProto->InventoryType);    [-ZERO]
         SendPacket(&data);
         return;

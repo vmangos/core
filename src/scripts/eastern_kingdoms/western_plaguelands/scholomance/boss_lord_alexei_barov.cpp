@@ -24,7 +24,7 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "scholomance.h"
 
-#define SPELL_IMMOLATE             20294                    // Old ID  was 15570
+#define SPELL_IMMOLATE             15570
 #define SPELL_VEILOFSHADOW         17820
 
 struct boss_lordalexeibarovAI : public ScriptedAI

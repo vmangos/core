@@ -29,12 +29,19 @@ namespace VMAP
     class GroupModel;
     class VMapManager2;
 
+    struct GroupLocationInfo
+    {
+        GroupModel const* hitModel = nullptr;
+        int32 rootId = -1;
+    };
+
     struct LocationInfo
     {
-        LocationInfo() : hitInstance(nullptr), hitModel(nullptr), ground_Z(-G3D::inf()) {};
-        const ModelInstance* hitInstance;
+        LocationInfo() : hitInstance(nullptr), hitModel(nullptr), ground_Z(-G3D::inf()), rootId(-1) {};
+        ModelInstance const* hitInstance;
         GroupModel const* hitModel;
         float ground_Z;
+        int32 rootId;
     };
 
     class StaticMapTree

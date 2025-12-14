@@ -2287,6 +2287,9 @@ dtStatus dtNavMeshQuery::getPortalPoints(dtPolyRef from, const dtPoly* fromPoly,
 		}
 		return DT_FAILURE | DT_INVALID_PARAM;
 	}
+
+	if (fromPoly->vertCount == 0)
+		return DT_FAILURE | DT_INVALID_PARAM;
 	
 	// Find portal vertices.
 	const int v0 = fromPoly->verts[link->edge];

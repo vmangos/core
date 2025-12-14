@@ -43,14 +43,14 @@ class SpellEntry;
 class ThreatCalcHelper
 {
     public:
-        static float CalcThreat(Unit* pHatedUnit, Unit* pHatingUnit, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* threatSpell);
+        static float CalcThreat(Unit* pHatedUnit, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* threatSpell);
 };
 
 //==============================================================
 class HostileReference : public Reference<Unit, ThreatManager>
 {
     public:
-        HostileReference(Unit* pUnit, ThreatManager *pThreatManager, float pThreat);
+        HostileReference(Unit* pUnit, ThreatManager *pThreatManager, float threat);
 
         //=================================================
         void addThreat(float pMod);
@@ -99,8 +99,10 @@ class HostileReference : public Reference<Unit, ThreatManager>
 
         //=================================================
 
+        // enemy target on the threat list
         ObjectGuid const& getUnitGuid() const { return iUnitGuid; }
 
+        // the creature that owns the threat list
         Unit* getSourceUnit();
 
         //=================================================
@@ -154,7 +156,7 @@ public:
     ThreatContainer() { iDirty = false; }
     ~ThreatContainer() { clearReferences(); }
 
-    HostileReference* addThreat(Unit* pVictim, float pThreat);
+    HostileReference* addThreat(Unit* pVictim, float threat);
 
     void modifyThreatPercent(Unit* pVictim, int32 percent);
 
@@ -190,7 +192,7 @@ public:
     void addThreat(Unit* pVictim, float threat) { addThreat(pVictim, threat, false, SPELL_SCHOOL_MASK_NONE, nullptr, false); }
 
     // add threat as raw value (ignore redirections and expection all mods applied already to it
-    void addThreatDirectly(Unit* pVictim, float threat);
+    void addThreatDirectly(Unit* pVictim, float threat, bool noNew = false);
 
     void modifyThreatPercent(Unit* pVictim, int32 pPercent);
 

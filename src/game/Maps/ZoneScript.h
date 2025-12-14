@@ -40,13 +40,13 @@ uint8 const CapturePointArtKit[3] = {2, 1, 21};
 
 enum ObjectiveStates
 {
-    OBJECTIVESTATE_NEUTRAL = 0,
-    OBJECTIVESTATE_ALLIANCE,
-    OBJECTIVESTATE_HORDE,
-    OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE,
-    OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE,
-    OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE,
-    OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE,
+    OBJECTIVESTATE_NEUTRAL = 0,                 // Slider is centered (grey)
+    OBJECTIVESTATE_ALLIANCE_CONTESTED,          // Slider moves from middle (grey) to blue
+    OBJECTIVESTATE_HORDE_CONTESTED,             // Slider moves from middle (grey) to red
+    OBJECTIVESTATE_ALLIANCE_PROGRESSING,        // Slider reached blue and moves on towards blue
+    OBJECTIVESTATE_HORDE_PROGRESSING,           // Slider reached red and moves on towards red
+    OBJECTIVESTATE_ALLIANCE,                    // Slider is at max blue
+    OBJECTIVESTATE_HORDE,                       // Slider is at max red
 };
 
 #define OTHER_TEAM(a) (a == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE)
@@ -104,9 +104,6 @@ class OPvPCapturePoint
 
         // send world state update to all players present
         void SendUpdateWorldState(uint32 field, uint32 value);
-
-        // send kill notify to players in the controlling faction
-        void SendObjectiveComplete(uint32 id, uint64 guid);
 
         // used when player is activated/inactivated in the area
         virtual bool HandlePlayerEnter(Player* plr);
@@ -252,7 +249,7 @@ class ZoneScript
         virtual void OnUnitDeath(Unit* /*pKiller*/, Unit* /*pVictim*/, SpellEntry const* /*spellProto*/) {}
     protected:
 
-        PlayerSet m_players[2];
+        ObjectGuidSet m_players[2];
         Map* m_pMap;
 
         // world state stuff

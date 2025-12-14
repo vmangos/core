@@ -29,6 +29,8 @@
 #include <string>
 #include <vector>
 
+#include "Crypto/Hash/MD5.h"
+
 #pragma pack(push, 1)
 struct ChallengeResponseEntry
 {
@@ -48,9 +50,9 @@ private:
 
 public:
     // windows module
-    WardenModule(std::string const &binary, std::string const &key, std::string const &cr);
+    WardenModule(std::string const& binary, std::string const& key, std::string const& cr);
 
-    WardenModule(WardenModule &&other) = default;
+    WardenModule(WardenModule&& other) = default;
 
     // true when this module is for windows (otherwise it is for Mac x86)
     bool Windows() const;
@@ -62,7 +64,7 @@ public:
     std::vector<uint8> key;
 
     // md5 hash of 'm_binary'
-    std::vector<uint8> hash;
+    Crypto::Hash::MD5::Digest hash;
 
     // offset into module of the memory reading function which is modified by some hacks
     std::uint32_t memoryRead;
@@ -72,6 +74,9 @@ public:
 
     // mapping of scan function to the numerical value of the opcode
     uint8_t opcodes[ScanTypeCount];
+
+    // invalid opcode value that signifies scans are over
+    uint8 scanTerminator;
 
     // pregenerated challenge, responses, and encryption keys for this module
     std::vector<ChallengeResponseEntry> crk;

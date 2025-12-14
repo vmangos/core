@@ -27,15 +27,18 @@
 
 class Petition;
 
+#define GUILD_EVENTLOG_MAX_RECORDS  100
 #define GUILD_RANKS_MIN_COUNT   5
 #define GUILD_RANKS_MAX_COUNT   10
 
 enum
 {
+    GUILD_RANK_MAX_LENGTH       = 15,
+    GUILD_NAME_MAX_LENGTH       = 24,
     GUILD_NOTE_MAX_LENGTH       = 31,
     GUILD_INFO_MAX_LENGTH       = 500,
     GUILD_MOTD_MAX_LENGTH       = 128,
-    GUILD_ROSTER_MAX_LENGTH     = 0x8000, // max packet size accepted by client
+    GUILD_ROSTER_MAX_LENGTH     = 0x8000 - 4, // max packet size accepted by client - packet header size
 };
 
 enum GuildDefaultRanks
@@ -127,10 +130,17 @@ enum GuildEvents
     GE_LEADER_CHANGED               = 0x07,
     GE_DISBANDED                    = 0x08,
     GE_TABARDCHANGE                 = 0x09,
-    GE_UNK1                         = 0x0A,                 // string, string EVENT_GUILD_ROSTER_UPDATE tab content change?
-    GE_UNK2                         = 0x0B,                 // EVENT_GUILD_ROSTER_UPDATE
+    GE_UPDATE_RANK_NAME             = 0x0A,                 // Arg1: RankID, Arg2: NewRankName
+    GE_UPDATE_ROSTER                = 0x0B,                 // EVENT_GUILD_ROSTER_UPDATE
     GE_SIGNED_ON                    = 0x0C,                 // ERR_FRIEND_ONLINE_SS
     GE_SIGNED_OFF                   = 0x0D,                 // ERR_FRIEND_OFFLINE_S
+};
+
+enum GuildRosterFlags
+{
+    GRF_ONLINE                      = 0x01,
+    GRF_AFK                         = 0x02,
+    GRF_DND                         = 0x04
 };
 
 enum PetitionSigns
@@ -152,6 +162,27 @@ enum GuildEventLogTypes
     GUILD_EVENT_LOG_UNINVITE_PLAYER   = 5,
     GUILD_EVENT_LOG_LEAVE_GUILD       = 6,
 };
+
+inline char const* GuildEventLogTypeToString(uint8 type)
+{
+    switch (type)
+    {
+        case GUILD_EVENT_LOG_INVITE_PLAYER:
+            return "Invite";
+        case GUILD_EVENT_LOG_JOIN_GUILD:
+            return "Join";
+        case GUILD_EVENT_LOG_PROMOTE_PLAYER:
+            return "Promote";
+        case GUILD_EVENT_LOG_DEMOTE_PLAYER:
+            return "Demote";
+        case GUILD_EVENT_LOG_UNINVITE_PLAYER:
+            return "Uninvite";
+        case GUILD_EVENT_LOG_LEAVE_GUILD:
+            return "Leave";
+    }
+    return "UNKNOWN";
+}
+
 
 enum GuildEmblem
 {
@@ -235,7 +266,7 @@ class Guild
         int32 GetBackgroundColor() const { return m_BackgroundColor; }
 
         void SetLeader(ObjectGuid guid);
-        GuildAddStatus AddMember(ObjectGuid plGuid, uint32 plRank);
+        GuildAddStatus AddMember(ObjectGuid plGuid, uint32 plRank, uint32 petitionId = 0);
         bool DelMember(ObjectGuid guid, bool isDisbanding = false);
         //lowest rank is the count of ranks - 1 (the highest rank_id in table)
         uint32 GetLowestRank() const { return m_Ranks.size() - 1; }
@@ -247,13 +278,13 @@ class Guild
         uint32 GetMemberSize() const { return members.size(); }
         uint32 GetAccountsNumber();
 
-        bool LoadGuildFromDB(QueryResult* guildDataResult);
+        bool LoadGuildFromDB(const std::unique_ptr<QueryResult>& guildDataResult);
         bool CheckGuildStructure();
-        bool LoadRanksFromDB(QueryResult* guildRanksResult);
-        bool LoadMembersFromDB(QueryResult* guildMembersResult);
+        bool LoadRanksFromDB(const std::unique_ptr<QueryResult>& guildRanksResult);
+        bool LoadMembersFromDB(const std::unique_ptr<QueryResult>& guildMembersResult);
 
-        void BroadcastToGuild(WorldSession* session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
-        void BroadcastToOfficers(WorldSession* session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastToGuild(WorldSession* session, char const* msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastToOfficers(WorldSession* session, char const* msg, uint32 language = LANG_UNIVERSAL);
         void BroadcastPacketToRank(WorldPacket* packet, uint32 rankId);
         void BroadcastPacket(WorldPacket* packet);
 
@@ -313,6 +344,7 @@ class Guild
         void   LoadGuildEventLogFromDB();
         void   DisplayGuildEventLog(WorldSession* session);
         void   LogGuildEvent(uint8 eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
+        std::list<GuildEventLogEntry> const& GetGuildEventLog() const { return m_GuildEventLog; }
         ObjectGuid GetGuildInviter(ObjectGuid playerGuid) const;
 
     protected:
@@ -339,9 +371,7 @@ class Guild
         MemberList members;
 
         /** These are actually ordered lists. The first element is the oldest entry.*/
-        typedef std::list<GuildEventLogEntry> GuildEventLog;
-        GuildEventLog m_GuildEventLog;
-
+        std::list<GuildEventLogEntry> m_GuildEventLog;
         uint32 m_GuildEventLogNextGuid;
 
     private:

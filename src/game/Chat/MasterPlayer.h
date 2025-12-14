@@ -38,7 +38,7 @@ public:
 
     // CHAT SYSTEM
     void UpdateSpeakTime();
-    void Whisper(std::string const& text, uint32 language, MasterPlayer* receiver);
+    void Whisper(char const* text, uint32 language, MasterPlayer* receiver);
     void ToggleDND();
     void ToggleAFK();
     void JoinedChannel(Channel *c);
@@ -48,10 +48,10 @@ public:
     // SOCIAL SYSTEM
     PlayerSocial* GetSocial() const { return m_social; }
     void SetSocial(PlayerSocial* s) { m_social = s; }
-    void LoadSocial(QueryResult* result);
+    void LoadSocial(std::unique_ptr<QueryResult> result);
 
     // ACTIONS SYSTEM
-    void LoadActions(QueryResult* result);
+    void LoadActions(std::unique_ptr<QueryResult> result);
     void SaveActions();
     ActionButtonList& GetActionButtons() { return m_actionButtons; }
     void SendInitialActionButtons() const;
@@ -59,8 +59,8 @@ public:
     void removeActionButton(uint8 button);
 
     // MAIL SYSTEM
-    void LoadMailedItems(QueryResult* result);
-    void LoadMails(QueryResult* result);
+    void LoadMailedItems(std::unique_ptr<QueryResult> result);
+    void LoadMails(std::unique_ptr<QueryResult> result);
     void SaveMails();
     void UpdateNextMailTimeAndUnreads();
     void AddNewMailDeliverTime(time_t deliver_time);
@@ -139,7 +139,7 @@ public:
     // GM system variables
     uint8 m_gmInvisibilityLevel;
     uint32 m_ExtraFlags;
-    std::set<ObjectGuid> m_allowedWhispers;
+    std::unordered_set<ObjectGuid> m_allowedWhispers;
 
     // TODO: Group ?
 

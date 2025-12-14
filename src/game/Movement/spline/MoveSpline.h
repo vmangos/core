@@ -68,6 +68,7 @@ namespace Movement
 
             void init_spline(MoveSplineInitArgs const& args);
             UpdateResult _updateState(int32& ms_time_diff);
+            Location ComputePosition(int32 lastIndex, int32 desiredTime) const;
 
         public:
 
@@ -107,6 +108,7 @@ namespace Movement
             }
 
             Location ComputePosition() const;
+            Location ComputePositionAfterTime(int32 duration) const;
 
             uint32 GetId() const { return m_Id;}
             bool Finalized() const { return splineflags.done; }

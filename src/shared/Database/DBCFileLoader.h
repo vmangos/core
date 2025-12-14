@@ -91,7 +91,7 @@ class DBCFileLoader
 
         // Get record by id
         Record getRecord(size_t id);
-        /// Get begin iterator over records
+        // Get begin iterator over records
 
         uint32 GetNumRows() const { return recordCount;}
         uint32 GetCols() const { return fieldCount; }

@@ -348,75 +348,9 @@ bool EffectDummyCreature_npc_snufflenose_gopher(WorldObject* pCaster, uint32 uiS
     return false;
 }
 
-enum
-{
-    SPELL_DEFENSIVE_STANCE       =   7164,
-    SPELL_IMPROVED_BLOCKING      =   3248,
-    SPELL_SHIELD_BASH            =   11972,
-
-};
-
-struct RazorfenDefenderAI : public ScriptedAI
-{
-    RazorfenDefenderAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 m_uiImprovedBlocking_Timer;
-    uint32 m_uiShieldBash_Timer;
-
-    void Reset() override
-    {
-        m_uiImprovedBlocking_Timer = 1000;
-        m_uiShieldBash_Timer      = 6600;
-        DoCastSpellIfCan(m_creature, SPELL_DEFENSIVE_STANCE, true);
-    }
-
-    void Aggro(Unit* pWho) override
-    {
-        m_creature->SetInCombatWithZone();
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (m_uiShieldBash_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH) == CAST_OK)
-                m_uiShieldBash_Timer = 8100;
-        }
-        else
-            m_uiShieldBash_Timer -= uiDiff;
-
-        if (m_uiImprovedBlocking_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_IMPROVED_BLOCKING, true) == CAST_OK)
-                m_uiImprovedBlocking_Timer = urand(6000, 9000);
-        }
-        else
-            m_uiImprovedBlocking_Timer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_RazorfenDefenderAI(Creature* pCreature)
-{
-    return new RazorfenDefenderAI(pCreature);
-}
-
 void AddSC_razorfen_kraul()
 {
     Script* pNewScript;
-
-    pNewScript = new Script;
-    pNewScript->Name = "razorfen_defender";
-    pNewScript->GetAI = &GetAI_RazorfenDefenderAI;
-    pNewScript->RegisterSelf();
-
 
     pNewScript = new Script;
     pNewScript->Name = "npc_willix_the_importer";

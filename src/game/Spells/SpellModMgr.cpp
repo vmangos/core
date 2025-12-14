@@ -45,6 +45,12 @@ SpellModMgr::~SpellModMgr()
 SQL : cf sql/nostalrius/spell_mod.sql et sql/nostalrius/spell_effect_mod.sql
 */
 
+inline void ModUInt64ValueIfExplicit(Field &f, uint64& value)
+{
+    if (f.GetInt64() >= 0)
+        value = f.GetUInt64();
+}
+
 inline void ModUInt32ValueIfExplicit(Field &f, uint32& value)
 {
     if (f.GetInt32() >= 0)
@@ -188,13 +194,13 @@ void SpellModMgr::LoadSpellMods()
 
     // 2 : Table spell_effect_mod
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading spell effect mods ...");
-    result.reset(WorldDatabase.Query(
+    result = WorldDatabase.Query(
                  "SELECT Id, EffectIndex, Effect, EffectApplyAuraName, EffectMechanic, EffectImplicitTargetA, EffectImplicitTargetB, "
                  "EffectRadiusIndex, EffectItemType, EffectMiscValue, EffectTriggerSpell, "
                  "EffectDieSides, EffectBaseDice, EffectBasePoints, EffectAmplitude, EffectChainTarget, " // Int
                  "EffectDicePerLevel, EffectRealPointsPerLevel, EffectPointsPerComboPoint, EffectMultipleValue " // Float
                  "FROM spell_effect_mod"
-                ));
+                );
     total_count = 0;
 
     if (!result)
@@ -238,7 +244,7 @@ void SpellModMgr::LoadSpellMods()
             // 7                  8               9                10
             // EffectRadiusIndex, EffectItemType, EffectMiscValue, EffectTriggerSpell
             ModUInt32ValueIfExplicit(fields[7], spell->EffectRadiusIndex[effect_idx]);
-            ModUInt32ValueIfExplicit(fields[8], spell->EffectItemType[effect_idx]);
+            ModUInt64ValueIfExplicit(fields[8], spell->EffectItemType[effect_idx]);
             ModInt32ValueIfExplicit(fields[9], spell->EffectMiscValue[effect_idx]);
             ModUInt32ValueIfExplicit(fields[10], spell->EffectTriggerSpell[effect_idx]);
 

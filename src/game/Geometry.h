@@ -92,14 +92,27 @@ namespace Geometry
         MaNGOS::NormalizeMapCoord(y);
     }
 
-    inline float ClampOrientation(float o)
+    // modulos a radian orientation to the range of 0..2PI
+    inline float NormalizeOrientation(float o)
     {
-        while (o > M_PI_F * 2.0f)
-            o -= M_PI_F * 2.0f;
-        while (o < 0.0f)
-            o += M_PI_F * 2.0f;
-        return o;
+        // fmod only supports positive numbers. Thus we have
+        // to emulate negative numbers
+        if (o < 0)
+        {
+            float mod = o *-1;
+            mod = fmod(mod, 2.0f*M_PI_F);
+            mod = -mod + 2.0f*M_PI_F;
+            return mod;
+        }
+        return fmod(o, 2.0f*M_PI_F);
     }
+
+    template<class A, class B>
+    inline bool IsPointLeftOfLine(A lineStart, A lineEnd, B point)
+    {
+        return (lineEnd.x - lineStart.x) * (point.y - lineStart.y) - (lineEnd.y - lineStart.y) * (point.x - lineStart.x) > 0;
+    }
+
 }
 
 #endif

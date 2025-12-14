@@ -39,17 +39,17 @@ enum
     NPC_VENGEFUL_PHANTOM        = 10387,
     NPC_THE_UNFORGIVEN          = 10516,
 
-    RIVENDARE_YELL_45MIN        = -1000020,
-    RIVENDARE_YELL_10MIN        = -1000021,
-    RIVENDARE_YELL_5MIN         = -1000022,
-    YSIDA_YELL_5MIN             = -1000023,
-    RIVENDARE_YELL_FAILED       = -1000024,
-    RIVENDARE_YELL_RAMMSTEIN    = -1000025,
-    RAMMSTEIN_YELL_SPAWN        = -1000026,
-    BLACKGUARD_YELL_SPAWN       = -1000027,
-    RIVENDARE_YELL_READY        = -1000028,
-    YSIDA_YELL_FAILED           = -1000029,
-    YSIDA_SAY_REWARD            = -1000030,
+    RIVENDARE_YELL_45MIN        = 11812,
+    RIVENDARE_YELL_10MIN        = 11813,
+    RIVENDARE_YELL_5MIN         = 11815,
+    YSIDA_YELL_5MIN             = 11816,
+    RIVENDARE_YELL_FAILED       = 11814,
+    RIVENDARE_YELL_RAMMSTEIN    = 6398,
+    RAMMSTEIN_YELL_SPAWN        = 6425,
+    BLACKGUARD_YELL_SPAWN       = 6415,
+    RIVENDARE_YELL_READY        = 6401,
+    YSIDA_YELL_FAILED           = 11817,
+    YSIDA_SAY_REWARD            = 11931,
 
     SPELL_YSIDA_FREED           = 27773
 };
@@ -194,7 +194,7 @@ struct instance_stratholme : public ScriptedInstance
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Cannot open slaugther square yet.");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Cannot open slaugther square yet.");
             return false;
         }
     }
@@ -382,7 +382,7 @@ struct instance_stratholme : public ScriptedInstance
                             break;
                         m_uiBaronRun_Timer = 45*MINUTE*IN_MILLISECONDS;
                         m_phaseBaron = 0;
-                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Baron run in progress.");
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Baron run in progress.");
                         if (Creature* pYsidaT = instance->GetCreature(m_uiYsidaTriggerGUID))
                             pYsidaT->SummonCreature(NPC_YSIDA,
                                                     4044.163f, -3334.2f, 115.0596f, 4.2f,
@@ -472,7 +472,7 @@ struct instance_stratholme : public ScriptedInstance
                         SummonRamstein();
                     }
                     else
-                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: %u Abomnation left to kill.", uiCount);
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: %u Abomnation left to kill.", uiCount);
                     m_summoningRammstein = false;
                 }
                 if (uiData == DONE) // on ramstein death OK
@@ -496,7 +496,7 @@ struct instance_stratholme : public ScriptedInstance
                     }
                     //UpdateGoState(m_uiZiggurat4GUID,GO_STATE_ACTIVE,false);
                     m_uiSlaugtherSquare_Timer = 60000;
-                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Slaugther event will continue in 60 sec.");
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Slaugther event will continue in 60 sec.");
                 }
                 if (uiData == FAIL) // on mob Evade // on ramstein evade
                 {
@@ -528,8 +528,7 @@ struct instance_stratholme : public ScriptedInstance
 
                         if (!players.isEmpty())
                         {
-                            std::list<uint32> baronSpells;
-                            std::list<uint32>::iterator spells_itr;
+                            std::vector<uint32> baronSpells;
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_45MIN);
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_10MIN);
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_5MIN);
@@ -539,12 +538,14 @@ struct instance_stratholme : public ScriptedInstance
                             {
                                 if (Player* pPlayer = itr.getSource())
                                 {
-                                    for (spells_itr = baronSpells.begin(); spells_itr != baronSpells.end(); ++spells_itr)
-                                        if (pPlayer->HasAura(*spells_itr))
-                                            pPlayer->RemoveAurasDueToSpell(*spells_itr);
+                                    for (auto spellId : baronSpells)
+                                    {
+                                        if (pPlayer->HasAura(spellId))
+                                            pPlayer->RemoveAurasDueToSpell(spellId);
+                                    }
 
                                     if (pPlayer->GetQuestStatus(QUEST_DEAD_MAN_PLEA) == QUEST_STATUS_INCOMPLETE)
-                                        pPlayer->AreaExploredOrEventHappens(QUEST_DEAD_MAN_PLEA);
+                                        pPlayer->KilledMonsterCredit(NPC_YSIDA, m_uiYsidaGUID);
                                 }
                             }
                         }
@@ -768,7 +769,7 @@ struct instance_stratholme : public ScriptedInstance
                 m_uiGateTrapTimers[i][0] -= uiDiff;
                 if (m_uiGateTrapTimers[i][0] <= uiDiff)
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SD2: Instance Stratholme - Rat Trap reseted %u.", i);
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "SD2: Instance Stratholme - Rat Trap reseted %u.", i);
                     m_uiGateTrapTimers[i][0] = 0;
                 }
             }
@@ -892,7 +893,7 @@ struct instance_stratholme : public ScriptedInstance
                     pYsida->CastSpell(pYsida, 5, true); // deathtouch
                 }
 
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Baron run event reached end. Event has state %u.", GetData(TYPE_BARON_RUN));
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Baron run event reached end. Event has state %u.", GetData(TYPE_BARON_RUN));
             }
             else
                 m_uiBaronRun_Timer -= uiDiff;
@@ -939,7 +940,7 @@ struct instance_stratholme : public ScriptedInstance
                         UpdateGoState(m_uiZiggurat5GUID, GO_STATE_ACTIVE, false);
                         pBaron->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
 
-                        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Black guard sentries spawned. Opening gates to baron.");
+                        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Black guard sentries spawned. Opening gates to baron.");
                     }
                 }
                 m_uiSlaugtherSquare_Timer = 0;
@@ -979,7 +980,7 @@ struct instance_stratholme : public ScriptedInstance
             pRamstein->GetMotionMaster()->MovePoint(0, 4033.009f, -3404.3293f, 115.3554f);
             pRamstein->SetHomePosition(4033.009f, -3404.3293f, 115.3554f, 4.788970f);
             SetData(TYPE_RAMSTEIN_EVENT, DONE);
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Stratholme: Ramstein spawned.");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Instance Stratholme: Ramstein spawned.");
         }
     }
     void DoGateTrap(uint8 uiGate)
@@ -988,7 +989,7 @@ struct instance_stratholme : public ScriptedInstance
         if (m_uiGateTrapTimers[uiGate][0])
             return;
 
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SD2: Instance Stratholme - Rat Trap activated %i.", uiGate);
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "SD2: Instance Stratholme - Rat Trap activated %i.", uiGate);
         // close the gates
         DoUseDoorOrButton(m_ratTrapGateGUID[2 * uiGate]);
         DoUseDoorOrButton(m_ratTrapGateGUID[2 * uiGate + 1]);

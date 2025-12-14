@@ -25,6 +25,7 @@
 #include "Common.h"
 #include "Duration.h"
 
+#include <cctype>
 #include <string>
 #include <vector>
 
@@ -63,6 +64,7 @@ uint32 GetUInt32ValueFromArray(Tokens const& data, uint16 index);
 float GetFloatValueFromArray(Tokens const& data, uint16 index);
 
 void stripLineInvisibleChars(std::string &src);
+void stripLineInvisibleChars(char* str);
 
 std::string secsToTimeString(time_t timeInSecs, bool shortText = false, bool hoursOnly = false);
 uint32 TimeStringToSecs(std::string const& timestring);
@@ -334,12 +336,18 @@ inline bool isLeapYear(int year)
 
 inline void strToUpper(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), toupper);
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c)
+    {
+        return std::toupper(c);
+    });
 }
 
 inline void strToLower(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), tolower);
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c)
+    {
+        return std::tolower(c);
+    });
 }
 
 inline wchar_t wcharToUpper(wchar_t wchar)
@@ -433,5 +441,16 @@ inline uint32 BatchifyTimer(uint32 timer, uint32 interval)
 typedef char const*(*ValueToStringFunc) (uint32 value);
 
 std::string FlagsToString(uint32 flags, ValueToStringFunc getNameFunc);
+
+inline float GetLambda(float startIndex, float endIndex, float currentIndex)
+{
+    return (currentIndex - startIndex) / (endIndex - startIndex);
+}
+
+inline float InterpolateValueAtIndex(float startIndex, float startValue, float endIndex, float endValue, float currentIndex)
+{
+    return startValue + GetLambda(startIndex, endIndex, currentIndex) * (endValue - startValue);
+}
+
 
 #endif

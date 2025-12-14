@@ -350,11 +350,39 @@ InstanceData* GetInstanceData_instance_shadowfang_keep(Map* pMap)
     return new instance_shadowfang_keep(pMap);
 }
 
+// 7057 - Haunting Spirits
+struct HauntingSpiritsScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply && aura->GetEffIndex() == EFFECT_INDEX_0)
+            aura->SetPeriodicTimer(5 * IN_MILLISECONDS);
+    }
+
+    void OnPeriodicDummy(Aura* aura) final
+    {
+        if (roll_chance_i(5)) // 5% chance every tick
+        {
+            aura->GetTarget()->CastSpell(aura->GetTarget(), 7067, true); // Summon Haunting Spirit
+        }
+    }
+};
+
+AuraScript* GetScript_HauntingSpirits(SpellEntry const*)
+{
+    return new HauntingSpiritsScript();
+}
+
 void AddSC_instance_shadowfang_keep()
 {
     Script* newscript;
     newscript = new Script;
     newscript->Name = "instance_shadowfang_keep";
     newscript->GetInstanceData = &GetInstanceData_instance_shadowfang_keep;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_haunting_spirits";
+    newscript->GetAuraScript = &GetScript_HauntingSpirits;
     newscript->RegisterSelf();
 }

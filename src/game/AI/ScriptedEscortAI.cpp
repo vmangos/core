@@ -15,6 +15,7 @@ EndScriptData */
 #include "MovementGenerator.h"
 #include "Player.h"
 #include "Group.h"
+#include "Map.h"
 
 float const DEFAULT_MAX_PLAYER_DISTANCE = 100.0f;
 float const DEFAULT_MAX_ASSIST_DISTANCE =  40.0f;
@@ -92,7 +93,7 @@ bool npc_escortAI::AssistPlayerInCombat(Unit* pWho)
     if (!m_creature->CanAssistPlayers())
         return false;
 
-    if (m_creature->HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_FEIGN_DEATH))
+    if (m_creature->HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_FEIGN_DEATH))
         return false;
 
     //not a player

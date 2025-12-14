@@ -14,22 +14,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Ebonroc
-SD%Complete: 90
-SDComment: Thrash is missing
-SDCategory: Blackwing Lair
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
 
-enum
+enum Ebonroc : uint32
 {
-    SPELL_SHADOW_FLAME          = 22539,
-    SPELL_WING_BUFFET           = 23339,
-    SPELL_SHADOW_OF_EBONROC     = 23340,
-    SPELL_THRASH                = 3391,                     // TODO missing
+    SPELL_SHADOW_FLAME      = 22539,
+    SPELL_WING_BUFFET       = 23339,
+    SPELL_SHADOW_OF_EBONROC = 23340,
+    SPELL_THRASH            = 3391,
 };
 
 struct boss_ebonrocAI : public ScriptedAI

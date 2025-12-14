@@ -178,8 +178,8 @@ class BIH
                 while (true)
                 {
                     uint32 tn = tree[node];
-                    uint32 axis = (tn & (3 << 30)) >> 30;
-                    bool const BVH2 = (tn & (1 << 29)) != 0;
+                    uint32 axis = (tn >> 30) & 3;
+                    bool const BVH2 = tn & (1 << 29);
                     int offset = tn & ~(7 << 29);
                     if (!BVH2)
                     {
@@ -277,8 +277,9 @@ class BIH
                 while (true)
                 {
                     uint32 tn = tree[node];
-                    uint32 axis = (tn & (3 << 30)) >> 30;
-                    bool const BVH2 = (tn & (1 << 29)) != 0;
+                    uint32 axis = (tn >> 30) & 3;
+                    bool const BVH2 = tn & (1 << 29);
+
                     int offset = tn & ~(7 << 29);
                     if (!BVH2)
                     {

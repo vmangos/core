@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup mangosd
-/// @{
-/// \file
+// \addtogroup mangosd
+// @{
+// \file
 
 #include "Common.h"
 #include "World.h"
@@ -59,7 +59,7 @@ void commandFinished(void*, bool /*sucess*/)
     fflush(stdout);
 }
 
-/// @}
+// @}
 
 #ifdef linux
 // Non-blocking keypress detector, when return pressed, return 1, else always return 0
@@ -76,15 +76,15 @@ int kb_hit_return()
 }
 #endif
 
-/// %Thread start
+// %Thread start
 void CliRunnable::operator()()
 {
-    ///- Init new SQL thread for the world database (one connection call enough)
+    // Init new SQL thread for the world database (one connection call enough)
     WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests
 
     char commandbuf[256];
 
-    ///- Display the list of available CLI functions then beep
+    // Display the list of available CLI functions then beep
     if (sConfig.GetBoolDefault("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
@@ -92,7 +92,7 @@ void CliRunnable::operator()()
     // later it will be printed after command queue updates
     printf("\nmangos>");
 
-    ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
+    // As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
     {
         fflush(stdout);
@@ -159,6 +159,6 @@ void CliRunnable::operator()()
         }
     }
 
-    ///- End the database thread
+    // End the database thread
     WorldDatabase.ThreadEnd();                                  // free mySQL thread resources
 }

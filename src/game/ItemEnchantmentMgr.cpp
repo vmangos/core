@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <stdlib.h>
 #include <functional>
 #include "ItemEnchantmentMgr.h"
 #include "Database/DatabaseEnv.h"
@@ -52,11 +51,10 @@ void LoadRandomEnchantmentsTable()
 {
     RandomItemEnch.clear();                                 // for reload case
 
-    EnchantmentStore::const_iterator tab;
     uint32 entry, ench;
     uint32 count = 0;
 
-    QueryResult* result = WorldDatabase.PQuery("SELECT entry, ench, chance FROM item_enchantment_template WHERE ((%u >= patch_min) && (%u <= patch_max))", sWorld.GetWowPatch(), sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT entry, ench, chance FROM item_enchantment_template WHERE ((%u >= patch_min) && (%u <= patch_max))", sWorld.GetWowPatch(), sWorld.GetWowPatch());
 
     if (result)
     {
@@ -72,13 +70,17 @@ void LoadRandomEnchantmentsTable()
             float chance = fields[2].GetFloat();
 
             if (chance > 0.000001f && chance <= 100.0f)
-                RandomItemEnch[entry].push_back(EnchStoreItem(ench, chance));
+            {
+                RandomItemEnch[entry].emplace_back(ench, chance);
+            }
+            else
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u ench %u has chance < 0.000001 or chance > 100 (%f), skipping.", entry, ench, chance);
+            }
 
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u Item Enchantment definitions", count);
@@ -92,7 +94,8 @@ void LoadRandomEnchantmentsTable()
 
 uint32 GetItemEnchantMod(uint32 entry)
 {
-    if (!entry) return 0;
+    if (!entry)
+        return 0;
 
     EnchantmentStore::const_iterator tab = RandomItemEnch.find(entry);
 
@@ -102,26 +105,23 @@ uint32 GetItemEnchantMod(uint32 entry)
         return 0;
     }
 
-    double dRoll = rand_chance();
-    float fCount = 0;
+    float chance = 0;
 
     EnchStoreList const& enchantList = tab->second;
-    for (const auto& ench_iter : enchantList)
+    for (auto const& ench_iter : enchantList)
     {
-        fCount += ench_iter.chance;
-
-        if (fCount > dRoll) return ench_iter.ench;
+        chance += ench_iter.chance;
     }
 
-    //we could get here only if sum of all enchantment chances is lower than 100%
-    dRoll = (irand(0, (int)floor(fCount * 100) + 1)) / 100.0f;
-    fCount = 0;
+    float const roll = rand_chance_f() * (chance / 100.f);
+    chance = 0.f;
 
-    for (const auto& ench_iter : enchantList)
+    for (auto const& ench_iter : enchantList)
     {
-        fCount += ench_iter.chance;
+        chance += ench_iter.chance;
 
-        if (fCount > dRoll) return ench_iter.ench;
+        if (chance >= roll)
+            return ench_iter.ench;
     }
 
     return 0;

@@ -45,39 +45,31 @@ class Map;
 // enum on which Events an action for linked NPCs can trigger
 enum CreatureLinkingEvent
 {
-    LINKING_EVENT_AGGRO = 0,
-    LINKING_EVENT_EVADE = 1,
-    LINKING_EVENT_DIE = 2,
-    LINKING_EVENT_RESPAWN = 3,
-    LINKING_EVENT_DESPAWN = 4,
+    LINKING_EVENT_AGGRO 	= 0,
+    LINKING_EVENT_EVADE 	= 1,
+    LINKING_EVENT_DIE 		= 2,
+    LINKING_EVENT_RESPAWN 	= 3,
+    LINKING_EVENT_DESPAWN 	= 4,
 };
 
-// enum describing possible flags action flags for NPCs linked to other NPCs
-// These flags are actually put into the database
-// FLAG_TO_ means, that in this case the linked NPC will also trigger an action for the NPC it is linked to
 enum CreatureLinkingFlags
 {
-    // Dynamic behaviour, in combat
-    FLAG_AGGRO_ON_AGGRO = 0x0001,
-    FLAG_TO_AGGRO_ON_AGGRO = 0x0002,
-    FLAG_RESPAWN_ON_EVADE = 0x0004,
-    FLAG_TO_RESPAWN_ON_EVADE = 0x0008,
-    FLAG_DESPAWN_ON_EVADE = 0x1000,
-    FLAG_DESPAWN_ON_DEATH = 0x0010,
-    FLAG_SELFKILL_ON_DEATH = 0x0020,
-    FLAG_RESPAWN_ON_DEATH = 0x0040,
-    FLAG_RESPAWN_ON_RESPAWN = 0x0080,
-    FLAG_DESPAWN_ON_RESPAWN = 0x0100,
-
-    // Dynamic behaviour, out of combat
-    FLAG_FOLLOW = 0x0200,
-    FLAG_DESPAWN_ON_DESPAWN = 0x2000,
-
-    // Passive behaviour
-    FLAG_CANT_SPAWN_IF_BOSS_DEAD = 0x0400,
-    FLAG_CANT_SPAWN_IF_BOSS_ALIVE = 0x0800,
-
-    LINKING_FLAG_INVALID = 0x4000,               // TODO adjust when other flags are implemented
+    FLAG_AGGRO_ON_AGGRO             = 0x0001,		// Aggro slave on master aggro
+    FLAG_TO_AGGRO_ON_AGGRO          = 0x0002,		// Aggro master on slave aggro
+    FLAG_RESPAWN_ON_EVADE           = 0x0004,		// Respawn slave on master evade
+    FLAG_TO_RESPAWN_ON_EVADE        = 0x0008,		// Respawn master on slave evade
+    FLAG_DESPAWN_ON_DEATH           = 0x0010,		// Despawn slave on mater death
+    FLAG_SELFKILL_ON_DEATH          = 0x0020,		// Kill slave on master death
+    FLAG_RESPAWN_ON_DEATH           = 0x0040,		// Respawn slave on master death
+    FLAG_RESPAWN_ON_RESPAWN         = 0x0080,		// Respawn slave on master respawn
+    FLAG_DESPAWN_ON_RESPAWN         = 0x0100,		// Despawn slave on master respawn
+    FLAG_FOLLOW                     = 0x0200,		// Slave moves following master's movement
+    FLAG_CANT_SPAWN_IF_BOSS_DEAD    = 0x0400,		// Slave won't spawn if master dead
+    FLAG_CANT_SPAWN_IF_BOSS_ALIVE   = 0x0800,		// Slave won't spawn if master alive	
+    FLAG_DESPAWN_ON_EVADE           = 0x1000,		// Despawn slave on master evade
+    FLAG_DESPAWN_ON_DESPAWN         = 0x2000,		// Slave despawns on master despawn
+    FLAG_EVADE_ON_EVADE             = 0x4000,		// Slave evades on master evade
+    LINKING_FLAG_INVALID            = 0x8000,       // TODO adjust when other flags are implemented
 };
 
 // Structure holding the information for an entry

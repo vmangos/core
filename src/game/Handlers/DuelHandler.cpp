@@ -32,18 +32,18 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     ObjectGuid guid;
     recvPacket >> guid;
 
-    if (!GetPlayer()->duel)                                 // ignore accept from duel-sender
+    if (!GetPlayer()->m_duel)                                 // ignore accept from duel-sender
         return;
 
     Player* pl       = GetPlayer();
-    Player* plTarget = pl->duel->opponent;
+    Player* plTarget = pl->m_duel->opponent;
 
-    if (pl == pl->duel->initiator || !plTarget || !plTarget->duel || pl == plTarget || pl->duel->startTime != 0 || plTarget->duel->startTime != 0)
+    if (pl == pl->m_duel->initiator || !plTarget || !plTarget->m_duel || pl == plTarget || pl->m_duel->startTime != 0 || plTarget->m_duel->startTime != 0)
         return;
 
     time_t now = time(nullptr);
-    pl->duel->startTimer = now;
-    plTarget->duel->startTimer = now;
+    pl->m_duel->startTimer = now;
+    plTarget->m_duel->startTimer = now;
 
     pl->SendDuelCountdown(3000);
     plTarget->SendDuelCountdown(3000);
@@ -53,15 +53,15 @@ void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
     auto pPlayer = GetPlayer();
     // no duel requested
-    if (!pPlayer->duel)
+    if (!pPlayer->m_duel)
         return;
 
     // player surrendered in a duel using /forfeit
-    if (pPlayer->duel->startTime != 0)
+    if (pPlayer->m_duel->startTime != 0)
     {
         pPlayer->CombatStopWithPets(true);
-        if (pPlayer->duel->opponent)
-            pPlayer->duel->opponent->CombatStopWithPets(true);
+        if (pPlayer->m_duel->opponent)
+            pPlayer->m_duel->opponent->CombatStopWithPets(true);
 
         pPlayer->CastSpell(GetPlayer(), 7267, true);    // beg
         pPlayer->DuelComplete(DUEL_WON);

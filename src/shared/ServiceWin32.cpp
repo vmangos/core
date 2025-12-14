@@ -24,7 +24,6 @@
 #include "Common.h"
 #include "Log.h"
 #include <cstring>
-#include <windows.h>
 #include <winsvc.h>
 
 #if !defined(WINADVAPI)

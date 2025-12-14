@@ -28,11 +28,12 @@
 #include "SpellCaster.h"
 #include "LootMgr.h"
 #include "Util.h"
+#include <shared_mutex>
 
 class Unit;
 class GameObjectAI;
 class GameObjectModel;
-class Transport;
+class ShipTransport;
 struct TransportAnimation;
 
 struct GameObjectDisplayInfoEntry;
@@ -50,7 +51,7 @@ class GameObject : public SpellCaster
 
         virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state);
         void Update(uint32 update_diff, uint32 p_time) override;
-        GameObjectInfo const* GetGOInfo() const;
+        GameObjectInfo const* GetGOInfo() const { return m_goInfo; }
 
         bool HasStaticDBSpawnData() const;                  // listed in `gameobject` table and have fixed in DB guid
         uint32 GetDBTableGUIDLow() const { return HasStaticDBSpawnData() ? GetGUIDLow() : 0; }
@@ -58,8 +59,9 @@ class GameObject : public SpellCaster
         void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
         QuaternionData const GetLocalRotation() const;
 
+        char const* GetName() const final { return GetGOInfo()->name.c_str(); }
         // overwrite WorldObject function for proper name localization
-        char const* GetNameForLocaleIdx(int32 locale_idx) const override;
+        char const* GetNameForLocaleIdx(int32 locale_idx) const final;
 
         void SaveToDB();
         void SaveToDB(uint32 mapid);
@@ -166,8 +168,8 @@ class GameObject : public SpellCaster
         LootState getLootState() const { return m_lootState; }
         void SetLootState(LootState s);
 
-        void AddToSkillupList(Player* player);
-        bool IsInSkillupList(Player* player) const;
+        void AddToSkillupList(Player const* player);
+        bool IsInSkillupList(Player const* player) const;
         void ClearSkillupList() { m_SkillupSet.clear(); }
         void ClearAllUsesData()
         {
@@ -182,12 +184,14 @@ class GameObject : public SpellCaster
         void SetSummonTarget(ObjectGuid o) { m_summonTarget = o; }
         void FinishRitual();
         void AddUniqueUse(Player* player);
-        void RemoveUniqueUse(Player* player);
-        bool HasUniqueUser(Player* player);
+        void RemoveUniqueUse(Player const* player);
+        bool HasUniqueUser(Player const* player);
         uint32 GetUniqueUseCount();
 
         void AddUse() { ++m_useTimes; }
         uint32 GetUseCount() const { return m_useTimes; }
+
+        void SetCooldownTime(time_t cooldown) { m_cooldownTime = cooldown; }
 
         void SaveRespawnTime() override;
 
@@ -195,7 +199,7 @@ class GameObject : public SpellCaster
 
         bool HasQuest(uint32 quest_id) const override;
         bool HasInvolvedQuest(uint32 quest_id) const override;
-        bool ActivateToQuest(Player* pTarget) const;
+        bool ActivateToQuest(Player const* pTarget) const;
         uint32 GetDefaultGossipMenuId() const override { return GetGOInfo()->GetGossipMenuId(); }
         void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false);
                                                             // 0 = use `gameobject`.`spawntimesecs`
@@ -219,13 +223,14 @@ class GameObject : public SpellCaster
 
         // Gestion des GameObjectAI
         void AIM_Initialize();
-        GameObjectAI* AI() { return i_AI; }
+        GameObjectAI* AI() { return m_AI; }
 
         void UpdateCollisionState();
         void UpdateModel();                                 // updates model in case displayId were changed
         GameObjectModel* m_model;
         void UpdateModelPosition();
 
+        void GetLosCheckPosition(float& x, float& y, float& z) const final;
         float GetStationaryX() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.x; return 0.f; }
         float GetStationaryY() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.y; return 0.f; }
         float GetStationaryZ() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.z; return 0.f; }
@@ -246,7 +251,9 @@ class GameObject : public SpellCaster
         bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
         uint32 GetFactionTemplateId() const final { return GetGOInfo()->faction; }
-        uint32 GetLevel() const final ;
+        uint32 GetLevel() const final;
+        bool CanAggroWhenOpening() const;
+        void DoAggroWhenOpening(Unit* pUser) const;
 
         bool IsAtInteractDistance(Position const& pos, float radius) const;
         bool IsAtInteractDistance(Player const* player, uint32 maxRange = 0) const;
@@ -271,7 +278,7 @@ class GameObject : public SpellCaster
         // collected only for GAMEOBJECT_TYPE_SUMMONING_RITUAL
         ObjectGuid m_firstUser;                             // first GO user, in most used cases owner, but in some cases no, for example non-summoned multi-use GAMEOBJECT_TYPE_SUMMONING_RITUAL
         GuidsSet m_UniqueUsers;                             // all players who use item, some items activated after specific amount unique uses
-        std::mutex m_UniqueUsers_lock;
+        std::shared_timed_mutex m_UniqueUsers_lock;
         ObjectGuid m_summonTarget;                          // The player who is being summoned
 
         uint64 m_rotation;
@@ -279,7 +286,7 @@ class GameObject : public SpellCaster
 
         Position m_stationaryPosition;
 
-        GameObjectAI* i_AI;
+        GameObjectAI* m_AI;
 
         uint32 m_playerGroupId;
     private:

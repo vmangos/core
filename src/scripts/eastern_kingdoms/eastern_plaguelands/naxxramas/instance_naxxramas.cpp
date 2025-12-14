@@ -24,6 +24,7 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 #include "InstanceStatistics.h"
+#include "Geometry.h"
 
 enum NaxxEvents
 {
@@ -107,6 +108,9 @@ uint8 instance_naxxramas::GetNumEndbossDead()
     return ret;
 }
 
+static const G3D::Vector2 DK_DOOR_A(2600.15f, -3008.61f);
+static const G3D::Vector2 DK_DOOR_B(2579.34f, -3029.44f);
+
 bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
 {
     if (pWho->IsInEvadeMode())
@@ -135,7 +139,7 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         case NPC_HEIGAN:
         {
             // evade if brought out of room towards bat/grub/beast gauntlet
-            if (pWho->GetPositionX() > 2825.0f)
+            if (pWho->GetPositionX() > 2825.0f || pWho->GetPositionY() < -3737.0f)
             {
                 pWho->AI()->EnterEvadeMode();
                 return false;
@@ -165,31 +169,31 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         case NPC_MOGRAINE:
         case NPC_ZELIEK:
         case NPC_THANE:
-            dist = 115.0f;
-            break;
+        {
+            if (Geometry::IsPointLeftOfLine(DK_DOOR_A, DK_DOOR_B, pWho->GetPosition()))
+            {
+                if (Creature* pC = GetSingleCreatureFromStorage(NPC_BLAUMEUX))
+                    if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
+                if (Creature* pC = GetSingleCreatureFromStorage(NPC_MOGRAINE))
+                    if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
+                if (Creature* pC = GetSingleCreatureFromStorage(NPC_ZELIEK))
+                    if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
+                if (Creature* pC = GetSingleCreatureFromStorage(NPC_THANE))
+                    if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
+                return false;
+            }
+
+            return true;
+        }
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
             dist = 9999.0f;
             break;
     }
 
     if (pWho->GetDistance2d(pWho->GetHomePosition()) > dist)
     {
-        if (entry == NPC_BLAUMEUX || entry == NPC_MOGRAINE || entry == NPC_ZELIEK || entry == NPC_THANE)
-        {
-            if (Creature* pC = GetSingleCreatureFromStorage(NPC_BLAUMEUX))
-                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
-            if (Creature* pC = GetSingleCreatureFromStorage(NPC_MOGRAINE))
-                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
-            if (Creature* pC = GetSingleCreatureFromStorage(NPC_ZELIEK))
-                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
-            if (Creature* pC = GetSingleCreatureFromStorage(NPC_THANE))
-                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
-        }
-        else
-        {
-            pWho->AI()->EnterEvadeMode();
-        }
+        pWho->AI()->EnterEvadeMode();
         return false;
     }
     return true;
@@ -242,7 +246,7 @@ void instance_naxxramas::UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32
 
     if (!pGO)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::UpdateAutomaticBossEntranceDoor called with nullptr GO");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::UpdateAutomaticBossEntranceDoor called with nullptr GO");
         return;
     }
     if (uiData == IN_PROGRESS || uiData == SPECIAL)
@@ -285,7 +289,7 @@ void instance_naxxramas::UpdateBossGate(GameObject* pGO, uint32 uiData)
 {
     if (!pGO)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::UpdateBossGate called with nullptr GO");
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::UpdateBossGate called with nullptr GO");
         return;
     }
     if (uiData == DONE)
@@ -341,7 +345,7 @@ void instance_naxxramas::UpdateTeleporters(uint32 uiType, uint32 uiData)
                 SetTeleporterState(pGO, uiData);
             break;
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
     }
 
     if (WingsAreCleared())
@@ -391,9 +395,6 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
         case NPC_SUB_BOSS_TRIGGER:
             if (m_auiEncounter[TYPE_GOTHIK] != IN_PROGRESS)
                 m_lGothTriggerList.push_back(pCreature->GetGUID());
-            break;
-        case NPC_ArchmageTarsis:
-            pCreature->SetStandState(UNIT_STAND_STATE_DEAD);
             break;
         case NPC_SewageSlime:
             pCreature->SetWanderDistance(30.0f);
@@ -517,7 +518,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             case 533196:
             case 533198:
                 m_alHeiganTrapGuids[2].push_back(pGo->GetObjectGuid());
-            ///case 533186:
+        //  case 533186:
         }
     }
 
@@ -564,7 +565,6 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_PLAG_HEIG_ENTRY_DOOR:
             UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_HEIGAN]);
             break;
-        case GO_PLAG_HEIG_EXIT_DOOR:
         case GO_PLAG_HEIG_OLD_EXIT_DOOR:
         case GO_PLAG_LOAT_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_HEIGAN]);
@@ -893,7 +893,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 }
                 else
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "4hm just died. Unable to find Argent Dawn faction for reputation ");
+                    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "4hm just died. Unable to find Argent Dawn faction for reputation ");
                 }
             }
             break;
@@ -1030,13 +1030,13 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 // We only update the wipe counter if the boss has been in combat for at least 10 seconds
                 if (pCreature->GetCombatTime(false) > 10)
                 {
-                    sInstanceStatistics.IncrementWipeCounter(533, entry);
+                    sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, entry);
                     if (entry == NPC_ZELIEK)
                     {
                         // special case handling for these 4hm buggers
-                        sInstanceStatistics.IncrementWipeCounter(533, NPC_MOGRAINE);
-                        sInstanceStatistics.IncrementWipeCounter(533, NPC_BLAUMEUX);
-                        sInstanceStatistics.IncrementWipeCounter(533, NPC_THANE);
+                        sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, NPC_MOGRAINE);
+                        sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, NPC_BLAUMEUX);
+                        sInstanceStatistics.IncrementWipeCounter(MAP_NAXXRAMAS, NPC_THANE);
                     }
                 }
             }
@@ -1087,13 +1087,13 @@ uint32 instance_naxxramas::GetData(uint32 uiType)
     if (uiType < MAX_ENCOUNTER)
         return m_auiEncounter[uiType];
 
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::GetData() called with %d as param. %d is MAX_ENCOUNTERS", uiType, MAX_ENCOUNTER);
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::GetData() called with %d as param. %d is MAX_ENCOUNTERS", uiType, MAX_ENCOUNTER);
     return 0;
 }
 
 uint64 instance_naxxramas::GetData64(uint32 uiData)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "instance_naxxramas::GetData64 called. Not implemented");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "instance_naxxramas::GetData64 called. Not implemented");
     return 0;
 }
 
@@ -1102,7 +1102,7 @@ uint64 instance_naxxramas::GetGOUuid(NaxxGOs which)
     auto it = m_mNpcEntryGuidStore.find(which);
     if (it == m_mNpcEntryGuidStore.end())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "instance_naxxramas::GetGOUuid called with param %d, not found", which);
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "instance_naxxramas::GetGOUuid called with param %d, not found", which);
         return 0;
     }
     return it->second;
@@ -1173,7 +1173,7 @@ bool instance_naxxramas::IsInRightSideGothArea(Unit const* pUnit)
     if (GameObject* pCombatGate = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
         return (pCombatGate->GetPositionY() >= pUnit->GetPositionY());
 
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "left/right side check, Gothik combat area failed.");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "left/right side check, Gothik combat area failed.");
     return true;
 }
 
@@ -1495,47 +1495,56 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
     }
 };
 
+enum
+{
+    SPELL_INVISIBILITY_AND_STEALTH_DETECTION = 18950,
+    SPELL_STONESKIN = 28995, // Periodic Heal and Damage Immunity
+    SPELL_GARGOYLE_STONEFORM_VISUAL = 29153, // Dummy Aura
+    SPELL_ACID_VOLLEY = 29325,
+
+    BCT_STRANGE_NOISE = 10755, // %s emits a strange noise.
+};
+
 struct mob_naxxramasGarboyleAI : public ScriptedAI
 {
-    mob_naxxramasGarboyleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    mob_naxxramasGarboyleAI(Creature* pCreature)
+        : ScriptedAI(pCreature)
     {
         Reset();
-        goStoneform();
+        EnterStoneform();
 
         if (m_creature->GetDefaultMovementType() == IDLE_MOTION_TYPE && m_creature->GetEntry() == 16168)
-            m_creature->CastSpell(m_creature, 18950, true); // stealth detection
+            m_creature->CastSpell(m_creature, SPELL_INVISIBILITY_AND_STEALTH_DETECTION, true);
     }
 
-    void goStoneform()
+    void EnterStoneform()
     {
         if (m_creature->GetDefaultMovementType() == IDLE_MOTION_TYPE && m_creature->GetEntry() == 16168)
-        {
-            m_creature->CastSpell(m_creature, 29154, true);
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
-        }
+            m_creature->CastSpell(m_creature, SPELL_GARGOYLE_STONEFORM_VISUAL, true);
     }
 
-    uint32 acidVolleyTimer;
+    uint32 m_uiAcidVolleyTimer;
 
     void Reset() override
     {
-        acidVolleyTimer = 4000;
+        m_uiAcidVolleyTimer = urand(2800, 6500);
     }
 
     void JustReachedHome() override
     {
-        goStoneform();
+        EnterStoneform();
     }
 
     void MoveInLineOfSight(Unit* pWho) override
     {
-        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING))
+        if (m_creature->HasAura(SPELL_GARGOYLE_STONEFORM_VISUAL))
         {
             if (pWho->GetTypeId() == TYPEID_PLAYER
                 && !m_creature->IsInCombat()
                 && m_creature->IsWithinDistInMap(pWho, 17.0f)
+                && m_creature->IsWithinLOSInMap(pWho)
                 && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH)
-                && m_creature->IsWithinLOSInMap(pWho))
+                && !pWho->HasAuraType(SPELL_AURA_MOD_UNATTACKABLE))
             {
                 AttackStart(pWho);
             }
@@ -1548,10 +1557,8 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
 
     void Aggro(Unit*) override
     {
-        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING))
-        {
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
-        }
+        if (m_creature->HasAura(SPELL_GARGOYLE_STONEFORM_VISUAL))
+            m_creature->RemoveAurasDueToSpellByCancel(SPELL_GARGOYLE_STONEFORM_VISUAL);
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1559,27 +1566,27 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->GetHealthPercent() < 30.0f && !m_creature->IsNonMeleeSpellCasted() && !m_creature->HasAura(28995))
+        if (m_creature->GetHealthPercent() < 30.0f && !m_creature->IsNonMeleeSpellCasted() && !m_creature->HasAura(SPELL_STONESKIN))
         {
-            if (DoCastSpellIfCan(m_creature, 28995) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_STONESKIN) == CAST_OK)
             {
-                m_creature->CastSpell(m_creature, 28995, true); // Stoneskin
-                DoScriptText(10755, m_creature); // %s emits a strange noise.
+                m_creature->CastSpell(m_creature, SPELL_STONESKIN, true);
+                DoScriptText(BCT_STRANGE_NOISE, m_creature);
             }
         }
 
-        if (acidVolleyTimer < diff && !m_creature->IsNonMeleeSpellCasted())
+        if (m_uiAcidVolleyTimer < diff && !m_creature->IsNonMeleeSpellCasted())
         {
             // supposedly the first gargoyle in plague wing did not do the acid volley, so
             // hackfix here to skip him
             if (m_creature->GetDBTableGUIDLow() != 88095)
             {
-                if (DoCastSpellIfCan(m_creature, 29325) == CAST_OK) // acid volley
-                    acidVolleyTimer = 8000;
+                if (DoCastSpellIfCan(m_creature, SPELL_ACID_VOLLEY) == CAST_OK) // acid volley
+                    m_uiAcidVolleyTimer = 8000;
             }
         }
         else
-            acidVolleyTimer -= diff;
+            m_uiAcidVolleyTimer -= diff;
 
         DoMeleeAttackIfReady();
     }
@@ -1765,13 +1772,6 @@ CreatureAI* GetAI_dark_touched_warrior(Creature* pCreature)
     return new mob_dark_touched_warriorAI(pCreature);
 }
 
-bool GossipHello_npc_ArchmageTarsis(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->GetStandState() != UNIT_STAND_STATE_SIT)
-        pCreature->SetStandState(UNIT_STAND_STATE_SIT);
-    return false;
-}
-
 enum OmarionMisc
 {
     QUEST_OMARIONS_HANDBOOK = 9233,
@@ -1849,7 +1849,7 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
     // if rep < honored, spit on player and be done with it.
     if (argentDawnRep < BOOK_REQ_RANK)
     {
-        DoScriptText(-1999913, pCreature, pPlayer); // spit on player
+        // DoScriptText(-1999913, pCreature, pPlayer); // spit on player -- Not in sniffs. Need confirmation
         pPlayer->CLOSE_GOSSIP_MENU();
         return true;
     }
@@ -2038,6 +2038,47 @@ bool GossipHello_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreature
     */
 }
 
+// 29153 - Gargoyle Stoneform Visual
+struct GargoyleStoneformScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply)
+        {
+            // using stand state 9 in sniff
+            aura->GetTarget()->SetStandState(MAX_UNIT_STAND_STATE);
+            aura->GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+        else // on remove
+        {
+            aura->GetTarget()->SetStandState(UNIT_STAND_STATE_STAND);
+            aura->GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
+    }
+};
+
+AuraScript* GetScript_GargoyleStoneform(SpellEntry const*)
+{
+    return new GargoyleStoneformScript();
+}
+
+// 27831 - Shadow Bolt Volley (Naxx, Unrelenting Rider)
+struct UnrelentingRiderShadowBoltVolleyScript : SpellScript
+{
+    bool OnCheckTarget(Spell const* /*spell*/, Unit* target, SpellEffectIndex /*eff*/) const final
+    {
+        // Shadow Bolt volley which should only target players with the Shadow Mark debuff
+        if (!target->HasAura(27825)) // Shadow Mark
+            return false;
+        return true;
+    }
+};
+
+SpellScript* GetScript_UnrelentingRiderShadowBoltVolley(SpellEntry const*)
+{
+    return new UnrelentingRiderShadowBoltVolleyScript();
+}
+
 void AddSC_instance_naxxramas()
 {
     Script* pNewScript;
@@ -2079,13 +2120,18 @@ void AddSC_instance_naxxramas()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "npc_archmage_tarsis";
-    pNewScript->pGossipHello = &GossipHello_npc_ArchmageTarsis;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
     pNewScript->Name = "mob_craftsman_omarion";
     pNewScript->pGossipHello = &GossipHello_npc_MasterCraftsmanOmarion;
     pNewScript->pGossipSelect = &GossipSelect_npc_MasterCraftsmanOmarion;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_gargoyle_stoneform";
+    pNewScript->GetAuraScript = &GetScript_GargoyleStoneform;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_unrelenting_rider_shadow_bolt_volley";
+    pNewScript->GetSpellScript = &GetScript_UnrelentingRiderShadowBoltVolley;
     pNewScript->RegisterSelf();
 }

@@ -63,7 +63,7 @@ bool GOHello_go_defias_gunpowder(Player* player, GameObject* pGo)
         if (pirate3 = pGo->SummonCreature(634, -131.290833f, -591.243103f, 18.077190f, 4.792192f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))//DEFIAS_OVERSEER
         {
             pirate3->GetMotionMaster()->MovePoint(0, -128.925980f, -616.494629f, 13.532340f, MOVE_PATHFINDING, 0, 6.269623f);
-            pirate3->SetRespawnDelay(350000);
+            pirate3->SetRespawnDelay(350);
         }
         pInstance->SetData(GUN_POWDER_EVENT, 1);
     }

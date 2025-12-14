@@ -254,7 +254,7 @@ struct boss_buruAI : public ScriptedAI
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 for (const auto itr : tList)
                 {
-                    Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
+                    Player* pPlayer = itr->getTarget()->ToPlayer();
                     if (pPlayer && pPlayer->IsAlive())
                     {
                         GUIDs[var] = itr->getUnitGuid();

@@ -34,6 +34,8 @@ set (libMPQ_SRCS
 	libmpq/platform.h
 	libmpq/wave.c
 	libmpq/wave.h
+	libmpq/mpq_libmpq.cpp
+	libmpq/mpq_libmpq.h
 )
 
 include_directories(

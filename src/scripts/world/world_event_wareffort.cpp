@@ -20,6 +20,7 @@
 */
 
 #include "scriptPCH.h"
+#include "CreatureEventAI.h"
 #include "world_event_wareffort.h"
 #include <array>
 
@@ -30,12 +31,12 @@ uint32 BuildWarEffortWorldStates(WorldPacket &data)
     {
         uint32 amount = sObjectMgr.GetSavedVariable(AllianceObjectives[i].currentVar, 0);
 
-        data << AllianceObjectives[i].wsCurrent << amount;
-        data << AllianceObjectives[i].wsRequired << AllianceObjectives[i].required;
+        WriteInitialWorldStatePair(data, AllianceObjectives[i].wsCurrent, amount);
+        WriteInitialWorldStatePair(data, AllianceObjectives[i].wsRequired, AllianceObjectives[i].required);
 
         amount = sObjectMgr.GetSavedVariable(HordeObjectives[i].currentVar, 0);
-        data << HordeObjectives[i].wsCurrent << amount;
-        data << HordeObjectives[i].wsRequired << HordeObjectives[i].required;
+        WriteInitialWorldStatePair(data, HordeObjectives[i].wsCurrent, amount);
+        WriteInitialWorldStatePair(data, HordeObjectives[i].wsRequired, HordeObjectives[i].required);
 
         count += 4;
     }
@@ -45,9 +46,9 @@ uint32 BuildWarEffortWorldStates(WorldPacket &data)
         uint32 allianceContrib = GetTeamStock(SharedObjectives[i].itemId, TEAM_ALLIANCE);
         uint32 hordeContrib = GetTeamStock(SharedObjectives[i].itemId, TEAM_HORDE);
 
-        data << SharedObjectives[i].wsAllianceCurrent << allianceContrib;
-        data << SharedObjectives[i].wsHordeCurrent << hordeContrib;
-        data << SharedObjectives[i].wsRequired << SharedObjectives[i].required;
+        WriteInitialWorldStatePair(data, SharedObjectives[i].wsAllianceCurrent, allianceContrib);
+        WriteInitialWorldStatePair(data, SharedObjectives[i].wsHordeCurrent, hordeContrib);
+        WriteInitialWorldStatePair(data, SharedObjectives[i].wsRequired, SharedObjectives[i].required);
 
         count += 3;
     }
@@ -73,7 +74,7 @@ uint32 BuildWarEffortWorldStates(WorldPacket &data)
                 daysRemaining = 1;
         }
 
-        data << WORLDSTATE_TRANSITION_DAYS_REMAINING << daysRemaining;
+        WriteInitialWorldStatePair(data, WS_WE_TRANSITION_DAYS_REMAINING, daysRemaining);
         ++count;
     }
 
@@ -89,7 +90,7 @@ void AutoCompleteWarEffortProgress()
     if (!rate)
         return;
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[WarEffortEvent] Auto-completing war effort progress. Rate: %0.2f", rate);
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[WarEffortEvent] Auto-completing war effort progress. Rate: %0.2f", rate);
 
     for (int i = 0; i < NUM_FACTION_OBJECTIVES; ++i)
     {
@@ -109,7 +110,7 @@ void AutoCompleteWarEffortProgress()
         AutoCompleteWarEffortResource(SharedObjectives[i].itemId, SharedObjectives[i].required, hordeVar, rate, TEAM_HORDE);
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[WarEffortEvent] Auto-complete done");
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[WarEffortEvent] Auto-complete done");
 }
 
 void AutoCompleteWarEffortResource(uint32 resourceId, uint32 required, uint32 savedVar, float rate, TeamId team)
@@ -136,7 +137,7 @@ void AutoCompleteWarEffortResource(uint32 resourceId, uint32 required, uint32 sa
     amount += increase;
 
     sObjectMgr.SetSavedVariable(savedVar, amount, true);
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[WarEffortEvent] %s resource %u (saved var: %u) incremented by %u to %u (goal: %u)",
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[WarEffortEvent] %s resource %u (saved var: %u) incremented by %u to %u (goal: %u)",
         teamStr.c_str(), resourceId, savedVar, increase, amount, required);
 }
 
@@ -145,7 +146,7 @@ uint32 GetSharedSavedVar(uint32 item, TeamId team)
     uint32 var = 0;
     if (team > 1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid team specified for shared War Effort stock, %u", team);
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Invalid team specified for shared War Effort stock, %u", team);
         return 0;
     }
 
@@ -171,7 +172,7 @@ uint32 GetSharedSavedVar(uint32 item, TeamId team)
                 var = VAR_WE_ALLIANCE_RUNEBANDAGE;
                 break;
             default:
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid item %u for shared War Effort stock", item);
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Invalid item %u for shared War Effort stock", item);
                 break;
             }
             break;
@@ -196,7 +197,7 @@ uint32 GetSharedSavedVar(uint32 item, TeamId team)
                 var = VAR_WE_HORDE_RUNEBANDAGE;
                 break;
             default:
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid item %u for shared War Effort stock", item);
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Invalid item %u for shared War Effort stock", item);
                 break;
             }
             break;
@@ -255,7 +256,7 @@ const WarEffortGossip& GetWarEffortGossip(uint32 item)
             return i;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot find war effort gossip text for the given item %u", item);
+    sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Cannot find war effort gossip text for the given item %u", item);
 
     return WarEffortGossipText[0];
 }
@@ -299,10 +300,10 @@ struct npc_AQwar_collectorAI : CreatureAI
 
         switch (creature->GetFactionTemplateId())
         {
-            case 57:
-            case 11:
+            case 12:
+            case 55:
+            case 80:
             case 875:
-            case 79:
                 team = TEAM_ALLIANCE;
                 break;
             default:
@@ -504,7 +505,7 @@ struct npc_AQwar_collectorAI : CreatureAI
         }
 
         if (!found)
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "npc_AQwar_collectorAI: Unit %s has collector AI but no defined resource", m_creature->GetGuidStr().c_str());
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "npc_AQwar_collectorAI: Unit %s has collector AI but no defined resource", m_creature->GetGuidStr().c_str());
 
         return objectiveReached;
     }
@@ -539,6 +540,35 @@ struct npc_AQwar_collectorAI : CreatureAI
     {
         return GetActiveTransportEvent() == EVENT_WAR_EFFORT_TERMINATOR;
     }
+
+    void SendWorldStateUpdateToPlayer(Player* pPlayer)
+    {
+        for (uint8 i = 0; i < NUM_SHARED_OBJECTIVES; ++i)
+        {
+            if (resourceItemId == SharedObjectives[i].itemId)
+            {
+                uint32 stock = GetTeamStock(resourceItemId, team);
+                pPlayer->SendUpdateWorldState(team == TEAM_ALLIANCE ? SharedObjectives[i].wsAllianceCurrent : SharedObjectives[i].wsHordeCurrent, stock);
+                break;
+            }
+        }
+
+        for (uint8 i = 0; i < NUM_FACTION_OBJECTIVES; ++i)
+        {
+            if (resourceItemId == AllianceObjectives[i].itemId)
+            {
+                uint32 stock = sObjectMgr.GetSavedVariable(AllianceObjectives[i].currentVar, 0);
+                pPlayer->SendUpdateWorldState(AllianceObjectives[i].wsCurrent, stock);
+                break;
+            }
+            else if (resourceItemId == HordeObjectives[i].itemId)
+            {
+                uint32 stock = sObjectMgr.GetSavedVariable(HordeObjectives[i].currentVar, 0);
+                pPlayer->SendUpdateWorldState(HordeObjectives[i].wsCurrent, stock);
+                break;
+            }
+        }
+    }
 };
 
 bool GossipHello_npc_AQwar_collector(Player* pPlayer, Creature* pCreature)
@@ -551,6 +581,8 @@ bool GossipHello_npc_AQwar_collector(Player* pPlayer, Creature* pCreature)
         objectiveReached = collectorAI->ObjectiveReached();
         if (objectiveReached)
             collectorAI->RemoveQuestGiverFlag();
+        else
+            collectorAI->SendWorldStateUpdateToPlayer(pPlayer);
 
         questItemId = collectorAI->resourceItemId;
     }
@@ -647,76 +679,6 @@ bool GetWarEffortStockInfo(uint32 resourceId, WarEffortStockInfo &info, TeamId t
     }
 
     return found;
-}
-
-bool ChatHandler::HandleGetWarEffortResource(char* args)
-{
-    uint32 resourceId = 0;
-    uint32 team;
-
-    if (!ExtractUInt32(&args, resourceId))
-        return false;
-
-    if (!ExtractUInt32(&args, team))
-        team = 0;
-
-    if (team > 1)
-        return false;
-
-    auto PrintResources = [this](WarEffortStockInfo &info)
-    {
-        double Progress = (double)info.count / (double)info.required;
-        PSendSysMessage("\"%s\" [%u] Current [%u] Required [%u] Completed: %.03f", info.proto->Name1, info.proto->ItemId, info.count, info.required, Progress);
-    };
-
-    WarEffortStockInfo info;
-    if (!GetWarEffortStockInfo(resourceId, info, TeamId(team)))
-    {
-        PSendSysMessage("Error: resource with id \"%d\" not found", resourceId);
-        return false;
-    }
-
-    PrintResources(info);
-
-    return true;
-}
-
-bool ChatHandler::HandleSetWarEffortResource(char* args)
-{
-    uint32 resourceId = 0;
-    uint32 resourceAmount = 0;
-    uint32 team = 0;
-
-    if (!ExtractUInt32(&args, resourceId))
-    {
-        PSendSysMessage("Usage example .wareffortset 3575 1245");
-        return false;
-    }
-
-    if (!ExtractUInt32(&args, resourceAmount))
-    {
-        PSendSysMessage("Usage example .wareffortset 3575 1245");
-        return false;
-    }
-
-    if (!ExtractUInt32(&args, team))
-        team = 0;
-
-    if (team > 1)
-        return false;
-
-    WarEffortStockInfo info;
-    if (!GetWarEffortStockInfo(resourceId, info, TeamId(team)))
-    {
-        PSendSysMessage("Error: resource with id \"%d\" not found", resourceId);
-        return false;
-    }
-
-    uint32 PreviousResourceCount = info.count;
-    sObjectMgr.SetSavedVariable(info.currentVar, resourceAmount, true);
-    double Progress = (double)resourceAmount / (double)info.required;
-    PSendSysMessage("\"%s\" Previous count [%u] New count [%u] Completed: %.03f", info.proto->Name1, PreviousResourceCount, resourceAmount, Progress);
-    return true;
 }
 
 CreatureAI *GetAI_npc_AQwar_collector(Creature *pCreature)
@@ -882,8 +844,14 @@ const static G3D::Vector3 ironforgeInfantryOrigin = { -6969.21f, 962.33f, 11.88f
 const static G3D::Vector3 orgrimmarInfantryOrigin = { -6975.30f, 940.14f, 13.14f };
 const static G3D::Vector3 saurfangWaveIncomingPosition = { -6985.67f, 956.06f, 10.21f };
 
-enum {
-    NPC_SAURFANG = 987000
+enum
+{
+    BCT_SAURFANG_FRIENDLY_DIED_EMOTE = 11525,
+    BCT_SAURFANG_FRIENDLY_DIED_SAY1 = 11526,
+    BCT_SAURFANG_FRIENDLY_DIED_SAY2 = 11529,
+
+    SPELL_SF_VENGEANCE = 26331,
+    NPC_SAURFANG = 14720
 };
 
 struct npc_infantrymanAI : ScriptedAI
@@ -932,6 +900,16 @@ struct npc_infantrymanAI : ScriptedAI
         if (m_followingSaurfang)
         {
             SetRespawnNearSaurfang();
+        }
+
+        if (Creature* pSaurfang = m_creature->FindNearestCreature(NPC_SAURFANG, 30.0f))
+        {
+            if (pSaurfang->IsInCombat() && !pSaurfang->HasAura(SPELL_SF_VENGEANCE))
+            {
+                DoScriptText(BCT_SAURFANG_FRIENDLY_DIED_EMOTE, pSaurfang, m_creature);
+                DoScriptText(PickRandomValue(BCT_SAURFANG_FRIENDLY_DIED_SAY1, BCT_SAURFANG_FRIENDLY_DIED_SAY2), pSaurfang, m_creature);
+                pSaurfang->CastSpell(pSaurfang, SPELL_SF_VENGEANCE, false);
+            }
         }
 
         ScriptedAI::JustDied(pKiller);
@@ -998,7 +976,7 @@ struct npc_infantrymanAI : ScriptedAI
 
         rotated.x = clockwise ? relative.y : -relative.y;
         rotated.y = clockwise ? -relative.x : relative.x;
-        rotated.z = rotated.z;
+        rotated.z = relative.z;
 
         vec = m_origin + rotated;
     }
@@ -1212,9 +1190,305 @@ CreatureAI *GetAI_npc_priestess(Creature *pCreature)
     return new npc_priestessAI(pCreature);
 }
 
-enum {
+enum
+{
+    BCT_SAURFANG_SPEECH1         = 11620,
+    BCT_SAURFANG_SPEECH2         = 11621,
+    BCT_SAURFANG_SPEECH3         = 11622,
+    BCT_SAURFANG_SPEECH4         = 11623,
+    BCT_SAURFANG_SPEECH5         = 11624,
+    BCT_SAURFANG_SPEECH6         = 11625,
+    BCT_SAURFANG_SPEECH7         = 11626,
+    BCT_SAURFANG_SPEECH8         = 11627,
+    BCT_SAURFANG_SPEECH9         = 11628,
+    BCT_SAURFANG_SPEECH10        = 11629,
+    BCT_SAURFANG_SPEECH11        = 11630,
+    BCT_SAURFANG_SPEECH12        = 11631,
+    BCT_SAURFANG_SPEECH13        = 11646,
+    BCT_SAURFANG_SPEECH14        = 11647,
+    BCT_SAURFANG_FINAL_BATTLE    = 11619,
+
+    BCT_SAURFANG_AGGRO1          = 11527, // guessed
+    BCT_SAURFANG_AGGRO2          = 11528, // guessed
+    BCT_SAURFANG_AGGRO3          = 11538, // sniffed
+    BCT_SAURFANG_AGGRO4          = 11540, // sniffed
+    BCT_SAURFANG_AGGRO5          = 11541, // guessed
+    BCT_SAURFANG_AGGRO6          = 11614, // sniffed
+    BCT_SAURFANG_AGGRO7          = 11615, // sniffed
+    BCT_SAURFANG_AGGRO8          = 11616, // sniffed
+    BCT_SAURFANG_AGGRO9          = 11648, // sniffed
+
+    BCT_SAURFANG_KILLED_UNIT     = 7237,  // sniffed
+    BCT_SAURFANG_RAGE            = 11563, // sniffed
+    BCT_SAURFANG_BATTLE_WON      = 11651, // sniffed
+
+    SPELL_SF_TERRIFYING_ROAR        = 14100,
+    SPELL_SF_CLEAVE                 = 16044,
+    SPELL_SF_CHARGE                 = 15749,
+    SPELL_SF_MORTAL_STRIKE          = 24573,
+    SPELL_SF_SAURFANG_RAGE          = 26341,
+
+    FACTION_MIGHT_OF_KALIMDOR       = 777,
+};
+
+static constexpr uint32 saurfangSpeech[] = { BCT_SAURFANG_SPEECH1, BCT_SAURFANG_SPEECH2, BCT_SAURFANG_SPEECH3, BCT_SAURFANG_SPEECH4, BCT_SAURFANG_SPEECH5, BCT_SAURFANG_SPEECH6, BCT_SAURFANG_SPEECH7, BCT_SAURFANG_SPEECH8, BCT_SAURFANG_SPEECH9, BCT_SAURFANG_SPEECH10, BCT_SAURFANG_SPEECH11, BCT_SAURFANG_SPEECH12, BCT_SAURFANG_SPEECH13, BCT_SAURFANG_SPEECH14 };
+
+std::array<Position, 12> const saurfangGatePath
+{{
+    { -7002.48f, 967.38f, 6.70f, 3.15f },
+    { -7205.49f, 967.08f, 0.95f, 2.9f },
+    { -7265.48f, 995.34f, 2.55f, 3.16f },
+    { -7418.73f, 1000.99f, 0.91f, 2.91f },
+    { -7661.01f, 1052.23f, 4.82f, 2.32f },
+    { -7759.05f, 1164.64f, 0.02f, 2.22f },
+    { -7810.24f, 1275.49f, -11.08f, 2.72f },
+    { -7909.35f, 1319.05f, -7.79f, 2.32f },
+    { -7952.77f, 1377.95f, 2.94f, 1.38f },
+    { -7933.09f, 1490.65f, -6.62f, 2.68f },
+    { -8014.01f, 1532.97f, 2.81f, 3.10f },
+    { -8079.99f, 1523.19f, 2.61f, 3.15f }
+}};
+
+struct npc_aqwar_saurfangAI : ScriptedAI
+{
+    bool m_CenarionHoldAttackWarn;
+    bool m_finalBattle;
+    uint32 m_speechDelay;
+    uint32 m_speechStep;
+    bool m_inSpeech;
+    bool m_movingToGate;
+    uint32 m_movePoint;
+    bool m_movePointReached;
+    bool m_movementPaused;
+    bool m_lastWave;
+
+    uint32 m_uiMortalStrikeTimer;
+    uint32 m_uiTerrifyingRoarTimer;
+    uint32 m_uiChargeTimer;
+    uint32 m_uiCleaveTimer;
+
+    npc_aqwar_saurfangAI(Creature *pCreature) : ScriptedAI(pCreature)
+    {
+        m_CenarionHoldAttackWarn = false;
+        m_finalBattle = false;
+        m_lastWave = false;
+        m_speechDelay = 120000; // 2 minutes on the first delay to give people time to reach CH
+        m_speechStep = 0;
+        m_inSpeech = false;
+
+        m_movePoint = 0;
+        m_movePointReached = true;
+        m_movementPaused = false;
+
+        m_creature->SetFactionTemplateId(FACTION_MIGHT_OF_KALIMDOR);
+        Reset();
+    }
+
+    void Reset() override
+    {
+        if (m_movingToGate)
+            m_creature->Mount(10278);
+
+        m_uiMortalStrikeTimer = urand(1, 15) * IN_MILLISECONDS;
+        m_uiChargeTimer = urand(0, 4) * IN_MILLISECONDS;
+        m_uiCleaveTimer = urand(3, 9) * IN_MILLISECONDS;
+        m_uiTerrifyingRoarTimer = urand(4, 12) * IN_MILLISECONDS;
+    }
+
+    void EnterCombat(Unit* pWho) override
+    {
+        m_creature->Unmount();
+        ScriptedAI::Aggro(pWho);
+        m_movementPaused = true;
+        DoScriptText(PickRandomValue(BCT_SAURFANG_AGGRO1, BCT_SAURFANG_AGGRO2, BCT_SAURFANG_AGGRO3, BCT_SAURFANG_AGGRO4, BCT_SAURFANG_AGGRO5, BCT_SAURFANG_AGGRO6, BCT_SAURFANG_AGGRO7, BCT_SAURFANG_AGGRO8, BCT_SAURFANG_AGGRO9), m_creature, pWho);
+
+        if (m_creature->CastSpell(m_creature, SPELL_SF_SAURFANG_RAGE, false) == SPELL_CAST_OK)
+            DoScriptText(BCT_SAURFANG_RAGE, m_creature);
+    }
+
+    void KilledUnit(Unit* pVictim) override
+    {
+        if (roll_chance_u(10))
+            DoScriptText(BCT_SAURFANG_KILLED_UNIT, m_creature);
+    }
+
+    void EnterEvadeMode() override
+    {
+        if (m_lastWave)
+        {
+            DoScriptText(BCT_SAURFANG_BATTLE_WON, m_creature);
+            m_lastWave = false;
+        }
+        ScriptedAI::EnterEvadeMode();
+    }
+
+    void MoveInLineOfSight(Unit *pWho) override
+    {
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pWho))
+        {
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+                m_creature->EnterCombatWithTarget(pWho);
+        }
+    }
+
+    void MovementInform(uint32 uiType, uint32 uiPoint) override
+    {
+        if (uiType != POINT_MOTION_TYPE)
+            return;
+
+        if (m_movingToGate)
+        {
+            m_creature->SetFacingTo(saurfangGatePath[uiPoint].o);
+            m_movePointReached = true;
+        }
+
+        if (m_movePoint == saurfangGatePath.size())
+        {
+            m_movingToGate = false;
+            m_creature->Unmount();
+            m_creature->SetHomePosition(saurfangGatePath[m_movePoint-1].x, saurfangGatePath[m_movePoint-1].y, saurfangGatePath[m_movePoint-1].z, 2.6f);
+        }
+    }
+
+    void UpdateAI(uint32 const diff) override
+    {
+        if (!m_creature->IsAlive())
+            return;
+
+        if (!m_CenarionHoldAttackWarn && sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT_CH_ATTACK))
+        {
+            MoveToWaveBattlePosition();
+            m_CenarionHoldAttackWarn = true;
+            return;
+        }
+
+        if (!m_finalBattle && sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT_FINALBATTLE))
+        {
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC);
+            m_inSpeech = true;
+            m_finalBattle = true;
+            m_creature->Mount(10278);
+
+            // Recover from crash/restart
+            if (!m_CenarionHoldAttackWarn)
+            {
+                MoveToWaveBattlePosition();
+                m_CenarionHoldAttackWarn = true;
+            }
+        }
+
+        if (m_finalBattle)
+        {
+            if (m_inSpeech)
+            {
+                if (m_speechDelay <= diff)
+                {
+                    DoScriptText(saurfangSpeech[m_speechStep], m_creature);
+                    ++m_speechStep;
+                    m_speechDelay = 10000;
+                }
+                else
+                    m_speechDelay -= diff;
+
+                if (m_speechStep == 14)
+                {
+                    sWorld.SendBroadcastTextToWorld(BCT_SAURFANG_FINAL_BATTLE);
+                    m_inSpeech = false;
+                    m_movingToGate = true;
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC);
+                    m_creature->SetWalk(false);
+                }
+            }
+            else if (m_movingToGate && m_movePointReached && !m_movementPaused)
+            {
+                m_creature->GetMotionMaster()->MovePoint(m_movePoint, saurfangGatePath[m_movePoint].x, saurfangGatePath[m_movePoint].y, saurfangGatePath[m_movePoint].z, MOVE_RUN_MODE);
+                m_creature->SetHomePosition(saurfangGatePath[m_movePoint].x, saurfangGatePath[m_movePoint].y, saurfangGatePath[m_movePoint].z, saurfangGatePath[m_movePoint].o);
+                ++m_movePoint;
+
+                m_movePointReached = false;
+            }
+        }
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+            return;
+
+        if (m_uiMortalStrikeTimer < diff)
+        {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_MORTAL_STRIKE) == CAST_OK)
+                m_uiMortalStrikeTimer = urand(11, 20) * IN_MILLISECONDS;
+        }
+        else
+            m_uiMortalStrikeTimer -= diff;
+
+        if (m_uiCleaveTimer < diff)
+        {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_CLEAVE) == CAST_OK)
+                m_uiCleaveTimer = urand(9, 21) * IN_MILLISECONDS;
+        }
+        else
+            m_uiCleaveTimer -= diff;
+
+        if (m_uiChargeTimer < diff)
+        {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_CHARGE) == CAST_OK)
+                m_uiChargeTimer = urand(4, 12) * IN_MILLISECONDS;
+        }
+        else
+            m_uiChargeTimer -= diff;
+
+        if (m_uiTerrifyingRoarTimer < diff)
+        {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_TERRIFYING_ROAR) == CAST_OK)
+                m_uiTerrifyingRoarTimer = urand(30, 40) * IN_MILLISECONDS;
+        }
+        else
+            m_uiTerrifyingRoarTimer -= diff;
+
+        DoMeleeAttackIfReady();
+    }
+
+    void JustRespawned() override
+    {
+        // Respawned back at CH. Keep running to the gate
+        if (m_movingToGate)
+        {
+            m_movePoint = 0;
+            m_movePointReached = true;
+            m_movementPaused = false;
+        }
+
+        ScriptedAI::JustRespawned();
+    }
+
+    void MoveToWaveBattlePosition()
+    {
+        m_creature->SetHomePosition(saurfangWaveIncomingPosition.x, saurfangWaveIncomingPosition.y, saurfangWaveIncomingPosition.z, 2.6f);
+        m_creature->GetMotionMaster()->MoveTargetedHome();
+    }
+
+    void JustReachedHome() override
+    {
+        m_movementPaused = false;
+    }
+};
+
+CreatureAI* GetAI_npc_aqwar_saurfang(Creature *pCreature)
+{
+    if (pCreature->GetZoneId() == 1377)
+        return new npc_aqwar_saurfangAI(pCreature);
+
+    return new CreatureEventAI(pCreature);
+}
+
+enum
+{
     NPC_COLOSSAL_ANUBISATH = 15743,
-    NPC_QIRAJI_DESTROYER = 15744
+    NPC_QIRAJI_DESTROYER = 15744,
+
+    BCT_QIRAJI_SUMMONED_1 = 11536,
+    BCT_QIRAJI_SUMMONED_2 = 11611,
+    BCT_QIRAJI_SUMMONED_3 = 11612,
+    BCT_QIRAJI_SUMMONED_4 = 11613,
 };
 
 struct npc_aqwar_cenarionhold_attackAI : ScriptedAI
@@ -1250,12 +1524,11 @@ struct npc_aqwar_cenarionhold_attackAI : ScriptedAI
         {
             // Many mobs per wave. 80% chance to be a Colossal Anubisath, 20% chance to be a Qiraji Destroyer
             // https://www.youtube.com/watch?v=F-FeUv7HSzI @ 7:11
-            for (int i = 0; i < 8; ++i)
+            for (int i = 0; i < 10; ++i)
             {
                 uint32 entry = urand(0, 5) ? NPC_COLOSSAL_ANUBISATH : NPC_QIRAJI_DESTROYER;
 
-                G3D::Vector3 summPos;
-                m_creature->GetPosition(summPos.x, summPos.y, summPos.z);
+                G3D::Vector3 summPos{ -7067.77f, 966.62f, 4.56f };
 
                 summPos.x += irand(-15, 15);
                 summPos.y += irand(-15, 15);
@@ -1268,8 +1541,18 @@ struct npc_aqwar_cenarionhold_attackAI : ScriptedAI
                 }
             }
 
+            DoScriptText(PickRandomValue(BCT_QIRAJI_SUMMONED_1, BCT_QIRAJI_SUMMONED_2, BCT_QIRAJI_SUMMONED_3, BCT_QIRAJI_SUMMONED_4), m_creature);
             m_timeUntilWave = 15 * MINUTE * IN_MILLISECONDS;
             ++m_waveCount;
+
+            if (m_waveCount == m_maxWaveCount)
+            {
+                if (Creature* pSaurfang = m_creature->FindNearestCreature(NPC_SAURFANG, MAX_VISIBILITY_DISTANCE))
+                {
+                    if (npc_aqwar_saurfangAI* pAI = dynamic_cast<npc_aqwar_saurfangAI*>(pSaurfang->AI()))
+                        pAI->m_lastWave = true;
+                }
+            }
         }
         else
             m_timeUntilWave -= diff;
@@ -1279,302 +1562,6 @@ struct npc_aqwar_cenarionhold_attackAI : ScriptedAI
 CreatureAI* GetAI_npc_aqwar_cenarionhold_attack(Creature *pCreature)
 {
     return new npc_aqwar_cenarionhold_attackAI(pCreature);
-}
-
-enum {
-    SCRIPT_SAURFANG_CH_ATTACK_WARN  = -1780300,
-    SCRIPT_SAURFANG_SPEECH1         = -1780301,
-    SCRIPT_SAURFANG_SPEECH2         = -1780302,
-    SCRIPT_SAURFANG_SPEECH3         = -1780303,
-    SCRIPT_SAURFANG_SPEECH4         = -1780304,
-    SCRIPT_SAURFANG_SPEECH5         = -1780305,
-    SCRIPT_SAURFANG_SPEECH6         = -1780306,
-    SCRIPT_SAURFANG_SPEECH7         = -1780307,
-    SCRIPT_SAURFANG_SPEECH8         = -1780308,
-    SCRIPT_SAURFANG_SPEECH9         = -1780309,
-    SCRIPT_SAURFANG_SPEECH10        = -1780310,
-    SCRIPT_SAURFANG_FINAL_BATTLE    = -1780311,
-
-    WORLD_TEXT_FINAL_BATTLE         = -1780311,     // The final battle for Kalimdor is upon us...
-
-    // Taken from Orgrimmar script
-    SPELL_SF_EXECUTE                = 7160,  //OK
-    SPELL_SF_CLEAVE                 = 15284, //OK
-    SPELL_SF_CHARGE                 = 22886, //OK
-    SPELL_SF_THUNDERCLAP            = 23931, //?
-    SPELL_SF_MORTALSTRIKE           = 12294, //?
-    SPELL_SF_SAURFANGRAGE           = 26339,
-    SPELL_SF_BATTLESHOUT            = 26043  // shout to put him in combat with other units so he doesn't run off
-};
-
-struct MovementPath {
-    float x;
-    float y;
-    float z;
-    float o;
-};
-
-std::array<MovementPath, 12> const saurfangGatePath {{
-    { -7002.48f, 967.38f, 6.70f, 3.15f },
-    { -7205.49f, 967.08f, 0.95f, 2.9f },
-    { -7265.48f, 995.34f, 2.55f, 3.16f },
-    { -7418.73f, 1000.99f, 0.91f, 2.91f },
-    { -7661.01f, 1052.23f, 4.82f, 2.32f },
-    { -7759.05f, 1164.64f, 0.02f, 2.22f },
-    { -7810.24f, 1275.49f, -11.08f, 2.72f },
-    { -7909.35f, 1319.05f, -7.79f, 2.32f },
-    { -7952.77f, 1377.95f, 2.94f, 1.38f },
-    { -7933.09f, 1490.65f, -6.62f, 2.68f },
-    { -8014.01f, 1532.97f, 2.81f, 3.10f },
-    { -8079.99f, 1523.19f, 2.61f, 3.15f }
-}};
-
-struct npc_aqwar_saurfangAI : ScriptedAI
-{
-    bool m_CenarionHoldAttackWarn;
-    bool m_finalBattle;
-    uint32 m_speechDelay;
-    uint32 m_speechStep;
-    bool m_inSpeech;
-    bool m_movingToGate;
-    uint32 m_movePoint;
-    bool m_movePointReached;
-    bool m_movementPaused;
-
-    uint32 m_uiExecute_Timer;
-    uint32 m_uiMortalStrike_Timer;
-    uint32 m_uiThunderClap_Timer;
-    uint32 m_uiCharge_Timer;
-    uint32 m_uiCleave_Timer;
-    uint32 m_uiSaurfangRage_Timer;
-    uint32 m_uiBattleShout_Timer;
-
-    npc_aqwar_saurfangAI(Creature *pCreature) : ScriptedAI(pCreature)
-    {
-        m_CenarionHoldAttackWarn = false;
-        m_finalBattle = false;
-        m_speechDelay = 120000; // 2 minutes on the first delay to give people time to reach CH
-        m_speechStep = 0;
-        m_inSpeech = false;
-
-        m_movePoint = 0;
-        m_movePointReached = true;
-        m_movementPaused = false;
-
-        Reset();
-    }
-
-    void Reset() override
-    {
-        if (m_movingToGate)
-            m_creature->Mount(10278);
-
-        m_uiExecute_Timer = 2000;
-        m_uiMortalStrike_Timer = 13000;
-        m_uiCharge_Timer = 8000;
-        m_uiCleave_Timer = 9000;
-        m_uiThunderClap_Timer = 9000;
-        m_uiSaurfangRage_Timer = 8000;
-        m_uiBattleShout_Timer = 30000;
-    }
-
-
-    void Aggro(Unit* pWho) override
-    {
-        m_creature->Unmount();
-        ScriptedAI::Aggro(pWho);
-        m_movementPaused = true;
-    }
-
-    void MoveInLineOfSight(Unit *pWho) override
-    {
-        if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pWho))
-        {
-            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
-            {
-                if (!m_creature->GetVictim())
-                    AttackStart(pWho);
-            }
-        }
-    }
-
-    void MovementInform(uint32 uiType, uint32 uiPoint) override
-    {
-        if (uiType != POINT_MOTION_TYPE)
-            return;
-
-        if (m_movingToGate)
-        {
-            m_creature->SetFacingTo(saurfangGatePath[uiPoint].o);
-            m_movePointReached = true;
-        }
-
-        if (m_movePoint == saurfangGatePath.size())
-        {
-            m_movingToGate = false;
-            m_creature->Unmount();
-            m_creature->SetHomePosition(saurfangGatePath[m_movePoint-1].x, saurfangGatePath[m_movePoint-1].y, saurfangGatePath[m_movePoint-1].z, 2.6f);
-        }
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (!m_creature->IsAlive())
-            return;
-
-        if (!m_CenarionHoldAttackWarn && sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT_CH_ATTACK))
-        {
-            DoScriptText(SCRIPT_SAURFANG_CH_ATTACK_WARN, m_creature);
-
-            MoveToWaveBattlePosition();
-            m_CenarionHoldAttackWarn = true;
-
-            return;
-        }
-
-        if (!m_finalBattle && sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT_FINALBATTLE))
-        {
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
-            m_inSpeech = true;
-            m_finalBattle = true;
-            m_creature->Mount(10278);
-
-            // Recover from crash/restart
-            if (!m_CenarionHoldAttackWarn)
-            {
-                MoveToWaveBattlePosition();
-                m_CenarionHoldAttackWarn = true;
-            }
-        }
-
-        if (m_finalBattle)
-        {
-            if (m_inSpeech)
-            {
-                if (m_speechDelay <= diff)
-                {
-                    DoScriptText(SCRIPT_SAURFANG_SPEECH1 - m_speechStep, m_creature);
-                    ++m_speechStep;
-                    m_speechDelay = 10000;
-                }
-                else
-                    m_speechDelay -= diff;
-
-                if (m_speechStep == 10)
-                {
-                    sWorld.SendWorldText(WORLD_TEXT_FINAL_BATTLE);
-                    m_inSpeech = false;
-                    m_movingToGate = true;
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
-                    m_creature->SetWalk(false);
-                }
-            }
-            else if (m_movingToGate && m_movePointReached && !m_movementPaused)
-            {
-                m_creature->GetMotionMaster()->MovePoint(m_movePoint, saurfangGatePath[m_movePoint].x, saurfangGatePath[m_movePoint].y, saurfangGatePath[m_movePoint].z, MOVE_RUN_MODE);
-                m_creature->SetHomePosition(saurfangGatePath[m_movePoint].x, saurfangGatePath[m_movePoint].y, saurfangGatePath[m_movePoint].z, saurfangGatePath[m_movePoint].o);
-                ++m_movePoint;
-
-                m_movePointReached = false;
-            }
-        }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (m_creature->GetVictim()->GetHealth() <= m_creature->GetVictim()->GetMaxHealth() * 0.2f)
-        {
-            if (m_uiExecute_Timer < diff)
-            {
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_EXECUTE);
-                m_uiExecute_Timer = 2000;
-            }
-            else
-                m_uiExecute_Timer -= diff;
-        }
-
-        if (m_uiMortalStrike_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_MORTALSTRIKE);
-            m_uiMortalStrike_Timer = 13000;
-        }
-        else
-            m_uiMortalStrike_Timer -= diff;
-
-        if (m_uiCleave_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_CLEAVE);
-            m_uiCleave_Timer = 7000;
-        }
-        else
-            m_uiCleave_Timer -= diff;
-
-        if (m_uiCharge_Timer < diff && m_creature->GetDistance(m_creature->GetVictim()->GetPositionX(),
-            m_creature->GetVictim()->GetPositionY(),
-            m_creature->GetVictim()->GetPositionZ()) >= 8.0f)
-        {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_CHARGE);
-            m_uiCharge_Timer = 9000;
-        }
-        else
-            m_uiCharge_Timer -= diff;
-
-        if (m_uiThunderClap_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_THUNDERCLAP);
-            m_uiThunderClap_Timer = 9000;
-        }
-        else
-            m_uiThunderClap_Timer -= diff;
-
-        if (m_uiSaurfangRage_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_SAURFANGRAGE);
-            m_uiSaurfangRage_Timer = 8000;
-        }
-        else
-            m_uiSaurfangRage_Timer -= diff;
-
-        if (m_uiBattleShout_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature, SPELL_SF_BATTLESHOUT);
-            m_uiBattleShout_Timer = 30000;
-        }
-        else
-            m_uiBattleShout_Timer -= diff;
-
-        DoMeleeAttackIfReady();
-    }
-
-    void JustRespawned() override
-    {
-        // Respawned back at CH. Keep running to the gate
-        if (m_movingToGate)
-        {
-            m_movePoint = 0;
-            m_movePointReached = true;
-            m_movementPaused = false;
-        }
-
-        ScriptedAI::JustRespawned();
-    }
-
-    void MoveToWaveBattlePosition()
-    {
-        m_creature->SetHomePosition(saurfangWaveIncomingPosition.x, saurfangWaveIncomingPosition.y, saurfangWaveIncomingPosition.z, 2.6f);
-
-        m_creature->GetMotionMaster()->MoveTargetedHome();
-    }
-
-    void JustReachedHome() override
-    {
-        m_movementPaused = false;
-    }
-};
-
-CreatureAI* GetAI_npc_aqwar_saurfang(Creature *pCreature)
-{
-    return new npc_aqwar_saurfangAI(pCreature);
 }
 
 void AddSC_war_effort()
@@ -1614,12 +1601,12 @@ void AddSC_war_effort()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "npc_aqwar_ch_attack";
-    pNewScript->GetAI = &GetAI_npc_aqwar_cenarionhold_attack;
+    pNewScript->Name = "npc_aqwar_saurfang";
+    pNewScript->GetAI = &GetAI_npc_aqwar_saurfang;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "npc_aqwar_saurfang";
-    pNewScript->GetAI = &GetAI_npc_aqwar_saurfang;
+    pNewScript->Name = "npc_aqwar_ch_attack";
+    pNewScript->GetAI = &GetAI_npc_aqwar_cenarionhold_attack;
     pNewScript->RegisterSelf();
 }

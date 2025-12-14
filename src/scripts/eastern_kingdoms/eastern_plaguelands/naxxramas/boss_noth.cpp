@@ -346,7 +346,7 @@ struct boss_nothAI : public ScriptedAI
                 // if you don't kill him during the 3rd ground phase. We'll just repeat previous phase logic
                 // after this. It's highly unlikely that any guild get to this stage without killing him or wiping.
                 m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(180));
-                //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_nothAI::OnRemoveVulnerability() called with phaseCounter: %d", phaseCounter);
+                //sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_nothAI::OnRemoveVulnerability() called with phaseCounter: %d", phaseCounter);
         }
     }
 
@@ -450,11 +450,31 @@ CreatureAI* GetAI_boss_noth(Creature* pCreature)
     return new boss_nothAI(pCreature);
 }
 
+// 29213 - Curse of the Plaguebringer (Naxxramas, Noth the Plaguebringer)
+struct NothCurseOfThePlaguebringerScript : SpellScript
+{
+    void OnSetTargetMap(Spell* /*spell*/, SpellEffectIndex /*effIdx*/, uint32& /*targetMode*/, float& /*radius*/, uint32& /*unMaxTargets*/, bool& selectClosestTargets) const final
+    {
+        selectClosestTargets = true;
+    }
+};
+
+SpellScript* GetScript_NothCurseOfThePlaguebringer(SpellEntry const*)
+{
+    return new NothCurseOfThePlaguebringerScript();
+}
+
 void AddSC_boss_noth()
 {
-    Script* NewScript;
-    NewScript = new Script;
-    NewScript->Name = "boss_noth";
-    NewScript->GetAI = &GetAI_boss_noth;
-    NewScript->RegisterSelf();
+    Script* pNewScript;
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_noth";
+    pNewScript->GetAI = &GetAI_boss_noth;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_noth_curse_of_the_plaguebringer";
+    pNewScript->GetSpellScript = &GetScript_NothCurseOfThePlaguebringer;
+    pNewScript->RegisterSelf();
 }

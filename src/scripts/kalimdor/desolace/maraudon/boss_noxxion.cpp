@@ -48,6 +48,13 @@ struct boss_noxxionAI : public ScriptedAI
         Invisible = false;
     }
 
+    void JustDied(Unit* pKiller) override
+    {
+        m_creature->DeMorph();
+        m_creature->SetFactionTemplateId(m_creature->GetCreatureInfo()->faction);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+    }
+
     void SummonAdds(Unit* victim)
     {
         if (Creature* summoned = DoSpawnCreature(13456, 8.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000))

@@ -25,6 +25,7 @@
 #include "InstanceData.h"
 #include "HardcodedEvents.h"
 #include "World.h"
+#include "CreatureGroups.h"
 
 char const* conditionSourceToStr[] =
 {
@@ -106,6 +107,9 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_WORLDOBJECT, //  54
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  55
     CONDITION_REQ_TARGET_WORLDOBJECT, //  56
+    CONDITION_REQ_SOURCE_CREATURE,    //  57
+    CONDITION_REQ_SOURCE_CREATURE,    //  58
+    CONDITION_REQ_TARGET_PLAYER,      //  59
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -172,7 +176,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_AURA:
         {
-            return target->ToUnit()->HasAura(m_value1, SpellEffectIndex(m_value2));
+            if (m_value2 < EFFECT_INDEX_0)
+                return target->ToUnit()->HasAura(m_value1);
+            else
+                return target->ToUnit()->HasAura(m_value1, SpellEffectIndex(m_value2));
         }
         case CONDITION_ITEM:
         {
@@ -496,9 +503,18 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             return target->ToUnit()->IsInCombat();
         }
-        case CONDITION_IS_HOSTILE_TO:
+        case CONDITION_REACTION:
         {
-            return target->IsHostileTo(source);
+            switch (m_value2)
+            {
+                case 0:
+                    return target->GetReactionTo(source) == m_value1;
+                case 1:
+                    return target->GetReactionTo(source) >= m_value1;
+                case 2:
+                    return target->GetReactionTo(source) <= m_value1;
+            }
+            return false;
         }
         case CONDITION_IS_IN_GROUP:
         {
@@ -587,7 +603,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             struct tm* timeinfo;
             timeinfo = localtime(&rawtime);
 
-            return (timeinfo->tm_hour >= m_value1) && (timeinfo->tm_min >= m_value2) && (timeinfo->tm_hour <= m_value3) && (timeinfo->tm_min <= m_value4);
+            return (timeinfo->tm_hour >= m_value1) &&
+                   ((timeinfo->tm_hour > m_value1) || (timeinfo->tm_min >= m_value2)) &&
+                   (timeinfo->tm_hour <= m_value3) &&
+                   ((timeinfo->tm_hour < m_value3) || (timeinfo->tm_min <= m_value4));
         }
         case CONDITION_DISTANCE_TO_POSITION:
         {
@@ -609,6 +628,46 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                     return (bool)target->FindNearestFriendlyPlayer(m_value2);
             }
             return false;
+        }
+        case CONDITION_CREATURE_GROUP_MEMBER:
+        {
+            CreatureGroup const* pGroup = source->ToCreature()->GetCreatureGroup();
+            if (!pGroup)
+                return false;
+            return !m_value1 || pGroup->GetOriginalLeaderGuid().GetCounter() == m_value1;
+        }
+        case CONDITION_CREATURE_GROUP_DEAD:
+        {
+            CreatureGroup const* pGroup = static_cast<Creature const*>(source)->GetCreatureGroup();
+            if (!pGroup)
+                return true;
+
+            if (pGroup->GetLeaderGuid() != source->GetObjectGuid())
+                if (Creature* pLeader = source->GetMap()->GetCreature(pGroup->GetLeaderGuid()))
+                    if (pLeader->IsAlive())
+                        return false;
+
+            for (auto const& itr : pGroup->GetMembers())
+                if (itr.first != source->GetObjectGuid())
+                    if (Creature* pMember = source->GetMap()->GetCreature(itr.first))
+                        if (pMember->IsAlive())
+                            return false;
+
+            return true;
+        }
+        case CONDITION_AREA_EXPLORED:
+        {
+            uint16 areaFlag = AreaEntry::GetFlagById(m_value1);
+            if (areaFlag == 0xffff)
+                return false;
+
+            int offset = areaFlag / 32;
+            if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
+                return false;
+
+            uint32 val = (uint32)(1 << (areaFlag % 32));
+            uint32 currFields = target->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + offset);
+            return (currFields & val) != 0;
         }
     }
     return false;
@@ -831,6 +890,7 @@ bool ConditionEntry::IsValid()
             break;
         }
         case CONDITION_AREAID:
+        case CONDITION_AREA_EXPLORED:
         {
             const auto *areaEntry = AreaEntry::GetById(m_value1);
             if (!areaEntry)
@@ -1006,7 +1066,7 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_NEARBY_GAMEOBJECT:
         {
-            if (!sObjectMgr.GetGameObjectInfo(m_value1))
+            if (!sObjectMgr.GetGameObjectTemplate(m_value1))
             {
                 if (!sObjectMgr.IsExistingGameObjectId(m_value1))
                 {
@@ -1062,7 +1122,7 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_SOURCE_ENTRY:
         {
-            if (!sObjectMgr.GetCreatureTemplate(m_value1) && !sObjectMgr.GetGameObjectInfo(m_value1))
+            if (!sObjectMgr.GetCreatureTemplate(m_value1) && !sObjectMgr.GetGameObjectTemplate(m_value1))
             {
                 if (!sObjectMgr.IsExistingCreatureId(m_value1) && !sObjectMgr.IsExistingGameObjectId(m_value1))
                 {
@@ -1178,6 +1238,21 @@ bool ConditionEntry::IsValid()
             m_value1 = GetIndexOfUpdateFieldForCurrentBuild(m_value1);
             break;
         }
+        case CONDITION_REACTION:
+        {
+            if (m_value1 < MIN_REPUTATION_RANK || m_value1 >= MAX_REPUTATION_RANK)
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Reaction condition (entry %u, type %u) has invalid rank %u (must be 0..7), skipped", m_entry, m_condition, m_value1);
+                return false;
+            }
+
+            if (m_value2 > 2)
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Reaction condition (entry %u, type %u) has invalid argument %u (must be 0..2), skipped", m_entry, m_condition, m_value2);
+                return false;
+            }
+            break;
+        }
         case CONDITION_DB_GUID:
         {
             if (!sObjectMgr.IsExistingCreatureGuid(m_value1) && !sObjectMgr.IsExistingGameObjectGuid(m_value1))
@@ -1248,6 +1323,18 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
+        case CONDITION_CREATURE_GROUP_MEMBER:
+        {
+            if (m_value1)
+            {
+                if (!sObjectMgr.IsExistingCreatureGuid(m_value1))
+                {
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CONDITION_CREATURE_GROUP_MEMBER (entry %u, type %d) uses non-existent guid %u in value1, skipped", m_entry, m_condition, m_value1);
+                    return false;
+                }
+            }
+            break;
+        }
         case CONDITION_NONE:
         case CONDITION_INSTANCE_SCRIPT:
         case CONDITION_ACTIVE_HOLIDAY:
@@ -1258,12 +1345,12 @@ bool ConditionEntry::IsValid()
         case CONDITION_IS_MOVING:
         case CONDITION_HAS_PET:
         case CONDITION_IS_IN_COMBAT:
-        case CONDITION_IS_HOSTILE_TO:
         case CONDITION_IS_IN_GROUP:
         case CONDITION_IS_ALIVE:
         case CONDITION_CANT_PATH_TO_VICTIM:
         case CONDITION_IS_PLAYER:
         case CONDITION_OBJECT_IS_SPAWNED:
+        case CONDITION_CREATURE_GROUP_DEAD:
             break;
         default:
             sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Condition entry %u has bad type of %d, skipped ", m_entry, m_condition);

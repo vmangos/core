@@ -28,8 +28,8 @@ enum
 {
     NPC_RAZZASHI_COBRA  = 11373,
 
-    SAY_TRANSFORM       = -1309000,
-    SAY_DEATH           = -1309001,
+    SAY_TRANSFORM       = 10026,
+    SAY_DEATH           = 10460,
 
     // P1 spells
     SPELL_HOLY_NOVA     = 23858,
@@ -196,7 +196,7 @@ struct boss_venoxisAI : public ScriptedAI
 
         if (!m_bPhaseTwo)
         {
-            /// Phase 1
+            // Phase 1
             if (m_uiHolyNova_Timer < uiDiff)
             {
                 DoCastSpellIfCan(m_creature, SPELL_HOLY_NOVA);

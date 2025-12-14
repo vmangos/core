@@ -24,9 +24,6 @@
 #include "ObjectMgr.h"
 #include "WorldSession.h"
 #include "Object.h"
-#include "Chat.h"
-#include "Language.h"
-#include "ScriptMgr.h"
 #include "World.h"
 #include "Group.h"
 #include "LFGMgr.h"
@@ -75,7 +72,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
     }
 
 
-   GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(obj->GetEntry());
+   GameObjectInfo const* gInfo = sObjectMgr.GetGameObjectTemplate(obj->GetEntry());
 
    sLFGMgr.AddToQueue(_player, gInfo->meetingstone.areaID);
 }

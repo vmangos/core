@@ -58,7 +58,8 @@ enum
 
     DATA_ARENA_CHALLENGER      = 42,
 
-    MAX_ENCOUNTER              = 20,
+    TYPE_FLAMELASH             = 43,
+    MAX_ENCOUNTER              = 21,
 
     EVENT_BAR_PATRONS          = 100,
 
@@ -101,6 +102,8 @@ enum
     GO_JAIL_DOOR_SHILL         = 170569,
 
     // Ambassador Flamelash
+    NPC_FLAMELASH              = 9156,
+    NPC_BURNING_SPIRIT         = 9178,
     GO_DWARF_RUNE_A01          = 170578,
     GO_DWARF_RUNE_B01          = 170579,
     GO_DWARF_RUNE_C01          = 170580,
@@ -108,6 +111,8 @@ enum
     GO_DWARF_RUNE_E01          = 170582,
     GO_DWARF_RUNE_F01          = 170583,
     GO_DWARF_RUNE_G01          = 170584,
+    DWARF_RUNES_MAX            = 7,
+    BURNING_SPIRIT_MAX         = 30, // What is a good maximum and should there be any?
 
     // Grim Guzzler
     NPC_PLUGGER_SPAZZRING      = 9499,
@@ -120,12 +125,12 @@ enum
     PATRON_EMOTE               = 0,
     PATRON_PISSED              = 1,
     PATRON_HOSTILE             = 2,
-    SAY_PISSED_PATRON_1        = -1230042,
-    SAY_PISSED_PATRON_2        = -1230040,
-    SAY_PISSED_PATRON_3        = -1230044,
-    SAY_ROCKNOT_DESPAWN        = -1230045,
-    YELL_PATROL_1              = -1230046,
-    YELL_PATROL_2              = -1230047,
+    SAY_PISSED_PATRON_1        = 5263,
+    SAY_PISSED_PATRON_2        = 5265,
+    SAY_PISSED_PATRON_3        = 5264,
+    SAY_ROCKNOT_DESPAWN        = 5281,
+    YELL_PATROL_1              = 5389,
+    YELL_PATROL_2              = 5390,
     SPELL_NAGMARA_VANISH       = 15341,
 
     NPC_FIREGUARD_DESTROYER    = 8911,
@@ -138,6 +143,7 @@ enum
     NPC_SHADOWFORGE_CITIZEN    = 8902,
     NPC_GRIMSTONE              = 10096,
     NPC_THELDREN               = 16059,
+    NPC_THELDREN_KILL_CREDIT   = 16166,
 
     GO_ARENA1                  = 161525,
     GO_ARENA2                  = 161522,
@@ -166,13 +172,13 @@ enum
     QUEST_ROYAL_RESCUE         = 4003,   // horde quest
     QUEST_FATE_KINGDOM         = 4362,   // alliance quest
 
-    YELL_MAGMUS                = -1230052,
+    YELL_MAGMUS                = 5430,
 
     // Emperor Dagran Thaurissan
-    YELL_SENATOR_1             = -1230048,
-    YELL_SENATOR_2             = -1230049,
-    YELL_SENATOR_3             = -1230050,
-    YELL_SENATOR_4             = -1230051,
+    YELL_SENATOR_1             = 5312,
+    YELL_SENATOR_2             = 5313,
+    YELL_SENATOR_3             = 5315,
+    YELL_SENATOR_4             = 5314,
 };
 
 // Random emotes for Grim Guzzler patrons

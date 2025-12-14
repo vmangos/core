@@ -36,21 +36,21 @@ class WardenScanMgr
         // these are stored as shared pointers to allow this collection to be emptied (presumably in the
         // process of repopulating it) without invalidating pointers held elsewhere, namely in the queues
         // of existing clients
-        std::vector<std::shared_ptr<const Scan>> m_scans;
+        std::vector<std::shared_ptr<Scan const>> m_scans;
 
     public:
         // load static scans from database
-        void loadFromDB();
+        void LoadFromDB();
 
         size_t Count() const { return m_scans.size(); }
 
-        void AddMacScan(const MacScan *);
+        void AddMacScan(MacScan const*);
         void AddMacScan(std::shared_ptr<MacScan>);
 
-        void AddWindowsScan(const WindowsScan *);
+        void AddWindowsScan(WindowsScan const*);
         void AddWindowsScan(std::shared_ptr<WindowsScan>);
 
-        std::vector<std::shared_ptr<const Scan>> GetRandomScans(ScanFlags flags) const;
+        std::vector<std::shared_ptr<Scan const>> GetRandomScans(ScanFlags flags, uint32 build) const;
 };
 
 #define sWardenScanMgr MaNGOS::Singleton<WardenScanMgr>::Instance()

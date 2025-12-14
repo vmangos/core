@@ -167,7 +167,7 @@ enum Powers
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
 
-#define MAX_POWERS                        5                 // not count POWER_RUNES for now
+#define MAX_POWERS                        5
 
 static char const* PowerToString(uint32 power)
 {
@@ -297,7 +297,7 @@ enum DamageEffectType
     DOT                     = 2,
     HEAL                    = 3,
     NODAMAGE                = 4,                            // used also in case when damage applied to health but not applied to spell channelInterruptFlags/etc
-    SELF_DAMAGE             = 5,
+    SELF_DAMAGE             = 5,                            // used for environmental damage
 };
 
 enum TextEmotes
@@ -1111,6 +1111,9 @@ enum SkillCategory
     SKILL_CATEGORY_GENERIC       = 12
 };
 
+#define MAX_TRIAL_MAIN_PROFESSION_SKILL 100
+#define MAX_TRIAL_SECONDARY_PROFESSION_SKILL 150
+
 // These errors are only printed in client console.
 enum TrainingFailureReason
 {
@@ -1161,6 +1164,8 @@ enum CorpseDynFlags
 };
 
 // Passive Spell codes explicit used in code
+#define SPELL_ID_LOGIN_EFFECT                   836
+#define SPELL_ID_DAZE                           1604
 #define SPELL_ID_PASSIVE_BATTLE_STANCE          2457
 #define SPELL_ID_PASSIVE_RESURRECTION_SICKNESS  15007
 
@@ -1185,68 +1190,114 @@ enum WeatherType
 
 enum ChatMsg
 {
-    CHAT_MSG_ADDON                  = 0xFFFFFFFF,
-    CHAT_MSG_SAY                    = 0x00,
-    CHAT_MSG_PARTY                  = 0x01,
-    CHAT_MSG_RAID                   = 0x02,
-    CHAT_MSG_GUILD                  = 0x03,
-    CHAT_MSG_OFFICER                = 0x04,
-    CHAT_MSG_YELL                   = 0x05,
-    CHAT_MSG_WHISPER                = 0x06,
-    CHAT_MSG_WHISPER_INFORM         = 0x07,
-    CHAT_MSG_EMOTE                  = 0x08,
-    CHAT_MSG_TEXT_EMOTE             = 0x09,
-    CHAT_MSG_SYSTEM                 = 0x0A,
-    CHAT_MSG_MONSTER_SAY            = 0x0B,
-    CHAT_MSG_MONSTER_YELL           = 0x0C,
-    CHAT_MSG_MONSTER_EMOTE          = 0x0D,
-    CHAT_MSG_CHANNEL                = 0x0E,
-    CHAT_MSG_CHANNEL_JOIN           = 0x0F,
-    CHAT_MSG_CHANNEL_LEAVE          = 0x10,
-    CHAT_MSG_CHANNEL_LIST           = 0x11,
-    CHAT_MSG_CHANNEL_NOTICE         = 0x12,
-    CHAT_MSG_CHANNEL_NOTICE_USER    = 0x13,
-    CHAT_MSG_AFK                    = 0x14,
-    CHAT_MSG_DND                    = 0x15,
-    CHAT_MSG_IGNORED                = 0x16,
-    CHAT_MSG_SKILL                  = 0x17,
-    CHAT_MSG_LOOT                   = 0x18,
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-    CHAT_MSG_BG_SYSTEM_NEUTRAL      = 0x52,
-    CHAT_MSG_BG_SYSTEM_ALLIANCE     = 0x53,
-    CHAT_MSG_BG_SYSTEM_HORDE        = 0x54,
-    CHAT_MSG_RAID_LEADER            = 0x57,
-    CHAT_MSG_RAID_WARNING           = 0x58,
-    CHAT_MSG_BATTLEGROUND           = 0x5C,
-    CHAT_MSG_BATTLEGROUND_LEADER    = 0x5D,
-#else
-    CHAT_MSG_BG_SYSTEM_NEUTRAL      = CHAT_MSG_SYSTEM,
-    CHAT_MSG_BG_SYSTEM_ALLIANCE     = CHAT_MSG_SYSTEM,
-    CHAT_MSG_BG_SYSTEM_HORDE        = CHAT_MSG_SYSTEM,
-    CHAT_MSG_RAID_LEADER            = CHAT_MSG_RAID,
-    CHAT_MSG_RAID_WARNING           = CHAT_MSG_RAID,
-    CHAT_MSG_BATTLEGROUND           = CHAT_MSG_RAID,
-    CHAT_MSG_BATTLEGROUND_LEADER    = CHAT_MSG_RAID,
+    CHAT_MSG_ADDON                                = 0xFFFFFFFF,
+    CHAT_MSG_SAY                                  = 0x00,
+    CHAT_MSG_PARTY                                = 0x01,
+    CHAT_MSG_RAID                                 = 0x02,
+    CHAT_MSG_GUILD                                = 0x03,
+    CHAT_MSG_OFFICER                              = 0x04,
+    CHAT_MSG_YELL                                 = 0x05,
+    CHAT_MSG_WHISPER                              = 0x06,
+    CHAT_MSG_WHISPER_INFORM                       = 0x07,
+    CHAT_MSG_EMOTE                                = 0x08,
+    CHAT_MSG_TEXT_EMOTE                           = 0x09,
+    CHAT_MSG_SYSTEM                               = 0x0A,
+    CHAT_MSG_MONSTER_SAY                          = 0x0B,
+    CHAT_MSG_MONSTER_YELL                         = 0x0C,
+    CHAT_MSG_MONSTER_EMOTE                        = 0x0D,
+    CHAT_MSG_CHANNEL                              = 0x0E,
+    CHAT_MSG_CHANNEL_JOIN                         = 0x0F,
+    CHAT_MSG_CHANNEL_LEAVE                        = 0x10,
+    CHAT_MSG_CHANNEL_LIST                         = 0x11,
+    CHAT_MSG_CHANNEL_NOTICE                       = 0x12,
+    CHAT_MSG_CHANNEL_NOTICE_USER                  = 0x13,
+    CHAT_MSG_AFK                                  = 0x14,
+    CHAT_MSG_DND                                  = 0x15,
+    CHAT_MSG_IGNORED                              = 0x16,
+    CHAT_MSG_SKILL                                = 0x17,
+    CHAT_MSG_LOOT                                 = 0x18,
+    CHAT_MSG_COMBAT_MISC_INFO                     = 0x19,
+    CHAT_MSG_MONSTER_WHISPER                      = 0x1A,
+    CHAT_MSG_COMBAT_SELF_HITS                     = 0x1B,
+    CHAT_MSG_COMBAT_SELF_MISSES                   = 0x1C,
+    CHAT_MSG_COMBAT_PET_HITS                      = 0x1D,
+    CHAT_MSG_COMBAT_PET_MISSES                    = 0x1E,
+    CHAT_MSG_COMBAT_PARTY_HITS                    = 0x1F,
+    CHAT_MSG_COMBAT_PARTY_MISSES                  = 0x20,
+    CHAT_MSG_COMBAT_FRIENDLYPLAYER_HITS           = 0x21,
+    CHAT_MSG_COMBAT_FRIENDLYPLAYER_MISSES         = 0x22,
+    CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS            = 0x23,
+    CHAT_MSG_COMBAT_HOSTILEPLAYER_MISSES          = 0x24,
+    CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS         = 0x25,
+    CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES       = 0x26,
+    CHAT_MSG_COMBAT_CREATURE_VS_PARTY_HITS        = 0x27,
+    CHAT_MSG_COMBAT_CREATURE_VS_PARTY_MISSES      = 0x28,
+    CHAT_MSG_COMBAT_CREATURE_VS_CREATURE_HITS     = 0x29,
+    CHAT_MSG_COMBAT_CREATURE_VS_CREATURE_MISSES   = 0x2A,
+    CHAT_MSG_COMBAT_FRIENDLY_DEATH                = 0x2B,
+    CHAT_MSG_COMBAT_HOSTILE_DEATH                 = 0x2C,
+    CHAT_MSG_COMBAT_XP_GAIN                       = 0x2D,
+    CHAT_MSG_SPELL_SELF_DAMAGE                    = 0x2E,
+    CHAT_MSG_SPELL_SELF_BUFF                      = 0x2F,
+    CHAT_MSG_SPELL_PET_DAMAGE                     = 0x30,
+    CHAT_MSG_SPELL_PET_BUFF                       = 0x31,
+    CHAT_MSG_SPELL_PARTY_DAMAGE                   = 0x32,
+    CHAT_MSG_SPELL_PARTY_BUFF                     = 0x33,
+    CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE          = 0x34,
+    CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF            = 0x35,
+    CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE           = 0x36,
+    CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF             = 0x37,
+    CHAT_MSG_SPELL_CREATURE_VS_SELF_DAMAGE        = 0x38,
+    CHAT_MSG_SPELL_CREATURE_VS_SELF_BUFF          = 0x39,
+    CHAT_MSG_SPELL_CREATURE_VS_PARTY_DAMAGE       = 0x3A,
+    CHAT_MSG_SPELL_CREATURE_VS_PARTY_BUFF         = 0x3B,
+    CHAT_MSG_SPELL_CREATURE_VS_CREATURE_DAMAGE    = 0x3C,
+    CHAT_MSG_SPELL_CREATURE_VS_CREATURE_BUFF      = 0x3D,
+    CHAT_MSG_SPELL_TRADESKILLS                    = 0x3E,
+    CHAT_MSG_SPELL_DAMAGESHIELDS_ON_SELF          = 0x3F,
+    CHAT_MSG_SPELL_DAMAGESHIELDS_ON_OTHERS        = 0x40,
+    CHAT_MSG_SPELL_AURA_GONE_SELF                 = 0x41,
+    CHAT_MSG_SPELL_AURA_GONE_PARTY                = 0x42,
+    CHAT_MSG_SPELL_AURA_GONE_OTHER                = 0x43,
+    CHAT_MSG_SPELL_ITEM_ENCHANTMENTS              = 0x44,
+    CHAT_MSG_SPELL_BREAK_AURA                     = 0x45,
+    CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE           = 0x46,
+    CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS            = 0x47,
+    CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE          = 0x48,
+    CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS           = 0x49,
+    CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE = 0x4A,
+    CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS  = 0x4B,
+    CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE  = 0x4C,
+    CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS   = 0x4D,
+    CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE       = 0x4E,
+    CHAT_MSG_SPELL_PERIODIC_CREATURE_BUFFS        = 0x4F,
+    CHAT_MSG_SPELL_FAILED_LOCALPLAYER             = 0x50,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1
+    CHAT_MSG_COMBAT_HONOR_GAIN                    = 0x51,
 #endif
-
-    // [-ZERO] Need find correct values
-    // Valeurs trouvees (Nostalrius)
-    CHAT_MSG_REPLY                  = 0x09,
-    CHAT_MSG_MONSTER_PARTY          = 0x30, //0x0D, just selected some free random value for avoid duplicates with really existed values
-    // 0x1A et non 0x31 (Nostalrius)
-    CHAT_MSG_MONSTER_WHISPER        = 0x1A, //0x0F, just selected some free random value for avoid duplicates with really existed values
-    //CHAT_MSG_MONEY                  = 0x1C,
-    //CHAT_MSG_OPENING                = 0x1D,
-    //CHAT_MSG_TRADESKILLS            = 0x1E,
-    //CHAT_MSG_PET_INFO               = 0x1F,
-    //CHAT_MSG_COMBAT_MISC_INFO       = 0x20,
-    //CHAT_MSG_COMBAT_XP_GAIN         = 0x21,
-    //CHAT_MSG_COMBAT_HONOR_GAIN      = 0x22,
-    //CHAT_MSG_COMBAT_FACTION_CHANGE  = 0x23,
-    CHAT_MSG_RAID_BOSS_WHISPER      = CHAT_MSG_MONSTER_WHISPER, // Et non 0x29. Y'a pas mieux.
-    CHAT_MSG_RAID_BOSS_EMOTE        = 0x5A, // 0x5A et non 0x2A (Nostalrius)
-    //CHAT_MSG_FILTERED               = 0x2B,
-    //CHAT_MSG_RESTRICTED             = 0x2E,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    CHAT_MSG_BG_SYSTEM_NEUTRAL                    = 0x52,
+    CHAT_MSG_BG_SYSTEM_ALLIANCE                   = 0x53,
+    CHAT_MSG_BG_SYSTEM_HORDE                      = 0x54,
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    CHAT_MSG_COMBAT_FACTION_CHANGE                = 0x55,
+    CHAT_MSG_MONEY                                = 0x56,
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    CHAT_MSG_RAID_LEADER                          = 0x57,
+    CHAT_MSG_RAID_WARNING                         = 0x58,
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+    CHAT_MSG_RAID_BOSS_WHISPER                    = 0x59, // appears as whisper, yet name is not in client
+    CHAT_MSG_RAID_BOSS_EMOTE                      = 0x5A,
+    CHAT_MSG_FILTERED                             = 0x5B,
+    CHAT_MSG_BATTLEGROUND                         = 0x5C,
+    CHAT_MSG_BATTLEGROUND_LEADER                  = 0x5D,
+#else
+    CHAT_MSG_RAID_BOSS_WHISPER                    = CHAT_MSG_MONSTER_WHISPER,
+    CHAT_MSG_RAID_BOSS_EMOTE                      = CHAT_MSG_MONSTER_EMOTE, // added in 1.11.2, but is broken, ChatFrame.lua was edited in 1.12 to fix it
+#endif
 };
 
 #define MAX_CHAT_MSG_TYPE 0x5E
@@ -1274,11 +1325,6 @@ enum PetDiet
 #define MAX_PET_DIET 9
 
 #define CHAIN_SPELL_JUMP_RADIUS 10
-
-// Max values for Guild
-#define GUILD_EVENTLOG_MAX_RECORDS  100
-#define GUILD_RANKS_MIN_COUNT       5
-#define GUILD_RANKS_MAX_COUNT       10
 
 enum AiReaction
 {
@@ -1395,6 +1441,31 @@ enum ShapeshiftForm
     FORM_SPIRITOFREDEMPTION = 0x20
 };
 
+inline bool IsTankingForm(ShapeshiftForm form)
+{
+    switch (form)
+    {
+        case FORM_BEAR:
+        case FORM_DIREBEAR:
+        case FORM_DEFENSIVESTANCE:
+            return true;
+    }
+    return false;
+}
+
+inline bool IsAttackSpeedOverridenForm(ShapeshiftForm form)
+{
+    switch (form)
+    {
+        case FORM_CAT:
+        case FORM_BEAR:
+        case FORM_DIREBEAR:
+            return true;
+    }
+
+    return false;
+}
+
 enum ShapeshiftFlags
 {
     SHAPESHIFT_FLAG_STANCE                  = 0x00000001,   // Form allows various player activities, which normally cause "You can't X while shapeshifted." errors (npc/go interaction, item use, etc)
@@ -1510,7 +1581,7 @@ enum ResponseCodes
     CHAR_NAME_SUCCESS,
 };
 
-/// Ban function modes
+// Ban function modes
 enum BanMode
 {
     BAN_ACCOUNT,
@@ -1518,13 +1589,62 @@ enum BanMode
     BAN_IP
 };
 
-/// Ban function return codes
+// Ban function return codes
 enum BanReturn
 {
     BAN_SUCCESS,
     BAN_SYNTAX_ERROR,
     BAN_NOTFOUND,
     BAN_INPROGRESS
+};
+
+enum Maps
+{
+    MAP_EASTERN_KINGDOMS    = 0,
+    MAP_KALIMDOR            = 1,
+    MAX_CONTINENT_ID        = 1,
+    MAP_TESTING             = 13,
+    MAP_SCOTT_TEST          = 25,
+    MAP_CASH_TEST           = 29,
+    MAP_ALTERAC_VALLEY      = 30,
+    MAP_SHADOWFANG_KEEP     = 33,
+    MAP_STORMWIND_STOCKADE  = 34,
+    MAP_STORMWIND_PRISON    = 35,
+    MAP_DEADMINES           = 36,
+    MAP_AZSHARA_CRATER      = 37,
+    MAP_COLLIN_TEST         = 42,
+    MAP_WAILING_CAVERNS     = 43,
+    MAP_MONASTERY           = 44,
+    MAP_RAZORFEN_KRAUL      = 47,
+    MAP_BLACKFATHOM_DEEPS   = 48,
+    MAP_ULDAMAN             = 70,
+    MAP_GNOMEREGAN          = 90,
+    MAP_SUNKEN_TEMPLE       = 109,
+    MAP_RAZORFEN_DOWNS      = 129,
+    MAP_EMERALD_DREAM       = 169,
+    MAP_SCARLET_MONASTERY   = 189,
+    MAP_ZUL_FARRAK          = 209,
+    MAP_BLACKROCK_SPIRE     = 229,
+    MAP_BLACKROCK_DEPTHS    = 230,
+    MAP_ONYXIAS_LAIR        = 249,
+    MAP_CAVERNS_OF_TIME     = 269,
+    MAP_SCHOLOMANCE         = 289,
+    MAP_ZUL_GURUB           = 309,
+    MAP_STRATHOLME          = 329,
+    MAP_MARAUDON            = 349,
+    MAP_DEEPRUN_TRAM        = 369,
+    MAP_RAGEFIRE_CHASM      = 389,
+    MAP_MOLTEN_CORE         = 409,
+    MAP_DIRE_MAUL           = 429,
+    MAP_CHAMPIONS_HALL      = 449,
+    MAP_HALL_OF_LEGENDS     = 450,
+    MAP_DEVELOPMENT_LAND    = 451,
+    MAP_BLACKWING_LAIR      = 469,
+    MAP_WARSONG_GULCH       = 489,
+    MAP_AHN_QIRAJ_RUINS     = 509,
+    MAP_ARATHI_BASIN        = 529,
+    MAP_AHN_QIRAJ_TEMPLE    = 531,
+    MAP_NAXXRAMAS           = 533
 };
 
 // Indexes of BattlemasterList.dbc
@@ -1541,10 +1661,10 @@ inline BattleGroundTypeId GetBattleGroundTypeIdByMapId(uint32 mapId)
 {
     switch(mapId)
     {
-        case 30:    return BATTLEGROUND_AV;
-        case 489:   return BATTLEGROUND_WS;
-        case 529:   return BATTLEGROUND_AB;
-        default:    return BATTLEGROUND_TYPE_NONE;
+        case MAP_ALTERAC_VALLEY: return BATTLEGROUND_AV;
+        case MAP_WARSONG_GULCH:  return BATTLEGROUND_WS;
+        case MAP_ARATHI_BASIN:   return BATTLEGROUND_AB;
+        default:                 return BATTLEGROUND_TYPE_NONE;
     }
 }
 
@@ -1552,9 +1672,9 @@ inline uint32 GetBattleGrounMapIdByTypeId(BattleGroundTypeId bgTypeId)
 {
     switch(bgTypeId)
     {
-        case BATTLEGROUND_AV:   return 30;
-        case BATTLEGROUND_WS:   return 489;
-        case BATTLEGROUND_AB:   return 529;
+        case BATTLEGROUND_AV:   return MAP_ALTERAC_VALLEY;
+        case BATTLEGROUND_WS:   return MAP_WARSONG_GULCH;
+        case BATTLEGROUND_AB:   return MAP_ARATHI_BASIN;
         default:                return 0;   //none
     }
 
@@ -1589,6 +1709,7 @@ enum MailResponseResult
 // in fact, these are also used elsewhere
 enum PetTameFailureReason
 {
+    PETTAME_NONE                    = 0,                    // no error, don't send to client
     PETTAME_INVALIDCREATURE         = 1,
     PETTAME_TOOMANY                 = 2,
     PETTAME_CREATUREALREADYOWNED    = 3,
@@ -1679,6 +1800,11 @@ struct Position
     float y = 0.0f;
     float z = 0.0f;
     float o = 0.0f;
+
+    bool IsEmpty() const
+    {
+        return !x && !y && !z && !o;
+    }
 };
 
 struct WorldLocation
@@ -1692,6 +1818,11 @@ struct WorldLocation
         : mapId(_mapid), x(_x), y(_y), z(_z), o(_o) {}
     WorldLocation(WorldLocation const& loc)
         : mapId(loc.mapId), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
+
+    bool IsEmpty() const
+    {
+        return !mapId && !x && !y && !z && !o;
+    }
 };
 
 #endif

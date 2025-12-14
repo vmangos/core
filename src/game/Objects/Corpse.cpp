@@ -27,6 +27,7 @@
 #include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "ObjectMgr.h"
+#include "MapManager.h"
 
 Corpse::Corpse(CorpseType type) : WorldObject(), loot(this), lootRecipient(nullptr), m_faction(nullptr)
 {
@@ -54,7 +55,7 @@ Corpse::~Corpse()
 
 void Corpse::AddToWorld()
 {
-    ///- Register the corpse for guid lookup
+    // Register the corpse for guid lookup
     if (!IsInWorld())
         sObjectAccessor.AddObject(this);
 
@@ -63,7 +64,7 @@ void Corpse::AddToWorld()
 
 void Corpse::RemoveFromWorld()
 {
-    ///- Remove the corpse from the accessor
+    // Remove the corpse from the accessor
     if (IsInWorld())
         sObjectAccessor.RemoveObject(this);
 
@@ -155,8 +156,8 @@ void Corpse::DeleteFromDB()
 
 bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
 {
-    ////                                                    0            1            2                  3                  4                  5                   6
-    //QueryResult* result = CharacterDatabase.Query("SELECT corpse.guid, player_guid, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
+    ////                                                                    0            1            2                  3                  4                  5                   6
+    //std::unique_ptr<QueryResult> result = CharacterDatabase.Query("SELECT corpse.guid, player_guid, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
     ////   7     8            9         10      11    12     13     14   15          16          17           18               19        20
     //    "time, corpse_type, instance, gender, race, class, skin, face, hair_style, hair_color, facial_hair, equipment_cache, guild_id, player_flags FROM corpse"
     uint32 playerLowGuid = fields[1].GetUInt32();
@@ -189,7 +190,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
     uint8 facialhair = fields[17].GetUInt8();
 
     uint32 guildId      = fields[19].GetUInt32();
-    uint32 playerFlags  = fields[20].GetUInt32();
+    uint32 charFlags    = fields[20].GetUInt32();
 
     ObjectGuid guid = ObjectGuid(HIGHGUID_CORPSE, lowguid);
     ObjectGuid playerGuid = ObjectGuid(HIGHGUID_PLAYER, playerLowGuid);
@@ -230,15 +231,15 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
     SetUInt32Value(CORPSE_FIELD_GUILD, guildId);
 
     uint32 flags = CORPSE_FLAG_UNK2;
-    if (playerFlags & PLAYER_FLAGS_HIDE_HELM)
+    if (charFlags & CHARACTER_FLAG_HIDE_HELM)
         flags |= CORPSE_FLAG_HIDE_HELM;
-    if (playerFlags & PLAYER_FLAGS_HIDE_CLOAK)
+    if (charFlags & CHARACTER_FLAG_HIDE_CLOAK)
         flags |= CORPSE_FLAG_HIDE_CLOAK;
     SetUInt32Value(CORPSE_FIELD_FLAGS, flags);
 
     // no need to mark corpse as lootable, because corpses are not saved in battle grounds
 
-    if (mapid <= 1)
+    if (mapid <= MAX_CONTINENT_ID)
         instanceid = sMapMgr.GetContinentInstanceId(mapid, positionX, positionY);
     SetLocationInstanceId(instanceid);
     SetLocationMapId(mapid);

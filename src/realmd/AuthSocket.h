@@ -19,17 +19,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup realmd
-/// @{
-/// \file
+// \addtogroup realmd
+// @{
+// \file
 
 #ifndef _AUTHSOCKET_H
 #define _AUTHSOCKET_H
 
 #include "Common.h"
-#include "Auth/BigNumber.h"
-#include "Auth/Sha1.h"
-#include "SRP6/SRP6.h"
+#include "Crypto/BigNumber.h"
+#include "Crypto/Hash/SHA1.h"
+#include "Crypto/Authentication/SRP6.h"
 #include "ByteBuffer.h"
 
 #include "BufferedSocket.h"
@@ -51,7 +51,7 @@ enum LockFlag
     GEO_CITY        = 0x20
 };
 
-/// Handle login commands
+// Handle login commands
 class AuthSocket: public BufferedSocket
 {
     public:
@@ -62,7 +62,7 @@ class AuthSocket: public BufferedSocket
 
         void OnAccept();
         void OnRead();
-        void SendProof(Sha1Hash sha);
+        void SendProof(Crypto::Hash::SHA1::Digest sha);
         void LoadRealmlist(ByteBuffer &pkt);
         bool VerifyPinData(uint32 pin, const PINData& clientData);
         uint32 GenerateTotpPin(const std::string& secret, int interval);
@@ -90,6 +90,7 @@ class AuthSocket: public BufferedSocket
         };
 
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
+        std::string GetRealmAddress(Realm const& realm) const;
 
         SRP6 srp;
         BigNumber m_reconnectProof;
@@ -138,4 +139,4 @@ class AuthSocket: public BufferedSocket
         void InitPatch();
 };
 #endif
-/// @}
+// @}

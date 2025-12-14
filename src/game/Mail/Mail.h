@@ -47,7 +47,7 @@ class Object;
 class Player;
 
 #define MAIL_BODY_ITEM_TEMPLATE 8383                        // - plain letter, A Dusty Unsent Letter: 889
-/// The maximal amount of items a mail can contain.
+// The maximal amount of items a mail can contain.
 #define MAX_MAIL_ITEMS 1
 /**
  * The type of the mail.
@@ -57,21 +57,21 @@ enum MailMessageType
 {
     MAIL_NORMAL         = 0,
     MAIL_AUCTION        = 2,
-    MAIL_CREATURE       = 3,                                /// client send CMSG_CREATURE_QUERY on this mailmessagetype
-    MAIL_GAMEOBJECT     = 4,                                /// client send CMSG_GAMEOBJECT_QUERY on this mailmessagetype
-    MAIL_ITEM           = 5,                                /// client send CMSG_ITEM_QUERY on this mailmessagetype
+    MAIL_CREATURE       = 3,                                // client send CMSG_CREATURE_QUERY on this mailmessagetype
+    MAIL_GAMEOBJECT     = 4,                                // client send CMSG_GAMEOBJECT_QUERY on this mailmessagetype
+    MAIL_ITEM           = 5,                                // client send CMSG_ITEM_QUERY on this mailmessagetype
 };
 /**
  * A Mask representing the status of the mail.
  */
 enum MailCheckMask
 {
-    MAIL_CHECK_MASK_NONE        = 0x00,                     /// Nothing.
-    MAIL_CHECK_MASK_READ        = 0x01,                     /// This mail was read.
-    MAIL_CHECK_MASK_RETURNED    = 0x02,                     /// This mail was returned. No allow return mail.
-    MAIL_CHECK_MASK_COPIED      = 0x04,                     /// This mail was copied. No allow make item copy from mail text.
-    MAIL_CHECK_MASK_COD_PAYMENT = 0x08,                     /// This mail is payable on delivery.
-    MAIL_CHECK_MASK_HAS_BODY    = 0x10,                     /// This mail has body text.
+    MAIL_CHECK_MASK_NONE        = 0x00,                     // Nothing.
+    MAIL_CHECK_MASK_READ        = 0x01,                     // This mail was read.
+    MAIL_CHECK_MASK_RETURNED    = 0x02,                     // This mail was returned. No allow return mail.
+    MAIL_CHECK_MASK_COPIED      = 0x04,                     // This mail was copied. No allow make item copy from mail text.
+    MAIL_CHECK_MASK_COD_PAYMENT = 0x08,                     // This mail is payable on delivery.
+    MAIL_CHECK_MASK_HAS_BODY    = 0x10,                     // This mail has body text.
 };
 
 /**
@@ -133,11 +133,11 @@ class MailSender
         MailSender(Object* sender, MailStationery stationery = MAIL_STATIONERY_DEFAULT);
         MailSender(AuctionEntry* sender);
     public:                                                 // Accessors
-        /// The Messagetype of this MailSender.
+        // The Messagetype of this MailSender.
         MailMessageType GetMailMessageType() const { return m_messageType; }
-        /// The GUID of the player represented by this MailSender, or the Entry of the non-player object.
+        // The GUID of the player represented by this MailSender, or the Entry of the non-player object.
         uint32 GetSenderId() const { return m_senderId; }
-        /// The stationary associated with this MailSender
+        // The stationary associated with this MailSender
         MailStationery GetStationery() const { return m_stationery; }
     private:
         // Trap for wrong used guid as low guid, no body
@@ -217,15 +217,15 @@ class MailDraft
          */
         MailDraft(std::string subject, std::string text);
     public:                                                 // Accessors
-        /// Returns the template ID used for this MailDraft.
+        // Returns the template ID used for this MailDraft.
         uint16 GetMailTemplateId() const { return m_mailTemplateId; }
-        /// Returns the subject of this MailDraft.
+        // Returns the subject of this MailDraft.
         std::string const& GetSubject() const { return m_subject; }
-        /// Returns the ID of the text of this MailDraft.
+        // Returns the ID of the text of this MailDraft.
         uint32 GetBodyId() const { return m_bodyId; }
-        /// Returns the ammount of money in this MailDraft.
+        // Returns the ammount of money in this MailDraft.
         uint32 GetMoney() const { return m_money; }
-        /// Returns the Cost of delivery of this MailDraft.
+        // Returns the Cost of delivery of this MailDraft.
         uint32 GetCOD() const { return m_COD; }
     public:                                                 // modifiers
 
@@ -257,22 +257,22 @@ class MailDraft
         MailDraft& operator=(MailDraft const&);             // trap decl, no body, ...because items clone is high price operation
 
         void deleteIncludedItems(bool inDB = false);
-        bool prepareItems(Player* receiver);                ///< called from SendMailTo for generate mailTemplateBase items
+        bool prepareItems(Player* receiver);                // called from SendMailTo for generate mailTemplateBase items
 
-        /// The ID of the template associated with this MailDraft.
+        // The ID of the template associated with this MailDraft.
         uint16      m_mailTemplateId;
-        /// Boolean specifying whether items are required or not.
+        // Boolean specifying whether items are required or not.
         bool        m_mailTemplateItemsNeed;
-        /// The subject of the MailDraft.
+        // The subject of the MailDraft.
         std::string m_subject;
-        /// The ID of the body of the MailDraft.
+        // The ID of the body of the MailDraft.
         uint32      m_bodyId;
-        /// A map of items in this MailDraft.
-        MailItemMap m_items;                                ///< Keep the items in a map to avoid duplicate guids (which can happen), store only low part of guid
+        // A map of items in this MailDraft.
+        MailItemMap m_items;                                // Keep the items in a map to avoid duplicate guids (which can happen), store only low part of guid
 
-        /// The amount of money in this MailDraft.
+        // The amount of money in this MailDraft.
         uint32 m_money;
-        /// The cod amount of this MailDraft.
+        // The cod amount of this MailDraft.
         uint32 m_COD;
 };
 /**
@@ -280,8 +280,8 @@ class MailDraft
  */
 struct MailItemInfo
 {
-    uint32 itemGuid;                                        ///< the item instance GUID
-    uint32 itemId;                                          ///< the item template ID
+    uint32 itemGuid;                                        // the item instance GUID
+    uint32 itemId;                                          // the item template ID
 };
 
 typedef std::vector<MailItemInfo> MailItemInfoVec;
@@ -290,39 +290,39 @@ typedef std::vector<MailItemInfo> MailItemInfoVec;
  */
 struct Mail
 {
-    /// the ID of the message contained in the mail.
+    // the ID of the message contained in the mail.
        uint32 messageID;
-       /// the type of the message
+       // the type of the message
     uint8 messageType;
-    /// the stationary used in this mail.
+    // the stationary used in this mail.
     uint8 stationery;
-    /// the ID of the template this mail is based on.
+    // the ID of the template this mail is based on.
     uint16 mailTemplateId;
-    /// the LowGUID of the player that sent this mail, or creature low guid, or other id
+    // the LowGUID of the player that sent this mail, or creature low guid, or other id
     uint32 sender;
-    /// the GUID of the player that this mail is sent to.
+    // the GUID of the player that this mail is sent to.
     ObjectGuid receiverGuid;
-    /// the subject of the mail
+    // the subject of the mail
     std::string subject;
-    /// The ID of the itemtext.
+    // The ID of the itemtext.
     uint32 itemTextId;
-    /// flag mark mail that already has items, or already generate none items for template
+    // flag mark mail that already has items, or already generate none items for template
     bool has_items;
-    /// A vector containing Information about the items in this mail.
+    // A vector containing Information about the items in this mail.
     MailItemInfoVec items;
-    /// A vector containing Information about the items that where already take from this mail.
+    // A vector containing Information about the items that where already take from this mail.
     std::vector<uint32> removedItems;
-    /// The time at which this mail will expire
+    // The time at which this mail will expire
     time_t expire_time;
-    /// The time at which this mail (was/will be) delivered
+    // The time at which this mail (was/will be) delivered
     time_t deliver_time;
-    /// The amount of money contained in this mail.
+    // The amount of money contained in this mail.
     uint32 money;
-    /// The amount of money the receiver has to pay to get this mail.
+    // The amount of money the receiver has to pay to get this mail.
     uint32 COD;
-    /// The time at which this mail was read.
+    // The time at which this mail was read.
     uint32 checked;
-    /// The state of this mail.
+    // The state of this mail.
     MailState state;
 
     /**
@@ -380,7 +380,7 @@ struct Mail
      * Generate items for template if items not genereated before (receiver has been offline, has_items == false)
      *
      */
-    void prepareTemplateItems(Player* receiver);            ///< called from _LoadMails for generate mailTemplateBase items not generated for offline player
+    void prepareTemplateItems(Player* receiver);            // called from _LoadMails for generate mailTemplateBase items not generated for offline player
 };
 
 #endif

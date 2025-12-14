@@ -186,7 +186,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         if (!m_pInstance)
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_anubrekhanAI::ctor failed to cast instanceData to instance_naxxramas");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_anubrekhanAI::ctor failed to cast instanceData to instance_naxxramas");
 
         CheckSpawnInitialCryptGuards();
         Reset();
@@ -208,7 +208,7 @@ struct boss_anubrekhanAI : public ScriptedAI
             }
             else 
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_anubrekhanAI::CheckSpawnInitialCryptGuards failed to spawn initial crypt guard");
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "boss_anubrekhanAI::CheckSpawnInitialCryptGuards failed to spawn initial crypt guard");
             }
         }
     }
@@ -409,12 +409,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                     m_creature->SetTargetGuid(target->GetObjectGuid());
                     m_uiRestoreTargetTimer = 1000;
                     m_uiImpaleTimer = IMPALE_CD();
-
-                    if (Creature* pC = m_creature->SummonCreature(533003, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetAngle(target),
-                        TEMPSUMMON_TIMED_DESPAWN, 4000))
-                    {
-                        pC->CastSpell(pC, SPELL_IMPALE, true);
-                    }
+                    DoCastSpellIfCan(target, SPELL_IMPALE);
                 }
             }
             else
@@ -563,7 +558,7 @@ struct anub_doorAI : public GameObjectAI
     {
         m_pInstance = (instance_naxxramas*)me->GetInstanceData();
         if (!m_pInstance)
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "anub_doorAI could not find instanceData");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "anub_doorAI could not find instanceData");
     }
 
     bool OnUse(Unit* user) override
@@ -575,7 +570,7 @@ struct anub_doorAI : public GameObjectAI
 
         if (!m_pInstance)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[boss_anubrekhan/anub_doorAI][Inst %03u] ERROR: No instance", user->GetInstanceId());
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_MINIMAL, "[boss_anubrekhan/anub_doorAI][Inst %03u] ERROR: No instance", user->GetInstanceId());
             return false;
         }
 

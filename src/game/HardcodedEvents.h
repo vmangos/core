@@ -87,7 +87,7 @@ struct DragonsOfNightmare : WorldEvent
     static void CheckSingleVariable(uint32 idx, uint32& value);
 
 private:
-    void GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid>& dragons, uint32& alive, time_t respawnTime);
+    void GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> const& dragons, uint32& alive, time_t respawnTime);
     bool LoadDragons(std::vector<ObjectGuid>& dragonGUIDs);
     //void GetExistingDragons(std::vector<ObjectGuid>& dragonGUIDs, std::vector<Creature*>& existingDragons);
     void PermutateDragons();
@@ -182,20 +182,21 @@ struct ScourgeInvasionEvent : WorldEvent
 private:
     struct InvasionZone
     {
-        uint32 map;
-        uint32 zoneId;
-        uint32 remainingVar;
-        uint32 necroAmount;
+        uint32 map = 0;
+        uint32 zoneId = 0;
+        uint32 remainingVar = 0;
+        uint32 necroAmount = 0;
         ObjectGuid mouthGuid;
-        std::vector<Position> mouth;
+        Position mouthPos;
     };
 
     struct CityAttack
     {
-        uint32 map;
-        uint32 zoneId;
+        uint32 map = 0;
+        uint32 zoneId = 0;
         ObjectGuid pallidGuid;
-        std::vector<Position> pallid;
+        uint32 spawnLocationId = 0;
+        std::vector<Position> pallidPos;
     };
 
     bool invasion1Loaded;
@@ -216,8 +217,8 @@ private:
     void StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable);
     void StartNewCityAttackIfTime(uint32 timeVariable, uint32 zoneVariable);
     bool ResumeInvasion(uint32 zoneId);
-    bool SummonMouth(Map* pMap, InvasionZone* zone, Position position);
-    bool SummonPallid(Map* pMap, CityAttack* zone, Position position, uint32 spawnLoc);
+    bool SummonMouth(InvasionZone* zone);
+    bool SummonPallid(CityAttack* zone, uint32 spawnLocId);
 
     Map* GetMap(uint32 mapId, Position const& invZone);
     bool isValidZoneId(uint32 zoneId);
@@ -250,6 +251,40 @@ enum WarEffortEventStage
     WAR_EFFORT_STAGE_COMPLETE       = 12
 };
 
+inline char const* WarEffortStageToString(uint32 stage)
+{
+    switch (stage)
+    {
+        case WAR_EFFORT_STAGE_COLLECTION:
+            return "Collection of Materials";
+        case WAR_EFFORT_STAGE_READY:
+            return "Material Collection Ready";
+        case WAR_EFFORT_STAGE_MOVE_1:
+            return "Moving to Silithus Day 1";
+        case WAR_EFFORT_STAGE_MOVE_2:
+            return "Moving to Silithus Day 2";
+        case WAR_EFFORT_STAGE_MOVE_3:
+            return "Moving to Silithus Day 3";
+        case WAR_EFFORT_STAGE_MOVE_4:
+            return "Moving to Silithus Day 4";
+        case WAR_EFFORT_STAGE_MOVE_5:
+            return "Moving to Silithus Day 5";
+        case WAR_EFFORT_STAGE_GONG_WAIT:
+            return "Waiting for Gong to be Rung";
+        case WAR_EFFORT_STAGE_GONG_RUNG:
+            return "Gong has been Rung";
+        case WAR_EFFORT_STAGE_BATTLE:
+            return "Battle at Gate";
+        case WAR_EFFORT_STAGE_CH_ATTACK:
+            return "Cenarion Hold Attack";
+        case WAR_EFFORT_STAGE_FINALBATTLE:
+            return "Final Battle";
+        case WAR_EFFORT_STAGE_COMPLETE:
+            return "Completed";
+    }
+    return "UNKNOWN";
+}
+
 enum WarEffortEnums
 {
     WAR_EFFORT_COLLECTION_TRANSITION_TIME   = 10 * MINUTE,  // 10 minutes between the event ending and starting the transition (what is the blizzlike thing here?)
@@ -257,8 +292,8 @@ enum WarEffortEnums
     WAR_EFFORT_GONG_DURATION                = 10 * HOUR,    // gong lasts 10 hours after the first dong
     WAR_EFFORT_CH_ATTACK_TIME               = 4 * HOUR,     // 4h after gong bang, CH gets attacked
     WAR_EFFORT_FINAL_BATTLE_TIME            = 4 * HOUR,     // 4h after CH attack, final battle begins
-    WAR_EFFORT_TEXT_CRYSTALS                = -1000008,     // Crystals emerge from the ground...
-    WAR_EFFORT_TEXT_BATTLE_OVER             = -1780312,     // The Might of Kalimdor is victorious...
+    WAR_EFFORT_TEXT_CRYSTALS                = 11432,        // Crystals emerge from the ground...
+    WAR_EFFORT_TEXT_BATTLE_OVER             = 11649,        // The Might of Kalimdor is victorious...
     WAR_EFFORT_ASHI_REWARD                  = 0x01,
     WAR_EFFORT_ZORA_REWARD                  = 0x02,
     WAR_EFFORT_REGAL_REWARD                 = 0x04

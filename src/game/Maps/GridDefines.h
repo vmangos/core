@@ -185,7 +185,7 @@ namespace MaNGOS
     }
     inline bool IsValidMapCoord(float c)
     {
-        return finite(c) && (std::fabs(c) <= MAP_HALFSIZE - 0.5);
+        return std::isfinite(c) && (std::fabs(c) <= MAP_HALFSIZE - 0.5);
     }
 
     inline bool IsValidMapCoord(float x, float y)
@@ -200,7 +200,7 @@ namespace MaNGOS
 
     inline bool IsValidMapCoord(float x, float y, float z, float o)
     {
-        return IsValidMapCoord(x,y,z) && finite(o) && fabs(o) <= 4 * M_PI;
+        return IsValidMapCoord(x,y,z) && std::isfinite(o) && fabs(o) <= 4 * M_PI;
     }
 }
 #endif

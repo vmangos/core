@@ -28,7 +28,6 @@ enum TotemType
 {
     TOTEM_PASSIVE    = 0,
     TOTEM_ACTIVE     = 1,
-    TOTEM_STATUE     = 2
 };
 
 class Totem : public Creature
@@ -49,7 +48,6 @@ class Totem : public Creature
         void SetOwner(Unit* owner);
 
         bool UpdateStats(Stats /*stat*/) override { return true; }
-        bool UpdateAllStats() override { return true; }
         void UpdateResistances(uint32 /*school*/) override {}
         void UpdateArmor() override {}
         void UpdateMaxHealth() override {}

@@ -3,7 +3,7 @@
 
 #include <atomic>
 #include <chrono>
-#include <mutex>
+#include <shared_mutex>
 #include <thread>
 #include <vector>
 #include <cstddef>
@@ -22,7 +22,7 @@ class MovementBroadcaster final
     std::chrono::milliseconds m_sleep_timer;
 
     std::vector<PlayersBCastSet> m_thread_players;
-    std::vector<std::mutex> m_thread_locks;
+    std::vector<std::shared_timed_mutex> m_thread_locks;
 
     void Work(std::size_t thread_id);
     void BroadcastPackets(std::size_t index, uint32& num_packets);

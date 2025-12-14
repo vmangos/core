@@ -39,6 +39,7 @@
 #include "Chat.h"
 #include "Anticheat.h"
 #include "AccountMgr.h"
+#include "TransactionLog.h"
 #include "Database/DatabaseImpl.h"
 
 void WorldSession::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, uint32 item_guid, uint32 item_count)
@@ -92,12 +93,12 @@ public:
     Player*     receiverPtr;
     Team        rcTeam;
     uint8       mailsCount;
-    void Callback(QueryResult* result)
+
+    void Callback(std::unique_ptr<QueryResult> result)
     {
         WorldSession* sess = sWorld.FindSession(accountId);
         if (!sess || !sess->GetPlayer() || sess->GetPlayer()->GetObjectGuid() != senderGuid || !sess->GetPlayer()->IsInWorld())
         {
-            delete result;
             delete this;
             return;
         }
@@ -106,7 +107,6 @@ public:
         {
             Field* fields = result->Fetch();
             mailsCount = fields[0].GetUInt32();
-            delete result;
         }
         sess->HandleSendMailCallback(this);
         delete this;
@@ -137,22 +137,27 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
     
     recv_data >> mailboxGuid;
     if (!CheckMailBox(mailboxGuid))
+    {
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
         return;
+    }
 
-    WorldSession::AsyncMailSendRequest* req = new WorldSession::AsyncMailSendRequest();
+    if (HasTrialRestrictions())
+    {
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_DISABLED_FOR_TRIAL_ACC);
+        return;
+    }
+
+    std::unique_ptr<WorldSession::AsyncMailSendRequest> req = std::make_unique<WorldSession::AsyncMailSendRequest>();
     req->accountId = GetAccountId();
     req->senderGuid = GetMasterPlayer()->GetObjectGuid();
+
     recv_data >> req->receiverName;
-
     recv_data >> req->subject;
-
     recv_data >> req->body;
-
     recv_data >> unk1;                                      // stationery?
     recv_data >> unk2;                                      // 0x00000000
-
     recv_data >> req->itemGuid;
-
     recv_data >> req->money >> req->COD;                    // money and cod
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
@@ -164,22 +169,15 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
 
     // packet read complete, now do check
     if (req->subject.size() > 64)
-    {
-        delete req;
         return;
-    }
 
     if (req->body.size() > 500)
-    {
-        delete req;
         return;
-    }
 
     // client interface limit
     if (req->COD > 100000000)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to send more than 10000g COD mail", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
-        delete req;
         return;
     }
 
@@ -191,17 +189,11 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
     if (!sWorld.getConfig(CONFIG_BOOL_GM_ALLOW_TRADES) && GetSecurity() > SEC_PLAYER)
     {
         if (!req->itemGuid.IsEmpty() || req->money)
-        {
-            delete req;
             return;
-        }
     }
 
     if (req->receiverName.empty())
-    {
-        delete req;
         return;
-    }
 
     MasterPlayer* pl = GetMasterPlayer();
 
@@ -213,7 +205,6 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "%s is sending mail to %s (GUID: nonexistent!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
                    pl->GetGuidStr().c_str(), req->receiverName.c_str(), req->subject.c_str(), req->body.c_str(), req->itemGuid ? 1 : 0, req->money, req->COD, unk1, unk2);
         SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
-        delete req;
         return;
     }
 
@@ -223,14 +214,27 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
     if (pl->GetObjectGuid() == req->receiver)
     {
         SendMailResult(0, MAIL_SEND, MAIL_ERR_CANNOT_SEND_TO_SELF);
-        delete req;
         return;
     }
 
     req->receiverPtr = sObjectMgr.GetPlayer(req->receiver);
 
+    // release ownership now cause we need to pass it to the query callback
+    HandleSendMailRequest(req.release());
+}
+
+void WorldSession::HandleSendMailRequest(AsyncMailSendRequest* req)
+{
     if (req->receiverPtr)
     {
+        // check trial account restrictions for online receiver
+        if (GetSecurity() <= SEC_PLAYER && req->receiverPtr->GetSession()->HasTrialRestrictions())
+        {
+            SendMailResult(0, MAIL_SEND, MAIL_ERR_DISABLED_FOR_TRIAL_ACC);
+            delete req;
+            return;
+        }
+
         MasterPlayer* receiverMasterPlayer = req->receiverPtr->GetSession()->GetMasterPlayer();
         ASSERT(receiverMasterPlayer);
         req->rcTeam = receiverMasterPlayer->GetTeam();
@@ -281,7 +285,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         return;
     }
 
-    uint32 rc_account = sObjectMgr.GetPlayerAccountIdByGUID(req->receiver);
+    uint32 receiverAccount = sObjectMgr.GetPlayerAccountIdByGUID(req->receiver);
 
     Item* item = nullptr;
 
@@ -316,6 +320,13 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         }
     }
 
+    // check trial account restrictions for offline receiver
+    if (!req->receiverPtr && GetSecurity() <= SEC_PLAYER && sAccountMgr.HasTrialRestrictions(receiverAccount))
+    {
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_DISABLED_FOR_TRIAL_ACC);
+        return;
+    }
+
     // Antispam checks
     if (loadedPlayer->GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAILSPAM_LEVEL) &&
         req->money < sWorld.getConfig(CONFIG_UINT32_MAILSPAM_MONEY) &&
@@ -326,7 +337,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
     }
 
     AccountPersistentData& data = sAccountMgr.GetAccountPersistentData(GetAccountId());
-    if (!data.CanMail(rc_account))
+    if (!data.CanMail(receiverAccount))
     {
         std::stringstream details;
         std::string from = ChatHandler(this).playerLink(GetMasterPlayer()->GetName());
@@ -344,7 +355,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         SendMailResult(0, MAIL_SEND, MAIL_OK);
         return;
     }
-    data.JustMailed(rc_account);
+    data.JustMailed(receiverAccount);
 
     SendMailResult(0, MAIL_SEND, MAIL_OK);
 
@@ -377,7 +388,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
                 sLog.Player(GetAccountId(), LOG_GM, LOG_LVL_BASIC,
                     "GM %s (Account: %u) mail item: %s (Entry: %u Count: %u) to player: %s (Account: %u)",
                     GetPlayerName(), GetAccountId(), item->GetProto()->Name1, item->GetEntry(), item->GetCount(),
-                    req->receiver.GetString().c_str(), rc_account);
+                    req->receiver.GetString().c_str(), receiverAccount);
             }
 
             loadedPlayer->MoveItemFromInventory(item->GetBagSlot(), item->GetSlot(), true);
@@ -395,7 +406,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         {
             sLog.Player(GetAccountId(), LOG_GM, LOG_LVL_BASIC,
                 "GM %s (Account: %u) mail money: %u to player: %s (Account: %u)",
-                GetPlayerName(), GetAccountId(), req->money, req->receiver.GetString().c_str(), rc_account);
+                GetPlayerName(), GetAccountId(), req->money, req->receiver.GetString().c_str(), receiverAccount);
         }
     }
 
@@ -714,6 +725,13 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recv_data)
         return;
     }
 
+    // prevent losing money due to reaching gold cap
+    if (int64(loadedPlayer->GetMoney()) + int64(m->money) > int64(loadedPlayer->GetMaxMoney()))
+    {
+        SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_ERR_INTERNAL_ERROR);
+        return;
+    }
+
     SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_OK);
 
     loadedPlayer->LogModifyMoney(m->money, "Mail", ObjectGuid(HIGHGUID_PLAYER, m->sender));
@@ -743,15 +761,36 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
     MasterPlayer* pl = GetMasterPlayer();
     ASSERT(pl);
 
-    // client can't work with packets > max int16 value
-    // uint32 const maxPacketSize = 32767;
+    constexpr uint32 averageSizePerMail =
+        sizeof(uint32) /*Message Id*/ +
+        sizeof(uint8) /*Message Type*/ + 
+        sizeof(uint64) /*Sender Guid*/ +
+        32 /*Subject (max 64)*/ +
+        sizeof(uint32) /*Item Text Id*/ +
+        sizeof(uint32) /*Unknown*/ +
+        sizeof(uint32) /*Stationery*/ +
+        sizeof(uint32) /*Item Entry*/ +
+        sizeof(uint32) /*Item Enchantment Id*/ +
+        sizeof(uint32) /*Item Random Property Id*/ +
+        sizeof(uint32) /*Item Suffix Factor*/ +
+        sizeof(uint8) /*Item Count*/ +
+        sizeof(uint32) /*Item Spell Charges*/ +
+        sizeof(uint32) /*Item Max Durability*/ +
+        sizeof(uint32) /*Item Durability*/ +
+        sizeof(uint32) /*Money*/ +
+        sizeof(uint32) /*Cod*/ +
+        sizeof(uint32) /*Checked*/ +
+        sizeof(float) /*Expire Time*/
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        + sizeof(uint32) /*Mail Template Id*/
+#endif
+        ;
 
-    uint32 mailsCount = 0;                                  // real send to client mails amount
-
-    WorldPacket data(SMSG_MAIL_LIST_RESULT, (200));         // guess size
+    WorldPacket data(SMSG_MAIL_LIST_RESULT, 1 + std::min(pl->GetMailSize(), 253u) * averageSizePerMail);
     data << uint8(0);                                       // mail's count
     time_t cur_time = time(nullptr);
 
+    uint32 mailsCount = 0;                                  // real send to client mails amount
     for (PlayerMails::iterator itr = pl->GetMailBegin(); itr != pl->GetMailEnd(); ++itr)
     {
         // packet send mail count as uint8, prevent overflow
@@ -761,13 +800,6 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
         // skip deleted or not delivered (deliver delay not expired) mails
         if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time || cur_time > (*itr)->expire_time)
             continue;
-
-        /*[-ZERO] TODO recheck this
-        size_t next_mail_size = 4+1+8+((*itr)->subject.size()+1)+4*7+1+item_count*(1+4+4+6*3*4+4+4+1+4+4+4);
-
-        if (data.wpos()+next_mail_size > maxPacketSize)
-            break;
-        */
 
         data << uint32((*itr)->messageID);                  // Message ID
         data << uint8((*itr)->messageType);                 // Message Type
@@ -788,7 +820,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
 
         data << (*itr)->subject;                            // Subject string - once 00, when mail type = 3
         data << uint32((*itr)->itemTextId);                 // sure about this
-        data << uint32(0);                                  // unknown
+        data << uint32(0);                                  // package (Package.dbc)
         data << uint32((*itr)->stationery);                 // stationery (Stationery.dbc)
 
         // 1.12.1 can have only single item
@@ -843,7 +875,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recv_data)
 
     recv_data >> itemTextId >> mailId >> unk;
 
-    ///TODO: some check needed, if player has item with guid mailId, or has mail with id mailId
+    // TODO: some check needed, if player has item with guid mailId, or has mail with id mailId
 
     WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, (4 + 10)); // guess size
     data << itemTextId;

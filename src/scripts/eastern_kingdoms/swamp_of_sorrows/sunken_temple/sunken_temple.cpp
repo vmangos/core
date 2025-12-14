@@ -45,11 +45,11 @@ enum
 
 enum
 {
-    EMOTE_MALFURION1              = -1109000,
-    SAY_MALFURION1                = -1109001,
-    SAY_MALFURION2                = -1109002,
-    SAY_MALFURION3                = -1109003,
-    SAY_MALFURION4                = -1109004,
+    EMOTE_MALFURION1              = 11191,
+    SAY_MALFURION1                = 11193,
+    SAY_MALFURION2                = 11194,
+    SAY_MALFURION3                = 11195,
+    SAY_MALFURION4                = 11196,
 
     MAX_MALFURION_TEMPLE_SPEECHES = 7
 };
@@ -168,33 +168,6 @@ bool AreaTrigger_at_shade_of_eranikus(Player* pPlayer, AreaTriggerEntry const* p
     return false;
 }
 
-/*######
-## go_atalai_light
-######*/
-
-struct go_atalai_lightAI: public GameObjectAI
-{
-    go_atalai_lightAI(GameObject* pGo) : GameObjectAI(pGo) {}
-
-    bool OnUse(Unit* pUser) override
-    {
-        ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData();
-
-        if (!pInstance || pInstance->GetData(TYPE_ATALARION) == DONE)
-            return false;
-
-        pInstance->SetData64(me->GetEntry(), me->GetGUID());
-        pInstance->SetData(TYPE_ATALARION, IN_PROGRESS);
-
-        return true;
-    }
-};
-
-GameObjectAI* GetAIgo_atalai_light(GameObject *pGo)
-{
-    return new go_atalai_lightAI(pGo);
-}
-
 void AddSC_sunken_temple()
 {
     Script* pNewScript;
@@ -207,10 +180,5 @@ void AddSC_sunken_temple()
     pNewScript = new Script;
     pNewScript->Name = "at_shade_of_eranikus";
     pNewScript->pAreaTrigger = &AreaTrigger_at_shade_of_eranikus;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "go_atalai_light";
-    pNewScript->GOGetAI = &GetAIgo_atalai_light;
     pNewScript->RegisterSelf();
 }

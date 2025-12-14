@@ -24,8 +24,7 @@
 #include "WardenModule.hpp"
 
 #include "Platform/Define.h"
-
-#include <openssl/md5.h>
+#include "Crypto/Hash/MD5.h"
 
 #include <zlib.h>
 
@@ -34,7 +33,9 @@
 #include <fstream>
 #include <exception>
 
-WardenModule::WardenModule(std::string const &bin, std::string const &kf, std::string const &cr)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+
+WardenModule::WardenModule(std::string const& bin, std::string const& kf, std::string const& cr)
 {
     std::ifstream b(bin, std::ios::binary | std::ios::ate);
 
@@ -47,21 +48,13 @@ WardenModule::WardenModule(std::string const &bin, std::string const &kf, std::s
     binary.resize(static_cast<size_t>(b.tellg()));
     b.seekg(0, std::ios::beg);
 
-    if (!b.read(reinterpret_cast<char *>(&binary[0]), binary.size()))
+    if (!b.read(reinterpret_cast<char*>(&binary[0]), binary.size()))
         throw std::runtime_error("Failed to open: " + bin);
 
     b.close();
 
     // compute md5 hash of encrypted/compressed data
-    {
-        // md5 hash
-        MD5_CTX ctx;
-        MD5_Init(&ctx);
-        MD5_Update(&ctx, &binary[0], binary.size());
-
-        hash.resize(MD5_DIGEST_LENGTH);
-        MD5_Final(&hash[0], &ctx);
-    }
+    hash = Crypto::Hash::MD5::ComputeFrom(binary);
 
     std::ifstream k(kf, std::ios::binary | std::ios::ate);
 
@@ -74,7 +67,7 @@ WardenModule::WardenModule(std::string const &bin, std::string const &kf, std::s
     key.resize(KeySize);
     k.seekg(0, std::ios::beg);
 
-    if (!k.read(reinterpret_cast<char *>(&key[0]), key.size()))
+    if (!k.read(reinterpret_cast<char*>(&key[0]), key.size()))
         throw std::runtime_error("Failed to open " + kf);
 
     k.close();
@@ -93,15 +86,32 @@ WardenModule::WardenModule(std::string const &bin, std::string const &kf, std::s
 
     c.seekg(0, std::ios::beg);
 
-    c.read(reinterpret_cast<char *>(&memoryRead), sizeof(memoryRead));
-    c.read(reinterpret_cast<char *>(&pageScanCheck), sizeof(pageScanCheck));
-    c.read(reinterpret_cast<char *>(&opcodes), sizeof(opcodes));
-    c.read(reinterpret_cast<char *>(&crk[0]), crSize);
+    c.read(reinterpret_cast<char*>(&memoryRead), sizeof(memoryRead));
+    c.read(reinterpret_cast<char*>(&pageScanCheck), sizeof(pageScanCheck));
+    c.read(reinterpret_cast<char*>(&opcodes), sizeof(opcodes));
+    c.read(reinterpret_cast<char*>(&crk[0]), crSize);
 
     c.close();
 
     if (Windows())
     {
+        for (uint8 i = 0; i <= UINT8_MAX; i++)
+        {
+            if (opcodes[0] != i &&
+                opcodes[1] != i &&
+                opcodes[2] != i &&
+                opcodes[3] != i &&
+                opcodes[4] != i &&
+                opcodes[5] != i &&
+                opcodes[6] != i &&
+                opcodes[7] != i &&
+                opcodes[8] != i)
+            {
+                scanTerminator = i;
+                break;
+            }
+        }
+
         if (!memoryRead)
             throw std::runtime_error("Module data does not include memory read information");
 
@@ -120,3 +130,5 @@ bool WardenModule::Windows() const
 
     return false;
 }
+
+#endif

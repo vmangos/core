@@ -24,7 +24,7 @@ void ScriptedPetAI::MoveInLineOfSight(Unit* pWho)
     if (!m_creature->HasReactState(REACT_AGGRESSIVE))
         return;
 
-    if (!pWho || !m_creature->IsValidAttackTarget(pWho) || !pWho->IsVisibleForOrDetect(m_creature, m_creature, true) ||
+    if (!m_creature->IsValidAttackTarget(pWho) || !pWho->IsVisibleForOrDetect(m_creature, m_creature, true) ||
         !m_creature->CanInitiateAttack() || !pWho->IsInAccessablePlaceFor(m_creature) || !m_creature->CanAttack(pWho, true))
         return;
 
@@ -40,7 +40,7 @@ void ScriptedPetAI::MoveInLineOfSight(Unit* pWho)
 
 void ScriptedPetAI::AttackStart(Unit* pWho)
 {
-    if (pWho && m_creature->Attack(pWho, true))
+    if (m_creature->Attack(pWho, true))
         m_creature->GetMotionMaster()->MoveChase(pWho);
 }
 
@@ -144,7 +144,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
                         }
                     }
                     // If we are out of the FOR it means no valid targets, so follow master.
-                    if (!m_creature->HasUnitState(UNIT_STAT_FOLLOW))
+                    if (!m_creature->HasUnitState(UNIT_STATE_FOLLOW))
                         m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
                 }
             }
@@ -152,7 +152,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
         else if (m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
         {
             // not following, so start follow
-            if (!m_creature->HasUnitState(UNIT_STAT_FOLLOW))
+            if (!m_creature->HasUnitState(UNIT_STATE_FOLLOW))
                 m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
             // update when not in combat

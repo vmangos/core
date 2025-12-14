@@ -128,7 +128,7 @@ ConfVersion=2020010501
 #
 #    SendMail
 #        Whether the server is allowed to send emails
-#        The server must have been compiled with USE_SENDGRID
+#        The server must have been compiled with ENABLE_MAILSENDER
 #        Default: 0 (Do not send mail)
 #
 #    MailFrom
@@ -147,6 +147,10 @@ ConfVersion=2020010501
 #    GeolockGUID
 #        The SendGrid template GUID for geolocking emails
 #        Default: ""
+#
+#    MaxSessionDuration
+#        Maximum time in seconds that sessions can stay open
+#        Default: 300 (5 minutes)
 #
 ###################################################################################################################
 
@@ -179,3 +183,4 @@ MailFrom = ""
 MailCertChecks = 1
 SendGridKey = ""
 GeolockGUID = ""
+MaxSessionDuration = 300

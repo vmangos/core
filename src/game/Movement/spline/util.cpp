@@ -17,14 +17,13 @@
  */
 
 #include "MoveSplineFlag.h"
-#include <math.h>
 #include <string>
 
 namespace Movement
 {
 double gravity = 19.29110527038574;
 
-/// Velocity bounds that makes fall speed limited
+// Velocity bounds that makes fall speed limited
 float terminalVelocity = 60.148003f;
 float terminalSavefallVelocity = 7.f;
 

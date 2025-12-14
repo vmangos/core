@@ -21,17 +21,17 @@
 
 #include "GameObject.h"
 #include "TransportMgr.h"
-#include "MapManager.h"
 
 #include <map>
 #include <set>
+#include <mutex>
 
 typedef std::set<Unit*> PassengerSet;
 
 class GenericTransport : public GameObject
 {
 public:
-    GenericTransport() : m_passengerTeleportItr(m_passengers.end()), m_pathProgress(0) {}
+    GenericTransport() : m_passengerTeleportItr(m_passengers.end()), m_pathProgress(0), m_creationTime(0) {}
     void CleanupsBeforeDelete() override;
 
     void SendOutOfRangeUpdateToMap();
@@ -45,16 +45,15 @@ public:
     void UpdatePosition(float x, float y, float z, float o);
     void UpdatePassengerPosition(Unit* object);
 
-    typedef std::set<Player*> PlayerSet;
     PassengerSet& GetPassengers() { return m_passengers; }
 
-    /// This method transforms supplied transport offsets into global coordinates
+    // This method transforms supplied transport offsets into global coordinates
     void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const
     {
         CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
     }
 
-    /// This method transforms supplied global coordinates into local offsets
+    // This method transforms supplied global coordinates into local offsets
     void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const
     {
         CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
@@ -67,14 +66,18 @@ public:
 
     uint32 GetPathProgress() const { return m_pathProgress; }
 protected:
-    void UpdatePassengerPositions(PassengerSet& passengers);
+    void UpdatePassengerPositions();
+    uint32 GetTimeSinceCreation();
 
+    std::mutex m_passengerMutex;
     PassengerSet m_passengers;
     PassengerSet::iterator m_passengerTeleportItr;
 
+    uint32 m_creationTime;
     uint32 m_pathProgress; // for MO transport its full time since start for normal time in cycle
 };
 
+// Elevators and Trams (type 11)
 class ElevatorTransport : public GenericTransport
 {
 public:
@@ -87,12 +90,13 @@ private:
     uint32 m_currentSeg;
 };
 
-class Transport : public GenericTransport
+// Ships and Zeppelins (type 15)
+class ShipTransport : public GenericTransport
 {
 public:
-    explicit Transport(TransportTemplate const& transportTemplate);
+    explicit ShipTransport(TransportTemplate const& transportTemplate);
 
-    bool Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
+    bool Create(uint32 guidlow, KeyFrameVec::const_iterator startFrame);
     void Update(uint32 update_diff, uint32 /*time_diff*/) override;
 
     uint32 GetPeriod() const { return m_period; }
@@ -104,7 +108,7 @@ private:
     void MoveToNextWayPoint();                          // move m_next/m_cur to next points
     float CalculateSegmentPos(float perc);
 
-    bool IsMoving() const { return m_isMoving; }
+    bool IsMoving() const override { return m_isMoving; }
     void SetMoving(bool val) { m_isMoving = val; }
 
     ShortTimeTracker m_positionChangeTimer;
@@ -115,6 +119,7 @@ private:
     KeyFrameVec::const_iterator m_nextFrame;
 
     uint32 m_period;
+    uint32 m_startProgress;
 
     TransportTemplate const& m_transportTemplate;
 };

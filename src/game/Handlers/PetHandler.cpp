@@ -95,6 +95,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             switch (spellid)
             {
                 case REACT_PASSIVE:                         //passive
+                    pCharmedUnit->InterruptNonMeleeSpells(false);
                     pCharmedUnit->AttackStop();
                 // no break
                 case REACT_DEFENSIVE:                       //recovery
@@ -156,7 +157,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                 pUnitTarget = nullptr;
 
             // make sure pet is facing target
-            if (pUnitTarget && pUnitTarget != pCharmedUnit && !pCharmedUnit->HasUnitState(UNIT_STAT_CAN_NOT_REACT) &&
+            if (pUnitTarget && pUnitTarget != pCharmedUnit && !pCharmedUnit->HasUnitState(UNIT_STATE_CAN_NOT_REACT) &&
                 spellInfo->IsNeedFaceTarget() && !pCharmedUnit->IsFacingTarget(pUnitTarget))
             {
                 float orientation = pCharmedUnit->GetAngle(pUnitTarget);
@@ -164,12 +165,21 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                 pCharmedUnit->SetOrientation(orientation);
             }
 
-            pCharmedUnit->ClearUnitState(UNIT_STAT_MOVING);
-            auto result = pCharmedUnit->CastSpell(pUnitTarget, spellInfo, false);
-            if (result != SPELL_CAST_OK)
+            pCharmedUnit->ClearUnitState(UNIT_STATE_MOVING);
+            SpellCastResult result = pCharmedUnit->CastSpell(pUnitTarget, spellInfo, false);
+
+            if (result == SPELL_CAST_OK)
+            {
+                if (pCharmedUnit->IsPet())
+                    ((Pet*)pCharmedUnit)->CheckLearning(spellid);
+
+                if (pCharmedUnit->IsMoving() && pCharmedUnit->IsNoMovementSpellCasted())
+                    pCharmedUnit->StopMoving();
+            }
+            else
                 pCharmedUnit->SendPetCastFail(spellid, result);
-            else if (((Creature*)pCharmedUnit)->IsPet())
-                ((Pet*)pCharmedUnit)->CheckLearning(spellid);
+
+
             break;
         }
         default:
@@ -349,10 +359,17 @@ void WorldSession::HandlePetRename(WorldPacket& recv_data)
 
     Pet* pet = _player->GetMap()->GetPet(petGuid);
     // check it!
-    if (!pet || pet->getPetType() != HUNTER_PET ||
+    if (!pet || pet->GetPetType() != HUNTER_PET ||
             !pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME) ||
             pet->GetOwnerGuid() != _player->GetObjectGuid() || !pet->GetCharmInfo())
         return;
+
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Hunters are now able to rename their pets while mounted.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+    if (_player->IsMounted())
+        return;
+#endif
 
     PetNameInvalidReason res = ObjectMgr::CheckPetName(name);
     if (res != PET_NAME_SUCCESS)
@@ -402,7 +419,7 @@ void WorldSession::HandlePetAbandon(WorldPacket& recv_data)
         if (pet)
         {
             // Permanently abandon pet
-            if (pet->getPetType() == HUNTER_PET)
+            if (pet->GetPetType() == HUNTER_PET)
                 pet->Unsummon(PET_SAVE_AS_DELETED, _player);
             // Simply dismiss
             else
@@ -428,7 +445,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pet->getPetType() != HUNTER_PET || pet->m_petSpells.size() <= 1)
+    if (pet->GetPetType() != HUNTER_PET || pet->m_petSpells.size() <= 1)
         return;
 
     CharmInfo* charmInfo = pet->GetCharmInfo();
@@ -450,7 +467,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
     {
         uint32 spellId = itr->first;                       // Pet::RemoveSpell can invalidate iterator at erase NEW spell
         ++itr;
-        pet->unlearnSpell(spellId, false);
+        pet->UnlearnSpell(spellId, false);
     }
 
     pet->SetTP(pet->GetLevel() * (pet->GetLoyaltyLevel() - 1));
@@ -536,7 +553,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
 
     recvPacket >> targets.ReadForCaster(pet);
 
-    pet->ClearUnitState(UNIT_STAT_MOVING);
+    pet->ClearUnitState(UNIT_STATE_MOVING);
 
     Spell* spell = new Spell(pet, spellInfo, false);
     spell->m_targets = targets;
@@ -550,7 +567,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
 
             //10% chance to play special pet attack talk, else growl
             //actually this only seems to happen on special spells, fire shield for imp, torment for voidwalker, but it's stupid to check every spell
-            if (((Pet*)pet)->getPetType() == SUMMON_PET && (urand(0, 100) < 10))
+            if (((Pet*)pet)->GetPetType() == SUMMON_PET && (urand(0, 100) < 10))
                 pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
             else
                 pet->SendPetAIReaction();

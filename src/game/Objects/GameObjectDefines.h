@@ -48,8 +48,12 @@ enum GameobjectTypes
     GAMEOBJECT_TYPE_GUARDPOST              = 21,
     GAMEOBJECT_TYPE_SPELLCASTER            = 22,
     GAMEOBJECT_TYPE_MEETINGSTONE           = 23,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
     GAMEOBJECT_TYPE_FLAGSTAND              = 24,
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     GAMEOBJECT_TYPE_FISHINGHOLE            = 25,
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     GAMEOBJECT_TYPE_FLAGDROP               = 26,
 #endif
@@ -77,12 +81,48 @@ enum GameObjectFlags
     GO_FLAG_TRIGGERED       = 0x00000040                    //typically, summoned objects. Triggered by spell or other events
 };
 
+inline char const* GameObjectFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case GO_FLAG_IN_USE:
+            return "In Use";
+        case GO_FLAG_LOCKED:
+            return "Locked";
+        case GO_FLAG_INTERACT_COND:
+            return "Interact Condition";
+        case GO_FLAG_TRANSPORT:
+            return "Transport";
+        case GO_FLAG_NO_INTERACT:
+            return "No Interact";
+        case GO_FLAG_NODESPAWN:
+            return "No Despawn";
+        case GO_FLAG_TRIGGERED:
+            return "Triggered";
+    }
+    return "UNKNOWN";
+}
+
 enum GameObjectDynamicLowFlags
 {
     GO_DYNFLAG_LO_ACTIVATE          = 0x01,                 // enables interaction with GO
     GO_DYNFLAG_LO_ANIMATE           = 0x02,                 // possibly more distinct animation of GO
     GO_DYNFLAG_LO_NO_INTERACT       = 0x04,                 // appears to disable interaction (not fully verified)
 };
+
+inline char const* GameObjectDynamicFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case GO_DYNFLAG_LO_ACTIVATE:
+            return "Activate";
+        case GO_DYNFLAG_LO_ANIMATE:
+            return "Animate";
+        case GO_DYNFLAG_LO_NO_INTERACT:
+            return "No Interact";
+    }
+    return "UNKNOWN";
+}
 
 enum class GameObjectActions : uint32
 {                                   // Name from client executable      // Comments
@@ -173,7 +213,8 @@ struct GameObjectInfo
     uint32  id;
     uint32  type;
     uint32  displayId;
-    char  * name;
+    std::string name;
+    std::string icon;
     uint32  faction;
     uint32  flags;
     float   size;
@@ -401,6 +442,7 @@ struct GameObjectInfo
             uint32 maxLevel;                                //1
             uint32 areaID;                                  //2
         } meetingstone;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         //24 GAMEOBJECT_TYPE_FLAGSTAND
         struct
         {
@@ -413,6 +455,8 @@ struct GameObjectInfo
             uint32 openTextID;                              //6
             uint32 losOK;                                   //7
         } flagstand;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         //25 GAMEOBJECT_TYPE_FISHINGHOLE
         struct
         {
@@ -422,6 +466,7 @@ struct GameObjectInfo
             uint32 maxSuccessOpens;                         //3
             uint32 lockId;                                  //4 -> Lock.dbc; possibly 1628 for all?
         } fishinghole;
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         //26 GAMEOBJECT_TYPE_FLAGDROP
         struct
@@ -480,7 +525,7 @@ struct GameObjectInfo
         // not use for specific field access (only for output with loop by all filed), also this determinate max union size
         struct
         {
-            uint32 data[24];
+            int32 data[24];
         } raw;
     };
 
@@ -524,8 +569,12 @@ struct GameObjectInfo
             case GAMEOBJECT_TYPE_GOOBER:     return goober.lockId;
             case GAMEOBJECT_TYPE_AREADAMAGE: return areadamage.lockId;
             case GAMEOBJECT_TYPE_CAMERA:     return camera.lockId;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
             case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.lockId;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             case GAMEOBJECT_TYPE_FISHINGHOLE:return fishinghole.lockId;
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
             case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.lockId;
 #endif
@@ -541,7 +590,9 @@ struct GameObjectInfo
             case GAMEOBJECT_TYPE_BUTTON:     return button.noDamageImmune;
             case GAMEOBJECT_TYPE_QUESTGIVER: return questgiver.noDamageImmune;
             case GAMEOBJECT_TYPE_GOOBER:     return goober.noDamageImmune;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
             case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.noDamageImmune;
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
             case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.noDamageImmune;
 #endif
@@ -558,7 +609,9 @@ struct GameObjectInfo
             case GAMEOBJECT_TYPE_QUESTGIVER: return questgiver.noDamageImmune != 0;
             case GAMEOBJECT_TYPE_CHEST:      return true;                           // All chests cannot be opened while immune on 3.3.5a
             case GAMEOBJECT_TYPE_GOOBER:     return goober.noDamageImmune != 0;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
             case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.noDamageImmune != 0;
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
             case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.noDamageImmune != 0;
 #endif
@@ -620,7 +673,9 @@ struct GameObjectInfo
         switch(type)
         {
             case GAMEOBJECT_TYPE_CHEST:       return chest.lootId;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             case GAMEOBJECT_TYPE_FISHINGHOLE: return fishinghole.lootId;
+#endif
             default: return 0;
         }
     }
@@ -658,7 +713,9 @@ struct GameObjectInfo
         switch (type)
         {
             case GAMEOBJECT_TYPE_DOOR:                  return true;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
             case GAMEOBJECT_TYPE_FLAGSTAND:             return true;
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
             case GAMEOBJECT_TYPE_FLAGDROP:              return true;
 #endif
@@ -690,13 +747,25 @@ struct GameObjectInfo
         }
     }
 
+    bool CanAlwaysBreakLoS() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_DOOR:              return true;
+            case GAMEOBJECT_TYPE_GENERIC:           return true;
+            default: return false;
+        }
+    }
+
     float GetInteractionDistance() const
     {
         switch (type)
         {
             case GAMEOBJECT_TYPE_QUESTGIVER:
             case GAMEOBJECT_TYPE_TEXT:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
             case GAMEOBJECT_TYPE_FLAGSTAND:
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
             case GAMEOBJECT_TYPE_FLAGDROP:
 #endif

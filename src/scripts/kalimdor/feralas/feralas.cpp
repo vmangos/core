@@ -41,17 +41,17 @@ bool GossipHello_npc_screecher_spirit(Player* pPlayer, Creature* pCreature)
 
 enum
 {
-    SAY_ESCORT_START                    = -1001106,
-    SAY_WANDER_1                        = -1001107,
-    SAY_WANDER_2                        = -1001108,
-    SAY_WANDER_3                        = -1001109,
-    SAY_WANDER_4                        = -1001110,
-    SAY_WANDER_DONE_1                   = -1001111,
-    SAY_WANDER_DONE_2                   = -1001112,
-    SAY_WANDER_DONE_3                   = -1001113,
-    EMOTE_WANDER                        = -1001114,
-    SAY_EVENT_COMPLETE_1                = -1001115,
-    SAY_EVENT_COMPLETE_2                = -1001116,
+    SAY_ESCORT_START                    = 3921,
+    SAY_WANDER_1                        = 3912,
+    SAY_WANDER_2                        = 3907,
+    SAY_WANDER_3                        = 3909,
+    SAY_WANDER_4                        = 3911,
+    SAY_WANDER_DONE_1                   = 3914,
+    SAY_WANDER_DONE_2                   = 3913,
+    SAY_WANDER_DONE_3                   = 3916,
+    EMOTE_WANDER                        = 3918,
+    SAY_EVENT_COMPLETE_1                = 3917,
+    SAY_EVENT_COMPLETE_2                = 3922,
 
     SPELL_SHAYS_BELL                    = 11402,
     NPC_ROCKBITER                       = 7765,
@@ -221,7 +221,7 @@ bool QuestAccept_npc_shay_leafrunner(Player* pPlayer, Creature* pCreature, Quest
         DoScriptText(SAY_ESCORT_START, pCreature);
         pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         if (npc_shay_leafrunnerAI* leafrunnerAI = dynamic_cast<npc_shay_leafrunnerAI*>(pCreature->AI()))
-            leafrunnerAI->BeforeStartFollow(pPlayer, pPlayer->GetFactionTemplateId(), pQuest);
+            leafrunnerAI->BeforeStartFollow(pPlayer, FACTION_ESCORT_A_NEUTRAL_PASSIVE, pQuest);
     }
     return true;
 }
@@ -280,15 +280,12 @@ struct MushgogAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        m_creature->SetInCombatWithZone();
         if (!m_bAggro)
         {
-            std::list<Creature*> m_AggroList;
-            GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-            for (const auto& it : m_AggroList)
+            if (Creature* pGriniblix = GetClosestCreatureWithEntry(m_creature, 14395, 120.0f))
             {
-                if (it->IsAlive())
-                    it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_01);
+                if (pGriniblix->IsAlive())
+                    pGriniblix->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_01);
             }
             m_bAggro = true;
         }
@@ -401,15 +398,12 @@ struct TheRazzaAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        m_creature->SetInCombatWithZone();
         if (!m_bAggro)
         {
-            std::list<Creature*> m_AggroList;
-            GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-            for (const auto& it : m_AggroList)
+            if (Creature* pGriniblix = GetClosestCreatureWithEntry(m_creature, 14395, 120.0f))
             {
-                if (it->IsAlive())
-                    it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_02);
+                if (pGriniblix->IsAlive())
+                    pGriniblix->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_02);
             }
             m_bAggro = true;
         }
@@ -417,12 +411,10 @@ struct TheRazzaAI : public ScriptedAI
 
     void JustDied(Unit* pWho) override
     {
-        std::list<Creature*> m_AggroList;
-        GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-        for (const auto& it : m_AggroList)
+        if (Creature* pGriniblix = GetClosestCreatureWithEntry(m_creature, 14395, 120.0f))
         {
-            if (it->IsAlive())
-                it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_03);
+            if (pGriniblix->IsAlive())
+                pGriniblix->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_03);
         }
     }
 
@@ -506,15 +498,12 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        m_creature->SetInCombatWithZone();
         if (!m_bAggro)
         {
-            std::list<Creature*> m_AggroList;
-            GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-            for (const auto& it : m_AggroList)
+            if (Creature* pGriniblix = GetClosestCreatureWithEntry(m_creature, 14395, 120.0f))
             {
-                if (it->IsAlive())
-                     it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_04);
+                if (pGriniblix->IsAlive())
+                    pGriniblix->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_04);
             }
             m_bAggro = true;
         }

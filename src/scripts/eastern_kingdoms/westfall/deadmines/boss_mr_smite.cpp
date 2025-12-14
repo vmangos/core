@@ -167,17 +167,17 @@ struct boss_mr_smiteAI : public ScriptedAI
         if (m_creature->GetHealthPercent() < 33.0f)
         {
             // It's Hammer, go Hammer!
-            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, EQUIP_ID_HAMMER);
-            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 0);
-            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
+            m_creature->SetVirtualItem(BASE_ATTACK, EQUIP_ID_HAMMER);
+            m_creature->SetVirtualItem(OFF_ATTACK, 0);
+            m_creature->SetVirtualItem(RANGED_ATTACK, 0);
             DoCastSpellIfCan(m_creature, SPELL_SMITE_HAMMER);
         }
         else
         {
             // It's double Axe.
-            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, EQUIP_ID_AXE);
-            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, EQUIP_ID_AXE);
-            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
+            m_creature->SetVirtualItem(BASE_ATTACK, EQUIP_ID_AXE);
+            m_creature->SetVirtualItem(OFF_ATTACK, EQUIP_ID_AXE);
+            m_creature->SetVirtualItem(RANGED_ATTACK, 0);
         }
 
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);

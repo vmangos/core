@@ -23,7 +23,6 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "Log.h"
-#include "Errors.h"
 #include "Player.h"
 
 Camera::Camera(Player* pl) : m_owner(*pl), m_source(pl)
@@ -140,16 +139,16 @@ void Camera::UpdateVisibilityOf(WorldObject* target)
 }
 
 template<class T>
-void Camera::UpdateVisibilityOf(T* target, UpdateData& data, std::set<WorldObject*>& vis)
+void Camera::UpdateVisibilityOf(T* target, UpdateData& data)
 {
-    m_owner.template UpdateVisibilityOf<T>(m_source, target, data, vis);
+    m_owner.template UpdateVisibilityOf<T>(m_source, target, data);
 }
 
-template void Camera::UpdateVisibilityOf(Player*       , UpdateData&, std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(Creature*     , UpdateData&, std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(Corpse*       , UpdateData&, std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(GameObject*   , UpdateData&, std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(DynamicObject*, UpdateData&, std::set<WorldObject*>&);
+template void Camera::UpdateVisibilityOf(Player*       , UpdateData&);
+template void Camera::UpdateVisibilityOf(Creature*     , UpdateData&);
+template void Camera::UpdateVisibilityOf(Corpse*       , UpdateData&);
+template void Camera::UpdateVisibilityOf(GameObject*   , UpdateData&);
+template void Camera::UpdateVisibilityOf(DynamicObject*, UpdateData&);
 
 void Camera::UpdateVisibilityForOwner()
 {

@@ -41,7 +41,6 @@ struct instance_wailing_caverns : public ScriptedInstance
     uint64 m_uiAnacondraGUID;
     //uint64 m_uiVerdanGUID;
     uint64 m_uiSerpentisGUID;
-    uint64 m_uiDMFChestGUID;
     bool Assaulted;
 
     // to be despawn when the nightmare is over
@@ -92,24 +91,9 @@ struct instance_wailing_caverns : public ScriptedInstance
     void OnObjectCreate(GameObject* pGo) override
     {
         if (pGo->GetEntry() == GO_DMF_CHEST)
-        {
             pGo->SetVisible(false);
-            m_uiDMFChestGUID = pGo->GetGUID();
-        }
     }
 
-    void OnPlayerEnter(Player* pPlayer) override
-    {
-        if (!pPlayer)
-            return;
-
-        // Darkmoon chest visible only for players on the quest
-        if (pPlayer->GetQuestStatus(QUEST_FORTUNE_AWAITS) == QUEST_STATUS_COMPLETE)
-        {
-            if (GameObject* pGo = instance->GetGameObject(m_uiDMFChestGUID))
-                pGo->SetVisible(true);
-        }
-    }
 
     void SetData(uint32 uiType, uint32 uiData) override
     {
@@ -174,12 +158,12 @@ struct instance_wailing_caverns : public ScriptedInstance
                 m_auiEncounter[uiType] = uiData;
                 break;
             default:
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Instance Wiling Caverns: ERROR SetData = %u for type %u does not exist/not implemented.", uiType, uiData);
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Instance Wiling Caverns: ERROR SetData = %u for type %u does not exist/not implemented.", uiType, uiData);
                 break;
         }
         if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && m_auiEncounter[2] == DONE && m_auiEncounter[3] == DONE && m_auiEncounter[4] == NOT_STARTED)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Debug:Wailing Caverns encounters done");
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Debug:Wailing Caverns encounters done");
             SetData(TYPE_DISCIPLE, SPECIAL);
             if (Creature* pDisciple = instance->GetCreature(m_uiDiscipleGUID))
             {
@@ -259,11 +243,29 @@ InstanceData* GetInstanceData_instance_wailing_caverns(Map* pMap)
     return new instance_wailing_caverns(pMap);
 }
 
+bool AreaTrigger_at_dmf_chest_wc(Player* pPlayer, AreaTriggerEntry const* pAt)
+{
+    // Darkmoon chest visible only for players on the quest
+    if (pPlayer->GetQuestStatus(QUEST_FORTUNE_AWAITS) == QUEST_STATUS_COMPLETE)
+    {
+        if (GameObject* pGo = pPlayer->FindNearestGameObject(GO_DMF_CHEST, 100.0f))
+            pGo->SetVisible(true);
+    }
+
+    return false;
+}
+
 void AddSC_instance_wailing_caverns()
 {
     Script* newscript;
+
     newscript = new Script;
     newscript->Name = "instance_wailing_caverns";
     newscript->GetInstanceData = &GetInstanceData_instance_wailing_caverns;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "at_dmf_chest_wc";
+    newscript->pAreaTrigger = &AreaTrigger_at_dmf_chest_wc;
     newscript->RegisterSelf();
 }

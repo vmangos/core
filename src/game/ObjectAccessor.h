@@ -137,18 +137,18 @@ class ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, MaNGOS::ClassLev
         static Corpse* GetCorpseInMap(ObjectGuid guid, uint32 mapid);
         void RemoveCorpse(Corpse* corpse);
         void AddCorpse(Corpse* corpse);
-        void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map);
-        void ConvertCorpseForPlayer(ObjectGuid player_guid, Player* looter = nullptr);
+        void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map const* map);
+        void ConvertCorpseForPlayer(ObjectGuid player_guid, Player const* looter = nullptr);
         void RemoveOldCorpses();
 
         // For call from Player/Corpse AddToWorld/RemoveFromWorld only
         void AddObject(Corpse* object) { HashMapHolder<Corpse>::Insert(object); }
         void AddObject(Player* object);
-        void AddObject(Transport* object) { HashMapHolder<Transport>::Insert(object); }
+        void AddObject(ShipTransport* object) { HashMapHolder<ShipTransport>::Insert(object); }
         void AddObject(MasterPlayer* object);
         void RemoveObject(Corpse* object) { HashMapHolder<Corpse>::Remove(object); }
         void RemoveObject(Player* object);
-        void RemoveObject(Transport* object) { HashMapHolder<Transport>::Remove(object); }
+        void RemoveObject(ShipTransport* object) { HashMapHolder<ShipTransport>::Remove(object); }
         void RemoveObject(MasterPlayer* object);
 
     private:

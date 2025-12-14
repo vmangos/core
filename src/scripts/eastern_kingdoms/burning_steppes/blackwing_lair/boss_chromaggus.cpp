@@ -14,20 +14,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Chromaggus
-SD%Complete: 95
-SDComment: Chromatic Mutation disabled due to lack of core support
-SDCategory: Blackwing Lair
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
 
-enum
+enum Chromaggus : uint32
 {
     EMOTE_GENERIC_FRENZY_KILL   = 7797,
-    EMOTE_SHIMMER               = -1469003,
+    EMOTE_SHIMMER               = 9793,
 
     // These spells are actually called elemental shield
     // What they do is decrease all damage by 75% then they increase
@@ -57,18 +50,23 @@ enum
     SPELL_CHROMATIC_MUT_1       = 23174,                    // Spell cast on player if they get all 5 debuffs
 
     SPELL_FRENZY                = 23128,                    // 28371 The frenzy spell may be wrong
-    SPELL_ENRAGE                = 28747
+    SPELL_ENRAGE                = 28747,
+
+    SPELL_CHROMATIC_MUTATION_ONE = 23175,
+    SPELL_CHROMATIC_MUTATION_TWO = 23177,
+    SPELL_BROOD_AFFLICTION_RED   = 23168
 };
 
-static uint32 const aPossibleBreaths[MAX_BREATHS] = {SPELL_INCINERATE, SPELL_TIME_LAPSE, SPELL_CORROSIVE_ACID, SPELL_IGNITE_FLESH, SPELL_FROST_BURN};
-
-struct TimeLapseInfo
+static constexpr uint32 aPossibleBreaths[MAX_BREATHS] =
 {
-    TimeLapseInfo(ObjectGuid const targetGuid, float const targetThreat, uint32 const targetHealth) : m_targetGuid(targetGuid), m_targetThreat(targetThreat), m_targetHealth(targetHealth) { }
-    ObjectGuid const m_targetGuid;
-    float const m_targetThreat;
-    uint32 const m_targetHealth;
+    SPELL_INCINERATE,
+    SPELL_TIME_LAPSE,
+    SPELL_CORROSIVE_ACID,
+    SPELL_IGNITE_FLESH,
+    SPELL_FROST_BURN
 };
+
+static constexpr uint32 NUM_BREATHS = sizeof(aPossibleBreaths) / sizeof(aPossibleBreaths[0]);
 
 struct boss_chromaggusAI : public ScriptedAI
 {
@@ -81,7 +79,6 @@ struct boss_chromaggusAI : public ScriptedAI
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         if (m_pInstance)
         {
-            const static uint32 NUM_BREATHS = sizeof(aPossibleBreaths) / sizeof(aPossibleBreaths[0]);
             uint32 breaths = m_pInstance->GetData64(DATA_CHROM_BREATH);
             m_uiBreathOneSpell = aPossibleBreaths[breaths % NUM_BREATHS];
             uint32 idx2 = breaths / NUM_BREATHS;
@@ -110,7 +107,6 @@ struct boss_chromaggusAI : public ScriptedAI
     bool m_bEnraged;
     bool m_bEngagedOnce;
 
-    std::vector<TimeLapseInfo*> m_vTimeLapseInfo;
     typedef std::vector<ObjectGuid> AfflictionGuids;
     AfflictionGuids m_lRedAfflictionPlayerGUID;
     AfflictionGuids m_lChromaticPlayerGUID;
@@ -121,11 +117,11 @@ struct boss_chromaggusAI : public ScriptedAI
 
         m_uiCurrentVulnerabilitySpell = 0;                  // We use this to store our last vulnerability spell so we can remove it later
 
-        m_uiShimmerTimer    = 0;                            // Time till we change vurlnerabilites
-        m_uiBreathOneTimer  = 30000;                        // First breath is 30 seconds
-        m_uiBreathTwoTimer  = 60000;                        // Second is 1 minute so that we can alternate
-        m_uiAfflictionTimer = 4000;                        // This is special - 5 seconds means that we cast this on 1 pPlayer every 5 sconds
-        m_uiFrenzyTimer     = 15000;
+        m_uiShimmerTimer    = 0;        // Vulnurability is applied at pull. Changes every 20 secs.
+        m_uiBreathOneTimer  = 30000;    // First breath happens in 30 secs. Repeats every 60 secs.
+        m_uiBreathTwoTimer  = 60000;    // Second breath happens in 60 secs. Repeats every 60 secs.
+        m_uiAfflictionTimer = 7500;     // Afflictions are applied every 7.5 secs.
+        m_uiFrenzyTimer     = 15000;    // Frenzy happens every 15 secs.
 
         m_bEnraged          = false;
         m_lRedAfflictionPlayerGUID.clear();
@@ -134,8 +130,8 @@ struct boss_chromaggusAI : public ScriptedAI
         {
             if (Player* pTarget = m_creature->GetMap()->GetPlayer(guid))
             {
-                pTarget->RemoveAurasDueToSpell(23175);
-                pTarget->RemoveAurasDueToSpell(23177);
+                pTarget->RemoveAurasDueToSpell(SPELL_CHROMATIC_MUTATION_ONE);
+                pTarget->RemoveAurasDueToSpell(SPELL_CHROMATIC_MUTATION_TWO);
                 pTarget->DealDamage(pTarget, pTarget->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
         }
@@ -148,10 +144,6 @@ struct boss_chromaggusAI : public ScriptedAI
             else
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING | UNIT_FLAG_IMMUNE_TO_NPC);
         }
-
-        for (const auto& itr : m_vTimeLapseInfo)
-            delete itr;
-        m_vTimeLapseInfo.clear();
     }
 
     void MoveInLineOfSight(Unit *pUnit) override
@@ -177,9 +169,6 @@ struct boss_chromaggusAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CHROMAGGUS, DONE);
-        for (const auto& itr : m_vTimeLapseInfo)
-            delete itr;
-        m_vTimeLapseInfo.clear();
     }
 
     void JustReachedHome() override
@@ -193,14 +182,13 @@ struct boss_chromaggusAI : public ScriptedAI
         if (!pTarget)
             return;
 
+        /* Better to do this in SpellAuras.cpp
         if (pSpell->Id == SPELL_TIME_LAPSE)
         {
             if (SpellAuraHolder* holder = pTarget->GetSpellAuraHolder(SPELL_TIME_LAPSE))
                 holder->SetTargetSecondaryThreatFocus(true);
-            if (pTarget->GetTypeId() != TYPEID_PLAYER)
-                return;
-            m_vTimeLapseInfo.push_back(new TimeLapseInfo(pTarget->GetObjectGuid(), m_creature->GetThreatManager().getThreat(pTarget), pTarget->GetHealth()));
         }
+        */
     }
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override
@@ -255,20 +243,6 @@ struct boss_chromaggusAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        for (std::vector<TimeLapseInfo*>::iterator itr = m_vTimeLapseInfo.begin(); itr != m_vTimeLapseInfo.end(); ++itr)
-            if (Player* pTarget = m_creature->GetMap()->GetPlayer((*itr)->m_targetGuid))
-            {
-                if (!pTarget->HasAura(SPELL_TIME_LAPSE) && pTarget->IsAlive())
-                {
-                    if ((*itr)->m_targetHealth >= (pTarget->GetMaxHealth() / 2))
-                        pTarget->SetHealth(pTarget->GetMaxHealth());
-                    delete *itr;
-                    m_vTimeLapseInfo.erase(itr--);
-                }
-            }
-            else
-                m_vTimeLapseInfo.erase(itr--);
-
         // Shimmer Timer Timer
         if (m_uiShimmerTimer < uiDiff)
         {
@@ -277,32 +251,19 @@ struct boss_chromaggusAI : public ScriptedAI
                 m_creature->RemoveAurasDueToSpell(m_uiCurrentVulnerabilitySpell);
 
             // Cast new random vurlnabilty on self
-            uint32 uiSpell;
-            switch (urand(0, 4))
-            {
-                case 0:
-                    uiSpell = SPELL_FIRE_VULNERABILITY;
-                    break;
-                case 1:
-                    uiSpell = SPELL_FROST_VULNERABILITY;
-                    break;
-                case 2:
-                    uiSpell = SPELL_SHADOW_VULNERABILITY;
-                    break;
-                case 3:
-                    uiSpell = SPELL_NATURE_VULNERABILITY;
-                    break;
-                case 4:
-                    uiSpell = SPELL_ARCANE_VULNERABILITY;
-                    break;
-            }
+            uint32 uiSpell = PickRandomValue(
+                SPELL_FIRE_VULNERABILITY,
+                SPELL_FROST_VULNERABILITY,
+                SPELL_SHADOW_VULNERABILITY,
+                SPELL_NATURE_VULNERABILITY,
+                SPELL_ARCANE_VULNERABILITY);
 
             if (DoCastSpellIfCan(m_creature, uiSpell) == CAST_OK)
             {
                 m_uiCurrentVulnerabilitySpell = uiSpell;
 
                 DoScriptText(EMOTE_SHIMMER, m_creature);
-                m_uiShimmerTimer = 45000;
+                m_uiShimmerTimer = 20000;
             }
         }
         else
@@ -329,79 +290,64 @@ struct boss_chromaggusAI : public ScriptedAI
         // Affliction Timer
         if (m_uiAfflictionTimer < uiDiff)
         {
-            uint32 m_uiSpellAfflict = 0;
+            uint32 uiSpellAfflict = PickRandomValue(
+                SPELL_BROODAF_BLUE,
+                SPELL_BROODAF_BLACK,
+                SPELL_BROODAF_RED,
+                SPELL_BROODAF_BRONZE,
+                SPELL_BROODAF_GREEN);
 
-            switch (urand(0, 4))
+            if (uiSpellAfflict == SPELL_BROODAF_RED)
             {
-                case 0:
-                    m_uiSpellAfflict = SPELL_BROODAF_BLUE;
-                    break;
-                case 1:
-                    m_uiSpellAfflict = SPELL_BROODAF_BLACK;
-                    break;
-                case 2:
-                    m_uiSpellAfflict = SPELL_BROODAF_RED;
-                    m_lRedAfflictionPlayerGUID.clear();
-                    break;
-                case 3:
-                    m_uiSpellAfflict = SPELL_BROODAF_BRONZE;
-                    break;
-                case 4:
-                    m_uiSpellAfflict = SPELL_BROODAF_GREEN;
-                    break;
+                m_lRedAfflictionPlayerGUID.clear();
             }
 
-            std::vector<ObjectGuid> m_vPossibleVictim;
-            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (const auto itr : tList)
-                if (Player* target = m_creature->GetMap()->GetPlayer(itr->getUnitGuid()))
-                    m_vPossibleVictim.push_back(target->GetObjectGuid());
-
-            int affli_rand = urand(0, 18);
-            for (int i = 0; i < affli_rand; ++i)
+            for (uint32 i = 0; i < urand(11, 15); ++i) // Affliction is applied 11-15 times per cast. Creatures such as pets can be targetted
             {
-                if (m_vPossibleVictim.empty())
-                    break;
-                std::vector<ObjectGuid>::iterator it = m_vPossibleVictim.begin() + urand(0, m_vPossibleVictim.size() - 1);
-                if (Player* pPlayer = m_creature->GetMap()->GetPlayer(*it))
+                if (Unit* afflictionTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
+                    if (afflictionTarget->HasAura(SPELL_CHROMATIC_MUT_1)) // To make sure mutated players are not being targeted with affliction.
+                        continue;
+
                     // Cast affliction
-                    if (DoCastSpellIfCan(pPlayer, m_uiSpellAfflict, CF_TRIGGERED) == CAST_OK)
+                    if (DoCastSpellIfCan(afflictionTarget, uiSpellAfflict, CF_TRIGGERED) == CAST_OK)
                     {
-                        if (m_uiSpellAfflict == SPELL_BROODAF_RED)
-                            m_lRedAfflictionPlayerGUID.push_back(pPlayer->GetObjectGuid());
+                        if (uiSpellAfflict == SPELL_BROODAF_RED && afflictionTarget->GetTypeId() == TYPEID_PLAYER)
+                            m_lRedAfflictionPlayerGUID.push_back(afflictionTarget->GetObjectGuid());
                     }
                     // Chromatic mutation if target is effected by all afflictions
-                    if (pPlayer->HasAura(SPELL_BROODAF_BLUE)
-                            && pPlayer->HasAura(SPELL_BROODAF_BLACK)
-                            && pPlayer->HasAura(SPELL_BROODAF_RED)
-                            && pPlayer->HasAura(SPELL_BROODAF_BRONZE)
-                            && pPlayer->HasAura(SPELL_BROODAF_GREEN))
+                    if (afflictionTarget->HasAura(SPELL_BROODAF_BLUE)
+                            && afflictionTarget->HasAura(SPELL_BROODAF_BLACK)
+                            && afflictionTarget->HasAura(SPELL_BROODAF_RED)
+                            && afflictionTarget->HasAura(SPELL_BROODAF_BRONZE)
+                            && afflictionTarget->HasAura(SPELL_BROODAF_GREEN))
                     {
-                        pPlayer->RemoveAurasDueToSpell(SPELL_BROODAF_BLUE);
-                        pPlayer->RemoveAurasDueToSpell(SPELL_BROODAF_BLACK);
-                        pPlayer->RemoveAurasDueToSpell(SPELL_BROODAF_RED);
-                        pPlayer->RemoveAurasDueToSpell(SPELL_BROODAF_BRONZE);
-                        pPlayer->RemoveAurasDueToSpell(SPELL_BROODAF_GREEN);
+                        afflictionTarget->RemoveAurasDueToSpell(SPELL_BROODAF_BLUE);
+                        afflictionTarget->RemoveAurasDueToSpell(SPELL_BROODAF_BLACK);
+                        afflictionTarget->RemoveAurasDueToSpell(SPELL_BROODAF_RED);
+                        afflictionTarget->RemoveAurasDueToSpell(SPELL_BROODAF_BRONZE);
+                        afflictionTarget->RemoveAurasDueToSpell(SPELL_BROODAF_GREEN);
 
-                        if (DoCastSpellIfCan(pPlayer, SPELL_CHROMATIC_MUT_1) == CAST_OK)
+                        if (afflictionTarget->GetTypeId() == TYPEID_PLAYER) // Only players are mutated
                         {
-                            // More Chromatic Mutation buffs
-                            pPlayer->AddAura(23175); //Mod DMG 500% + Mod Haste Melee 100 + Mod Haste Spell 300
-                            pPlayer->AddAura(23177); //Max Health 10000 + Mod healing 1000%
-                            m_lChromaticPlayerGUID.push_back(pPlayer->GetObjectGuid());
+                            afflictionTarget->AddAura(SPELL_CHROMATIC_MUT_1, ADD_AURA_NO_OPTION, m_creature); // Main MC aura
+                            afflictionTarget->AddAura(SPELL_CHROMATIC_MUTATION_ONE);                          // Mod DMG 500% + Mod Haste Melee 100 + Mod Haste Spell 300
+                            afflictionTarget->AddAura(SPELL_CHROMATIC_MUTATION_TWO);                          // Max Health 10000 + Mod healing 1000%
+                            m_lChromaticPlayerGUID.push_back(afflictionTarget->GetObjectGuid());
                         }
+                        else    // Pets die instantly
+                            afflictionTarget->DealDamage(afflictionTarget, afflictionTarget->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+
                     }
                 }
-                m_vPossibleVictim.erase(it);
             }
-            m_uiAfflictionTimer = 4000;
+            m_uiAfflictionTimer = 7500;
         }
         else
             m_uiAfflictionTimer -= uiDiff;
 
-        // If player dies from a direct hit or dot while he had the aura SPELL_BROODAF_RED
-        for (AfflictionGuids::iterator itr = m_lRedAfflictionPlayerGUID.begin(); itr != m_lRedAfflictionPlayerGUID.end();)
+        // If player dies while he had the aura SPELL_BROODAF_RED
+        for (auto itr = m_lRedAfflictionPlayerGUID.begin(); itr != m_lRedAfflictionPlayerGUID.end();)
         {
             Player* pTarget = m_creature->GetMap()->GetPlayer(*itr);
             if (pTarget && pTarget->IsAlive() && !pTarget->HasAura(SPELL_BROODAF_RED, EFFECT_INDEX_0))
@@ -419,16 +365,16 @@ struct boss_chromaggusAI : public ScriptedAI
             ++itr;
         }
 
-        // If player dies from a direct hit or dot while he had the aura SPELL_CHROMATIC_MUT_1
-        for (AfflictionGuids::iterator itr = m_lChromaticPlayerGUID.begin(); itr != m_lChromaticPlayerGUID.end();)
+        // If player dies while he had the aura SPELL_CHROMATIC_MUT_1
+        for (auto itr = m_lChromaticPlayerGUID.begin(); itr != m_lChromaticPlayerGUID.end();)
         {
             if (Player* pTarget = m_creature->GetMap()->GetPlayer(*itr))
             {
                 if (pTarget->IsDead())
                 {
-                    pTarget->RemoveAurasDueToSpell(23175);
-                    pTarget->RemoveAurasDueToSpell(23177);
-                    if (DoCastSpellIfCan(m_creature, 23168) == CAST_OK) //Heal 150000 HP
+                    pTarget->RemoveAurasDueToSpell(SPELL_CHROMATIC_MUTATION_ONE);
+                    pTarget->RemoveAurasDueToSpell(SPELL_CHROMATIC_MUTATION_TWO);
+                    if (DoCastSpellIfCan(m_creature, SPELL_BROOD_AFFLICTION_RED) == CAST_OK) // Heal 150000 HP
                         itr = m_lChromaticPlayerGUID.erase(itr);
                     break;
                 }

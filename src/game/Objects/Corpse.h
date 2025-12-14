@@ -74,6 +74,8 @@ class Corpse : public WorldObject
         void ResetGhostTime() { m_time = time(nullptr); }
         CorpseType GetType() const { return m_type; }
 
+        char const* GetName() const final { return "Corpse"; }
+
         ReputationRank GetReactionTo(WorldObject const* target) const final ;
         bool IsHostileTo(WorldObject const* target) const override;
         bool IsFriendlyTo(WorldObject const* target) const override;
@@ -91,7 +93,7 @@ class Corpse : public WorldObject
 
         bool IsExpired(time_t t) const;
         void SetFactionTemplate(FactionTemplateEntry const* entry) { m_faction = entry; }
-        FactionTemplateEntry const* GetFactionTemplate() { return m_faction; }
+        FactionTemplateEntry const* GetFactionTemplate() const { return m_faction; }
         uint32 GetFactionTemplateId() const final;
     private:
         GridReference<Corpse> m_gridRef;

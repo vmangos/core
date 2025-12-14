@@ -240,19 +240,14 @@ class ObjectGuid
         uint64 m_guid;
 };
 
-namespace std {
-
-    template <>
-    struct hash<ObjectGuid>
+template <>
+struct std::hash<ObjectGuid>
+{
+    std::size_t operator()(ObjectGuid const& k) const
     {
-        std::size_t operator()(ObjectGuid const& k) const
-        {
-            using std::hash;
-            return hash<uint64>()(k.GetRawValue());
-        }
-    };
-
-}
+        return std::hash<uint64>()(k.GetRawValue());
+    }
+};
 
 typedef std::unordered_set<ObjectGuid> ObjectGuidSet;
 typedef std::list<ObjectGuid> GuidList;
@@ -287,7 +282,8 @@ class ObjectGuidGenerator
         explicit ObjectGuidGenerator(uint32 start = 1) : m_nextGuid(start) {}
 
     public:                                                 // modifiers
-        void Set(uint32 val) { m_nextGuid = val; }
+        void LoadFromDB(char const* fieldName, char const* tableName);
+        void SetMaxUsedGuid(uint32 val, char const* guidType);
         uint32 Generate();
         void GenerateRange(uint32& first, uint32& last);
 

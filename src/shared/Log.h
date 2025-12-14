@@ -27,6 +27,7 @@
 
 #include <unordered_set>
 
+class Warden;
 class Config;
 class Player;
 class WorldSession;
@@ -141,6 +142,8 @@ enum LogType
     LOG_GM,
     LOG_GM_CRITICAL,
     LOG_ANTICHEAT,
+    LOG_SCRIPTS,
+    LOG_MOVEMENT,
     LOG_TYPE_MAX
 };
 
@@ -161,6 +164,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         } 
     }
     public:
+        void OpenWorldLogFiles();
         void InitSmartlogEntries(std::string const& str);
         void InitSmartlogGuids(std::string const& str);
 
@@ -170,7 +174,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         // for player-specific messages
         void Player(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
         void Player(WorldSession const* session, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
-        void OutWardenPlayer(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
+        void OutWarden(Warden const* warden, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(4, 5);
         void Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
         void Player(uint32 accountId, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
 
@@ -200,12 +204,10 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         void SetColor(FILE* where, Color color) const;
         void ResetColor(FILE* where) const;
 
-        static void outTime(FILE* where);
-        static void outTimestamp(FILE* file);
+        static void OutTime(FILE* where);
+        static void OutTimestamp(FILE* file);
 
-        FILE* openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile, bool overwriteOnOpen) const;
-        FILE* openGmlogPerAccount(uint32 account) const;
-
+        FILE* OpenLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile, bool overwriteOnOpen) const;
         FILE* logFiles[LOG_TYPE_MAX];
 
         // log/console control
@@ -222,12 +224,6 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         // cache values for after initilization use (like gm log per account case)
         std::string m_logsDir;
         std::string const m_logsTimestamp;
-
-        // char log control
-        bool m_charLog_Dump;
-
-        // gm log control
-        std::string m_gmlog_filename_format;
 
         // smart log for logging events (e.g. deaths) of certain entities
         std::unordered_set<uint32> m_smartlogExtraEntries;

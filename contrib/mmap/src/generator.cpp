@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <cstdlib>
 #include "MMapCommon.h"
 #include "MapBuilder.h"
 #ifdef _WIN32
@@ -81,6 +82,7 @@ void printUsage()
     printf("-? or /? or -h : This help\n");
     printf("[#] : Build only the map specified by #.\n");
     printf("--tile [#,#] : Build the specified tile\n");
+    printf("--threads : amount of threads to use for extraction.\n");
     printf("--skipLiquid : liquid data for maps\n");
     printf("--skipContinents : skip continents\n");
     printf("--skipJunkMaps : junk maps include some unused\n");
@@ -109,8 +111,9 @@ bool handleArgs(int argc, char** argv,
                 bool& silent,
                 bool& quick,
                 bool& buildOnlyGameobjectModels,
-                char*& offMeshInputPath,
-                char*& configInputPath)
+                char const*& offMeshInputPath,
+                char const*& configInputPath,
+                int& threads)
 {
     char* param = nullptr;
     for (int i = 1; i < argc; ++i)
@@ -136,6 +139,14 @@ bool handleArgs(int argc, char** argv,
                 printf("invalid tile coords.\n");
                 return false;
             }
+        }
+        else if (strcmp(argv[i], "--threads") == 0)
+        {
+            param = argv[++i];
+            if (!param)
+                return false;
+
+            threads = std::max(1, atoi(param));
         }
         else if (strcmp(argv[i], "--skipLiquid") == 0)
         {
@@ -206,7 +217,7 @@ bool handleArgs(int argc, char** argv,
     return true;
 }
 
-int finish(const char* message, int returnValue)
+int finish(char const* message, int returnValue)
 {
     printf("%s", message);
     getchar();
@@ -227,45 +238,83 @@ int main(int argc, char** argv)
     bool silent = false;
     bool buildOnlyGameobjectModels = false;
     bool quick = false;
+    int threads = 0;
 
-    char* offMeshInputPath = "offmesh.txt";
-    char* configInputPath = "config.json";
+    char const* offMeshInputPath = "offmesh.txt";
+    char const* configInputPath = "config.json";
 
-    bool validParam = handleArgs(argc, argv, mapId, tileX, tileY, skipLiquid,
-                                 skipContinents, skipJunkMaps, skipBattlegrounds,
-                                 debug, silent, quick, buildOnlyGameobjectModels, offMeshInputPath, configInputPath);
+    bool validParam = handleArgs(argc, argv, mapId, tileX, tileY, skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds, debug, silent, quick, buildOnlyGameobjectModels, offMeshInputPath, configInputPath, threads);
 
     if (!validParam)
-        return silent ? -1 : finish("You have specified invalid parameters (use -? for more help)", -1);
+        return silent ? EXIT_FAILURE : finish("You have specified invalid parameters (use -? for more help)", EXIT_FAILURE);
+
+    if (!silent)
+    {
+        std::cout << "MMap Generator" << endl;
+        std::cout << "====================================" << endl;
+    }
 
     if (mapId == -1 && debug && !buildOnlyGameobjectModels)
     {
         if (silent)
-            return -2;
+            return EXIT_FAILURE;
 
         printf("You have specified debug output, but didn't specify a map to generate.\n");
         printf("This will generate debug output for ALL maps.\n");
         printf("Are you sure you want to continue? (y/n) ");
         if (getchar() != 'y')
-            return 0;
+            return EXIT_SUCCESS;
     }
 
     if (!checkDirectories(debug))
-        return silent ? -3 : finish("Press any key to close...", -3);
+        return silent ? EXIT_FAILURE : finish("Press any key to close...", EXIT_FAILURE);
 
-    MapBuilder builder(configInputPath, skipLiquid, skipContinents, skipJunkMaps,
-                       skipBattlegrounds, debug, quick, offMeshInputPath);
+    if (!silent)
+    {
+        std::cout << "offMeshInputPath = " << offMeshInputPath << endl;
+        std::cout << "configInputPath = " << configInputPath << endl;
+    }
+
+    if (!threads)
+    {
+        int systemThreads = std::thread::hardware_concurrency();
+        std::cout << "How many cores should be used? (" << systemThreads << " are available)" << std::endl;
+        std::cin >> threads;
+        std::cin.get();
+        threads = std::min(systemThreads, threads);
+        threads = std::max(1, threads);
+        std::cout << "Using " << threads << " cores." << std::endl;
+
+        std::cout << "Press enter to start building mmaps." << endl;
+        std::cout << "====================================" << endl;
+        std::cin.get();
+    }
+
+    MapBuilder builder(configInputPath, skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds, debug, quick, offMeshInputPath, uint8(threads));
 
     if (buildOnlyGameobjectModels)
         builder.buildTransports();
     else if (tileX > -1 && tileY > -1 && mapId >= 0)
         builder.buildSingleTile(mapId, tileX, tileY);
     else if (mapId >= 0)
-        builder.buildMap(uint32(mapId));
+        builder.buildSingleMap(uint32(mapId));
     else
     {
         builder.buildAllMaps();
         builder.buildTransports();
     }
-    return silent ? 1 : finish("Movemap build is complete!", 1);
+
+    while (builder.IsBusy())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+
+    if (silent)
+    {
+        return EXIT_SUCCESS;
+    }
+    else
+    {
+        return finish("MoveMapGenerator finished with success!", EXIT_SUCCESS);
+    }
 }

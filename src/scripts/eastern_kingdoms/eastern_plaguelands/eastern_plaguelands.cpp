@@ -302,7 +302,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 m_archerGUIDs[j] = summoned->GetGUID();
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summoned->AddUnitState(UNIT_STAT_ROOT);
+                summoned->AddUnitState(UNIT_STATE_ROOT);
                 break;
             case NPC_WARRIOR:
                 SetAttackOnPeasantOrPlayer(summoned);
@@ -1746,10 +1746,10 @@ CreatureAI* GetAI_npc_joseph_redpath(Creature* pCreature)
 
 bool GossipHello_npc_joseph_redpath(Player* pPlayer, Creature* pCreature)
 {
-    pPlayer->SEND_GOSSIP_MENU(10935, pCreature->GetGUID());
+    pPlayer->SEND_GOSSIP_MENU(3861, pCreature->GetGUID());
     if (pPlayer->GetQuestStatus(QUEST_BATTLE_DARROWSHIRE) == QUEST_STATUS_INCOMPLETE)
     {
-        pPlayer->AreaExploredOrEventHappens(QUEST_BATTLE_DARROWSHIRE);
+        pPlayer->KilledMonsterCredit(NPC_JOSEPH_REDPATH, pCreature->GetObjectGuid());
         pCreature->HandleEmote(EMOTE_ONESHOT_BEG);
         if (npc_joseph_redpathAI* pJosephAI = dynamic_cast<npc_joseph_redpathAI*>(pCreature->AI()))
             pJosephAI->BeginEvent();
@@ -1766,7 +1766,7 @@ enum MarkOfDetonationData
 
 bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpellId, SpellEffectIndex effIndex, GameObject* pGameObjectTarget)
 {
-    //always check spellid and effectindex
+    // always check spellid and effectindex
     if (uiSpellId == SPELL_PLACING_SMOKEY_S_EXPLOSIVES && effIndex == EFFECT_INDEX_0)
     {
         if (Player* pPlayer = pCaster->ToPlayer())
@@ -1775,13 +1775,228 @@ bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpe
             {
                 pPlayer->KilledMonsterCredit(pCreature->GetEntry(), pCreature->GetObjectGuid());
                 pCreature->DealDamage(pCreature, pCreature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+
+                // TODO: move this to db as On Death event script on the creature with guid condition
+                static std::map<uint32 /*npcGuid*/, std::vector<uint32 /*goGuid*/>> const fireObjectsMap =
+                {
+                    { 53157, { 35947, 35948, 35949, 35950, 35951, 35952, 35953, 35954, 35955, 35956 } },
+                    { 53168, { 35936, 35937, 35938, 35939, 35940, 35941, 35942, 35943, 35944, 35945 } },
+                    { 54270, { 35903, 35904, 35905, 35906, 35907, 35908, 35909, 35910, 35911, 35912 } },
+                    { 54271 ,{ 35892, 35893, 35894, 35895, 35896, 35897, 35898, 35899, 35900, 35901 } },
+                    { 56689, { 35958, 35959, 35960, 35961, 35962, 35963, 35964, 35965, 35966, 35967 } },
+                    { 92232, { 35881, 35882, 35883, 35884, 35885, 35886, 35887, 35888, 35889, 35890 } },
+                    { 92254, { 35925, 35926, 35927, 35928, 35929, 35930, 35931, 35932, 35933, 35934 } },
+                    { 92262, { 35914, 35915, 35916, 35917, 35918, 35919, 35920, 35921, 35922, 35923 } },
+                };
+
+                auto itr = fireObjectsMap.find(pCreature->GetGUIDLow());
+                if (itr != fireObjectsMap.end())
+                {
+                    ScriptInfo script;
+                    script.id = uiSpellId;
+                    script.command = SCRIPT_COMMAND_RESPAWN_GAMEOBJECT;
+                    script.respawnGo.despawnDelay = 180;
+                    for (auto const& goGuid : itr->second)
+                    {
+                        script.respawnGo.goGuid = goGuid;
+                        pCreature->GetMap()->ScriptCommandStartDirect(script, pCreature, pCreature);
+                    }
+                }
             }
-            //always return true when we are handling this spell and effect
+            // always return true when we are handling this spell and effect
             pGameObjectTarget->Despawn();
             return true;
         }
     }
     return false;
+}
+
+/*************************
+*** npc_guard_didier ***
+*************************/
+
+enum GuardDidierData
+{
+    SAY_MULE_DIED = 12118,
+    SPELL_MARK_OF_DIDIER = 28114,
+    GOSSIP_NOT_STARTED = 7165,
+    GOSSIP_MULE_DIED = 7168,
+};
+
+struct npc_guard_didierAI : public ScriptedAI
+{
+    explicit npc_guard_didierAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_muleDied = false;
+        Reset();
+    }
+
+    bool m_muleDied;
+
+    void Reset() override { }
+
+    void JustRespawned() override
+    {
+        m_muleDied = false;
+        m_creature->SetReactState(REACT_PASSIVE);
+        m_creature->SetDefaultGossipMenuId(GOSSIP_NOT_STARTED);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        m_muleDied = false;
+
+        if (CreatureGroup* pGroup = m_creature->GetCreatureGroup())
+            pGroup->DoForAllMembers(m_creature->GetMap(), [](Creature* pMember) { if (pMember->IsAlive()) pMember->DespawnOrUnsummon(1); });
+    }
+
+    void JustReachedHome() override
+    {
+        if (m_muleDied)
+        {
+            m_muleDied = false;
+            m_creature->GetMotionMaster()->Clear(false, true);
+            m_creature->GetMotionMaster()->MoveIdle();
+            m_creature->MonsterSay(SAY_MULE_DIED);
+            m_creature->HandleEmote(EMOTE_ONESHOT_CRY);
+            m_creature->SetDefaultGossipMenuId(GOSSIP_MULE_DIED);
+            m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+            if (CreatureGroup* pGroup = m_creature->GetCreatureGroup())
+                pGroup->DoForAllMembers(m_creature->GetMap(), [](Creature* pMember)
+                {
+                    if (pMember->IsAlive())
+                    {
+                        if (pMember->HasAura(SPELL_MARK_OF_DIDIER))
+                            pMember->RemoveAurasDueToSpell(SPELL_MARK_OF_DIDIER);
+
+                        pMember->DespawnOrUnsummon(90 * IN_MILLISECONDS);
+                    }
+                });
+            m_creature->DespawnOrUnsummon(90 * IN_MILLISECONDS);
+
+            if (m_creature->HasAura(SPELL_MARK_OF_DIDIER))
+                m_creature->RemoveAurasDueToSpell(SPELL_MARK_OF_DIDIER);
+        }
+        else
+        {
+            m_creature->SetReactState(REACT_PASSIVE);
+        }
+    }
+
+    void GroupMemberJustDied(Creature* unit, bool isLeader) override
+    {
+        m_muleDied = true;
+    }
+
+    void EnableCombat(Unit* pAttacker)
+    {
+        m_creature->SetReactState(REACT_AGGRESSIVE);
+
+        if (CreatureGroup* pGroup = m_creature->GetCreatureGroup())
+            pGroup->DoForAllMembers(m_creature->GetMap(), [pAttacker](Creature* pMember)
+            {
+                if (!pMember->HasReactState(REACT_AGGRESSIVE) && pMember->IsAlive())
+                {
+                    pMember->SetReactState(REACT_AGGRESSIVE);
+                    pMember->AI()->AttackStart(pAttacker);
+                }
+            });
+    }
+
+    void DamageTaken(Unit* pAttacker, uint32& /*damage*/) override
+    {
+        if (!m_creature->HasReactState(REACT_AGGRESSIVE))
+        {
+            EnableCombat(pAttacker);
+            AttackStart(pAttacker);
+        }
+    }
+
+    void AttackStart(Unit* pVictim)
+    {
+        if (m_creature->HasReactState(REACT_PASSIVE))
+        {
+            if (m_creature->IsWithinDistInMap(pVictim, m_creature->GetAttackDistance(pVictim)))
+                EnableCombat(pVictim);
+            else
+            {
+                // always add threat even if passive to avoid constantly evading
+                m_creature->AddThreat(pVictim);
+                return;
+            }
+        }
+        
+        ScriptedAI::AttackStart(pVictim);
+    }
+};
+
+CreatureAI* GetAI_npc_guard_didier(Creature* pCreature)
+{
+    return new npc_guard_didierAI(pCreature);
+}
+
+/*************************
+*** npc_caravan_mule ***
+*************************/
+
+struct npc_caravan_muleAI : public ScriptedAI
+{
+    explicit npc_caravan_muleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_creature->SetReactState(REACT_PASSIVE);
+    }
+
+    void Reset() override
+    { 
+        m_creature->SetReactState(REACT_PASSIVE);
+    }
+
+    void EnableCombat(Unit* pAttacker)
+    {
+        m_creature->SetReactState(REACT_AGGRESSIVE);
+
+        if (CreatureGroup* pGroup = m_creature->GetCreatureGroup())
+            pGroup->DoForAllMembers(m_creature->GetMap(), [pAttacker](Creature* pMember)
+        {
+            if (!pMember->HasReactState(REACT_AGGRESSIVE) && pMember->IsAlive())
+            {
+                pMember->SetReactState(REACT_AGGRESSIVE);
+                pMember->AI()->AttackStart(pAttacker);
+            }
+        });
+    }
+
+    void DamageTaken(Unit* pAttacker, uint32& /*damage*/) override
+    {
+        if (!m_creature->HasReactState(REACT_AGGRESSIVE))
+        {
+            EnableCombat(pAttacker);
+            AttackStart(pAttacker);
+        }
+    }
+
+    void AttackStart(Unit* pVictim)
+    {
+        if (m_creature->HasReactState(REACT_PASSIVE))
+        {
+            if (m_creature->IsWithinDistInMap(pVictim, m_creature->GetAttackDistance(pVictim)))
+                EnableCombat(pVictim);
+            else
+            {
+                // always add threat even if passive to avoid constantly evading
+                m_creature->AddThreat(pVictim);
+                return;
+            }
+        }
+
+        ScriptedAI::AttackStart(pVictim);
+    }
+};
+
+CreatureAI* GetAI_npc_caravan_mule(Creature* pCreature)
+{
+    return new npc_caravan_muleAI(pCreature);
 }
 
 void AddSC_eastern_plaguelands()
@@ -1821,5 +2036,15 @@ void AddSC_eastern_plaguelands()
     newscript = new Script;
     newscript->Name = "go_mark_of_detonation";
     newscript->pEffectDummyGameObj = &EffectDummyGameObj_go_mark_of_detonation;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_guard_didier";
+    newscript->GetAI = &GetAI_npc_guard_didier;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_caravan_mule";
+    newscript->GetAI = &GetAI_npc_caravan_mule;
     newscript->RegisterSelf();
 }

@@ -23,7 +23,7 @@ enum
 
 void DefineGoChallenge(Creature * crea, uint64 gobjGUID);
 
-/// Script du GameObject de challenge (GO_CHALLENGE_UROK)
+// Challenge GameObject Script (GO_CHALLENGE_UROK)
 struct go_urok_challengeAI: public GameObjectAI
 {
     go_urok_challengeAI(GameObject* go) : GameObjectAI(go), _actived(true), _step(0), _timer(0), _spellTimer(0)
@@ -53,12 +53,12 @@ struct go_urok_challengeAI: public GameObjectAI
                 switch (_step)
                 {
                     case 0:
-                        SpawnRune(0, -13.7f, -385.3f, 48.95f, 4.85f);
-                        SpawnRune(1, -27.78f, -385.75f, 48.5f, 5.66f);
-                        SpawnRune(2, -25.0f, -369.9f, 49.66f, 5.2f);
-                        SpawnRune(3, -34.4f, -370.6f, 50.3f, 5.4f);
-                        SpawnRune(4, -34.0f, -370.4f, 50.3f, 5.4f);
-                        SpawnRune(5, -49.4f, -368.5f, 51.7f, 5.5f);
+                        SpawnRune(0, -13.7275f, -384.816f, 48.9746f, 3.68265f);
+                        SpawnRune(1, -27.8804f, -385.891f, 48.5067f, 3.7001f);
+                        SpawnRune(2, -24.8824f, -369.619f, 49.7059f, 3.4034f);
+                        SpawnRune(3, -12.3689f, -376.475f, 49.335f, 5.044f);
+                        SpawnRune(4, -34.5437f, -370.233f, 50.3396f, 5.35816f);
+                        SpawnRune(5, -47.9095f, -369.089f, 51.5425f, 1.37881f);
                         _timer = 3000;
                         break;
                     case 1:
@@ -81,7 +81,7 @@ struct go_urok_challengeAI: public GameObjectAI
         {
             if (Creature* invoc = me->SummonCreature(entry, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 400000, false))
             {
-                invoc->SetRespawnDelay(600000);
+                invoc->SetRespawnDelay(7 * DAY);
                 // Visuel d'apparition
                 if (entry == NPC_UROK_DOOMHOWL)
                     invoc->SendSpellGo(invoc, SPELL_UROK_SUMMONED);

@@ -822,7 +822,7 @@ DWORD dwTypeIndex,
 unsigned nestingLevel,
 DWORD_PTR offset,
 bool& bHandled,
-char* Name)
+char const* Name)
 {
     bHandled = false;
 

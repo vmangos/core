@@ -76,7 +76,7 @@ enum MangosStrings
     LANG_NON_EXIST_CHARACTER            = 47,
     LANG_FRIEND_IGNORE_UNKNOWN          = 48,
     LANG_LEVEL_MINREQUIRED              = 49,
-    //                                  = 50, not used
+    LANG_COMMAND_UNAVAILABLE            = 50,
     LANG_NPC_TAINER_HELLO               = 51,
     LANG_COMMAND_INVALID_ITEM_COUNT     = 52,
     LANG_COMMAND_MAIL_ITEMS_LIMIT       = 53,
@@ -188,7 +188,14 @@ enum MangosStrings
     LANG_XP_RATE_MIN                    = 177,
     LANG_XP_RATE_MAX                    = 178,
     LANG_XP_RATE_SET                    = 179,
-    // Room for more level 1              180-199 not used
+    LANG_ALLIANCE_BATTLEBOT_ADDED       = 180,
+    LANG_HORDE_BATTLEBOT_ADDED          = 181,
+    LANG_CAN_ONLY_WHISPER_FRIENDS       = 182,
+    LANG_CANT_USE_PUBLIC_CHANNELS       = 183,
+    LANG_RESTRICTED_ACCOUNT             = 184,
+    LANG_ALLIANCE_BATTLEBOT_TEMP_ADDED  = 185,
+    LANG_HORDE_BATTLEBOT_TEMP_ADDED     = 186,
+    // Room for more level 1              187-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -282,7 +289,7 @@ enum MangosStrings
     LANG_COMMAND_ADDVENDORITEMITEMS     = 280,
     LANG_COMMAND_KICKSELF               = 281,
     LANG_COMMAND_KICKMESSAGE            = 282,
-    //                                    283, not used
+    LANG_ACCOUNT_WARNED                 = 283,
     LANG_COMMAND_WHISPERACCEPTING       = 284,
     LANG_COMMAND_WHISPERON              = 285,
     LANG_COMMAND_WHISPEROFF             = 286,
@@ -341,8 +348,8 @@ enum MangosStrings
     LANG_INVIS_OFF                      = 346,
     LANG_COMMAND_GOTAXINODENOTFOUND     = 347,
     LANG_GAMEOBJECT_HAVE_INVALID_DATA   = 348,
-    LANG_GOD_ON                         = 349,
-    LANG_GOD_OFF                        = 350,
+    LANG_CHEAT_GOD_ON                   = 349,
+    LANG_CHEAT_GOD_OFF                  = 350,
     LANG_YOU_SET_WALLCLIMB              = 351,
     LANG_YOUR_WALLCLIMB_SET             = 352,
     LANG_CHEAT_NO_CD_ON                 = 353,
@@ -480,8 +487,6 @@ enum MangosStrings
     LANG_COMMAND_QUEST_COMPLETE         = 475,
     LANG_COMMAND_QUEST_ACTIVE           = 476,
 
-    LANG_COMMAND_FLYMODE_STATUS         = 477,
-
     LANG_COMMAND_OPCODESENT             = 478,
 
     LANG_COMMAND_IMPORT_SUCCESS         = 479,
@@ -571,7 +576,7 @@ enum MangosStrings
     LANG_NPCINFO_ARMOR                  = 1033,
     LANG_NPCINFO_AIINFO                 = 1034,
 
-    LANG_PINFO_ACCOUNT                  = 616,
+    LANG_PINFO_ACCOUNT                  = 600,
     LANG_PINFO_LEVEL                    = 549,
     LANG_PINFO_NO_REP                   = 550,
 
@@ -637,29 +642,18 @@ enum MangosStrings
     LANG_GMLIST_EMPTY                   = 599,
     // End Level 3 list, continued at 1100
 
-    // Battleground
-    LANG_BG_A_WINS                      = 600,
-    LANG_BG_H_WINS                      = 601,
-
-    LANG_BG_WS_START_ONE_MINUTE         = 602,
-    LANG_BG_WS_START_HALF_MINUTE        = 603,
-    LANG_BG_WS_HAS_BEGUN                = 604,
-
-    LANG_BG_WS_CAPTURED_HF              = 605,
-    LANG_BG_WS_CAPTURED_AF              = 606,
-    LANG_BG_WS_DROPPED_HF               = 607,
-    LANG_BG_WS_DROPPED_AF               = 608,
-    LANG_BG_WS_RETURNED_AF              = 609,
-    LANG_BG_WS_RETURNED_HF              = 610,
-    LANG_BG_WS_PICKEDUP_HF              = 611,
-    LANG_BG_WS_PICKEDUP_AF              = 612,
-    LANG_BG_WS_F_PLACED                 = 613,
-    LANG_BG_WS_ALLIANCE_FLAG_RESPAWNED  = 614,
-    LANG_BG_WS_HORDE_FLAG_RESPAWNED     = 615,
-    LANG_COMMAND_SOUND_NOT_FOUND        = 617,
-    LANG_COMMAND_SOUND_LIST             = 618,
+    LANG_COMMAND_SOUND_NOT_FOUND        = 601,
+    LANG_COMMAND_SOUND_LIST             = 602,
 
     // cheat commands
+    LANG_YOU_SET_FIXED_Z                = 611,
+    LANG_YOUR_FIXED_Z_SET               = 612,
+    LANG_CHEAT_FIXED_Z_ON               = 613,
+    LANG_CHEAT_FIXED_Z_OFF              = 614,
+    LANG_YOU_SET_FLY                    = 615,
+    LANG_YOUR_FLY_SET                   = 616,
+    LANG_CHEAT_FLY_ON                   = 617,
+    LANG_CHEAT_FLY_OFF                  = 618,
     LANG_YOU_SET_INSTANT_CAST           = 619,
     LANG_YOUR_INSTANT_CAST_SET          = 620,
     LANG_CHEAT_NO_POWER_COST_ON         = 621,
@@ -705,11 +699,6 @@ enum MangosStrings
     LANG_BG_AB_NODE_ASSAULTED           = 659,
     LANG_BG_AB_NODE_CLAIMED             = 660,
 
-    LANG_BG_AB_START_ONE_MINUTE         = 661,
-    LANG_BG_AB_START_HALF_MINUTE        = 662,
-    LANG_BG_AB_HAS_BEGUN                = 663,
-    LANG_BG_AB_A_NEAR_VICTORY           = 664,
-    LANG_BG_AB_H_NEAR_VICTORY           = 665,
     LANG_BG_MARK_BY_MAIL                = 666,
     LANG_NARAIN_LETTER                  = 667,
 
@@ -741,12 +730,16 @@ enum MangosStrings
     LANG_YOUR_IMMUNE_NPC_SET            = 691,
     LANG_YOU_SET_UNTARGETABLE           = 692,
     LANG_YOUR_UNTARGETABLE_SET          = 693,
+    LANG_CHEAT_DEBUG_TARGET_INFO_ON     = 694,
+    LANG_CHEAT_DEBUG_TARGET_INFO_OFF    = 695,
+    LANG_YOU_SET_DEBUG_TARGET_INFO      = 696,
+    LANG_YOUR_DEBUG_TARGET_INFO_SET     = 697,
 
     LANG_RESTORED_ITEM                  = 699,
-    //LANG_ARENA_ONE_TOOLOW             = 700,
-    //LANG_ARENA_ONE_MINUTE             = 701,
-    //LANG_ARENA_THIRTY_SECONDS         = 702,
-    //LANG_ARENA_FIFTEEN_SECONDS        = 703,
+    LANG_YOU_SET_BEASTMASTER            = 700,
+    LANG_YOUR_BEASTMASTER_SET           = 701,
+    LANG_CHEAT_BEASTMASTER_ON           = 702,
+    LANG_CHEAT_BEASTMASTER_OFF          = 703,
     //LANG_ARENA_BEGUN                  = 704,
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
@@ -799,8 +792,8 @@ enum MangosStrings
     //                                  = 749, not used
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING      = 750,  // "Not enough players. This game will close in %u mins."
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
-    LANG_BATTLEGROUND_ONLY_ALLIANCE_USE = 752,              // "Only The Alliance can use that portal"
-    LANG_BATTLEGROUND_ONLY_HORDE_USE    = 753,              // "Only The Horde can use that portal"
+//                                      = 752, not used
+//                                      = 753, not used
 //                                      = 754, not used
 //                                      = 755, not used
 //                                      = 756, not used
@@ -832,12 +825,7 @@ enum MangosStrings
     LANG_BG_AV_NODE_TOWER_FROST_W       = 781,
     LANG_BG_AV_NODE_GRAVE_FROST_HUT     = 782,
 
-//                                      = 783, not used
-    LANG_BG_AV_START_ONE_MINUTE         = 784,
-    LANG_BG_AV_START_HALF_MINUTE        = 785,
-    LANG_BG_AV_HAS_BEGUN                = 786,
-    LANG_BG_AV_A_NEAR_LOSE              = 787,
-    LANG_BG_AV_H_NEAR_LOSE              = 788,
+    //                                    783 - 788 not used
     LANG_BG_AV_H_GENERAL_DEAD           = 789,
     LANG_BG_AV_A_GENERAL_DEAD           = 790,
     // Room for battleground/arena strings 791-799 not used

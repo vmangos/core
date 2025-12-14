@@ -107,6 +107,9 @@ namespace MovementPacketSender
         void SendMovementFlagChangeToObservers(Unit* unit, MovementFlags mFlag, bool apply);
         void SendMovementFlagChangeToAll(Unit* unit, MovementFlags mFlag, bool apply);
 
+        /* run or walk*/
+        void SendToggleRunWalkToAll(Unit* unit, bool run);
+
         // utility method
         MovementChangeType GetChangeTypeByMoveType(UnitMoveType moveType);
         UnitMoveType GetMoveTypeByChangeType(MovementChangeType moveType);

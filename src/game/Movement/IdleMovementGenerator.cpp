@@ -37,7 +37,7 @@ DistractMovementGenerator::Initialize(Unit& owner)
     if (!owner.IsStandingUp())
         owner.SetStandState(UNIT_STAND_STATE_STAND);
 
-    owner.AddUnitState(UNIT_STAT_DISTRACTED);
+    owner.AddUnitState(UNIT_STATE_DISTRACTED);
 }
 
 void
@@ -50,7 +50,7 @@ DistractMovementGenerator::Finalize(Unit& owner)
         owner.SetFacingTo(angle);
     }
 
-    owner.ClearUnitState(UNIT_STAT_DISTRACTED);
+    owner.ClearUnitState(UNIT_STATE_DISTRACTED);
 }
 
 void
@@ -77,7 +77,7 @@ DistractMovementGenerator::Update(Unit& /*owner*/, uint32 const& time_diff)
 void
 AssistanceDistractMovementGenerator::Finalize(Unit &unit)
 {
-    unit.ClearUnitState(UNIT_STAT_DISTRACTED);
+    unit.ClearUnitState(UNIT_STATE_DISTRACTED);
     if (Unit* victim = unit.GetVictim())
     {
         if (unit.IsAlive())

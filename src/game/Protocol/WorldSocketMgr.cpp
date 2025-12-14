@@ -19,11 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/** \file WorldSocketMgr.cpp
-*  \ingroup u2w
-*  \author Derex <derex101@gmail.com>
-*/
-
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
 #include "MangosSocketMgrImpl.h"

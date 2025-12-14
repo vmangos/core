@@ -189,7 +189,7 @@ struct npc_obsidionAI : public ScriptedAI
 bool GossipHello_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature)
 {
     if (Creature* Obsidion = GetClosestCreatureWithEntry(pCreature, NPC_OBSIDION, VISIBLE_RANGE))
-        return false; /// everything is ok
+        return false; // everything is ok
 
     pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid(), QUEST_RISE_OBSIDION);
     pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());

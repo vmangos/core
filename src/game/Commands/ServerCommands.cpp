@@ -39,7 +39,9 @@
 #include "AuraRemovalMgr.h"
 #include "AutoBroadCastMgr.h"
 #include "SpellModMgr.h"
+#include "MapManager.h"
 #include "CreatureGroups.h"
+#include "HardcodedEvents.h"
 
 bool ChatHandler::HandleAnnounceCommand(char* args)
 {
@@ -273,8 +275,8 @@ bool ChatHandler::HandleWorldTestCommand(char *args)
         return false;
     }
     PSendSysMessage("My worldmask is 0x%x. My target worldmask is 0x%x.", me->GetWorldMask(), target->GetWorldMask());
-    PSendSysMessage("I see the target ? %s", me->CanSeeInWorld(target) ? "oui" : "non");
-    PSendSysMessage("My target sees me ? %s", target->CanSeeInWorld(me) ? "oui" : "non");
+    PSendSysMessage("I see the target ? %s", me->CanSeeInWorld(target) ? "yes" : "no");
+    PSendSysMessage("My target sees me ? %s", target->CanSeeInWorld(me) ? "yes" : "no");
     return true;
 }
 
@@ -390,7 +392,7 @@ bool ChatHandler::HandleServerPLimitCommand(char *args)
     return true;
 }
 
-/// Triggering corpses expire check in world
+// Triggering corpses expire check in world
 bool ChatHandler::HandleServerCorpsesCommand(char* /*args*/)
 {
     sObjectAccessor.RemoveOldCorpses();
@@ -490,7 +492,7 @@ bool ChatHandler::HandleServerIdleShutDownCommand(char* args)
     return true;
 }
 
-/// Close RA connection
+// Close RA connection
 bool ChatHandler::HandleQuitCommand(char* /*args*/)
 {
     // processed in RASocket
@@ -498,7 +500,7 @@ bool ChatHandler::HandleQuitCommand(char* /*args*/)
     return true;
 }
 
-/// Exit the realm
+// Exit the realm
 bool ChatHandler::HandleServerExitCommand(char* /*args*/)
 {
     SendSysMessage(LANG_COMMAND_EXIT);
@@ -522,7 +524,7 @@ bool ChatHandler::HandleViewLogCommand(char* args)
     return true;
 }
 
-/// Set the filters of logging
+// Set the filters of logging
 bool ChatHandler::HandleServerLogFilterCommand(char* args)
 {
     if (!*args)
@@ -569,7 +571,7 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
     return false;
 }
 
-/// Set the level of logging
+// Set the level of logging
 bool ChatHandler::HandleServerLogLevelCommand(char *args)
 {
     if (!*args)
@@ -966,7 +968,7 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAllSpellCommand(char* /*args*/)
 {
-    HandleReloadSpellAffectCommand((char*)"a");
+    HandleReloadSpellTemplateCommand((char*)"a");
     HandleReloadSpellAreaCommand((char*)"a");
     HandleReloadSpellChainCommand((char*)"a");
     HandleReloadSpellElixirCommand((char*)"a");
@@ -1037,7 +1039,7 @@ bool ChatHandler::HandleReloadAreaTriggerTeleportCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadCommandCommand(char* /*args*/)
 {
-    load_command_table = true;
+    m_loadCommandTable = true;
     SendSysMessage("DB table `command` will be reloaded at next chat command use.");
     return true;
 }
@@ -1146,7 +1148,7 @@ bool ChatHandler::HandleReloadQuestTemplateCommand(char* /*args*/)
     sObjectMgr.LoadQuests();
     SendSysMessage("DB table `quest_template` (quest definitions) reloaded.");
 
-    /// dependent also from `gameobject` but this table not reloaded anyway
+    // dependent also from `gameobject` but this table not reloaded anyway
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading GameObjects for quests...");
     sObjectMgr.LoadGameObjectForQuests();
     SendSysMessage("Data GameObjects for quests reloaded.");
@@ -1340,14 +1342,6 @@ bool ChatHandler::HandleReloadSkillFishingBaseLevelCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleReloadSpellAffectCommand(char* /*args*/)
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading SpellAffect definitions...");
-    sSpellMgr.LoadSpellAffects();
-    SendSysMessage("DB table `spell_affect` (spell mods apply requirements) reloaded.");
-    return true;
-}
-
 bool ChatHandler::HandleReloadSpellAreaCommand(char* /*args*/)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading SpellArea Data...");
@@ -1409,6 +1403,16 @@ bool ChatHandler::HandleReloadSpellTargetPositionCommand(char* /*args*/)
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading spell target destination coordinates...");
     sSpellMgr.LoadSpellTargetPositions();
     SendSysMessage("DB table `spell_target_position` (destination coordinates for spell targets) reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadSpellTemplateCommand(char* /*args*/)
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading Spell Definitions...");
+    sSpellMgr.LoadSpells();
+    SendSysMessage("DB table `spell_template` reloaded.");
+    sSpellModMgr.LoadSpellMods();
+    SendSysMessage("DB table `spell_mod` reloaded.");
     return true;
 }
 
@@ -1737,13 +1741,6 @@ bool ChatHandler::HandleReloadGameObjectCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleReloadCreatureTemplate(char*)
-{
-    sObjectMgr.LoadCreatureTemplates();
-    SendSysMessage(">> Table `creature_template` reloaded.");
-    return true;
-}
-
 bool ChatHandler::HandleReloadItemTemplate(char*)
 {
     sObjectMgr.LoadItemPrototypes();
@@ -1758,10 +1755,37 @@ bool ChatHandler::HandleReloadMapTemplate(char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadGameObjectTemplate(char*)
+bool ChatHandler::HandleReloadCreatureTemplatesCommand(char* args)
 {
-    sObjectMgr.LoadGameobjectInfo();
-    SendSysMessage(">> Table `gameobject_template` reloaded.");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `creature_template` Table!");
+    uint32 entry;
+    if (ExtractUInt32(&args, entry))
+    {
+        sObjectMgr.LoadCreatureTemplate(entry);
+        PSendSysMessage("Creature template %u reloaded.", entry);
+    }
+    else
+    {
+        sObjectMgr.LoadCreatureTemplates();
+        SendSysMessage("DB table `creature_template` reloaded.");
+    }
+    return true;
+}
+
+bool ChatHandler::HandleReloadGameObjectTemplatesCommand(char* args)
+{
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Re-Loading `gameobject_template` Table!");
+    uint32 entry;
+    if (ExtractUInt32(&args, entry))
+    {
+        sObjectMgr.LoadGameObjectTemplate(entry);
+        PSendSysMessage("GameObject template %u reloaded.", entry);
+    }
+    else
+    {
+        sObjectMgr.LoadGameObjectTemplates();
+        SendSysMessage("DB table `gameobject_template` reloaded.");
+    }
     return true;
 }
 
@@ -1837,7 +1861,7 @@ bool ChatHandler::HandleReloadCreatureDisplayInfoAddon(char*)
 
 bool ChatHandler::HandleReloadIPBanList(char*)
 {
-    sAccountMgr.LoadIPBanList();
+    sAccountMgr.LoadIPBanList(LoginDatabase.Query(LOAD_IP_BANS_QUERY));
     SendSysMessage(">> Table `ip_banned` reloaded.");
     return true;
 }
@@ -1924,5 +1948,14 @@ bool ChatHandler::HandleReloadAnticheatCommand(char*)
 {
     sAnticheatMgr->LoadAnticheatData();
     SendSysMessage(">> Anticheat data reloaded");
+    return true;
+}
+
+bool ChatHandler::HandleListMapsCommand(char* /*args*/)
+{
+    SendSysMessage("Listing all currently created maps:");
+    for (auto const& itr : sMapMgr.Maps())
+        PSendSysMessage("%u-%u - %s - Players %u - Created %s ago", itr.first.nMapId, itr.first.nInstanceId, playerLink(itr.second->GetMapName()).c_str(), itr.second->GetPlayersCountExceptGMs(), secsToTimeString(time(nullptr) - itr.second->GetCreateTime(), true).c_str());
+
     return true;
 }

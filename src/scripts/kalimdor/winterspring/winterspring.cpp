@@ -44,7 +44,7 @@ enum
     SPELL_DEMONIC_DOOM              = 23298,
     SPELL_STINGING_TRAUMA           = 23299,
     
-    EMOTE_POISON                    = -1000651,
+    EMOTE_POISON                    = 9786,
 
     NPC_ARTORIUS_THE_AMIABLE        = 14531,
     NPC_ARTORIUS_THE_DOOMBRINGER    = 14535,
@@ -164,7 +164,7 @@ struct npc_artoriusAI : public ScriptedAI
                 
                 for (const auto itr : tList)
                 {
-                    if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
+                    if (Unit* pUnit = itr->getTarget())
                     {
                         if (pUnit->IsAlive())
                         {

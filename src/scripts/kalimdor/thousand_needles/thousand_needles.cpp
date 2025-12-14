@@ -36,11 +36,11 @@ EndContentData */
 
 enum
 {
-    SAY_LAKO_START              = -1000365,
-    SAY_LAKO_LOOK_OUT           = -1000366,
-    SAY_LAKO_HERE_COME          = -1000367,
-    SAY_LAKO_MORE               = -1000368,
-    SAY_LAKO_END                = -1000369,
+    SAY_LAKO_START              = 5926,
+    SAY_LAKO_LOOK_OUT           = 5927,
+    SAY_LAKO_HERE_COME          = 5928,
+    SAY_LAKO_MORE               = 5929,
+    SAY_LAKO_END                = 5930,
 
     QUEST_FREE_AT_LAST          = 4904,
     NPC_GRIM_BANDIT             = 10758,
@@ -137,9 +137,9 @@ bool QuestAccept_npc_lakota_windsong(Player* pPlayer, Creature* pCreature, Quest
 
 enum
 {
-    SAY_START           = -1000362,
-    SAY_WYVERN          = -1000363,
-    SAY_COMPLETE        = -1000364,
+    SAY_START           = 5648,
+    SAY_WYVERN          = 5654,
+    SAY_COMPLETE        = 5683,
 
     QUEST_HOMEWARD      = 4770,
     NPC_WYVERN          = 4107
@@ -397,13 +397,14 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
         npc_grenka_bloodscreechAI::Reset();
     }
 
+    bool m_bHasFled;
     uint8 m_uiWave;
     uint32 m_uiTimer;
     ObjectGuid m_PlayerGuid;
 
     void Reset() override
     {
-        
+        m_bHasFled = false;
     }
 
     void DoSummon(uint8 index) const
@@ -435,18 +436,18 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
         {
             switch (m_uiWave)
             {
-            case 0:
-                DoSummon(0);
-                m_uiTimer = 15000;
-                ++m_uiWave;
-                break;
-            case 1:
-                DoSummon(1);
-                DoSummon(2);
-                m_uiTimer = 15000;
-                ++m_uiWave;
-                break;
-            case 2:
+                case 0:
+                    DoSummon(0);
+                    m_uiTimer = 15000;
+                    ++m_uiWave;
+                    break;
+                case 1:
+                    DoSummon(1);
+                    DoSummon(2);
+                    m_uiTimer = 15000;
+                    ++m_uiWave;
+                    break;
+                case 2:
                 {
                     DoSummon(3);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
@@ -457,14 +458,21 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
                             m_creature->AI()->AttackStart(pPlayer);
                     }
                     ++m_uiWave;
+                    break;
                 }
-                break;
             }
         }
         else
             m_uiTimer -= uiDiff;
 
         ScriptedAI::UpdateAI(uiDiff);
+
+        if (!m_bHasFled && m_creature->GetVictim() && m_creature->GetHealthPercent() < 15.0f)
+        {
+            m_bHasFled = true;
+            m_creature->DoFlee();
+            return;
+        }
     }
 };
 

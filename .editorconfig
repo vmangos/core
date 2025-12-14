@@ -1,0 +1,22 @@
+root = true
+
+[{*.h,*.c,*.hpp,*.cpp}]
+charset = utf-8
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+tab_width = 16 # <-- To instantly see when a TAB was used
+trim_trailing_whitespace = true
+max_line_length = 999
+
+[*.md]
+charset = utf-8
+insert_final_newline = true
+indent_style = space
+
+[{*.cmake,CMakeLists.txt}]
+charset = utf-8
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true

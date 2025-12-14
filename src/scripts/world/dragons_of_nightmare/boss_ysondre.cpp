@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  */
 
@@ -8,8 +8,8 @@
 enum
 {
     // Ysondre
-    SAY_YSONDRE_AGGRO               = -1000360,
-    SAY_SUMMON_DRUIDS               = -1000361,
+    SAY_YSONDRE_AGGRO               = 10880,
+    SAY_SUMMON_DRUIDS               = 10881,
 
     SPELL_LIGHTNINGWAVE             = 24819,
     SPELL_SUMMONDRUIDS              = 24795,
@@ -61,7 +61,7 @@ bool boss_ysondreAI::DoSpecialAbility()
 
     for (const auto attacker : attackers)
     {
-        Player* pPlayer = m_creature->GetMap()->GetPlayer(attacker->getUnitGuid());
+        Player* pPlayer = attacker->getTarget()->ToPlayer();
         if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster())
             ++attackersCount;
     }

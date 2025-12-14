@@ -366,7 +366,7 @@ struct npc_karlekAI : public ScriptedAI
         if (pPlayer)
         {
             m_playerGUID = pPlayer->GetGUID();
-            pPlayer->TeleportTo(1, 2191.9f, -4773.4f, 54.9f, 2.56f);
+            pPlayer->TeleportTo(MAP_KALIMDOR, 2191.9f, -4773.4f, 54.9f, 2.56f);
         }
 
         // Verifier que le mob ne soit pas deja pop!
@@ -526,7 +526,7 @@ bool GossipSelect_npc_laska(Player *player, Creature *pCreature, uint32 sender, 
             char sMessage[200];
             sprintf(sMessage, "A bientot !");
             pCreature->MonsterSay(sMessage, 0, 0);
-            player->TeleportTo(1, 2202.89f, -4784.48f, 65.18f, 2.14f);
+            player->TeleportTo(MAP_KALIMDOR, 2202.89f, -4784.48f, 65.18f, 2.14f);
         }
         else
         {

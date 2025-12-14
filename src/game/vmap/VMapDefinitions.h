@@ -32,17 +32,16 @@ namespace VMAP
 }
 
 #ifndef NO_CORE_FUNCS
-#include "Errors.h"
 #include "Log.h"
 #elif defined MMAP_GENERATOR
-#include <assert.h>
+#include <cassert>
 #define MANGOS_ASSERT(x) assert(x)
 #define sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, ...) 0
 #define sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, ...) 0
 #define LOG_FILTER_MAP_LOADING true
 #define DEBUG_FILTER_LOG(F,...) do{ if (F) sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, __VA_ARGS__); } while(0)
 #else
-#include <assert.h>
+#include <cassert>
 #define MANGOS_ASSERT(x) assert(x)
 #define sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, ...) do{ printf(__VA_ARGS__); printf("\n"); } while(0)
 #define sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, ...) do{ printf(__VA_ARGS__); printf("\n"); } while(0)

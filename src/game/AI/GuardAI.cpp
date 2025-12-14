@@ -81,11 +81,6 @@ void GuardAI::MoveInLineOfSight(Unit* pWho)
     }
 }
 
-void GuardAI::EnterCombat(Unit*)
-{
-    m_creature->CallForHelp(30.0f);
-}
-
 void GuardAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

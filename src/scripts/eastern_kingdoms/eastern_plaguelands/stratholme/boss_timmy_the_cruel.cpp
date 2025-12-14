@@ -23,12 +23,13 @@ EndScriptData */
 
 #include "scriptPCH.h"
 
-#define SAY_SPAWN               -1900160
-
-#define SPELL_RAVENOUSCLAW      17470
-#define SPELL_ENRAGE            8599
-
-#define TIMMY_ENTRY             10808
+enum : uint32
+{
+    SAY_SPAWN          = 6150,
+    SPELL_RAVENOUSCLAW = 17470,
+    SPELL_ENRAGE       = 8599,
+    TIMMY_ENTRY        = 10808
+};
 
 struct boss_timmy_the_cruelAI : public ScriptedAI
 {
@@ -84,6 +85,7 @@ struct npc_crimson_guardsmanAI : public ScriptedAI
         m_bIsTimmySpawner = pCreature->GetDBTableGUIDLow() == 54070;
     }
 
+    bool m_bHasFled;
     bool m_bIsTimmySpawner;
     uint32 m_uiDisarmTimer;
     uint32 m_uiShieldBashTimer;
@@ -91,6 +93,7 @@ struct npc_crimson_guardsmanAI : public ScriptedAI
 
     void Reset() override
     {
+        m_bHasFled = false;
         m_uiDisarmTimer = 6000;
         m_uiShieldBashTimer = 4000;
         m_uiShieldChargeTimer = 1000;
@@ -121,6 +124,13 @@ struct npc_crimson_guardsmanAI : public ScriptedAI
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
+
+        if (!m_bHasFled && m_creature->GetHealthPercent() < 15.0f)
+        {
+            m_bHasFled = true;
+            m_creature->DoFlee();
+            return;
+        }
 
         if (m_uiDisarmTimer < diff)
         {

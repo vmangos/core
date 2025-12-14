@@ -32,7 +32,6 @@ EndScriptData
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
 npc_injured_patient     100%    patients for triage-quests (6622 and 6624)
 npc_doctor              100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 and 6624 (Triage)
-npc_lunaclaw_spirit     100%    Appears at two different locations, quest 6001/6002
 npc_mount_vendor        100%    Regular mount vendors all over the world. Display gossip if player doesn't meet the requirements to buy
 npc_event_fireworks     100%    Shoots fireworks every hour. Used for New Year's Eve event.
 EndContentData */
@@ -43,9 +42,8 @@ EndContentData */
 
 enum
 {
-    EMOTE_A_HELLO           = -1000204,
-    EMOTE_H_HELLO           = -1000205,
-    EMOTE_CLUCK_TEXT2       = -1000206,
+    EMOTE_HELLO             = 4714,
+    EMOTE_TEXT2             = 5170,
 
     QUEST_CLUCK             = 3861,
     FACTION_FRIENDLY        = 35,
@@ -75,7 +73,7 @@ struct npc_chicken_cluckAI : public CritterAI
 
     void Reset()
     {
-        m_uiResetFlagTimer = 120000;
+        m_uiResetFlagTimer = 20000;
 
         m_creature->SetFactionTemplateId(FACTION_CHICKEN);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -92,14 +90,7 @@ struct npc_chicken_cluckAI : public CritterAI
                     m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                     m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
 
-                    DoScriptText(EMOTE_A_HELLO, m_creature);
-
-                    /* are there any difference in texts, after 3.x ?
-                    if (pPlayer->GetTeam() == HORDE)
-                        DoScriptText(EMOTE_H_HELLO, m_creature);
-                    else
-                        DoScriptText(EMOTE_A_HELLO, m_creature);
-                    */
+                    DoScriptText(EMOTE_HELLO, m_creature);
                 }
             }
         }
@@ -110,7 +101,8 @@ struct npc_chicken_cluckAI : public CritterAI
             {
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
-                DoScriptText(EMOTE_CLUCK_TEXT2, m_creature);
+
+                DoScriptText(EMOTE_TEXT2, m_creature);
             }
         }
     }
@@ -121,7 +113,7 @@ struct npc_chicken_cluckAI : public CritterAI
         if (m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
         {
             if (m_uiResetFlagTimer < uiDiff)
-                EnterEvadeMode();
+                Reset();
             else
                 m_uiResetFlagTimer -= uiDiff;
         }
@@ -135,37 +127,15 @@ CreatureAI* GetAI_npc_chicken_cluck(Creature* pCreature)
     return new npc_chicken_cluckAI(pCreature);
 }
 
-bool QuestAccept_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_CLUCK)
-    {
-        if (npc_chicken_cluckAI* pChickenAI = dynamic_cast<npc_chicken_cluckAI*>(pCreature->AI()))
-            pChickenAI->Reset();
-    }
-
-    return true;
-}
-
-bool QuestComplete_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_CLUCK)
-    {
-        if (npc_chicken_cluckAI* pChickenAI = dynamic_cast<npc_chicken_cluckAI*>(pCreature->AI()))
-            pChickenAI->Reset();
-    }
-
-    return true;
-}
-
 /*######
 ## Triage quest
 ######*/
 
 enum
 {
-    SAY_DOC1                    = -1000201,
-    SAY_DOC2                    = -1000202,
-    SAY_DOC3                    = -1000203,
+    SAY_DOC1                    = 8355,
+    SAY_DOC2                    = 8359,
+    SAY_DOC3                    = 8361,
 
     QUEST_TRIAGE_H              = 6622,
     QUEST_TRIAGE_A              = 6624,
@@ -502,7 +472,7 @@ void npc_doctorAI::UpdateAI(uint32 const uiDiff)
                         case DOCTOR_ALLIANCE: patientEntry = AllianceSoldierId[urand(0, 2)]; break;
                         case DOCTOR_HORDE:    patientEntry = HordeSoldierId[urand(0, 2)];    break;
                         default:
-                            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
+                            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Invalid entry for Triage doctor. Please check your database");
                             return;
                     }
 
@@ -685,151 +655,6 @@ struct npc_steam_tonkAI : public ScriptedAI
 CreatureAI* GetAI_npc_steam_tonk(Creature* pCreature)
 {
     return new npc_steam_tonkAI(pCreature);
-}
-
-/*######
-## npc_lunaclaw_spirit
-######*/
-
-enum
-{
-    QUEST_BODY_HEART_A      = 6001,
-    QUEST_BODY_HEART_H      = 6002,
-
-    TEXT_ID_DEFAULT         = 4714,
-    TEXT_ID_PROGRESS        = 4715
-};
-
-#define GOSSIP_ITEM_GRANT   "You have thought well, spirit. I ask you to grant me the strength of your body and the strength of your heart."
-
-bool GossipHello_npc_lunaclaw_spirit(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(QUEST_BODY_HEART_A) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(QUEST_BODY_HEART_H) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_GRANT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(TEXT_ID_DEFAULT, pCreature->GetGUID());
-    return true;
-}
-
-bool GossipSelect_npc_lunaclaw_spirit(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->SEND_GOSSIP_MENU(TEXT_ID_PROGRESS, pCreature->GetGUID());
-        pPlayer->AreaExploredOrEventHappens((pPlayer->GetTeam() == ALLIANCE) ? QUEST_BODY_HEART_A : QUEST_BODY_HEART_H);
-    }
-    return true;
-}
-
-/*
- * Rat of the depths
- */
-
-enum
-{
-    QUEST_CHASSE_AU_RAT        = 6661,
-    SPELL_EXTASE_MELODIEUSE    = 21050,
-    SPELL_EXTASE_MELO_VISU     = 21051,
-    SPELL_MONTY_FRAPPE_RATS    = 21052,
-    NPC_RAT_PROFONDEURS        = 13016,
-    NPC_RAT_ENSORCELE          = 13017,
-    NPC_MONTY                  = 12997,
-};
-
-struct rat_des_profondeursAI : public ScriptedAI
-{
-    rat_des_profondeursAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    ObjectGuid m_FollowingPlayerGuid;
-    uint32 QuestFinishCheck_Timer;
-
-    void Reset() override
-    {
-        QuestFinishCheck_Timer = 0;
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_FollowingPlayerGuid)
-            return;
-        Player* pPlayer = m_creature->GetMap()->GetPlayer(m_FollowingPlayerGuid);
-        if (!pPlayer || !pPlayer->IsInWorld() ||
-                (pPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_INCOMPLETE && pPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_COMPLETE))
-        {
-            m_FollowingPlayerGuid.Clear();
-            m_creature->RemoveAurasDueToSpell(SPELL_EXTASE_MELO_VISU);
-            m_creature->UpdateEntry(NPC_RAT_PROFONDEURS);
-            m_creature->DisappearAndDie();
-            return;
-        }
-        // La quete est-elle terminee ?
-        if (QuestFinishCheck_Timer < uiDiff)
-        {
-            Creature* pMonty = m_creature->FindNearestCreature(NPC_MONTY, 20.0f, true);
-            if (!pMonty || pPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_COMPLETE)
-            {
-                QuestFinishCheck_Timer = 5000;
-                return;
-            }
-            // Quete finie.
-            pPlayer->GroupEventHappens(QUEST_CHASSE_AU_RAT, m_creature);        // Complete la quete
-            pMonty->CastSpell(m_creature, SPELL_MONTY_FRAPPE_RATS, true);       // Monty frappe le rat
-            // Et on ".die" les autres rats.
-            std::list<Creature*> pCreaList;
-            m_creature->GetCreatureListWithEntryInGrid(pCreaList, NPC_RAT_ENSORCELE, 100.0f);
-            for (const auto& pCreature : pCreaList)
-            {
-                if (pCreature->AI()->GetData(0) == m_FollowingPlayerGuid.GetCounter())
-                    pCreature->DisappearAndDie();
-            }
-        }
-        else
-            QuestFinishCheck_Timer -= uiDiff;
-    }
-
-    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpellInfo) override
-    {
-        // Ce rat est deja pris !
-        if (!m_FollowingPlayerGuid.IsEmpty())
-            return;
-        if (!pSpellInfo || pSpellInfo->Id != SPELL_EXTASE_MELODIEUSE)
-            return;
-        Player* pCasterPlayer = pCaster->ToPlayer();
-        if (!pCasterPlayer)
-            return;
-        if (pCasterPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_INCOMPLETE)
-            return;
-        m_FollowingPlayerGuid = pCasterPlayer->GetObjectGuid();
-        m_creature->UpdateEntry(NPC_RAT_ENSORCELE);
-        m_creature->CastSpell(m_creature, SPELL_EXTASE_MELO_VISU, true);
-        m_creature->GetMotionMaster()->Clear(false);
-        m_creature->GetMotionMaster()->MoveFollow(pCasterPlayer, 1.0f, M_PI_F);
-        pCasterPlayer->RewardPlayerAndGroupAtCast(m_creature, SPELL_EXTASE_MELODIEUSE);
-    }
-
-    void JustDied(Unit* pKiller) override
-    {
-        if (!m_FollowingPlayerGuid)
-            return;
-        Player* pQuestPlayer = m_creature->GetMap()->GetPlayer(m_FollowingPlayerGuid);
-        if (!pQuestPlayer || !pQuestPlayer->IsInWorld())
-            return;
-        pQuestPlayer->FailQuest(QUEST_CHASSE_AU_RAT);
-        m_FollowingPlayerGuid.Clear();
-    }
-
-    uint32 GetData(uint32 dataType) override
-    {
-        return dataType == 0 ? m_FollowingPlayerGuid.GetCounter() : 0;
-    }
-};
-
-CreatureAI* GetAI_rat_des_profondeurs(Creature* pCreature)
-{
-    return new rat_des_profondeursAI(pCreature);
 }
 
 /*######
@@ -1116,7 +941,7 @@ CreatureAI* GetAI_npc_cannonball_runner(Creature* pCreature)
 enum
 {
     SPELL_IMMUNITY      = 29230,
-    SAY_CLEANER_AGGRO   = -1289010
+    SAY_CLEANER_AGGRO   = 9726
 };
 
 struct npc_the_cleanerAI : public ScriptedAI
@@ -1370,7 +1195,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (m_creature->IsTemporarySummon())
         {
             if (Player* pSummoner = m_creature->GetMap()->GetPlayer(static_cast<TemporarySummon*>(m_creature)->GetSummonerGuid()))
-                if (CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(Fireworks[m_uiIndex].m_bIsCluster ? NPC_CLUSTER_CREDIT_MARKER : NPC_FIREWORK_CREDIT_MARKER))
+                if (CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(Fireworks[m_uiIndex].m_bIsCluster ? NPC_CLUSTER_CREDIT_MARKER : NPC_FIREWORK_CREDIT_MARKER))
                     pSummoner->KilledMonster(cInfo, ObjectGuid());
         }
 
@@ -1702,9 +1527,6 @@ struct npc_shahramAI : ScriptedPetAI
 
                 case 1:
                     shahramSpell = SPELL_FLAMES_OF_SHAHRAM;
-                    if (!urand(0, 99))
-                        DoScriptText(-1409006, m_creature);
-
                     break;
 
                 default:
@@ -2384,7 +2206,7 @@ struct npc_oozeling_jubjubAI : public ScriptedPetAI
         if (type == POINT_MOTION_TYPE && id == 1)
         {
             m_creature->MonsterTextEmote(EMOTE_GUZZLE_ALE);
-            m_creature->AddUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STATE_ROOT);
             m_uiReturnTimer = 3000;
         }
     }
@@ -2396,7 +2218,7 @@ struct npc_oozeling_jubjubAI : public ScriptedPetAI
             if (m_uiReturnTimer <= uiDiff)
             {
                 m_uiReturnTimer = 0;
-                m_creature->ClearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STATE_ROOT);
 
                 if (GameObject* pMug = m_creature->FindNearestGameObject(OBJECT_DARK_IRON_MUG, 1.0f))
                 {
@@ -2419,6 +2241,32 @@ CreatureAI* GetAI_npc_oozeling_jubjub(Creature* pCreature)
     return new npc_oozeling_jubjubAI(pCreature);
 }
 
+/*
+  Alliance Res Fixer
+  Horde Res Fixer
+*/
+
+bool GossipHello_npc_res_fixer(Player* pPlayer, Creature* pCreature)
+{
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, 8995, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->SEND_GOSSIP_MENU(6440, pCreature->GetObjectGuid());
+    return true;
+}
+
+bool GossipSelect_npc_res_fixer(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+    {
+        ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(pPlayer->GetRace());
+        uint32 const spellId = raceEntry ? raceEntry->resSicknessSpellId : SPELL_ID_PASSIVE_RESURRECTION_SICKNESS;
+        pPlayer->RemoveAurasDueToSpell(spellId);
+        pPlayer->DurabilityRepairAll(false, 0);
+        pPlayer->CLOSE_GOSSIP_MENU();
+    }
+
+    return true;
+}
+
 void AddSC_npcs_special()
 {
     Script* newscript;
@@ -2426,8 +2274,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_chicken_cluck";
     newscript->GetAI = &GetAI_npc_chicken_cluck;
-    newscript->pQuestAcceptNPC =   &QuestAccept_npc_chicken_cluck;
-    newscript->pQuestComplete = &QuestComplete_npc_chicken_cluck;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -2454,17 +2300,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_steam_tonk";
     newscript->GetAI = &GetAI_npc_steam_tonk;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_lunaclaw_spirit";
-    newscript->pGossipHello =  &GossipHello_npc_lunaclaw_spirit;
-    newscript->pGossipSelect = &GossipSelect_npc_lunaclaw_spirit;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "rat_des_profondeurs";
-    newscript->GetAI = &GetAI_rat_des_profondeurs;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -2559,5 +2394,11 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_oozeling_jubjub";
     newscript->GetAI = &GetAI_npc_oozeling_jubjub;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_res_fixes";
+    newscript->pGossipHello = &GossipHello_npc_res_fixer;
+    newscript->pGossipSelect = &GossipSelect_npc_res_fixer;
     newscript->RegisterSelf();
 }
