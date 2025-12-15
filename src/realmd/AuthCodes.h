@@ -35,7 +35,6 @@ enum eAuthCmd
     CMD_REALM_LIST                  = 0x10,
     CMD_XFER_INITIATE               = 0x30,
     CMD_XFER_DATA                   = 0x31,
-    // these opcodes no longer exist in currently supported client
     CMD_XFER_ACCEPT                 = 0x32,
     CMD_XFER_RESUME                 = 0x33,
     CMD_XFER_CANCEL                 = 0x34
@@ -90,6 +89,40 @@ enum AuthResult
     WOW_FAIL_UNLOCKABLE_LOCK        = 0x19,                 // Your account has been locked but can be unlocked.
     WOW_FAIL_CONVERSION_REQUIRED    = 0x20,                 // This account needs to be converted to a Battle.net account. Please [Click Here] or go to: <site> to begin conversion.
     WOW_FAIL_DISCONNECTED           = 0xFF                  // Disconnected
+};
+
+enum AccountFlags
+{
+    ACCOUNT_FLAG_GM                   = 0x00000001,
+    ACCOUNT_FLAG_NOKICK               = 0x00000002,
+    ACCOUNT_FLAG_COLLECTOR            = 0x00000004,
+    ACCOUNT_FLAG_WOW_TRIAL            = 0x00000008,
+    ACCOUNT_FLAG_CANCELLED            = 0x00000010,
+    ACCOUNT_FLAG_IGR                  = 0x00000020,
+    ACCOUNT_FLAG_WHOLESALER           = 0x00000040,
+    ACCOUNT_FLAG_PRIVILEGED           = 0x00000080,
+    ACCOUNT_FLAG_EU_FORBID_ELV        = 0x00000100,
+    ACCOUNT_FLAG_EU_FORBID_BILLING    = 0x00000200,
+    ACCOUNT_FLAG_WOW_RESTRICTED       = 0x00000400,
+    ACCOUNT_FLAG_REFERRAL             = 0x00000800,
+    ACCOUNT_FLAG_BLIZZARD             = 0x00001000,
+    ACCOUNT_FLAG_RECURRING_BILLING    = 0x00002000,
+    ACCOUNT_FLAG_NOELECTUP            = 0x00004000,
+    ACCOUNT_FLAG_KR_CERTIFICATE       = 0x00008000,
+    ACCOUNT_FLAG_EXPANSION_COLLECTOR  = 0x00010000,
+    ACCOUNT_FLAG_DISABLE_VOICE        = 0x00020000,
+    ACCOUNT_FLAG_DISABLE_VOICE_SPEAK  = 0x00040000,
+    ACCOUNT_FLAG_REFERRAL_RESURRECT   = 0x00080000,
+    ACCOUNT_FLAG_EU_FORBID_CC         = 0x00100000,
+    ACCOUNT_FLAG_OPENBETA_DELL        = 0x00200000,
+    ACCOUNT_FLAG_PROPASS              = 0x00400000,
+    ACCOUNT_FLAG_PROPASS_LOCK         = 0x00800000,
+    ACCOUNT_FLAG_PENDING_UPGRADE      = 0x01000000,
+    ACCOUNT_FLAG_RETAIL_FROM_TRIAL    = 0x02000000,
+    ACCOUNT_FLAG_EXPANSION2_COLLECTOR = 0x04000000,
+    ACCOUNT_FLAG_OVERMIND_LINKED      = 0x08000000,
+    ACCOUNT_FLAG_DEMOS                = 0x10000000,
+    ACCOUNT_FLAG_DEATH_KNIGHT_OK      = 0x20000000,
 };
 
 #endif

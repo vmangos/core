@@ -282,6 +282,7 @@ class ObjectGuidGenerator
         explicit ObjectGuidGenerator(uint32 start = 1) : m_nextGuid(start) {}
 
     public:                                                 // modifiers
+        void LoadFromDB(char const* fieldName, char const* tableName);
         void SetMaxUsedGuid(uint32 val, char const* guidType);
         uint32 Generate();
         void GenerateRange(uint32& first, uint32& last);

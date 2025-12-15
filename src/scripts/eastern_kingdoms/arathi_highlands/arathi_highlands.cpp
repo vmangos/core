@@ -451,6 +451,35 @@ bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, Quest const*
     return true;
 }
 
+struct go_arathi_cannon_fireAI : public GameObjectAI
+{
+    go_arathi_cannon_fireAI(GameObject* pGo) : GameObjectAI(pGo) { }
+
+    bool OnUse(Unit* user) override
+    {
+        // disable trap
+        return true;
+    }
+};
+
+GameObjectAI* GetAIgo_arathi_cannon_fire(GameObject *pGo)
+{
+    return new go_arathi_cannon_fireAI(pGo);
+}
+
+struct DeathFromBelowCannonFireScript : SpellScript
+{
+    bool OnCheckTarget(Spell const* /*spell*/, Unit* target, SpellEffectIndex /*eff*/) const final
+    {
+        return !target->IsCharmerOrOwnerPlayerOrPlayerItself();
+    }
+};
+
+SpellScript* GetScript_DeathFromBelowCannonFire(SpellEntry const*)
+{
+    return new DeathFromBelowCannonFireScript();
+}
+
 void AddSC_arathi_highlands()
 {
     Script* newscript;
@@ -471,5 +500,15 @@ void AddSC_arathi_highlands()
     newscript->Name = "npc_kinelory";
     newscript->GetAI = &GetAI_npc_kinelory;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_kinelory;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_arathi_cannon_fire";
+    newscript->GOGetAI = &GetAIgo_arathi_cannon_fire;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_death_from_below_cannon_fire";
+    newscript->GetSpellScript = &GetScript_DeathFromBelowCannonFire;
     newscript->RegisterSelf();
 }

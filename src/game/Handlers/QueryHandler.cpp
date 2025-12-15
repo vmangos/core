@@ -284,7 +284,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recv_data)
         data.append(name, nameLen + 1);
         data << uint8(0) << uint8(0) << uint8(0);   // name2, name3, name4
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-        data << uint8(0);                           // one more name, client handles it a bit differently
+        data << info->icon;
         data.append(info->raw.data, 24);            // these are read as int32
 #else
         data.append(info->raw.data, 16);            // these are read as int32

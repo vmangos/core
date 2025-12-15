@@ -27,7 +27,19 @@
 namespace MMAP
 {
     TerrainBuilder::TerrainBuilder(bool skipLiquid, bool quick) : m_skipLiquid(skipLiquid), m_V9(nullptr), m_V8(nullptr), m_quick(quick), m_mapId(0) { }
-    TerrainBuilder::~TerrainBuilder() { }
+    TerrainBuilder::~TerrainBuilder()
+    {
+        if (m_V8)
+        {
+            delete[] m_V8;
+            m_V8 = nullptr;
+        }
+        if (m_V9)
+        {
+            delete[] m_V9;
+            m_V9 = nullptr;
+        }
+    }
 
     /**************************************************************************/
     void TerrainBuilder::getLoopVars(Spot portion, int& loopStart, int& loopEnd, int& loopInc)

@@ -47,8 +47,10 @@
 #include "Opcodes_1_8_4.h"
 #elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
 #include "Opcodes_1_7_1.h"
-#else
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
 #include "Opcodes_1_6_1.h"
+#else
+#include "Opcodes_1_5_1.h"
 #endif
 
 inline bool IsAnyMoveAckOpcode(uint16 opcode)

@@ -442,7 +442,7 @@ class Unit : public SpellCaster
                 ResetAttackTimer(att);
         }
         void ApplyAttackTimePercentMod(WeaponAttackType att,float val, bool apply, bool recalcDamage = false);
-        void ApplyCastTimePercentMod(float val, bool apply);
+        void UpdateCastSpeed();
 
         float GetObjectBoundingRadius() const final { return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; }
         float GetCombatReach() const final { return m_floatValues[UNIT_FIELD_COMBATREACH]; }

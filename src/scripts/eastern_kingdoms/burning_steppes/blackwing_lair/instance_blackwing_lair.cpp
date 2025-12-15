@@ -942,18 +942,25 @@ bool GOHello_go_orb_of_domination(Player* pPlayer, GameObject* pGo)
         {
             if (Creature* pCreature = pGo->GetMap()->GetCreature(pInstance->GetData64(DATA_RAZORGORE_GUID)))
             {
-                // Deja CM ?
+                // Already mind controlled
                 if (pCreature->HasUnitState(UNIT_STATE_POSSESSED))
+                    return true;
+                // Avoid bugging out
+                if (pCreature->IsInEvadeMode())
                     return true;
                 if (pCreature->IsInCombat() && pInstance->GetData64(DATA_EGG) != DONE)
                 {
-                    pPlayer->CastSpell(pPlayer, SPELL_MIND_EXHAUSTION, true);
-                    pPlayer->CastSpell(pCreature, SPELL_POSSESS, true);
-                    if (Creature* pTrigger = pGo->GetMap()->GetCreature(pInstance->GetData64(DATA_TRIGGER_GUID)))
+                    if (pPlayer->CastSpell(pPlayer, SPELL_MIND_EXHAUSTION, true) == SPELL_CAST_OK)
                     {
-                        pCreature->AddThreat(pTrigger, 100.0f);
-                        pTrigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, pCreature->GetObjectGuid());
-                        pTrigger->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS_VISUAL);
+                        if (pPlayer->CastSpell(pCreature, SPELL_POSSESS, true) == SPELL_CAST_OK)
+                        {
+                            if (Creature* pTrigger = pGo->GetMap()->GetCreature(pInstance->GetData64(DATA_TRIGGER_GUID)))
+                            {
+                                pCreature->AddThreat(pTrigger, 100.0f);
+                                pTrigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, pCreature->GetObjectGuid());
+                                pTrigger->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS_VISUAL);
+                            }
+                        }
                     }
                 }
             }

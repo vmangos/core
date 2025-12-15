@@ -237,6 +237,9 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recv_data)
 
         _player->AutoUnequipOffhandIfNeed();
     }
+
+    if (Player::IsBagPos(dest))
+        _player->SendOpenContainer(pSrcItem->GetObjectGuid());
 }
 
 void WorldSession::HandleDestroyItemOpcode(WorldPacket& recv_data)

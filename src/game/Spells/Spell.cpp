@@ -4733,6 +4733,21 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCas
     caster->GetSession()->SendPacket(&data);
 }
 
+static void WriteGuidHelper(WorldPacket& data, Object* pCaster)
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    if (pCaster)
+        data << pCaster->GetPackGUID();
+    else
+        data << ObjectGuid().WriteAsPacked();
+#else
+    if (pCaster)
+        data << pCaster->GetGUID();
+    else
+        data << uint64(0);
+#endif
+}
+
 void Spell::SendSpellStart()
 {
     if (!IsNeedSendToClient())
@@ -4750,20 +4765,14 @@ void Spell::SendSpellStart()
         castFlags = CAST_FLAG_HIDDEN_COMBATLOG;
 
     WorldPacket data(SMSG_SPELL_START, (8 + 8 + 4 + 2 + 4));
+
     if (m_CastItem)
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data << m_CastItem->GetPackGUID();
+        WriteGuidHelper(data, m_CastItem);
     else
-        data << m_caster->GetPackGUID();
+        WriteGuidHelper(data, m_caster);
 
-    data << m_caster->GetPackGUID();
-#else
-        data << m_CastItem->GetGUID();
-    else
-        data << m_caster->GetGUID();
+    WriteGuidHelper(data, m_casterUnit);
 
-    data << m_caster->GetGUID();
-#endif
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint16(castFlags);                              // cast flags
     data << uint32(m_timer);                                // delay?
@@ -4791,23 +4800,13 @@ void Spell::SendSpellGo()
 
     WorldPacket data(SMSG_SPELL_GO, 53);                    // guess size
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (m_CastItem)
-        data << m_CastItem->GetPackGUID();
+        WriteGuidHelper(data, m_CastItem);
     else
-        data << m_caster->GetPackGUID();
-#else
-    if (m_CastItem)
-        data << m_CastItem->GetGUID();
-    else
-        data << m_caster->GetGUID();
-#endif
+        WriteGuidHelper(data, m_caster);
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << m_caster->GetPackGUID();
-#else
-    data << m_caster->GetGUID();
-#endif
+    WriteGuidHelper(data, m_casterUnit);
+
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint16(castFlags);                              // cast flags
 
@@ -8660,6 +8659,18 @@ void Spell::OnSpellLaunch()
 {
     if (!m_casterUnit || !m_casterUnit->IsInWorld())
         return;
+
+    if (GameObject* go = m_targets.getGOTarget())
+    {
+        for (auto const& effect : m_spellInfo->Effect)
+        {
+            if (effect == SPELL_EFFECT_OPEN_LOCK || effect == SPELL_EFFECT_OPEN_LOCK_ITEM)
+            {
+                go->DoAggroWhenOpening(m_casterUnit);
+                break;
+            }
+        }
+    }
 
     unitTarget = m_targets.getUnitTarget();
 

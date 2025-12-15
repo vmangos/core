@@ -31,15 +31,13 @@
 
 using namespace MaNGOS;
 
-void
-VisibleChangesNotifier::Visit(CameraMapType& m)
+void VisibleChangesNotifier::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
         iter.getSource()->UpdateVisibilityOf(&i_object);
 }
 
-void
-VisibleNotifier::Notify()
+void VisibleNotifier::Notify()
 {
     Player& player = *i_camera.GetOwner();
     // at this moment i_clientGUIDs have guids that not iterate at grid level checks
@@ -115,8 +113,7 @@ VisibleNotifier::Notify()
     }
 }
 
-void
-MessageDeliverer::Visit(CameraMapType& m)
+void MessageDeliverer::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
     {
@@ -145,8 +142,7 @@ void MessageDelivererExcept::Visit(CameraMapType& m)
 }
 
 
-void
-ObjectMessageDeliverer::Visit(CameraMapType& m)
+void ObjectMessageDeliverer::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
     {
@@ -155,8 +151,7 @@ ObjectMessageDeliverer::Visit(CameraMapType& m)
     }
 }
 
-void
-MessageDistDeliverer::Visit(CameraMapType& m)
+void MessageDistDeliverer::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
     {
@@ -172,8 +167,7 @@ MessageDistDeliverer::Visit(CameraMapType& m)
     }
 }
 
-void
-ObjectMessageDistDeliverer::Visit(CameraMapType& m)
+void ObjectMessageDistDeliverer::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
     {
@@ -185,8 +179,8 @@ ObjectMessageDistDeliverer::Visit(CameraMapType& m)
     }
 }
 
-template<class T> void
-ObjectUpdater::Visit(GridRefManager<T>& m)
+template<class T>
+void ObjectUpdater::Visit(GridRefManager<T>& m)
 {
     for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {

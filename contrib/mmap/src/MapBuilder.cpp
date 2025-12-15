@@ -134,6 +134,7 @@ namespace MMAP
 
     std::set<uint32>& MapBuilder::getTileList(uint32 mapID)
     {
+        std::lock_guard<std::mutex> lock(m_tilesMutex);
         TileList::iterator itr = m_tiles.find(mapID);
         if (itr != m_tiles.end())
             return (*itr).second;
@@ -144,35 +145,14 @@ namespace MMAP
     void MapBuilder::buildSingleMap(uint32 mapID)
     {
         m_cancel.store(false);
-
         buildMap(mapID);
-
-        std::vector<TileWorker*> workers;
-        for (uint8 i = 0; i < m_threads; ++i)
-        {
-            workers.emplace_back(new TileWorker(this, false, m_quick, m_debug, m_config));
-        }
-
-        while (!m_tileQueue.Empty())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        }
-
-        m_cancel.store(true);
-        m_tileQueue.Cancel();
-
-        for (auto& th : workers)
-        {
-            delete th;
-        }
-
+        processQueuedTiles();
         printf("Done.");
     }
 
     void MapBuilder::buildAllMaps()
     {
         m_cancel.store(false);
-
         for (TileList::iterator it = m_tiles.begin(); it != m_tiles.end(); ++it)
         {
             uint32 mapID = (*it).first;
@@ -180,13 +160,19 @@ namespace MMAP
                 buildMap(mapID);
         }
 
-        std::vector<TileWorker*> workers;
+        processQueuedTiles();
+        printf("Done.");
+    }
+
+    void MapBuilder::processQueuedTiles()
+    {
+        std::vector<std::unique_ptr<TileWorker>> workers;
         for (uint8 i = 0; i < m_threads; ++i)
         {
-            workers.emplace_back(new TileWorker(this, false, m_quick, m_debug, m_config));
+            workers.emplace_back(std::make_unique<TileWorker>(this, false, m_quick, m_debug, m_config));
         }
 
-        while (!m_tileQueue.Empty())
+        while (!m_tileQueue.Empty() && !m_cancel.load())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
@@ -194,12 +180,10 @@ namespace MMAP
         m_cancel.store(true);
         m_tileQueue.Cancel();
 
-        for (auto& th : workers)
+        for (auto& worker : workers)
         {
-            delete th;
+            worker->WaitCompletion();
         }
-
-        printf("Done.");
     }
 
     void MapBuilder::getGridBounds(uint32 mapID, uint32& minX, uint32& minY, uint32& maxX, uint32& maxY)
@@ -287,22 +271,17 @@ namespace MMAP
         memcpy(&tileInfo.m_navMeshParams, navMesh->getParams(), sizeof(dtNavMeshParams));
         m_tileQueue.Push(tileInfo);
 
-        std::vector<TileWorker*> workers;
-        workers.emplace_back(new TileWorker(this, false, m_quick, m_debug, m_config));
+        auto worker = std::make_unique<TileWorker>(this, false, m_quick, m_debug, m_config);
 
-        while (!m_tileQueue.Empty())
+        while (!m_tileQueue.Empty() && !m_cancel.load())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 
         m_cancel.store(true);
-
         m_tileQueue.Cancel();
 
-        for (auto& tileBuilder : workers)
-        {
-            delete tileBuilder;
-        }
+        worker->WaitCompletion();
 
         dtFreeNavMesh(navMesh);
 
@@ -406,6 +385,7 @@ namespace MMAP
         if (!navMesh->init(&navMeshParams))
         {
             printf("[Map %03i] Failed creating navmesh!                   \n", mapID);
+            dtFreeNavMesh(navMesh);
             return;
         }
 
@@ -593,6 +573,7 @@ namespace MMAP
         memset(m_triareas, AREA_NONE, tTriCount*sizeof(unsigned char));
         rcMarkWalkableTriangles(m_rcContext, config.walkableSlopeAngle, tVerts, tVertCount, tTris, tTriCount, m_triareas);
         rcRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, m_triareas, tTriCount, *tile.solid, config.walkableClimb);
+        delete[] m_triareas;
         rcFilterLowHangingWalkableObstacles(m_rcContext, config.walkableClimb, *tile.solid);
         rcFilterLedgeSpans(m_rcContext, config.walkableHeight, config.walkableClimb, *tile.solid);
         rcFilterWalkableLowHeightSpans(m_rcContext, config.walkableHeight, *tile.solid);
@@ -733,6 +714,7 @@ namespace MMAP
             char message[1024];
             sprintf(message, "Failed to open %s for writing!\n", fileName);
             perror(message);
+            dtFree(navData);
             return;
         }
 
@@ -760,7 +742,10 @@ namespace MMAP
                 fclose(file);
             }
         }
+
+        dtFree(navData);
     }
+
     void MapBuilder::buildTransports()
     {
         // List of MO Transport gameobjects

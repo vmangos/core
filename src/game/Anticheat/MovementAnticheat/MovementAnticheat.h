@@ -72,6 +72,7 @@ class MovementAnticheat
         void Init();
         void InitNewPlayer(Player* pPlayer);
         void ResetJumpCounters();
+        static void InitWallClimbLimits();
 
         void AddCheats(uint32 cheats, uint32 count = 1);
         void StoreCheat(uint32 type, uint32 count = 1);
@@ -143,6 +144,10 @@ class MovementAnticheat
         uint32 m_bottingCheckStartTime = 0;
         uint32 m_movementPacketsCount = 0;
         TurnType m_turnType = TURN_NONE;
+
+        // Wallclimb limits - initialized from vmangos.conf 
+        static float m_wallSlope;
+        static float m_wallSlopeHigh;
 
         Player* me = nullptr; // current player object that checks run on, changes on mind control
         WorldSession* const m_session = nullptr; // session to which the cheat data belongs, does not change

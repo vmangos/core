@@ -47,13 +47,6 @@
 #include <ace/OS_NS_fcntl.h>
 #include <ace/OS_NS_sys_stat.h>
 
-enum AccountFlags
-{
-    ACCOUNT_FLAG_GM         = 0x00000001,
-    ACCOUNT_FLAG_TRIAL      = 0x00000008,
-    ACCOUNT_FLAG_PROPASS    = 0x00800000,
-};
-
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some paltform
 #if defined( __GNUC__ )
 #pragma pack(1)
@@ -292,7 +285,7 @@ void AuthSocket::SendProof(Crypto::Hash::SHA1::Digest sha)
         memcpy(proof.M2, sha.data(), sha.size());
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
-        proof.accountFlags = ACCOUNT_FLAG_PROPASS;
+        proof.accountFlags = ACCOUNT_FLAG_PROPASS_LOCK;
         proof.surveyId = 0x00000000;
         proof.loginFlags = 0x0000;
 

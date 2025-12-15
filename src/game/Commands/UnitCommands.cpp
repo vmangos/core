@@ -2022,7 +2022,7 @@ bool ChatHandler::HandleModifyCastSpeedCommand(char *args)
         return false;
 
     // This field is an Int32 before 1.12.
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     if (amount < 0)
     {
         SendSysMessage(LANG_BAD_VALUE);

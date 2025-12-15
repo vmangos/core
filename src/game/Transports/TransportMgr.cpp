@@ -59,6 +59,30 @@ void TransportMgr::LoadTransportTemplates()
                 m_transportTemplates.erase(entry);
         }
     }
+
+    // load period override from db since our algorithm is not perfect
+    if (std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT `entry`, `period` FROM `transports` t1 WHERE `build`=(SELECT max(`build`) FROM `transports` t2 WHERE t1.`entry`=t2.`entry` && `build` <= %u)", SUPPORTED_CLIENT_BUILD))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 entry = fields[0].GetUInt32();
+            uint32 period = fields[1].GetUInt32();
+
+            if (TransportTemplate* tInfo = GetTransportTemplate(entry))
+            {
+                if (period)
+                {
+                    // Override calculated period with more accurate db value.
+                    tInfo->pathTime = period;
+                    tInfo->keyFrames.back().DepartureTime = period;
+                }
+            }
+            else
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid gameobject %u in transport table.", entry);
+
+        } while (result->NextRow());
+    }
 }
 
 class SplineRawInitializer
@@ -337,90 +361,67 @@ TransportAnimationEntry const* TransportAnimation::GetNextAnimNode(uint32 time) 
     return nullptr;
 }
 
-ShipTransport* TransportMgr::CreateTransport(uint32 entry, Map* map /*= nullptr*/)
+ShipTransport* TransportMgr::CreateTransport(uint32 entry, Map* map)
 {
-    // instance case, execute GetGameObjectEntry hook
-    if (map && !entry)
+    MANGOS_ASSERT(map);
+    TransportTemplate const* tInfo = GetTransportTemplate(entry);
+    MANGOS_ASSERT(tInfo);
+
+    // find when transport is on this map
+    KeyFrameVec::const_iterator frameItr;
+    for (frameItr = tInfo->keyFrames.cbegin(); frameItr != tInfo->keyFrames.cend(); ++frameItr)
+    {
+        if ((*frameItr).Node->mapid == map->GetId())
+            break;
+    }
+    MANGOS_ASSERT(frameItr != tInfo->keyFrames.cend());
+
+    // ...at first waypoint
+    TaxiPathNodeEntry const* startNode = frameItr->Node;
+    uint32 mapId = startNode->mapid;
+    float x = startNode->x;
+    float y = startNode->y;
+    float z = startNode->z;
+    float o = frameItr->InitialOrientation;
+
+    // do not create it on the wrong continent instance
+    uint32 instanceId = sMapMgr.GetContinentInstanceId(mapId, x, y);
+    if (map->IsContinent() && instanceId != map->GetInstanceId())
         return nullptr;
 
-    TransportTemplate const* tInfo = GetTransportTemplate(entry);
-    if (!tInfo)
+    if (map->Instanceable() != tInfo->inInstance)
     {
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Transport %u will not be loaded, transport template is missing", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Transport %u attempted creation in instance map (id: %u) but it is not an instanced transport!", entry, mapId);
         return nullptr;
     }
 
     // create transport...
     ShipTransport* trans = new ShipTransport(*tInfo);
-
-    // ...at first waypoint
-    TaxiPathNodeEntry const* startNode = tInfo->keyFrames.begin()->Node;
-    uint32 mapId = startNode->mapid;
-    float x = startNode->x;
-    float y = startNode->y;
-    float z = startNode->z;
-    float o = tInfo->keyFrames.begin()->InitialOrientation;
-
-    // creates the Gameobject
-    if (!trans->Create(entry, mapId, x, y, z, o, GO_ANIMPROGRESS_DEFAULT))
+    if (!trans->Create(entry, frameItr))
     {
         delete trans;
         return nullptr;
     }
 
-    if (MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(mapId))
-    {
-        if (mapEntry->Instanceable() != tInfo->inInstance)
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Transport %u (name: %s) attempted creation in instance map (id: %u) but it is not an instanced transport!", entry, trans->GetName(), mapId);
-            delete trans;
-            return nullptr;
-        }
-    }
-
-    // use preset map for instances (need to know which instance)
-    trans->SetLocationInstanceId(sMapMgr.GetContinentInstanceId(mapId, x, y));
-    trans->SetMap(map ? map : sMapMgr.CreateMap(mapId, trans));
-
-    // Passengers will be loaded once a player is near
+    trans->SetLocationInstanceId(instanceId);
+    trans->SetMap(map);
     trans->GetMap()->Add<ShipTransport>(trans);
+
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Created transport %u on map %u.", entry, mapId);
+
     return trans;
 }
 
-void TransportMgr::SpawnContinentTransports()
+void TransportMgr::SpawnTransportsOnMap(Map* map)
 {
-    if (m_transportAnimations.empty())
-        return;
-
-    uint32 oldMSTime = WorldTimer::getMSTime();
-
-    std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT `entry`, `period` FROM `transports` t1 WHERE `build`=(SELECT max(`build`) FROM `transports` t2 WHERE t1.`entry`=t2.`entry` && `build` <= %u)", SUPPORTED_CLIENT_BUILD);
-
-    uint32 count = 0;
-    if (result)
+    for (auto& itr : m_transportTemplates)
     {
-        do
-        {
-            Field* fields = result->Fetch();
-            uint32 entry = fields[0].GetUInt32();
-            uint32 period = fields[1].GetUInt32();
+        // only spawn continent transports once
+        if (itr.second.spawned && !itr.second.inInstance)
+            continue;
 
-            if (TransportTemplate* tInfo = GetTransportTemplate(entry))
-            {
-                if (period)
-                {
-                    // Override calculated period with more accurate db value.
-                    tInfo->pathTime = period;
-                    tInfo->keyFrames.back().DepartureTime = period;
-                }
-                
-                if (!tInfo->inInstance)
-                    if (CreateTransport(entry))
-                        ++count;
-            }
-
-        } while (result->NextRow());
+        if (itr.second.mapsUsed.find(map->GetId()) != itr.second.mapsUsed.end())
+            if (CreateTransport(itr.first, map))
+                itr.second.spawned = true;
     }
-
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Spawned %u continent transports in %u ms", count, WorldTimer::getMSTimeDiffToNow(oldMSTime));
 }

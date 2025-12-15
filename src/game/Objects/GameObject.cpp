@@ -417,7 +417,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                                 caster->FinishSpell(CURRENT_CHANNELED_SPELL);
 
                                 WorldPacket data(SMSG_FISH_NOT_HOOKED, 0);
-                                ((Player*)caster)->GetSession()->SendPacket(&data);
+                                caster->GetSession()->SendPacket(&data);
                             }
                             // can be deleted
                             m_lootState = GO_JUST_DEACTIVATED;
@@ -1468,20 +1468,6 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (GetFactionTemplateId() && !GetGOInfo()->chest.minSuccessOpens && !GetGOInfo()->chest.maxSuccessOpens)
-            {
-                std::list<Unit*> targets;
-                MaNGOS::AnyFriendlyUnitInObjectRangeCheck check(this, 10.0f);
-                MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(targets, check);
-                Cell::VisitAllObjects(this, searcher, 10.0f);
-                for (Unit* attacker : targets)
-                {
-                    if (!attacker->IsInCombat() && !attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) &&
-                        attacker->IsValidAttackTarget(user) && attacker->IsWithinLOSInMap(user) && attacker->AI())
-                        attacker->AI()->AttackStart(user);
-                }
-            }
-
             GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
             TriggerLinkedGameObject(user);
             return;
@@ -2394,30 +2380,41 @@ void GameObject::GetLosCheckPosition(float& x, float& y, float& z) const
 {
     if (GameObjectDisplayInfoAddon const* displayInfo = sGameObjectDisplayInfoAddonStorage.LookupEntry<GameObjectDisplayInfoAddon>(GetDisplayId()))
     {
-        float scale = GetObjectScale();
+        if (displayInfo->min_x || displayInfo->min_y || displayInfo->min_z || displayInfo->max_x || displayInfo->max_y || displayInfo->max_z)
+        {
+            float scale = GetObjectScale();
 
-        float minX = displayInfo->min_x * scale;
-        float minY = displayInfo->min_y * scale;
-        float minZ = displayInfo->min_z * scale;
-        float maxX = displayInfo->max_x * scale;
-        float maxY = displayInfo->max_y * scale;
-        float maxZ = displayInfo->max_z * scale;
+            float minX = displayInfo->min_x * scale;
+            float minY = displayInfo->min_y * scale;
+            float minZ = displayInfo->min_z * scale;
+            float maxX = displayInfo->max_x * scale;
+            float maxY = displayInfo->max_y * scale;
+            float maxZ = displayInfo->max_z * scale;
 
-        QuaternionData worldRotation = GetLocalRotation();
-        G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
+            QuaternionData worldRotation = GetLocalRotation();
+            G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
 
-        auto pos = G3D::CoordinateFrame{ { worldRotationQuat },{ GetPositionX(), GetPositionY(), GetPositionZ() } }
-        .toWorldSpace(G3D::Box{ { minX, minY, minZ },{ maxX, maxY, maxZ } }).center();
+            auto pos = G3D::CoordinateFrame{ { worldRotationQuat },{ GetPositionX(), GetPositionY(), GetPositionZ() } }
+            .toWorldSpace(G3D::Box{ { minX, minY, minZ },{ maxX, maxY, maxZ } }).center();
 
+            x = pos.x;
+            y = pos.y;
+            z = pos.z;
+            return;
+        }
+    }
+
+    if (m_model)
+    {
+        auto pos = m_model->getBounds().center();
         x = pos.x;
         y = pos.y;
         z = pos.z;
+        return;
     }
-    else
-    {
-        GetPosition(x, y, z);
-        z += 1.0f;
-    }
+    
+    GetPosition(x, y, z);
+    z += 1.0f;
 }
 
 GameObjectData const* GameObject::GetGOData() const
@@ -2634,4 +2631,51 @@ SpellEntry const* GameObject::GetSpellForLock(Player const* player) const
 const QuaternionData GameObject::GetLocalRotation() const
 {
     return QuaternionData(GetFloatValue(GAMEOBJECT_ROTATION), GetFloatValue(GAMEOBJECT_ROTATION + 1), GetFloatValue(GAMEOBJECT_ROTATION + 2), GetFloatValue(GAMEOBJECT_ROTATION + 3));
+}
+
+bool GameObject::CanAggroWhenOpening() const
+{
+    if (GetGoType() != GAMEOBJECT_TYPE_CHEST)
+        return false;
+
+    // only faction Treasure
+    if (GetFactionId() != 77)
+        return false;
+
+    uint32 lockId = GetGOInfo()->GetLockId();
+    if (!lockId)
+        return false;
+
+    LockEntry const* lock = sLockStore.LookupEntry(lockId);
+    if (!lock)
+        return false;
+
+    for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
+    {
+        if (lock->Type[i] != LOCK_KEY_SKILL)
+            continue;
+
+        if (lock->Index[i] == LOCKTYPE_TREASURE)
+            return true;
+    }
+
+    return false;
+}
+
+void GameObject::DoAggroWhenOpening(Unit* user) const
+{
+    if (!CanAggroWhenOpening())
+        return;
+
+    std::list<Creature*> targets;
+    MaNGOS::AnyHostileUnitInObjectRangeCheck check(this, user, 10.0f);
+    MaNGOS::CreatureListSearcher<MaNGOS::AnyHostileUnitInObjectRangeCheck> searcher(targets, check);
+    Cell::VisitAllObjects(this, searcher, 10.0f);
+    for (Creature* attacker : targets)
+    {
+        if (!attacker->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL) &&
+            !attacker->GetCharmerGuid().IsPlayer() && !attacker->GetOwnerGuid().IsPlayer() &&
+            attacker->IsValidAttackTarget(user) && attacker->IsWithinLOSInMap(user))
+            attacker->EnterCombatWithTarget(user);
+    }
 }

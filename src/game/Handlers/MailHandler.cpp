@@ -725,6 +725,13 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recv_data)
         return;
     }
 
+    // prevent losing money due to reaching gold cap
+    if (int64(loadedPlayer->GetMoney()) + int64(m->money) > int64(loadedPlayer->GetMaxMoney()))
+    {
+        SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_ERR_INTERNAL_ERROR);
+        return;
+    }
+
     SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_OK);
 
     loadedPlayer->LogModifyMoney(m->money, "Mail", ObjectGuid(HIGHGUID_PLAYER, m->sender));

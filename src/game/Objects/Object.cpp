@@ -842,7 +842,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                     }
                     *data << m_uint32Values[index];
                 }
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
                 else if (index == UNIT_MOD_CAST_SPEED)
                 {
                     if (m_floatValues[index] < 0.001f)
@@ -3218,7 +3218,7 @@ bool WorldObject::IsLikePlayer() const
         return true;
 
     if (Pet const* pPet = ToPet())
-        return pPet->isControlled() && pPet->GetOwnerGuid().IsPlayer();
+        return pPet->IsControlled() && pPet->GetOwnerGuid().IsPlayer();
 
     return false;
 }

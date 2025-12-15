@@ -32,6 +32,8 @@
 #include <vector>
 #include <string>
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+
 void WardenMac::LoadScriptedScans()
 {
     sWardenScanMgr.AddMacScan(std::make_shared<MacStringHashScan>(true));
@@ -127,3 +129,5 @@ void WardenMac::InitializeClient()
 {
     m_initialized = true;
 }
+
+#endif

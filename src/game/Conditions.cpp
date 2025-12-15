@@ -109,6 +109,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_WORLDOBJECT, //  56
     CONDITION_REQ_SOURCE_CREATURE,    //  57
     CONDITION_REQ_SOURCE_CREATURE,    //  58
+    CONDITION_REQ_TARGET_PLAYER,      //  59
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -654,6 +655,20 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
 
             return true;
         }
+        case CONDITION_AREA_EXPLORED:
+        {
+            uint16 areaFlag = AreaEntry::GetFlagById(m_value1);
+            if (areaFlag == 0xffff)
+                return false;
+
+            int offset = areaFlag / 32;
+            if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
+                return false;
+
+            uint32 val = (uint32)(1 << (areaFlag % 32));
+            uint32 currFields = target->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + offset);
+            return (currFields & val) != 0;
+        }
     }
     return false;
 }
@@ -875,6 +890,7 @@ bool ConditionEntry::IsValid()
             break;
         }
         case CONDITION_AREAID:
+        case CONDITION_AREA_EXPLORED:
         {
             const auto *areaEntry = AreaEntry::GetById(m_value1);
             if (!areaEntry)

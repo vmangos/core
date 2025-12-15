@@ -214,6 +214,7 @@ struct GameObjectInfo
     uint32  type;
     uint32  displayId;
     std::string name;
+    std::string icon;
     uint32  faction;
     uint32  flags;
     float   size;
@@ -524,7 +525,7 @@ struct GameObjectInfo
         // not use for specific field access (only for output with loop by all filed), also this determinate max union size
         struct
         {
-            uint32 data[24];
+            int32 data[24];
         } raw;
     };
 

@@ -5263,7 +5263,7 @@ void Aura::HandleModCastingSpeed(bool apply, bool /*Real*/)
                 modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, m_modifier.m_amount);
     }
 
-    GetTarget()->ApplyCastTimePercentMod(m_modifier.m_amount, apply);
+    GetTarget()->UpdateCastSpeed();
 }
 
 void Aura::HandleModAttackSpeed(bool apply, bool /*Real*/)
@@ -5545,12 +5545,6 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
             target->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, m_modifier.m_amount, apply);
             target->HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, m_modifier.m_amount, apply);
             target->HandleStatModifier(UNIT_MOD_DAMAGE_RANGED, TOTAL_PCT, m_modifier.m_amount, apply);
-
-            // For show in client
-            if (target->IsPlayer())
-            {
-                target->ApplyModSignedFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT, m_modifier.m_amount / 100.0f, apply);
-            }
         }
         else
         {
@@ -5558,30 +5552,16 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
         }
     }
 
-    // Skip non magic case for speedup
-    if ((m_modifier.m_miscvalue & SPELL_SCHOOL_MASK_MAGIC) == 0)
-        return;
-
+    // skip item specific requirements
     if (GetSpellProto()->EquippedItemClass != -1 || GetSpellProto()->EquippedItemInventoryTypeMask != 0)
-    {
-        // wand magic case (skip generic to all item spell bonuses)
-        // done in Player::_ApplyWeaponDependentAuraMods
-
-        // Skip item specific requirements for not wand magic damage
         return;
-    }
 
-    // Magic damage percent modifiers implemented in Unit::SpellDamageBonusDone
-    // Send info to client
-    if (target->IsPlayer())
+    // update display in client
+    if (Player* player = target->ToPlayer())
     {
-        for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-        {
-            if (m_modifier.m_miscvalue & (1 << i)) // make sure current spell school is actually included
-            {
-                target->ApplyModSignedFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + i, m_modifier.m_amount / 100.0f, apply);
-            }
-        }
+        for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
+            if (m_modifier.m_miscvalue & (1 << i))
+                player->UpdateDamageDonePercent(i);
     }
 }
 
@@ -5610,7 +5590,7 @@ void Aura::HandleModPowerCostPCT(bool apply, bool Real)
     float amount = m_modifier.m_amount / 100.0f;
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
         if (m_modifier.m_miscvalue & (1 << i))
-            GetTarget()->ApplyModSignedFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + i, amount, apply);
+            GetTarget()->SetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + i, GetTarget()->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT, (1 << i)) / 100.0f);
 #endif
 }
 

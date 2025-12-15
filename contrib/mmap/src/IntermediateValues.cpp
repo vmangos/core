@@ -202,7 +202,7 @@ namespace MMAP
     void IntermediateValues::generateObjFile(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
         char objFileName[255];
-        sprintf(objFileName, "map%03u%02u%02u", mapID, tileY, tileX);
+        snprintf(objFileName, sizeof(objFileName), "map%03u%02u%02u", mapID, tileX, tileY);
         generateObjFile(objFileName, meshData);
     }
     void IntermediateValues::generateObjFile(std::string filename, MeshData& meshData)

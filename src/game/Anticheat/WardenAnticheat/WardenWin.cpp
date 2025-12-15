@@ -43,6 +43,8 @@
 #include <sstream>
 #include <iomanip>
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+
 namespace
 {
 // fixed offsets for classic client(s):
@@ -1431,3 +1433,5 @@ void WardenWin::GetPlayerInfo(std::string& clock, std::string& fingerprint, std:
     if (m_proxifierFound)
         proxifier = "Proxifier is running";
 }
+
+#endif

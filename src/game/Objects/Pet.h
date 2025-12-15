@@ -129,9 +129,6 @@ typedef std::vector<uint32> AutoSpellList;
 
 #define HAPPINESS_LEVEL_SIZE        333000
 
-extern uint32 const LevelUpLoyalty[6];
-extern uint32 const LevelStartLoyalty[6];
-
 #define ACTIVE_SPELLS_MAX           4
 
 #define PET_FOLLOW_DIST 2.0f
@@ -151,26 +148,26 @@ class Pet : public Creature
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
-        PetType getPetType() const { return m_petType; }
-        void setPetType(PetType type) { m_petType = type; }
-        bool isControlled() const { return getPetType() == SUMMON_PET || getPetType() == HUNTER_PET; }
-        bool isTemporarySummoned() const { return m_duration > 0; }
+        PetType GetPetType() const { return m_petType; }
+        void SetPetType(PetType type) { m_petType = type; }
+        bool IsControlled() const { return GetPetType() == SUMMON_PET || GetPetType() == HUNTER_PET; }
+        bool IsTemporarySummoned() const { return m_duration > 0; }
         bool IsPermanentPetFor(Player const* owner) const;              // pet have tab in character windows and set UNIT_FIELD_PETNUMBER
 
-        bool Create (uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 pet_number);
+        bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 petNumber);
         bool CreateBaseAtCreature(Creature* creature);
         bool LoadPetFromDB(Player* owner, uint32 petEntry = 0, uint32 petNumber = 0, bool current = false);
         void SavePetToDB(PetSaveMode mode);
+        static void DeleteFromDB(uint32 guidlow, bool separateTransaction = true);
         void Unsummon(PetSaveMode mode, Unit* owner = nullptr);
         void DelayedUnsummon(uint32 timeMSToDespawn, PetSaveMode mode);
-        static void DeleteFromDB(uint32 guidlow, bool separate_transaction = true);
 
         void InitializeDefaultName();
         char const* GetName() const final { return m_name.c_str(); }
         void SetName(std::string const& newname) { m_name = newname; }
         char const* GetNameForLocaleIdx(int32 locale_idx) const final;
 
-        void SetDeathState(DeathState s) override;                   // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
+        void SetDeathState(DeathState s) override;              // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
         void Update(uint32 update_diff, uint32 diff) override;  // overwrite virtual Creature::Update and Unit::Update
 
         uint8 GetPetAutoSpellSize() const override { return m_autospells.size(); }
@@ -204,23 +201,16 @@ class Pet : public Creature
 
         int32 GetBonusDamage() const { return m_bonusdamage; }
         void SetBonusDamage(int32 damage) { m_bonusdamage = damage; }
-
         bool UpdateAllStats() override;
         void UpdateResistances(uint32 school) override;
         void UpdateArmor() override;
         void UpdateAttackPowerAndDamage(bool ranged = false) override;
         void UpdateDamagePhysical(WeaponAttackType attType) override;
 
-        bool   CanTakeMoreActiveSpells(uint32 SpellIconID);
-        void   ToggleAutocast(uint32 spellid, bool apply);
-        bool   HasTPForSpell(uint32 spellid);
-        int32  GetTPForSpell(uint32 spellid);
-
+        // World of Warcraft Client Patch 1.6.0 (2005-07-12)
+        // - Pets will now enter passive/follow mode when their masters mount.
         void SetEnabled(bool on);
         bool IsEnabled() const { return m_enabled; }
-
-        bool HasSpell(uint32 spell) const override;
-        void AddTeachSpell(uint32 learned_id, uint32 source_id) { m_teachspells[learned_id] = source_id; }
 
         void LearnPetPassives();
         void CastPetAuras(bool current);
@@ -235,18 +225,25 @@ class Pet : public Creature
         void _LoadSpells();
         void _SaveSpells();
 
+        bool HasSpell(uint32 spellId) const override;
+        void AddTeachSpell(uint32 learnedId, uint32 sourceId) { m_teachspells[learnedId] = sourceId; }
         bool AddSpell(uint32 spellId, ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
         bool LearnSpell(uint32 spellId);
-        bool unlearnSpell(uint32 spellId, bool learn_prev, bool clear_ab = true);
-        bool RemoveSpell(uint32 spellId, bool learn_prev, bool clear_ab = true);
+        bool UnlearnSpell(uint32 spellId, bool learnPrevious, bool clearActionBar = true);
+        bool RemoveSpell(uint32 spellId, bool learnPrevious, bool clearActionBar = true);
         void CleanupActionBar();
+
+        bool   CanTakeMoreActiveSpells(uint32 spellId);
+        void   ToggleAutocast(uint32 spellId, bool apply);
+        bool   HasTPForSpell(uint32 spellId);
+        int32  GetTPForSpell(uint32 spellId);
 
         PetSpellMap     m_petSpells;
         TeachSpellMap   m_teachspells;
         AutoSpellList   m_autospells;
 
         void InitPetCreateSpells();
-        void CheckLearning(uint32 spellid);
+        void CheckLearning(uint32 spellId);
         uint32 GetResetTalentsCost() const;
 
         void  SetTP(int32 TP);
@@ -254,7 +251,7 @@ class Pet : public Creature
         uint32 GetSkillIdForPetTraining() const;
         bool CanLearnPetSpell(uint32 spellId) const;
 
-        int32   m_TrainingPoints;
+        int32   m_trainingPoints;
         uint32  m_resetTalentsCost;
         time_t  m_resetTalentsTime;
 
@@ -263,7 +260,10 @@ class Pet : public Creature
         void SetAuraUpdateMask(uint64 mask) { m_auraUpdateMask = mask; }
         void ResetAuraUpdateMask() { m_auraUpdateMask = 0; }
 
-        bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
+        bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed (saved)
+        
+        static uint32 const LevelUpLoyalty[6];
+        static uint32 const LevelStartLoyalty[6];
     protected:
         std::string m_name;
         uint32  m_focusTimer;

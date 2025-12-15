@@ -294,9 +294,11 @@ void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
 
         if (processing >= PACKET_PROCESS_MAX_TYPE)
         {
+            /*
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) will be skipped",
                 LookupOpcodeName(newPacket->GetOpcode()),
                 newPacket->GetOpcode());
+            */
             return;
         }
     }
