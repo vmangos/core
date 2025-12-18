@@ -842,12 +842,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     m_casterUnit->CastSpell(m_casterUnit, spellId, true, nullptr);
                     return;
                 }
-                case 17770:                                 // Wolfshead Helm Energy
-                {
-                    if (m_casterUnit)
-                        m_casterUnit->CastSpell(m_casterUnit, 29940, true, nullptr);
-                    return;
-                }
                 case 17950:                                 // Shadow Portal
                 {
                     if (!unitTarget)
@@ -945,12 +939,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     damage = dither(damage * (pPlayer->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100);
                     if (damage > 0)
                         pPlayer->CastCustomSpell(pPlayer, 23234, (int32)(damage), {}, {}, true, nullptr);
-                    return;
-                }
-                case 20577:                                 // Cannibalize
-                {
-                    if (m_casterUnit && (unitTarget || corpseTarget))
-                        m_casterUnit->CastSpell(m_casterUnit, 20578, true, nullptr);
                     return;
                 }
                 case 21147:                                 // Arcane Vacuum

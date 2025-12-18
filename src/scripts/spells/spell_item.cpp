@@ -594,6 +594,26 @@ SpellScript* GetScript_FirstAid(SpellEntry const*)
     return new FirstAidScript();
 }
 
+enum
+{
+    SPELL_WOLFSHEAD_HELM_ENERGY = 29940,
+};
+
+// 17770 - Wolfshead Helm Energy
+struct WolfsheadHelmScript : public SpellScript
+{
+    void OnSuccessfulFinish(Spell* spell) const final
+    {
+        if (spell->m_casterUnit)
+            spell->m_casterUnit->CastSpell(spell->m_casterUnit, SPELL_WOLFSHEAD_HELM_ENERGY, true);
+    }
+};
+
+SpellScript* GetScript_WolfsheadHelm(SpellEntry const*)
+{
+    return new WolfsheadHelmScript();
+}
+
 void AddSC_item_spell_scripts()
 {
     Script* newscript;
@@ -716,5 +736,10 @@ void AddSC_item_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_first_aid";
     newscript->GetSpellScript = &GetScript_FirstAid;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_wolfshead_helm";
+    newscript->GetSpellScript = &GetScript_WolfsheadHelm;
     newscript->RegisterSelf();
 }
