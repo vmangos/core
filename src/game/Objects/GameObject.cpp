@@ -347,26 +347,11 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                 case GAMEOBJECT_TYPE_TRAP:
                 {
                     // Arming Time for GAMEOBJECT_TYPE_TRAP (6)
-                    // Only apply arming delay if owner is in combat
+                    /* Ivina < Nostalrius > : toujours appliquer le startDelay. Retirer le delai de la DB si jamais un piege n'en a pas. */
+                    // Unit* owner = GetOwner();
+                    // if (owner && ((Player*)owner)->IsInCombat())
                     if (GetGOInfo()->trap.startDelay)
-                    {
-                        Unit* owner = GetOwner();
-                        if (owner && owner->IsInCombat())
-                        {
-                            // Owner in combat: apply startup delay
-                            m_cooldownTime = time(nullptr) + GetGOInfo()->trap.startDelay;
-                        }
-                        else
-                        {
-                            // Owner not in combat: arm instantly
-                            m_cooldownTime = 0;
-                        }
-                    }
-                    else
-                    {
-                        m_cooldownTime = 0;
-                    }
-
+                        m_cooldownTime = time(nullptr) + GetGOInfo()->trap.startDelay;
                     m_lootState = GO_READY;
                     break;
                 }
@@ -474,44 +459,43 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
 
             if (isSpawned())
             {
+                // traps can have time and can not have
                 GameObjectInfo const* goInfo = GetGOInfo();
                 if (goInfo->type == GAMEOBJECT_TYPE_TRAP)
                 {
-                    // Check cooldown/arming delay
-                    // In GO_READY, m_cooldownTime is the arming delay
                     if (m_cooldownTime >= time(nullptr))
                         return;
 
+                    // traps
                     Unit* owner = GetOwner();
-                    Unit* target = nullptr;  // Target to trigger trap on
+                    Unit* ok = nullptr;                        // pointer to appropriate target if found any
 
                     bool IsBattleGroundTrap = false;
-
-                    // Calculate activation radius
+                    //FIXME: this is activation radius (in different casting radius that must be selected from spell data)
+                    //TODO: move activated state code (cast itself) to GO_ACTIVATED, in this place only check activating and set state
                     float radius = float(goInfo->trap.radius);
                     if (!radius)
                     {
-                        if (goInfo->trap.cooldown != 3)
+                        if (goInfo->trap.cooldown != 3)     // cast in other case (at some triggering/linked go/etc explicit call)
                             return;
                         else
                         {
                             if (m_respawnTime > 0)
                                 break;
 
-                            // Battleground trap: data2 == 0 && data5 == 3
+                            // battlegrounds gameobjects has data2 == 0 && data5 == 3
                             radius = float(goInfo->trap.cooldown);
                             IsBattleGroundTrap = true;
                         }
                     }
-
-                    // Special radius overrides for specific hunter traps
+                    // Rayon float et non entier (impose par la DB) pour certains pieges chassoux :
                     switch (goInfo->id)
                     {
-                        case 2561:   // Explosive Trap
-                        case 164638: // Immolation Trap
-                        case 164639: // Frost Trap
-                        case 164839: // Freezing Trap
-                        case 164872: // Various hunter traps
+                        case 2561:
+                        case 164638:
+                        case 164639:
+                        case 164839:
+                        case 164872:
                         case 164873:
                         case 164874:
                         case 164875:
@@ -523,83 +507,62 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                             break;
                     }
 
-                    // TARGET SELECTION
-                    if (owner && goInfo->trap.charges > 0)  // Hunter trap (has charges = player-owned)
+                    // Note: this hack with search required until GO casting not implemented
+                    // search unfriendly creature
+                    if (owner && goInfo->trap.charges > 0)  // hunter trap
                     {
-                        // Use existing HunterTrapTargetSelectorCheck (already checks friendliness, combat, PvP)
                         HunterTrapTargetSelectorCheck u_check(this, owner, radius);
-                        MaNGOS::UnitLastSearcher<HunterTrapTargetSelectorCheck> checker(target, u_check);
-                        Cell::VisitWorldObjects(this, checker, radius); // Players
-                        Cell::VisitGridObjects(this, checker, radius);  // Creatures
+                        MaNGOS::UnitLastSearcher<HunterTrapTargetSelectorCheck> checker(ok, u_check);
+                        Cell::VisitWorldObjects(this, checker, radius); // players
+                        Cell::VisitGridObjects(this, checker, radius); // units
                     }
-                    else  // Environmental trap (no owner/charges)
+                    else                                    // environmental trap
                     {
-                        // Environmental traps target players only
-                        Player* p_target = nullptr;
+                        // environmental damage spells already have around enemies targeting but this not help in case nonexistent GO casting support
+
+                        // affect only players
+                        Player* p_ok = nullptr;
                         MaNGOS::AnyPlayerInObjectRangeCheck p_check(this, radius);
-                        MaNGOS::PlayerSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> checker(p_target, p_check);
+                        MaNGOS::PlayerSearcher<MaNGOS::AnyPlayerInObjectRangeCheck>  checker(p_ok, p_check);
                         Cell::VisitWorldObjects(this, checker, radius);
-                        target = p_target;
+                        ok = p_ok;
                     }
 
-                    // TRIGGER TRAP if target found
-                    if (target)
+                    if (ok && (!AI() || !AI()->OnUse(ok)))
                     {
-                        // Check if AI wants to block trigger
-                        if (AI() && AI()->OnUse(target))
-                        {
-                            // AI handled the trigger, skip default behavior - but still need to set cooldown
-                            m_cooldownTime = time(nullptr) + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4));
-                            return;
-                        }
+                        if (owner)
+                            owner->CastSpell(ok, goInfo->trap.spellId, true, nullptr, nullptr, GetObjectGuid());
+                        else
+                            CastSpell(ok, goInfo->trap.spellId, true, nullptr, nullptr, GetObjectGuid());
 
-                        // Pprevents triggering on immune/ghost targets
-                        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
-                            return;
+                        // use template cooldown if provided
+                        m_cooldownTime = time(nullptr) + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4));
 
-                        // Cast spell if configured
-                        if (goInfo->trap.spellId)
-                        {
-                            if (owner)
-                                owner->CastSpell(target, goInfo->trap.spellId, true, nullptr, nullptr, GetObjectGuid());
-                            else
-                                CastSpell(target, goInfo->trap.spellId, true, nullptr, nullptr, GetObjectGuid());
-                        }
-
-                        if (HasCustomAnim())
-                            SendGameObjectCustomAnim();
-
-                        if (IsBattleGroundTrap && target->GetTypeId() == TYPEID_PLAYER)
-                        {
-                            if (((Player*)target)->InBattleGround())
-                            {
-                                if (BattleGround* bg = ((Player*)target)->GetBattleGround())
-                                    bg->HandleTriggerBuff(this);
-                            }
-                        }
-
+                        // count charges
                         if (goInfo->trap.charges > 0)
                             AddUse();
 
-                        // ENTER REARMING STATE (GO_ACTIVATED)
-                        uint32 cooldown = goInfo->trap.cooldown ? goInfo->trap.cooldown : 4;
-                        m_cooldownTime = time(nullptr) + cooldown;
+                        if (IsBattleGroundTrap && ok->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            //BattleGround gameobjects case
+                            if (((Player*)ok)->InBattleGround())
+                                if (BattleGround* bg = ((Player*)ok)->GetBattleGround())
+                                    bg->HandleTriggerBuff(this);
+                        }
 
-                        SetLootState(GO_ACTIVATED);
-
-                        // Set visual state to GO_STATE_ACTIVE_ALTERNATIVE
-                        // This shows the "triggered" animation/appearance
-                        SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                        // TODO: all traps can be activated, also those without spell.
+                        // Some may have have animation and/or are expected to despawn.
+                        if (HasCustomAnim())
+                            SendGameObjectCustomAnim();
                     }
                 }
 
-                // Check charges for despawn (after all trap logic)
                 if (uint32 max_charges = goInfo->GetCharges())
                 {
                     if (m_useTimes >= max_charges)
                     {
                         m_useTimes = 0;
-                        SetLootState(GO_JUST_DEACTIVATED);  // Despawn trap
+                        SetLootState(GO_JUST_DEACTIVATED);  // can be despawned or destroyed
                     }
                 }
             }
@@ -614,18 +577,6 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                     if (GetGOInfo()->GetAutoCloseTime() && (m_cooldownTime < time(nullptr)))
                         ResetDoorOrButton();
                     break;
-                case GAMEOBJECT_TYPE_TRAP:  // cmangos trap rearming
-                {
-                    // REARMING PHASE
-                    // In GO_ACTIVATED, m_cooldownTime is the rearm timer
-                    if (m_cooldownTime < time(nullptr))
-                    {
-                        SetLootState(GO_READY);
-                        SetGoState(GO_STATE_READY);
-                        m_cooldownTime = 0;  // Clear timer, trap is active again
-                    }
-                    break;
-                }
                 case GAMEOBJECT_TYPE_GOOBER:
                     if (m_cooldownTime < time(nullptr))
                     {
@@ -1529,56 +1480,29 @@ void GameObject::Use(Unit* user)
         }
         case GAMEOBJECT_TYPE_TRAP:                          // 6
         {
-            // Called by TriggerLinkedGameObject() or direct spell activation
-            GameObjectInfo const* goInfo = GetGOInfo();
+            // Currently we do not expect trap code below to be Use()
+            // directly (except from spell effect). Code here will be called by TriggerLinkedGameObject.
 
-            // Ignore if already rearming
-            if (m_lootState == GO_ACTIVATED)
-                return;
-
-            // Check if user is valid target
-            if (user)
+            if (uint32 spellId = GetGOInfo()->trap.spellId)
             {
-                // Don't trigger on immune/ghost targets
-                if (user->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
-                    return;
-            }
-
-            // Script hook for custom trap behavior
-            if (AI() && AI()->OnUse(user))
-                return;  // Script handled it, don't run default logic
-
-            // Cast spell - if any
-            if (uint32 spellId = goInfo->trap.spellId)
-            {
-                if (user)
-                {
-                    if (Unit* pOwner = GetOwner())
-                        pOwner->CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
-                    else
-                        CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
-                }
+                if (Unit* pOwner = GetOwner())
+                    pOwner->CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
+                else
+                    CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
             }
 
             if (HasCustomAnim())
                 SendGameObjectCustomAnim();
 
-            if (uint32 max_charges = goInfo->GetCharges())
+            if (uint32 max_charges = GetGOInfo()->GetCharges())
             {
                 AddUse();
                 if (m_useTimes >= max_charges)
                 {
                     m_useTimes = 0;
                     SetLootState(GO_JUST_DEACTIVATED);
-                    return;
                 }
             }
-
-            // Enter rearming state (GO_ACTIVATED)
-            uint32 cooldown = goInfo->trap.cooldown ? goInfo->trap.cooldown : 4;
-            m_cooldownTime = time(nullptr) + cooldown;
-            SetLootState(GO_ACTIVATED);
-            SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
 
             return;
         }
