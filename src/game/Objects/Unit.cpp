@@ -737,7 +737,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
     uint32 health = pVictim->GetHealth();
     // duel ends when player has 1 or less hp
     bool duel_hasEnded = false;
-    if (pVictim->IsPlayer() && ((Player*)pVictim)->m_duel && damage >= (health - 1))
+    if (pVictim->IsPlayer() && ((Player*)pVictim)->m_duel && health > 0 && damage >= (health - 1))
     {
         // prevent kill only if killed in duel and killed by opponent or opponent controlled creature
         if (((Player*)pVictim)->m_duel->opponent == this ||
@@ -1612,6 +1612,8 @@ void Unit::DealMeleeDamage(CalcDamageInfo const* damageInfo, bool durabilityLoss
             else if (offtime > percent60)
             {
                 offtime -= 2.0f * percent20;
+                if (offtime < 0.0f)
+                    offtime = 0.0f;
                 pVictim->SetAttackTimer(OFF_ATTACK, uint32(offtime));
             }
         }
@@ -1624,6 +1626,8 @@ void Unit::DealMeleeDamage(CalcDamageInfo const* damageInfo, bool durabilityLoss
             else if (basetime > percent60)
             {
                 basetime -= 2.0f * percent20;
+                if (basetime < 0.0f)
+                    basetime = 0.0f;
                 pVictim->SetAttackTimer(BASE_ATTACK, uint32(basetime));
             }
         }
@@ -5739,6 +5743,9 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
             }
         }
 
+         if (mechanic == MECHANIC_NONE)
+            return false;
+
         uint32 mask = 1 << (mechanic - 1);
         AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MECHANIC_IMMUNITY_MASK);
         for (const auto& iter : immuneAuraApply)
@@ -5813,6 +5820,9 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
                     return true;
             }
         }
+
+        if (mechanic == MECHANIC_NONE)
+            return false;
 
         AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MECHANIC_IMMUNITY_MASK);
         for (const auto& iter : immuneAuraApply)
@@ -11186,7 +11196,7 @@ void Unit::RestoreMovement()
 
 void Unit::SetTransformScale(float scale)
 {
-    if (!scale)
+    if (!scale || !m_nativeScaleOverride)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to set transform scale to 0!");
         return;
