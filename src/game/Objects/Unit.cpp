@@ -5743,22 +5743,22 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
             }
         }
 
-         if (mechanic == MECHANIC_NONE)
-            return false;
-
-        uint32 mask = 1 << (mechanic - 1);
-        AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MECHANIC_IMMUNITY_MASK);
-        for (const auto& iter : immuneAuraApply)
+        if (mechanic != MECHANIC_NONE)
         {
-            if (iter->GetModifier()->m_miscvalue & mask)
+            uint32 mask = 1 << (mechanic - 1);
+            AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MECHANIC_IMMUNITY_MASK);
+            for (const auto& iter : immuneAuraApply)
             {
-                SpellEntry const* pImmunitySpell = iter->GetSpellProto();
+                if (iter->GetModifier()->m_miscvalue & mask)
+                {
+                    SpellEntry const* pImmunitySpell = iter->GetSpellProto();
 
-                if ((pImmunitySpell && pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveSpell())
-                    return true;
+                    if ((pImmunitySpell && pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveSpell())
+                        return true;
 
-                if (pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
-                    return true;
+                    if (pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
+                        return true;
+                }
             }
         }
     }
