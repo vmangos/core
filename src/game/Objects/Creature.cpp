@@ -111,7 +111,7 @@ bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
                     // When nearby mobs aggro from another mob's initial call for assistance
                     // their leash timers become linked and attacking one will keep the rest from evading.
                     if (assistant->GetVictim())
-                        assistant->SetLastLeashExtensionTimePtr(m_owner.ToCreature()->GetLastLeashExtensionTimePtr());
+                        assistant->SetLastLeashExtensionTimePtr(static_cast<Creature*>(&m_owner)->GetLastLeashExtensionTimePtr());
                 }
             }
         }
