@@ -35,7 +35,7 @@ enum Nefarian : uint32
     SAY_HUNTER                  = 9849,
     SAY_ROGUE                   = 9856,
 
-    SPELL_SHADOWFLAME_INITIAL   = 22992, // old spell id 22972 -> wrong
+    SPELL_SHADOWFLAME_PASSIV    = 22992,
     SPELL_SHADOWFLAME           = 22539,
     SPELL_BELLOWING_ROAR        = 22686,
     SPELL_VEIL_OF_SHADOW        = 22687, // old spell id 7068 -> wrong
@@ -305,8 +305,6 @@ struct boss_nefarianAI : ScriptedAI
                         m_creature->SetInCombatWithZone();
                         m_creature->SetFly(true);
 
-                        m_creature->CastSpell(m_creature, SPELL_SHADOWFLAME_INITIAL, true); // Test speed 17 / fire damage on the initial ??? Oo
-
                         DoScriptText(SAY_AGGRO, m_creature);
 
                         m_creature->GetMotionMaster()->MovePoint(1, -7449.145f, -1320.647f, 476.795f);
@@ -329,6 +327,7 @@ struct boss_nefarianAI : ScriptedAI
                             //m_creature->GetMotionMaster()->Clear(false);
                             m_creature->GetMotionMaster()->MoveChase(pTarget);
                             SetCombatMovement(true);
+                            m_creature->CastSpell(pTarget, SPELL_SHADOWFLAME_PASSIV, true);
                         }
                         m_bTransitionDone = true;
                         break;
@@ -662,6 +661,32 @@ SpellScript* GetScript_NefarianCorruptedTotems(SpellEntry const*)
     return new NefarianCorruptedTotemsScript();
 }
 
+// 22992 - Shadow Flame
+// When Nefarian lands at the start of Phase 2 of his encounter he will use an AoE Shadowflame
+// that ignores LoS, this spell does about 1000 initial shadow damage,
+// but applies a deadly DoT if an Onyxia Scale Cloak is not equipped.
+struct NefarianShadowFlamePassiveScript : SpellScript
+{
+    static constexpr uint32 SPELL_SHADOWFLAME_TRIGGER = 22986;
+
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
+        {
+            if (spell->GetUnitTarget())
+            {
+                spell->m_casterUnit->CastSpell(spell->GetUnitTarget(), SPELL_SHADOWFLAME_TRIGGER, true);
+            }
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_NefarianShadowFlamePassive(SpellEntry const*)
+{
+    return new NefarianShadowFlamePassiveScript();
+}
+
 void AddSC_boss_nefarian()
 {
     Script* pNewScript;
@@ -679,5 +704,10 @@ void AddSC_boss_nefarian()
     pNewScript = new Script;
     pNewScript->Name = "spell_nefarian_corrupted_totems";
     pNewScript->GetSpellScript = &GetScript_NefarianCorruptedTotems;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_nefarian_shadow_flame_passive";
+    pNewScript->GetSpellScript = &GetScript_NefarianShadowFlamePassive;
     pNewScript->RegisterSelf();
 }

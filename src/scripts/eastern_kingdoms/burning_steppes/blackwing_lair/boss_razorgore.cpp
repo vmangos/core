@@ -365,8 +365,6 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        DoScriptText(EMOTE_FLEE, m_creature);
-
         std::list<Creature*> lCreatureNear;
         GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, { NPC_BLACKWING_LEGGIONAIRE, NPC_BLACKWING_MAGE, NPC_DEATH_TALON_DRAGONSPAWN }, 250.0f);
 
@@ -374,6 +372,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         {
             if (it->IsAlive())
             {
+                it->MonsterTextEmote(EMOTE_FLEE, it);
                 it->SetHomePosition(-7555.55f, -1025.16f, 408.4914f, 0.65f);
                 it->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_SPAWNING | UNIT_FLAG_PACIFIED | UNIT_FLAG_SILENCED);
                 it->AI()->EnterEvadeMode();
