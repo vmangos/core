@@ -671,13 +671,8 @@ struct NefarianShadowFlamePassiveScript : SpellScript
 
     bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
-        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
-        {
-            if (spell->GetUnitTarget())
-            {
-                spell->m_casterUnit->CastSpell(spell->GetUnitTarget(), SPELL_SHADOWFLAME_TRIGGER, true);
-            }
-        }
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit && spell->GetUnitTarget())
+            spell->m_casterUnit->CastSpell(spell->GetUnitTarget(), SPELL_SHADOWFLAME_TRIGGER, true);
         return true;
     }
 };
