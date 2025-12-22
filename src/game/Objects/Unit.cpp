@@ -737,7 +737,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
     uint32 health = pVictim->GetHealth();
     // duel ends when player has 1 or less hp
     bool duel_hasEnded = false;
-    if (pVictim->IsPlayer() && ((Player*)pVictim)->m_duel && health > 0 && damage >= (health - 1))
+    if (pVictim->IsPlayer() && ((Player*)pVictim)->m_duel && (damage + 1) >= health)
     {
         // prevent kill only if killed in duel and killed by opponent or opponent controlled creature
         if (((Player*)pVictim)->m_duel->opponent == this ||
@@ -748,7 +748,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             || pVictim == this && reflected
 #endif
             )
-            damage = health - 1;
+            damage = health ? health - 1 : 0;
 
         duel_hasEnded = true;
     }
