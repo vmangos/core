@@ -136,23 +136,19 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/stranglethorn_vale/stranglethorn_vale.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_arlokk.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_gahzranka.cpp
-    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_grilek.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_hakkar.cpp
-    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_hazzarah.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_jeklik.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_jindo.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_mandokir.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_marli.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_renataki.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/boss_venoxis.cpp
-    eastern_kingdoms/stranglethorn_vale/zulgurub/boss_wushoolay.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/instance_zulgurub.cpp
     eastern_kingdoms/stranglethorn_vale/zulgurub/zulgurub_trash.cpp
     eastern_kingdoms/swamp_of_sorrows/swamp_of_sorrows.cpp
     eastern_kingdoms/swamp_of_sorrows/sunken_temple/instance_sunken_temple.cpp
     eastern_kingdoms/swamp_of_sorrows/sunken_temple/sunken_temple.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_arcanist_doan.cpp
-    eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_azshir_the_sleepless.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_herod.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_high_inquisitor_fairbanks.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_houndmaster_loksey.cpp
@@ -168,7 +164,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/western_plaguelands/scholomance/boss_illucia_barov.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_instructor_malicia.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_jandice_barov.cpp
-    eastern_kingdoms/western_plaguelands/scholomance/boss_kormok.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_lord_alexei_barov.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_lorekeeper_polkelt.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_ras_frostwhisper.cpp
