@@ -104,6 +104,10 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 DELETE FROM `pool_template` WHERE `entry` = 1297;
 
+-- Correct Patch for Attunement to the Core
+UPDATE `creature_questrelation` SET `patch_max` = 2 WHERE `id` = 14387 AND `quest` = 7487;
+UPDATE `creature_involvedrelation` SET `patch_max` = 2 WHERE `id` = 14387 AND `quest` = 7487;
+
 
 -- End of migration.
 END IF;
