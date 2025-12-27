@@ -16,7 +16,6 @@
 
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
-#include "Group.h"
 
 enum Nefarian : uint32
 {
@@ -692,14 +691,20 @@ struct NefarianClassCallMageAuraScript : public AuraScript
             pMage->HasAura(SPELL_POLYMORPH))
             return;
 
-        Group* pGroup = pMage->GetGroup();
-        if (!pGroup)
+        Map* pMap = pMage->GetMap();
+        if (!pMap)
+            return;
+
+        // Use GetMap()->GetPlayers() instead of group to prevent exploit where mage
+        // could leave group to avoid casting polymorph on members
+        Map::PlayerList const& players = pMap->GetPlayers();
+        if (players.isEmpty())
             return;
 
         std::vector<Player*> possibleTargets;
-        for (GroupReference* pRef = pGroup->GetFirstMember(); pRef != nullptr; pRef = pRef->next())
+        for (const auto& itr : players)
         {
-            Player* pPlayer = pRef->getSource();
+            Player* pPlayer = itr.getSource();
             if (!pPlayer ||
                 !pPlayer->IsAlive() ||
                 !pPlayer->IsInWorld() ||
