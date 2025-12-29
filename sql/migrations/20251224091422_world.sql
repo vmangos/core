@@ -9,8 +9,8 @@ INSERT INTO `migrations` VALUES ('20251224091422');
 -- Add your query below.
 
 
--- Arkkoran Muckdweller (6136) should share spawn with Arkkoran Clacker (6135)
-UPDATE `creature` SET `id` = 6135, `id2` = 6136 WHERE `id` IN (6135, 6136);
+-- Arkkoran Muckdweller (6136) should share spawn with Arkkoran Clacker (6135) Arkkoran Pincer (6137) Arkkoran Oracle (6138)
+UPDATE `creature` SET `id` = 6135, `id2` = 6136, `id3` = 6137, `id4` = 6138 WHERE `id` IN (6135, 6136, 6137, 6138);
 
 -- Firetail Scorpid (9697) should share spawn with Giant Ember Worg (9698)
 UPDATE `creature` SET `id` = 9697, `id2` = 9698 WHERE `id` IN (9697, 9698);
