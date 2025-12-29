@@ -49,6 +49,27 @@ UPDATE `quest_template` SET `RequiredMinRepFaction` = 529, `RequiredMinRepValue`
 -- Fix Console Errors
 UPDATE `creature` SET `mana_percent` = 100 WHERE  `guid` IN (17021, 17018, 17017, 17013, 17010, 17004);
 
+-- Events list for Devlin Agamand
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(165703, 1657, 0, 1, 0, 100, 3, 180000, 300000, 180000, 300000, 165703, 165704, 0, 'Devlin Agamand - Random Say OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(165703, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 567, 568, 569, 570, 0, 0, 0, 0, 0, 'Devlin Agamand - Random Say OOC'),
+(165704, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 571, 572, 573, 0, 0, 0, 0, 0, 0, 'Devlin Agamand - Random Say OOC');
+
+-- Events list for Lillith Nefara
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 1946;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(194601, 1946, 0, 4, 0, 100, 0, 0, 0, 0, 0, 194601, 0, 0, 'Lillith Nefara - Say on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(194601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 427, 0, 0, 0, 0, 0, 0, 0, 0, 'Lillith Nefara - Say on Aggro');
+
+-- Events list for Caretaker Caice
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 2307;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(230701, 2307, 0, 1, 0, 100, 1, 180000, 300000, 180000, 300000, 230701, 0, 0, 'Caretaker Caice - Random Say OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(230701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 583, 584, 585, 586, 0, 0, 0, 0, 0, 'Caretaker Caice - Random Say OOC');
+
 -- Pool Some Rich Thorium in Burning Steppes
 SET @PTEMPLATE = 3589;
 
