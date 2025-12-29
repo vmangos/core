@@ -8,6 +8,17 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES ('20251224091422');
 -- Add your query below.
 
+-- Blue Dragonspawn (193) should share spawn with Blue Scalebane (6130) Draconic Mageweaver (6131)
+UPDATE `creature` SET `id` = 193, `id2` = 6130, `id3` = 6131 WHERE `id` IN (193, 6130, 6131);
+
+-- Thunderhead Patriarch (6379) should share spawn with Thunderhead Consort (6380)
+UPDATE `creature` SET `id` = 6379, `id2` = 6380 WHERE `id` IN (6379, 6380);
+
+-- Cliff Breaker (6146) should share spawn with Cliff Thunderer (6147)
+UPDATE `creature` SET `id` = 6146, `id2` = 6147 WHERE `id` IN (6146, 6147);
+
+-- Servant of Arkkoroc (6143) should share spawn with Servant of Arkkoroc (6144)
+UPDATE `creature` SET `id` = 6143, `id2` = 6144 WHERE `id` IN (6143, 6144);
 
 -- Arkkoran Muckdweller (6136) should share spawn with Arkkoran Clacker (6135) Arkkoran Pincer (6137) Arkkoran Oracle (6138)
 UPDATE `creature` SET `id` = 6135, `id2` = 6136, `id3` = 6137, `id4` = 6138 WHERE `id` IN (6135, 6136, 6137, 6138);
