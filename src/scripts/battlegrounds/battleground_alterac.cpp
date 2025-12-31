@@ -5119,6 +5119,9 @@ struct AV_mineNpcAI : public ScriptedAI
 
 CreatureAI* GetAI_AV_Mines_AI(Creature* pCreature)
 {
+    if (pCreature->GetMapId() != MAP_ALTERAC_VALLEY)
+        return new BasicAI(pCreature);
+
     return new AV_mineNpcAI(pCreature);
 }
 
