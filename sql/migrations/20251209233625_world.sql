@@ -428,34 +428,37 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 -- .go xyz -4833.3306 -1694.9738 504.03348
 
 -- Ironforge Mountaineer and Ironforge Guard should share spawns in Ironforge Airport
-UPDATE creature SET id2 = 727  WHERE guid IN (190204, 190203, 190202, 190207, 190205, 190208, 190206, 190210, 190211, 190212, 190213);
-UPDATE creature SET id2 = 5595 WHERE guid IN (190189, 190190, 190192, 190195, 190196, 190194, 190198, 190193, 190191, 190200, 190201, 190199, 190209);
+UPDATE `creature` SET `id2` = 727  WHERE `guid` IN (190204, 190203, 190202, 190207, 190205, 190208, 190206, 190210, 190211, 190212, 190213);
+UPDATE `creature` SET `id2` = 5595 WHERE `guid` IN (190189, 190190, 190192, 190195, 190196, 190194, 190198, 190193, 190191, 190200, 190201, 190199, 190209);
 
 -- Delete duplicate rabbit
-DELETE FROM creature WHERE `guid`=190186;
+DELETE FROM `creature` WHERE `guid`=190186;
 
 -- Correct emote for Ironforge Mountainer
 UPDATE `creature_addon` SET `emote_state`=28 WHERE `guid`=190201;
 
--- Emote 69 for Ironforge Guard
+-- Delete emote waypoints for Ironforge Guard
 DELETE FROM `creature_movement` WHERE `id`=190209;
 DELETE FROM `creature_movement_scripts` WHERE `id`=21;
-INSERT INTO `creature_addon` (`guid`,`emote_state`) VALUES (190209, 69);
+UPDATE `creature` SET `wander_distance`=0, `movement_type`=0 WHERE `guid`=190209;
 
 -- Emote 1 for Gnome Engineer
 DELETE FROM `creature_movement` WHERE `id`=190241;
 DELETE FROM `creature_movement_scripts` WHERE `id`=22;
 INSERT INTO `creature_addon` (`guid`,`emote_state`) VALUES (190241, 1);
+UPDATE `creature` SET `wander_distance`=0, `movement_type`=0 WHERE `guid`=190241;
 
 -- Emote 4 for Holdout Warrior
 DELETE FROM `creature_movement` WHERE `id`=190229;
 DELETE FROM `creature_movement_scripts` WHERE `id`=23;
 INSERT INTO `creature_addon` (`guid`,`emote_state`) VALUES (190229, 4);
+UPDATE `creature` SET `wander_distance`=0, `movement_type`=0 WHERE `guid`=190229;
 
 -- Emote 21 for Peria Lamenur
 DELETE FROM `creature_movement` WHERE `id`=190228;
 DELETE FROM `creature_movement_scripts` WHERE `id`=24;
 INSERT INTO `creature_addon` (`guid`,`emote_state`) VALUES (190228, 21);
+UPDATE `creature` SET `wander_distance`=0, `movement_type`=0 WHERE `guid`=190228;
 
 -- Delete custom troll spawns
 DELETE FROM `creature` WHERE `guid` IN (190225, 190227, 190226, 190223, 190224, 190222);
