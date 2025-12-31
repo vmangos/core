@@ -350,6 +350,8 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
         GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 
+    GetPlayer()->ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_LOGGING_OUT, true);
+
     WorldPacket data(SMSG_LOGOUT_RESPONSE, 1 + 4);
     data << uint32(0);
     data << uint8(0);
@@ -381,6 +383,8 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPacket& /*recv_data*/)
         //! DISABLE_ROTATE
         GetPlayer()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
+
+    GetPlayer()->ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_LOGGING_OUT, false);
 }
 
 void WorldSession::HandleTogglePvP(WorldPacket& recv_data)

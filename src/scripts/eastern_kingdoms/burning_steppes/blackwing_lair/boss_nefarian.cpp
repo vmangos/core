@@ -35,7 +35,7 @@ enum Nefarian : uint32
     SAY_HUNTER                  = 9849,
     SAY_ROGUE                   = 9856,
 
-    SPELL_SHADOWFLAME_INITIAL   = 22992, // old spell id 22972 -> wrong
+    SPELL_SHADOWFLAME_PASSIV    = 22992,
     SPELL_SHADOWFLAME           = 22539,
     SPELL_BELLOWING_ROAR        = 22686,
     SPELL_VEIL_OF_SHADOW        = 22687, // old spell id 7068 -> wrong
@@ -98,8 +98,6 @@ struct boss_nefarianAI : ScriptedAI
     bool m_bWarriorStance;
 
     std::vector<ClassCallInfo> m_vPossibleCalls;
-    std::list<ObjectGuid> MagePlayerGUID;
-    uint32 m_uiMageTriggerTimer;
 
     void Reset() override
     {
@@ -114,9 +112,7 @@ struct boss_nefarianAI : ScriptedAI
         m_bWarriorStance        = false;
         m_uiTransitionStage     = 0;
         m_uiTransitionTimer     = 100;
-        m_uiMageTriggerTimer    = 0;
 
-        MagePlayerGUID.clear();
         m_vPossibleCalls.clear();
 
         m_vPossibleCalls.emplace_back(CLASS_WARRIOR,  SAY_WARRIOR);
@@ -182,18 +178,6 @@ struct boss_nefarianAI : ScriptedAI
         }
     }
 
-    /*
-    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell)
-    {
-        if (!pTarget)
-            return;
-
-        if (pSpell->Id == SPELL_BELLOWING_ROAR)
-            if (SpellAuraHolder* holder = pTarget->GetSpellAuraHolder(SPELL_BELLOWING_ROAR))
-                holder->SetTargetSecondaryThreatFocus(true);
-    }
-    */
-
     bool HandleClassCall(uint8 ClassCalled)
     {
         if (!ClassCalled)
@@ -204,13 +188,12 @@ struct boss_nefarianAI : ScriptedAI
             return false;
 
         bool bClassFound = false;
-        // Clear mage GUIDs or we'll be adding the same players again for subsequent
-        // mage class calls, resulting in far more polymorphs than intended
-        MagePlayerGUID.clear();
         for (const auto& itr : players)
         {
             Player* pPlayer = itr.getSource();
-            if (pPlayer && pPlayer->IsAlive())
+            if (pPlayer &&
+                pPlayer->IsAlive() &&
+                !pPlayer->IsGameMaster())
             {
                 if (pPlayer->GetClass() == ClassCalled)
                 {
@@ -234,17 +217,7 @@ struct boss_nefarianAI : ScriptedAI
                         }
                         case CLASS_ROGUE:
                         {
-                            WorldLocation loc;
-                            float dang = frand(0, M_PI_F * 2);
-                            float dsin = sin(dang);
-                            float dcos = cos(dang);
-                            m_creature->GetPosition(loc);
-                            loc.x += 5.0f * dcos;
-                            loc.y += 5.0f * dsin;
-                            loc.z += 0.5f;
-                            loc.o = dang - M_PI_F;
-                            pPlayer->TeleportTo(loc);
-                            pPlayer->AddAura(SPELL_ROGUE);
+                            pPlayer->CastSpell(pPlayer, SPELL_ROGUE, true);
                             break;
                         }
                         case CLASS_PRIEST:
@@ -259,23 +232,12 @@ struct boss_nefarianAI : ScriptedAI
                         }
                         case CLASS_MAGE:
                         {
-                            pPlayer->AddAura(SPELL_MAGE);
-                            MagePlayerGUID.push_back(pPlayer->GetObjectGuid());
+                            pPlayer->CastSpell(pPlayer, SPELL_MAGE, true);
                             break;
                         }
                         case CLASS_WARLOCK:
                         {
                             pPlayer->CastSpell(pPlayer, SPELL_WARLOCK, true);
-                            m_creature->SummonCreature(NPC_CORRUPTED_INFERNAL,
-                                pPlayer->GetPositionX(),
-                                pPlayer->GetPositionY(),
-                                pPlayer->GetPositionZ(),
-                                pPlayer->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-                            m_creature->SummonCreature(NPC_CORRUPTED_INFERNAL,
-                                pPlayer->GetPositionX(),
-                                pPlayer->GetPositionY(),
-                                pPlayer->GetPositionZ(),
-                                pPlayer->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                             break;
                         }
                         case CLASS_DRUID:
@@ -305,12 +267,9 @@ struct boss_nefarianAI : ScriptedAI
                         m_creature->SetInCombatWithZone();
                         m_creature->SetFly(true);
 
-                        m_creature->CastSpell(m_creature, SPELL_SHADOWFLAME_INITIAL, true); // Test speed 17 / fire damage on the initial ??? Oo
-
                         DoScriptText(SAY_AGGRO, m_creature);
 
                         m_creature->GetMotionMaster()->MovePoint(1, -7449.145f, -1320.647f, 476.795f);
-                        //m_creature->MonsterMove(-7449.145f, -1320.647f, 476.795f);
                         m_creature->MonsterMoveWithSpeed(-7449.145f, -1320.647f, 476.795f, -10.0f, 17, uint32(MOVE_FORCE_DESTINATION));
                         m_uiTransitionTimer = 0;
                         break;
@@ -325,10 +284,9 @@ struct boss_nefarianAI : ScriptedAI
                         m_creature->RemoveAurasDueToSpell(SPELL_HOVER);
                         if (Unit* pTarget = m_creature->GetVictim())
                         {
-                            //m_creature->AI()->AttackStart(pTarget);
-                            //m_creature->GetMotionMaster()->Clear(false);
                             m_creature->GetMotionMaster()->MoveChase(pTarget);
                             SetCombatMovement(true);
+                            m_creature->CastSpell(pTarget, SPELL_SHADOWFLAME_PASSIV, true);
                         }
                         m_bTransitionDone = true;
                         break;
@@ -408,46 +366,6 @@ struct boss_nefarianAI : ScriptedAI
         }
         else
             m_uiClassCallTimer -= uiDiff;
-
-        if (!MagePlayerGUID.empty())
-        {
-            if (m_uiMageTriggerTimer < uiDiff)
-            {
-                for (const auto& guid : MagePlayerGUID)
-                {
-                    if (Player* pMage = m_creature->GetMap()->GetPlayer(guid))
-                    {
-                        if (pMage->HasAura(SPELL_MAGE))
-                        {
-                            std::vector<ObjectGuid> m_vPossibleVictim;
-                            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                            for (const auto itr2 : tList)
-                            {
-                                if (Creature* pCreature = itr2->getTarget()->ToCreature())
-                                {
-                                    if (!pCreature->IsTotem() && pCreature->GetDistance(pMage) < 60.0f && !pCreature->HasAura(SPELL_POLYMORPH))
-                                        m_vPossibleVictim.push_back(pCreature->GetObjectGuid());
-                                }
-                            }
-
-                            if (m_vPossibleVictim.empty())
-                                continue;
-
-                            if (Unit *pTarget = m_creature->GetMap()->GetUnit(m_vPossibleVictim[urand(0, m_vPossibleVictim.size() - 1)]))
-                            {
-                                pMage->InterruptNonMeleeSpells(false);
-                                pMage->CastSpell(pTarget, SPELL_POLYMORPH, false); //cast polymorph
-                                if (pTarget != pMage)
-                                    pTarget->CastSpell(pTarget, SPELL_POLYMORPH, true); //cast polymorph
-                            }
-                        }
-                    }
-                }
-                m_uiMageTriggerTimer = 5000;
-            }
-            else
-                m_uiMageTriggerTimer -= uiDiff;
-        }
 
         // Phase3 begins when we are below X health
         if (!m_bPhase3 && m_creature->GetHealthPercent() < 20.0f)
@@ -662,6 +580,159 @@ SpellScript* GetScript_NefarianCorruptedTotems(SpellEntry const*)
     return new NefarianCorruptedTotemsScript();
 }
 
+// 22992 - Shadow Flame
+// When Nefarian lands at the start of Phase 2 of his encounter he will use an AoE Shadowflame.
+// This spell does about 1000 initial shadow damage, but applies a deadly DoT if an Onyxia Scale Cloak is not equipped.
+// Players can avoid getting hit by hiding behind Nefarians throne.
+struct NefarianShadowFlamePassiveScript : SpellScript
+{
+    static constexpr uint32 SPELL_SHADOWFLAME_TRIGGER = 22986;
+
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit && spell->GetUnitTarget())
+            spell->m_casterUnit->CastSpell(spell->GetUnitTarget(), SPELL_SHADOWFLAME_TRIGGER, true);
+        return true;
+    }
+};
+
+SpellScript* GetScript_NefarianShadowFlamePassive(SpellEntry const*)
+{
+    return new NefarianShadowFlamePassiveScript();
+}
+
+// 23427 - Nefarian Class Call Warlock
+// Each Warlock will summon 2 hostile Corrupted Infernals.
+// They will stun and do damage to the Warlocks and anyone near them.
+struct NefarianClassCallWarlockScript : SpellScript
+{
+    static constexpr uint32 SPELL_SUMMON_INFERNALS = 23426;
+
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx != EFFECT_INDEX_0)
+            return true;
+
+        Unit* target = spell->GetUnitTarget();
+        if (!target)
+            return true;
+
+        // Each Warlock summons 2 Corrupted Infernals
+        target->CastSpell(target, SPELL_SUMMON_INFERNALS, true);
+        target->CastSpell(target, SPELL_SUMMON_INFERNALS, true);
+        return true;
+    }
+};
+
+SpellScript* GetScript_NefarianClassCallWarlock(SpellEntry const*)
+{
+    return new NefarianClassCallWarlockScript();
+}
+
+// 23414 - Nefarian Class Call Rogue
+// Paralyze and teleport player to random position near Nefarian
+struct NefarianClassCallRogueScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx != EFFECT_INDEX_0)
+            return true;
+
+        Unit* caster = spell->m_casterUnit;
+        Unit* target = spell->GetUnitTarget();
+        if (!caster || !target)
+            return true;
+
+        // Teleport player to a random position near caster (Nefarian)
+        // Use GetFirstCollisionPosition to avoid teleporting into walls/obstacles
+        if (Player* player = target->ToPlayer())
+        {
+            // Get a random angle around Nefarian
+            float angle = frand(0, M_PI_F * 2);
+            Position pos;
+            caster->GetFirstCollisionPosition(pos, 5.0f, angle);
+            WorldLocation loc;
+            loc.x = pos.x;
+            loc.y = pos.y;
+            loc.z = pos.z;
+            loc.o = angle - M_PI_F;
+            loc.mapId = caster->GetMapId();
+            player->TeleportTo(loc);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_NefarianClassCallRogue(SpellEntry const*)
+{
+    return new NefarianClassCallRogueScript();
+}
+
+// 23410 - Nefarian Class Call Mage - Wild Magic
+// Randomly cast Wild Polymorph on raid members, polymorphing them
+struct NefarianClassCallMageAuraScript : public AuraScript
+{
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+        if (apply && aura->GetEffIndex() == EFFECT_INDEX_0)
+        {
+            aura->SetPeriodicTimer(5 * IN_MILLISECONDS);
+        }
+    }
+
+    void OnPeriodicTickEnd(Aura* aura) final
+    {
+        Unit* mage = aura->GetTarget();
+        if (!mage || !mage->IsPlayer())
+            return;
+
+        Player* pMage = mage->ToPlayer();
+        if (!pMage->IsAlive() ||
+            pMage->HasAura(SPELL_POLYMORPH))
+            return;
+
+        Map* pMap = pMage->GetMap();
+        if (!pMap)
+            return;
+
+        // Use GetMap()->GetPlayers() instead of group to prevent exploit where mage
+        // could leave group to avoid casting polymorph on members
+        Map::PlayerList const& players = pMap->GetPlayers();
+        if (players.isEmpty())
+            return;
+
+        std::vector<Player*> possibleTargets;
+        for (const auto& itr : players)
+        {
+            Player* pPlayer = itr.getSource();
+            if (!pPlayer ||
+                !pPlayer->IsAlive() ||
+                !pPlayer->IsInWorld() ||
+                // pPlayer == pMage || // Skip self
+                pPlayer->HasAura(SPELL_POLYMORPH) ||
+                !pMage->IsWithinDist(pPlayer, 60.0f))
+                continue;
+
+            possibleTargets.push_back(pPlayer);
+        }
+
+        if (possibleTargets.empty())
+            return;
+
+        Player* polymorphTarget = possibleTargets[urand(0, possibleTargets.size() - 1)];
+        if (polymorphTarget)
+        {
+            pMage->InterruptNonMeleeSpells(false);
+            pMage->CastSpell(polymorphTarget, SPELL_POLYMORPH, false);
+        }
+    }
+};
+
+AuraScript* GetScript_NefarianClassCallMage(SpellEntry const*)
+{
+    return new NefarianClassCallMageAuraScript();
+}
+
 void AddSC_boss_nefarian()
 {
     Script* pNewScript;
@@ -679,5 +750,25 @@ void AddSC_boss_nefarian()
     pNewScript = new Script;
     pNewScript->Name = "spell_nefarian_corrupted_totems";
     pNewScript->GetSpellScript = &GetScript_NefarianCorruptedTotems;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_nefarian_shadow_flame_passive";
+    pNewScript->GetSpellScript = &GetScript_NefarianShadowFlamePassive;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_nefarian_class_call_warlock";
+    pNewScript->GetSpellScript = &GetScript_NefarianClassCallWarlock;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_nefarian_class_call_rogue";
+    pNewScript->GetSpellScript = &GetScript_NefarianClassCallRogue;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_nefarian_class_call_mage";
+    pNewScript->GetAuraScript = &GetScript_NefarianClassCallMage;
     pNewScript->RegisterSelf();
 }

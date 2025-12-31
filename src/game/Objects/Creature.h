@@ -566,6 +566,7 @@ class Creature : public Unit
         }
 
         bool HasWeapon() const;
+        bool CanBeDisarmed() const final;
 
         void SetCallForHelpDist(float dist)
         {

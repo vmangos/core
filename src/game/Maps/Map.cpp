@@ -110,7 +110,7 @@ ElevatorTransport* Map::GetElevatorTransport(ObjectGuid guid)
 
 void Map::LoadMapAndVMap(int gx, int gy)
 {
-    if (m_bLoadedGrids[gx][gx])
+    if (m_bLoadedGrids[gx][gy])
         return;
 
     GridMap * pInfo = m_terrainData->Load(gx, gy);
@@ -155,6 +155,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_persistentState->SetUsedByMapState(this);
     m_weatherSystem = new WeatherSystem(this);
 
+    sTransportMgr.SpawnTransportsOnMap(this);
     LoadElevatorTransports();
 }
 
@@ -476,7 +477,7 @@ Map::Add(T* obj)
     obj->SetMap(this);
 
     Cell cell(p);
-    if (obj->isActiveObject() && !IsUnloading())
+    if (obj->IsActiveObject() && !IsUnloading())
         EnsureGridLoadedAtEnter(cell);
     else
         EnsureGridCreated(GridPair(cell.GridX(), cell.GridY()));
@@ -487,7 +488,7 @@ Map::Add(T* obj)
     AddToGrid(obj, grid, cell);
     obj->AddToWorld();
 
-    if (obj->isActiveObject() && !IsUnloading())
+    if (obj->IsActiveObject() && !IsUnloading())
         AddToActive(obj);
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "%s enters grid[%u,%u]", obj->GetObjectGuid().GetString().c_str(), cell.GridX(), cell.GridY());
@@ -1334,7 +1335,7 @@ Map::Remove(T* obj, bool remove)
     m_mCreatureSummonCount.erase(obj->GetGUID());
     m_mCreatureSummonLimit.erase(obj->GetGUID());
 
-    if (obj->isActiveObject())
+    if (obj->IsActiveObject())
         RemoveFromActive(obj);
 
     if (remove)
@@ -1360,7 +1361,7 @@ Map::Remove(T* obj, bool remove)
 template<>
 void Map::Remove(GenericTransport* obj, bool remove)
 {
-    if (obj->isActiveObject())
+    if (obj->IsActiveObject())
         RemoveFromActive(obj);
     if (remove)
         obj->CleanupsBeforeDelete();
@@ -1518,7 +1519,7 @@ bool Map::CreatureCellRelocation(Creature* c, Cell const& new_cell)
     Cell const& old_cell = c->GetCurrentCell();
     if (old_cell.DiffGrid(new_cell))
     {
-        if ((!c->isActiveObject() || IsUnloading()) && !loaded(new_cell.gridPair()))
+        if ((!c->IsActiveObject() || IsUnloading()) && !loaded(new_cell.gridPair()))
         {
             DEBUG_FILTER_LOG(LOG_FILTER_CREATURE_MOVES, "Creature (GUID: %u Entry: %u) attempt move from grid[%u,%u]cell[%u,%u] to unloaded grid[%u,%u]cell[%u,%u].", c->GetGUIDLow(), c->GetEntry(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
             return false;

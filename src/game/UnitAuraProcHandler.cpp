@@ -1623,7 +1623,16 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 a
             {
                 if (Spell* spell = GetCurrentSpell(CURRENT_GENERIC_SPELL))
                 {
-                    spell->AddTriggeredSpell(trigger_spell_id);
+                    if (Unit* pTarget = spell->m_targets.getUnitTarget())
+                    {
+                        m_Events.AddLambdaEventAtOffset([me = this, targetGuid = pTarget->GetObjectGuid(), trigger_spell_id]()
+                        {
+                            if (!me->IsInWorld() || !me->IsAlive())
+                                return;
+                            if (Unit* pTarget = me->GetMap()->GetUnit(targetGuid))
+                                me->CastSpell(pTarget, trigger_spell_id, true);
+                        }, BATCHING_INTERVAL);
+                    }
                     return SPELL_AURA_PROC_OK;
                 }
                 return SPELL_AURA_PROC_FAILED;

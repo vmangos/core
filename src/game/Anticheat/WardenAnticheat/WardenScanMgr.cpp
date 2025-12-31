@@ -34,6 +34,8 @@
 #include <algorithm>
 #include <random>
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+
 INSTANTIATE_SINGLETON_1(WardenScanMgr);
 
 namespace
@@ -348,3 +350,5 @@ std::vector<std::shared_ptr<Scan const>> WardenScanMgr::GetRandomScans(ScanFlags
 
     return std::move(matches);
 }
+
+#endif

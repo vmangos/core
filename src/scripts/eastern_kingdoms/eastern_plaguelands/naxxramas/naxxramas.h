@@ -302,6 +302,9 @@ static constexpr float eyeStalkPossitions[max_stalks][4] =
     { 2813.34f, -3780.97f, 275.08f, 1.84f },
 };
 
+static const float aSapphPositions[4] = {3522.56f, -5236.76f, 137.626f, 4.4855f}; // Taken from DB
+static const uint32 SPAWN_ANIM_TIMER = 22000;
+
 class instance_naxxramas : public ScriptedInstance
 {
 public:

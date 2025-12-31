@@ -493,7 +493,7 @@ uint32 SpellEntry::GetCastTime(SpellCaster const* caster, Spell* spell) const
 
             if (!(Attributes & (SPELL_ATTR_IS_ABILITY | SPELL_ATTR_IS_TRADESKILL)))
             {
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
                 castTime = int32(castTime * pUnit->GetFloatValue(UNIT_MOD_CAST_SPEED));
 #else
                 castTime = int32(castTime * (1.0f + pUnit->GetInt32Value(UNIT_MOD_CAST_SPEED) / 100.0f));

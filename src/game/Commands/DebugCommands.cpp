@@ -364,7 +364,7 @@ bool ChatHandler::HandleDebugSendOpenBagCommand(char *args)
         return false;
     }
 
-    pTarget->SendOpenContainer();
+    pTarget->SendOpenContainer(pTarget->GetObjectGuid());
     return true;
 }
 

@@ -5109,7 +5109,7 @@ bool ChatHandler::HandleQuestRemoveCommand(char* args)
     player->SetQuestStatus(entry, QUEST_STATUS_NONE);
 
     // reset rewarded for restart repeatable quest
-    player->getQuestStatusMap()[entry].m_rewarded = false;
+    player->GetQuestStatusMap()[entry].m_rewarded = false;
 
     SendSysMessage(LANG_COMMAND_QUEST_REMOVED);
     return true;
@@ -5290,7 +5290,7 @@ bool ChatHandler::HandlePetUnlearnSpellCommand(char* args)
     if (!ExtractOptInt32(&args, spellId, 1))
         return false;
 
-    if (pet->unlearnSpell(spellId, false, true))
+    if (pet->UnlearnSpell(spellId, false, true))
         PSendSysMessage("Removed spell %u from pet %s.", spellId, pet->GetName());
     else
         PSendSysMessage("Failed to remove spell %u from pet %s.", spellId, pet->GetName());
@@ -5391,7 +5391,7 @@ bool ChatHandler::HandlePetLoyaltyCommand(char* args)
     if (!pet)
         return false;
 
-    if (pet->getPetType() != HUNTER_PET)
+    if (pet->GetPetType() != HUNTER_PET)
         return false;
 
     int32 loyaltyPoints;
@@ -5411,7 +5411,7 @@ bool ChatHandler::HandlePetInfoCommand(char* args)
 
     PSendSysMessage("Info for %s", pPet->GetObjectGuid().GetString().c_str());
     PSendSysMessage("Owner: %s", pPet->GetOwnerGuid().GetString().c_str());
-    PSendSysMessage("Pet type: %u", pPet->getPetType());
+    PSendSysMessage("Pet type: %u", pPet->GetPetType());
     PSendSysMessage("Loyalty level: %hhu", pPet->GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_PET_LOYALTY));
     PSendSysMessage("Pet number: %u", pPet->GetUInt32Value(UNIT_FIELD_PETNUMBER));
     PSendSysMessage("Pet name timestamp: %u", pPet->GetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP));

@@ -647,11 +647,25 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
     // remove affects from attacker at any non-DoT damage (including 0 damage)
     if (damagetype != DOT)
     {
-        RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-        RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
+        // World of Warcraft Client Patch 1.6.0 (2005-07-12)
+        // - Damage caused by environmental effects will now cancel stealth (e.g. swimming in lava).
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_5_1
+        if (damagetype != SELF_DAMAGE)
+#endif
+            RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+        
+        // feign death does not break from environmental damage, tested on classic
+        if (damagetype != SELF_DAMAGE)
+            RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
         if (pVictim->IsPlayer() && !pVictim->IsMounted() && !pVictim->IsStandingUp())
-            static_cast<Player*>(pVictim)->ScheduleStandUp();
+        {
+            // if it's environmental damage there are no procs so we cant schedule standup
+            if (damagetype != SELF_DAMAGE && sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
+                static_cast<Player*>(pVictim)->ScheduleStandUp();
+            else
+                static_cast<Player*>(pVictim)->SetStandState(UNIT_STAND_STATE_STAND);
+        }
     }
 
     auto ShouldEnterCombat = [&]()
@@ -723,7 +737,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
     uint32 health = pVictim->GetHealth();
     // duel ends when player has 1 or less hp
     bool duel_hasEnded = false;
-    if (pVictim->IsPlayer() && ((Player*)pVictim)->m_duel && damage >= (health - 1))
+    if (pVictim->IsPlayer() && ((Player*)pVictim)->m_duel && (damage + 1) >= health)
     {
         // prevent kill only if killed in duel and killed by opponent or opponent controlled creature
         if (((Player*)pVictim)->m_duel->opponent == this ||
@@ -734,7 +748,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             || pVictim == this && reflected
 #endif
             )
-            damage = health - 1;
+            damage = health ? health - 1 : 0;
 
         duel_hasEnded = true;
     }
@@ -810,12 +824,12 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             pVictim->ModifyHealth(-(int32)dmg);
         }
 
-        if (damagetype != DOT)
+        if (damagetype != DOT && damagetype != SELF_DAMAGE)
         {
             if (!GetVictim() && IsPlayer())
             {
                 // if not have main target then attack state with target (including AI call)
-                //start melee attacks only after melee hit
+                // start melee attacks only after melee hit
                 Attack(pVictim, (damagetype == DIRECT_DAMAGE));
             }
 
@@ -865,16 +879,16 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
         else
             pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_DAMAGE_CANCELS, spellProto ? spellProto->Id : 0, true, SKIP_STEALTH);
 
-        if (damagetype != NODAMAGE && damage && pVictim->IsPlayer())
+        if (damagetype != NODAMAGE && damagetype != DOT && damage)
         {
-            if (damagetype != DOT)
+            if (pVictim->IsPlayer())
             {
                 for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
                 {
                     // skip channeled spell (processed differently below)
                     if (i == CURRENT_CHANNELED_SPELL)
                         continue;
-
+    
                     if (Spell* spell = pVictim->GetCurrentSpell(CurrentSpellTypes(i)))
                     {
                         if (spell->getState() == SPELL_STATE_PREPARING)
@@ -886,28 +900,28 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                         }
                     }
                 }
+            }
 
-                if (Spell* spell = pVictim->m_currentSpells[CURRENT_CHANNELED_SPELL])
+            if (Spell* spell = pVictim->m_currentSpells[CURRENT_CHANNELED_SPELL])
+            {
+                if (spell->getState() == SPELL_STATE_CASTING)
                 {
-                    if (spell->getState() == SPELL_STATE_CASTING)
+                    if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION))
                     {
-                        if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION))
-                        {
-                            if (pVictim != this)                //don't shorten the duration of channeling if you damage yourself
-                                spell->DelayedChannel();
-                        }
-                        else if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS))
-                        {
-                            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Spell %u canceled at damage!", spell->m_spellInfo->Id);
-                            pVictim->InterruptSpell(CURRENT_CHANNELED_SPELL);
-                        }
+                        if (pVictim != this && pVictim->IsPlayer())                //don't shorten the duration of channeling if you damage yourself
+                            spell->DelayedChannel();
                     }
-                    else if (spell->getState() == SPELL_STATE_DELAYED)
-                        // break channeled spell in delayed state on damage
+                    else if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS))
                     {
                         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Spell %u canceled at damage!", spell->m_spellInfo->Id);
                         pVictim->InterruptSpell(CURRENT_CHANNELED_SPELL);
                     }
+                }
+                else if (spell->getState() == SPELL_STATE_DELAYED && pVictim->IsPlayer())
+                    // break channeled spell in delayed state on damage
+                {
+                    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Spell %u canceled at damage!", spell->m_spellInfo->Id);
+                    pVictim->InterruptSpell(CURRENT_CHANNELED_SPELL);
                 }
             }
         }
@@ -1598,6 +1612,8 @@ void Unit::DealMeleeDamage(CalcDamageInfo const* damageInfo, bool durabilityLoss
             else if (offtime > percent60)
             {
                 offtime -= 2.0f * percent20;
+                if (offtime < 0.0f)
+                    offtime = 0.0f;
                 pVictim->SetAttackTimer(OFF_ATTACK, uint32(offtime));
             }
         }
@@ -1610,6 +1626,8 @@ void Unit::DealMeleeDamage(CalcDamageInfo const* damageInfo, bool durabilityLoss
             else if (basetime > percent60)
             {
                 basetime -= 2.0f * percent20;
+                if (basetime < 0.0f)
+                    basetime = 0.0f;
                 pVictim->SetAttackTimer(BASE_ATTACK, uint32(basetime));
             }
         }
@@ -4620,9 +4638,9 @@ void Unit::SetPowerType(Powers new_powertype)
     }
     else if (Pet* pPet = ToPet())
     {
-        if (pPet->isControlled())
+        if (pPet->IsControlled())
         {
-            Player* pOwner = ::ToPlayer(GetOwner());
+            Player* pOwner = GetOwnerPlayer();
             if (pOwner && pOwner->GetGroup())
                 pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_POWER_TYPE);
         }
@@ -4997,12 +5015,9 @@ Creature* Unit::GetOwnerCreature() const
 
 Player* Unit::GetOwnerPlayer() const
 {
-    if (!IsInWorld())
-        return nullptr;
-
-    if (ObjectGuid ownerid = GetOwnerGuid())
-        if (ownerid.IsPlayer())
-            return GetMap()->GetPlayer(ownerid);
+    ObjectGuid guid = GetOwnerGuid();
+    if (guid.IsPlayer())
+        return ObjectAccessor::FindPlayer(guid);
 
     return nullptr;
 }
@@ -5136,6 +5151,8 @@ void Unit::SetPet(Pet* pet)
     SetPetGuid(pet ? pet->GetObjectGuid() : ObjectGuid());
     if (pet)
         pet->SetWorldMask(GetWorldMask());
+    if (IsPlayer())
+        ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_CONTROLLING_PET, pet != nullptr);
 }
 
 void Unit::SetCharm(Unit* pet)
@@ -5360,7 +5377,7 @@ bool Unit::UnsummonOldPetBeforeNewSummon(uint32 newPetEntry, bool canUnsummon)
         else if (IsPlayer())
         {
             if (newPetEntry)
-                OldSummon->Unsummon(OldSummon->getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT, this);
+                OldSummon->Unsummon(OldSummon->GetPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT, this);
             else
                 return false;
         }
@@ -5726,19 +5743,22 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
             }
         }
 
-        uint32 mask = 1 << (mechanic - 1);
-        AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MECHANIC_IMMUNITY_MASK);
-        for (const auto& iter : immuneAuraApply)
+        if (mechanic != MECHANIC_NONE)
         {
-            if (iter->GetModifier()->m_miscvalue & mask)
+            uint32 mask = 1 << (mechanic - 1);
+            AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MECHANIC_IMMUNITY_MASK);
+            for (const auto& iter : immuneAuraApply)
             {
-                SpellEntry const* pImmunitySpell = iter->GetSpellProto();
+                if (iter->GetModifier()->m_miscvalue & mask)
+                {
+                    SpellEntry const* pImmunitySpell = iter->GetSpellProto();
 
-                if ((pImmunitySpell && pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveSpell())
-                    return true;
+                    if ((pImmunitySpell && pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveSpell())
+                        return true;
 
-                if (pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
-                    return true;
+                    if (pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
+                        return true;
+                }
             }
         }
     }
@@ -5801,18 +5821,21 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
             }
         }
 
-        AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MECHANIC_IMMUNITY_MASK);
-        for (const auto& iter : immuneAuraApply)
+        if (mechanic != MECHANIC_NONE)
         {
-            if (iter->GetModifier()->m_miscvalue & (1 << (mechanic - 1)))
+            AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MECHANIC_IMMUNITY_MASK);
+            for (const auto& iter : immuneAuraApply)
             {
-                SpellEntry const* pImmunitySpell = iter->GetSpellProto();
+                if (iter->GetModifier()->m_miscvalue & (1 << (mechanic - 1)))
+                {
+                    SpellEntry const* pImmunitySpell = iter->GetSpellProto();
 
-                if ((pImmunitySpell && pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveEffect(index))
-                    return true;
+                    if ((pImmunitySpell && pImmunitySpell->IsPositiveSpell()) != spellInfo->IsPositiveEffect(index))
+                        return true;
 
-                if (pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
-                    return true;
+                    if (pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
+                        return true;
+                }
             }
         }
     }
@@ -6199,7 +6222,8 @@ void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/
 
     if (!touchOnly)
     {
-        SetInCombatWith(pAggressor);
+        // in classic out of combat player hit by aoe from creature gets put in combat for 5 seconds
+        SetInCombatState(UsesPvPCombatTimer() ? UNIT_PVP_COMBAT_TIMER : 0, pAggressor);
         if (Creature* pCreature = ToCreature())
             pCreature->UpdateLeashExtensionTime();
 
@@ -8273,9 +8297,9 @@ void Unit::SetHealth(uint32 val)
     }
     else if (Pet* pPet = ToPet())
     {
-        if (pPet->isControlled())
+        if (pPet->IsControlled())
         {
-            Player* pOwner = ::ToPlayer(GetOwner());
+            Player* pOwner = GetOwnerPlayer();
             if (pOwner && pOwner->GetGroup())
                 pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_HP);
         }
@@ -8296,9 +8320,9 @@ void Unit::SetMaxHealth(uint32 val)
     }
     else if (Pet* pPet = ToPet())
     {
-        if (pPet->isControlled())
+        if (pPet->IsControlled())
         {
-            Player* pOwner = ::ToPlayer(GetOwner());
+            Player* pOwner = GetOwnerPlayer();
             if (pOwner && pOwner->GetGroup())
                 pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MAX_HP);
         }
@@ -8341,15 +8365,15 @@ void Unit::SetPower(Powers power, uint32 val)
     }
     else if (Pet* pPet = ToPet())
     {
-        if (pPet->isControlled())
+        if (pPet->IsControlled())
         {
-            Player* pOwner = ::ToPlayer(GetOwner());
+            Player* pOwner = GetOwnerPlayer();
             if (pOwner && pOwner->GetGroup())
                 pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_POWER);
         }
 
         // Update the pet's character sheet with happiness damage bonus
-        if (pPet->getPetType() == HUNTER_PET && power == POWER_HAPPINESS)
+        if (pPet->GetPetType() == HUNTER_PET && power == POWER_HAPPINESS)
             pPet->UpdateDamagePhysical(BASE_ATTACK);
     }
 }
@@ -8367,9 +8391,9 @@ void Unit::SetMaxPower(Powers power, uint32 val)
     }
     else if (Pet* pPet = ToPet())
     {
-        if (pPet->isControlled())
+        if (pPet->IsControlled())
         {
-            Player* pOwner = ::ToPlayer(GetOwner());
+            Player* pOwner = GetOwnerPlayer();
             if (pOwner && pOwner->GetGroup())
                 pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MAX_POWER);
         }
@@ -8391,9 +8415,9 @@ void Unit::ApplyPowerMod(Powers power, uint32 val, bool apply)
     }
     else if (Pet* pPet = ToPet())
     {
-        if (pPet->isControlled())
+        if (pPet->IsControlled())
         {
-            Player* pOwner = ::ToPlayer(GetOwner());
+            Player* pOwner = GetOwnerPlayer();
             if (pOwner && pOwner->GetGroup())
                 pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_POWER);
         }
@@ -8412,9 +8436,9 @@ void Unit::ApplyMaxPowerMod(Powers power, uint32 val, bool apply)
     }
     else if (Pet* pPet = ToPet())
     {
-        if (pPet->isControlled())
+        if (pPet->IsControlled())
         {
-            Player* pOwner = ::ToPlayer(GetOwner());
+            Player* pOwner = GetOwnerPlayer();
             if (pOwner && pOwner->GetGroup())
                 pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MAX_POWER);
         }
@@ -8432,11 +8456,11 @@ uint32 Unit::GetCreatePowers(Powers power) const
         case POWER_RAGE:
             return 1000;
         case POWER_FOCUS:
-            return (IsPlayer() || !IsPet() || ((Pet const*)this)->getPetType() != HUNTER_PET ? 0 : 100);
+            return (IsPlayer() || !IsPet() || ((Pet const*)this)->GetPetType() != HUNTER_PET ? 0 : 100);
         case POWER_ENERGY:
             return 100;
         case POWER_HAPPINESS:
-            return (IsPlayer() || !IsPet() || ((Pet const*)this)->getPetType() != HUNTER_PET ? 0 : 1050000);
+            return (IsPlayer() || !IsPet() || ((Pet const*)this)->GetPetType() != HUNTER_PET ? 0 : 1050000);
     }
 
     return 0;
@@ -8903,7 +8927,7 @@ void Unit::HandlePetCommand(CommandStates command, Unit* pTarget)
                     pCharmedCreature->AI()->AttackStart(pTarget);
 
                     //10% chance to play special pet attack talk, else growl
-                    if (pCharmedCreature->IsPet() && ((Pet*)this)->getPetType() == SUMMON_PET && this != pTarget && urand(0, 100) < 10)
+                    if (pCharmedCreature->IsPet() && ((Pet*)this)->GetPetType() == SUMMON_PET && this != pTarget && urand(0, 100) < 10)
                         SendPetTalk((uint32)PET_TALK_ATTACK);
                     else
                     {
@@ -8934,7 +8958,7 @@ void Unit::HandlePetCommand(CommandStates command, Unit* pTarget)
             if (Pet* pPet = ToPet())
             {
                 // Hunter pets are dismissed with a spell with a cast time
-                if (pPet->getPetType() != HUNTER_PET)
+                if (pPet->GetPetType() != HUNTER_PET)
                     // dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
                     pPet->Unsummon(PET_SAVE_NOT_IN_SLOT);
             }
@@ -9188,7 +9212,7 @@ Player* Unit::GetSpellModOwner() const
     {
         if (pCreature->IsPet() || pCreature->IsTotem())
         {
-            if (Player* pOwner = ::ToPlayer(GetOwner()))
+            if (Player* pOwner = GetOwnerPlayer())
                 return pOwner;
         }
     }
@@ -9214,7 +9238,7 @@ void Unit::SendPetCastFail(uint32 spellid, SpellCastResult msg)
 
 void Unit::SendPetActionFeedback(uint8 msg)
 {
-    if (Player* pOwner = ::ToPlayer(GetOwner()))
+    if (Player* pOwner = GetOwnerPlayer())
     {
         WorldPacket data(SMSG_PET_ACTION_FEEDBACK, 1);
         data << uint8(msg);
@@ -9225,7 +9249,7 @@ void Unit::SendPetActionFeedback(uint8 msg)
 void Unit::SendPetTalk(uint32 pettalk)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    if (Player* pOwner = ::ToPlayer(GetOwner()))
+    if (Player* pOwner = GetOwnerPlayer())
     {
         WorldPacket data(SMSG_PET_ACTION_SOUND, 8 + 4);
         data << GetObjectGuid();
@@ -9237,7 +9261,7 @@ void Unit::SendPetTalk(uint32 pettalk)
 
 void Unit::SendPetAIReaction()
 {
-    if (Player* pOwner = ::ToPlayer(GetOwner()))
+    if (Player* pOwner = GetOwnerPlayer())
     {
         WorldPacket data(SMSG_AI_REACTION, 8 + 4);
         data << GetObjectGuid();
@@ -9508,8 +9532,8 @@ void Unit::SetDisplayId(uint32 displayId)
     UpdateModelData();
 
     if (Pet* pPet = ToPet())
-        if (pPet->isControlled())
-            if (Player* pOwner = ::ToPlayer(GetOwner()))
+        if (pPet->IsControlled())
+            if (Player* pOwner = GetOwnerPlayer())
                 if (pOwner->GetGroup())
                     pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MODEL_ID);
 }
@@ -9889,16 +9913,36 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
     }
 }
 
-void Unit::ApplyCastTimePercentMod(float val, bool apply)
+void Unit::UpdateCastSpeed()
 {
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-    if (val > 0)
-        SetFloatValue(UNIT_MOD_CAST_SPEED, GetFloatValue(UNIT_MOD_CAST_SPEED) * (apply ? 100.0f / (100.0f + val) : (100.0f + val) / 100.0f));
-    else
-        SetFloatValue(UNIT_MOD_CAST_SPEED, GetFloatValue(UNIT_MOD_CAST_SPEED) * (apply ? (100.0f - val) / 100.0f : 100.0f / (100.0f - val)));
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+    float total = 1.0f;
 #else
-    int32 intval = round(val);
-    SetInt32Value(UNIT_MOD_CAST_SPEED, (GetInt32Value(UNIT_MOD_CAST_SPEED) + (apply ? -intval : intval)));
+    int32 total = 0;
+#endif
+
+    AuraList const& auras = GetAurasByType(SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK);
+    for (auto const& aura : auras)
+    {
+        if (!aura->IsApplied())
+            continue;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+        float val = aura->GetModifier()->m_amount;
+        if (val > 0)
+            total *= 100.0f / (100.0f + val);
+        else
+            total *= (100.0f - val) / 100.0f;
+#else
+        int32 intval = round(aura->GetModifier()->m_amount);
+        total -= intval;
+#endif
+    }
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+    SetFloatValue(UNIT_MOD_CAST_SPEED, total);
+#else
+    SetInt32Value(UNIT_MOD_CAST_SPEED, total);
 #endif
 }
 
@@ -9914,9 +9958,9 @@ void Unit::UpdateAuraForGroup(uint8 slot)
     }
     else if (Pet* pPet = ToPet())
     {
-        if (pPet->isControlled())
+        if (pPet->IsControlled())
         {
-            if (Player* pOwner = ::ToPlayer(GetOwner()))
+            if (Player* pOwner = GetOwnerPlayer())
             {
                 if (pOwner->GetGroup())
                 {
@@ -10915,7 +10959,7 @@ void Unit::SendSpellGo(Unit* target, uint32 spellId) const
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendPlaySpellVisual(uint32 id) const
+void Unit::SendPlaySpellVisualKit(uint32 id) const
 {
     WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
     data << uint64(GetGUID());
@@ -11152,7 +11196,7 @@ void Unit::RestoreMovement()
 
 void Unit::SetTransformScale(float scale)
 {
-    if (!scale)
+    if (!scale || !m_nativeScaleOverride)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to set transform scale to 0!");
         return;

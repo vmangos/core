@@ -545,6 +545,175 @@ SpellScript* GetScript_TanarisFieldSampling(SpellEntry const*)
     return new TanarisFieldSamplingScript();
 }
 
+// 26374 - Elune's Candle
+struct ElunesCandleScript : public SpellScript
+{
+    void OnCast(Spell* spell) const final
+    {
+        static uint32 const OmenSpells[] = { 26622, 26623, 26624, 26625, 26649 };
+
+        uint32 spellId = 26636;
+
+        Unit* target = spell->m_targets.getUnitTarget();
+
+        if (target && target->ToUnit())
+        {
+            if (target->GetEntry() == 15467)
+                spellId = OmenSpells[urand(0, 4)];
+
+            if (target->GetEntry() == 15466)
+                spellId = 26624;
+        }
+
+        spell->m_caster->CastSpell(target, spellId, true);
+    }
+};
+
+SpellScript* GetScript_ElunesCandle(SpellEntry const*)
+{
+    return new ElunesCandleScript();
+}
+
+enum
+{
+    SPELL_RECENTLY_BANDAGED = 11196,
+};
+
+// 746, 1159, 3267, 3268, 7926, 7927, 10838, 10839, 18608, 18610, 20803, 23567, 23568, 23569, 23696, 24412, 24413, 24414, 30020 - First Aid
+struct FirstAidScript : public SpellScript
+{
+    void OnAfterHit(Spell* spell) const final
+    {
+        if (spell->GetUnitTarget())
+            spell->m_caster->CastSpell(spell->GetUnitTarget(), SPELL_RECENTLY_BANDAGED, true, spell->m_CastItem);
+    }
+};
+
+SpellScript* GetScript_FirstAid(SpellEntry const*)
+{
+    return new FirstAidScript();
+}
+
+enum
+{
+    SPELL_WOLFSHEAD_HELM_ENERGY = 29940,
+};
+
+// 17770 - Wolfshead Helm Energy
+struct WolfsheadHelmScript : public SpellScript
+{
+    void OnSuccessfulFinish(Spell* spell) const final
+    {
+        if (spell->m_casterUnit)
+            spell->m_casterUnit->CastSpell(spell->m_casterUnit, SPELL_WOLFSHEAD_HELM_ENERGY, true);
+    }
+};
+
+SpellScript* GetScript_WolfsheadHelm(SpellEntry const*)
+{
+    return new WolfsheadHelmScript();
+}
+
+enum
+{
+    SPELL_KODO_KOMBOBULATOR_QEUST_CREDIT = 18172,
+};
+
+// 18153 - Kodo Kombobulator
+struct KodoKombobulatorScript : public SpellScript
+{
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        if (spell->m_casterUnit && spell->m_casterUnit->HasAura(SPELL_KODO_KOMBOBULATOR_QEUST_CREDIT))
+            return SPELL_FAILED_ITEM_NOT_READY;
+
+        return SPELL_CAST_OK;
+    }
+};
+
+SpellScript* GetScript_KodoKombobulator(SpellEntry const*)
+{
+    return new KodoKombobulatorScript();
+}
+
+enum
+{
+    NPC_DEEPRUN_RAT = 13016,
+};
+
+// 21050 - Melodious Rapture (Rat Catcher's Flute)
+struct MelodiusRaptureScript : public SpellScript
+{
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        if (!spell->m_targets.getUnitTarget() || spell->m_targets.getUnitTarget()->GetEntry() != NPC_DEEPRUN_RAT)
+            return SPELL_FAILED_BAD_TARGETS;
+
+        return SPELL_CAST_OK;
+    }
+};
+
+SpellScript* GetScript_MelodiusRapture(SpellEntry const*)
+{
+    return new MelodiusRaptureScript();
+}
+
+// 16072 - Purify and Place Food (Filled Cleansing Bowl)
+struct PurifyAndPlaceFoodScript : public SpellScript
+{
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        // Quest The Blackwood Corrupted - Don't allow cast if event already started.
+        if (spell->m_spellInfo->Id == 16072 && spell->m_caster->GetMap()->GetScriptedMapEvent(3938))
+            return SPELL_FAILED_NOT_READY;
+
+        return SPELL_CAST_OK;
+    }
+};
+
+SpellScript* GetScript_PurifyAndPlaceFood(SpellEntry const*)
+{
+    return new PurifyAndPlaceFoodScript();
+}
+
+// 26656 - Summon Black Qiraji Battle Tank (Black Qiraji Resonating Crystal)
+struct SummonBlackQirajiBattleTankScript : public SpellScript
+{
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        if (spell->m_casterUnit->IsMounted())
+        {
+            spell->m_casterUnit->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+            return SPELL_FAILED_DONT_REPORT;
+        }
+
+        if (spell->m_casterUnit->IsInWater() && (!spell->m_casterUnit->IsPlayer() || static_cast<Player*>(spell->m_casterUnit)->IsInHighLiquid()))
+            return SPELL_FAILED_ONLY_ABOVEWATER;
+
+        if (Player* pPlayer = spell->m_casterUnit->ToPlayer())
+        {
+            if (pPlayer->GetTransport())
+                return SPELL_FAILED_NO_MOUNTS_ALLOWED;
+
+            if (spell->m_casterUnit->GetMapId() != MAP_AHN_QIRAJ_TEMPLE && !sMapStorage.LookupEntry<MapEntry>(spell->m_casterUnit->GetMapId())->IsMountAllowed() && !spell->IsTriggered())
+                return SPELL_FAILED_NO_MOUNTS_ALLOWED;
+        }
+
+        if (spell->m_casterUnit->GetAreaId() == 35)
+            return SPELL_FAILED_NO_MOUNTS_ALLOWED;
+
+        if (spell->m_casterUnit->IsInDisallowedMountForm())
+            return SPELL_FAILED_NOT_SHAPESHIFT;
+
+        return SPELL_CAST_OK;
+    }
+};
+
+SpellScript* GetScript_SummonBlackQirajiBattleTank(SpellEntry const*)
+{
+    return new SummonBlackQirajiBattleTankScript();
+}
+
 void AddSC_item_spell_scripts()
 {
     Script* newscript;
@@ -657,5 +826,40 @@ void AddSC_item_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_tanaris_field_sampling";
     newscript->GetSpellScript = &GetScript_TanarisFieldSampling;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_elunes_candle";
+    newscript->GetSpellScript = &GetScript_ElunesCandle;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_first_aid";
+    newscript->GetSpellScript = &GetScript_FirstAid;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_wolfshead_helm";
+    newscript->GetSpellScript = &GetScript_WolfsheadHelm;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_kodo_kombobulator";
+    newscript->GetSpellScript = &GetScript_KodoKombobulator;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_melodius_rapture";
+    newscript->GetSpellScript = &GetScript_MelodiusRapture;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_purify_and_place_food";
+    newscript->GetSpellScript = &GetScript_PurifyAndPlaceFood;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_summon_black_qiraji_battle_tank";
+    newscript->GetSpellScript = &GetScript_SummonBlackQirajiBattleTank;
     newscript->RegisterSelf();
 }

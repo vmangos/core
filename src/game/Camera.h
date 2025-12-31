@@ -74,7 +74,7 @@ class Camera
 
     public:
         GridReference<Camera>& GetGridRef() { return m_gridRef; }
-        bool isActiveObject() const { return false; }
+        bool IsActiveObject() const { return false; }
     private:
         GridReference<Camera> m_gridRef;
 };

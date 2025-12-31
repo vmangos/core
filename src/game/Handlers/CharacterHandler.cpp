@@ -248,7 +248,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (!Player::ValidateAppearance(race_, class_, gender, hairStyle, hairColor, face, facialHair, skin, true))
+    if (!Player::ValidateAppearance(race_, gender, hairStyle, hairColor, face, facialHair, skin))
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);

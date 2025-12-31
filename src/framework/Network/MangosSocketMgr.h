@@ -41,7 +41,7 @@ class MangosSocketMgr
         int StartThreadsIfNeeded();
 
         MangosSocketMgr();
-        ~MangosSocketMgr();
+        virtual ~MangosSocketMgr() noexcept;
 
         ReactorRunnable<SocketType>* m_netThreads;
         size_t m_netThreadsCount;

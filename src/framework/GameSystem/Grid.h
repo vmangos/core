@@ -103,7 +103,7 @@ class Grid
         template<class SPECIFIC_OBJECT>
         bool AddGridObject(SPECIFIC_OBJECT *obj)
         {
-            if (obj->isActiveObject())
+            if (obj->IsActiveObject())
                 m_activeGridObjects.insert(obj);
 
             return i_container.template insert<SPECIFIC_OBJECT>(obj);
@@ -114,7 +114,7 @@ class Grid
         template<class SPECIFIC_OBJECT>
         bool RemoveGridObject(SPECIFIC_OBJECT *obj)
         {
-            if (obj->isActiveObject())
+            if (obj->IsActiveObject())
                 m_activeGridObjects.erase(obj);
 
             return i_container.template remove<SPECIFIC_OBJECT>(obj);

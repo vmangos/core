@@ -203,13 +203,13 @@ void ChaseMovementGenerator<T>::_setTargetLocation(T &owner)
         m_bReachable = true;
 
     m_bRecalculateTravel = false;
-    if (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && !transport && owner.HasDistanceCasterMovement())
-        if (path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
-        {
-            if (!owner.movespline->Finalized())
-                owner.StopMoving();
-            return;
-        }
+    if (!transport && owner.HasDistanceCasterMovement() && 
+        path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
+    {
+        if (!owner.movespline->Finalized())
+            owner.StopMoving();
+        return;
+    }
 
     // Prevent redundant moves
     if ((path.Length() < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
@@ -650,13 +650,6 @@ void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
         m_bReachable = true;
 
     m_bRecalculateTravel = false;
-    if (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && !transport && owner.HasDistanceCasterMovement())
-        if (path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
-        {
-            if (!owner.movespline->Finalized())
-                owner.StopMoving();
-            return;
-        }
 
     // Prevent redundant moves
     // He is flying too high for me. Moving a few meters wont change anything.

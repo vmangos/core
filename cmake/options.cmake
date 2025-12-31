@@ -1,6 +1,6 @@
 
 # Generic boolean options
-option(USE_STD_MALLOC                 "Use standard malloc instead of TBB"                                                            OFF)
+option(USE_STD_MALLOC                 "Use standard malloc instead of TBB"                                                            ON)
 option(BUILD_FOR_HOST_CPU             "Build specifically for the host CPU via `-march=native` (might not run on different machines)" ON)
 option(TBB_DEBUG                      "Use TBB debug libraries"                                                                       OFF)
 option(USE_SCRIPTS                    "Build scripts"                                                                                 ON)

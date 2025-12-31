@@ -560,7 +560,7 @@ void WorldSession::SendStablePet(ObjectGuid guid)
     uint8 num = 0;                                          // counter for place holder
 
     // not let move dead pet in slot
-    if (pet && pet->IsAlive() && pet->getPetType() == HUNTER_PET)
+    if (pet && pet->IsAlive() && pet->GetPetType() == HUNTER_PET)
     {
         data << uint32(pet->GetCharmInfo()->GetPetNumber());
         data << uint32(pet->GetEntry());
@@ -655,7 +655,7 @@ void WorldSession::HandleStablePet(WorldPacket& recv_data)
     Pet* pet = _player->GetPet();
 
     // can't place in stable dead pet
-    if (!pet || !pet->IsAlive() || pet->getPetType() != HUNTER_PET)
+    if (!pet || !pet->IsAlive() || pet->GetPetType() != HUNTER_PET)
     {
         SendStableResult(STABLE_ERR_STABLE);
         return;
@@ -787,7 +787,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recv_data)
 
     Pet* pet = _player->GetPet();
 
-    if (!pet || !pet->IsAlive() || pet->getPetType() != HUNTER_PET)
+    if (!pet || !pet->IsAlive() || pet->GetPetType() != HUNTER_PET)
     {
         SendStableResult(STABLE_ERR_STABLE);
         return;

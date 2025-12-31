@@ -20,10 +20,6 @@ cmake_minimum_required(VERSION 3.1...3.20)
 
 project(MaNGOS)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 # Allow -DACE_ROOT, -DTBB_ROOT, etc.
 if(${CMAKE_VERSION} VERSION_GREATER "3.11")
   cmake_policy(SET CMP0074 NEW)
@@ -31,7 +27,6 @@ endif()
 
 include(cmake/common.cmake)
 include(cmake/options.cmake)
-
 include(cmake/platform/detect_platform.cmake)
 
 # Force out-of-source build
@@ -100,6 +95,24 @@ if(NOT ACE_FOUND)
     "This project requires ACE installed. Please download the ACE Micro Release Kit from http://download.dre.vanderbilt.edu/ and install it. If this script didn't find ACE and it was correctly installed please set ACE_ROOT to the correct path."
   )
 endif()
+
+set(ACE_VERSION_FILE "${ACE_INCLUDE_DIR}/ace/Version.h")
+file(READ "${ACE_VERSION_FILE}" ACE_VERSION_CONTENTS)
+string(REGEX MATCH "ACE_MAJOR_VERSION[ \t]+([0-9]+)" _ "${ACE_VERSION_CONTENTS}")
+set(ACE_MAJOR_VERSION "${CMAKE_MATCH_1}")
+message(STATUS "Found ACE version: ${ACE_MAJOR_VERSION}")
+
+if (ACE_MAJOR_VERSION GREATER 7)
+    set(CMAKE_CXX_STANDARD 17)
+    message(WARNING
+      "Installed ACE version requires higher C++ standard. Switching to C++17. Be aware that this project targets C++14 if you intend to contribute."
+      )
+else()
+    set(CMAKE_CXX_STANDARD 14)
+endif()
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(NOT USE_STD_MALLOC)
   unset(TBB_INCLUDE_DIRS            CACHE)

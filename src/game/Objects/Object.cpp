@@ -601,20 +601,20 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
     if (updatetype == UPDATETYPE_CREATE_OBJECT)
 #endif
     {
-        if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
+        if (IsType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {
             if (((GameObject*)this)->ActivateToQuest(target) || target->IsGameMaster())
                 IsActivateToQuest = true;
 
             updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
         }
-        else if (isType(TYPEMASK_UNIT) && target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
+        else if (IsType(TYPEMASK_UNIT) && target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
         {
             // Force include dynamic flags to make special info visible.
             updateMask->SetBit(UNIT_DYNAMIC_FLAGS);
         }
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
-        else if (isType(TYPEMASK_ITEM))
+        else if (IsType(TYPEMASK_ITEM))
         {
             // Force include flags field in create object packet,
             // because the static flags need to be sent in that field.
@@ -624,7 +624,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
     }
     else                                                    // case UPDATETYPE_VALUES
     {
-        if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
+        if (IsType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {
             if (((GameObject*)this)->ActivateToQuest(target) || target->IsGameMaster())
                 IsActivateToQuest = true;
@@ -635,7 +635,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
 #endif
         }
     }
-    if (isType(TYPEMASK_GAMEOBJECT))
+    if (IsType(TYPEMASK_GAMEOBJECT))
     {
         target->m_visibleGobjsQuestAct_lock.acquire();
         target->m_visibleGobjQuestActivated[GetObjectGuid()] = IsActivateToQuest;
@@ -648,7 +648,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
     data->append(updateMask->GetMask(), updateMask->GetLength());
 
     // 2 specialized loops for speed optimization in non-unit case
-    if (isType(TYPEMASK_UNIT))                              // unit (creature/player) case
+    if (IsType(TYPEMASK_UNIT))                              // unit (creature/player) case
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
         {
@@ -843,7 +843,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                     }
                     *data << m_uint32Values[index];
                 }
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
                 else if (index == UNIT_MOD_CAST_SPEED)
                 {
                     if (m_floatValues[index] < 0.001f)
@@ -860,7 +860,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
-    else if (isType(TYPEMASK_GAMEOBJECT))                   // gameobject case
+    else if (IsType(TYPEMASK_GAMEOBJECT))                   // gameobject case
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
         {
@@ -894,7 +894,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
-    else if (isType(TYPEMASK_CORPSE))
+    else if (IsType(TYPEMASK_CORPSE))
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
         {
@@ -921,7 +921,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
         }
     }
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
-    else if (isType(TYPEMASK_ITEM))
+    else if (IsType(TYPEMASK_ITEM))
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
         {
@@ -1431,7 +1431,7 @@ bool WorldObject::IsWithinLootXPDist(WorldObject const* objToLoot) const
     if (objToLoot->IsCreature() && (static_cast<Creature const*>(objToLoot)->GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS))
         lootDistance += 150.0f;
 
-    return _IsWithinDist(objToLoot, lootDistance, false);
+    return IsWithinDist(objToLoot, lootDistance, false);
 }
 
 float WorldObject::GetVisibilityModifier() const
@@ -1643,7 +1643,7 @@ bool WorldObject::IsInMap(WorldObject const* obj) const
     return IsInWorld() && obj->IsInWorld() && (FindMap() == obj->FindMap());
 }
 
-bool WorldObject::_IsWithinDist(WorldObject const* obj, float const dist2compare, bool const is3D, SizeFactor distcalc) const
+bool WorldObject::IsWithinDist(WorldObject const* obj, float const dist2compare, bool const is3D, SizeFactor distcalc) const
 {
     ASSERT(obj);
     float const dx = GetPositionX() - obj->GetPositionX();
@@ -2245,7 +2245,7 @@ void WorldObject::SendObjectDeSpawnAnim() const
     SendObjectMessageToSet(&data, true);
 }
 
-bool WorldObject::isWithinVisibilityDistanceOf(Unit const* viewer, WorldObject const* viewPoint, bool inVisibleList) const
+bool WorldObject::IsWithinVisibilityDistanceOf(Unit const* viewer, WorldObject const* viewPoint, bool inVisibleList) const
 {
     if (viewer->IsTaxiFlying())
     {
@@ -2821,7 +2821,7 @@ struct WorldObjectChangeAccumulator
     {
         // send self fields changes in another way, otherwise
         // with new camera system when player's camera too far from player, camera wouldn't receive packets and changes from player
-        if (i_object.isType(TYPEMASK_PLAYER))
+        if (i_object.IsType(TYPEMASK_PLAYER))
             i_object.BuildUpdateDataForPlayer((Player*)&i_object, i_updateDatas);
     }
 
@@ -2921,7 +2921,7 @@ void WorldObject::DestroyForNearbyPlayers()
         if (!plr->IsInVisibleList_Unsafe(this))
             continue;
 
-        if (isType(TYPEMASK_UNIT) && ((Unit*)this)->GetCharmerGuid() == plr->GetObjectGuid()) // TODO: this is for puppet
+        if (IsType(TYPEMASK_UNIT) && ((Unit*)this)->GetCharmerGuid() == plr->GetObjectGuid()) // TODO: this is for puppet
             continue;
 
         DestroyForPlayer(plr);
@@ -3032,6 +3032,15 @@ GameObject* WorldObject::FindRandomGameObject(uint32 entry, float range) const
     return *tcIter;
 }
 
+GameObject* WorldObject::FindNearbyClosedDoor(float range) const
+{
+    GameObject* door = nullptr;
+    MaNGOS::AnyClosedDoorInRangeCheck go_check(this, range);
+    MaNGOS::GameObjectSearcher<MaNGOS::AnyClosedDoorInRangeCheck> checker(door, go_check);
+    Cell::VisitGridObjects(this, checker, range);
+    return door;
+}
+
 Player* WorldObject::FindNearestPlayer(float range) const
 {
     Player* target = nullptr;
@@ -3131,6 +3140,12 @@ uint32 WorldObject::RespawnNearCreaturesByEntry(uint32 entry, float range)
 
 void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z) const
 {
+    GetRelativePositions(fForwardBackward, fLeftRight, x, y);
+    z = GetPositionZ() + fUpDown;
+}
+
+void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float &x, float &y) const
+{
     float orientation = GetOrientation() + M_PI / 2.0f;
 
     float x_coef = cos(orientation);
@@ -3141,7 +3156,6 @@ void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight,
 
     x = GetPositionX() + x_coef * fLeftRight + x_range_add;
     y = GetPositionY() + y_coef * fLeftRight + y_range_add;
-    z = GetPositionZ() + fUpDown;
 }
 
 void WorldObject::GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o) const
@@ -3219,7 +3233,7 @@ bool WorldObject::IsLikePlayer() const
         return true;
 
     if (Pet const* pPet = ToPet())
-        return pPet->isControlled() && pPet->GetOwnerGuid().IsPlayer();
+        return pPet->IsControlled() && pPet->GetOwnerGuid().IsPlayer();
 
     return false;
 }
@@ -3451,11 +3465,6 @@ void WorldObject::LoadMapCellsAround(float dist) const
     ASSERT(IsInWorld());
     NULLNotifier notifier = NULLNotifier();
     Cell::VisitAllObjects(this, notifier, dist, false);
-}
-
-bool WorldObject::isVisibleFor(Player const* u, WorldObject const* viewPoint) const
-{
-    return IsVisibleForInState(u, viewPoint, false);
 }
 
 FactionTemplateEntry const* WorldObject::GetFactionTemplateEntry() const

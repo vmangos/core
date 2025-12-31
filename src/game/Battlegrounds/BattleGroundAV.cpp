@@ -128,12 +128,15 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
     for (int i = 0; i < BG_AV_NB_ASSAULTS; ++i)
         m_challengeMinReputationNeeded[i] = REP_NEUTRAL; /** Real value REP_REVERED */
 
+    // World of Warcraft Client Patch 1.6.0 (2005-07-12)
+    // The minimum reputation needed to send a cavalry charge has been 
+    // reduced to Honored.
+    m_challengeMinReputationNeeded[BG_AV_CAVALRY_ASSAULT]               = sWorld.GetWowPatch() < WOW_PATCH_106 ? REP_REVERED : REP_HONORED;
+    m_challengeMinReputationNeeded[BG_AV_GROUND_ASSAULT]                = REP_HONORED;
     m_challengeMinReputationNeeded[BG_AV_WORLDBOSS_ASSAULT]             = REP_NEUTRAL;
-    m_challengeMinReputationNeeded[BG_AV_CAVALRY_ASSAULT]               = REP_HONORED;
     m_challengeMinReputationNeeded[BG_AV_AIR_ASSAULT_BEACON_SOLDIER]    = REP_REVERED;
     m_challengeMinReputationNeeded[BG_AV_AIR_ASSAULT_BEACON_LIEUTENANT] = REP_REVERED;
     m_challengeMinReputationNeeded[BG_AV_AIR_ASSAULT_BEACON_COMMANDER]  = REP_REVERED;
-    m_challengeMinReputationNeeded[BG_AV_GROUND_ASSAULT]                = REP_HONORED;
 
     /** Some challenge can be repeated, timers handling this functionality */
     m_challengeTimerStart[BG_AV_AIR_ASSAULT_BEACON_SOLDIER]   =   1800000; /** Real value 1800000 */

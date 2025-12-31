@@ -85,7 +85,6 @@ source_group("Dynamic"
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${TBB_INCLUDE_DIRS}
   ${ACE_INCLUDE_DIR}
   ${CMAKE_SOURCE_DIR}/src/shared
 )
@@ -96,6 +95,11 @@ add_library(framework STATIC
 
 SET_TARGET_PROPERTIES (framework PROPERTIES FOLDER "Game Libs")
 
-target_link_libraries(framework
-  ${TBB_LIBRARIES}
-)
+if(NOT USE_STD_MALLOC)
+  include_directories(
+    ${TBB_INCLUDE_DIRS}
+  )
+  target_link_libraries(framework
+    ${TBB_LIBRARIES}
+  )
+endif()

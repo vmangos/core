@@ -358,7 +358,7 @@ bool Creature::InitEntry(uint32 entry, GameEventCreatureData const* eventData /*
     // Load creature equipment
     LoadDefaultEquipment(eventData);
 
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 #else
     SetInt32Value(UNIT_MOD_CAST_SPEED, 0);
@@ -1683,7 +1683,7 @@ void Creature::SetInitCreaturePowerType()
 {
     Pet* pPet = ToPet();
 
-    if (pPet && pPet->getPetType() == HUNTER_PET)
+    if (pPet && pPet->GetPetType() == HUNTER_PET)
         return;
 
     if (GetClassLevelStats()->mana > 0)
@@ -2554,7 +2554,7 @@ bool Creature::CanRespondToCallForHelpAgainst(Unit const* pEnemy) const
         return false;
 
     // prevent player from being stuck in combat with creature out of visibility radius
-    if (pEnemy->IsCharmerOrOwnerPlayerOrPlayerItself() && !isWithinVisibilityDistanceOf(pEnemy, pEnemy) && !GetMap()->IsDungeon())
+    if (pEnemy->IsCharmerOrOwnerPlayerOrPlayerItself() && !IsWithinVisibilityDistanceOf(pEnemy, pEnemy) && !GetMap()->IsDungeon())
         return false;
 
     return true;
@@ -3520,6 +3520,7 @@ void Creature::GetHomePosition(float &x, float &y, float &z, float &o)
     }
     GetRespawnCoord(x, y, z, &o);
 }
+
 void Creature::SetHomePosition(float x, float y, float z, float o)
 {
     m_homePosition.x = x;
@@ -4183,8 +4184,13 @@ void Creature::LeaveCreatureGroup()
 
 bool Creature::HasWeapon() const
 {
-    uint8 itemClass = GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (0 * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
-    return itemClass == ITEM_CLASS_WEAPON;
+    return GetVirtualItemClass(BASE_ATTACK) == ITEM_CLASS_WEAPON;
+}
+
+bool Creature::CanBeDisarmed() const
+{
+    return CanUseEquippedWeapon(BASE_ATTACK) &&
+           GetVirtualItemClass(BASE_ATTACK) == ITEM_CLASS_WEAPON;
 }
 
 void Creature::StartCooldownForSummoner()

@@ -58,13 +58,38 @@ SpellScript* GetScript_WarlockDemonicSacrifice(SpellEntry const*)
 // 17962, 18930, 18931, 18932 - Conflagrate
 struct WarlockConflagrateScript : SpellScript
 {
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        if (!spell->m_targets.getUnitTarget())
+            return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+
+        // for caster applied auras only
+        bool found = false;
+        Unit::AuraList const& auras = spell->m_targets.getUnitTarget()->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+        for (const auto periodicDamageAura : auras)
+        {
+            // Immolate
+            if (periodicDamageAura->GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMMOLATE>() &&
+                periodicDamageAura->GetCasterGuid() == spell->m_caster->GetObjectGuid())
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            return SPELL_FAILED_TARGET_AURASTATE;
+
+        return SPELL_CAST_OK;
+    }
+
     bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
         {
             // for caster applied auras only
-            Unit::AuraList const& mPeriodic = spell->GetUnitTarget()->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-            for (const auto i : mPeriodic)
+            Unit::AuraList const& auras = spell->GetUnitTarget()->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+            for (const auto i : auras)
             {
                 // Immolate
                 if (i->GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMMOLATE>() &&
@@ -87,6 +112,23 @@ SpellScript* GetScript_WarlockConflagrate(SpellEntry const*)
 // 1454, 1455, 1456, 11687, 11688, 11689 - Life Tap
 struct WarlockLifeTapScript : SpellScript
 {
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        float cost = spell->m_currentBasePoints[EFFECT_INDEX_0];
+
+        if (Player* modOwner = spell->m_casterUnit->GetSpellModOwner())
+            modOwner->ApplySpellMod(spell->m_spellInfo->Id, SPELLMOD_COST, cost, spell);
+
+        float dmg = spell->m_casterUnit->SpellDamageBonusDone(spell->m_casterUnit, spell->m_spellInfo, EFFECT_INDEX_0, uint32(cost > 0 ? cost : 0), SPELL_DIRECT_DAMAGE);
+        dmg = spell->m_casterUnit->SpellDamageBonusTaken(spell->m_casterUnit, spell->m_spellInfo, EFFECT_INDEX_0, dmg, SPELL_DIRECT_DAMAGE);
+
+        // use cail as dithering might round up later.
+        if (int32(spell->m_casterUnit->GetHealth()) <= std::ceil(dmg))
+            return SPELL_FAILED_FIZZLE;
+
+        return SPELL_CAST_OK;
+    }
+
     bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->m_casterUnit)
@@ -325,6 +367,44 @@ SpellScript* GetScript_WarlockCreateHealthstone(SpellEntry const*)
     return new WarlockCreateHealthstoneScript();
 }
 
+// 698 - Ritual of Summoning
+struct WarlockRitualOfSummoningScript : public SpellScript
+{
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        Player* caster = spell->m_caster->ToPlayer();
+        if (!caster)
+            return SPELL_FAILED_BAD_TARGETS;
+
+        if (!caster->GetSelectionGuid())
+            return SPELL_FAILED_BAD_TARGETS;
+
+        Player* target = sObjectMgr.GetPlayer(caster->GetSelectionGuid());
+        if (!target || caster == target || !target->IsInSameRaidWith(caster))
+            return SPELL_FAILED_BAD_TARGETS;
+
+        if (target->IsInCombat())
+            return SPELL_FAILED_TARGET_IN_COMBAT;
+
+        // check if our map is dungeon
+        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(caster->GetMapId());
+        if (mapEntry && mapEntry->IsDungeon())
+        {
+            if (caster->GetMap() != target->GetMap())
+                return SPELL_FAILED_TARGET_NOT_IN_INSTANCE;
+        }
+        else if (caster->InBattleGround())
+            return SPELL_FAILED_NOT_HERE;
+
+        return SPELL_CAST_OK;
+    }
+};
+
+SpellScript* GetScript_WarlockRitualOfSummoning(SpellEntry const*)
+{
+    return new WarlockRitualOfSummoningScript();
+}
+
 void AddSC_warlock_spell_scripts()
 {
     Script* newscript;
@@ -362,5 +442,10 @@ void AddSC_warlock_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_warlock_create_healthstone";
     newscript->GetSpellScript = &GetScript_WarlockCreateHealthstone;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warlock_ritual_of_summoning";
+    newscript->GetSpellScript = &GetScript_WarlockRitualOfSummoning;
     newscript->RegisterSelf();
 }

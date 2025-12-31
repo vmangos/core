@@ -1827,10 +1827,6 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Starting ZoneScripts");
     sZoneScriptMgr.InitZoneScripts();
 
-    //Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Transports...");
-    sTransportMgr.SpawnContinentTransports();
-
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Deleting expired bans...");
     LoginDatabase.Execute("DELETE FROM `ip_banned` WHERE `unbandate`<=UNIX_TIMESTAMP() AND `unbandate`<>`bandate`");
 

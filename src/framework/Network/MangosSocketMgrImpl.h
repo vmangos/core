@@ -238,7 +238,7 @@ MangosSocketMgr<SocketType>::MangosSocketMgr():
 }
 
 template <typename SocketType>
-MangosSocketMgr<SocketType>::~MangosSocketMgr()
+MangosSocketMgr<SocketType>::~MangosSocketMgr() noexcept
 {
     Wait();
 

@@ -714,6 +714,22 @@ namespace MaNGOS
             GameObjectEntryInPosRangeCheck(GameObjectEntryInPosRangeCheck const&);
     };
 
+    class AnyClosedDoorInRangeCheck
+    {
+        public:
+            AnyClosedDoorInRangeCheck(WorldObject const* pObject, float fMaxRange) : m_pObject(pObject), m_fRange(fMaxRange) {}
+            bool operator() (GameObject* pGo)
+            {
+                return pGo->GetGoType() == GAMEOBJECT_TYPE_DOOR &&
+                       pGo->GetGoState() == GO_STATE_READY &&
+                       m_pObject->IsWithinDist(pGo, m_fRange);
+            }
+
+        private:
+            const WorldObject* m_pObject;
+            float m_fRange;
+    };
+
     // Unit checks
 
     class MostHPMissingInRangeCheck
@@ -781,6 +797,23 @@ namespace MaNGOS
                 if (!i_funit->CanSeeInWorld(u))
                     return false;
                 return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u);
+            }
+        private:
+            WorldObject const* i_obj;
+            Unit const* i_funit;
+            float i_range;
+    };
+
+    class AnyHostileUnitInObjectRangeCheck
+    {
+        public:
+            AnyHostileUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range) : i_obj(obj), i_funit(funit), i_range(range) {}
+            WorldObject const& GetFocusObject() const { return *i_obj; }
+            bool operator()(Unit* u)
+            {
+                if (!i_funit->CanSeeInWorld(u))
+                    return false;
+                return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsHostileTo(u);
             }
         private:
             WorldObject const* i_obj;

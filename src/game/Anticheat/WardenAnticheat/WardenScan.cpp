@@ -34,6 +34,8 @@
 #include <algorithm>
 #include <functional>
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+
 ScanFlags operator|(ScanFlags lhs, ScanFlags rhs)
 {
     return static_cast<ScanFlags> (
@@ -523,3 +525,5 @@ WindowsTimeScan::WindowsTimeScan(CheckT checker, std::string const& comment, Sca
 {
     MANGOS_ASSERT(!!checker);
 }
+
+#endif

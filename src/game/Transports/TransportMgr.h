@@ -83,7 +83,7 @@ typedef std::vector<KeyFrame>  KeyFrameVec;
 
 struct TransportTemplate
 {
-    TransportTemplate() : inInstance(false), pathTime(0), accelTime(0.0f), accelDist(0.0f), entry(0) { }
+    TransportTemplate() : inInstance(false), pathTime(0), accelTime(0.0f), accelDist(0.0f), entry(0), spawned(false) { }
     ~TransportTemplate();
 
     std::set<uint32> mapsUsed;
@@ -93,6 +93,7 @@ struct TransportTemplate
     float accelTime;
     float accelDist;
     uint32 entry;
+    bool spawned;
 };
 
 typedef std::multimap<uint32 /*mapId*/, uint32 /*guidLow*/> ElevatorTransportMap;
@@ -116,8 +117,8 @@ public:
     TransportTemplate* GetTransportTemplate(uint32 entry);
 
     void LoadTransportTemplates();
-    void SpawnContinentTransports();
-    ShipTransport* CreateTransport(uint32 entry, Map* map = nullptr);
+    void SpawnTransportsOnMap(Map* map);
+    ShipTransport* CreateTransport(uint32 entry, Map* map);
 
     // elevator transports
     ElevatorTransportMapBounds GetElevatorTransportsForMap(uint32 mapId) const

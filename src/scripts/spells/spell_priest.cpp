@@ -81,6 +81,54 @@ SpellScript* GetScript_PriestPowerWordShield(SpellEntry const*)
     return new PriestPowerWordShieldScript();
 }
 
+// 15237, 15430, 15431, 27799, 27800, 27801 - Holy Nova
+struct PriestHolyNovaScript : public SpellScript
+{
+    void OnSuccessfulFinish(Spell* spell) const final
+    {
+        if (!spell->m_casterUnit)
+            return;
+
+        uint32 spellId;
+        switch (spell->m_spellInfo->Id)
+        {
+            case 15237:
+                spellId = 23455;
+                break;// Holy Nova, rank 1
+            case 15430:
+                spellId = 23458;
+                break;// Holy Nova, rank 2
+            case 15431:
+                spellId = 23459;
+                break;// Holy Nova, rank 3
+            case 27799:
+                spellId = 27803;
+                break;// Holy Nova, rank 4
+            case 27800:
+                spellId = 27804;
+                break;// Holy Nova, rank 5
+            case 27801:
+                spellId = 27805;
+                break;// Holy Nova, rank 6
+            default:
+                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Holy Nova spell script assigned to unhandled spell id %u.", spell->m_spellInfo->Id);
+                return;
+        }
+
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+        if (!spellInfo)
+            return;
+
+        Spell* newSpell = new Spell(spell->m_casterUnit, spellInfo, true, spell->GetOriginalCasterGuid());
+        newSpell->prepare(spell->m_targets); // use original spell targets
+    }
+};
+
+SpellScript* GetScript_PriestHolyNova(SpellEntry const*)
+{
+    return new PriestHolyNovaScript();
+}
+
 void AddSC_priest_spell_scripts()
 {
     Script* newscript;
@@ -93,5 +141,10 @@ void AddSC_priest_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_priest_power_word_shield";
     newscript->GetSpellScript = &GetScript_PriestPowerWordShield;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_priest_holy_nova";
+    newscript->GetSpellScript = &GetScript_PriestHolyNova;
     newscript->RegisterSelf();
 }

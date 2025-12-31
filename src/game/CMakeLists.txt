@@ -522,11 +522,16 @@ include_directories(
   ${CMAKE_BINARY_DIR}
   ${CMAKE_BINARY_DIR}/src/shared
   ${MYSQL_INCLUDE_DIR}
-  ${TBB_INCLUDE_DIRS}
   ${ACE_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
   ${ZLIB_INCLUDE_DIRS}
 )
+
+if(NOT USE_STD_MALLOC)
+  include_directories(
+    ${TBB_INCLUDE_DIRS}
+  )
+endif()
 
 if(WIN32)
   include_directories(
