@@ -15976,7 +15976,7 @@ void Player::_LoadBoundInstances(std::unique_ptr<QueryResult> result)
 
 InstancePlayerBind* Player::GetBoundInstance(uint32 mapId)
 {
-    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_boundInstancesMutex);
     BoundInstancesMap::iterator itr = m_boundInstances.find(mapId);
     if (itr != m_boundInstances.end())
         return &itr->second;
@@ -15986,7 +15986,7 @@ InstancePlayerBind* Player::GetBoundInstance(uint32 mapId)
 
 void Player::UnbindInstance(uint32 mapId, bool unload)
 {
-    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_boundInstancesMutex);
     BoundInstancesMap::iterator itr = m_boundInstances.find(mapId);
     UnbindInstance(itr, unload);
 }
@@ -16008,7 +16008,7 @@ InstancePlayerBind* Player::BindToInstance(DungeonPersistentState* state, bool p
     if (state)
     {
         ASSERT(state->GetMapId() > 1);
-        std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_boundInstancesMutex);
         InstancePlayerBind& bind = m_boundInstances[state->GetMapId()];
 
         if (bind.state)
@@ -16076,7 +16076,7 @@ void Player::SendRaidInfo() const
     size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
 
-    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_boundInstancesMutex);
     for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)
@@ -16107,7 +16107,7 @@ void Player::SendSavedInstances() const
     bool hasBeenSaved = false;
     WorldPacket data;
 
-    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_boundInstancesMutex);
     for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)                               // only permanent binds are sent
@@ -16157,7 +16157,7 @@ void Player::ConvertInstancesToGroup(Player* player, Group* group, ObjectGuid pl
 
     if (player)
     {
-        std::lock_guard<std::mutex> guard(player->m_boundInstancesMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(player->m_boundInstancesMutex);
         for (BoundInstancesMap::iterator itr = player->m_boundInstances.begin(); itr != player->m_boundInstances.end();)
         {
             has_binds = true;
@@ -17200,7 +17200,7 @@ void Player::SendResetFailedNotify()
 void Player::ResetInstances(InstanceResetMethod method)
 {
     // method can be INSTANCE_RESET_ALL, INSTANCE_RESET_GROUP_JOIN
-    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_boundInstancesMutex);
     for (BoundInstancesMap::iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
     {
         DungeonPersistentState* state = itr->second.state;
@@ -17263,7 +17263,7 @@ void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
     if (!pGroup)
         return;
 
-    std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_boundInstancesMutex);
     BoundInstancesMap::iterator itr = m_boundInstances.find(mapId);
     if (itr == m_boundInstances.end() || itr->second.perm)
         return;
@@ -18845,9 +18845,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
             ObjectGuid t_guid = target->GetObjectGuid();
 
             target->DestroyForPlayer(this);
-            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            m_visibleGUIDs_lock.acquire_write();
             m_visibleGUIDs.erase(t_guid);
-            lock.unlock();
+            m_visibleGUIDs_lock.release();
 
             if (Player* plTarget = target->ToPlayer())
                 if (plTarget->m_broadcaster)
@@ -18863,9 +18863,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
             target->SendCreateUpdateToPlayer(this);
             if (target->GetTypeId() != TYPEID_GAMEOBJECT || !((GameObject*)target)->IsMoTransport())
             {
-                std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+                m_visibleGUIDs_lock.acquire_write();
                 m_visibleGUIDs.insert(target->GetObjectGuid());
-                lock.unlock();
+                m_visibleGUIDs_lock.release();
 
                 if (Player* plTarget = target->ToPlayer())
                     if (plTarget->m_broadcaster)
@@ -18934,9 +18934,9 @@ void Player::UpdateVisibilityOf<Player>(WorldObject const* viewPoint, Player* ta
             ObjectGuid t_guid = target->GetObjectGuid();
 
             target->BuildOutOfRangeUpdateBlock(data);
-            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            m_visibleGUIDs_lock.acquire_write();
             m_visibleGUIDs.erase(t_guid);
-            lock.unlock();
+            m_visibleGUIDs_lock.release();
 
             RemoveBroadcastListener(target, this);
             DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range for %s. Distance = %f", t_guid.GetString().c_str(), GetGuidStr().c_str(), GetDistance(target));
@@ -18947,9 +18947,9 @@ void Player::UpdateVisibilityOf<Player>(WorldObject const* viewPoint, Player* ta
         if (target->FindMap() && target->IsWithinVisibilityDistanceOf(this, viewPoint, inVisibleList) && target->IsVisibleForInState(this, viewPoint, false))
         {
             target->BuildCreateUpdateBlockForPlayer(data, this);
-            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            m_visibleGUIDs_lock.acquire_write();
             UpdateVisibilityOf_helper(m_visibleGUIDs, target);
-            lock.unlock();
+            m_visibleGUIDs_lock.release();
 
             AddBroadcastListener(target, this);
             DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is visible now for %s. Distance = %f", target->GetGuidStr().c_str(), GetGuidStr().c_str(), GetDistance(target));
@@ -18969,9 +18969,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
             ObjectGuid t_guid = target->GetObjectGuid();
 
             target->BuildOutOfRangeUpdateBlock(data);
-            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            m_visibleGUIDs_lock.acquire_write();
             m_visibleGUIDs.erase(t_guid);
-            lock.unlock();
+            m_visibleGUIDs_lock.release();
 
             RemoveBroadcastListener(target, this);
             DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range for %s. Distance = %f", t_guid.GetString().c_str(), GetGuidStr().c_str(), GetDistance(target));
@@ -18982,9 +18982,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
         if (target->FindMap() && target->IsWithinVisibilityDistanceOf(this, viewPoint, inVisibleList) && target->IsVisibleForInState(this, viewPoint, false))
         {
             target->BuildCreateUpdateBlockForPlayer(data, this);
-            std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+            m_visibleGUIDs_lock.acquire_write();
             UpdateVisibilityOf_helper(m_visibleGUIDs, target);
-            lock.unlock();
+            m_visibleGUIDs_lock.release();
 
             AddBroadcastListener(target, this);
             DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is visible now for %s. Distance = %f", target->GetGuidStr().c_str(), GetGuidStr().c_str(), GetDistance(target));
@@ -19671,7 +19671,7 @@ void Player::UpdateForQuestWorldObjects()
         return;
 
     UpdateData updateData;
-    std::shared_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+    m_visibleGUIDs_lock.acquire_read();
     for (const auto& guid : m_visibleGUIDs)
     {
         if (guid.IsGameObject())
@@ -19686,7 +19686,7 @@ void Player::UpdateForQuestWorldObjects()
             }
         }
     }
-    lock.unlock();
+    m_visibleGUIDs_lock.release();
     if (updateData.HasData())
         updateData.Send(GetSession());
 }
@@ -22087,8 +22087,9 @@ bool Player::IsInVisibleList(WorldObject const* u) const
 {
     if (u == this)
         return true;
-    std::shared_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
+    m_visibleGUIDs_lock.acquire_read();
     bool atClient = m_visibleGUIDs.find(u->GetObjectGuid()) != m_visibleGUIDs.end();
+    m_visibleGUIDs_lock.release();
     return atClient;
 }
 
@@ -22394,7 +22395,6 @@ void Player::RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32
         SendClearCooldown(spellEntry->Id, this);
     }
 }
-
 
 void Player::CastHighestStealthRank()
 {
@@ -22765,3 +22765,4 @@ void Player::ClearTemporaryWarWithFactions()
         m_temporaryAtWarFactions.clear();
     }
 }
+

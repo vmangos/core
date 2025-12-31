@@ -226,13 +226,13 @@ ObjectGridLoader::Visit(GameObjectMapType& m)
     GridType& grid = (*i_map->getNGrid(i_cell.GridX(), i_cell.GridY()))(i_cell.CellX(), i_cell.CellY());
 
     {
-        std::shared_lock<std::shared_timed_mutex> lock(sObjectMgr.GetCellLoadingObjectsMutex());
+        ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(sObjectMgr.GetCellLoadingObjectsMutex());
         if (auto const& cellGuids = sObjectMgr.GetCellObjectGuids(i_map->GetId(), cell_id))
             LoadHelper(cellGuids->gameobjects, cell_pair, m, i_gameObjects, i_map, grid);
     }
     
     {
-        std::shared_lock<std::shared_timed_mutex> lock(i_map->GetPersistentState()->GetCellObjectGuidsMutex());
+        ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(i_map->GetPersistentState()->GetCellObjectGuidsMutex());
         if (auto const& cellGuids = i_map->GetPersistentState()->GetCellObjectGuids(cell_id))
             LoadHelper(cellGuids->gameobjects, cell_pair, m, i_gameObjects, i_map, grid);
     }
@@ -248,13 +248,13 @@ ObjectGridLoader::Visit(CreatureMapType& m)
     GridType& grid = (*i_map->getNGrid(i_cell.GridX(), i_cell.GridY()))(i_cell.CellX(), i_cell.CellY());
     
     {
-        std::shared_lock<std::shared_timed_mutex> lock(sObjectMgr.GetCellLoadingObjectsMutex());
+        ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(sObjectMgr.GetCellLoadingObjectsMutex());
         if (auto const& cellGuids = sObjectMgr.GetCellObjectGuids(i_map->GetId(), cell_id))
             LoadHelper(cellGuids->creatures, cell_pair, m, i_creatures, i_map, grid);
     }
 
     {
-        std::shared_lock<std::shared_timed_mutex> lock(i_map->GetPersistentState()->GetCellObjectGuidsMutex());
+        ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(i_map->GetPersistentState()->GetCellObjectGuidsMutex());
         if (auto const& cellGuids = i_map->GetPersistentState()->GetCellObjectGuids(cell_id))
             LoadHelper(cellGuids->creatures, cell_pair, m, i_creatures, i_map, grid);
     }
@@ -270,7 +270,7 @@ ObjectWorldLoader::Visit(CorpseMapType& m)
     GridType& grid = (*i_map->getNGrid(i_cell.GridX(), i_cell.GridY()))(i_cell.CellX(), i_cell.CellY());
 
     {
-        std::shared_lock<std::shared_timed_mutex> lock(sObjectMgr.GetCellLoadingObjectsMutex());
+        ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(sObjectMgr.GetCellLoadingObjectsMutex());
         if (auto const& cellGuids = sObjectMgr.GetCellObjectGuids(i_map->GetId(), cell_id))
             LoadHelper(cellGuids->corpses, cell_pair, m, i_corpses, i_map, grid);
     }

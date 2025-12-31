@@ -78,7 +78,6 @@
 #include "MovementBroadcaster.h"
 #include "HonorMgr.h"
 #include "Anticheat/Anticheat.h"
-#include "ThreadPool.h"
 #include "AuraRemovalMgr.h"
 #include "InstanceStatistics.h"
 #include "GuardMgr.h"
@@ -134,7 +133,6 @@ World::World():
     m_MaintenanceTimeChecker = 0;
     m_anticrashRearmTimer = 0;
 
-    m_defaultDbcLocale = LOCALE_enUS;
     m_availableDbcLocaleMask = 0;
 
     for (uint32 & value : m_configUint32Values)
@@ -149,8 +147,8 @@ World::World():
     for (bool & value : m_configBoolValues)
         value = false;
 
-    m_timeRate = 1.0f;
-    m_charDbWorkerThread    = nullptr;
+    m_charDbWorkerThread = nullptr;
+    m_lfgQueueThread = nullptr;
 }
 
 // World destructor
@@ -172,23 +170,20 @@ World::~World()
 
     if (m_charDbWorkerThread)
     {
-        if (m_charDbWorkerThread->joinable())
-            m_charDbWorkerThread->join();
-        m_charDbWorkerThread.reset(nullptr);
+        m_charDbWorkerThread->wait();
+        delete m_charDbWorkerThread;
     }
 
     if (m_lfgQueueThread)
     {
-        if (m_lfgQueueThread->joinable())
-            m_lfgQueueThread->join();
-        m_lfgQueueThread.reset(nullptr);
+        m_lfgQueueThread->wait();
+        delete m_lfgQueueThread;
     }
 
     if (m_asyncPacketsThread)
     {
-        if (m_asyncPacketsThread->joinable())
-            m_asyncPacketsThread->join();
-        m_asyncPacketsThread.reset(nullptr);
+        m_asyncPacketsThread->wait();
+        delete m_asyncPacketsThread;
     }
 
     //TODO free addSessQueue
@@ -197,18 +192,18 @@ World::~World()
 void World::Shutdown()
 {
     sPlayerBotMgr.DeleteAll();
-    KickAll();                                     // save and kick all players
-    UpdateSessions(1);                             // real players unload required UpdateSessions call
-
-    if (m_charDbWorkerThread && m_charDbWorkerThread->joinable())
-        m_charDbWorkerThread->join();
-
-    if (m_lfgQueueThread && m_lfgQueueThread->joinable())
-        m_lfgQueueThread->join();
-
-    if (m_asyncPacketsThread && m_asyncPacketsThread->joinable())
-        m_asyncPacketsThread->join();
-
+    KickAll();                                       // save and kick all players
+    UpdateSessions(1);                               // real players unload required UpdateSessions call
+    
+    if (m_charDbWorkerThread)
+        m_charDbWorkerThread->wait();
+    
+    if (m_lfgQueueThread)
+        m_lfgQueueThread->wait();
+      
+    if (m_asyncPacketsThread)
+        m_asyncPacketsThread->wait();
+    
     sAnticheatMgr->StopWardenUpdateThread();
 }
 
@@ -943,8 +938,8 @@ void World::LoadConfigSettings(bool reload)
 
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
-    VMAP::VMapFactory::createOrGetVMapManager()->setUseManagedPtrs(!disableModelUnload);
 
+    VMAP::VMapFactory::createOrGetVMapManager()->setDisableModelUnload(disableModelUnload);
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i", enableLOS, enableHeight, getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) ? 1 : 0);
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "WORLD: VMap data directory is: %svmaps", m_dataPath.c_str());
     setConfig(CONFIG_BOOL_MMAP_ENABLED, "mmap.enabled", true);
@@ -1242,25 +1237,54 @@ void World::LoadConfigSettings(bool reload)
     sLog.InitSmartlogGuids(sConfig.GetStringDefault("Smartlog.ExtraGuids", ""));
 }
 
-void CharactersDatabaseWorkerThread()
+
+class CharactersDatabaseWorkerThread : public ACE_Based::Runnable
 {
-    time_t lastCheckTime = 0;
-    CharacterDatabase.ThreadStart();
-    while (!sWorld.IsStopped())
+public:
+    CharactersDatabaseWorkerThread()
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        time_t const now = time(nullptr);
-        if ((lastCheckTime + 30 * MINUTE) < now)
+    }
+
+    virtual void run()
+    {
+        CharacterDatabase.ThreadStart();
+        while (!sWorld.IsStopped())
         {
+            ACE_Based::Thread::Sleep(1000);
             if (CharacterDatabase.HasAsyncQuery())
                 continue;
             Player::DeleteOldCharacters();
             sObjectMgr.ReturnOrDeleteOldMails(true);
-            lastCheckTime = now;
         }
+        CharacterDatabase.ThreadEnd();
     }
-    CharacterDatabase.ThreadEnd();
-}
+};
+
+class LFGQueueWorkerThread : public ACE_Based::Runnable
+{
+public:
+    LFGQueueWorkerThread()
+    {
+    }
+
+    virtual void run()
+    {
+        sWorld.GetLFGQueue().Update();
+    }
+};
+
+class AsyncPacketsWorkerThread : public ACE_Based::Runnable
+{
+public:
+    AsyncPacketsWorkerThread()
+    {
+    }
+
+    virtual void run()
+    {
+        sWorld.ProcessAsyncPackets();
+    }
+};
 
 char const* World::GetPatchName() const
 {
@@ -1866,22 +1890,14 @@ void World::SetInitialWorldSettings()
         sObjectMgr.RestoreDeletedItems();
     }
 
-    if (GetWowPatch() >= WOW_PATCH_103 || !getConfig(CONFIG_BOOL_ACCURATE_LFG))
-    {
-        m_lfgQueueThread.reset(new std::thread([&]()
-        {
-            m_lfgQueue.Update();
-        }));
-    }
-
     sAnticheatMgr->StartWardenUpdateThread();
 
     m_broadcaster =
         std::make_unique<MovementBroadcaster>(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
-
-    m_charDbWorkerThread.reset(new std::thread(&CharactersDatabaseWorkerThread));
-    m_asyncPacketsThread.reset(new std::thread(&World::ProcessAsyncPackets, this));
+    m_lfgQueueThread = new ACE_Based::Thread(new LFGQueueWorkerThread());
+    m_charDbWorkerThread = new ACE_Based::Thread(new CharactersDatabaseWorkerThread());
+    m_asyncPacketsThread = new ACE_Based::Thread(new AsyncPacketsWorkerThread());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "==========================================================");
@@ -1945,8 +1961,8 @@ void World::ProcessAsyncPackets()
 {
     do
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        std::lock_guard<std::mutex> lock(m_asyncPacketsMutex);
+        ACE_Based::Thread::Sleep(20);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_asyncPacketsMutex);
 
         if (IsStopped())
             return;
@@ -1967,6 +1983,23 @@ void World::ProcessAsyncPackets()
         }
     } while (!IsStopped());
 }
+
+class WorldAsyncTasksExecutor : public ACE_Based::Runnable
+{
+public:
+    WorldAsyncTasksExecutor() {}
+    void run()
+    {
+        WorldDatabase.ThreadStart();
+        AsyncTask* task;
+        while (sWorld.GetNextAsyncTask(task))
+        {
+            task->run();
+            delete task;
+        }
+        WorldDatabase.ThreadEnd();
+    }
+};
 
 // Update the World !
 void World::Update(uint32 diff)
@@ -2002,7 +2035,7 @@ void World::Update(uint32 diff)
 
     {
         m_canProcessAsyncPackets = false;
-        std::lock_guard<std::mutex> lock(m_asyncPacketsMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_asyncPacketsMutex);
 
         GetMessager().Execute(this);
 
@@ -2029,22 +2062,11 @@ void World::Update(uint32 diff)
 
     // Update objects (maps, transport, creatures,...)
     uint32 updateMapSystemTime = WorldTimer::getMSTime();
-    
-    // TODO: find a better place for this
-    if (!m_updateThreads)
-    {
-        m_updateThreads = std::unique_ptr<ThreadPool>( new ThreadPool(
-                    getConfig(CONFIG_UINT32_ASYNC_TASKS_THREADS_COUNT),
-                    ThreadPool::ClearMode::UPPON_COMPLETION)
-                                             );
-        m_updateThreads->start<ThreadPool::MySQL<>>();
-    }
-    std::unique_lock<std::mutex> lock(m_asyncTaskQueueMutex);
-    _asyncTasks.swap(_asyncTasksBusy);
-    std::future<void> job = m_updateThreads->processWorkload(_asyncTasksBusy);
-    _asyncTasks.clear();
-    lock.unlock();
-    
+    int threadsCount = getConfig(CONFIG_UINT32_ASYNC_TASKS_THREADS_COUNT);
+    std::vector<ACE_Based::Thread*> asyncTaskThreads(threadsCount);
+    for (int i = 0; i < threadsCount; ++i)
+        asyncTaskThreads[i] = new ACE_Based::Thread(new WorldAsyncTasksExecutor());
+
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
     sGuardMgr.Update(diff);
@@ -2062,9 +2084,11 @@ void World::Update(uint32 diff)
     }
 
     uint32 asyncWaitBegin = WorldTimer::getMSTime();
-
-    if (job.valid())
-        job.wait();
+    for (int i = 0; i < threadsCount; ++i)
+    {
+        asyncTaskThreads[i]->wait();
+        delete asyncTaskThreads[i];
+    }
 
     updateMapSystemTime = WorldTimer::getMSTimeDiffToNow(updateMapSystemTime);
     if (getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAPSYSTEM_UPDATE) && updateMapSystemTime > getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAPSYSTEM_UPDATE))
@@ -2126,7 +2150,7 @@ void World::Update(uint32 diff)
 
     {
         m_canProcessAsyncPackets = false;
-        std::lock_guard<std::mutex> lock(m_asyncPacketsMutex);
+        ACE_Guard<ACE_Thread_Mutex> guard(m_asyncPacketsMutex);
 
         // And last, but not least handle the issued cli commands
         ProcessCliCommands();
@@ -3094,12 +3118,7 @@ void World::SetSessionDisconnected(WorldSession* sess)
     m_disconnectedSessions.insert(sess);
 }
 
-void World::AddAsyncTask(std::function<void()> task) {
-    std::lock_guard<std::mutex> lock(m_asyncTaskQueueMutex);
-    _asyncTasks.push_back(std::move(task));
-}
-
-void World::LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, char const* type, uint32 dataInt)
+void World::LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, const char* type, uint32 dataInt)
 {
     if (!LogsDatabase || !getConfig(CONFIG_BOOL_LOGSDB_TRADES))
         return;
@@ -3216,7 +3235,7 @@ time_t World::GetWorldUpdateTimerInterval(WorldTimers timer)
     return m_timers[timer].GetInterval();
 }
 
-void SessionPacketSendTask::operator()()
+void SessionPacketSendTask::run()
 {
     if (WorldSession* session = sWorld.FindSession(m_accountId))
     {

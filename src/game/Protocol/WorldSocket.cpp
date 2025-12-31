@@ -70,7 +70,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* newPct)
                 return HandleAuthSession(*newPct);
             default:
             {
-                GuardType lock(m_sessionLock);
+                ACE_GUARD_RETURN(LockType, Guard, m_sessionLock, -1);
 
                 if (m_session != nullptr)
                 {
@@ -368,7 +368,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
             if (max_count && m_overSpeedPings > max_count)
             {
-                GuardType lock(m_sessionLock);
+                ACE_GUARD_RETURN(LockType, Guard, m_sessionLock, -1);
 
                 if (m_session && m_session->GetSecurity() == SEC_PLAYER)
                 {
@@ -386,7 +386,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
     // critical section
     {
-        GuardType lock(m_sessionLock);
+        ACE_GUARD_RETURN(LockType, Guard, m_sessionLock, -1);
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         if (m_session)

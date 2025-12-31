@@ -3109,8 +3109,8 @@ bool Unit::ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, 
     // Currently moved by server.
     if (!movespline->Finalized())
     {
-        std::unique_lock<std::mutex> guard(asyncMovesplineLock, std::try_to_lock);
-        if (!guard.owns_lock())
+        ACE_Guard<ACE_Thread_Mutex> guard(asyncMovesplineLock, false);
+        if (!guard.locked())
             return false;
 
         auto loc = movespline->ComputePositionAfterTime(diffMs);

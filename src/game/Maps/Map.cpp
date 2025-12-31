@@ -51,7 +51,6 @@
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
 #include "GridSearchers.h"
-#include "ThreadPool.h"
 #include "AuraRemovalMgr.h"
 #include "world/world_event_wareffort.h"
 #include "CreatureGroups.h"
@@ -155,22 +154,6 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_persistentState = sMapPersistentStateMgr.AddPersistentState(m_mapEntry, GetInstanceId(), 0, IsDungeon());
     m_persistentState->SetUsedByMapState(this);
     m_weatherSystem = new WeatherSystem(this);
-
-    if (IsContinent())
-    {
-        int numObjThreads = (int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS);
-        if (numObjThreads > 1)
-        {
-            m_objectThreads.reset(new ThreadPool(numObjThreads -1));
-            m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
-        }
-        m_motionThreads.reset(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS)));
-        m_visibilityThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1,0)));
-        m_cellThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS) - 1, 0)));
-        m_visibilityThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
-        m_cellThreads->start();
-        m_motionThreads->start();
-    }
 
     sTransportMgr.SpawnTransportsOnMap(this);
     LoadElevatorTransports();
@@ -784,6 +767,24 @@ inline void Map::UpdateActiveCellsCallback(uint32 diff, uint32 now, uint32 threa
     }
 }
 
+class MapAsynchCellsWorker : public ACE_Based::Runnable
+{
+public:
+    MapAsynchCellsWorker(int i, int nthreads, uint32 _diff, uint32 _now, uint32 _step, Map* m) : threadIdx(i), nThreads(nthreads), diff(_diff), now(_now), step(_step), map(m)
+    {
+    }
+
+    virtual void run()
+    {
+        map->UpdateActiveCellsCallback(diff, now, threadIdx, nThreads, step);
+    }
+    int threadIdx;
+    int nThreads;
+    uint32 diff, now, step;
+    Map* map;
+};
+
+
 inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
 {
     resetMarkedCells();
@@ -795,17 +796,26 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
     for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end(); ++m_activeNonPlayersIter)
         MarkCellsAroundObject(*m_activeNonPlayersIter);
 
-    const int nthreads = m_cellThreads->size();
-    for (int step = 0; step < 2; step++)
+    int const nthreads = sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS);
+    // Step 1
+    std::vector<ACE_Based::Thread*> threads;
+    for (int i = 0; i < (nthreads - 1); ++i)
+        threads.push_back(new ACE_Based::Thread(new MapAsynchCellsWorker(i, nthreads, diff, now, 0, this)));
+    UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 0);
+    for (const auto& thread : threads)
     {
-        for (int i = 0; i < nthreads; ++i)
-            m_cellThreads << [this, diff, now, i, nthreads, step](){
-                UpdateActiveCellsCallback(diff, now, i, nthreads+1, step);
-            };
-        std::future<void> job = m_cellThreads->processWorkload();
-        UpdateActiveCellsCallback(diff, now, nthreads, nthreads+1, step);
-        if (job.valid())
-            job.wait();
+        thread->wait();
+        delete thread;
+    }
+    // Step 2
+    threads.clear();
+    for (int i = 0; i < (nthreads - 1); ++i)
+        threads.push_back(new ACE_Based::Thread(new MapAsynchCellsWorker(i, nthreads, diff, now, 1, this)));
+    UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 1);
+    for (const auto& thread : threads)
+    {
+        thread->wait();
+        delete thread;
     }
 }
 
@@ -833,6 +843,26 @@ inline void Map::UpdateActiveCellsSynch(uint32 now, uint32 diff)
     }
 }
 
+class UnitsMovementUpdater : public ACE_Based::Runnable
+{
+public:
+    UnitsMovementUpdater(int i, int nthreads, std::unordered_set<Unit*>& _updates, uint32 _diff) : threadIdx(i), nThreads(nthreads), updates(_updates), diff(_diff)
+    {
+    }
+
+    virtual void run()
+    {
+        int i = 0;
+        for (const auto itr : updates)
+            if (((++i) % nThreads) == threadIdx)
+                if (itr->IsInWorld())
+                    itr->GetMotionMaster()->UpdateMotionAsync(diff);
+    }
+    int threadIdx;
+    int nThreads;
+    std::unordered_set<Unit*>& updates;
+    uint32 diff;
+};
 
 inline void Map::UpdateCells(uint32 map_diff)
 {
@@ -845,20 +875,23 @@ inline void Map::UpdateCells(uint32 map_diff)
     m_lastCellsUpdate = now;
     m_currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
 
-    // update active cells around players and active objects
-    if (IsContinent() && m_cellThreads->status() == ThreadPool::Status::READY)
+    /// update active cells around players and active objects
+    if (IsContinent() && sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS))
         UpdateActiveCellsAsynch(now, diff);
     else
         UpdateActiveCellsSynch(now, diff);
 
-    if (IsContinent() && m_motionThreads->status() == ThreadPool::Status::READY && !m_unitsMvtUpdate.empty())
+    int nthreads = sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS);
+    if (IsContinent() && nthreads)
     {
-        for (std::unordered_set<Unit*>::iterator it = m_unitsMvtUpdate.begin(); it != m_unitsMvtUpdate.end(); it++)
-            m_motionThreads << [it,diff](){
-                 if ((*it)->IsInWorld())
-                    (*it)->GetMotionMaster()->UpdateMotionAsync(diff);
-            };
-        m_motionThreads->processWorkload().wait();
+        std::vector<ACE_Based::Thread*> threads(nthreads);
+        for (int i = 0; i < nthreads; ++i)
+            threads[i] = new ACE_Based::Thread(new UnitsMovementUpdater(i, nthreads, m_unitsMvtUpdate, diff));
+        for (const auto& thread : threads)
+        {
+            thread->wait();
+            delete thread;
+        }
     }
     m_unitsMvtUpdate.clear();
 }
@@ -969,7 +1002,6 @@ void Map::Update(uint32 t_diff)
     uint32 sessionsUpdateTime = WorldTimer::getMSTimeDiffToNow(updateMapTime);
 
     // update players at tick
-    std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
     UpdateSessionsMovementAndSpellsIfNeeded();
     UpdatePlayers();
     uint32 playersUpdateTime = WorldTimer::getMSTimeDiffToNow(updateMapTime) - sessionsUpdateTime;
@@ -995,13 +1027,16 @@ void Map::Update(uint32 t_diff)
 
     uint32 additionnalWaitTime = 0;
     uint32 additionnalUpdateCounts = 0;
-    if (!Instanceable())
+    if (m_updateIdx >= 0)
     {
         additionnalWaitTime = WorldTimer::getMSTime();
-        sMapMgr.MarkContinentUpdateFinished();
-        while (!sMapMgr.waitContinentUpdateFinishedUntil(start + std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE))))
+        sMapMgr.MarkContinentUpdateFinished(m_updateIdx);
+        while (!sMapMgr.IsContinentUpdateFinished())
         {
-            start = std::chrono::high_resolution_clock::now();
+            ACE_Based::Thread::Sleep(10);
+            if (sMapMgr.IsContinentUpdateFinished())
+                break;
+
             UpdateSessionsMovementAndSpellsIfNeeded();
             UpdatePlayers();
             ++additionnalUpdateCounts;
@@ -1760,8 +1795,9 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
     MANGOS_ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
 
     obj->CleanupsBeforeDelete();                            // remove or simplify at least cross referenced links
-    std::lock_guard<std::mutex> lock(m_objectsToRemoveLock);
+    m_objectsToRemoveLock.acquire();
     m_objectsToRemove.insert(obj);
+    m_objectsToRemoveLock.release();
 }
 
 void Map::RemoveAllObjectsInRemoveList()
@@ -1769,7 +1805,7 @@ void Map::RemoveAllObjectsInRemoveList()
     if (m_objectsToRemove.empty())
         return;
 
-    std::lock_guard<std::mutex> lock(m_objectsToRemoveLock);
+    m_objectsToRemoveLock.acquire();
     while (!m_objectsToRemove.empty())
     {
         WorldObject* obj = *m_objectsToRemove.begin();
@@ -1812,6 +1848,7 @@ void Map::RemoveAllObjectsInRemoveList()
                 break;
         }
     }
+    m_objectsToRemoveLock.release();
 }
 
 bool Map::HaveRealPlayers() const
@@ -2517,21 +2554,21 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, ObjectGuid source
     // Schedule script execution for all scripts in the script map
     ScriptMap const* s2 = &(s->second);
     bool immedScript = false;
-    
-    std::lock_guard<MapMutexType> lock(m_scriptSchedule_lock);
-    for (ScriptMap::const_iterator iter = s2->begin(); iter != s2->end(); ++iter)
+    m_scriptSchedule_lock.acquire();
+    for (const auto& iter : *s2)
     {
         ScriptAction sa;
         sa.sourceGuid = sourceGuid;
         sa.targetGuid = targetGuid;
 
-        sa.script = &iter->second;
-        m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(sWorld.GetGameTime() + iter->first), sa));
-        if (iter->first == 0)
+        sa.script = &iter.second;
+        m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(sWorld.GetGameTime() + iter.first), sa));
+        if (iter.first == 0)
             immedScript = true;
 
         sScriptMgr.IncreaseScheduledScriptsCount();
     }
+    m_scriptSchedule_lock.release();
 }
 
 void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid sourceGuid, ObjectGuid targetGuid)
@@ -2543,9 +2580,10 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid 
     sa.targetGuid = targetGuid;
 
     sa.script = &script;
-    std::lock_guard<std::mutex> lock(m_scriptSchedule_lock);
+    m_scriptSchedule_lock.acquire();
     m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(sWorld.GetGameTime() + delay), sa));
     sScriptMgr.IncreaseScheduledScriptsCount();
+    m_scriptSchedule_lock.release();
 }
 
 bool Map::ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target)
@@ -2628,10 +2666,12 @@ void Map::TerminateScript(ScriptAction const& step)
 // Process queued scripts
 void Map::ScriptsProcess()
 {
-    std::unique_lock<std::mutex> lock(m_scriptSchedule_lock);
-
+    m_scriptSchedule_lock.acquire();
     if (m_scriptSchedule.empty())
+    {
+        m_scriptSchedule_lock.release();
         return;
+    }
 
     // Process overdue queued scripts
     ScriptScheduleMap::iterator iter = m_scriptSchedule.begin();
@@ -2639,7 +2679,7 @@ void Map::ScriptsProcess()
     while (!m_scriptSchedule.empty() && (iter->first <= sWorld.GetGameTime()))
     {
         ScriptAction const step = iter->second;
-        lock.unlock();
+        m_scriptSchedule_lock.release();
 
         WorldObject* source = nullptr;
         WorldObject* target = nullptr;
@@ -2654,7 +2694,7 @@ void Map::ScriptsProcess()
         else
             scriptResultOk = (step.script->raw.data[4] & SF_GENERAL_ABORT_ON_FAILURE) != 0;
 
-        lock.lock();
+        m_scriptSchedule_lock.acquire();
 
         // Command returns true if we should abort script.
         if (scriptResultOk)
@@ -2668,9 +2708,9 @@ void Map::ScriptsProcess()
 
             sScriptMgr.DecreaseScheduledScriptCount();
         }
-
         iter = m_scriptSchedule.begin();
     }
+    m_scriptSchedule_lock.release();
 }
 
 void Map::StartAreaTriggerScript(AreaTriggerEntry const* pTrigger, Player* pPlayer)
@@ -2819,46 +2859,85 @@ WorldObject* Map::GetWorldObjectOrPlayer(ObjectGuid guid)
 
 void Map::AddUpdateObject(Object *obj)
 {
-    if (m_processingSendObjUpdates)
-        return;
-    std::lock_guard<std::mutex> lock(m_objectsToClientUpdateLock);
+  if (m_processingSendObjUpdates)
+      return;
+    m_objectsToClientUpdateLock.acquire();
     m_objectsToClientUpdate.insert(obj);
+    m_objectsToClientUpdateLock.release();
 }
 
 void Map::RemoveUpdateObject(Object *obj)
 {
     ASSERT(!m_processingSendObjUpdates);
-    std::lock_guard<std::mutex> lock(m_objectsToClientUpdateLock);
-    m_objectsToClientUpdate.erase( obj );
+    m_objectsToClientUpdateLock.acquire();
+    m_objectsToClientUpdate.erase(obj);
+    m_objectsToClientUpdateLock.release();
 }
 
 void Map::AddRelocatedUnit(Unit *obj)
 {
     if (m_processingUnitsRelocation)
         return;
-    std::lock_guard<std::mutex> lock(m_unitsRelocatedLock);
+    m_unitsRelocatedLock.acquire();
     m_unitsRelocated.insert(obj);
+    m_unitsRelocatedLock.release();
 }
 
 void Map::RemoveRelocatedUnit(Unit *obj)
 {
     ASSERT(!m_processingUnitsRelocation);
-    std::lock_guard<std::mutex> lock(m_unitsRelocatedLock);
+    m_unitsRelocatedLock.acquire();
     m_unitsRelocated.erase(obj);
+    m_unitsRelocatedLock.release();
 }
 
 void Map::AddUnitToMovementUpdate(Unit *unit)
 {
-    std::lock_guard<std::mutex> lock(m_unitsMvtUpdateLock);
+    m_unitsMvtUpdateLock.acquire();
     m_unitsMvtUpdate.insert(unit);
+    m_unitsMvtUpdateLock.release();
 }
 
 void Map::RemoveUnitFromMovementUpdate(Unit *unit)
 {
-    std::lock_guard<std::mutex> lock(m_unitsMvtUpdateLock);
+    m_unitsMvtUpdateLock.acquire();
     m_unitsMvtUpdate.erase(unit);
+    m_unitsMvtUpdateLock.release();
 }
 
+class ObjectUpdatePacketBuilder : public ACE_Based::Runnable
+{
+public:
+    ObjectUpdatePacketBuilder(std::unordered_set<Object*>::iterator& a, std::unordered_set<Object*>::iterator& b, uint32 now) : begin(a), current(a), end(b), beginTime(now)
+    {
+    }
+
+    virtual void run()
+    {
+        WorldDatabase.ThreadStart(); // Not needed if we don't do SQL queries from this thread ...
+        DoUpdateObjects();
+        WorldDatabase.ThreadEnd();
+    }
+    void DoUpdateObjects()
+    {
+        uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_TIMEOUT);
+        UpdateDataMapType update_players; // Player -> UpdateData
+
+        for (; current != end; ++current)
+        {
+            if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
+                break;
+            (*current)->BuildUpdateData(update_players);
+        }
+
+        for (auto& itr : update_players)
+            itr.second.Send(itr.first->GetSession());
+    }
+    std::unordered_set<Object*>::iterator begin;
+    std::unordered_set<Object*>::iterator current;
+    std::unordered_set<Object*>::iterator end;
+    uint32 beginTime;
+};
 
 //#define MAP_SENDOBJECTUPDATES_PROFILE
 
@@ -2873,110 +2952,103 @@ void Map::SendObjectUpdates()
     m_processingSendObjUpdates = true;
 
     // Compute maximum number of threads
-//#define FORCE_OLD_THREADCOUNT
-#ifndef FORCE_OLD_THREADCOUNT
-    int threads = m_objectThreads ? m_objectThreads->size() +1 : 1;
-#else
-    int threads = 1;
+    uint32 threads = 1;
     if (IsContinent())
-        threads = m_objectThreads ? m_objectThreads->size() +1 : 1;
+    {
+        threads = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS);
+        if (!threads)
+            threads = 1;
+    }
     if (!m_objUpdatesThreads)
         m_objUpdatesThreads = 1;
     if (threads < m_objUpdatesThreads)
         m_objUpdatesThreads = threads;
-#endif
     if (threads > objectsCount)
         threads = objectsCount;
-    int step = objectsCount / threads;
 
+    uint32 step = objectsCount / threads;
+    ACE_Based::Thread** updaters = threads > 1 ? new ACE_Based::Thread*[threads - 1] : nullptr;
+    ObjectUpdatePacketBuilder** objUpdaters = new ObjectUpdatePacketBuilder*[threads];
+    std::unordered_set<Object*>::iterator itBegin = m_objectsToClientUpdate.begin();
+    std::unordered_set<Object*>::iterator itEnd = m_objectsToClientUpdate.begin();
     ASSERT(step > 0);
     ASSERT(threads >= 1);
-
-    if (objectsCount % threads)
-        step++;
-
-    std::vector<std::unordered_set<Object*>::iterator> t;
-    t.reserve(m_objectsToClientUpdate.size() + 1);
-    for (std::unordered_set<Object*>::iterator it = m_objectsToClientUpdate.begin(); it != m_objectsToClientUpdate.end(); it++)
-        t.push_back(it);
-    t.push_back(m_objectsToClientUpdate.end());
-    uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_TIMEOUT);
-//#define FORCE_NO_ATOMIC_INT
-#if ATOMIC_INT_LOCK_FREE == 2 && !defined(FORCE_NO_ATOMIC_INT)
-    std::atomic_int ait(0);
-    auto f = [&t, &ait, beginTime=now, timeout](){
-        UpdateDataMapType update_players; // Player -> UpdateData
-        int it;
-        while ((it = ait++) < t.size() -1)
+    for (uint32 i = 0; i < threads; ++i)
+    {
+        itBegin = itEnd;
+        if (i == (threads - 1))
+            itEnd = m_objectsToClientUpdate.end();
+        else
         {
-            (*t[it])->BuildUpdateData(update_players);
-            if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
-                break;
+            for (uint32 j = 0; j < step; ++j)
+                ++itEnd;
         }
+        objUpdaters[i] = new ObjectUpdatePacketBuilder(itBegin, itEnd, now);
+        objUpdaters[i]->incReference();
 
-        for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
-            iter->second.Send(iter->first->GetSession());
-    };
-    std::future<void> job;
-    if (m_objectThreads) {
-        for (int i = 1; i < threads; i++)
-            m_objectThreads << f;
-        job = m_objectThreads->processWorkload();
+        if (i == (threads - 1)) // Do not create a useless supplementary thread
+            objUpdaters[i]->DoUpdateObjects();
+        else
+            updaters[i] = new ACE_Based::Thread(objUpdaters[i]);
+    }
+    for (uint32 i = 0; i < (threads - 1); ++i)
+        updaters[i]->wait();
+    for (uint32 i = 0; i < threads; ++i)
+    {
+        /* std::set::erase
+         * Iterators, pointers and references referring to elements removed by the function are invalidated.
+         * All other iterators, pointers and references keep their validity.
+         */
+        m_objectsToClientUpdate.erase(objUpdaters[i]->begin, objUpdaters[i]->current);
+        objUpdaters[i]->decReference();
+        if (i != (threads - 1))
+            delete updaters[i];
     }
 
-    f();
-
-    if (job.valid())
-        job.wait();
-    if (ait >= m_objectsToClientUpdate.size()) //ait is increased before checks, so max value is `objectsCount + threads`
-        m_objectsToClientUpdate.clear();
-    else
-        m_objectsToClientUpdate.erase(t.front(), t[ait]);
-#else
-    std::vector<int> counters;
-    for (int i = 0; i < threads; i++)
-        counters.push_back(i * step);
-    auto f = [&t, &counters, step, beginTime=now, timeout](int id){
-        UpdateDataMapType update_players; // Player -> UpdateData
-        for (int &it = counters[id]; it < std::min((int)t.size() -1, step * (id + 1)); it++)
-        {
-            if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
-                break;
-            (*t[it])->BuildUpdateData(update_players);
-        }
-        for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
-            iter->second.Send(iter->first->GetSession());
-    };
-    std::future<void> job;
-    if (m_objectThreads) {
-        for (int i = 1; i < threads; i++)
-            m_objectThreads << std::bind(f, i);
-        job = m_objectThreads->processWorkload();
-    }
-
-    f(0);
-
-    if (job.valid())
-        job.wait();
-    for (int i = 0; i < threads; i++)
-        m_objectsToClientUpdate.erase(t[step * i], t[counters[i]]);
-#endif
-
-#ifdef FORCE_OLD_THREADCOUNT
     // If we timeout, use more threads !
     if (!m_objectsToClientUpdate.empty())
         ++m_objUpdatesThreads;
     else
         --m_objUpdatesThreads;
-#endif
 
     m_processingSendObjUpdates = false;
+    delete[] updaters;
+    delete[] objUpdaters;
 #ifdef MAP_SENDOBJECTUPDATES_PROFILE
     uint32 diff = WorldTimer::getMSTimeDiffToNow(now);
     if (diff > 50)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "SendObjectUpdates in %04u ms [%u threads. %3u/%3u]", diff, threads, objectsCount - m_objectsToClientUpdate.size(), objectsCount);
 #endif
 }
+
+class VisibilityUpdater : public ACE_Based::Runnable
+{
+public:
+    VisibilityUpdater(std::unordered_set<Unit*>::iterator& a, std::unordered_set<Unit*>::iterator& b, uint32 now) : begin(a), current(a), end(b), beginTime(now)
+    {
+    }
+
+    virtual void run()
+    {
+        WorldDatabase.ThreadStart();
+        DoUpdateVisibility();
+        WorldDatabase.ThreadEnd();
+    }
+    void DoUpdateVisibility()
+    {
+        uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_TIMEOUT);
+        for (; current != end; ++current)
+        {
+            if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
+                break;
+            (*current)->ProcessRelocationVisibilityUpdates();
+        }
+    }
+    std::unordered_set<Unit*>::iterator begin;
+    std::unordered_set<Unit*>::iterator current;
+    std::unordered_set<Unit*>::iterator end;
+    uint32 beginTime;
+};
 
 //#define MAP_UPDATEVISIBILITY_PROFILE
 
@@ -2992,47 +3064,50 @@ void Map::UpdateVisibilityForRelocations()
     // Compute number of threads to spawn
     uint32 threads = 1;
     if (IsContinent())
-        threads = m_visibilityThreads->size() + 1;
+    {
+        threads = sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS);
+        if (!threads)
+            threads = 1;
+    }
     if (!m_unitRelocationThreads)
         m_unitRelocationThreads = 1;
     if (threads < m_unitRelocationThreads)
         m_unitRelocationThreads = threads;
     if (threads > objectsCount)
         threads = objectsCount;
+
     uint32 step = objectsCount / threads;
-    
+    ACE_Based::Thread** updaters = threads > 1 ? new ACE_Based::Thread*[threads - 1] : nullptr;
+    VisibilityUpdater** visUpdaters = new VisibilityUpdater*[threads];
+    std::unordered_set<Unit*>::iterator itBegin = m_unitsRelocated.begin();
+    std::unordered_set<Unit*>::iterator itEnd = m_unitsRelocated.begin();
     ASSERT(step > 0);
-
-    std::vector<std::unordered_set<Unit*>::iterator> t;
-    t.reserve(m_unitsRelocated.size());
-    for (std::unordered_set<Unit*>::iterator it = m_unitsRelocated.begin(); it != m_unitsRelocated.end(); it++)
-        t.emplace_back(it);
-    std::atomic<int> ait(0);
-    uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_TIMEOUT);
-    auto f = [&t, &ait, beginTime=now, timeout](){
-        int it = ait++;
-        while (it < t.size())
+    for (uint32 i = 0; i < threads; ++i)
+    {
+        itBegin = itEnd;
+        if (i == (threads - 1))
+            itEnd = m_unitsRelocated.end();
+        else
         {
-            (*t[it])->ProcessRelocationVisibilityUpdates();
-            if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
-                break;
-            it = ait++;
+            for (uint32 j = 0; j < step; ++j)
+                ++itEnd;
         }
-    };
-    for (uint32 i = 0; i < threads -1; ++i)
-        m_visibilityThreads << f;
-
-    std::future<void> job;
-    if (m_visibilityThreads)
-        job = m_visibilityThreads->processWorkload();
-
-    f();
-    if (job.valid())
-        job.wait();
-    if (ait >= m_unitsRelocated.size()) //ait is increased before checks, so max value is `objectsCount + threads`
-        m_unitsRelocated.clear();
-    else
-        m_unitsRelocated.erase(t.front(), t[ait]);
+        visUpdaters[i] = new VisibilityUpdater(itBegin, itEnd, now);
+        visUpdaters[i]->incReference();
+        if (i == (threads - 1))
+            visUpdaters[i]->DoUpdateVisibility();
+        else
+            updaters[i] = new ACE_Based::Thread(visUpdaters[i]);
+    }
+    for (uint32 i = 0; i < threads - 1; ++i)
+        updaters[i]->wait();
+    for (uint32 i = 0; i < threads; ++i)
+    {
+        m_unitsRelocated.erase(visUpdaters[i]->begin, visUpdaters[i]->current);
+        visUpdaters[i]->decReference();
+        if (i != (threads - 1))
+            delete updaters[i];
+    }
 
     if (!m_unitsRelocated.empty())
         ++m_unitRelocationThreads;
@@ -3040,6 +3115,8 @@ void Map::UpdateVisibilityForRelocations()
         --m_unitRelocationThreads;
 
     m_processingUnitsRelocation = false;
+    delete[] updaters;
+    delete[] visUpdaters;
 
 #ifdef MAP_UPDATEVISIBILITY_PROFILE
     uint32 diff = WorldTimer::getMSTimeDiffToNow(now);
@@ -3052,7 +3129,7 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
 {
     // TODOLOCK
     // TODO: for map local guid counters possible force reload map instead shutdown server at guid counter overflow
-    std::lock_guard<std::mutex> lock(m_guidGenerators_lock);
+    m_guidGenerators_lock.acquire();
     uint32 guid = 0;
     switch (guidhigh)
     {
@@ -3072,6 +3149,7 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
         default:
             MANGOS_ASSERT(0);
     }
+    m_guidGenerators_lock.release();
     return guid;
 }
 
@@ -3409,7 +3487,7 @@ GameObjectModel const* Map::FindDynamicObjectCollisionModel(float x1, float y1, 
     GameObjectModel const* result = nullptr;
     if (pos1 != pos2)
     {
-        std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+        ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
         result = m_dynamicTree.getObjectHit(pos1, pos2);
     }
     return result;
@@ -3417,42 +3495,41 @@ GameObjectModel const* Map::FindDynamicObjectCollisionModel(float x1, float y1, 
 
 void Map::RemoveGameObjectModel(const GameObjectModel &model)
 {
-    std::lock_guard<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Write_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     m_dynamicTree.remove(model);
     m_dynamicTree.balance();
 }
 
 void Map::InsertGameObjectModel(const GameObjectModel &model)
 {
-    std::lock_guard<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Write_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     m_dynamicTree.insert(model);
     m_dynamicTree.balance();
 }
 
 bool Map::ContainsGameObjectModel(const GameObjectModel &model) const
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     return m_dynamicTree.contains(model);
 }
 
 bool Map::GetDynamicObjectHitPos(Movement::Vector3 start, Movement::Vector3 end, Movement::Vector3 &out, float finalDistMod) const
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     return m_dynamicTree.getObjectHitPos(start, end, out, finalDistMod);
 }
 
 float Map::GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     return m_dynamicTree.getHeight(x, y, z, maxSearchDist);
 }
 
 bool Map::CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2, bool ignoreM2Model) const
 {
-    std::shared_lock<std::shared_timed_mutex> lock(m_dynamicTreeLock);
+    ACE_Read_Guard<ACE_RW_Thread_Mutex> guard(m_dynamicTreeLock);
     return m_dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, ignoreM2Model);
 }
-
 
 void Map::CrashUnload()
 {
@@ -3557,7 +3634,7 @@ bool Map::ShouldUpdateMap(uint32 now, uint32 inactiveTimeLimit)
     // in AddCorpseToRemove because it can be called concurrently.
     if (!update)
     {
-        std::lock_guard<MapMutexType> guard(m_corpseRemovalLock);
+        ACE_Guard<MapMutexType> guard(m_corpseRemovalLock);
         if (!m_corpseToRemove.empty())
             update = true;
     }
@@ -3571,7 +3648,7 @@ bool Map::ShouldUpdateMap(uint32 now, uint32 inactiveTimeLimit)
  */
 void Map::AddCorpseToRemove(Corpse* corpse, ObjectGuid looter_guid)
 {
-    std::lock_guard<MapMutexType> guard(m_corpseRemovalLock);
+    ACE_Guard<MapMutexType> guard(m_corpseRemovalLock);
     m_corpseToRemove.emplace_back(corpse, looter_guid);
 }
 
@@ -3580,7 +3657,7 @@ void Map::AddCorpseToRemove(Corpse* corpse, ObjectGuid looter_guid)
 */
 void Map::RemoveBones(Corpse* corpse)
 {
-    std::lock_guard<MapMutexType> guard(m_bonesLock);
+    ACE_Guard<MapMutexType> guard(m_bonesLock);
     m_bones.remove(corpse);
 }
 
@@ -3589,7 +3666,7 @@ void Map::RemoveBones(Corpse* corpse)
  */
 void Map::RemoveCorpses(bool unload)
 {
-    std::lock_guard<MapMutexType> guard(m_corpseRemovalLock);
+    ACE_Guard<MapMutexType> guard(m_corpseRemovalLock);
     for (auto iter = m_corpseToRemove.begin(); iter != m_corpseToRemove.end();)
     {
         auto corpse = iter->first;
@@ -3652,7 +3729,7 @@ void Map::RemoveCorpses(bool unload)
 
             // Only take the lock for a second
             {
-                std::lock_guard<MapMutexType> guard(m_bonesLock);
+                ACE_Guard<MapMutexType> guard(m_bonesLock);
                 m_bones.push_back(bones);
             }
         }
@@ -3683,7 +3760,7 @@ void Map::RemoveOldBones(uint32 const diff)
     m_bonesCleanupTimer = 0u;
 
     time_t now = time(nullptr);
-    std::lock_guard<MapMutexType> guard(m_bonesLock);
+    ACE_Guard<MapMutexType> guard(m_bonesLock);
     for (auto iter = m_bones.begin(); iter != m_bones.end();)
     {
         Corpse* bones = *iter;

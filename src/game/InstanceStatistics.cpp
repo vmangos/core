@@ -143,7 +143,7 @@ void InstanceStatisticsMgr::LoadFromDB()
 void InstanceStatisticsMgr::IncrementWipeCounter(uint32 mapId, uint32 creatureEntry)
 {
     uint32 count;
-    std::unique_lock<std::mutex> lock(m_wipesMutex);
+    m_wipesMutex.acquire();
     auto it = m_instanceWipes.find(std::make_pair(mapId, creatureEntry));
     if (it == m_instanceWipes.end())
     {
@@ -155,7 +155,7 @@ void InstanceStatisticsMgr::IncrementWipeCounter(uint32 mapId, uint32 creatureEn
         it->second.count++;
         count = it->second.count;
     }
-    lock.unlock();
+    m_wipesMutex.release();
 
     Save(mapId, creatureEntry, count);
 }
@@ -173,7 +173,7 @@ void InstanceStatisticsMgr::IncrementKillCounter(Creature* pKiller, Player* pVic
         spellId = spellProto->Id;
     uint32 count = 0;
 
-    std::unique_lock<std::mutex> lock(m_creatureKillsMutex);
+    m_creatureKillsMutex.acquire();
     auto it = m_instanceCreatureKills.find(std::make_pair(mapId, creatureEntry));
     if (it == m_instanceCreatureKills.end())
     {
@@ -196,14 +196,14 @@ void InstanceStatisticsMgr::IncrementKillCounter(Creature* pKiller, Player* pVic
             count = ++it2->second;
         }
     }
-    lock.unlock();
+    m_creatureKillsMutex.release();
 
     Save(mapId,creatureEntry,spellId,count);
 }
 
 void InstanceStatisticsMgr::IncrementCustomCounter(eInstanceCustomCounter index, bool save)
 {
-    std::unique_lock<std::mutex> lock(m_customCountersMutex);
+    m_customCountersMutex.acquire();
     uint32 count;
     auto it = m_instanceCustomCounters.find(index);
     if (it == m_instanceCustomCounters.end())
@@ -216,7 +216,7 @@ void InstanceStatisticsMgr::IncrementCustomCounter(eInstanceCustomCounter index,
         it->second++;
         count = it->second;
     }
-    lock.unlock();
+    m_customCountersMutex.release();
 
     if (save)
     {

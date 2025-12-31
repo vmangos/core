@@ -95,15 +95,24 @@ Warden* AnticheatManager::CreateWardenFor(WorldSession* client, BigNumber* K)
     return warden;
 }
 
+void AnticheatManagerWorker::run()
+{
+    m_manager->UpdateWardenSessions();
+}
+
 void AnticheatManager::StartWardenUpdateThread()
 {
-   m_wardenUpdateThread = std::thread(&AnticheatManager::UpdateWardenSessions, this);
+    m_wardenUpdateThread = new ACE_Based::Thread(new AnticheatManagerWorker(this));
 }
 
 void AnticheatManager::StopWardenUpdateThread()
 {
-    if (m_wardenUpdateThread.joinable())
-        m_wardenUpdateThread.join();
+    if (m_wardenUpdateThread)
+    {
+        m_wardenUpdateThread->wait();
+        delete m_wardenUpdateThread;
+        m_wardenUpdateThread = nullptr;
+    }
 }
 
 void AnticheatManager::UpdateWardenSessions()
@@ -111,7 +120,7 @@ void AnticheatManager::UpdateWardenSessions()
     while (!World::IsStopped())
     {
         {
-            std::lock_guard<std::mutex> guard(m_wardenSessionsMutex);
+            ACE_Guard<ACE_Thread_Mutex> guard(m_wardenSessionsMutex);
             AddOrRemovePendingSessions();
         }
 
@@ -121,7 +130,7 @@ void AnticheatManager::UpdateWardenSessions()
                 warden->Update();
         }
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        ACE_Based::Thread::Sleep(1000);
     }
 }
 
@@ -171,13 +180,13 @@ void AnticheatManager::RemoveWardenSessionInternal(Warden* warden)
 
 void AnticheatManager::AddWardenSession(Warden* warden)
 {
-    std::lock_guard<std::mutex> guard(m_wardenSessionsMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_wardenSessionsMutex);
     m_wardenSessionsToAdd.push_back(warden);
 }
 
 void AnticheatManager::RemoveWardenSession(Warden* warden)
 {
-    std::lock_guard<std::mutex> guard(m_wardenSessionsMutex);
+    ACE_Guard<ACE_Thread_Mutex> guard(m_wardenSessionsMutex);
     m_wardenSessionsToRemove.push_back(warden);
 }
 

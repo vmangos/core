@@ -22,16 +22,18 @@
 #ifndef __SQLDELAYTHREAD_H
 #define __SQLDELAYTHREAD_H
 
+#include "ace/Thread_Mutex.h"
 #include "LockedQueue.h"
+#include "Threading.h"
 
 
 class Database;
 class SqlOperation;
 class SqlConnection;
 
-class SqlDelayThread
+class SqlDelayThread : public ACE_Based::Runnable
 {
-    typedef LockedQueue<SqlOperation*, std::mutex> SqlQueue;
+    typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
 
     private:
         SqlQueue m_sqlQueue;                                // Queue of SQL statements
@@ -40,20 +42,19 @@ class SqlDelayThread
         SqlConnection *m_dbConnection;                      // Pointer to DB connection
         volatile bool m_running;
 
+        int m_workerId;
 
         //process all enqueued requests
         void ProcessRequests();
 
     public:
-        SqlDelayThread(Database* db, SqlConnection* conn);
-        ~SqlDelayThread();
+        SqlDelayThread(Database* db, SqlConnection* conn, int workerId);
+        ~SqlDelayThread() override;
 
         // Put sql statement to delay queue
         bool Delay(SqlOperation* sql) { m_sqlQueue.add(sql); return true; }
-        void addSerialOperation(SqlOperation *op);
-        bool HasAsyncQuery();
 
         virtual void Stop();                                // Stop event
-        void run();                                         // Main Thread loop
+        void run() override;                                // Main Thread loop
 };
 #endif                                                      //__SQLDELAYTHREAD_H

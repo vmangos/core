@@ -28,7 +28,7 @@
 #include "SpellDefines.h"
 #include "SharedDefines.h"
 #include "nonstd/optional.hpp"
-#include <atomic>
+#include "ace/Atomic_Op.h"
 
 using nonstd::optional;
 
@@ -384,7 +384,7 @@ class ScriptMgr
         std::set<uint32> m_referencedGameObjectGuids;
 
         //atomic op counter for active scripts amount
-        std::atomic<int> m_scheduledScripts;
+        ACE_Atomic_Op<ACE_Thread_Mutex, int> m_scheduledScripts;
 };
 
 #define sScriptMgr MaNGOS::Singleton<ScriptMgr>::Instance()

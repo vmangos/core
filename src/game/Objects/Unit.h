@@ -1439,7 +1439,7 @@ class Unit : public SpellCaster
         // Serialize access to the movespline to prevent thread race conditions in async
         // move spline updates (one thread updates a spline, while another checks the
         // spline for end point with targeted move gen)
-        mutable std::mutex asyncMovesplineLock;
+        mutable ACE_Thread_Mutex asyncMovesplineLock;
 
         void HandleInterruptsOnMovement(bool positionChanged);
         void OnRelocated();

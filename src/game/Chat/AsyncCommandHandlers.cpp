@@ -239,10 +239,11 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData* data)
 // the world update
 void PlayerSearchHandler::HandlePlayerAccountSearchResult(std::unique_ptr<QueryResult>, SqlQueryHolder* queryHolder, int)
 {
-    sWorld.AddAsyncTask(PlayerAccountSearchDisplayTask((PlayerSearchQueryHolder*)queryHolder));
+    PlayerAccountSearchDisplayTask* task = new PlayerAccountSearchDisplayTask((PlayerSearchQueryHolder*)queryHolder);
+    sWorld.AddAsyncTask(task);
 }
 
-void PlayerAccountSearchDisplayTask::operator ()()
+void PlayerAccountSearchDisplayTask::run()
 {
     // NOTE: Do not currently support console access for these commands
     WorldSession* session = sWorld.FindSession(holder->GetAccountId());
@@ -308,7 +309,7 @@ void PlayerAccountSearchDisplayTask::operator ()()
     delete holder;
 }
 
-void PlayerCharacterLookupDisplayTask::operator()()
+void PlayerCharacterLookupDisplayTask::run()
 {
     std::unique_ptr<QueryResult> result;
     result.swap(*unsafeResult); // we are now the owner of this result. The unsafeResult is nullptr.
@@ -333,7 +334,8 @@ void PlayerCharacterLookupDisplayTask::operator()()
 // Handle the result and create a display task to run in the world update
 void PlayerSearchHandler::HandlePlayerCharacterLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
 {
-    sWorld.AddAsyncTask(std::move(PlayerCharacterLookupDisplayTask(std::move(result), accountId, limit)));
+    PlayerCharacterLookupDisplayTask* task = new PlayerCharacterLookupDisplayTask(std::move(result), accountId, limit);
+    sWorld.AddAsyncTask(task);
 }
 
 void PlayerSearchHandler::ShowPlayerListHelper(std::unique_ptr<QueryResult> result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)
@@ -404,7 +406,7 @@ bool PlayerSearchQueryHolder::GetAccountInfo(uint32 queryIndex, std::pair<uint32
     return true;
 }
 
-void AccountSearchDisplayTask::operator ()()
+void AccountSearchDisplayTask::run()
 {
     std::unique_ptr<QueryResult> result;
     result.swap(*unsafeResult); // we are now the owner of this result. The unsafeResult is nullptr.
@@ -429,7 +431,8 @@ void AccountSearchDisplayTask::operator ()()
 
 void AccountSearchHandler::HandleAccountLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
 {
-    sWorld.AddAsyncTask(std::move(AccountSearchDisplayTask(std::move(result), accountId, limit)));
+    AccountSearchDisplayTask *task = new AccountSearchDisplayTask(std::move(result), accountId, limit);
+    sWorld.AddAsyncTask(task);
 }
 
 void AccountSearchHandler::ShowAccountListHelper(std::unique_ptr<QueryResult> result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)
