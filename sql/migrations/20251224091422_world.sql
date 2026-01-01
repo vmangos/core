@@ -8,6 +8,7 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES ('20251224091422');
 -- Add your query below.
 
+
 -- Remove Duplicate Sharks
 DELETE FROM `creature` WHERE `guid` IN (88969, 88979, 88978, 88977, 88976, 88973, 88972, 88971, 88970);
 
@@ -49,9 +50,6 @@ UPDATE `quest_template` SET `CompleteScript` = 5227 WHERE `entry` = 5227 AND `pa
 -- The Shadow Guard (9213) and The Ice Guard (9211) Require Argent Dawn Honored
 UPDATE `quest_template` SET `RequiredMinRepFaction` = 529, `RequiredMinRepValue` = 9000 WHERE `entry` IN (9211, 9213);
 
--- Fix Console Errors
-UPDATE `creature` SET `mana_percent` = 100 WHERE  `guid` IN (17021, 17018, 17017, 17013, 17010, 17004);
-
 -- Events list for Devlin Agamand
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
 (165703, 1657, 0, 1, 0, 100, 3, 180000, 300000, 180000, 300000, 165703, 165704, 0, 'Devlin Agamand - Random Say OOC');
@@ -72,75 +70,6 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 (230701, 2307, 0, 1, 0, 100, 1, 180000, 300000, 180000, 300000, 230701, 0, 0, 'Caretaker Caice - Random Say OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (230701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 583, 584, 585, 586, 0, 0, 0, 0, 0, 'Caretaker Caice - Random Say OOC');
-
--- Pool Some Rich Thorium in Burning Steppes
-SET @PTEMPLATE = 3589;
-
--- Misc
-DELETE FROM `pool_pool` WHERE `pool_id` IN (21436, 21441, 21437, 21416);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Misc' WHERE `entry` IN (21436, 21441, 21437, 21416);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Misc' WHERE `pool_entry` IN (21436, 21441, 21437, 21416);
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+1, 1, 'Burning Steppes - Misc - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 0, 10);
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(21436, @PTEMPLATE+1, 0, 'Burning Steppes - Misc - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21441, @PTEMPLATE+1, 0, 'Burning Steppes - Misc - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21437, @PTEMPLATE+1, 0, 'Burning Steppes - Misc - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21416, @PTEMPLATE+1, 0, 'Burning Steppes - Misc - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0);
-
--- Ruins of Thaurissian
-DELETE FROM `pool_pool` WHERE `pool_id` IN (21438, 21433, 21435, 21432, 21440);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Ruins of Thaurissian' WHERE `entry` IN (21438, 21433, 21435, 21432, 21440);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Ruins of Thaurissian' WHERE `pool_entry` IN (21438, 21433, 21435, 21432, 21440);
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+2, 1, 'Burning Steppes - Ruins of Thaurissian - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 0, 10);
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(21438, @PTEMPLATE+2, 0, 'Burning Steppes - Ruins of Thaurissian - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21433, @PTEMPLATE+2, 0, 'Burning Steppes - Ruins of Thaurissian - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21435, @PTEMPLATE+2, 0, 'Burning Steppes - Ruins of Thaurissian - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21432, @PTEMPLATE+2, 0, 'Burning Steppes - Ruins of Thaurissian - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21440, @PTEMPLATE+2, 0, 'Burning Steppes - Ruins of Thaurissian - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0);
-
--- Blackrock Stronghold
-DELETE FROM `pool_pool` WHERE `pool_id` IN (21434, 21431, 21429, 21430, 21439);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Blackrock Stronghold' WHERE `entry` IN (21434, 21431, 21429, 21430, 21439);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Blackrock Stronghold' WHERE `pool_entry` IN (21434, 21431, 21429, 21430, 21439);
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+3, 1, 'Burning Steppes - Blackrock Stronghold - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 0, 10);
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(21434, @PTEMPLATE+3, 0, 'Burning Steppes - Blackrock Stronghold - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21431, @PTEMPLATE+3, 0, 'Burning Steppes - Blackrock Stronghold - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21429, @PTEMPLATE+3, 0, 'Burning Steppes - Blackrock Stronghold - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21430, @PTEMPLATE+3, 0, 'Burning Steppes - Blackrock Stronghold - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21439, @PTEMPLATE+3, 0, 'Burning Steppes - Blackrock Stronghold - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0);
-
--- Draco\'dar
-DELETE FROM `pool_pool` WHERE `pool_id` IN (21427, 21418, 21423, 21426, 21428);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Draco\'dar' WHERE `entry` IN (21427, 21418, 21423, 21426, 21428);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Draco\'dar' WHERE `pool_entry` IN (21427, 21418, 21423, 21426, 21428);
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+4, 1, 'Burning Steppes - Draco\'dar - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 0, 10);
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(21427, @PTEMPLATE+4, 0, 'Burning Steppes - Draco\'dar - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21418, @PTEMPLATE+4, 0, 'Burning Steppes - Draco\'dar - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21423, @PTEMPLATE+4, 0, 'Burning Steppes - Draco\'dar - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21426, @PTEMPLATE+4, 0, 'Burning Steppes - Draco\'dar - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21428, @PTEMPLATE+4, 0, 'Burning Steppes - Draco\'dar - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0);
-
--- Pillar of Ash
-DELETE FROM `pool_pool` WHERE `pool_id` IN (21417, 21425, 21420, 21419, 21421);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Pillar of Ash' WHERE `entry` IN (21417, 21425, 21420, 21419, 21421);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein - Burning Steppes - Pillar of Ash' WHERE `pool_entry` IN (21417, 21425, 21420, 21419, 21421);
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+5, 1, 'Burning Steppes - Pillar of Ash - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 0, 10);
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(21417, @PTEMPLATE+5, 0, 'Burning Steppes - Pillar of Ash - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21425, @PTEMPLATE+5, 0, 'Burning Steppes - Pillar of Ash - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21420, @PTEMPLATE+5, 0, 'Burning Steppes - Pillar of Ash - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21419, @PTEMPLATE+5, 0, 'Burning Steppes - Pillar of Ash - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0),
-(21421, @PTEMPLATE+5, 0, 'Burning Steppes - Pillar of Ash - Truesilver Deposit / Dark Iron Deposit / Rich Thorium Vein', 0);
-
-DELETE FROM `pool_template` WHERE `entry` = 1297;
 
 -- Correct Patch for Attunement to the Core
 UPDATE `creature_questrelation` SET `patch_max` = 2 WHERE `id` = 14387 AND `quest` = 7487;
