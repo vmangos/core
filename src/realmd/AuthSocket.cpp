@@ -1256,9 +1256,10 @@ bool AuthSocket::VerifyPinData(uint32 pin, const PINData& clientData)
     return hash.AsDecStr() == clientHash.AsDecStr();
 }
 
-uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
+uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval)
+{
     std::vector<uint8> decoded_key((secret.size() + 7) / 8 * 5);
-    int key_size = base32_decode((const uint8_t*)secret.data(), decoded_key.data(), decoded_key.size());
+    int key_size = base32_decode((const uint8_t*)secret.data(), decoded_key.data());
 
     if (key_size == -1)
     {
