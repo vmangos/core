@@ -2661,12 +2661,6 @@ uint32 SpellMgr::GetRequiredAreaForSpell(uint32 spellId)
     // Not defined in database.
     switch (spellId)
     {
-        // Alterac Valley
-        case 22564: // Recall (Alliance)
-        case 22563: // Recall (Horde)
-        case 23538: // Battle Standard (Horde)
-        case 23539: // Battle Standard (Alliance)
-            return 2597;
         // Warsong Gulch
         case 23333: // Warsong Flag
         case 23335: // Silverwing Flag
