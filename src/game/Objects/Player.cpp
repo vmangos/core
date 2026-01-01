@@ -22137,7 +22137,7 @@ void Player::AddGCD(SpellEntry const& spellEntry, uint32 /*forcedDuration = 0*/,
     ApplySpellMod(spellEntry.Id, SPELLMOD_GLOBAL_COOLDOWN, gcdDuration);
 
     // apply haste rating
-    if (spellEntry.StartRecoveryCategory == 133 && gcdDuration == 1500 &&
+    if (spellEntry.StartRecoveryCategory == SPELLCATEGORY_GLOBAL && gcdDuration == 1500 &&
         spellEntry.DmgClass != SPELL_DAMAGE_CLASS_MELEE && spellEntry.DmgClass != SPELL_DAMAGE_CLASS_RANGED &&
         !spellEntry.HasAttribute(SPELL_ATTR_USES_RANGED_SLOT) && !spellEntry.HasAttribute(SPELL_ATTR_IS_ABILITY))
     {
@@ -22268,6 +22268,18 @@ void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* item
             data << GetObjectGuid();
             SendDirectMessage(&data);
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sending SMSG_COOLDOWN_EVENT with spell id = %u", spellEntry.Id);
+        }
+    }
+
+    // Shooting with Wands should trigger GCD. Without this check GCD is only client side but not server side.
+    if (spellCategory && recTime)
+    {
+        if (SpellCategoryEntry const* pCategoryEntry = sSpellCategoryStore.LookupEntry(spellCategory))
+        {
+            if (pCategoryEntry->Flags & SCF_COOLDOWN_IS_GLOBAL)
+            {
+                m_GCDCatMap.emplace(SPELLCATEGORY_GLOBAL, std::chrono::milliseconds(recTime) + sWorld.GetCurrentClockTime());
+            }
         }
     }
 }

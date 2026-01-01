@@ -1197,6 +1197,12 @@ enum SpellCategories
     SPELLCATEGORY_REINCARNATION = 1161
 };
 
+enum SpellCategoryFlags
+{
+    SCF_COOLDOWN_MODIFIES_ITEM = 0x1,
+    SCF_COOLDOWN_IS_GLOBAL = 0x2,
+};
+
 // Spell clasification
 enum SpellSpecific
 {
