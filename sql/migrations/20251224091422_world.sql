@@ -170,6 +170,9 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 (618201, 1, 0, 1, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Daphne Stilwell - Emote'),
 (618201, 8, 0, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Daphne Stilwell - Emote');
 
+-- Remove Duplicate Blood of Heroes
+DELETE FROM `gameobject` WHERE `guid` = 25371;
+
 
 -- End of migration.
 END IF;
