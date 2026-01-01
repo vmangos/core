@@ -462,6 +462,8 @@ UPDATE `creature` SET `wander_distance`=0, `movement_type`=0 WHERE `guid`=190228
 
 -- Delete custom troll spawns
 DELETE FROM `creature` WHERE `guid` IN (190225, 190227, 190226, 190223, 190224, 190222);
+DELETE FROM `creature_linking` WHERE `guid` IN (190225, 190227, 190226, 190223, 190224, 190222);
+DELETE FROM `creature_groups` WHERE `member_guid` IN (190225, 190227, 190226, 190223, 190224, 190222);
 
 -- Delete custom troll waypoints
 DELETE FROM `creature_movement` WHERE `id`=190222;

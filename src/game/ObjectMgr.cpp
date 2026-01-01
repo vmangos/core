@@ -4092,11 +4092,15 @@ void ObjectMgr::LoadItemPrototypes()
                     }
                 }
 
+                // this check is disabled because 12344 uses spell category that does not exist in the dbc
+                // yet item has this category assigned in both vanilla wdb files and classic db2 files
+                /*
                 if (proto->Spells[j].SpellCategory > 0)
                 {
                     if (!sSpellCategoryStore.LookupEntry(proto->Spells[j].SpellCategory))
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Item (Entry: %u) has wrong (not existing) spell category in spellcategory_%d (%u)", i, j + 1, proto->Spells[j].SpellCategory);
                 }
+                */
             }
         }
 
