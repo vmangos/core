@@ -733,6 +733,45 @@ AuraScript* GetScript_NefarianClassCallMage(SpellEntry const*)
     return new NefarianClassCallMageAuraScript();
 }
 
+// 23603 - Nefarian Class Call Mage - Polymorph (Transform Display-ID)
+struct NefarianPolymorphAuraScript : public AuraScript
+{
+    void OnAfterApply(Aura* aura, bool apply) final
+    {
+        if (!apply)
+            return;
+
+        Unit* target = aura->GetTarget();
+
+        // Randomly select one of three display IDs for the polymorph transform
+        uint32 display_id = 0;
+        int rand = urand(0, 2);
+        switch (rand)
+        {
+            case 0:
+                display_id = 1060;
+                break;
+            case 1:
+                display_id = 4473;
+                break;
+            case 2:
+                display_id = 7898;
+                break;
+        }
+
+        if (display_id)
+        {
+            target->SetDisplayId(display_id);
+            target->SetTransformScale(1.0f);
+        }
+    }
+};
+
+AuraScript* GetScript_NefarianPolymorph(SpellEntry const*)
+{
+    return new NefarianPolymorphAuraScript();
+}
+
 void AddSC_boss_nefarian()
 {
     Script* pNewScript;
@@ -770,5 +809,10 @@ void AddSC_boss_nefarian()
     pNewScript = new Script;
     pNewScript->Name = "spell_nefarian_class_call_mage";
     pNewScript->GetAuraScript = &GetScript_NefarianClassCallMage;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_nefarian_polymorph";
+    pNewScript->GetAuraScript = &GetScript_NefarianPolymorph;
     pNewScript->RegisterSelf();
 }

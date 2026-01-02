@@ -146,6 +146,53 @@ SpellScript* GetScript_WarriorBloodrage(SpellEntry const*)
     return new WarriorBloodrageScript();
 }
 
+// 12292 - Sweeping Strikes
+struct WarriorSweepingStrikesAuraScript : public AuraScript
+{
+    void OnHolderInit(SpellAuraHolder* holder, WorldObject* /*caster*/) final
+    {
+        // Sweeping Strikes should not be removed on shapeshift
+        holder->SetRemovedOnShapeLost(false);
+    }
+};
+
+AuraScript* GetScript_WarriorSweepingStrikes(SpellEntry const*)
+{
+    return new WarriorSweepingStrikesAuraScript();
+}
+
+// 23234 - Blood Fury
+struct WarriorBloodFuryAuraScript : public AuraScript
+{
+    enum
+    {
+        SPELL_BLOOD_FURY_DEBUFF = 23230,
+    };
+
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+#if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1) && (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4)
+        // Blood Fury - Add aura to decrease attack power on remove
+        if (!apply && (aura->GetHolder()->GetRemoveMode() == AURA_REMOVE_BY_CANCEL || aura->GetHolder()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE))
+        {
+            Unit* target = aura->GetTarget();
+            // using delayed event because of an error in ExclusiveAuraUnapply
+            target->m_Events.AddLambdaEventAtOffset([target]
+            {
+                int32 attackPower = -25 * (target->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100;
+                if (attackPower < 0)
+                    target->CastCustomSpell(target, SPELL_BLOOD_FURY_DEBUFF, attackPower, {}, {}, true, nullptr);
+            }, 1);
+        }
+#endif
+    }
+};
+
+AuraScript* GetScript_WarriorBloodFury(SpellEntry const*)
+{
+    return new WarriorBloodFuryAuraScript();
+}
+
 void AddSC_warrior_spell_scripts()
 {
     Script* newscript;
@@ -183,5 +230,15 @@ void AddSC_warrior_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_warrior_bloodrage";
     newscript->GetSpellScript = &GetScript_WarriorBloodrage;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warrior_sweeping_strikes";
+    newscript->GetAuraScript = &GetScript_WarriorSweepingStrikes;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warrior_blood_fury";
+    newscript->GetAuraScript = &GetScript_WarriorBloodFury;
     newscript->RegisterSelf();
 }

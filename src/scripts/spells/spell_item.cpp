@@ -714,6 +714,59 @@ SpellScript* GetScript_SummonBlackQirajiBattleTank(SpellEntry const*)
     return new SummonBlackQirajiBattleTankScript();
 }
 
+// 4060 - Discombobulate (Discombobulator Ray)
+struct DiscombobulateAuraScript : public AuraScript
+{
+    void OnAfterApply(Aura* aura, bool apply) final
+    {
+        if (!apply)
+            return;
+
+        Unit* target = aura->GetTarget();
+
+        // Discombobulate removes mount auras when applied
+        target->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+    }
+};
+
+AuraScript* GetScript_Discombobulate(SpellEntry const*)
+{
+    return new DiscombobulateAuraScript();
+}
+
+// 28282 - Ashbringer
+struct AshbringerAuraScript : public AuraScript
+{
+    enum
+    {
+        FACTION_SCARLET_CRUSADE = 56,
+        REPUTATION_RANK_FRIENDLY = 7,
+    };
+
+    void OnAfterApply(Aura* aura, bool apply) final
+    {
+        Unit* target = aura->GetTarget();
+        if (target->GetTypeId() != TYPEID_PLAYER)
+            return;
+
+        Player* player = target->ToPlayer();
+        ReputationRank scarlet_crusade_rank = ReputationRank(REPUTATION_RANK_FRIENDLY);
+
+        // Ashbringer makes you friendly with Scarlet Crusade too
+        player->GetReputationMgr().ApplyForceReaction(FACTION_SCARLET_CRUSADE, scarlet_crusade_rank, apply);
+        player->GetReputationMgr().SendForceReactions();
+
+        // Stop fighting if at apply forced rank friendly or at remove real rank friendly
+        if ((apply && scarlet_crusade_rank >= REP_FRIENDLY) || (!apply && player->GetReputationRank(FACTION_SCARLET_CRUSADE) >= REP_FRIENDLY))
+            player->StopAttackFaction(FACTION_SCARLET_CRUSADE);
+    }
+};
+
+AuraScript* GetScript_Ashbringer(SpellEntry const*)
+{
+    return new AshbringerAuraScript();
+}
+
 void AddSC_item_spell_scripts()
 {
     Script* newscript;
@@ -861,5 +914,15 @@ void AddSC_item_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_summon_black_qiraji_battle_tank";
     newscript->GetSpellScript = &GetScript_SummonBlackQirajiBattleTank;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_discombobulate";
+    newscript->GetAuraScript = &GetScript_Discombobulate;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_ashbringer";
+    newscript->GetAuraScript = &GetScript_Ashbringer;
     newscript->RegisterSelf();
 }
