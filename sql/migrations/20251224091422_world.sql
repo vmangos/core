@@ -102,6 +102,10 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `
 -- Remove Duplicate Blood of Heroes
 DELETE FROM `gameobject` WHERE `guid` = 25371;
 
+-- Remove Rogue PLaguebloom
+DELETE FROM `gameobject` WHERE `guid` = 20108;
+DELETE FROM `pool_gameobject` WHERE `guid` = 20108;
+
 
 -- End of migration.
 END IF;
