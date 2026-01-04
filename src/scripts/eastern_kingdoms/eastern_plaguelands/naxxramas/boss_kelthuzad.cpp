@@ -1149,10 +1149,10 @@ struct ChainsOfKelThuzadAuraScript : public AuraScript
     void OnAfterApply(Aura* aura, bool apply) final
     {
         Unit* target = aura->GetTarget();
-        if (target->GetTypeId() != TYPEID_PLAYER)
+        Player* player = target->ToPlayer();
+        if (!player)
             return;
 
-        Player* player = target->ToPlayer();
         if (apply && player->m_AI)
         {
             // Enable positive spells for charmed players (allows healing/buffing while charmed)

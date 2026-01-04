@@ -1108,8 +1108,6 @@ struct ThaddiusPositiveChargeAuraScript : public AuraScript
         for (auto const& it : pList)
         {
             Player* pPlayer = it.getSource();
-            if (!pPlayer)
-                continue;
             if (pPlayer->GetGUID() == target->GetGUID())
                 continue;
             if (pPlayer->IsDead())
@@ -1170,8 +1168,6 @@ struct ThaddiusNegativeChargeAuraScript : public AuraScript
         for (auto const& it : pList)
         {
             Player* pPlayer = it.getSource();
-            if (!pPlayer)
-                continue;
             if (pPlayer->GetGUID() == caster->GetGUID())
                 continue;
             if (pPlayer->IsDead())

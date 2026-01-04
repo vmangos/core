@@ -415,10 +415,10 @@ struct ControllingSteamTonkAuraScript : public AuraScript
 {
     enum
     {
-        SPELL_DAMAGED_TONK              = 27771,
-        SPELL_STUN                      = 9179,
-        SPELL_UNROOT                    = 24935,
-        GAMEOBJECT_TONK_CONTROL_CONSOLE = 180524
+        SPELL_DAMAGED_TONK      = 27771,
+        SPELL_STUN              = 9179,
+        SPELL_UNROOT            = 24935,
+        GO_TONK_CONTROL_CONSOLE = 180524
     };
 
     void OnAfterApply(Aura* aura, bool apply) final
@@ -443,7 +443,7 @@ struct ControllingSteamTonkAuraScript : public AuraScript
         player->RemoveAurasDueToSpell(SPELL_UNROOT);
 
         // Reset Tonk Control Console
-        if (GameObject* pConsole = player->FindNearestGameObject(GAMEOBJECT_TONK_CONTROL_CONSOLE, INTERACTION_DISTANCE))
+        if (GameObject* pConsole = player->FindNearestGameObject(GO_TONK_CONTROL_CONSOLE, INTERACTION_DISTANCE))
         {
             pConsole->SetGoState(GO_STATE_READY);
             pConsole->SetLootState(GO_READY);
