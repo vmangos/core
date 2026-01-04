@@ -2358,6 +2358,61 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
     return true;
 }
 
+void SpellMgr::LoadSpellCones()
+{
+    mSpellCones.clear();                              // need for reload case
+
+    uint32 count = 0;
+
+    //                                                               0        1
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `cone_degrees` FROM `spell_cone`"));
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spell cones", count);
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+        int16 degrees = fields[1].GetInt16();
+
+        SpellEntry const* pSpellInfo = GetSpellEntry(entry);
+
+        if (!pSpellInfo)
+        {
+            if (!IsExistingSpellId(entry))
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_cone` does not exist", entry);
+            continue;
+        }
+
+        if (degrees < -360 || degrees > 360)
+        {
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_cone` has incorrect angle %u outside of valid range", entry, degrees);
+            continue;
+        }
+
+        float angle = degrees * M_PI_F / 180.0f;
+
+        mSpellCones[entry] = angle;
+
+        ++count;
+    } while (result->NextRow());
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spell cones", count);
+}
+
 void SpellMgr::LoadSpellAreas()
 {
     mSpellAreaMap.clear();                                  // need for reload case

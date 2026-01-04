@@ -2779,92 +2779,79 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             break;
         case TARGET_ENUM_UNITS_ENEMY_IN_CONE_24:
         {
-            SpellNotifyPushType pushType = PUSH_IN_FRONT;
-            switch (m_spellInfo->SpellVisual)            // Some spell require a different target fill
-            {
-                case 3879:
-                    pushType = PUSH_IN_BACK;
-                    break;
-                case 7441:
-                    pushType = PUSH_IN_FRONT_15;
-                    break;
-                case 7619: // anub impale
-                    pushType = PUSH_IN_FRONT_15;
-                    break;
-            }
-            FillAreaTargets(targetUnitMap, radius, pushType, SPELL_TARGETS_AOE_DAMAGE);
+            FillAreaTargets(targetUnitMap, radius, PUSH_IN_CONE, SPELL_TARGETS_AOE_DAMAGE);
             break;
         }
         case TARGET_ENUM_UNITS_ENEMY_IN_CONE_54:
         {
             switch (m_spellInfo->Id)
             {
-            case 24820:
-            case 24821:
-            case 24822:
-            case 24823:
-            case 24835:
-            case 24836:
-            case 24837:
-            case 24838:
-            {
-                UnitList tempTargetUnitMap;
-                FillAreaTargets(tempTargetUnitMap, radius, PUSH_SELF_CENTER, SPELL_TARGETS_AOE_DAMAGE);
-
-                for (const auto itr : tempTargetUnitMap)
+                case 24820:
+                case 24821:
+                case 24822:
+                case 24823:
+                case 24835:
+                case 24836:
+                case 24837:
+                case 24838:
                 {
-                    float angle;
-                    float arc;
+                    UnitList tempTargetUnitMap;
+                    FillAreaTargets(tempTargetUnitMap, radius, PUSH_SELF_CENTER, SPELL_TARGETS_AOE_DAMAGE);
 
-                    switch (m_spellInfo->Id)
+                    for (const auto itr : tempTargetUnitMap)
                     {
-                        case 24820:
-                            angle = 0.0f * M_PI_F / 4.0f;
-                            arc = 2.0f * M_PI_F / 3.0f;
-                            break;
-                        case 24821:
-                            angle = 1.0f * M_PI_F / 4.0f;
-                            arc = 2.0f * M_PI_F / 3.0f;
-                            break;
-                        case 24822:
-                            angle = 2.0f * M_PI_F / 4.0f;
-                            arc = 2.0f * M_PI_F / 3.0f;
-                            break;
-                        case 24823:
-                            angle = 3.0f * M_PI_F / 4.0f;
-                            arc = 2.0f * M_PI_F / 3.0f;
-                            break;
-                        case 24835:
-                            angle = -4.0f * M_PI_F / 4.0f;
-                            arc = 2.0f * M_PI_F / 3.0f;
-                            break;
-                        case 24836:
-                            angle = -3.0f * M_PI_F / 4.0f;
-                            arc = 2.0f * M_PI_F / 3.0f;
-                            break;
-                        case 24837:
-                            angle = -2.0f * M_PI_F / 4.0f;
-                            arc = 2.0f * M_PI_F / 3.0f;
-                            break;
-                        case 24838:
-                            angle = -1.0f * M_PI_F / 4.0f;
-                            arc = 2.0f * M_PI_F / 3.0f;
-                            break;
-                        default:
-                            angle = 0.0f;
-                            arc = M_PI_F / 2.0f;
-                            break;
+                        float angle;
+                        float arc;
+
+                        switch (m_spellInfo->Id)
+                        {
+                            case 24820:
+                                angle = 0.0f * M_PI_F / 4.0f;
+                                arc = 2.0f * M_PI_F / 3.0f;
+                                break;
+                            case 24821:
+                                angle = 1.0f * M_PI_F / 4.0f;
+                                arc = 2.0f * M_PI_F / 3.0f;
+                                break;
+                            case 24822:
+                                angle = 2.0f * M_PI_F / 4.0f;
+                                arc = 2.0f * M_PI_F / 3.0f;
+                                break;
+                            case 24823:
+                                angle = 3.0f * M_PI_F / 4.0f;
+                                arc = 2.0f * M_PI_F / 3.0f;
+                                break;
+                            case 24835:
+                                angle = -4.0f * M_PI_F / 4.0f;
+                                arc = 2.0f * M_PI_F / 3.0f;
+                                break;
+                            case 24836:
+                                angle = -3.0f * M_PI_F / 4.0f;
+                                arc = 2.0f * M_PI_F / 3.0f;
+                                break;
+                            case 24837:
+                                angle = -2.0f * M_PI_F / 4.0f;
+                                arc = 2.0f * M_PI_F / 3.0f;
+                                break;
+                            case 24838:
+                                angle = -1.0f * M_PI_F / 4.0f;
+                                arc = 2.0f * M_PI_F / 3.0f;
+                                break;
+                            default:
+                                angle = 0.0f;
+                                arc = M_PI_F / 2.0f;
+                                break;
+                        }
+
+                        if (m_caster->HasInArc(itr, arc, angle))
+                            targetUnitMap.push_back(itr);
                     }
 
-                    if (m_caster->HasInArc(itr, arc, angle))
-                        targetUnitMap.push_back(itr);
+                    break;
                 }
-
-                break;
-            }
-            default:
-                FillAreaTargets(targetUnitMap, radius, PUSH_IN_FRONT_90, SPELL_TARGETS_AOE_DAMAGE);
-                break;
+                default:
+                    FillAreaTargets(targetUnitMap, radius, PUSH_IN_CONE, SPELL_TARGETS_AOE_DAMAGE);
+                    break;
             }
 
             break;
@@ -2881,7 +2868,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
             // fill real target list if no spell script target defined
             FillAreaTargets(bounds.first != bounds.second ? tempTargetUnitMap : targetUnitMap,
-                radius, PUSH_IN_FRONT_15, bounds.first != bounds.second ? SPELL_TARGETS_ALL : targetB);
+                radius, PUSH_IN_CONE, bounds.first != bounds.second ? SPELL_TARGETS_ALL : targetB);
 
             for (const auto iter : tempTargetUnitMap)
             {
@@ -8068,6 +8055,7 @@ public:
     Spell &i_spell;
     SpellNotifyPushType i_push_type;
     float i_radius;
+    float i_angle;
     SpellTargets i_TargetType;
     SpellCaster* i_originalCaster;
     SpellCaster* i_castingObject;
@@ -8085,7 +8073,7 @@ public:
 
     SpellNotifierCreatureAndPlayer(Spell &spell, Spell::UnitList &data, float radius, SpellNotifyPushType type,
                                    SpellTargets TargetType = SPELL_TARGETS_NOT_FRIENDLY, SpellCaster* originalCaster = nullptr)
-        : i_data(&data), i_spell(spell), i_push_type(type), i_radius(radius), i_TargetType(TargetType),
+        : i_data(&data), i_spell(spell), i_push_type(type), i_radius(radius), i_angle(0.0f), i_TargetType(TargetType),
           i_originalCaster(originalCaster), i_castingObject(i_spell.GetCastingObject())
     {
         if (!i_originalCaster)
@@ -8093,10 +8081,9 @@ public:
 
         switch (i_push_type)
         {
-            case PUSH_IN_FRONT:
-            case PUSH_IN_FRONT_90:
-            case PUSH_IN_FRONT_15:
-            case PUSH_IN_BACK:
+            case PUSH_IN_CONE:
+                i_angle = sSpellMgr.GetSpellCone(i_spell.m_spellInfo->Id);
+                // no break
             case PUSH_SELF_CENTER:
                 if (i_castingObject)
                 {
@@ -8214,21 +8201,15 @@ public:
             // we don't need to check InMap here, it's already done some lines above
             switch (i_push_type)
             {
-                case PUSH_IN_FRONT:
-                    if (i_castingObject->IsWithinDist(unit, radius, true, SizeFactor::None) && i_castingObject->HasInArc(unit, 2 * M_PI_F / 3))
-                        inRange = true;
-                    break;
-                case PUSH_IN_FRONT_90:
-                    if (i_castingObject->IsWithinDist(unit, radius, true, SizeFactor::None) && i_castingObject->HasInArc(unit, M_PI_F / 2))
-                        inRange = true;
-                    break;
-                case PUSH_IN_FRONT_15:
-                    if (i_castingObject->IsWithinDist(unit, radius, true, SizeFactor::None) && i_castingObject->HasInArc(unit, M_PI_F / 12))
-                        inRange = true;
-                    break;
-                case PUSH_IN_BACK: // 75
-                    if (i_castingObject->IsWithinDist(unit, radius, true, SizeFactor::None) && !i_castingObject->HasInArc(unit, 2 * M_PI_F - 5 * M_PI_F / 12))
-                        inRange = true;
+                case PUSH_IN_CONE:
+                    if (i_castingObject->IsWithinDist(unit, radius, true, SizeFactor::None))
+                    {
+                        // negative angle means in the back
+                        if (i_angle > 0)
+                            inRange = i_castingObject->HasInArc(unit, i_angle);
+                        else if (i_angle < 0)
+                            inRange = !i_castingObject->HasInArc(unit, (M_PI_F * 2.0f) + i_angle);
+                    }
                     break;
                 case PUSH_SELF_CENTER:
                     if (i_castingObject->IsWithinDist(unit, radius, true, SizeFactor::None))

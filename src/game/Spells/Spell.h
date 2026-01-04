@@ -63,10 +63,7 @@ enum SpellCastFlags
 
 enum SpellNotifyPushType
 {
-    PUSH_IN_FRONT,
-    PUSH_IN_FRONT_90,
-    PUSH_IN_FRONT_15,
-    PUSH_IN_BACK,
+    PUSH_IN_CONE,
     PUSH_SELF_CENTER,
     PUSH_SRC_CENTER,
     PUSH_DEST_CENTER,

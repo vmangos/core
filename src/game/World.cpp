@@ -1631,6 +1631,9 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading spell pet auras...");
     sSpellMgr.LoadSpellPetAuras();
 
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading spell cones...");
+    sSpellMgr.LoadSpellCones();
+
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Player Create Info & Level Stats...");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sObjectMgr.LoadPlayerInfo();
