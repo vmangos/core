@@ -2398,7 +2398,7 @@ void SpellMgr::LoadSpellCones()
 
         if (degrees < -360 || degrees > 360)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_cone` has incorrect angle %u outside of valid range", entry, degrees);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_cone` has incorrect angle %i outside of valid range", entry, degrees);
             continue;
         }
 
