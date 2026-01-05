@@ -16,6 +16,7 @@
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
+#include "AI/PlayerAI.h"
 
 enum KelthuzadData
 {
@@ -1142,6 +1143,29 @@ SpellScript* GetScript_KelThuzadVoidBlast(SpellEntry const*)
     return new KelThuzadVoidBlastScript();
 }
 
+// 28410 - Chains of Kel'Thuzad
+struct ChainsOfKelThuzadAuraScript : public AuraScript
+{
+    void OnAfterApply(Aura* aura, bool apply) final
+    {
+        Unit* target = aura->GetTarget();
+        Player* player = target->ToPlayer();
+        if (!player)
+            return;
+
+        if (apply && player->m_AI)
+        {
+            // Enable positive spells for charmed players (allows healing/buffing while charmed)
+            player->m_AI->enablePositiveSpells = true;
+        }
+    }
+};
+
+AuraScript* GetScript_ChainsOfKelThuzad(SpellEntry const*)
+{
+    return new ChainsOfKelThuzadAuraScript();
+}
+
 void AddSC_boss_kelthuzad()
 {
     Script* NewScript;
@@ -1179,5 +1203,10 @@ void AddSC_boss_kelthuzad()
     NewScript = new Script;
     NewScript->Name = "spell_kelthuzad_void_blast";
     NewScript->GetSpellScript = &GetScript_KelThuzadVoidBlast;
+    NewScript->RegisterSelf();
+
+    NewScript = new Script;
+    NewScript->Name = "spell_chains_of_kelthuzad";
+    NewScript->GetAuraScript = &GetScript_ChainsOfKelThuzad;
     NewScript->RegisterSelf();
 }

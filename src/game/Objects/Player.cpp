@@ -4628,6 +4628,33 @@ void Player::SetFly(bool enable)
     SendHeartBeat(true);
 }
 
+enum GhostForm : uint32
+{
+    SPELL_WISP_SPIRIT       = 20585,
+    SPELL_WISP_SPIRIT_GHOST = 20584,
+    SPELL_GHOST             = 8326,
+};
+
+void Player::ApplyGhostForm()
+{
+    if (HasSpell(SPELL_WISP_SPIRIT))
+    {
+        CastSpell(this, SPELL_WISP_SPIRIT_GHOST, true);
+    }
+    CastSpell(this, SPELL_GHOST, true);
+    SetWaterWalking(true);
+}
+
+void Player::RemoveGhostForm()
+{
+    if (HasSpell(SPELL_WISP_SPIRIT))
+    {
+        RemoveAurasDueToSpell(SPELL_WISP_SPIRIT_GHOST);
+    }
+    RemoveAurasDueToSpell(SPELL_GHOST);
+    SetWaterWalking(false);
+}
+
 /* Preconditions:
   - a resurrectable corpse must not be loaded for the player (only bones)
   - the player must be in world
@@ -4641,9 +4668,7 @@ void Player::BuildPlayerRepop()
     //this is spirit release confirm?
     RemovePet(PET_SAVE_REAGENTS);
 
-    if (GetRace() == RACE_NIGHTELF)
-        CastSpell(this, 20584, true);                       // auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
-    CastSpell(this, 8326, true);                            // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
+    ApplyGhostForm();
 
     // the player cannot have a corpse already, only bones which are not returned by GetCorpse
     Corpse* corpse;
@@ -4668,7 +4693,6 @@ void Player::BuildPlayerRepop()
     // convert player body to ghost
     SetHealth(1);
 
-    SetWaterWalking(true);
     if (!GetSession()->IsLogingOut())
         SetRooted(false);
 
@@ -4695,11 +4719,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     SetDeathState(ALIVE);
 
-    if (GetRace() == RACE_NIGHTELF)
-        RemoveAurasDueToSpell(20584);                       // speed bonuses
-    RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
-
-    SetWaterWalking(false);
+    RemoveGhostForm();
     SetRooted(false);
 
     // set health/powers (0- will be set in caller)

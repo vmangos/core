@@ -1087,6 +1087,126 @@ CreatureAI* GetAI_boss_thaddius(Creature* pCreature)
     return new boss_thaddiusAI(pCreature);
 }
 
+// 28059 - Positive Charge (Thaddius)
+struct ThaddiusPositiveChargeAuraScript : public AuraScript
+{
+    enum
+    {
+        SPELL_POSITIVE_CHARGE_APPLY = 28059,
+        SPELL_POSITIVE_CHARGE_AMP   = 29659
+    };
+
+    void OnPeriodicTrigger(Aura* aura, Unit* caster, Unit* target, WorldObject* /*targetObject*/, SpellEntry const*& /*spellInfo*/) final
+    {
+        // Only process in Naxxramas to avoid performance issues
+        if (target->GetMap()->GetId() != MAP_NAXXRAMAS)
+            return;
+
+        int numStacks = 0;
+        // Finding the amount of other players within 13yd that has the same polarity
+        Map::PlayerList const& pList = target->GetMap()->GetPlayers();
+        for (auto const& it : pList)
+        {
+            Player* pPlayer = it.getSource();
+            if (pPlayer->GetGUID() == target->GetGUID())
+                continue;
+            if (pPlayer->IsDead())
+                continue;
+            // 2d distance should be good enough
+            if (pPlayer->HasAura(SPELL_POSITIVE_CHARGE_APPLY) && caster->GetDistance2d(pPlayer) < 13.0f)
+            {
+                ++numStacks;
+            }
+        }
+        if (numStacks > 0)
+        {
+            if (!target->HasAura(SPELL_POSITIVE_CHARGE_AMP))
+                target->AddAura(SPELL_POSITIVE_CHARGE_AMP);
+            target->GetAura(SPELL_POSITIVE_CHARGE_AMP, EFFECT_INDEX_0)->GetHolder()->SetStackAmount(numStacks);
+        }
+        else
+        {
+            target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_AMP);
+        }
+    }
+
+    void OnAfterApply(Aura* aura, bool apply) final
+    {
+        if (apply)
+            return;
+
+        Unit* target = aura->GetTarget();
+        // Remove amplify effect on remove
+        if (target->HasAura(SPELL_POSITIVE_CHARGE_AMP))
+            target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_AMP);
+    }
+};
+
+AuraScript* GetScript_ThaddiusPositiveChargeAura(SpellEntry const*)
+{
+    return new ThaddiusPositiveChargeAuraScript();
+}
+
+// 28084 - Negative Charge (Thaddius)
+struct ThaddiusNegativeChargeAuraScript : public AuraScript
+{
+    enum
+    {
+        SPELL_NEGATIVE_CHARGE_APPLY = 28084,
+        SPELL_NEGATIVE_CHARGE_AMP   = 29660
+    };
+
+    void OnPeriodicTrigger(Aura* aura, Unit* caster, Unit* target, WorldObject* /*targetObject*/, SpellEntry const*& /*spellInfo*/) final
+    {
+        // Only process in Naxxramas to avoid performance issues
+        if (target->GetMap()->GetId() != MAP_NAXXRAMAS)
+            return;
+
+        int numStacks = 0;
+        // Finding the amount of other players within 13yd that has the same polarity
+        Map::PlayerList const& pList = target->GetMap()->GetPlayers();
+        for (auto const& it : pList)
+        {
+            Player* pPlayer = it.getSource();
+            if (pPlayer->GetGUID() == caster->GetGUID())
+                continue;
+            if (pPlayer->IsDead())
+                continue;
+            // 2d distance should be good enough
+            if (pPlayer->HasAura(SPELL_NEGATIVE_CHARGE_APPLY) && caster->GetDistance2d(pPlayer) < 13.0f)
+            {
+                ++numStacks;
+            }
+        }
+        if (numStacks > 0)
+        {
+            if (!target->HasAura(SPELL_NEGATIVE_CHARGE_AMP))
+                target->AddAura(SPELL_NEGATIVE_CHARGE_AMP);
+            target->GetAura(SPELL_NEGATIVE_CHARGE_AMP, EFFECT_INDEX_0)->GetHolder()->SetStackAmount(numStacks);
+        }
+        else
+        {
+            target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_AMP);
+        }
+    }
+
+    void OnAfterApply(Aura* aura, bool apply) final
+    {
+        if (apply)
+            return;
+
+        Unit* target = aura->GetTarget();
+        // Remove amplify effect on remove
+        if (target->HasAura(SPELL_NEGATIVE_CHARGE_AMP))
+            target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_AMP);
+    }
+};
+
+AuraScript* GetScript_ThaddiusNegativeChargeAura(SpellEntry const*)
+{
+    return new ThaddiusNegativeChargeAuraScript();
+}
+
 // 28062 - Positive Charge (Thaddius)
 struct ThaddiusPositiveChargeScript : public SpellScript
 {
@@ -1185,5 +1305,15 @@ void AddSC_boss_thaddius()
     pNewScript = new Script;
     pNewScript->Name = "spell_thaddius_magnetic_pull";
     pNewScript->GetSpellScript = &GetScript_ThaddiusMagneticPull;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_thaddius_positive_charge_aura";
+    pNewScript->GetAuraScript = &GetScript_ThaddiusPositiveChargeAura;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_thaddius_negative_charge_aura";
+    pNewScript->GetAuraScript = &GetScript_ThaddiusNegativeChargeAura;
     pNewScript->RegisterSelf();
 }

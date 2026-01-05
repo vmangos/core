@@ -2066,6 +2066,8 @@ class Player final: public Unit
         void ResurrectPlayer(float restore_percent, bool applySickness = false);
         void BuildPlayerRepop();
         void RepopAtGraveyard();
+        void ApplyGhostForm();
+        void RemoveGhostForm();
         void ScheduleRepopAtGraveyard();
 
         // Nostalrius : Phasing
