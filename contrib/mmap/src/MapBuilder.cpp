@@ -147,7 +147,11 @@ namespace MMAP
         m_cancel.store(false);
         buildMap(mapID);
         processQueuedTiles();
-        printf("Done.");
+
+        char mapFileName[255];
+        sprintf(mapFileName, "mmaps/%03u.mmap", mapID);
+        printf("[Map %03i] Updated map file: %s\n", mapID, mapFileName);
+        printf("Done.\n");
     }
 
     void MapBuilder::buildAllMaps()
@@ -161,7 +165,7 @@ namespace MMAP
         }
 
         processQueuedTiles();
-        printf("Done.");
+        printf("Done.\n");
     }
 
     void MapBuilder::processQueuedTiles()
@@ -242,15 +246,17 @@ namespace MMAP
             uint32 minX, minY, maxX, maxY;
             getGridBounds(mapID, minX, minY, maxX, maxY);
 
-            // add all tiles within bounds to tile list.
-            for (uint32 i = minX; i <= maxX; ++i)
-                for (uint32 j = minY; j <= maxY; ++j)
-                    if (i == tileX && j == tileY)
-                        tiles.insert(StaticMapTree::packTileID(i, j));
+            // Only add the requested tile to avoid allocating NavMesh for entire map
+            // when building a single tile (which would cause massive memory overhead).
+            if (tileX >= minX && tileX <= maxX && tileY >= minY && tileY <= maxY)
+                tiles.insert(StaticMapTree::packTileID(tileX, tileY));
         }
 
         if (!tiles.size())
+        {
+            printf("[Map %03i] Tile [%02u,%02u] not found in valid tile range!\n", mapID, tileX, tileY);
             return;
+        }
 
         dtNavMesh* navMesh = nullptr;
         buildNavMesh(mapID, navMesh);
@@ -260,32 +266,25 @@ namespace MMAP
             return;
         }
 
-        printf("Adding %i, %i, %i", mapID, tileX, tileY);
+        printf("[Map %03i] Building single tile [%02u,%02u]\n", mapID, tileX, tileY);
 
         TileInfo tileInfo;
         tileInfo.m_mapId = mapID;
         tileInfo.m_tileX = tileX;
         tileInfo.m_tileY = tileY;
-        tileInfo.m_curTile = 0;
-        tileInfo.m_tileCount = uint32(tiles.size());
+        tileInfo.m_curTile = 1;
+        tileInfo.m_tileCount = 1;
+        tileInfo.m_forceRebuild = true;  // Always rebuild when building a single tile
         memcpy(&tileInfo.m_navMeshParams, navMesh->getParams(), sizeof(dtNavMeshParams));
         m_tileQueue.Push(tileInfo);
 
-        auto worker = std::make_unique<TileWorker>(this, false, m_quick, m_debug, m_config);
-
-        while (!m_tileQueue.Empty() && !m_cancel.load())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        }
-
-        m_cancel.store(true);
-        m_tileQueue.Cancel();
-
-        worker->WaitCompletion();
-
         dtFreeNavMesh(navMesh);
 
-        printf("Building single tile finished.");
+        processQueuedTiles();
+
+        char outputFileName[255];
+        sprintf(outputFileName, "mmaps/%03u%02u%02u.mmtile", mapID, tileY, tileX);
+        printf("[Map %03i] Generated file: %s\n", mapID, outputFileName);
     }
 
     void MapBuilder::buildMap(uint32 mapID)

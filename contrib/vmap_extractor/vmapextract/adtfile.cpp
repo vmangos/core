@@ -168,8 +168,8 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
                 char* p = buf;
                 while (p < buf + size)
                 {
-                    FixNameCase(p, strlen(p));
-                    std::string path(p); // Store copy after name fixed
+                    // Store original path before any modifications for ExtractSingleModel's fallback logic
+                    std::string path(p); // Store copy of original path
 
                     std::string fixedName;
                     ExtractSingleModel(path, fixedName, failedPaths);

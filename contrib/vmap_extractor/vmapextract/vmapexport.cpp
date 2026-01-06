@@ -132,6 +132,7 @@ bool ExtractWmo()
 bool ExtractSingleWmo(std::string& fname)
 {
     // Copy files from archive
+    // Note: This function does not have fallback logic for path variants (underscores vs spaces)
 
     char szLocalFile[1024];
     char* plain_name = GetPlainName(&fname[0]);
@@ -234,10 +235,9 @@ bool ExtractSingleWmo(std::string& fname)
     return true;
 }
 
-void ParsMapFiles()
+bool ParsMapFiles()
 {
     char fn[512];
-    //char id_filename[64];
     char id[10];
     StringSet failedPaths;
     for (unsigned int i = 0; i < map_count; ++i)
@@ -254,7 +254,6 @@ void ParsMapFiles()
                 {
                     if (ADTFile* ADT = WDT.GetMap(x, y))
                     {
-                        //sprintf(id_filename,"%02u %02u %03u",x,y,map_ids[i].id);//!!!!!!!!!
                         ADT->init(map_ids[i].id, x, y, failedPaths);
                         delete ADT;
                     }
@@ -271,8 +270,9 @@ void ParsMapFiles()
         printf("Warning: Some models could not be extracted, see below\n");
         for (StringSet::const_iterator itr = failedPaths.begin(); itr != failedPaths.end(); ++itr)
             printf("Could not find file of model %s\n", itr->c_str());
-        printf("A few not found models can be expected and are not alarming.\n");
+        return false;
     }
+    return true;
 }
 
 void getGamePath()
@@ -483,20 +483,24 @@ int main(int argc, char** argv)
 
 
         delete dbc;
-        ParsMapFiles();
+        bool mapSuccess = ParsMapFiles();
         delete[] map_ids;
-        //nError = ERROR_SUCCESS;
-        // Extract models, listed in DameObjectDisplayInfo.dbc
-        ExtractGameobjectModels();
-    }
+        // Extract models, listed in GameObjectDisplayInfo.dbc
+        bool goSuccess = ExtractGameobjectModels();
 
-    printf("\n");
-    if (!success)
+        bool hasWarnings = !mapSuccess || !goSuccess;
+
+        printf("\n");
+        if (hasWarnings)
+            printf("Extract for %s. Work complete with warnings.\n", szRawVMAPMagic);
+        else
+            printf("Extract for %s. Work complete. No errors.\n", szRawVMAPMagic);
+    }
+    else
     {
-        printf("ERROR: Extract for %s. Work NOT complete.\n   Precise vector data=%d.\nPress any key.\n", szRawVMAPMagic, preciseVectorData);
-        getchar();
+        printf("\n");
+        printf("ERROR: Extract for %s. Work NOT complete.\n", szRawVMAPMagic);
     }
 
-    printf("Extract for %s. Work complete. No errors.\n", szRawVMAPMagic);
-    return 0;
+    return success ? 0 : 1;
 }

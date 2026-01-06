@@ -91,10 +91,6 @@ bool WMORoot::open()
             {
                 std::string path = ptr;
 
-                char* s = GetPlainName(ptr);
-                FixNameCase(s, strlen(s));
-                FixNameSpaces(s, strlen(s));
-
                 uint32 doodadNameIndex = ptr - f.getPointer();
                 ptr += path.length() + 1;
 

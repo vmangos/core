@@ -239,7 +239,7 @@ namespace MMAP
                     return;
                 }
 
-                buildTile(tileInfo.m_mapId, tileInfo.m_tileX, tileInfo.m_tileY, navMesh, tileInfo.m_curTile, tileInfo.m_tileCount);
+                buildTile(tileInfo.m_mapId, tileInfo.m_tileX, tileInfo.m_tileY, navMesh, tileInfo.m_curTile, tileInfo.m_tileCount, tileInfo.m_forceRebuild);
                 dtFreeNavMesh(navMesh);
             }
             else
@@ -374,9 +374,9 @@ namespace MMAP
         return true;
     }
 
-    void TileWorker::buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh, uint32 curTile, uint32 tileCount)
+    void TileWorker::buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh, uint32 curTile, uint32 tileCount, bool forceRebuild)
     {
-        if (shouldSkipTile(mapID, tileX, tileY))
+        if (!forceRebuild && shouldSkipTile(mapID, tileX, tileY))
         {
             return;
         }
@@ -410,8 +410,8 @@ namespace MMAP
         float bmin[3], bmax[3];
         m_mapBuilder->getTileBounds(tileX, tileY, allVerts.getCArray(), allVerts.size() / 3, bmin, bmax);
 
-        // offmesh.txt
-        m_terrainBuilder->loadOffMeshConnections(mapID, tileX, tileY, meshData, m_mapBuilder->m_offMeshFilePath);
+        // offmesh.txt (verbose output only for single tile builds)
+        m_terrainBuilder->loadOffMeshConnections(mapID, tileX, tileY, meshData, m_mapBuilder->m_offMeshFilePath, tileCount == 1);
 
         // build navmesh tile
         buildMoveMapTile(mapID, tileX, tileY, meshData, bmin, bmax, navMesh);

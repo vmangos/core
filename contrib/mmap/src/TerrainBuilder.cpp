@@ -1006,7 +1006,7 @@ namespace MMAP
     }
 
     /**************************************************************************/
-    void TerrainBuilder::loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, char const* offMeshFilePath)
+    void TerrainBuilder::loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, char const* offMeshFilePath, bool printOffmeshData)
     {
         // no meshfile input given?
         if (offMeshFilePath == nullptr)
@@ -1033,6 +1033,12 @@ namespace MMAP
 
             if (mapID == mid && tileX == tx && tileY == ty)
             {
+                if (printOffmeshData)
+                {
+                    printf(" loadOffMeshConnections:: Found offmesh connection for map %u tile [%u,%u]: (%.2f %.2f %.2f) -> (%.2f %.2f %.2f) size %.2f\n",
+                           mapID, tileX, tileY, p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], size);
+                }
+
                 meshData.offMeshConnections.append(p0[1]);
                 meshData.offMeshConnections.append(p0[2]);
                 meshData.offMeshConnections.append(p0[0]);
