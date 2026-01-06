@@ -16,8 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <cstring>
 #include <string>
 #include <iostream>
+#include <vector>
 #ifdef WIN32
 #include "direct.h"
 #else
@@ -29,9 +31,30 @@
 //=======================================================
 int main(int argc, char* argv[])
 {
+    // Skip all interactive prompts (for scripted runs)
+    bool silent = false;
+    std::vector<std::string> args;
+    for (int i = 1; i < argc; ++i)
+    {
+        if (strcmp(argv[i], "--silent") == 0)
+            silent = true;
+        else
+            args.push_back(argv[i]);
+    }
+
+    std::cout << "VMap Assembler" << std::endl;
+    std::cout << "======================================" << std::endl;
+
+    if (!silent)
+    {
+        std::cout << "Press enter to start assembling vmaps." << std::endl;
+        std::cout << "======================================" << std::endl;
+        std::cin.get();
+    }
+
     std::string src;
     std::string dest;
-    if (argc != 3)
+    if (args.size() != 2)
     {
         //std::cout << "usage: " << argv[0] << " <raw data dir> <vmap dest dir>" << std::endl;
         //return 1;
@@ -47,8 +70,8 @@ int main(int argc, char* argv[])
     }
     else
     {
-        src = argv[1];
-        dest = argv[2];
+        src = args[0];
+        dest = args[1];
     }
 
     std::cout << "using " << src << " as source directory and writing output to " << dest << std::endl;
@@ -59,10 +82,20 @@ int main(int argc, char* argv[])
     {
         std::cout << "exit with errors" << std::endl;
         delete ta;
+        if (!silent)
+        {
+            std::cout << "Press enter to close." << std::endl;
+            std::cin.get();
+        }
         return 1;
     }
 
     delete ta;
     std::cout << "Ok, all done" << std::endl;
+    if (!silent)
+    {
+        std::cout << "Press enter to close." << std::endl;
+        std::cin.get();
+    }
     return 0;
 }

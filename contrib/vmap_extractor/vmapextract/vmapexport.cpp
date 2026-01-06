@@ -74,13 +74,15 @@ char output_path[128] = ".";
 char input_path[1024] = ".";
 bool hasInputPathParam = false;
 bool preciseVectorData = true;
+// Skip all interactive prompts (for scripted runs)
+bool CONF_silent = false;
 std::unordered_map<std::string, WMODoodadData> WmoDoodads;
 
 // Constants
 
 //static const char * szWorkDirMaps = ".\\Maps";
 const char* szWorkDirWmo = "./Buildings";
-const char* szRawVMAPMagic = "VMAPs05";
+const char* RAW_VMAP_MAGIC = "VMAPs05";
 
 std::map<std::pair<uint32, uint16>, uint32> uniqueObjectIds;
 
@@ -337,6 +339,7 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
     snprintf(path, sizeof(path), "%sbase.MPQ", input_path);
     pArchiveNames.push_back(path);
     snprintf(path, sizeof(path), "%smisc.MPQ", input_path);
+    pArchiveNames.push_back(path);
 
     // now, scan for the patch levels in the core dir
     printf("Scanning patch levels from data directory.\n");
@@ -379,13 +382,17 @@ bool processArgv(int argc, char** argv)
                 result = false;
             }
         }
-        else if (strcmp("-?", argv[1]) == 0)
+        else if (strcmp("-?", argv[i]) == 0)
         {
             result = false;
         }
         else if (strcmp("-l", argv[i]) == 0)
         {
             preciseVectorData = true;
+        }
+        else if (strcmp("--silent", argv[i]) == 0)
+        {
+            CONF_silent = true;
         }
         else
         {
@@ -395,11 +402,12 @@ bool processArgv(int argc, char** argv)
     }
     if (!result)
     {
-        printf("Extract for %s.\n", szRawVMAPMagic);
-        printf("%s [-?][-s][-l][-d <path>]\n", argv[0]);
+        printf("Extract for %s.\n", RAW_VMAP_MAGIC);
+        printf("%s [-?][-s][-l][-d <path>][--silent]\n", argv[0]);
         printf("   -s : small size (data size optimization), ~500MB less vmap data.\n");
         printf("   -l : (default) large size, ~500MB more vmap data. (might contain more details)\n");
         printf("   -d <path>: Path to the vector data source folder.\n");
+        printf("   --silent : skip all interactive prompts (for scripted runs).\n");
         printf("   -? : This message.\n");
     }
     return result;
@@ -432,14 +440,41 @@ int main(int argc, char** argv)
         if (!stat(sdir.c_str(), &status) || !stat(sdir_bin.c_str(), &status))
         {
             printf("Your output directory seems to be polluted, please use an empty directory!\n");
-            printf("<press return to exit>");
-            char garbage[2];
-            IgnoreResult(scanf("%c", garbage));
+            if (!CONF_silent)
+            {
+                printf("<press return to exit>");
+                char garbage[2];
+                IgnoreResult(scanf("%c", garbage));
+            }
             return 1;
         }
     }
 
-    printf("Extract for %s. Beginning work ....\n", szRawVMAPMagic);
+    // Prompt user for vmap resolution (empty input or --silent keeps the -s/-l command line setting)
+    bool highRes = preciseVectorData;
+
+    if (!CONF_silent)
+    {
+        std::string userInput;
+        std::cout << "Extract vmaps with high resolution (default = " << (highRes ? "y" : "n") << ")? [y/n]" << std::endl;
+        std::getline(std::cin, userInput);
+        if (!userInput.empty())
+            highRes = userInput.compare("y") == 0;
+    }
+
+    std::cout << "High resolution = " << highRes << std::endl;
+
+    if (!CONF_silent)
+    {
+        std::cout << "Press enter to start extracting vmaps." << std::endl;
+        std::cout << "=====================================" << std::endl;
+        std::cin.get();
+    }
+
+    // Overwrite due to user input
+    preciseVectorData = highRes;
+
+    printf("Extract for %s. Beginning work ....\n", RAW_VMAP_MAGIC);
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     // Create the working directory
     if (mkdir(szWorkDirWmo
@@ -500,14 +535,20 @@ int main(int argc, char** argv)
 
         printf("\n");
         if (hasWarnings)
-            printf("Extract for %s. Work complete with warnings.\n", szRawVMAPMagic);
+            printf("Extract for %s. Work complete with warnings.\n", RAW_VMAP_MAGIC);
         else
-            printf("Extract for %s. Work complete. No errors.\n", szRawVMAPMagic);
+            printf("Extract for %s. Work complete. No errors.\n", RAW_VMAP_MAGIC);
     }
     else
     {
         printf("\n");
-        printf("ERROR: Extract for %s. Work NOT complete.\n", szRawVMAPMagic);
+        printf("ERROR: Extract for %s. Work NOT complete.\n", RAW_VMAP_MAGIC);
+    }
+
+    if (!CONF_silent)
+    {
+        std::cout << "Press enter to close." << std::endl;
+        std::cin.get();
     }
 
     return success ? 0 : 1;
