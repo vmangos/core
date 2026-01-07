@@ -2521,8 +2521,9 @@ bool ChatHandler::HandleMmapConnection(char* /*args*/)
             return true;
         }
 
-        int32 tileX = 32 - pPlayer->GetPositionX() / SIZE_OF_GRIDS;
-        int32 tileY = 32 - pPlayer->GetPositionY() / SIZE_OF_GRIDS;
+        // Switched x/y
+        int32 tileY = 32 - pPlayer->GetPositionX() / SIZE_OF_GRIDS;
+        int32 tileX = 32 - pPlayer->GetPositionY() / SIZE_OF_GRIDS;
 
         // Format: mapID tileX,tileY (start_x start_y start_z) (end_x end_y end_z) size
         PSendSysMessage("Offmesh connection recorded:");
@@ -2531,6 +2532,7 @@ bool ChatHandler::HandleMmapConnection(char* /*args*/)
                         startX, startY, startZ,
                         pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
         PSendSysMessage("Rebuild with: MoveMapGenerator %u --tile %d,%d", pPlayer->GetMapId(), tileX, tileY);
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Rebuild with: MoveMapGenerator %u --tile %d,%d", pPlayer->GetMapId(), tileX, tileY);
 
         // Write to file
         FILE* file = fopen("offmesh_connections.txt", "a");

@@ -148,9 +148,7 @@ namespace MMAP
         buildMap(mapID);
         processQueuedTiles();
 
-        char mapFileName[255];
-        sprintf(mapFileName, "mmaps/%03u.mmap", mapID);
-        printf("[Map %03i] Updated map file: %s\n", mapID, mapFileName);
+        printf("[Map %03i] Updated map file: mmaps/%03u.mmap\n", mapID, mapID);
         printf("Done.\n");
     }
 
@@ -282,9 +280,7 @@ namespace MMAP
 
         processQueuedTiles();
 
-        char outputFileName[255];
-        sprintf(outputFileName, "mmaps/%03u%02u%02u.mmtile", mapID, tileY, tileX);
-        printf("[Map %03i] Generated file: %s\n", mapID, outputFileName);
+        printf("[Map %03i] Generated file: mmaps/%03u%02u%02u.mmtile\n", mapID, mapID, tileY, tileX);
     }
 
     void MapBuilder::buildMap(uint32 mapID)
