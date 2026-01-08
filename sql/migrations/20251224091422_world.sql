@@ -12,6 +12,9 @@ INSERT INTO `migrations` VALUES ('20251224091422');
 -- Remove Duplicate Sharks
 DELETE FROM `creature` WHERE `guid` IN (88969, 88979, 88978, 88977, 88976, 88973, 88972, 88971, 88970);
 
+-- Plaguehound (8597) should share spawn with Noxious Plaguebat (8601)
+UPDATE `creature` SET `id` = 8597, `id2` = 8601 WHERE `id` IN (8597, 8601);
+
 -- Blue Dragonspawn (193) should share spawn with Blue Scalebane (6130) Draconic Mageweaver (6131)
 UPDATE `creature` SET `id` = 193, `id2` = 6130, `id3` = 6131 WHERE `id` IN (193, 6130, 6131);
 
