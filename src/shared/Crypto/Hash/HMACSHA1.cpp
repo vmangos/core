@@ -21,6 +21,13 @@
 
 #include <openssl/hmac.h>
 
+
+Crypto::Hash::HMACSHA1::Generator::Generator(std::vector<uint8> const& key)
+  : Generator(key.data(), key.size())
+{
+    // use base ctor
+}
+
 Crypto::Hash::HMACSHA1::Generator::Generator(uint8 const* key, size_t len)
 {
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10100000L

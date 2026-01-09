@@ -39,6 +39,7 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include "ArgparserForServer.h"
+#include "Crypto/Encoding/Base32.h"
 #include "ProxyProtocol/ProxyV2Reader.h"
 
 #include "IO/Networking/AsyncSocketAcceptor.h"
