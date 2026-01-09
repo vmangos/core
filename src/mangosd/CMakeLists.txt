@@ -30,13 +30,10 @@ set(EXECUTABLE_SRCS
   remote/soap/MaNGOSsoap.cpp
 )
 
-
 if(WIN32)
   list(APPEND EXECUTABLE_SRCS
     mangosd.rc
   )
-
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
 endif()
 
 include_directories(

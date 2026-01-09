@@ -30,7 +30,6 @@ include_directories(../../src/game/vmap/)
 include_directories(../../src/game/Commands/)
 include_directories(../../dep/include/g3dlite/)
 include_directories(../../src/framework/)
-include_directories(${ACE_INCLUDE_DIR})
 
 add_library(vmap
     ../../src/game/vmap/BIH.cpp
@@ -58,7 +57,6 @@ SET_TARGET_PROPERTIES (${EXECUTABLE_NAME} PROPERTIES FOLDER Extractors)
 target_link_libraries(${EXECUTABLE_NAME}
                     vmap
                     g3dlite
-                    ${ACE_LIBRARIES}
                     framework
 )
 

@@ -33,7 +33,6 @@ include_directories(
     ../../src/game/Commands
     ../../dep/include/g3dlite
     ../../src/framework
-    ${ACE_INCLUDE_DIR}
     ../../dep/recastnavigation/
     ../../dep/recastnavigation/Detour/Include
     ../../dep/recastnavigation/Recast/Include
@@ -56,7 +55,6 @@ target_link_libraries(${EXECUTABLE_NAME}
                         vmap 
                         Detour
                         Recast
-                        ${ACE_LIBRARIES}
                         shared
                         framework
                         )
