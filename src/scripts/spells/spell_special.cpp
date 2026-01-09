@@ -298,6 +298,9 @@ struct CannibalizeAuraScript : public AuraScript
 {
     void OnAfterApply(Aura* aura, bool apply) final
     {
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
         Unit* target = aura->GetTarget();
         if (!apply)
         {
@@ -336,6 +339,9 @@ struct SilithystAuraScript : public AuraScript
 
     void OnAfterApply(Aura* aura, bool apply) final
     {
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
         Unit* target = aura->GetTarget();
         if (target->GetTypeId() != TYPEID_PLAYER)
             return;
@@ -426,6 +432,9 @@ struct ControllingSteamTonkAuraScript : public AuraScript
         if (apply)
             return;
 
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
         Unit* target = aura->GetTarget();
         Unit* caster = aura->GetCaster();
         if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
@@ -470,6 +479,9 @@ struct ShadowmeldAuraScript : public AuraScript
         if (!apply)
             return;
 
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
         Unit* target = aura->GetTarget();
         if (target->GetTypeId() != TYPEID_PLAYER)
             return;
@@ -481,6 +493,9 @@ struct ShadowmeldAuraScript : public AuraScript
     void OnBeforeApply(Aura* aura, bool apply) final
     {
         if (apply)
+            return;
+
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
             return;
 
         Unit* target = aura->GetTarget();
@@ -502,6 +517,9 @@ struct StoneformAuraScript : public AuraScript
 {
     void OnAfterApply(Aura* aura, bool apply) final
     {
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
         Unit* target = aura->GetTarget();
 
         // Stoneform grants immunity to Disease and Poison dispels

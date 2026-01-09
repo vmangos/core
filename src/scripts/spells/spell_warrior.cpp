@@ -172,6 +172,9 @@ struct WarriorBloodFuryAuraScript : public AuraScript
     void OnBeforeApply(Aura* aura, bool apply) final
     {
 #if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1) && (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4)
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
         // Blood Fury - Add aura to decrease attack power on remove
         if (!apply && (aura->GetHolder()->GetRemoveMode() == AURA_REMOVE_BY_CANCEL || aura->GetHolder()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE))
         {

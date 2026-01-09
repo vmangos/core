@@ -722,6 +722,9 @@ struct DiscombobulateAuraScript : public AuraScript
         if (!apply)
             return;
 
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
         Unit* target = aura->GetTarget();
 
         // Discombobulate removes mount auras when applied
@@ -745,6 +748,9 @@ struct AshbringerAuraScript : public AuraScript
 
     void OnAfterApply(Aura* aura, bool apply) final
     {
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
         Unit* target = aura->GetTarget();
         if (target->GetTypeId() != TYPEID_PLAYER)
             return;
