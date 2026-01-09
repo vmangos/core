@@ -2494,48 +2494,67 @@ bool ChatHandler::HandleMmap(char* args)
     return true;
 }
 
-enum MmapConnectionStep
+bool ChatHandler::HandleMmapConnection(char* /*args*/)
 {
-    FIRST_STEP,
-    SECOND_STEP,
-};
+    static bool hasStartPoint = false;
+    static float startX = 0.0f, startY = 0.0f, startZ = 0.0f;
+    static uint32 startMapId = 0;
 
-bool ChatHandler::HandleMmapConnection(char* args)
-{
-    FILE* fOffmeshFile = fopen("offmesh_conn", "a");
-    if (!fOffmeshFile)
-    {
-        SendSysMessage("Unable to open file.");
-        return true;
-    }
-    // map tileY,X (X,Y,Z) (X,Y,Z) Size
-    // 0 31,59 (-14429.889648 450.344452 15.430828) (-14424.218750 444.332855 12.773965) 2.5 // booty bay dock
-    static MmapConnectionStep step = FIRST_STEP;
-    static float firstX = 0.0f, firstY = 0.0f, firstZ = 0.0f;
     Player* pPlayer = m_session->GetPlayer();
-    if (step == FIRST_STEP)
+
+    if (!hasStartPoint)
     {
-        pPlayer->GetPosition(firstX, firstY, firstZ);
-        step = SECOND_STEP;
-        SendSysMessage("Enregistre ...");
+        // First call: record start position
+        pPlayer->GetPosition(startX, startY, startZ);
+        startMapId = pPlayer->GetMapId();
+        hasStartPoint = true;
+        PSendSysMessage("Start point recorded at (%.2f, %.2f, %.2f). Move to end point and run command again.", startX, startY, startZ);
     }
     else
     {
-        int32 gx = 32 - pPlayer->GetPositionX() / SIZE_OF_GRIDS;
-        int32 gy = 32 - pPlayer->GetPositionY() / SIZE_OF_GRIDS;
-        PSendSysMessage("%u %u,%u (%f %f %f) (%f %f %f) %f",
-                        pPlayer->GetMapId(), gy, gx, firstX, firstY, firstZ,
-                        pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(),
-                        pPlayer->GetObjectScale());
-        fprintf(fOffmeshFile, "%u %u,%u (%f %f %f) (%f %f %f) %f\n",
-                pPlayer->GetMapId(), gy, gx, firstX, firstY, firstZ,
-                pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(),
-                pPlayer->GetObjectScale());
+        // Second call: record end position and write connection
+        if (pPlayer->GetMapId() != startMapId)
+        {
+            SendSysMessage("Error: You changed maps! Connection cancelled. Start again.");
+            hasStartPoint = false;
+            startX = startY = startZ = 0.0f;
+            return true;
+        }
 
-        step = FIRST_STEP;
-        firstX = firstY = firstZ = 0.0f;
+        // Switched x/y
+        int32 tileY = 32 - pPlayer->GetPositionX() / SIZE_OF_GRIDS;
+        int32 tileX = 32 - pPlayer->GetPositionY() / SIZE_OF_GRIDS;
+
+        // Format: mapID tileX,tileY (start_x start_y start_z) (end_x end_y end_z) size
+        PSendSysMessage("Offmesh connection recorded:");
+        PSendSysMessage("%u %d,%d (%.6f %.6f %.6f) (%.6f %.6f %.6f) 2.5",
+                        pPlayer->GetMapId(), tileX, tileY,
+                        startX, startY, startZ,
+                        pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
+        PSendSysMessage("Rebuild with: MoveMapGenerator %u --tile %d,%d", pPlayer->GetMapId(), tileX, tileY);
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Rebuild with: MoveMapGenerator %u --tile %d,%d", pPlayer->GetMapId(), tileX, tileY);
+
+        // Write to file
+        FILE* file = fopen("offmesh_connections.txt", "a");
+        if (file)
+        {
+            fprintf(file, "%u %d,%d (%.6f %.6f %.6f) (%.6f %.6f %.6f) 2.5\n",
+                    pPlayer->GetMapId(), tileX, tileY,
+                    startX, startY, startZ,
+                    pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
+            fclose(file);
+            SendSysMessage("Written to offmesh_connections.txt");
+        }
+        else
+        {
+            SendSysMessage("Warning: Could not write to offmesh_connections.txt");
+        }
+
+        // Reset state
+        hasStartPoint = false;
+        startX = startY = startZ = 0.0f;
     }
-    fclose(fOffmeshFile);
+
     return true;
 }
 

@@ -20,7 +20,7 @@ namespace MMAP
 {
     struct TileInfo
     {
-        TileInfo() : m_mapId(uint32(-1)), m_tileX(), m_tileY(), m_navMeshParams(), m_curTile(0), m_tileCount(0) {}
+        TileInfo() : m_mapId(uint32(-1)), m_tileX(), m_tileY(), m_navMeshParams(), m_curTile(0), m_tileCount(0), m_forceRebuild(false) {}
 
         uint32 m_mapId;
         uint32 m_tileX;
@@ -28,6 +28,7 @@ namespace MMAP
         uint32 m_curTile;
         uint32 m_tileCount;
         dtNavMeshParams m_navMeshParams;
+        bool m_forceRebuild;
     };
 
     template <typename T>
@@ -153,7 +154,7 @@ namespace MMAP
         bool duDumpPolyMeshToObj(rcPolyMesh& pmesh, uint32 mapID, uint32 tileY, uint32 tileX);
         bool duDumpPolyMeshDetailToObj(rcPolyMeshDetail& dmesh, uint32 mapID, uint32 tileY, uint32 tileX);
         bool shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY);
-        void buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh, uint32 curTile, uint32 tileCount);
+        void buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh, uint32 curTile, uint32 tileCount, bool forceRebuild = false);
         void buildMoveMapTile(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, float bmin[3], float bmax[3], dtNavMesh* navMesh);
 
         json getDefaultConfig();
