@@ -2358,6 +2358,61 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
     return true;
 }
 
+void SpellMgr::LoadSpellCones()
+{
+    mSpellCones.clear();                              // need for reload case
+
+    uint32 count = 0;
+
+    //                                                               0        1
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `cone_degrees` FROM `spell_cone`"));
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spell cones", count);
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+        int16 degrees = fields[1].GetInt16();
+
+        SpellEntry const* pSpellInfo = GetSpellEntry(entry);
+
+        if (!pSpellInfo)
+        {
+            if (!IsExistingSpellId(entry))
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_cone` does not exist", entry);
+            continue;
+        }
+
+        if (degrees < -360 || degrees > 360)
+        {
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_cone` has incorrect angle %i outside of valid range", entry, degrees);
+            continue;
+        }
+
+        float angle = degrees * M_PI_F / 180.0f;
+
+        mSpellCones[entry] = angle;
+
+        ++count;
+    } while (result->NextRow());
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spell cones", count);
+}
+
 void SpellMgr::LoadSpellAreas()
 {
     mSpellAreaMap.clear();                                  // need for reload case
@@ -2584,9 +2639,10 @@ void SpellMgr::LoadSpellAreas()
 SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const* spellInfo, Unit const* caster, Player const* player)
 {
     // Spell can be casted only in battleground
-    if (spellInfo->HasAttribute(SPELL_ATTR_EX3_ONLY_BATTLEGROUNDS) &&
-        (!player || !player->InBattleGround()))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+    if (spellInfo->HasAttribute(SPELL_ATTR_EX3_ONLY_BATTLEGROUNDS) && (!player || !player->InBattleGround()))
         return SPELL_FAILED_ONLY_BATTLEGROUNDS;
+#endif
 
     uint32 mapId = caster ? caster->GetMapId() : (player ? player->GetMapId() : 0);
 
@@ -2610,6 +2666,7 @@ SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const* spell
         case 23333:                                         // Warsong Flag
         case 23335:                                         // Silverwing Flag
             return player && player->GetMapId() == MAP_WARSONG_GULCH && player->InBattleGround() ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         case 2584:                                          // Waiting to Resurrect
         {
             return player && player->InBattleGround() ? SPELL_CAST_OK : SPELL_FAILED_ONLY_BATTLEGROUNDS;
@@ -2623,6 +2680,7 @@ SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const* spell
                 return SPELL_FAILED_REQUIRES_AREA;
             return mapEntry->IsBattleGround() ? SPELL_CAST_OK : SPELL_FAILED_ONLY_BATTLEGROUNDS;
         }
+#endif
     }
 
     if (caster)
@@ -2658,12 +2716,6 @@ uint32 SpellMgr::GetRequiredAreaForSpell(uint32 spellId)
     // Not defined in database.
     switch (spellId)
     {
-        // Alterac Valley
-        case 22564: // Recall (Alliance)
-        case 22563: // Recall (Horde)
-        case 23538: // Battle Standard (Horde)
-        case 23539: // Battle Standard (Alliance)
-            return 2597;
         // Warsong Gulch
         case 23333: // Warsong Flag
         case 23335: // Silverwing Flag

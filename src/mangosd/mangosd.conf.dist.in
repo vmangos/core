@@ -247,6 +247,10 @@ BindIP = "0.0.0.0"
 #        Default: 1 (Enable)
 #                 0 (Disabled)
 #
+#    ReusableGuidPoolSize
+#        Preload unused guids in db to reuse for new characters, items, texts and corpses.
+#        Default: 100000
+#
 ###################################################################################################################
 
 UseProcessors = 0
@@ -283,6 +287,7 @@ MaxCoreStuckTime = 0
 BanListReloadTimer = 120
 AddonChannel = 1
 CleanCharacterDB = 1
+ReusableGuidPoolSize = 100000
 
 # Optimization / load mitigation settings
 Continents.Instanciate                      = 0
@@ -583,7 +588,7 @@ DebuffLimit = 0
 #        GM Log file of gm commands
 #        Default: "" (Disable)
 #
-#    LogFile.CriticalCommands
+#    LogFile.GmCriticalCommands
 #        Log file for commands marked as critical, when used on own character (same IP for example)
 #        Default: "gm_critical.log"
 #                 "" - Empty name for disable

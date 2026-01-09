@@ -4088,11 +4088,15 @@ void ObjectMgr::LoadItemPrototypes()
                     }
                 }
 
+                // this check is disabled because 12344 uses spell category that does not exist in the dbc
+                // yet item has this category assigned in both vanilla wdb files and classic db2 files
+                /*
                 if (proto->Spells[j].SpellCategory > 0)
                 {
                     if (!sSpellCategoryStore.LookupEntry(proto->Spells[j].SpellCategory))
                         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Item (Entry: %u) has wrong (not existing) spell category in spellcategory_%d (%u)", i, j + 1, proto->Spells[j].SpellCategory);
                 }
+                */
             }
         }
 
@@ -5256,7 +5260,7 @@ void ObjectMgr::LoadGroups()
                  "(SELECT COUNT(*) FROM `character_instance` WHERE `guid` = `group_instance`.`leader_guid` AND `instance` = `group_instance`.`instance` AND `permanent` = 1 LIMIT 1), "
                  // 6
                  " `groups`.`group_id` "
-                 "FROM `group_instance` LEFT JOIN `instance` ON `instance` = `id` LEFT JOIN `groups` ON `groups`.`leader_guid` = `group_instance`.`leader_guid` ORDER BY `leader_guid`"
+                 "FROM `group_instance` LEFT JOIN `instance` ON `instance` = `id` LEFT JOIN `groups` ON `groups`.`leader_guid` = `group_instance`.`leader_guid` ORDER BY `group_instance`.`leader_guid`"
              );
 
     if (!result)
@@ -6228,18 +6232,18 @@ void ObjectMgr::LoadPetCreateSpells()
         bool have_spell_db = false;
         for (int i = 0; i < 4; ++i)
         {
-            PetCreateSpell.spellid[i] = fields[i + 1].GetUInt32();
+            PetCreateSpell.spellId[i] = fields[i + 1].GetUInt32();
 
-            if (!PetCreateSpell.spellid[i])
+            if (!PetCreateSpell.spellId[i])
                 continue;
 
             have_spell_db = true;
 
-            SpellEntry const* i_spell = sSpellMgr.GetSpellEntry(PetCreateSpell.spellid[i]);
+            SpellEntry const* i_spell = sSpellMgr.GetSpellEntry(PetCreateSpell.spellId[i]);
             if (!i_spell)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `petcreateinfo_spell` does not exist", PetCreateSpell.spellid[i]);
-                PetCreateSpell.spellid[i] = 0;
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `petcreateinfo_spell` does not exist", PetCreateSpell.spellId[i]);
+                PetCreateSpell.spellId[i] = 0;
                 continue;
             }
 
@@ -6301,7 +6305,7 @@ void ObjectMgr::LoadPetCreateSpells()
                     petspell_id = cache_itr->second;
             }
 
-            PetCreateSpell.spellid[i] = petspell_id;
+            PetCreateSpell.spellId[i] = petspell_id;
         }
 
         m_PetCreateSpellMap[itr.first] = PetCreateSpell;
@@ -7650,22 +7654,22 @@ void ObjectMgr::PackGroupIds()
 
 void ObjectMgr::SetHighestGuids()
 {
-    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT MAX(`guid`) FROM `characters`"));
-    if (result)
-        m_CharGuids.SetMaxUsedGuid((*result)[0].GetUInt32(), "Character");
-
-    result = CharacterDatabase.Query("SELECT MAX(`guid`) FROM `item_instance`");
-    if (result)
-        m_ItemGuids.SetMaxUsedGuid((*result)[0].GetUInt32(), "Item");
+    m_CharGuids.LoadFromDB("guid", "characters");
+    m_ItemGuids.LoadFromDB("guid", "item_instance");
+    m_CorpseGuids.LoadFromDB("guid", "corpse");
+    m_ItemTextIds.LoadFromDB("id", "item_text");
 
     // Cleanup other tables from nonexistent guids (>=m_hiItemGuid)
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
-    CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.PExecute("DELETE FROM `auction` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `character_gifts` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `item_loot` WHERE `guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `petition` WHERE `charter_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.CommitTransaction();
 
-    result = WorldDatabase.Query("SELECT MAX(`guid`) FROM `creature`");
+    std::unique_ptr<QueryResult> result = WorldDatabase.Query("SELECT MAX(`guid`) FROM `creature`");
     if (result)
         m_FirstTemporaryCreatureGuid = (*result)[0].GetUInt32();
 
@@ -7687,14 +7691,6 @@ void ObjectMgr::SetHighestGuids()
     result = CharacterDatabase.Query("SELECT MAX(`id`) FROM `mail`");
     if (result)
         m_MailIds.SetMaxUsedGuid((*result)[0].GetUInt32(), "Mail");
-
-    result = CharacterDatabase.Query("SELECT MAX(`id`) FROM `item_text`");
-    if (result)
-        m_ItemTextIds.SetMaxUsedGuid((*result)[0].GetUInt32(), "Item Text");
-
-    result = CharacterDatabase.Query("SELECT MAX(`guid`) FROM `corpse`");
-    if (result)
-        m_CorpseGuids.SetMaxUsedGuid((*result)[0].GetUInt32(), "Corpse");
 
     result = CharacterDatabase.Query("SELECT MAX(`guild_id`) FROM `guild`");
     if (result)
@@ -7856,8 +7852,8 @@ inline void CheckGOConsumable(GameObjectInfo const* goInfo, uint32 dataN, uint32
 
 void ObjectMgr::LoadGameObjectTemplates()
 {
-    //                                                                0        1       2            3       4          5        6       7        8        9        10       11       12       13       14       15       16       17        18        19        20        21        22        23        24        25        26        27        28        29        30        31         32         33
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name` FROM `gameobject_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `gameobject_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
+    //                                                                0        1       2            3       4       5          6        7       8        9        10       11       12       13       14       15       16       17       18        19        20        21        22        23        24        25        26        27        28        29        30        31        32         33         34
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `type`, `displayId`, `name`, `icon`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name` FROM `gameobject_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `gameobject_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
 
     if (!result)
         return;
@@ -7879,8 +7875,8 @@ void ObjectMgr::LoadGameObjectTemplates()
 
 void ObjectMgr::LoadGameObjectTemplate(uint32 entry)
 {
-    //                                                                0        1       2            3       4          5        6       7        8        9        10       11       12       13       14       15       16       17        18        19        20        21        22        23        24        25        26        27        28        29        30        31         32         33
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name` FROM `gameobject_template` t1 WHERE `entry`=%u && `patch`=(SELECT max(`patch`) FROM `gameobject_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", entry, sWorld.GetWowPatch()));
+    //                                                                0        1       2            3       4       5          6        7       8        9        10       11       12       13       14       15       16       17       18        19        20        21        22        23        24        25        26        27        28        29        30        31        32         33         34
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `type`, `displayId`, `name`, `icon`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name` FROM `gameobject_template` t1 WHERE `entry`=%u && `patch`=(SELECT max(`patch`) FROM `gameobject_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", entry, sWorld.GetWowPatch()));
 
     if (!result)
         return;
@@ -7910,14 +7906,15 @@ void ObjectMgr::LoadGameObjectInfo(Field* fields)
     pInfo->type = fields[1].GetUInt32();
     pInfo->displayId = fields[2].GetUInt32();
     pInfo->name = fields[3].GetCppString();
-    pInfo->faction = fields[4].GetUInt32();
-    pInfo->flags = fields[5].GetUInt32();
-    pInfo->size = fields[6].GetFloat();
+    pInfo->icon = fields[4].GetCppString();
+    pInfo->faction = fields[5].GetUInt32();
+    pInfo->flags = fields[6].GetUInt32();
+    pInfo->size = fields[7].GetFloat();
     for (uint32 i = 0; i < 24; ++i)
-        pInfo->raw.data[i] = fields[7 + i].GetInt32();
-    pInfo->MinMoneyLoot = fields[31].GetUInt32();
-    pInfo->MaxMoneyLoot = fields[32].GetUInt32();
-    pInfo->ScriptId = sScriptMgr.GetScriptId(fields[33].GetString());
+        pInfo->raw.data[i] = fields[8 + i].GetInt32();
+    pInfo->MinMoneyLoot = fields[32].GetUInt32();
+    pInfo->MaxMoneyLoot = fields[33].GetUInt32();
+    pInfo->ScriptId = sScriptMgr.GetScriptId(fields[34].GetString());
 }
 
 void ObjectMgr::CheckGameObjectTemplate(GameObjectInfo* goInfo)
@@ -8059,6 +8056,7 @@ void ObjectMgr::CheckGameObjectTemplate(GameObjectInfo* goInfo)
             CheckGOSpellId(goInfo, goInfo->spellcaster.spellId, 0);
             break;
         }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         case GAMEOBJECT_TYPE_FLAGSTAND:                 //24
         {
             if (goInfo->flagstand.lockId)
@@ -8066,12 +8064,15 @@ void ObjectMgr::CheckGameObjectTemplate(GameObjectInfo* goInfo)
             CheckGONoDamageImmuneId(goInfo, goInfo->flagstand.noDamageImmune, 5);
             break;
         }
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         case GAMEOBJECT_TYPE_FISHINGHOLE:               //25
         {
             if (goInfo->fishinghole.lockId)
                 CheckGOLockId(goInfo, goInfo->fishinghole.lockId, 4);
             break;
         }
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         case GAMEOBJECT_TYPE_FLAGDROP:                  //26
         {

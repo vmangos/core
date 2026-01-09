@@ -710,7 +710,11 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
     if (mask & GROUP_UPDATE_FLAG_AURAS_NEGATIVE)
     {
         uint64 auramask = sendAllAuras ? player->GetNegativeAuraApplicationMask() : player->GetAuraUpdateMask();
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         uint16 maskForClient = uint16(auramask >> 32);
+#else
+        uint8 maskForClient = uint8(auramask >> 32);
+#endif
         *data << maskForClient;
         for (uint64 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
             if (auramask & (uint64(1) << i))
@@ -798,7 +802,12 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
         if (pet)
         {
             uint64 auramask = sendAllAuras ? pet->GetNegativeAuraApplicationMask() : pet->GetAuraUpdateMask();
-            *data << uint16(auramask >> 32);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            uint16 maskForClient = uint16(auramask >> 32);
+#else
+            uint8 maskForClient = uint8(auramask >> 32);
+#endif
+            *data << maskForClient;
             for (uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
             {
                 if (auramask & (uint64(1) << i))
@@ -839,15 +848,27 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
 
     if (!player || !player->IsInSameRaidWith(_player))
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 3 + 4 + 1);
+#else
+        WorldPacket data(SMSG_PARTY_MEMBER_STATS, 8 + 4 + 1);
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << guid.WriteAsPacked();
+#else
+        data << guid;
+#endif
         data << uint32(GROUP_UPDATE_FLAG_STATUS);
         data << uint8(MEMBER_STATUS_OFFLINE);
         SendPacket(&data);
         return;
     }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
     WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 4 + 2 + 2 + 2 + 1 + 2 * 6 + 8 + 1 + 8);
+#else
+    WorldPacket data(SMSG_PARTY_MEMBER_STATS, 4 + 2 + 2 + 2 + 1 + 2 * 6 + 8 + 1 + 8);
+#endif
     BuildPartyMemberStatsPacket(player, &data, GROUP_UPDATE_FULL, true);
     SendPacket(&data);
 }

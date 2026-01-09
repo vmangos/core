@@ -54,7 +54,6 @@ set (game_SRCS
     AI/CreatureEventAI.cpp
     AI/CreatureEventAIMgr.cpp
     AI/CritterAI.cpp
-    AI/GenericSpellAI.cpp
     AI/GuardAI.cpp
     AI/GuardEventAI.cpp
     AI/NullCreatureAI.cpp
@@ -526,6 +525,12 @@ include_directories(
   ${OPENSSL_INCLUDE_DIR}
   ${ZLIB_INCLUDE_DIRS}
 )
+
+if(NOT USE_STD_MALLOC)
+  include_directories(
+    ${TBB_INCLUDE_DIRS}
+  )
+endif()
 
 if(WIN32)
   include_directories(

@@ -24,13 +24,13 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Allow `find_package()` to use `<PackageName>_ROOT` variable
 if(${CMAKE_VERSION} VERSION_GREATER "3.11")
   cmake_policy(SET CMP0074 NEW)
 endif()
 
 include(cmake/common.cmake)
 include(cmake/options.cmake)
-
 include(cmake/platform/detect_platform.cmake)
 
 # Force out-of-source build
@@ -85,7 +85,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
 set(CMAKE_INSTALL_RPATH ${LIBS_DIR})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
-# Find needed packages and if necessery abort if something important is missing
+# Find needed packages and if necessary abort if something important is missing
 
 if (ENABLE_MAILSENDER)
   set(REQUIRES_LIBCURL ON)

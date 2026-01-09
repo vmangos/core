@@ -251,7 +251,9 @@ class GameObject : public SpellCaster
         bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
         uint32 GetFactionTemplateId() const final { return GetGOInfo()->faction; }
-        uint32 GetLevel() const final ;
+        uint32 GetLevel() const final;
+        bool CanAggroWhenOpening() const;
+        void DoAggroWhenOpening(Unit* pUser) const;
 
         bool IsAtInteractDistance(Position const& pos, float radius) const;
         bool IsAtInteractDistance(Player const* player, uint32 maxRange = 0) const;

@@ -297,7 +297,7 @@ enum DamageEffectType
     DOT                     = 2,
     HEAL                    = 3,
     NODAMAGE                = 4,                            // used also in case when damage applied to health but not applied to spell channelInterruptFlags/etc
-    SELF_DAMAGE             = 5,
+    SELF_DAMAGE             = 5,                            // used for environmental damage
 };
 
 enum TextEmotes
@@ -1619,7 +1619,7 @@ enum Maps
     MAP_BLACKFATHOM_DEEPS   = 48,
     MAP_ULDAMAN             = 70,
     MAP_GNOMEREGAN          = 90,
-    MAP_SUNKEN_TEMLE        = 109,
+    MAP_SUNKEN_TEMPLE       = 109,
     MAP_RAZORFEN_DOWNS      = 129,
     MAP_EMERALD_DREAM       = 169,
     MAP_SCARLET_MONASTERY   = 189,

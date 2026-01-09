@@ -79,9 +79,10 @@ bool WDTFile::init(char* map_id, unsigned int mapID)
                 int q = 0;
                 while (p < buf + size)
                 {
-                    string path(p);
+                    std::string path(p);
                     char* s = wdtGetPlainName(p);
-                    fixnamen(s, strlen(s));
+                    FixNameCase(s, strlen(s));
+                    // FixNameSpaces(s, strlen(s)); not needed here?
                     p = p + strlen(p) + 1;
                     m_wmoNames.push_back(s);
                 }

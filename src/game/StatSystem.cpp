@@ -1003,7 +1003,7 @@ void Pet::UpdateResistances(uint32 school)
 
 void Pet::UpdateArmor()
 {
-    float amount = (GetStat(STAT_AGILITY) * (getPetType() == HUNTER_PET ? 2.0f : 1.0f));
+    float amount = (GetStat(STAT_AGILITY) * (GetPetType() == HUNTER_PET ? 2.0f : 1.0f));
 
     m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] += amount;
     int32 value = GetTotalResistanceValue(SPELL_SCHOOL_NORMAL);
@@ -1063,7 +1063,7 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
      * We have to ignore creatures that don't have AP set in database (we would divide by 0)
      */
     // Compute base attack power
-    float createAttackPower = getPetType() == HUNTER_PET ? 2.0f * GetCreateStat(STAT_STRENGTH) - 20.0f
+    float createAttackPower = GetPetType() == HUNTER_PET ? 2.0f * GetCreateStat(STAT_STRENGTH) - 20.0f
                                                          : GetInt32Value(UNIT_FIELD_ATTACK_POWER);
 
     if (createAttackPower > 0)
@@ -1077,7 +1077,7 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
     float maxdamage = ((base_value + weapon_maxdamage) * base_pct + total_value + total_phys) * total_pct;
 
     //  Pet's base damage changes depending on happiness
-    if (getPetType() == HUNTER_PET)
+    if (GetPetType() == HUNTER_PET)
     {
         switch (GetHappinessState())
         {

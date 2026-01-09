@@ -1,39 +1,66 @@
-// Base32 implementation
-//
-// Copyright 2010 Google Inc.
-// Author: Markus Gutschke
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// Encode and decode from base32 encoding using the following alphabet:
-//   ABCDEFGHIJKLMNOPQRSTUVWXYZ234567
-// This alphabet is documented in RFC 4648/3548
-//
-// We allow white-space and hyphens, but all other characters are considered
-// invalid.
-//
-// All functions return the number of output bytes or -1 on error. If the
-// output buffer is too small, the result will silently be truncated.
+/**
+ * base32 (de)coder implementation as specified by RFC4648.
+ *
+ * Copyright (c) 2010 Adrien Kunysz
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ **/
 
-#ifndef _BASE32_H_
-#define _BASE32_H_
+#ifndef __BASE32_H_
+#define __BASE32_H_
 
-#include <stdint.h>
+#include <stddef.h>   // size_t
 
-int base32_decode(uint8_t const* encoded, uint8_t* result, int bufSize);
+/**
+ * Returns the length of the output buffer required to encode len bytes of
+ * data into base32. This is a macro to allow users to define buffer size at
+ * compilation time.
+ */
+#define BASE32_LEN(len)  (((len)/5)*8 + ((len) % 5 ? 8 : 0))
 
-int base32_encode(uint8_t const* data, int length, uint8_t* result,
-                  int bufSize);
+/**
+ * Returns the length of the output buffer required to decode a base32 string
+ * of len characters. Please note that len must be a multiple of 8 as per
+ * definition of a base32 string. This is a macro to allow users to define
+ * buffer size at compilation time.
+ */
+#define UNBASE32_LEN(len)  (((len)/8)*5)
 
+/**
+ * Encode the data pointed to by plain into base32 and store the
+ * result at the address pointed to by coded. The "coded" argument
+ * must point to a location that has enough available space
+ * to store the whole coded string. The resulting string will only
+ * contain characters from the [A-Z2-7=] set. The "len" arguments
+ * define how many bytes will be read from the "plain" buffer.
+ **/
+void base32_encode(const unsigned char *plain, size_t len, unsigned char *coded);
 
-#endif /* _BASE32_H_ */
+/**
+ * Decode the null terminated string pointed to by coded and write
+ * the decoded data into the location pointed to by plain. The
+ * "plain" argument must point to a location that has enough available
+ * space to store the whole decoded string.
+ * Returns the length of the decoded string. This may be less than
+ * expected due to padding. If an invalid base32 character is found
+ * in the coded string, decoding will stop at that point.
+ **/
+size_t base32_decode(const unsigned char *coded, unsigned char *plain);
+
+#endif

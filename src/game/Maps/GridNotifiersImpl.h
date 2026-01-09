@@ -39,7 +39,7 @@ inline void MaNGOS::VisibleNotifier::Visit(GridRefManager<T>& m)
 {
     for(typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        i_camera.UpdateVisibilityOf(iter->getSource(), i_data, i_visibleNow);
+        i_camera.UpdateVisibilityOf(iter->getSource(), i_data);
         i_clientGUIDs.erase(iter->getSource()->GetObjectGuid());
     }
 }

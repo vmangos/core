@@ -1230,6 +1230,87 @@ bool ChatHandler::HandlePartyBotAoECommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandlePartyBotStartCastingCommand(char * args)
+{
+    return HandlePartyBotToggleCastingCommand(true);
+}
+
+bool ChatHandler::HandlePartyBotStopCastingCommand(char * args)
+{
+    return HandlePartyBotToggleCastingCommand(false);
+}
+
+bool ChatHandler::HandlePartyBotToggleCastingCommand(bool allowCasting)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (pTarget && (pTarget != pPlayer))
+    {
+        if (pTarget->AI())
+        {
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                if (allowCasting)
+                {
+                    pAI->m_preventCasting = false;
+                    PSendSysMessage("%s will be allowed to cast spells.", pTarget->GetName());
+                }
+                else
+                {
+                    pAI->m_preventCasting = true;
+                    pTarget->InterruptNonMeleeSpells(false);
+                    PSendSysMessage("%s will no longer cast spells.", pTarget->GetName());
+                }
+                return true;
+            }
+        }
+        SendSysMessage("Target is not a party bot.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    if (allowCasting)
+                    {
+                        pAI->m_preventCasting = false;
+                    }
+                    else
+                    {
+                        pAI->m_preventCasting = true;
+                        pTarget->InterruptNonMeleeSpells(false);
+                    }
+                }
+            }
+        }
+    }
+
+    if (allowCasting)
+        SendSysMessage("All bots are now allowed to cast spells again.");
+    else
+        SendSysMessage("All bots are now forbidden from casting spells.");
+
+    return true;
+}
+
 static std::map<std::string, RaidTargetIcon> raidTargetIcons =
 {
     { "star",     RAID_TARGET_ICON_STAR     },

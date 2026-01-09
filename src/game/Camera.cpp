@@ -67,7 +67,7 @@ void Camera::SetView(WorldObject* obj, bool update_far_sight_field /*= true*/)
         return;
     }
 
-    if (!obj->isType(TypeMask(TYPEMASK_DYNAMICOBJECT | TYPEMASK_UNIT)))
+    if (!obj->IsType(TypeMask(TYPEMASK_DYNAMICOBJECT | TYPEMASK_UNIT)))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Camera::SetView, viewpoint type is not available for client");
         return;
@@ -75,12 +75,12 @@ void Camera::SetView(WorldObject* obj, bool update_far_sight_field /*= true*/)
 
     // detach and deregister from active objects if there are no more reasons to be active
     m_source->GetViewPoint().Detach(this);
-    if (!m_source->isActiveObject())
+    if (!m_source->IsActiveObject())
         m_source->GetMap()->RemoveFromActive(m_source);
 
     m_source = obj;
 
-    if (!m_source->isActiveObject())
+    if (!m_source->IsActiveObject())
         m_source->GetMap()->AddToActive(m_source);
 
     m_source->GetViewPoint().Attach(this);
@@ -139,16 +139,16 @@ void Camera::UpdateVisibilityOf(WorldObject* target)
 }
 
 template<class T>
-void Camera::UpdateVisibilityOf(T* target, UpdateData& data, std::set<WorldObject*>& vis)
+void Camera::UpdateVisibilityOf(T* target, UpdateData& data)
 {
-    m_owner.template UpdateVisibilityOf<T>(m_source, target, data, vis);
+    m_owner.template UpdateVisibilityOf<T>(m_source, target, data);
 }
 
-template void Camera::UpdateVisibilityOf(Player*       , UpdateData&, std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(Creature*     , UpdateData&, std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(Corpse*       , UpdateData&, std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(GameObject*   , UpdateData&, std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(DynamicObject*, UpdateData&, std::set<WorldObject*>&);
+template void Camera::UpdateVisibilityOf(Player*       , UpdateData&);
+template void Camera::UpdateVisibilityOf(Creature*     , UpdateData&);
+template void Camera::UpdateVisibilityOf(Corpse*       , UpdateData&);
+template void Camera::UpdateVisibilityOf(GameObject*   , UpdateData&);
+template void Camera::UpdateVisibilityOf(DynamicObject*, UpdateData&);
 
 void Camera::UpdateVisibilityForOwner()
 {

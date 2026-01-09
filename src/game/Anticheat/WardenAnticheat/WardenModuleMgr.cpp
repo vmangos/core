@@ -36,6 +36,8 @@
 #include <string>
 #include <fstream>
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+
 INSTANTIATE_SINGLETON_1(WardenModuleMgr);
 
 std::vector<std::string> GetModuleNames(std::string const& moduleDir)
@@ -111,3 +113,5 @@ WardenModule const* WardenModuleMgr::GetMacModule() const
 
     return &m_macModules[urand(0, m_macModules.size() - 1)];
 }
+
+#endif

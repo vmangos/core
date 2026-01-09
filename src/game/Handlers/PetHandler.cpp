@@ -359,7 +359,7 @@ void WorldSession::HandlePetRename(WorldPacket& recv_data)
 
     Pet* pet = _player->GetMap()->GetPet(petGuid);
     // check it!
-    if (!pet || pet->getPetType() != HUNTER_PET ||
+    if (!pet || pet->GetPetType() != HUNTER_PET ||
             !pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME) ||
             pet->GetOwnerGuid() != _player->GetObjectGuid() || !pet->GetCharmInfo())
         return;
@@ -419,7 +419,7 @@ void WorldSession::HandlePetAbandon(WorldPacket& recv_data)
         if (pet)
         {
             // Permanently abandon pet
-            if (pet->getPetType() == HUNTER_PET)
+            if (pet->GetPetType() == HUNTER_PET)
                 pet->Unsummon(PET_SAVE_AS_DELETED, _player);
             // Simply dismiss
             else
@@ -445,7 +445,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pet->getPetType() != HUNTER_PET || pet->m_petSpells.size() <= 1)
+    if (pet->GetPetType() != HUNTER_PET || pet->m_petSpells.size() <= 1)
         return;
 
     CharmInfo* charmInfo = pet->GetCharmInfo();
@@ -467,7 +467,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
     {
         uint32 spellId = itr->first;                       // Pet::RemoveSpell can invalidate iterator at erase NEW spell
         ++itr;
-        pet->unlearnSpell(spellId, false);
+        pet->UnlearnSpell(spellId, false);
     }
 
     pet->SetTP(pet->GetLevel() * (pet->GetLoyaltyLevel() - 1));
@@ -567,7 +567,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
 
             //10% chance to play special pet attack talk, else growl
             //actually this only seems to happen on special spells, fire shield for imp, torment for voidwalker, but it's stupid to check every spell
-            if (((Pet*)pet)->getPetType() == SUMMON_PET && (urand(0, 100) < 10))
+            if (((Pet*)pet)->GetPetType() == SUMMON_PET && (urand(0, 100) < 10))
                 pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
             else
                 pet->SendPetAIReaction();

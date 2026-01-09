@@ -52,7 +52,7 @@ class Camera
         void ResetView(bool update_far_sight_field = true);
 
         template<class T>
-        void UpdateVisibilityOf(T* obj, UpdateData& d, std::set<WorldObject*>& vis);
+        void UpdateVisibilityOf(T* obj, UpdateData& d);
         void UpdateVisibilityOf(WorldObject* obj);
 
         void ReceivePacket(WorldPacket* data);
@@ -74,7 +74,7 @@ class Camera
 
     public:
         GridReference<Camera>& GetGridRef() { return m_gridRef; }
-        bool isActiveObject() const { return false; }
+        bool IsActiveObject() const { return false; }
     private:
         GridReference<Camera> m_gridRef;
 };

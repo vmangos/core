@@ -257,6 +257,9 @@ enum ConditionType
                                                             // Value1: leader_guid (optional)
     CONDITION_CREATURE_GROUP_DEAD   = 58,                   // Checks if creature's group is dead.
                                                             // Requirement: Creature Source
+    CONDITION_AREA_EXPLORED         = 59,                   // Checks if the player has explored the specified area.
+                                                            // Requirement: Player Target
+                                                            // Value1: area_id
 };
 
 enum ConditionFlags

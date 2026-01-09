@@ -85,6 +85,16 @@ SpellScript* GetScript_PaladinJudgementOfCommandDummy(SpellEntry const*)
 // 20473, 20929, 20930 - Holy Shock
 struct PaladinHolyShockScript : SpellScript
 {
+    SpellCastResult OnCheckCast(Spell* spell, bool /*strict*/) const final
+    {
+        if (spell->m_targets.getUnitTarget() &&
+            !spell->m_caster->IsFriendlyTo(spell->m_targets.getUnitTarget()) &&
+            !spell->m_caster->IsFacingTarget(spell->m_targets.getUnitTarget()))
+            return SPELL_FAILED_UNIT_NOT_INFRONT;
+
+        return SPELL_CAST_OK;
+    }
+
     bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
     {
         if (effIdx == EFFECT_INDEX_0 && spell->GetUnitTarget())
@@ -198,6 +208,28 @@ SpellScript* GetScript_PaladinReckoning(SpellEntry const*)
     return new PaladinReckoningScript();
 }
 
+enum
+{
+    SPELL_FORBEARANCE = 25771,
+};
+
+// 642, 1020 - Divine Shield
+// 498, 5573 - Divine Protection
+// 1022, 5599, 10278 - Blessing of Protection
+struct PaladinBubbleScript : public SpellScript
+{
+    void OnAfterHit(Spell* spell) const final
+    {
+        if (spell->GetUnitTarget())
+            spell->m_caster->CastSpell(spell->GetUnitTarget(), SPELL_FORBEARANCE, true);
+    }
+};
+
+SpellScript* GetScript_PaladinBubble(SpellEntry const*)
+{
+    return new PaladinBubbleScript();
+}
+
 void AddSC_paladin_spell_scripts()
 {
     Script* newscript;
@@ -235,5 +267,10 @@ void AddSC_paladin_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_paladin_reckoning";
     newscript->GetSpellScript = &GetScript_PaladinReckoning;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_paladin_bubble";
+    newscript->GetSpellScript = &GetScript_PaladinBubble;
     newscript->RegisterSelf();
 }

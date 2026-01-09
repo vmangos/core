@@ -36,12 +36,12 @@ namespace FactorySelector
 {
 CreatureAI* selectAI(Creature* creature)
 {
-    // Vide: un joueur CM un mob.
+    // Player mind controlling a creature.
     if (!creature->IsPet() && creature->GetCharmGuid().IsPlayer() && creature->HasUnitState(UNIT_FLAG_POSSESSED))
         return new NullCreatureAI(creature);
 
     // Allow scripting AI for normal creatures and not controlled pets (guardians and mini-pets)
-    if ((!creature->IsPet() || !((Pet*)creature)->isControlled()) && !creature->IsCharmed())
+    if ((!creature->IsPet() || !((Pet*)creature)->IsControlled()) && !creature->IsCharmed())
         if (CreatureAI* scriptedAI = sScriptMgr.GetCreatureAI(creature))
             return scriptedAI;
 
@@ -52,10 +52,9 @@ CreatureAI* selectAI(Creature* creature)
     std::string ainame = creature->GetAIName();
 
     // select by NPC flags _first_ - otherwise EventAI might be choosen for pets/totems
-    // excplicit check for isControlled() and owner type to allow guardian, mini-pets and pets controlled by NPCs to be scripted by EventAI
+    // excplicit check for IsControlled() and owner type to allow guardian, mini-pets and pets controlled by NPCs to be scripted by EventAI
     Unit* owner = nullptr;
-    if ((creature->IsPet() && ((Pet*)creature)->isControlled() &&
-            ((owner = creature->GetOwner()) && owner->GetTypeId() == TYPEID_PLAYER)) || creature->IsCharmed())
+    if ((creature->IsPet() && ((Pet*)creature)->IsControlled() && creature->GetOwnerGuid().IsPlayer()) || creature->IsCharmed())
         ai_factory = ai_registry.GetRegistryItem("PetAI");
     else if (creature->IsTotem())
         ai_factory = ai_registry.GetRegistryItem("TotemAI");

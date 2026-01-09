@@ -354,7 +354,7 @@ typedef std::pair<GossipMenuItemsMap::const_iterator, GossipMenuItemsMap::const_
 
 struct PetCreateSpellEntry
 {
-    uint32 spellid[4];
+    uint32 spellId[4];
 };
 
 struct GraveYardData

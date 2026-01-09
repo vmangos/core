@@ -45,7 +45,7 @@ char* GetPlainName(char* FileName)
     return FileName;
 }
 
-void fixnamen(char* name, size_t len)
+void FixNameCase(char* name, size_t len)
 {
     if (len < 3)
         return;
@@ -66,7 +66,7 @@ void fixnamen(char* name, size_t len)
         name[i] |= 0x20;
 }
 
-void fixname2(char* name, size_t len)
+void FixNameSpaces(char* name, size_t len)
 {
     if (len < 3)
         return;
@@ -168,8 +168,8 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
                 char* p = buf;
                 while (p < buf + size)
                 {
-                    fixnamen(p, strlen(p));
-                    string path(p);                         // Store copy after name fixed
+                    FixNameCase(p, strlen(p));
+                    std::string path(p); // Store copy after name fixed
 
                     std::string fixedName;
                     ExtractSingleModel(path, fixedName, failedPaths);
@@ -189,10 +189,12 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failed
                 char* p = buf;
                 while (p < buf + size)
                 {
-                    string path(p);
+                    std::string path(p);
+
                     char* s = GetPlainName(p);
-                    fixnamen(s, strlen(s));
-                    fixname2(s, strlen(s));
+                    FixNameCase(s, strlen(s));
+                    FixNameSpaces(s, strlen(s));
+
                     p = p + strlen(p) + 1;
                     WmoInstanceNames.emplace_back(s);
                 }

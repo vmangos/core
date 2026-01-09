@@ -51,7 +51,9 @@ enum NaxxEvents
 
     EVENT_DKWING_INTRO_2,
     EVENT_DKWING_INTRO_3,
-    EVENT_DKWING_INTRO_4
+    EVENT_DKWING_INTRO_4,
+
+    EVENT_SPAWN_SAPPHIRON
 };
 
 instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
@@ -651,10 +653,22 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
                 pGo->SetGoState(GO_STATE_READY);
             else
                 pGo->SetGoState(GO_STATE_ACTIVE);
-        case GO_SAPPHIRON_SPAWN:
-            if(m_auiEncounter[TYPE_SAPPHIRON] == DONE)
-                pGo->DeleteLater();
             break;
+        case GO_SAPPHIRON_SPAWN:
+        {
+            // Server crash handling:
+            // - spawn Sapphiron immediately
+            // - remove spawn anim bones
+            if (GetData(TYPE_SAPPHIRON) == SPECIAL)
+            {
+                if (m_auiEncounter[TYPE_SAPPHIRON] != DONE)
+                {
+                    pGo->SummonCreature(NPC_SAPPHIRON, aSapphPositions[0], aSapphPositions[1], aSapphPositions[2], aSapphPositions[3], TEMPSUMMON_DEAD_DESPAWN, 0);
+                }
+                pGo->DeleteLater();
+            }
+            break;
+        }
     }
 }
 
@@ -927,6 +941,12 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             if(uiData == DONE)
                 m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_1, 12000);
 
+            // Start Sapphiron summoning process
+            if (uiData == SPECIAL)
+            {
+                m_events.ScheduleEvent(EVENT_SPAWN_SAPPHIRON, SPAWN_ANIM_TIMER);
+            }
+
             m_auiEncounter[uiType] = uiData;
             UpdateBossGate(GO_KELTHUZAD_WATERFALL_DOOR, uiData);
             // GO_KELTHUZAD_DOOR is opened at the end of EVENT_KT_LK_DIALOGUE
@@ -1043,7 +1063,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         }
     }
 
-    if (uiData == DONE)
+    if (uiData == DONE || (uiData == SPECIAL && uiType == TYPE_SAPPHIRON))
     {
         OUT_SAVE_INST_DATA;
 
@@ -1351,6 +1371,14 @@ void instance_naxxramas::Update(uint32 diff)
             case EVENT_DKWING_INTRO_4:
                 DoOrSimulateScriptTextForMap(SAY_BLAU_TAUNT3, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
                 break;
+            case EVENT_SPAWN_SAPPHIRON:
+            {
+                if (Player* pPlayer = GetPlayerInMap())
+                {
+                    pPlayer->SummonCreature(NPC_SAPPHIRON, aSapphPositions[0], aSapphPositions[1], aSapphPositions[2], aSapphPositions[3], TEMPSUMMON_DEAD_DESPAWN, 0);
+                }
+                break;
+            }
         }
     }
 }
@@ -1365,7 +1393,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, AreaTriggerEntr
     switch (pAt->id)
     {
         case AREATRIGGER_HUB_TO_FROSTWYRM:
-            if (WingsAreCleared())
+            if (WingsAreCleared() || pPlayer->IsGameMaster())
             {
                 pPlayer->TeleportTo(toFrostwyrmTPPos);
             }
@@ -1411,10 +1439,15 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, AreaTriggerEntr
 
 bool AreaTrigger_at_naxxramas(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
-    if (pPlayer->IsGameMaster() || !pPlayer->IsAlive())
+    if (!pPlayer->IsAlive())
         return false;
 
-    if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())
+    // Allow GMs to use teleporter
+    if (pPlayer->IsGameMaster() &&
+        pAt->id != AREATRIGGER_HUB_TO_FROSTWYRM)
+        return false;
+
+    if (auto* pInstance = dynamic_cast<instance_naxxramas*>(pPlayer->GetInstanceData()))
     {
         pInstance->onNaxxramasAreaTrigger(pPlayer, pAt);
     }

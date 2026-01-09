@@ -184,7 +184,7 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
         PSendSysMessage("Dynamic Flags: %s", FlagsToString(pGameObject->GetUInt32Value(GAMEOBJECT_DYN_FLAGS), GameObjectDynamicFlagToString).c_str());
     if (pGameObject->GetVisibilityModifier())
         PSendSysMessage("Visibility Modifier: %g", pGameObject->GetVisibilityModifier());
-    if (pGameObject->isActiveObject())
+    if (pGameObject->IsActiveObject())
         SendSysMessage("Active Object.");
     if (pGameObject->isSpawned())
         SendSysMessage("Object is spawned.");

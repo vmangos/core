@@ -31,15 +31,13 @@
 
 using namespace MaNGOS;
 
-void
-VisibleChangesNotifier::Visit(CameraMapType& m)
+void VisibleChangesNotifier::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
         iter.getSource()->UpdateVisibilityOf(&i_object);
 }
 
-void
-VisibleNotifier::Notify()
+void VisibleNotifier::Notify()
 {
     Player& player = *i_camera.GetOwner();
     // at this moment i_clientGUIDs have guids that not iterate at grid level checks
@@ -54,17 +52,17 @@ VisibleNotifier::Notify()
                 switch (itr->GetTypeId())
                 {
                     case TYPEID_GAMEOBJECT:
-                        player.UpdateVisibilityOf(&player, itr->ToGameObject(), i_data, i_visibleNow);
+                        player.UpdateVisibilityOf(&player, itr->ToGameObject(), i_data);
                         break;
                     case TYPEID_PLAYER:
-                        player.UpdateVisibilityOf(&player, itr->ToPlayer(), i_data, i_visibleNow);
+                        player.UpdateVisibilityOf(&player, itr->ToPlayer(), i_data);
                         itr->ToPlayer()->UpdateVisibilityOf(itr, &player);
                         break;
                     case TYPEID_UNIT:
-                        player.UpdateVisibilityOf(&player, itr->ToCreature(), i_data, i_visibleNow);
+                        player.UpdateVisibilityOf(&player, itr->ToCreature(), i_data);
                         break;
                     case TYPEID_DYNAMICOBJECT:
-                        player.UpdateVisibilityOf(&player, (DynamicObject*)itr, i_data, i_visibleNow);
+                        player.UpdateVisibilityOf(&player, (DynamicObject*)itr, i_data);
                         break;
                     default:
                         break;
@@ -76,7 +74,7 @@ VisibleNotifier::Notify()
     // Update current map active objects, modifies i_clientGUIDs so we are not sending
     // out of range updates for an active obj
     if (player.GetMap())
-        player.GetMap()->UpdateActiveObjectVisibility(&player, i_clientGUIDs, i_data, i_visibleNow);
+        player.GetMap()->UpdateActiveObjectVisibility(&player, i_clientGUIDs, i_data);
 
     // generate outOfRange for not iterate objects
     i_data.AddOutOfRangeGUID(i_clientGUIDs);
@@ -115,8 +113,7 @@ VisibleNotifier::Notify()
     }
 }
 
-void
-MessageDeliverer::Visit(CameraMapType& m)
+void MessageDeliverer::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
     {
@@ -145,8 +142,7 @@ void MessageDelivererExcept::Visit(CameraMapType& m)
 }
 
 
-void
-ObjectMessageDeliverer::Visit(CameraMapType& m)
+void ObjectMessageDeliverer::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
     {
@@ -155,8 +151,7 @@ ObjectMessageDeliverer::Visit(CameraMapType& m)
     }
 }
 
-void
-MessageDistDeliverer::Visit(CameraMapType& m)
+void MessageDistDeliverer::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
     {
@@ -172,8 +167,7 @@ MessageDistDeliverer::Visit(CameraMapType& m)
     }
 }
 
-void
-ObjectMessageDistDeliverer::Visit(CameraMapType& m)
+void ObjectMessageDistDeliverer::Visit(CameraMapType& m)
 {
     for (const auto& iter : m)
     {
@@ -185,8 +179,8 @@ ObjectMessageDistDeliverer::Visit(CameraMapType& m)
     }
 }
 
-template<class T> void
-ObjectUpdater::Visit(GridRefManager<T>& m)
+template<class T>
+void ObjectUpdater::Visit(GridRefManager<T>& m)
 {
     for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {

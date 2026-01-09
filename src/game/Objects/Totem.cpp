@@ -70,7 +70,7 @@ void Totem::Update(uint32 update_diff, uint32 time)
         // Don't unsummon if owner is a creature - let them persist after creature death
         (owner->GetTypeId() != TYPEID_UNIT && !owner->IsAlive()) || 
         !IsAlive() || 
-        !isWithinVisibilityDistanceOf(owner, owner))
+        !IsWithinVisibilityDistanceOf(owner, owner))
     {
         UnSummon();                                         // remove self
         return;

@@ -34,7 +34,7 @@
 
 #include <G3D/Quat.h>
 
-ShipTransport::ShipTransport(TransportTemplate const& transportTemplate) : GenericTransport(), m_transportTemplate(transportTemplate), m_isMoving(true), m_pendingStop(false)
+ShipTransport::ShipTransport(TransportTemplate const& transportTemplate) : GenericTransport(), m_transportTemplate(transportTemplate), m_isMoving(true), m_pendingStop(false), m_startProgress(0)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT;
 
@@ -45,13 +45,19 @@ ShipTransport::ShipTransport(TransportTemplate const& transportTemplate) : Gener
     SetPeriod(transportTemplate.pathTime);
 }
 
-bool ShipTransport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)
+bool ShipTransport::Create(uint32 guidlow, KeyFrameVec::const_iterator startFrame)
 {
-    Relocate(x, y, z, ang);
+    TaxiPathNodeEntry const* startNode = startFrame->Node;
+    uint32 mapId = startNode->mapid;
+    float x = startNode->x;
+    float y = startNode->y;
+    float z = startNode->z;
+    float o = startFrame->InitialOrientation;
+    Relocate(x, y, z, o);
 
     if (!IsPositionValid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Transport (GUID: %u) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
                       guidlow, x, y);
         return false;
     }
@@ -59,35 +65,30 @@ bool ShipTransport::Create(uint32 guidlow, uint32 mapid, float x, float y, float
     Object::_Create(guidlow, 0, HIGHGUID_MO_TRANSPORT);
 
     GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectTemplate(guidlow);
-
     if (!goinfo)
     {
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapId, x, y, z, o);
         return false;
     }
 
     m_goInfo = goinfo;
 
     // initialize waypoints
-    m_nextFrame = GetKeyFrames().begin();
+    m_nextFrame = startFrame;
     m_currentFrame = m_nextFrame++;
-
-    m_pathProgress = sWorld.GetCurrentMSTime();
+    m_creationTime = sWorld.GetCurrentMSTime();
+    m_pathProgress = startFrame->ArriveTime;
+    m_startProgress = m_pathProgress;
 
     SetObjectScale(goinfo->size);
-
     SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
     SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
-
     SetEntry(goinfo->id);
-
     SetDisplayId(goinfo->displayId);
     SetUInt32Value(GAMEOBJECT_DISPLAYID, goinfo->displayId);
-
     SetGoState(GO_STATE_READY);
     SetGoType(GameobjectTypes(goinfo->type));
-
-    SetGoAnimProgress(animprogress);
+    SetGoAnimProgress(GO_ANIMPROGRESS_DEFAULT);
 
     sObjectAccessor.AddObject(this);
     return true;
@@ -140,7 +141,7 @@ bool ShipTransport::TeleportTransport(uint32 newMapid, float x, float y, float z
                 Creature* creature = static_cast<Creature*>(passenger);
                 RemovePassenger(creature);
 
-                Player* pOwner = ::ToPlayer(creature->GetOwner());
+                Player* pOwner = creature->GetOwnerPlayer();
                 if (!pOwner || pOwner->GetTransport() != this)
                 {
                     if (creature->IsInCombat())
@@ -287,7 +288,8 @@ void ShipTransport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
     if (GetKeyFrames().size() <= 1)
         return;
 
-    uint32 currentMsTime = sWorld.GetCurrentMSTime();
+    // m_pathProgress is time in ms since server start when transport was created + arrival time of keyframe it started in
+    uint32 currentMsTime = GetTimeSinceCreation() + m_startProgress;
     if (m_pathProgress >= currentMsTime) // map transition and update happened in same tick due to MT
         return;
 
@@ -383,7 +385,8 @@ bool ElevatorTransport::Create(uint32 guidlow, uint32 name_id, Map* map, float x
     if (GenericTransport::Create(guidlow, name_id, map, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state))
     {
         m_animationInfo = sTransportMgr.GetTransportAnimInfo(GetGOInfo()->id);
-        m_pathProgress = m_animationInfo ? (sWorld.GetCurrentMSTime() % m_animationInfo->TotalTime) : 0;
+        m_creationTime = sWorld.GetCurrentMSTime();
+        m_pathProgress = 0;
         m_currentSeg = 0;
         return true;
     }
@@ -395,7 +398,7 @@ void ElevatorTransport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
     if (!m_animationInfo)
         return;
 
-    m_pathProgress = sWorld.GetCurrentMSTime() % m_animationInfo->TotalTime;
+    m_pathProgress = GetTimeSinceCreation() % m_animationInfo->TotalTime;
     TransportAnimationEntry const* nodeNext = m_animationInfo->GetNextAnimNode(m_pathProgress);
     TransportAnimationEntry const* nodePrev = m_animationInfo->GetPrevAnimNode(m_pathProgress);
     if (nodeNext && nodePrev)
@@ -429,6 +432,11 @@ void ElevatorTransport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
 
         //SummonCreature(1, currentPos.x, currentPos.y, currentPos.z, GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 1000);
     }
+}
+
+uint32 GenericTransport::GetTimeSinceCreation()
+{
+    return WorldTimer::getMSTimeDiffToNow(m_creationTime);
 }
 
 void GenericTransport::UpdatePosition(float x, float y, float z, float o)

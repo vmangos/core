@@ -1779,15 +1779,14 @@ bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpe
                 // TODO: move this to db as On Death event script on the creature with guid condition
                 static std::map<uint32 /*npcGuid*/, std::vector<uint32 /*goGuid*/>> const fireObjectsMap =
                 {
-                    // TODO: fire and smoke gameobjects for the other positions are not sniffed
-                    // { 53157, {} },
-                    // { 53168, {} },
-                    // { 54270, {} },
-                    { 54271 ,{ 2780, 2781, 2782, 2783, 2784, 2787, 2790, 2791, 2792, 2793 } }
-                    // { 56689, {} },
-                    // { 92232, {} },
-                    // { 92254, {} },
-                    // { 92262, {} },
+                    { 53157, { 35947, 35948, 35949, 35950, 35951, 35952, 35953, 35954, 35955, 35956 } },
+                    { 53168, { 35936, 35937, 35938, 35939, 35940, 35941, 35942, 35943, 35944, 35945 } },
+                    { 54270, { 35903, 35904, 35905, 35906, 35907, 35908, 35909, 35910, 35911, 35912 } },
+                    { 54271 ,{ 35892, 35893, 35894, 35895, 35896, 35897, 35898, 35899, 35900, 35901 } },
+                    { 56689, { 35958, 35959, 35960, 35961, 35962, 35963, 35964, 35965, 35966, 35967 } },
+                    { 92232, { 35881, 35882, 35883, 35884, 35885, 35886, 35887, 35888, 35889, 35890 } },
+                    { 92254, { 35925, 35926, 35927, 35928, 35929, 35930, 35931, 35932, 35933, 35934 } },
+                    { 92262, { 35914, 35915, 35916, 35917, 35918, 35919, 35920, 35921, 35922, 35923 } },
                 };
 
                 auto itr = fireObjectsMap.find(pCreature->GetGUIDLow());
@@ -1796,7 +1795,7 @@ bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpe
                     ScriptInfo script;
                     script.id = uiSpellId;
                     script.command = SCRIPT_COMMAND_RESPAWN_GAMEOBJECT;
-                    script.respawnGo.despawnDelay = 12;
+                    script.respawnGo.despawnDelay = 180;
                     for (auto const& goGuid : itr->second)
                     {
                         script.respawnGo.goGuid = goGuid;

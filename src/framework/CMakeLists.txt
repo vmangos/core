@@ -17,7 +17,7 @@
 
 # include(${CMAKE_SOURCE_DIR}/dep/tbb/tbbinclude.cmake)
 
-set(framework_SRCS 
+set(framework_SRCS
   Dynamic/FactoryHolder.h
   Dynamic/ObjectRegistry.h
   GameSystem/Grid.h
@@ -81,7 +81,6 @@ source_group("Dynamic"
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${TBB_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/src/shared
 )
 
@@ -91,6 +90,11 @@ add_library(framework STATIC
 
 SET_TARGET_PROPERTIES (framework PROPERTIES FOLDER "Game Libs")
 
-target_link_libraries(framework
-  ${TBB_LIBRARIES}
-)
+if(NOT USE_STD_MALLOC)
+  include_directories(
+    ${TBB_INCLUDE_DIRS}
+  )
+  target_link_libraries(framework
+    ${TBB_LIBRARIES}
+  )
+endif()

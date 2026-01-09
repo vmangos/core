@@ -51,6 +51,7 @@ AnticheatManager::~AnticheatManager()
 
 void AnticheatManager::LoadAnticheatData()
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, "Loading warden checks...");
     sWardenScanMgr.LoadFromDB();
@@ -59,6 +60,7 @@ void AnticheatManager::LoadAnticheatData()
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, "");
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, "Loading warden modules...");
     sWardenModuleMgr;
+#endif
 }
 
 MovementAnticheat* AnticheatManager::CreateAnticheatFor(Player* player)
@@ -70,6 +72,7 @@ MovementAnticheat* AnticheatManager::CreateAnticheatFor(Player* player)
 
 Warden* AnticheatManager::CreateWardenForInternal(WorldSession* client, BigNumber* K)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
     if ((client->GetSecurity() != SEC_PLAYER) &&
         sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_PLAYERS_ONLY))
         return nullptr;
@@ -80,6 +83,7 @@ Warden* AnticheatManager::CreateWardenForInternal(WorldSession* client, BigNumbe
         return new WardenMac(client, *K);
     else if (os == CLIENT_OS_WIN && sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED))
         return new WardenWin(client, *K);
+#endif
 
     return nullptr;
 }

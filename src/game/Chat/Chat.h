@@ -279,6 +279,9 @@ class ChatHandler
         bool HandlePartyBotAttackStopCommand(char * args);
         bool HandlePartyBotPullCommand(char * args);
         bool HandlePartyBotAoECommand(char * args);
+        bool HandlePartyBotStartCastingCommand(char * args);
+        bool HandlePartyBotStopCastingCommand(char * args);
+        bool HandlePartyBotToggleCastingCommand(bool allowCasting);
         bool HandlePartyBotControlMarkCommand(char * args);
         bool HandlePartyBotFocusMarkCommand(char * args);
         bool HandlePartyBotClearMarksCommand(char * args);

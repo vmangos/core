@@ -177,7 +177,7 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
                                   "`characters`.`played_time_total`, `character_pet`.`entry`, `character_pet`.`display_id`, `character_pet`.`level`, `characters`.`equipment_cache` "
                                   "FROM `characters` LEFT JOIN `character_pet` ON `characters`.`guid`=`character_pet`.`owner_guid` AND `character_pet`.`slot`='%u' "
                                   "LEFT JOIN `guild_member` ON `characters`.`guid` = `guild_member`.`guid` "
-                                  "WHERE `characters`.`account` = '%u' ORDER BY `characters`.`guid` "
+                                  "WHERE `characters`.`account` = '%u' ORDER BY `characters`.`create_time`, `characters`.`guid` "
                                   "LIMIT 0,10",
                                   PET_SAVE_AS_CURRENT, GetAccountId());
 }
@@ -248,7 +248,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (!Player::ValidateAppearance(race_, class_, gender, hairStyle, hairColor, face, facialHair, skin, true))
+    if (!Player::ValidateAppearance(race_, gender, hairStyle, hairColor, face, facialHair, skin))
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);
@@ -671,11 +671,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         if (pCurrChar->m_deathState != ALIVE)
         {
             // not blizz like, we must correctly save and load player instead...
-            if (pCurrChar->GetRace() == RACE_NIGHTELF)
-                pCurrChar->CastSpell(pCurrChar, 20584, true);   // auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
-            pCurrChar->CastSpell(pCurrChar, 8326, true);        // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
-
-            pCurrChar->SetWaterWalking(true);
+            pCurrChar->ApplyGhostForm();
         }
     }
 

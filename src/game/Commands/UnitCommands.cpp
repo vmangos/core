@@ -524,13 +524,13 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Positive frost damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST));
     PSendSysMessage("Positive shadow damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW));
     PSendSysMessage("Positive arcane damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_ARCANE));
-    PSendSysMessage("Negative physical damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_NORMAL));
-    PSendSysMessage("Negative holy damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_HOLY));
-    PSendSysMessage("Negative fire damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FIRE));
-    PSendSysMessage("Negative nature damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_NATURE));
-    PSendSysMessage("Negative frost damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FROST));
-    PSendSysMessage("Negative shadow damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_SHADOW));
-    PSendSysMessage("Negative arcane damage mod: %u", pPlayer->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_ARCANE));
+    PSendSysMessage("Negative physical damage mod: %d", pPlayer->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_NORMAL));
+    PSendSysMessage("Negative holy damage mod: %d", pPlayer->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_HOLY));
+    PSendSysMessage("Negative fire damage mod: %d", pPlayer->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FIRE));
+    PSendSysMessage("Negative nature damage mod: %d", pPlayer->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_NATURE));
+    PSendSysMessage("Negative frost damage mod: %d", pPlayer->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FROST));
+    PSendSysMessage("Negative shadow damage mod: %d", pPlayer->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_SHADOW));
+    PSendSysMessage("Negative arcane damage mod: %d", pPlayer->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_ARCANE));
     PSendSysMessage("Percent physical damage mod: %g", pPlayer->GetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + SPELL_SCHOOL_NORMAL));
     PSendSysMessage("Percent holy damage mod: %g", pPlayer->GetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + SPELL_SCHOOL_HOLY));
     PSendSysMessage("Percent fire damage mod: %g", pPlayer->GetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + SPELL_SCHOOL_FIRE));
@@ -2022,7 +2022,7 @@ bool ChatHandler::HandleModifyCastSpeedCommand(char *args)
         return false;
 
     // This field is an Int32 before 1.12.
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     if (amount < 0)
     {
         SendSysMessage(LANG_BAD_VALUE);

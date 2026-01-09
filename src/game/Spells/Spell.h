@@ -57,10 +57,7 @@ enum SpellCastFlags
 
 enum SpellNotifyPushType
 {
-    PUSH_IN_FRONT,
-    PUSH_IN_FRONT_90,
-    PUSH_IN_FRONT_15,
-    PUSH_IN_BACK,
+    PUSH_IN_CONE,
     PUSH_SELF_CENTER,
     PUSH_SRC_CENTER,
     PUSH_DEST_CENTER,
@@ -444,14 +441,6 @@ class Spell
         void UpdatePointers();                              // must be used at call Spell code after time delay (non triggered spell cast/update spell call/etc)
 
         bool CheckTargetCreatureType(Unit* target) const;
-
-        void AddTriggeredSpell(SpellEntry const* spellInfo) { m_TriggerSpells.push_back(spellInfo); }
-        void AddPrecastSpell(SpellEntry const* spellInfo) { m_preCastSpells.push_back(spellInfo); }
-        void AddTriggeredSpell(uint32 spellId);
-        void AddPrecastSpell(uint32 spellId);
-        void CastPreCastSpells(Unit* target);
-        void CastTriggerSpells();
-
         void CleanupTargetList();
         void ClearCastItem();
 
@@ -644,10 +633,6 @@ class Spell
         SpellCastResult CanOpenLock(SpellEffectIndex effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);
         uint32 GetSpellBatchingEffectDelay(SpellCaster const* pTarget, SpellEffectIndex effIndex) const;
         // -------------------------------------------
-
-        //List For Triggered Spells
-        std::vector<SpellEntry const*> m_TriggerSpells;                      // casted by caster to same targets settings in m_targets at success finish of current spell
-        std::vector<SpellEntry const*> m_preCastSpells;                      // casted by caster to each target at spell hit before spell effects apply
 
         // Scripting System
         SpellScript* m_spellScript = nullptr;

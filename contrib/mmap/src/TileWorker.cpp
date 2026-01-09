@@ -218,15 +218,19 @@ namespace MMAP
     {
         while (true)
         {
-            TileInfo tileInfo;
-
             if (m_mapBuilder->m_cancel.load())
             {
                 return;
             }
 
+            TileInfo tileInfo;
             if (m_mapBuilder->m_tileQueue.WaitAndPop(tileInfo))
             {
+                if (m_mapBuilder->m_cancel.load())
+                {
+                    return;
+                }
+
                 dtNavMesh* navMesh = dtAllocNavMesh();
                 if (!navMesh->init(&tileInfo.m_navMeshParams))
                 {
@@ -236,8 +240,11 @@ namespace MMAP
                 }
 
                 buildTile(tileInfo.m_mapId, tileInfo.m_tileX, tileInfo.m_tileY, navMesh, tileInfo.m_curTile, tileInfo.m_tileCount);
-
                 dtFreeNavMesh(navMesh);
+            }
+            else
+            {
+                return;
             }
         }
     }

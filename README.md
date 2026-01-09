@@ -12,8 +12,8 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 - 1.8.4.4878
 - 1.7.1.4695
 - 1.6.1.4544
-<!--- 1.5.1.4449
-- 1.4.2.4375
+- 1.5.1.4449
+<!--- 1.4.2.4375
 - 1.3.1.4297
 - 1.2.4.4222-->
 

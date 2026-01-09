@@ -385,9 +385,6 @@ class Creature : public Unit
 
         void SetInCombatWithZone(bool initialPulse = true);
         void EnterCombatWithTarget(Unit* pTarget);
-        bool canStartAttack(Unit const* who, bool force) const;
-        bool _IsTargetAcceptable(Unit const* target) const;
-        bool canCreatureAttack(Unit const* pVictim, bool force) const;
 
         // Smartlog
         time_t GetCombatTime(bool total) const;
@@ -416,7 +413,6 @@ class Creature : public Unit
 
         // AI helpers
         Unit* SelectNearestHostileUnitInAggroRange(bool useLOS, bool ignoreCivilians = false) const;
-        Unit* SelectNearestTargetInAttackDistance(float dist) const;
         Creature* FindNearestFriendlyGuard(float range) const;
         void CallNearestGuard(Unit* pEnemy) const;
 
@@ -570,6 +566,7 @@ class Creature : public Unit
         }
 
         bool HasWeapon() const;
+        bool CanBeDisarmed() const final;
 
         void SetCallForHelpDist(float dist)
         {

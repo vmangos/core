@@ -510,7 +510,7 @@ bool Map::ScriptCommand_OpenDoor(ScriptInfo const& script, WorldObject* source, 
 
     pDoor->UseDoorOrButton(time_to_close);
 
-    if (target && target->isType(TYPEMASK_GAMEOBJECT) && (static_cast<GameObject*>(target))->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
+    if (target && target->IsType(TYPEMASK_GAMEOBJECT) && (static_cast<GameObject*>(target))->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
         (static_cast<GameObject*>(target))->UseDoorOrButton(time_to_close);
 
     return false;
@@ -553,7 +553,7 @@ bool Map::ScriptCommand_CloseDoor(ScriptInfo const& script, WorldObject* source,
 
     pDoor->UseDoorOrButton(time_to_open);
 
-    if (target && target->isType(TYPEMASK_GAMEOBJECT) && (static_cast<GameObject*>(target))->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
+    if (target && target->IsType(TYPEMASK_GAMEOBJECT) && (static_cast<GameObject*>(target))->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
         (static_cast<GameObject*>(target))->UseDoorOrButton(time_to_open);
 
     return false;

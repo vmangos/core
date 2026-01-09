@@ -108,6 +108,55 @@ void ObjectGuidGenerator<high>::GenerateRange(uint32& first, uint32& last)
     last = m_nextGuid;
 }
 
+// Loads the max guid and any gaps to reuse.
+template<HighGuid high>
+void ObjectGuidGenerator<high>::LoadFromDB(char const* fieldName, char const* tableName)
+{
+    std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT MAX(`%s`) FROM `%s`", fieldName, tableName));
+    if (!result)
+        return;
+
+    SetMaxUsedGuid((*result)[0].GetUInt32(), tableName);
+
+    uint32 const maxPoolSize = sWorld.getConfig(CONFIG_UINT32_REUSABLE_GUID_POOL_SIZE);
+    if (!maxPoolSize)
+        return;
+
+    uint32 const maxQuerySize = std::max(maxPoolSize * 2u, 1000u);
+    uint32 lowerBound = 1;
+    uint32 upperBound;
+
+    do
+    {
+        upperBound = lowerBound - 1 + maxQuerySize;
+        result = CharacterDatabase.PQuery("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u ORDER BY `%s` ASC", fieldName, tableName, fieldName, lowerBound, upperBound, fieldName);
+        if (!result)
+            goto end;
+
+        uint32 lastGuid = lowerBound - 1;
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 currentGuid = fields[0].GetUInt32();
+
+            for (uint32 i = lastGuid + 1; i < currentGuid; ++i)
+            {
+                m_freedGuids.push(i);
+                if (m_freedGuids.size() >= maxPoolSize)
+                    goto end;
+            }
+            lastGuid = currentGuid;
+
+        } while (result->NextRow());
+
+        lowerBound += maxQuerySize;
+    } while (upperBound < m_nextGuid);
+
+end:
+    if (!m_freedGuids.empty())
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Loaded %u free %s guids for reuse.", (uint32)m_freedGuids.size(), tableName);
+}
+
 template<HighGuid high>
 void ObjectGuidGenerator<high>::SetMaxUsedGuid(uint32 val, char const* guidType)
 {

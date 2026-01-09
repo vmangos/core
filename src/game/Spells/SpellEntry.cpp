@@ -495,7 +495,7 @@ uint32 SpellEntry::GetCastTime(SpellCaster const* caster, Spell* spell) const
 
             if (!(Attributes & (SPELL_ATTR_IS_ABILITY | SPELL_ATTR_IS_TRADESKILL)))
             {
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
                 castTime = int32(castTime * pUnit->GetFloatValue(UNIT_MOD_CAST_SPEED));
 #else
                 castTime = int32(castTime * (1.0f + pUnit->GetInt32Value(UNIT_MOD_CAST_SPEED) / 100.0f));
@@ -1031,8 +1031,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
 {
     // talents that learn spells can have stance requirements that need ignore
     // (this requirement only for client-side stance show in talent description)
-    if (GetTalentSpellCost(Id) > 0 &&
-            (Effect[EFFECT_INDEX_0] == SPELL_EFFECT_LEARN_SPELL || Effect[EFFECT_INDEX_1] == SPELL_EFFECT_LEARN_SPELL || Effect[EFFECT_INDEX_2] == SPELL_EFFECT_LEARN_SPELL))
+    if (HasEffect(SPELL_EFFECT_LEARN_SPELL) && GetTalentSpellCost(Id) > 0)
         return SPELL_CAST_OK;
 
     uint32 stanceMask = (form ? 1 << (form - 1) : 0);
@@ -1052,7 +1051,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
             return SPELL_CAST_OK;
         }
-        actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells
+        actAsShifted = !(shapeInfo->flags1 & SHAPESHIFT_FLAG_STANCE);            // shapeshift acts as normal form for spells
     }
 
     if (actAsShifted)
@@ -1065,7 +1064,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
     else
     {
         // needs shapeshift
-        if (!(AttributesEx2 & SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED) && Stances != 0)
+        if (!HasAttribute(SPELL_ATTR_EX2_ALLOW_WHILE_NOT_SHAPESHIFTED) && Stances != 0)
             return SPELL_FAILED_ONLY_SHAPESHIFT;
     }
 

@@ -86,7 +86,7 @@ bool ChatHandler::HandleNpcSpawnInfoCommand(char* /*args*/)
     }
     PSendSysMessage("Movement Type: %s", movementType.c_str());
     PSendSysMessage("Wander Distance: %g", pData->wander_distance);
-    PSendSysMessage(LANG_NPCINFO_ACTIVE_VISIBILITY, target->isActiveObject(), target->GetVisibilityModifier());
+    PSendSysMessage(LANG_NPCINFO_ACTIVE_VISIBILITY, target->IsActiveObject(), target->GetVisibilityModifier());
     ShowNpcOrGoSpawnInformation<Creature>(target->GetGUIDLow());
 
     return true;
@@ -130,7 +130,7 @@ bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
     PSendSysMessage(LANG_NPCINFO_DUNGEON_ID, target->GetInstanceId());
     PSendSysMessage(LANG_NPCINFO_POSITION, float(target->GetPositionX()), float(target->GetPositionY()), float(target->GetPositionZ()));
     PSendSysMessage(LANG_NPCINFO_AIINFO, target->GetAIName().c_str(), target->GetScriptName().c_str());
-    PSendSysMessage(LANG_NPCINFO_ACTIVE_VISIBILITY, target->isActiveObject(), target->GetVisibilityModifier());
+    PSendSysMessage(LANG_NPCINFO_ACTIVE_VISIBILITY, target->IsActiveObject(), target->GetVisibilityModifier());
 
     if ((npcflags & UNIT_NPC_FLAG_VENDOR))
         SendSysMessage(LANG_NPCINFO_VENDOR);

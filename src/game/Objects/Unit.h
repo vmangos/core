@@ -442,7 +442,7 @@ class Unit : public SpellCaster
                 ResetAttackTimer(att);
         }
         void ApplyAttackTimePercentMod(WeaponAttackType att,float val, bool apply, bool recalcDamage = false);
-        void ApplyCastTimePercentMod(float val, bool apply);
+        void UpdateCastSpeed();
 
         float GetObjectBoundingRadius() const final { return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; }
         float GetCombatReach() const final { return m_floatValues[UNIT_FIELD_COMBATREACH]; }
@@ -700,7 +700,7 @@ class Unit : public SpellCaster
         void ClearDiminishings() { m_Diminishing.clear(); }
 
         void SendSpellGo(Unit* target, uint32 spellId) const;
-        void SendPlaySpellVisual(uint32 id) const;
+        void SendPlaySpellVisualKit(uint32 id) const;
         void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo const* pInfo, AuraType auraTypeOverride = SPELL_AURA_NONE) const;
         void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;
         void WritePetSpellsCooldown(WorldPacket& data) const;
@@ -1006,6 +1006,7 @@ class Unit : public SpellCaster
                     return true;
             }
         }
+        virtual bool CanBeDisarmed() const = 0;
 
         void AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType = BASE_ATTACK, bool extra = false);
         void SendAttackStateUpdate(CalcDamageInfo const* damageInfo) const;

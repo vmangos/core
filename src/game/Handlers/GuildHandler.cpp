@@ -61,7 +61,7 @@ void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (gname.size() > GUILD_NAME_MAX_LENGTH)
+    if (utf8length(gname) > GUILD_NAME_MAX_LENGTH)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild name to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
@@ -495,7 +495,7 @@ void WorldSession::HandleGuildMOTDOpcode(WorldPacket& recvPacket)
     else
         MOTD.clear();
 
-    if (MOTD.size() > GUILD_MOTD_MAX_LENGTH)
+    if (utf8length(MOTD) > GUILD_MOTD_MAX_LENGTH)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild motd to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
@@ -547,7 +547,7 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPacket& recvPacket)
     }
 
     recvPacket >> PNOTE;
-    if (PNOTE.size() > GUILD_NOTE_MAX_LENGTH)
+    if (utf8length(PNOTE) > GUILD_NOTE_MAX_LENGTH)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild player note to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
@@ -587,7 +587,7 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket)
     }
 
     recvPacket >> OFFNOTE;
-    if (OFFNOTE.size() > GUILD_NOTE_MAX_LENGTH)
+    if (utf8length(OFFNOTE) > GUILD_NOTE_MAX_LENGTH)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild officer note to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
@@ -623,7 +623,7 @@ void WorldSession::HandleGuildRankOpcode(WorldPacket& recvPacket)
     recvPacket >> rights;
     recvPacket >> rankName;
 
-    if (rankName.size() > GUILD_RANK_MAX_LENGTH)
+    if (utf8length(rankName) > GUILD_RANK_MAX_LENGTH)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild rank name to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
@@ -645,7 +645,7 @@ void WorldSession::HandleGuildAddRankOpcode(WorldPacket& recvPacket)
     std::string rankName;
     recvPacket >> rankName;
 
-    if (rankName.size() > GUILD_RANK_MAX_LENGTH)
+    if (utf8length(rankName) > GUILD_RANK_MAX_LENGTH)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild rank name to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
@@ -708,7 +708,7 @@ void WorldSession::HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket)
     std::string GINFO;
     recvPacket >> GINFO;
 
-    if (GINFO.size() > GUILD_INFO_MAX_LENGTH)
+    if (utf8length(GINFO) > GUILD_INFO_MAX_LENGTH)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild info to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
