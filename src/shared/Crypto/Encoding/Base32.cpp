@@ -237,8 +237,13 @@ static int decode_sequence(const unsigned char *coded, unsigned char *plain)
         int octet = get_octet(block);
 
         int c = decode_char(coded[block]);
-        if (c < 0)  // invalid char, stop here
-            return octet;
+        if (c < 0) // invalid char, stop here
+        {
+            if (coded[block] == '\0' || coded[block] == '=') // just end of string
+                return octet;
+
+            return -1; // <-- vMangos custom change. Completely fail if invalid char was used.
+        }
 
         plain[octet] |= shift_left(c, offset);
         if (offset < 0) {  // does this block overflows to next octet?
@@ -254,6 +259,9 @@ size_t base32_decode(const unsigned char *coded, unsigned char *plain)
     size_t written = 0;
     for (size_t i = 0, j = 0; ; i += 8, j += 5) {
         int n = decode_sequence(&coded[i], &plain[j]);
+        if (n == -1)
+            return 0; // <-- vMangos custom change. Completely fail if invalid char was used.
+
         written += n;
         if (n < 5)
             return written;
@@ -291,6 +299,10 @@ nonstd::optional<std::vector<uint8>> Crypto::Encoding::Base32::Decode(std::strin
 
     size_t written = base32_decode(reinterpret_cast<const unsigned char*>(base32_source_string.c_str()), output_bin.data());
     MANGOS_ASSERT(written <= output_size);
+    if (written == 0) // will return 0 if invalid character
+    {
+        return nonstd::nullopt;
+    }
 
     output_bin.resize(written); // trim last bytes
 
