@@ -19,7 +19,7 @@
 #include "Common.h"
 #include "Log.h"
 #include "Crypto/Hash/HMACSHA1.h"
-#include "Auth/base32.h"
+#include "Crypto/Encoding/Base32.h"
 #include "SRP6.h"
 
 #include <openssl/crypto.h>

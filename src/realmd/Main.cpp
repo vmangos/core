@@ -36,7 +36,6 @@
 #include "migrations_list.h"
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
-
 #include <ace/Get_Opt.h>
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>

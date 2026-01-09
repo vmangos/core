@@ -40,6 +40,7 @@ namespace Crypto { namespace Hash { namespace HMACSHA1
     class Generator
     {
     public:
+        Generator(std::vector<uint8> const& key);
         Generator(uint8 const* key, size_t len);
         ~Generator();
 

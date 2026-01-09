@@ -42,6 +42,8 @@ set (shared_SRCS
     Crypto/BigNumber.cpp
     Crypto/Authentication/SRP6.h
     Crypto/Authentication/SRP6.cpp
+    Crypto/Encoding/Base32.h
+    Crypto/Encoding/Base32.cpp
     Crypto/Encryption/RC4.h
     Crypto/Encryption/RC4.cpp
     Crypto/Hash/HMACSHA1.h
@@ -84,9 +86,7 @@ set (shared_SRCS
     Duration.h
     WheatyExceptionReport.cpp
     Auth/AuthCrypt.h
-    Auth/base32.h
     Auth/AuthCrypt.cpp
-    Auth/base32.cpp
     Config/Config.cpp
     Database/Database.cpp
     Database/DatabaseMysql.cpp

@@ -25,7 +25,7 @@
 
 #include "Common.h"
 #include "Crypto/Hash/HMACSHA1.h"
-#include "Auth/base32.h"
+#include "Crypto/Encoding/Base32.h"
 #include "Database/DatabaseEnv.h"
 #include "Config/Config.h"
 #include "Log.h"
@@ -1258,10 +1258,8 @@ bool AuthSocket::VerifyPinData(uint32 pin, const PINData& clientData)
 
 uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval)
 {
-    std::vector<uint8> decoded_key((secret.size() + 7) / 8 * 5);
-    int key_size = base32_decode((const uint8_t*)secret.data(), decoded_key.data());
-
-    if (key_size == -1)
+    nonstd::optional<std::vector<uint8>> maybe_decoded_key = Crypto::Encoding::Base32::Decode(secret, 64);
+    if (!maybe_decoded_key.has_value())
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Unable to base32 decode TOTP key for user %s", m_safelogin.c_str());
         return -1;
@@ -1273,7 +1271,7 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval)
     uint64 step = static_cast<uint64>((floor(now / 30))) + interval;
     EndianConvertReverse(step);
 
-    Crypto::Hash::HMACSHA1::Generator hmac(decoded_key.data(), key_size);
+    Crypto::Hash::HMACSHA1::Generator hmac(maybe_decoded_key.value());
     hmac.UpdateData((uint8*)&step, sizeof(step));
 
     auto hmac_result = hmac.GetDigest();
