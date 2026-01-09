@@ -51,13 +51,6 @@
 #include <ctime>
 //#include "Util.h" -- for commented utf8ToUpperOnlyLatin
 
-enum AccountFlags
-{
-    ACCOUNT_FLAG_GM         = 0x00000001,
-    ACCOUNT_FLAG_TRIAL      = 0x00000008,
-    ACCOUNT_FLAG_PROPASS    = 0x00800000,
-};
-
 typedef struct AuthHandler
 {
     eAuthCmd cmd;
@@ -1283,7 +1276,7 @@ bool AuthSocket::VerifyPinData(uint32 pin, PINData const& clientData)
 uint32 AuthSocket::GenerateTotpPin(std::string const& secret, int interval)
 {
     std::vector<uint8> decoded_key((secret.size() + 7) / 8 * 5);
-    int key_size = base32_decode((uint8_t const*)secret.data(), decoded_key.data(), decoded_key.size());
+    int key_size = base32_decode((uint8_t const*)secret.data(), decoded_key.data()); // TODO: possible buffer overflow, need to add `decoded_key.size()`
 
     if (key_size == -1)
     {

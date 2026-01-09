@@ -25,6 +25,7 @@
 #define __WARDENMODULE_HPP_
 
 #include "Platform/Define.h"
+#include "Progression.h" // required for SUPPORTED_CLIENT_BUILD
 
 #include <string>
 #include <vector>

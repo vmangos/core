@@ -30,6 +30,7 @@
 #include "ScriptMgr.h"
 #include "Util.h"
 #include "World.h"
+#include "Map.h"
 #include "GridMap.h"
 #include "ScriptMgr.h"
 
