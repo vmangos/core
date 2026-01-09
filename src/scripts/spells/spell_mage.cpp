@@ -133,6 +133,65 @@ AuraScript* GetScript_MageIgnite(SpellEntry const*)
     return new MageIgniteScript();
 }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+
+enum
+{
+    SPELL_COMBUSTION_PROC_AURA = 11129,
+    SPELL_COMBUSTION_CRIT_BUFF = 28682,
+};
+
+// 11129 - Combustion (invisible proc aura, the spell in your book)
+struct MageCombustionProcScript : public AuraScript
+{
+    optional<SpellAuraProcResult> OnProc(Unit* pOwner, Unit* pVictim, uint32 /*amount*/, int32 originalAmount, Aura* triggeredByAura, SpellEntry const* /*procSpell*/, uint32 /*procFlag*/, uint32 procEx, uint32 cooldown) final
+    {
+        // does not proc if no target is affected (aoe like flamestrike)
+        if (!pVictim)
+            return SPELL_AURA_PROC_FAILED;
+        
+        // combustion counter was dispelled or clicked off
+        if (!pOwner->HasAura(SPELL_COMBUSTION_CRIT_BUFF))
+        {
+            pOwner->RemoveAurasDueToSpell(triggeredByAura->GetId());
+            return SPELL_AURA_PROC_FAILED;
+        }
+
+        // last charge and crit
+        if (triggeredByAura->GetHolder()->GetAuraCharges() <= 1 && (procEx & PROC_EX_CRITICAL_HIT))
+        {
+            pOwner->RemoveAurasDueToSpell(SPELL_COMBUSTION_CRIT_BUFF); // remove Combustion auras
+            return SPELL_AURA_PROC_OK; // charge counting (will be removed)
+        }
+        
+        pOwner->CastSpell(pOwner, SPELL_COMBUSTION_CRIT_BUFF, true, nullptr, triggeredByAura);
+        return (procEx & PROC_EX_CRITICAL_HIT) ? SPELL_AURA_PROC_OK : SPELL_AURA_PROC_FAILED; // charge update only at crit hits, no hidden cooldowns
+    }
+};
+
+AuraScript* GetScript_MageCombustionProc(SpellEntry const*)
+{
+    return new MageCombustionProcScript();
+}
+
+// 28682 - Combustion (visible crit buff, triggered by 11129)
+struct MageCombustionBuffScript : public AuraScript
+{
+    void OnAfterApply(Aura* aura, bool apply) final
+    {
+        // removing the invisible proc aura starts cooldown
+        if (!apply && aura->GetEffIndex() == EFFECT_INDEX_0 && aura->GetRemoveMode() == AURA_REMOVE_BY_CANCEL)
+            aura->GetTarget()->RemoveAurasDueToSpell(SPELL_COMBUSTION_PROC_AURA);
+    }
+};
+
+AuraScript* GetScript_MageCombustionBuff(SpellEntry const*)
+{
+    return new MageCombustionBuffScript();
+}
+
+#endif
+
 void AddSC_mage_spell_scripts()
 {
     Script* newscript;
@@ -146,4 +205,16 @@ void AddSC_mage_spell_scripts()
     newscript->Name = "spell_mage_ignite";
     newscript->GetAuraScript = &GetScript_MageIgnite;
     newscript->RegisterSelf();
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    newscript = new Script;
+    newscript->Name = "spell_mage_combustion_proc";
+    newscript->GetAuraScript = &GetScript_MageCombustionProc;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_mage_combustion_buff";
+    newscript->GetAuraScript = &GetScript_MageCombustionBuff;
+    newscript->RegisterSelf();
+#endif
 }

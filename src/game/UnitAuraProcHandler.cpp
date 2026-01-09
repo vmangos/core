@@ -860,33 +860,6 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                 triggered_spell_id = 29077;
                 break;
             }
-            switch (dummySpell->Id)
-            {
-                // Combustion
-                case 11129:
-                {
-                    // does not proc if no target is affected (aoe like flamestrike)
-                    if (!pVictim)
-                        return SPELL_AURA_PROC_FAILED;
-
-                    // combustion counter was dispelled or clicked off
-                    if (!HasAura(28682))
-                    {
-                        RemoveAurasDueToSpell(11129);
-                        return SPELL_AURA_PROC_FAILED;
-                    }
-
-                    //last charge and crit
-                    if (triggeredByAura->GetHolder()->GetAuraCharges() <= 1 && (procEx & PROC_EX_CRITICAL_HIT))
-                    {
-                        RemoveAurasDueToSpell(28682);       //-> remove Combustion auras
-                        return SPELL_AURA_PROC_OK;                        // charge counting (will removed)
-                    }
-
-                    CastSpell(this, 28682, true, castItem, triggeredByAura);
-                    return (procEx & PROC_EX_CRITICAL_HIT) ? SPELL_AURA_PROC_OK : SPELL_AURA_PROC_FAILED; // charge update only at crit hits, no hidden cooldowns
-                }
-            }
             break;
         }
         case SPELLFAMILY_WARRIOR:
