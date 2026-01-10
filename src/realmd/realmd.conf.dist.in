@@ -110,6 +110,14 @@ ConfVersion=2024091701
 #        Default: 20
 #                 0  (Disabled)
 #
+#    DnsResolveTimeout
+#        Maximum time in seconds to wait for DNS resolution when updating realm list.
+#        If DNS resolution takes longer than this timeout, the realm will be temporarily
+#        skipped until the next update cycle (see RealmsStateUpdateDelay).
+#        This prevents the server from hanging when DNS servers are unreachable.
+#        Default: 5 (seconds)
+#                 0 (use system default - potentially blocking, not recommended)
+#
 #    WrongPass.MaxCount
 #        Number of login attemps with wrong password before the account or IP is banned
 #        Default: 0  (Never ban)
@@ -189,6 +197,7 @@ ProcessPriority = 1
 WaitAtStartupError = 5 # consider fixing your actual problem before changing this value!
 MinRealmListDelay = 1
 RealmsStateUpdateDelay = 20
+DnsResolveTimeout = 5
 WrongPass.MaxCount = 0
 WrongPass.BanTime = 600
 WrongPass.BanType = 0

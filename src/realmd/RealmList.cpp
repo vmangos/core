@@ -33,6 +33,7 @@
 #include "Database/DatabaseEnv.h"
 #include "IO/Networking/DNS.h"
 #include "IO/Networking/Utils.h"
+#include "Config/Config.h"
 
 INSTANTIATE_SINGLETON_1( RealmList );
 
@@ -167,6 +168,9 @@ void RealmList::UpdateRealms(bool init)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Updating realm list...");
 
+    uint32 dnsTimeoutSeconds = sConfig.GetIntDefault("DnsResolveTimeout", 5);
+    std::chrono::seconds dnsTimeout(dnsTimeoutSeconds);
+
     std::unique_ptr<QueryResult> result = LoginDatabase.Query(
         //       0     1       2          3               4                  5       6
         "SELECT `id`, `name`, `address`, `localAddress`, `localSubnetMask`, `port`, `icon`, "
@@ -201,17 +205,18 @@ void RealmList::UpdateRealms(bool init)
                 realmflags &= (REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD);
             }
 
-            auto externalIpAddress = IO::Networking::DNS::ResolveDomainSingle(externalAddressString, IO::Networking::IpAddress::Type::IPv4);
+            // Use DNS resolution with timeout to prevent hanging on unreachable DNS servers
+            auto externalIpAddress = IO::Networking::DNS::ResolveDomainSingle(externalAddressString, IO::Networking::IpAddress::Type::IPv4, dnsTimeout);
             if (!externalIpAddress)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not parse externalAddress: %s for realm \"%s\" (id %d) will skip realm update.", externalAddressString.c_str(), name.c_str(), realmId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not resolve or parse externalAddress: %s for realm \"%s\" (id %d) - will skip realm update.", externalAddressString.c_str(), name.c_str(), realmId);
                 continue;
             }
 
-            auto localIpAddress = IO::Networking::DNS::ResolveDomainSingle(localAddressString, IO::Networking::IpAddress::Type::IPv4);
+            auto localIpAddress = IO::Networking::DNS::ResolveDomainSingle(localAddressString, IO::Networking::IpAddress::Type::IPv4, dnsTimeout);
             if (!localIpAddress)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not parse localAddress: %s for realm \"%s\" (id %d) will skip realm update.", localAddressString.c_str(), name.c_str(), realmId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not resolve or parse localAddress: %s for realm \"%s\" (id %d) - will skip realm update.", localAddressString.c_str(), name.c_str(), realmId);
                 continue;
             }
 
