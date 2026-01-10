@@ -741,7 +741,7 @@ struct NefarianPolymorphAuraScript : public AuraScript
         if (!apply)
             return;
 
-        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+        if (aura->GetEffIndex() != EFFECT_INDEX_1)
             return;
 
         Unit* target = aura->GetTarget();
