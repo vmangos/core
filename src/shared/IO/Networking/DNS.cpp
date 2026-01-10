@@ -4,7 +4,7 @@
 #include "Errors.h"
 #include "Util.h"
 #include "IO/SystemErrorToString.h"
-#include <thread>
+#include "IO/Multithreading/CreateThread.h"
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
@@ -142,7 +142,7 @@ std::vector<IO::Networking::IpAddress> IO::Networking::DNS::ResolveDomainAll(std
     auto state = std::make_shared<DnsResolverState>();
 
     // Worker thread that performs the DNS resolution
-    std::thread resolverThread([state, domainName, type]()
+    std::thread resolverThread = IO::Multithreading::CreateThread("DnsResolver", [state, domainName, type]()
     {
         try
         {
@@ -194,7 +194,7 @@ std::vector<IO::Networking::IpAddress> IO::Networking::DNS::ResolveDomainAll(std
         {
             std::rethrow_exception(state->exceptionPtr);
         }
-        catch (const std::exception& e)
+        catch (std::exception const& e)
         {
             sLog.Out(LogType::LOG_NETWORK, LOG_LVL_ERROR, "DNS resolution exception for domain %s: %s", domainName.c_str(), e.what());
         }
