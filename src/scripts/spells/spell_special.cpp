@@ -339,6 +339,10 @@ struct SilithystAuraScript : public AuraScript
 
     void OnAfterApply(Aura* aura, bool apply) final
     {
+        // Silithyst PvP was added in patch 1.12, FORCE_REACTION effect on INDEX_1
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_12_1
+        return;
+#endif
         if (aura->GetEffIndex() != EFFECT_INDEX_1)
             return;
 
