@@ -16826,17 +16826,9 @@ void Player::_SaveInventory()
 
     for (auto& item : m_itemUpdateQueue)
     {
+        // items remember their place in the update queue, and when they need to be removed from the queue they just set that index to null
         if (!item)
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_SaveInventory - Null item pointer found in item update queue of %s.", GetGuidStr().c_str());
             continue;
-        }
-
-        if (item->IsDeleted())
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_SaveInventory - Already deleted item pointer found in item update queue of %s.", GetGuidStr().c_str());
-            continue;
-        }
 
         if (item->GetState() != ITEM_REMOVED)
         {

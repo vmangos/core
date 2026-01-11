@@ -429,7 +429,7 @@ class Object
         uint16 m_valuesCount;
 
         bool m_objectUpdated;   // Marked for client update
-        bool m_deleted;         // Object in remove list or destroyed
+        bool m_deleted;         // Object in remove list
         uint32 m_delayedActions;
 
     private:

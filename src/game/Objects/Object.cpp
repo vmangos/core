@@ -213,7 +213,6 @@ Object::~Object()
     m_uint32Values = nullptr;
     delete[] m_uint32Values_mirror;
     m_uint32Values_mirror = nullptr;
-    m_deleted = true;
 }
 
 void Object::_InitValues()
