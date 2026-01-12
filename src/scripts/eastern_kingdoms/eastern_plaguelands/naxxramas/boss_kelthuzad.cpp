@@ -1148,6 +1148,9 @@ struct ChainsOfKelThuzadAuraScript : public AuraScript
 {
     void OnAfterApply(Aura* aura, bool apply) final
     {
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
         Unit* target = aura->GetTarget();
         Player* player = target->ToPlayer();
         if (!player)

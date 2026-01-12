@@ -1096,7 +1096,7 @@ struct ThaddiusPositiveChargeAuraScript : public AuraScript
         SPELL_POSITIVE_CHARGE_AMP   = 29659
     };
 
-    void OnPeriodicTrigger(Aura* aura, Unit* caster, Unit* target, WorldObject* /*targetObject*/, SpellEntry const*& /*spellInfo*/) final
+    void OnPeriodicTrigger(Aura* /*aura*/, Unit* /*caster*/, Unit* target, WorldObject* /*targetObject*/, SpellEntry const*& /*spellInfo*/) final
     {
         // Only process in Naxxramas to avoid performance issues
         if (target->GetMap()->GetId() != MAP_NAXXRAMAS)
@@ -1113,7 +1113,7 @@ struct ThaddiusPositiveChargeAuraScript : public AuraScript
             if (pPlayer->IsDead())
                 continue;
             // 2d distance should be good enough
-            if (pPlayer->HasAura(SPELL_POSITIVE_CHARGE_APPLY) && caster->GetDistance2d(pPlayer) < 13.0f)
+            if (pPlayer->HasAura(SPELL_POSITIVE_CHARGE_APPLY) && target->GetDistance2d(pPlayer) < 13.0f)
             {
                 ++numStacks;
             }
@@ -1133,6 +1133,9 @@ struct ThaddiusPositiveChargeAuraScript : public AuraScript
     void OnAfterApply(Aura* aura, bool apply) final
     {
         if (apply)
+            return;
+
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
             return;
 
         Unit* target = aura->GetTarget();
@@ -1156,7 +1159,7 @@ struct ThaddiusNegativeChargeAuraScript : public AuraScript
         SPELL_NEGATIVE_CHARGE_AMP   = 29660
     };
 
-    void OnPeriodicTrigger(Aura* aura, Unit* caster, Unit* target, WorldObject* /*targetObject*/, SpellEntry const*& /*spellInfo*/) final
+    void OnPeriodicTrigger(Aura* /*aura*/, Unit* /*caster*/, Unit* target, WorldObject* /*targetObject*/, SpellEntry const*& /*spellInfo*/) final
     {
         // Only process in Naxxramas to avoid performance issues
         if (target->GetMap()->GetId() != MAP_NAXXRAMAS)
@@ -1168,12 +1171,12 @@ struct ThaddiusNegativeChargeAuraScript : public AuraScript
         for (auto const& it : pList)
         {
             Player* pPlayer = it.getSource();
-            if (pPlayer->GetGUID() == caster->GetGUID())
+            if (pPlayer->GetGUID() == target->GetGUID())
                 continue;
             if (pPlayer->IsDead())
                 continue;
             // 2d distance should be good enough
-            if (pPlayer->HasAura(SPELL_NEGATIVE_CHARGE_APPLY) && caster->GetDistance2d(pPlayer) < 13.0f)
+            if (pPlayer->HasAura(SPELL_NEGATIVE_CHARGE_APPLY) && target->GetDistance2d(pPlayer) < 13.0f)
             {
                 ++numStacks;
             }
@@ -1193,6 +1196,9 @@ struct ThaddiusNegativeChargeAuraScript : public AuraScript
     void OnAfterApply(Aura* aura, bool apply) final
     {
         if (apply)
+            return;
+
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
             return;
 
         Unit* target = aura->GetTarget();
