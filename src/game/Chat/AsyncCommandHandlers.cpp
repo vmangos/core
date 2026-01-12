@@ -57,7 +57,7 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
         if (auto const warden = target->GetSession()->GetWarden())
         {
             warden->GetPlayerInfo(data->m_wardenClock, data->m_wardenFingerprint, data->m_wardenHypervisors,
-                data->m_wardenEndscene, data->m_wardenProxifier);
+                data->m_wardenRenderer, data->m_wardenProxifier);
             data->m_hasUsedClickToMove = warden->HasUsedClickToMove();
         }
 
@@ -225,8 +225,8 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData* data)
         cHandler.SendSysMessage(data->m_wardenFingerprint.c_str());
     if (!data->m_wardenHypervisors.empty())
         cHandler.SendSysMessage(data->m_wardenHypervisors.c_str());
-    if (!data->m_wardenEndscene.empty())
-        cHandler.SendSysMessage(data->m_wardenEndscene.c_str());
+    if (!data->m_wardenRenderer.empty())
+        cHandler.SendSysMessage(data->m_wardenRenderer.c_str());
     if (!data->m_wardenProxifier.empty())
         cHandler.SendSysMessage(data->m_wardenProxifier.c_str());
     if (data->m_hasUsedClickToMove)
@@ -397,7 +397,7 @@ bool PlayerSearchQueryHolder::GetAccountInfo(uint32 queryIndex, std::pair<uint32
     PlayerSearchAccountMap::const_iterator iter = m_accounts.find(queryIndex);
     if (iter == m_accounts.cend())
         return false;
-    
+
     pair.first = (*iter).second.first;
     pair.second = (*iter).second.second;
 

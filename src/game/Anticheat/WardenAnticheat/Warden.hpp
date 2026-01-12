@@ -181,7 +181,7 @@ class Warden
         virtual void SetCharEnumPacket(WorldPacket&& packet) = 0;
 
         virtual void GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
-            std::string& endscene, std::string& proxifier) const = 0;
+            std::string& renderer, std::string& proxifier) const = 0;
 
         std::vector<WorldPacket> m_packetQueue;
         std::mutex m_packetQueueMutex;
