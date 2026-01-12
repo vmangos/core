@@ -1052,8 +1052,16 @@ void WardenWin::LoadScriptedScans()
         }
         wardenWin->m_renderingApi = rendering_api;
 
-        // immediately request second stage
-        wardenWin->EnqueueScans({ endSceneLocate2 });
+        if (wardenWin->m_renderingApi == ClientRenderingApi::Direct3D)
+        {
+            // immediately request second stage
+            wardenWin->EnqueueScans({ endSceneLocate2 });
+        }
+        else
+        {
+            // We are not able to determine the endSceneAddress for OpenGL (because nobody reverse engineered it yet)
+            wardenWin->m_endSceneAddress = 0;
+        }
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
