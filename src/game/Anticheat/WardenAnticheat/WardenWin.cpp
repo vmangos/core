@@ -48,9 +48,6 @@
 
 namespace
 {
-// An offset not yet reverse-engineered. To be determined.
-uint32 constexpr tbd = static_cast<uint32>(-1);
-
 // fixed offsets for classic client(s):
 static constexpr struct ClientOffsets
 {
@@ -97,7 +94,7 @@ static constexpr struct ClientOffsets
         0x226E0,
         0xBEC94C,
         0xC60AD0,
-        0xB804E0, tbd, 0x3890, 0x0, 0xA8,
+        0xB804E0, 0x1FC, 0x3890, 0x0, 0xA8,
         0xC598DC, 0x228, 0x08,
         0xBBEFC8
     },
@@ -108,7 +105,7 @@ static constexpr struct ClientOffsets
         0x22580,
         0xC01BBC,
         0xC74844,
-        0xB95818, tbd, 0x38A0, 0x0, 0xA8,
+        0xB95818, 0x1FC, 0x38A0, 0x0, 0xA8,
         0xC6EBF4, 0x228, 0x08,
         0xBD4260
     },
@@ -119,7 +116,7 @@ static constexpr struct ClientOffsets
         0x226A0,
         0xC213E4,
         0xC9470C,
-        0xBB4E98, tbd, 0x38A0, 0x0, 0xA8,
+        0xBB4E98, 0x1FC, 0x38A0, 0x0, 0xA8,
         0xC8E64C, 0x228, 0x08,
         0xBF3A94
     },
@@ -130,7 +127,7 @@ static constexpr struct ClientOffsets
         0x2BDF0,
         0xC6F4CC,
         0xCE4BD0,
-        0xC02F48, tbd, 0x38A8, 0x0, 0xA8,
+        0xC02F48, 0x1FC, 0x38A8, 0x0, 0xA8,
         0xCDCB8C, 0x228, 0x08,
         0xC41B44
     },
@@ -152,7 +149,7 @@ static constexpr struct ClientOffsets
         0x2C010,
         0xC7B2A4,
         0xCF0BC8,
-        0xC0ED38, tbd, 0x38A8, 0x0, 0xA8,
+        0xC0ED38, 0x1FC, 0x38A8, 0x0, 0xA8,
         0xCE897C, 0x228, 0x08,
         0xC4D890
     },
@@ -163,7 +160,7 @@ static constexpr struct ClientOffsets
         0x2C010,
         0xC7F9C4,
         0xCF52E8,
-        0xC133E0, tbd, 0x38A8, 0x0, 0xA8,
+        0xC133E0, 0x1FC, 0x38A8, 0x0, 0xA8,
         0xCED09C, 0x228, 0x08,
         0xC51FB0
     }
@@ -1111,15 +1108,8 @@ void WardenWin::LoadScriptedScans()
 
         auto const offsets = GetClientOffets(wardenWin->m_clientBuild);
 
-        // immediately request next scan in this chain. Either 1.5 (which checks OpenGL/DirectX) or step 2
-        if (offsets->g_gxDevicePtr_OfsApiKind == tbd) // tbd = to be determined
-        {
-            wardenWin->EnqueueScans({ endSceneLocate2 });
-        }
-        else
-        {
-            wardenWin->EnqueueScans({ endSceneLocate15 });
-        }
+        // immediately request next scan in this chain.
+        wardenWin->EnqueueScans({ endSceneLocate15 });
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
