@@ -57,6 +57,14 @@ struct WIN_SYSTEM_INFO {
 
 static_assert(sizeof(WIN_SYSTEM_INFO) == 0x24, "WIN_SYSTEM_INFO wrong size");
 
+enum class ClientRenderingApi
+{
+    OpenGL,
+    Direct3D, // DirectX 9.0c in vanilla wow
+};
+
+std::string const& ClientRenderingApiToString(ClientRenderingApi client_rendering_api);
+
 class WardenWin final : public Warden
 {
     private:
@@ -78,7 +86,9 @@ class WardenWin final : public Warden
         uint32 m_lastTimeCheckServer;
 
         bool m_endSceneFound;
-        uint32 m_endSceneAddress;
+        uint32 m_endSceneAddress; // will change with each EndScene stage (pointer dereference chain). Only valid when m_endSceneFound is true.
+        nonstd::optional<ClientRenderingApi> m_renderingApi;
+
 
         bool m_offsetsInitialized;
 
@@ -89,7 +99,7 @@ class WardenWin final : public Warden
         // send module initialization information (function offsets, etc.)
         virtual void InitializeClient();
 
-        /* 
+        /*
             (a, b) initialization packet options:
 
             (4, 0) -> "lua string check" initialization
@@ -150,7 +160,7 @@ class WardenWin final : public Warden
         virtual void SetCharEnumPacket(WorldPacket&& packet);
 
         virtual void GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
-            std::string& endscene, std::string& proxifier) const;
+            std::string& renderer, std::string& proxifier) const;
 };
 
 #endif /*!__WARDENWIN_HPP_*/
