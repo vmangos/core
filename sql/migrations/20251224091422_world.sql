@@ -115,7 +115,7 @@ DELETE FROM `pool_gameobject` WHERE `guid` = 20108;
 -- Can we see if cmangos has any additional spawns here https://github.com/cmangos/tbc-db/blob/18387b80f4d14da5905baf184c98444d94e14223/Updates/0556_vanilla_veins.sql
 -- Add missing Tin Vein (credit cmangos)
 SET @GGUID = 246;
-SET @PTEMPLATE = 1227;
+SET @PTEMPLATE = 1258;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@GGUID+0, 1732, 0, -2596.69970703125, -1893.5811767578125, 20.57378578186035156, 1.099556446075439453, 0, 0, 0.522498130798339843, 0.852640450000762939, 300, 900, 100, 1, 0, 0, 0, 10),
 (@GGUID+1, 1733, 0, -2596.69970703125, -1893.5811767578125, 20.57378578186035156, 1.099556446075439453, 0, 0, 0.522498130798339843, 0.852640450000762939, 300, 900, 100, 1, 0, 0, 0, 10);
