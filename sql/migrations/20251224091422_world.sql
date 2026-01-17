@@ -114,7 +114,7 @@ DELETE FROM `pool_gameobject` WHERE `guid` = 20108;
 
 -- Can we see if cmangos has any additional spawns here https://github.com/cmangos/tbc-db/blob/18387b80f4d14da5905baf184c98444d94e14223/Updates/0556_vanilla_veins.sql
 -- Add Some Missing Tin Vein / Silver Vein (credit cmangos)
---Wetlands
+-- Wetlands
 SET @GGUID = 246;
 SET @PTEMPLATE = 3007;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
