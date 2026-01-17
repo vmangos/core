@@ -112,6 +112,21 @@ DELETE FROM `gameobject` WHERE `guid` = 25371;
 DELETE FROM `gameobject` WHERE `guid` = 20108;
 DELETE FROM `pool_gameobject` WHERE `guid` = 20108;
 
+-- Can we see if cmangos has any additional spawns here https://github.com/cmangos/tbc-db/blob/18387b80f4d14da5905baf184c98444d94e14223/Updates/0556_vanilla_veins.sql
+-- Add missing Tin Vein (credit cmangos)
+SET @GGUID = 246;
+SET @PTEMPLATE = 1227;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, 1732, 0, -2596.69970703125, -1893.5811767578125, 20.57378578186035156, 1.099556446075439453, 0, 0, 0.522498130798339843, 0.852640450000762939, 300, 900, 100, 1, 0, 0, 0, 10),
+(@GGUID+1, 1733, 0, -2596.69970703125, -1893.5811767578125, 20.57378578186035156, 1.099556446075439453, 0, 0, 0.522498130798339843, 0.852640450000762939, 300, 900, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+0, 1, 'Tin Vein / Silver Vein - Wetlands', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(@GGUID+0, @PTEMPLATE+0, 95, 'Tin Vein / Silver Vein - Wetlands', 0, 0, 10),
+(@GGUID+1, @PTEMPLATE+0, 5, 'Tin Vein / Silver Vein - Wetlands', 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+0, 1348, 0, 'Wetlands - Tin Vein / Silver Vein', 0);
+
 
 -- End of migration.
 END IF;
