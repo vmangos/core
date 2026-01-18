@@ -376,7 +376,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 cons
             if (!m_nodeIndexes.empty() && creature.movespline->_currentSplineIdx() >= m_nodeIndexes.front())
             {
                 m_nodeIndexes.pop_front();
-                if (OnArrived(creature));
+                if (OnArrived(creature))
                     creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
             }
         }
