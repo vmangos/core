@@ -164,7 +164,7 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
     float startPoint[VERTEX_SIZE] = {startPos.y, startPos.z, startPos.x};
     float endPoint[VERTEX_SIZE] = {endPos.y, endPos.z, endPos.x};
 
-    bool const canSwimToDestination = m_sourceUnit->CanSwim() &&
+    bool const canSwimToDestination = m_sourceUnit->CanSwim() && (!m_sourceUnit->IsCreature() || m_sourceUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_USE_SWIM_ANIMATION)) &&
                                       m_sourceUnit->CanSwimAtPosition(startPos) &&
                                       m_sourceUnit->CanSwimAtPosition(endPos);
 
