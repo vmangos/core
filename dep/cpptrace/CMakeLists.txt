@@ -426,7 +426,11 @@ if(CPPTRACE_GET_SYMBOLS_WITH_LIBDWARF)
           DOWNLOAD_EXTRACT_TIMESTAMP TRUE
           URL "${CPPTRACE_ZSTD_URL}"
       )
-      FetchContent_MakeAvailable(zstd)
+      FetchContent_GetProperties(zstd)
+      if(NOT zstd_POPULATED)
+        FetchContent_Populate(zstd)
+        add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR} EXCLUDE_FROM_ALL)
+      endif()
     endif()
     # Libdwarf itself
     set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
@@ -438,7 +442,11 @@ if(CPPTRACE_GET_SYMBOLS_WITH_LIBDWARF)
       GIT_TAG ${CPPTRACE_LIBDWARF_TAG}
       GIT_SHALLOW ${CPPTRACE_LIBDWARF_SHALLOW}
     )
-    FetchContent_MakeAvailable(libdwarf)
+    FetchContent_GetProperties(libdwarf)
+    if(NOT libdwarf_POPULATED)
+      FetchContent_Populate(libdwarf)
+      add_subdirectory(${libdwarf_SOURCE_DIR} ${libdwarf_BINARY_DIR} EXCLUDE_FROM_ALL)
+    endif()
     target_include_directories(
       dwarf
       PRIVATE
@@ -601,9 +609,10 @@ endif()
 
 # =============================================== Install ===============================================
 
-if(NOT CMAKE_SKIP_INSTALL_RULES)
-  include(cmake/InstallRules.cmake)
-endif()
+# Disabled: cpptrace is statically linked and not needed at runtime
+# if(NOT CMAKE_SKIP_INSTALL_RULES)
+#   include(cmake/InstallRules.cmake)
+# endif()
 
 # =============================================== Demo/test ===============================================
 
