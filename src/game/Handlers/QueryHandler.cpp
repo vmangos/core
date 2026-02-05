@@ -490,9 +490,19 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recv_data)
     {
         guid = ObjectGuid(HIGHGUID_ITEM, guids);
         Item* item = _player->GetItemByGuid(guid);
-        if (!item)
+        if (item)
+        { 
+            ItemPrototype const* proto = item->GetProto();
+            if (!proto || proto->PageText != origPageID) // Cheat
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CMSG_PAGE_TEXT_QUERY - Invalid item info sent PageText by PlayerGuid: %u ObjectGuid: %u",
+                pGuid, guid);
+                error = true;
+            }
+        }
+        else // Cheat
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - Invalid item sent by PlayerGuid: %u ItemGuid: %u",
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CMSG_PAGE_TEXT_QUERY - Invalid item sent by PlayerGuid: %u ItemGuid: %u",
             pGuid, guid);
             error = true;
         }
@@ -508,39 +518,39 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recv_data)
             {
                 if (info->type == GAMEOBJECT_TYPE_TEXT)
                 {
-                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None)) // Should be 5.55556f but we allow extra distance incase of lag
+                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None) && info->text.pageID == origPageID && info->text.language) // Should be 5.55556f but we allow extra distance incase of lag
                     {
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - GAMEOBJECT_TYPE_TEXT out of distance by PlayerGuid: %u ObjectGuid: %u Entry: %u",
+                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CMSG_PAGE_TEXT_QUERY - GAMEOBJECT_TYPE_TEXT out of distance by PlayerGuid: %u ObjectGuid: %u Entry: %u",
                         pGuid, guid, entry);
                         error = true;
                     }
                 }
                 else if (info->type == GAMEOBJECT_TYPE_GOOBER)
                 {
-                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None)) // Should be 5.55556f but we allow extra distance incase of lag
+                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None) && info->goober.pageId == origPageID && info->goober.language) // Should be 5.55556f but we allow extra distance incase of lag
                     {
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - GAMEOBJECT_TYPE_GOOBER out of distance by PlayerGuid: %u ObjectGuid: %u Entry: %u",
+                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CMSG_PAGE_TEXT_QUERY - GAMEOBJECT_TYPE_GOOBER out of distance by PlayerGuid: %u ObjectGuid: %u Entry: %u",
                         pGuid, guid, entry);
                         error = true;
                     }
                 }
                 else // Cheat
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - Invalid object type sent PageText by PlayerGuid: %u ObjectGuid: %u Entry: %u Type: %u",
+                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CMSG_PAGE_TEXT_QUERY - Invalid object type sent PageText by PlayerGuid: %u ObjectGuid: %u Entry: %u Type: %u",
                     pGuid, guid, entry, info->type);
                     error = true;
                 }
             }
             else // Error
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - Invalid object info sent by PlayerGuid: %u ObjectGuid: %u Entry: %u",
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CMSG_PAGE_TEXT_QUERY - Invalid object info sent by PlayerGuid: %u ObjectGuid: %u Entry: %u",
                 pGuid, guid, entry);
                 error = true;
             }
         }
         else // Cheat
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - Invalid object sent by PlayerGuid: %u ObjectGuid: %u Entry: %u",
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CMSG_PAGE_TEXT_QUERY - Invalid object sent by PlayerGuid: %u ObjectGuid: %u Entry: %u",
             pGuid, guid, entry);
             error = true;
         }
