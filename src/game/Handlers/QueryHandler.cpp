@@ -516,18 +516,18 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recv_data)
             GameObjectInfo const* info = obj->GetGOInfo();
             if (info)
             {
-                if (info->type == GAMEOBJECT_TYPE_TEXT)
+                if (info->type == GAMEOBJECT_TYPE_TEXT && info->text.pageID == origPageID)
                 {
-                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None) && info->text.pageID == origPageID) // Should be 5.55556f but we allow extra distance incase of lag
+                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None)) // Should be 5.55556f but we allow extra distance incase of lag
                     {
                         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CMSG_PAGE_TEXT_QUERY - GAMEOBJECT_TYPE_TEXT out of distance by PlayerGuid: %u ObjectGuid: %u Entry: %u",
                         pGuid, guid, entry);
                         error = true;
                     }
                 }
-                else if (info->type == GAMEOBJECT_TYPE_GOOBER)
+                else if (info->type == GAMEOBJECT_TYPE_GOOBER && info->goober.pageId == origPageID)
                 {
-                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None) && info->goober.pageId == origPageID) // Should be 5.55556f but we allow extra distance incase of lag
+                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None)) // Should be 5.55556f but we allow extra distance incase of lag
                     {
                         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "CMSG_PAGE_TEXT_QUERY - GAMEOBJECT_TYPE_GOOBER out of distance by PlayerGuid: %u ObjectGuid: %u Entry: %u",
                         pGuid, guid, entry);
