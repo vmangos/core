@@ -432,8 +432,135 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recv_data)
 {
+    // Check map here for GAMEOBJECT_ITEM_TEXT
+    ObjectGuid pGuid = _player->GetObjectGuid();
+    Map* map = _player->GetMap();
+    if (!map || !pGuid)
+        return;
+
+    // Page Text ID
     uint32 pageID;
     recv_data >> pageID;
+    uint32 origPageID = pageID;
+
+    // Object GUID - written in 3 bytes
+    uint8 guid1;
+    recv_data >> guid1;
+    uint8 guid2;
+    recv_data >> guid2;
+    uint8 guid3;
+    recv_data >> guid3;
+    uint32 guids;
+
+    // Pack into uint32
+    guids = ((uint32)guid1 << 0) |
+            ((uint32)guid2 << 8) |
+            ((uint32)guid3 << 16);
+
+    // Object Entry - written in 3 bytes
+    uint8 entry1;
+    recv_data >> entry1;
+    uint8 entry2;
+    recv_data >> entry2;
+    uint8 entry3;
+    recv_data >> entry3;
+    uint32 entry;
+
+    // Pack into uint32
+    entry = ((uint32)entry1 << 0) |
+            ((uint32)entry2 << 8) |
+            ((uint32)entry3 << 16);
+
+    // Lock Type - The spell & animation which the client will use
+    uint8 lockType;
+    recv_data >> lockType;
+
+    // Flags - TODO: find out what these mean. Book Items = 0x40, Book Objects = 0xF1.
+    uint8 flags;
+    recv_data >> flags;
+
+    // HandlePageTextQuery is only called from three things:
+    // - GAMEOBJECT_TYPE_TEXT
+    // - GAMEOBJECT_TYPE_GOOBER with page_text (two exist in vanilla (Ameth'Aran tablets))
+    // - Items with page_text (including Eye of Divinity)
+    ObjectGuid guid;
+    bool error = false;
+    bool isItem = (flags == 0x40 ? true : false);
+    if (isItem)
+    {
+        guid = ObjectGuid(HIGHGUID_ITEM, guids);
+        Item* item = _player->GetItemByGuid(guid);
+        if (!item)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - Invalid item sent by PlayerGuid: %u ItemGuid: %u",
+            pGuid, guid);
+            error = true;
+        }
+    }
+    else if (!isItem)
+    {
+        guid = ObjectGuid(HIGHGUID_GAMEOBJECT, entry, guids);
+        GameObject* obj = map->GetGameObject(guid);
+        if (obj)
+        {
+            GameObjectInfo const* info = obj->GetGOInfo();
+            if (info)
+            {
+                if (info->type == GAMEOBJECT_TYPE_TEXT)
+                {
+                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None)) // Should be 5.55556f but we allow extra distance incase of lag
+                    {
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - GAMEOBJECT_TYPE_TEXT out of distance by PlayerGuid: %u ObjectGuid: %u Entry: %u",
+                        pGuid, guid, entry);
+                        error = true;
+                    }
+                }
+                else if (info->type == GAMEOBJECT_TYPE_GOOBER)
+                {
+                    if (!_player->IsWithinDist(obj, 10.0f, true, SizeFactor::None)) // Should be 5.55556f but we allow extra distance incase of lag
+                    {
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - GAMEOBJECT_TYPE_GOOBER out of distance by PlayerGuid: %u ObjectGuid: %u Entry: %u",
+                        pGuid, guid, entry);
+                        error = true;
+                    }
+                }
+                else // Cheat
+                {
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - Invalid object type sent PageText by PlayerGuid: %u ObjectGuid: %u Entry: %u Type: %u",
+                    pGuid, guid, entry, info->type);
+                    error = true;
+                }
+            }
+            else // Error
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - Invalid object info sent by PlayerGuid: %u ObjectGuid: %u Entry: %u",
+                pGuid, guid, entry);
+                error = true;
+            }
+        }
+        else // Cheat
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CMSG_PAGE_TEXT_QUERY - Invalid object sent by PlayerGuid: %u ObjectGuid: %u Entry: %u",
+            pGuid, guid, entry);
+            error = true;
+        }
+    }
+
+    // Return if bad client data
+    if (error)
+    {
+        if (pageID)
+        {
+            // Cheating
+            WorldPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 50);
+            data << pageID;
+            data << "It appears you were attempting to do something illegal...";
+            data << uint32(0);
+            SendPacket(&data);
+        }
+
+        return;
+    }
 
     while (pageID)
     {
@@ -467,10 +594,10 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recv_data)
             data << uint32(pPage->next_page);
             pageID = pPage->next_page;
         }
+
         SendPacket(&data);
     }
 }
-
 void WorldSession::SendQueryTimeResponse()
 {
     WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4);
