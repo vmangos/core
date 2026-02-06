@@ -4157,6 +4157,8 @@ void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint
         return;
     }
 
+    // MEMORY LEAK: CreatureGroup created with 'new' and members added via AddMember().
+    // If creature is destroyed without LeaveCreatureGroup(), member entries leak.
     CreatureGroup* group = leader->GetCreatureGroup();
     if (!group)
     {

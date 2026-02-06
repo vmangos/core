@@ -1539,6 +1539,8 @@ class ObjectMgr
         void LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment);
         void LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table);
         void LoadVendors(char const* tableName, bool isTemplates);
+        void CleanupItemPrototypes();
+        void CleanupCreatureAuras();
         void LoadTrainers(char const* tableName, bool isTemplates);
 
         // Storing all existing IDs in database.

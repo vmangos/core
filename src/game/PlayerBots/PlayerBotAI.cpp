@@ -134,12 +134,21 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     newChar->SetMap(map);
     newChar->SaveRecallPosition();
     newChar->CreatePacketBroadcaster();
+
+    // Initialize PvP flags
+    uint32 zoneId, areaId;
+    newChar->GetZoneAndAreaId(zoneId, areaId);
+    newChar->UpdateZone(zoneId, areaId);
+
     MasterPlayer* mPlayer = new MasterPlayer(sess);
     mPlayer->LoadPlayer(newChar);
     mPlayer->SetSocial(sSocialMgr.LoadFromDB(nullptr, newChar->GetObjectGuid()));
     if (!newChar->GetMap()->Add(newChar))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "PlayerBotAI::SpawnNewPlayer: Unable to add player to map!");
+        newChar->DeletePacketBroadcaster();
+        sObjectMgr.DeletePlayerFromCache(newChar->GetGUIDLow());
+        delete mPlayer;
         delete newChar;
         return false;
     }

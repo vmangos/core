@@ -1960,6 +1960,9 @@ struct AV_NpcEventAI : public npc_escortAI
 
     void Reset() override
     {
+        Event_Timer = 0;
+        Point = 0;
+
         if ((m_creature->GetEntry() == AV_NPC_ENTRY_VIPORE && m_creature->GetDistance(-1221.27f, -354.51f, 57.7f) < 5.0f) ||
             (m_creature->GetEntry() == AV_NPC_ENTRY_ICHMAN && m_creature->GetDistance(-1291.28f, -266.65f, 91.66f) < 5.0f))
             m_creature->SetStandState(UNIT_STAND_STATE_SIT);

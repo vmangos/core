@@ -83,6 +83,7 @@ Pet::Pet(PetType type) :
 
 Pet::~Pet()
 {
+    ClearCharmInfo();
 }
 
 void Pet::AddToWorld()

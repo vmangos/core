@@ -262,7 +262,7 @@ void MotionMaster::DelayedClean(bool reset, bool all)
 
     if (!m_expList)
         m_expList = new ExpireList();
-;
+
     std::vector<MovementGenerator*> mvtGensToFinalize;
     while (all ? !empty() : size() > 1)
     {
@@ -902,16 +902,26 @@ bool MotionMaster::MoveDistance(Unit const* pTarget, float distance)
 
 void MotionMaster::ClearType(MovementGeneratorType moveType)
 {
+    // Collect first, then erase, then finalize — mirroring DirectClean.
+    // Finalize() can trigger CreatureAI::MovementInform which may call MovePoint/Mutate,
+    // causing a push_back on the underlying deque and invalidating all iterators.
+    std::vector<MovementGenerator*> toFinalize;
     for (iterator it = begin(); it != end();)
     {
         if ((*it)->GetMovementGeneratorType() == moveType)
         {
-            (*it)->Finalize(*m_owner);
+            toFinalize.push_back(*it);
             erase(it);
             it = begin();
         }
         else
             ++it;
+    }
+    for (MovementGenerator* mg : toFinalize)
+    {
+        mg->Finalize(*m_owner);
+        if (!isStatic(mg))
+            delete mg;
     }
 }
 
