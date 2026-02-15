@@ -368,7 +368,7 @@ class WorldSession
         bool CheckMailBox(ObjectGuid guid);
         void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, uint32 item_guid = 0, uint32 item_count = 0);
         void SendNewMail();
-        
+
         // Trade
         void SendTradeStatus(TradeStatus status);
         void SendUpdateTrade(bool trader_state = true);
@@ -770,7 +770,7 @@ class WorldSession
         void HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data);
         void HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data);
         void HandleSelfResOpcode(WorldPacket& recv_data);
-        
+
     private:
         // private trade method
         void MoveItems(Item* myItems[], Item* hisItems[]);
@@ -840,7 +840,7 @@ class WorldSession
         uint32 m_movePacketsSentThisInterval = 0;
         time_t m_movePacketTrackingIntervalStart = 0;
 #endif
-        
+
         // Clustering system (TODO remove this)
     public:
         MasterPlayer* GetMasterPlayer() const { return m_masterPlayer; }

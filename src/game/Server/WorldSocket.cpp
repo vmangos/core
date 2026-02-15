@@ -36,6 +36,7 @@
 #include "DBCStores.h"
 #include "Config/Config.h"
 #include "Util.h"
+#include "Errors.h"
 
 #include "IO/Networking/DNS.h"
 #include "IO/Timer/AsyncSystemTimer.h"
