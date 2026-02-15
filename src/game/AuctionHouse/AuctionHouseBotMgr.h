@@ -12,17 +12,16 @@ class Player;
 struct AuctionHouseBotEntry
 {
     uint32 item;
-    uint32 stack;
-    uint32 bid;
-    uint32 buyout;
+    uint32 avg_buyout;
 };
 
 struct AuctionHouseBotConfig
 {
-    uint32 itemcount;
     uint32 ahfid;
+    uint32 itemcount;
 
     bool enable;
+    bool buyoutEnable;
 };
 
 class AuctionHouseBotMgr
@@ -36,11 +35,13 @@ class AuctionHouseBotMgr
         // force - put items in AH even if bot is disabled
         void Update(bool force = false);
         void AddItem(AuctionHouseBotEntry e, AuctionHouseObject *auctionHouse);
+        float getMultiplierForRandomItem(std::string suffx, uint32 itemSubclass);
 
     protected:
         std::vector<AuctionHouseBotEntry> m_items;
         std::unique_ptr<AuctionHouseBotConfig> m_config;
         AuctionHouseEntry const* m_auctionHouseEntry = nullptr;
+        std::map<std::string, uint32> m_itemCategoryCount;
 
         bool m_loaded = false;
 };

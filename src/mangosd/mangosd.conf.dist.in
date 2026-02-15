@@ -2921,6 +2921,17 @@ CharDelete.KeepDays = 30
 #        Default: 0 - off
 #                 1 - on
 #
+#    AHBot.itemcount
+#        How many listings to put into the auction house at most.
+#        The AH bot will add items until this number of listings is reached in the auction house (this includes potential player listings).
+#        Default: 4000
+#
+#    AHBot.buyout.enable
+#        Allow buyout.
+#        The AH bot will consider buying items placed by players.
+#        Default: 0 - off
+#                 1 - on
+#
 #    AHBot.ah.fid
 #        The faction template ID used for the AH bot.
 #        This determines which auction house(s) listings are put into.
@@ -2928,15 +2939,11 @@ CharDelete.KeepDays = 30
 #                  55 - Alliance (Ironforge, Stormwind and Teldrassil)
 #                  29 - Horde (Orgrimmar, Thunderbluff and Undercity)
 #
-#    AHBot.itemcount
-#        How many listings to put into the auction house at most.
-#        The AH bot will add items until this number of listings is reached in the auction house (this includes potential player listings).
-#        Default: 50
-#
 ###################################################################################################################
 AHBot.Enable = 0
+AHBot.itemcount = 4000
+AHBot.buyout.enable = 0
 AHBot.ah.fid = 120
-AHBot.itemcount = 50
 
 ###################################################################################################################
 # PLAYER BOTS
