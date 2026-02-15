@@ -47,6 +47,7 @@
 #include "TradeData.h"
 #include "Geometry.h"
 #include "Anticheat.h"
+#include "SpellCastTargetsInfo.h"
 
 using namespace Spells;
 
@@ -68,6 +69,46 @@ SpellCastTargets::SpellCastTargets()
 
 SpellCastTargets::~SpellCastTargets()
 {
+}
+
+SpellCastTargets SpellCastTargets::FromSpellCastTargetsInfo(SpellCastTargetsInfo const& info, Unit* caster)
+{
+    SpellCastTargets targets;
+    targets.m_targetMask = info.m_targetMask;
+
+    if (targets.m_targetMask == TARGET_FLAG_SELF)
+    {
+        targets.m_destX = caster->GetPositionX();
+        targets.m_destY = caster->GetPositionY();
+        targets.m_destZ = caster->GetPositionZ();
+        targets.m_unitTarget = caster;
+        targets.m_unitTargetGUID = caster->GetObjectGuid();
+    }
+    else
+    {
+        if (targets.m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM))
+        {
+            MANGOS_ASSERT(caster->IsPlayer()); // Must be a player if items are used
+        }
+
+        targets.m_srcX = info.m_srcX;
+        targets.m_srcY = info.m_srcY;
+        targets.m_srcZ = info.m_srcZ;
+        targets.m_destX = info.m_destX;
+        targets.m_destY = info.m_destY;
+        targets.m_destZ = info.m_destZ;
+        targets.m_strTarget = info.m_strTarget;
+        targets.m_unitTargetGUID = info.m_unitTargetGUID;
+        targets.m_GOTargetGUID = info.m_GOTargetGUID;
+        targets.m_CorpseTargetGUID = info.m_CorpseTargetGUID;
+        targets.m_itemTargetGUID = info.m_itemTargetGUID;
+        targets.m_itemTargetEntry = info.m_itemTargetEntry;
+    }
+
+    // Resolve GUIDs to find real units/GOs
+    targets.Update(caster);
+
+    return targets;
 }
 
 void SpellCastTargets::setUnitTarget(Unit* target)
@@ -153,70 +194,6 @@ void SpellCastTargets::Update(SpellCaster* pCaster)
         if (m_itemTarget)
             m_itemTargetEntry = m_itemTarget->GetEntry();
     }
-}
-
-void SpellCastTargets::read(ByteBuffer& data, Unit* caster)
-{
-    data >> m_targetMask;
-
-    if (m_targetMask == TARGET_FLAG_SELF)
-    {
-        m_destX = caster->GetPositionX();
-        m_destY = caster->GetPositionY();
-        m_destZ = caster->GetPositionZ();
-        m_unitTarget = caster;
-        m_unitTargetGUID = caster->GetObjectGuid();
-        return;
-    }
-
-    // TARGET_FLAG_UNIT_MINIPET is used for non-combat pets, maybe other?
-    if (m_targetMask & (TARGET_FLAG_UNIT))
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data >> m_unitTargetGUID.ReadAsPacked();
-#else
-        data >> m_unitTargetGUID;
-#endif
-
-    if (m_targetMask & (TARGET_FLAG_GAMEOBJECT))
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data >> m_GOTargetGUID.ReadAsPacked();
-#else
-        data >> m_GOTargetGUID;
-#endif
-
-    if (m_targetMask & (TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_CORPSE_ENEMY))
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data >> m_CorpseTargetGUID.ReadAsPacked();
-#else
-        data >> m_CorpseTargetGUID;
-#endif
-
-    if ((m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM)) && caster->IsPlayer())
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data >> m_itemTargetGUID.ReadAsPacked();
-#else
-        data >> m_itemTargetGUID;
-#endif
-
-    if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
-    {
-        data >> m_srcX >> m_srcY >> m_srcZ;
-        if (!MaNGOS::IsValidMapCoord(m_srcX, m_srcY, m_srcZ))
-            throw ByteBufferException(false, data.rpos(), 0, data.size());
-    }
-
-    if (m_targetMask & TARGET_FLAG_DEST_LOCATION)
-    {
-        data >> m_destX >> m_destY >> m_destZ;
-        if (!MaNGOS::IsValidMapCoord(m_destX, m_destY, m_destZ))
-            throw ByteBufferException(false, data.rpos(), 0, data.size());
-    }
-
-    if (m_targetMask & TARGET_FLAG_STRING)
-        data >> m_strTarget;
-
-    // find real units/GOs
-    Update(caster);
 }
 
 void SpellCastTargets::write(ByteBuffer& data) const

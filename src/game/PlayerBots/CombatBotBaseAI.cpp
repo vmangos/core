@@ -1797,7 +1797,7 @@ void CombatBotBaseAI::PopulateSpellData()
                 }
                 return pHighestRank;
             };
-            
+
             SpellEntry const* pPoisonSpell = nullptr;
             std::vector<SpellEntry const*> vPoisons;
             if (hasDeadlyPoison && (pPoisonSpell = GetHighestRankOfPoisonByName("Deadly Poison", me->GetLevel())))
@@ -2225,7 +2225,7 @@ bool CombatBotBaseAI::IsValidBuffTarget(Unit const* pTarget, SpellEntry const* p
             if (it == i.first)
                 return false;
     }
-        
+
     return true;
 }
 
@@ -2647,7 +2647,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
     for (auto& itr : itemsPerSlot)
     {
         bool hasPrimaryStatItem = false;
-        
+
         for (auto const& pItem : itr.second)
         {
             for (auto const& stat : pItem->ItemStat)
@@ -2891,8 +2891,8 @@ void CombatBotBaseAI::AddHunterAmmo()
                     AddItemToInventory(pAmmoProto->ItemId, pAmmoProto->GetMaxStackSize());
                     me->SetAmmo(pAmmoProto->ItemId);
                 }
-            }  
-        }  
+            }
+        }
     }
 }
 
@@ -3185,14 +3185,14 @@ void CombatBotBaseAI::SendBattlefieldPortPacket()
 {
     for (uint32 i = BATTLEGROUND_QUEUE_AV; i <= BATTLEGROUND_QUEUE_AB; i++)
     {
-        if (me->IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId(i)))
+        if (me->IsInvitedForBattleGroundQueueType(static_cast<BattleGroundQueueTypeId>(i)))
         {
-            WorldPacket data(CMSG_BATTLEFIELD_PORT);
+            WorldPackets::Battleground::BattleFieldPort packet;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-            data << uint32(GetBattleGrounMapIdByTypeId(BattleGroundTypeId(i)));
+            packet.mapId = GetBattleGrounMapIdByTypeId(static_cast<BattleGroundTypeId>(i));
 #endif
-            data << uint8(1);
-            me->GetSession()->HandleBattleFieldPortOpcode(data);
+            packet.action = 1;
+            me->GetSession()->HandleBattleFieldPortOpcode(packet);
             break;
         }
     }
@@ -3200,19 +3200,18 @@ void CombatBotBaseAI::SendBattlefieldPortPacket()
 
 void CombatBotBaseAI::SendBattlemasterJoinPacket(uint8 battlegroundId)
 {
-    WorldPacket data(CMSG_BATTLEFIELD_JOIN);
-    data << me->GetObjectGuid();                       // battlemaster guid, or player guid if joining queue from BG portal
-
+    uint32 instanceId = 0; // first available
+    uint32 mapId;
     switch (battlegroundId)
     {
         case BATTLEGROUND_QUEUE_AV:
-            data << uint32(MAP_ALTERAC_VALLEY);
+            mapId = MAP_ALTERAC_VALLEY;
             break;
         case BATTLEGROUND_QUEUE_WS:
-            data << uint32(MAP_WARSONG_GULCH);
+            mapId = MAP_WARSONG_GULCH;
             break;
         case BATTLEGROUND_QUEUE_AB:
-            data << uint32(MAP_ARATHI_BASIN);
+            mapId = MAP_ARATHI_BASIN;
             break;
         default:
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Invalid BG queue type!");
@@ -3220,16 +3219,14 @@ void CombatBotBaseAI::SendBattlemasterJoinPacket(uint8 battlegroundId)
             return;
     }
 
-    data << uint32(0);                                 // instance id, 0 if First Available selected
-    data << uint8(0);                                  // join as group
-    me->GetSession()->HandleBattlemasterJoinOpcode(data);
+    me->GetSession()->RequestBgJoinQueue(me->GetObjectGuid(), instanceId, mapId, false);
 }
 
 void CombatBotBaseAI::SendAreaTriggerPacket(uint32 areaTriggerId)
 {
-    WorldPacket data(CMSG_AREATRIGGER);
-    data << uint32(areaTriggerId);
-    me->GetSession()->HandleAreaTriggerOpcode(data);
+    WorldPackets::Misc::AreaTrigger packet;
+    packet.triggerId = areaTriggerId;
+    me->GetSession()->HandleAreaTriggerOpcode(packet);
 }
 
 void CombatBotBaseAI::ActivateNearbyAreaTrigger()

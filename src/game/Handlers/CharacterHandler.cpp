@@ -158,14 +158,14 @@ void WorldSession::HandleCharEnum(std::unique_ptr<QueryResult> result)
         }
         while (result->NextRow());
     }
-    
+
     data.put<uint8>(0, num);
     m_charactersCount = num;
 
     SendPacket(&data);
 }
 
-void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleCharEnumOpcode(NullClientPacket const& /*packet*/)
 {
     // get all the data necessary for loading all characters (along with their pets) on the account
     CharacterDatabase.AsyncPQuery(&chrHandler, &CharacterHandler::HandleCharEnumCallback, GetAccountId(),
@@ -182,21 +182,8 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
                                   PET_SAVE_AS_CURRENT, GetAccountId());
 }
 
-void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
+void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CharCreate const& packet)
 {
-    std::string name;
-    uint8 race_, class_;
-
-    recv_data >> name;
-
-    recv_data >> race_;
-    recv_data >> class_;
-
-    // extract other data required for player creating
-    uint8 gender, skin, face, hairStyle, hairColor, facialHair, outfitId;
-    recv_data >> gender >> skin >> face;
-    recv_data >> hairStyle >> hairColor >> facialHair >> outfitId;
-
     WorldPacket data(SMSG_CHAR_CREATE, 1);                  // returned with diff.values in all cases
 
     if (GetSecurity() == SEC_PLAYER)
@@ -205,7 +192,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         {
             bool disabled = false;
 
-            Team team = Player::TeamForRace(race_);
+            Team team = Player::TeamForRace(packet.race);
             switch (team)
             {
                 case ALLIANCE:
@@ -225,15 +212,15 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         }
     }
 
-    ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(class_);
-    ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race_);
+    ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(packet.class_);
+    ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(packet.race);
 
     if (!classEntry || !raceEntry)
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);
         std::stringstream oss;
-        oss << "Attempt to create character of invalid Class (" << int(class_) << ") or Race (" << int(race_) << ")";
+        oss << "Attempt to create character of invalid Class (" << int(packet.class_) << ") or Race (" << int(packet.race) << ")";
         ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
         return;
     }
@@ -243,12 +230,12 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         data << (uint8)CHAR_CREATE_DISABLED;
         SendPacket(&data);
         std::stringstream oss;
-        oss << "Attempt to create character of non-playable Race (" << int(race_) << ")";
+        oss << "Attempt to create character of non-playable Race (" << int(packet.race) << ")";
         ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
         return;
     }
 
-    if (!Player::ValidateAppearance(race_, gender, hairStyle, hairColor, face, facialHair, skin))
+    if (!Player::ValidateAppearance(packet.race, packet.gender, packet.hairStyle, packet.hairColor, packet.face, packet.facialHair, packet.skin))
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);
@@ -256,8 +243,10 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         return;
     }
 
+    std::string safeName = packet.name;
+
     // prevent character creating with invalid name
-    if (!normalizePlayerName(name))
+    if (!normalizePlayerName(safeName))
     {
         data << (uint8)CHAR_NAME_NO_NAME;
         SendPacket(&data);
@@ -266,7 +255,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
     }
 
     // check name limitations
-    uint8 res = ObjectMgr::CheckPlayerName(name, true);
+    uint8 res = ObjectMgr::CheckPlayerName(safeName, true);
     if (res != CHAR_NAME_SUCCESS)
     {
         data << uint8(res);
@@ -274,14 +263,14 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (GetSecurity() == SEC_PLAYER && sObjectMgr.IsReservedName(name))
+    if (GetSecurity() == SEC_PLAYER && sObjectMgr.IsReservedName(safeName))
     {
         data << (uint8)CHAR_NAME_RESERVED;
         SendPacket(&data);
         return;
     }
 
-    if (sObjectMgr.GetPlayerGuidByName(name))
+    if (sObjectMgr.GetPlayerGuidByName(safeName))
     {
         data << (uint8)CHAR_CREATE_NAME_IN_USE;
         SendPacket(&data);
@@ -305,7 +294,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         if (!characters.empty())
         {
             PlayerCacheData const* cData = characters.front();
-            Team team_ = Player::TeamForRace(race_);
+            Team team_ = Player::TeamForRace(packet.race);
 
             uint8 acc_race = cData->uiRace;
 
@@ -324,7 +313,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
     }
 
     uint32 const guidLow = sObjectMgr.GeneratePlayerLowGuid();
-    if (Player::SaveNewPlayer(this, guidLow, name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair))
+    if (Player::SaveNewPlayer(this, guidLow, safeName, packet.race, packet.class_, packet.gender, packet.skin, packet.face, packet.hairStyle, packet.hairColor, packet.facialHair))
     {
         m_charactersCount += 1;
 
@@ -340,10 +329,9 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
+void WorldSession::HandleCharDeleteOpcode(WorldPackets::Character::CharDelete const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
+    ObjectGuid guid = packet.guid;
 
     // can't delete loaded character
     if (ObjectAccessor::FindPlayerNotInWorld(guid))
@@ -387,13 +375,10 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
+void WorldSession::HandlePlayerLoginOpcode(WorldPackets::Character::PlayerLogin const& packet)
 {
-    ObjectGuid playerGuid;
-    recv_data >> playerGuid;
-
     if ((!sWorld.getConfig(CONFIG_BOOL_WORLD_AVAILABLE) && GetSecurity() == SEC_PLAYER) ||
-        PlayerLoading() || GetPlayer() != nullptr || !playerGuid.IsPlayer())
+        PlayerLoading() || GetPlayer() != nullptr || !packet.guid.IsPlayer())
     {
         WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
         data << (uint8)1;
@@ -401,7 +386,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
         return;
     }
 
-    LoginQueryHolder* holder = new LoginQueryHolder(GetAccountId(), playerGuid);
+    LoginQueryHolder* holder = new LoginQueryHolder(GetAccountId(), packet.guid);
     if (!holder->Initialize())
     {
         delete holder;                                      // delete all unprocessed queries
@@ -712,7 +697,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     std::string IP_str = GetRemoteAddress();
 
     sLog.Player(this, LOG_CHAR, "Login", LOG_LVL_DETAIL, alreadyOnline ? "Player was already online" : "");
-    
+
     if (!alreadyOnline && !pCurrChar->IsStandingUp() && !pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
 
@@ -735,85 +720,66 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             pGroup->SendLootStartRollsForPlayer(pCurrChar);
 }
 
-void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket& recv_data)
+void WorldSession::HandleSetFactionAtWarOpcode(WorldPackets::Misc::SetFactionAtWar const& packet)
 {
-    uint32 repListId;
-    uint8  flag;
-
-    recv_data >> repListId;
-    recv_data >> flag;
-
     Player* pPlayer = GetPlayer();
 
     if (pPlayer->IsInCombat())
         return;
 
-    pPlayer->GetReputationMgr().SetAtWar(repListId, flag);
+    pPlayer->GetReputationMgr().SetAtWar(packet.repListId, packet.flag);
 }
 
-void WorldSession::HandleTutorialFlagOpcode(WorldPacket& recv_data)
+void WorldSession::HandleTutorialFlagOpcode(WorldPackets::Misc::TutorialFlag const& packet)
 {
-    uint32 iFlag;
-    recv_data >> iFlag;
-
-    uint32 wInt = (iFlag / 32);
+    uint32 wInt = (packet.iFlag / 32);
     if (wInt >= 8)
         return;
 
-    uint32 rInt = (iFlag % 32);
+    uint32 rInt = (packet.iFlag % 32);
 
     uint32 tutflag = GetTutorialInt(wInt);
     tutflag |= (1 << rInt);
     SetTutorialInt(wInt, tutflag);
 }
 
-void WorldSession::HandleTutorialClearOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleTutorialClearOpcode(NullClientPacket const& /*packet*/)
 {
     for (uint32 iI = 0; iI < 8; ++iI)
         SetTutorialInt(iI, 0xFFFFFFFF);
 }
 
-void WorldSession::HandleTutorialResetOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleTutorialResetOpcode(NullClientPacket const& /*packet*/)
 {
     for (uint32 iI = 0; iI < 8; iI++)
         SetTutorialInt(iI, 0x00000000);
 }
 
-void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recv_data)
-{
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    int32 repId;
-    recv_data >> repId;
-    GetPlayer()->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, repId);
-#endif
-}
-
-void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recv_data)
+void WorldSession::HandleSetWatchedFactionOpcode(WorldPackets::Misc::SetWatchedFaction const& packet)
 {
-    uint32 replistid;
-    uint8 inactive;
-    recv_data >> replistid >> inactive;
-
-    _player->GetReputationMgr().SetInactive(replistid, inactive);
+    GetPlayer()->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, packet.repId);
 }
 
-void WorldSession::HandleShowingHelmOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleSetFactionInactiveOpcode(WorldPackets::Misc::SetFactionInactive const& packet)
+{
+    _player->GetReputationMgr().SetInactive(packet.replistid, packet.inactive);
+}
+#endif
+
+void WorldSession::HandleShowingHelmOpcode(NullClientPacket const& /*packet*/)
 {
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
 }
 
-void WorldSession::HandleShowingCloakOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleShowingCloakOpcode(NullClientPacket const& /*packet*/)
 {
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
 }
 
-void WorldSession::HandleCharRenameOpcode(WorldPacket& recv_data)
+void WorldSession::HandleCharRenameOpcode(WorldPackets::Character::CharRename const& packet)
 {
-    ObjectGuid guid;
-    std::string newname;
-
-    recv_data >> guid;
-    recv_data >> newname;
+    std::string newname = packet.newname;
 
     // prevent character rename to invalid name
     if (!normalizePlayerName(newname))
@@ -850,7 +816,7 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recv_data)
     CharacterDatabase.AsyncPQuery(&WorldSession::HandleChangePlayerNameOpcodeCallBack,
                                   GetAccountId(), newname,
                                   "SELECT `guid`, `name` FROM `characters` WHERE `guid` = %u AND `account` = %u AND (`character_flags` & %u) = %u AND NOT EXISTS (SELECT NULL FROM `characters` WHERE `name` = '%s')",
-                                  guid.GetCounter(), GetAccountId(), CHARACTER_FLAG_RENAME, CHARACTER_FLAG_RENAME, escaped_newname.c_str()
+                                  packet.guid.GetCounter(), GetAccountId(), CHARACTER_FLAG_RENAME, CHARACTER_FLAG_RENAME, escaped_newname.c_str()
                                  );
 }
 

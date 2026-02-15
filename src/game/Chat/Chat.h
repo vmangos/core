@@ -91,6 +91,12 @@ enum PlayerChatTag
     CHAT_TAG_GM                 = 3,
 };
 
+enum class ParseCommandResult
+{
+    CommandDetectedAndHandled,
+    WasNotHandled,
+};
+
 class PartyBotAI;
 class BattleBotAI;
 
@@ -119,10 +125,10 @@ class ChatHandler
         void PSendSysMessage(int32 entry, ...  );
         std::string PGetParseString(int32 entry, ...);
 
-        bool ParseCommands(char const* text);
+        ParseCommandResult ParseCommands(char const* text);
         ChatCommand const* FindCommand(char const* text);
 
-        bool isValidChatMessage(char const* msg);
+        bool isValidChatMessage(std::string const& msg);
         bool HasSentErrorMessage() { return m_sentErrorMessage;}
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
@@ -189,7 +195,7 @@ class ChatHandler
         void CheckIntegrity(ChatCommand *table, ChatCommand *parentCommand);
         static void FillFullCommandsName(ChatCommand* table, std::string prefix);
         static ChatCommand* getCommandTable();
-        
+
         bool HandleAnticheatCommand(char*);
         bool HandleReloadAnticheatCommand(char*);
         bool HandleViewLogCommand(char*);
@@ -390,8 +396,8 @@ class ChatHandler
         bool HandleDebugControlCommand(char *args);
         bool HandlePvPCommand(char *args);
         // Channel
-        bool HandleChannelJoinCommand(char*);
-        bool HandleChannelLeaveCommand(char*);
+        bool HandleChannelJoinCommand(char* args);
+        bool HandleChannelLeaveCommand(char* args);
 
         bool HandleAccountCommand(char* args);
         bool HandleAccountCharactersCommand(char* args);
@@ -471,7 +477,7 @@ class ChatHandler
         bool HandleDebugPlaySoundCommand(char* args);
         bool HandleDebugPlayScriptText(char* args);
         bool HandleDebugPlayMusicCommand(char* args);
-        
+
         bool HandleDebugSendBuyErrorCommand(char* args);
         bool HandleDebugSendChannelNotifyCommand(char* args);
         bool HandleDebugSendChatMsgCommand(char* args);

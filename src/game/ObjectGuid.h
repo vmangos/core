@@ -139,6 +139,13 @@ class ObjectGuid
     public:                                                 // modifiers
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        // TODO: Remove `ReadAsPacked` when transformation is done
+        PackedGuidReader ReadAsPackedClientBuildAware() { return PackedGuidReader(*this); }
+#else
+        ObjectGuid& ReadAsPackedClientBuildAware() { return *this; }
+#endif
+
         void Set(uint64 const& guid);
         void Clear() { m_guid = 0; }
 

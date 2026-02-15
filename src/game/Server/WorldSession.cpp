@@ -58,7 +58,7 @@ static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& o
 
 bool MapSessionFilter::Process(std::unique_ptr<WorldPacket> const& packet)
 {
-    OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
+    OpcodeHandler const& opHandle = LookupOpcodeHandler(packet->GetOpcode());
     // let's check if our opcode can be really processed in Map::Update()
     return MapSessionFilterHelper(m_pSession, opHandle);
 }
@@ -175,6 +175,18 @@ void WorldSession::SendPacketImpl(WorldPacket const* packet)
     m_socket->SendPacket(*packet);
 }
 
+void WorldSession::VerifyPacketWasCorrectlyRead(WorldPacket const& recvPacket, ClientPacket const& clientPacket) const
+{
+    if (clientPacket.GetOpcode() != recvPacket.GetOpcode())
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NicePacket Conversion] Received %d (%s) but after parse it was %d", recvPacket.GetOpcode(), LookupOpcodeName(recvPacket.GetOpcode()), clientPacket.GetOpcode());
+    }
+    if (recvPacket.rpos() != recvPacket.size())
+    {
+        sLog.Out(LOG_NETWORK, LOG_LVL_ERROR, "[NicePacket Conversion] Packet is size %d but only parsed %d (opcode %d %s)", recvPacket.size(), recvPacket.rpos(), recvPacket.GetOpcode(), LookupOpcodeName(recvPacket.GetOpcode()));
+    }
+}
+
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
 void WorldSession::SendMovementPacket(WorldPacket const* packet)
 {
@@ -273,12 +285,13 @@ void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
     uint32 processing;
 
     // Handle chat packets on async thread when possible
-    if (newPacket->GetOpcode() == CMSG_MESSAGECHAT &&
-        newPacket->size() >= sizeof(uint32))
+    if (newPacket->GetOpcode() == CMSG_MESSAGECHAT && newPacket->size() >= sizeof(uint32))
+    {
         processing = GetChatPacketProcessingType(*((uint32*)newPacket->contents()));
+    }
     else
     {
-        OpcodeHandler const& opHandle = opcodeTable[newPacket->GetOpcode()];
+        OpcodeHandler const& opHandle = LookupOpcodeHandler(newPacket->GetOpcode());
         processing = opHandle.packetProcessing;
 
         if (processing >= PACKET_PROCESS_MAX_TYPE)
@@ -496,7 +509,7 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
         if (!AllowPacket(packet->GetOpcode()))
             break;
 
-        OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
+        OpcodeHandler const& opHandle = LookupOpcodeHandler(packet->GetOpcode());
         try
         {
             uint32 packetTime = WorldTimer::getMSTime();
@@ -679,7 +692,7 @@ void WorldSession::LogoutPlayer(bool Save)
         // this should fix players being able to logout and login back with full hp at death position
         while (_player->IsBeingTeleportedFar())
         {
-            HandleMoveWorldportAckOpcode();
+            HandleMoveWorldportAck();
             sMapMgr.ExecuteSingleDelayedTeleport(_player); // Execute chain teleport if there are some
         }
 
@@ -694,7 +707,7 @@ void WorldSession::LogoutPlayer(bool Save)
             // loading screen during the teleport into bg when joining
             while (_player->IsBeingTeleportedFar())
             {
-                HandleMoveWorldportAckOpcode();
+                HandleMoveWorldportAck();
                 sMapMgr.ExecuteSingleDelayedTeleport(_player);
             }
         }
@@ -905,13 +918,6 @@ void WorldSession::Handle_EarlyProccess(WorldPacket& recvPacket)
 void WorldSession::Handle_ServerSide(WorldPacket& recvPacket)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received server-side opcode %s (0x%.4X)",
-                  LookupOpcodeName(recvPacket.GetOpcode()),
-                  recvPacket.GetOpcode());
-}
-
-void WorldSession::Handle_Deprecated(WorldPacket& recvPacket)
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received deprecated opcode %s (0x%.4X)",
                   LookupOpcodeName(recvPacket.GetOpcode()),
                   recvPacket.GetOpcode());
 }

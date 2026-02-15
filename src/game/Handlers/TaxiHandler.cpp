@@ -30,11 +30,9 @@
 #include "Path.h"
 #include "WaypointMovementGenerator.h"
 
-void WorldSession::HandleTaxiNodeStatusQueryOpcode(WorldPacket& recv_data)
+void WorldSession::HandleTaxiNodeStatusQueryOpcode(WorldPackets::Taxi::TaxiNodeStatusQuery const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
-    SendTaxiStatus(guid);
+    SendTaxiStatus(packet.creatureGuidNearTaxi);
 }
 
 void WorldSession::SendTaxiStatus(ObjectGuid guid)
@@ -59,16 +57,13 @@ void WorldSession::SendTaxiStatus(ObjectGuid guid)
     SendPacket(&data);
 }
 
-void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket& recv_data)
+void WorldSession::HandleTaxiQueryAvailableNodes(WorldPackets::Taxi::TaxiQueryAvailableNodes const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
-
     // cheating checks
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTaxiQueryAvailableNodes - %s not found or you can't interact with him.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTaxiQueryAvailableNodes - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
         return;
     }
 
@@ -143,46 +138,31 @@ bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
         return false;
 }
 
-void WorldSession::HandleActivateTaxiExpressOpcode(WorldPacket& recv_data)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+void WorldSession::HandleActivateTaxiExpressOpcode(WorldPackets::Taxi::ActivateTaxiExpress const& packet)
 {
-    ObjectGuid guid;
-    uint32 node_count, _totalcost;
-
-    recv_data >> guid >> _totalcost >> node_count;
-
-    Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
+    Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(packet.flightmasterGuid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleActivateTaxiExpressOpcode - %s not found or you can't interact with it.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleActivateTaxiExpressOpcode - %s not found or you can't interact with it.", packet.flightmasterGuid.GetString().c_str());
         return;
     }
-    std::vector<uint32> nodes;
 
-    for (uint32 i = 0; i < node_count; ++i)
-    {
-        uint32 node;
-        recv_data >> node;
-        nodes.push_back(node);
-    }
-
-    if (nodes.empty())
+    if (packet.nodes.empty())
         return;
 
-    GetPlayer()->ActivateTaxiPathTo(nodes, npc);
+    GetPlayer()->ActivateTaxiPathTo(packet.nodes, npc);
 }
+#endif
 
-void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recv_data)
+void WorldSession::HandleActivateTaxiOpcode(WorldPackets::Taxi::ActivateTaxi const& packet)
 {
-    ObjectGuid guid;
-    std::vector<uint32> nodes;
-    nodes.resize(2);
+    std::vector<uint32> nodes { packet.node1, packet.node2 };
 
-    recv_data >> guid >> nodes[0] >> nodes[1];
-
-    Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
+    Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(packet.flightmasterGuid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleActivateTaxiOpcode - %s not found or you can't interact with it.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleActivateTaxiOpcode - %s not found or you can't interact with it.", packet.flightmasterGuid.GetString().c_str());
         return;
     }
 

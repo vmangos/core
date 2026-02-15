@@ -47,16 +47,15 @@ void WorldSession::SendPartyResult(PartyOperation operation, std::string const& 
 {
     WorldPacket data(SMSG_PARTY_COMMAND_RESULT, (4 + member.size() + 1 + 4));
     data << uint32(operation);
-    data << member;                                         // max len 48
+    data << member; // max len 48
     data << uint32(res);
 
     SendPacket(&data);
 }
 
-void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
+void WorldSession::HandleGroupInviteOpcode(WorldPackets::Group::GroupInvite const& packet)
 {
-    std::string membername;
-    recv_data >> membername;
+    std::string membername = packet.memberName;
 
     // Attempt add selected player
 
@@ -146,14 +145,14 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
     }
 
     // ok, we do it
-    WorldPacket data(SMSG_GROUP_INVITE, 10);                // guess size
+    WorldPacket data(SMSG_GROUP_INVITE, 10); // guess size
     data << GetPlayer()->GetName();
     player->GetSession()->SendPacket(&data);
 
     SendPartyResult(PARTY_OP_INVITE, membername, ERR_PARTY_RESULT_OK);
 }
 
-void WorldSession::HandleGroupAcceptOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleGroupAcceptOpcode(NullClientPacket const& /*packet*/)
 {
     Group* group = GetPlayer()->GetGroupInvite();
     if (!group)
@@ -162,7 +161,7 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& /*recv_data*/)
     if (group->GetLeaderGuid() == GetPlayer()->GetObjectGuid())
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleGroupAcceptOpcode: %s tried to accept an invite to his own group",
-                      GetPlayer()->GetGuidStr().c_str());
+                 GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -198,9 +197,9 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& /*recv_data*/)
     group->BroadcastGroupUpdate();
 }
 
-void WorldSession::HandleGroupDeclineOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleGroupDeclineOpcode(NullClientPacket const& /*packet*/)
 {
-    Group  *group  = GetPlayer()->GetGroupInvite();
+    Group* group = GetPlayer()->GetGroupInvite();
     if (!group)
         return;
 
@@ -214,15 +213,14 @@ void WorldSession::HandleGroupDeclineOpcode(WorldPacket& /*recv_data*/)
         return;
 
     // report
-    WorldPacket data(SMSG_GROUP_DECLINE, 10);               // guess size
+    WorldPacket data(SMSG_GROUP_DECLINE, 10); // guess size
     data << GetPlayer()->GetName();
     leader->GetSession()->SendPacket(&data);
 }
 
-void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recv_data)
+void WorldSession::HandleGroupUninviteGuidOpcode(WorldPackets::Group::GroupUninviteGuid const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
+    ObjectGuid guid = packet.guid;
 
     // can't uninvite yourself
     if (guid == GetPlayer()->GetObjectGuid())
@@ -257,10 +255,9 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recv_data)
     SendPartyResult(PARTY_OP_LEAVE, "", ERR_TARGET_NOT_IN_GROUP_S);
 }
 
-void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recv_data)
+void WorldSession::HandleGroupUninviteOpcode(WorldPackets::Group::GroupUninvite const& packet)
 {
-    std::string membername;
-    recv_data >> membername;
+    std::string membername = packet.memberName;
 
     // player not found
     if (!normalizePlayerName(membername))
@@ -304,38 +301,27 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recv_data)
     SendPartyResult(PARTY_OP_LEAVE, membername, ERR_TARGET_NOT_IN_GROUP_S);
 }
 
-void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recv_data)
+void WorldSession::HandleGroupSetLeaderOpcode(WorldPackets::Group::GroupSetLeader const& packet)
 {
-    ObjectGuid guid;
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-    recv_data >> guid;
-#else
-    std::string name;
-    recv_data >> name;
-#endif
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-    Player* player = sObjectMgr.GetPlayer(guid);
+    Player* player = sObjectMgr.GetPlayer(packet.guid);
 #else
-    Player* player = sObjectMgr.GetPlayer(name.c_str());
-    if (player)
-        guid = player->GetObjectGuid();
+    Player* player = sObjectMgr.GetPlayer(packet.name.c_str());
 #endif
 
     /** error handling **/
     if (!player || player == GetPlayer() || !group->IsLeader(GetPlayer()->GetObjectGuid()) || player->GetGroup() != group)
         return;
-    /********************/
 
     // everything is fine, do it
-    group->ChangeLeader(guid);
+    group->ChangeLeader(player->GetObjectGuid());
 }
 
-void WorldSession::HandleGroupDisbandOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleGroupDisbandOpcode(NullClientPacket const& /*packet*/)
 {
     if (!GetPlayer()->GetGroup())
         return;
@@ -353,15 +339,10 @@ void WorldSession::HandleGroupDisbandOpcode(WorldPacket& /*recv_data*/)
     GetPlayer()->RemoveFromGroup();
 }
 
-void WorldSession::HandleLootMethodOpcode(WorldPacket& recv_data)
+void WorldSession::HandleLootMethodOpcode(WorldPackets::Group::LootMethod const& packet)
 {
-    uint32 lootMethod;
-    ObjectGuid lootMaster;
-    uint32 lootThreshold;
-    recv_data >> lootMethod >> lootMaster >> lootThreshold;
-
     // Impossible.
-    if (lootMethod > 4)
+    if (packet.lootMethod > 4)
         return;
 
     Group* group = GetPlayer()->GetGroup();
@@ -377,20 +358,15 @@ void WorldSession::HandleLootMethodOpcode(WorldPacket& recv_data)
     /********************/
 
     // everything is fine, do it
-    group->SetLootMethod((LootMethod)lootMethod);
-    group->SetLooterGuid(lootMaster);
-    group->SetLootThreshold((ItemQualities)lootThreshold);
+    group->SetLootMethod((LootMethod)packet.lootMethod);
+    group->SetLooterGuid(packet.lootMaster);
+    group->SetLootThreshold((ItemQualities)packet.lootThreshold);
     group->SendUpdate();
 }
 
-void WorldSession::HandleLootRoll(WorldPacket& recv_data)
+void WorldSession::HandleLootRoll(WorldPackets::Loot::LootRoll const& packet)
 {
-    ObjectGuid lootedTarget;
-    uint32 itemSlot;
-    uint8  rollType;
-    recv_data >> lootedTarget; // guid of the loot source
-    recv_data >> itemSlot;
-    recv_data >> rollType;
+    uint8 rollType = packet.rollType;
 
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -408,15 +384,11 @@ void WorldSession::HandleLootRoll(WorldPacket& recv_data)
 #endif
 
     // everything is fine, do it, if false then some cheating problem found (result not used in pre-3.0)
-    group->CountRollVote(GetPlayer(), lootedTarget, itemSlot, RollVote(rollType));
+    group->CountRollVote(GetPlayer(), packet.lootedTarget, packet.itemSlot, RollVote(rollType));
 }
 
-void WorldSession::HandleMinimapPingOpcode(WorldPacket& recv_data)
+void WorldSession::HandleMinimapPingOpcode(WorldPackets::Group::MinimapPing const& packet)
 {
-    float x, y;
-    recv_data >> x;
-    recv_data >> y;
-
     if (!GetPlayer()->GetGroup())
         return;
 
@@ -428,24 +400,23 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recv_data)
     // everything is fine, do it
     WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
     data << GetPlayer()->GetObjectGuid();
-    data << float(x);
-    data << float(y);
+    data << float(packet.x);
+    data << float(packet.y);
     GetPlayer()->GetGroup()->BroadcastPacket(&data, true, -1, GetPlayer()->GetObjectGuid());
 }
 
-void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
+void WorldSession::HandleRandomRollOpcode(WorldPackets::Group::RandomRoll const& packet)
 {
-    uint32 minimum, maximum, roll;
-    recv_data >> minimum;
-    recv_data >> maximum;
+    uint32 minimum = packet.minimum;
+    uint32 maximum = packet.maximum;
 
     /** error handling **/
-    if (minimum > maximum || maximum > 10000)               // < 32768 for urand call
+    if (minimum > maximum || maximum > 10000) // < 32768 for urand call
         return;
     /********************/
 
     // everything is fine, do it
-    roll = urand(minimum, maximum);
+    uint32 roll = urand(minimum, maximum);
 
     //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ROLL: MIN: %u, MAX: %u, ROLL: %u", minimum, maximum, roll);
 
@@ -468,11 +439,9 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
 #endif
 }
 
-void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recv_data)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+void WorldSession::HandleRaidTargetUpdateOpcode(WorldPackets::Group::RaidTargetUpdate const& packet)
 {
-    uint8  x;
-    recv_data >> x;
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         group = GetPlayer()->GetOriginalGroup();
@@ -483,21 +452,20 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recv_data)
     /********************/
 
     // everything is fine, do it
-    if (x == 0xFF)                                          // target icon request
+    if (packet.iconId == 0xFF) // target icon request
         group->SendTargetIconList(this);
-    else                                                    // target icon update
+    else // target icon update
     {
         if (!group->IsLeader(GetPlayer()->GetObjectGuid()) &&
             !group->IsAssistant(GetPlayer()->GetObjectGuid()))
             return;
 
-        ObjectGuid guid;
-        recv_data >> guid;
-        group->SetTargetIcon(x, guid);
+        group->SetTargetIcon(packet.iconId, packet.guid);
     }
 }
+#endif
 
-void WorldSession::HandleGroupRaidConvertOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleGroupRaidConvertOpcode(NullClientPacket const& /*packet*/)
 {
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -516,13 +484,9 @@ void WorldSession::HandleGroupRaidConvertOpcode(WorldPacket& /*recv_data*/)
     group->ConvertToRaid();
 }
 
-void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recv_data)
+void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPackets::Group::GroupChangeSubGroup const& packet)
 {
-    std::string name;
-    uint8 groupNr;
-    recv_data >> name;
-
-    recv_data >> groupNr;
+    uint8 groupNr = packet.groupNr;
 
     if (groupNr >= MAX_RAID_SUBGROUPS)
         return;
@@ -534,7 +498,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recv_data)
 
     /** error handling **/
     if (!group->IsLeader(GetPlayer()->GetObjectGuid()) &&
-            !group->IsAssistant(GetPlayer()->GetObjectGuid()))
+        !group->IsAssistant(GetPlayer()->GetObjectGuid()))
         return;
 
     if (!group->HasFreeSlotSubGroup(groupNr))
@@ -542,44 +506,39 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recv_data)
     /********************/
 
     // everything is fine, do it
-    if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
+    if (Player* player = sObjectMgr.GetPlayer(packet.name.c_str()))
         group->ChangeMembersGroup(player, groupNr);
     else
     {
-        if (ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(name))
+        if (ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(packet.name))
             group->ChangeMembersGroup(guid, groupNr);
     }
 }
 
-void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
+void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPackets::Group::GroupSwapSubGroup const& packet)
 {
-    std::string name;
-    std::string nameSwapWith;
-
-    recv_data >> name;
-    recv_data >> nameSwapWith;
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
 
     /** error handling **/
     if (!group->IsLeader(GetPlayer()->GetObjectGuid()) &&
-            !group->IsAssistant(GetPlayer()->GetObjectGuid()))
+        !group->IsAssistant(GetPlayer()->GetObjectGuid()))
         return;
     /********************/
     // If both players are online do swap with Player objects, else
     // do swap with Guids
-    Player* player = sObjectMgr.GetPlayer(name.c_str());
-    Player* swapPlayer = sObjectMgr.GetPlayer(nameSwapWith.c_str());
+    Player* player = sObjectMgr.GetPlayer(packet.name.c_str());
+    Player* swapPlayer = sObjectMgr.GetPlayer(packet.nameSwapWith.c_str());
 
     if (player && swapPlayer)
     {
         group->SwapMembersGroup(player, swapPlayer);
     }
-    else {
-        ObjectGuid swapGuid = sObjectMgr.GetPlayerGuidByName(name);
-        ObjectGuid swapWithGuid = sObjectMgr.GetPlayerGuidByName(nameSwapWith);
+    else
+    {
+        ObjectGuid swapGuid = sObjectMgr.GetPlayerGuidByName(packet.name);
+        ObjectGuid swapWithGuid = sObjectMgr.GetPlayerGuidByName(packet.nameSwapWith);
 
         if (!swapGuid || !swapWithGuid)
             return;
@@ -588,42 +547,30 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recv_data)
+void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPackets::Group::GroupAssistantLeader const& packet)
 {
-    ObjectGuid guid;
-    uint8 flag;
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-    recv_data >> guid;
-#else
-    std::string name;
-    recv_data >> name;
-#endif
-    recv_data >> flag;
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
 
-    /** error handling **/
-    if (!group->IsLeader(GetPlayer()->GetObjectGuid()))
-        return;
-    /********************/
-
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
-    if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
-        guid = player->GetObjectGuid();
-    else
-        return;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+    Player* player = sObjectMgr.GetPlayer(packet.guid);
+#else
+    Player* player = sObjectMgr.GetPlayer(packet.name.c_str());
 #endif
 
+    /** error handling **/
+    if (!player || player == GetPlayer() || !group->IsLeader(GetPlayer()->GetObjectGuid()) || player->GetGroup() != group)
+        return;
+
     // everything is fine, do it
-    group->SetAssistant(guid, (flag != 0));
+    group->SetAssistant(player->GetObjectGuid(), (packet.flag != 0));
 }
 
-void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recv_data)
-{
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    if (recv_data.empty())                                  // request
+void WorldSession::HandleRaidReadyCheckOpcode(WorldPackets::Group::RaidReadyCheck const& packet)
+{
+    if (!packet.state.has_value()) // request
     {
         Group* group = GetPlayer()->GetGroup();
         if (!group)
@@ -631,7 +578,7 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recv_data)
 
         /** error handling **/
         if (!group->IsLeader(GetPlayer()->GetObjectGuid()) &&
-                !group->IsAssistant(GetPlayer()->GetObjectGuid()))
+            !group->IsAssistant(GetPlayer()->GetObjectGuid()))
             return;
         /********************/
 
@@ -641,25 +588,23 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recv_data)
 
         group->OfflineReadyCheck();
     }
-    else                                                    // answer
+    else // answer
     {
-        uint8 state;
-        recv_data >> state;
         Group* group = GetPlayer()->GetGroup();
         if (!group)
             return;
 
-        // On transmet au chef de raid
+        // Forward to the raid leader
         if (Player* gleader = sObjectMgr.GetPlayer(group->GetLeaderGuid()))
         {
             WorldPacket data(MSG_RAID_READY_CHECK, 9);
             data << GetPlayer()->GetObjectGuid();
-            data << uint8(state);
+            data << uint8(packet.state.value());
             gleader->GetSession()->SendPacket(&data);
         }
     }
-#endif
 }
+#endif
 
 void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data, uint32 mask, bool sendAllAuras)
 {
@@ -823,10 +768,10 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 {
     uint32 mask = player->GetGroupUpdateFlag();
 
-    if (mask & GROUP_UPDATE_FLAG_POWER_TYPE)                // if update power type, update current/max power also
+    if (mask & GROUP_UPDATE_FLAG_POWER_TYPE) // if update power type, update current/max power also
         mask |= (GROUP_UPDATE_FLAG_CUR_POWER | GROUP_UPDATE_FLAG_MAX_POWER);
 
-    if (mask & GROUP_UPDATE_FLAG_PET_POWER_TYPE)            // same for pets
+    if (mask & GROUP_UPDATE_FLAG_PET_POWER_TYPE) // same for pets
         mask |= (GROUP_UPDATE_FLAG_PET_CUR_POWER | GROUP_UPDATE_FLAG_PET_MAX_POWER);
 
     uint32 byteCount = 0;
@@ -839,10 +784,9 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 }
 
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/
-void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
+void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPackets::Group::RequestPartyMemberStats const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
+    ObjectGuid guid = packet.guid;
 
     Player* player = HashMapHolder<Player>::Find(guid);
 
@@ -873,7 +817,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleRequestRaidInfoOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleRequestRaidInfoOpcode(NullClientPacket const& /*packet*/)
 {
     // every time the player checks the character screen
     _player->SendRaidInfo();

@@ -27,11 +27,12 @@
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
 #include "LootMgr.h"
+#include "Object.h"
 #include "Player.h"
 #include <vector>
 #include <memory>
 
-
+struct SpellCastTargetsInfo;
 struct SpellScript;
 class WorldSession;
 class WorldPacket;
@@ -72,24 +73,16 @@ namespace MaNGOS
 
 class SpellCastTargets;
 
-struct SpellCastTargetsReader
-{
-    explicit SpellCastTargetsReader(SpellCastTargets& _targets, Unit* _caster) : targets(_targets), caster(_caster) {}
-
-    SpellCastTargets& targets;
-    Unit* caster;
-};
-
 class SpellCastTargets
 {
     public:
         SpellCastTargets();
         ~SpellCastTargets();
 
-        void read(ByteBuffer& data, Unit* caster);
-        void write(ByteBuffer& data) const;
+        static SpellCastTargets FromSpellCastTargetsInfo(SpellCastTargetsInfo const& info, Unit* caster);
 
-        SpellCastTargetsReader ReadForCaster(Unit* caster) { return SpellCastTargetsReader(*this,caster); }
+        // use SpellCastTargetsInfo for read
+        void write(ByteBuffer& data) const;
 
         SpellCastTargets& operator=(SpellCastTargets const& target)
         {
@@ -174,12 +167,6 @@ class SpellCastTargets
 inline ByteBuffer& operator<< (ByteBuffer& buf, SpellCastTargets const& targets)
 {
     targets.write(buf);
-    return buf;
-}
-
-inline ByteBuffer& operator>> (ByteBuffer& buf, SpellCastTargetsReader const& targets)
-{
-    targets.targets.read(buf,targets.caster);
     return buf;
 }
 
