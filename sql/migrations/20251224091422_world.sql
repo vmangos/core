@@ -183,6 +183,9 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `f
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (@PTEMPLATE+0, 386, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0);
 
+-- Correct Patch For Dark Iron Inside Instances
+UPDATE `gameobject` SET `patch_min` = 0 WHERE `id`=165658 AND (`map`=230 OR `map`=409);
+
 
 -- End of migration.
 END IF;
