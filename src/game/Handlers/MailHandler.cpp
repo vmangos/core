@@ -285,6 +285,13 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         return;
     }
 
+    // A normal client can't open mail- and trade-window at the same time. Prevent spoofing packets.
+    if (loadedPlayer->m_trade)
+    {
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+        return;
+    }
+
     uint32 receiverAccount = sObjectMgr.GetPlayerAccountIdByGUID(req->receiver);
 
     Item* item = nullptr;
