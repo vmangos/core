@@ -186,6 +186,16 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 -- Correct Patch For Dark Iron Inside Instances
 UPDATE `gameobject` SET `patch_min` = 0 WHERE `id`=165658 AND (`map`=230 OR `map`=409);
 
+-- Correct Gossip for Ranshalla
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(3131, 4787, 1023);
+-- 1021: Target Has Complete Quest 4901 In Log
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1021, 9, 4901, 2, 0, 0, 0);
+-- 1022: Target Has Done Quest 4901
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1022, 8, 4901, 0, 0, 0, 0);
+-- 1023: (1021: Target Has Complete Quest 4901 In Log) Or (1022: Target Has Done Quest 4901)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1023, -2, 1021, 1022, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
