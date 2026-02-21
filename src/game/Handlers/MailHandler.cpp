@@ -134,7 +134,7 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
 {
     ObjectGuid mailboxGuid;
     uint32 unk1, unk2;
-    
+
     recv_data >> mailboxGuid;
     if (!CheckMailBox(mailboxGuid))
     {
@@ -301,7 +301,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         }
 
         // prevent sending item from bank slot
-        if (_player->IsBankPos(item->GetPos())) 
+        if (_player->IsBankPos(item->GetPos()))
         {
             SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
             return;
@@ -763,7 +763,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
 
     constexpr uint32 averageSizePerMail =
         sizeof(uint32) /*Message Id*/ +
-        sizeof(uint8) /*Message Type*/ + 
+        sizeof(uint8) /*Message Type*/ +
         sizeof(uint64) /*Sender Guid*/ +
         32 /*Subject (max 64)*/ +
         sizeof(uint32) /*Item Text Id*/ +
