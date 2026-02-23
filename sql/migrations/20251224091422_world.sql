@@ -185,6 +185,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 -- Correct Patch For Dark Iron Inside Instances
 UPDATE `gameobject` SET `patch_min` = 0 WHERE `id`=165658 AND (`map`=230 OR `map`=409);
+UPDATE `pool_gameobject` SET `patch_min` = 0 WHERE `pool_entry` = 25622 or `pool_entry` = 25609;
 
 -- Correct Gossip for Ranshalla
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
