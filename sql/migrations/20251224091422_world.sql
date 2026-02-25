@@ -184,8 +184,9 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+0, 386, 0, 'Stonetalon Mountains - Windshear Mine - Tin Vein / Silver Vein', 0);
 
 -- Correct Patch For Dark Iron Inside Instances
-UPDATE `gameobject` SET `patch_min` = 0 WHERE `id`=165658 AND (`map`=230 OR `map`=409);
-UPDATE `pool_gameobject` SET `patch_min` = 0 WHERE `pool_entry` = 25622 or `pool_entry` = 25609;
+UPDATE `gameobject` SET `patch_min` = 0 WHERE `id`=165658 AND (`map` = 230 OR `map` = 409);
+UPDATE `pool_gameobject` SET `patch_min` = 0 WHERE `pool_entry` = 25622 OR `pool_entry` = 25609;
+update `pool_template` SET `patch_min` = 0 WHERE `entry` = 25609 OR `entry` = 25622;
 
 -- Correct Gossip for Ranshalla
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
