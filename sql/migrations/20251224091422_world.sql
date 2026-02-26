@@ -12,6 +12,10 @@ INSERT INTO `migrations` VALUES ('20251224091422');
 -- Remove Duplicate Sharks
 DELETE FROM `creature` WHERE `guid` IN (88969, 88979, 88978, 88977, 88976, 88973, 88972, 88971, 88970);
 
+-- Cliff Walkers Should Have Large Wander Distance
+UPDATE `creature` SET `movement_type` = 1 WHERE `guid` IN (35139, 35167);
+UPDATE `creature` SET `wander_distance` = 70 WHERE `id` IN (6148, 6147, 6146) AND `movement_type` = 1;
+
 -- Frenzied Plaguehound (8598) should share spawn with Monstrous Plaguebat (8602)
 UPDATE `creature` SET `id` = 8598, `id2` = 8602 WHERE `id` IN (8598, 8602);
 
