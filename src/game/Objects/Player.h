@@ -738,6 +738,14 @@ struct ScheduledTeleportData
     std::function<void()> recover = std::function<void()>();
 };
 
+struct QuestShareInfo
+{
+    explicit QuestShareInfo(ObjectGuid guid, uint32 questId) : PlayerGuid(guid), QuestId(questId) {}
+
+    ObjectGuid PlayerGuid;
+    uint32 QuestId;
+};
+
 class Player final: public Unit
 {
     friend class WorldSession;
@@ -1065,7 +1073,8 @@ class Player final: public Unit
         typedef std::set<uint32> QuestSet;
         QuestSet m_timedquests;
 
-        ObjectGuid m_dividerGuid;
+        nonstd::optional<QuestShareInfo> m_questShareInfo;
+
         uint32 m_ingametime;
         QuestStatusMap mQuestStatus;
         void AdjustQuestReqItemCount(Quest const* pQuest, QuestStatusData& questStatusData);
@@ -1177,9 +1186,9 @@ class Player final: public Unit
         void SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32 current, uint32 count);
         void SendQuestUpdateAddCreatureOrGo(Quest const* pQuest, ObjectGuid guid, uint32 creatureOrGO_idx, uint32 count);
 
-        ObjectGuid GetDividerGuid() const { return m_dividerGuid; }
-        void SetDividerGuid(ObjectGuid guid) { m_dividerGuid = guid; }
-        void ClearDividerGuid() { m_dividerGuid.Clear(); }
+        auto const& GetQuestShareInfo() const { return m_questShareInfo; }
+        void SetQuestShareInfo(ObjectGuid guid, uint32 questId) { m_questShareInfo.emplace(guid, questId); }
+        void ClearQuestShareInfo() { m_questShareInfo.reset(); }
 
         uint32 GetInGameTime() const { return m_ingametime; }
         void SetInGameTime(uint32 time) { m_ingametime = time; }
