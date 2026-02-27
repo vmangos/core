@@ -12,6 +12,10 @@ INSERT INTO `migrations` VALUES ('20251224091422');
 -- Remove Duplicate Sharks
 DELETE FROM `creature` WHERE `guid` IN (88969, 88979, 88978, 88977, 88976, 88973, 88972, 88971, 88970);
 
+-- Thunderheads Should Have Large Wander Distance
+UPDATE `creature` SET `movement_type` = 1 WHERE `guid` IN (36205, 36212);
+UPDATE `creature` SET `wander_distance` = 40 WHERE `id` IN (6380, 6377, 6379, 6375) AND `movement_type` = 1;
+
 -- Cliff Walkers Should Have Large Wander Distance
 UPDATE `creature` SET `movement_type` = 1 WHERE `guid` IN (35139, 35167);
 UPDATE `creature` SET `wander_distance` = 70 WHERE `id` IN (6148, 6147, 6146) AND `movement_type` = 1;
