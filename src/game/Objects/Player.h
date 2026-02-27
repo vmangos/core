@@ -538,7 +538,7 @@ enum BuyBackSlots                                           // 12 slots after 1.
 #endif
 };
 
-enum KeyRingSlots                                           // 32 slots
+enum KeyRingSlots                                           // 32 (only 16 slots are visible/accessible in UI)
 {
     KEYRING_SLOT_START          = 81,
     KEYRING_SLOT_END            = 97
@@ -973,7 +973,14 @@ class Player final: public Unit
 #endif
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        uint32 GetMaxKeyringSize() const { return GetLevel() < 40 ? 4 : (GetLevel() < 50 ? 8 : 12); }
+        uint32 GetMaxKeyringSize() const
+        {
+            uint32 level = GetLevel();
+            if (level > 60) return 16;
+            if (level >= 50) return 12;
+            if (level >= 40) return 8;
+            return 4;
+        }
 #else
         uint32 GetMaxKeyringSize() const { return 0; }
 #endif
