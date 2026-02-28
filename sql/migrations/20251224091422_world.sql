@@ -12,6 +12,10 @@ INSERT INTO `migrations` VALUES ('20251224091422');
 -- Remove Duplicate Sharks
 DELETE FROM `creature` WHERE `guid` IN (88969, 88979, 88978, 88977, 88976, 88973, 88972, 88971, 88970);
 
+-- Mistwings Should Have Large Wander Distance
+UPDATE `creature` SET `movement_type`=1 WHERE  `guid`=35834;
+UPDATE `creature` SET `wander_distance` = 30 WHERE `id` IN (8764, 8763) AND `movement_type` = 1;
+
 -- Thunderheads Should Have Large Wander Distance
 UPDATE `creature` SET `movement_type` = 1 WHERE `guid` IN (36205, 36212);
 UPDATE `creature` SET `wander_distance` = 40 WHERE `id` IN (6380, 6377, 6379, 6375, 6378) AND `movement_type` = 1;
