@@ -26,6 +26,8 @@
 
 #include <sstream>
 
+const ObjectGuid ObjectGuid::Empty;
+
 char const* ObjectGuid::GetTypeName(HighGuid high)
 {
     switch (high)

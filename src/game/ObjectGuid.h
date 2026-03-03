@@ -145,6 +145,7 @@ class ObjectGuid
         PackedGuid WriteAsPacked() const;
     public:                                                 // accessors
         uint64 const& GetRawValue() const { return m_guid; }
+        static const ObjectGuid Empty;
         static HighGuid GetHigh(uint64 guid) { return HighGuid((guid >> 48) & 0x0000FFFF); }
         static void ClampPlayerGuid(uint64& value);
         HighGuid GetHigh() const { return GetHigh(m_guid); }

@@ -606,6 +606,20 @@ class Map : public GridRefManager<NGridType>
         bool ShouldUpdateMap(uint32 now, uint32 inactiveTimeLimit);
         void RemoveBones(Corpse* corpse);
 
+        // ModPlayerBots compatibility helpers (Trinity callsites)
+        template <typename... Args>
+        bool CheckCollisionAndGetValidCoords(Args&&...) const { return true; }
+
+        bool IsInWater(uint32 /*phaseMask*/, float x, float y, float z, float /*collisionHeight*/) const
+        {
+            return m_terrainData && m_terrainData->IsInWater(x, y, z);
+        }
+
+        bool IsUnderWater(uint32 /*phaseMask*/, float x, float y, float z, float /*collisionHeight*/) const
+        {
+            return m_terrainData && m_terrainData->IsUnderWater(x, y, z);
+        }
+
     private:
         void LoadMapAndVMap(int gx, int gy);
 

@@ -61,12 +61,12 @@ Channel::Channel(std::string const& name)
             m_announce = false;
         }
 
-        if (m_name == u8"World")
+        if (m_name == "World")
         {
             m_flags |= CHANNEL_FLAG_GENERAL;
             m_announce = false;
         }
-        else if (m_name == u8"China" || m_name == u8"中国")
+        else if (m_name == "China" || m_name == "中国")
         {
             m_flags |= CHANNEL_FLAG_CUSTOM;
             m_announce = false;

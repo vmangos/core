@@ -72,8 +72,9 @@
 #include "MovementPacketSender.h"
 #include "ZoneScript.h"
 #include "ZoneScriptMgr.h"
-#include "PlayerBotMgr.h"
-#include "PlayerBotAI.h"
+#include "PlayerBotsCompat/PlayerBotMgrCompat.h"
+#include "PlayerBotsCompat/PlayerBotsStubs.h"
+#include "AI/PlayerAI.h"
 #include "AccountMgr.h"
 #include "Anticheat.h"
 #include "MovementBroadcaster.h"
@@ -21210,11 +21211,11 @@ void Player::RemoveTemporaryAI()
 {
     PlayerBotEntry* pBot = GetSession()->GetBot();
 
-    if (!pBot || (pBot->ai.get() != AI()))
+    if (!pBot || (reinterpret_cast<PlayerAI*>(pBot->ai.get()) != AI()))
         RemoveAI();
 
-    if (pBot && (pBot->ai.get() != AI()))
-        SetAI(pBot->ai.get());
+    if (pBot && (reinterpret_cast<PlayerAI*>(pBot->ai.get()) != AI()))
+        SetAI(reinterpret_cast<PlayerAI*>(pBot->ai.get()));
 }
 
 void Player::SetControlledBy(Unit* pWho)
@@ -21224,7 +21225,7 @@ void Player::SetControlledBy(Unit* pWho)
         PlayerBotEntry* pBot = GetSession()->GetBot();
 
         // Careful not to delete bot ai
-        if (!pBot || (pBot->ai.get() != m_AI))
+        if (!pBot || (reinterpret_cast<PlayerAI*>(pBot->ai.get()) != m_AI))
             delete m_AI;
 
         m_AI = nullptr;

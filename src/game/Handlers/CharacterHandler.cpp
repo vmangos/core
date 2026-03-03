@@ -40,7 +40,7 @@
 #include "Anticheat.h"
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
-#include "PlayerBotMgr.h"
+#include "PlayerBotsCompat/PlayerBotMgrCompat.h"
 #include "MapManager.h"
 #include "AccountMgr.h"
 

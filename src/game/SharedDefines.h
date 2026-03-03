@@ -25,6 +25,7 @@
 #include "Platform/Define.h"
 #include "Progression.h"
 #include <cassert>
+#include <cmath>
 
 #define MAX_SPELL_EFFECTS 3
 #define EFFECT_0          0
@@ -1796,6 +1797,7 @@ struct Position
 {
     Position() = default;
     Position(float position_x, float position_y, float position_z, float orientation) : x(position_x), y(position_y), z(position_z), o(orientation) {}
+    Position(float position_x, float position_y, float position_z) : x(position_x), y(position_y), z(position_z), o(0.0f) {}
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
@@ -1804,6 +1806,19 @@ struct Position
     bool IsEmpty() const
     {
         return !x && !y && !z && !o;
+    }
+
+    float GetPositionX() const { return x; }
+    float GetPositionY() const { return y; }
+    float GetPositionZ() const { return z; }
+    float GetOrientation() const { return o; }
+
+    float GetDistance(float x1, float y1, float z1) const
+    {
+        float dx = x - x1;
+        float dy = y - y1;
+        float dz = z - z1;
+        return sqrt(dx * dx + dy * dy + dz * dz);
     }
 };
 
@@ -1816,8 +1831,13 @@ struct WorldLocation
     float o = 0.0f;
     explicit WorldLocation(uint16 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
         : mapId(_mapid), x(_x), y(_y), z(_z), o(_o) {}
-    WorldLocation(WorldLocation const& loc)
-        : mapId(loc.mapId), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
+    WorldLocation(WorldLocation const& loc) = default;
+
+    uint16 GetMapId() const { return mapId; }
+    float GetPositionX() const { return x; }
+    float GetPositionY() const { return y; }
+    float GetPositionZ() const { return z; }
+    float GetOrientation() const { return o; }
 
     bool IsEmpty() const
     {

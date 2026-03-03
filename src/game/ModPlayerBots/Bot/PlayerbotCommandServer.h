@@ -1,0 +1,6 @@
+#ifndef _PLAYERBOT_PLAYERBOTCOMMANDSERVER_H_SHIM
+#define _PLAYERBOT_PLAYERBOTCOMMANDSERVER_H_SHIM
+
+#include "Cmd/PlayerbotCommandServer.h"
+
+#endif

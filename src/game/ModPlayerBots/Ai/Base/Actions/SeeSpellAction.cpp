@@ -1,0 +1,198 @@
+/*
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
+ */
+
+#include "SeeSpellAction.h"
+
+#include "Event.h"
+#include "Formations.h"
+#include "PathGenerator.h"
+#include "Playerbots.h"
+#include "RTSCValues.h"
+#include "RtscAction.h"
+#include "PositionValue.h"
+#include "ByteBuffer.h"
+
+std::set<uint32> const FISHING_SPELLS = {7620, 7731, 7732, 18248, 33095, 51294};
+
+Creature* SeeSpellAction::CreateWps(Player* wpOwner, float x, float y, float z, float o, uint32 entry, Creature* lastWp,
+                                    bool important)
+{
+    float dist = wpOwner->GetDistance(x, y, z);
+    float delay = 1000.0f * dist / wpOwner->GetSpeed(MOVE_RUN) + sPlayerbotAIConfig.reactDelay;
+
+    if (!important)
+        delay *= 0.25;
+
+    Creature* wpCreature = wpOwner->SummonCreature(entry, x, y, z - 1, o, TEMPSUMMON_TIMED_DESPAWN, delay);
+    if (!important)
+        wpCreature->SetObjectScale(0.2f);
+
+    return wpCreature;
+}
+
+bool SeeSpellAction::Execute(Event event)
+{
+    // RTSC packet data
+    WorldPacket p(event.getPacket());
+    uint8 castCount;
+    uint32 spellId;
+    uint8 castFlags;
+
+    // check RTSC header size = castCount (uint8) + spellId (uint32) + castFlags (uint8)
+    uint32 const rtscHeaderSize = sizeof(uint8) + sizeof(uint32) + sizeof(uint8);
+    if (p.size() < rtscHeaderSize)
+    {
+        LOG_WARN("playerbots", "SeeSpellAction: Corrupt RTSC packet size={}, expected>={}", p.size(), rtscHeaderSize);
+        return false;
+    }
+
+    Player* master = botAI->GetMaster();
+    if (!master)
+        return false;
+
+    // read RTSC packet data
+    p.rpos(0); // set read position to start
+    p >> castCount >> spellId >> castFlags;
+
+    // if (!botAI->HasStrategy("RTSC", botAI->GetState()))
+    //     return false;
+
+    if (FISHING_SPELLS.find(spellId) != FISHING_SPELLS.end())
+    {
+        if (AI_VALUE(bool, "can fish") && sPlayerbotAIConfig.enableFishingWithMaster)
+        {
+            botAI->ChangeStrategy("+master fishing", BOT_STATE_NON_COMBAT);
+            return true;
+        }
+        return false;
+    }
+
+    if (spellId != RTSC_MOVE_SPELL)
+        return false;
+
+    // should not throw exception,just defensive measure to prevent any crashes when core function breaks.
+    SpellCastTargets targets;
+    try
+    {
+        targets.read(p, master);
+        float destX, destY, destZ;
+        targets.getDestination(destX, destY, destZ);
+        if (destX == 0.0f && destY == 0.0f && destZ == 0.0f)
+        {
+            // do not dereference a null destination; ignore malformed RTSC packets instead of crashing
+            LOG_WARN("playerbots", "SeeSpellAction: (malformed) RTSC payload does not contain full targets data");
+            return false;
+        }
+    }
+    catch (ByteBufferException const&)
+    {
+        // ignore malformed RTSC packets instead of crashing
+        LOG_WARN("playerbots", "SeeSpellAction: Failed deserialization (malformed) RTSC payload");
+        return false;
+    }
+
+    float destX, destY, destZ;
+    targets.getDestination(destX, destY, destZ);
+    WorldPosition spellPosition(master->GetMapId(), Position(destX, destY, destZ));
+    SET_AI_VALUE(WorldPosition, "see spell location", spellPosition);
+
+    bool selected = AI_VALUE(bool, "RTSC selected");
+    bool inRange = spellPosition.distance(bot) <= 10;
+    std::string const nextAction = AI_VALUE(std::string, "RTSC next spell action");
+
+    if (nextAction.empty())
+    {
+        if (!inRange && selected)
+            master->SendPlaySpellVisualKit(6372);
+        else if (inRange && !selected)
+            master->SendPlaySpellVisualKit(5036);
+
+        SET_AI_VALUE(bool, "RTSC selected", inRange);
+
+        if (selected)
+            return MoveToSpell(spellPosition);
+
+        return inRange;
+    }
+    else if (nextAction == "move")
+    {
+        return MoveToSpell(spellPosition);
+    }
+    else if (nextAction.find("save ") != std::string::npos)
+    {
+        std::string locationName;
+        if (nextAction.find("save selected ") != std::string::npos)
+        {
+            if (!selected)
+                return false;
+
+            locationName = nextAction.substr(14);
+        }
+        else
+            locationName = nextAction.substr(5);
+
+        SetFormationOffset(spellPosition);
+
+        SET_AI_VALUE2(WorldPosition, "RTSC saved location", locationName, spellPosition);
+
+        Creature* wpCreature =
+            bot->SummonCreature(15631, spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(),
+                                spellPosition.getO(), TEMPSUMMON_TIMED_DESPAWN, 2000.0f);
+        wpCreature->SetObjectScale(0.5f);
+        RESET_AI_VALUE(std::string, "RTSC next spell action");
+
+        return true;
+    }
+
+    return false;
+}
+
+bool SeeSpellAction::SelectSpell(WorldPosition& spellPosition)
+{
+    Player* master = botAI->GetMaster();
+    if (spellPosition.distance(bot) <= 5 || AI_VALUE(bool, "RTSC selected"))
+    {
+        SET_AI_VALUE(bool, "RTSC selected", true);
+        master->SendPlaySpellVisualKit(5036);
+    }
+
+    return true;
+}
+
+bool SeeSpellAction::MoveToSpell(WorldPosition& spellPosition, bool inFormation)
+{
+    if (inFormation)
+        SetFormationOffset(spellPosition);
+
+    if (botAI->HasStrategy("stay", botAI->GetState()))
+    {
+        PositionMap& posMap = AI_VALUE(PositionMap&, "position");
+        PositionInfo stayPosition = posMap["stay"];
+
+        stayPosition.Set(spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(), spellPosition.getMapId());
+        posMap["stay"] = stayPosition;
+    }
+
+    if (bot->IsWithinLOS(spellPosition.getX(), spellPosition.getY(), spellPosition.getZ()))
+        return MoveNear(spellPosition.getMapId(), spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(), 0);
+
+    return MoveTo(spellPosition.getMapId(), spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(), false,
+                  false);
+}
+
+void SeeSpellAction::SetFormationOffset(WorldPosition& spellPosition)
+{
+    Player* master = botAI->GetMaster();
+
+    Formation* formation = AI_VALUE(Formation*, "formation");
+
+    WorldLocation formationLocation = formation->GetLocation();
+
+    if (formationLocation.GetPositionX() != 0 || formationLocation.GetPositionY() != 0)
+    {
+        spellPosition -= WorldPosition(master);
+        spellPosition += formationLocation;
+    }
+}

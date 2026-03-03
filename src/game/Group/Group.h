@@ -229,6 +229,8 @@ class Group
         bool IsFull() const { return (m_groupType==GROUPTYPE_NORMAL) ? (m_memberSlots.size()>=MAX_GROUP_SIZE) : (m_memberSlots.size()>=MAX_RAID_SIZE); }
         bool isRaidGroup() const { return m_groupType==GROUPTYPE_RAID; }
         bool isBGGroup()   const { return m_bgGroup != nullptr; }
+        bool isLFGGroup()  const { return false; } // Vanilla: LFG system not available
+        bool isBFGroup()   const { return false; } // Vanilla: Battlefield system not available
         bool IsCreated()   const { return GetMembersCount() > 0; }
         ObjectGuid GetLeaderGuid() const { return m_leaderGuid; }
         char const*  GetLeaderName() const { return m_leaderName.c_str(); }
@@ -319,7 +321,9 @@ class Group
         }
 
         ObjectGuid GetTargetWithIcon(RaidTargetIcon id) const { return m_targetIcons[id]; }
+        ObjectGuid GetTargetIcon(uint8 id) const { return m_targetIcons[id]; }
         void SetTargetIcon(uint8 id, ObjectGuid targetGuid);
+        void SetTargetIcon(uint8 id, ObjectGuid /*sourceGuid*/, ObjectGuid targetGuid) { SetTargetIcon(id, targetGuid); }
         void ClearTargetIcon(ObjectGuid targetGuid);
         bool InCombatToInstance(uint32 instanceId);
         void ResetInstances(InstanceResetMethod method, Player* SendMsgTo);
