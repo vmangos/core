@@ -21,7 +21,7 @@
 #include "Config/Config.h"
 #include "DatabaseEnv.h"
 #include "GuildTaskMgr.h"
-#include "PlayerScript.h"
+#include "ScriptCompat.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotGuildMgr.h"
 #include "PlayerbotSpellRepository.h"
@@ -29,6 +29,7 @@
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
 #include "PlayerbotCommandScript.h"
+#include "../Ai/Base/Actions/BattleGroundTactics.h"
 #include "cmath"
 
 class PlayerbotsDatabaseScript
@@ -73,7 +74,7 @@ public:
 
     void OnPlayerLogin(Player* player) override
     {
-        if (!player->GetSession()->IsBot())
+        if (!player->IsBot())
         {
             PlayerbotsMgr::instance().AddPlayerbotData(player, false);
             sRandomPlayerbotMgr.OnPlayerLogin(player);
@@ -96,8 +97,8 @@ public:
                 roundedTime = roundedTime.substr(0, roundedTime.find('.') + 2);
 
                 ChatHandler(player->GetSession()).SendSysMessage(
-                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '"
-                    + roundedTime + "' minutes.");
+                    (std::string("|cff00ff00Playerbots:|r bot initialization at server startup takes about '")
+                    + roundedTime + "' minutes.").c_str());
             }
         }
     }
@@ -260,6 +261,8 @@ public:
         return true;
     }
 
+    // Achievements not supported in Vanilla - disabled
+    /*
     bool OnPlayerBeforeAchievementComplete(Player* player, AchievementEntry const* achievement) override
     {
         if ((sRandomPlayerbotMgr.IsRandomBot(player) || sRandomPlayerbotMgr.IsAddclassBot(player)) &&
@@ -270,6 +273,7 @@ public:
 
         return true;
     }
+    */
 
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
     {
@@ -278,7 +282,7 @@ public:
             return;
 
         // no XP multiplier, when player is no bot.
-        if (!player->GetSession()->IsBot() || !sRandomPlayerbotMgr.IsRandomBot(player))
+        if (!player->IsBot() || !sRandomPlayerbotMgr.IsRandomBot(player))
             return;
 
         // no XP multiplier, when bot is in a group with a real player.
@@ -292,7 +296,7 @@ public:
                     continue;
                 }
 
-                if (!member->GetSession()->IsBot())
+                if (!member->IsBot())
                 {
                     return;
                 }
@@ -392,6 +396,8 @@ class PlayerbotsScript : public PlayerbotScript
 public:
     PlayerbotsScript() : PlayerbotScript("PlayerbotsScript") {}
 
+    // LFG not supported in Vanilla - disabled
+    /*
     bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList) override
     {
         bool nonBotFound = false;
@@ -408,6 +414,11 @@ public:
         }
 
         return nonBotFound;
+    }
+    */
+    bool OnPlayerbotCheckLFGQueue(int32 /*dummy*/) override
+    {
+        return true;
     }
 
     void OnPlayerbotCheckKillTask(Player* player, Unit* victim) override
@@ -529,7 +540,7 @@ public:
         bgStrategies[bg->GetInstanceID()] = data;
     }
 
-    void OnBattlegroundEnd(Battleground* bg, TeamId /*winnerTeam*/) override { bgStrategies.erase(bg->GetInstanceID()); }
+    void OnBattlegroundEnd(Battleground* bg, uint32 /*winnerTeam*/) override { bgStrategies.erase(bg->GetInstanceID()); }
 };
 
 void AddPlayerbotsSecureLoginScripts();

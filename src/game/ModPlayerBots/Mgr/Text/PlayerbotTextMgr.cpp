@@ -78,13 +78,13 @@ std::string PlayerbotTextMgr::GetBotText(std::string name)
 {
     if (botTexts.empty())
     {
-        LOG_ERROR("playerbots", "Can't get bot text {}! No bots texts loaded!", name);
+        LOG_ERROR("playerbots", "Can't get bot text {}! No bots texts loaded!", name.c_str());
         return "";
     }
 
     if (botTexts[name].empty())
     {
-        LOG_ERROR("playerbots", "Can't get bot text {}! No bots texts for this name!", name);
+        LOG_ERROR("playerbots", "Can't get bot text {}! No bots texts for this name!", name.c_str());
         return "";
     }
 

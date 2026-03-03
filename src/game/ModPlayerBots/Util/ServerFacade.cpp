@@ -10,8 +10,8 @@
 
 float ServerFacade::GetDistance2d(Unit* unit, WorldObject* wo)
 {
-    ASSERT_NOTNULL(unit);
-    ASSERT_NOTNULL(wo);
+    if (!unit || !wo)
+        return 0.0f;
 
     float dist = unit->GetDistance2d(wo);
     return std::round(dist * 10.0f) / 10.0f;
@@ -53,7 +53,7 @@ void ServerFacade::SetFacingTo(Player* bot, WorldObject* wo, bool force)
     bot->SetOrientation(angle);
 
     if (!bot->IsRooted())
-        bot->SendMovementFlagUpdate();
+        bot->SendMovementPacket(MSG_MOVE_HEARTBEAT, false);
     // }
 }
 

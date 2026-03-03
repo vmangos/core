@@ -3983,7 +3983,7 @@ void PlayerbotFactory::InitGuild()
     if (!guild)
     {
         if (!PlayerbotGuildMgr::instance().CreateGuild(bot, guildName))
-            LOG_ERROR("playerbots","Failed to create guild {} for bot {}", guildName, bot->GetName());
+            LOG_ERROR("playerbots","Failed to create guild {} for bot {}", guildName.c_str(), bot->GetName());
         return;
     }
     else
@@ -3991,7 +3991,7 @@ void PlayerbotFactory::InitGuild()
         if (guild->AddMember(bot->GetGUID(), urand(GR_OFFICER, GR_INITIATE)) == GuildAddStatus::OK)
             PlayerbotGuildMgr::instance().OnGuildUpdate(guild);
         else
-            LOG_ERROR("playerbots","Bot {} failed to join guild {}.", bot->GetName(), guildName);
+            LOG_ERROR("playerbots","Bot {} failed to join guild {}.", bot->GetName(), guildName.c_str());
     }
     // add guild tabard
     if (bot->GetGuildId() && bot->GetLevel() > 9 && urand(0, 4) && !bot->HasItemCount(5976, 1))

@@ -71,7 +71,7 @@ void ReleaseSpiritAction::LogRelease(const std::string& releaseMsg, bool isAutoR
 
     LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> {}",
         LOG_GUID(bot->GetGUID()),
-        teamPrefix,
+        teamPrefix.c_str(),
         bot->GetLevel(),
         bot->GetName(),
         releaseMsg.c_str());

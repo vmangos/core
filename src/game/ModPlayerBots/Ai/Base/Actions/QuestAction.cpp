@@ -155,7 +155,7 @@ bool QuestAction::CompleteQuest(Player* player, uint32 entry)
     const std::string text_quest = ChatHelper::FormatQuest(pQuest);
     if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
-        LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), pQuest->GetTitle());
+        LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), pQuest->GetTitle().c_str());
         std::string say_msg = "Quest [ " + text_quest + " ] completed";
         bot->Say(say_msg.c_str(), LANG_UNIVERSAL);
     }
@@ -368,7 +368,7 @@ bool QuestUpdateAddItemAction::Execute(Event event)
             {
                 const auto text = PlayerbotTextMgr::instance().GetBotText("%quest_link - %item_link %quest_obj_available/%quest_obj_required", placeholders);
                 botAI->Say(text);
-                LOG_INFO("playerbots", "{} => {}", bot->GetName(), text);
+                LOG_INFO("playerbots", "{} => {}", bot->GetName(), text.c_str());
             }
 
             BroadcastHelper::BroadcastQuestUpdateAddItem(botAI, bot, pair.first, availableItemsCount, requiredItemsCount, itemPrototype);

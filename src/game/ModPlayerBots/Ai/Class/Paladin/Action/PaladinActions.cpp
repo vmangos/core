@@ -374,7 +374,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     }
 
     bool ok = botAI->CastSpell(castName, target);
-    LOG_DEBUG("playerbots", "[Sanct] Cast {} on {} result={}", castName, target->GetName(), ok);
+    LOG_DEBUG("playerbots", "[Sanct] Cast {} on {} result={}", castName.c_str(), target->GetName(), ok);
     return ok;
 }
 

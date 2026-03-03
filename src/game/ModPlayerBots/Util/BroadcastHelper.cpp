@@ -492,7 +492,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* ai, Player* bot, Creature *crea
     }
     else
     {
-        switch (creature->GetCreatureTemplate()->rank)
+        switch (creature->GetCreatureInfo()->rank)
         {
             case CREATURE_ELITE_NORMAL:
                 if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillNormal)
@@ -544,16 +544,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* ai, Player* bot, Creature *crea
                     );
                 }
                 break;
-            case CREATURE_UNKNOWN:
-                if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillUnknown)
-                {
-                    return BroadcastToChannelWithGlobalChance(
-                        ai,
-                        PlayerbotTextMgr::instance().GetBotText("broadcast_killed_unknown", placeholders),
-                        { {TO_GUILD, 50}, {TO_WORLD, 50}, {TO_GENERAL, 100} }
-                    );
-                }
-                break;
+            // CREATURE_UNKNOWN not supported in Vanilla - use default instead
             default:
                 break;
         }
