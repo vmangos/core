@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20260303150410');
 -- Add your query below.
 
 -- Pool Mountain Silversage in Western Plaguelands
-SET @PTEMPLATE = 1221;
+SET @PTEMPLATE = 1220;
 -- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Group 1
 DELETE FROM `pool_gameobject` WHERE `guid` IN (66836, 68770, 68769, 66832, 68767, 593);
