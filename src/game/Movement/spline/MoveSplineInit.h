@@ -22,6 +22,7 @@
 #include "MoveSplineInitArgs.h"
 #include "PathFinder.h"
 #include "MotionMaster.h"
+#include "UnitDefines.h"
 
 class Unit;
 

@@ -29,6 +29,7 @@
 #include "WaypointManager.h"
 #include "CreatureGroups.h"
 #include "Player.h"
+#include "MoveSplineInitArgs.h"
 
 #include <vector>
 #include <set>
