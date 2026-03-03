@@ -3786,6 +3786,21 @@ bool PlayerbotAI::CanCastVehicleSpell(uint32 spellId, Unit* target)
 
     return false;
 }
+#else
+bool PlayerbotAI::CanCastVehicleSpell(uint32 /*spellId*/, Unit* /*target*/)
+{
+    return false;
+}
+
+bool PlayerbotAI::CastVehicleSpell(uint32 /*spellId*/, Unit* /*target*/)
+{
+    return false;
+}
+
+bool PlayerbotAI::IsInVehicle(bool /*canControl*/, bool /*canCast*/, bool /*canAttack*/, bool /*canTurn*/, bool /*fixed*/)
+{
+    return false;
+}
 #endif // PB_HAS_VEHICLES
 
 #if PB_HAS_VEHICLES
@@ -6234,6 +6249,11 @@ uint8 PlayerbotAI::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool sw
 }
 */
 // End of commented-out FindEquipSlot implementation
+
+uint8 PlayerbotAI::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const
+{
+    return bot->FindEquipSlot(proto, slot, swap);
+}
 
 bool PlayerbotAI::IsSafe(Player* player)
 {

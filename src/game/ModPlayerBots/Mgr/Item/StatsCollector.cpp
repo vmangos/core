@@ -39,9 +39,11 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
     }
     stats[STATS_TYPE_ARMOR] += proto->Armor;
     stats[STATS_TYPE_BLOCK_VALUE] += proto->Block;
-    for (int i = 0; i < proto->StatsCount; i++)
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
     {
         const _ItemStat& stat = proto->ItemStat[i];
+        if (!stat.ItemStatValue)
+            continue;
         const int32& val = stat.ItemStatValue;
         CollectByItemStatType(stat.ItemStatType, val);
     }
@@ -69,11 +71,7 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
         }
     }
 
-    if (proto->socketBonus)
-    {
-        if (const SpellItemEnchantmentEntry* enchant = sSpellItemEnchantmentStore.LookupEntry(proto->socketBonus))
-            CollectEnchantStats(enchant);
-    }
+    // Socket bonus is not available in vanilla ItemPrototype.
 }
 
 void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, int32 spellCooldown)
@@ -208,7 +206,7 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, int32 s
 
 void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchant, uint32 default_enchant_amount)
 {
-    for (int s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
+    for (int s = 0; s < 3; ++s)
     {
         uint32 enchant_display_type = enchant->type[s];
         uint32 enchant_amount = enchant->amount[s];
@@ -362,13 +360,24 @@ bool StatsCollector::CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 pro
     if (eventEntry)
     {
         spellFamilyName = eventEntry->spellFamilyName;
-        flag96 spellFamilyMask = eventEntry->spellFamilyMask;
+        flag96 spellFamilyMask = eventEntry->spellFamilyMask[0] | eventEntry->spellFamilyMask[1] |
+                                 eventEntry->spellFamilyMask[2];
         if (spellFamilyName != 0)
         {
             if (!CheckSpellValidation(spellFamilyName, spellFamilyMask, strict))
                 return false;
         }
     }
+
+    constexpr uint32 TAKEN_HIT_PROC_FLAG_MASK =
+        PROC_FLAG_TAKE_MELEE_SWING | PROC_FLAG_TAKE_MELEE_ABILITY | PROC_FLAG_TAKE_RANGED_ATTACK |
+        PROC_FLAG_TAKE_RANGED_ABILITY | PROC_FLAG_TAKE_HARMFUL_ABILITY | PROC_FLAG_TAKE_HARMFUL_SPELL |
+        PROC_FLAG_TAKE_HARMFUL_PERIODIC | PROC_FLAG_TAKEN_ANY_DAMAGE;
+    constexpr uint32 MELEE_PROC_FLAG_MASK = PROC_FLAG_DEAL_MELEE_SWING | PROC_FLAG_DEAL_MELEE_ABILITY;
+    constexpr uint32 RANGED_PROC_FLAG_MASK = PROC_FLAG_DEAL_RANGED_ATTACK | PROC_FLAG_DEAL_RANGED_ABILITY;
+    constexpr uint32 SPELL_PROC_FLAG_MASK = PROC_FLAG_DEAL_HELPFUL_ABILITY | PROC_FLAG_DEAL_HARMFUL_ABILITY |
+                                            PROC_FLAG_DEAL_HELPFUL_SPELL | PROC_FLAG_DEAL_HARMFUL_SPELL;
+    constexpr uint32 PERIODIC_PROC_FLAG_MASK = PROC_FLAG_DEAL_HARMFUL_PERIODIC | PROC_FLAG_TAKE_HARMFUL_PERIODIC;
 
     uint32 triggerMask = TAKEN_HIT_PROC_FLAG_MASK;  // Generic trigger mask
     switch (type_)
@@ -377,7 +386,7 @@ bool StatsCollector::CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 pro
         {
             triggerMask |= MELEE_PROC_FLAG_MASK;
             triggerMask |= SPELL_PROC_FLAG_MASK;
-            triggerMask |= PROC_FLAG_DONE_PERIODIC;
+            triggerMask |= PROC_FLAG_DEAL_HARMFUL_PERIODIC;
             if (procFlags & triggerMask)
                 return true;
             break;
@@ -395,7 +404,7 @@ bool StatsCollector::CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 pro
         {
             triggerMask |= RANGED_PROC_FLAG_MASK;
             triggerMask |= SPELL_PROC_FLAG_MASK;
-            triggerMask |= PROC_FLAG_DONE_PERIODIC;
+            triggerMask |= PROC_FLAG_DEAL_HARMFUL_PERIODIC;
             if (procFlags & triggerMask)
                 return true;
             break;
@@ -403,10 +412,7 @@ bool StatsCollector::CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 pro
         case CollectorType::SPELL_DMG:
         {
             triggerMask |= SPELL_PROC_FLAG_MASK;
-            triggerMask |= PROC_FLAG_DONE_PERIODIC;
-            // Healing spell cannot trigger
-            triggerMask &= ~PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS;
-            triggerMask &= ~PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS;
+            triggerMask |= PROC_FLAG_DEAL_HARMFUL_PERIODIC;
             if (procFlags & triggerMask)
                 return true;
             break;
@@ -414,13 +420,10 @@ bool StatsCollector::CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 pro
         case CollectorType::SPELL_HEAL:
         {
             triggerMask |= SPELL_PROC_FLAG_MASK;
-            triggerMask |= PROC_FLAG_DONE_PERIODIC;
-            // Dmg spell should not trigger
-            triggerMask &= ~PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG;
-            triggerMask &= ~PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG;
+            triggerMask |= PROC_FLAG_DEAL_HARMFUL_PERIODIC;
             if (!spellFamilyName)
                 triggerMask &=
-                    ~PROC_FLAG_DONE_PERIODIC;  // spellFamilyName = 0 and PROC_FLAG_DONE_PERIODIC -> it is a dmg spell
+                    ~PROC_FLAG_DEAL_HARMFUL_PERIODIC;  // spellFamilyName = 0 and periodic-only trigger tends to be damage spell
             if (procFlags & triggerMask)
                 return true;
             break;
@@ -456,97 +459,153 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
         case ITEM_MOD_STAMINA:
             stats[STATS_TYPE_STAMINA] += val;
             break;
+#ifdef ITEM_MOD_DEFENSE_SKILL_RATING
         case ITEM_MOD_DEFENSE_SKILL_RATING:
             stats[STATS_TYPE_DEFENSE] += val;
             break;
+#endif
+#ifdef ITEM_MOD_DODGE_RATING
         case ITEM_MOD_DODGE_RATING:
             stats[STATS_TYPE_DODGE] += val;
             break;
+#endif
+#ifdef ITEM_MOD_PARRY_RATING
         case ITEM_MOD_PARRY_RATING:
             stats[STATS_TYPE_PARRY] += val;
             break;
+#endif
+#ifdef ITEM_MOD_BLOCK_RATING
         case ITEM_MOD_BLOCK_RATING:
             stats[STATS_TYPE_BLOCK_RATING] += val;
             break;
+#endif
+#ifdef ITEM_MOD_HIT_MELEE_RATING
         case ITEM_MOD_HIT_MELEE_RATING:
             if (type_ & CollectorType::MELEE)
                 stats[STATS_TYPE_HIT] += val;
             break;
+#endif
+#ifdef ITEM_MOD_HIT_RANGED_RATING
         case ITEM_MOD_HIT_RANGED_RATING:
             if (type_ & CollectorType::RANGED)
                 stats[STATS_TYPE_HIT] += val;
             break;
+#endif
+#ifdef ITEM_MOD_HIT_SPELL_RATING
         case ITEM_MOD_HIT_SPELL_RATING:
             if (type_ & CollectorType::SPELL)
                 stats[STATS_TYPE_HIT] += val;
             break;
+#endif
+#ifdef ITEM_MOD_CRIT_MELEE_RATING
         case ITEM_MOD_CRIT_MELEE_RATING:
             if (type_ & CollectorType::MELEE)
                 stats[STATS_TYPE_CRIT] += val;
             break;
+#endif
+#ifdef ITEM_MOD_CRIT_RANGED_RATING
         case ITEM_MOD_CRIT_RANGED_RATING:
             if (type_ & CollectorType::RANGED)
                 stats[STATS_TYPE_CRIT] += val;
             break;
+#endif
+#ifdef ITEM_MOD_CRIT_SPELL_RATING
         case ITEM_MOD_CRIT_SPELL_RATING:
             if (type_ & CollectorType::SPELL)
                 stats[STATS_TYPE_CRIT] += val;
             break;
+#endif
+#ifdef ITEM_MOD_HASTE_MELEE_RATING
         case ITEM_MOD_HASTE_MELEE_RATING:
             if (type_ & CollectorType::MELEE)
                 stats[STATS_TYPE_HASTE] += val;
             break;
+#endif
+#ifdef ITEM_MOD_HASTE_RANGED_RATING
         case ITEM_MOD_HASTE_RANGED_RATING:
             if (type_ & CollectorType::RANGED)
                 stats[STATS_TYPE_HASTE] += val;
             break;
+#endif
+#ifdef ITEM_MOD_HASTE_SPELL_RATING
         case ITEM_MOD_HASTE_SPELL_RATING:
             if (type_ & CollectorType::SPELL)
                 stats[STATS_TYPE_HASTE] += val;
             break;
+#endif
+#ifdef ITEM_MOD_HIT_RATING
         case ITEM_MOD_HIT_RATING:
             stats[STATS_TYPE_HIT] += val;
             break;
+#endif
+#ifdef ITEM_MOD_CRIT_RATING
         case ITEM_MOD_CRIT_RATING:
             stats[STATS_TYPE_CRIT] += val;
             break;
+#endif
+#ifdef ITEM_MOD_RESILIENCE_RATING
         case ITEM_MOD_RESILIENCE_RATING:
             stats[STATS_TYPE_RESILIENCE] += val;
             break;
+#endif
+#ifdef ITEM_MOD_HASTE_RATING
         case ITEM_MOD_HASTE_RATING:
             stats[STATS_TYPE_HASTE] += val;
             break;
+#endif
+#ifdef ITEM_MOD_EXPERTISE_RATING
         case ITEM_MOD_EXPERTISE_RATING:
             stats[STATS_TYPE_EXPERTISE] += val;
             break;
+#endif
+#ifdef ITEM_MOD_ATTACK_POWER
         case ITEM_MOD_ATTACK_POWER:
             stats[STATS_TYPE_ATTACK_POWER] += val;
             break;
+#endif
+#ifdef ITEM_MOD_RANGED_ATTACK_POWER
         case ITEM_MOD_RANGED_ATTACK_POWER:
             if (type_ == CollectorType::RANGED)
                 stats[STATS_TYPE_ATTACK_POWER] += val;
             break;
+#endif
+#ifdef ITEM_MOD_MANA_REGENERATION
         case ITEM_MOD_MANA_REGENERATION:
             stats[STATS_TYPE_MANA_REGENERATION] += val;
             break;
+#endif
+#ifdef ITEM_MOD_ARMOR_PENETRATION_RATING
         case ITEM_MOD_ARMOR_PENETRATION_RATING:
             stats[STATS_TYPE_ARMOR_PENETRATION] += val;
             break;
+#endif
+#ifdef ITEM_MOD_SPELL_POWER
         case ITEM_MOD_SPELL_POWER:
             stats[STATS_TYPE_SPELL_POWER] += val;
             stats[STATS_TYPE_HEAL_POWER] += val;
             break;
+#endif
+#ifdef ITEM_MOD_HEALTH_REGEN
         case ITEM_MOD_HEALTH_REGEN:
             stats[STATS_TYPE_HEALTH_REGENERATION] += val;
             break;
+#endif
+#ifdef ITEM_MOD_SPELL_PENETRATION
         case ITEM_MOD_SPELL_PENETRATION:
             stats[STATS_TYPE_SPELL_PENETRATION] += val;
             break;
+#endif
+#ifdef ITEM_MOD_BLOCK_VALUE
         case ITEM_MOD_BLOCK_VALUE:
             stats[STATS_TYPE_BLOCK_VALUE] += val;
             break;
+#endif
+#ifdef ITEM_MOD_SPELL_HEALING_DONE
         case ITEM_MOD_SPELL_HEALING_DONE:  // deprecated
+#endif
+#ifdef ITEM_MOD_SPELL_DAMAGE_DONE
         case ITEM_MOD_SPELL_DAMAGE_DONE:   // deprecated
+#endif
         default:
             break;
     }

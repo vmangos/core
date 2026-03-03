@@ -700,21 +700,31 @@ list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Raid/VaultOfAr
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Raid/Ulduar/.*\\.cpp$")
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Raid/Icecrown/.*\\.cpp$")
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Raid/EyeOfEternity/.*\\.cpp$")
-# Phase 6: Exclude GuildTaskMgr for faster green build (has deep DB/mail/guild API drift)
+
+# Keep Trinity-only guild task implementation excluded in Vanilla build.
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Guild/GuildTaskMgr\\.cpp$")
 
-# Phase 6.1: Exclude Item managers with heavy TBC/WotLK API drift while porting core bot runtime.
-list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Item/StatsCollector\\.cpp$")
+# Keep Trinity-only random item manager implementation excluded in Vanilla build.
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Item/RandomItemMgr\\.cpp$")
-list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Item/LootObjectStack\\.cpp$")
+
+# Legacy PlayerBots chat command handlers and manager implementation.
+file(GLOB PLAYERBOTS_LEGACY_SRCS
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBots/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBots/*.h
+)
 
 # Add ModPlayerBots sources to game_SRCS
 list(APPEND game_SRCS ${MODPLAYERBOTS_SRCS})
+list(APPEND game_SRCS ${PLAYERBOTS_LEGACY_SRCS})
 
 # Add PlayerBotsCompat stubs that need compilation
 set(PLAYERBOTS_COMPAT_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/GameGraveyard.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/ModPlayerBotsActionStubs.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/PlayerbotCommandServerStub.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/PlayerBotMgrCompat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/GuildTaskMgrCompat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/RandomItemMgrCompat.cpp
 )
 list(APPEND game_SRCS ${PLAYERBOTS_COMPAT_SRCS})
 

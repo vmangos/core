@@ -8,6 +8,7 @@
 class Player;
 class WorldPacket;
 
+#if !defined(MANGOS_PLAYERBOTAI_H)
 class PlayerBotAI
 {
 public:
@@ -17,7 +18,9 @@ public:
     virtual void OnPacketReceived(const WorldPacket* packet) {}
     virtual void Remove() {}
 };
+#endif
 
+#if !defined(_PLAYERBOTMGR_H)
 enum PlayerBotState
 {
     PB_STATE_OFFLINE,
@@ -27,18 +30,18 @@ enum PlayerBotState
 
 struct PlayerBotEntry
 {
-    uint64 playerGUID;
+    uint64_t playerGUID;
     std::string name;
-    uint32 accountId;
+    uint32_t accountId;
 
-    uint32 chance;
-    uint8 state;
+    uint32_t chance;
+    uint8_t state;
     bool isChatBot;
     bool customBot;
     bool requestRemoval;
     std::unique_ptr<PlayerBotAI> ai;
 
-    PlayerBotEntry(uint64 guid, uint32 account, uint32 chance_)
+    PlayerBotEntry(uint64_t guid, uint32_t account, uint32_t chance_)
         : playerGUID(guid), accountId(account), chance(chance_), state(PB_STATE_OFFLINE), isChatBot(false), customBot(false), requestRemoval(false), ai(nullptr)
     {}
 
@@ -46,5 +49,6 @@ struct PlayerBotEntry
         : playerGUID(0), accountId(0), chance(100), state(PB_STATE_OFFLINE), isChatBot(false), customBot(false), requestRemoval(false), ai(nullptr)
     {}
 };
+#endif
 
 #endif // _PLAYERBOTS_STUBS_H

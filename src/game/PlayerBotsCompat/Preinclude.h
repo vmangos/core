@@ -263,7 +263,7 @@ typedef GenericTransport Transport; // vMaNGOS uses GenericTransport, Trinity us
 #undef sObjectMgr
 #define sObjectMgr MaNGOS::Singleton<ObjectMgr>::Instance()
 #undef sSpellMgr
-#define sSpellMgr MaNGOS::Singleton<SpellMgr>::Instance()
+#define sSpellMgr SpellMgr::Instance()
 
 // Battleground naming: Battleground vs BattleGround
 #define BattlegroundWS BattleGroundWS
@@ -437,7 +437,7 @@ struct PB_AreaTableStoreStub {
         return PB_GetAreaEntry(id);
     }
 };
-PB_AreaTableStoreStub sAreaTableStore;
+static PB_AreaTableStoreStub sAreaTableStore;
 
 // Stub for sTaxiNodesStore - vMaNGOS uses ObjectMgr::GetTaxiNodeEntry instead
 inline TaxiNodesEntry const* PB_GetTaxiNodeEntry(uint32 nodeId)
@@ -455,7 +455,7 @@ struct PB_TaxiNodesStoreStub {
         return sObjectMgr.GetMaxTaxiNodeId();
     }
 };
-PB_TaxiNodesStoreStub sTaxiNodesStore;
+static PB_TaxiNodesStoreStub sTaxiNodesStore;
 
 // Aura interrupt flags that don't exist in Vanilla
 #ifndef AURA_INTERRUPT_FLAG_TELEPORTED

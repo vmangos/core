@@ -63,14 +63,14 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
         return;
     }
     Creature* creature = botAI->GetCreature(lootGUID);
-    if (creature && creature->getDeathState() == DeathState::Corpse)
+    if (creature && creature->GetDeathState() == CORPSE)
     {
         if (creature->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE))
             guid = lootGUID;
 
         if (creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
         {
-            skillId = creature->GetCreatureTemplate()->GetRequiredLootSkill();
+            skillId = SKILL_SKINNING;
             uint32 targetLevel = creature->GetLevel();
             reqSkillValue = targetLevel < 10 ? 1 : targetLevel < 20 ? (targetLevel - 10) * 10 : targetLevel * 5;
             if (botAI->HasSkill((SkillType)skillId) && bot->GetSkillValue(skillId) >= reqSkillValue)
@@ -86,33 +86,8 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
         bool onlyHasQuestItems = true;
         bool hasAnyQuestItems = false;
 
-        GameObjectQuestItemList const* items = sObjectMgr.GetGameObjectQuestItemList(go->GetEntry());
-        for (size_t i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; i++)
-        {
-            if (!items || i >= items->size())
-                break;
-
-            uint32 itemId = uint32((*items)[i]);
-            if (!itemId)
-                continue;
-
-            hasAnyQuestItems = true;
-
-            if (IsNeededForQuest(bot, itemId))
-            {
-                this->guid = lootGUID;
-                return;
-            }
-
-            const ItemTemplate* proto = sObjectMgr.GetItemTemplate(itemId);
-            if (!proto)
-                continue;
-
-            if (proto->Class != ITEM_CLASS_QUEST)
-            {
-                onlyHasQuestItems = false;
-            }
-        }
+        // vMaNGOS does not expose Trinity's gameobject quest-item list API.
+        // Quest-only filtering is handled by loot template checks below.
 
         // Retrieve the correct loot table entry
         uint32 lootEntry = go->GetGOInfo()->GetLootId();
@@ -122,8 +97,8 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
         // Check the main loot template
         if (const LootTemplate* lootTemplate = LootTemplates_Gameobject.GetLootFor(lootEntry))
         {
-            Loot loot;
-            lootTemplate->Process(loot, LootTemplates_Gameobject, 1, bot);
+            Loot loot(go);
+            lootTemplate->Process(loot, LootTemplates_Gameobject, true, 0);
 
             for (const LootItem& item : loot.items)
             {
@@ -144,8 +119,8 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
                 // If this item references another loot table, process it
                 if (const LootTemplate* refLootTemplate = LootTemplates_Reference.GetLootFor(itemId))
                 {
-                    Loot refLoot;
-                    refLootTemplate->Process(refLoot, LootTemplates_Reference, 1, bot);
+                    Loot refLoot(go);
+                    refLootTemplate->Process(refLoot, LootTemplates_Reference, true, 0);
 
                     for (const LootItem& refItem : refLoot.items)
                     {
@@ -222,7 +197,7 @@ bool LootObject::IsNeededForQuest(Player* bot, uint32 itemId)
             continue;
 
         QuestStatusData& qData = bot->getQuestStatusMap()[questId];
-        if (qData.Status != QUEST_STATUS_INCOMPLETE)
+        if (qData.m_status != QUEST_STATUS_INCOMPLETE)
             continue;
 
         Quest const* qInfo = sObjectMgr.GetQuestTemplate(questId);
@@ -254,7 +229,7 @@ WorldObject* LootObject::GetWorldObject(Player* bot)
         return nullptr;
     }
     Creature* creature = botAI->GetCreature(guid);
-    if (creature && creature->getDeathState() == DeathState::Corpse && creature->IsInWorld())
+    if (creature && creature->GetDeathState() == CORPSE && creature->IsInWorld())
         return creature;
 
     GameObject* go = botAI->GetGameObject(guid);
@@ -293,16 +268,16 @@ bool LootObject::IsLootPossible(Player* bot)
         return false;
 
     Creature* creature = botAI->GetCreature(guid);
-    if (creature && creature->getDeathState() == DeathState::Corpse)
+    if (creature && creature->GetDeathState() == CORPSE)
     {
-        if (!bot->isAllowedToLoot(creature) && skillId != SKILL_SKINNING)
+        if (!bot->IsAllowedToLoot(creature) && skillId != SKILL_SKINNING)
             return false;
     }
 
     // Prevent bot from running to chests that are unlootable (e.g. Gunship Armory before completing the event) or on
     // respawn time
     GameObject* go = botAI->GetGameObject(guid);
-    if (go && (go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE) || !go->isSpawned()))
+    if (go && (go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND) || !go->isSpawned()))
         return false;
 
     if (skillId == SKILL_NONE)
