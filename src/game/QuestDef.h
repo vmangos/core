@@ -386,10 +386,8 @@ struct QuestStatusData
 {
     QuestStatusData()
         : m_status(QUEST_STATUS_NONE),m_rewarded(false),
-        m_explored(false), m_timer(0), uState(QUEST_NEW), m_reward_choice(0)
+        m_explored(false), m_timer(0), uState(QUEST_NEW), m_reward_choice(0), m_itemcount{}, m_creatureOrGOcount{}
     {
-        memset(m_itemcount, 0, QUEST_OBJECTIVES_COUNT * sizeof(uint32));
-        memset(m_creatureOrGOcount, 0, QUEST_OBJECTIVES_COUNT * sizeof(uint32));
     }
 
     QuestStatus m_status;

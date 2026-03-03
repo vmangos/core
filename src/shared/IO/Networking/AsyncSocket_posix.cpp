@@ -494,14 +494,14 @@ void IO::Networking::AsyncSocket::OnIoEvent(uint32_t event)
     #error "Unsupported"
 #endif
 
-    if (m_atomicState.load(std::memory_order_relaxed) & SocketStateFlags::IGNORE_TRANSFERS)
-        return; // This is just an initial check, must be atomically checked in the handlers later.
-
     if (event == CALLBACK_EVENT_FLAG)
     {
         PerformContextSwitch();
         return;
     }
+
+    if (m_atomicState.load(std::memory_order_relaxed) & SocketStateFlags::IGNORE_TRANSFERS)
+        return; // This is just an initial check, must be atomically checked in the handlers later.
 
 #if defined(__linux__)
     if (event & EPOLLERR)

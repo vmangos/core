@@ -38,7 +38,6 @@ set (shared_SRCS
     Timer.h
     Util.h
     WheatyExceptionReport.h
-    WorldPacket.h
     Config/Config.h
     Config/ConfigEnv.h
     Crypto/BigNumber.h

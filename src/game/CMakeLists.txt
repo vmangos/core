@@ -46,7 +46,6 @@ set (game_SRCS
     UnitAuraProcHandler.cpp
     Weather.cpp
     World.cpp
-    WorldSession.cpp
     AI/BasicAI.cpp
     AI/CreatureAI.cpp
     AI/CreatureAIRegistry.cpp
@@ -196,11 +195,10 @@ set (game_SRCS
     PlayerBots/BattleBotWaypoints.cpp
     PlayerBots/PlayerBotAI.cpp
     PlayerBots/PlayerBotMgr.cpp
-    Protocol/Opcodes.cpp
-    Protocol/WorldSocket.h
-    Protocol/WorldSocket.cpp
-    Protocol/WorldSocketMgr.h
-    Protocol/WorldSocketMgr.cpp
+    Server/Protocol/Opcodes.cpp
+    Server/WorldSession.cpp
+    Server/WorldSocket.cpp
+    Server/WorldSocketMgr.cpp
     Spells/Spell.cpp
     Spells/SpellAuras.cpp
     Spells/SpellEffects.cpp
@@ -259,7 +257,6 @@ set (game_SRCS
     UnitEvents.h
     Weather.h
     World.h
-    WorldSession.h
     WorldStates.h
     AI/BasicAI.h
     AI/CreatureAI.h
@@ -421,7 +418,11 @@ set (game_SRCS
     PlayerBots/BattleBotWaypoints.h
     PlayerBots/PlayerBotAI.h
     PlayerBots/PlayerBotMgr.h
-    Protocol/Opcodes.h
+    Server/Protocol/Opcodes.h
+    Server/WorldPacket.h
+    Server/WorldSession.h
+    Server/WorldSocket.h
+    Server/WorldSocketMgr.h
     Spells/Spell.h
     Spells/SpellAuraDefines.h
     Spells/SpellAuras.h
@@ -504,7 +505,8 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/OutdoorPvP
   ${CMAKE_CURRENT_SOURCE_DIR}/PacketBroadcast
   ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBots
-  ${CMAKE_CURRENT_SOURCE_DIR}/Protocol
+  ${CMAKE_CURRENT_SOURCE_DIR}/Server
+  ${CMAKE_CURRENT_SOURCE_DIR}/Server/Protocol
   ${CMAKE_CURRENT_SOURCE_DIR}/Spells
   ${CMAKE_CURRENT_SOURCE_DIR}/Threat
   ${CMAKE_CURRENT_SOURCE_DIR}/Transports
@@ -601,15 +603,14 @@ if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
 else()
   if(USE_PCH)
       target_precompile_headers(game PRIVATE
-      Protocol/WorldSocket.h
+      Server/WorldSocket.h
       ../shared/Common.h
-
       Maps/MapManager.h
       ../shared/Log.h
       ObjectAccessor.h
       ObjectGuid.h
       Database/SQLStorages.h
-      Protocol/Opcodes.h
+      Server/Protocol/Opcodes.h
       SharedDefines.h
       Guild/GuildMgr.h
       ObjectMgr.h

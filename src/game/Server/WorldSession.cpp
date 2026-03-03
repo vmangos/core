@@ -19,10 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/** \file
-    \ingroup u2w
-*/
-
 #include "WorldSocket.h"
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
@@ -203,7 +199,7 @@ void WorldSession::SendMovementPacket(WorldPacket const* packet)
         SendPacketImpl(packet);
         return;
     }
-        
+
     std::lock_guard<std::mutex> guard(m_movementPacketCompressorMutex);
     if (m_movementPacketCompressor.CanAddPacket(*packet))
         m_movementPacketCompressor.AddPacket(*packet);
@@ -457,7 +453,7 @@ bool WorldSession::Update(PacketFilter& updater)
             m_movePacketsSentThisInterval = 0;
         }
 #endif
-        
+
         if (sWorld.getConfig(CONFIG_BOOL_LIMIT_PLAY_TIME) &&
             GetPlayer() && GetPlayer()->IsInWorld())
             CheckPlayedTimeLimit(currTime);
@@ -671,7 +667,7 @@ void WorldSession::LogoutPlayer(bool Save)
             _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_LEAVE_WORLD_CANCELS);
 
         }
-        
+
 
         if (_player->IsInLFG())
             sWorld.GetLFGQueue().GetMessager().AddMessage([playerGuid = _player->GetObjectGuid()](LFGQueue* queue)
@@ -1229,7 +1225,7 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
 
         sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, detector, oss.str().c_str());
     }
-    
+
     sLog.Player(this, LOG_ANTICHEAT, detector, LOG_LVL_MINIMAL, "[%s] Player %s, Cheat %s, Penalty: %s",
         detector, playerDesc.c_str(), reason, action);
 }
