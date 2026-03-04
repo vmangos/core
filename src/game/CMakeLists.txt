@@ -707,18 +707,12 @@ list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Guild/GuildTa
 # Keep Trinity-only random item manager implementation excluded in Vanilla build.
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Item/RandomItemMgr\\.cpp$")
 
-# Legacy PlayerBots chat command handlers and manager implementation.
-file(GLOB PLAYERBOTS_LEGACY_SRCS
-    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBots/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBots/*.h
-)
-
 # Add ModPlayerBots sources to game_SRCS
 list(APPEND game_SRCS ${MODPLAYERBOTS_SRCS})
-list(APPEND game_SRCS ${PLAYERBOTS_LEGACY_SRCS})
 
 # Add PlayerBotsCompat stubs that need compilation
 set(PLAYERBOTS_COMPAT_SRCS
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/ChatBotCommandsCompat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/GameGraveyard.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/ModPlayerBotsActionStubs.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/PlayerbotCommandServerStub.cpp
