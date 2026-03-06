@@ -210,6 +210,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- 1023: (1021: Target Has Complete Quest 4901 In Log) Or (1022: Target Has Done Quest 4901)
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1023, -2, 1021, 1022, 0, 0, 0);
 
+-- Gwina Stonebranch 5138 does not sell copper rod
+DELETE FROM `npc_vendor` WHERE `entry` = 5138 AND `item` = 6217;
+
 
 -- End of migration.
 END IF;
