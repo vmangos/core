@@ -147,7 +147,9 @@ set_target_properties(${EXECUTABLE_NAME} PROPERTIES LINK_FLAGS
 install(TARGETS ${EXECUTABLE_NAME} DESTINATION ${BIN_DIR})
 install(FILES run-mangosd DESTINATION ${BIN_DIR})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mangosd.conf.dist.in ${CMAKE_CURRENT_BINARY_DIR}/mangosd.conf.dist)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/playerbots.conf.dist.in ${CMAKE_CURRENT_BINARY_DIR}/playerbots.conf.dist COPYONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mangosd.conf.dist DESTINATION ${CONF_DIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/playerbots.conf.dist DESTINATION ${CONF_DIR})
 
 if(WIN32 AND MSVC)
   install(FILES $<TARGET_PDB_FILE:${EXECUTABLE_NAME}> DESTINATION ${BIN_DIR} OPTIONAL)

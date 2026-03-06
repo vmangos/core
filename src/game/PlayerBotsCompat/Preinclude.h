@@ -747,9 +747,6 @@ inline std::unique_ptr<QueryResult> PB_QueryFormat(Database& db, const char* fmt
     return db.Query(std::string(buf));
 }
 
-// PlayerbotsDatabase doesn't exist in vMaNGOS, map to CharacterDatabase
-#define PlayerbotsDatabase CharacterDatabase
-
 // Group::MemberSlot::flags - stub for maintank check
 #define MEMBER_FLAG_MAINTANK 0
 

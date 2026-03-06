@@ -23,6 +23,7 @@
 #include "Policies/ThreadingModel.h"
 #include <shared_mutex>
 #include <unordered_map>
+#include <vector>
 
 class Config
 {
@@ -30,6 +31,7 @@ class Config
     using Lock = MaNGOS::ClassLevelLockable<Config, std::shared_timed_mutex>;
 
     bool LoadFromFile(std::string const& filename);
+    bool MergeFromFile(std::string const& filename);
     bool Reload();
 
     bool IsSet(char const* name) const;
@@ -45,9 +47,11 @@ class Config
  private:
     friend class MaNGOS::Singleton<Config, Lock>;
 
+    bool LoadFile(std::string const& filename, bool clearExisting);
     bool ProcessLine(char const* line);
 
     std::string m_fileName;
+    std::vector<std::string> m_additionalFiles;
     std::unordered_map<std::string, std::string> m_configMap;
 
     using LockType = std::shared_timed_mutex;

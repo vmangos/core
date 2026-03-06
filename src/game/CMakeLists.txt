@@ -682,7 +682,6 @@ list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/W
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/WipeAction\\.cpp$")
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/WorldBuffAction\\.cpp$")
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Bot/Cmd/PlayerbotCommandServer\\.cpp$")
-list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Script/PlayerbotCommandScript\\.cpp$")
 
 # Trial of the Champion — Vehicle-dependent dungeon, not available in Vanilla
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Dungeon/TrialOfTheChampion/Action/TrialOfTheChampionActions\\.cpp$")

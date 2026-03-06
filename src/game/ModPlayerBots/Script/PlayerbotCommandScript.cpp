@@ -1,218 +1,240 @@
-/*
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-#if !PB_DISABLE_BG_BOT_LOGIC
-#include "BattleGroundTactics.h"
-#endif
 #include "Chat.h"
-#include "GuildTaskMgr.h"
-#include "PerfMonitor.h"
-#include "PlayerbotMgr.h"
-#include "RandomPlayerbotMgr.h"
-#include "ScriptMgr.h"
-
-using namespace Acore::ChatCommands;
-
-class playerbots_commandscript : public CommandScript
-{
-public:
-    playerbots_commandscript() : CommandScript("playerbots_commandscript") {}
-
-    ChatCommandTable GetCommands() const override
-    {
-        static ChatCommandTable playerbotsDebugCommandTable = {
+#include "PlayerbotCommandScript.h"
+#include "ModPlayerBots/Bot/Factory/PlayerbotFactory.h"
+#include "ModPlayerBots/Bot/Debug/PerfMonitor.h"
+#include "ModPlayerBots/Bot/PlayerbotMgr.h"
+#include "ModPlayerBots/Bot/RandomPlayerbotMgr.h"
+#include "ModPlayerBots/Mgr/Guild/GuildTaskMgr.h"
+#include "ModPlayerBots/PlayerbotAIConfig.h"
 #if !PB_DISABLE_BG_BOT_LOGIC
-            {"bg", HandleDebugBGCommand, SEC_GAMEMASTER, Console::Yes},
+#include "ModPlayerBots/Ai/Base/Actions/BattleGroundTactics.h"
 #endif
-        };
 
-        static ChatCommandTable playerbotsAccountCommandTable = {
-            {"setKey", HandleSetSecurityKeyCommand, SEC_PLAYER, Console::No},
-            {"link", HandleLinkAccountCommand, SEC_PLAYER, Console::No},
-            {"linkedAccounts", HandleViewLinkedAccountsCommand, SEC_PLAYER, Console::No},
-            {"unlink", HandleUnlinkAccountCommand, SEC_PLAYER, Console::No},
-        };
+bool ChatHandler::HandleRandomPlayerbotCommand(char* args)
+{
+    return RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(this, args);
+}
 
-        static ChatCommandTable playerbotsCommandTable = {
-            {"bot", HandlePlayerbotCommand, SEC_PLAYER, Console::No},
-            {"gtask", HandleGuildTaskCommand, SEC_GAMEMASTER, Console::Yes},
-            {"pmon", HandlePerfMonCommand, SEC_GAMEMASTER, Console::Yes},
-            {"rndbot", HandleRandomPlayerbotCommand, SEC_GAMEMASTER, Console::Yes},
-            {"debug", playerbotsDebugCommandTable},
-            {"account", playerbotsAccountCommandTable},
-        };
-
-        static ChatCommandTable commandTable = {
-            {"playerbots", playerbotsCommandTable},
-        };
-
-        return commandTable;
+bool ChatHandler::HandleAutogearCommand(char* /*args*/)
+{
+    WorldSession* session = GetSession();
+    if (!session)
+    {
+        PSendSysMessage("This command requires an active player session.");
+        return false;
     }
 
-    static bool HandlePlayerbotCommand(ChatHandler* handler, char const* args)
+    Player* caller = session->GetPlayer();
+    Player* target = caller;
+
+    if (Player* selected = GetSelectedPlayer())
     {
-        return PlayerbotMgr::HandlePlayerbotMgrCommand(handler, args);
+        if (selected != caller && session->GetSecurity() < SEC_GAMEMASTER)
+        {
+            PSendSysMessage("Only GMs can use autogear on another player.");
+            return false;
+        }
+
+        target = selected;
     }
 
-    static bool HandleRandomPlayerbotCommand(ChatHandler* handler, char const* args)
+    if (!sPlayerbotAIConfig.autoGearCommand)
     {
-        return RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(handler, args);
+        PSendSysMessage("Autogear is disabled in the playerbots configuration.");
+        return false;
     }
 
-    static bool HandleGuildTaskCommand(ChatHandler* handler, char const* args)
+    uint32 gearScoreLimit = sPlayerbotAIConfig.autoGearScoreLimit == 0
+                                ? 0
+                                : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig.autoGearScoreLimit,
+                                                                       sPlayerbotAIConfig.autoGearQualityLimit);
+
+    PlayerbotFactory factory(target, target->GetLevel(), sPlayerbotAIConfig.autoGearQualityLimit, gearScoreLimit);
+    factory.InitEquipment(true);
+    factory.InitAmmo();
+
+    if (target->GetLevel() >= sPlayerbotAIConfig.minEnchantingBotLevel)
+        factory.ApplyEnchantAndGemsNew();
+
+    target->DurabilityRepairAll(false, 1.0f);
+
+    if (target == caller)
+        PSendSysMessage("Autogeared {}.", target->GetName());
+    else
+        PSendSysMessage("Autogeared {} for {}.", target->GetName(), caller->GetName());
+
+    return true;
+}
+
+bool ChatHandler::HandleGuildTaskCommand(char* args)
+{
+    return GuildTaskMgr::HandleConsoleCommand(this, args);
+}
+
+bool ChatHandler::HandlePerfMonCommand(char* args)
+{
+    if (!args)
+        args = const_cast<char*>("");
+
+    if (!strcmp(args, "reset"))
     {
-        return GuildTaskMgr::HandleConsoleCommand(handler, args);
-    }
-
-    static bool HandlePerfMonCommand(ChatHandler* handler, char const* args)
-    {
-        if (!strcmp(args, "reset"))
-        {
-            sPerfMonitor.Reset();
-            return true;
-        }
-
-        if (!strcmp(args, "tick"))
-        {
-            sPerfMonitor.PrintStats(true, false);
-            return true;
-        }
-
-        if (!strcmp(args, "stack"))
-        {
-            sPerfMonitor.PrintStats(false, true);
-            return true;
-        }
-
-        if (!strcmp(args, "toggle"))
-        {
-            sPlayerbotAIConfig.perfMonEnabled = !sPlayerbotAIConfig.perfMonEnabled;
-            if (sPlayerbotAIConfig.perfMonEnabled)
-                LOG_INFO("playerbots", "Performance monitor enabled");
-            else
-                LOG_INFO("playerbots", "Performance monitor disabled");
-            return true;
-        }
-
-        sPerfMonitor.PrintStats();
+        sPerfMonitor.Reset();
         return true;
     }
 
+    if (!strcmp(args, "tick"))
+    {
+        sPerfMonitor.PrintStats(true, false);
+        return true;
+    }
+
+    if (!strcmp(args, "stack"))
+    {
+        sPerfMonitor.PrintStats(false, true);
+        return true;
+    }
+
+    if (!strcmp(args, "toggle"))
+    {
+        sPlayerbotAIConfig.perfMonEnabled = !sPlayerbotAIConfig.perfMonEnabled;
+        if (sPlayerbotAIConfig.perfMonEnabled)
+            LOG_INFO("playerbots", "Performance monitor enabled");
+        else
+            LOG_INFO("playerbots", "Performance monitor disabled");
+        return true;
+    }
+
+    sPerfMonitor.PrintStats();
+    return true;
+}
+
+bool ChatHandler::HandleDebugBGCommand(char* args)
+{
 #if !PB_DISABLE_BG_BOT_LOGIC
-    static bool HandleDebugBGCommand(ChatHandler* handler, char const* args)
-    {
-        return BGTactics::HandleConsoleCommand(handler, args);
-    }
+    return BGTactics::HandleConsoleCommand(this, args);
+#else
+    (void)args;
+    return false;
 #endif
+}
 
-    static bool HandleSetSecurityKeyCommand(ChatHandler* handler, char const* args)
+bool ChatHandler::HandleSetSecurityKeyCommand(char* args)
+{
+    if (!args || !*args)
     {
-        if (!args || !*args)
-        {
-            handler->PSendSysMessage("Usage: .playerbots account setKey <securityKey>");
-            return false;
-        }
-
-        Player* player = handler->GetSession()->GetPlayer();
-        std::string key = args;
-
-        PlayerbotMgr* mgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
-        if (mgr)
-        {
-            mgr->HandleSetSecurityKeyCommand(player, key);
-            return true;
-        }
-        else
-        {
-            handler->PSendSysMessage("PlayerbotMgr instance not found.");
-            return false;
-        }
+        PSendSysMessage("Usage: .playerbots account setKey <securityKey>");
+        return false;
     }
 
-    static bool HandleLinkAccountCommand(ChatHandler* handler, char const* args)
+    WorldSession* session = GetSession();
+    if (!session)
     {
-        if (!args || !*args)
-            return false;
-
-        char* accountName = strtok((char*)args, " ");
-        char* key = strtok(nullptr, " ");
-
-        if (!accountName || !key)
-        {
-            handler->PSendSysMessage("Usage: .playerbots account link <accountName> <securityKey>");
-            return false;
-        }
-
-        Player* player = handler->GetSession()->GetPlayer();
-
-        PlayerbotMgr* mgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
-        if (mgr)
-        {
-            mgr->HandleLinkAccountCommand(player, accountName, key);
-            return true;
-        }
-        else
-        {
-            handler->PSendSysMessage("PlayerbotMgr instance not found.");
-            return false;
-        }
+        PSendSysMessage("This command requires an active player session.");
+        return false;
     }
 
-    static bool HandleViewLinkedAccountsCommand(ChatHandler* handler, char const* /*args*/)
+    Player* player = session->GetPlayer();
+    PlayerbotMgr* mgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
+    if (!mgr)
     {
-        Player* player = handler->GetSession()->GetPlayer();
-
-        PlayerbotMgr* mgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
-        if (mgr)
-        {
-            mgr->HandleViewLinkedAccountsCommand(player);
-            return true;
-        }
-        else
-        {
-            handler->PSendSysMessage("PlayerbotMgr instance not found.");
-            return false;
-        }
+        PSendSysMessage("PlayerbotMgr instance not found.");
+        return false;
     }
 
-    static bool HandleUnlinkAccountCommand(ChatHandler* handler, char const* args)
+    mgr->HandleSetSecurityKeyCommand(player, std::string(args));
+    return true;
+}
+
+bool ChatHandler::HandleLinkAccountCommand(char* args)
+{
+    if (!args || !*args)
     {
-        if (!args || !*args)
-            return false;
-
-        char* accountName = strtok((char*)args, " ");
-        if (!accountName)
-        {
-            handler->PSendSysMessage("Usage: .playerbots account unlink <accountName>");
-            return false;
-        }
-
-        Player* player = handler->GetSession()->GetPlayer();
-
-        PlayerbotMgr* mgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
-        if (mgr)
-        {
-            mgr->HandleUnlinkAccountCommand(player, accountName);
-            return true;
-        }
-        else
-        {
-            handler->PSendSysMessage("PlayerbotMgr instance not found.");
-            return false;
-        }
+        PSendSysMessage("Usage: .playerbots account link <accountName> <securityKey>");
+        return false;
     }
-};
 
-void AddPlayerbotsCommandscripts() { new playerbots_commandscript(); }
+    WorldSession* session = GetSession();
+    if (!session)
+    {
+        PSendSysMessage("This command requires an active player session.");
+        return false;
+    }
+
+    char* accountName = strtok(args, " ");
+    char* key = strtok(nullptr, " ");
+    if (!accountName || !key)
+    {
+        PSendSysMessage("Usage: .playerbots account link <accountName> <securityKey>");
+        return false;
+    }
+
+    Player* player = session->GetPlayer();
+    PlayerbotMgr* mgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
+    if (!mgr)
+    {
+        PSendSysMessage("PlayerbotMgr instance not found.");
+        return false;
+    }
+
+    mgr->HandleLinkAccountCommand(player, accountName, key);
+    return true;
+}
+
+bool ChatHandler::HandleViewLinkedAccountsCommand(char* /*args*/)
+{
+    WorldSession* session = GetSession();
+    if (!session)
+    {
+        PSendSysMessage("This command requires an active player session.");
+        return false;
+    }
+
+    Player* player = session->GetPlayer();
+    PlayerbotMgr* mgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
+    if (!mgr)
+    {
+        PSendSysMessage("PlayerbotMgr instance not found.");
+        return false;
+    }
+
+    mgr->HandleViewLinkedAccountsCommand(player);
+    return true;
+}
+
+bool ChatHandler::HandleUnlinkAccountCommand(char* args)
+{
+    if (!args || !*args)
+    {
+        PSendSysMessage("Usage: .playerbots account unlink <accountName>");
+        return false;
+    }
+
+    WorldSession* session = GetSession();
+    if (!session)
+    {
+        PSendSysMessage("This command requires an active player session.");
+        return false;
+    }
+
+    char* accountName = strtok(args, " ");
+    if (!accountName)
+    {
+        PSendSysMessage("Usage: .playerbots account unlink <accountName>");
+        return false;
+    }
+
+    Player* player = session->GetPlayer();
+    PlayerbotMgr* mgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
+    if (!mgr)
+    {
+        PSendSysMessage("PlayerbotMgr instance not found.");
+        return false;
+    }
+
+    mgr->HandleUnlinkAccountCommand(player, accountName);
+    return true;
+}
+
+void AddPlayerbotsCommandscripts()
+{
+}

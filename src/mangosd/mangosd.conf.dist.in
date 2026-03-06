@@ -2941,6 +2941,11 @@ AHBot.itemcount = 50
 ###################################################################################################################
 # PLAYER BOTS
 #
+#    ModPlayerBots settings
+#        The integrated ModPlayerBots configuration is loaded from a separate `playerbots.conf`
+#        file in the same directory as `mangosd.conf`.
+#        The legacy compatibility settings below remain in `mangosd.conf`.
+#
 #    RandomBot.Enable
 #        Enables automatic spawning of random bots. These bots have no AI. You have to code one and assign it.
 #        Default: 0 - off
@@ -3047,4 +3052,3 @@ DynamicRespawn.AffectRespawnTimeBelow   = 0
 DynamicRespawn.AffectLevelBelow         = 0
 DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
-

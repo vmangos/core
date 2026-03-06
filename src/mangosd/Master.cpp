@@ -197,6 +197,7 @@ int Master::Run()
     WorldDatabase.AllowAsyncTransactions();
     LoginDatabase.AllowAsyncTransactions();
     LogsDatabase.AllowAsyncTransactions();
+    PlayerbotsDatabase.AllowAsyncTransactions();
 
     // Catch termination signals
     _HookSignals();
@@ -358,6 +359,7 @@ int Master::Run()
     WorldDatabase.StopServer();
     LoginDatabase.StopServer();
     LogsDatabase.StopServer();
+    PlayerbotsDatabase.StopServer();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Halting process...");
 
@@ -460,7 +462,7 @@ bool StartDB(const std::string& name, DatabaseType& database, char const** migra
     // Initialise the world database
     if (!database.Initialize(dbstring.c_str(), nConnections, nAsyncConnections))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot connect to world database %s", name.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot connect to %s database", name.c_str());
         return false;
     }
 
@@ -480,12 +482,14 @@ bool Master::_StartDB()
     if (!StartDB("World", WorldDatabase, MIGRATIONS_WORLD) ||
         !StartDB("Character", CharacterDatabase, MIGRATIONS_CHARACTERS) ||
         !StartDB("Login", LoginDatabase, MIGRATIONS_LOGON) ||
-        !StartDB("Logs", LogsDatabase, MIGRATIONS_LOGS))
+        !StartDB("Logs", LogsDatabase, MIGRATIONS_LOGS) ||
+        !StartDB("Playerbots", PlayerbotsDatabase, MIGRATIONS_PLAYERBOTS))
     {
         WorldDatabase.HaltDelayThread();
         CharacterDatabase.HaltDelayThread();
         LoginDatabase.HaltDelayThread();
         LogsDatabase.HaltDelayThread();
+        PlayerbotsDatabase.HaltDelayThread();
         return false;
     }
 

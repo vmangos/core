@@ -27,5 +27,8 @@ ${migrations_logon}
 "static const char *MIGRATIONS_LOGS[] =\n{"
 ${migrations_logs}
 "\n\tNULL\n};\n\n"
+"static const char *MIGRATIONS_PLAYERBOTS[] =\n{"
+${migrations_playerbots}
+"\n\tNULL\n};\n\n"
 "#endif\n"
 )

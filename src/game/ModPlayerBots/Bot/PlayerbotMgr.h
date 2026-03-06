@@ -10,6 +10,8 @@
 #include "Player.h"
 #include "PlayerbotAIBase.h"
 
+typedef uint32 LowType;
+
 class ChatHandler;
 class PlayerbotAI;
 class PlayerbotLoginQueryHolder;

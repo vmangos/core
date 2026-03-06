@@ -270,6 +270,16 @@ class ChatHandler
         bool HandleBotReloadCommand(char * args);
         bool HandleBotStopCommand(char * args);
         bool HandleBotStartCommand(char * args);
+        bool HandlePlayerbotsCommand(char* args);
+        bool HandleRandomPlayerbotCommand(char* args);
+        bool HandleAutogearCommand(char* args);
+        bool HandleGuildTaskCommand(char* args);
+        bool HandlePerfMonCommand(char* args);
+        bool HandleDebugBGCommand(char* args);
+        bool HandleSetSecurityKeyCommand(char* args);
+        bool HandleLinkAccountCommand(char* args);
+        bool HandleViewLinkedAccountsCommand(char* args);
+        bool HandleUnlinkAccountCommand(char* args);
         bool PartyBotAddRequirementCheck(Player const* pPlayer, Player const* pTarget);
         bool HandlePartyBotAddCommand(char * args);
         bool HandlePartyBotCloneCommand(char * args);

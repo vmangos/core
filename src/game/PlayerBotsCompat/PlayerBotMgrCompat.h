@@ -19,7 +19,7 @@ public:
     void Update(uint32 diff);
 
     bool IsSavingAllowed() { return true; }
-    void OnPlayerInWorld(Player* /*player*/) {}
+    void OnPlayerInWorld(Player* player);
     bool ForceAccountConnection(WorldSession* /*sess*/) { return false; }
     bool IsChatBot(uint32 /*playerGuid*/) { return false; }
 

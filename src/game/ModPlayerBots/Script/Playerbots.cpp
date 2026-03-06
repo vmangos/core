@@ -29,32 +29,10 @@
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
 #include "PlayerbotCommandScript.h"
+#if !PB_DISABLE_BG_BOT_LOGIC
 #include "../Ai/Base/Actions/BattleGroundTactics.h"
+#endif
 #include "cmath"
-
-class PlayerbotsDatabaseScript
-{
-public:
-    PlayerbotsDatabaseScript() {}
-
-    void OnDatabasesKeepAlive() { }
-
-    void OnDatabasesClosing() { }
-
-    void OnDatabaseWarnAboutSyncQueries(bool apply) { (void)apply; }
-
-    void OnDatabaseSelectIndexLogout(Player* player, uint32& statementIndex, uint32& statementParam)
-    {
-        (void)player;
-        statementIndex = 0;
-        statementParam = 0;
-    }
-
-    void OnDatabaseGetDBRevision(std::string& revision)
-    {
-        revision = "Unknown Playerbots Database Revision";
-    }
-};
 
 class PlayerbotsPlayerScript : public PlayerScript
 {
@@ -506,6 +484,7 @@ public:
     }
 };
 
+#if !PB_DISABLE_BG_BOT_LOGIC
 class PlayerBotsBGScript : public BGScript
 {
 public:
@@ -540,8 +519,12 @@ public:
         bgStrategies[bg->GetInstanceID()] = data;
     }
 
-    void OnBattlegroundEnd(Battleground* bg, uint32 /*winnerTeam*/) override { bgStrategies.erase(bg->GetInstanceID()); }
+    void OnBattlegroundEnd(Battleground* bg, uint32 /*winnerTeam*/) override
+    {
+        bgStrategies.erase(bg->GetInstanceID());
+    }
 };
+#endif
 
 void AddPlayerbotsSecureLoginScripts();
 
@@ -552,7 +535,9 @@ void AddPlayerbotsScripts()
     new PlayerbotsServerScript();
     new PlayerbotsWorldScript();
     new PlayerbotsScript();
+#if !PB_DISABLE_BG_BOT_LOGIC
     new PlayerBotsBGScript();
+#endif
     AddPlayerbotsSecureLoginScripts();
     AddPlayerbotsCommandscripts();
     PlayerBotsGuildValidationScript();

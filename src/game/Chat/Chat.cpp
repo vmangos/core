@@ -38,6 +38,7 @@
 #include "SpellMgr.h"
 #include "PoolManager.h"
 #include "GameEventMgr.h"
+#include "ModPlayerBots/Bot/PlayerbotMgr.h"
 
 // Supported shift-links (client generated and server side)
 // |color|Harea:area_id|h[name]|h|r
@@ -1180,6 +1181,37 @@ ChatCommand * ChatHandler::getCommandTable()
         { nullptr,          0,                false, nullptr,                                          "", nullptr }
     };
 
+#if !PB_DISABLE_BG_BOT_LOGIC
+    static ChatCommand playerbotsDebugCommandTable[] =
+    {
+        { "bg",             SEC_GAMEMASTER,   true,  &ChatHandler::HandleDebugBGCommand,               "", nullptr },
+        { nullptr,          0,                false, nullptr,                                          "", nullptr }
+    };
+#endif
+
+    static ChatCommand playerbotsAccountCommandTable[] =
+    {
+        { "setKey",         SEC_PLAYER,       false, &ChatHandler::HandleSetSecurityKeyCommand,        "", nullptr },
+        { "link",           SEC_PLAYER,       false, &ChatHandler::HandleLinkAccountCommand,           "", nullptr },
+        { "linkedAccounts", SEC_PLAYER,       false, &ChatHandler::HandleViewLinkedAccountsCommand,    "", nullptr },
+        { "unlink",         SEC_PLAYER,       false, &ChatHandler::HandleUnlinkAccountCommand,         "", nullptr },
+        { nullptr,          0,                false, nullptr,                                          "", nullptr }
+    };
+
+    static ChatCommand playerbotsCommandTable[] =
+    {
+        { "bot",            SEC_PLAYER,       false, &ChatHandler::HandlePlayerbotsCommand,            "", nullptr },
+        { "gtask",          SEC_GAMEMASTER,   true,  &ChatHandler::HandleGuildTaskCommand,             "", nullptr },
+        { "pmon",           SEC_GAMEMASTER,   true,  &ChatHandler::HandlePerfMonCommand,               "", nullptr },
+        { "rndbot",         SEC_GAMEMASTER,   true,  &ChatHandler::HandleRandomPlayerbotCommand,       "", nullptr },
+#if !PB_DISABLE_BG_BOT_LOGIC
+        { "debug",          SEC_GAMEMASTER,   true,  nullptr,                                          "", playerbotsDebugCommandTable },
+#endif
+        { "account",        SEC_PLAYER,       false, nullptr,                                          "", playerbotsAccountCommandTable },
+        { "",               SEC_GAMEMASTER,   true,  &ChatHandler::HandlePlayerbotsCommand,            "Manage playerbots", nullptr },
+        { nullptr,          0,                false, nullptr,                                          "", nullptr }
+    };
+
     static ChatCommand commandTable[] =
     {
         { "account",        SEC_PLAYER,         true, nullptr,                                         "", accountCommandTable  },
@@ -1215,9 +1247,11 @@ ChatCommand * ChatHandler::getCommandTable()
         { "wp",             SEC_TICKETMASTER,   false, nullptr,                                        "", wpCommandTable       },
         { "service",        SEC_ADMINISTRATOR,  true, nullptr,                                         "", serviceCommandTable  },
         { "bot",            SEC_ADMINISTRATOR,  true, nullptr,                              "Manage bots", botCommandTable      },
+        { "autogear",       SEC_PLAYER,         false, &ChatHandler::HandleAutogearCommand,           "Auto gear player", nullptr          },
         { "ahbot",          SEC_ADMINISTRATOR,  true, nullptr,                            "Manage AH bot", ahbotCommandTable    },
         { "partybot",       SEC_ADMINISTRATOR,  false, nullptr,                       "Manage party bots", partyBotCommandTable },
-        { "battlebot",      SEC_ADMINISTRATOR,  true, nullptr,                      "Manage battle bots", battleBotCommandTable},
+        { "battlebot",      SEC_ADMINISTRATOR,  true, nullptr,                      "Manage battle bots", battleBotCommandTable },
+        { "playerbots",     SEC_PLAYER,         true,  nullptr,                     "Manage playerbots", playerbotsCommandTable },
         { "world",          SEC_ADMINISTRATOR,  false, nullptr,                                        "", worldCommandTable    },
         { "possess",        SEC_GAMEMASTER,     false, &ChatHandler::HandlePossessCommand,             "", nullptr              },
         { "cinematic",      SEC_DEVELOPER,      false, nullptr,                                        "", cinematicCommandTable},
@@ -4065,6 +4099,10 @@ template void ChatHandler::ShowNpcOrGoSpawnInformation<GameObject>(uint32 guid);
 template std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation<Creature>(uint32 guid);
 template std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation<GameObject>(uint32 guid);
 
+bool ChatHandler::HandlePlayerbotsCommand(char* args)
+{
+    return PlayerbotMgr::HandlePlayerbotMgrCommand(this, args);
+}
 
 LocaleConstant NullChatHandler::GetSessionDbcLocale() const
 {

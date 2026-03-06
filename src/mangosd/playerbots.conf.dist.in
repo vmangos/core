@@ -1,0 +1,953 @@
+########################################
+# ModPlayerBots Configuration file     #
+########################################
+
+[PlayerbotsConf]
+ConfVersion=2026030605
+
+####################################################################################################
+# OVERVIEW
+#
+# This file is loaded by `mangosd` after `mangosd.conf` and overlays matching keys.
+# Rename it to `playerbots.conf` and keep it in the same directory as `mangosd.conf`.
+#
+# The integrated playerbots module is Vanilla-first. This template intentionally excludes or rewrites
+# settings whose original WotLK documentation would be misleading on a Vanilla core.
+#
+# Unspecified `AiPlayerbot.*` settings fall back to the defaults compiled into
+# `core/src/game/ModPlayerBots/PlayerbotAIConfig.cpp`.
+####################################################################################################
+
+####################################################################################################
+# DATABASE & CONNECTIONS
+#
+# `PlayerbotsDatabase.*` configures the separate playerbots database used by the integrated module.
+#
+# `PlayerbotsDatabase.Info`
+#   Database connection string in the format:
+#   "hostname;port;username;password;database"
+#
+# `PlayerbotsDatabase.Connections`
+#   Number of synchronous SELECT connections.
+#
+# `PlayerbotsDatabase.WorkerThreads`
+#   Number of asynchronous worker connections.
+####################################################################################################
+PlayerbotsDatabase.Info          = "127.0.0.1;3306;mangos;mangos;playerbots"
+PlayerbotsDatabase.Connections   = 2
+PlayerbotsDatabase.WorkerThreads = 1
+
+####################################################################################################
+# CORE SETTINGS
+#
+# High-level module switches and common random bot defaults.
+####################################################################################################
+AiPlayerbot.Enabled = 1
+AiPlayerbot.RandomBotAutologin = 1
+
+# Target online randombot population.
+AiPlayerbot.MinRandomBots = 500
+AiPlayerbot.MaxRandomBots = 500
+
+# Number of accounts reserved for randombots.
+# 0 = determine automatically
+AiPlayerbot.RandomBotAccountCount = 0
+
+# Delete all randombot accounts on startup when set to 1.
+AiPlayerbot.DeleteRandomBotAccounts = 0
+
+# Keep randombots offline until a real player is online.
+AiPlayerbot.DisabledWithoutRealPlayer = 0
+AiPlayerbot.DisabledWithoutRealPlayerLoginDelay = 30
+AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay = 300
+
+AiPlayerbot.EnableNewRpgStrategy = 1
+AiPlayerbot.AutoDoQuests = 1
+
+####################################################################################################
+# PLAYERBOTS SETTINGS
+#
+# This section is the top-level home for settings that affect player-controlled bots, summons,
+# combat behavior, AI pacing, and other core bot interactions.
+####################################################################################################
+
+####################################################################################################
+# GENERAL
+####################################################################################################
+
+# Maximum number of bots a player can control at once.
+AiPlayerbot.MaxAddedBots = 40
+
+# Allow the `addclass` command.
+# 0 = GM only
+# 1 = enabled
+AiPlayerbot.AddClassCommand = 1
+
+# Number of pooled accounts used by the `addclass` command.
+AiPlayerbot.AddClassAccountPoolSize = 50
+
+# Invitation policy for player-controlled bots.
+# 0 = GM only
+# 1 = accept based on level
+# 2 = always accept
+AiPlayerbot.GroupInvitationPermission = 1
+
+# Keep alt bots in the party after the master leaves.
+AiPlayerbot.KeepAltsInGroup = 0
+
+# Auto-login player alts as altbots on player login.
+AiPlayerbot.BotAutologin = 0
+
+# Allow inviting altbots from the same account.
+AiPlayerbot.AllowAccountBots = 1
+
+# Allow inviting altbots from the player's guild.
+AiPlayerbot.AllowGuildBots = 1
+
+# Allow linked accounts for shared altbot control.
+AiPlayerbot.AllowTrustedAccountBots = 1
+
+# Allow randombots to form guilds with nearby randombots.
+AiPlayerbot.RandomBotGuildNearby = 0
+
+# Number of guilds created by randombots.
+AiPlayerbot.RandomBotGuildCount = 20
+
+# Maximum number of members in randombot guilds.
+AiPlayerbot.RandomBotGuildSizeMax = 15
+
+# Delete all randombot guilds on startup when set to 1.
+AiPlayerbot.DeleteRandomBotGuilds = 0
+
+# Allow randombots to invite players to groups, raids, or guilds.
+AiPlayerbot.RandomBotInvitePlayer = 0
+
+# Allow bots to chat when inviting other bots or players.
+AiPlayerbot.InviteChat = 0
+
+# Summon bots automatically when they accept a group invitation.
+AiPlayerbot.SummonWhenGroup = 1
+
+# Allow a player to be activated as a selfbot.
+# 0 = disabled
+# 1 = GM only
+# 2 = all players
+# 3 = activate on login
+AiPlayerbot.SelfBotLevel = 1
+
+# Restrict non-GM initialization to `init=auto` only.
+AiPlayerbot.AutoInitOnly = 0
+
+# Upper equipment-level ratio used by `init=auto`.
+AiPlayerbot.AutoInitEquipLevelLimitRatio = 1.0
+
+# Trainer spell behavior.
+# yes = train normally
+# free = train without cost
+# no = list only
+AiPlayerbot.AutoTrainSpells = yes
+
+####################################################################################################
+# SUMMON OPTIONS
+####################################################################################################
+
+# Allow summoning bots while the master is in combat.
+AiPlayerbot.AllowSummonInCombat = 1
+
+# Allow summoning bots while the master is dead.
+AiPlayerbot.AllowSummonWhenMasterIsDead = 1
+
+# Allow summoning dead bots.
+# 0 = ghosts only
+# 1 = always
+AiPlayerbot.AllowSummonWhenBotIsDead = 1
+
+# Revive behavior when summoning bots.
+# 0 = disabled
+# 1 = disabled during combat
+# 2 = enabled
+AiPlayerbot.ReviveBotWhenSummoned = 1
+
+# Repair bot gear on summon.
+AiPlayerbot.BotRepairWhenSummon = 1
+
+####################################################################################################
+# MOUNT
+####################################################################################################
+
+# Ground mount thresholds. These values are loaded by the integrated runtime as generic progression
+# controls. On Vanilla, only ground mount progression is normally relevant.
+AiPlayerbot.UseGroundMountAtMinLevel = 20
+AiPlayerbot.UseFastGroundMountAtMinLevel = 40
+
+# Flying mount thresholds are retained only because the runtime still exposes them. They are not
+# part of normal Vanilla gameplay and can usually be left at their defaults.
+AiPlayerbot.UseFlyMountAtMinLevel = 60
+AiPlayerbot.UseFastFlyMountAtMinLevel = 70
+
+####################################################################################################
+# GEAR
+####################################################################################################
+
+# Cosmetic toggles for randombot display.
+AiPlayerbot.RandomBotShowHelmet = 1
+AiPlayerbot.RandomBotShowCloak = 1
+
+# Let altbots auto-equip clear inventory upgrades.
+AiPlayerbot.AutoEquipUpgradeLoot = 1
+
+# Upgrade threshold for auto-equip logic.
+AiPlayerbot.EquipUpgradeThreshold = 1.1
+
+# Run two rounds of gear initialization for better initial results.
+AiPlayerbot.TwoRoundsGearInit = 0
+
+####################################################################################################
+# LOOTING
+####################################################################################################
+
+# Keep bots looting when the group loot method is free-for-all.
+AiPlayerbot.FreeMethodLoot = 0
+
+# Default loot roll behavior.
+# 0 = pass
+# 1 = greed
+# 2 = need
+AiPlayerbot.LootRollLevel = 1
+
+####################################################################################################
+# TIMERS
+####################################################################################################
+
+# Maximum AI iterations per server tick.
+AiPlayerbot.IterationsPerTick = 10
+
+# Delay between short-cooldown spell casts, in milliseconds.
+AiPlayerbot.GlobalCooldown = 500
+
+# Maximum wait time while moving, in milliseconds.
+AiPlayerbot.MaxWaitForMove = 5000
+
+# Control MoveSplinePath usage.
+# 0 = enabled everywhere
+# 1 = disabled in BG only
+# 2 = disabled everywhere
+AiPlayerbot.DisableMoveSplinePath = 0
+
+# Path search budget for movement.
+AiPlayerbot.MaxMovementSearchTime = 3
+
+# Action expiration time in milliseconds.
+AiPlayerbot.ExpireActionTime = 5000
+
+# Maximum duration considered for dispellable auras.
+AiPlayerbot.DispelAuraDuration = 700
+
+# Base delay between bot reactions, in milliseconds.
+AiPlayerbot.ReactDelay = 100
+
+# Dynamically adjust react delay to reduce server load.
+AiPlayerbot.DynamicReactDelay = 1
+
+# Delay before inactive behavior kicks in, in milliseconds.
+AiPlayerbot.PassiveDelay = 10000
+
+# Minimum delay before repeating actions such as chat or emotes.
+AiPlayerbot.RepeatDelay = 2000
+
+# Miscellaneous delay timers, in milliseconds.
+AiPlayerbot.ErrorDelay = 100
+AiPlayerbot.RpgDelay = 10000
+AiPlayerbot.SitDelay = 20000
+AiPlayerbot.ReturnDelay = 2000
+AiPlayerbot.LootDelay = 1000
+
+####################################################################################################
+# DISTANCES
+####################################################################################################
+
+# Distances are measured in yards.
+AiPlayerbot.FarDistance = 20.0
+AiPlayerbot.SightDistance = 75.0
+AiPlayerbot.SpellDistance = 28.5
+AiPlayerbot.ShootDistance = 26.0
+AiPlayerbot.HealDistance = 38.5
+AiPlayerbot.LootDistance = 25.0
+AiPlayerbot.FleeDistance = 8.0
+AiPlayerbot.AggroDistance = 22
+AiPlayerbot.TooCloseDistance = 5.0
+AiPlayerbot.MeleeDistance = 1.5
+AiPlayerbot.FollowDistance = 1.5
+AiPlayerbot.WhisperDistance = 6000.0
+AiPlayerbot.ContactDistance = 0.5
+AiPlayerbot.AoeRadius = 10
+AiPlayerbot.RpgDistance = 200
+AiPlayerbot.GrindDistance = 75.0
+AiPlayerbot.ReactDistance = 150.0
+
+####################################################################################################
+# THRESHOLDS
+####################################################################################################
+
+# Health and mana thresholds, in percent.
+AiPlayerbot.CriticalHealth = 25
+AiPlayerbot.LowHealth = 45
+AiPlayerbot.MediumHealth = 65
+AiPlayerbot.AlmostFullHealth = 85
+AiPlayerbot.LowMana = 15
+AiPlayerbot.MediumMana = 40
+AiPlayerbot.HighMana = 65
+
+####################################################################################################
+# QUESTS
+####################################################################################################
+
+# Quest reward handling.
+# yes = pick the most useful reward
+# no = list rewards only
+# ask = pick a useful reward and report alternatives
+AiPlayerbot.AutoPickReward = yes
+
+# Sync bot quest completion with the player.
+AiPlayerbot.SyncQuestWithPlayer = 1
+
+# Allow bots to auto-complete quests for the player when turning in their own quests.
+AiPlayerbot.SyncQuestForPlayer = 0
+
+# Drop obsolete quests automatically.
+AiPlayerbot.DropObsoleteQuests = 1
+
+####################################################################################################
+# COMBAT
+####################################################################################################
+
+# Add dungeon or raid strategies automatically when entering supported instances.
+AiPlayerbot.ApplyInstanceStrategies = 1
+
+# Enable the generic avoid-aoe strategy.
+AiPlayerbot.AutoAvoidAoe = 1
+
+# Only avoid area effects up to this radius.
+AiPlayerbot.MaxAoeAvoidRadius = 15.0
+
+# Spell IDs that should never trigger generic AOE avoidance.
+AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810,29946
+
+# Enable healer mana-saving behavior.
+AiPlayerbot.AutoSaveMana = 1
+
+# Mana percentage below which the save-mana strategy becomes active.
+AiPlayerbot.SaveManaThreshold = 60
+
+# Allow bots to flee from enemies when appropriate.
+AiPlayerbot.FleeingEnabled = 1
+
+####################################################################################################
+# GREATER BUFFS STRATEGIES
+####################################################################################################
+
+# Minimum group size before bots prefer greater group buffs.
+AiPlayerbot.MinBotsForGreaterBuff = 3
+
+# Cooldown between reagent-missing RP warnings, in seconds.
+AiPlayerbot.RPWarningCooldown = 30
+
+####################################################################################################
+# CHEATS
+####################################################################################################
+
+# Enable the maintenance command.
+AiPlayerbot.MaintenanceCommand = 1
+
+# Altbot maintenance toggles.
+AiPlayerbot.AltMaintenanceAmmo = 1
+AiPlayerbot.AltMaintenanceFood = 1
+AiPlayerbot.AltMaintenanceReagents = 1
+AiPlayerbot.AltMaintenanceConsumables = 1
+AiPlayerbot.AltMaintenancePotions = 1
+AiPlayerbot.AltMaintenanceBags = 1
+AiPlayerbot.AltMaintenanceMounts = 1
+AiPlayerbot.AltMaintenanceSkills = 1
+AiPlayerbot.AltMaintenanceClassSpells = 1
+AiPlayerbot.AltMaintenanceAvailableSpells = 1
+AiPlayerbot.AltMaintenanceSpecialSpells = 1
+AiPlayerbot.AltMaintenanceTalentTree = 1
+
+# Glyph and gem/enchant maintenance settings are still read by the integrated runtime but are kept
+# here as legacy compatibility knobs. They are not generally relevant on a Vanilla server.
+AiPlayerbot.AltMaintenanceGlyphs = 1
+AiPlayerbot.AltMaintenanceGemsEnchants = 1
+
+AiPlayerbot.AltMaintenancePet = 1
+AiPlayerbot.AltMaintenancePetTalents = 1
+AiPlayerbot.AltMaintenanceReputation = 1
+AiPlayerbot.AltMaintenanceAttunementQuests = 1
+AiPlayerbot.AltMaintenanceKeyring = 1
+
+# Enable automatic gear upgrades through the autogear command.
+AiPlayerbot.AutoGearCommand = 1
+AiPlayerbot.AutoGearCommandAltBots = 1
+
+# Generic quality and item-level caps for autogear.
+AiPlayerbot.AutoGearQualityLimit = 4
+AiPlayerbot.AutoGearScoreLimit = 0
+
+# Bot cheat list. Multiple values may be combined with commas.
+# Common values: food, taxi, gold, health, mana, power, raid
+AiPlayerbot.BotCheats = "food,taxi,raid"
+
+####################################################################################################
+# FLIGHTPATH
+####################################################################################################
+
+# Taxi staggering controls in milliseconds.
+AiPlayerbot.BotTaxiDelayMinMs = 350
+AiPlayerbot.BotTaxiDelayMaxMs = 5000
+AiPlayerbot.BotTaxiGapMs = 200
+AiPlayerbot.BotTaxiGapJitterMs = 100
+
+####################################################################################################
+# PROFESSIONS
+####################################################################################################
+
+# Fishing support settings.
+AiPlayerbot.EnableFishingWithMaster = 1
+AiPlayerbot.FishingDistanceFromMaster = 10.0
+AiPlayerbot.FishingDistance = 40.0
+AiPlayerbot.EndFishingWithMaster = 30.0
+
+####################################################################################################
+# RANDOMBOT SETTINGS
+#
+# This section is the top-level home for autonomous random bot behavior.
+####################################################################################################
+
+####################################################################################################
+# GENERAL
+####################################################################################################
+
+# Generate random passwords for randombot accounts.
+AiPlayerbot.RandomBotRandomPassword = 0
+
+# Prefix used for new randombot account names.
+AiPlayerbot.RandomBotAccountPrefix = "rndbot"
+
+# Minimum and maximum levels for generated randombots.
+AiPlayerbot.RandomBotMinLevel = 1
+AiPlayerbot.RandomBotMaxLevel = 80
+
+# Sync the maximum random bot level with the highest online player level.
+AiPlayerbot.SyncLevelWithPlayers = 0
+
+# Pre-complete many lower-level quests during bot creation.
+AiPlayerbot.PreQuests = 0
+
+# Allow randombots to join the queue systems supported by the integrated runtime.
+AiPlayerbot.RandomBotJoinLfg = 1
+
+# Rotate bots online and offline from a larger total pool.
+AiPlayerbot.EnablePeriodicOnlineOffline = 0
+AiPlayerbot.PeriodicOnlineOfflineRatio = 2.0
+
+# Faction ratio for generated randombots.
+AiPlayerbot.RandomBotAllianceRatio = 50
+AiPlayerbot.RandomBotHordeRatio = 50
+
+# Legacy non-Vanilla compatibility switch retained by the runtime.
+AiPlayerbot.DisableDeathKnightLogin = 0
+
+# Legacy expansion talent limiter retained by the runtime.
+AiPlayerbot.LimitTalentsExpansion = 0
+
+# Trading mode for randombots.
+# 0 = disabled
+# 1 = enabled
+# 2 = buy only
+# 3 = sell only
+AiPlayerbot.EnableRandomBotTrading = 1
+
+# Prefixes ignored by trade-action text analysis.
+AiPlayerbot.TradeActionExcludedPrefixes = "RPLL_H_,DBMv4,{звезда} Questie,{rt1} Questie"
+
+####################################################################################################
+# LEVELS
+####################################################################################################
+
+# Disable random starting levels.
+AiPlayerbot.DisableRandomLevels = 0
+
+# Starting level used when random levels are disabled.
+AiPlayerbot.RandombotStartingLevel = 5
+
+# Chance a newly randomized bot starts at the configured minimum or maximum level.
+AiPlayerbot.RandomBotMinLevelChance = 0.1
+AiPlayerbot.RandomBotMaxLevelChance = 0.01
+
+# Prevent random bots from leveling.
+AiPlayerbot.RandomBotFixedLevel = 0
+
+# Reset bots at max level back to the configured minimum level.
+AiPlayerbot.DowngradeMaxLevelBot = 0
+
+# Random bot XP multiplier. Effective rate is server XP rate times this value.
+AiPlayerbot.RandomBotXPRate = 1.0
+
+####################################################################################################
+# GEAR
+####################################################################################################
+
+# Generic randombot gear caps.
+AiPlayerbot.RandomGearQualityLimit = 3
+AiPlayerbot.RandomGearScoreLimit = 0
+
+# Allow bots to improve their generated gear over time.
+AiPlayerbot.IncrementalGearInit = 1
+
+# Minimum level for automatic enchants and gem-like maintenance behavior.
+AiPlayerbot.MinEnchantingBotLevel = 60
+
+# Legacy expansion gating toggles retained by the runtime.
+AiPlayerbot.LimitEnchantExpansion = 1
+AiPlayerbot.LimitGearExpansion = 1
+
+# Chance a generated bot receives intentionally weaker gear.
+AiPlayerbot.RandomGearLoweringChance = 0
+
+# Require a minimum player gear level before some randombots accept invitations.
+AiPlayerbot.GearScoreCheck = 0
+
+# Preserve randomized equipment after a configured level threshold.
+AiPlayerbot.EquipmentPersistence = 0
+AiPlayerbot.EquipmentPersistenceLevel = 60
+
+# Upgrade randombot equipment automatically on level-up.
+AiPlayerbot.AutoUpgradeEquip = 1
+
+# Hunter and pet defaults.
+AiPlayerbot.HunterWolfPet = 0
+AiPlayerbot.DefaultPetStance = 1
+AiPlayerbot.PetChatCommandDebug = 0
+AiPlayerbot.ExcludedHunterPetFamilies = ""
+
+####################################################################################################
+# ACTIVITIES
+####################################################################################################
+
+# Percentage of active bots in areas without nearby real players.
+AiPlayerbot.BotActiveAlone = 10
+
+# Force activity behavior when players are nearby.
+AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
+AiPlayerbot.BotActiveAloneForceWhenInZone = 1
+AiPlayerbot.BotActiveAloneForceWhenInMap = 0
+AiPlayerbot.BotActiveAloneForceWhenIsFriend = 1
+AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
+
+# Automatically scale active bot percentage based on server latency.
+AiPlayerbot.botActiveAloneSmartScale = 1
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor = 50
+AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling = 200
+AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
+AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
+
+####################################################################################################
+# QUESTS
+####################################################################################################
+
+# Quest IDs completed and rewarded for all randombots.
+AiPlayerbot.RandomBotQuestIds = "3802,5505,6502,7761,7848"
+
+# Allow randombots to group with nearby bots for shared quests.
+AiPlayerbot.RandomBotGroupNearby = 0
+
+# Allow randombots to choose and complete quests on their own.
+AiPlayerbot.AutoDoQuests = 1
+
+# Quest items bots should never destroy.
+AiPlayerbot.RandomBotQuestItems = "5175,5176,5177,5178,6948,11000,12382,13704,16309"
+
+####################################################################################################
+# SPELLS
+####################################################################################################
+
+# Learn quest reward spells automatically on level-up.
+AiPlayerbot.AutoLearnQuestSpells = 0
+
+# Learn trainer spells automatically on level-up.
+AiPlayerbot.AutoLearnTrainerSpells = 1
+
+# Spend talent points automatically on level-up.
+AiPlayerbot.AutoPickTalents = 1
+
+# Extra spells taught to every randombot and granted by maintenance to altbots.
+# Use Vanilla-appropriate spell IDs here.
+AiPlayerbot.RandomBotSpellIds = ""
+
+# Spell used to open certain lootable gameobjects.
+AiPlayerbot.OpenGoSpell = 6477
+
+####################################################################################################
+# STRATEGIES
+####################################################################################################
+
+# Additional randombot strategies applied after default role/spec strategies.
+AiPlayerbot.RandomBotCombatStrategies = ""
+AiPlayerbot.RandomBotNonCombatStrategies = ""
+
+# Additional altbot strategy overrides.
+AiPlayerbot.CombatStrategies = ""
+AiPlayerbot.NonCombatStrategies = ""
+
+# Remove the `healer dps` strategy on restricted maps.
+AiPlayerbot.HealerDPSMapRestriction = 1
+
+# Map IDs where `healer dps` is disabled when the restriction is enabled.
+AiPlayerbot.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,1007,269,409,469,509,531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649"
+
+####################################################################################################
+# RPG STRATEGY
+####################################################################################################
+
+# Enable the newer RPG-style world behavior system.
+AiPlayerbot.EnableNewRpgStrategy = 1
+
+# Relative weights for RPG state selection.
+AiPlayerbot.RpgStatusProbWeight.WanderRandom = 15
+AiPlayerbot.RpgStatusProbWeight.WanderNpc = 20
+AiPlayerbot.RpgStatusProbWeight.GoGrind = 15
+AiPlayerbot.RpgStatusProbWeight.GoCamp = 10
+AiPlayerbot.RpgStatusProbWeight.DoQuest = 60
+AiPlayerbot.RpgStatusProbWeight.TravelFlight = 15
+AiPlayerbot.RpgStatusProbWeight.Rest = 5
+
+# Vanilla zone brackets for the RPG teleport and travel system.
+# Format: AiPlayerbot.ZoneBracket.<zoneId> = minLevel,maxLevel
+AiPlayerbot.ZoneBracket.1 = 5,12
+AiPlayerbot.ZoneBracket.12 = 5,12
+AiPlayerbot.ZoneBracket.14 = 5,12
+AiPlayerbot.ZoneBracket.85 = 5,12
+AiPlayerbot.ZoneBracket.141 = 5,12
+AiPlayerbot.ZoneBracket.215 = 5,12
+
+AiPlayerbot.ZoneBracket.17 = 10,25
+AiPlayerbot.ZoneBracket.38 = 10,20
+AiPlayerbot.ZoneBracket.40 = 10,21
+AiPlayerbot.ZoneBracket.130 = 10,23
+AiPlayerbot.ZoneBracket.148 = 10,21
+
+AiPlayerbot.ZoneBracket.10 = 19,33
+AiPlayerbot.ZoneBracket.11 = 21,30
+AiPlayerbot.ZoneBracket.44 = 16,28
+AiPlayerbot.ZoneBracket.267 = 20,34
+AiPlayerbot.ZoneBracket.331 = 18,33
+AiPlayerbot.ZoneBracket.400 = 24,36
+AiPlayerbot.ZoneBracket.406 = 16,29
+
+AiPlayerbot.ZoneBracket.3 = 36,46
+AiPlayerbot.ZoneBracket.8 = 36,46
+AiPlayerbot.ZoneBracket.15 = 35,46
+AiPlayerbot.ZoneBracket.16 = 45,52
+AiPlayerbot.ZoneBracket.33 = 32,47
+AiPlayerbot.ZoneBracket.45 = 30,42
+AiPlayerbot.ZoneBracket.47 = 42,51
+AiPlayerbot.ZoneBracket.51 = 45,51
+AiPlayerbot.ZoneBracket.357 = 40,52
+AiPlayerbot.ZoneBracket.405 = 30,41
+AiPlayerbot.ZoneBracket.440 = 41,52
+
+AiPlayerbot.ZoneBracket.4 = 52,57
+AiPlayerbot.ZoneBracket.28 = 50,60
+AiPlayerbot.ZoneBracket.46 = 51,60
+AiPlayerbot.ZoneBracket.139 = 54,60
+AiPlayerbot.ZoneBracket.361 = 47,57
+AiPlayerbot.ZoneBracket.490 = 49,56
+AiPlayerbot.ZoneBracket.618 = 54,60
+AiPlayerbot.ZoneBracket.1377 = 54,60
+
+####################################################################################################
+# TELEPORTS
+####################################################################################################
+
+# Map IDs where bots may be teleported. Vanilla defaults are Eastern Kingdoms and Kalimdor.
+AiPlayerbot.RandomBotMaps = 0,1
+
+# Chance bots teleport to a banker or capital city.
+AiPlayerbot.ProbTeleToBankers = 0.25
+
+# Capital city banker weighting.
+AiPlayerbot.EnableWeightTeleToCityBankers = 1
+AiPlayerbot.TeleToStormwindWeight = 2
+AiPlayerbot.TeleToIronforgeWeight = 1
+AiPlayerbot.TeleToDarnassusWeight = 1
+AiPlayerbot.TeleToExodarWeight = 0
+AiPlayerbot.TeleToOrgrimmarWeight = 2
+AiPlayerbot.TeleToUndercityWeight = 1
+AiPlayerbot.TeleToThunderBluffWeight = 1
+AiPlayerbot.TeleToSilvermoonCityWeight = 0
+AiPlayerbot.TeleToShattrathCityWeight = 0
+AiPlayerbot.TeleToDalaranWeight = 0
+
+# Post-death teleport distance and old RPG-level bracket rules.
+AiPlayerbot.RandomBotTeleportDistance = 100
+AiPlayerbot.RandomBotTeleLowerLevel = 1
+AiPlayerbot.RandomBotTeleHigherLevel = 3
+
+# Teleport bots to new leveling areas when they level up.
+AiPlayerbot.AutoTeleportForLevel = 1
+
+####################################################################################################
+# BATTLEGROUNDS & PVP
+####################################################################################################
+
+# Allow randombots to join battlegrounds.
+AiPlayerbot.RandomBotJoinBG = 1
+
+# Allow bots to auto-start supported battleground queues.
+AiPlayerbot.RandomBotAutoJoinBG = 0
+
+# Auto-join battleground bracket selections for Vanilla battlegrounds only.
+AiPlayerbot.RandomBotAutoJoinAVBrackets = 3
+AiPlayerbot.RandomBotAutoJoinABBrackets = 5
+AiPlayerbot.RandomBotAutoJoinWSBrackets = 5
+
+# Per-bracket battleground fill counts.
+AiPlayerbot.RandomBotAutoJoinBGAVCount = 0
+AiPlayerbot.RandomBotAutoJoinBGABCount = 1
+AiPlayerbot.RandomBotAutoJoinBGWSCount = 1
+
+# Legacy arena, Eye of the Storm, and Isle of Conquest runtime knobs are intentionally omitted from
+# the Vanilla dist.
+
+# PvP restricted zones and areas.
+AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,3951"
+AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,3938,3754,3786,3973"
+
+# Speed up battleground reactions.
+AiPlayerbot.FastReactInBG = 1
+
+####################################################################################################
+# RANDOM BOT TIMING AND BEHAVIOR
+####################################################################################################
+
+# Manager update cadence, in seconds.
+AiPlayerbot.RandomBotUpdateInterval = 20
+
+# How often the manager adjusts the online random bot count.
+AiPlayerbot.RandomBotCountChangeMinInterval = 1800
+AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
+
+# Minimum and maximum number of seconds a random bot remains online before cycling out.
+AiPlayerbot.MinRandomBotInWorldTime = 3600
+AiPlayerbot.MaxRandomBotInWorldTime = 1209600
+
+# Re-randomization timing.
+AiPlayerbot.MinRandomBotRandomizeTime = 7200
+AiPlayerbot.MaxRandomBotRandomizeTime = 1209600
+
+# Number of bots processed per manager update.
+AiPlayerbot.RandomBotsPerInterval = 60
+
+# Revive timing after death.
+AiPlayerbot.MinRandomBotReviveTime = 60
+AiPlayerbot.MaxRandomBotReviveTime = 300
+
+# Teleport timing between leveling areas.
+AiPlayerbot.MinRandomBotTeleportInterval = 3600
+AiPlayerbot.MaxRandomBotTeleportInterval = 18000
+
+# Lifetime for bots marked as permanently in world or used when rotation is effectively disabled.
+AiPlayerbot.PermanentlyInWorldTime = 31104000
+
+####################################################################################################
+# PREMADE SPECS AND TALENT DATA
+#
+# The integrated runtime still has premade-spec related config families, but the original WotLK
+# payloads are intentionally not shipped in this Vanilla template.
+#
+# Reasons:
+# - WotLK glyph data is invalid in Vanilla.
+# - WotLK talent strings are not suitable for Vanilla trees.
+# - Death Knight content is not applicable to vMaNGOS Vanilla.
+#
+# A future Vanilla-specific premade dataset can be introduced separately.
+####################################################################################################
+
+####################################################################################################
+# SYSTEM, DEBUG, CHAT, AND LOGGING
+#
+# This section is the top-level home for infrastructure settings that do not fit gameplay buckets.
+####################################################################################################
+
+####################################################################################################
+# DEBUG
+####################################################################################################
+
+# Command server port. Set to 0 to disable.
+AiPlayerbot.CommandServerPort = 8888
+
+# Restrict some manager operations to bots in groups only.
+AiPlayerbot.LogInGroupOnly = 1
+
+# Enable extra per-tick value logging.
+AiPlayerbot.LogValuesPerTick = 0
+
+# Debug multiplier used by some random-change systems.
+AiPlayerbot.RandomChangeMultiplier = 1
+
+# Tell players which spell triggered avoid-aoe behavior.
+AiPlayerbot.TellWhenAvoidAoe = 0
+
+# Enable the performance monitor.
+AiPlayerbot.PerfMonEnabled = 0
+
+####################################################################################################
+# CHAT SETTINGS
+####################################################################################################
+
+# Prefix and separator used for bot chat commands.
+AiPlayerbot.CommandPrefix = ""
+AiPlayerbot.CommandSeparator = "\\"
+
+# Basic bot social behavior.
+AiPlayerbot.RandomBotTalk = 0
+AiPlayerbot.RandomBotEmote = 0
+AiPlayerbot.RandomBotSuggestDungeons = 0
+AiPlayerbot.EnableGreet = 0
+AiPlayerbot.GuildRepliesRate = 0
+AiPlayerbot.RandomBotSayWithoutMaster = 0
+
+# Reply behavior for common meme and toxic-link patterns.
+AiPlayerbot.ToxicLinksRepliesChance = 0
+AiPlayerbot.ThunderfuryRepliesChance = 0
+
+# Global broadcast enable.
+AiPlayerbot.EnableBroadcasts = 0
+
+# Channel-level broadcast chances.
+AiPlayerbot.BroadcastToGuildGlobalChance = 30000
+AiPlayerbot.BroadcastToWorldGlobalChance = 30000
+AiPlayerbot.BroadcastToGeneralGlobalChance = 30000
+AiPlayerbot.BroadcastToTradeGlobalChance = 30000
+AiPlayerbot.BroadcastToLFGGlobalChance = 30000
+AiPlayerbot.BroadcastToLocalDefenseGlobalChance = 30000
+AiPlayerbot.BroadcastToWorldDefenseGlobalChance = 30000
+AiPlayerbot.BroadcastToGuildRecruitmentGlobalChance = 30000
+
+# Looting broadcasts.
+AiPlayerbot.BroadcastChanceLootingItemPoor = 30
+AiPlayerbot.BroadcastChanceLootingItemNormal = 150
+AiPlayerbot.BroadcastChanceLootingItemUncommon = 10000
+AiPlayerbot.BroadcastChanceLootingItemRare = 20000
+AiPlayerbot.BroadcastChanceLootingItemEpic = 30000
+AiPlayerbot.BroadcastChanceLootingItemLegendary = 30000
+AiPlayerbot.BroadcastChanceLootingItemArtifact = 30000
+
+# Quest broadcasts.
+AiPlayerbot.BroadcastChanceQuestAccepted = 6000
+AiPlayerbot.BroadcastChanceQuestUpdateObjectiveCompleted = 300
+AiPlayerbot.BroadcastChanceQuestUpdateObjectiveProgress = 300
+AiPlayerbot.BroadcastChanceQuestUpdateFailedTimer = 300
+AiPlayerbot.BroadcastChanceQuestUpdateComplete = 1000
+AiPlayerbot.BroadcastChanceQuestTurnedIn = 10000
+
+# Kill broadcasts.
+AiPlayerbot.BroadcastChanceKillNormal = 30
+AiPlayerbot.BroadcastChanceKillElite = 300
+AiPlayerbot.BroadcastChanceKillRareelite = 3000
+AiPlayerbot.BroadcastChanceKillWorldboss = 20000
+AiPlayerbot.BroadcastChanceKillRare = 10000
+AiPlayerbot.BroadcastChanceKillUnknown = 100
+AiPlayerbot.BroadcastChanceKillPet = 10
+AiPlayerbot.BroadcastChanceKillPlayer = 30
+
+# Level-up broadcasts.
+AiPlayerbot.BroadcastChanceLevelupGeneric = 20000
+AiPlayerbot.BroadcastChanceLevelupTenX = 30000
+AiPlayerbot.BroadcastChanceLevelupMaxLevel = 30000
+
+# Suggestion broadcasts.
+AiPlayerbot.BroadcastChanceSuggestInstance = 5000
+AiPlayerbot.BroadcastChanceSuggestQuest = 10000
+AiPlayerbot.BroadcastChanceSuggestGrindMaterials = 5000
+AiPlayerbot.BroadcastChanceSuggestGrindReputation = 5000
+AiPlayerbot.BroadcastChanceSuggestSell = 300
+AiPlayerbot.BroadcastChanceSuggestSomething = 30000
+AiPlayerbot.BroadcastChanceSuggestSomethingToxic = 0
+AiPlayerbot.BroadcastChanceSuggestToxicLinks = 0
+AiPlayerbot.ToxicLinksPrefix = gnomes
+AiPlayerbot.BroadcastChanceSuggestThunderfury = 1
+
+# Guild-management style broadcast rate.
+AiPlayerbot.BroadcastChanceGuildManagement = 30000
+
+####################################################################################################
+# LOGS
+####################################################################################################
+
+# Explicit allow-list of custom playerbot log files that may be created.
+AiPlayerbot.AllowedLogFiles = ""
+
+# GameObject GUIDs bots should never interact with.
+AiPlayerbot.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,179490,141596,160836,160845,179516,176224,181085,176112,128308,128403,165739,165738,175245,175970,176325,176327,123329,2560
+
+####################################################################################################
+# LEGACY RUNTIME KNOBS STILL SUPPORTED
+####################################################################################################
+
+# Log in all randombots during startup.
+AiPlayerbot.RandomBotLoginAtStartup = 1
+
+# Guild task system.
+AiPlayerbot.EnableGuildTasks = 0
+AiPlayerbot.MinGuildTaskChangeTime = 172800
+AiPlayerbot.MaxGuildTaskChangeTime = 432000
+AiPlayerbot.MinGuildTaskAdvertisementTime = 300
+AiPlayerbot.MaxGuildTaskAdvertisementTime = 28800
+AiPlayerbot.MinGuildTaskRewardTime = 300
+AiPlayerbot.MaxGuildTaskRewardTime = 3600
+AiPlayerbot.GuildTaskAdvertCleanupTime = 300
+AiPlayerbot.GuildTaskKillTaskDistance = 2000
+
+# Presentation tweaks and random behavior helpers.
+AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
+AiPlayerbot.RandomBotRpgChance = 0.20
+AiPlayerbot.RandombotsWalkingRPG = 0
+AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
+
+# Internal manager timing knobs.
+AiPlayerbot.MinRandomBotsPriceChangeInterval = 7200
+AiPlayerbot.MaxRandomBotsPriceChangeInterval = 172800
+AiPlayerbot.MinRandomBotChangeStrategyTime = 180
+AiPlayerbot.MaxRandomBotChangeStrategyTime = 720
+
+# Facade and summon support tuning.
+AiPlayerbot.TargetPosRecalcDistance = 0.1
+AiPlayerbot.SummonAtInnkeepersEnabled = 1
+
+# Optional world-buff matrix for scripted buff combinations.
+AiPlayerbot.WorldBuffMatrix = ""
+
+# Legacy raid-buff compatibility switch retained by the runtime.
+# This is not part of Vanilla gameplay and is normally left disabled by server operators.
+AiPlayerbot.EnableICCBuffs = 0
+
+####################################################################################################
+# LEGACY / OMITTED WOTLK SETTINGS
+#
+# These keys existed in the source WotLK config but are intentionally not part of the Vanilla dist:
+# - `AiPlayerbot.SpellDump` (no integrated runtime support found)
+# - `AiPlayerbot.PremadeAvoidAoe` (no integrated runtime support found)
+# - WotLK premade spec/glyph payloads
+# - Death Knight-specific config payloads
+# - Arena team, rated arena, Eye of the Storm, and Isle of Conquest payloads omitted from the
+#   Vanilla dist
+# - Expansion-specific zone and teleport examples that would mislead Vanilla operators
+####################################################################################################
+
+####################################################################################################
+# NOTES
+#
+# This file is now organized as the authoritative Vanilla playerbots config template.
+# Later phases of the config port will expand the currently empty top-level sections with the
+# Vanilla-safe settings identified in `plans/playerbots_vanilla_config_phase1_matrix.md`.
+####################################################################################################

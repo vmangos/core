@@ -34,6 +34,7 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include "ArgparserForServer.h"
+#include <filesystem>
 
 #ifdef WIN32
 #include "ServiceWin32.h"
@@ -55,6 +56,7 @@ DatabaseType WorldDatabase;                                 // Accessor to the w
 DatabaseType CharacterDatabase;                             // Accessor to the character database
 DatabaseType LoginDatabase;                                 // Accessor to the realm/login database
 DatabaseType LogsDatabase;                                  // Accessor to the logs database
+DatabaseType PlayerbotsDatabase;                            // Accessor to the playerbots database
 
 uint32 realmID;                                             // Id of the realm
 std::string realmName;                                      // Name of the realm
@@ -80,6 +82,17 @@ extern int main(int argc, char **argv)
     if (!sConfig.LoadFromFile(args.configFilePath)) // must be done before (linux) service init
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find or parse configuration file %s", args.configFilePath.c_str());
+        Log::WaitBeforeContinueIfNeed();
+        return EXIT_FAILURE;
+    }
+
+    std::filesystem::path playerbotsConfigPath = std::filesystem::path(args.configFilePath).parent_path() / "playerbots.conf";
+    if (playerbotsConfigPath.empty())
+        playerbotsConfigPath = "playerbots.conf";
+
+    if (!sConfig.MergeFromFile(playerbotsConfigPath.string()))
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find or parse playerbots configuration file %s", playerbotsConfigPath.string().c_str());
         Log::WaitBeforeContinueIfNeed();
         return EXIT_FAILURE;
     }
@@ -127,6 +140,7 @@ extern int main(int argc, char **argv)
         "                  MMMMMM\n"
         "                          https://github.com/vmangos\n\n");
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s", sConfig.GetFilename().c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using playerbots configuration file %s", playerbotsConfigPath.string().c_str());
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core Revision: " _FULLVERSION);
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
     if (SSLeay() < 0x009080bfL )

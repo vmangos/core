@@ -36,26 +36,52 @@ static bool IsLineEndChar(char chr)
 bool Config::LoadFromFile(std::string const& filename)
 {
     m_fileName = filename;
+    m_additionalFiles.clear();
     return Reload();
+}
+
+bool Config::MergeFromFile(std::string const& filename)
+{
+    if (!LoadFile(filename, false))
+        return false;
+
+    m_additionalFiles.push_back(filename);
+    return true;
 }
 
 bool Config::Reload()
 {
-    FILE* pFile = fopen(m_fileName.c_str(), "r");
+    if (!LoadFile(m_fileName, true))
+        return false;
+
+    for (std::string const& filename : m_additionalFiles)
+    {
+        if (!LoadFile(filename, false))
+            return false;
+    }
+
+    std::shared_lock<std::shared_timed_mutex> guard(m_configLock);
+    return !m_configMap.empty();
+}
+
+bool Config::LoadFile(std::string const& filename, bool clearExisting)
+{
+    FILE* pFile = fopen(filename.c_str(), "r");
     if (!pFile)
         return false;
 
-    std::lock_guard<std::shared_timed_mutex> guard(m_configLock);
-    m_configMap.clear();
-
-    char buffer[1024];
-    while (fgets(buffer, sizeof(buffer), pFile))
     {
-        ProcessLine(buffer);
+        std::lock_guard<std::shared_timed_mutex> guard(m_configLock);
+        if (clearExisting)
+            m_configMap.clear();
+
+        char buffer[1024];
+        while (fgets(buffer, sizeof(buffer), pFile))
+            ProcessLine(buffer);
     }
 
     fclose(pFile);
-    return !m_configMap.empty();
+    return true;
 }
 
 enum LineReadStage
@@ -143,11 +169,15 @@ bool Config::ProcessLine(char const* line)
     if (name.empty() || value.empty())
         return false;
 
-    if (!m_configMap.insert({ name, value }).second)
+    auto it = m_configMap.find(name);
+    if (it != m_configMap.end())
     {
-        printf("Config setting '%s' appear twice in config! Ignoring second occurrence.\n", name.c_str());
-        return false;
+        // Support layered config semantics: later files/entries override earlier ones.
+        it->second = value;
+        return true;
     }
+
+    m_configMap.insert({ name, value });
 
     return true;
 }

@@ -828,6 +828,13 @@ static uint8 GetOfflinePlayerGender(ObjectGuid guid)
 
 bool PlayerbotMgr::HandlePlayerbotMgrCommand(ChatHandler* handler, char const* args)
 {
+    // Defensive init: command table is always available, but config init may not have run yet
+    // in some startup paths. Attempt a lazy init before reporting "disabled".
+    if (!sPlayerbotAIConfig.enabled)
+    {
+        sPlayerbotAIConfig.Initialize();
+    }
+
     if (!sPlayerbotAIConfig.enabled)
     {
         handler->PSendSysMessage("|cffff0000Playerbot system is currently disabled!");
