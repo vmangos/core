@@ -2012,7 +2012,7 @@ void TravelNodeMap::generateWalkPaths()
         }
     }
 
-    LOG_INFO("playerbots", ">> Generated paths for {} nodes.", TravelNodeMap::instance().getNodes().size());
+    LOG_INFO("playerbots", ">> Generated paths for %zu nodes.", TravelNodeMap::instance().getNodes().size());
 }
 
 void TravelNodeMap::generateTaxiPaths()
@@ -2119,7 +2119,7 @@ void TravelNodeMap::removeUselessPaths()
 
         it++;
 
-        LOG_INFO("playerbots", "Iteration {}, removed {}", it, rem);
+        LOG_INFO("playerbots", "Iteration %u, removed %u", it, rem);
     }
 }
 
@@ -2141,7 +2141,7 @@ void TravelNodeMap::calculatePathCosts()
         }
     }
 
-    LOG_INFO("playerbots", ">> Calculated pathcost for {} nodes.", TravelNodeMap::instance().getNodes().size());
+    LOG_INFO("playerbots", ">> Calculated pathcost for %zu nodes.", TravelNodeMap::instance().getNodes().size());
 }
 
 void TravelNodeMap::generatePaths()
@@ -2316,7 +2316,7 @@ void TravelNodeMap::saveNodeStore()
         saveNodes.insert(std::make_pair(node, i));
     }
 
-    LOG_INFO("playerbots", ">> Saved {} travelNodes.", anodes.size());
+    LOG_INFO("playerbots", ">> Saved %zu travelNodes.", anodes.size());
 
     {
         uint32 paths = 0, points = 0;
@@ -2358,7 +2358,7 @@ void TravelNodeMap::saveNodeStore()
             }
         }
 
-        LOG_INFO("playerbots", ">> Saved {} travelNode Paths, {} points.", paths, points);
+        LOG_INFO("playerbots", ">> Saved %u travelNode Paths, %u points.", paths, points);
     }
 
     PlayerbotsDatabase.CommitTransaction();
@@ -2389,7 +2389,7 @@ void TravelNodeMap::loadNodeStore()
 
             } while (result->NextRow());
 
-            LOG_INFO("playerbots", ">> Loaded {} travelNodes.", saveNodes.size());
+            LOG_INFO("playerbots", ">> Loaded %zu travelNodes.", saveNodes.size());
         }
         else
         {
@@ -2432,7 +2432,7 @@ void TravelNodeMap::loadNodeStore()
 
             } while (result->NextRow());
 
-            LOG_INFO("playerbots", ">> Loaded {} travelNode paths.", result->GetRowCount());
+            LOG_INFO("playerbots", ">> Loaded %u travelNode paths.", result->GetRowCount());
         }
         else
         {
@@ -2474,7 +2474,7 @@ void TravelNodeMap::loadNodeStore()
 
             } while (result->NextRow());
 
-            LOG_INFO("playerbots", ">> Loaded {} travelNode paths points.", result->GetRowCount());
+            LOG_INFO("playerbots", ">> Loaded %u travelNode paths points.", result->GetRowCount());
         }
         else
         {

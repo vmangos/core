@@ -124,7 +124,16 @@ void Camera::Event_RemovedFromWorld()
         return;
     }
 
-    ResetView();
+    // The current viewpoint is already being removed from the world. Rebinding the
+    // camera to the owner is enough here; forcing a full visibility refresh during
+    // grid unload can walk partially torn-down objects.
+    m_source->GetViewPoint().Detach(this);
+    m_source = &m_owner;
+    m_source->GetViewPoint().Attach(this);
+
+    m_gridRef.unlink();
+    if (GridType* grid = m_source->GetViewPoint().m_grid)
+        grid->AddWorldObject(this);
 }
 
 void Camera::Event_Moved()

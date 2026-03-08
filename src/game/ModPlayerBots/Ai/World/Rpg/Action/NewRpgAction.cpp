@@ -334,7 +334,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
             /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
             botAI->lowPriorityQuest.insert(questId);
             botAI->rpgStatistic.questAbandoned++;
-            LOG_DEBUG("playerbots", "[New RPG] {} marked as abandoned quest {}", bot->GetName(), questId);
+            LOG_DEBUG("playerbots", "[New RPG] %s marked as abandoned quest %u", bot->GetName(), questId);
             botAI->rpgInfo.ChangeToIdle();
             return true;
         }
@@ -401,7 +401,7 @@ bool NewRpgDoQuestAction::DoCompletedQuest()
         /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
         botAI->lowPriorityQuest.insert(questId);
         botAI->rpgStatistic.questAbandoned++;
-        LOG_DEBUG("playerbots", "[New RPG] {} marked as abandoned quest {}", bot->GetName(), questId);
+        LOG_DEBUG("playerbots", "[New RPG] %s marked as abandoned quest %u", bot->GetName(), questId);
         botAI->rpgInfo.ChangeToIdle();
         return true;
     }
@@ -435,7 +435,7 @@ bool NewRpgTravelFlightAction::Execute(Event event)
     }
     if (!bot->ActivateTaxiPathTo(nodes, flightMaster, 0))
     {
-        LOG_DEBUG("playerbots", "[New RPG] {} active taxi path {} (from {} to {}) failed", bot->GetName(),
+        LOG_DEBUG("playerbots", "[New RPG] %s active taxi path %u (from %u to %u) failed", bot->GetName(),
                   flightMaster->GetEntry(), nodes[0], nodes[1]);
         botAI->rpgInfo.ChangeToIdle();
     }

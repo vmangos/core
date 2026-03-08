@@ -45,7 +45,7 @@ public:
         // Check if target is already in a group
         if (target->GetGroup())
         {
-            LOG_DEBUG("playerbots", "GroupInviteOperation: Target {} is already in a group", target->GetName());
+            LOG_DEBUG("playerbots", "GroupInviteOperation: Target %s is already in a group", target->GetName());
             return false;
         }
 
@@ -58,11 +58,11 @@ public:
             if (!group->Create(bot))
             {
                 delete group;
-                LOG_ERROR("playerbots", "GroupInviteOperation: Failed to create group for bot {}", bot->GetName());
+                LOG_ERROR("playerbots", "GroupInviteOperation: Failed to create group for bot %s", bot->GetName());
                 return false;
             }
             sGroupMgr->AddGroup(group);
-            LOG_DEBUG("playerbots", "GroupInviteOperation: Created new group for bot {}", bot->GetName());
+            LOG_DEBUG("playerbots", "GroupInviteOperation: Created new group for bot %s", bot->GetName());
         }
 
         // Convert to raid if needed (more than 5 members)
@@ -75,7 +75,7 @@ public:
         // Add member to group
         if (group->AddMember(target))
         {
-            LOG_DEBUG("playerbots", "GroupInviteOperation: Successfully added {} to group", target->GetName());
+            LOG_DEBUG("playerbots", "GroupInviteOperation: Successfully added %s to group", target->GetName());
             if (sPlayerbotAIConfig.summonWhenGroup && target->GetDistance(bot) > sPlayerbotAIConfig.sightDistance)
             {
                 PlayerbotAI* targetAI = sPlayerbotsMgr.GetPlayerbotAI(target);
@@ -89,7 +89,7 @@ public:
         }
         else
         {
-            LOG_ERROR("playerbots", "GroupInviteOperation: Failed to add {} to group", target->GetName());
+            LOG_ERROR("playerbots", "GroupInviteOperation: Failed to add %s to group", target->GetName());
             return false;
         }
     }
@@ -144,7 +144,7 @@ public:
         }
 
         group->RemoveMember(target->GetGUID());
-        LOG_DEBUG("playerbots", "GroupRemoveMemberOperation: Removed {} from group", target->GetName());
+        LOG_DEBUG("playerbots", "GroupRemoveMemberOperation: Removed %s from group", target->GetName());
         return true;
     }
 
@@ -242,7 +242,7 @@ public:
         }
 
         group->ChangeLeader(newLeader->GetGUID());
-        LOG_DEBUG("playerbots", "GroupSetLeaderOperation: Changed leader to {}", newLeader->GetName());
+        LOG_DEBUG("playerbots", "GroupSetLeaderOperation: Changed leader to %s", newLeader->GetName());
         return true;
     }
 
@@ -295,7 +295,7 @@ public:
             if (memberGroup)
             {
                 memberGroup->RemoveMember(memberGuid);
-                LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Removed {} from their existing group",
+                LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Removed %s from their existing group",
                          member->GetName());
             }
         }
@@ -313,13 +313,13 @@ public:
         if (!newGroup->Create(leader))
         {
             delete newGroup;
-            LOG_ERROR("playerbots", "ArenaGroupFormationOperation: Failed to create arena group for leader {}",
+            LOG_ERROR("playerbots", "ArenaGroupFormationOperation: Failed to create arena group for leader %s",
                      leader->GetName());
             return false;
         }
 
         sGroupMgr->AddGroup(newGroup);
-        LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Created new arena group with leader {}",
+        LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Created new arena group with leader %s",
                  leader->GetName());
 
         // Step 4: Add members to the new group
@@ -329,14 +329,14 @@ public:
             Player* member = ObjectAccessor::FindPlayer(memberGuid);
             if (!member)
             {
-                LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Member {} not found, skipping",
+                LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Member %s not found, skipping",
                          memberGuid.ToString());
                 continue;
             }
 
             if (member->GetLevel() < 70)
             {
-                LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Member {} is below level 70, skipping",
+                LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Member %s is below level 70, skipping",
                          member->GetName());
                 continue;
             }
@@ -344,11 +344,11 @@ public:
             if (newGroup->AddMember(member))
             {
                 addedMembers++;
-                LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Added {} to arena group",
+                LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Added %s to arena group",
                          member->GetName());
             }
             else
-                LOG_ERROR("playerbots", "ArenaGroupFormationOperation: Failed to add {} to arena group",
+                LOG_ERROR("playerbots", "ArenaGroupFormationOperation: Failed to add %s to arena group",
                          member->GetName());
         }
 
@@ -374,19 +374,19 @@ public:
             member->TeleportTo(leader->GetMapId(), leader->GetPositionX(), leader->GetPositionY(),
                               leader->GetPositionZ(), 0);
 
-            LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Teleported {} to leader", member->GetName());
+            LOG_DEBUG("playerbots", "ArenaGroupFormationOperation: Teleported %s to leader", member->GetName());
         }
 
         // Check if we have enough members
         if (newGroup->GetMembersCount() < m_requiredSize)
         {
-            LOG_INFO("playerbots", "Team #{} <{}> Group is not ready for match (not enough members: {}/{})",
+            LOG_INFO("playerbots", "Team #%u <%s> Group is not ready for match (not enough members: %u/%u)",
                     m_arenaTeamId, m_arenaTeamName, newGroup->GetMembersCount(), m_requiredSize);
             newGroup->Disband();
             return false;
         }
 
-        LOG_INFO("playerbots", "Team #{} <{}> Group is ready for match with {} members",
+        LOG_INFO("playerbots", "Team #%u <%s> Group is ready for match with %u members",
                 m_arenaTeamId, m_arenaTeamName, newGroup->GetMembersCount());
         return true;
     }

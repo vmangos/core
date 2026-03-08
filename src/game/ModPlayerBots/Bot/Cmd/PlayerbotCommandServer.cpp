@@ -55,7 +55,7 @@ void session(socket_ptr sock)
     }
     catch (std::exception& e)
     {
-        LOG_ERROR("playerbots", "{}", e.what());
+        LOG_ERROR("playerbots", "%s", e.what());
     }
 }
 
@@ -79,7 +79,7 @@ void Run()
 
     std::ostringstream s;
     s << "Starting Playerbots Command Server on port " << sPlayerbotAIConfig.commandServerPort;
-    LOG_INFO("playerbots", "{}", s.str().c_str());
+    LOG_INFO("playerbots", "%s", s.str().c_str());
 
     try
     {
@@ -89,7 +89,7 @@ void Run()
 
     catch (std::exception& e)
     {
-        LOG_ERROR("playerbots", "{}", e.what());
+        LOG_ERROR("playerbots", "%s", e.what());
     }
 }
 

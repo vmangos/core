@@ -11,6 +11,7 @@
 #include "PlayerbotMgr.h"
 #include "GameTime.h"
 #include "PlayerbotCommandServer.h"
+#include <unordered_set>
 
 struct BattlegroundInfo
 {
@@ -192,6 +193,21 @@ protected:
     void OnBotLoginInternal(Player* const bot) override;
 
 private:
+    struct AutonomousInitState
+    {
+        bool missingRandomized = false;
+        bool missingStrategyEvent = false;
+        bool missingTeleportEvent = false;
+        bool missingStrategyMode = false;
+        bool baselineLevel = false;
+
+        bool NeedsRepair() const
+        {
+            return missingRandomized || baselineLevel ||
+                ((missingStrategyEvent || missingTeleportEvent) && missingStrategyMode);
+        }
+    };
+
     RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
     {
         this->playersLevel = sPlayerbotAIConfig.randombotStartingLevel;
@@ -236,6 +252,8 @@ private:
     bool _isBotLogging = true;
     NewRpgStatistic rpgStasticTotal;
     CachedEvent* FindEvent(uint32 bot, std::string const& event);
+    void LoadEventCache(uint32 bot);
+    void CleanupExpiredEvents(bool forceDbCleanup = false);
     uint32 GetEventValue(uint32 bot, std::string const& event);
     std::string GetEventData(uint32 bot, std::string const& event);
     uint32 SetEventValue(uint32 bot, std::string const& event, uint32 value, uint32 validIn,
@@ -251,6 +269,14 @@ private:
     uint32 AddRandomBots();
     bool ProcessBot(uint32 bot);
     void ScheduleRandomize(uint32 bot, uint32 time);
+    void ScheduleLogout(uint32 bot, uint32 time = 0);
+    AutonomousInitState GetAutonomousInitState(Player* bot);
+    bool EnsureAutonomousInit(Player* bot, char const* context);
+    void ScheduleAutonomousEvents(uint32 bot, char const* context = nullptr);
+    void RepairBrokenRandomBotState();
+    uint32 GetRandomBotCountTarget();
+    std::vector<uint32> GetOfflineRandomBots(uint32 limit);
+    bool IsEventDue(uint32 bot, std::string const& event);
     void RandomTeleport(Player* bot);
     void RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth = false);
     uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);
@@ -265,6 +291,10 @@ private:
     std::list<uint32> currentBots;
     uint32 bgBotsCount;
     uint32 playersLevel;
+    uint32 processIndex = 0;
+    uint32 lastPopulationLogCount = 0;
+    time_t lastEventCleanupTime = 0;
+    time_t lastPopulationLogTime = 0;
 
     // Account lists
     std::vector<uint32> rndBotTypeAccounts;             // Accounts marked as RNDbot (type 1)

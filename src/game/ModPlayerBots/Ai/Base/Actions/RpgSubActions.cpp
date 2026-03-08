@@ -165,7 +165,7 @@ bool RpgTaxiAction::Execute(Event event)
 
     if (nodes.empty())
     {
-        LOG_ERROR("playerbots", "Bot {} - No flight paths available", bot->GetName());
+        LOG_ERROR("playerbots", "Bot %s - No flight paths available", bot->GetName());
         return false;
     }
 
@@ -186,19 +186,20 @@ bool RpgTaxiAction::Execute(Event event)
     Creature* flightMaster = bot->GetNPCIfCanInteractWith(guidP, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!flightMaster)
     {
-        LOG_ERROR("playerbots", "Bot {} cannot talk to flightmaster ({} location available)", bot->GetName(),
+        LOG_ERROR("playerbots", "Bot %s cannot talk to flightmaster (%zu location available)", bot->GetName(),
                   nodes.size());
         return false;
     }
 
     if (!bot->ActivateTaxiPathTo({fromNodeId, toNodeId}, flightMaster, 0))
     {
-        LOG_ERROR("playerbots", "Bot {} cannot fly {} ({} location available)", bot->GetName(), path, nodes.size());
+        LOG_ERROR("playerbots", "Bot %s cannot fly %u (%zu location available)", bot->GetName(), path, nodes.size());
         return false;
     }
 
-    LOG_INFO("playerbots", "Bot {} <{}> is flying from {} to {} ({} location available)",
-             LOG_GUID(bot->GetGUID()), bot->GetName(), nodeFrom->name[0].c_str(), nodeTo->name[0].c_str(), nodes.size());
+    LOG_INFO("playerbots", "Bot %llu <%s> is flying from %s to %s (%zu location available)",
+             static_cast<unsigned long long>(LOG_GUID(bot->GetGUID())), bot->GetName(), nodeFrom->name[0].c_str(),
+             nodeTo->name[0].c_str(), nodes.size());
 
     bot->SetMoney(money);
 

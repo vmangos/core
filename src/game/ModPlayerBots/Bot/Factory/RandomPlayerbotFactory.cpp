@@ -61,32 +61,69 @@ bool RandomPlayerbotFactory::IsValidRaceClassCombination(uint8 race, uint8 cls, 
     return info != nullptr;
 }
 
-Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache)
+bool RandomPlayerbotFactory::LoadNameCacheEntry(
+    NameRaceAndGender raceAndGender,
+    std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache)
+{
+    std::vector<std::string>& names = nameCache[raceAndGender];
+    if (!names.empty())
+        return true;
+
+    auto result = CharacterDatabase.PQuery(
+        "SELECT n.name "
+        "FROM playerbots_names n "
+        "LEFT OUTER JOIN characters c ON c.name = n.name "
+        "WHERE c.guid IS NULL AND n.gender = '%u' "
+        "ORDER BY n.name_id "
+        "LIMIT %u",
+        static_cast<uint8>(raceAndGender), NameCacheBatchSize);
+    if (!result)
+        return false;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        std::string const name = fields[0].GetCppString();
+        if (sObjectMgr.CheckPlayerName(name) == CHAR_NAME_SUCCESS)
+            names.push_back(name);
+    } while (result->NextRow());
+
+    return !names.empty();
+}
+
+bool RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache)
 {
     LOG_DEBUG("playerbots", "Creating a new random bot for class: %u", cls);
 
-    const bool alliance = static_cast<bool>(urand(0, 1));
-
     std::vector<uint8> raceOptions;
+    std::vector<uint8> allianceRaceOptions;
+    std::vector<uint8> hordeRaceOptions;
     for (uint8 race = RACE_HUMAN; race < MAX_RACES; ++race)
     {
         // skip disabled with config races - not available in Vanilla, assume all enabled
         // if ((1 << (race - 1)) & sWorld.getIntConfig(CONFIG_CHARACTER_CREATING_DISABLED_RACEMASK))
         //     continue;
 
-        // Try to get 50/50 faction distribution for random bot population balance.
-        // Without this check, races from the faction with more class options would dominate.
-        if (alliance == IsAlliance(race))
-        {
-            if (IsValidRaceClassCombination(race, cls, 0))
-                raceOptions.push_back(race);
-        }
+        if (!IsValidRaceClassCombination(race, cls, 0))
+            continue;
+
+        raceOptions.push_back(race);
+        if (IsAlliance(race))
+            allianceRaceOptions.push_back(race);
+        else
+            hordeRaceOptions.push_back(race);
     }
 
     if (raceOptions.empty())
     {
         LOG_ERROR("playerbots", "No races are available for class: %u", cls);
-        return nullptr;
+        return false;
+    }
+
+    // Preserve faction balancing only when the class is available to both factions.
+    if (!allianceRaceOptions.empty() && !hordeRaceOptions.empty())
+    {
+        raceOptions = urand(0, 1) ? allianceRaceOptions : hordeRaceOptions;
     }
 
     const uint8 race = raceOptions[urand(0, raceOptions.size() - 1)];
@@ -96,11 +133,11 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     std::string name;
     if (!nameCache.empty())
     {
-        if (nameCache[raceAndGender].empty())
+        if (!LoadNameCacheEntry(raceAndGender, nameCache))
         {
             LOG_ERROR("playerbots", "No names found for the specified race: %u and gender: %u",
                     race, gender);
-            return nullptr;
+            return false;
         }
 
         uint32 i = urand(0, nameCache[raceAndGender].size() - 1);
@@ -116,7 +153,7 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
     if (name.empty())
     {
         LOG_ERROR("playerbots", "Failed to get a valid random bot name");
-        return nullptr;
+        return false;
     }
 
     std::vector<uint8> skinColors, facialHairTypes;
@@ -157,27 +194,18 @@ Player* RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls
 
     uint32 guidlow = sObjectMgr.GeneratePlayerLowGuid();
 
-    Player* player = new Player(session);
-    player->GetMotionMaster()->Initialize();
-    if (!player->Create(guidlow, name, race, cls, gender, face.second, face.first, hair.first, hair.second, facialHair))
+    if (!Player::SaveNewPlayer(session, guidlow, name, race, cls, gender, face.second, face.first, hair.first, hair.second, facialHair))
     {
-        player->CleanupsBeforeDelete();
-        delete player;
-
-        LOG_ERROR("playerbots", "Unable to create random bot - name: \"{}\", race: {}, class: {}",
-                name.c_str(), race, cls);
-        return nullptr;
+        LOG_ERROR("playerbots",
+            "Unable to persist random bot for account %u - name: \"%s\", race: %u, class: %u",
+            session->GetAccountId(), name.c_str(), race, cls);
+        return false;
     }
 
-    if (cls == CLASS_DEATH_KNIGHT)
-    {
-        player->LearnSpell(50977, false);
-    }
-
-    LOG_DEBUG("playerbots", "Random bot created - name: \"{}\", race: {}, class: {}",
+    LOG_DEBUG("playerbots", "Random bot created - name: \"%s\", race: %u, class: %u",
             name.c_str(), race, cls);
 
-    return player;
+    return true;
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender raceAndGender)
@@ -571,6 +599,11 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     // Calculates the total number of required accounts.
     uint32 totalAccountCount = CalculateTotalAccountCount();
+    LOG_INFO("playerbots", "Random bot config: autologin=%s, min=%u, max=%u, account target=%u",
+        sPlayerbotAIConfig.randomBotAutologin ? "true" : "false",
+        sPlayerbotAIConfig.minRandomBots,
+        sPlayerbotAIConfig.maxRandomBots,
+        totalAccountCount);
     uint32 timer = getMSTime();
 
     for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
@@ -615,10 +648,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     LOG_INFO("playerbots", "Creating random bot characters...");
     uint32 totalRandomBotChars = 0;
-    std::vector<std::pair<Player*, uint32>> playerBots;
     std::vector<WorldSession*> sessionBots;
     int bot_creation = 0;
-    bool nameCached = false;
     for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
     {
         std::ostringstream out;
@@ -640,33 +671,6 @@ void RandomPlayerbotFactory::CreateRandomBots()
             continue;
         }
 
-        if (!nameCached)
-        {
-            nameCached = true;
-            LOG_INFO("playerbots", "Creating cache for names per gender and race...");
-            auto result = CharacterDatabase.Query("SELECT name, gender FROM playerbots_names");
-            if (!result)
-            {
-                LOG_ERROR("playerbots", "No more unused names left");
-                return;
-            }
-            do
-            {
-                Field* fields = result->Fetch();
-                std::string name = fields[0].GetCppString();
-                NameRaceAndGender raceAndGender = static_cast<NameRaceAndGender>(fields[1].GetUInt8());
-                if (sObjectMgr.CheckPlayerName(name) == CHAR_NAME_SUCCESS)
-                {
-                    auto checkResult = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE name = '%s'", name.c_str());
-                    if (checkResult)
-                        continue;
-
-                    nameCache[raceAndGender].push_back(name);
-                }
-
-            } while (result->NextRow());
-        }
-
         LOG_DEBUG("playerbots", "Creating random bot characters for account: [%u/%u]", accountNumber + 1, totalAccountCount);
         RandomPlayerbotFactory factory;
 
@@ -683,20 +687,12 @@ void RandomPlayerbotFactory::CreateRandomBots()
             // if ((1 << (cls - 1)) & sWorld.getIntConfig(CONFIG_CHARACTER_CREATING_DISABLED_CLASSMASK))
             //     continue;
 
-            Player* playerBot = factory.CreateRandomBot(session, cls, nameCache);
-            if (!playerBot)
+            if (!factory.CreateRandomBot(session, cls, nameCache))
             {
-                LOG_ERROR("playerbots", "Fail to create character for account %u", accountId);
+                LOG_ERROR("playerbots", "Failed to create persistent random bot character for account %u, class %u", accountId, cls);
                 continue;
             }
 
-            playerBot->SaveToDB(true, false);
-            // sCharacterCache not available in Vanilla - skip cache update
-            // sCharacterCache->AddCharacterCacheEntry(playerBot->GetGUID(), accountId, playerBot->GetName(),
-            //                                         playerBot->getGender(), playerBot->GetRace(),
-            //                                         playerBot->getClass(), playerBot->GetLevel());
-            playerBot->CleanupsBeforeDelete();
-            delete playerBot;
             bot_creation++;
         }
     }
@@ -722,6 +718,11 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
     LOG_INFO("server.loading", ">> %zu random bot accounts with %u characters available",
             sPlayerbotAIConfig.randomBotAccounts.size(), totalRandomBotChars);
+
+    if (!totalRandomBotChars)
+    {
+        LOG_WARN("playerbots", "No random bot characters are available after startup account scan");
+    }
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomGuildName()

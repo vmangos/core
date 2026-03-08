@@ -3,6 +3,7 @@
 
 #include "Strategy.h"
 #include "RaidAq20Strategy.h"
+#include "RaidAq40Strategy.h"
 #include "RaidMcStrategy.h"
 #include "RaidBwlStrategy.h"
 #if !PB_DISABLE_BG_BOT_LOGIC
@@ -24,6 +25,7 @@ public:
     RaidStrategyContext() : NamedObjectContext<Strategy>(false, true)
     {
         creators["aq20"] = &RaidStrategyContext::aq20;
+        creators["aq40"] = &RaidStrategyContext::aq40;
         creators["moltencore"] = &RaidStrategyContext::moltencore;
         creators["bwl"] = &RaidStrategyContext::bwl;
 #if !PB_DISABLE_BG_BOT_LOGIC
@@ -42,6 +44,7 @@ public:
 
 private:
     static Strategy* aq20(PlayerbotAI* botAI) { return new RaidAq20Strategy(botAI); }
+    static Strategy* aq40(PlayerbotAI* botAI) { return new RaidAq40Strategy(botAI); }
     static Strategy* moltencore(PlayerbotAI* botAI) { return new RaidMcStrategy(botAI); }
     static Strategy* bwl(PlayerbotAI* botAI) { return new RaidBwlStrategy(botAI); }
 #if !PB_DISABLE_BG_BOT_LOGIC

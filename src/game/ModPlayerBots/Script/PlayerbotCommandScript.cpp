@@ -59,9 +59,9 @@ bool ChatHandler::HandleAutogearCommand(char* /*args*/)
     target->DurabilityRepairAll(false, 1.0f);
 
     if (target == caller)
-        PSendSysMessage("Autogeared {}.", target->GetName());
+        PSendSysMessage("Autogeared %s.", target->GetName());
     else
-        PSendSysMessage("Autogeared {} for {}.", target->GetName(), caller->GetName());
+        PSendSysMessage("Autogeared %s for %s.", target->GetName(), caller->GetName());
 
     return true;
 }

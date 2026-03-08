@@ -1,6 +1,7 @@
 #include "PlayerBotMgrCompat.h"
 
 #include "ModPlayerBots/Bot/PlayerbotAI.h"
+#include "ModPlayerBots/PlayerbotAIConfig.h"
 #include "ModPlayerBots/Bot/PlayerbotMgr.h"
 #include "ModPlayerBots/Bot/RandomPlayerbotMgr.h"
 #include "World.h"
@@ -14,11 +15,12 @@ PlayerBotMgr& PlayerBotMgr::instance()
 
 void PlayerBotMgr::LoadConfig()
 {
+    sPlayerbotAIConfig.Initialize();
 }
 
 void PlayerBotMgr::Load()
 {
-    sRandomPlayerbotMgr.Init();
+    sPlayerbotAIConfig.InitializeLate();
 }
 
 void PlayerBotMgr::DeleteAll()

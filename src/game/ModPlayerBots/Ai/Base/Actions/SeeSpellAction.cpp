@@ -44,7 +44,7 @@ bool SeeSpellAction::Execute(Event event)
     uint32 const rtscHeaderSize = sizeof(uint8) + sizeof(uint32) + sizeof(uint8);
     if (p.size() < rtscHeaderSize)
     {
-        LOG_WARN("playerbots", "SeeSpellAction: Corrupt RTSC packet size={}, expected>={}", p.size(), rtscHeaderSize);
+        LOG_WARN("playerbots", "SeeSpellAction: Corrupt RTSC packet size=%zu, expected>=%u", p.size(), rtscHeaderSize);
         return false;
     }
 

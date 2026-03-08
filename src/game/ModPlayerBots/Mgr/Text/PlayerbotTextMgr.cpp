@@ -49,7 +49,7 @@ void PlayerbotTextMgr::LoadBotTexts()
         } while (result->NextRow());
     }
 
-    LOG_INFO("playerbots", "{} playerbots texts loaded", count);
+    LOG_INFO("playerbots", "%u playerbots texts loaded", count);
 }
 
 void PlayerbotTextMgr::LoadBotTextChance()
@@ -78,13 +78,13 @@ std::string PlayerbotTextMgr::GetBotText(std::string name)
 {
     if (botTexts.empty())
     {
-        LOG_ERROR("playerbots", "Can't get bot text {}! No bots texts loaded!", name.c_str());
+        LOG_ERROR("playerbots", "Can't get bot text %s! No bots texts loaded!", name.c_str());
         return "";
     }
 
     if (botTexts[name].empty())
     {
-        LOG_ERROR("playerbots", "Can't get bot text {}! No bots texts for this name!", name.c_str());
+        LOG_ERROR("playerbots", "Can't get bot text %s! No bots texts for this name!", name.c_str());
         return "";
     }
 
@@ -127,12 +127,12 @@ std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::map<std::
 {
     if (botTexts.empty())
     {
-        LOG_ERROR("playerbots", "Can't get bot text reply {}! No bots texts loaded!", replyType);
+        LOG_ERROR("playerbots", "Can't get bot text reply %u! No bots texts loaded!", replyType);
         return "";
     }
     if (botTexts["reply"].empty())
     {
-        LOG_ERROR("playerbots", "Can't get bot text reply {}! No bots texts replies!", replyType);
+        LOG_ERROR("playerbots", "Can't get bot text reply %u! No bots texts replies!", replyType);
         return "";
     }
 
@@ -196,7 +196,8 @@ void PlayerbotTextMgr::AddLocalePriority(uint32 locale)
 {
     if (locale >= MAX_LOCALES)
     {
-        LOG_WARN("playerbots", "Ignoring locale {} for bot texts because it exceeds MAX_LOCALES ({})", locale, MAX_LOCALES - 1);
+        LOG_WARN("playerbots", "Ignoring locale %u for bot texts because it exceeds MAX_LOCALES (%u)", locale,
+                 MAX_LOCALES - 1);
         return;
     }
 

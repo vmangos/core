@@ -73,6 +73,7 @@ public:
     }
 
     bool Initialize();
+    bool InitializeLate();
     bool IsInRandomAccountList(uint32 id);
     bool IsInRandomQuestItemList(uint32 id);
     bool IsPvpProhibited(uint32 zoneId, uint32 areaId);
@@ -380,6 +381,7 @@ public:
     std::vector<uint32> randomBotArenaTeams;
 
     uint32 selfBotLevel;
+    bool lateInitializationComplete = false;
     bool downgradeMaxLevelBot;
     bool equipmentPersistence;
     int32 equipmentPersistenceLevel;

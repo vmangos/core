@@ -40,6 +40,7 @@
 #include "BroadcastHelper.h"
 #include "WorldSessionMgr.h"
 #include "DatabaseEnv.h"
+#include "PlayerBotsCompat/PlayerBotsStubs.h"
 
 class BotInitGuard
 {
@@ -111,7 +112,14 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
 
     uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(playerGuid);
     if (!accountId)
+    {
+        std::string botName;
+        bool hasName = sCharacterCache->GetCharacterNameByGuid(playerGuid, botName);
+        LOG_WARN("playerbots",
+            "Skipping bot login for guid %u: character cache lookup failed after reload (account=%u, name=%s)",
+            playerGuid.GetCounter(), accountId, hasName ? botName.c_str() : "<missing>");
         return;
+    }
 
     WorldSession* masterSession = masterAccountId ? sWorldSessionMgr->FindSession(masterAccountId) : nullptr;
     Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
@@ -137,7 +145,8 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
         PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(masterPlayer);
         if (!mgr)
         {
-            LOG_DEBUG("playerbots", "PlayerbotMgr not found for master player with GUID: {}", masterPlayer->GetGUID());
+        LOG_DEBUG("playerbots", "PlayerbotMgr not found for master player with GUID: %llu",
+                  static_cast<unsigned long long>(masterPlayer->GetGUID()));
             return;
         }
         uint32 count = mgr->GetPlayerbotsCount() + botLoading.size();
@@ -166,7 +175,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
 
 bool PlayerbotHolder::IsAccountLinked(uint32 accountId, uint32 linkedAccountId)
 {
-    auto result = PB_QueryFormat(CharacterDatabase,
+    auto result = PB_QueryFormat(PlayerbotsDatabase,
         "SELECT 1 FROM playerbots_account_links WHERE account_id = {} AND linked_account_id = {}", accountId, linkedAccountId);
     return result != nullptr;
 }
@@ -188,12 +197,13 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     // vMaNGOS WorldSession constructor: WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, AccountTypes sec, time_t mute_time, LocaleConstant locale)
     // For bots, we create with nullptr socket
     WorldSession* botSession = new WorldSession(botAccountId, nullptr, SEC_PLAYER, 0, LOCALE_enUS);
+    auto botEntry = std::make_shared<PlayerBotEntry>(holder.guid.GetRawValue(), botAccountId, 100);
+    botEntry->state = PB_STATE_LOADING;
+    botSession->SetBot(botEntry);
 
     // Store session and request async login through the native API.
     sWorld.AddSession(botSession);
     botSession->LoginPlayer(holder.guid);
-
-    SetBotLoading(holder.guid, false);
 
     if (masterAccountId)
     {
@@ -317,7 +327,7 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
         // auto cleanupOp = std::make_unique<BotLogoutGroupCleanupOperation>(guid);
         // PlayerbotWorldThreadProcessor::instance().QueueOperation(std::move(cleanupOp));
 
-        LOG_DEBUG("playerbots", "Bot {} logging out", bot->GetName());
+        LOG_DEBUG("playerbots", "Bot %s logging out", bot->GetName());
         bot->SaveToDB(false, false);
 
         WorldSession* botWorldSessionPtr = bot->GetSession();
@@ -419,7 +429,7 @@ void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
             PlayerbotRepository::instance().Save(botAI);
         }
 
-        LOG_DEBUG("playerbots", "Bot {} logged out", bot->GetName());
+        LOG_DEBUG("playerbots", "Bot %s logged out", bot->GetName());
 
         bot->SaveToDB(false, false);
 
@@ -456,6 +466,8 @@ Player* PlayerbotHolder::GetPlayerBot(uint32 lowGuid) const
 
 void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
+    SetBotLoading(bot->GetGUID(), false);
+
     // Prevent duplicate login
     if (playerBots.find(bot->GetGUID()) != playerBots.end())
     {
@@ -465,13 +477,18 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     PlayerbotsMgr::instance().AddPlayerbotData(bot, true);
     playerBots[bot->GetGUID()] = bot;
 
+    if (WorldSession* session = bot->GetSession())
+        if (PlayerBotEntry* botEntry = session->GetBot())
+            botEntry->state = PB_STATE_ONLINE;
+
     OnBotLoginInternal(bot);
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI)
     {
         // Log a warning here to indicate that the botAI is null
-        LOG_DEBUG("mod-playerbots", "PlayerbotAI is null for bot with GUID: {}", bot->GetGUID());
+        LOG_DEBUG("mod-playerbots", "PlayerbotAI is null for bot with GUID: %llu",
+                  static_cast<unsigned long long>(bot->GetGUID()));
         return;
     }
 
@@ -828,13 +845,6 @@ static uint8 GetOfflinePlayerGender(ObjectGuid guid)
 
 bool PlayerbotMgr::HandlePlayerbotMgrCommand(ChatHandler* handler, char const* args)
 {
-    // Defensive init: command table is always available, but config init may not have run yet
-    // in some startup paths. Attempt a lazy init before reporting "disabled".
-    if (!sPlayerbotAIConfig.enabled)
-    {
-        sPlayerbotAIConfig.Initialize();
-    }
-
     if (!sPlayerbotAIConfig.enabled)
     {
         handler->PSendSysMessage("|cffff0000Playerbot system is currently disabled!");
@@ -862,7 +872,7 @@ bool PlayerbotMgr::HandlePlayerbotMgrCommand(ChatHandler* handler, char const* a
 
     for (std::vector<std::string>::iterator i = messages.begin(); i != messages.end(); ++i)
     {
-        handler->PSendSysMessage("{}", i->c_str());
+        handler->PSendSysMessage("%s", i->c_str());
     }
 
     return true;
@@ -1574,7 +1584,7 @@ void PlayerbotMgr::OnBotLoginInternal(Player* const bot)
     botAI->SetMaster(master);
     botAI->ResetStrategies();
 
-    LOG_INFO("playerbots", "Bot {} logged in", bot->GetName());
+    LOG_INFO("playerbots", "Bot %s logged in", bot->GetName());
 }
 
 void PlayerbotMgr::OnPlayerLogin(Player* player)
@@ -1585,7 +1595,8 @@ void PlayerbotMgr::OnPlayerLogin(Player* player)
     WorldSession* session = player->GetSession();
     if (!session)
     {
-        LOG_WARN("playerbots", "Unable to register locale priority for player {} because the session is missing", player->GetName());
+        LOG_WARN("playerbots", "Unable to register locale priority for player %s because the session is missing",
+                 player->GetName());
         return;
     }
 
@@ -1607,7 +1618,7 @@ void PlayerbotMgr::OnPlayerLogin(Player* player)
         return;
 
     uint32 accountId = session->GetAccountId();
-    std::unique_ptr<QueryResult> results = CharacterDatabase.PQuery("SELECT name FROM characters WHERE account = {}", accountId);
+    std::unique_ptr<QueryResult> results = CharacterDatabase.PQuery("SELECT name FROM characters WHERE account = %u", accountId);
     if (results)
     {
         std::ostringstream out;

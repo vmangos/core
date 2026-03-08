@@ -653,19 +653,22 @@ bool PlayerbotAIConfig::Initialize()
 
     selfBotLevel = sConfig.GetIntDefault("AiPlayerbot.SelfBotLevel", 1);
 
+    excludedHunterPetFamilies.clear();
+    LoadList<std::vector<uint32>>(sConfig.GetStringDefault("AiPlayerbot.ExcludedHunterPetFamilies", ""), excludedHunterPetFamilies);
+
+    return true;
+}
+
+bool PlayerbotAIConfig::InitializeLate()
+{
+    if (!enabled || lateInitializationComplete)
+        return true;
+
     RandomPlayerbotFactory::CreateRandomBots();
     if (World::IsStopped())
-    {
         return true;
-    }
 
-    // Assign account types after accounts are created
-    sRandomPlayerbotMgr.AssignAccountTypes();
-
-    if (sPlayerbotAIConfig.enabled)
-    {
-        sRandomPlayerbotMgr.Init();
-    }
+    sRandomPlayerbotMgr.Init();
 
     PlayerbotGuildMgr::instance().Init();
     sRandomItemMgr.Init();
@@ -676,13 +679,10 @@ bool PlayerbotAIConfig::Initialize()
 
     AiObjectContext::BuildAllSharedContexts();
 
-    if (sPlayerbotAIConfig.randomBotSuggestDungeons)
-    {
+    if (randomBotSuggestDungeons)
         PlayerbotDungeonRepository::instance().LoadDungeonSuggestions();
-    }
 
-    excludedHunterPetFamilies.clear();
-    LoadList<std::vector<uint32>>(sConfig.GetStringDefault("AiPlayerbot.ExcludedHunterPetFamilies", ""), excludedHunterPetFamilies);
+    lateInitializationComplete = true;
 
     LOG_INFO("server.loading", "---------------------------------------");
     LOG_INFO("server.loading", "       mod-playerbots initialized      ");
@@ -814,7 +814,7 @@ void PlayerbotAIConfig::loadWorldBuff()
 
         if (firstColon == std::string::npos || secondColon == std::string::npos)
         {
-            LOG_ERROR("playerbots", "Malformed entry: [{}]", entry.c_str());
+            LOG_ERROR("playerbots", "Malformed entry: [%s]", entry.c_str());
             continue;
         }
 
@@ -829,14 +829,14 @@ void PlayerbotAIConfig::loadWorldBuff()
             try {
                 ids.push_back(static_cast<uint32>(std::stoi(token)));
             } catch (...) {
-                LOG_ERROR("playerbots", "Invalid meta token in [{}]", entry.c_str());
+                LOG_ERROR("playerbots", "Invalid meta token in [%s]", entry.c_str());
                 break;
             }
         }
 
         if (ids.size() != 5)
         {
-            LOG_ERROR("playerbots", "Entry [{}] has incomplete meta block", entry.c_str());
+            LOG_ERROR("playerbots", "Entry [%s] has incomplete meta block", entry.c_str());
             continue;
         }
 
@@ -848,7 +848,7 @@ void PlayerbotAIConfig::loadWorldBuff()
                 worldBuff wb = { spellId, ids[0], ids[1], ids[2], ids[3], ids[4] };
                 worldBuffs.push_back(wb);
             } catch (...) {
-                LOG_ERROR("playerbots", "Invalid spell ID in [{}]", entry.c_str());
+                LOG_ERROR("playerbots", "Invalid spell ID in [%s]", entry.c_str());
             }
         }
     }

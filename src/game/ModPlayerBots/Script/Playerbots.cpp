@@ -29,6 +29,7 @@
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
 #include "PlayerbotCommandScript.h"
+#include "World.h"
 #if !PB_DISABLE_BG_BOT_LOGIC
 #include "../Ai/Base/Actions/BattleGroundTactics.h"
 #endif
@@ -52,32 +53,35 @@ public:
 
     void OnPlayerLogin(Player* player) override
     {
-        if (!player->IsBot())
+        if (player->IsBot())
         {
-            PlayerbotsMgr::instance().AddPlayerbotData(player, false);
             sRandomPlayerbotMgr.OnPlayerLogin(player);
+            return;
+        }
 
-            // Before modifying the following messages, please make sure it does not violate the AGPLv3.0 license
-            // especially if you are distributing a repack or hosting a public server
-            // e.g. you can replace the URL with your own repository,
-            // but it should be publicly accessible and include all modifications you've made
-            if (sPlayerbotAIConfig.enabled)
-            {
-                ChatHandler(player->GetSession()).SendSysMessage(
-                    "|cff00ff00This server runs with |cff00ccffmod-playerbots|r "
-                    "|cffcccccchttps://github.com/mod-playerbots/mod-playerbots|r");
-            }
+        PlayerbotsMgr::instance().AddPlayerbotData(player, false);
+        sRandomPlayerbotMgr.OnPlayerLogin(player);
 
-            if (sPlayerbotAIConfig.enabled || sPlayerbotAIConfig.randomBotAutologin)
-            {
-                std::string roundedTime =
-                    std::to_string(std::ceil((sPlayerbotAIConfig.maxRandomBots * 0.11 / 60) * 10) / 10.0);
-                roundedTime = roundedTime.substr(0, roundedTime.find('.') + 2);
+        // Before modifying the following messages, please make sure it does not violate the AGPLv3.0 license
+        // especially if you are distributing a repack or hosting a public server
+        // e.g. you can replace the URL with your own repository,
+        // but it should be publicly accessible and include all modifications you've made
+        if (sPlayerbotAIConfig.enabled)
+        {
+            ChatHandler(player->GetSession()).SendSysMessage(
+                "|cff00ff00This server runs with |cff00ccffmod-playerbots|r "
+                "|cffcccccchttps://github.com/mod-playerbots/mod-playerbots|r");
+        }
 
-                ChatHandler(player->GetSession()).SendSysMessage(
-                    (std::string("|cff00ff00Playerbots:|r bot initialization at server startup takes about '")
-                    + roundedTime + "' minutes.").c_str());
-            }
+        if (sPlayerbotAIConfig.enabled || sPlayerbotAIConfig.randomBotAutologin)
+        {
+            std::string roundedTime =
+                std::to_string(std::ceil((sPlayerbotAIConfig.maxRandomBots * 0.11 / 60) * 10) / 10.0);
+            roundedTime = roundedTime.substr(0, roundedTime.find('.') + 2);
+
+            ChatHandler(player->GetSession()).SendSysMessage(
+                (std::string("|cff00ff00Playerbots:|r bot initialization at server startup takes about '")
+                + roundedTime + "' minutes.").c_str());
         }
     }
 
@@ -354,7 +358,7 @@ public:
 
         sPlayerbotAIConfig.Initialize();
 
-        LOG_INFO("server.loading", ">> Loaded playerbots config in {} ms", GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", ">> Loaded playerbots config in %u ms", GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
 
         PlayerbotSpellRepository::Instance().Initialize();
@@ -364,6 +368,13 @@ public:
 
     void OnUpdate(uint32 diff) override
     {
+        if (sPlayerbotAIConfig.enabled && !sPlayerbotAIConfig.lateInitializationComplete)
+        {
+            sPlayerbotAIConfig.InitializeLate();
+            if (!sPlayerbotAIConfig.lateInitializationComplete || World::IsStopped())
+                return;
+        }
+
         PlayerbotWorldThreadProcessor::instance().Update(diff);
         sRandomPlayerbotMgr.UpdateAI(diff);  // World thread only
     }

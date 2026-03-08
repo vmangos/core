@@ -23,9 +23,16 @@ void PlayerbotDungeonRepository::LoadDungeonSuggestions()
     LOG_INFO("server.loading", "Loading playerbots dungeon suggestions...");
     uint32 oldMSTime = getMSTime();
 
+    m_dungeonSuggestions.clear();
+
     uint32 count = 0;
     std::unique_ptr<QueryResult> result = PlayerbotsDatabase.Query(
-        "SELECT name, difficulty, min_level, max_level, abbreviation, strategy FROM playerbots_dungeon_suggestion");
+        "SELECT d.name, d.difficulty, d.min_level, d.max_level, "
+        "COALESCE(a.abbrevation, ''), COALESCE(s.strategy, '') "
+        "FROM playerbots_dungeon_suggestion_definition d "
+        "LEFT JOIN playerbots_dungeon_suggestion_abbrevation a ON a.definition_slug = d.slug "
+        "LEFT JOIN playerbots_dungeon_suggestion_strategy s "
+        "ON s.definition_slug = d.slug AND s.difficulty = d.difficulty");
     if (result)
     {
         do
@@ -45,6 +52,6 @@ void PlayerbotDungeonRepository::LoadDungeonSuggestions()
         } while (result->NextRow());
     }
 
-    LOG_INFO("server.loading", "{} playerbots dungeon suggestions loaded in {} ms", count,
+    LOG_INFO("server.loading", "%u playerbots dungeon suggestions loaded in %u ms", count,
              GetMSTimeDiffToNow(oldMSTime));
 }

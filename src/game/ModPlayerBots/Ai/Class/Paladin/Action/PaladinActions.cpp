@@ -241,7 +241,7 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
     if (botAI->HasStrategy("bmana", BOT_STATE_NON_COMBAT) &&
         targetPlayer && IsTankRole(targetPlayer))
     {
-        LOG_DEBUG("playerbots", "[Wisdom/bmana] Skip tank {} (Kings only)", target->GetName());
+        LOG_DEBUG("playerbots", "[Wisdom/bmana] Skip tank %s (Kings only)", target->GetName());
         return false;
     }
 
@@ -300,7 +300,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
         bool selfHasSanct = HasSanctAura(self);
         bool needSelf = IsTankRole(self) && !selfHasSanct;
 
-        LOG_DEBUG("playerbots", "[Sanct] {} isTank={} selfHasSanct={} needSelf={}",
+        LOG_DEBUG("playerbots", "[Sanct] %s isTank=%u selfHasSanct=%u needSelf=%u",
                   bot->GetName(), IsTankRole(self), selfHasSanct, needSelf);
 
         if (needSelf)
@@ -345,7 +345,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
         bool hasKings = HasKingsAura(target);
         bool hasSanct = HasSanctAura(target);
         bool knowSanct = bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY);
-        LOG_DEBUG("playerbots", "[Sanct] Final target={} hasKings={} hasSanct={} knowSanct={}",
+        LOG_DEBUG("playerbots", "[Sanct] Final target=%s hasKings=%u hasSanct=%u knowSanct=%u",
                   target->GetName(), hasKings, hasSanct, knowSanct);
     }
 
@@ -374,7 +374,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     }
 
     bool ok = botAI->CastSpell(castName, target);
-    LOG_DEBUG("playerbots", "[Sanct] Cast {} on {} result={}", castName.c_str(), target->GetName(), ok);
+    LOG_DEBUG("playerbots", "[Sanct] Cast %s on %s result=%u", castName.c_str(), target->GetName(), ok);
     return ok;
 }
 
@@ -401,7 +401,7 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
     {
         if (target->GetGUID() == bot->GetGUID())
         {
-            LOG_DEBUG("playerbots", "[Kings/bstats-solo] Skip self to keep Sanctuary on {}", bot->GetName());
+            LOG_DEBUG("playerbots", "[Kings/bstats-solo] Skip self to keep Sanctuary on %s", bot->GetName());
             return false;
         }
     }
@@ -418,7 +418,7 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
     {
         if (!targetPlayer || !IsTankRole(targetPlayer))
         {
-            LOG_DEBUG("playerbots", "[Kings/bmana] Skip non-tank {}", target->GetName());
+            LOG_DEBUG("playerbots", "[Kings/bmana] Skip non-tank %s", target->GetName());
             return false;
         }
     }
@@ -435,13 +435,13 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
 
         if (isTank && hasSanctFromMe)
         {
-            LOG_DEBUG("playerbots", "[Kings] Skip: {} has my Sanctuary and is a tank", target->GetName());
+            LOG_DEBUG("playerbots", "[Kings] Skip: %s has my Sanctuary and is a tank", target->GetName());
             return false;
         }
 
         if (hasBstats && isTank && hasSanctAny)
         {
-            LOG_DEBUG("playerbots", "[Kings] Skip (bstats): {} already has Sanctuary and is a tank", target->GetName());
+            LOG_DEBUG("playerbots", "[Kings] Skip (bstats): %s already has Sanctuary and is a tank", target->GetName());
             return false;
         }
     }

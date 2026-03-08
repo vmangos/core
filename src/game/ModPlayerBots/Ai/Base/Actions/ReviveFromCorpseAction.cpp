@@ -61,7 +61,7 @@ bool ReviveFromCorpseAction::Execute(Event event)
         }
     }
 
-    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> revives at body", LOG_GUID(bot->GetGUID()),
+    LOG_DEBUG("playerbots", "Bot %llu %s:%u <%s> revives at body", static_cast<unsigned long long>(LOG_GUID(bot->GetGUID())),
               bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
 
     bot->GetMotionMaster()->Clear();
@@ -326,7 +326,8 @@ bool SpiritHealerAction::Execute(Event event)
             Unit* unit = botAI->GetUnit(*i);
             if (unit && unit->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITHEALER))
             {
-                LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> revives at spirit healer", LOG_GUID(bot->GetGUID()),
+                LOG_DEBUG("playerbots", "Bot %llu %s:%u <%s> revives at spirit healer",
+                          static_cast<unsigned long long>(LOG_GUID(bot->GetGUID())),
                           bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
                 PlayerbotChatHandler ch(bot);
                 bot->ResurrectPlayer(0.5f);

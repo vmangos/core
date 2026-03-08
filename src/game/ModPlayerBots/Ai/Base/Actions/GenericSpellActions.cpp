@@ -84,7 +84,7 @@ bool CastSpellAction::isPossible()
     {
         if (!sPlayerbotAIConfig.logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster()))
         {
-            LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", bot->GetName());
+            LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: %s", bot->GetName());
         }
         return false;
     }
@@ -96,7 +96,7 @@ bool CastSpellAction::isPossible()
     {
         if (!sPlayerbotAIConfig.logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster()))
         {
-            LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", bot->GetName());
+            LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: %s", bot->GetName());
         }
         bot->Unmount();
         return false;

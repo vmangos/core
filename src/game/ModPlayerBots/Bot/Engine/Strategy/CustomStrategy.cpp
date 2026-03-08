@@ -26,7 +26,7 @@ NextAction toNextAction(std::string const action)
     if (tokens.size() == 1)
         return NextAction(tokens[0], ACTION_NORMAL);
 
-    LOG_ERROR("playerbots", "Invalid action {}", action.c_str());
+    LOG_ERROR("playerbots", "Invalid action %s", action.c_str());
 
     throw std::invalid_argument("Invalid action");
 }
@@ -50,7 +50,7 @@ TriggerNode* toTriggerNode(std::string const actionLine)
     if (tokens.size() == 2)
         return new TriggerNode(tokens[0], toNextActionArray(tokens[1]));
 
-    LOG_ERROR("playerbots", "Invalid action line {}", actionLine.c_str());
+    LOG_ERROR("playerbots", "Invalid action line %s", actionLine.c_str());
     return nullptr;
 }
 

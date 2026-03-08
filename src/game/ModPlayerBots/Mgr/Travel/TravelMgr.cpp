@@ -1745,44 +1745,44 @@ void TravelMgr::logQuestError(uint32 errorNr, Quest* quest, uint32 objective, ui
 
     if (errorNr == 1)
     {
-        LOG_ERROR("playerbots", "Quest {} [{}] has {} {} [{}] but none is found in the world.",
+        LOG_ERROR("playerbots", "Quest %s [%u] has %s %s [%d] but none is found in the world.",
                   quest->GetTitle().c_str(), quest->GetQuestId(), objective == 0 ? "quest giver" : "quest taker",
                   unitName.c_str(), unitId);
     }
     else if (errorNr == 2)
     {
-        LOG_ERROR("playerbots", "Quest {} [{}] needs {} [{}] for objective {} but none is found in the world.",
+        LOG_ERROR("playerbots", "Quest %s [%u] needs %s [%d] for objective %u but none is found in the world.",
                   quest->GetTitle().c_str(), quest->GetQuestId(), unitName.c_str(), unitId, objective);
     }
     else if (errorNr == 3)
     {
-        LOG_ERROR("playerbots", "Quest {} [{}] needs itemId {} but no such item exists.", quest->GetTitle().c_str(),
+        LOG_ERROR("playerbots", "Quest %s [%u] needs itemId %u but no such item exists.", quest->GetTitle().c_str(),
                   quest->GetQuestId(), itemId);
     }
     else if (errorNr == 4)
     {
         LOG_ERROR(
             "playerbots",
-            "Quest {} [{}] needs {} [{}] for loot of item {} [{}] for objective {} but none is found in the world.",
+            "Quest %s [%u] needs %s [%d] for loot of item %s [%u] for objective %u but none is found in the world.",
             quest->GetTitle().c_str(), quest->GetQuestId(), unitName.c_str(), unitId, proto->Name1, itemId,
             objective);
     }
     else if (errorNr == 5)
     {
-        LOG_ERROR("playerbots", "Quest {} [{}] needs item {} [{}] for objective {} but none is found in the world.",
+        LOG_ERROR("playerbots", "Quest %s [%u] needs item %s [%u] for objective %u but none is found in the world.",
                   quest->GetTitle().c_str(), quest->GetQuestId(), proto->Name1, itemId, objective);
     }
     else if (errorNr == 6)
     {
-        LOG_ERROR("playerbots", "Quest {} [{}] has no quest giver.", quest->GetTitle().c_str(), quest->GetQuestId());
+        LOG_ERROR("playerbots", "Quest %s [%u] has no quest giver.", quest->GetTitle().c_str(), quest->GetQuestId());
     }
     else if (errorNr == 7)
     {
-        LOG_ERROR("playerbots", "Quest {} [{}] has no quest taker.", quest->GetTitle().c_str(), quest->GetQuestId());
+        LOG_ERROR("playerbots", "Quest %s [%u] has no quest taker.", quest->GetTitle().c_str(), quest->GetQuestId());
     }
     else if (errorNr == 8)
     {
-        LOG_ERROR("playerbots", "Quest {} [{}] has no quest viable quest objective.", quest->GetTitle().c_str(),
+        LOG_ERROR("playerbots", "Quest %s [%u] has no quest viable quest objective.", quest->GetTitle().c_str(),
                   quest->GetQuestId());
     }
 }
@@ -1917,7 +1917,7 @@ void TravelMgr::LoadQuestTravelTable()
 
         } while (result->NextRow());
 
-        LOG_INFO("playerbots", ">> Loaded {} units locations.", units.size());
+        LOG_INFO("playerbots", ">> Loaded %zu units locations.", units.size());
     }
     else
     {
@@ -1943,7 +1943,7 @@ void TravelMgr::LoadQuestTravelTable()
 
         } while (result->NextRow());
 
-        LOG_INFO("playerbots", ">> Loaded {} relations.", relations.size());
+        LOG_INFO("playerbots", ">> Loaded %zu relations.", relations.size());
     }
     else
     {
@@ -1969,7 +1969,7 @@ void TravelMgr::LoadQuestTravelTable()
 
         } while (result->NextRow());
 
-        LOG_INFO("playerbots", ">> Loaded {} loot lists.", loots.size());
+        LOG_INFO("playerbots", ">> Loaded %zu loot lists.", loots.size());
     }
     else
     {

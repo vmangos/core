@@ -51,12 +51,12 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
     if (secLevel == PLAYERBOT_SECURITY_DENY_ALL ||
         (secLevel == PLAYERBOT_SECURITY_TALK && reason != PLAYERBOT_DENY_FAR))
     {
-        LOG_DEBUG("playerbots", "{} / {}: skipping guild task update - not enough security level, reason = {}",
+        LOG_DEBUG("playerbots", "%s / %s: skipping guild task update - not enough security level, reason = %d",
                   guild->GetName().c_str(), player->GetName().c_str(), reason);
         return;
     }
 
-    LOG_DEBUG("playerbots", "{}: guild task update for player {}", guild->GetName().c_str(), player->GetName().c_str());
+    LOG_DEBUG("playerbots", "%s: guild task update for player %s", guild->GetName().c_str(), player->GetName().c_str());
 
     ObjectGuid::LowType owner = player->GetGUID().GetCounter();
 
@@ -76,7 +76,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
 
         if (task == GUILD_TASK_TYPE_NONE)
         {
-            LOG_ERROR("playerbots", "{} / {}: error creating guild task", guild->GetName().c_str(),
+            LOG_ERROR("playerbots", "%s / %s: error creating guild task", guild->GetName().c_str(),
                       player->GetName().c_str());
         }
 
@@ -86,7 +86,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
                      urand(sPlayerbotAIConfig.minGuildTaskAdvertisementTime,
                            sPlayerbotAIConfig.maxGuildTaskAdvertisementTime));
 
-        LOG_DEBUG("playerbots", "{} / {}: guild task {} is set for {} secs", guild->GetName().c_str(),
+        LOG_DEBUG("playerbots", "%s / %s: guild task %u is set for %u secs", guild->GetName().c_str(),
                   player->GetName().c_str(), task, time);
         return;
     }
@@ -96,7 +96,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
     uint32 advertisement = GetTaskValue(owner, guildId, "advertisement");
     if (!advertisement)
     {
-        LOG_DEBUG("playerbots", "{} / {}: sending advertisement", guild->GetName().c_str(), player->GetName().c_str());
+        LOG_DEBUG("playerbots", "%s / %s: sending advertisement", guild->GetName().c_str(), player->GetName().c_str());
 
         if (SendAdvertisement(trans, owner, guildId))
         {
@@ -106,7 +106,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
         }
         else
         {
-            LOG_DEBUG("playerbots", "{} / {}: error sending advertisement", guild->GetName().c_str(),
+            LOG_DEBUG("playerbots", "%s / %s: error sending advertisement", guild->GetName().c_str(),
                       player->GetName().c_str());
         }
     }
@@ -114,7 +114,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
     uint32 thanks = GetTaskValue(owner, guildId, "thanks");
     if (!thanks)
     {
-        LOG_DEBUG("playerbots", "{} / {}: sending thanks", guild->GetName().c_str(), player->GetName().c_str());
+        LOG_DEBUG("playerbots", "%s / %s: sending thanks", guild->GetName().c_str(), player->GetName().c_str());
 
         if (SendThanks(trans, owner, guildId, GetTaskValue(owner, guildId, "payment")))
         {
@@ -123,7 +123,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
         }
         else
         {
-            LOG_DEBUG("playerbots", "{} / {}: error sending thanks", guild->GetName().c_str(),
+            LOG_DEBUG("playerbots", "%s / %s: error sending thanks", guild->GetName().c_str(),
                       player->GetName().c_str());
         }
     }
@@ -131,7 +131,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
     uint32 reward = GetTaskValue(owner, guildId, "reward");
     if (!reward)
     {
-        LOG_DEBUG("playerbots", "{} / {}: sending reward", guild->GetName().c_str(), player->GetName().c_str());
+        LOG_DEBUG("playerbots", "%s / %s: sending reward", guild->GetName().c_str(), player->GetName().c_str());
 
         if (Reward(trans, owner, guildId))
         {
@@ -140,7 +140,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
         }
         else
         {
-            LOG_DEBUG("playerbots", "{} / {}: error sending reward", guild->GetName().c_str(),
+            LOG_DEBUG("playerbots", "%s / %s: error sending reward", guild->GetName().c_str(),
                       player->GetName().c_str());
         }
     }
@@ -193,14 +193,14 @@ bool GuildTaskMgr::CreateItemTask(Player* player, uint32 guildId)
     uint32 itemId = sRandomItemMgr.GetRandomItem(player->GetLevel() - 5, RANDOM_ITEM_GUILD_TASK, &predicate);
     if (!itemId)
     {
-        LOG_ERROR("playerbots", "{} / {}: no items avaible for item task",
+        LOG_ERROR("playerbots", "%s / %s: no items avaible for item task",
                   sGuildMgr.GetGuildById(guildId)->GetName().c_str(), player->GetName().c_str());
         return false;
     }
 
     uint32 count = GetMaxItemTaskCount(itemId);
 
-    LOG_DEBUG("playerbots", "{} / {}: item task {} (x{})", sGuildMgr.GetGuildById(guildId)->GetName().c_str(),
+    LOG_DEBUG("playerbots", "%s / %s: item task %u (x%u)", sGuildMgr.GetGuildById(guildId)->GetName().c_str(),
               player->GetName().c_str(), itemId, count);
 
     SetTaskValue(player->GetGUID().GetCounter(), guildId, "itemCount", count,
@@ -250,7 +250,7 @@ bool GuildTaskMgr::CreateKillTask(Player* player, uint32 guildId)
 
     if (ids.empty())
     {
-        LOG_ERROR("playerbots", "{} / {}: no rare creatures available for kill task",
+        LOG_ERROR("playerbots", "%s / %s: no rare creatures available for kill task",
                   sGuildMgr.GetGuildById(guildId)->GetName().c_str(), player->GetName().c_str());
         return false;
     }
@@ -258,7 +258,7 @@ bool GuildTaskMgr::CreateKillTask(Player* player, uint32 guildId)
     uint32 index = urand(0, ids.size() - 1);
     uint32 creatureId = ids[index];
 
-    LOG_DEBUG("playerbots", "{} / {}: kill task {}", sGuildMgr.GetGuildById(guildId)->GetName().c_str(),
+    LOG_DEBUG("playerbots", "%s / %s: kill task %u", sGuildMgr.GetGuildById(guildId)->GetName().c_str(),
               player->GetName().c_str(), creatureId);
 
     SetTaskValue(player->GetGUID().GetCounter(), guildId, "killTask", creatureId,
@@ -672,7 +672,7 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* /* handler */, char const* 
         ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(charName);
         if (!guid)
         {
-            LOG_ERROR("playerbots", "Player {} not found", charName.c_str());
+            LOG_ERROR("playerbots", "Player %s not found", charName.c_str());
             return false;
         }
 
@@ -777,7 +777,7 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* /* handler */, char const* 
                 if (payment && paymentValidIn < validIn)
                     name << " payment " << ChatHelper::formatMoney(payment) << " in " << formatTime(paymentValidIn);
 
-                LOG_INFO("playerbots", "{}: {} valid in {} [{}]", charName.c_str(), name.str().c_str(),
+                LOG_INFO("playerbots", "%s: %s valid in %s [%s]", charName.c_str(), name.str().c_str(),
                          formatTime(validIn).c_str(), guild->GetName().c_str());
 
             } while (result->NextRow());
@@ -819,7 +819,7 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* /* handler */, char const* 
         ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(charName);
         if (!guid)
         {
-            LOG_ERROR("playerbots", "Player {} not found", charName.c_str());
+            LOG_ERROR("playerbots", "Player %s not found", charName.c_str());
             return false;
         }
 
@@ -871,12 +871,12 @@ bool GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
     if (!sRandomPlayerbotMgr.IsRandomBot(bot))
         return false;
 
-    LOG_DEBUG("playerbots", "{} / {}: checking guild task", guild->GetName().c_str(), ownerPlayer->GetName().c_str());
+    LOG_DEBUG("playerbots", "%s / %s: checking guild task", guild->GetName().c_str(), ownerPlayer->GetName().c_str());
 
     uint32 itemTask = GetTaskValue(owner, guildId, "itemTask");
     if (itemTask != itemId)
     {
-        LOG_DEBUG("playerbots", "{} / {}: item {} is not guild task item ({})", guild->GetName().c_str(),
+        LOG_DEBUG("playerbots", "%s / %s: item %u is not guild task item (%u)", guild->GetName().c_str(),
                   ownerPlayer->GetName().c_str(), itemId, itemTask);
 
         if (byMail)
@@ -904,7 +904,7 @@ bool GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
 
     if (obtained >= count)
     {
-        LOG_DEBUG("playerbots", "{} / {}: guild task complete", guild->GetName().c_str(),
+        LOG_DEBUG("playerbots", "%s / %s: guild task complete", guild->GetName().c_str(),
                   ownerPlayer->GetName().c_str());
         SetTaskValue(owner, guildId, "reward", 1, rewardTime - 15);
         SetTaskValue(owner, guildId, "itemCount", 0, 0);
@@ -913,7 +913,7 @@ bool GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
     }
     else
     {
-        LOG_DEBUG("playerbots", "{} / {}: guild task progress {}/{}", guild->GetName().c_str(),
+        LOG_DEBUG("playerbots", "%s / %s: guild task progress %u/%u", guild->GetName().c_str(),
                   ownerPlayer->GetName().c_str(), obtained, count);
         SetTaskValue(owner, guildId, "itemCount", count - obtained, sPlayerbotAIConfig.maxGuildTaskChangeTime);
         SetTaskValue(owner, guildId, "thanks", 1, rewardTime - 30);
@@ -1084,7 +1084,7 @@ void GuildTaskMgr::CheckKillTaskInternal(Player* player, Unit* victim)
         if (value != creature->GetEntry())
             continue;
 
-        LOG_DEBUG("playerbots", "{} / {}: guild task complete", guild->GetName().c_str(), player->GetName().c_str());
+        LOG_DEBUG("playerbots", "%s / %s: guild task complete", guild->GetName().c_str(), player->GetName().c_str());
         SetTaskValue(owner, guildId, "reward", 1,
                      urand(sPlayerbotAIConfig.minGuildTaskRewardTime, sPlayerbotAIConfig.maxGuildTaskRewardTime));
 
@@ -1116,7 +1116,7 @@ void GuildTaskMgr::CleanupAdverts()
     {
         CharacterDatabase.Execute("DELETE FROM mail WHERE subject LIKE 'Guild Task%%' AND deliver_time <= {}",
                                   deliverTime);
-        LOG_INFO("playerbots", "{} old gtask adverts removed", count);
+        LOG_INFO("playerbots", "%u old gtask adverts removed", count);
     }
 }
 
@@ -1161,7 +1161,7 @@ void GuildTaskMgr::RemoveDuplicatedAdverts()
         }
 
         DeleteMail(buffer);
-        LOG_INFO("playerbots", "{} duplicated gtask adverts removed", count);
+        LOG_INFO("playerbots", "%u duplicated gtask adverts removed", count);
     }
 }
 
@@ -1206,7 +1206,7 @@ bool GuildTaskMgr::CheckTaskTransfer(std::string const text, Player* ownerPlayer
     if (text.empty())
         return false;
 
-    LOG_DEBUG("playerbots", "{} / {}: checking guild task transfer", guild->GetName().c_str(),
+    LOG_DEBUG("playerbots", "%s / %s: checking guild task transfer", guild->GetName().c_str(),
               ownerPlayer->GetName().c_str());
 
     uint32 account = ownerPlayer->GetSession()->GetAccountId();

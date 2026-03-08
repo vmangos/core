@@ -738,10 +738,54 @@ typedef uint32 TriggerCastFlags;
 // Bag.h include needed for Bag class methods
 #include "Objects/Bag.h"
 
-// Database query format helper for Trinity-style queries
+// Database query format helper for Trinity-style queries.
+// Supports both legacy printf-style formats and Trinity-style "{}" placeholders.
+inline void PB_AppendQueryFormat(std::ostringstream& out, const char* fmt)
+{
+    out << fmt;
+}
+
+template <typename T>
+inline void PB_AppendQueryArg(std::ostringstream& out, T const& value)
+{
+    out << value;
+}
+
+inline void PB_AppendQueryArg(std::ostringstream& out, char const* value)
+{
+    out << (value ? value : "");
+}
+
+inline void PB_AppendQueryArg(std::ostringstream& out, std::string const& value)
+{
+    out << value;
+}
+
+template <typename T, typename... Args>
+inline void PB_AppendQueryFormat(std::ostringstream& out, const char* fmt, T const& value, Args const&... args)
+{
+    const char* placeholder = strstr(fmt, "{}");
+    if (!placeholder)
+    {
+        out << fmt;
+        return;
+    }
+
+    out.write(fmt, placeholder - fmt);
+    PB_AppendQueryArg(out, value);
+    PB_AppendQueryFormat(out, placeholder + 2, args...);
+}
+
 template<typename... Args>
 inline std::unique_ptr<QueryResult> PB_QueryFormat(Database& db, const char* fmt, Args... args)
 {
+    if (strstr(fmt, "{}"))
+    {
+        std::ostringstream query;
+        PB_AppendQueryFormat(query, fmt, args...);
+        return db.Query(query.str());
+    }
+
     char buf[4096];
     snprintf(buf, sizeof(buf), fmt, args...);
     return db.Query(std::string(buf));

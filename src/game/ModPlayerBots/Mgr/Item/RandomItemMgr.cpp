@@ -230,12 +230,12 @@ void RandomItemMgr::BuildRandomItemCache()
 
         } while (result->NextRow());
 
-        LOG_INFO("server.loading", "Equipment cache loaded from {} records", count);
+        LOG_INFO("server.loading", "Equipment cache loaded from %u records", count);
     }
     else
     {
         ItemTemplateContainer const* itemTemplates = sObjectMgr.GetItemTemplateStore();
-        LOG_INFO("server.loading", "Building random item cache from {} items", itemTemplates->size());
+        LOG_INFO("server.loading", "Building random item cache from %zu items", itemTemplates->size());
 
         for (auto const& itr : *itemTemplates)
         {
@@ -283,7 +283,7 @@ void RandomItemMgr::BuildRandomItemCache()
             for (uint32 type = RANDOM_ITEM_GUILD_TASK; type <= RANDOM_ITEM_GUILD_TASK_REWARD_TRADE_RARE; type++)
             {
                 RandomItemList list = randomItemCache[level][(RandomItemType)type];
-                LOG_INFO("playerbots", "    Level {}..{} Type {} - {} random items cached", level * 10, level * 10 + 9,
+                LOG_INFO("playerbots", "    Level %u..%u Type %u - %zu random items cached", level * 10, level * 10 + 9,
                          type, list.size());
 
                 for (RandomItemList::iterator i = list.begin(); i != list.end(); ++i)
@@ -293,7 +293,7 @@ void RandomItemMgr::BuildRandomItemCache()
                     if (!proto)
                         continue;
 
-                    LOG_DEBUG("playerbots", "        [{}] {}", itemId, proto->Name1.c_str());
+                    LOG_DEBUG("playerbots", "        [%u] %s", itemId, proto->Name1.c_str());
                 }
             }
         }
@@ -870,7 +870,7 @@ void RandomItemMgr::BuildItemInfoCache()
 
         } while (result->NextRow());
 
-        LOG_INFO("playerbots", "Loaded {} weightscale class specs", totalcount);
+        LOG_INFO("playerbots", "Loaded %u weightscale class specs", totalcount);
     }
 
     stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_WEIGHTSCALE_DATA);
@@ -899,7 +899,7 @@ void RandomItemMgr::BuildItemInfoCache()
 
         } while (result->NextRow());
 
-        LOG_INFO("playerbots", "Loaded {} weightscale stat weights", statcount);
+        LOG_INFO("playerbots", "Loaded %u weightscale stat weights", statcount);
     }
 
     if (m_weightScales[1].empty())
@@ -926,7 +926,7 @@ void RandomItemMgr::BuildItemInfoCache()
         } while (result->NextRow());
     }
 
-    LOG_INFO("playerbots", "Loaded {} vendor items...", vendorItems.size());
+    LOG_INFO("playerbots", "Loaded %zu vendor items...", vendorItems.size());
 
     // calculate drop source
     LOG_INFO("playerbots", "Loading loot templates...");
@@ -956,10 +956,10 @@ void RandomItemMgr::BuildItemInfoCache()
         }
     }
 
-    LOG_INFO("playerbots", "Loaded {} loot templates...", dropMap->size());
+    LOG_INFO("playerbots", "Loaded %zu loot templates...", dropMap->size());
 
     ItemTemplateContainer const* itemTemplate = sObjectMgr.GetItemTemplateStore();
-    LOG_INFO("playerbots", "Calculating stat weights for {} items...", itemTemplate->size());
+    LOG_INFO("playerbots", "Calculating stat weights for %zu items...", itemTemplate->size());
 
     PlayerbotsDatabaseTransaction trans = PlayerbotsDatabase.BeginTransaction();
 
@@ -1737,7 +1737,7 @@ uint32 RandomItemMgr::GetUpgrade(Player* player, std::string spec, uint8 slot, u
         oldStatWeight = itemInfoCache[itemId].weights[specId];
 
         if (oldStatWeight)
-            LOG_INFO("playerbots", "Old Item: {}, weight: {}", itemId, oldStatWeight);
+            LOG_INFO("playerbots", "Old Item: %u, weight: %u", itemId, oldStatWeight);
         else
             LOG_INFO("playerbots", "Old item has no stat weight");
     }
@@ -1821,7 +1821,7 @@ uint32 RandomItemMgr::GetUpgrade(Player* player, std::string spec, uint8 slot, u
     }
 
     if (closestUpgrade)
-        LOG_INFO("playerbots", "New Item: {}, weight: {}", closestUpgrade, closestUpgradeWeight);
+        LOG_INFO("playerbots", "New Item: %u, weight: %u", closestUpgrade, closestUpgradeWeight);
 
     return closestUpgrade;
 }
@@ -1859,7 +1859,7 @@ std::vector<uint32> RandomItemMgr::GetUpgradeList(Player* player, std::string sp
         oldStatWeight = itemInfoCache[itemId].weights[specId];
 
         if (oldStatWeight)
-            LOG_INFO("playerbots", "Old Item: {}, weight: {}", itemId, oldStatWeight);
+            LOG_INFO("playerbots", "Old Item: %u, weight: %u", itemId, oldStatWeight);
         else
             LOG_INFO("playerbots", "Old item has no stat weight");
     }
@@ -1943,7 +1943,7 @@ std::vector<uint32> RandomItemMgr::GetUpgradeList(Player* player, std::string sp
     }
 
     if (listItems.size())
-        LOG_INFO("playerbots", "New Items: {}, Old item:%d, New items max: {}", listItems.size(), oldStatWeight,
+        LOG_INFO("playerbots", "New Items: %zu, Old item:%u, New items max: %u", listItems.size(), oldStatWeight,
                  closestUpgradeWeight);
 
     return std::move(listItems);
@@ -2124,7 +2124,7 @@ void RandomItemMgr::BuildEquipCache()
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("playerbots", "Equipment cache loaded from {} records", count);
+        LOG_INFO("playerbots", "Equipment cache loaded from %u records", count);
     }
     else
     {
@@ -2312,7 +2312,7 @@ void RandomItemMgr::BuildAmmoCache()
 {
     uint32 maxLevel = sWorld.getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
-    LOG_INFO("server.loading", "Building ammo cache for {} levels", maxLevel);
+    LOG_INFO("server.loading", "Building ammo cache for %u levels", maxLevel);
 
     uint32 counter = 0;
     for (uint32 level = 1; level <= maxLevel; level += 1)
@@ -2336,7 +2336,7 @@ void RandomItemMgr::BuildAmmoCache()
         }
     }
 
-    LOG_INFO("server.loading", "Cached {} ammo", counter);  // TEST
+    LOG_INFO("server.loading", "Cached %u ammo", counter);  // TEST
 }
 
 std::vector<uint32> RandomItemMgr::GetAmmo(uint32 level, uint32 subClass) { return ammoCache[level][subClass]; }
@@ -2345,7 +2345,7 @@ void RandomItemMgr::BuildPotionCache()
 {
     uint32 maxLevel = sWorld.getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
-    LOG_INFO("playerbots", "Building potion cache for {} levels", maxLevel);
+    LOG_INFO("playerbots", "Building potion cache for %u levels", maxLevel);
 
     ItemTemplateContainer const* itemTemplates = sObjectMgr.GetItemTemplateStore();
 
@@ -2417,7 +2417,7 @@ void RandomItemMgr::BuildPotionCache()
         }
     }
 
-    LOG_INFO("playerbots", "Cached {} potions", counter);
+    LOG_INFO("playerbots", "Cached %u potions", counter);
 }
 
 void RandomItemMgr::BuildFoodCache()
@@ -2426,7 +2426,7 @@ void RandomItemMgr::BuildFoodCache()
     if (maxLevel > sWorld.getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         maxLevel = sWorld.getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
-    LOG_INFO("server.loading", "Building food cache for {} levels", maxLevel);
+    LOG_INFO("server.loading", "Building food cache for %u levels", maxLevel);
 
     ItemTemplateContainer const* itemTemplates = sObjectMgr.GetItemTemplateStore();
 
@@ -2474,11 +2474,11 @@ void RandomItemMgr::BuildFoodCache()
             uint32 category = categories[i];
             uint32 size = foodCache[level / 10][category].size();
             ++counter;
-            LOG_DEBUG("server.loading", "Food cache for level={}, category={}: {} items", level, category, size);
+            LOG_DEBUG("server.loading", "Food cache for level=%u, category=%u: %u items", level, category, size);
         }
     }
 
-    LOG_INFO("server.loading", "Cached {} types of food", counter);
+    LOG_INFO("server.loading", "Cached %u types of food", counter);
 }
 
 uint32 RandomItemMgr::GetRandomPotion(uint32 level, uint32 effect)
@@ -2559,7 +2559,7 @@ void RandomItemMgr::BuildTradeCache()
     if (maxLevel > sWorld.getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         maxLevel = sWorld.getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
-    LOG_INFO("server.loading", "Building trade cache for {} levels", maxLevel);
+    LOG_INFO("server.loading", "Building trade cache for %u levels", maxLevel);
 
     ItemTemplateContainer const* itemTemplates = sObjectMgr.GetItemTemplateStore();
 
@@ -2591,11 +2591,11 @@ void RandomItemMgr::BuildTradeCache()
     for (uint32 level = 1; level <= maxLevel + 1; level += 10)
     {
         uint32 size = tradeCache[level / 10].size();
-        LOG_DEBUG("server.loading", "Trade cache for level={}: {} items", level, size);
+        LOG_DEBUG("server.loading", "Trade cache for level=%u: %u items", level, size);
         ++counter;
     }
 
-    LOG_INFO("server.loading", "Cached {} trade items", counter);  // TEST
+    LOG_INFO("server.loading", "Cached %u trade items", counter);  // TEST
 }
 
 uint32 RandomItemMgr::GetRandomTrade(uint32 level)
@@ -2626,12 +2626,12 @@ void RandomItemMgr::BuildRarityCache()
 
         } while (result->NextRow());
 
-        LOG_INFO("playerbots", "Item rarity cache loaded from {} records", count);
+        LOG_INFO("playerbots", "Item rarity cache loaded from %u records", count);
     }
     else
     {
         ItemTemplateContainer const* itemTemplates = sObjectMgr.GetItemTemplateStore();
-        LOG_INFO("playerbots", "Building item rarity cache from {} items", itemTemplates->size());
+        LOG_INFO("playerbots", "Building item rarity cache from %zu items", itemTemplates->size());
 
         for (auto const& itr : *itemTemplates)
         {
@@ -2759,7 +2759,7 @@ void RandomItemMgr::BuildRarityCache()
             }
         }
 
-        LOG_INFO("playerbots", "Item rarity cache built from {} items", itemTemplates->size());
+        LOG_INFO("playerbots", "Item rarity cache built from %zu items", itemTemplates->size());
     }
 }
 

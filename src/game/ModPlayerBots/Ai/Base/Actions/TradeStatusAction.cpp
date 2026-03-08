@@ -142,9 +142,9 @@ void TradeStatusAction::BeginTrade()
     botAI->TellMaster("=== Inventory ===");
     TellItems(visitor.items, visitor.soulbound);
 
-    if (sRandomPlayerbotMgr.IsRandomBot(bot))
+    if (sRandomPlayerbotMgr.IsRandomBot(bot) || sRandomPlayerbotMgr.IsAddclassBot(bot))
     {
-        uint32 discount = sRandomPlayerbotMgr.GetTradeDiscount(bot, botAI->GetMaster());
+        uint32 discount = sRandomPlayerbotMgr.GetTradeDiscount(bot, trader);
         if (discount)
         {
             std::ostringstream out;

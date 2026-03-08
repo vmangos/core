@@ -69,8 +69,8 @@ void ReleaseSpiritAction::LogRelease(const std::string& releaseMsg, bool isAutoR
 {
     const std::string teamPrefix = bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H";
 
-    LOG_DEBUG("playerbots", "Bot {} {}:{} <{}> {}",
-        LOG_GUID(bot->GetGUID()),
+    LOG_DEBUG("playerbots", "Bot %llu %s:%u <%s> %s",
+        static_cast<unsigned long long>(LOG_GUID(bot->GetGUID())),
         teamPrefix.c_str(),
         bot->GetLevel(),
         bot->GetName(),

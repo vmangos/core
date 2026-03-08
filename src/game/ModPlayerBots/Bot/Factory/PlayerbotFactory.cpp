@@ -6,6 +6,7 @@
 #include "PlayerbotFactory.h"
 
 #include <random>
+#include <unordered_set>
 #include <utility>
 
 #include "AccountMgr.h"
@@ -165,7 +166,7 @@ void PlayerbotFactory::Init()
             // LOG_INFO("playerbots", "Add {} to enchantment spells", id);
         }
     }
-    LOG_INFO("playerbots", "Loading {} enchantment spells", enchantSpellIdCache.size());
+    LOG_INFO("playerbots", "Loading %zu enchantment spells", enchantSpellIdCache.size());
     // Gems not available in Vanilla - skip gem loading
     /*
     for (uint32 i = 0; i < sSpellItemEnchantmentStore.GetNumRows(); ++i)
@@ -205,7 +206,7 @@ void PlayerbotFactory::Init()
         enchantGemIdCache.push_back(gemId);
     }
     */
-    LOG_INFO("playerbots", "Loading {} enchantment gems", enchantGemIdCache.size());
+    LOG_INFO("playerbots", "Loading %zu enchantment gems", enchantGemIdCache.size());
 }
 
 void PlayerbotFactory::Prepare()
@@ -237,7 +238,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     // {
     //     return;
     // }
-    LOG_DEBUG("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"),
+    LOG_DEBUG("playerbots", "%s randomizing %s (level %u class = %u)...", (incremental ? "Incremental" : "Full"),
              bot->GetName(), level, bot->getClass());
     // LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
@@ -810,7 +811,7 @@ void PlayerbotFactory::InitPetTalents()
             std::vector<TalentEntry const*>& spells_row = i->second;
             if (spells_row.empty())
             {
-                LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName(), i->first);
+                LOG_INFO("playerbots", "%s: No spells for talent row %u", bot->GetName(), i->first);
                 continue;
             }
             int attemptCount = 0;
@@ -960,7 +961,7 @@ void PlayerbotFactory::InitPet()
 
         if (ids.empty())
         {
-            LOG_ERROR("playerbots", "No pets available for bot {} ({} level)", bot->GetName(), bot->GetLevel());
+            LOG_ERROR("playerbots", "No pets available for bot %s (%u level)", bot->GetName(), bot->GetLevel());
             return;
         }
 
@@ -1026,7 +1027,7 @@ void PlayerbotFactory::InitPet()
     }
     else
     {
-        LOG_ERROR("playerbots", "Cannot create pet for bot {}", bot->GetName());
+        LOG_ERROR("playerbots", "Cannot create pet for bot %s", bot->GetName());
         return;
     }
 
@@ -1166,7 +1167,7 @@ void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_templa
         if (i == MAX_SPECNO)
         {
             specTab = 0;
-            LOG_ERROR("playerbots", "Fail to select spec num for bot {}! Set to 0.", bot->GetName());
+            LOG_ERROR("playerbots", "Fail to select spec num for bot %s! Set to 0.", bot->GetName());
         }
     }
     if (reset)
@@ -2253,7 +2254,7 @@ void PlayerbotFactory::EnchantItem(Item* item)
 
     if (ids.empty())
     {
-        LOG_DEBUG("playerbots", "{}: no enchantments found for item {}", bot->GetName(),
+        LOG_DEBUG("playerbots", "%s: no enchantments found for item %u", bot->GetName(),
                   item->GetTemplate()->ItemId);
         return;
     }
@@ -2732,7 +2733,7 @@ void PlayerbotFactory::InitTalents(uint32 specNo)
         std::vector<TalentEntry const*>& spells_row = i->second;
         if (spells_row.empty())
         {
-            LOG_INFO("playerbots", "{}: No spells for talent row {}", bot->GetName(), i->first);
+            LOG_INFO("playerbots", "%s: No spells for talent row %u", bot->GetName(), i->first);
             continue;
         }
         int attemptCount = 0;
@@ -2889,16 +2890,37 @@ ObjectGuid PlayerbotFactory::GetRandomBot()
     return guids[index];
 }
 
+namespace
+{
+    void AddPrevQuestsInternal(uint32 questId, std::list<uint32>& questIds, std::unordered_set<uint32>& visitedQuestIds)
+    {
+        if (!visitedQuestIds.insert(questId).second)
+            return;
+
+        Quest const* quest = sObjectMgr.GetQuestTemplate(questId);
+        if (!quest)
+        {
+            LOG_WARN("playerbots", "Skipping missing quest template %u while building prerequisite quest list", questId);
+            return;
+        }
+
+        for (Quest::PrevQuests::const_iterator iter = quest->prevQuests.begin(); iter != quest->prevQuests.end(); ++iter)
+        {
+            uint32 prevId = std::abs(*iter);
+            if (!prevId)
+                continue;
+
+            AddPrevQuestsInternal(prevId, questIds, visitedQuestIds);
+            questIds.remove(prevId);
+            questIds.push_back(prevId);
+        }
+    }
+}
+
 void PlayerbotFactory::AddPrevQuests(uint32 questId, std::list<uint32>& questIds)
 {
-    Quest const* quest = sObjectMgr.GetQuestTemplate(questId);
-    for (Quest::PrevQuests::const_iterator iter = quest->prevQuests.begin(); iter != quest->prevQuests.end(); ++iter)
-    {
-        uint32 prevId = abs(*iter);
-        AddPrevQuests(prevId, questIds);
-        questIds.remove(prevId);
-        questIds.push_back(prevId);
-    }
+    std::unordered_set<uint32> visitedQuestIds;
+    AddPrevQuestsInternal(questId, questIds, visitedQuestIds);
 }
 
 void PlayerbotFactory::InitQuests(std::list<uint32>& questMap, bool withRewardItem)
@@ -3139,7 +3161,7 @@ void PlayerbotFactory::InitMounts()
         if (spell)
         {
             bot->LearnSpell(spell, false);
-            LOG_DEBUG("playerbots", "Bot {} ({}) learned {} mount {}", std::to_string(bot->GetGUIDLow()).c_str(),
+            LOG_DEBUG("playerbots", "Bot %s (%u) learned %s mount %u", std::to_string(bot->GetGUIDLow()).c_str(),
                       bot->GetLevel(), type == 0 ? "slow" : (type == 1 ? "fast" : "flying"), spell);
         }
     }
@@ -3888,7 +3910,7 @@ void PlayerbotFactory::InitInventoryTrade()
     uint32 itemId = sRandomItemMgr.GetRandomTrade(level);
     if (!itemId)
     {
-        LOG_ERROR("playerbots", "No trade items available for bot {} ({} level)", bot->GetName(),
+        LOG_ERROR("playerbots", "No trade items available for bot %s (%u level)", bot->GetName(),
                   bot->GetLevel());
         return;
     }
@@ -3983,7 +4005,7 @@ void PlayerbotFactory::InitGuild()
     if (!guild)
     {
         if (!PlayerbotGuildMgr::instance().CreateGuild(bot, guildName))
-            LOG_ERROR("playerbots","Failed to create guild {} for bot {}", guildName.c_str(), bot->GetName());
+            LOG_ERROR("playerbots","Failed to create guild %s for bot %s", guildName.c_str(), bot->GetName());
         return;
     }
     else
@@ -3991,7 +4013,7 @@ void PlayerbotFactory::InitGuild()
         if (guild->AddMember(bot->GetGUID(), urand(GR_OFFICER, GR_INITIATE)) == GuildAddStatus::OK)
             PlayerbotGuildMgr::instance().OnGuildUpdate(guild);
         else
-            LOG_ERROR("playerbots","Bot {} failed to join guild {}.", bot->GetName(), guildName.c_str());
+            LOG_ERROR("playerbots","Bot %s failed to join guild %s.", bot->GetName(), guildName.c_str());
     }
     // add guild tabard
     if (bot->GetGuildId() && bot->GetLevel() > 9 && urand(0, 4) && !bot->HasItemCount(5976, 1))
@@ -4151,7 +4173,7 @@ void PlayerbotFactory::InitArenaTeam()
         ArenaTeam* arenateam = sArenaTeamMgr->GetArenaTeamById(arenateamID);
         if (!arenateam)
         {
-            LOG_ERROR("playerbots", "Invalid arena team {}", arenateamID);
+            LOG_ERROR("playerbots", "Invalid arena team %u", arenateamID);
             arenateams.erase(arenateams.begin() + index);
             continue;
         }

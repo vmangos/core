@@ -49,7 +49,7 @@ public:
     RandomPlayerbotFactory() {};
     virtual ~RandomPlayerbotFactory() {}
 
-    Player* CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<NameRaceAndGender, std::vector<std::string>>& names);
+    bool CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<NameRaceAndGender, std::vector<std::string>>& names);
     static void CreateRandomBots();
     static void CreateRandomArenaTeams(ArenaType slot, uint32 count);
     static std::string const CreateRandomGuildName();
@@ -57,7 +57,10 @@ public:
     static uint32 CalculateAvailableCharsPerAccount();
 
 private:
+    static constexpr uint32 NameCacheBatchSize = 200;
     static bool IsValidRaceClassCombination(uint8 race, uint8 class_, uint32 expansion);
+    static bool LoadNameCacheEntry(NameRaceAndGender raceAndGender,
+                                   std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache);
     std::string const CreateRandomBotName(NameRaceAndGender raceAndGender);
     static std::string const CreateRandomArenaTeamName();
 };

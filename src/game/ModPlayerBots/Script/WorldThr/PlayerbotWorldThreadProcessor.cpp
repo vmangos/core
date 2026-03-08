@@ -45,7 +45,7 @@ bool PlayerbotWorldThreadProcessor::QueueOperation(std::unique_ptr<PlayerbotOper
     if (m_operationQueue.size() >= m_maxQueueSize)
     {
         LOG_ERROR("playerbots",
-                  "PlayerbotWorldThreadProcessor queue is full ({} operations). Dropping operation: {}",
+                  "PlayerbotWorldThreadProcessor queue is full (%u operations). Dropping operation: %s",
                   m_maxQueueSize, operation->GetName().c_str());
 
         std::lock_guard<std::mutex> statsLock(m_statsMutex);
@@ -99,7 +99,7 @@ void PlayerbotWorldThreadProcessor::ProcessBatch()
             // Check if operation is still valid
             if (!operation->IsValid())
             {
-                LOG_DEBUG("playerbots", "Skipping invalid operation: {}", operation->GetName().c_str());
+                LOG_DEBUG("playerbots", "Skipping invalid operation: %s", operation->GetName().c_str());
 
                 std::lock_guard<std::mutex> statsLock(m_statsMutex);
                 m_stats.totalOperationsSkipped++;
@@ -117,7 +117,7 @@ void PlayerbotWorldThreadProcessor::ProcessBatch()
 
             // Log slow operations
             if (executionTime > 100)
-                LOG_WARN("playerbots", "Slow operation: {} took {}ms", operation->GetName().c_str(), executionTime);
+                LOG_WARN("playerbots", "Slow operation: %s took %ums", operation->GetName().c_str(), executionTime);
 
             // Update statistics
             std::lock_guard<std::mutex> statsLock(m_statsMutex);
@@ -126,19 +126,19 @@ void PlayerbotWorldThreadProcessor::ProcessBatch()
             else
             {
                 m_stats.totalOperationsFailed++;
-                LOG_DEBUG("playerbots", "Operation failed: {}", operation->GetName().c_str());
+                LOG_DEBUG("playerbots", "Operation failed: %s", operation->GetName().c_str());
             }
         }
         catch (std::exception const& e)
         {
-            LOG_ERROR("playerbots", "Exception in operation {}: {}", operation->GetName().c_str(), e.what());
+            LOG_ERROR("playerbots", "Exception in operation %s: %s", operation->GetName().c_str(), e.what());
 
             std::lock_guard<std::mutex> statsLock(m_statsMutex);
             m_stats.totalOperationsFailed++;
         }
         catch (...)
         {
-            LOG_ERROR("playerbots", "Unknown exception in operation {}", operation->GetName().c_str());
+            LOG_ERROR("playerbots", "Unknown exception in operation %s", operation->GetName().c_str());
 
             std::lock_guard<std::mutex> statsLock(m_statsMutex);
             m_stats.totalOperationsFailed++;
@@ -164,7 +164,7 @@ void PlayerbotWorldThreadProcessor::CheckQueueHealth()
     if (queueSize >= threshold)
     {
         LOG_WARN("playerbots",
-                 "PlayerbotWorldThreadProcessor queue is {}% full ({}/{}). "
+                 "PlayerbotWorldThreadProcessor queue is %u%% full (%u/%u). "
                  "Consider increasing update frequency or batch size.",
                  (queueSize * 100) / m_maxQueueSize, queueSize, m_maxQueueSize);
     }
@@ -182,7 +182,7 @@ void PlayerbotWorldThreadProcessor::ClearQueue()
 
     uint32 cleared = static_cast<uint32>(m_operationQueue.size());
     if (cleared > 0)
-        LOG_INFO("playerbots", "Clearing {} queued operations", cleared);
+        LOG_INFO("playerbots", "Clearing %u queued operations", cleared);
 
     // Clear the queue
     while (!m_operationQueue.empty())

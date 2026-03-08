@@ -627,7 +627,7 @@ void Engine::LogAction(char const* format, ...)
     }
     else
     {
-        LOG_DEBUG("playerbots", "{} {}", bot->GetName(), buf);
+        LOG_DEBUG("playerbots", "%s %s", bot->GetName(), buf);
     }
 }
 
@@ -665,5 +665,5 @@ void Engine::LogValues()
         return;
 
     std::string const text = botAI->GetAiObjectContext()->FormatValues();
-    LOG_DEBUG("playerbots", "Values for {}: {}", bot->GetName(), text.c_str());
+    LOG_DEBUG("playerbots", "Values for %s: %s", bot->GetName(), text.c_str());
 }

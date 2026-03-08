@@ -14967,7 +14967,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
         }
     }
 
-    if (PlayerBotEntry* e = GetSession()->GetBot())
+    if (PlayerBotEntry* e = GetSession()->GetBot(); e && e->ai)
         e->ai->BeforeAddToMap(this);
 
     // player bounded instance saves loaded in _LoadBoundInstances, group versions at group loading

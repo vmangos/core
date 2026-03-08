@@ -17,7 +17,7 @@ bool AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
 
     if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
-        PB_LOG_INFO("playerbots", "{} => Quest [{}] accepted", bot->GetName(), quest->GetTitle().c_str());
+        PB_LOG_INFO("playerbots", "%s => Quest [%s] accepted", bot->GetName(), quest->GetTitle().c_str());
         bot->Say(("Quest [" + text_quest + "] accepted").c_str(), LANG_UNIVERSAL);
     }
 
@@ -87,7 +87,7 @@ bool AcceptQuestAction::Execute(Event event)
     {
         std::stringstream ss;
         ss << "AcceptQuestAction [" << qInfo->GetTitle() << "] - [" << std::to_string(qInfo->GetQuestId()) << "]";
-        PB_LOG_DEBUG("playerbots", "{}", ss.str().c_str());
+        PB_LOG_DEBUG("playerbots", "%s", ss.str().c_str());
         // botAI->TellMaster(ss.str());
     }
 
