@@ -7,6 +7,7 @@
 #define _PLAYERBOT_VALUECONTEXT_H
 
 #include "ActiveSpellValue.h"
+#include "AggressiveTargetValue.h"
 #include "AlwaysLootListValue.h"
 #include "AoeHealValues.h"
 #include "AoeValues.h"
@@ -135,6 +136,7 @@ public:
         creators["line target"] = &ValueContext::line_target;
         creators["tank target"] = &ValueContext::tank_target;
         creators["dps target"] = &ValueContext::dps_target;
+        creators["aggressive target"] = &ValueContext::aggressive_target;
         creators["dps aoe target"] = &ValueContext::dps_aoe_target;
         creators["least hp target"] = &ValueContext::least_hp_target;
         creators["enemy player target"] = &ValueContext::enemy_player_target;
@@ -450,6 +452,7 @@ private:
     static UntypedValue* line_target(PlayerbotAI* botAI) { return new LineTargetValue(botAI); }
     static UntypedValue* tank_target(PlayerbotAI* botAI) { return new TankTargetValue(botAI); }
     static UntypedValue* dps_target(PlayerbotAI* botAI) { return new DpsTargetValue(botAI); }
+    static UntypedValue* aggressive_target(PlayerbotAI* botAI) { return new AggressiveTargetValue(botAI); }
     static UntypedValue* dps_aoe_target(PlayerbotAI* botAI) { return new DpsAoeTargetValue(botAI); }
     static UntypedValue* least_hp_target(PlayerbotAI* botAI) { return new LeastHpTargetValue(botAI); }
     static UntypedValue* enemy_player_target(PlayerbotAI* botAI) { return new EnemyPlayerValue(botAI); }

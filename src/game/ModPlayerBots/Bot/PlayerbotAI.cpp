@@ -2542,9 +2542,17 @@ std::string PlayerbotAI::GetLocalizedAreaName(const AreaTableEntry* entry)
     std::string name;
     if (entry)
     {
-        name = entry->area_name[sWorld.GetDefaultDbcLocale()];
+        LocaleConstant locale = sWorld.GetAvailableDbcLocale(sWorld.GetDefaultDbcLocale());
+        if (locale >= MAX_LOCALES)
+            locale = LOCALE_enUS;
+
+        if (char const* localizedName = entry->area_name[locale])
+            name = localizedName;
         if (name.empty())
-            name = entry->area_name[LOCALE_enUS];
+        {
+            if (char const* fallbackName = entry->area_name[LOCALE_enUS])
+                name = fallbackName;
+        }
     }
 
     return name;

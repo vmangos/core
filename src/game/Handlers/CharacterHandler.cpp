@@ -41,6 +41,7 @@
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 #include "PlayerBotsCompat/PlayerBotMgrCompat.h"
+#include "ModPlayerBots/Bot/PlayerbotMgr.h"
 #include "MapManager.h"
 #include "AccountMgr.h"
 
@@ -126,13 +127,30 @@ public:
         if (!holder)
             return;
 
-        WorldSession* session = sWorld.FindSession(((LoginQueryHolder*)holder)->GetAccountId());
+        LoginQueryHolder* loginHolder = (LoginQueryHolder*)holder;
+        ObjectGuid const guid = loginHolder->GetGuid();
+        WorldSession* session = PlayerbotHolder::FindPendingBotSession(guid);
+        if (!session)
+            session = sWorld.FindSession(loginHolder->GetAccountId());
+
         if (!session)
         {
             delete holder;
             return;
         }
-        session->HandlePlayerLogin((LoginQueryHolder*)holder);
+
+        session->HandlePlayerLogin(loginHolder);
+
+        if (session->GetBot())
+        {
+            PlayerbotHolder::UnregisterPendingBotSession(guid);
+
+            if (!session->GetPlayer() && !session->PlayerLoading())
+            {
+                PlayerbotHolder::ClearPendingBotOwner(guid);
+                delete session;
+            }
+        }
     }
 } chrHandler;
 
@@ -417,6 +435,11 @@ void WorldSession::LoginPlayer(ObjectGuid loginPlayerGuid)
     LoginQueryHolder* holder = new LoginQueryHolder(GetAccountId(), loginPlayerGuid);
     if (!holder->Initialize())
     {
+        if (GetBot())
+        {
+            PlayerbotHolder::ClearPendingBotOwner(loginPlayerGuid);
+            KickPlayer();
+        }
         delete holder;                                      // delete all unprocessed queries
         return;
     }
@@ -450,6 +473,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // Hacking attempt
         if (pCurrChar->GetSession()->GetAccountId() != GetAccountId())
         {
+            if (GetBot())
+                PlayerbotHolder::ClearPendingBotOwner(playerGuid);
             ProcessAnticheatAction("PassiveAnticheat", "Attempt to login to character on different account", CHEAT_ACTION_LOG);
             KickPlayer();
             delete holder;
@@ -459,6 +484,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
         if (pCurrChar->FindMap() != sMapMgr.FindMap(pCurrChar->GetMapId(), pCurrChar->GetInstanceId()))
         {
+            if (GetBot())
+                PlayerbotHolder::ClearPendingBotOwner(playerGuid);
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Dangling map pointer during login on character guid %u", playerGuid.GetCounter());
             KickPlayer();
             delete holder;
@@ -486,6 +513,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // Character found online but not in world ?
         if (HashMapHolder<Player>::Find(playerGuid))
         {
+            if (GetBot())
+                PlayerbotHolder::ClearPendingBotOwner(playerGuid);
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Trying to login already ingame character guid %u", playerGuid.GetCounter());
             KickPlayer();
             delete holder;
@@ -504,6 +533,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         pCurrChar->SendPacketsAtRelogin();
     else if (!pCurrChar->LoadFromDB(playerGuid, holder))
     {
+        if (GetBot())
+            PlayerbotHolder::ClearPendingBotOwner(playerGuid);
         KickPlayer();                                       // disconnect client, player no set to session and it will not deleted or saved at kick
         delete pCurrChar;                                   // delete it manually
         delete holder;                                      // delete all unprocessed queries

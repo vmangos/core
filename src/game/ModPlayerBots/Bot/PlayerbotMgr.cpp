@@ -27,6 +27,7 @@
 #include "ObjectGuid.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAIConfig.h"
+#include "PlayerbotAI.h"
 #include "PlayerbotRepository.h"
 #include "PlayerbotFactory.h"
 #include "PlayerbotOperations.h"
@@ -70,8 +71,36 @@ private:
 
 std::unordered_set<ObjectGuid> BotInitGuard::botsBeingInitialized;
 std::unordered_set<ObjectGuid> PlayerbotHolder::botLoading;
+std::unordered_map<ObjectGuid, uint32> PlayerbotHolder::pendingBotOwners;
+std::unordered_map<ObjectGuid, WorldSession*> PlayerbotHolder::pendingBotSessions;
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
+
+namespace
+{
+class PlayerbotSessionPacketBridge : public PlayerBotAI
+{
+public:
+    explicit PlayerbotSessionPacketBridge(ObjectGuid botGuid) : botGuid(botGuid) {}
+
+    void OnPacketReceived(WorldPacket const* packet) override
+    {
+        if (!packet)
+            return;
+
+        Player* bot = ObjectAccessor::FindPlayer(botGuid);
+        if (!bot)
+            return;
+
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (botAI)
+            botAI->HandleBotOutgoingPacket(*packet);
+    }
+
+private:
+    ObjectGuid botGuid;
+};
+}  // namespace
 
 // Simple holder for bot login data (vMaNGOS doesn't have LoginQueryHolder base class available)
 struct PlayerbotLoginQueryHolder
@@ -167,6 +196,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     }
 
     SetBotLoading(playerGuid, true);
+    SetPendingBotOwner(playerGuid, masterAccountId);
 
     // Synchronous login for vMaNGOS (simpler than Trinity async pattern)
     PlayerbotLoginQueryHolder holder(masterAccountId, accountId, playerGuid);
@@ -188,10 +218,45 @@ void PlayerbotHolder::SetBotLoading(ObjectGuid guid, bool loading)
         botLoading.erase(guid);
 }
 
+bool PlayerbotHolder::TryGetPendingBotOwner(ObjectGuid guid, uint32& masterAccountId)
+{
+    auto const itr = pendingBotOwners.find(guid);
+    if (itr == pendingBotOwners.end())
+        return false;
+
+    masterAccountId = itr->second;
+    return true;
+}
+
+void PlayerbotHolder::SetPendingBotOwner(ObjectGuid guid, uint32 masterAccountId)
+{
+    pendingBotOwners[guid] = masterAccountId;
+}
+
+void PlayerbotHolder::ClearPendingBotOwner(ObjectGuid guid)
+{
+    pendingBotOwners.erase(guid);
+}
+
+void PlayerbotHolder::RegisterPendingBotSession(ObjectGuid guid, WorldSession* session)
+{
+    pendingBotSessions[guid] = session;
+}
+
+WorldSession* PlayerbotHolder::FindPendingBotSession(ObjectGuid guid)
+{
+    auto const itr = pendingBotSessions.find(guid);
+    return itr == pendingBotSessions.end() ? nullptr : itr->second;
+}
+
+void PlayerbotHolder::UnregisterPendingBotSession(ObjectGuid guid)
+{
+    pendingBotSessions.erase(guid);
+}
+
 void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder)
 {
     uint32 botAccountId = holder.GetAccountId();
-    uint32 masterAccountId = holder.GetMasterAccountId();
 
     // Create world session for bot
     // vMaNGOS WorldSession constructor: WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, AccountTypes sec, time_t mute_time, LocaleConstant locale)
@@ -199,23 +264,13 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     WorldSession* botSession = new WorldSession(botAccountId, nullptr, SEC_PLAYER, 0, LOCALE_enUS);
     auto botEntry = std::make_shared<PlayerBotEntry>(holder.guid.GetRawValue(), botAccountId, 100);
     botEntry->state = PB_STATE_LOADING;
+    botEntry->ai = std::make_unique<PlayerbotSessionPacketBridge>(holder.guid);
     botSession->SetBot(botEntry);
 
-    // Store session and request async login through the native API.
-    sWorld.AddSession(botSession);
+    // Keep bot login sessions outside the world's account-indexed session map.
+    // Vanilla only supports one WorldSession per account there, which breaks multi-bot accounts.
+    RegisterPendingBotSession(holder.guid, botSession);
     botSession->LoginPlayer(holder.guid);
-
-    if (masterAccountId)
-    {
-        if (WorldSession* masterSession = sWorldSessionMgr->FindSession(masterAccountId))
-        {
-            if (Player* masterPlayer = masterSession->GetPlayer())
-            {
-                if (PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(masterPlayer))
-                    mgr->OnPlayerLogin(masterPlayer);
-            }
-        }
-    }
 }
 
 void PlayerbotHolder::UpdateSessions()
@@ -240,9 +295,9 @@ void PlayerbotHolder::UpdateSessions()
 
 void PlayerbotHolder::HandleBotPackets(WorldSession* session)
 {
-    // vMaNGOS doesn't have GetPacketQueue() method
-    // Bot packet processing is handled differently in vMaNGOS
-    // Stubbing for now - packets are handled via the normal session update mechanism
+    // Vanilla bot sessions receive server packets through the WorldSession::SendPacket bridge
+    // attached to PlayerBotEntry::ai. There is no separate packet queue to drain here.
+    (void)session;
 }
 
 void PlayerbotHolder::LogoutAllBots()
@@ -467,6 +522,8 @@ Player* PlayerbotHolder::GetPlayerBot(uint32 lowGuid) const
 void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
     SetBotLoading(bot->GetGUID(), false);
+    ClearPendingBotOwner(bot->GetGUID());
+    UnregisterPendingBotSession(bot->GetGUID());
 
     // Prevent duplicate login
     if (playerBots.find(bot->GetGUID()) != playerBots.end())

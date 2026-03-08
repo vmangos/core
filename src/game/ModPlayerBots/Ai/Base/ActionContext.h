@@ -114,6 +114,7 @@ public:
         creators["food"] = &ActionContext::food;
         creators["drink"] = &ActionContext::drink;
         creators["tank assist"] = &ActionContext::tank_assist;
+        creators["aggressive target"] = &ActionContext::aggressive_target;
         creators["dps assist"] = &ActionContext::dps_assist;
         creators["dps aoe"] = &ActionContext::dps_aoe;
         creators["attack rti target"] = &ActionContext::attack_rti_target;
@@ -339,6 +340,7 @@ private:
     static Action* release_loot(PlayerbotAI* botAI) { return new ReleaseLootAction(botAI); }
     static Action* dps_assist(PlayerbotAI* botAI) { return new DpsAssistAction(botAI); }
     static Action* dps_aoe(PlayerbotAI* botAI) { return new DpsAoeAction(botAI); }
+    static Action* aggressive_target(PlayerbotAI* botAI) { return new AggressiveTargetAction(botAI); }
     static Action* attack_rti_target(PlayerbotAI* botAI) { return new AttackRtiTargetAction(botAI); }
     static Action* tank_assist(PlayerbotAI* botAI) { return new TankAssistAction(botAI); }
     static Action* drink(PlayerbotAI* botAI) { return new DrinkAction(botAI); }

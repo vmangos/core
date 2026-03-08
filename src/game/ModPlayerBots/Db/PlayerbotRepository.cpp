@@ -14,7 +14,8 @@ void PlayerbotRepository::Load(PlayerbotAI* botAI)
     uint32 guid = botAI->GetBot()->GetGUIDLow();
 
     // vMaNGOS: Use PQuery instead of prepared statements
-    std::unique_ptr<QueryResult> result = PlayerbotsDatabase.PQuery("SELECT key, value FROM playerbots_db_store WHERE guid = %u", guid);
+    std::unique_ptr<QueryResult> result =
+        PlayerbotsDatabase.PQuery("SELECT `key`, `value` FROM `playerbots_db_store` WHERE `guid` = %u", guid);
 
     if (result)
     {
@@ -54,7 +55,7 @@ void PlayerbotRepository::Save(PlayerbotAI* botAI)
     Reset(botAI);
 
     // vMaNGOS: Use PExecute instead of prepared statements
-    PlayerbotsDatabase.PExecute("DELETE FROM playerbots_db_store WHERE guid = %u", guid);
+    PlayerbotsDatabase.PExecute("DELETE FROM `playerbots_db_store` WHERE `guid` = %u", guid);
 
     std::vector<std::string> data = botAI->GetAiObjectContext()->Save();
     for (std::vector<std::string>::iterator i = data.begin(); i != data.end(); ++i)
@@ -82,15 +83,17 @@ void PlayerbotRepository::Reset(PlayerbotAI* botAI)
     uint32 guid = botAI->GetBot()->GetGUIDLow();
 
     // vMaNGOS: Use PExecute instead of prepared statements
-    PlayerbotsDatabase.PExecute("DELETE FROM playerbots_db_store WHERE guid = %u", guid);
+    PlayerbotsDatabase.PExecute("DELETE FROM `playerbots_db_store` WHERE `guid` = %u", guid);
 }
 
 void PlayerbotRepository::SaveValue(uint32 guid, std::string const key, std::string const value)
 {
     // vMaNGOS: Use PExecute instead of prepared statements
-    // Escape the key and value strings to prevent SQL injection
     std::string escapedKey = key;
     std::string escapedValue = value;
-    PlayerbotsDatabase.PExecute("INSERT INTO playerbots_db_store (guid, key, value) VALUES (%u, '%s', '%s')",
-                              guid, escapedKey.c_str(), escapedValue.c_str());
+    PlayerbotsDatabase.escape_string(escapedKey);
+    PlayerbotsDatabase.escape_string(escapedValue);
+
+    PlayerbotsDatabase.PExecute("INSERT INTO `playerbots_db_store` (`guid`, `key`, `value`) VALUES (%u, '%s', '%s')",
+                                guid, escapedKey.c_str(), escapedValue.c_str());
 }

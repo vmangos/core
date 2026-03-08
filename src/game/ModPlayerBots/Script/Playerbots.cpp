@@ -55,7 +55,7 @@ public:
     {
         if (player->IsBot())
         {
-            sRandomPlayerbotMgr.OnPlayerLogin(player);
+            // Bot finalization runs from Player::AddToWorld via PlayerBotMgrCompat::OnPlayerInWorld.
             return;
         }
 

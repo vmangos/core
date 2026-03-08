@@ -16,6 +16,7 @@
 #include "ReputationMgr.h"
 #include "ServerFacade.h"
 #include "BroadcastHelper.h"
+#include "ByteBuffer.h"
 
 bool QuestAction::Execute(Event event)
 {
@@ -384,9 +385,18 @@ bool QuestItemPushResultAction::Execute(Event event)
     uint32 received, created, sendChatMessage, itemSlot, itemEntry, itemSuffixFactory, count, itemCount;
     uint8 bagSlot;
     int32 itemRandomPropertyId;
-    packet >> guid >> received >> created >> sendChatMessage;
-    packet >> bagSlot >> itemSlot >> itemEntry >> itemSuffixFactory >> itemRandomPropertyId;
-    packet >> count >> itemCount;
+
+    try
+    {
+        packet >> guid >> received >> created >> sendChatMessage;
+        packet >> bagSlot >> itemSlot >> itemEntry >> itemSuffixFactory >> itemRandomPropertyId;
+        packet >> count >> itemCount;
+    }
+    catch (ByteBufferException const&)
+    {
+        LOG_WARN("playerbots", "QuestItemPushResultAction: Failed to deserialize quest item push packet");
+        return false;
+    }
 
     if (guid != bot->GetObjectGuid())
         return false;

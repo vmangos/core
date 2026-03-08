@@ -539,6 +539,11 @@ void PlayerbotFactory::InitConsumables()
 {
     int specTab = AiFactory::GetPlayerSpecTab(bot);
     std::vector<std::pair<uint32, uint32>> items;
+    auto const canUseItem = [&](uint32 itemId, uint32 maxSupportedLevel = 75) -> bool
+    {
+        ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
+        return proto && proto->RequiredLevel <= level && level <= maxSupportedLevel;
+    };
 
     switch (bot->getClass())
     {
@@ -550,8 +555,7 @@ void PlayerbotFactory::InitConsumables()
                 std::vector<uint32> mana_oils = {BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL, LESSER_MANA_OIL, MINOR_MANA_OIL};
                 for (uint32 itemId : mana_oils)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 4});
                     break;
@@ -563,8 +567,7 @@ void PlayerbotFactory::InitConsumables()
                 std::vector<uint32> wizard_oils = {BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL};
                 for (uint32 itemId : wizard_oils)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 4});
                     break;
@@ -578,8 +581,7 @@ void PlayerbotFactory::InitConsumables()
             std::vector<uint32> wizard_oils = {BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL};
             for (uint32 itemId : wizard_oils)
             {
-                ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                if (proto->RequiredLevel > level || level > 75)
+                if (!canUseItem(itemId))
                     continue;
                 items.push_back({itemId, 4});
                 break;
@@ -594,8 +596,7 @@ void PlayerbotFactory::InitConsumables()
                 std::vector<uint32> wizard_oils = {BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL};
                 for (uint32 itemId : wizard_oils)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 4});
                     break;
@@ -608,16 +609,14 @@ void PlayerbotFactory::InitConsumables()
                 std::vector<uint32> weightstones = {ADAMANTITE_WEIGHTSTONE, FEL_WEIGHTSTONE, DENSE_WEIGHTSTONE, SOLID_WEIGHTSTONE, HEAVY_WEIGHTSTONE, COARSE_WEIGHTSTONE, ROUGH_WEIGHTSTONE};
                 for (uint32 itemId : sharpening_stones)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 20});
                     break;
                 }
                 for (uint32 itemId : weightstones)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 20});
                     break;
@@ -629,8 +628,7 @@ void PlayerbotFactory::InitConsumables()
                 std::vector<uint32> mana_oils = {BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL, LESSER_MANA_OIL, MINOR_MANA_OIL};
                 for (uint32 itemId : mana_oils)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 4});
                     break;
@@ -646,8 +644,7 @@ void PlayerbotFactory::InitConsumables()
                 std::vector<uint32> mana_oils = {BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL, LESSER_MANA_OIL, MINOR_MANA_OIL};
                 for (uint32 itemId : mana_oils)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 4});
                     break;
@@ -659,8 +656,7 @@ void PlayerbotFactory::InitConsumables()
                 std::vector<uint32> wizard_oils = {BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL};
                 for (uint32 itemId : wizard_oils)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 4});
                     break;
@@ -673,16 +669,14 @@ void PlayerbotFactory::InitConsumables()
                 std::vector<uint32> weightstones = {ADAMANTITE_WEIGHTSTONE, FEL_WEIGHTSTONE, DENSE_WEIGHTSTONE, SOLID_WEIGHTSTONE, HEAVY_WEIGHTSTONE, COARSE_WEIGHTSTONE, ROUGH_WEIGHTSTONE};
                 for (uint32 itemId : sharpening_stones)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 20});
                     break;
                 }
                 for (uint32 itemId : weightstones)
                 {
-                    ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                    if (proto->RequiredLevel > level || level > 75)
+                    if (!canUseItem(itemId))
                         continue;
                     items.push_back({itemId, 20});
                     break;
@@ -698,16 +692,14 @@ void PlayerbotFactory::InitConsumables()
             std::vector<uint32> weightstones = {ADAMANTITE_WEIGHTSTONE, FEL_WEIGHTSTONE, DENSE_WEIGHTSTONE, SOLID_WEIGHTSTONE, HEAVY_WEIGHTSTONE, COARSE_WEIGHTSTONE, ROUGH_WEIGHTSTONE};
             for (uint32 itemId : sharpening_stones)
             {
-                ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                if (proto->RequiredLevel > level || level > 75)
+                if (!canUseItem(itemId))
                     continue;
                 items.push_back({itemId, 20});
                 break;
             }
             for (uint32 itemId : weightstones)
             {
-                ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                if (proto->RequiredLevel > level || level > 75)
+                if (!canUseItem(itemId))
                     continue;
                 items.push_back({itemId, 20});
                 break;
@@ -721,16 +713,14 @@ void PlayerbotFactory::InitConsumables()
             std::vector<uint32> deadly_poisons = {DEADLY_POISON_IX, DEADLY_POISON_VIII, DEADLY_POISON_VII, DEADLY_POISON_VI, DEADLY_POISON_V, DEADLY_POISON_IV, DEADLY_POISON_III, DEADLY_POISON_II, DEADLY_POISON};
             for (uint32 itemId : deadly_poisons)
             {
-                ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                if (proto->RequiredLevel > level)
+                if (!canUseItem(itemId, UINT32_MAX))
                     continue;
                 items.push_back({itemId, 20});
                 break;
             }
             for (uint32 itemId : instant_poisons)
             {
-                ItemTemplate const* proto = sObjectMgr.GetItemTemplate(itemId);
-                if (proto->RequiredLevel > level)
+                if (!canUseItem(itemId, UINT32_MAX))
                     continue;
                 items.push_back({itemId, 20});
                 break;
@@ -2930,6 +2920,11 @@ void PlayerbotFactory::InitQuests(std::list<uint32>& questMap, bool withRewardIt
     {
         uint32 questId = *i;
         Quest const* quest = sObjectMgr.GetQuestTemplate(questId);
+        if (!quest)
+        {
+            LOG_WARN("playerbots", "Skipping missing quest template %u during bot quest initialization", questId);
+            continue;
+        }
 
         if (!bot->SatisfyQuestClass(quest, false) || quest->GetMinLevel() > bot->GetLevel() ||
             !bot->SatisfyQuestRace(quest, false))

@@ -6,6 +6,7 @@
 #ifndef _PLAYERBOT_STRATEGYCONTEXT_H
 #define _PLAYERBOT_STRATEGYCONTEXT_H
 
+#include "AggressiveStrategy.h"
 #include "AttackEnemyPlayersStrategy.h"
 #if !PB_DISABLE_BG_BOT_LOGIC
 #include "BattlegroundStrategy.h"
@@ -92,6 +93,7 @@ public:
         creators["map full"] = &StrategyContext::map_full;
         creators["sit"] = &StrategyContext::sit;
         creators["mark rti"] = &StrategyContext::mark_rti;
+        creators["aggressive"] = &StrategyContext::aggressive;
         creators["adds"] = &StrategyContext::possible_adds;
         creators["close"] = &StrategyContext::close;
         creators["ranged"] = &StrategyContext::ranged;
@@ -168,6 +170,7 @@ private:
     static Strategy* map_full(PlayerbotAI* botAI) { return new MapFullStrategy(botAI); }
     static Strategy* sit(PlayerbotAI* botAI) { return new SitStrategy(botAI); }
     static Strategy* possible_adds(PlayerbotAI* botAI) { return new PossibleAddsStrategy(botAI); }
+    static Strategy* aggressive(PlayerbotAI* botAI) { return new AggressiveStrategy(botAI); }
     static Strategy* mount(PlayerbotAI* botAI) { return new MountStrategy(botAI); }
 #if !PB_DISABLE_BG_BOT_LOGIC
     static Strategy* bg(PlayerbotAI* botAI) { return new BGStrategy(botAI); }

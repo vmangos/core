@@ -157,8 +157,23 @@ bool PlayerbotAIConfig::Initialize()
         sConfig.GetStringDefault("AiPlayerbot.RandomBotQuestItems",
                                            "5175,5176,5177,5178,6948,11000,12382,13704,16309"),
         randomBotQuestItems);
-    LoadList<std::vector<uint32>>(sConfig.GetStringDefault("AiPlayerbot.RandomBotSpellIds", "54197"),
+    LoadList<std::vector<uint32>>(sConfig.GetStringDefault("AiPlayerbot.RandomBotSpellIds", ""),
                                   randomBotSpellIds);
+    randomBotSpellIds.erase(
+        std::remove_if(
+            randomBotSpellIds.begin(), randomBotSpellIds.end(),
+            [](uint32 spellId)
+            {
+                if (!spellId)
+                    return true;
+
+                if (sSpellMgr.GetSpellEntry(spellId))
+                    return false;
+
+                LOG_WARN("playerbots", "Skipping invalid random bot spell id %u", spellId);
+                return true;
+            }),
+        randomBotSpellIds.end());
     LoadList<std::vector<uint32>>(
         sConfig.GetStringDefault("AiPlayerbot.PvpProhibitedZoneIds",
                                            "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,"

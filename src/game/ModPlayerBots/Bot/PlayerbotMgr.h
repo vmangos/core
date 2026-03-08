@@ -9,6 +9,7 @@
 #include "ObjectGuid.h"
 #include "Player.h"
 #include "PlayerbotAIBase.h"
+#include <unordered_map>
 
 typedef uint32 LowType;
 
@@ -16,6 +17,7 @@ class ChatHandler;
 class PlayerbotAI;
 class PlayerbotLoginQueryHolder;
 class WorldPacket;
+class WorldSession;
 
 typedef std::map<ObjectGuid, Player*> PlayerBotMap;
 typedef std::map<std::string, std::set<std::string> > PlayerBotErrorMap;
@@ -57,6 +59,12 @@ public:
 
     bool IsBotLoading(ObjectGuid guid) const { return botLoading.find(guid) != botLoading.end(); }
     void SetBotLoading(ObjectGuid guid, bool loading);
+    static bool TryGetPendingBotOwner(ObjectGuid guid, uint32& masterAccountId);
+    static void SetPendingBotOwner(ObjectGuid guid, uint32 masterAccountId);
+    static void ClearPendingBotOwner(ObjectGuid guid);
+    static void RegisterPendingBotSession(ObjectGuid guid, WorldSession* session);
+    static WorldSession* FindPendingBotSession(ObjectGuid guid);
+    static void UnregisterPendingBotSession(ObjectGuid guid);
     
     static PlayerbotHolder* instance();
 
@@ -65,6 +73,8 @@ protected:
 
     PlayerBotMap playerBots;
     static std::unordered_set<ObjectGuid> botLoading;
+    static std::unordered_map<ObjectGuid, uint32> pendingBotOwners;
+    static std::unordered_map<ObjectGuid, WorldSession*> pendingBotSessions;
 };
 
 class PlayerbotMgr : public PlayerbotHolder
