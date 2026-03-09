@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20260302083859');
 -- Add your query below.
 
 -- Pool Firebloom in Blasted Lands
-SET @PTEMPLATE = 4080;
+SET @PTEMPLATE = 5152;
 -- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Group 1
 DELETE FROM `pool_gameobject` WHERE `guid` IN (12316, 55465, 55471, 55470, 12278);
