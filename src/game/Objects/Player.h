@@ -538,7 +538,7 @@ enum BuyBackSlots                                           // 12 slots after 1.
 #endif
 };
 
-enum KeyRingSlots                                           // 32 (only 16 slots are visible/accessible in UI)
+enum KeyRingSlots                                           // 32 slots (only 16 are visible/accessible in UI)
 {
     KEYRING_SLOT_START          = 81,
     KEYRING_SLOT_END            = 97
