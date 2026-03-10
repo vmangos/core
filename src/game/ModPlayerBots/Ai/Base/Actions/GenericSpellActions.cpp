@@ -338,17 +338,14 @@ bool UseTrinketAction::UseTrinket(Item* item)
 
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
-    // uint8 spell_index = 0; //not used, line marked for removal.
-    uint8 cast_count = 1;
-    ObjectGuid item_guid = item->GetGUID();
-    uint32 glyphIndex = 0;
-    uint8 castFlags = 0;
-    uint32 targetFlag = 0;
+    uint8 spellIndex = 0;
+    uint16 targetFlag = TARGET_FLAG_NONE;
     uint32 spellId = 0;
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
         if (item->GetTemplate()->Spells[i].SpellId > 0 && item->GetTemplate()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
         {
+            spellIndex = i;
             spellId = item->GetTemplate()->Spells[i].SpellId;
             const SpellInfo* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
@@ -387,10 +384,9 @@ bool UseTrinketAction::UseTrinket(Item* item)
     if (!spellId)
         return false;
     WorldPacket packet(CMSG_USE_ITEM);
-    packet << bagIndex << slot << cast_count << spellId << item_guid << glyphIndex << castFlags;
+    packet << bagIndex << slot << spellIndex;
 
-    targetFlag = 0;
-    packet << targetFlag << bot->GetPackGUID();
+    packet << targetFlag;
     bot->GetSession()->HandleUseItemOpcode(packet);
     return true;
 }

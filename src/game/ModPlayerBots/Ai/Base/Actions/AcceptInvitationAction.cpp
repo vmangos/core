@@ -16,18 +16,28 @@ bool AcceptInvitationAction::Execute(Event event)
 {
     Group* grp = bot->GetGroupInvite();
     if (!grp)
+    {
+        LOG_INFO("playerbots", "Invite accept failed: %s (%u) has no pending GroupInvite",
+            bot->GetName(), bot->GetGUIDLow());
         return false;
+    }
+
     WorldPacket packet = event.getPacket();
-    uint8 flag;
     std::string name;
-    packet >> flag >> name;
+    packet >> name;
 
     Player* inviter = ObjectAccessor::FindPlayer(grp->GetLeaderGuid());
     if (!inviter)
+    {
+        LOG_INFO("playerbots", "Invite accept failed: %s (%u) inviter lookup failed for '%s'",
+            bot->GetName(), bot->GetGUIDLow(), name.c_str());
         return false;
+    }
 
     if (!botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, inviter))
     {
+        LOG_INFO("playerbots", "Invite accept rejected by security: %s (%u) inviter=%s (%u)",
+            bot->GetName(), bot->GetGUIDLow(), inviter->GetName(), inviter->GetGUIDLow());
         WorldPacket data(SMSG_GROUP_DECLINE, 10);
         data << bot->GetName();
         inviter->SendDirectMessage(&data);
@@ -44,7 +54,11 @@ bool AcceptInvitationAction::Execute(Event event)
     bot->GetSession()->HandleGroupAcceptOpcode(p);
 
     if (!bot->GetGroup() || !bot->GetGroup()->IsMember(inviter->GetGUID()))
+    {
+        LOG_INFO("playerbots", "Invite accept failed post-accept membership check: %s (%u) inviter=%s (%u)",
+            bot->GetName(), bot->GetGUIDLow(), inviter->GetName(), inviter->GetGUIDLow());
         return false;
+    }
 
     if (sRandomPlayerbotMgr.IsRandomBot(bot))
         botAI->SetMaster(inviter);

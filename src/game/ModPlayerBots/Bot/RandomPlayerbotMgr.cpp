@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "AccountMgr.h"
+#include "Bag.h"
 #include "BattleGround.h"
 #include "BattleGroundMgr.h"
 #include "ChannelMgr.h"
@@ -77,6 +78,35 @@ std::string JoinReasons(std::vector<std::string> const& reasons)
         out << reasons[i];
     }
     return out.str();
+}
+
+void NormalizePersistedNewItemState(Item* item)
+{
+    if (!item || item->GetState() != ITEM_NEW)
+        return;
+
+    if (CharacterDatabase.PQuery("SELECT 1 FROM `character_inventory` WHERE `item_guid` = '%u' LIMIT 1", item->GetGUIDLow()))
+        item->FSetState(ITEM_CHANGED);
+}
+
+void NormalizePersistedInventoryState(Player* bot)
+{
+    if (!bot)
+        return;
+
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+        NormalizePersistedNewItemState(bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot));
+
+    for (uint8 bagSlot = INVENTORY_SLOT_BAG_START; bagSlot < INVENTORY_SLOT_BAG_END; ++bagSlot)
+    {
+        Bag* bag = static_cast<Bag*>(bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bagSlot));
+        NormalizePersistedNewItemState(bag);
+        if (!bag)
+            continue;
+
+        for (uint8 slot = 0; slot < bag->GetBagSize(); ++slot)
+            NormalizePersistedNewItemState(bag->GetItemByPos(slot));
+    }
 }
 
 std::set<uint32> ParseBracketList(std::string const& value)
@@ -365,7 +395,7 @@ void RandomPlayerbotMgr::Randomize(Player* bot)
     factory.Randomize(false);
 
     SetValue(bot, "randomized", level);
-    ScheduleAutonomousEvents(bot->GetGUIDLow(), "randomize");
+    FinalizeAutonomousInit(bot, "randomize");
 }
 
 void RandomPlayerbotMgr::Clear(Player* bot)
@@ -397,7 +427,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     factory.Randomize(false);
 
     SetValue(bot, "randomized", level);
-    ScheduleAutonomousEvents(bot->GetGUIDLow(), "randomize_first");
+    FinalizeAutonomousInit(bot, "randomize_first");
 }
 
 void RandomPlayerbotMgr::RandomizeMin(Player* bot)
@@ -426,7 +456,7 @@ void RandomPlayerbotMgr::IncreaseLevel(Player* bot)
     factory.Randomize(true);
 
     SetValue(bot, "randomized", nextLevel);
-    ScheduleAutonomousEvents(bot->GetGUIDLow(), "increase_level");
+    FinalizeAutonomousInit(bot, "increase_level");
 }
 
 void RandomPlayerbotMgr::ScheduleTeleport(uint32 bot, uint32 time)
@@ -1400,8 +1430,41 @@ RandomPlayerbotMgr::AutonomousInitState RandomPlayerbotMgr::GetAutonomousInitSta
     state.missingTeleportEvent = GetEventValue(guidLow, "teleport") == 0;
     state.missingStrategyMode = GetEventValue(guidLow, "strategy_mode") == 0;
     state.baselineLevel = level <= baselineLevel && (configuredMinLevel > level || randomizedLevel > level);
+    state.missingTalents = bot->GetLevel() >= 10 && bot->GetFreeTalentPoints() > 0;
+
+    Item* mainHand = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    bool missingStarterArmor = bot->GetLevel() >= 5 &&
+        !bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_CHEST) &&
+        !bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_LEGS) &&
+        !bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET);
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    uint32 gearScore = botAI ? botAI->GetEquipGearScore(bot) : 0;
+    state.missingGear = !mainHand || gearScore == 0 || missingStarterArmor;
 
     return state;
+}
+
+bool RandomPlayerbotMgr::RepairRandomBotRuntimeState(Player* bot, char const* context)
+{
+    if (!bot)
+        return false;
+
+    PlayerbotFactory factory(bot, ClampToLevelBracket(bot->GetLevel()));
+    factory.InitTalentsTree(true, true, true);
+    factory.InitEquipment(true);
+    factory.InitBags(false);
+    factory.InitAmmo();
+    factory.InitReagents();
+    factory.InitFood();
+    factory.InitConsumables();
+    factory.InitPotions();
+    NormalizePersistedInventoryState(bot);
+    bot->SaveToDB(false, false);
+    FinalizeAutonomousInit(bot, context);
+
+    LOG_INFO("playerbots", "Random bot runtime state repaired: %s (%u) level=%u context=%s",
+        bot->GetName(), bot->GetGUIDLow(), bot->GetLevel(), context ? context : "unknown");
+    return true;
 }
 
 bool RandomPlayerbotMgr::EnsureAutonomousInit(Player* bot, char const* context)
@@ -1410,7 +1473,9 @@ bool RandomPlayerbotMgr::EnsureAutonomousInit(Player* bot, char const* context)
         return false;
 
     AutonomousInitState state = GetAutonomousInitState(bot);
-    if (!state.NeedsRepair())
+    bool hasAutonomyGap = state.missingRandomized || state.missingStrategyEvent || state.missingTeleportEvent ||
+        state.missingStrategyMode || state.baselineLevel || state.missingTalents || state.missingGear;
+    if (!hasAutonomyGap)
         return false;
 
     std::vector<std::string> reasons;
@@ -1424,18 +1489,51 @@ bool RandomPlayerbotMgr::EnsureAutonomousInit(Player* bot, char const* context)
         reasons.push_back("missing strategy mode");
     if (state.baselineLevel)
         reasons.push_back("baseline level");
+    if (state.missingTalents)
+        reasons.push_back("missing talents");
+    if (state.missingGear)
+        reasons.push_back("missing gear");
 
     LOG_INFO("playerbots", "Random bot uninitialized: %s (%u) [%s] context=%s",
         bot->GetName(), bot->GetGUIDLow(), JoinReasons(reasons).c_str(), context ? context : "unknown");
 
-    RandomizeFirst(bot);
+    if (state.NeedsFullRandomize())
+    {
+        RandomizeFirst(bot);
 
-    LOG_INFO("playerbots", "Random bot repaired: %s (%u) level=%u context=%s",
-        bot->GetName(), bot->GetGUIDLow(), bot->GetLevel(), context ? context : "unknown");
-    return true;
+        LOG_INFO("playerbots", "Random bot repaired: %s (%u) level=%u context=%s",
+            bot->GetName(), bot->GetGUIDLow(), bot->GetLevel(), context ? context : "unknown");
+        return true;
+    }
+
+    bool updated = false;
+    if (state.NeedsTargetedRepair())
+        updated = RepairRandomBotRuntimeState(bot, context);
+
+    if (state.missingStrategyMode)
+    {
+        FinalizeAutonomousInit(bot, context);
+        updated = true;
+    }
+    else if (state.missingStrategyEvent || state.missingTeleportEvent)
+    {
+        BackfillAutonomousEvents(bot->GetGUIDLow(), context);
+        updated = true;
+    }
+
+    return updated;
 }
 
-void RandomPlayerbotMgr::ScheduleAutonomousEvents(uint32 bot, char const* context)
+void RandomPlayerbotMgr::FinalizeAutonomousInit(Player* bot, char const* context)
+{
+    if (!bot)
+        return;
+
+    ChangeStrategyOnce(bot);
+    BackfillAutonomousEvents(bot->GetGUIDLow(), context);
+}
+
+void RandomPlayerbotMgr::BackfillAutonomousEvents(uint32 bot, char const* context)
 {
     std::vector<std::string> missing;
     if (!GetEventValue(bot, "randomize"))
@@ -1455,14 +1553,25 @@ void RandomPlayerbotMgr::ScheduleAutonomousEvents(uint32 bot, char const* contex
             bot, JoinReasons(missing).c_str(), context ? context : "unknown");
     }
 
-    ScheduleRandomize(bot, 0);
-    ScheduleTeleport(bot, 0);
-    ScheduleChangeStrategy(bot, 0);
-    ScheduleLogout(bot, 0);
+    if (!GetEventValue(bot, "randomize"))
+        ScheduleRandomize(bot, 0);
+    if (!GetEventValue(bot, "teleport"))
+        ScheduleTeleport(bot, 0);
+    if (!GetEventValue(bot, "strategy"))
+        ScheduleChangeStrategy(bot, 0);
+    if (!GetEventValue(bot, "logout"))
+        ScheduleLogout(bot, 0);
+    if (!GetEventValue(bot, "revive"))
+    {
+        SetEventValue(bot, "revive", 1,
+            urand(sPlayerbotAIConfig.minRandomBotReviveTime,
+                std::max(sPlayerbotAIConfig.minRandomBotReviveTime, sPlayerbotAIConfig.maxRandomBotReviveTime)));
+    }
+}
 
-    SetEventValue(bot, "revive", 1,
-        urand(sPlayerbotAIConfig.minRandomBotReviveTime,
-            std::max(sPlayerbotAIConfig.minRandomBotReviveTime, sPlayerbotAIConfig.maxRandomBotReviveTime)));
+void RandomPlayerbotMgr::ScheduleAutonomousEvents(uint32 bot, char const* context)
+{
+    BackfillAutonomousEvents(bot, context);
 }
 
 void RandomPlayerbotMgr::RepairBrokenRandomBotState()

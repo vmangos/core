@@ -1,9 +1,8 @@
 #pragma once
 
-#include <cstdint>
+#include "Common.h"
 
-// Stub for AreaTableEntry (Trinity/AzerothCore specific)
-// Vanilla vMaNGOS uses WMOAreaTableEntry instead
+// Trinity-shaped area adapter used by ModPlayerBots compatibility code.
 struct AreaTableEntry
 {
     uint32 ID;
@@ -13,7 +12,7 @@ struct AreaTableEntry
     uint32 flags;
     uint32 area_level;
     uint32 area_team;
-    char* area_name[8];
+    char* area_name[9];
     uint32 string;
 
     // Minimal interface for compatibility

@@ -21,6 +21,19 @@ private:
     WorldPacket packet_;
 };
 
+class AutoEquipItemSlot
+{
+public:
+    explicit AutoEquipItemSlot(WorldPacket&& packet) : packet_(std::move(packet)) { }
+
+    void Read() { }
+
+    operator WorldPacket&() { return packet_; }
+
+private:
+    WorldPacket packet_;
+};
+
 class SellItem
 {
 public:

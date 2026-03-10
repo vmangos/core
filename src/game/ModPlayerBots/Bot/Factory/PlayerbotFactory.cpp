@@ -44,6 +44,48 @@
 #include "AiObjectContext.h"
 #include "ItemPackets.h"
 
+namespace
+{
+void LearnSpellIfExists(Player* bot, uint32 spellId)
+{
+    if (!bot || !sSpellMgr.GetSpellEntry(spellId))
+        return;
+
+    bot->LearnSpell(spellId, false);
+}
+
+void NormalizePersistedNewItemState(Item* item)
+{
+    if (!item || item->GetState() != ITEM_NEW)
+        return;
+
+    if (CharacterDatabase.PQuery("SELECT 1 FROM `character_inventory` WHERE `item_guid` = '%u' LIMIT 1", item->GetGUIDLow()))
+        item->FSetState(ITEM_CHANGED);
+}
+
+void NormalizePersistedInventoryState(Player* bot)
+{
+    if (!bot)
+        return;
+
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+        NormalizePersistedNewItemState(bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot));
+
+    for (uint8 slot = KEYRING_SLOT_START; slot < KEYRING_SLOT_END; ++slot)
+        NormalizePersistedNewItemState(bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot));
+
+    for (uint8 bagSlot = INVENTORY_SLOT_BAG_START; bagSlot < INVENTORY_SLOT_BAG_END; ++bagSlot)
+    {
+        Bag* bag = static_cast<Bag*>(bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bagSlot));
+        if (!bag)
+            continue;
+
+        for (uint8 slot = 0; slot < bag->GetBagSize(); ++slot)
+            NormalizePersistedNewItemState(bag->GetItemByPos(slot));
+    }
+}
+}
+
 const uint64 diveMask = (1LL << 7) | (1LL << 44) | (1LL << 37) | (1LL << 38) | (1LL << 26) | (1LL << 30) | (1LL << 27) |
                         (1LL << 33) | (1LL << 24) | (1LL << 34);
 
@@ -489,6 +531,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     bot->SetMoney(urand(level * 100000, level * 5 * 100000));
     bot->SetHealth(bot->GetMaxHealth());
     bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
+    NormalizePersistedInventoryState(bot);
     bot->SaveToDB(false, false);
     LOG_DEBUG("playerbots", "Initialization Done.");
     if (pmo)
@@ -2360,13 +2403,13 @@ void PlayerbotFactory::InitSkills()
 
     bot->SetSkill(SKILL_RIDING, 0, 0, 0);
     if (bot->GetLevel() >= sPlayerbotAIConfig.useGroundMountAtMinLevel)
-        bot->LearnSpell(33388, false);
+        LearnSpellIfExists(bot, 33388);
     if (bot->GetLevel() >= sPlayerbotAIConfig.useFastGroundMountAtMinLevel)
-        bot->LearnSpell(33391, false);
+        LearnSpellIfExists(bot, 33391);
     if (bot->GetLevel() >= sPlayerbotAIConfig.useFlyMountAtMinLevel)
-        bot->LearnSpell(34090, false);
+        LearnSpellIfExists(bot, 34090);
     if (bot->GetLevel() >= sPlayerbotAIConfig.useFastFlyMountAtMinLevel)
-        bot->LearnSpell(34091, false);
+        LearnSpellIfExists(bot, 34091);
 
     uint32 skillLevel = bot->GetLevel() < 40 ? 0 : 1;
     uint32 dualWieldLevel = bot->GetLevel() < 20 ? 0 : 1;
@@ -2400,6 +2443,8 @@ void PlayerbotFactory::InitSkills()
             bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
             bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
             bot->SetCanDualWield(dualWieldLevel);
+            if (dualWieldLevel)
+                bot->LearnSpell(674, true);  // Dual Wield — ensures flag persists across reloads
             break;
         case CLASS_PALADIN:
             SetRandomSkill(SKILL_SWORDS);
@@ -2452,9 +2497,8 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_POLEARMS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
-            bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
             bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
-            bot->SetCanDualWield(dualWieldLevel);
+            // Hunters cannot dual wield in vanilla 1.12
             break;
         case CLASS_ROGUE:
             SetRandomSkill(SKILL_SWORDS);
@@ -2469,6 +2513,7 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_LOCKPICKING);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, 1, 1);
             bot->SetCanDualWield(true);
+            bot->LearnSpell(674, true);  // Dual Wield — ensures flag persists across reloads
             break;
         case CLASS_DEATH_KNIGHT:
             SetRandomSkill(SKILL_SWORDS);
@@ -2502,6 +2547,9 @@ void PlayerbotFactory::InitSkills()
 
 void PlayerbotFactory::SetRandomSkill(uint16 id)
 {
+    if (!GetSkillRaceClassInfo(id, bot->GetRace(), bot->getClass()))
+        return;
+
     uint32 maxValue = level * 5;
 
     // do not let skill go beyond limit even if maxlevel > blizzlike
@@ -3151,8 +3199,19 @@ void PlayerbotFactory::InitMounts()
         if (bot->GetLevel() < fourthmount && type == 3)
             continue;
 
-        uint32 index = urand(0, mounts[bot->GetRace()][type].size() - 1);
-        uint32 spell = mounts[bot->GetRace()][type][index];
+        std::vector<uint32> validMounts;
+        validMounts.reserve(mounts[bot->GetRace()][type].size());
+        for (uint32 spell : mounts[bot->GetRace()][type])
+        {
+            if (sSpellMgr.GetSpellEntry(spell))
+                validMounts.push_back(spell);
+        }
+
+        if (validMounts.empty())
+            continue;
+
+        uint32 index = urand(0, validMounts.size() - 1);
+        uint32 spell = validMounts[index];
         if (spell)
         {
             bot->LearnSpell(spell, false);
@@ -3743,10 +3802,10 @@ void PlayerbotFactory::InitGlyphs(bool increment)
 
             for (uint32 effect = 0; effect <= EFFECT_2; ++effect)
             {
-                if (entry->Effects[effect].Effect != SPELL_EFFECT_APPLY_GLYPH)
+                if (entry->Effect[effect] != SPELL_EFFECT_APPLY_GLYPH)
                     continue;
 
-                uint32 glyph = entry->Effects[effect].MiscValue;
+                uint32 glyph = entry->EffectMiscValue[effect];
                 glyphs.push_back(glyph);
             }
         }
@@ -3788,10 +3847,10 @@ void PlayerbotFactory::InitGlyphs(bool increment)
 
                 for (uint32 effect = 0; effect <= EFFECT_2; ++effect)
                 {
-                    if (entry->Effects[effect].Effect != SPELL_EFFECT_APPLY_GLYPH)
+                    if (entry->Effect[effect] != SPELL_EFFECT_APPLY_GLYPH)
                         continue;
 
-                    glyph = entry->Effects[effect].MiscValue;
+                    glyph = entry->EffectMiscValue[effect];
                 }
             }
             if (!glyph)
@@ -4588,28 +4647,7 @@ std::vector<InventoryType> PlayerbotFactory::GetPossibleInventoryTypeListBySlot(
 
 void PlayerbotFactory::LoadEnchantContainer()
 {
-    // Uses Trinity prepared statements - not available in Vanilla vMaNGOS
-    return;
-#if 0
     m_EnchantContainer.clear();
-
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_ENCHANTS);
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
-    {
-        do
-        {
-            Field* fields = result->Fetch();
-
-            EnchantTemplate pEnchant;
-            pEnchant.ClassId = fields[0].Get<uint8>();
-            pEnchant.SpecId = fields[1].Get<uint8>();
-            pEnchant.SpellId = fields[2].Get<uint32>();
-            pEnchant.SlotId = fields[3].Get<uint8>();
-
-            m_EnchantContainer.push_back(std::move(pEnchant));
-        } while (result->NextRow());
-    }
-#endif
 }
 
 void PlayerbotFactory::IterateItems(IterateItemsVisitor* visitor, IterateItemsMask mask)
@@ -4794,7 +4832,8 @@ void PlayerbotFactory::InitAttunementQuests()
 
     uint32 currentXP = bot->GetUInt32Value(PLAYER_XP);
 
-    // List of attunement quest IDs
+#if !PB_COMPAT_VANILLA
+    // TBC attunement chains do not exist on vanilla builds.
     std::list<uint32> attunementQuestsTBC = {
         // Caverns of Time - Part 1
         10279, // To The Master's Lair
@@ -4819,28 +4858,22 @@ void PlayerbotFactory::InitAttunementQuests()
         11492  // Hard to Kill
     };
 
-    // Complete all level-appropriate attunement quests for the bot
     if (level >= 60)
     {
         std::list<uint32> questsToComplete;
 
-        // Check each quest status before adding to the completion list
         for (uint32 questId : attunementQuestsTBC)
         {
             QuestStatus questStatus = bot->GetQuestStatus(questId);
 
-            if (questStatus == QUEST_STATUS_NONE) // Quest not yet taken/completed
-            {
+            if (questStatus == QUEST_STATUS_NONE)
                 questsToComplete.push_back(questId);
-            }
         }
 
-        // Only complete quests that haven't been finished yet
         if (!questsToComplete.empty())
-        {
             InitQuests(questsToComplete, false);
-        }
     }
+#endif
 
     // Reset XP so bot's level remains unchanged
     bot->GiveLevel(level);

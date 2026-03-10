@@ -44,6 +44,13 @@ bool ChatHandler::HandleAutogearCommand(char* /*args*/)
         return false;
     }
 
+    if (target->IsBot() && !sPlayerbotAIConfig.autoGearCommandAltBots &&
+        !sPlayerbotAIConfig.IsInRandomAccountList(target->GetSession()->GetAccountId()))
+    {
+        PSendSysMessage("You cannot use autogear on alt bots.");
+        return false;
+    }
+
     uint32 gearScoreLimit = sPlayerbotAIConfig.autoGearScoreLimit == 0
                                 ? 0
                                 : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig.autoGearScoreLimit,

@@ -532,12 +532,10 @@ bool GuildTaskMgr::IsGuildTaskItem(uint32 itemId, uint32 guildId)
 
     uint32 value = 0;
 
-    PlayerbotsDatabasePreparedStatement* stmt =
-        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_GUILD_TASKS_BY_VALUE);
-    stmt->SetData(0, itemId);
-    stmt->SetData(1, guildId);
-    stmt->SetData(2, "itemTask");
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
+    if (PreparedQueryResult result = PlayerbotsDatabase.PQuery(
+            "SELECT `value`, `time`, `validIn` FROM `playerbots_guild_tasks` "
+            "WHERE `value` = '%u' AND `guildid` = '%u' AND `type` = '%s' LIMIT 1",
+            itemId, guildId, "itemTask"))
     {
         Field* fields = result->Fetch();
         value = fields[0].Get<uint32>();
@@ -560,11 +558,10 @@ std::map<uint32, uint32> GuildTaskMgr::GetTaskValues(uint32 owner, std::string c
 
     std::map<uint32, uint32> results;
 
-    PlayerbotsDatabasePreparedStatement* stmt =
-        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_GUILD_TASKS_BY_OWNER);
-    stmt->SetData(0, owner);
-    stmt->SetData(1, type);
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
+    if (PreparedQueryResult result = PlayerbotsDatabase.PQuery(
+            "SELECT `value`, `time`, `validIn`, `guildid` FROM `playerbots_guild_tasks` "
+            "WHERE `owner` = '%u' AND `type` = '%s'",
+            owner, type.c_str()))
     {
         do
         {
@@ -593,12 +590,10 @@ uint32 GuildTaskMgr::GetTaskValue(uint32 owner, uint32 guildId, std::string cons
 
     uint32 value = 0;
 
-    PlayerbotsDatabasePreparedStatement* stmt =
-        PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_GUILD_TASKS_BY_OWNER_AND_TYPE);
-    stmt->SetData(0, owner);
-    stmt->SetData(1, guildId);
-    stmt->SetData(2, type);
-    if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
+    if (PreparedQueryResult result = PlayerbotsDatabase.PQuery(
+            "SELECT `value`, `time`, `validIn` FROM `playerbots_guild_tasks` "
+            "WHERE `owner` = '%u' AND `guildid` = '%u' AND `type` = '%s' LIMIT 1",
+            owner, guildId, type.c_str()))
     {
         Field* fields = result->Fetch();
         value = fields[0].Get<uint32>();
@@ -616,22 +611,16 @@ uint32 GuildTaskMgr::GetTaskValue(uint32 owner, uint32 guildId, std::string cons
 
 uint32 GuildTaskMgr::SetTaskValue(uint32 owner, uint32 guildId, std::string const type, uint32 value, uint32 validIn)
 {
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_GUILD_TASKS);
-    stmt->SetData(0, owner);
-    stmt->SetData(1, guildId);
-    stmt->SetData(2, type);
-    PlayerbotsDatabase.Execute(stmt);
+    PlayerbotsDatabase.PExecute(
+        "DELETE FROM `playerbots_guild_tasks` WHERE `owner` = '%u' AND `guildid` = '%u' AND `type` = '%s'",
+        owner, guildId, type.c_str());
 
     if (value)
     {
-        stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_GUILD_TASKS);
-        stmt->SetData(0, owner);
-        stmt->SetData(1, guildId);
-        stmt->SetData(2, (uint32)time(nullptr));
-        stmt->SetData(3, validIn);
-        stmt->SetData(4, type);
-        stmt->SetData(5, value);
-        PlayerbotsDatabase.Execute(stmt);
+        PlayerbotsDatabase.PExecute(
+            "INSERT INTO `playerbots_guild_tasks` (`owner`, `guildid`, `time`, `validIn`, `type`, `value`) "
+            "VALUES ('%u', '%u', '%u', '%u', '%s', '%u')",
+            owner, guildId, (uint32)time(nullptr), validIn, type.c_str(), value);
     }
 
     return value;
@@ -678,11 +667,10 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* /* handler */, char const* 
 
         uint32 owner = guid.GetCounter();
 
-        PlayerbotsDatabasePreparedStatement* stmt =
-            PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_GUILD_TASKS_BY_OWNER_ORDERED);
-        stmt->SetData(0, owner);
-        stmt->SetData(1, "activeTask");
-        if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
+        if (PreparedQueryResult result = PlayerbotsDatabase.PQuery(
+                "SELECT `value`, `time`, `validIn`, `guildid` FROM `playerbots_guild_tasks` "
+                "WHERE `owner` = '%u' AND `type` = '%s' ORDER BY `guildid`, `time` DESC",
+                owner, "activeTask"))
         {
             do
             {
@@ -825,10 +813,9 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* /* handler */, char const* 
 
         uint32 owner = guid.GetCounter();
 
-        PlayerbotsDatabasePreparedStatement* stmt =
-            PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_GUILD_TASKS_BY_OWNER_DISTINCT);
-        stmt->SetData(0, owner);
-        if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
+        if (PreparedQueryResult result = PlayerbotsDatabase.PQuery(
+                "SELECT DISTINCT `guildid` FROM `playerbots_guild_tasks` WHERE `owner` = '%u' ORDER BY `guildid`",
+                owner))
         {
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             do

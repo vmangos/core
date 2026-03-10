@@ -496,11 +496,14 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
 
 void DungeonResetScheduler::ScheduleReset(bool add, time_t time, DungeonResetEvent event)
 {
-    MapPersistentStateManager::PersistentStateMap::iterator itr = m_InstanceSaves.m_instanceSaveByInstanceId.find(event.instanceId);
-    if (itr == m_InstanceSaves.m_instanceSaveByInstanceId.end())
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[DungeonReset] Instance %u [map %u]: ScheduleReset %u for unknown instance.", event.instanceId, event.mapId, event.type);
-    else if (itr->second->GetMapId() != event.mapId)
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[DungeonReset] Instance %u [map %u]: ScheduleReset %u for wrong instance [map %u]", event.instanceId, event.mapId, event.type, itr->second->GetMapId());
+    if (event.type == RESET_EVENT_NORMAL_DUNGEON)
+    {
+        MapPersistentStateManager::PersistentStateMap::iterator itr = m_InstanceSaves.m_instanceSaveByInstanceId.find(event.instanceId);
+        if (itr == m_InstanceSaves.m_instanceSaveByInstanceId.end())
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[DungeonReset] Instance %u [map %u]: ScheduleReset %u for unknown instance.", event.instanceId, event.mapId, event.type);
+        else if (itr->second->GetMapId() != event.mapId)
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[DungeonReset] Instance %u [map %u]: ScheduleReset %u for wrong instance [map %u]", event.instanceId, event.mapId, event.type, itr->second->GetMapId());
+    }
 
     if (add)
         m_resetTimeQueue.insert(std::pair<time_t, DungeonResetEvent>(time, event));

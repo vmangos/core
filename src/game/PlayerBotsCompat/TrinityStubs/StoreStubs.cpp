@@ -13,9 +13,16 @@
  */
 
 #include "Policies/SingletonImp.h"
-#include "../Common.h"
+
+#include <array>
+#include <memory>
+#include <mutex>
+#include <unordered_map>
+
+#include "Common.h"
 #include "ObjectMgr.h"
 #include "DBCStores.h"
+#include "Map.h"
 #include "SharedDefines.h"
 
 // Include forward declarations from StoreStubs.h
@@ -24,19 +31,67 @@
 // ============================================================================
 // AreaTable Store Stub - TrinityCore compatibility
 // ============================================================================
-// TODO: Vanilla vMaNGOS doesn't have sAreaTableStore - TrinityCore does
-//       Implement proper area lookup by querying vMaNGOS terrain/map data structures.
-//       Currently returns empty entry to avoid crashes.
+namespace
+{
+struct CachedAreaEntry
+{
+    AreaTableEntry entry = {};
+    std::array<std::string, MAX_LOCALE> names = {};
+
+    explicit CachedAreaEntry(AreaEntry const& area)
+    {
+        memset(&entry, 0, sizeof(entry));
+        entry.ID = area.Id;
+        entry.map_id = area.MapId;
+        entry.zone = area.ZoneId;
+        entry.explore_flag = area.ExploreFlag;
+        entry.flags = area.Flags;
+        entry.area_level = area.AreaLevel;
+        entry.area_team = area.Team;
+
+        names[LOCALE_enUS] = area.Name ? area.Name : "";
+        entry.area_name[LOCALE_enUS] = names[LOCALE_enUS].empty() ? nullptr : &names[LOCALE_enUS][0];
+
+        for (int32 dbLocale = 0; dbLocale < MAX_DBC_LOCALE; ++dbLocale)
+        {
+            LocaleConstant locale = GetDbcLocaleFromDbLocale(DBLocaleConstant(dbLocale));
+            if (locale == LOCALE_enUS)
+                continue;
+
+            sObjectMgr.GetAreaLocaleString(area.Id, dbLocale, &names[locale]);
+            entry.area_name[locale] = names[locale].empty() ? nullptr : &names[locale][0];
+        }
+    }
+};
+
+using AreaEntryCache = std::unordered_map<uint32, std::unique_ptr<CachedAreaEntry> >;
+
+AreaEntryCache& GetAreaEntryCache()
+{
+    static AreaEntryCache cache;
+    return cache;
+}
+
+std::mutex& GetAreaEntryCacheLock()
+{
+    static std::mutex lock;
+    return lock;
+}
+}
 
 AreaTableEntry const* PB_GetAreaEntry(uint32 areaId)
 {
-    static AreaTableEntry emptyEntry;
-    memset(&emptyEntry, 0, sizeof(AreaTableEntry));
-    return &emptyEntry;
-}
+    AreaEntry const* area = AreaEntry::GetById(areaId);
+    if (!area)
+        return nullptr;
 
-PB_AreaTableStoreStub::PB_AreaTableStoreStub()
-{
+    std::lock_guard<std::mutex> guard(GetAreaEntryCacheLock());
+    AreaEntryCache& cache = GetAreaEntryCache();
+    AreaEntryCache::iterator itr = cache.find(areaId);
+    if (itr == cache.end())
+        itr = cache.insert(std::make_pair(areaId, std::unique_ptr<CachedAreaEntry>(new CachedAreaEntry(*area)))).first;
+
+    return &itr->second->entry;
 }
 
 AreaTableEntry const* PB_AreaTableStoreStub::LookupEntry(uint32 id) const
@@ -56,10 +111,6 @@ PB_AreaTableStoreStub sAreaTableStore;
 TaxiNodesEntry const* PB_GetTaxiNodeEntry(uint32 nodeId)
 {
     return sObjectMgr.GetTaxiNodeEntry(nodeId);
-}
-
-PB_TaxiNodesStoreStub::PB_TaxiNodesStoreStub()
-{
 }
 
 TaxiNodesEntry const* PB_TaxiNodesStoreStub::LookupEntry(uint32 id) const

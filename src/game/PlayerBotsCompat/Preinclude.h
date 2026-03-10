@@ -16,6 +16,7 @@
 #include "Transports/Transport.h"
 #include "Chat/Chat.h"
 #include "PlayerBotsCompat/TrinityStubs/AreaTableEntry.h"
+#include "PlayerBotsCompat/TrinityStubs/StoreStubs.h"
 
 // 1) Feature flags (vanilla)
 #define PB_COMPAT_VANILLA 1
@@ -425,37 +426,6 @@ inline uint32 PB_GetGameTimeSeconds() { return static_cast<uint32>(GameTime::Get
 
 // Battleground object use compatibility
 #define CanUseBattlegroundObject CanUseBattleGroundObject
-
-// Stub for sAreaTableStore (Trinity-specific) - Vanilla doesn't have this
-inline AreaTableEntry const* PB_GetAreaEntry(uint32 areaId)
-{
-    static AreaTableEntry emptyEntry;
-    return &emptyEntry;
-}
-struct PB_AreaTableStoreStub {
-    inline AreaTableEntry const* LookupEntry(uint32 id) const {
-        return PB_GetAreaEntry(id);
-    }
-};
-static PB_AreaTableStoreStub sAreaTableStore;
-
-// Stub for sTaxiNodesStore - vMaNGOS uses ObjectMgr::GetTaxiNodeEntry instead
-inline TaxiNodesEntry const* PB_GetTaxiNodeEntry(uint32 nodeId)
-{
-    return sObjectMgr.GetTaxiNodeEntry(nodeId);
-}
-struct PB_TaxiNodesStoreStub {
-    inline TaxiNodesEntry const* LookupEntry(uint32 id) const {
-        return PB_GetTaxiNodeEntry(id);
-    }
-    inline TaxiNodesEntry const* GetTaxiNodeEntry(uint32 id) const {
-        return PB_GetTaxiNodeEntry(id);
-    }
-    inline uint32 GetNumRows() const {
-        return sObjectMgr.GetMaxTaxiNodeId();
-    }
-};
-static PB_TaxiNodesStoreStub sTaxiNodesStore;
 
 // Aura interrupt flags that don't exist in Vanilla
 #ifndef AURA_INTERRUPT_FLAG_TELEPORTED

@@ -200,12 +200,18 @@ private:
         bool missingTeleportEvent = false;
         bool missingStrategyMode = false;
         bool baselineLevel = false;
+        bool missingTalents = false;
+        bool missingGear = false;
 
-        bool NeedsRepair() const
+        bool NeedsFullRandomize() const
         {
             return missingRandomized || baselineLevel ||
                 ((missingStrategyEvent || missingTeleportEvent) && missingStrategyMode);
         }
+
+        bool NeedsTargetedRepair() const { return missingTalents || missingGear; }
+
+        bool NeedsRepair() const { return NeedsFullRandomize() || NeedsTargetedRepair(); }
     };
 
     RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
@@ -272,7 +278,10 @@ private:
     void ScheduleLogout(uint32 bot, uint32 time = 0);
     AutonomousInitState GetAutonomousInitState(Player* bot);
     bool EnsureAutonomousInit(Player* bot, char const* context);
+    void FinalizeAutonomousInit(Player* bot, char const* context);
+    void BackfillAutonomousEvents(uint32 bot, char const* context = nullptr);
     void ScheduleAutonomousEvents(uint32 bot, char const* context = nullptr);
+    bool RepairRandomBotRuntimeState(Player* bot, char const* context);
     void RepairBrokenRandomBotState();
     uint32 GetRandomBotCountTarget();
     std::vector<uint32> GetOfflineRandomBots(uint32 limit);

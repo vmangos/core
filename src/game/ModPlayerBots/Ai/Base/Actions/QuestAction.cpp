@@ -381,16 +381,24 @@ bool QuestUpdateAddItemAction::Execute(Event event)
 bool QuestItemPushResultAction::Execute(Event event)
 {
     WorldPacket packet = event.getPacket();
+
+    static size_t const vanillaItemPushPacketSize = 8 + 4 + 4 + 4 + 1 + 4 + 4 + 4 + 4;
+    if (packet.size() < vanillaItemPushPacketSize)
+    {
+        LOG_WARN("playerbots", "QuestItemPushResultAction: Short item push packet size=%zu, expected>=%zu", packet.size(), vanillaItemPushPacketSize);
+        return false;
+    }
+
     ObjectGuid guid;
-    uint32 received, created, sendChatMessage, itemSlot, itemEntry, itemSuffixFactory, count, itemCount;
+    uint32 received, created, sendChatMessage, itemSlot, itemEntry, itemSuffixFactor, count;
     uint8 bagSlot;
     int32 itemRandomPropertyId;
 
     try
     {
         packet >> guid >> received >> created >> sendChatMessage;
-        packet >> bagSlot >> itemSlot >> itemEntry >> itemSuffixFactory >> itemRandomPropertyId;
-        packet >> count >> itemCount;
+        packet >> bagSlot >> itemSlot >> itemEntry >> itemSuffixFactor >> itemRandomPropertyId;
+        packet >> count;
     }
     catch (ByteBufferException const&)
     {
@@ -404,6 +412,8 @@ bool QuestItemPushResultAction::Execute(Event event)
     const ItemTemplate* proto = sObjectMgr.GetItemTemplate(itemEntry);
     if (!proto)
         return false;
+
+    uint32 const itemCount = botAI->GetInventoryItemsCountWithId(itemEntry);
 
     for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {

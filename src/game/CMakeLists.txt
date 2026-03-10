@@ -703,9 +703,6 @@ list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Raid/EyeOfEter
 # Keep Trinity-only guild task implementation excluded in Vanilla build.
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Guild/GuildTaskMgr\\.cpp$")
 
-# Keep Trinity-only random item manager implementation excluded in Vanilla build.
-list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Item/RandomItemMgr\\.cpp$")
-
 # Add ModPlayerBots sources to game_SRCS
 list(APPEND game_SRCS ${MODPLAYERBOTS_SRCS})
 
@@ -715,9 +712,9 @@ set(PLAYERBOTS_COMPAT_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/GameGraveyard.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/ModPlayerBotsActionStubs.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/PlayerbotCommandServerStub.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs/StoreStubs.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/PlayerBotMgrCompat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/GuildTaskMgrCompat.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/RandomItemMgrCompat.cpp
 )
 list(APPEND game_SRCS ${PLAYERBOTS_COMPAT_SRCS})
 

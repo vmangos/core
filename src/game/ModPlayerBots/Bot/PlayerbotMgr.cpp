@@ -78,6 +78,15 @@ PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
 
 namespace
 {
+bool IsPlayerbotLookupSafe(Player* player)
+{
+    if (!player)
+        return false;
+
+    WorldSession* session = player->GetSession();
+    return session && !session->IsLogingOut() && player->IsInWorld() && !player->IsDuringRemoveFromWorld();
+}
+
 class PlayerbotSessionPacketBridge : public PlayerBotAI
 {
 public:
@@ -550,14 +559,14 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
 
     Player* master = botAI->GetMaster();
-    if (master)
+    Group* group = bot->GetGroup();
+    if (master && group)
     {
         ObjectGuid masterGuid = master->GetGUID();
-        if (master->GetGroup() && !master->GetGroup()->IsLeader(masterGuid))
-            master->GetGroup()->ChangeLeader(masterGuid);
+        if (group->IsMember(masterGuid) && !group->IsLeader(masterGuid))
+            group->ChangeLeader(masterGuid);
     }
 
-    Group* group = bot->GetGroup();
     if (group)
     {
         bool groupValid = false;
@@ -1795,14 +1804,11 @@ void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid, bool is_AI)
 
 PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 {
-    if (!(sPlayerbotAIConfig.enabled) || !player)
+    if (!sPlayerbotAIConfig.enabled || !IsPlayerbotLookupSafe(player))
     {
         return nullptr;
     }
-    // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld())
-    // {
-    //     return nullptr;
-    // }
+
     auto itr = _playerbotsAIMap.find(player->GetGUID());
     if (itr != _playerbotsAIMap.end())
     {
@@ -1815,10 +1821,11 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
 {
-    if (!(sPlayerbotAIConfig.enabled) || !player)
+    if (!sPlayerbotAIConfig.enabled || !IsPlayerbotLookupSafe(player))
     {
         return nullptr;
     }
+
     auto itr = _playerbotsMgrMap.find(player->GetGUID());
     if (itr != _playerbotsMgrMap.end())
     {

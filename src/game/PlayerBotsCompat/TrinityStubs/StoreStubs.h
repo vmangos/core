@@ -8,13 +8,14 @@
 #ifndef _PLAYERBOT_STORE_STUBS_H
 #define _PLAYERBOT_STORE_STUBS_H
 
+#include "Common.h"
+
 // Forward declarations for types used in stubs
 class AreaTableEntry;
 class TaxiNodesEntry;
 
-// Stub for sAreaTableStore (Trinity-specific) - Vanilla doesn't have this
-// Provide a stub that returns empty entries to avoid crashes
-inline AreaTableEntry const* PB_GetAreaEntry(uint32 areaId);
+// Trinity-style area store adapter backed by vanilla AreaEntry data.
+AreaTableEntry const* PB_GetAreaEntry(uint32 areaId);
 
 class PB_AreaTableStoreStub
 {
@@ -23,9 +24,8 @@ public:
     AreaTableEntry const* LookupEntry(uint32 id) const;
 };
 
-// Stub for sTaxiNodesStore - vMAngOS uses ObjectMgr::GetTaxiNodeEntry instead
-// Provide a stub that delegates to ObjectMgr
-inline TaxiNodesEntry const* PB_GetTaxiNodeEntry(uint32 nodeId);
+// Stub for sTaxiNodesStore - vMAngOS uses ObjectMgr::GetTaxiNodeEntry instead.
+TaxiNodesEntry const* PB_GetTaxiNodeEntry(uint32 nodeId);
 
 class PB_TaxiNodesStoreStub
 {
@@ -39,10 +39,5 @@ public:
 // External instances defined in StoreStubs.cpp
 extern PB_AreaTableStoreStub sAreaTableStore;
 extern PB_TaxiNodesStoreStub sTaxiNodesStore;
-
-// TODO: These are temporary stubs to get a clean build. Proper implementations
-//       should be created that actually query vMAngOS data structures
-//       for area/taxi node lookups. Currently returns empty entries
-//       or delegates to ObjectMgr where possible.
 
 #endif // _PLAYERBOT_STORE_STUBS_H

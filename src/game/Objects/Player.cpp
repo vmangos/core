@@ -20614,6 +20614,7 @@ void Player::_LoadSkills(std::unique_ptr<QueryResult> result)
             if (!rcEntry)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Character %u has forbidden skill %u for his race/class combination", GetGUIDLow(), skill);
+                CharacterDatabase.PExecute("DELETE FROM `character_skills` WHERE `guid` = '%u' AND `skill` = '%u'", GetGUIDLow(), skill);
                 continue;
             }
 

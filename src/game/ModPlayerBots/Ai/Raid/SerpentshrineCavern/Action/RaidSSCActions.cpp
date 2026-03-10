@@ -2,6 +2,7 @@
 #include "RaidSSCHelpers.h"
 #include "Bot/Factory/AiFactory.h"
 #include "Corpse.h"
+#include "DBCStores.h"
 #include "LootAction.h"
 #include "LootObjectStack.h"
 #include "ObjectAccessor.h"
@@ -81,12 +82,11 @@ bool UnderbogColossusEscapeToxicPoolAction::Execute(Event /*event*/)
         {
             for (int e = 0; e < MAX_SPELL_EFFECTS; ++e)
             {
-                auto const& eff = sInfo->Effects[e];
-                if (eff.Effect == SPELL_EFFECT_SCHOOL_DAMAGE ||
-                    (eff.Effect == SPELL_EFFECT_APPLY_AURA &&
-                     eff.ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE))
+                if (sInfo->Effect[e] == SPELL_EFFECT_SCHOOL_DAMAGE ||
+                    (sInfo->Effect[e] == SPELL_EFFECT_APPLY_AURA &&
+                     sInfo->EffectApplyAuraName[e] == SPELL_AURA_PERIODIC_DAMAGE))
                 {
-                    radius = eff.CalcRadius();
+                    radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(sInfo->EffectRadiusIndex[e]));
                     break;
                 }
             }
@@ -2817,31 +2817,21 @@ bool LadyVashjPassTheTaintedCoreAction::UseCoreOnNearestGenerator(const uint32 i
 
     const uint8 bagIndex = core->GetBagSlot();
     const uint8 slot = core->GetSlot();
-    constexpr uint8 cast_count = 0;
-    uint32 spellId = 0;
-
+    uint8 spellIndex = 0;
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
         if (core->GetTemplate()->Spells[i].SpellId > 0)
         {
-            spellId = core->GetTemplate()->Spells[i].SpellId;
+            spellIndex = i;
             break;
         }
     }
 
-    const ObjectGuid item_guid = core->GetGUID();
-    constexpr uint32 glyphIndex = 0;
-    constexpr uint8 castFlags = 0;
-
     WorldPacket packet(CMSG_USE_ITEM);
     packet << bagIndex;
     packet << slot;
-    packet << cast_count;
-    packet << spellId;
-    packet << item_guid;
-    packet << glyphIndex;
-    packet << castFlags;
-    packet << (uint32)TARGET_FLAG_GAMEOBJECT;
+    packet << spellIndex;
+    packet << static_cast<uint16>(TARGET_FLAG_GAMEOBJECT);
     packet << generator->GetGUID().WriteAsPacked();
 
     bot->GetSession()->HandleUseItemOpcode(packet);

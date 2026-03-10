@@ -29,11 +29,24 @@
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
 #include "PlayerbotCommandScript.h"
+#include "PlayerBotsCompat/PlayerbotChatHandlerCompat.h"
 #include "World.h"
 #if !PB_DISABLE_BG_BOT_LOGIC
 #include "../Ai/Base/Actions/BattleGroundTactics.h"
 #endif
 #include "cmath"
+
+namespace
+{
+bool IsPlayerbotUpdateSafe(Player* player)
+{
+    if (!player)
+        return false;
+
+    WorldSession* session = player->GetSession();
+    return session && !session->IsLogingOut() && player->IsInWorld() && !player->IsDuringRemoveFromWorld();
+}
+}  // namespace
 
 class PlayerbotsPlayerScript : public PlayerScript
 {
@@ -133,6 +146,9 @@ public:
 
     void OnPlayerAfterUpdate(Player* player, uint32 diff) override
     {
+        if (!IsPlayerbotUpdateSafe(player))
+            return;
+
         PlayerbotAI* const botAI = PlayerbotsMgr::instance().GetPlayerbotAI(player);
 
         if (botAI != nullptr)
@@ -148,99 +164,22 @@ public:
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Player* receiver) override
     {
-        if (type != CHAT_MSG_WHISPER)
-        {
-            return true;
-        }
-
-        PlayerbotAI* const botAI = PlayerbotsMgr::instance().GetPlayerbotAI(receiver);
-
-        if (botAI == nullptr)
-        {
-            return true;
-        }
-
-        botAI->HandleCommand(type, msg, player);
-
-        // hotfix; otherwise the server will crash when whispering logout
-        // https://github.com/mod-playerbots/mod-playerbots/pull/1838
-        // TODO: find the root cause and solve it. (does not happen in party chat)
-        if (msg == "logout")
-            return false;
-
-        return true;
+        return PlayerbotChatHandlerCompat::OnPlayerCanUseChat(player, type, 0, msg, receiver);
     }
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Group* group) override
     {
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            Player* const member = itr->GetSource();
-
-            if (member == nullptr)
-            {
-                continue;
-            }
-
-            PlayerbotAI* const botAI = PlayerbotsMgr::instance().GetPlayerbotAI(member);
-
-            if (botAI == nullptr)
-            {
-                continue;
-            }
-
-            botAI->HandleCommand(type, msg, player);
-        }
-
-        return true;
+        return PlayerbotChatHandlerCompat::OnPlayerCanUseChat(player, type, 0, msg, group);
     }
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Guild* guild) override
     {
-        if (type != CHAT_MSG_GUILD)
-        {
-            return true;
-        }
-
-        PlayerbotMgr* playerbotMgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
-
-        if (playerbotMgr == nullptr)
-        {
-            return true;
-        }
-
-        for (PlayerBotMap::const_iterator it = playerbotMgr->GetPlayerBotsBegin(); it != playerbotMgr->GetPlayerBotsEnd(); ++it)
-        {
-            Player* const bot = it->second;
-
-            if (bot == nullptr)
-            {
-                continue;
-            }
-
-            if (bot->GetGuildId() != player->GetGuildId())
-            {
-                continue;
-            }
-
-            PlayerbotsMgr::instance().GetPlayerbotAI(bot)->HandleCommand(type, msg, player);
-        }
-
-        return true;
+        return PlayerbotChatHandlerCompat::OnPlayerCanUseChat(player, type, 0, msg, guild);
     }
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Channel* channel) override
     {
-        PlayerbotMgr* const playerbotMgr = PlayerbotsMgr::instance().GetPlayerbotMgr(player);
-
-        if (playerbotMgr != nullptr && channel->GetFlags() & 0x18)
-        {
-            playerbotMgr->HandleCommand(type, msg);
-        }
-
-        sRandomPlayerbotMgr.HandleCommand(type, msg, player);
-
-        return true;
+        return PlayerbotChatHandlerCompat::OnPlayerCanUseChat(player, type, 0, msg, channel);
     }
 
     // Achievements not supported in Vanilla - disabled
@@ -468,9 +407,11 @@ public:
 
     void OnPlayerbotUpdateSessions(Player* player) override
     {
-        if (player)
-            if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
-                playerbotMgr->UpdateSessions();
+        if (!IsPlayerbotUpdateSafe(player))
+            return;
+
+        if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
+            playerbotMgr->UpdateSessions();
     }
 
     void OnPlayerbotLogout(Player* player) override

@@ -8,9 +8,11 @@
 #include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
 #include "DatabaseEnv.h"
+#include "Database/SqlOperations.h"
 #include "GuildMgr.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
+#include "Player.h"
 #include "PlayerbotGuildMgr.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
@@ -19,6 +21,76 @@
 #include "Guild.h"            // EmblemInfo::SaveToDB
 #include "Log.h"
 #include "GuildMgr.h"
+
+namespace
+{
+class RandomBotLoginQueryHolder : public SqlQueryHolder
+{
+public:
+    explicit RandomBotLoginQueryHolder(ObjectGuid guid) : SqlQueryHolder(guid.GetCounter()), guid_(guid) {}
+
+    bool Initialize()
+    {
+        SetSize(MAX_PLAYER_LOGIN_QUERY);
+
+        SetResult(PLAYER_LOGIN_QUERY_LOADFROM, CharacterDatabase.PQuery(
+            "SELECT `guid`, `account`, `name`, `race`, `class`, `gender`, `level`, `xp`, `money`, `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `bank_bag_slots`, `character_flags`, "
+            "`position_x`, `position_y`, `position_z`, `map`, `orientation`, `known_taxi_mask`, `played_time_total`, `played_time_level`, `rest_bonus`, `logout_time`, `reset_talents_multiplier`, "
+            "`reset_talents_time`, `transport_guid`, `transport_x`, `transport_y`, `transport_z`, `transport_o`, `extra_flags`, `stable_slots`, `death_expire_time`, `current_taxi_path`, "
+            "`honor_rank_points`, `honor_highest_rank`, `honor_standing`, `honor_last_week_hk`, `honor_last_week_cp`, `honor_stored_hk`, `honor_stored_dk`, "
+            "`watched_faction`, `drunk`, `health`, `power1`, `power2`, `power3`, `power4`, `power5`, `explored_zones`, `ammo_id`, `action_bars`, "
+            "`world_phase_mask`, `create_time`, `instance` FROM `characters` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADGROUP, CharacterDatabase.PQuery(
+            "SELECT `group_id` FROM `group_member` WHERE `member_guid` ='%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES, CharacterDatabase.PQuery(
+            "SELECT `id`, `permanent`, `map`, `reset_time` FROM `character_instance` LEFT JOIN `instance` ON `instance` = `id` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADAURAS, CharacterDatabase.PQuery(
+            "SELECT `caster_guid`, `item_guid`, `spell`, `stacks`, `charges`, `base_points0`, `base_points1`, `base_points2`, `periodic_time0`, `periodic_time1`, `periodic_time2`, `max_duration`, `duration`, `effect_index_mask` FROM `character_aura` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADSPELLS, CharacterDatabase.PQuery(
+            "SELECT `spell`, `active`, `disabled` FROM `character_spell` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADQUESTSTATUS, CharacterDatabase.PQuery(
+            "SELECT `quest`, `status`, `rewarded`, `explored`, `timer`, `mob_count1`, `mob_count2`, `mob_count3`, `mob_count4`, `item_count1`, `item_count2`, `item_count3`, `item_count4`, `reward_choice` FROM `character_queststatus` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADHONORCP, CharacterDatabase.PQuery(
+            "SELECT `victim_type`, `victim_id`, `cp`, `date`, `type` FROM `character_honor_cp` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADREPUTATION, CharacterDatabase.PQuery(
+            "SELECT `faction`, `standing`, `flags` FROM `character_reputation` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADINVENTORY, CharacterDatabase.PQuery(
+            "SELECT * FROM (SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `bag`, `slot`, `item_guid`, `item_instance`.`item_id`, `generated_loot` FROM `character_inventory` JOIN `item_instance` ON `character_inventory`.`item_guid` = `item_instance`.`guid` WHERE `character_inventory`.`guid` = '%u') as t ORDER BY `bag`, `slot`",
+            guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADITEMLOOT, CharacterDatabase.PQuery(
+            "SELECT `guid`, `item_id`, `amount`, `property` FROM `item_loot` WHERE `owner_guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADACTIONS, CharacterDatabase.PQuery(
+            "SELECT `button`, `action`, `type` FROM `character_action` WHERE `guid` = '%u' ORDER BY `button`", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADSOCIALLIST, CharacterDatabase.PQuery(
+            "SELECT `friend`, `flags` FROM `character_social` WHERE `guid` = '%u' LIMIT 255", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADHOMEBIND, CharacterDatabase.PQuery(
+            "SELECT `map`, `zone`, `position_x`, `position_y`, `position_z` FROM `character_homebind` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS, CharacterDatabase.PQuery(
+            "SELECT `spell`, `spell_expire_time`, `category`, `category_expire_time`, `item_id` FROM `character_spell_cooldown` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADGUILD, CharacterDatabase.PQuery(
+            "SELECT `guild_id`, `rank` FROM `guild_member` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADBGDATA, CharacterDatabase.PQuery(
+            "SELECT `instance_id`, `team`, `join_x`, `join_y`, `join_z`, `join_o`, `join_map` FROM `character_battleground_data` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA, CharacterDatabase.PQuery(
+            "SELECT `type`, `time`, `data` FROM `character_account_data` WHERE `guid`='%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADSKILLS, CharacterDatabase.PQuery(
+            "SELECT `skill`, `value`, `max` FROM `character_skills` WHERE `guid` = '%u'", guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADMAILS, CharacterDatabase.PQuery(
+            "SELECT `id`, `message_type`, `sender_guid`, `receiver_guid`, `subject`, `item_text_id`, `expire_time`, `deliver_time`, `money`, `cod`, `checked`, `stationery`, `mail_template_id`, `has_items` FROM `mail` WHERE `receiver_guid` = '%u' ORDER BY `id` DESC",
+            guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS, CharacterDatabase.PQuery(
+            "SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `mail_id`, `item_guid`, `item_instance`.`item_id`, `generated_loot` FROM `mail_items` JOIN `item_instance` ON `item_guid` = `guid` WHERE `receiver_guid` = '%u'",
+            guid_.GetCounter()));
+        SetResult(PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS, CharacterDatabase.PQuery(
+            "SELECT `skill`, `value` FROM `character_forgotten_skills` WHERE `guid` = '%u'", guid_.GetCounter()));
+
+        return true;
+    }
+
+private:
+    ObjectGuid guid_;
+};
+}  // namespace
 
 constexpr RandomPlayerbotFactory::NameRaceAndGender RandomPlayerbotFactory::CombineRaceAndGender(uint8 race,
                                                                                                 uint8 gender)
@@ -200,6 +272,26 @@ bool RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, s
             "Unable to persist random bot for account %u - name: \"%s\", race: %u, class: %u",
             session->GetAccountId(), name.c_str(), race, cls);
         return false;
+    }
+
+    std::unique_ptr<Player> bot(new Player(session));
+    RandomBotLoginQueryHolder holder(ObjectGuid(HIGHGUID_PLAYER, guidlow));
+    if (!holder.Initialize() || !bot->LoadFromDB(ObjectGuid(HIGHGUID_PLAYER, guidlow), &holder))
+    {
+        LOG_ERROR("playerbots",
+            "Unable to materialize random bot state for account %u - name: \"%s\", guid: %u",
+            session->GetAccountId(), name.c_str(), guidlow);
+        return false;
+    }
+
+    bot->SaveToDB(false, false);
+
+    if (PlayerCacheData* cacheData = sObjectMgr.GetPlayerDataByGUID(guidlow))
+    {
+        sObjectMgr.UpdatePlayerCachedPosition(cacheData, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(),
+            bot->GetPositionZ(), bot->GetOrientation(), false);
+        cacheData->uiLevel = bot->GetLevel();
+        cacheData->uiZoneId = bot->GetCachedZoneId();
     }
 
     LOG_DEBUG("playerbots", "Random bot created - name: \"%s\", race: %u, class: %u",

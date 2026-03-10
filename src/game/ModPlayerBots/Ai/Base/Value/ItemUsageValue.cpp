@@ -857,8 +857,6 @@ bool ItemUsageValue::SpellGivesSkillUp(uint32 spellId, Player* bot)
 
 std::string const ItemUsageValue::GetConsumableType(ItemTemplate const* proto, bool hasMana)
 {
-    std::string const foodType = "";
-
     if ((proto->SubClass == ITEM_SUBCLASS_CONSUMABLE || proto->SubClass == ITEM_SUBCLASS_FOOD))
     {
         if (proto->Spells[0].SpellCategory == 11)
@@ -867,34 +865,31 @@ std::string const ItemUsageValue::GetConsumableType(ItemTemplate const* proto, b
             return "drink";
     }
 
-    // Note: ITEM_SUBCLASS_POTION, ITEM_SUBCLASS_FLASK, and ITEM_SUBCLASS_BANDAGE
-    // don't exist in Vanilla (TBC+ additions). In Vanilla, these are likely
-    // handled as ITEM_SUBCLASS_CONSUMABLE with different spell categories/effects.
-    // TODO: Implement Vanilla-compatible detection for potions/flasks/bandages
+    if (proto->SubClass == ITEM_SUBCLASS_BANDAGE)
+        return "bandage";
 
-    /* Commented out - ITEM_SUBCLASS_POTION/FLASK don't exist in Vanilla
-    if (proto->SubClass == ITEM_SUBCLASS_POTION || proto->SubClass == ITEM_SUBCLASS_FLASK)
+    if (proto->Class != ITEM_CLASS_CONSUMABLE)
+        return "";
+
+    bool potionLikeSubclass =
+        proto->SubClass == ITEM_SUBCLASS_POTION || proto->SubClass == ITEM_SUBCLASS_FLASK;
+
+    for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
     {
-        for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
-        {
-            SpellInfo const* spellInfo = sSpellMgr.GetSpellEntry(proto->Spells[j].SpellId);
-            if (spellInfo)
-                for (int i = 0; i < 3; i++)
-                {
-                    if (spellInfo->Effect[i] == SPELL_EFFECT_ENERGIZE && hasMana)
-                        return "mana potion";
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellEntry(proto->Spells[j].SpellId);
+        if (!spellInfo)
+            continue;
 
-                    if (spellInfo->Effect[i] == SPELL_EFFECT_HEAL)
-                        return "healing potion";
-                }
+        for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (spellInfo->Effect[i] == SPELL_EFFECT_HEAL && potionLikeSubclass)
+                return "healing potion";
+
+            if (spellInfo->Effect[i] == SPELL_EFFECT_ENERGIZE && hasMana &&
+                (potionLikeSubclass || spellInfo->EffectMiscValue[i] == POWER_MANA))
+                return "mana potion";
         }
     }
-
-    if (proto->SubClass == ITEM_SUBCLASS_BANDAGE)
-    {
-        return "bandage";
-    }
-    */
 
     return "";
 }

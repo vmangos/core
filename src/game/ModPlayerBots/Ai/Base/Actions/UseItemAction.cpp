@@ -71,16 +71,14 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
     uint8 spell_index = 0;
-    uint8 cast_count = 1;
+    uint16 targetFlag = TARGET_FLAG_NONE;
     ObjectGuid item_guid = item->GetGUID();
-    uint32 glyphIndex = 0;
-    uint8 castFlags = 0;
-    uint32 targetFlag = 0;
     uint32 spellId = 0;
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
         if (item->GetTemplate()->Spells[i].SpellId > 0)
         {
+            spell_index = i;
             spellId = item->GetTemplate()->Spells[i].SpellId;
             if (!botAI->CanCastSpell(spellId, bot, false, itemTarget, item))
             {
@@ -90,7 +88,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     }
 
     WorldPacket packet(CMSG_USE_ITEM);
-    packet << bagIndex << slot << cast_count << spellId << item_guid << glyphIndex << castFlags;
+    packet << bagIndex << slot << spell_index;
 
     bool targetSelected = false;
 
@@ -134,7 +132,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         {
             targetFlag = TARGET_FLAG_ITEM;
             packet << targetFlag;
-            packet << itemTarget->GetGUID();
+            packet << itemTarget->GetPackGUID();
             out << " on " << chat->FormatItem(itemTarget->GetTemplate());
             targetSelected = true;
         }
@@ -160,7 +158,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     if (!targetSelected && item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && unitTarget)
     {
         targetFlag = TARGET_FLAG_UNIT;
-        packet << targetFlag << unitTarget->GetGUID();
+        packet << targetFlag << unitTarget->GetPackGUID();
         out << " on " << unitTarget->GetName();
         targetSelected = true;
     }
@@ -217,7 +215,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
                     return false;
 
                 targetFlag = TARGET_FLAG_TRADE_ITEM;
-                packet << targetFlag << (uint8)1 << ObjectGuid((uint64)TRADE_SLOT_NONTRADED);
+                packet << targetFlag << ObjectGuid(uint64(TRADE_SLOT_NONTRADED)).WriteAsPacked();
                 targetSelected = true;
                 out << " on traded item";
             }
@@ -225,7 +223,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
             {
                 targetFlag = TARGET_FLAG_ITEM;
                 packet << targetFlag;
-                packet << itemForSpell->GetGUID();
+                packet << itemForSpell->GetPackGUID();
                 targetSelected = true;
                 out << " on " << chat->FormatItem(itemForSpell->GetTemplate());
             }
@@ -240,26 +238,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     {
         targetFlag = 0;
         packet << targetFlag;
-
-        // Use the actual target if provided
-        if (unitTarget)
-        {
-            packet << unitTarget->GetGUID();
-            targetSelected = true;
-
-            if (unitTarget == bot || !unitTarget->IsInWorld())
-                out << " on self";
-            else if (unitTarget->IsHostileTo(bot))
-                out << " on self";
-            else
-                out << " on " << unitTarget->GetName();
-        }
-        else
-        {
-            packet << bot->GetPackGUID();
-            targetSelected = true;
-            out << " on self";
-        }
+        out << " on self";
     }
 
     ItemTemplate const* proto = item->GetTemplate();

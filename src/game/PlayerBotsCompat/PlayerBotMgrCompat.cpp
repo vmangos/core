@@ -7,6 +7,18 @@
 #include "World.h"
 #include "WorldSession.h"
 
+namespace
+{
+bool IsPlayerbotUpdateSafe(Player* player)
+{
+    if (!player)
+        return false;
+
+    WorldSession* session = player->GetSession();
+    return session && !session->IsLogingOut() && player->IsInWorld() && !player->IsDuringRemoveFromWorld();
+}
+}  // namespace
+
 PlayerBotMgr& PlayerBotMgr::instance()
 {
     static PlayerBotMgr instance;
@@ -36,7 +48,7 @@ void PlayerBotMgr::Update(uint32 diff)
     for (auto itr = sRandomPlayerbotMgr.GetPlayerBotsBegin(); itr != sRandomPlayerbotMgr.GetPlayerBotsEnd(); ++itr)
     {
         Player* bot = itr->second;
-        if (!bot)
+        if (!IsPlayerbotUpdateSafe(bot))
             continue;
 
         if (PlayerbotAI* botAI = sPlayerbotsMgr.GetPlayerbotAI(bot))
@@ -51,7 +63,7 @@ void PlayerBotMgr::Update(uint32 diff)
             continue;
 
         Player* player = session->GetPlayer();
-        if (!player)
+        if (!IsPlayerbotUpdateSafe(player))
             continue;
 
         if (PlayerbotAI* botAI = sPlayerbotsMgr.GetPlayerbotAI(player))
@@ -62,7 +74,7 @@ void PlayerBotMgr::Update(uint32 diff)
             for (auto botItr = playerbotMgr->GetPlayerBotsBegin(); botItr != playerbotMgr->GetPlayerBotsEnd(); ++botItr)
             {
                 Player* bot = botItr->second;
-                if (!bot)
+                if (!IsPlayerbotUpdateSafe(bot))
                     continue;
 
                 if (PlayerbotAI* botAI = sPlayerbotsMgr.GetPlayerbotAI(bot))

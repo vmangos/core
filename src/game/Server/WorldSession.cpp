@@ -499,6 +499,7 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
         OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
         try
         {
+            packet->rpos(0);
             uint32 packetTime = WorldTimer::getMSTime();
             switch (opHandle.status)
             {

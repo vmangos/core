@@ -212,6 +212,19 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
 void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
 {
+    size_t const minPayloadSize = sizeof(uint64) + sizeof(uint32)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        + sizeof(uint32)
+#endif
+    ;
+    if (recvData.size() < minPayloadSize)
+    {
+        sLog.Player(this, LOG_MOVEMENT, LOG_LVL_ERROR,
+            "WorldSession::HandleMoveTeleportAckOpcode: malformed MSG_MOVE_TELEPORT_ACK from player %u, opcode %u, packet size %u (expected at least %u).",
+            _player ? _player->GetGUIDLow() : 0, recvData.GetOpcode(), uint32(recvData.size()), uint32(minPayloadSize));
+        return;
+    }
+
     ObjectGuid guid;
     recvData >> guid;
     uint32 movementCounter = 0;
@@ -1209,4 +1222,3 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
         pMover->GetMap()->CreatureRelocation((Creature*)pMover, pMover->m_movementInfo.GetPos().x, pMover->m_movementInfo.GetPos().y, pMover->m_movementInfo.GetPos().z, pMover->m_movementInfo.GetPos().o);
     }
 }
-

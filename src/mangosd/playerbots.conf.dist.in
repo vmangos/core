@@ -761,16 +761,154 @@ AiPlayerbot.PermanentlyInWorldTime = 31104000
 ####################################################################################################
 # PREMADE SPECS AND TALENT DATA
 #
-# The integrated runtime still has premade-spec related config families, but the original WotLK
-# payloads are intentionally not shipped in this Vanilla template.
+# Only vanilla-safe premade specs are shipped here.
+# WotLK glyph payloads, Death Knight data, and PvP/frostfire extras are intentionally omitted.
 #
-# Reasons:
-# - WotLK glyph data is invalid in Vanilla.
-# - WotLK talent strings are not suitable for Vanilla trees.
-# - Death Knight content is not applicable to vMaNGOS Vanilla.
+# AiPlayerbot.PremadeSpecName.<class>.<specno> = <name>
+# AiPlayerbot.PremadeSpecLink.<class>.<specno>.<level> = <link>
 #
-# A future Vanilla-specific premade dataset can be introduced separately.
+# 0 <= specno < 20, 1 <= level <= 60
 ####################################################################################################
+
+# Warrior
+AiPlayerbot.PremadeSpecName.1.0 = arms
+AiPlayerbot.PremadeSpecLink.1.0.60 = 3022032023335100002012211231241
+AiPlayerbot.PremadeSpecName.1.1 = fury
+AiPlayerbot.PremadeSpecLink.1.1.60 = -305053000500310053120501351
+AiPlayerbot.PremadeSpecName.1.2 = protection
+AiPlayerbot.PremadeSpecLink.1.2.60 = --053351225000210521030113321
+
+# Paladin
+AiPlayerbot.PremadeSpecName.2.0 = holy
+AiPlayerbot.PremadeSpecLink.2.0.60 = 50350151020013053100515221
+AiPlayerbot.PremadeSpecName.2.1 = protection
+AiPlayerbot.PremadeSpecLink.2.1.60 = -05005135203102311333112321
+AiPlayerbot.PremadeSpecName.2.2 = retribution
+AiPlayerbot.PremadeSpecLink.2.2.60 = --05230051203331302133231131
+
+# Hunter
+AiPlayerbot.PremadeSpecName.3.0 = beast mastery
+AiPlayerbot.PremadeSpecLink.3.0.60 = 51200201505112233110531151
+AiPlayerbot.PremadeSpecName.3.1 = marksmanship
+AiPlayerbot.PremadeSpecLink.3.1.60 = -035305101030013233115031151
+AiPlayerbot.PremadeSpecName.3.2 = survival
+AiPlayerbot.PremadeSpecLink.3.2.60 = --5000032500033330502135201311
+
+# Rogue
+AiPlayerbot.PremadeSpecName.4.0 = assassination
+AiPlayerbot.PremadeSpecLink.4.0.60 = 005303104352100520103331051
+AiPlayerbot.PremadeSpecName.4.1 = combat
+AiPlayerbot.PremadeSpecLink.4.1.60 = -0252051000035015223100501251
+AiPlayerbot.PremadeSpecName.4.2 = subtlety
+AiPlayerbot.PremadeSpecLink.4.2.60 = --5022012030321121350115031151
+
+# Priest
+AiPlayerbot.PremadeSpecName.5.0 = discipline
+AiPlayerbot.PremadeSpecLink.5.0.60 = 0503203130300512301323131051
+AiPlayerbot.PremadeSpecName.5.1 = holy
+AiPlayerbot.PremadeSpecLink.5.1.60 = -035050031301152530000331331
+AiPlayerbot.PremadeSpecName.5.2 = shadow
+AiPlayerbot.PremadeSpecLink.5.2.60 = --325003041203010323150301351
+
+# Shaman
+AiPlayerbot.PremadeSpecName.7.0 = elemental
+AiPlayerbot.PremadeSpecLink.7.0.60 = 4530001520213351102301351
+AiPlayerbot.PremadeSpecName.7.1 = enhancement
+AiPlayerbot.PremadeSpecLink.7.1.60 = -30305003105021333031121131051
+AiPlayerbot.PremadeSpecName.7.2 = restoration
+AiPlayerbot.PremadeSpecLink.7.2.60 = --50005301235310501102321251
+
+# Mage
+AiPlayerbot.PremadeSpecName.8.0 = arcane
+AiPlayerbot.PremadeSpecLink.8.0.60 = 230005231100330150323102500321
+AiPlayerbot.PremadeSpecName.8.1 = fire
+AiPlayerbot.PremadeSpecLink.8.1.60 = -0055030011302231053120321341
+AiPlayerbot.PremadeSpecName.8.2 = frost
+AiPlayerbot.PremadeSpecLink.8.2.60 = --0533030313203100030152231151
+
+# Warlock
+AiPlayerbot.PremadeSpecName.9.0 = affliction
+AiPlayerbot.PremadeSpecLink.9.0.60 = 2350022001113510053500131151
+AiPlayerbot.PremadeSpecName.9.1 = demonology
+AiPlayerbot.PremadeSpecLink.9.1.60 = -003203301135112530135201051
+AiPlayerbot.PremadeSpecName.9.2 = destruction
+AiPlayerbot.PremadeSpecLink.9.2.60 = --05203215200231051305031151
+
+# Druid
+AiPlayerbot.PremadeSpecName.11.0 = balance
+AiPlayerbot.PremadeSpecLink.11.0.60 = 5022203105331003213005301231
+AiPlayerbot.PremadeSpecName.11.1 = feral bear
+AiPlayerbot.PremadeSpecLink.11.1.60 = -500232130322110353100301310501
+AiPlayerbot.PremadeSpecName.11.2 = restoration
+AiPlayerbot.PremadeSpecLink.11.2.60 = --230033312031500531050113051
+AiPlayerbot.PremadeSpecName.11.3 = feral cat
+AiPlayerbot.PremadeSpecLink.11.3.60 = -552202032322010053100030310501
+
+# Random bot default talent specs
+AiPlayerbot.RandomClassSpecProb.1.0 = 20
+AiPlayerbot.RandomClassSpecIndex.1.0 = 0
+AiPlayerbot.RandomClassSpecProb.1.1 = 40
+AiPlayerbot.RandomClassSpecIndex.1.1 = 1
+AiPlayerbot.RandomClassSpecProb.1.2 = 40
+AiPlayerbot.RandomClassSpecIndex.1.2 = 2
+
+AiPlayerbot.RandomClassSpecProb.2.0 = 30
+AiPlayerbot.RandomClassSpecIndex.2.0 = 0
+AiPlayerbot.RandomClassSpecProb.2.1 = 40
+AiPlayerbot.RandomClassSpecIndex.2.1 = 1
+AiPlayerbot.RandomClassSpecProb.2.2 = 30
+AiPlayerbot.RandomClassSpecIndex.2.2 = 2
+
+AiPlayerbot.RandomClassSpecProb.3.0 = 33
+AiPlayerbot.RandomClassSpecIndex.3.0 = 0
+AiPlayerbot.RandomClassSpecProb.3.1 = 33
+AiPlayerbot.RandomClassSpecIndex.3.1 = 1
+AiPlayerbot.RandomClassSpecProb.3.2 = 33
+AiPlayerbot.RandomClassSpecIndex.3.2 = 2
+
+AiPlayerbot.RandomClassSpecProb.4.0 = 45
+AiPlayerbot.RandomClassSpecIndex.4.0 = 0
+AiPlayerbot.RandomClassSpecProb.4.1 = 45
+AiPlayerbot.RandomClassSpecIndex.4.1 = 1
+AiPlayerbot.RandomClassSpecProb.4.2 = 10
+AiPlayerbot.RandomClassSpecIndex.4.2 = 2
+
+AiPlayerbot.RandomClassSpecProb.5.0 = 40
+AiPlayerbot.RandomClassSpecIndex.5.0 = 0
+AiPlayerbot.RandomClassSpecProb.5.1 = 35
+AiPlayerbot.RandomClassSpecIndex.5.1 = 1
+AiPlayerbot.RandomClassSpecProb.5.2 = 25
+AiPlayerbot.RandomClassSpecIndex.5.2 = 2
+
+AiPlayerbot.RandomClassSpecProb.7.0 = 33
+AiPlayerbot.RandomClassSpecIndex.7.0 = 0
+AiPlayerbot.RandomClassSpecProb.7.1 = 33
+AiPlayerbot.RandomClassSpecIndex.7.1 = 1
+AiPlayerbot.RandomClassSpecProb.7.2 = 33
+AiPlayerbot.RandomClassSpecIndex.7.2 = 2
+
+AiPlayerbot.RandomClassSpecProb.8.0 = 30
+AiPlayerbot.RandomClassSpecIndex.8.0 = 0
+AiPlayerbot.RandomClassSpecProb.8.1 = 30
+AiPlayerbot.RandomClassSpecIndex.8.1 = 1
+AiPlayerbot.RandomClassSpecProb.8.2 = 40
+AiPlayerbot.RandomClassSpecIndex.8.2 = 2
+
+AiPlayerbot.RandomClassSpecProb.9.0 = 33
+AiPlayerbot.RandomClassSpecIndex.9.0 = 0
+AiPlayerbot.RandomClassSpecProb.9.1 = 34
+AiPlayerbot.RandomClassSpecIndex.9.1 = 1
+AiPlayerbot.RandomClassSpecProb.9.2 = 33
+AiPlayerbot.RandomClassSpecIndex.9.2 = 2
+
+AiPlayerbot.RandomClassSpecProb.11.0 = 20
+AiPlayerbot.RandomClassSpecIndex.11.0 = 0
+AiPlayerbot.RandomClassSpecProb.11.1 = 25
+AiPlayerbot.RandomClassSpecIndex.11.1 = 1
+AiPlayerbot.RandomClassSpecProb.11.2 = 35
+AiPlayerbot.RandomClassSpecIndex.11.2 = 2
+AiPlayerbot.RandomClassSpecProb.11.3 = 20
+AiPlayerbot.RandomClassSpecIndex.11.3 = 3
 
 ####################################################################################################
 # SYSTEM, DEBUG, CHAT, AND LOGGING
