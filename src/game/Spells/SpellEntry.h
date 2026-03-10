@@ -416,6 +416,47 @@ namespace Spells
                 effect == SPELL_EFFECT_APPLY_AREA_AURA_FRIEND ;
     }
 
+    inline uint32 GetAllowedTargetMaskForTargetType(SpellTarget target)
+    {
+        switch (target)
+        {
+            case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_SRC_LOC:
+            case TARGET_PLAYER_NYI:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_SRC_LOC:
+                return TARGET_FLAG_SOURCE_LOCATION;
+            case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DYNOBJ_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DYNOBJ_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_DEST_LOC:
+                return TARGET_FLAG_DEST_LOCATION;
+            case TARGET_GAMEOBJECT:
+                return TARGET_FLAG_GAMEOBJECT;
+            case TARGET_LOCKED:
+                return TARGET_FLAG_LOCKED;
+            case TARGET_UNIT_ENEMY:
+            case TARGET_LOCATION_CASTER_TARGET_POSITION:
+                return TARGET_FLAG_UNIT | TARGET_FLAG_UNIT_ENEMY;
+            case TARGET_UNIT_FRIEND:
+            case TARGET_UNIT_FRIEND_CHAIN_HEAL:
+                return TARGET_FLAG_UNIT | TARGET_FLAG_UNIT_ALLY;
+            case TARGET_UNIT_PARTY:
+                return TARGET_FLAG_UNIT | TARGET_FLAG_UNIT_PARTY;
+            case TARGET_UNIT_RAID:
+            case TARGET_UNIT_RAID_AND_CLASS:
+                return TARGET_FLAG_UNIT | TARGET_FLAG_UNIT_RAID;
+            case TARGET_UNIT:
+            case TARGET_LOCATION_UNIT_POSITION:
+                return TARGET_FLAG_UNIT;
+        }
+        return 0;
+    }
+
     inline uint32 GetDispellMask(DispelType dispel)
     {
         // If dispell all
@@ -648,6 +689,7 @@ class SpellEntry
         uint32 MinTargetLevel = 0;                                 // 162
         uint32 Custom = 0;                                         // 176
         uint32 Internal = 0;                                       // Assigned by the core.
+        uint32 AllowedTargetMask = 0;                              // Assigned by the core.
         uint32 ScriptId = 0;
 
         // HELPERS:
@@ -883,7 +925,7 @@ class SpellEntry
         bool IsDeathOnlySpell() const
         {
             return HasAttribute(SPELL_ATTR_EX3_ONLY_ON_GHOSTS) || 
-                   (Targets & (TARGET_FLAG_PVP_CORPSE | TARGET_FLAG_UNIT_CORPSE | TARGET_FLAG_CORPSE)) ||
+                   (Targets & (TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_UNIT_DEAD | TARGET_FLAG_CORPSE_ALLY)) ||
                    (Id == 2584);
         }
 

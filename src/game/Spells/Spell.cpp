@@ -46,6 +46,7 @@
 #include "ZoneScript.h"
 #include "TradeData.h"
 #include "Geometry.h"
+#include "Anticheat.h"
 
 using namespace Spells;
 
@@ -102,7 +103,7 @@ void SpellCastTargets::setGOTarget(GameObject* target)
 {
     m_GOTarget = target;
     m_GOTargetGUID = target->GetObjectGuid();
-    //    m_targetMask |= TARGET_FLAG_OBJECT;
+    //    m_targetMask |= TARGET_FLAG_GAMEOBJECT;
 }
 
 void SpellCastTargets::setItemTarget(Item* item)
@@ -168,15 +169,15 @@ void SpellCastTargets::read(ByteBuffer& data, Unit* caster)
         return;
     }
 
-    // TARGET_FLAG_UNK2 is used for non-combat pets, maybe other?
-    if (m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_UNK2))
+    // TARGET_FLAG_UNIT_MINIPET is used for non-combat pets, maybe other?
+    if (m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_UNIT_MINIPET))
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_unitTargetGUID.ReadAsPacked();
 #else
         data >> m_unitTargetGUID;
 #endif
 
-    if (m_targetMask & (TARGET_FLAG_OBJECT | TARGET_FLAG_OBJECT_UNK))
+    if (m_targetMask & (TARGET_FLAG_GAMEOBJECT | TARGET_FLAG_LOCKED))
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_GOTargetGUID.ReadAsPacked();
 #else
@@ -207,7 +208,7 @@ void SpellCastTargets::read(ByteBuffer& data, Unit* caster)
     if (m_targetMask & TARGET_FLAG_STRING)
         data >> m_strTarget;
 
-    if (m_targetMask & (TARGET_FLAG_CORPSE | TARGET_FLAG_PVP_CORPSE))
+    if (m_targetMask & (TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_CORPSE_ENEMY))
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_CorpseTargetGUID.ReadAsPacked();
 #else
@@ -222,7 +223,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
 {
     data << uint16(m_targetMask);
 
-    if (m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_PVP_CORPSE | TARGET_FLAG_OBJECT | TARGET_FLAG_CORPSE | TARGET_FLAG_UNK2))
+    if (m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_GAMEOBJECT | TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_UNIT_MINIPET))
     {
         if (m_targetMask & TARGET_FLAG_UNIT)
         {
@@ -235,7 +236,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
             else
                 data << uint8(0);
         }
-        else if (m_targetMask & (TARGET_FLAG_OBJECT | TARGET_FLAG_OBJECT_UNK))
+        else if (m_targetMask & (TARGET_FLAG_GAMEOBJECT | TARGET_FLAG_LOCKED))
         {
             if (m_GOTarget)
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -246,7 +247,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
             else
                 data << uint8(0);
         }
-        else if (m_targetMask & (TARGET_FLAG_CORPSE | TARGET_FLAG_PVP_CORPSE))
+        else if (m_targetMask & (TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_CORPSE_ENEMY))
             data << m_CorpseTargetGUID.WriteAsPacked();
         else
             data << uint8(0);
@@ -5604,14 +5605,12 @@ SpellCastResult Spell::CheckCast(bool strict)
 
         if (strict && m_casterUnit)
         {
-            if (m_casterUnit && m_casterUnit->IsInCombat() && m_spellInfo->IsNonCombatSpell())
+            if (m_casterUnit->IsInCombat() && m_spellInfo->IsNonCombatSpell())
                 return SPELL_FAILED_AFFECTING_COMBAT;
 
-            // only check at first call, Stealth auras are already removed at second call
-            // for now, ignore triggered spells
-            //if (strict)
-            //{
-            // Cannot be used in this stance/form
+            if (m_casterUnit->IsCharmerOrOwnerPlayerOrPlayerItself() && !ValidateExplicitTargetMask())
+                return SPELL_FAILED_BAD_TARGETS;
+
             SpellCastResult shapeError = m_spellInfo->GetErrorAtShapeshiftedCast(m_casterUnit->GetShapeshiftForm());
             if (shapeError != SPELL_CAST_OK)
                 return shapeError;
@@ -6894,6 +6893,31 @@ SpellCastResult Spell::CheckCasterAuras() const
             return prevented_reason;
     }
     return SPELL_CAST_OK;
+}
+
+bool Spell::ValidateExplicitTargetMask() const
+{
+    if (!m_casterUnit)
+        return true;
+
+    static constexpr uint32 verifiableTargetFlags[] = { TARGET_FLAG_UNIT , TARGET_FLAG_ITEM , TARGET_FLAG_SOURCE_LOCATION , TARGET_FLAG_DEST_LOCATION , TARGET_FLAG_CORPSE_ENEMY , TARGET_FLAG_GAMEOBJECT , TARGET_FLAG_LOCKED , TARGET_FLAG_CORPSE_ALLY, TARGET_FLAG_UNIT_MINIPET };
+    uint32 const expectedTargetMask = m_spellInfo->AllowedTargetMask;
+
+    for (uint32 flag : verifiableTargetFlags)
+    {
+        if ((m_targets.m_targetMask & flag) && !(expectedTargetMask & flag))
+        {
+            if (Player* pPlayer = m_casterUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                std::stringstream oss;
+                oss << "Casting spell " << m_spellInfo->Id << " with unexpected " << SpellCastTargetFlagToString(flag) << " (" << flag << ") included in the target mask (" << m_targets.m_targetMask << ")";
+                pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
+            }
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool Spell::CanAutoCast(Unit* target)

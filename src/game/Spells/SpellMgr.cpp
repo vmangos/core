@@ -3425,6 +3425,25 @@ namespace SpellInternal
         }
         return true;
     }
+
+    uint32 GetAllowedTargetMask(SpellEntry const* spellInfo)
+    {
+        uint32 targetMask = spellInfo->Targets;
+
+        for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if (spellInfo->Effect[i])
+            {
+                targetMask |= GetAllowedTargetMaskForTargetType((SpellTarget)spellInfo->EffectImplicitTargetA[i]);
+                targetMask |= GetAllowedTargetMaskForTargetType((SpellTarget)spellInfo->EffectImplicitTargetB[i]);
+            }
+        }
+
+        if (targetMask & (TARGET_FLAG_UNIT_RAID | TARGET_FLAG_UNIT_PARTY | TARGET_FLAG_UNIT_ENEMY | TARGET_FLAG_UNIT_ALLY | TARGET_FLAG_UNIT_DEAD | TARGET_FLAG_UNIT_MINIPET))
+            targetMask |= TARGET_FLAG_UNIT;
+
+        return targetMask;
+    }
 }
 
 void SpellMgr::AssignInternalSpellFlags()
@@ -3483,6 +3502,8 @@ void SpellMgr::AssignInternalSpellFlags()
 
             if (SpellInternal::IsCCSpell(pSpellEntry.get()))
                 pSpellEntry->Internal |= SPELL_INTERNAL_CROWD_CONTROL;
+
+            pSpellEntry->AllowedTargetMask = SpellInternal::GetAllowedTargetMask(pSpellEntry.get());
         }
     }
 }
