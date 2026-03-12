@@ -135,6 +135,9 @@ public:
 
         if (!session)
         {
+            PlayerbotHolder::SetBotLoading(guid, false);
+            PlayerbotHolder::ClearPendingBotOwner(guid);
+            PlayerbotHolder::UnregisterPendingBotSession(guid);
             delete holder;
             return;
         }
@@ -147,6 +150,7 @@ public:
 
             if (!session->GetPlayer() && !session->PlayerLoading())
             {
+                PlayerbotHolder::SetBotLoading(guid, false);
                 PlayerbotHolder::ClearPendingBotOwner(guid);
                 delete session;
             }
@@ -437,6 +441,7 @@ void WorldSession::LoginPlayer(ObjectGuid loginPlayerGuid)
     {
         if (GetBot())
         {
+            PlayerbotHolder::SetBotLoading(loginPlayerGuid, false);
             PlayerbotHolder::ClearPendingBotOwner(loginPlayerGuid);
             KickPlayer();
         }
@@ -474,7 +479,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         if (pCurrChar->GetSession()->GetAccountId() != GetAccountId())
         {
             if (GetBot())
+            {
+                PlayerbotHolder::SetBotLoading(playerGuid, false);
                 PlayerbotHolder::ClearPendingBotOwner(playerGuid);
+            }
             ProcessAnticheatAction("PassiveAnticheat", "Attempt to login to character on different account", CHEAT_ACTION_LOG);
             KickPlayer();
             delete holder;
@@ -485,7 +493,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         if (pCurrChar->FindMap() != sMapMgr.FindMap(pCurrChar->GetMapId(), pCurrChar->GetInstanceId()))
         {
             if (GetBot())
+            {
+                PlayerbotHolder::SetBotLoading(playerGuid, false);
                 PlayerbotHolder::ClearPendingBotOwner(playerGuid);
+            }
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Dangling map pointer during login on character guid %u", playerGuid.GetCounter());
             KickPlayer();
             delete holder;
@@ -514,7 +525,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         if (HashMapHolder<Player>::Find(playerGuid))
         {
             if (GetBot())
+            {
+                PlayerbotHolder::SetBotLoading(playerGuid, false);
                 PlayerbotHolder::ClearPendingBotOwner(playerGuid);
+            }
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH] Trying to login already ingame character guid %u", playerGuid.GetCounter());
             KickPlayer();
             delete holder;
@@ -534,7 +548,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     else if (!pCurrChar->LoadFromDB(playerGuid, holder))
     {
         if (GetBot())
+        {
+            PlayerbotHolder::SetBotLoading(playerGuid, false);
             PlayerbotHolder::ClearPendingBotOwner(playerGuid);
+        }
         KickPlayer();                                       // disconnect client, player no set to session and it will not deleted or saved at kick
         delete pCurrChar;                                   // delete it manually
         delete holder;                                      // delete all unprocessed queries

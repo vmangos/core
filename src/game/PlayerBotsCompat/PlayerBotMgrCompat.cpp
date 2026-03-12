@@ -112,10 +112,13 @@ void PlayerBotMgr::OnPlayerInWorld(Player* player)
                     "Bot %s (%u) entered world but master account %u has no active playerbot manager; removing bot session",
                     player->GetName(), player->GetGUIDLow(), masterAccountId);
                 PlayerbotHolder::ClearPendingBotOwner(player->GetGUID());
-                sRandomPlayerbotMgr.SetBotLoading(player->GetGUID(), false);
-                WorldSession* botSession = player->GetSession();
-                botSession->LogoutPlayer(true);
-                delete botSession;
+                PlayerbotHolder::SetBotLoading(player->GetGUID(), false);
+                PlayerbotHolder::UnregisterPendingBotSession(player->GetGUID());
+                if (WorldSession* botSession = player->GetSession())
+                {
+                    botSession->LogoutPlayer(true);
+                    delete botSession;
+                }
                 return;
             }
 
@@ -132,7 +135,12 @@ void PlayerBotMgr::OnPlayerInWorld(Player* player)
         return;
     }
 
-    if (!sPlayerbotsMgr.GetPlayerbotMgr(player))
+    if (PlayerbotMgr* mgr = sPlayerbotsMgr.GetPlayerbotMgr(player))
+    {
+        if (mgr->GetMaster() != player)
+            mgr->SetMaster(player);
+    }
+    else
         sPlayerbotsMgr.AddPlayerbotData(player, false);
 
     sRandomPlayerbotMgr.OnPlayerLogin(player);

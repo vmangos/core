@@ -6,7 +6,9 @@
 #include "Bot/Factory/AiFactory.h"
 
 #include "BattlegroundMgr.h"
+#if !PB_COMPAT_VANILLA
 #include "DKAiObjectContext.h"
+#endif
 #include "DruidAiObjectContext.h"
 #include "Engine.h"
 #include "Group.h"
@@ -48,8 +50,10 @@ AiObjectContext* AiFactory::createAiObjectContext(Player* player, PlayerbotAI* b
             return new HunterAiObjectContext(botAI);
         case CLASS_ROGUE:
             return new RogueAiObjectContext(botAI);
+#if !PB_COMPAT_VANILLA
         case CLASS_DEATH_KNIGHT:
             return new DKAiObjectContext(botAI);
+#endif
     }
 
     return new AiObjectContext(botAI);

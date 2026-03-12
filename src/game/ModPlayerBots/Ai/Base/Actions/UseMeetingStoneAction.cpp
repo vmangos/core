@@ -57,35 +57,15 @@ bool UseMeetingStoneAction::Execute(Event event)
 
 bool SummonAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player* master = event.getOwner() ? event.getOwner() : GetMaster();
     if (!master)
         return false;
 
-    if (Pet* pet = bot->GetPet())
-    {
+    if (bot->GetPet())
         botAI->PetFollow();
-    }
 
-    if (master->GetSession()->GetSecurity() >= SEC_PLAYER)
-    {
-        // botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Set({});
-        AI_VALUE(std::list<FleeInfo>&, "recently flee info").clear();
-        return Teleport(master, bot, true);
-    }
-
-    if (SummonUsingGos(master, bot, true) || SummonUsingNpcs(master, bot, true))
-    {
-        botAI->TellMasterNoFacing("Hello!");
-        return true;
-    }
-
-    if (SummonUsingGos(bot, master, true) || SummonUsingNpcs(bot, master, true))
-    {
-        botAI->TellMasterNoFacing("Welcome!");
-        return true;
-    }
-
-    return false;
+    AI_VALUE(std::list<FleeInfo>&, "recently flee info").clear();
+    return Teleport(master, bot, true);
 }
 
 bool SummonAction::SummonUsingGos(Player* summoner, Player* player, bool preserveAuras)
@@ -149,7 +129,6 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player, bool preser
 
 bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras)
 {
-    // Player* master = GetMaster();
     if (!summoner || summoner == player)
         return false;
 
@@ -159,78 +138,73 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
         return false;
     }
 
-    if (!summoner->IsBeingTeleported() && !player->IsBeingTeleported())
+    if (summoner->IsBeingTeleported() || player->IsBeingTeleported())
+        return false;
+
+    if (summoner->IsInCombat() && !sPlayerbotAIConfig.allowSummonInCombat)
     {
-        float followAngle = GetFollowAngle();
-        for (float angle = followAngle - M_PI; angle <= followAngle + M_PI; angle += M_PI / 4)
-        {
-            uint32 mapId = summoner->GetMapId();
-            float x = summoner->GetPositionX() + cos(angle) * sPlayerbotAIConfig.followDistance;
-            float y = summoner->GetPositionY() + sin(angle) * sPlayerbotAIConfig.followDistance;
-            float z = summoner->GetPositionZ();
-
-            if (summoner->IsWithinLOS(x, y, z))
-            {
-                if (sPlayerbotAIConfig.botRepairWhenSummon)  // .conf option to repair bot gear when summoned 0 = off, 1 = on
-                    bot->DurabilityRepairAll(false, 1.0f, false);
-
-                if (summoner->IsInCombat() && !sPlayerbotAIConfig.allowSummonInCombat)
-                {
-                    botAI->TellError("You cannot summon me while you're in combat");
-                    return false;
-                }
-
-                if (!summoner->IsAlive() && !sPlayerbotAIConfig.allowSummonWhenMasterIsDead)
-                {
-                    botAI->TellError("You cannot summon me while you're dead");
-                    return false;
-                }
-
-                if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) &&
-                    !sPlayerbotAIConfig.allowSummonWhenBotIsDead)
-                {
-                    botAI->TellError("You cannot summon me while I'm dead, you need to release my spirit first");
-                    return false;
-                }
-
-                bool revive =
-                    sPlayerbotAIConfig.reviveBotWhenSummoned == 2 ||
-                    (sPlayerbotAIConfig.reviveBotWhenSummoned == 1 && !summoner->IsInCombat() && summoner->IsAlive());
-
-                if (bot->isDead() && revive)
-                {
-                    bot->ResurrectPlayer(1.0f, false);
-                    bot->SpawnCorpseBones();
-                    botAI->TellMasterNoFacing("I live, again!");
-                    botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Reset();
-                }
-
-                player->GetMotionMaster()->Clear();
-                AI_VALUE(LastMovement&, "last movement").clear();
-
-                if (!preserveAuras)
-                    player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED |
-                                                          AURA_INTERRUPT_FLAG_CHANGE_MAP);
-                player->TeleportTo(mapId, x, y, z, 0);
-                if (player->GetPet())
-                    player->GetPet()->NearTeleportTo(x, y, z, player->GetOrientation());
-                if (player->GetGuardianPet())
-                    player->GetGuardianPet()->NearTeleportTo(x, y, z, player->GetOrientation());
-                if (botAI->HasStrategy("stay", botAI->GetState()))
-                {
-                    PositionMap& posMap = AI_VALUE(PositionMap&, "position");
-                    PositionInfo stayPosition = posMap["stay"];
-
-                    stayPosition.Set(x,y, z, mapId);
-                    posMap["stay"] = stayPosition;
-                }
-
-                return true;
-            }
-        }
+        botAI->TellError("You cannot summon me while you're in combat");
+        return false;
     }
 
-    if (summoner != player)
-         botAI->TellError("Not enough place to summon");
-    return false;
+    if (!summoner->IsAlive() && !sPlayerbotAIConfig.allowSummonWhenMasterIsDead)
+    {
+        botAI->TellError("You cannot summon me while you're dead");
+        return false;
+    }
+
+    if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) && !sPlayerbotAIConfig.allowSummonWhenBotIsDead)
+    {
+        botAI->TellError("You cannot summon me while I'm dead, you need to release my spirit first");
+        return false;
+    }
+
+    bool revive =
+        sPlayerbotAIConfig.reviveBotWhenSummoned == 2 ||
+        (sPlayerbotAIConfig.reviveBotWhenSummoned == 1 && !summoner->IsInCombat() && summoner->IsAlive());
+
+    if (bot->isDead() && revive)
+    {
+        bot->ResurrectPlayer(1.0f, false);
+        bot->SpawnCorpseBones();
+        botAI->TellMasterNoFacing("I live, again!");
+        botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Reset();
+    }
+
+    float x = summoner->GetPositionX();
+    float y = summoner->GetPositionY();
+    float z = summoner->GetPositionZ();
+    float angle = summoner->GetOrientation() + GetFollowAngle();
+    summoner->GetNearPoint(player, x, y, z, 0.0f, sPlayerbotAIConfig.followDistance, angle);
+
+    if (sPlayerbotAIConfig.botRepairWhenSummon)  // .conf option to repair bot gear when summoned 0 = off, 1 = on
+        bot->DurabilityRepairAll(false, 1.0f, false);
+
+    if (!preserveAuras)
+        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
+
+    if (!player->TeleportTo(summoner->GetMapId(), x, y, z, summoner->GetOrientation()))
+    {
+        if (summoner != player)
+            botAI->TellError("Not enough place to summon");
+        return false;
+    }
+
+    player->GetMotionMaster()->Clear();
+    AI_VALUE(LastMovement&, "last movement").clear();
+
+    if (player->GetPet())
+        player->GetPet()->NearTeleportTo(x, y, z, summoner->GetOrientation());
+    if (player->GetGuardianPet())
+        player->GetGuardianPet()->NearTeleportTo(x, y, z, summoner->GetOrientation());
+    if (botAI->HasStrategy("stay", botAI->GetState()))
+    {
+        PositionMap& posMap = AI_VALUE(PositionMap&, "position");
+        PositionInfo stayPosition = posMap["stay"];
+
+        stayPosition.Set(x, y, z, summoner->GetMapId());
+        posMap["stay"] = stayPosition;
+    }
+
+    return true;
 }

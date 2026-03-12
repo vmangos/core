@@ -30,12 +30,13 @@
 #include "PlayerbotAI.h"
 #include "PlayerbotRepository.h"
 #include "PlayerbotFactory.h"
-#include "PlayerbotOperations.h"
+#include "ModPlayerBots/Script/WorldThr/PlayerbotOperation.h"
 #include "PlayerbotSecurity.h"
 #include "PlayerbotWorldThreadProcessor.h"
 #include "Playerbots.h"
 #include "PlayerbotGuildMgr.h"
 #include "RandomPlayerbotMgr.h"
+#include "../Ai/Base/Actions/UseMeetingStoneAction.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
 #include "BroadcastHelper.h"
@@ -78,6 +79,41 @@ PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
 
 namespace
 {
+uint32 GetPersistedGroupId(ObjectGuid guid)
+{
+    std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery(
+        "SELECT `group_id` FROM `group_member` WHERE `member_guid` = '%u'", guid.GetCounter()));
+    return result ? (*result)[0].GetUInt32() : 0;
+}
+
+void CleanupOfflineBotGroupState(ObjectGuid botGuid, Player* master)
+{
+    uint32 groupId = GetPersistedGroupId(botGuid);
+    if (!groupId)
+        return;
+
+    Group* masterGroup = master ? master->GetGroup() : nullptr;
+    if (masterGroup && masterGroup->GetId() == groupId)
+        return;
+
+    LOG_INFO("playerbots",
+        "Cleaning persisted group state for bot guid=%u group_id=%u master_guid=%u",
+        botGuid.GetCounter(), groupId, master ? master->GetGUIDLow() : 0);
+
+    if (Group* staleGroup = sObjectMgr.GetGroupById(groupId))
+    {
+        staleGroup->RemoveMember(botGuid, GROUP_LEAVE);
+        return;
+    }
+
+    CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `member_guid` = '%u'", botGuid.GetCounter());
+
+    std::unique_ptr<QueryResult> countResult(CharacterDatabase.PQuery(
+        "SELECT COUNT(*) FROM `group_member` WHERE `group_id` = '%u'", groupId));
+    if (!countResult || !(*countResult)[0].GetUInt32())
+        CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `group_id` = '%u'", groupId);
+}
+
 bool IsPlayerbotLookupSafe(Player* player)
 {
     if (!player)
@@ -109,6 +145,7 @@ public:
 private:
     ObjectGuid botGuid;
 };
+
 }  // namespace
 
 // Simple holder for bot login data (vMaNGOS doesn't have LoginQueryHolder base class available)
@@ -138,15 +175,15 @@ public:
 };
 static BotCharacterHandler botChrHandler;
 
-void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId)
+std::string PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId, bool admin)
 {
     if (botLoading.find(playerGuid) != botLoading.end())
-        return;
+        return "login already in progress";
 
     // has bot already been added?
     Player* bot = ObjectAccessor::FindPlayer(playerGuid);
     if (bot && bot->IsInWorld())
-        return;
+        return "player already logged in";
 
     uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(playerGuid);
     if (!accountId)
@@ -156,11 +193,14 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
         LOG_WARN("playerbots",
             "Skipping bot login for guid %u: character cache lookup failed after reload (account=%u, name=%s)",
             playerGuid.GetCounter(), accountId, hasName ? botName.c_str() : "<missing>");
-        return;
+        return "character account lookup failed";
     }
 
     WorldSession* masterSession = masterAccountId ? sWorldSessionMgr->FindSession(masterAccountId) : nullptr;
     Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
+
+    if (masterPlayer)
+        CleanupOfflineBotGroupState(playerGuid, masterPlayer);
 
     bool isRndbot = !masterAccountId;
     bool sameAccount = sPlayerbotAIConfig.allowAccountBots && accountId == masterAccountId;
@@ -173,7 +213,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     std::ostringstream out;
     std::string botName;
     sCharacterCache->GetCharacterNameByGuid(playerGuid, botName);
-    if (!isRndbot && !sameAccount && !sameGuild && !addClassBot && !linkedAccount)
+    if (!admin && !isRndbot && !sameAccount && !sameGuild && !addClassBot && !linkedAccount)
     {
         allowed = false;
         out << "Failure: You are not allowed to control bot " << botName;
@@ -183,9 +223,9 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
         PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(masterPlayer);
         if (!mgr)
         {
-        LOG_DEBUG("playerbots", "PlayerbotMgr not found for master player with GUID: %llu",
-                  static_cast<unsigned long long>(masterPlayer->GetGUID()));
-            return;
+            LOG_DEBUG("playerbots", "PlayerbotMgr not found for master player with GUID: %llu",
+                      static_cast<unsigned long long>(masterPlayer->GetGUID()));
+            return "master playerbot manager not found";
         }
         uint32 count = mgr->GetPlayerbotsCount() + botLoading.size();
         if (count >= sPlayerbotAIConfig.maxAddedBots)
@@ -201,7 +241,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
             ChatHandler ch(masterSession);
             ch.SendSysMessage(out.str().c_str());
         }
-        return;
+        return out.str();
     }
 
     SetBotLoading(playerGuid, true);
@@ -210,6 +250,7 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     // Synchronous login for vMaNGOS (simpler than Trinity async pattern)
     PlayerbotLoginQueryHolder holder(masterAccountId, accountId, playerGuid);
     HandlePlayerBotLoginCallback(holder);
+    return "";
 }
 
 bool PlayerbotHolder::IsAccountLinked(uint32 accountId, uint32 linkedAccountId)
@@ -530,6 +571,9 @@ Player* PlayerbotHolder::GetPlayerBot(uint32 lowGuid) const
 
 void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
+    uint32 pendingMasterAccountId = 0;
+    bool expectPlayerMaster = TryGetPendingBotOwner(bot->GetGUID(), pendingMasterAccountId) && pendingMasterAccountId;
+
     SetBotLoading(bot->GetGUID(), false);
     ClearPendingBotOwner(bot->GetGUID());
     UnregisterPendingBotSession(bot->GetGUID());
@@ -558,11 +602,61 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         return;
     }
 
-    Player* master = botAI->GetMaster();
+    Player* master = GetHolderMaster();
+    if (master && botAI->GetMaster() != master)
+        botAI->SetMaster(master);
+    else if (!master && expectPlayerMaster)
+    {
+        WorldSession* masterSession = sWorldSessionMgr->FindSession(pendingMasterAccountId);
+        Player* pendingMaster = masterSession ? masterSession->GetPlayer() : nullptr;
+        if (pendingMaster)
+        {
+            master = pendingMaster;
+            if (botAI->GetMaster() != master)
+                botAI->SetMaster(master);
+        }
+    }
+    else if (!master)
+        master = botAI->GetMaster();
+
     Group* group = bot->GetGroup();
+    Group* groupInvite = bot->GetGroupInvite();
+    ObjectGuid masterGuid;
+    if (master)
+        masterGuid = master->GetGUID();
+
+    LOG_DEBUG("playerbots",
+        "OnBotLogin state: bot=%s guid=%u group_id=%u invite_group_id=%u resolved_master_guid=%u",
+        bot->GetName(), bot->GetGUIDLow(), group ? group->GetId() : 0, groupInvite ? groupInvite->GetId() : 0,
+        masterGuid ? masterGuid.GetCounter() : 0);
+
+    if (master || expectPlayerMaster)
+    {
+        if (group && (!master || !group->IsMember(masterGuid)))
+        {
+            LOG_DEBUG("playerbots",
+                "Clearing stale bot group on login: bot=%s guid=%u group_id=%u group_leader_guid=%u resolved_master_guid=%u",
+                bot->GetName(), bot->GetGUIDLow(), group->GetId(), group->GetLeaderGuid().GetCounter(),
+                masterGuid.GetCounter());
+            Player::RemoveFromGroup(group, bot->GetObjectGuid());
+            if (bot->GetOriginalGroup() == group)
+                bot->SetOriginalGroup(nullptr);
+            group = bot->GetGroup();
+        }
+
+        groupInvite = bot->GetGroupInvite();
+        if (groupInvite && (!master || (!groupInvite->IsMember(masterGuid) && groupInvite->GetLeaderGuid() != masterGuid)))
+        {
+            LOG_DEBUG("playerbots",
+                "Clearing stale bot group invite on login: bot=%s guid=%u invite_group_id=%u invite_leader_guid=%u resolved_master_guid=%u",
+                bot->GetName(), bot->GetGUIDLow(), groupInvite->GetId(),
+                groupInvite->GetLeaderGuid().GetCounter(), masterGuid.GetCounter());
+            bot->UninviteFromGroup();
+        }
+    }
+
     if (master && group)
     {
-        ObjectGuid masterGuid = master->GetGUID();
         if (group->IsMember(masterGuid) && !group->IsLeader(masterGuid))
             group->ChangeLeader(masterGuid);
     }
@@ -581,6 +675,8 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
                     groupValid = true;
                     break;
                 }
+
+                continue;
             }
 
             // Don't disband alt groups when master goes away
@@ -626,39 +722,39 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     botAI->TellMaster("Hello!", PLAYERBOT_SECURITY_TALK);
 
-    // Queue group operations for world thread
     if (master && master->GetGroup() && !group)
     {
         Group* mgroup = master->GetGroup();
         if (mgroup->GetMembersCount() >= 5)
         {
             if (!mgroup->isRaidGroup() && !mgroup->isBGGroup())
-            {
-                // Vanilla: Convert to raid directly (no thread operation needed)
                 mgroup->ConvertToRaid();
-            }
+
             if (mgroup->isRaidGroup())
-            {
-                // Vanilla: Add member to raid directly (no thread operation needed)
                 mgroup->AddMember(bot->GetGUID(), bot->GetName());
-            }
         }
         else
         {
-            // Vanilla: Add member to group directly (no thread operation needed)
             mgroup->AddMember(bot->GetGUID(), bot->GetName());
         }
     }
     else if (master && !group)
     {
-        // Vanilla: Create group and add member directly (no thread operation needed)
         if (!master->GetGroup())
         {
             Group* newGroup = new Group;
             if (newGroup->Create(master->GetGUID(), master->GetName()))
             {
                 sObjectMgr.AddGroup(newGroup);
-                newGroup->AddMember(bot->GetGUID(), bot->GetName());
+                // Create() already added master as a member in vanilla vMaNGOS,
+                // so only add the bot here.
+                if (!newGroup->AddMember(bot->GetGUID(), bot->GetName()))
+                {
+                    // Bot add failed - disband and clean up
+                    newGroup->RemoveMember(master->GetGUID(), GROUP_LEAVE);
+                    sObjectMgr.RemoveGroup(newGroup);
+                    delete newGroup;
+                }
             }
             else
             {
@@ -669,6 +765,13 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         {
             master->GetGroup()->AddMember(bot->GetGUID(), bot->GetName());
         }
+    }
+
+    if (master && botAI && sPlayerbotAIConfig.summonWhenGroup &&
+        (bot->GetMapId() != master->GetMapId() || bot->GetDistance(master) > sPlayerbotAIConfig.sightDistance))
+    {
+        SummonAction summonAction(botAI, "group summon");
+        summonAction.Teleport(master, bot, true);
     }
     // if (master)
     // {
@@ -687,7 +790,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
 
     bot->SaveToDB(false, false);
-    bool addClassBot = sRandomPlayerbotMgr.IsAccountType(accountId, 2);
+    bool addClassBot = sRandomPlayerbotMgr.IsAddclassAccount(accountId);
     if (addClassBot && master && abs((int)master->GetLevel() - (int)bot->GetLevel()) > 3)
     {
         // PlayerbotFactory factory(bot, master->GetLevel());
@@ -754,8 +857,8 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
                 }
         }
 
-        AddPlayerBot(guid, masterAccountId);
-        return "ok";
+        std::string result = AddPlayerBot(guid, masterAccountId, admin);
+        return result.empty() ? "ok" : result;
     }
     else if (cmd == "remove" || cmd == "logout" || cmd == "rm")
     {
@@ -1653,6 +1756,11 @@ void PlayerbotMgr::OnBotLoginInternal(Player* const bot)
     LOG_INFO("playerbots", "Bot %s logged in", bot->GetName());
 }
 
+Player* PlayerbotMgr::GetHolderMaster() const
+{
+    return master;
+}
+
 void PlayerbotMgr::OnPlayerLogin(Player* player)
 {
     if (!player)
@@ -1763,6 +1871,14 @@ void PlayerbotsMgr::AddPlayerbotData(Player* player, bool isBotAI)
         std::unordered_map<ObjectGuid, PlayerbotAIBase*>::iterator itr = _playerbotsMgrMap.find(player->GetGUID());
         if (itr != _playerbotsMgrMap.end())
         {
+            if (!itr->second->IsBotAI())
+            {
+                PlayerbotMgr* playerbotMgr = reinterpret_cast<PlayerbotMgr*>(itr->second);
+                playerbotMgr->SetMaster(player);
+                playerbotMgr->OnPlayerLogin(player);
+                return;
+            }
+
             _playerbotsMgrMap.erase(itr);
         }
         PlayerbotMgr* playerbotMgr = new PlayerbotMgr(player);

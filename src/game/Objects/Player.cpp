@@ -16436,7 +16436,9 @@ bool Player::SaveNewPlayer(WorldSession* session, uint32 guidlow, std::string co
     sObjectMgr.SetPlayerWorldMask(guidlow, WORLD_DEFAULT_CHAR);
     session->SaveTutorialsData(); // changed only while character in game
 
-    CharacterDatabase.CommitTransaction();
+    // New characters are often materialized immediately after creation (random bots, character list refresh),
+    // so the base character row must be visible before this call returns.
+    CharacterDatabase.CommitTransactionDirect();
 
     uint32 zoneId = 0;
     uint32 areaId = 0;
@@ -22129,7 +22131,9 @@ void Player::DeletePacketBroadcaster()
 {
     if (m_broadcaster)
     {
-        sWorld.GetBroadcaster()->RemovePlayer(m_broadcaster);
+        if (MovementBroadcaster* broadcaster = sWorld.GetBroadcaster())
+            broadcaster->RemovePlayer(m_broadcaster);
+
         // Remove reference to socket, so we can free descriptor, buffers, etc...
         m_broadcaster->FreeAtLogout();
         m_broadcaster.reset();
@@ -22139,9 +22143,14 @@ void Player::DeletePacketBroadcaster()
 void Player::CreatePacketBroadcaster()
 {
     ASSERT(!m_broadcaster);
+
+    MovementBroadcaster* broadcaster = sWorld.GetBroadcaster();
+    if (!broadcaster)
+        return;
+
     // Register player packet queue with the packet broadcaster
     m_broadcaster = std::make_shared<PlayerBroadcaster>(m_session->GetSocket(), GetObjectGuid());
-    sWorld.GetBroadcaster()->RegisterPlayer(m_broadcaster);
+    broadcaster->RegisterPlayer(m_broadcaster);
 }
 
 

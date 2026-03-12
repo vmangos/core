@@ -28,7 +28,7 @@ public:
     PlayerbotHolder();
     virtual ~PlayerbotHolder(){};
 
-    void AddPlayerBot(ObjectGuid guid, uint32 masterAccountId);
+    std::string AddPlayerBot(ObjectGuid guid, uint32 masterAccountId, bool admin = false);
     bool IsAccountLinked(uint32 accountId, uint32 masterAccountId);
     void HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder);
 
@@ -58,7 +58,7 @@ public:
     uint32 GetPlayerbotsCountByClass(uint32 cls);
 
     bool IsBotLoading(ObjectGuid guid) const { return botLoading.find(guid) != botLoading.end(); }
-    void SetBotLoading(ObjectGuid guid, bool loading);
+    static void SetBotLoading(ObjectGuid guid, bool loading);
     static bool TryGetPendingBotOwner(ObjectGuid guid, uint32& masterAccountId);
     static void SetPendingBotOwner(ObjectGuid guid, uint32 masterAccountId);
     static void ClearPendingBotOwner(ObjectGuid guid);
@@ -70,6 +70,7 @@ public:
 
 protected:
     virtual void OnBotLoginInternal(Player* const bot) = 0;
+    virtual Player* GetHolderMaster() const { return nullptr; }
 
     PlayerBotMap playerBots;
     static std::unordered_set<ObjectGuid> botLoading;
@@ -94,6 +95,7 @@ public:
     void TellError(std::string const botName, std::string const text);
 
     Player* GetMaster() const { return master; };
+    void SetMaster(Player* player) { master = player; }
 
     void SaveToDB();
 
@@ -104,10 +106,11 @@ public:
 
 protected:
     void OnBotLoginInternal(Player* const bot) override;
+    Player* GetHolderMaster() const override;
     void CheckTellErrors(uint32 elapsed);
 
 private:
-    Player* const master;
+    Player* master;
     PlayerBotErrorMap errors;
     time_t lastErrorTell;
 };

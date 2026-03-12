@@ -8,7 +8,9 @@
 #include "ActionContext.h"
 #include "ChatActionContext.h"
 #include "ChatTriggerContext.h"
+#if !PB_COMPAT_VANILLA
 #include "DKAiObjectContext.h"
+#endif
 #include "DruidAiObjectContext.h"
 #include "HunterAiObjectContext.h"
 #include "MageAiObjectContext.h"
@@ -95,7 +97,9 @@ void AiObjectContext::BuildAllSharedContexts()
     DruidAiObjectContext::BuildSharedContexts();
     HunterAiObjectContext::BuildSharedContexts();
     RogueAiObjectContext::BuildSharedContexts();
+#if !PB_COMPAT_VANILLA
     DKAiObjectContext::BuildSharedContexts();
+#endif
 }
 
 void AiObjectContext::BuildSharedContexts()

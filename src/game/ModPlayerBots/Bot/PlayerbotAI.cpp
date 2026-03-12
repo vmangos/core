@@ -1174,40 +1174,55 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
             if (!p.empty() && (p.GetOpcode() == SMSG_MESSAGECHAT || p.GetOpcode() == SMSG_GM_MESSAGECHAT))
             {
                 p.rpos(0);
-                uint8 msgtype, chatTag;
-                uint32 lang, textLen, unused;
-                ObjectGuid guid1, guid2;
+                uint8 msgtype = 0;
+                uint8 chatTag = 0;
+                uint32 lang = 0;
+                uint32 textLen = 0;
+                ObjectGuid guid1;
+                ObjectGuid guid2;
                 std::string name = "";
                 std::string chanName = "";
                 std::string message = "";
 
-                p >> msgtype >> lang;
-                p >> guid1 >> unused;
+                try
+                {
+                    p >> msgtype >> lang;
+
+                    switch (msgtype)
+                    {
+                        case CHAT_MSG_SAY:
+                        case CHAT_MSG_PARTY:
+                        case CHAT_MSG_YELL:
+                            p >> guid1 >> guid2 >> textLen >> message >> chatTag;
+                            break;
+                        case CHAT_MSG_CHANNEL:
+                            p >> chanName;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+                            {
+                                uint32 playerRank;
+                                p >> playerRank;
+                            }
+#endif
+                            p >> guid1 >> textLen >> message >> chatTag;
+                            break;
+                        case CHAT_MSG_WHISPER:
+                        case CHAT_MSG_GUILD:
+                            p >> guid1 >> textLen >> message >> chatTag;
+                            break;
+                        default:
+                            return;
+                    }
+                }
+                catch (ByteBufferException const&)
+                {
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR,
+                             "[PlayerbotAI] Failed to parse outgoing chat packet opcode 0x%.4X msgtype %u for bot %s",
+                             p.GetOpcode(), msgtype, bot->GetName());
+                    return;
+                }
+
                 if (guid1.IsEmpty() || p.size() > p.DEFAULT_SIZE)
                     return;
-
-                if (p.GetOpcode() == SMSG_GM_MESSAGECHAT)
-                {
-                    p >> textLen;
-                    p >> name;
-                }
-
-                switch (msgtype)
-                {
-                    case CHAT_MSG_CHANNEL:
-                        p >> chanName;
-                        [[fallthrough]];
-                    case CHAT_MSG_SAY:
-                    case CHAT_MSG_PARTY:
-                    case CHAT_MSG_YELL:
-                    case CHAT_MSG_WHISPER:
-                    case CHAT_MSG_GUILD:
-                        p >> guid2;
-                        p >> textLen >> message >> chatTag;
-                        break;
-                    default:
-                        return;
-                }
 
                 if (chanName == "World")
                     return;
@@ -4353,6 +4368,10 @@ bool PlayerbotAI::HasPlayerNearby(WorldPosition* pos, float range)
     bool nearPlayer = false;
     for (auto& player : sRandomPlayerbotMgr.GetPlayers())
     {
+        if (!player || !player->GetSession() || !player->IsInWorld() || player->IsDuringRemoveFromWorld() ||
+            player->GetSession()->IsLogingOut())
+            continue;
+
         if (!player->IsGameMaster() || player->isGMVisible())
         {
             if (player->GetMapId() != bot->GetMapId())
@@ -4382,12 +4401,19 @@ bool PlayerbotAI::HasPlayerNearby(float range)
 
 bool PlayerbotAI::HasManyPlayersNearby(uint32 trigerrValue, float range)
 {
-    float sqRange = range * range;
     uint32 found = 0;
 
     for (auto& player : sRandomPlayerbotMgr.GetPlayers())
     {
-        if ((!player->IsGameMaster() || player->isGMVisible()) && ServerFacade::instance().GetDistance2d(player, bot) < sqRange)
+        if (!player || !player->GetSession() || !player->IsInWorld() || player->IsDuringRemoveFromWorld() ||
+            player->GetSession()->IsLogingOut())
+            continue;
+
+        if (player->GetMapId() != bot->GetMapId())
+            continue;
+
+        if ((!player->IsGameMaster() || player->isGMVisible()) &&
+            ServerFacade::instance().GetDistance2d(player, bot) < range)
         {
             found++;
 
@@ -4917,8 +4943,11 @@ uint32 PlayerbotAI::GetMixedGearScore(Player* player, bool withBags, bool withBa
         // check bags
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         {
-            if (Bag* pBag = (Bag*)player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             {
+                if (!pItem->IsBag())
+                    continue;
+                Bag* pBag = (Bag*)pItem;
                 for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
                 {
                     if (Item* item2 = pBag->GetItemByPos(j))

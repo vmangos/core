@@ -703,6 +703,9 @@ list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Raid/EyeOfEter
 # Keep Trinity-only guild task implementation excluded in Vanilla build.
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Guild/GuildTaskMgr\\.cpp$")
 
+# Death Knight is WotLK-only and should not be part of the Vanilla build.
+list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Class/Dk/.*\\.(cpp|h)$")
+
 # Add ModPlayerBots sources to game_SRCS
 list(APPEND game_SRCS ${MODPLAYERBOTS_SRCS})
 

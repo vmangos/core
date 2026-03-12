@@ -188,6 +188,7 @@ public:
     // Account type management
     void AssignAccountTypes();
     bool IsAccountType(uint32 accountId, uint8 accountType);
+    bool IsAddclassAccount(uint32 accountId);
 
 protected:
     void OnBotLoginInternal(Player* const bot) override;
@@ -283,6 +284,9 @@ private:
     void ScheduleAutonomousEvents(uint32 bot, char const* context = nullptr);
     bool RepairRandomBotRuntimeState(Player* bot, char const* context);
     void RepairBrokenRandomBotState();
+    void PruneOrphanRandomBotState();
+    bool HasCharacterRow(uint32 bot) const;
+    void ClearMissingBotEventState(uint32 bot, char const* context);
     uint32 GetRandomBotCountTarget();
     std::vector<uint32> GetOfflineRandomBots(uint32 limit);
     bool IsEventDue(uint32 bot, std::string const& event);

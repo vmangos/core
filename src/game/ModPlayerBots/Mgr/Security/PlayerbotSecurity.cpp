@@ -47,6 +47,18 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         return PLAYERBOT_SECURITY_DENY_ALL;
     }
 
+    // Player-owned bots on random accounts must follow owner security semantics.
+    if (botAI->HasActivePlayerMaster())
+    {
+        if (botAI->GetMaster() == from)
+            return PLAYERBOT_SECURITY_ALLOW_ALL;
+
+        if (reason)
+            *reason = PLAYERBOT_DENY_NOT_YOURS;
+
+        return PLAYERBOT_SECURITY_INVITE;
+    }
+
     if (sPlayerbotAIConfig.IsInRandomAccountList(account))
     {
         // (duplicate check in case of faction change)

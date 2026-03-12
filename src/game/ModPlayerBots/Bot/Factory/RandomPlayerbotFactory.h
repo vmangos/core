@@ -61,6 +61,8 @@ private:
     static bool IsValidRaceClassCombination(uint8 race, uint8 class_, uint32 expansion);
     static bool LoadNameCacheEntry(NameRaceAndGender raceAndGender,
                                    std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache);
+    static bool MaterializeRandomBot(WorldSession* session, uint32 guidlow, std::string const& name);
+    static void CleanupFailedRandomBotCreation(WorldSession* session, uint32 guidlow);
     std::string const CreateRandomBotName(NameRaceAndGender raceAndGender);
     static std::string const CreateRandomArenaTeamName();
 };

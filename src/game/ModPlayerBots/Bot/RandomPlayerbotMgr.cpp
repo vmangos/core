@@ -382,6 +382,10 @@ bool RandomPlayerbotMgr::IsAddclassBot(LowType bot)
             return true;
     }
 
+    uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HIGHGUID_PLAYER, static_cast<uint32>(bot)));
+    if (accountId && IsAddclassAccount(accountId))
+        return true;
+
     return false;
 }
 
@@ -553,12 +557,31 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
     if (!player)
         return;
 
-    if (IsRandomBot(player) || sPlayerbotAIConfig.IsInRandomAccountList(player->GetSession()->GetAccountId()))
+    uint32 pendingOwnerAccount = 0;
+    bool hasPendingOwner = player->IsBot() && PlayerbotHolder::TryGetPendingBotOwner(player->GetGUID(), pendingOwnerAccount);
+    if (hasPendingOwner && pendingOwnerAccount != 0)
+        return;
+
+    WorldSession* session = player->GetSession();
+    uint32 accountId = session ? session->GetAccountId() : 0;
+    bool addclassAccount = IsAddclassAccount(accountId);
+
+    if (IsRandomBot(player) || (sPlayerbotAIConfig.IsInRandomAccountList(accountId) && !addclassAccount))
     {
         SetEventValue(player->GetGUIDLow(), "add", 1, 0);
         OnBotLogin(player);
+        if (player->IsBot())
+        {
+            Player* master = GET_PLAYERBOT_AI(player) ? GET_PLAYERBOT_AI(player)->GetMaster() : nullptr;
+            LOG_INFO("playerbots",
+                "Bot login routed in RandomPlayerbotMgr::OnPlayerLogin: bot=%s guid=%u account=%u pending_owner_account=0 selected_holder=RandomPlayerbotMgr final_master_guid=%u",
+                player->GetName(), player->GetGUIDLow(), accountId, master ? master->GetGUIDLow() : 0);
+        }
         return;
     }
+
+    if (player->IsBot())
+        return;
 
     if (std::find(players.begin(), players.end(), player) == players.end())
         players.push_back(player);
@@ -1350,6 +1373,7 @@ void RandomPlayerbotMgr::Init()
     PrepareZone2LevelBracket();
     PrepareTeleportCache();
     LoadBattleMastersCache();
+    PruneOrphanRandomBotState();
     CleanupExpiredEvents(true);
     RepairBrokenRandomBotState();
 
@@ -1368,6 +1392,37 @@ void RandomPlayerbotMgr::Init()
         addClassTypeAccounts.size(),
         locsPerLevelCache.size(),
         rpgLocsCacheLevel.size());
+}
+
+void RandomPlayerbotMgr::PruneOrphanRandomBotState()
+{
+    uint32 orphanRows = 0;
+    uint32 orphanBots = 0;
+
+    if (auto result = CharacterDatabase.PQuery(
+        "SELECT COUNT(*), COUNT(DISTINCT bot) "
+        "FROM playerbots_random_bots random_bot "
+        "LEFT JOIN characters c ON c.guid = random_bot.bot "
+        "WHERE random_bot.owner = %u AND random_bot.bot <> 0 AND c.guid IS NULL",
+        RANDOM_BOT_OWNER))
+    {
+        Field* fields = result->Fetch();
+        orphanRows = fields[0].GetUInt32();
+        orphanBots = fields[1].GetUInt32();
+    }
+
+    if (orphanRows)
+    {
+        CharacterDatabase.PExecute(
+            "DELETE random_bot "
+            "FROM playerbots_random_bots random_bot "
+            "LEFT JOIN characters c ON c.guid = random_bot.bot "
+            "WHERE random_bot.owner = %u AND random_bot.bot <> 0 AND c.guid IS NULL",
+            RANDOM_BOT_OWNER);
+    }
+
+    LOG_INFO("playerbots", "Random bot orphan cleanup pruned %u rows across %u bot GUIDs",
+        orphanRows, orphanBots);
 }
 
 void RandomPlayerbotMgr::AssignAccountTypes()
@@ -1398,6 +1453,11 @@ bool RandomPlayerbotMgr::IsAccountType(uint32 accountId, uint8 accountType)
         return std::find(addClassTypeAccounts.begin(), addClassTypeAccounts.end(), accountId) != addClassTypeAccounts.end();
 
     return false;
+}
+
+bool RandomPlayerbotMgr::IsAddclassAccount(uint32 accountId)
+{
+    return accountId && IsAccountType(accountId, 2);
 }
 
 void RandomPlayerbotMgr::OnBotLoginInternal(Player* const bot)
@@ -1665,6 +1725,25 @@ void RandomPlayerbotMgr::RepairBrokenRandomBotState()
     SetEventValue(MANAGER_BOT, "autonomy_repair_v1", 1, 0);
 }
 
+bool RandomPlayerbotMgr::HasCharacterRow(uint32 bot) const
+{
+    return CharacterDatabase.PQuery("SELECT 1 FROM characters WHERE guid = %u LIMIT 1", bot) != nullptr;
+}
+
+void RandomPlayerbotMgr::ClearMissingBotEventState(uint32 bot, char const* context)
+{
+    CharacterDatabase.PExecute(
+        "DELETE FROM playerbots_random_bots WHERE owner = %u AND bot = %u",
+        RANDOM_BOT_OWNER, bot);
+
+    BotEventCache& cache = eventCache[bot];
+    cache.loaded = true;
+    cache.events.clear();
+
+    LOG_INFO("playerbots", "Random bot event state removed for missing character guid=%u context=%s",
+        bot, context ? context : "unknown");
+}
+
 CachedEvent* RandomPlayerbotMgr::FindEvent(uint32 bot, std::string const& event)
 {
     LoadEventCache(bot);
@@ -1690,6 +1769,12 @@ void RandomPlayerbotMgr::LoadEventCache(uint32 bot)
     BotEventCache& cache = eventCache[bot];
     if (cache.loaded)
         return;
+
+    if (bot != 0 && !HasCharacterRow(bot))
+    {
+        ClearMissingBotEventState(bot, "load_event_cache");
+        return;
+    }
 
     cache.loaded = true;
     auto result = CharacterDatabase.PQuery(

@@ -555,6 +555,9 @@ static constexpr float STEP_SIZE = 3.0f;
 
 bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map const* pMap, std::vector<Vector3>& fullPath, std::vector<Vector3>& checkedPositions, uint32& stepsRemaining, float angle)
 {
+    if (!MaNGOS::IsValidMapCoord(currentPos.x, currentPos.y, currentPos.z) || currentPos.z <= INVALID_HEIGHT)
+        return false;
+
     float const currentDistance = Geometry::GetDistance3D(targetPos, currentPos);
     if (currentDistance < (STEP_SIZE + 1))
         return true;
@@ -569,6 +572,9 @@ bool BuildPathStep(Vector3 const& currentPos, Vector3 const& targetPos, Map cons
         Vector3 newPos;
         Geometry::GetNearPoint2DAroundPosition(currentPos.x, currentPos.y, newPos.x, newPos.y, STEP_SIZE, Geometry::NormalizeOrientation(angle + ORIENTATION_OFFSETS[i]));
         newPos.z = pMap->GetHeight(newPos.x, newPos.y, currentPos.z + 0.1f, true);
+
+        if (!MaNGOS::IsValidMapCoord(newPos.x, newPos.y, newPos.z) || newPos.z <= INVALID_HEIGHT)
+            continue;
 
         float const zdiff = newPos.z - currentPos.z;
         if (((zdiff < -0.0f) ? (-zdiff > STEP_SIZE) : (zdiff > STEP_SIZE * 0.9f)))

@@ -24,15 +24,133 @@
 
 namespace
 {
+struct CharacterCleanupQuery
+{
+    char const* tableName;
+    char const* sql;
+};
+
+bool CharacterTableExists(char const* tableName)
+{
+    return CharacterDatabase.PQuery("SHOW TABLES LIKE '%s'", tableName) != nullptr;
+}
+
+void ExecuteCharacterCleanupDirect(char const* tableName, char const* sql)
+{
+    if (!CharacterTableExists(tableName))
+    {
+        LOG_DEBUG("playerbots", "Skipping cleanup for missing character table `%s`", tableName);
+        return;
+    }
+
+    CharacterDatabase.DirectExecute(sql);
+}
+
+void CleanupOrphanedCharacterDataDirect()
+{
+    static CharacterCleanupQuery const cleanupQueries[] =
+    {
+        { "character_action", "DELETE FROM character_action WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_aura", "DELETE FROM character_aura WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_battleground_data", "DELETE FROM character_battleground_data WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_forgotten_skills", "DELETE FROM character_forgotten_skills WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_homebind", "DELETE FROM character_homebind WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_honor_cp", "DELETE FROM character_honor_cp WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_instance", "DELETE FROM character_instance WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_inventory", "DELETE FROM character_inventory WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_pet", "DELETE FROM character_pet WHERE owner_guid NOT IN (SELECT guid FROM characters)" },
+        { "character_queststatus", "DELETE FROM character_queststatus WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_reputation", "DELETE FROM character_reputation WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_skills", "DELETE FROM character_skills WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_social", "DELETE FROM character_social WHERE guid NOT IN (SELECT guid FROM characters) OR friend NOT IN (SELECT guid FROM characters)" },
+        { "character_spell", "DELETE FROM character_spell WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_spell_cooldown", "DELETE FROM character_spell_cooldown WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "character_stats", "DELETE FROM character_stats WHERE guid NOT IN (SELECT guid FROM characters)" },
+        { "corpse", "DELETE FROM corpse WHERE player_guid NOT IN (SELECT guid FROM characters)" },
+        { "group_instance", "DELETE FROM group_instance WHERE leader_guid NOT IN (SELECT guid FROM characters)" },
+        { "groups", "DELETE FROM `groups` WHERE leader_guid NOT IN (SELECT guid FROM characters)" },
+        { "group_member", "DELETE FROM group_member WHERE member_guid NOT IN (SELECT guid FROM characters) OR group_id NOT IN (SELECT group_id FROM `groups`)" },
+        { "guild", "DELETE FROM guild WHERE leader_guid NOT IN (SELECT guid FROM characters)" },
+        { "guild_eventlog", "DELETE FROM guild_eventlog WHERE guild_id NOT IN (SELECT guild_id FROM guild)" },
+        { "guild_member", "DELETE FROM guild_member WHERE guild_id NOT IN (SELECT guild_id FROM guild) OR guid NOT IN (SELECT guid FROM characters)" },
+        { "guild_rank", "DELETE FROM guild_rank WHERE guild_id NOT IN (SELECT guild_id FROM guild)" },
+        { "item_instance", "DELETE FROM item_instance WHERE owner_guid NOT IN (SELECT guid FROM characters) AND owner_guid > 0" },
+        { "item_loot", "DELETE FROM item_loot WHERE owner_guid NOT IN (SELECT guid FROM characters)" },
+        { "mail", "DELETE FROM mail WHERE receiver_guid NOT IN (SELECT guid FROM characters)" },
+        { "mail_items", "DELETE FROM mail_items WHERE receiver_guid NOT IN (SELECT guid FROM characters)" },
+        { "petition", "DELETE FROM petition WHERE owner_guid NOT IN (SELECT guid FROM characters)" },
+        { "petition_sign", "DELETE FROM petition_sign WHERE owner_guid NOT IN (SELECT guid FROM characters) OR player_guid NOT IN (SELECT guid FROM characters)" },
+        { "pet_aura", "DELETE FROM pet_aura WHERE guid NOT IN (SELECT id FROM character_pet)" },
+        { "pet_spell", "DELETE FROM pet_spell WHERE guid NOT IN (SELECT id FROM character_pet)" },
+        { "pet_spell_cooldown", "DELETE FROM pet_spell_cooldown WHERE guid NOT IN (SELECT id FROM character_pet)" }
+    };
+
+    for (CharacterCleanupQuery const& cleanupQuery : cleanupQueries)
+        ExecuteCharacterCleanupDirect(cleanupQuery.tableName, cleanupQuery.sql);
+}
+
+void CleanupCharacterDataForGuidDirect(uint32 guidlow)
+{
+    static char const* const guidTables[] =
+    {
+        "character_action",
+        "character_inventory",
+        "character_spell",
+        "character_spell_cooldown",
+        "character_stats",
+        "character_homebind",
+        "character_skills",
+        "character_reputation",
+        "character_queststatus",
+        "character_aura"
+    };
+
+    for (char const* tableName : guidTables)
+    {
+        if (!CharacterTableExists(tableName))
+            continue;
+
+        CharacterDatabase.DirectPExecute("DELETE FROM `%s` WHERE `guid` = '%u'", tableName, guidlow);
+    }
+
+    if (CharacterTableExists("playerbots_random_bots"))
+        CharacterDatabase.DirectPExecute("DELETE FROM `playerbots_random_bots` WHERE `bot` = '%u'", guidlow);
+}
+
+bool WaitForCharacterRow(uint32 guidlow, uint32 attempts = 100, uint32 sleepMs = 50)
+{
+    for (uint32 attempt = 0; attempt < attempts; ++attempt)
+    {
+        if (CharacterDatabase.PQuery("SELECT `guid` FROM `characters` WHERE `guid` = '%u'", guidlow))
+            return true;
+
+        if (attempt + 1 < attempts)
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleepMs));
+    }
+
+    return false;
+}
+
 class RandomBotLoginQueryHolder : public SqlQueryHolder
 {
 public:
     explicit RandomBotLoginQueryHolder(ObjectGuid guid) : SqlQueryHolder(guid.GetCounter()), guid_(guid) {}
+    ~RandomBotLoginQueryHolder()
+    {
+        DeleteAllResults();
+    }
 
     bool Initialize()
     {
         SetSize(MAX_PLAYER_LOGIN_QUERY);
+        bool res = true;
 
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADFROM,            "SELECT `guid`, `account`, `name`, `race`, `class`, `gender`, `level`, `xp`, `money`, `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `bank_bag_slots`, `character_flags`, "
+                                                                 "`position_x`, `position_y`, `position_z`, `map`, `orientation`, `known_taxi_mask`, `played_time_total`, `played_time_level`, `rest_bonus`, `logout_time`, `reset_talents_multiplier`, "
+                                                                 "`reset_talents_time`, `transport_guid`, `transport_x`, `transport_y`, `transport_z`, `transport_o`, `extra_flags`, `stable_slots`, `death_expire_time`, `current_taxi_path`, "
+                                                                 "`honor_rank_points`, `honor_highest_rank`, `honor_standing`, `honor_last_week_hk`, `honor_last_week_cp`, `honor_stored_hk`, `honor_stored_dk`, "
+                                                                 "`watched_faction`, `drunk`, `health`, `power1`, `power2`, `power3`, `power4`, `power5`, `explored_zones`, `ammo_id`, `action_bars`, "
+                                                                 "`world_phase_mask`, `create_time`, `instance` FROM `characters` WHERE `guid` = '%u'", guid_.GetCounter());
         SetResult(PLAYER_LOGIN_QUERY_LOADFROM, CharacterDatabase.PQuery(
             "SELECT `guid`, `account`, `name`, `race`, `class`, `gender`, `level`, `xp`, `money`, `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `bank_bag_slots`, `character_flags`, "
             "`position_x`, `position_y`, `position_z`, `map`, `orientation`, `known_taxi_mask`, `played_time_total`, `played_time_level`, `rest_bonus`, `logout_time`, `reset_talents_multiplier`, "
@@ -40,51 +158,48 @@ public:
             "`honor_rank_points`, `honor_highest_rank`, `honor_standing`, `honor_last_week_hk`, `honor_last_week_cp`, `honor_stored_hk`, `honor_stored_dk`, "
             "`watched_faction`, `drunk`, `health`, `power1`, `power2`, `power3`, `power4`, `power5`, `explored_zones`, `ammo_id`, `action_bars`, "
             "`world_phase_mask`, `create_time`, `instance` FROM `characters` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADGROUP, CharacterDatabase.PQuery(
-            "SELECT `group_id` FROM `group_member` WHERE `member_guid` ='%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES, CharacterDatabase.PQuery(
-            "SELECT `id`, `permanent`, `map`, `reset_time` FROM `character_instance` LEFT JOIN `instance` ON `instance` = `id` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADAURAS, CharacterDatabase.PQuery(
-            "SELECT `caster_guid`, `item_guid`, `spell`, `stacks`, `charges`, `base_points0`, `base_points1`, `base_points2`, `periodic_time0`, `periodic_time1`, `periodic_time2`, `max_duration`, `duration`, `effect_index_mask` FROM `character_aura` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADSPELLS, CharacterDatabase.PQuery(
-            "SELECT `spell`, `active`, `disabled` FROM `character_spell` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADQUESTSTATUS, CharacterDatabase.PQuery(
-            "SELECT `quest`, `status`, `rewarded`, `explored`, `timer`, `mob_count1`, `mob_count2`, `mob_count3`, `mob_count4`, `item_count1`, `item_count2`, `item_count3`, `item_count4`, `reward_choice` FROM `character_queststatus` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADHONORCP, CharacterDatabase.PQuery(
-            "SELECT `victim_type`, `victim_id`, `cp`, `date`, `type` FROM `character_honor_cp` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADREPUTATION, CharacterDatabase.PQuery(
-            "SELECT `faction`, `standing`, `flags` FROM `character_reputation` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADINVENTORY, CharacterDatabase.PQuery(
-            "SELECT * FROM (SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `bag`, `slot`, `item_guid`, `item_instance`.`item_id`, `generated_loot` FROM `character_inventory` JOIN `item_instance` ON `character_inventory`.`item_guid` = `item_instance`.`guid` WHERE `character_inventory`.`guid` = '%u') as t ORDER BY `bag`, `slot`",
-            guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADITEMLOOT, CharacterDatabase.PQuery(
-            "SELECT `guid`, `item_id`, `amount`, `property` FROM `item_loot` WHERE `owner_guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADACTIONS, CharacterDatabase.PQuery(
-            "SELECT `button`, `action`, `type` FROM `character_action` WHERE `guid` = '%u' ORDER BY `button`", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADSOCIALLIST, CharacterDatabase.PQuery(
-            "SELECT `friend`, `flags` FROM `character_social` WHERE `guid` = '%u' LIMIT 255", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADHOMEBIND, CharacterDatabase.PQuery(
-            "SELECT `map`, `zone`, `position_x`, `position_y`, `position_z` FROM `character_homebind` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS, CharacterDatabase.PQuery(
-            "SELECT `spell`, `spell_expire_time`, `category`, `category_expire_time`, `item_id` FROM `character_spell_cooldown` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADGUILD, CharacterDatabase.PQuery(
-            "SELECT `guild_id`, `rank` FROM `guild_member` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADBGDATA, CharacterDatabase.PQuery(
-            "SELECT `instance_id`, `team`, `join_x`, `join_y`, `join_z`, `join_o`, `join_map` FROM `character_battleground_data` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA, CharacterDatabase.PQuery(
-            "SELECT `type`, `time`, `data` FROM `character_account_data` WHERE `guid`='%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADSKILLS, CharacterDatabase.PQuery(
-            "SELECT `skill`, `value`, `max` FROM `character_skills` WHERE `guid` = '%u'", guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADMAILS, CharacterDatabase.PQuery(
-            "SELECT `id`, `message_type`, `sender_guid`, `receiver_guid`, `subject`, `item_text_id`, `expire_time`, `deliver_time`, `money`, `cod`, `checked`, `stationery`, `mail_template_id`, `has_items` FROM `mail` WHERE `receiver_guid` = '%u' ORDER BY `id` DESC",
-            guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS, CharacterDatabase.PQuery(
-            "SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `mail_id`, `item_guid`, `item_instance`.`item_id`, `generated_loot` FROM `mail_items` JOIN `item_instance` ON `item_guid` = `guid` WHERE `receiver_guid` = '%u'",
-            guid_.GetCounter()));
-        SetResult(PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS, CharacterDatabase.PQuery(
-            "SELECT `skill`, `value` FROM `character_forgotten_skills` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGROUP,           "SELECT `group_id` FROM `group_member` WHERE `member_guid` ='%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADGROUP, CharacterDatabase.PQuery("SELECT `group_id` FROM `group_member` WHERE `member_guid` ='%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES,  "SELECT `id`, `permanent`, `map`, `reset_time` FROM `character_instance` LEFT JOIN `instance` ON `instance` = `id` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES, CharacterDatabase.PQuery("SELECT `id`, `permanent`, `map`, `reset_time` FROM `character_instance` LEFT JOIN `instance` ON `instance` = `id` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADAURAS,           "SELECT `caster_guid`, `item_guid`, `spell`, `stacks`, `charges`, `base_points0`, `base_points1`, `base_points2`, `periodic_time0`, `periodic_time1`, `periodic_time2`, `max_duration`, `duration`, `effect_index_mask` FROM `character_aura` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADAURAS, CharacterDatabase.PQuery("SELECT `caster_guid`, `item_guid`, `spell`, `stacks`, `charges`, `base_points0`, `base_points1`, `base_points2`, `periodic_time0`, `periodic_time1`, `periodic_time2`, `max_duration`, `duration`, `effect_index_mask` FROM `character_aura` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADSPELLS,          "SELECT `spell`, `active`, `disabled` FROM `character_spell` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADSPELLS, CharacterDatabase.PQuery("SELECT `spell`, `active`, `disabled` FROM `character_spell` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADQUESTSTATUS,     "SELECT `quest`, `status`, `rewarded`, `explored`, `timer`, `mob_count1`, `mob_count2`, `mob_count3`, `mob_count4`, `item_count1`, `item_count2`, `item_count3`, `item_count4`, `reward_choice` FROM `character_queststatus` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADQUESTSTATUS, CharacterDatabase.PQuery("SELECT `quest`, `status`, `rewarded`, `explored`, `timer`, `mob_count1`, `mob_count2`, `mob_count3`, `mob_count4`, `item_count1`, `item_count2`, `item_count3`, `item_count4`, `reward_choice` FROM `character_queststatus` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADHONORCP,         "SELECT `victim_type`, `victim_id`, `cp`, `date`, `type` FROM `character_honor_cp` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADHONORCP, CharacterDatabase.PQuery("SELECT `victim_type`, `victim_id`, `cp`, `date`, `type` FROM `character_honor_cp` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADREPUTATION,      "SELECT `faction`, `standing`, `flags` FROM `character_reputation` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADREPUTATION, CharacterDatabase.PQuery("SELECT `faction`, `standing`, `flags` FROM `character_reputation` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADINVENTORY,       "SELECT * FROM (SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `bag`, `slot`, `item_guid`, `item_instance`.`item_id`, `generated_loot` FROM `character_inventory` JOIN `item_instance` ON `character_inventory`.`item_guid` = `item_instance`.`guid` WHERE `character_inventory`.`guid` = '%u') as t ORDER BY `bag`, `slot`", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADINVENTORY, CharacterDatabase.PQuery("SELECT * FROM (SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `bag`, `slot`, `item_guid`, `item_instance`.`item_id`, `generated_loot` FROM `character_inventory` JOIN `item_instance` ON `character_inventory`.`item_guid` = `item_instance`.`guid` WHERE `character_inventory`.`guid` = '%u') as t ORDER BY `bag`, `slot`", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADITEMLOOT,        "SELECT `guid`, `item_id`, `amount`, `property` FROM `item_loot` WHERE `owner_guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADITEMLOOT, CharacterDatabase.PQuery("SELECT `guid`, `item_id`, `amount`, `property` FROM `item_loot` WHERE `owner_guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADACTIONS,         "SELECT `button`, `action`, `type` FROM `character_action` WHERE `guid` = '%u' ORDER BY `button`", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADACTIONS, CharacterDatabase.PQuery("SELECT `button`, `action`, `type` FROM `character_action` WHERE `guid` = '%u' ORDER BY `button`", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADSOCIALLIST,      "SELECT `friend`, `flags` FROM `character_social` WHERE `guid` = '%u' LIMIT 255", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADSOCIALLIST, CharacterDatabase.PQuery("SELECT `friend`, `flags` FROM `character_social` WHERE `guid` = '%u' LIMIT 255", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADHOMEBIND,        "SELECT `map`, `zone`, `position_x`, `position_y`, `position_z` FROM `character_homebind` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADHOMEBIND, CharacterDatabase.PQuery("SELECT `map`, `zone`, `position_x`, `position_y`, `position_z` FROM `character_homebind` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS,  "SELECT `spell`, `spell_expire_time`, `category`, `category_expire_time`, `item_id` FROM `character_spell_cooldown` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADSPELLCOOLDOWNS, CharacterDatabase.PQuery("SELECT `spell`, `spell_expire_time`, `category`, `category_expire_time`, `item_id` FROM `character_spell_cooldown` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGUILD,           "SELECT `guild_id`, `rank` FROM `guild_member` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADGUILD, CharacterDatabase.PQuery("SELECT `guild_id`, `rank` FROM `guild_member` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADBGDATA,          "SELECT `instance_id`, `team`, `join_x`, `join_y`, `join_z`, `join_o`, `join_map` FROM `character_battleground_data` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADBGDATA, CharacterDatabase.PQuery("SELECT `instance_id`, `team`, `join_x`, `join_y`, `join_z`, `join_o`, `join_map` FROM `character_battleground_data` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA,     "SELECT `type`, `time`, `data` FROM `character_account_data` WHERE `guid`='%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA, CharacterDatabase.PQuery("SELECT `type`, `time`, `data` FROM `character_account_data` WHERE `guid`='%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADSKILLS,          "SELECT `skill`, `value`, `max` FROM `character_skills` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADSKILLS, CharacterDatabase.PQuery("SELECT `skill`, `value`, `max` FROM `character_skills` WHERE `guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADMAILS,           "SELECT `id`, `message_type`, `sender_guid`, `receiver_guid`, `subject`, `item_text_id`, `expire_time`, `deliver_time`, `money`, `cod`, `checked`, `stationery`, `mail_template_id`, `has_items` FROM `mail` WHERE `receiver_guid` = '%u' ORDER BY `id` DESC", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADMAILS, CharacterDatabase.PQuery("SELECT `id`, `message_type`, `sender_guid`, `receiver_guid`, `subject`, `item_text_id`, `expire_time`, `deliver_time`, `money`, `cod`, `checked`, `stationery`, `mail_template_id`, `has_items` FROM `mail` WHERE `receiver_guid` = '%u' ORDER BY `id` DESC", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS,     "SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `mail_id`, `item_guid`, `item_instance`.`item_id`, `generated_loot` FROM `mail_items` JOIN `item_instance` ON `item_guid` = `guid` WHERE `receiver_guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS, CharacterDatabase.PQuery("SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `mail_id`, `item_guid`, `item_instance`.`item_id`, `generated_loot` FROM `mail_items` JOIN `item_instance` ON `item_guid` = `guid` WHERE `receiver_guid` = '%u'", guid_.GetCounter()));
+        res &= SetPQuery(PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS,    "SELECT `skill`, `value` FROM `character_forgotten_skills` WHERE `guid` = '%u'", guid_.GetCounter());
+        SetResult(PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS, CharacterDatabase.PQuery("SELECT `skill`, `value` FROM `character_forgotten_skills` WHERE `guid` = '%u'", guid_.GetCounter()));
 
-        return true;
+        return res;
     }
 
 private:
@@ -161,6 +276,57 @@ bool RandomPlayerbotFactory::LoadNameCacheEntry(
     } while (result->NextRow());
 
     return !names.empty();
+}
+
+bool RandomPlayerbotFactory::MaterializeRandomBot(WorldSession* session, uint32 guidlow, std::string const& name)
+{
+    ObjectGuid guid(HIGHGUID_PLAYER, guidlow);
+
+    if (!WaitForCharacterRow(guidlow))
+    {
+        LOG_ERROR("playerbots",
+            "Random bot row did not become visible after save for account %u - name: \"%s\", guid: %u",
+            session->GetAccountId(), name.c_str(), guidlow);
+        return false;
+    }
+
+    for (uint8 attempt = 0; attempt < 20; ++attempt)
+    {
+        std::unique_ptr<Player> bot(new Player(session));
+        RandomBotLoginQueryHolder holder(guid);
+        if (holder.Initialize() && bot->LoadFromDB(guid, &holder))
+        {
+            bot->SaveToDB(false, false);
+
+            if (PlayerCacheData* cacheData = sObjectMgr.GetPlayerDataByGUID(guidlow))
+            {
+                sObjectMgr.UpdatePlayerCachedPosition(cacheData, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(),
+                    bot->GetPositionZ(), bot->GetOrientation(), false);
+                cacheData->uiLevel = bot->GetLevel();
+                cacheData->uiZoneId = bot->GetCachedZoneId();
+            }
+
+            return true;
+        }
+
+        if (attempt + 1 < 20)
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    LOG_ERROR("playerbots",
+        "Unable to materialize random bot state for account %u - name: \"%s\", guid: %u",
+        session->GetAccountId(), name.c_str(), guidlow);
+    return false;
+}
+
+void RandomPlayerbotFactory::CleanupFailedRandomBotCreation(WorldSession* session, uint32 guidlow)
+{
+    CharacterDatabase.DirectPExecute("DELETE FROM `characters` WHERE `guid` = '%u'", guidlow);
+    CleanupCharacterDataForGuidDirect(guidlow);
+    sObjectMgr.DeletePlayerFromCache(guidlow);
+
+    LOG_DEBUG("playerbots", "Cleaned up failed random bot creation for account %u, guid %u",
+        session->GetAccountId(), guidlow);
 }
 
 bool RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<NameRaceAndGender, std::vector<std::string>>& nameCache)
@@ -274,24 +440,10 @@ bool RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, s
         return false;
     }
 
-    std::unique_ptr<Player> bot(new Player(session));
-    RandomBotLoginQueryHolder holder(ObjectGuid(HIGHGUID_PLAYER, guidlow));
-    if (!holder.Initialize() || !bot->LoadFromDB(ObjectGuid(HIGHGUID_PLAYER, guidlow), &holder))
+    if (!MaterializeRandomBot(session, guidlow, name))
     {
-        LOG_ERROR("playerbots",
-            "Unable to materialize random bot state for account %u - name: \"%s\", guid: %u",
-            session->GetAccountId(), name.c_str(), guidlow);
+        CleanupFailedRandomBotCreation(session, guidlow);
         return false;
-    }
-
-    bot->SaveToDB(false, false);
-
-    if (PlayerCacheData* cacheData = sObjectMgr.GetPlayerDataByGUID(guidlow))
-    {
-        sObjectMgr.UpdatePlayerCachedPosition(cacheData, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(),
-            bot->GetPositionZ(), bot->GetOrientation(), false);
-        cacheData->uiLevel = bot->GetLevel();
-        cacheData->uiZoneId = bot->GetCachedZoneId();
     }
 
     LOG_DEBUG("playerbots", "Random bot created - name: \"%s\", race: %u, class: %u",
@@ -565,10 +717,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
         LOG_INFO("playerbots", "Deleting all random bot characters and accounts...");
 
-        // First execute all the cleanup SQL commands
-        // Clear playerbots_random_bots and playerbots_account_type
-        // PlayerbotsDatabase.Execute("DELETE FROM playerbots_random_bots");
-        // PlayerbotsDatabase.Execute("DELETE FROM playerbots_account_type");
+        // Clear active random-bot state stored in the characters database.
+        CharacterDatabase.DirectExecute("DELETE FROM playerbots_random_bots");
 
         // Get the database names dynamically - not available in Vanilla, use hardcoded or skip
         // std::string loginDBName = LoginDatabase.GetConnectionInfo()->database;
@@ -593,57 +743,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         // PlayerbotsDatabase.Execute("DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM " + characterDBName + ".characters WHERE account IN (SELECT id FROM " + loginDBName + ".account WHERE username NOT LIKE '{}%%'))",
         //     sPlayerbotAIConfig.randomBotAccountPrefix.c_str());
 
-        // Clean up orphaned records in character-related tables
-        CharacterDatabase.Execute("DELETE FROM arena_team_member WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM arena_team WHERE arenaTeamId NOT IN (SELECT arenaTeamId FROM arena_team_member)");
-        CharacterDatabase.Execute("DELETE FROM character_account_data WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_achievement WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_achievement_progress WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_action WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_arena_stats WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_aura WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_entry_point WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_glyphs WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_homebind WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_inventory WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM item_instance WHERE owner_guid NOT IN (SELECT guid FROM characters) AND owner_guid > 0");
-
-        // Clean up pet data
-        CharacterDatabase.Execute("DELETE FROM character_pet WHERE owner NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM pet_aura WHERE guid NOT IN (SELECT id FROM character_pet)");
-        CharacterDatabase.Execute("DELETE FROM pet_spell WHERE guid NOT IN (SELECT id FROM character_pet)");
-        CharacterDatabase.Execute("DELETE FROM pet_spell_cooldown WHERE guid NOT IN (SELECT id FROM character_pet)");
-
-        // Clean up character data
-        CharacterDatabase.Execute("DELETE FROM character_queststatus WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_queststatus_rewarded WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_reputation WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_skills WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_social WHERE friend NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_spell WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_spell_cooldown WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM character_talent WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM corpse WHERE guid NOT IN (SELECT guid FROM characters)");
-
-        // Clean up group data
-        CharacterDatabase.Execute("DELETE FROM `groups` WHERE leaderGuid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM group_member WHERE memberGuid NOT IN (SELECT guid FROM characters)");
-
-        // Clean up mail
-        CharacterDatabase.Execute("DELETE FROM mail WHERE receiver NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM mail_items WHERE receiver NOT IN (SELECT guid FROM characters)");
-
-        // Clean up guild data
-        CharacterDatabase.Execute("DELETE FROM guild WHERE leaderguid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM guild_bank_eventlog WHERE guildid NOT IN (SELECT guildid FROM guild)");
-        CharacterDatabase.Execute("DELETE FROM guild_member WHERE guildid NOT IN (SELECT guildid FROM guild) OR guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM guild_rank WHERE guildid NOT IN (SELECT guildid FROM guild)");
-
-        // Clean up petition data
-        CharacterDatabase.Execute("DELETE FROM petition WHERE ownerguid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM petition_sign WHERE ownerguid NOT IN (SELECT guid FROM characters) OR playerguid NOT IN (SELECT guid FROM characters)");
-
-        // Finally, delete the bot accounts themselves
+        // Delete the bot accounts before orphan cleanup so per-character rows are detached first.
         LOG_INFO("playerbots", "Deleting random bot accounts...");
         auto results = LoginDatabase.PQuery("SELECT id FROM account WHERE username LIKE '%s%%'",
                                               sPlayerbotAIConfig.randomBotAccountPrefix.c_str());
@@ -673,16 +773,15 @@ void RandomPlayerbotFactory::CreateRandomBots()
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        // Flush tables to ensure all data in memory are written to disk
-        LoginDatabase.Execute("FLUSH TABLES");
-        CharacterDatabase.Execute("FLUSH TABLES");
-        // PlayerbotsDatabase.Execute("FLUSH TABLES");
+        CleanupOrphanedCharacterDataDirect();
 
         LOG_INFO("playerbots", ">> Random bot accounts and data deleted in %u ms", GetMSTimeDiffToNow(timer));
         LOG_INFO("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
         World::StopNow(SHUTDOWN_EXIT_CODE);
         return;
     }
+
+    CleanupOrphanedCharacterDataDirect();
 
     LOG_INFO("playerbots", "Creating random bot accounts...");
     std::unordered_map<NameRaceAndGender, std::vector<std::string>> nameCache;
