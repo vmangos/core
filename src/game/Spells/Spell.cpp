@@ -5603,7 +5603,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             if (m_casterUnit->IsInCombat() && m_spellInfo->IsNonCombatSpell())
                 return SPELL_FAILED_AFFECTING_COMBAT;
 
-            if (m_casterUnit->IsCharmerOrOwnerPlayerOrPlayerItself() && !ValidateExplicitTargetMask())
+            if (m_isClientStarted && !ValidateExplicitTargetMask())
                 return SPELL_FAILED_BAD_TARGETS;
 
             SpellCastResult shapeError = m_spellInfo->GetErrorAtShapeshiftedCast(m_casterUnit->GetShapeshiftForm());
@@ -6892,7 +6892,8 @@ SpellCastResult Spell::CheckCasterAuras() const
 
 bool Spell::ValidateExplicitTargetMask() const
 {
-    if (!m_casterUnit)
+    Player* pPlayer = ToPlayer(m_casterUnit);
+    if (!pPlayer)
         return true;
 
     static constexpr uint32 verifiableTargetFlags[] = { TARGET_FLAG_UNIT , TARGET_FLAG_ITEM , TARGET_FLAG_SOURCE_LOCATION , TARGET_FLAG_DEST_LOCATION  , TARGET_FLAG_GAMEOBJECT };
@@ -6901,12 +6902,9 @@ bool Spell::ValidateExplicitTargetMask() const
 
     if (!allowedTargetMask && m_targets.m_targetMask)
     {
-        if (Player* pPlayer = m_casterUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
-        {
-            std::stringstream oss;
-            oss << "Casting spell " << m_spellInfo->Id << " with unexpected target mask (" << m_targets.m_targetMask << ") when none were expected";
-            pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
-        }
+        std::stringstream oss;
+        oss << "Casting spell " << m_spellInfo->Id << " with unexpected target mask (" << m_targets.m_targetMask << ") when none were expected";
+        pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
         return false;
     }
 
@@ -6914,23 +6912,17 @@ bool Spell::ValidateExplicitTargetMask() const
     {
         if ((m_targets.m_targetMask & flag) && !(allowedTargetMask & flag))
         {
-            if (Player* pPlayer = m_casterUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
-            {
-                std::stringstream oss;
-                oss << "Casting spell " << m_spellInfo->Id << " with unexpected " << SpellCastTargetFlagToString(flag) << " (" << flag << ") included in the target mask (" << m_targets.m_targetMask << ")";
-                pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
-            }
+            std::stringstream oss;
+            oss << "Casting spell " << m_spellInfo->Id << " with unexpected " << SpellCastTargetFlagToString(flag) << " (" << flag << ") included in the target mask (" << m_targets.m_targetMask << ")";
+            pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
             return false;
         }
 
         if (!(m_targets.m_targetMask & flag) && (expectedTargetMask & flag))
         {
-            if (Player* pPlayer = m_casterUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
-            {
-                std::stringstream oss;
-                oss << "Casting spell " << m_spellInfo->Id << " with expected " << SpellCastTargetFlagToString(flag) << " (" << flag << ") not included in the target mask (" << m_targets.m_targetMask << ")";
-                pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
-            }
+            std::stringstream oss;
+            oss << "Casting spell " << m_spellInfo->Id << " with expected " << SpellCastTargetFlagToString(flag) << " (" << flag << ") not included in the target mask (" << m_targets.m_targetMask << ")";
+            pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
             return false;
         }
     }
