@@ -6,8 +6,8 @@
 #ifndef _PLAYERBOT_PLAYERBOTAIBASE_H
 #define _PLAYERBOT_PLAYERBOTAIBASE_H
 
-#include "Define.h"
-#include "PlayerbotAIConfig.h"
+#include "PlayerBotsCompat/Define.h"
+#include "ModPlayerBots/PlayerbotAIConfig.h"
 
 class PlayerbotAIBase
 {

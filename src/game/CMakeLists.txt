@@ -490,111 +490,9 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Movement
   ${CMAKE_CURRENT_SOURCE_DIR}/Movement/spline
   ${CMAKE_CURRENT_SOURCE_DIR}/Objects
-    ${CMAKE_CURRENT_SOURCE_DIR}/OutdoorPvP
-    ${CMAKE_CURRENT_SOURCE_DIR}/PacketBroadcast
-    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat
-    ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base/Actions
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base/Value
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Debug
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Cmd
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/Value
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Factory
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Db
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Guild
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Item
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Move
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Security
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Talent
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Text
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Travel
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Script
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Script/WorldThr
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Util
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/WorldPacket
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Dk
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Dk/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Dk/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Dk/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Druid
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Druid/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Druid/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Druid/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Hunter
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Hunter/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Hunter/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Hunter/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Mage
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Mage/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Mage/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Mage/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Paladin
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Paladin/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Paladin/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Paladin/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Priest
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Priest/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Priest/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Priest/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Rogue
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Rogue/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Rogue/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Rogue/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Shaman
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Shaman/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Shaman/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Shaman/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warlock
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warlock/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warlock/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warlock/Trigger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warrior
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warrior/Action
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warrior/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warrior/Trigger
-  )
-  
-  include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Dungeon
-  )
-  
-  # Add all Dungeon/Raid/World subdirectories dynamically
-  file(GLOB_RECURSE DUNGEON_DIRS
-    LIST_DIRECTORIES true
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Dungeon/*
-  )
-  foreach(DIR ${DUNGEON_DIRS})
-    if(IS_DIRECTORY ${DIR})
-      include_directories(${DIR})
-    endif()
-  endforeach()
-  
-  file(GLOB_RECURSE RAID_DIRS
-    LIST_DIRECTORIES true
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Raid/*
-  )
-  foreach(DIR ${RAID_DIRS})
-    if(IS_DIRECTORY ${DIR})
-      include_directories(${DIR})
-    endif()
-  endforeach()
-  
-  include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/World/Rpg
-  )
-
-  include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Server
+  ${CMAKE_CURRENT_SOURCE_DIR}/OutdoorPvP
+  ${CMAKE_CURRENT_SOURCE_DIR}/PacketBroadcast
+  ${CMAKE_CURRENT_SOURCE_DIR}/Server
   ${CMAKE_CURRENT_SOURCE_DIR}/Server/Protocol
   ${CMAKE_CURRENT_SOURCE_DIR}/Spells
   ${CMAKE_CURRENT_SOURCE_DIR}/Threat
@@ -615,6 +513,102 @@ include_directories(
   ${OPENSSL_INCLUDE_DIR}
   ${ZLIB_INCLUDE_DIRS}
 )
+
+set(PLAYERBOTS_PRIVATE_INCLUDE_DIRS
+  ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat
+  ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/TrinityStubs
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base/Actions
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Base/Value
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Debug
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Cmd
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/Value
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Factory
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Db
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Guild
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Item
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Move
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Security
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Talent
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Text
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Mgr/Travel
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Script
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Script/WorldThr
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Util
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Bot/Engine/WorldPacket
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Dk
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Dk/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Dk/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Dk/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Druid
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Druid/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Druid/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Druid/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Hunter
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Hunter/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Hunter/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Hunter/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Mage
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Mage/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Mage/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Mage/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Paladin
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Paladin/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Paladin/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Paladin/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Priest
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Priest/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Priest/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Priest/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Rogue
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Rogue/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Rogue/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Rogue/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Shaman
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Shaman/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Shaman/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Shaman/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warlock
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warlock/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warlock/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warlock/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warrior
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warrior/Action
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warrior/Strategy
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Class/Warrior/Trigger
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Dungeon
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/World/Rpg
+)
+
+# Add all Dungeon/Raid subdirectories dynamically for bot-only includes.
+file(GLOB_RECURSE DUNGEON_DIRS
+  LIST_DIRECTORIES true
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Dungeon/*
+)
+foreach(DIR ${DUNGEON_DIRS})
+  if(IS_DIRECTORY ${DIR})
+    list(APPEND PLAYERBOTS_PRIVATE_INCLUDE_DIRS ${DIR})
+  endif()
+endforeach()
+
+file(GLOB_RECURSE RAID_DIRS
+  LIST_DIRECTORIES true
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModPlayerBots/Ai/Raid/*
+)
+foreach(DIR ${RAID_DIRS})
+  if(IS_DIRECTORY ${DIR})
+    list(APPEND PLAYERBOTS_PRIVATE_INCLUDE_DIRS ${DIR})
+  endif()
+endforeach()
 
 if(NOT USE_STD_MALLOC)
   include_directories(
@@ -677,7 +671,6 @@ list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/A
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/ArenaTeamActions\\.cpp$")
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Strategy/BattlegroundStrategy\\.cpp$")
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/VehicleActions\\.cpp$")
-list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/UseMeetingStoneAction\\.cpp$")
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/WhoAction\\.cpp$")
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/WipeAction\\.cpp$")
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Base/Actions/WorldBuffAction\\.cpp$")
@@ -706,9 +699,6 @@ list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Mgr/Guild/GuildTa
 # Death Knight is WotLK-only and should not be part of the Vanilla build.
 list(FILTER MODPLAYERBOTS_SRCS EXCLUDE REGEX ".*/ModPlayerBots/Ai/Class/Dk/.*\\.(cpp|h)$")
 
-# Add ModPlayerBots sources to game_SRCS
-list(APPEND game_SRCS ${MODPLAYERBOTS_SRCS})
-
 # Add PlayerBotsCompat stubs that need compilation
 set(PLAYERBOTS_COMPAT_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/ChatBotCommandsCompat.cpp
@@ -719,33 +709,45 @@ set(PLAYERBOTS_COMPAT_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/PlayerBotMgrCompat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/GuildTaskMgrCompat.cpp
 )
-list(APPEND game_SRCS ${PLAYERBOTS_COMPAT_SRCS})
-
-# Add preinclude for PlayerBotsCompat stubs
-set_source_files_properties(${PLAYERBOTS_COMPAT_SRCS} PROPERTIES
-    COMPILE_FLAGS "-include ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/Preinclude.h"
-)
-
-# Add preinclude for ModPlayerBots files only
-set_source_files_properties(${MODPLAYERBOTS_SRCS} PROPERTIES
-    COMPILE_FLAGS "-include ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/Preinclude.h"
-)
 
 add_library(game STATIC
   ${game_SRCS}
 )
 
+add_library(playerbots STATIC
+  ${MODPLAYERBOTS_SRCS}
+  ${PLAYERBOTS_COMPAT_SRCS}
+)
+
 SET_TARGET_PROPERTIES (game PROPERTIES FOLDER "Game Libs")
+SET_TARGET_PROPERTIES (playerbots PROPERTIES FOLDER "Game Libs")
 
 target_link_libraries(game
   shared
   Detour
 )
 
+target_link_libraries(playerbots
+  shared
+  Detour
+)
+
+target_include_directories(playerbots PRIVATE
+  ${PLAYERBOTS_PRIVATE_INCLUDE_DIRS}
+)
+
 #add_dependencies(game revision.h)
 
 # Generate precompiled header
 if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
+  set_source_files_properties(${PLAYERBOTS_COMPAT_SRCS} PROPERTIES
+      COMPILE_FLAGS "-include ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/Preinclude.h"
+  )
+
+  set_source_files_properties(${MODPLAYERBOTS_SRCS} PROPERTIES
+      COMPILE_FLAGS "-include ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/Preinclude.h"
+  )
+
   if(USE_PCH)
     if(MSVC OR XCODE)
       if(MSVC)
@@ -757,8 +759,18 @@ if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
     endif()
   endif()
 else()
+  if(NOT USE_PCH)
+    set_source_files_properties(${PLAYERBOTS_COMPAT_SRCS} PROPERTIES
+        COMPILE_FLAGS "-include ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/Preinclude.h"
+    )
+
+    set_source_files_properties(${MODPLAYERBOTS_SRCS} PROPERTIES
+        COMPILE_FLAGS "-include ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBotsCompat/Preinclude.h"
+    )
+  endif()
+
   if(USE_PCH)
-      target_precompile_headers(game PRIVATE
+    target_precompile_headers(game PRIVATE
       Server/WorldSocket.h
       ../shared/Common.h
       Maps/MapManager.h
@@ -771,6 +783,10 @@ else()
       Guild/GuildMgr.h
       ObjectMgr.h
       ScriptMgr.h
-      )
+    )
+
+    target_precompile_headers(playerbots PRIVATE
+      PlayerBotsCompat/Preinclude.h
+    )
   endif()
 endif()

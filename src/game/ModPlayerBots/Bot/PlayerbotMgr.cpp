@@ -771,7 +771,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         (bot->GetMapId() != master->GetMapId() || bot->GetDistance(master) > sPlayerbotAIConfig.sightDistance))
     {
         SummonAction summonAction(botAI, "group summon");
-        summonAction.Teleport(master, bot, true);
+        summonAction.Teleport(master, bot, true, master, "group join");
     }
     // if (master)
     // {

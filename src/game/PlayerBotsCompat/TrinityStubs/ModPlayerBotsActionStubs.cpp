@@ -1,33 +1,7 @@
-#include "UseMeetingStoneAction.h"
 #include "VehicleActions.h"
 #include "WhoAction.h"
 #include "WipeAction.h"
 #include "WorldBuffAction.h"
-
-bool SummonAction::Execute(Event)
-{
-    return false;
-}
-
-bool SummonAction::Teleport(Player*, Player*, bool)
-{
-    return false;
-}
-
-bool SummonAction::SummonUsingGos(Player*, Player*, bool)
-{
-    return false;
-}
-
-bool SummonAction::SummonUsingNpcs(Player*, Player*, bool)
-{
-    return false;
-}
-
-bool UseMeetingStoneAction::Execute(Event)
-{
-    return false;
-}
 
 bool EnterVehicleAction::Execute(Event)
 {

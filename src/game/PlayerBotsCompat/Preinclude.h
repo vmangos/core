@@ -11,6 +11,7 @@
 #include "Database/DBCEnums.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
+#include "Server/Protocol/Opcodes.h"
 #include "PlayerBotsCompat/TrinityStubs/GameTime.h"
 #include "PlayerBotsCompat/TrinityStubs/CharacterCache.h"
 #include "Transports/Transport.h"

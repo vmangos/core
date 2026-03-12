@@ -86,6 +86,7 @@ add_executable(${EXECUTABLE_NAME}
 if(USE_SCRIPTS)
   target_link_libraries(${EXECUTABLE_NAME}
     game
+    playerbots
     scripts
     shared
     framework
@@ -95,6 +96,7 @@ if(USE_SCRIPTS)
 else()
   target_link_libraries(${EXECUTABLE_NAME}
     game
+    playerbots
     #scripts
     shared
     framework

@@ -82,7 +82,7 @@ public:
                 if (targetAI)
                 {
                     SummonAction summonAction(targetAI, "group summon");
-                    summonAction.Teleport(bot, target, true);
+                    summonAction.Teleport(bot, target, true, nullptr, "group invite operation");
                 }
             }
             return true;

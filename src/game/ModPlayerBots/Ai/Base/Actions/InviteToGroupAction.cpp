@@ -9,6 +9,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotSecurity.h"
 #include "Playerbots.h"
 
 namespace
@@ -30,7 +31,7 @@ bool CanInviteToGroup(Player* inviter, Player* player)
     if (inviter->GetGroup() && !inviter->GetGroup()->IsLeader(inviter->GetGUID()))
         return false;
 
-    if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP) && inviter->GetTeam() != player->GetTeam())
+    if (!PlayerbotSecurity::IsFactionInteractionAllowed(player, inviter))
         return false;
 
     return true;

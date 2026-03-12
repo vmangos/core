@@ -34,6 +34,22 @@ bool AcceptInvitationAction::Execute(Event event)
         return false;
     }
 
+    if (!PlayerbotSecurity::IsFactionInteractionAllowed(bot, inviter))
+    {
+        bool const allowTwoSideGroup = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP);
+        LOG_INFO("playerbots",
+            "Invite accept denied by faction policy: inviter=%s inviterGuidLow=%u inviterTeam=%u inviterSecurity=%u "
+            "bot=%s botGuidLow=%u botTeam=%u allowTwoSideGroup=%u",
+            inviter->GetName(), inviter->GetGUIDLow(), inviter->GetTeam(),
+            inviter->GetSession() ? inviter->GetSession()->GetSecurity() : 0, bot->GetName(), bot->GetGUIDLow(),
+            bot->GetTeam(), allowTwoSideGroup);
+        WorldPacket data(SMSG_GROUP_DECLINE, 10);
+        data << bot->GetName();
+        inviter->SendDirectMessage(&data);
+        bot->UninviteFromGroup();
+        return false;
+    }
+
     if (!botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, inviter))
     {
         LOG_INFO("playerbots", "Invite accept rejected by security: %s (%u) inviter=%s (%u)",
@@ -73,7 +89,7 @@ bool AcceptInvitationAction::Execute(Event event)
 
     if (sPlayerbotAIConfig.summonWhenGroup && bot->GetDistance(inviter) > sPlayerbotAIConfig.sightDistance)
     {
-        Teleport(inviter, bot, true);
+        Teleport(inviter, bot, true, inviter, "group invite");
     }
     return true;
 }

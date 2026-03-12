@@ -44,6 +44,7 @@ class PlayerbotSecurity
 public:
     PlayerbotSecurity(Player* const bot);
 
+    static bool IsFactionInteractionAllowed(Player const* bot, Player const* requester);
     PlayerbotSecurityLevel LevelFor(Player* from, DenyReason* reason = nullptr, bool ignoreGroup = false);
     bool CheckLevelFor(PlayerbotSecurityLevel level, bool silent, Player* from, bool ignoreGroup = false);
 

@@ -14,6 +14,38 @@
 #include "Playerbots.h"
 #include "PositionValue.h"
 
+namespace
+{
+void NotifySummonPlayer(Player* bot, Player* notifyPlayer, std::string const& text)
+{
+    if (!bot || !notifyPlayer || !bot->IsInWorld() || !notifyPlayer->IsInWorld())
+        return;
+
+    bot->MonsterWhisper(text.c_str(), notifyPlayer);
+}
+
+Player* ResolveSummonNotifyPlayer(PlayerbotAI* botAI, Player* notifyPlayer)
+{
+    if (botAI && notifyPlayer == botAI->GetBot())
+        return botAI->GetMaster();
+
+    if (notifyPlayer)
+        return notifyPlayer;
+
+    return botAI ? botAI->GetMaster() : nullptr;
+}
+
+char const* GetSummonSourceTag(char const* source)
+{
+    return source ? source : "summon";
+}
+
+bool TeleportPlayerTo(Player* summoner, Player* player, float x, float y, float z, float orientation)
+{
+    return player && summoner && player->TeleportTo(summoner->GetMapId(), x, y, z, orientation);
+}
+}  // namespace
+
 bool UseMeetingStoneAction::Execute(Event event)
 {
     Player* master = GetMaster();
@@ -25,18 +57,15 @@ bool UseMeetingStoneAction::Execute(Event event)
     ObjectGuid guid;
     p >> guid;
 
-    if (master->GetTarget() && master->GetTarget() != bot->GetGUID())
+    if (master->GetTarget() && master->GetTarget() != bot->GetObjectGuid())
         return false;
 
     if (!master->GetTarget() && master->GetGroup() != bot->GetGroup())
         return false;
 
-    if (master->IsBeingTeleported())
-        return false;
-
     if (bot->IsInCombat())
     {
-        botAI->TellError("I am in combat");
+        NotifySummonPlayer(bot, ResolveSummonNotifyPlayer(botAI, master), "Summon failed: I am in combat.");
         return false;
     }
 
@@ -49,10 +78,10 @@ bool UseMeetingStoneAction::Execute(Event event)
         return false;
 
     GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
-    if (!goInfo || goInfo->entry != 179944)
+    if (!goInfo || goInfo->type != GAMEOBJECT_TYPE_MEETINGSTONE)
         return false;
 
-    return Teleport(master, bot, false);
+    return Teleport(master, bot, false, master, "meeting stone");
 }
 
 bool SummonAction::Execute(Event event)
@@ -65,7 +94,7 @@ bool SummonAction::Execute(Event event)
         botAI->PetFollow();
 
     AI_VALUE(std::list<FleeInfo>&, "recently flee info").clear();
-    return Teleport(master, bot, true);
+    return Teleport(master, bot, true, master, "chat summon");
 }
 
 bool SummonAction::SummonUsingGos(Player* summoner, Player* player, bool preserveAuras)
@@ -78,10 +107,11 @@ bool SummonAction::SummonUsingGos(Player* summoner, Player* player, bool preserv
     for (GameObject* go : targets)
     {
         if (go->isSpawned() && go->GetGoType() == GAMEOBJECT_TYPE_MEETINGSTONE)
-            return Teleport(summoner, player, preserveAuras);
+            return Teleport(summoner, player, preserveAuras, summoner, "meeting stone");
     }
 
-    botAI->TellError(summoner == bot ? "There is no meeting stone nearby" : "There is no meeting stone near you");
+    NotifySummonPlayer(bot, ResolveSummonNotifyPlayer(botAI, summoner),
+                       summoner == bot ? "There is no meeting stone nearby" : "There is no meeting stone near you");
     return false;
 }
 
@@ -101,13 +131,15 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player, bool preser
         {
             if (!player->HasItemCount(6948, 1, false))
             {
-                botAI->TellError(player == bot ? "I have no hearthstone" : "You have no hearthstone");
+                NotifySummonPlayer(bot, ResolveSummonNotifyPlayer(botAI, summoner),
+                                   player == bot ? "I have no hearthstone" : "You have no hearthstone");
                 return false;
             }
 
-            if (player->HasSpellCooldown(8690))
+            if (!player->IsSpellReady(8690))
             {
-                botAI->TellError(player == bot ? "My hearthstone is not ready" : "Your hearthstone is not ready");
+                NotifySummonPlayer(bot, ResolveSummonNotifyPlayer(botAI, summoner),
+                                   player == bot ? "My hearthstone is not ready" : "Your hearthstone is not ready");
                 return false;
             }
 
@@ -119,43 +151,65 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player, bool preser
             Spell spell(player, spellInfo, TRIGGERED_NONE);
             spell.SendSpellCooldown();
 
-            return Teleport(summoner, player, preserveAuras);
+            return Teleport(summoner, player, preserveAuras, summoner, "innkeeper summon");
         }
     }
 
-    botAI->TellError(summoner == bot ? "There are no innkeepers nearby" : "There are no innkeepers near you");
+    NotifySummonPlayer(bot, ResolveSummonNotifyPlayer(botAI, summoner),
+                       summoner == bot ? "There are no innkeepers nearby" : "There are no innkeepers near you");
     return false;
 }
 
-bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras)
+bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras, Player* notifyPlayer,
+                            char const* source)
 {
     if (!summoner || summoner == player)
         return false;
 
+    notifyPlayer = ResolveSummonNotifyPlayer(botAI, notifyPlayer);
+    char const* sourceTag = GetSummonSourceTag(source);
+
+#if PB_HAS_VEHICLES
     if (player->GetVehicle())
     {
-        botAI->TellError("You cannot summon me while I'm on a vehicle");
+        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: I am on a vehicle.");
+        LOG_INFO("playerbots", "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=bot_on_vehicle", sourceTag,
+            summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow());
+        return false;
+    }
+#endif
+
+    if (summoner->IsBeingTeleported() || player->IsBeingTeleported())
+    {
+        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: one of us is already teleporting.");
+        LOG_INFO("playerbots",
+            "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=already_teleporting summonerTeleporting=%u botTeleporting=%u",
+            sourceTag, summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow(),
+            summoner->IsBeingTeleported(), player->IsBeingTeleported());
         return false;
     }
 
-    if (summoner->IsBeingTeleported() || player->IsBeingTeleported())
-        return false;
-
     if (summoner->IsInCombat() && !sPlayerbotAIConfig.allowSummonInCombat)
     {
-        botAI->TellError("You cannot summon me while you're in combat");
+        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: you are in combat.");
+        LOG_INFO("playerbots", "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=summoner_in_combat", sourceTag,
+            summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow());
         return false;
     }
 
     if (!summoner->IsAlive() && !sPlayerbotAIConfig.allowSummonWhenMasterIsDead)
     {
-        botAI->TellError("You cannot summon me while you're dead");
+        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: you are dead.");
+        LOG_INFO("playerbots", "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=summoner_dead", sourceTag,
+            summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow());
         return false;
     }
 
     if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) && !sPlayerbotAIConfig.allowSummonWhenBotIsDead)
     {
-        botAI->TellError("You cannot summon me while I'm dead, you need to release my spirit first");
+        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: I am dead and cannot be revived for summon.");
+        LOG_INFO("playerbots", "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=bot_dead", sourceTag,
+            summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow());
         return false;
     }
 
@@ -167,44 +221,67 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
     {
         bot->ResurrectPlayer(1.0f, false);
         bot->SpawnCorpseBones();
-        botAI->TellMasterNoFacing("I live, again!");
+        NotifySummonPlayer(bot, notifyPlayer, "I live, again!");
         botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Reset();
     }
 
-    float x = summoner->GetPositionX();
-    float y = summoner->GetPositionY();
-    float z = summoner->GetPositionZ();
-    float angle = summoner->GetOrientation() + GetFollowAngle();
-    summoner->GetNearPoint(player, x, y, z, 0.0f, sPlayerbotAIConfig.followDistance, angle);
-
     if (sPlayerbotAIConfig.botRepairWhenSummon)  // .conf option to repair bot gear when summoned 0 = off, 1 = on
-        bot->DurabilityRepairAll(false, 1.0f, false);
+        bot->DurabilityRepairAll(false, 1.0f);
 
     if (!preserveAuras)
         player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
 
-    if (!player->TeleportTo(summoner->GetMapId(), x, y, z, summoner->GetOrientation()))
+    float destX = summoner->GetPositionX();
+    float destY = summoner->GetPositionY();
+    float destZ = summoner->GetPositionZ();
+    float destO = summoner->GetOrientation();
+    bool usedFallback = false;
+
+    if (!TeleportPlayerTo(summoner, player, destX, destY, destZ, destO))
     {
-        if (summoner != player)
-            botAI->TellError("Not enough place to summon");
-        return false;
+        float fallbackX = summoner->GetPositionX();
+        float fallbackY = summoner->GetPositionY();
+        float fallbackZ = summoner->GetPositionZ();
+        float fallbackAngle = summoner->GetOrientation() + GetFollowAngle();
+        summoner->GetNearPoint(player, fallbackX, fallbackY, fallbackZ, 0.0f, sPlayerbotAIConfig.followDistance,
+                               fallbackAngle);
+
+        if (!TeleportPlayerTo(summoner, player, fallbackX, fallbackY, fallbackZ, destO))
+        {
+            NotifySummonPlayer(bot, notifyPlayer, "Summon failed: no valid place to teleport.");
+            LOG_INFO("playerbots",
+                "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=no_valid_placement map=%u exact=(%.2f, %.2f, %.2f) fallback=(%.2f, %.2f, %.2f)",
+                sourceTag, summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow(),
+                summoner->GetMapId(), destX, destY, destZ, fallbackX, fallbackY, fallbackZ);
+            return false;
+        }
+
+        destX = fallbackX;
+        destY = fallbackY;
+        destZ = fallbackZ;
+        usedFallback = true;
     }
 
     player->GetMotionMaster()->Clear();
     AI_VALUE(LastMovement&, "last movement").clear();
 
-    if (player->GetPet())
-        player->GetPet()->NearTeleportTo(x, y, z, summoner->GetOrientation());
-    if (player->GetGuardianPet())
-        player->GetGuardianPet()->NearTeleportTo(x, y, z, summoner->GetOrientation());
+    player->CallForAllControlledUnits([destX, destY, destZ, destO](Unit* unit)
+    {
+        unit->NearTeleportTo(destX, destY, destZ, destO);
+    }, CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
     if (botAI->HasStrategy("stay", botAI->GetState()))
     {
         PositionMap& posMap = AI_VALUE(PositionMap&, "position");
         PositionInfo stayPosition = posMap["stay"];
 
-        stayPosition.Set(x, y, z, summoner->GetMapId());
+        stayPosition.Set(destX, destY, destZ, summoner->GetMapId());
         posMap["stay"] = stayPosition;
     }
 
+    NotifySummonPlayer(bot, notifyPlayer, usedFallback ? "Summoned nearby." : "Summoned.");
+    LOG_INFO("playerbots",
+        "Summon succeeded (%s): summoner=%s (%u) bot=%s (%u) map=%u x=%.2f y=%.2f z=%.2f fallback=%u", sourceTag,
+        summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow(), summoner->GetMapId(),
+        destX, destY, destZ, usedFallback);
     return true;
 }

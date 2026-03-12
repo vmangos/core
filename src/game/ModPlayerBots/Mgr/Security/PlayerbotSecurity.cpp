@@ -15,6 +15,21 @@ PlayerbotSecurity::PlayerbotSecurity(Player* const bot) : bot(bot)
         account = sCharacterCache->GetCharacterAccountIdByGuid(bot->GetGUID());
 }
 
+bool PlayerbotSecurity::IsFactionInteractionAllowed(Player const* bot, Player const* requester)
+{
+    if (!bot || !requester)
+        return false;
+
+    if (WorldSession const* session = requester->GetSession())
+        if (session->GetSecurity() >= SEC_GAMEMASTER)
+            return true;
+
+    if (bot->GetTeam() == requester->GetTeam())
+        return true;
+
+    return sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP);
+}
+
 PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* reason, bool ignoreGroup)
 {
     // Basic pointer validity checks
@@ -39,7 +54,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         return PLAYERBOT_SECURITY_DENY_ALL;
     }
 
-    if (botAI->IsOpposing(from))
+    if (!IsFactionInteractionAllowed(bot, from))
     {
         if (reason)
             *reason = PLAYERBOT_DENY_OPPOSING;
@@ -61,15 +76,6 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
 
     if (sPlayerbotAIConfig.IsInRandomAccountList(account))
     {
-        // (duplicate check in case of faction change)
-        if (botAI->IsOpposing(from))
-        {
-            if (reason)
-                *reason = PLAYERBOT_DENY_OPPOSING;
-
-            return PLAYERBOT_SECURITY_DENY_ALL;
-        }
-
         Group* fromGroup = from->GetGroup();
         Group* botGroup = bot->GetGroup();
 
@@ -199,7 +205,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
         return false;
 
     Player* master = botAI->GetMaster();
-    if (master && botAI->IsOpposing(master))
+    if (master && !IsFactionInteractionAllowed(bot, master))
         if (WorldSession* session = master->GetSession())
             if (session->GetSecurity() < SEC_GAMEMASTER)
                 return false;

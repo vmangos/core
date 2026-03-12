@@ -8,7 +8,7 @@
 
 #include "ObjectGuid.h"
 #include "Player.h"
-#include "PlayerbotAIBase.h"
+#include "ModPlayerBots/Bot/Engine/PlayerbotAIBase.h"
 #include <unordered_map>
 
 typedef uint32 LowType;
