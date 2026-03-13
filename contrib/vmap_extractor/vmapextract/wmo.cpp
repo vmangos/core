@@ -474,12 +474,18 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
                     liquidEntry = 3;        // magma
                     break;
                 case 3:
-                    if (rootWMO->RootWMOID == 4489) // Stratholme_raid.wmo WMOID == 4489
+                    switch (rootWMO->RootWMOID)
                     {
-                        liquidEntry = 21;   // Naxxramas slime
+                        case 4489:            // Stratholme_Raid.wmo, WMOID 4489
+                            liquidEntry = 21; // Naxxramas slime
+                            break;
+                        case 1150:            // Undercity.wmo, WMOID 1150
+                            liquidEntry = 1;  // Water
+                            break;
+                        default:
+                            liquidEntry = 4;  // Normal slime
+                            break;
                     }
-                    else
-                        liquidEntry = 4;    // Normal slime
                     break;
                 default:
                     break;
