@@ -161,7 +161,7 @@ bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player, bool preser
 }
 
 bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras, Player* notifyPlayer,
-                            char const* source)
+                            char const* source, bool notifyPlayerResult)
 {
     if (!summoner || summoner == player)
         return false;
@@ -172,7 +172,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
 #if PB_HAS_VEHICLES
     if (player->GetVehicle())
     {
-        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: I am on a vehicle.");
+        if (notifyPlayerResult)
+            NotifySummonPlayer(bot, notifyPlayer, "Summon failed: I am on a vehicle.");
         LOG_INFO("playerbots", "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=bot_on_vehicle", sourceTag,
             summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow());
         return false;
@@ -181,7 +182,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
 
     if (summoner->IsBeingTeleported() || player->IsBeingTeleported())
     {
-        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: one of us is already teleporting.");
+        if (notifyPlayerResult)
+            NotifySummonPlayer(bot, notifyPlayer, "Summon failed: one of us is already teleporting.");
         LOG_INFO("playerbots",
             "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=already_teleporting summonerTeleporting=%u botTeleporting=%u",
             sourceTag, summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow(),
@@ -191,7 +193,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
 
     if (summoner->IsInCombat() && !sPlayerbotAIConfig.allowSummonInCombat)
     {
-        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: you are in combat.");
+        if (notifyPlayerResult)
+            NotifySummonPlayer(bot, notifyPlayer, "Summon failed: you are in combat.");
         LOG_INFO("playerbots", "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=summoner_in_combat", sourceTag,
             summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow());
         return false;
@@ -199,7 +202,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
 
     if (!summoner->IsAlive() && !sPlayerbotAIConfig.allowSummonWhenMasterIsDead)
     {
-        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: you are dead.");
+        if (notifyPlayerResult)
+            NotifySummonPlayer(bot, notifyPlayer, "Summon failed: you are dead.");
         LOG_INFO("playerbots", "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=summoner_dead", sourceTag,
             summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow());
         return false;
@@ -207,7 +211,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
 
     if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) && !sPlayerbotAIConfig.allowSummonWhenBotIsDead)
     {
-        NotifySummonPlayer(bot, notifyPlayer, "Summon failed: I am dead and cannot be revived for summon.");
+        if (notifyPlayerResult)
+            NotifySummonPlayer(bot, notifyPlayer, "Summon failed: I am dead and cannot be revived for summon.");
         LOG_INFO("playerbots", "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=bot_dead", sourceTag,
             summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow());
         return false;
@@ -221,7 +226,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
     {
         bot->ResurrectPlayer(1.0f, false);
         bot->SpawnCorpseBones();
-        NotifySummonPlayer(bot, notifyPlayer, "I live, again!");
+        if (notifyPlayerResult)
+            NotifySummonPlayer(bot, notifyPlayer, "I live, again!");
         botAI->GetAiObjectContext()->GetValue<GuidVector>("prioritized targets")->Reset();
     }
 
@@ -248,7 +254,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
 
         if (!TeleportPlayerTo(summoner, player, fallbackX, fallbackY, fallbackZ, destO))
         {
-            NotifySummonPlayer(bot, notifyPlayer, "Summon failed: no valid place to teleport.");
+            if (notifyPlayerResult)
+                NotifySummonPlayer(bot, notifyPlayer, "Summon failed: no valid place to teleport.");
             LOG_INFO("playerbots",
                 "Summon failed (%s): summoner=%s (%u) bot=%s (%u) reason=no_valid_placement map=%u exact=(%.2f, %.2f, %.2f) fallback=(%.2f, %.2f, %.2f)",
                 sourceTag, summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow(),
@@ -265,8 +272,11 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
     player->GetMotionMaster()->Clear();
     AI_VALUE(LastMovement&, "last movement").clear();
 
-    player->CallForAllControlledUnits([destX, destY, destZ, destO](Unit* unit)
+    uint32 worldMask = summoner->GetWorldMask();
+    player->SetWorldMask(worldMask);
+    player->CallForAllControlledUnits([destX, destY, destZ, destO, worldMask](Unit* unit)
     {
+        unit->SetWorldMask(worldMask);
         unit->NearTeleportTo(destX, destY, destZ, destO);
     }, CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
     if (botAI->HasStrategy("stay", botAI->GetState()))
@@ -278,7 +288,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
         posMap["stay"] = stayPosition;
     }
 
-    NotifySummonPlayer(bot, notifyPlayer, usedFallback ? "Summoned nearby." : "Summoned.");
+    if (notifyPlayerResult)
+        NotifySummonPlayer(bot, notifyPlayer, usedFallback ? "Summoned nearby." : "Summoned.");
     LOG_INFO("playerbots",
         "Summon succeeded (%s): summoner=%s (%u) bot=%s (%u) map=%u x=%.2f y=%.2f z=%.2f fallback=%u", sourceTag,
         summoner->GetName(), summoner->GetGUIDLow(), player->GetName(), player->GetGUIDLow(), summoner->GetMapId(),

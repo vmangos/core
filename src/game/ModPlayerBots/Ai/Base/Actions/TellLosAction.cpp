@@ -56,24 +56,26 @@ bool TellLosAction::Execute(Event event)
 
 void TellLosAction::ListUnits(std::string const title, GuidVector units)
 {
+    Player* viewer = botAI->GetActiveMaster() ? botAI->GetActiveMaster() : botAI->GetMaster();
     botAI->TellMaster(title);
 
     for (ObjectGuid const guid : units)
     {
         if (Unit* unit = botAI->GetUnit(guid))
         {
-            botAI->TellMaster(unit->GetNameForLocaleIdx(sWorld.GetDefaultDbcLocale()));
+            botAI->TellMaster(unit->GetNameForLocaleIdx(viewer && viewer->GetSession() ? viewer->GetSession()->GetSessionDbLocaleIndex() : -1));
         }
     }
 }
 void TellLosAction::ListGameObjects(std::string const title, GuidVector gos)
 {
+    Player* viewer = botAI->GetActiveMaster() ? botAI->GetActiveMaster() : botAI->GetMaster();
     botAI->TellMaster(title);
 
     for (ObjectGuid const guid : gos)
     {
         if (GameObject* go = botAI->GetGameObject(guid))
-            botAI->TellMaster(chat->FormatGameobject(go));
+            botAI->TellMaster(chat->FormatGameobject(go, viewer));
     }
 }
 

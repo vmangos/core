@@ -11,6 +11,7 @@
 #include <string>
 
 #include "Bot/Factory/AiFactory.h"
+#include "../Ai/Base/Actions/UseMeetingStoneAction.h"
 #include "BudgetValues.h"
 #include "ChannelMgr.h"
 #include "CharacterPackets.h"
@@ -1539,6 +1540,14 @@ void PlayerbotAI::DoNextAction(bool min)
 
     currentEngine->DoNextAction(nullptr, 0, (minimal || min));
 
+    // Recovery must run before the minimal early-return so that cross-map
+    // teleport fires even when the bot would otherwise be in passive mode.
+    if (TryRecoverToActiveMaster())
+    {
+        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+        return;
+    }
+
     if (minimal)
     {
         if (!bot->isAFK() && !bot->InBattleground() && !HasRealPlayerMaster())
@@ -1579,6 +1588,55 @@ void PlayerbotAI::DoNextAction(bool min)
         bot->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED);
         bot->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
     }
+}
+
+bool PlayerbotAI::TryRecoverToActiveMaster()
+{
+    Player* activeMaster = GetActiveMaster();
+    if (!activeMaster || !HasActivePlayerMaster() || !bot->GetGroup() || bot->GetGroup() != activeMaster->GetGroup())
+        return false;
+
+    if (bot->InBattleground() || activeMaster->InBattleground())
+        return false;
+
+    // Cross-map: different mapId or different instance (layer) on the same continent
+    bool crossMap = bot->GetMapId() != activeMaster->GetMapId() ||
+                    bot->GetInstanceId() != activeMaster->GetInstanceId();
+
+    // For same-map recovery, respect the follow/stay strategy.
+    // For cross-map recovery always teleport — the bot is unreachable otherwise.
+    if (!crossMap)
+    {
+        bool stayMode = HasStrategy("stay", BOT_STATE_NON_COMBAT) || HasStrategy("stay", BOT_STATE_COMBAT);
+        bool followMode = HasStrategy("follow", BOT_STATE_NON_COMBAT) || HasStrategy("follow", BOT_STATE_COMBAT);
+        if (stayMode || !followMode)
+            return false;
+    }
+
+    float distance2d = crossMap ? 0.0f : ServerFacade::instance().GetDistance2d(bot, activeMaster);
+    bool needsRecovery = crossMap ||
+                         bot->GetWorldMask() != activeMaster->GetWorldMask() ||
+                         distance2d > sPlayerbotAIConfig.sightDistance;
+    if (!needsRecovery)
+        return false;
+
+    time_t now = time(nullptr);
+    if (lastMasterRecoveryAttempt && now < (lastMasterRecoveryAttempt + 3))
+        return false;
+
+    LOG_INFO("playerbots",
+        "TryRecoverToActiveMaster: bot=%s attempting recovery to master=%s (botMap=%u masterMap=%u botInst=%u masterInst=%u crossMap=%u)",
+        bot->GetName(), activeMaster->GetName(),
+        bot->GetMapId(), activeMaster->GetMapId(),
+        bot->GetInstanceId(), activeMaster->GetInstanceId(),
+        crossMap);
+
+    lastMasterRecoveryAttempt = now;
+    SummonAction summonAction(this, "master recovery");
+    bool result = summonAction.Teleport(activeMaster, bot, true, nullptr, "auto master recovery", false);
+    if (!result)
+        LOG_INFO("playerbots", "TryRecoverToActiveMaster: bot=%s teleport to master=%s FAILED", bot->GetName(), activeMaster->GetName());
+    return result;
 }
 
 void PlayerbotAI::ReInitCurrentEngine()

@@ -153,6 +153,14 @@ bool PlayerbotAIConfig::Initialize()
     weightTeleToSilvermoonCity = sConfig.GetIntDefault("AiPlayerbot.TeleToSilvermoonCityWeight", 1);
     weightTeleToShattrathCity = sConfig.GetIntDefault("AiPlayerbot.TeleToShattrathCityWeight", 1);
     weightTeleToDalaran = sConfig.GetIntDefault("AiPlayerbot.TeleToDalaranWeight", 1);
+    enableCapitalCityPopulation = sConfig.GetBoolDefault("AiPlayerbot.EnableCapitalCityPopulation", true);
+    minStormwindBots = sConfig.GetIntDefault("AiPlayerbot.MinStormwindBots", 20);
+    minOrgrimmarBots = sConfig.GetIntDefault("AiPlayerbot.MinOrgrimmarBots", 20);
+    capitalCityMinLevel = sConfig.GetIntDefault("AiPlayerbot.CapitalCityMinLevel", 20);
+    capitalCityDwellMin = sConfig.GetIntDefault("AiPlayerbot.CapitalCityDwellMin", 600);
+    capitalCityDwellMax = sConfig.GetIntDefault("AiPlayerbot.CapitalCityDwellMax", 1800);
+    capitalCityCheckInterval = sConfig.GetIntDefault("AiPlayerbot.CapitalCityCheckInterval", 60);
+    capitalCityProtectFromLogout = sConfig.GetBoolDefault("AiPlayerbot.CapitalCityProtectFromLogout", true);
     LoadList<std::vector<uint32>>(
         sConfig.GetStringDefault("AiPlayerbot.RandomBotQuestItems",
                                            "5175,5176,5177,5178,6948,11000,12382,13704,16309"),

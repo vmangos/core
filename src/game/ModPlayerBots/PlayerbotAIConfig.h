@@ -117,6 +117,14 @@ public:
     int weightTeleToSilvermoonCity;
     int weightTeleToShattrathCity;
     int weightTeleToDalaran;
+    bool enableCapitalCityPopulation;
+    uint32 minStormwindBots;
+    uint32 minOrgrimmarBots;
+    uint32 capitalCityMinLevel;
+    uint32 capitalCityDwellMin;
+    uint32 capitalCityDwellMax;
+    uint32 capitalCityCheckInterval;
+    bool capitalCityProtectFromLogout;
     std::vector<uint32> randomBotMaps;
     std::vector<uint32> randomBotQuestItems;
     std::vector<uint32> randomBotAccounts;

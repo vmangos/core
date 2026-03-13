@@ -87,7 +87,7 @@ bool AcceptInvitationAction::Execute(Event event)
 
     botAI->TellMaster("Hello");
 
-    if (sPlayerbotAIConfig.summonWhenGroup && bot->GetDistance(inviter) > sPlayerbotAIConfig.sightDistance)
+    if (bot->GetDistance(inviter) > sPlayerbotAIConfig.sightDistance || bot->GetWorldMask() != inviter->GetWorldMask())
     {
         Teleport(inviter, bot, true, inviter, "group invite");
     }

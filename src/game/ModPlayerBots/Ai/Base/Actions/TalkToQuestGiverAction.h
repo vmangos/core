@@ -9,6 +9,7 @@
 #include "QuestAction.h"
 
 class Quest;
+class Player;
 class PlayerbotAI;
 class WorldObject;
 
@@ -19,14 +20,14 @@ public:
 
 protected:
     bool ProcessQuest(Quest const* quest, Object* questGiver) override;
-    bool TurnInQuest(Quest const* quest, Object* questGiver, std::ostringstream& out);
+    bool TurnInQuest(Quest const* quest, Object* questGiver, std::ostringstream& out, Player const* viewer = nullptr);
 
 private:
-    void RewardNoItem(Quest const* quest, Object* questGiver, std::ostringstream& out);
-    void RewardSingleItem(Quest const* quest, Object* questGiver, std::ostringstream& out);
+    void RewardNoItem(Quest const* quest, Object* questGiver, std::ostringstream& out, Player const* viewer);
+    void RewardSingleItem(Quest const* quest, Object* questGiver, std::ostringstream& out, Player const* viewer);
     std::set<uint32> BestRewards(Quest const* quest);
-    void RewardMultipleItem(Quest const* quest, Object* questGiver, std::ostringstream& out);
-    void AskToSelectReward(Quest const* quest, std::ostringstream& out, bool forEquip);
+    void RewardMultipleItem(Quest const* quest, Object* questGiver, std::ostringstream& out, Player const* viewer);
+    void AskToSelectReward(Quest const* quest, std::ostringstream& out, bool forEquip, Player const* viewer);
 };
 
 class TurnInQueryQuestAction : public TalkToQuestGiverAction

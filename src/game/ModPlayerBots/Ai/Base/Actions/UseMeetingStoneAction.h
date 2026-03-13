@@ -18,7 +18,7 @@ public:
 
     bool Execute(Event event) override;
     bool Teleport(Player* summoner, Player* player, bool preserveAuras, Player* notifyPlayer = nullptr,
-                  char const* source = nullptr);
+                  char const* source = nullptr, bool notifyPlayerResult = true);
 
 protected:
     bool SummonUsingGos(Player* summoner, Player* player, bool preserveAuras);

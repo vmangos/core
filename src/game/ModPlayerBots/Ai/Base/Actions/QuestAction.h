@@ -24,9 +24,9 @@ public:
     bool Execute(Event event) override;
 
 protected:
-    bool CompleteQuest(Player* player, uint32 entry);
+    bool CompleteQuest(Player* player, uint32 entry, Player const* viewer = nullptr);
     virtual bool ProcessQuest(Quest const* quest, Object* questGiver) = 0;
-    bool AcceptQuest(Quest const* quest, ObjectGuid questGiver);
+    bool AcceptQuest(Quest const* quest, ObjectGuid questGiver, Player const* viewer = nullptr);
     bool ProcessQuests(ObjectGuid questGiver);
     bool ProcessQuests(WorldObject* questGiver);
 };

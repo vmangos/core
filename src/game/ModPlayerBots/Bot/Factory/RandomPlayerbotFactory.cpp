@@ -446,8 +446,8 @@ bool RandomPlayerbotFactory::CreateRandomBot(WorldSession* session, uint8 cls, s
         return false;
     }
 
-    LOG_DEBUG("playerbots", "Random bot created - name: \"%s\", race: %u, class: %u",
-            name.c_str(), race, cls);
+    LOG_INFO("playerbots", "Random bot created: %s (%u) race=%u class=%u account=%u",
+        name.c_str(), guidlow, race, cls, session->GetAccountId());
 
     return true;
 }
@@ -591,12 +591,12 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
         if (sPlayerbotAIConfig.maxRandomBots == 0)
         {
             // PlayerbotsDatabase.Execute("UPDATE playerbots_account_type SET account_type = 0 WHERE account_type = 1");
-            LOG_INFO("playerbots", "MaxRandomBots set to 0, any RNDbot accounts (type 1) will be unassigned (type 0)");
+            LOG_DEBUG("playerbots", "MaxRandomBots set to 0, any RNDbot accounts (type 1) will be unassigned (type 0)");
         }
         if (sPlayerbotAIConfig.addClassAccountPoolSize == 0)
         {
             // PlayerbotsDatabase.Execute("UPDATE playerbots_account_type SET account_type = 0 WHERE account_type = 2");
-            LOG_INFO("playerbots", "AddClassAccountPoolSize set to 0, any AddClass accounts (type 2) will be unassigned (type 0)");
+            LOG_DEBUG("playerbots", "AddClassAccountPoolSize set to 0, any AddClass accounts (type 2) will be unassigned (type 0)");
         }
 
         // Wait for DB to reflect the change, up to 1 second max. This is needed to make sure other logs don't show wrong info
@@ -715,7 +715,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
                 botAccounts.push_back(accountId);
         }
 
-        LOG_INFO("playerbots", "Deleting all random bot characters and accounts...");
+        LOG_DEBUG("playerbots", "Deleting all random bot characters and accounts...");
 
         // Clear active random-bot state stored in the characters database.
         CharacterDatabase.DirectExecute("DELETE FROM playerbots_random_bots");
@@ -744,7 +744,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         //     sPlayerbotAIConfig.randomBotAccountPrefix.c_str());
 
         // Delete the bot accounts before orphan cleanup so per-character rows are detached first.
-        LOG_INFO("playerbots", "Deleting random bot accounts...");
+        LOG_DEBUG("playerbots", "Deleting random bot accounts...");
         auto results = LoginDatabase.PQuery("SELECT id FROM account WHERE username LIKE '%s%%'",
                                               sPlayerbotAIConfig.randomBotAccountPrefix.c_str());
         int32 deletion_count = 0;
@@ -775,22 +775,22 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
         CleanupOrphanedCharacterDataDirect();
 
-        LOG_INFO("playerbots", ">> Random bot accounts and data deleted in %u ms", GetMSTimeDiffToNow(timer));
-        LOG_INFO("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
+        LOG_DEBUG("playerbots", ">> Random bot accounts and data deleted in %u ms", GetMSTimeDiffToNow(timer));
+        LOG_DEBUG("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
         World::StopNow(SHUTDOWN_EXIT_CODE);
         return;
     }
 
     CleanupOrphanedCharacterDataDirect();
 
-    LOG_INFO("playerbots", "Creating random bot accounts...");
+    LOG_DEBUG("playerbots", "Creating random bot accounts...");
     std::unordered_map<NameRaceAndGender, std::vector<std::string>> nameCache;
     // std::vector<std::future<void>> account_creations; // Not used in Vanilla - async not needed
     int account_creation = 0;
 
     // Calculates the total number of required accounts.
     uint32 totalAccountCount = CalculateTotalAccountCount();
-    LOG_INFO("playerbots", "Random bot config: autologin=%s, min=%u, max=%u, account target=%u",
+    LOG_DEBUG("playerbots", "Random bot config: autologin=%s, min=%u, max=%u, account target=%u",
         sPlayerbotAIConfig.randomBotAutologin ? "true" : "false",
         sPlayerbotAIConfig.minRandomBots,
         sPlayerbotAIConfig.maxRandomBots,
@@ -833,11 +833,11 @@ void RandomPlayerbotFactory::CreateRandomBots()
             {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
-            LOG_INFO("playerbots", ">> %u Accounts loaded into database in %u ms", account_creation, GetMSTimeDiffToNow(timer));
+            LOG_DEBUG("playerbots", ">> %u Accounts loaded into database in %u ms", account_creation, GetMSTimeDiffToNow(timer));
         }
-        LOG_INFO("playerbots", ">> %u Accounts loaded into database in %u ms", account_creation, GetMSTimeDiffToNow(timer));
+        LOG_DEBUG("playerbots", ">> %u Accounts loaded into database in %u ms", account_creation, GetMSTimeDiffToNow(timer));
 
-    LOG_INFO("playerbots", "Creating random bot characters...");
+    LOG_DEBUG("playerbots", "Creating random bot characters...");
     uint32 totalRandomBotChars = 0;
     std::vector<WorldSession*> sessionBots;
     int bot_creation = 0;
@@ -896,7 +896,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
-        LOG_INFO("playerbots", ">> %u Characters loaded into database in %u ms", bot_creation, GetMSTimeDiffToNow(timer));
+        LOG_DEBUG("playerbots", ">> %u Characters loaded into database in %u ms", bot_creation, GetMSTimeDiffToNow(timer));
     }
 
     for (WorldSession* session : sessionBots)

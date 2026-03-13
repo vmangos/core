@@ -42,6 +42,7 @@ bool UseItemAction::Execute(Event event)
 
 bool UseItemAction::UseGameObject(ObjectGuid guid)
 {
+    Player* viewer = botAI->GetActiveMaster() ? botAI->GetActiveMaster() : GetMaster();
     GameObject* go = botAI->GetGameObject(guid);
     if (!go || !go->isSpawned() /* || go->GetGoState() != GO_STATE_READY*/)
         return false;
@@ -49,7 +50,7 @@ bool UseItemAction::UseGameObject(ObjectGuid guid)
     go->Use(bot);
 
     std::ostringstream out;
-    out << "Using " << chat->FormatGameobject(go);
+    out << "Using " << chat->FormatGameobject(go, viewer);
     botAI->TellMasterNoFacing(out.str());
     return true;
 }
@@ -62,6 +63,7 @@ bool UseItemAction::UseItemOnItem(Item* item, Item* itemTarget) { return UseItem
 
 bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Unit* unitTarget)
 {
+    Player* viewer = botAI->GetActiveMaster() ? botAI->GetActiveMaster() : GetMaster();
     if (bot->CanUseItem(item) != EQUIP_ERR_OK)
         return false;
 
@@ -93,7 +95,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     bool targetSelected = false;
 
     std::ostringstream out;
-    out << "Using " << chat->FormatItem(item->GetTemplate());
+    out << "Using " << chat->FormatItem(item->GetTemplate(), 0, 0, viewer);
 
     if (item->GetTemplate()->Stackable > 1)
     {
@@ -114,7 +116,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
 
         packet << targetFlag;
         packet << goGuid.WriteAsPacked();
-        out << " on " << chat->FormatGameobject(go);
+        out << " on " << chat->FormatGameobject(go, viewer);
         targetSelected = true;
     }
 
@@ -133,7 +135,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
             targetFlag = TARGET_FLAG_ITEM;
             packet << targetFlag;
             packet << itemTarget->GetPackGUID();
-            out << " on " << chat->FormatItem(itemTarget->GetTemplate());
+            out << " on " << chat->FormatItem(itemTarget->GetTemplate(), 0, 0, viewer);
             targetSelected = true;
         }
     }
@@ -174,7 +176,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
             bot->GetSession()->HandleQuestgiverAcceptQuestOpcode(packet);
 
             std::ostringstream out;
-            out << "Got quest " << chat->FormatQuest(qInfo);
+            out << "Got quest " << chat->FormatQuest(qInfo, viewer);
             botAI->TellMasterNoFacing(out.str());
             return true;
         }
@@ -225,7 +227,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
                 packet << targetFlag;
                 packet << itemForSpell->GetPackGUID();
                 targetSelected = true;
-                out << " on " << chat->FormatItem(itemForSpell->GetTemplate());
+                out << " on " << chat->FormatItem(itemForSpell->GetTemplate(), 0, 0, viewer);
             }
             uint32 castTime = spellInfo->GetCastTime(bot);
             botAI->SetNextCheckDelay(castTime + sPlayerbotAIConfig.reactDelay);

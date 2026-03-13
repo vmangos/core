@@ -42,12 +42,13 @@ public:
     uint32 parseSpell(std::string const text);
     static std::string parseValue(const std::string& type, const std::string& text);
 
-    static std::string const FormatQuest(Quest const* quest);
-    static std::string const FormatItem(ItemTemplate const* proto, uint32 count = 0, uint32 total = 0);
+    static std::string const FormatQuest(Quest const* quest, Player const* viewer = nullptr);
+    static std::string const FormatItem(ItemTemplate const* proto, uint32 count = 0, uint32 total = 0,
+                                        Player const* viewer = nullptr);
     static std::string const FormatQItem(uint32 itemId);
     static std::string const FormatSpell(SpellEntry const* spellInfo);
-    static std::string const FormatGameobject(GameObject* go);
-    static std::string const FormatWorldobject(WorldObject* wo);
+    static std::string const FormatGameobject(GameObject* go, Player const* viewer = nullptr);
+    static std::string const FormatWorldobject(WorldObject* wo, Player const* viewer = nullptr);
     static std::string const FormatWorldEntry(int32 entry);
     static std::string const FormatQuestObjective(std::string const name, uint32 available, uint32 required);
     static GuidVector parseGameobjects(std::string const text);
@@ -74,6 +75,12 @@ public:
     static std::set<uint32> ExtractAllItemIds(const std::string& text);
 
 private:
+    static int GetDbLocaleIndex(Player const* viewer);
+    static LocaleConstant GetLocaleConstant(Player const* viewer);
+    static std::string GetQuestTitleForViewer(Quest const* quest, Player const* viewer);
+    static std::string GetItemNameForViewer(ItemTemplate const* proto, Player const* viewer);
+    static char const* GetWorldObjectNameForViewer(WorldObject* wo, Player const* viewer);
+
     static std::map<std::string, uint32> consumableSubClasses;
     static std::map<std::string, uint32> tradeSubClasses;
     static std::map<std::string, uint32> itemQualities;

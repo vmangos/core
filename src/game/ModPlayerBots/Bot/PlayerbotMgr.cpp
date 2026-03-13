@@ -79,6 +79,29 @@ PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
 
 namespace
 {
+uint32 GetOnlineAccountBotCount()
+{
+    uint32 accountBotCount = 0;
+    World::SessionMap const sessions = sWorld.GetAllSessions();
+
+    for (auto const& [accountId, session] : sessions)
+    {
+        (void)accountId;
+
+        if (!session)
+            continue;
+
+        Player* player = session->GetPlayer();
+        if (!player || player->IsBot())
+            continue;
+
+        if (PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(player))
+            accountBotCount += mgr->GetPlayerbotsCount();
+    }
+
+    return accountBotCount;
+}
+
 uint32 GetPersistedGroupId(ObjectGuid guid)
 {
     std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery(
@@ -767,11 +790,16 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         }
     }
 
-    if (master && botAI && sPlayerbotAIConfig.summonWhenGroup &&
-        (bot->GetMapId() != master->GetMapId() || bot->GetDistance(master) > sPlayerbotAIConfig.sightDistance))
+    if (master && botAI)
     {
-        SummonAction summonAction(botAI, "group summon");
-        summonAction.Teleport(master, bot, true, master, "group join");
+        bool needsSummon = (bot->GetMapId() != master->GetMapId()) ||
+                           (bot->GetWorldMask() != master->GetWorldMask()) ||
+                           (bot->GetDistance(master) > sPlayerbotAIConfig.sightDistance);
+        if (needsSummon)
+        {
+            SummonAction summonAction(botAI, "group summon");
+            summonAction.Teleport(master, bot, true, master, "group join");
+        }
     }
     // if (master)
     // {
@@ -1225,6 +1253,21 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     if (!strcmp(cmd, "lookup"))
     {
         messages.push_back(LookupBots(master));
+        return messages;
+    }
+
+    if (!strcmp(cmd, "online"))
+    {
+        uint32 const accountBotCount = GetOnlineAccountBotCount();
+        uint32 const randomBotCount = sRandomPlayerbotMgr.GetPlayerbotsCount();
+        uint32 const totalBotCount = accountBotCount + randomBotCount;
+
+        std::ostringstream out;
+        out << "Online bots: " << totalBotCount
+            << " (account: " << accountBotCount
+            << ", random: " << randomBotCount << ")";
+
+        messages.push_back(out.str());
         return messages;
     }
 
@@ -1774,13 +1817,10 @@ void PlayerbotMgr::OnPlayerLogin(Player* player)
         return;
     }
 
-    // DB locale (source of bot text translation)
-    LocaleConstant databaseLocale = static_cast<LocaleConstant>(session->GetSessionDbLocaleIndex());
-
-    // For bot texts (DB-driven), prefer the database locale with a safe fallback.
-    LocaleConstant usedLocale = databaseLocale;
+    int dbLocaleIdx = session->GetSessionDbLocaleIndex();
+    LocaleConstant usedLocale = dbLocaleIdx < 0 ? LOCALE_enUS : sObjectMgr.GetLocaleForIndex(dbLocaleIdx);
     if (usedLocale >= MAX_LOCALES)
-        usedLocale = LOCALE_enUS; // fallback
+        usedLocale = LOCALE_enUS;
 
     // set locale priority for bot texts
     PlayerbotTextMgr::instance().AddLocalePriority(usedLocale);

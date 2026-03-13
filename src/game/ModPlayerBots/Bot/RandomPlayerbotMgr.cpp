@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cmath>
 #include <limits>
+#include <random>
 #include <sstream>
 
 #include "AccountMgr.h"
@@ -33,6 +34,94 @@ namespace
 {
 constexpr uint32 RANDOM_BOT_OWNER = 0;
 constexpr uint32 MANAGER_BOT = 0;
+constexpr float PLAYER_VISIBILITY_GUARD_RANGE = 100.0f;
+using TeleportCityId = RandomPlayerbotMgr::TeleportCityId;
+using TeleportCityFaction = RandomPlayerbotMgr::TeleportCityFaction;
+
+struct TeleportCityMeta
+{
+    TeleportCityFaction faction;
+    uint32 zoneId;
+    char const* name;
+    WorldLocation fallback;
+};
+
+static std::map<uint32, std::pair<TeleportCityId, TeleportCityFaction>> const kBankerToCity = {
+    {2455, {TeleportCityId::STORMWIND, TeleportCityFaction::ALLIANCE}},
+    {2456, {TeleportCityId::STORMWIND, TeleportCityFaction::ALLIANCE}},
+    {2457, {TeleportCityId::STORMWIND, TeleportCityFaction::ALLIANCE}},
+    {2460, {TeleportCityId::IRONFORGE, TeleportCityFaction::ALLIANCE}},
+    {2461, {TeleportCityId::IRONFORGE, TeleportCityFaction::ALLIANCE}},
+    {5099, {TeleportCityId::IRONFORGE, TeleportCityFaction::ALLIANCE}},
+    {4155, {TeleportCityId::DARNASSUS, TeleportCityFaction::ALLIANCE}},
+    {4208, {TeleportCityId::DARNASSUS, TeleportCityFaction::ALLIANCE}},
+    {4209, {TeleportCityId::DARNASSUS, TeleportCityFaction::ALLIANCE}},
+    {17773, {TeleportCityId::EXODAR, TeleportCityFaction::ALLIANCE}},
+    {18350, {TeleportCityId::EXODAR, TeleportCityFaction::ALLIANCE}},
+    {16710, {TeleportCityId::EXODAR, TeleportCityFaction::ALLIANCE}},
+    {3320, {TeleportCityId::ORGRIMMAR, TeleportCityFaction::HORDE}},
+    {3309, {TeleportCityId::ORGRIMMAR, TeleportCityFaction::HORDE}},
+    {3318, {TeleportCityId::ORGRIMMAR, TeleportCityFaction::HORDE}},
+    {4549, {TeleportCityId::UNDERCITY, TeleportCityFaction::HORDE}},
+    {2459, {TeleportCityId::UNDERCITY, TeleportCityFaction::HORDE}},
+    {2458, {TeleportCityId::UNDERCITY, TeleportCityFaction::HORDE}},
+    {4550, {TeleportCityId::UNDERCITY, TeleportCityFaction::HORDE}},
+    {2996, {TeleportCityId::THUNDER_BLUFF, TeleportCityFaction::HORDE}},
+    {8356, {TeleportCityId::THUNDER_BLUFF, TeleportCityFaction::HORDE}},
+    {8357, {TeleportCityId::THUNDER_BLUFF, TeleportCityFaction::HORDE}},
+    {17631, {TeleportCityId::SILVERMOON_CITY, TeleportCityFaction::HORDE}},
+    {17632, {TeleportCityId::SILVERMOON_CITY, TeleportCityFaction::HORDE}},
+    {17633, {TeleportCityId::SILVERMOON_CITY, TeleportCityFaction::HORDE}},
+    {16615, {TeleportCityId::SILVERMOON_CITY, TeleportCityFaction::HORDE}},
+    {16616, {TeleportCityId::SILVERMOON_CITY, TeleportCityFaction::HORDE}},
+    {16617, {TeleportCityId::SILVERMOON_CITY, TeleportCityFaction::HORDE}},
+    {19246, {TeleportCityId::SHATTRATH_CITY, TeleportCityFaction::NEUTRAL}},
+    {19338, {TeleportCityId::SHATTRATH_CITY, TeleportCityFaction::NEUTRAL}},
+    {19034, {TeleportCityId::SHATTRATH_CITY, TeleportCityFaction::NEUTRAL}},
+    {19318, {TeleportCityId::SHATTRATH_CITY, TeleportCityFaction::NEUTRAL}},
+    {30604, {TeleportCityId::DALARAN, TeleportCityFaction::NEUTRAL}},
+    {30605, {TeleportCityId::DALARAN, TeleportCityFaction::NEUTRAL}},
+    {30607, {TeleportCityId::DALARAN, TeleportCityFaction::NEUTRAL}},
+    {28675, {TeleportCityId::DALARAN, TeleportCityFaction::NEUTRAL}},
+    {28676, {TeleportCityId::DALARAN, TeleportCityFaction::NEUTRAL}},
+    {28677, {TeleportCityId::DALARAN, TeleportCityFaction::NEUTRAL}}
+};
+
+static std::map<TeleportCityId, TeleportCityMeta> const kTeleportCities = {
+    {TeleportCityId::STORMWIND, {TeleportCityFaction::ALLIANCE, 1519, "stormwind", WorldLocation(0, -8867.68f, 673.373f, 97.9034f, 0.0f)}},
+    {TeleportCityId::IRONFORGE, {TeleportCityFaction::ALLIANCE, 1537, "ironforge", WorldLocation(0, -4981.25f, -881.542f, 501.66f, 0.0f)}},
+    {TeleportCityId::DARNASSUS, {TeleportCityFaction::ALLIANCE, 1657, "darnassus", WorldLocation(1, 9951.52f, 2280.32f, 1341.39f, 0.0f)}},
+    {TeleportCityId::EXODAR, {TeleportCityFaction::ALLIANCE, 3557, "exodar", WorldLocation(530, -3987.29f, -11846.6f, -2.01903f, 0.0f)}},
+    {TeleportCityId::ORGRIMMAR, {TeleportCityFaction::HORDE, 1637, "orgrimmar", WorldLocation(1, 1633.33f, -4439.11f, 15.7588f, 0.0f)}},
+    {TeleportCityId::UNDERCITY, {TeleportCityFaction::HORDE, 1497, "undercity", WorldLocation(0, 1568.5f, 267.95f, -62.16f, 0.0f)}},
+    {TeleportCityId::THUNDER_BLUFF, {TeleportCityFaction::HORDE, 1638, "thunderbluff", WorldLocation(1, -1273.17f, 122.56f, 131.29f, 0.0f)}},
+    {TeleportCityId::SILVERMOON_CITY, {TeleportCityFaction::HORDE, 3487, "silvermoon", WorldLocation(530, 9499.16f, -7279.2f, 14.29f, 0.0f)}},
+    {TeleportCityId::SHATTRATH_CITY, {TeleportCityFaction::NEUTRAL, 3703, "shattrath", WorldLocation(530, -1887.62f, 5359.09f, -12.43f, 0.0f)}},
+    {TeleportCityId::DALARAN, {TeleportCityFaction::NEUTRAL, 4395, "dalaran", WorldLocation(571, 5807.75f, 588.347f, 660.94f, 0.0f)}}
+};
+
+bool HasAllowedMap(uint32 mapId)
+{
+    if (sPlayerbotAIConfig.randomBotMaps.empty())
+        return true;
+
+    return std::find(sPlayerbotAIConfig.randomBotMaps.begin(), sPlayerbotAIConfig.randomBotMaps.end(), mapId) !=
+        sPlayerbotAIConfig.randomBotMaps.end();
+}
+
+bool IsSafeTeleportZoneForBot(Player* bot, AreaTableEntry const* zone)
+{
+    if (!bot || !zone)
+        return false;
+
+    if (zone->area_team == 4 && bot->GetTeamId() == TEAM_ALLIANCE)
+        return false;
+
+    if (zone->area_team == 2 && bot->GetTeamId() == TEAM_HORDE)
+        return false;
+
+    return true;
+}
 
 bool IsSupportedRandomBg(BattlegroundTypeId bgTypeId)
 {
@@ -196,7 +285,7 @@ uint32 RandomPlayerbotMgr::GetMaxAllowedBotCount()
 
 void RandomPlayerbotMgr::LogPlayerLocation()
 {
-    LOG_INFO("playerbots", "Random bot manager: players=%zu random_bots=%zu active_bots=%u target=%u activity=%.1f%%",
+    LOG_DEBUG("playerbots", "Random bot manager: players=%zu random_bots=%zu active_bots=%u target=%u activity=%.1f%%",
         players.size(), currentBots.size(), activeBots, GetMaxAllowedBotCount(), getActivityPercentage());
 }
 
@@ -222,6 +311,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool)
     GetBots();
     CheckBgQueue();
     CheckLfgQueue();
+    MaintainCapitalCityPopulation();
 
     if (!BgCheckTimer || now >= BgCheckTimer)
     {
@@ -250,6 +340,9 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool)
                 PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
                 if (!botAI || botAI->HasActivePlayerMaster() || bot->IsInCombat() || bot->InBattleground())
                     continue;
+
+                if (ShouldProtectCapitalBotFromLogout(bot))
+                    continue;
             }
 
             logoutCandidates.push_back(botGuid);
@@ -266,6 +359,12 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool)
                 if (std::find(logoutCandidates.begin(), logoutCandidates.end(), botGuid) != logoutCandidates.end())
                     continue;
 
+                if (Player* bot = GetPlayerBot(botGuid))
+                {
+                    if (ShouldProtectCapitalBotFromLogout(bot))
+                        continue;
+                }
+
                 logoutCandidates.push_back(botGuid);
                 --extra;
             }
@@ -278,7 +377,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool)
 
             if (Player* bot = GetPlayerBot(botGuid))
             {
-                LOG_INFO("playerbots", "Random bot logout: %s (%u)", bot->GetName(), botGuid);
+                LOG_DEBUG("playerbots", "Random bot logout: %s (%u)", bot->GetName(), botGuid);
                 LogoutPlayerBot(bot->GetGUID());
                 ++actions;
             }
@@ -313,7 +412,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool)
     {
         lastPopulationLogTime = now;
         lastPopulationLogCount = static_cast<uint32>(currentBots.size());
-        LOG_INFO("playerbots", "Random bot population: online=%zu target=%u players=%zu loading=%zu",
+        LOG_DEBUG("playerbots", "Random bot population: online=%zu target=%u players=%zu loading=%zu",
             currentBots.size(), desiredCount, players.size(), botLoading.size());
     }
 }
@@ -573,8 +672,7 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
         if (player->IsBot())
         {
             Player* master = GET_PLAYERBOT_AI(player) ? GET_PLAYERBOT_AI(player)->GetMaster() : nullptr;
-            LOG_INFO("playerbots",
-                "Bot login routed in RandomPlayerbotMgr::OnPlayerLogin: bot=%s guid=%u account=%u pending_owner_account=0 selected_holder=RandomPlayerbotMgr final_master_guid=%u",
+            LOG_INFO("playerbots", "Random bot login: %s (%u) account=%u master=%u",
                 player->GetName(), player->GetGUIDLow(), accountId, master ? master->GetGUIDLow() : 0);
         }
         return;
@@ -705,14 +803,43 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     if (!bot)
         return;
 
-    std::vector<WorldLocation>& locs = locsPerLevelCache[ClampToLevelBracket(bot->GetLevel())];
+    uint32 level = ClampToLevelBracket(bot->GetLevel());
+    std::vector<WorldLocation>& locs = locsPerLevelCache[level];
     if (locs.empty())
     {
-        std::vector<WorldLocation>& starters = IsAlliance(bot->GetRace())
-            ? allianceStarterPerLevelCache[ClampToLevelBracket(bot->GetLevel())]
-            : hordeStarterPerLevelCache[ClampToLevelBracket(bot->GetLevel())];
+        std::vector<WorldLocation>& starters = IsAlliance(bot->GetRace()) ? allianceStarterPerLevelCache[level]
+                                                                           : hordeStarterPerLevelCache[level];
         RandomTeleport(bot, starters);
         return;
+    }
+
+    if (level >= 10 && urand(0, 100) < uint32(sPlayerbotAIConfig.probTeleToBankers * 100.0f))
+    {
+        std::vector<BankerLocation> const& bankerLocs = bankerLocsPerLevelCache[level];
+        std::vector<WorldLocation> fallbackLocs;
+        fallbackLocs.reserve(bankerLocs.size());
+        for (BankerLocation const& bankerLoc : bankerLocs)
+            fallbackLocs.push_back(bankerLoc.loc);
+
+        if (!fallbackLocs.empty())
+        {
+            if (!sPlayerbotAIConfig.enableWeightTeleToCityBankers)
+            {
+                RandomTeleport(bot, fallbackLocs, true);
+                return;
+            }
+
+            WorldLocation cityLoc;
+            if (GetRandomCityTeleportTarget(bot, cityLoc))
+            {
+                std::vector<WorldLocation> cityTargets(1, cityLoc);
+                RandomTeleport(bot, cityTargets, true);
+                return;
+            }
+
+            RandomTeleport(bot, fallbackLocs, true);
+            return;
+        }
     }
 
     RandomTeleport(bot, locs);
@@ -740,6 +867,309 @@ void RandomPlayerbotMgr::RandomTeleportForRpg(Player* bot)
     }
 
     RandomTeleport(bot, locs);
+}
+
+char const* RandomPlayerbotMgr::GetCityName(TeleportCityId city)
+{
+    auto itr = kTeleportCities.find(city);
+    return itr != kTeleportCities.end() ? itr->second.name : "unknown";
+}
+
+uint32 RandomPlayerbotMgr::GetCityZoneId(TeleportCityId city)
+{
+    auto itr = kTeleportCities.find(city);
+    return itr != kTeleportCities.end() ? itr->second.zoneId : 0;
+}
+
+uint32 RandomPlayerbotMgr::GetCityWeight(TeleportCityId city)
+{
+    switch (city)
+    {
+        case TeleportCityId::STORMWIND:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToStormwind);
+        case TeleportCityId::IRONFORGE:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToIronforge);
+        case TeleportCityId::DARNASSUS:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToDarnassus);
+        case TeleportCityId::EXODAR:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToExodar);
+        case TeleportCityId::ORGRIMMAR:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToOrgrimmar);
+        case TeleportCityId::UNDERCITY:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToUndercity);
+        case TeleportCityId::THUNDER_BLUFF:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToThunderBluff);
+        case TeleportCityId::SILVERMOON_CITY:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToSilvermoonCity);
+        case TeleportCityId::SHATTRATH_CITY:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToShattrathCity);
+        case TeleportCityId::DALARAN:
+            return std::max(0, sPlayerbotAIConfig.weightTeleToDalaran);
+    }
+
+    return 0;
+}
+
+bool RandomPlayerbotMgr::IsCityAvailableForBot(Player* bot, TeleportCityId city)
+{
+    if (!bot)
+        return false;
+
+    auto cityItr = kTeleportCities.find(city);
+    if (cityItr == kTeleportCities.end())
+        return false;
+
+    TeleportCityFaction faction = cityItr->second.faction;
+    if (faction == TeleportCityFaction::NEUTRAL)
+        return true;
+
+    if (IsAlliance(bot->GetRace()))
+        return faction == TeleportCityFaction::ALLIANCE;
+
+    return faction == TeleportCityFaction::HORDE;
+}
+
+bool RandomPlayerbotMgr::GetRandomCityTeleportTarget(Player* bot, TeleportCityId city, WorldLocation& loc)
+{
+    if (!bot || !IsCityAvailableForBot(bot, city))
+        return false;
+
+    auto cityLocItr = bankerLocsPerCityCache.find(city);
+    if (cityLocItr != bankerLocsPerCityCache.end() && !cityLocItr->second.empty())
+    {
+        BankerLocation const& bankerLoc = PickRandom(cityLocItr->second);
+        loc = bankerLoc.loc;
+        return true;
+    }
+
+    auto fallbackItr = kTeleportCities.find(city);
+    if (fallbackItr == kTeleportCities.end())
+        return false;
+
+    loc = fallbackItr->second.fallback;
+    return true;
+}
+
+bool RandomPlayerbotMgr::GetRandomCityTeleportTarget(Player* bot, WorldLocation& loc)
+{
+    if (!bot)
+        return false;
+
+    std::vector<TeleportCityId> weightedCities;
+    for (auto const& cityEntry : bankerLocsPerCityCache)
+    {
+        if (!IsCityAvailableForBot(bot, cityEntry.first))
+            continue;
+
+        uint32 weight = GetCityWeight(cityEntry.first);
+        if (!weight)
+            continue;
+
+        for (uint32 i = 0; i < weight; ++i)
+            weightedCities.push_back(cityEntry.first);
+    }
+
+    if (weightedCities.empty())
+    {
+        for (auto const& cityEntry : kTeleportCities)
+        {
+            if (!IsCityAvailableForBot(bot, cityEntry.first))
+                continue;
+
+            uint32 weight = GetCityWeight(cityEntry.first);
+            if (!weight)
+                continue;
+
+            for (uint32 i = 0; i < weight; ++i)
+                weightedCities.push_back(cityEntry.first);
+        }
+    }
+
+    if (weightedCities.empty())
+        return false;
+
+    return GetRandomCityTeleportTarget(bot, PickRandom(weightedCities), loc);
+}
+
+bool RandomPlayerbotMgr::GetCapitalAnchorCity(Player* bot, TeleportCityId& city)
+{
+    if (!bot)
+        return false;
+
+    std::string anchor = GetData(bot->GetGUIDLow(), "city_anchor");
+    if (anchor == "stormwind")
+    {
+        city = TeleportCityId::STORMWIND;
+        return true;
+    }
+
+    if (anchor == "orgrimmar")
+    {
+        city = TeleportCityId::ORGRIMMAR;
+        return true;
+    }
+
+    return false;
+}
+
+uint32 RandomPlayerbotMgr::GetCapitalCityBotCount(uint32 zoneId)
+{
+    uint32 count = 0;
+    for (uint32 botGuid : currentBots)
+    {
+        Player* bot = GetPlayerBot(botGuid);
+        if (!bot || !bot->IsInWorld() || bot->InBattleground())
+            continue;
+
+        if (sTerrainMgr.GetZoneId(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()) == zoneId)
+            ++count;
+    }
+
+    return count;
+}
+
+bool RandomPlayerbotMgr::IsTeleportTargetVisibleToPlayers(WorldLocation const& loc, float range)
+{
+    float const sqRange = range * range;
+    for (Player* player : players)
+    {
+        if (!player || !player->GetSession() || !player->IsInWorld() || player->IsDuringRemoveFromWorld() ||
+            player->GetSession()->IsLogingOut())
+            continue;
+
+        if (player->GetMapId() != loc.mapId)
+            continue;
+
+        float dx = player->GetPositionX() - loc.x;
+        float dy = player->GetPositionY() - loc.y;
+        float dz = player->GetPositionZ() - loc.z;
+        if (dx * dx + dy * dy + dz * dz <= sqRange)
+            return true;
+    }
+
+    return false;
+}
+
+bool RandomPlayerbotMgr::TeleportBotToCapitalAnchor(Player* bot, TeleportCityId city, bool resetAnchorTimers)
+{
+    if (!bot)
+        return false;
+
+    uint32 currentZone = sTerrainMgr.GetZoneId(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
+    uint32 cityZone = GetCityZoneId(city);
+
+    SetValue(bot, "city_anchor", 1, GetCityName(city));
+
+    if (currentZone != cityZone)
+    {
+        WorldLocation cityLoc;
+        if (!GetRandomCityTeleportTarget(bot, city, cityLoc))
+            return false;
+
+        std::vector<WorldLocation> cityTargets(1, cityLoc);
+        RandomTeleport(bot, cityTargets, true);
+    }
+
+    if (resetAnchorTimers)
+    {
+        uint32 dwellMin = std::max<uint32>(1, sPlayerbotAIConfig.capitalCityDwellMin);
+        uint32 dwellMax = std::max(dwellMin, sPlayerbotAIConfig.capitalCityDwellMax);
+        uint32 dwell = urand(dwellMin, dwellMax);
+        ScheduleTeleport(bot->GetGUIDLow(), dwell);
+        ScheduleLogout(bot->GetGUIDLow(), dwell);
+    }
+
+    return true;
+}
+
+bool RandomPlayerbotMgr::ShouldProtectCapitalBotFromLogout(Player* bot)
+{
+    if (!bot || !sPlayerbotAIConfig.enableCapitalCityPopulation || !sPlayerbotAIConfig.capitalCityProtectFromLogout)
+        return false;
+
+    TeleportCityId city;
+    if (!GetCapitalAnchorCity(bot, city))
+        return false;
+
+    uint32 target = city == TeleportCityId::STORMWIND ? sPlayerbotAIConfig.minStormwindBots : sPlayerbotAIConfig.minOrgrimmarBots;
+    return target && GetCapitalCityBotCount(GetCityZoneId(city)) < target;
+}
+
+void RandomPlayerbotMgr::MaintainCapitalCityPopulation()
+{
+    if (!sPlayerbotAIConfig.enableCapitalCityPopulation)
+        return;
+
+    if (GetEventValue(MANAGER_BOT, "capital_city_check"))
+        return;
+
+    SetEventValue(MANAGER_BOT, "capital_city_check", 1, std::max<uint32>(1, sPlayerbotAIConfig.capitalCityCheckInterval));
+
+    auto maintainCity = [this](TeleportCityId city, uint32 targetCount)
+    {
+        if (!targetCount)
+            return;
+
+        uint32 currentCount = GetCapitalCityBotCount(GetCityZoneId(city));
+        if (currentCount >= targetCount)
+            return;
+
+        struct Candidate
+        {
+            Player* bot = nullptr;
+            int32 score = 0;
+        };
+
+        std::vector<Candidate> candidates;
+        for (uint32 botGuid : currentBots)
+        {
+            Player* bot = GetPlayerBot(botGuid);
+            if (!bot || !bot->IsInWorld() || bot->IsBeingTeleported() || bot->isDead() || bot->IsInCombat() ||
+                bot->InBattleground() || bot->InBattlegroundQueue() || bot->GetLevel() < sPlayerbotAIConfig.capitalCityMinLevel)
+            {
+                continue;
+            }
+
+            PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+            if (!botAI || botAI->HasActivePlayerMaster())
+                continue;
+
+            std::string anchor = GetData(botGuid, "city_anchor");
+            if (!anchor.empty() && anchor != GetCityName(city))
+                continue;
+
+            uint32 zoneId = sTerrainMgr.GetZoneId(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
+            int32 score = int32(bot->GetLevel());
+            if (!bot->GetGroup())
+                score += 1000;
+            if (anchor == GetCityName(city))
+                score += 10000;
+            if (zoneId == GetCityZoneId(city))
+                score += 5000;
+
+            candidates.push_back({bot, score});
+        }
+
+        std::sort(candidates.begin(), candidates.end(), [](Candidate const& lhs, Candidate const& rhs) {
+            return lhs.score > rhs.score;
+        });
+
+        uint32 shortage = targetCount - currentCount;
+        for (Candidate const& candidate : candidates)
+        {
+            if (!shortage)
+                break;
+
+            if (TeleportBotToCapitalAnchor(candidate.bot, city, true))
+            {
+                --shortage;
+                ++currentCount;
+            }
+        }
+    };
+
+    maintainCity(TeleportCityId::STORMWIND, sPlayerbotAIConfig.minStormwindBots);
+    maintainCity(TeleportCityId::ORGRIMMAR, sPlayerbotAIConfig.minOrgrimmarBots);
 }
 
 bool RandomPlayerbotMgr::ProcessBot(Player* player)
@@ -840,7 +1270,13 @@ void RandomPlayerbotMgr::Revive(Player* player)
             player->SpawnCorpseBones();
 
         if (!player->InBattleground())
-            RandomTeleportForLevel(player);
+        {
+            TeleportCityId city;
+            if (GetCapitalAnchorCity(player, city))
+                TeleportBotToCapitalAnchor(player, city, true);
+            else
+                RandomTeleportForLevel(player);
+        }
     }
 
     SetEventValue(player->GetGUIDLow(), "revive", 1,
@@ -902,7 +1338,7 @@ void RandomPlayerbotMgr::ChangeStrategyOnce(Player* player)
 
     botAI->ChangeStrategy(strategy, BOT_STATE_NON_COMBAT);
     SetValue(player, "strategy_mode", 1, mode);
-    LOG_INFO("playerbots", "Random bot strategy mode: %s (%u) -> %s",
+    LOG_DEBUG("playerbots", "Random bot strategy mode: %s (%u) -> %s",
         player->GetName(), player->GetGUIDLow(), mode.c_str());
 }
 
@@ -1032,7 +1468,7 @@ void RandomPlayerbotMgr::LoadBattleMastersCache()
 
     sObjectMgr.DoCreatureData(worker);
 
-    LOG_INFO("playerbots", "Random battlemaster cache: AV=%zu AB=%zu WS=%zu",
+    LOG_DEBUG("playerbots", "Random battlemaster cache: AV=%zu AB=%zu WS=%zu",
         BattleMastersCache[TEAM_ALLIANCE][BATTLEGROUND_AV].size() +
             BattleMastersCache[TEAM_HORDE][BATTLEGROUND_AV].size(),
         BattleMastersCache[TEAM_ALLIANCE][BATTLEGROUND_AB].size() +
@@ -1210,7 +1646,7 @@ void RandomPlayerbotMgr::LogBattlegroundInfo()
     auto [wsQueues, wsInstances, wsAllianceBots, wsHordeBots, wsAlliancePlayers, wsHordePlayers] =
         summarize(BATTLEGROUND_WS);
 
-    LOG_INFO("playerbots",
+    LOG_DEBUG("playerbots",
         "Random BG state: AV q=%u inst=%u a=%u/%u h=%u/%u | AB q=%u inst=%u a=%u/%u h=%u/%u | WS q=%u inst=%u a=%u/%u h=%u/%u",
         avQueues, avInstances, avAllianceBots, avAlliancePlayers, avHordeBots, avHordePlayers,
         abQueues, abInstances, abAllianceBots, abAlliancePlayers, abHordeBots, abHordePlayers,
@@ -1263,6 +1699,10 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
     allianceStarterPerLevelCache.clear();
     hordeStarterPerLevelCache.clear();
     bankerLocsPerLevelCache.clear();
+    bankerLocsPerCityCache.clear();
+    cityBankerEntries.clear();
+    bankerEntryToCity = kBankerToCity;
+    bankerEntryToLocation.clear();
     rpgLocsCacheLevel.clear();
 
     uint32 maxLevel = sWorld.getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
@@ -1357,6 +1797,14 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 uint32 high = ClampToLevelBracket(std::max(low, bracketItr->second.high));
                 for (uint32 level = low; level <= high; ++level)
                     mgr->bankerLocsPerLevelCache[level].push_back({loc, data.creature_id[0]});
+
+                auto cityItr = mgr->bankerEntryToCity.find(data.creature_id[0]);
+                if (cityItr != mgr->bankerEntryToCity.end())
+                {
+                    mgr->bankerLocsPerCityCache[cityItr->second.first].push_back({loc, data.creature_id[0]});
+                    mgr->cityBankerEntries[cityItr->second.first].push_back(data.creature_id[0]);
+                    mgr->bankerEntryToLocation.insert(std::make_pair(data.creature_id[0], loc));
+                }
             }
 
             return false;
@@ -1386,7 +1834,7 @@ void RandomPlayerbotMgr::Init()
                 std::max(sPlayerbotAIConfig.randomBotCountChangeMinInterval,
                     sPlayerbotAIConfig.randomBotCountChangeMaxInterval)));
 
-    LOG_INFO("playerbots", "RandomPlayerbotMgr initialized: autologin=%s random_accounts=%zu addclass_accounts=%zu level_cache=%zu rpg_cache=%zu",
+    LOG_DEBUG("playerbots", "RandomPlayerbotMgr initialized: autologin=%s random_accounts=%zu addclass_accounts=%zu level_cache=%zu rpg_cache=%zu",
         sPlayerbotAIConfig.randomBotAutologin ? "true" : "false",
         rndBotTypeAccounts.size(),
         addClassTypeAccounts.size(),
@@ -1421,7 +1869,7 @@ void RandomPlayerbotMgr::PruneOrphanRandomBotState()
             RANDOM_BOT_OWNER);
     }
 
-    LOG_INFO("playerbots", "Random bot orphan cleanup pruned %u rows across %u bot GUIDs",
+    LOG_DEBUG("playerbots", "Random bot orphan cleanup pruned %u rows across %u bot GUIDs",
         orphanRows, orphanBots);
 }
 
@@ -1522,8 +1970,9 @@ bool RandomPlayerbotMgr::RepairRandomBotRuntimeState(Player* bot, char const* co
     bot->SaveToDB(false, false);
     FinalizeAutonomousInit(bot, context);
 
-    LOG_INFO("playerbots", "Random bot runtime state repaired: %s (%u) level=%u context=%s",
+    LOG_DEBUG("playerbots", "Random bot runtime state repaired: %s (%u) level=%u context=%s",
         bot->GetName(), bot->GetGUIDLow(), bot->GetLevel(), context ? context : "unknown");
+
     return true;
 }
 
@@ -1554,15 +2003,16 @@ bool RandomPlayerbotMgr::EnsureAutonomousInit(Player* bot, char const* context)
     if (state.missingGear)
         reasons.push_back("missing gear");
 
-    LOG_INFO("playerbots", "Random bot uninitialized: %s (%u) [%s] context=%s",
+    LOG_DEBUG("playerbots", "Random bot uninitialized: %s (%u) [%s] context=%s",
         bot->GetName(), bot->GetGUIDLow(), JoinReasons(reasons).c_str(), context ? context : "unknown");
 
     if (state.NeedsFullRandomize())
     {
         RandomizeFirst(bot);
 
-        LOG_INFO("playerbots", "Random bot repaired: %s (%u) level=%u context=%s",
+        LOG_DEBUG("playerbots", "Random bot repaired: %s (%u) level=%u context=%s",
             bot->GetName(), bot->GetGUIDLow(), bot->GetLevel(), context ? context : "unknown");
+
         return true;
     }
 
@@ -1609,7 +2059,7 @@ void RandomPlayerbotMgr::BackfillAutonomousEvents(uint32 bot, char const* contex
 
     if (!missing.empty())
     {
-        LOG_INFO("playerbots", "Random bot scheduled with missing events: %u [%s] context=%s",
+        LOG_DEBUG("playerbots", "Random bot scheduled with missing events: %u [%s] context=%s",
             bot, JoinReasons(missing).c_str(), context ? context : "unknown");
     }
 
@@ -1674,7 +2124,7 @@ void RandomPlayerbotMgr::RepairBrokenRandomBotState()
     if (!result)
     {
         SetEventValue(MANAGER_BOT, "autonomy_repair_v1", 1, 0);
-        LOG_INFO("playerbots", "Random bot autonomy repair: no add-only bots required backfill");
+        LOG_DEBUG("playerbots", "Random bot autonomy repair: no add-only bots required backfill");
         return;
     }
 
@@ -1687,7 +2137,7 @@ void RandomPlayerbotMgr::RepairBrokenRandomBotState()
     if (brokenBots.empty())
     {
         SetEventValue(MANAGER_BOT, "autonomy_repair_v1", 1, 0);
-        LOG_INFO("playerbots", "Random bot autonomy repair: no add-only bots required backfill");
+        LOG_DEBUG("playerbots", "Random bot autonomy repair: no add-only bots required backfill");
         return;
     }
 
@@ -1720,7 +2170,7 @@ void RandomPlayerbotMgr::RepairBrokenRandomBotState()
         }
     }
 
-    LOG_INFO("playerbots", "Random bot autonomy repair backfill prepared %zu add-only bots for reinitialization",
+    LOG_DEBUG("playerbots", "Random bot autonomy repair backfill prepared %zu add-only bots for reinitialization",
         brokenBots.size());
     SetEventValue(MANAGER_BOT, "autonomy_repair_v1", 1, 0);
 }
@@ -1740,7 +2190,7 @@ void RandomPlayerbotMgr::ClearMissingBotEventState(uint32 bot, char const* conte
     cache.loaded = true;
     cache.events.clear();
 
-    LOG_INFO("playerbots", "Random bot event state removed for missing character guid=%u context=%s",
+    LOG_DEBUG("playerbots", "Random bot event state removed for missing character guid=%u context=%s",
         bot, context ? context : "unknown");
 }
 
@@ -2050,6 +2500,10 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot)
     if (!bot)
         return;
 
+    TeleportCityId capitalCity;
+    if (GetCapitalAnchorCity(bot, capitalCity) && TeleportBotToCapitalAnchor(bot, capitalCity, true))
+        return;
+
     std::string strategyMode = GetData(bot->GetGUIDLow(), "strategy_mode");
     if (strategyMode == "new rpg" || strategyMode == "rpg")
         RandomTeleportForRpg(bot);
@@ -2062,24 +2516,111 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot)
         RandomTeleportForLevel(bot);
 }
 
-void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool)
+void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth)
 {
-    if (!bot || locs.empty() || bot->IsBeingTeleported())
-        return;
-
-    WorldLocation const& loc = PickRandom(locs);
-    if (!MapManager::IsValidMapCoord(loc))
-        return;
-
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (botAI)
+    if (!bot || locs.empty() || bot->IsBeingTeleported() || !bot->IsInWorld())
     {
-        botAI->Reset();
-        bot->CombatStop(true);
+        if (bot)
+            ScheduleTeleport(bot->GetGUIDLow(), 60);
+        return;
     }
 
-    bot->TeleportTo(loc.mapId, loc.x, loc.y, loc.z, loc.o);
-    ScheduleTeleport(bot->GetGUIDLow(), 0);
+    if (bot->IsRooted() || bot->InBattlegroundQueue() || bot->InBattleground())
+    {
+        ScheduleTeleport(bot->GetGUIDLow(), 60);
+        return;
+    }
+
+    if (bot->GetGroup() && !bot->GetGroup()->IsLeader(bot->GetGUID()))
+    {
+        ScheduleTeleport(bot->GetGUIDLow(), 60);
+        return;
+    }
+
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+    {
+        ScheduleTeleport(bot->GetGUIDLow(), 60);
+        return;
+    }
+
+    if (bot->HasUnitMovementFlag(MOVEFLAG_ONTRANSPORT) && bot->HasUnitState(UNIT_STATE_IGNORE_PATHFINDING) &&
+        botAI->HasPlayerNearby())
+    {
+        ScheduleTeleport(bot->GetGUIDLow(), 60);
+        return;
+    }
+
+    std::vector<WorldLocation> candidates;
+    candidates.reserve(locs.size());
+    for (WorldLocation const& loc : locs)
+    {
+        if (HasAllowedMap(loc.mapId))
+            candidates.push_back(loc);
+    }
+
+    if (candidates.empty())
+    {
+        ScheduleTeleport(bot->GetGUIDLow(), 60);
+        return;
+    }
+
+    std::shuffle(candidates.begin(), candidates.end(), std::mt19937(std::random_device{}()));
+    for (WorldLocation loc : candidates)
+    {
+        if (!MapManager::IsValidMapCoord(loc))
+            continue;
+
+        Map* map = sMapMgr.FindMap(loc.mapId, 0);
+        if (!map)
+            continue;
+
+        AreaTableEntry const* zone =
+            sAreaTableStore.LookupEntry(sTerrainMgr.GetZoneId(loc.mapId, loc.x, loc.y, loc.z));
+        AreaTableEntry const* area =
+            sAreaTableStore.LookupEntry(sTerrainMgr.GetAreaId(loc.mapId, loc.x, loc.y, loc.z));
+        if (!zone || !area || !IsSafeTeleportZoneForBot(bot, zone))
+            continue;
+
+        if (map->IsInWater(PHASEMASK_NORMAL, loc.x, loc.y, loc.z, bot->GetCollisionHeight()))
+            continue;
+
+        float ground = map->GetHeight(loc.x, loc.y, loc.z + 0.5f, true, 50.0f);
+        if (ground <= INVALID_HEIGHT)
+            continue;
+
+        loc.z = ground + 0.05f;
+
+        if (!botAI->CheckLocationDistanceByLevel(bot, loc, true))
+            continue;
+
+        if (IsTeleportTargetVisibleToPlayers(loc, PLAYER_VISIBILITY_GUARD_RANGE))
+            continue;
+
+        if (hearth)
+            bot->SetHomebindToLocation(loc, zone->ID);
+
+        botAI->Reset();
+        bot->CombatStop(true);
+        bot->GetMotionMaster()->Clear();
+        bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
+        bot->TeleportTo(loc.mapId, loc.x, loc.y, loc.z, loc.o);
+        bot->SendMovementPacket(MSG_MOVE_HEARTBEAT, true);
+
+        uint32 nextDelay = 0;
+        TeleportCityId city;
+        if (GetCapitalAnchorCity(bot, city))
+        {
+            uint32 dwellMin = std::max<uint32>(1, sPlayerbotAIConfig.capitalCityDwellMin);
+            uint32 dwellMax = std::max(dwellMin, sPlayerbotAIConfig.capitalCityDwellMax);
+            nextDelay = urand(dwellMin, dwellMax);
+        }
+
+        ScheduleTeleport(bot->GetGUIDLow(), nextDelay);
+        return;
+    }
+
+    ScheduleTeleport(bot->GetGUIDLow(), 60);
 }
 
 uint32 RandomPlayerbotMgr::GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ)

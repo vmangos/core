@@ -16,7 +16,8 @@ bool QuestConfirmAcceptAction::Execute(Event event)
         return false;
     }
     std::ostringstream out;
-    out << "Quest: " << chat->FormatQuest(quest) << " confirm accept";
+    Player* viewer = event.getOwner() ? event.getOwner() : (botAI->GetActiveMaster() ? botAI->GetActiveMaster() : GetMaster());
+    out << "Quest: " << chat->FormatQuest(quest, viewer) << " confirm accept";
     botAI->TellMaster(out);
     bot->GetSession()->HandleQuestConfirmAccept(sendPacket);
     return true;

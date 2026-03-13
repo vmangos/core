@@ -481,7 +481,7 @@ AiPlayerbot.RandombotStartingLevel = 5
 
 # Chance a newly randomized bot starts at the configured minimum or maximum level.
 AiPlayerbot.RandomBotMinLevelChance = 0.1
-AiPlayerbot.RandomBotMaxLevelChance = 0.01
+AiPlayerbot.RandomBotMaxLevelChance = 0.05
 
 # Prevent random bots from leveling.
 AiPlayerbot.RandomBotFixedLevel = 0
@@ -534,7 +534,7 @@ AiPlayerbot.ExcludedHunterPetFamilies = ""
 ####################################################################################################
 
 # Percentage of active bots in areas without nearby real players.
-AiPlayerbot.BotActiveAlone = 10
+AiPlayerbot.BotActiveAlone = 100
 
 # Force activity behavior when players are nearby.
 AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
@@ -686,6 +686,16 @@ AiPlayerbot.TeleToThunderBluffWeight = 1
 AiPlayerbot.TeleToSilvermoonCityWeight = 0
 AiPlayerbot.TeleToShattrathCityWeight = 0
 AiPlayerbot.TeleToDalaranWeight = 0
+
+# Maintain a minimum randombot population inside the faction capitals.
+AiPlayerbot.EnableCapitalCityPopulation = 1
+AiPlayerbot.MinStormwindBots = 20
+AiPlayerbot.MinOrgrimmarBots = 20
+AiPlayerbot.CapitalCityMinLevel = 20
+AiPlayerbot.CapitalCityDwellMin = 600
+AiPlayerbot.CapitalCityDwellMax = 1800
+AiPlayerbot.CapitalCityCheckInterval = 60
+AiPlayerbot.CapitalCityProtectFromLogout = 1
 
 # Post-death teleport distance and old RPG-level bracket rules.
 AiPlayerbot.RandomBotTeleportDistance = 100

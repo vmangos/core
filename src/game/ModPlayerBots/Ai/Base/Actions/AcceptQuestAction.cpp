@@ -10,9 +10,10 @@
 
 bool AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
 {
-    if (!AcceptQuest(quest, questGiver->GetGUID())) return false;
+    Player* viewer = botAI->GetActiveMaster() ? botAI->GetActiveMaster() : GetMaster();
+    if (!AcceptQuest(quest, questGiver->GetGUID(), viewer)) return false;
 
-    auto text_quest = ChatHelper::FormatQuest(quest);
+    auto text_quest = ChatHelper::FormatQuest(quest, viewer);
     bot->PlayDistanceSound(620);
 
     if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
@@ -81,7 +82,7 @@ bool AcceptQuestAction::Execute(Event event)
     if (!qInfo)
         return false;
 
-    hasAccept |= AcceptQuest(qInfo, ObjectGuid(guid));
+    hasAccept |= AcceptQuest(qInfo, ObjectGuid(guid), requester);
 
     if (hasAccept)
     {

@@ -11,6 +11,7 @@
 #include "ObjectMgr.h"
 #include "Playerbots.h"
 #include "SpellInfo.h"
+#include "WorldSession.h"
 
 #include <regex>
 
@@ -24,6 +25,79 @@ std::map<std::string, ChatMsg> ChatHelper::chats;
 std::map<uint8, std::string> ChatHelper::classes;
 std::map<uint8, std::string> ChatHelper::races;
 std::map<uint8, std::map<uint8, std::string> > ChatHelper::specs;
+
+int ChatHelper::GetDbLocaleIndex(Player const* viewer)
+{
+    if (!viewer)
+        return -1;
+
+    WorldSession* session = viewer->GetSession();
+    if (!session)
+        return -1;
+
+    int dbLocaleIdx = session->GetSessionDbLocaleIndex();
+    if (dbLocaleIdx < 0)
+        return -1;
+
+    LocaleConstant locale = sObjectMgr.GetLocaleForIndex(dbLocaleIdx);
+    if (locale >= MAX_LOCALES)
+        return -1;
+
+    return dbLocaleIdx;
+}
+
+LocaleConstant ChatHelper::GetLocaleConstant(Player const* viewer)
+{
+    int dbLocaleIdx = GetDbLocaleIndex(viewer);
+    if (dbLocaleIdx < 0)
+        return LOCALE_enUS;
+
+    LocaleConstant locale = sObjectMgr.GetLocaleForIndex(dbLocaleIdx);
+    return locale < MAX_LOCALES ? locale : LOCALE_enUS;
+}
+
+std::string ChatHelper::GetQuestTitleForViewer(Quest const* quest, Player const* viewer)
+{
+    if (!quest)
+        return "Invalid quest";
+
+    QuestLocale const* locale = sObjectMgr.GetQuestLocale(quest->GetQuestId());
+    int dbLocaleIdx = GetDbLocaleIndex(viewer);
+
+    if (locale && dbLocaleIdx >= 0 && locale->Title.size() > static_cast<size_t>(dbLocaleIdx) &&
+        !locale->Title[dbLocaleIdx].empty())
+    {
+        return locale->Title[dbLocaleIdx];
+    }
+
+    return quest->GetTitle();
+}
+
+std::string ChatHelper::GetItemNameForViewer(ItemTemplate const* proto, Player const* viewer)
+{
+    if (!proto)
+        return "item";
+
+    ItemLocale const* locale = sObjectMgr.GetItemLocale(proto->ItemId);
+    int dbLocaleIdx = GetDbLocaleIndex(viewer);
+
+    if (locale && dbLocaleIdx >= 0 && locale->Name.size() > static_cast<size_t>(dbLocaleIdx) &&
+        !locale->Name[dbLocaleIdx].empty())
+    {
+        return locale->Name[dbLocaleIdx];
+    }
+
+    return proto->Name1;
+}
+
+char const* ChatHelper::GetWorldObjectNameForViewer(WorldObject* wo, Player const* viewer)
+{
+    if (!wo)
+        return "unknown";
+
+    int dbLocaleIdx = GetDbLocaleIndex(viewer);
+    return wo->GetNameForLocaleIdx(dbLocaleIdx);
+}
 
 template <class T>
 static bool substrContainsInMap(std::string const searchTerm, std::map<std::string, T> searchIn)
@@ -351,43 +425,30 @@ ItemWithRandomProperty ChatHelper::parseItemWithRandomProperty(std::string const
     return res;
 }
 
-std::string const ChatHelper::FormatQuest(Quest const* quest)
+std::string const ChatHelper::FormatQuest(Quest const* quest, Player const* viewer)
 {
     if (!quest)
-    {
         return "Invalid quest";
-    }
 
     std::ostringstream out;
-    QuestLocale const* locale = sObjectMgr.GetQuestLocale(quest->GetQuestId());
-    std::string questTitle;
-
-    if (locale && locale->Title.size() > sWorld.GetDefaultDbcLocale())
-        questTitle = locale->Title[sWorld.GetDefaultDbcLocale()];
-
-    if (questTitle.empty())
-        questTitle = quest->GetTitle();
-
-    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << questTitle << "]|h|r";
+    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h["
+        << GetQuestTitleForViewer(quest, viewer) << "]|h|r";
     return out.str();
 }
 
-std::string const ChatHelper::FormatGameobject(GameObject* go)
+std::string const ChatHelper::FormatGameobject(GameObject* go, Player const* viewer)
 {
     std::ostringstream out;
     out << "|cFFFFFF00|Hfound:" << go->GetGUID() << ":" << go->GetEntry() << ":"
-        << "|h[" << go->GetNameForLocaleIdx(sWorld.GetDefaultDbcLocale()) << "]|h|r";
+        << "|h[" << GetWorldObjectNameForViewer(go, viewer) << "]|h|r";
     return out.str();
 }
 
-std::string const ChatHelper::FormatWorldobject(WorldObject* wo)
+std::string const ChatHelper::FormatWorldobject(WorldObject* wo, Player const* viewer)
 {
     std::ostringstream out;
     out << "|cFFFFFF00|Hfound:" << wo->GetGUID() << ":" << wo->GetEntry() << ":"
-        << "|h[";
-    out << (wo->ToGameObject() ? ((GameObject*)wo)->GetNameForLocaleIdx(sWorld.GetDefaultDbcLocale())
-                               : wo->GetNameForLocaleIdx(sWorld.GetDefaultDbcLocale()))
-        << "]|h|r";
+        << "|h[" << GetWorldObjectNameForViewer(wo, viewer) << "]|h|r";
     return out.str();
 }
 
@@ -425,23 +486,14 @@ std::string const ChatHelper::FormatSpell(SpellInfo const* spellInfo)
     return out.str();
 }
 
-std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count, uint32 total)
+std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count, uint32 total, Player const* viewer)
 {
     char color[32];
     snprintf(color, sizeof(color), "%x", ItemQualityColors[proto->Quality]);
 
-    std::string itemName;
-    const ItemLocale* locale = sObjectMgr.GetItemLocale(proto->ItemId);
-
-    if (locale && locale->Name.size() > sWorld.GetDefaultDbcLocale())
-        itemName = locale->Name[sWorld.GetDefaultDbcLocale()];
-
-    if (itemName.empty())
-        itemName = proto->Name1;
-
     std::ostringstream out;
     out << "|c" << color << "|Hitem:" << proto->ItemId << ":0:0:0:0:0:0:0"
-        << "|h[" << itemName << "]|h|r";
+        << "|h[" << GetItemNameForViewer(proto, viewer) << "]|h|r";
 
     if (count > 1)
         out << "x" << count;

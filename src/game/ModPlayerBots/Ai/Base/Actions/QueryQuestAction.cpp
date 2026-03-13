@@ -16,7 +16,7 @@ void QueryQuestAction::TellObjective(std::string const name, uint32 available, u
 
 bool QueryQuestAction::Execute(Event event)
 {
-    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+    Player* requester = event.getOwner() ? event.getOwner() : (botAI->GetActiveMaster() ? botAI->GetActiveMaster() : GetMaster());
     Player* bot = botAI->GetBot();
     WorldPosition botPos(bot);
     WorldPosition* ptr_botpos = &botPos;
@@ -55,7 +55,7 @@ bool QueryQuestAction::Execute(Event event)
             continue;
 
         std::ostringstream out;
-        out << "--- " << chat->FormatQuest(sObjectMgr.GetQuestTemplate(questId)) << " ";
+        out << "--- " << chat->FormatQuest(sObjectMgr.GetQuestTemplate(questId), requester) << " ";
 
         if (bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
         {
@@ -66,7 +66,7 @@ bool QueryQuestAction::Execute(Event event)
         {
             out << "|c00FF0000not completed|r ---";
             botAI->TellMaster(out);
-            TellObjectives(questId);
+            TellObjectives(questId, requester);
         }
 
         if (travel)
@@ -110,7 +110,7 @@ bool QueryQuestAction::Execute(Event event)
     return false;
 }
 
-void QueryQuestAction::TellObjectives(uint32 questId)
+void QueryQuestAction::TellObjectives(uint32 questId, Player const* viewer)
 {
     Quest const* questTemplate = sObjectMgr.GetQuestTemplate(questId);
 
@@ -136,7 +136,7 @@ void QueryQuestAction::TellObjectives(uint32 questId)
             uint32 available = questStatus.ItemCount[i];
             ItemTemplate const* proto = sObjectMgr.GetItemTemplate(questTemplate->RequiredItemId[i]);
             if (proto)
-                TellObjective(chat->FormatItem(proto), available, required);
+                TellObjective(chat->FormatItem(proto, 0, 0, viewer), available, required);
         }
 
         // Checks for required NPCs or GOs

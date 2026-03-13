@@ -11,7 +11,11 @@
 #include "PlayerbotMgr.h"
 #include "GameTime.h"
 #include "PlayerbotCommandServer.h"
+#include "SharedDefines.h"
+#include <map>
+#include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 struct BattlegroundInfo
 {
@@ -46,7 +50,6 @@ struct BattlegroundInfo
 
 class ChatHandler;
 class PerfMonitorOperation;
-class WorldLocation;
 
 struct CachedEvent
 {
@@ -90,6 +93,27 @@ private:
 class RandomPlayerbotMgr : public PlayerbotHolder
 {
 public:
+    enum class TeleportCityId : uint8
+    {
+        STORMWIND,
+        IRONFORGE,
+        DARNASSUS,
+        EXODAR,
+        ORGRIMMAR,
+        UNDERCITY,
+        THUNDER_BLUFF,
+        SILVERMOON_CITY,
+        SHATTRATH_CITY,
+        DALARAN
+    };
+
+    enum class TeleportCityFaction : uint8
+    {
+        ALLIANCE,
+        HORDE,
+        NEUTRAL
+    };
+
     static RandomPlayerbotMgr& instance()
     {
         static RandomPlayerbotMgr instance;
@@ -184,6 +208,10 @@ public:
         uint32 entry;
     };
     std::map<uint8, std::vector<BankerLocation>> bankerLocsPerLevelCache;
+    std::map<TeleportCityId, std::vector<BankerLocation>> bankerLocsPerCityCache;
+    std::map<TeleportCityId, std::vector<uint32>> cityBankerEntries;
+    std::map<uint32, std::pair<TeleportCityId, TeleportCityFaction>> bankerEntryToCity;
+    std::map<uint32, WorldLocation> bankerEntryToLocation;
 
     // Account type management
     void AssignAccountTypes();
@@ -290,9 +318,21 @@ private:
     uint32 GetRandomBotCountTarget();
     std::vector<uint32> GetOfflineRandomBots(uint32 limit);
     bool IsEventDue(uint32 bot, std::string const& event);
+    void MaintainCapitalCityPopulation();
     void RandomTeleport(Player* bot);
     void RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth = false);
     uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);
+    bool GetCapitalAnchorCity(Player* bot, TeleportCityId& city);
+    bool GetRandomCityTeleportTarget(Player* bot, TeleportCityId city, WorldLocation& loc);
+    bool GetRandomCityTeleportTarget(Player* bot, WorldLocation& loc);
+    bool TeleportBotToCapitalAnchor(Player* bot, TeleportCityId city, bool resetAnchorTimers);
+    bool ShouldProtectCapitalBotFromLogout(Player* bot);
+    uint32 GetCapitalCityBotCount(uint32 zoneId);
+    bool IsTeleportTargetVisibleToPlayers(WorldLocation const& loc, float range);
+    char const* GetCityName(TeleportCityId city);
+    uint32 GetCityZoneId(TeleportCityId city);
+    uint32 GetCityWeight(TeleportCityId city);
+    bool IsCityAvailableForBot(Player* bot, TeleportCityId city);
     typedef void (RandomPlayerbotMgr::*ConsoleCommandHandler)(Player*);
     std::vector<Player*> players;
     uint32 processTicks;

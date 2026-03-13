@@ -208,6 +208,7 @@ bool NewRpgBaseAction::ForceToWait(uint32 duration, MovementPriority priority)
 /// Quest related method refer to TalkToQuestGiverAction.h
 bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
 {
+    Player* viewer = botAI->GetActiveMaster() ? botAI->GetActiveMaster() : botAI->GetMaster();
     WorldObject* object = bot->GetMap()->GetWorldObject(guid);
     if (!object || !bot->CanInteractWithQuestGiver(object))
         return false;
@@ -238,7 +239,7 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
         {
             AcceptQuest(quest, guid);
             if (botAI->GetMaster())
-                botAI->TellMasterNoFacing("Quest accepted " + ChatHelper::FormatQuest(quest));
+                botAI->TellMasterNoFacing("Quest accepted " + ChatHelper::FormatQuest(quest, viewer));
             BroadcastHelper::BroadcastQuestAccepted(botAI, bot, quest);
             botAI->rpgStatistic.questAccepted++;
             LOG_DEBUG("playerbots", "[New RPG] %s accept quest %u", bot->GetName(), quest->GetQuestId());
@@ -247,7 +248,7 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
         {
             TurnInQuest(quest, guid);
             if (botAI->GetMaster())
-                botAI->TellMasterNoFacing("Quest rewarded " + ChatHelper::FormatQuest(quest));
+                botAI->TellMasterNoFacing("Quest rewarded " + ChatHelper::FormatQuest(quest, viewer));
             BroadcastHelper::BroadcastQuestTurnedIn(botAI, bot, quest);
             botAI->rpgStatistic.questRewarded++;
             LOG_DEBUG("playerbots", "[New RPG] %s turned in quest %u", bot->GetName(), quest->GetQuestId());
@@ -505,6 +506,7 @@ bool NewRpgBaseAction::IsQuestCapableDoing(Quest const* quest)
 
 bool NewRpgBaseAction::OrganizeQuestLog()
 {
+    Player* viewer = botAI->GetActiveMaster() ? botAI->GetActiveMaster() : botAI->GetMaster();
     int32 freeSlotNum = 0;
 
     for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
@@ -535,7 +537,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             packet << (uint8)i;
             bot->GetSession()->HandleQuestLogRemoveQuest(packet);
             if (botAI->GetMaster())
-                botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
+                botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest, viewer));
             botAI->rpgStatistic.questDropped++;
             dropped++;
         }
@@ -560,7 +562,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             packet << (uint8)i;
             bot->GetSession()->HandleQuestLogRemoveQuest(packet);
             if (botAI->GetMaster())
-                botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
+                botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest, viewer));
             botAI->rpgStatistic.questDropped++;
             dropped++;
         }
@@ -582,7 +584,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
         packet << (uint8)i;
         bot->GetSession()->HandleQuestLogRemoveQuest(packet);
         if (botAI->GetMaster())
-            botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest));
+            botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest, viewer));
         botAI->rpgStatistic.questDropped++;
     }
 

@@ -538,6 +538,7 @@ public:
     bool HasRealPlayerMaster();
     // Bot has a master that is activly playing.
     bool HasActivePlayerMaster();
+    Player* GetActiveMaster();
     // Get the group leader or the master of the bot.
     // Checks if the bot is summoned as alt of a player
     bool IsAlt();
@@ -612,7 +613,7 @@ private:
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,
                                    bool mixed = false);
     bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
-    Player* GetActiveMaster();
+    bool TryRecoverToActiveMaster();
     void UpdateAIGroupMaster();
     Item* FindItemInInventory(std::function<bool(ItemTemplate const*)> checkItem) const;
     void HandleCommands();
@@ -652,6 +653,7 @@ protected:
     BotCheatMask cheatMask = BotCheatMask::none;
     Position jumpDestination = Position();
     uint32 nextTransportCheck = 0;
+    time_t lastMasterRecoveryAttempt = 0;
 };
 
 #endif

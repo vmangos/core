@@ -438,9 +438,8 @@ bool KologarnEyebeamTrigger::IsActive()
         {
             if (Unit* unit = botAI->GetUnit(guid))
             {
-                std::string triggerName = unit->GetNameForLocaleIdx(sWorld.GetDefaultDbcLocale());
-
-                if (triggerName.rfind("Focused Eyebeam", 0) == 0 &&
+                if ((unit->HasAura(SPELL_FOCUSED_EYEBEAM_10_2) || unit->HasAura(SPELL_FOCUSED_EYEBEAM_10) ||
+                     unit->HasAura(SPELL_FOCUSED_EYEBEAM_25_2) || unit->HasAura(SPELL_FOCUSED_EYEBEAM_25)) &&
                     bot->GetDistance2d(unit) < ULDUAR_KOLOGARN_EYEBEAM_RADIUS + 1.0f)
                 {
                     return true;

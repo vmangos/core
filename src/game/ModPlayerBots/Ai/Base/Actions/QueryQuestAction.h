@@ -9,6 +9,7 @@
 #include "Action.h"
 
 class PlayerbotAI;
+class Player;
 
 class QueryQuestAction : public Action
 {
@@ -18,7 +19,7 @@ public:
     bool Execute(Event event) override;
 
 private:
-    void TellObjectives(uint32 questId);
+    void TellObjectives(uint32 questId, Player const* viewer);
     void TellObjective(std::string const name, uint32 available, uint32 required);
 };
 

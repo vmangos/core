@@ -76,7 +76,7 @@ public:
         if (group->AddMember(target))
         {
             LOG_DEBUG("playerbots", "GroupInviteOperation: Successfully added %s to group", target->GetName());
-            if (sPlayerbotAIConfig.summonWhenGroup && target->GetDistance(bot) > sPlayerbotAIConfig.sightDistance)
+            if (target->GetDistance(bot) > sPlayerbotAIConfig.sightDistance || target->GetWorldMask() != bot->GetWorldMask())
             {
                 PlayerbotAI* targetAI = sPlayerbotsMgr.GetPlayerbotAI(target);
                 if (targetAI)

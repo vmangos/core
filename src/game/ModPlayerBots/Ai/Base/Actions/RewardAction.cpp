@@ -45,6 +45,7 @@ bool RewardAction::Execute(Event event)
 
 bool RewardAction::Reward(uint32 itemId, Object* questGiver)
 {
+    Player* viewer = botAI->GetActiveMaster() ? botAI->GetActiveMaster() : GetMaster();
     QuestMenu& questMenu = bot->PlayerTalkClass->GetQuestMenu();
     for (uint32 iI = 0; iI < questMenu.MenuItemCount(); ++iI)
     {
@@ -69,7 +70,7 @@ bool RewardAction::Reward(uint32 itemId, Object* questGiver)
                     std::string const itemName = pRewardItem->Name1;
 
                     std::ostringstream out;
-                    out << chat->FormatItem(pRewardItem) << " rewarded";
+                    out << chat->FormatItem(pRewardItem, 0, 0, viewer) << " rewarded";
                     botAI->TellMaster(out);
 
                     return true;
