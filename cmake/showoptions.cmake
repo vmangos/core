@@ -40,10 +40,10 @@ else()
   message(STATUS "Mailsender enabled    : No (default)")
 endif()
 
-if(DISABLE_STACK_TRACE)
-  message(STATUS "Cpptrace enabled      : No")
-else()
+if(ENABLE_CPPTRACE)
   message(STATUS "Cpptrace enabled      : Yes (default)")
+else()
+  message(STATUS "Cpptrace enabled      : No")
 endif()
 
 if(UNIX)

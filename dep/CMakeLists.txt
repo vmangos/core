@@ -22,7 +22,7 @@ if (USE_EXTRACTORS)
   add_subdirectory(libmpq)
 endif()
 
-if (NOT DISABLE_STACK_TRACE)
+if (ENABLE_CPPTRACE)
   add_subdirectory(cpptrace)
   set_target_properties(cpptrace-lib PROPERTIES FOLDER "3rd Party")
   get_cmake_property(variables CACHE_VARIABLES) # hide "CPPTRACE_*" variables in default cmake config

@@ -281,12 +281,12 @@ if(WIN32)
   target_link_libraries(shared PUBLIC ws2_32 mswsock)
 endif()
 
-if (NOT DISABLE_STACK_TRACE)
+if (ENABLE_CPPTRACE)
   target_link_libraries(shared PRIVATE cpptrace::cpptrace)
 endif()
 
 SET_TARGET_PROPERTIES(shared PROPERTIES FOLDER "Game Libs")
 
-if (DISABLE_STACK_TRACE)
-  target_compile_definitions(shared PRIVATE DISABLE_STACK_TRACE)
+if (ENABLE_CPPTRACE)
+  target_compile_definitions(shared PRIVATE ENABLE_CPPTRACE)
 endif()

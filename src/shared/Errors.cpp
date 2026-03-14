@@ -1,7 +1,7 @@
 #include "Errors.h"
 #include "Log.h"
 
-#ifndef DISABLE_STACK_TRACE
+#ifdef ENABLE_CPPTRACE
 #include <cpptrace/cpptrace.hpp>
 #endif
 
@@ -12,8 +12,8 @@ void MaNGOS::Errors::PrintStacktrace()
 
 void MaNGOS::Errors::PrintStacktrace(int skipFrames, int maxFrames)
 {
-#ifdef DISABLE_STACK_TRACE
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stack traces using cpptrace are disabled. Set DISABLE_STACK_TRACE=OFF during CMake configuration to enable them.");
+#ifndef ENABLE_CPPTRACE
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Stack traces using cpptrace are disabled. Set ENABLE_CPPTRACE=ON (default) during CMake configuration to enable them.");
 #else
     cpptrace::stacktrace st = cpptrace::generate_trace(
         std::size_t(skipFrames) + 1, // we want to skip our own frame
