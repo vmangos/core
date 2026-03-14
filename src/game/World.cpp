@@ -3218,6 +3218,14 @@ time_t World::GetWorldUpdateTimerInterval(WorldTimers timer)
     return m_timers[timer].GetInterval();
 }
 
+uint32 World::GetDelayUntilNextSpellBatchingInterval()
+{
+    if (!getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY))
+        return 0;
+
+    return (getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) - (WorldTimer::getMSTime() % getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY)));
+}
+
 void SessionPacketSendTask::operator()()
 {
     if (WorldSession* session = sWorld.FindSession(m_accountId))

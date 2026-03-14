@@ -477,9 +477,9 @@ class ByteBuffer
         void appendPackXYZ(float x, float y, float z)
         {
             uint32 packed = 0;
-            packed |= ((int)(x / 0.25f) & 0x7FF);
-            packed |= ((int)(y / 0.25f) & 0x7FF) << 11;
-            packed |= ((int)(z / 0.25f) & 0x3FF) << 22;
+            packed |= ((int)lroundf(x * 4.0f) & 0x7FF);
+            packed |= ((int)lroundf(y * 4.0f) & 0x7FF) << 11;
+            packed |= ((int)lroundf(z * 4.0f) & 0x3FF) << 22;
             *this << packed;
         }
 

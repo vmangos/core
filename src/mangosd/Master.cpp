@@ -273,7 +273,7 @@ int Master::Run()
 #endif
 
     (void)sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
-    IO::Multithreading::RenameCurrentThread("Main");
+    IO::Multithreading::RenameCurrentThread("mangosd-main");
 
     // Start soap serving thread
     std::unique_ptr<std::thread> soap_thread = nullptr;

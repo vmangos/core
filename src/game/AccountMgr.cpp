@@ -231,9 +231,9 @@ bool AccountMgr::GetName(uint32 accountId, std::string &name)
     {
         std::shared_lock<std::shared_timed_mutex> guard(m_accountPersistentDataMutex);
         auto itr = m_accountPersistentData.find(accountId);
-        if (itr != m_accountPersistentData.end() && !itr->second.m_email.empty())
+        if (itr != m_accountPersistentData.end() && !itr->second.m_username.empty())
         {
-            name = itr->second.m_email;
+            name = itr->second.m_username;
             return true;
         }
     }

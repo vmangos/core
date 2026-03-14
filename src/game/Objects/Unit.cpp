@@ -381,10 +381,12 @@ AutoAttackCheckResult Unit::CanAutoAttackTarget(Unit const* pVictim) const
 
 void Unit::DelayAutoAttacks()
 {
+    uint32 const attackDelay = std::max(sWorld.GetDelayUntilNextSpellBatchingInterval(), 100u);
+
     if (IsAttackReady(BASE_ATTACK))
-        SetAttackTimer(BASE_ATTACK, 100);
+        SetAttackTimer(BASE_ATTACK, attackDelay);
     if (HaveOffhandWeapon() && IsAttackReady(OFF_ATTACK))
-        SetAttackTimer(OFF_ATTACK, 100);
+        SetAttackTimer(OFF_ATTACK, attackDelay);
 }
 
 bool Unit::UpdateMeleeAttackingState()

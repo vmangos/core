@@ -350,6 +350,7 @@ class Spell
         SpellCastResult CheckRange(bool strict);
         SpellCastResult CheckPower() const;
         SpellCastResult CheckCasterAuras() const;
+        bool ValidateExplicitTargetMask() const;
 
         float CalculateDamage(SpellEffectIndex i, Unit* target) { return m_caster->CalculateSpellEffectValue(target, m_spellInfo, i, &m_currentBasePoints[i], this); }
         static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell = nullptr, Item* castItem = nullptr, bool dropModCharge = true);

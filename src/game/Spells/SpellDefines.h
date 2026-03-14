@@ -90,6 +90,73 @@ enum SpellTarget
     MAX_SPELL_TARGETS
 };
 
+// SpellEntry::Targets
+enum SpellCastTargetFlags
+{
+    TARGET_FLAG_SELF            = 0x00000000,
+    TARGET_FLAG_UNUSED1         = 0x00000001,               // not used in any spells (can be set dynamically)
+    TARGET_FLAG_UNIT            = 0x00000002,               // pguid
+    TARGET_FLAG_UNIT_RAID       = 0x00000004,               // not used in any spells (can be set dynamically)
+    TARGET_FLAG_UNIT_PARTY      = 0x00000008,               // not used in any spells (can be set dynamically)
+    TARGET_FLAG_ITEM            = 0x00000010,               // pguid
+    TARGET_FLAG_SOURCE_LOCATION = 0x00000020,               // 3 float
+    TARGET_FLAG_DEST_LOCATION   = 0x00000040,               // 3 float
+    TARGET_FLAG_UNIT_ENEMY      = 0x00000080,               // CanAttack == true
+    TARGET_FLAG_UNIT_ALLY       = 0x00000100,               // CanAssist == true
+    TARGET_FLAG_CORPSE_ENEMY    = 0x00000200,               // pguid, CanAssist == false
+    TARGET_FLAG_UNIT_DEAD       = 0x00000400,               // skinning-like effects
+    TARGET_FLAG_GAMEOBJECT      = 0x00000800,               // pguid, 0 spells
+    TARGET_FLAG_TRADE_ITEM      = 0x00001000,               // pguid, 0 spells
+    TARGET_FLAG_STRING          = 0x00002000,               // string, 0 spells
+    TARGET_FLAG_LOCKED          = 0x00004000,               // 199 spells, opening object/lock
+    TARGET_FLAG_CORPSE_ALLY     = 0x00008000,               // pguid, CanAssist == true
+    TARGET_FLAG_UNIT_MINIPET    = 0x00010000,               // pguid, not used in any spells (can be set dynamically)
+};
+
+inline char const* SpellCastTargetFlagToString(uint32 flag)
+{
+    switch (flag)
+    {
+        case TARGET_FLAG_SELF:
+            return "TARGET_FLAG_SELF";
+        case TARGET_FLAG_UNUSED1:
+            return "TARGET_FLAG_UNUSED1";
+        case TARGET_FLAG_UNIT:
+            return "TARGET_FLAG_UNIT";
+        case TARGET_FLAG_UNIT_RAID:
+            return "TARGET_FLAG_UNIT_RAID";
+        case TARGET_FLAG_UNIT_PARTY:
+            return "TARGET_FLAG_UNIT_PARTY";
+        case TARGET_FLAG_ITEM:
+            return "TARGET_FLAG_ITEM";
+        case TARGET_FLAG_SOURCE_LOCATION:
+            return "TARGET_FLAG_SOURCE_LOCATION";
+        case TARGET_FLAG_DEST_LOCATION:
+            return "TARGET_FLAG_DEST_LOCATION";
+        case TARGET_FLAG_UNIT_ENEMY:
+            return "TARGET_FLAG_UNIT_ENEMY";
+        case TARGET_FLAG_UNIT_ALLY:
+            return "TARGET_FLAG_UNIT_ALLY";
+        case TARGET_FLAG_CORPSE_ENEMY:
+            return "TARGET_FLAG_CORPSE_ENEMY";
+        case TARGET_FLAG_UNIT_DEAD:
+            return "TARGET_FLAG_UNIT_DEAD";
+        case TARGET_FLAG_GAMEOBJECT:
+            return "TARGET_FLAG_GAMEOBJECT";
+        case TARGET_FLAG_TRADE_ITEM:
+            return "TARGET_FLAG_TRADE_ITEM";
+        case TARGET_FLAG_STRING:
+            return "TARGET_FLAG_STRING";
+        case TARGET_FLAG_LOCKED:
+            return "TARGET_FLAG_LOCKED";
+        case TARGET_FLAG_CORPSE_ALLY:
+            return "TARGET_FLAG_CORPSE_ALLY";
+        case TARGET_FLAG_UNIT_MINIPET:
+            return "TARGET_FLAG_UNIT_MINIPET";
+    }
+    return "UNKNOWN";
+}
+
 enum SpellMissInfo
 {
     SPELL_MISS_NONE                    = 0,

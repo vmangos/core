@@ -155,7 +155,9 @@ void SRP6::HashSessionKey(void)
 
 bool SRP6::Proof(uint8 const* lp_M, int l)
 {
-    if (!memcmp(M.AsByteArray().data(), lp_M, l))
+    // Needs a minimum length l for M's byte array to
+    // avoid memcmp accessing data out of bounds!
+    if (!memcmp(M.AsByteArray(l).data(), lp_M, l))
         return false;
 
     return true;
