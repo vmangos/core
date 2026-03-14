@@ -1,7 +1,9 @@
 #include "Errors.h"
 #include "Log.h"
 
+#ifndef DISABLE_STACK_TRACE
 #include <cpptrace/cpptrace.hpp>
+#endif
 
 void MaNGOS::Errors::PrintStacktrace()
 {
@@ -10,6 +12,9 @@ void MaNGOS::Errors::PrintStacktrace()
 
 void MaNGOS::Errors::PrintStacktrace(int skipFrames, int maxFrames)
 {
+#ifdef DISABLE_STACK_TRACE
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DISABLE_STACK_TRACE is set.");
+#else
     cpptrace::stacktrace st = cpptrace::generate_trace(
         std::size_t(skipFrames) + 1, // we want to skip our own frame
         std::size_t(maxFrames)
@@ -58,6 +63,7 @@ void MaNGOS::Errors::PrintStacktrace(int skipFrames, int maxFrames)
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Missing debug symbols. Please build with debug symbols.");
 #endif
     }
+#endif
 }
 
 [[noreturn]]
