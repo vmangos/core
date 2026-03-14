@@ -313,6 +313,14 @@ void AuctionHouseBotMgr::Update(bool force /* = false */)
             return a.second < b.second;
     }))->second;
     
+    uint32 itemCategoryMaximalCount = (std::max_element(m_itemCategoryCount.begin(), m_itemCategoryCount.end(),
+        [](const auto& a, const auto& b) {
+            return a.second > b.second;
+    }))->second;
+
+    // used to prevent possible infinite loop
+    uint32 cycleCounter = 0;
+
     while (auctionHouseCount < m_config->itemcount){
         AuctionHouseBotEntry ahbotEntry = m_items[urand(0, m_items.size()-1)];
 
@@ -349,10 +357,18 @@ void AuctionHouseBotMgr::Update(bool force /* = false */)
         else if (itemClass == ITEM_CLASS_TRADE_GOODS){
             itemAddChance = itemCategoryMinimalCount / m_itemCategoryCount["tradeGoods"];
         }
+        
+        bool needToAdd = false;
+        if (frand(0.0f, 1.0f) < itemAddChance || cycleCounter >= itemCategoryMaximalCount){
+            needToAdd = true;
+        }
+        else
+            cycleCounter++;
 
-        if (frand(0.0f, 1.0f) < itemAddChance){
+        if (needToAdd){
             AddItem(ahbotEntry, auctionHouse);
-            auctionHouseCount++;
+            auctionHouseCount;
+            cycleCounter = 0;
         }
     }
     
