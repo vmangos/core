@@ -334,12 +334,6 @@ include_directories(
   ${MYSQL_INCLUDE_DIR}
 )
 
-if(NOT USE_STD_MALLOC)
-  include_directories(
-    ${TBB_INCLUDE_DIRS}
-  )
-endif()
-
 add_library(${LIBRARY_NAME} STATIC
   ${SCRIPTS_SRCS}
 )

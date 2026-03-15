@@ -34,6 +34,18 @@ else()
   message(STATUS "Build scripts         : No")
 endif()
 
+if(BUILD_EXTRACTORS)
+  message(STATUS "Build extractors      : Yes")
+else()
+  message(STATUS "Build extractors      : No (default)")
+endif()
+
+if(BUILD_REALMMERGE)
+  message(STATUS "Build realm merge     : Yes")
+else()
+  message(STATUS "Build realm merge     : No (default)")
+endif()
+
 if(ENABLE_MAILSENDER)
   message(STATUS "Mailsender enabled    : Yes")
 else()

@@ -283,6 +283,6 @@ message(STATUS "Build flags (DEBUG)   : ${CMAKE_CXX_FLAGS_DEBUG}")
 add_subdirectory(src)
 add_subdirectory(dep)
 
-if (USE_EXTRACTORS OR USE_REALMMERGE)
+if (BUILD_EXTRACTORS OR BUILD_REALMMERGE)
     add_subdirectory(contrib)
 endif()

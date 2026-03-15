@@ -527,12 +527,6 @@ include_directories(
   ${ZLIB_INCLUDE_DIRS}
 )
 
-if(NOT USE_STD_MALLOC)
-  include_directories(
-    ${TBB_INCLUDE_DIRS}
-  )
-endif()
-
 if(WIN32)
   include_directories(
     ${CMAKE_SOURCE_DIR}/dep/windows/include

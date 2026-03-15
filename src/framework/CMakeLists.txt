@@ -15,8 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# include(${CMAKE_SOURCE_DIR}/dep/tbb/tbbinclude.cmake)
-
 set(framework_SRCS
   Dynamic/FactoryHolder.h
   Dynamic/ObjectRegistry.h
@@ -90,11 +88,3 @@ add_library(framework STATIC
 
 SET_TARGET_PROPERTIES (framework PROPERTIES FOLDER "Game Libs")
 
-if(NOT USE_STD_MALLOC)
-  include_directories(
-    ${TBB_INCLUDE_DIRS}
-  )
-  target_link_libraries(framework
-    ${TBB_LIBRARIES}
-  )
-endif()
