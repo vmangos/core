@@ -2210,9 +2210,6 @@ Unit* CombatBotBaseAI::SelectAttackerDifferentFrom(Unit const* pExcept) const
 
 bool CombatBotBaseAI::IsValidBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const
 {
-    if (!pSpellEntry)
-        return false;
-
     std::vector<uint32> morePowerfulSpells;
     sSpellMgr.ListMorePowerfulSpells(pSpellEntry->Id, morePowerfulSpells);
 
@@ -2234,9 +2231,6 @@ bool CombatBotBaseAI::IsValidBuffTarget(Unit const* pTarget, SpellEntry const* p
 
 Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
 {
-    if (!pSpellEntry)
-        return nullptr;
-
     Group* pGroup = me->GetGroup();
     if (pGroup)
     {
