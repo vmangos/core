@@ -9,12 +9,12 @@ option(ENABLE_CPPTRACE                "Enables cpptrace stack tracing; can be di
 
 if(USE_EXTRACTORS)
   message(WARNING "USE_EXTRACTORS is deprecated, please use BUILD_EXTRACTORS instead")
-  set(BUILD_EXTRACTORS ON)
+  set(BUILD_EXTRACTORS ON CACHE BOOL "Build extractors" FORCE)
 endif()
 
 if(USE_REALMMERGE)
   message(WARNING "USE_REALMMERGE is deprecated, please use BUILD_REALMMERGE instead")
-  set(BUILD_REALMMERGE ON)
+  set(BUILD_REALMMERGE ON CACHE BOOL "Build helper tool for merging character databases" FORCE)
 endif()
 
 # Other options
