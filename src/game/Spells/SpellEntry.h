@@ -438,7 +438,7 @@ namespace Spells
             case TARGET_GAMEOBJECT:
                 return TARGET_FLAG_GAMEOBJECT;
             case TARGET_LOCKED:
-                return TARGET_FLAG_LOCKED;
+                return TARGET_FLAG_ITEM | TARGET_FLAG_GAMEOBJECT | TARGET_FLAG_LOCKED;
             case TARGET_UNIT_ENEMY:
             case TARGET_LOCATION_CASTER_TARGET_POSITION:
                 return TARGET_FLAG_UNIT | TARGET_FLAG_UNIT_ENEMY;
