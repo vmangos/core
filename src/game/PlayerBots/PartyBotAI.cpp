@@ -1666,33 +1666,16 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
 
 void PartyBotAI::UpdateOutOfCombatAI_Mage()
 {
-    if (m_spells.mage.pArcaneBrilliance)
+    SpellEntry const* pBuffSpell = nullptr;
+    if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneIntellect, m_spells.mage.pArcaneBrilliance, pBuffSpell))
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneBrilliance))
+        if (CanTryToCastSpell(pTarget, pBuffSpell))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneBrilliance))
+            if (DoCastSpell(pTarget, pBuffSpell) == SPELL_CAST_OK)
             {
-                if (DoCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
-            }
-        }
-    }
-    else if (m_spells.mage.pArcaneIntellect)
-    {
-        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneIntellect))
-        {
-            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneIntellect))
-            {
-                if (DoCastSpell(pTarget, m_spells.mage.pArcaneIntellect) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
+                m_isBuffing = true;
+                me->ClearTarget();
+                return;
             }
         }
     }
@@ -1928,95 +1911,42 @@ void PartyBotAI::UpdateInCombatAI_Mage()
 
 void PartyBotAI::UpdateOutOfCombatAI_Priest()
 {
-    if (m_spells.priest.pPrayerofFortitude)
+    SpellEntry const* pBuffSpell = nullptr;
+    if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPowerWordFortitude, m_spells.priest.pPrayerofFortitude, pBuffSpell))
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofFortitude))
+        if (CanTryToCastSpell(pTarget, pBuffSpell))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofFortitude))
+            if (DoCastSpell(pTarget, pBuffSpell) == SPELL_CAST_OK)
             {
-                if (DoCastSpell(pTarget, m_spells.priest.pPrayerofFortitude) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
-            }
-        }
-    }
-    else if (m_spells.priest.pPowerWordFortitude)
-    {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPowerWordFortitude))
-        {
-            if (CanTryToCastSpell(pTarget, m_spells.priest.pPowerWordFortitude))
-            {
-                if (DoCastSpell(pTarget, m_spells.priest.pPowerWordFortitude) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
+                m_isBuffing = true;
+                me->ClearTarget();
+                return;
             }
         }
     }
 
-    if (m_spells.priest.pPrayerofSpirit)
+    if (Player* pTarget = SelectBuffTarget(m_spells.priest.pDivineSpirit, m_spells.priest.pPrayerofSpirit, pBuffSpell))
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofSpirit))
+        if (CanTryToCastSpell(pTarget, pBuffSpell))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofSpirit))
+            if (DoCastSpell(pTarget, pBuffSpell) == SPELL_CAST_OK)
             {
-                if (DoCastSpell(pTarget, m_spells.priest.pPrayerofSpirit) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
-            }
-        }
-    }
-    else if (m_spells.priest.pDivineSpirit)
-    {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pDivineSpirit))
-        {
-            if (CanTryToCastSpell(me, m_spells.priest.pDivineSpirit))
-            {
-                if (DoCastSpell(me, m_spells.priest.pDivineSpirit) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
+                m_isBuffing = true;
+                me->ClearTarget();
+                return;
             }
         }
     }
 
-    if (m_spells.priest.pPrayerofShadowProtection)
+    if (Player* pTarget = SelectBuffTarget(m_spells.priest.pShadowProtection, m_spells.priest.pPrayerofShadowProtection, pBuffSpell))
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofShadowProtection))
+        if (CanTryToCastSpell(pTarget, pBuffSpell))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofShadowProtection))
+            if (DoCastSpell(pTarget, pBuffSpell) == SPELL_CAST_OK)
             {
-                if (DoCastSpell(pTarget, m_spells.priest.pPrayerofShadowProtection) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
-            }
-        }
-    }
-    else if (m_spells.priest.pShadowProtection)
-    {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pShadowProtection))
-        {
-            if (CanTryToCastSpell(pTarget, m_spells.priest.pShadowProtection))
-            {
-                if (DoCastSpell(pTarget, m_spells.priest.pShadowProtection) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
+                m_isBuffing = true;
+                me->ClearTarget();
+                return;
             }
         }
     }
@@ -3019,33 +2949,16 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
         return;
     }
 
-    if (m_spells.druid.pGiftoftheWild)
+    SpellEntry const* pBuffSpell = nullptr;
+    if (Player* pTarget = SelectBuffTarget(m_spells.druid.pMarkoftheWild, m_spells.druid.pGiftoftheWild, pBuffSpell))
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.druid.pGiftoftheWild))
+        if (CanTryToCastSpell(pTarget, pBuffSpell))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.druid.pGiftoftheWild))
+            if (DoCastSpell(pTarget, pBuffSpell) == SPELL_CAST_OK)
             {
-                if (DoCastSpell(pTarget, m_spells.druid.pGiftoftheWild) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
-            }
-        }
-    }
-    else if (m_spells.druid.pMarkoftheWild)
-    {
-        if (Player* pTarget = SelectBuffTarget(m_spells.druid.pMarkoftheWild))
-        {
-            if (CanTryToCastSpell(pTarget, m_spells.druid.pMarkoftheWild))
-            {
-                if (DoCastSpell(pTarget, m_spells.druid.pMarkoftheWild) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    me->ClearTarget();
-                    return;
-                }
+                m_isBuffing = true;
+                me->ClearTarget();
+                return;
             }
         }
     }
