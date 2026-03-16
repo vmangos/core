@@ -281,6 +281,12 @@ if(WIN32)
   target_link_libraries(shared PUBLIC ws2_32 mswsock)
 endif()
 
-target_link_libraries(shared PRIVATE cpptrace::cpptrace)
+if (ENABLE_CPPTRACE)
+  target_link_libraries(shared PRIVATE cpptrace::cpptrace)
+endif()
 
 SET_TARGET_PROPERTIES(shared PROPERTIES FOLDER "Game Libs")
+
+if (ENABLE_CPPTRACE)
+  target_compile_definitions(shared PRIVATE ENABLE_CPPTRACE)
+endif()

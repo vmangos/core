@@ -40,6 +40,12 @@ else()
   message(STATUS "Mailsender enabled    : No (default)")
 endif()
 
+if(ENABLE_CPPTRACE)
+  message(STATUS "Cpptrace enabled      : Yes (default)")
+else()
+  message(STATUS "Cpptrace enabled      : No")
+endif()
+
 if(UNIX)
   if(DEBUG_SYMBOLS)
     message(STATUS "Debug symbols         : Included")

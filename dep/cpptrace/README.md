@@ -61,34 +61,39 @@ README.md -> README_original.md
 ```
 
 ### Prevent zstd, libdwarf from installing files (EXCLUDE_FROM_ALL)
-Use `FetchContent_Populate` + `add_subdirectory(EXCLUDE_FROM_ALL)` instead of
-`FetchContent_MakeAvailable` so the subprojects are excluded from the install step.
+Add `EXCLUDE_FROM_ALL` to `FetchContent_Declare`
 ```diff
+diff --git a/dep/cpptrace/CMakeLists.txt b/dep/cpptrace/CMakeLists.txt
+index 2c73da03f..c1dfaf6a9 100644
 --- a/dep/cpptrace/CMakeLists.txt
 +++ b/dep/cpptrace/CMakeLists.txt
-@@ -424,7 +424,11 @@ if(CPPTRACE_GET_SYMBOLS_WITH_LIBDWARF)
+@@ -425,8 +425,12 @@ if(CPPTRACE_GET_SYMBOLS_WITH_LIBDWARF)
+           SOURCE_SUBDIR build/cmake
+           DOWNLOAD_EXTRACT_TIMESTAMP TRUE
            URL "${CPPTRACE_ZSTD_URL}"
++          EXCLUDE_FROM_ALL
        )
 -      FetchContent_MakeAvailable(zstd)
 +      FetchContent_GetProperties(zstd)
 +      if(NOT zstd_POPULATED)
-+        FetchContent_Populate(zstd)
-+        add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR} EXCLUDE_FROM_ALL)
++        FetchContent_MakeAvailable(zstd)
 +      endif()
      endif()
      # Libdwarf itself
      set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-@@ -435,7 +439,11 @@ if(CPPTRACE_GET_SYMBOLS_WITH_LIBDWARF)
+@@ -437,8 +441,12 @@ if(CPPTRACE_GET_SYMBOLS_WITH_LIBDWARF)
+       GIT_REPOSITORY ${CPPTRACE_LIBDWARF_REPO}
        GIT_TAG ${CPPTRACE_LIBDWARF_TAG}
        GIT_SHALLOW ${CPPTRACE_LIBDWARF_SHALLOW}
++      EXCLUDE_FROM_ALL
      )
 -    FetchContent_MakeAvailable(libdwarf)
 +    FetchContent_GetProperties(libdwarf)
 +    if(NOT libdwarf_POPULATED)
-+      FetchContent_Populate(libdwarf)
-+      add_subdirectory(${libdwarf_SOURCE_DIR} ${libdwarf_BINARY_DIR} EXCLUDE_FROM_ALL)
++      FetchContent_MakeAvailable(libdwarf)
 +    endif()
      target_include_directories(
        dwarf
        PRIVATE
+@@ -601,9 +609,10 @@ endif()
 ```

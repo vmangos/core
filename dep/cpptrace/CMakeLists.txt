@@ -425,11 +425,11 @@ if(CPPTRACE_GET_SYMBOLS_WITH_LIBDWARF)
           SOURCE_SUBDIR build/cmake
           DOWNLOAD_EXTRACT_TIMESTAMP TRUE
           URL "${CPPTRACE_ZSTD_URL}"
+          EXCLUDE_FROM_ALL
       )
       FetchContent_GetProperties(zstd)
       if(NOT zstd_POPULATED)
-        FetchContent_Populate(zstd)
-        add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR} EXCLUDE_FROM_ALL)
+        FetchContent_MakeAvailable(zstd)
       endif()
     endif()
     # Libdwarf itself
@@ -441,11 +441,11 @@ if(CPPTRACE_GET_SYMBOLS_WITH_LIBDWARF)
       GIT_REPOSITORY ${CPPTRACE_LIBDWARF_REPO}
       GIT_TAG ${CPPTRACE_LIBDWARF_TAG}
       GIT_SHALLOW ${CPPTRACE_LIBDWARF_SHALLOW}
+      EXCLUDE_FROM_ALL
     )
     FetchContent_GetProperties(libdwarf)
     if(NOT libdwarf_POPULATED)
-      FetchContent_Populate(libdwarf)
-      add_subdirectory(${libdwarf_SOURCE_DIR} ${libdwarf_BINARY_DIR} EXCLUDE_FROM_ALL)
+      FetchContent_MakeAvailable(libdwarf)
     endif()
     target_include_directories(
       dwarf
