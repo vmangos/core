@@ -217,23 +217,12 @@ struct npc_eris_havenfireAI : public ScriptedAI
         if (!summoned)
             return;
 
-        std::vector<uint32> mobsEntries;
-        std::vector<uint32>::iterator entriesIt;
-        mobsEntries.push_back(NPC_PEASANT_0);
-        mobsEntries.push_back(NPC_PEASANT_1);
-
-        for (entriesIt = mobsEntries.begin(); entriesIt != mobsEntries.end(); ++entriesIt)
+        std::list<Creature*> tmpMobsList;
+        GetCreatureListWithEntryInGrid(tmpMobsList, m_creature, { NPC_PEASANT_0 , NPC_PEASANT_1 }, 100.0f);
+        for (auto const& curr : tmpMobsList)
         {
-            std::list<Creature*> tmpMobsList;
-            GetCreatureListWithEntryInGrid(tmpMobsList, m_creature, (*entriesIt), 100.0f);
-            while (!tmpMobsList.empty())
-            {
-                Creature* curr = tmpMobsList.front();
-                tmpMobsList.pop_front();
-
-                if (curr->IsAlive())
-                    summoned->AddThreat(curr, float(urand(100, 200)));
-            }
+            if (curr->IsAlive())
+                summoned->AddThreat(curr, float(urand(100, 200)));
         }
 
         if (Player* player = GetPlayer())
@@ -253,32 +242,17 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 }
             }
         }
-        mobsEntries.clear();
     }
 
     void DespawnAll()
     {
-        std::vector<uint32> mobsEntries;
-        std::vector<uint32>::iterator entriesIt;
-        mobsEntries.push_back(NPC_PEASANT_0);
-        mobsEntries.push_back(NPC_PEASANT_1);
-        mobsEntries.push_back(NPC_WARRIOR);
-        mobsEntries.push_back(NPC_ARCHER);
-
-        for (entriesIt = mobsEntries.begin(); entriesIt != mobsEntries.end(); ++entriesIt)
+        std::list<Creature*> tmpMobsList;
+        GetCreatureListWithEntryInGrid(tmpMobsList, m_creature, { NPC_PEASANT_0 , NPC_PEASANT_1 , NPC_WARRIOR , NPC_ARCHER }, 150.0f);
+        for (auto const& curr : tmpMobsList)
         {
-            std::list<Creature*> tmpMobsList;
-            GetCreatureListWithEntryInGrid(tmpMobsList, m_creature, (*entriesIt), 150.0f);
-            while (!tmpMobsList.empty())
-            {
-                Creature* curr = tmpMobsList.front();
-                tmpMobsList.pop_front();
-
-                if (curr->IsAlive())
-                    curr->ForcedDespawn();
-            }
+            if (curr->IsAlive())
+                curr->ForcedDespawn();
         }
-        mobsEntries.clear();
 
         for (auto& guid : m_deathPostGUIDs)
         {
@@ -300,9 +274,6 @@ struct npc_eris_havenfireAI : public ScriptedAI
                     ++j;
 
                 m_archerGUIDs[j] = summoned->GetGUID();
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summoned->AddUnitState(UNIT_STATE_ROOT);
                 break;
             case NPC_WARRIOR:
                 SetAttackOnPeasantOrPlayer(summoned);
@@ -317,8 +288,6 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 if (j < 50)
                     m_villagerGUIDs[j] = summoned->GetGUID();
 
-                if (Player* player = GetPlayer())
-                    summoned->SetFactionTemplateId(player->GetFactionTemplateId());
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 break;
         }
@@ -671,9 +640,9 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
     void KilledUnit(Unit* victim) override { }
 
-    void DamageTaken(Unit *done_by, uint32 &damage) override
+    void DamageTaken(Unit* pAttacker, uint32 &damage) override
     {
-        if (done_by->GetEntry() == NPC_ARCHER)
+        if (pAttacker->GetEntry() == NPC_ARCHER)
             damage = urand(80, 105);
     }
 
@@ -1159,7 +1128,7 @@ struct go_darrowshire_triggerAI : public GameObjectAI
                 summoned->GetMotionMaster()->MovePoint(2, DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, MOVE_PATHFINDING, 5.0f);
                 break;
             case NPC_MARDUK_THE_BLACK:
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_SPAWNING);
+                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                 summoned->ForcedDespawn(12000);
                 break;
             default:
