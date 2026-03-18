@@ -3442,6 +3442,12 @@ namespace SpellInternal
         if (targetMask & (TARGET_FLAG_UNIT_RAID | TARGET_FLAG_UNIT_PARTY | TARGET_FLAG_UNIT_ENEMY | TARGET_FLAG_UNIT_ALLY | TARGET_FLAG_UNIT_DEAD | TARGET_FLAG_UNIT_MINIPET))
             targetMask |= TARGET_FLAG_UNIT;
 
+        if (targetMask & (TARGET_FLAG_LOCKED))
+            targetMask |= TARGET_FLAG_ITEM | TARGET_FLAG_GAMEOBJECT;
+
+        if (targetMask & (TARGET_FLAG_ITEM))
+            targetMask |= TARGET_FLAG_TRADE_ITEM;
+
         // unreleased player corpse is still a unit
         if (targetMask & (TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_CORPSE_ALLY))
             targetMask |= TARGET_FLAG_UNIT;

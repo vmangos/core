@@ -6899,7 +6899,7 @@ bool Spell::ValidateExplicitTargetMask() const
     if (!pPlayer)
         return true;
 
-    static constexpr uint32 verifiableTargetFlags[] = { TARGET_FLAG_UNIT , TARGET_FLAG_ITEM , TARGET_FLAG_SOURCE_LOCATION , TARGET_FLAG_DEST_LOCATION  , TARGET_FLAG_GAMEOBJECT };
+    static constexpr uint32 verifiableTargetFlags[] = { TARGET_FLAG_UNIT , TARGET_FLAG_ITEM , TARGET_FLAG_TRADE_ITEM, TARGET_FLAG_SOURCE_LOCATION , TARGET_FLAG_DEST_LOCATION  , TARGET_FLAG_GAMEOBJECT, TARGET_FLAG_CORPSE_ENEMY, TARGET_FLAG_CORPSE_ALLY };
     uint32 const allowedTargetMask = m_spellInfo->AllowedTargetMask;
     uint32 const expectedTargetMask = m_spellInfo->Targets;
 
@@ -6920,14 +6920,55 @@ bool Spell::ValidateExplicitTargetMask() const
             pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
             return false;
         }
+    }
 
-        if (!(m_targets.m_targetMask & flag) && (expectedTargetMask & flag))
-        {
-            std::stringstream oss;
-            oss << "Casting spell " << m_spellInfo->Id << " with expected " << SpellCastTargetFlagToString(flag) << " (" << flag << ") not included in the target mask (" << m_targets.m_targetMask << ")";
-            pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
-            return false;
-        }
+    auto PrintExpectedFlag = [&](uint32 flag)
+    {
+        std::stringstream oss;
+        oss << "Casting spell " << m_spellInfo->Id << " with expected " << SpellCastTargetFlagToString(flag) << " (" << flag << ") not included in the target mask (" << m_targets.m_targetMask << ")";
+        pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
+    };
+
+    if (!(m_targets.m_targetMask & TARGET_FLAG_UNIT) && (expectedTargetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_UNIT_RAID | TARGET_FLAG_UNIT_PARTY | TARGET_FLAG_UNIT_ENEMY | TARGET_FLAG_UNIT_ALLY | TARGET_FLAG_UNIT_DEAD | TARGET_FLAG_UNIT_MINIPET)))
+    {
+        PrintExpectedFlag(TARGET_FLAG_UNIT);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM)) && (expectedTargetMask & TARGET_FLAG_ITEM))
+    {
+        PrintExpectedFlag(TARGET_FLAG_ITEM);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & TARGET_FLAG_SOURCE_LOCATION) && (expectedTargetMask & TARGET_FLAG_SOURCE_LOCATION))
+    {
+        PrintExpectedFlag(TARGET_FLAG_SOURCE_LOCATION);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) && (expectedTargetMask & TARGET_FLAG_DEST_LOCATION))
+    {
+        PrintExpectedFlag(TARGET_FLAG_DEST_LOCATION);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & TARGET_FLAG_GAMEOBJECT) && (expectedTargetMask & TARGET_FLAG_GAMEOBJECT))
+    {
+        PrintExpectedFlag(TARGET_FLAG_GAMEOBJECT);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_GAMEOBJECT)) && (expectedTargetMask & TARGET_FLAG_LOCKED))
+    {
+        PrintExpectedFlag(TARGET_FLAG_LOCKED);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_CORPSE_ALLY)) && (expectedTargetMask & (TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_CORPSE_ALLY)))
+    {
+        PrintExpectedFlag(expectedTargetMask & (TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_CORPSE_ALLY));
+        return false;
     }
 
     return true;
