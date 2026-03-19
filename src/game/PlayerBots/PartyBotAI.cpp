@@ -699,7 +699,10 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         me->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     if (me->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL))
+    {
+        BreakCrowdControlEffects();
         return;
+    }
 
     if (me->IsDead())
     {

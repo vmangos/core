@@ -135,8 +135,9 @@ public:
 
     bool SummonShamanTotems();
     SpellCastResult CastWeaponBuff(SpellEntry const* pSpellEntry, EquipmentSlots slot);
-    void UseTrinketEffects();
-    bool UseItemEffect(Item* pItem);
+    bool UseTrinketEffects(bool onlyToBreakCC = false);
+    bool UseItemEffect(Item* pItem, bool onlyToBreakCC = false);
+    void BreakCrowdControlEffects();
 
     virtual void UpdateInCombatAI() = 0;
     virtual void UpdateOutOfCombatAI() = 0;
