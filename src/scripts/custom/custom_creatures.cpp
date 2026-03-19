@@ -570,6 +570,13 @@ enum Enchants
     WEP_HEAL,
     WEP2H_INT,
     WEP2H_SPIRIT,
+    OFFHAND_CRUSADER,
+    OFFHAND_STRENGTH,
+    OFFHAND_AGILITY,
+    OFFHAND_LIFESTEAL,
+    OFFHAND_FIERY,
+    OFFHAND_ICY,
+    OFFHAND_DEMONSLAYING,
     OFFHAND_SPIRIT,
     OFFHAND_STAM,
     OFFHAND_FROSTRES,
@@ -682,10 +689,33 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
             player->ADD_GOSSIP_ITEM(5, "Demonslaying",       GOSSIP_SENDER_MAIN, WEP_DEMONSLAYING);
             break;
         case EQUIPMENT_SLOT_OFFHAND:
-            player->ADD_GOSSIP_ITEM(5, "Spirit",             GOSSIP_SENDER_MAIN, OFFHAND_SPIRIT);
-            player->ADD_GOSSIP_ITEM(5, "Stamina",            GOSSIP_SENDER_MAIN, OFFHAND_STAM);
-            player->ADD_GOSSIP_ITEM(5, "Frost Resistance",   GOSSIP_SENDER_MAIN, OFFHAND_FROSTRES);
-            player->ADD_GOSSIP_ITEM(5, "Shield Spike",       GOSSIP_SENDER_MAIN, OFFHAND_SHIELDSPIKE);
+            // If wielding shield, show shield enchants. If not, show weapon enchants.
+            if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+            {
+                if (item->GetProto()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
+                        {
+                            player->ADD_GOSSIP_ITEM(5, "Spirit",             GOSSIP_SENDER_MAIN, OFFHAND_SPIRIT);
+                            player->ADD_GOSSIP_ITEM(5, "Stamina",            GOSSIP_SENDER_MAIN, OFFHAND_STAM);
+                            player->ADD_GOSSIP_ITEM(5, "Frost Resistance",   GOSSIP_SENDER_MAIN, OFFHAND_FROSTRES);
+                            player->ADD_GOSSIP_ITEM(5, "Shield Spike",       GOSSIP_SENDER_MAIN, OFFHAND_SHIELDSPIKE);
+                        }
+                        else
+                        {
+                            player->ADD_GOSSIP_ITEM(5, "Crusader",           GOSSIP_SENDER_MAIN, OFFHAND_CRUSADER);
+                            player->ADD_GOSSIP_ITEM(5, "1H Strength",        GOSSIP_SENDER_MAIN, OFFHAND_STRENGTH);
+                            player->ADD_GOSSIP_ITEM(5, "1H Agility",         GOSSIP_SENDER_MAIN, OFFHAND_AGILITY);
+                            player->ADD_GOSSIP_ITEM(5, "Lifesteal",          GOSSIP_SENDER_MAIN, OFFHAND_LIFESTEAL);
+                            player->ADD_GOSSIP_ITEM(5, "Fiery",              GOSSIP_SENDER_MAIN, OFFHAND_FIERY);
+                            player->ADD_GOSSIP_ITEM(5, "Icy",                GOSSIP_SENDER_MAIN, OFFHAND_ICY);
+                            player->ADD_GOSSIP_ITEM(5, "Demonslaying",       GOSSIP_SENDER_MAIN, OFFHAND_DEMONSLAYING);
+                        }
+            }
+            else 
+            {
+                player->GetSession()->SendNotification("You don't have anything equipped in your offhand!");
+                player->CLOSE_GOSSIP_MENU();
+                return true;
+            }
             break;
         }
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
@@ -755,6 +785,42 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
                 id = 912;
                 break;
 
+            case OFFHAND_CRUSADER:
+            case OFFHAND_STRENGTH:
+            case OFFHAND_AGILITY:
+            case OFFHAND_LIFESTEAL:
+            case OFFHAND_FIERY:
+            case OFFHAND_ICY:
+            case OFFHAND_DEMONSLAYING:
+                // If wielding non-weapons like flowers, enchant fails. Else, enchant succeeds.
+                item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+                if (item->GetProto()->Class != ITEM_CLASS_WEAPON ||
+                   (item && item->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_SWORD
+                         && item->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_MACE
+                         && item->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_AXE
+                         && item->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER
+                         && item->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FIST))
+                {
+                    player->GetSession()->SendNotification("Requires Offhand Weapon");
+                    player->CLOSE_GOSSIP_MENU();
+                    return true;
+                }
+                if (action == OFFHAND_CRUSADER)
+                    id = 1900;
+                else if (action == OFFHAND_STRENGTH)
+                    id = 2563;
+                else if (action == OFFHAND_AGILITY)
+                    id = 2564;
+                else if (action == OFFHAND_LIFESTEAL)
+                    id = 1898;
+                else if (action == OFFHAND_ICY)
+                    id = 1894;
+                else if (action == OFFHAND_FIERY)
+                    id = 803;
+                else if (action == OFFHAND_DEMONSLAYING)
+                    id = 912;
+                break;
+            
             case OFFHAND_SPIRIT:
             case OFFHAND_STAM:
             case OFFHAND_FROSTRES:
