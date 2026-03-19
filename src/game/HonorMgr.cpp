@@ -183,6 +183,14 @@ void HonorMaintenancer::InactiveDecayRankPoints()
 
 void HonorMaintenancer::SetCityRanks()
 {
+    // A direct transaction is needed to keep the clear-and-reassign sequence
+    // ordered if CharacterDatabase.WorkerThreads is > 1
+    if (!CharacterDatabase.BeginTransaction())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HonorMaintenancer::SetCityRanks: failed to start transaction.");
+        return;
+    }
+
     CharacterDatabase.Execute("UPDATE `characters` SET `extra_flags` = `extra_flags` & ~0x0400");
 
     std::map<uint8, std::pair<uint32, uint32>> highestStandingInRace =
@@ -222,6 +230,8 @@ void HonorMaintenancer::SetCityRanks()
         if (lowGuid > 0)
             CharacterDatabase.PExecute("UPDATE `characters` SET `extra_flags` = `extra_flags` | 0x0400 WHERE `guid` = %u", standing.second.first);
     }
+
+    CharacterDatabase.CommitTransactionDirect();
 }
 
 void HonorMaintenancer::FlushRankPoints()
