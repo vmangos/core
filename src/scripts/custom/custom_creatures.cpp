@@ -586,7 +586,7 @@ enum Enchants
     BRACER_HEAL,
     BRACER_INT,
     BRACER_MP5,
-    ,
+    GLOVES_STR,
     GLOVES_AGI,
     GLOVES_FIRE,
     GLOVES_FROST,
