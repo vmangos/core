@@ -586,7 +586,7 @@ enum Enchants
     BRACER_HEAL,
     BRACER_INT,
     BRACER_MP5,
-    GLOVES_STR,
+    ,
     GLOVES_AGI,
     GLOVES_FIRE,
     GLOVES_FROST,
@@ -658,7 +658,7 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
             player->ADD_GOSSIP_ITEM(5, "MP5",                GOSSIP_SENDER_MAIN, BRACER_MP5);
             break;
         case EQUIPMENT_SLOT_HANDS:
-            player->ADD_GOSSIP_ITEM(5, "Strength",            GOSSIP_SENDER_MAIN, GLOVES_STR);
+            player->ADD_GOSSIP_ITEM(5, "Strength",           GOSSIP_SENDER_MAIN, GLOVES_STR);
             player->ADD_GOSSIP_ITEM(5, "Agility",            GOSSIP_SENDER_MAIN, GLOVES_AGI);
             player->ADD_GOSSIP_ITEM(5, "Fire Power",         GOSSIP_SENDER_MAIN, GLOVES_FIRE);
             player->ADD_GOSSIP_ITEM(5, "Frost Power",        GOSSIP_SENDER_MAIN, GLOVES_FROST);
