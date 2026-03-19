@@ -267,7 +267,7 @@ void HonorMaintenancer::DoMaintenance()
     uint32 periodsProcessed = 0;
     while (m_markerToStart)
     {
-        periodsProcessed++;
+        ++periodsProcessed;
 
         // Clear data from any previous iteration
         m_weeklyScores.clear();
