@@ -3073,7 +3073,6 @@ void CombatBotBaseAI::BreakCrowdControlEffects()
                     }
                     return;
                 }
-                   
             }
             break;
         }
