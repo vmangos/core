@@ -6,6 +6,7 @@
 #include "LeaveGroupAction.h"
 
 #include "Event.h"
+#include "PartyLeadershipUtils.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
@@ -156,4 +157,35 @@ bool LeaveFarAwayAction::isUseful()
     }
 
     return false;
+}
+
+bool LeaveNoRealPlayerPartyAction::Execute(Event event)
+{
+    (void)event;
+
+    if (!isUseful())
+        return false;
+
+    SET_AI_VALUE(time_t, "party without real player since", 0);
+    botAI->LeaveOrDisbandGroup();
+    return true;
+}
+
+bool LeaveNoRealPlayerPartyAction::isUseful()
+{
+    if (!PartyLeadership::IsEligibleRandombotPartyLeader(botAI))
+        return false;
+
+    if (sPlayerbotAIConfig.randomBotNoRealPlayerPartyTimeout == 0)
+        return false;
+
+    if (PartyLeadership::HasActiveRealPlayerInGroup(bot))
+        return false;
+
+    time_t since = AI_VALUE(time_t, "party without real player since");
+    if (!since)
+        return false;
+
+    return static_cast<uint32>(time(nullptr) - since) >= sPlayerbotAIConfig.randomBotNoRealPlayerPartyTimeout &&
+           !bot->IsInCombat();
 }

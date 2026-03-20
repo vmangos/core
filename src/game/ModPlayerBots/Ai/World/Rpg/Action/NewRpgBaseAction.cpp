@@ -1,5 +1,8 @@
 #include "NewRpgBaseAction.h"
 
+#include <algorithm>
+#include <cmath>
+
 #include "BroadcastHelper.h"
 #include "ChatHelper.h"
 #include "Creature.h"
@@ -235,7 +238,8 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
 
         const QuestStatus& status = bot->GetQuestStatus(item.QuestId);
         if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false) &&
-            IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
+            IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest) && QuestFitsPopulationPlan(quest) &&
+            botAI->lowPriorityQuest.find(item.QuestId) == botAI->lowPriorityQuest.end())
         {
             AcceptQuest(quest, guid);
             if (botAI->GetMaster())
@@ -435,6 +439,26 @@ bool NewRpgBaseAction::TurnInQuest(Quest const* quest, ObjectGuid guid)
     return true;
 }
 
+bool NewRpgBaseAction::QuestFitsPopulationPlan(Quest const* quest)
+{
+    return sRandomPlayerbotMgr.IsQuestInPopulationPlan(bot, quest);
+}
+
+bool NewRpgBaseAction::DropQuestFromLog(uint16 slot, Quest const* quest, Player* viewer)
+{
+    if (!quest)
+        return false;
+
+    LOG_DEBUG("playerbots", "[New RPG] %s drop quest %u", bot->GetName(), quest->GetQuestId());
+    WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
+    packet << static_cast<uint8>(slot);
+    bot->GetSession()->HandleQuestLogRemoveQuest(packet);
+    if (botAI->GetMaster())
+        botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest, viewer));
+    botAI->rpgStatistic.questDropped++;
+    return true;
+}
+
 uint32 NewRpgBaseAction::BestRewardIndex(Quest const* quest)
 {
     ItemIds returnIds;
@@ -516,12 +540,8 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             freeSlotNum++;
     }
 
-    // it's ok if we have two more free slots
-    if (freeSlotNum >= 2)
-        return false;
-
     int32 dropped = 0;
-    // remove quests that not worth doing or not capable of doing
+    // Always prune quests that no longer fit the assigned population plan.
     for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
         uint32 questId = bot->GetQuestSlotQuestId(i);
@@ -529,25 +549,21 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             continue;
 
         const Quest* quest = sObjectMgr.GetQuestTemplate(questId);
-        if (!IsQuestWorthDoing(quest) || !IsQuestCapableDoing(quest) ||
+        if (!quest || !QuestFitsPopulationPlan(quest) || !IsQuestWorthDoing(quest) || !IsQuestCapableDoing(quest) ||
             bot->GetQuestStatus(questId) == QUEST_STATUS_FAILED)
         {
-            LOG_DEBUG("playerbots", "[New RPG] %s drop quest %u", bot->GetName(), questId);
-            WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
-            packet << (uint8)i;
-            bot->GetSession()->HandleQuestLogRemoveQuest(packet);
-            if (botAI->GetMaster())
-                botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest, viewer));
-            botAI->rpgStatistic.questDropped++;
-            dropped++;
+            dropped += DropQuestFromLog(i, quest, viewer) ? 1 : 0;
         }
     }
+
+    if (freeSlotNum >= 2)
+        return dropped > 0;
 
     // drop more than 8 quests at once to avoid repeated accept and drop
     if (dropped >= 8)
         return true;
 
-    // remove festival/class quests and quests in different zone
+    // remove quest categories that are poor fits for autonomous world questing.
     for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
         uint32 questId = bot->GetQuestSlotQuestId(i);
@@ -555,40 +571,16 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             continue;
 
         const Quest* quest = sObjectMgr.GetQuestTemplate(questId);
-        if (quest->GetZoneOrSort() < 0 || (quest->GetZoneOrSort() > 0 && quest->GetZoneOrSort() != bot->GetZoneId()))
+        if (quest->GetZoneOrSort() < 0)
         {
-            LOG_DEBUG("playerbots", "[New RPG] %s drop quest %u", bot->GetName(), questId);
-            WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
-            packet << (uint8)i;
-            bot->GetSession()->HandleQuestLogRemoveQuest(packet);
-            if (botAI->GetMaster())
-                botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest, viewer));
-            botAI->rpgStatistic.questDropped++;
-            dropped++;
+            dropped += DropQuestFromLog(i, quest, viewer) ? 1 : 0;
         }
     }
 
     if (dropped >= 8)
         return true;
 
-    // clear quests log
-    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
-    {
-        uint32 questId = bot->GetQuestSlotQuestId(i);
-        if (!questId)
-            continue;
-
-        const Quest* quest = sObjectMgr.GetQuestTemplate(questId);
-        LOG_DEBUG("playerbots", "[New RPG] %s drop quest %u", bot->GetName(), questId);
-        WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
-        packet << (uint8)i;
-        bot->GetSession()->HandleQuestLogRemoveQuest(packet);
-        if (botAI->GetMaster())
-            botAI->TellMasterNoFacing("Quest dropped " + ChatHelper::FormatQuest(quest, viewer));
-        botAI->rpgStatistic.questDropped++;
-    }
-
-    return true;
+    return dropped > 0;
 }
 
 bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
@@ -596,6 +588,9 @@ bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
     OrganizeQuestLog();
     if (ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract(true, 80.0f))
     {
+        if (sPlayerbotAIConfig.debugRandomBotQuesting)
+            LOG_DEBUG("playerbots", "[New RPG] %s nearby quest target %u", bot->GetName(), npcOrGo.GetCounter());
+
         WorldObject* object = bot->GetMap()->GetWorldObject(npcOrGo);
         if (bot->CanInteractWithQuestGiver(object))
         {
@@ -608,6 +603,71 @@ bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
     return false;
 }
 
+namespace
+{
+float GetQuestLevelFitScore(Player* bot, Quest const* quest)
+{
+    if (!bot || !quest)
+        return -1000.0f;
+
+    int32 questLevel = quest->GetQuestLevel();
+    if (questLevel <= 0)
+        questLevel = bot->GetLevel();
+
+    return std::max(0.0f, 20.0f - std::fabs(float(bot->GetLevel()) - float(questLevel)));
+}
+
+float GetQuestObjectScore(Player* bot, WorldObject* object)
+{
+    if (!bot || !object)
+        return -1.0f;
+
+    bot->PrepareQuestMenu(object->GetGUID());
+    QuestMenu& menu = bot->PlayerTalkClass->GetQuestMenu();
+    if (menu.Empty())
+        return -1.0f;
+
+    float bestScore = -1.0f;
+    uint32 zoneId = bot->GetZoneId();
+
+    for (uint8 idx = 0; idx < menu.GetMenuItemCount(); ++idx)
+    {
+        QuestMenuItem const& item = menu.GetItem(idx);
+        Quest const* quest = sObjectMgr.GetQuestTemplate(item.QuestId);
+        if (!quest)
+            continue;
+
+        float score = -1.0f;
+        QuestStatus status = bot->GetQuestStatus(item.QuestId);
+        if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
+            score = 100.0f + GetQuestLevelFitScore(bot, quest);
+        else if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false))
+        {
+            score = 40.0f + GetQuestLevelFitScore(bot, quest);
+            if (sRandomPlayerbotMgr.IsQuestInPopulationPlan(bot, quest))
+                score += 18.0f;
+            else
+                score -= 25.0f;
+
+            if (quest->GetZoneOrSort() > 0 && uint32(quest->GetZoneOrSort()) == zoneId)
+                score += 10.0f;
+            else if (quest->GetZoneOrSort() > 0)
+                score -= 3.0f;
+
+            score += float((bot->GetGUIDLow() + item.QuestId) % 7) * 0.15f;
+        }
+
+        if (score < 0.0f)
+            continue;
+
+        score -= std::min(30.0f, bot->GetExactDist(object) / 10.0f);
+        bestScore = std::max(bestScore, score);
+    }
+
+    return bestScore;
+}
+}
+
 ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly, float distanceLimit)
 {
     GuidVector possibleTargets = AI_VALUE(GuidVector, "possible new rpg targets");
@@ -617,6 +677,7 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
         return ObjectGuid();
 
     WorldObject* nearestObject = nullptr;
+    float bestQuestScore = -1.0f;
     for (ObjectGuid& guid : possibleTargets)
     {
         WorldObject* object = bot->GetMap()->GetWorldObject(guid);
@@ -629,9 +690,12 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
 
         if (CanInteractWithQuestGiver(object) && HasQuestToAcceptOrReward(object))
         {
-            if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
+            float score = GetQuestObjectScore(bot, object);
+            if (score > bestQuestScore)
+            {
+                bestQuestScore = score;
                 nearestObject = object;
-            break;
+            }
         }
     }
 
@@ -647,33 +711,108 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
 
         if (CanInteractWithQuestGiver(object) && HasQuestToAcceptOrReward(object))
         {
-            if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
+            float score = GetQuestObjectScore(bot, object);
+            if (score > bestQuestScore)
+            {
+                bestQuestScore = score;
                 nearestObject = object;
-            break;
+            }
         }
     }
 
     if (nearestObject)
-        return nearestObject->GetGUID();
+    {
+        if (sPlayerbotAIConfig.debugRandomBotQuesting)
+            LOG_DEBUG("playerbots", "[New RPG] %s selected quest object %u score %.2f", bot->GetName(), nearestObject->GetObjectGuid().GetCounter(), bestQuestScore);
+        return nearestObject->GetObjectGuid();
+    }
 
     // No questgiver to accept or reward
     if (questgiverOnly)
         return ObjectGuid();
 
-    if (possibleTargets.empty())
-        return ObjectGuid();
+    std::string role = sRandomPlayerbotMgr.GetData(bot->GetGUIDLow(), "population_role");
+    uint32 lastNpcStamp = sRandomPlayerbotMgr.GetValue(bot->GetGUIDLow(), "last_rpg_npc");
+    uint32 lastNpcCounter = static_cast<uint32>(std::strtoul(sRandomPlayerbotMgr.GetData(bot->GetGUIDLow(), "last_rpg_npc").c_str(), nullptr, 10));
+    ObjectGuid bestGuid;
+    float bestScore = -1.0f;
+    uint32 now = getMSTime() / IN_MILLISECONDS;
 
-    int idx = urand(0, possibleTargets.size() - 1);
-    ObjectGuid guid = possibleTargets[idx];
-    WorldObject* object = bot->GetMap()->GetAnyTypeCreature(guid);
-    if (!object)
-        object = bot->GetMap()->GetGameObject(guid);
-
-    if (object && object->IsInWorld())
+    auto scoreObject = [&](WorldObject* object) -> float
     {
-        return object->GetGUID();
+        if (!object || !object->IsInWorld())
+            return -1.0f;
+
+        float score = 0.10f;
+        if (Creature* creature = object->ToCreature())
+        {
+            uint32 flags = creature->GetUInt32Value(UNIT_NPC_FLAGS);
+            bool cityRole = role == "reserve_city";
+            bool starterRole = role == "reserve_starter";
+
+            if (flags & UNIT_NPC_FLAG_QUESTGIVER)
+                score = 1.00f;
+            else if (flags & (UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_TRAINER_CLASS | UNIT_NPC_FLAG_TRAINER_PROFESSION))
+                score = 0.92f;
+            else if (flags & UNIT_NPC_FLAG_FLIGHTMASTER)
+                score = 0.88f;
+            else if (flags & (UNIT_NPC_FLAG_VENDOR | UNIT_NPC_FLAG_REPAIR))
+                score = 0.72f;
+            else if (flags & UNIT_NPC_FLAG_AUCTIONEER)
+                score = cityRole ? 0.85f : 0.40f;
+            else if (flags & (UNIT_NPC_FLAG_BANKER | UNIT_NPC_FLAG_GUILD_BANKER))
+                score = cityRole ? 0.75f : (starterRole ? 0.40f : 0.18f);
+            else if (flags & UNIT_NPC_FLAG_INNKEEPER)
+                score = cityRole ? 0.68f : (starterRole ? 0.35f : 0.15f);
+            else if (flags & UNIT_NPC_FLAG_GOSSIP)
+                score = 0.35f;
+        }
+        else if (object->ToGameObject())
+        {
+            score = 0.60f;
+        }
+
+        float distance = std::max(1.0f, bot->GetExactDist(object));
+        score += std::max(0.0f, 0.25f - (distance / 600.0f));
+
+        if (lastNpcCounter && object->GetObjectGuid().GetCounter() == lastNpcCounter && lastNpcStamp &&
+            now < lastNpcStamp + 60)
+        {
+            score *= 0.20f;
+        }
+
+        return score;
+    };
+
+    for (ObjectGuid const& guid : possibleTargets)
+    {
+        WorldObject* object = bot->GetMap()->GetWorldObject(guid);
+        if (!object || (distanceLimit && bot->GetDistance(object) > distanceLimit))
+            continue;
+
+        float score = scoreObject(object);
+        if (score > bestScore)
+        {
+            bestScore = score;
+            bestGuid = guid;
+        }
     }
-    return ObjectGuid();
+
+    for (ObjectGuid const& guid : possibleGameObjects)
+    {
+        WorldObject* object = bot->GetMap()->GetWorldObject(guid);
+        if (!object || (distanceLimit && bot->GetDistance(object) > distanceLimit))
+            continue;
+
+        float score = scoreObject(object);
+        if (score > bestScore)
+        {
+            bestScore = score;
+            bestGuid = guid;
+        }
+    }
+
+    return bestGuid;
 }
 
 bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
@@ -705,7 +844,8 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
 
         const QuestStatus& status = bot->GetQuestStatus(item.QuestId);
         if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false) &&
-            IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
+            IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest) && QuestFitsPopulationPlan(quest) &&
+            botAI->lowPriorityQuest.find(item.QuestId) == botAI->lowPriorityQuest.end())
         {
             return true;
         }
@@ -732,7 +872,64 @@ static std::vector<float> GenerateRandomWeights(int n)
 
 bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete)
 {
-    return false;
+    poiInfo.clear();
+
+    auto itr = TravelMgr::instance().quests.find(questId);
+    if (itr == TravelMgr::instance().quests.end() || !itr->second)
+    {
+        if (sPlayerbotAIConfig.debugRandomBotQuesting)
+            LOG_DEBUG("playerbots", "[New RPG] %s no quest container for quest %u", bot->GetName(), questId);
+        return false;
+    }
+
+    auto collect = [&](std::vector<QuestTravelDestination*> const& destinations)
+    {
+        for (QuestTravelDestination* destination : destinations)
+        {
+            if (!destination || !destination->isActive(bot))
+                continue;
+
+            if (!sRandomPlayerbotMgr.IsTravelDestinationInPopulationPlan(bot, destination))
+                continue;
+
+            int32 objectiveIdx = -1;
+            if (QuestObjectiveTravelDestination* objectiveDestination = dynamic_cast<QuestObjectiveTravelDestination*>(destination))
+                objectiveIdx = static_cast<int32>(objectiveDestination->GetObjective());
+
+            for (WorldPosition* point : destination->getPoints(true))
+            {
+                if (!point)
+                    continue;
+
+                poiInfo.push_back({*point, objectiveIdx});
+            }
+        }
+    };
+
+    QuestContainer* container = itr->second;
+    collect(toComplete ? container->questTakers : container->questObjectives);
+
+    if (poiInfo.empty())
+    {
+        if (sPlayerbotAIConfig.debugRandomBotQuesting)
+            LOG_DEBUG("playerbots", "[New RPG] %s no active POIs for quest %u (%s)", bot->GetName(), questId, toComplete ? "turn-in" : "objective");
+        return false;
+    }
+
+    std::sort(poiInfo.begin(), poiInfo.end(), [this](POIInfo left, POIInfo right) {
+        bool leftSameMap = left.pos.getMapId() == bot->GetMapId();
+        bool rightSameMap = right.pos.getMapId() == bot->GetMapId();
+        if (leftSameMap != rightSameMap)
+            return leftSameMap;
+        return left.pos.distance(bot) < right.pos.distance(bot);
+    });
+
+    if (sPlayerbotAIConfig.debugRandomBotQuesting)
+        LOG_DEBUG("playerbots", "[New RPG] %s quest %u (%s) collected %zu POIs, best map=%u objective=%d distance=%.1f",
+            bot->GetName(), questId, toComplete ? "turn-in" : "objective", poiInfo.size(), poiInfo.front().pos.getMapId(),
+            poiInfo.front().objectiveIdx, poiInfo.front().pos.distance(bot));
+
+    return true;
 }
 
 WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
@@ -978,6 +1175,10 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
             for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
             {
                 uint32 questId = bot->GetQuestSlotQuestId(slot);
+                Quest const* quest = sObjectMgr.GetQuestTemplate(questId);
+                if (!quest || !QuestFitsPopulationPlan(quest))
+                    continue;
+
                 if (botAI->lowPriorityQuest.find(questId) != botAI->lowPriorityQuest.end())
                     continue;
 
@@ -1064,6 +1265,10 @@ bool NewRpgBaseAction::CheckRpgStatusAvailable(NewRpgStatus status)
             for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
             {
                 uint32 questId = bot->GetQuestSlotQuestId(slot);
+                Quest const* quest = sObjectMgr.GetQuestTemplate(questId);
+                if (!quest || !QuestFitsPopulationPlan(quest))
+                    continue;
+
                 if (botAI->lowPriorityQuest.find(questId) != botAI->lowPriorityQuest.end())
                     continue;
 

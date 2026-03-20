@@ -1109,6 +1109,8 @@ class Player final: public Unit
         void CompleteQuest(uint32 questId);
         void RemoveQuest(uint32 questId);
         void RemoveQuestAtSlot(uint32 slot);
+        void RemoveActiveQuest(uint32 questId, bool updateAbandonQuest = false);
+        void RemoveRewardedQuest(uint32 questId);
         void IncompleteQuest(uint32 questId);
         void RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questGiver, bool announce = true);
         void FailQuest(uint32 questId);
@@ -1128,6 +1130,7 @@ class Player final: public Unit
         bool SatisfyQuestNextChain(Quest const* qInfo, bool msg) const;
         bool SatisfyQuestPrevChain(Quest const* qInfo, bool msg) const;
         bool TakeOrReplaceQuestStartItems(uint32 questId, bool msg, bool giveQuestStartItem);
+        bool IsQuestRewarded(uint32 questId) const;
         bool GetQuestRewardStatus(uint32 questId) const;
         QuestStatusData const* GetQuestStatusData(uint32 questId) const;
         QuestStatus GetQuestStatus(uint32 questId) const;

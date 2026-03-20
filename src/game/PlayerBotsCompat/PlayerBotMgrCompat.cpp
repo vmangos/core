@@ -7,6 +7,8 @@
 #include "World.h"
 #include "WorldSession.h"
 
+#include <unordered_map>
+
 namespace
 {
 bool IsPlayerbotUpdateSafe(Player* player)
@@ -82,7 +84,55 @@ void PlayerBotMgr::Update(uint32 diff)
             }
 
             playerbotMgr->UpdateAI(diff);
+
+            LOG_DEBUG("playerbots",
+                "PlayerBotMgr::Update: calling UpdateSessions for master=%s(%u) numBots=%zu",
+                player->GetName(), player->GetGUIDLow(),
+                std::distance(playerbotMgr->GetPlayerBotsBegin(), playerbotMgr->GetPlayerBotsEnd()));
+
             playerbotMgr->UpdateSessions();
+
+            // Recovery: scan for bots stuck in BeingTeleportedFar for too long.
+            // If a bot has been in this state for more than 10 seconds, forcefully
+            // cancel their teleport and send them to homebind.
+            {
+                static std::unordered_map<uint32 /*lowGuid*/, uint32 /*msTimer*/> s_stuckTimers;
+                for (auto botItr = playerbotMgr->GetPlayerBotsBegin(); botItr != playerbotMgr->GetPlayerBotsEnd(); ++botItr)
+                {
+                    Player* bot = botItr->second;
+                    if (!bot)
+                        continue;
+
+                    uint32 lowGuid = bot->GetGUIDLow();
+                    if (!bot->IsBeingTeleportedFar())
+                    {
+                        s_stuckTimers.erase(lowGuid);
+                        continue;
+                    }
+
+                    auto it = s_stuckTimers.find(lowGuid);
+                    if (it == s_stuckTimers.end())
+                    {
+                        s_stuckTimers[lowGuid] = diff;
+                    }
+                    else
+                    {
+                        it->second += diff;
+                        if (it->second >= 10000) // 10 seconds
+                        {
+                            LOG_ERROR("playerbots",
+                                "PlayerBotMgr::Update: bot=%s(%u) stuck in BeingTeleportedFar for %u ms, forcing homebind recovery",
+                                bot->GetName(), lowGuid, it->second);
+                            s_stuckTimers.erase(it);
+
+                            // Cancel the pending far teleport and send bot to homebind
+                            bot->SetSemaphoreTeleportFar(false);
+                            bot->ResetMap();
+                            bot->TeleportToHomebind();
+                        }
+                    }
+                }
+            }
         }
     }
 }

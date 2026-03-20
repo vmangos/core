@@ -423,6 +423,12 @@ bool Map::Add(Player* player)
     Cell cell(p);
     EnsureGridLoadedAtEnter(cell, player);
     player->AddToWorld();
+
+    // A hook during AddToWorld (e.g., bot login summon) may have triggered a
+    // far teleport that already removed the player from this map.
+    if (!player->IsInWorld())
+        return false;
+
     player->LoadMapCellsAround(GetGridActivationDistance());
 
     // Order matters! Send the world first, and the player then
@@ -2119,7 +2125,7 @@ bool DungeonMap::CanEnter(Player* player)
 
     // cannot enter if the instance is full (player cap), GMs don't count
     uint32 maxPlayers = GetMaxPlayers();
-    if (!player->IsGameMaster() && GetPlayersCountExceptGMs() >= maxPlayers)
+    if (!player->IsGameMaster() && !player->HasCheatOption(PLAYER_CHEAT_TRIGGER_PASS) && GetPlayersCountExceptGMs() >= maxPlayers)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName());
         player->SendTransferAborted(TRANSFER_ABORT_MAX_PLAYERS);
@@ -2145,8 +2151,9 @@ bool DungeonMap::CanEnter(Player* player)
     //   graveyard rushing in instances.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     Group* pGroup = player->GetGroup();
-    if (IsRaid() && GetInstanceData() && GetInstanceData()->IsEncounterInProgress() && 
-        pGroup && pGroup->InCombatToInstance(GetInstanceId()) && player->IsAlive() && !player->IsGameMaster())
+    if (IsRaid() && GetInstanceData() && GetInstanceData()->IsEncounterInProgress() &&
+        pGroup && pGroup->InCombatToInstance(GetInstanceId()) && player->IsAlive() && !player->IsGameMaster() &&
+        !player->HasCheatOption(PLAYER_CHEAT_TRIGGER_PASS))
     {
         player->SendTransferAborted(TRANSFER_ABORT_ZONE_IN_COMBAT);
         return false;

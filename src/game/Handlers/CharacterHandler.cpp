@@ -663,14 +663,20 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     if (!alreadyOnline && !pCurrChar->GetMap()->Add(pCurrChar))
     {
-        // normal delayed teleport protection not applied (and this correct) for this case (Player object just created)
-        AreaTriggerTeleport const* at = sObjectMgr.GetGoBackTrigger(pCurrChar->GetMapId());
-        if (at)
-            pCurrChar->TeleportTo(at->destination);
-        else if (pCurrChar->GetMapId() == MAP_NAXXRAMAS)
-            pCurrChar->TeleportTo(MAP_EASTERN_KINGDOMS, 3362.15f, -3379.35f, 144.782f, 6.28319f); // Naxxramas has no exit trigger
-        else
-            pCurrChar->TeleportToHomebind();
+        // If a bot was already teleported during AddToWorld (e.g., summon to
+        // master on a different map), skip fallback teleport — the scheduled
+        // far teleport will handle placement on the correct map.
+        if (!pCurrChar->IsBeingTeleportedFar())
+        {
+            // normal delayed teleport protection not applied (and this correct) for this case (Player object just created)
+            AreaTriggerTeleport const* at = sObjectMgr.GetGoBackTrigger(pCurrChar->GetMapId());
+            if (at)
+                pCurrChar->TeleportTo(at->destination);
+            else if (pCurrChar->GetMapId() == MAP_NAXXRAMAS)
+                pCurrChar->TeleportTo(MAP_EASTERN_KINGDOMS, 3362.15f, -3379.35f, 144.782f, 6.28319f); // Naxxramas has no exit trigger
+            else
+                pCurrChar->TeleportToHomebind();
+        }
 
         sMapMgr.ExecuteSingleDelayedTeleport(pCurrChar);
     }

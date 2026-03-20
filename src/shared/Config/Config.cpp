@@ -235,3 +235,17 @@ float Config::GetFloatDefault(char const* name, float def) const
     std::string val;
     return GetValueHelper(name, val) ? std::stof(val) : def;
 }
+
+std::vector<std::pair<std::string, std::string>> Config::GetEntriesByPrefix(std::string const& prefix) const
+{
+    std::vector<std::pair<std::string, std::string>> entries;
+
+    std::shared_lock<std::shared_timed_mutex> guard(m_configLock);
+    for (auto const& entry : m_configMap)
+    {
+        if (entry.first.compare(0, prefix.size(), prefix) == 0)
+            entries.push_back(entry);
+    }
+
+    return entries;
+}

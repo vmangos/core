@@ -6,6 +6,7 @@
 #include "PlayerbotSecurity.h"
 
 #include "LFGMgr.h"
+#include "Log.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
@@ -175,6 +176,10 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
     }
 
     // Non-random bots: only their master has full access
+    if (PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(from))
+        if (mgr->GetPlayerBot(bot->GetGUID()) == bot)
+            return PLAYERBOT_SECURITY_ALLOW_ALL;
+
     if (botAI->GetMaster() == from)
         return PLAYERBOT_SECURITY_ALLOW_ALL;
 
@@ -196,15 +201,29 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
     if (realLevel >= level || from == bot)
         return true;
 
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    Player* master = botAI ? botAI->GetMaster() : nullptr;
+    LOG_INFO("playerbots",
+        "CheckLevelFor: reject bot=%s(%u) requester=%s(%u) required=%u actual=%u reason=%u silent=%u ignoreGroup=%u botInWorld=%u requesterInWorld=%u botMap=%u requesterMap=%u botInst=%u requesterInst=%u botGroupPtr=%p requesterGroupPtr=%p botWorldMask=%u requesterWorldMask=%u master=%s(%u)",
+        bot->GetName(), bot->GetGUIDLow(),
+        from->GetName(), from->GetGUIDLow(),
+        uint32(level), uint32(realLevel), uint32(reason), silent, ignoreGroup,
+        bot->IsInWorld(), from->IsInWorld(),
+        bot->GetMapId(), from->GetMapId(),
+        bot->GetInstanceId(), from->GetInstanceId(),
+        static_cast<void const*>(bot->GetGroup()),
+        static_cast<void const*>(from->GetGroup()),
+        bot->GetWorldMask(), from->GetWorldMask(),
+        master ? master->GetName() : "<null>", master ? master->GetGUIDLow() : 0);
+
     PlayerbotAI* fromBotAI = GET_PLAYERBOT_AI(from);
     if (silent || (fromBotAI && !fromBotAI->IsRealPlayer()))
         return false;
 
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI)
         return false;
 
-    Player* master = botAI->GetMaster();
+    master = botAI->GetMaster();
     if (master && !IsFactionInteractionAllowed(bot, master))
         if (WorldSession* session = master->GetSession())
             if (session->GetSecurity() < SEC_GAMEMASTER)

@@ -12,27 +12,17 @@ class GenericWarlockNonCombatStrategyActionNodeFactory : public NamedObjectFacto
 public:
     GenericWarlockNonCombatStrategyActionNodeFactory()
     {
-        creators["fel armor"] = &fel_armor;
         creators["demon armor"] = &demon_armor;
         creators["summon voidwalker"] = &summon_voidwalker;
-        creators["summon felguard"] = &summon_felguard;
         creators["summon succubus"] = &summon_succubus;
         creators["summon felhunter"] = &summon_felhunter;
     }
 
     // Pet skills are setup in pass-through fashion, so if one fails, it attempts to cast the next one
-    // The order goes Felguard -> Felhunter -> Succubus -> Voidwalker -> Imp
+    // The order goes Felhunter -> Succubus -> Voidwalker -> Imp (vanilla 1.12, no Felguard)
     // Pets are summoned based on the non-combat strategy you have active, the warlock's level, and if they have a soul shard available
 
 private:
-    static ActionNode* fel_armor([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("fel armor",
-                              /*P*/ {},
-                              /*A*/ { NextAction("demon armor") },
-                              /*C*/ {});
-    }
-
     static ActionNode* demon_armor([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("demon armor",
@@ -61,13 +51,6 @@ private:
                               /*A*/ { NextAction("summon succubus") },
                               /*C*/ {});
     }
-    static ActionNode* summon_felguard([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("summon felguard",
-                              /*P*/ {},
-                              /*A*/ { NextAction("summon felhunter") },
-                              /*C*/ {});
-    }
 };
 
 GenericWarlockNonCombatStrategy::GenericWarlockNonCombatStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI)
@@ -80,11 +63,11 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
     NonCombatStrategy::InitTriggers(triggers);
     triggers.push_back(new TriggerNode("has pet", { NextAction("toggle pet spell", 60.0f) }));
     triggers.push_back(new TriggerNode("new pet", { NextAction("set pet stance", 60.0f) }));
-    triggers.push_back(new TriggerNode("no pet", { NextAction("fel domination", 30.0f) }));
+    // Note: fel domination is TBC; in vanilla, pet summon is handled by the pet strategy
     triggers.push_back(new TriggerNode("no soul shard", { NextAction("create soul shard", 60.0f) }));
     triggers.push_back(new TriggerNode("too many soul shards", { NextAction("destroy soul shard", 60.0f) }));
     triggers.push_back(new TriggerNode("soul link", { NextAction("soul link", 28.0f) }));
-    triggers.push_back(new TriggerNode("demon armor", { NextAction("fel armor", 27.0f) }));
+    triggers.push_back(new TriggerNode("demon armor", { NextAction("demon armor", 27.0f) }));
     triggers.push_back(new TriggerNode("unending breath", { NextAction("unending breath", 12.0f) }));
     triggers.push_back(new TriggerNode("unending breath on party", { NextAction("unending breath on party", 11.0f) }));
     triggers.push_back(new TriggerNode("no healthstone", { NextAction("create healthstone", 26.0f) }));
@@ -140,7 +123,8 @@ void SummonFelhunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("wrong pet", { NextAction("summon felhunter", 29.0f) }));
 }
 
-// Non-combat strategy for summoning a Felguard
+// Non-combat strategy for summoning a Felguard (TBC pet - not available in vanilla 1.12)
+// Falls back to summoning a Felhunter instead
 // Enabled by default for the Demonology spec
 // To enable, type "nc +felguard"
 // To disable, type "nc -felguard"
@@ -148,8 +132,9 @@ SummonFelguardStrategy::SummonFelguardStrategy(PlayerbotAI* ai) : NonCombatStrat
 
 void SummonFelguardStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("no pet", { NextAction("summon felguard", 29.0f) }));
-    triggers.push_back(new TriggerNode("wrong pet", { NextAction("summon felguard", 29.0f) }));
+    // Felguard does not exist in vanilla 1.12, summon felhunter as the best alternative
+    triggers.push_back(new TriggerNode("no pet", { NextAction("summon felhunter", 29.0f) }));
+    triggers.push_back(new TriggerNode("wrong pet", { NextAction("summon felhunter", 29.0f) }));
 }
 
 // Non-combat strategy for selecting themselves to receive soulstone

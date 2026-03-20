@@ -24,7 +24,6 @@ public:
         creators["cleanse disease on party"] = &cleanse_disease_on_party;
         creators["seal of wisdom"] = &seal_of_wisdom;
         creators["seal of justice"] = &seal_of_justice;
-        creators["hand of reckoning"] = &hand_of_reckoning;
         creators["judgement"] = &judgement;
         creators["judgement of wisdom"] = &judgement_of_wisdom;
         creators["divine shield"] = &divine_shield;
@@ -42,10 +41,6 @@ public:
         creators["blessing of sanctuary on party"] = &blessing_of_sanctuary_on_party;
         creators["blessing of sanctuary"] = &blessing_of_sanctuary;
         creators["seal of command"] = &seal_of_command;
-        creators["taunt spell"] = &hand_of_reckoning;
-        creators["righteous defense"] = &righteous_defense;
-        creators["avenger's shield"] = &avengers_shield;
-        creators["divine sacrifice"] = &divine_sacrifice;
     }
 
 private:
@@ -168,34 +163,6 @@ private:
                               /*P*/ {},
                               /*A*/ { NextAction("seal of righteousness") },
                               /*C*/ {});
-    }
-    static ActionNode* hand_of_reckoning(PlayerbotAI* /* ai */)
-    {
-        return new ActionNode("hand of reckoning",
-                              /*P*/ {},
-                              /*A*/ { NextAction("righteous defense") },
-                              /*C*/ {});
-    }
-    static ActionNode* righteous_defense(PlayerbotAI* /* ai */)
-    {
-        return new ActionNode("righteous defense",
-                              /*P*/ {},
-                              /*A*/ { NextAction("avenger's shield") },
-                              /*C*/ {});
-    }
-    static ActionNode* avengers_shield(PlayerbotAI* /* ai */)
-    {
-        return new ActionNode("avenger's shield",
-                              /*P*/ {},
-                              /*A*/ { NextAction("judgement of wisdom") },
-                              /*C*/ {});
-    }
-    static ActionNode* divine_sacrifice(PlayerbotAI* /* ai */)
-    {
-        return new ActionNode("divine sacrifice",
-                              /*P*/ {},
-                              /*A*/ {},
-                              /*C*/ { NextAction("cancel divine sacrifice") });
     }
     static ActionNode* judgement_of_wisdom(PlayerbotAI* /* ai */)
     {

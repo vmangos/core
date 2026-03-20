@@ -9,10 +9,26 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
+namespace
+{
+bool IsSafePartyMember(Player* player)
+{
+    return player && player->IsInWorld() && !player->IsDuringRemoveFromWorld();
+}
+
+bool IsSafePartyUnit(Unit* unit)
+{
+    return unit && unit->IsInWorld() && !unit->IsDuringRemoveFromWorld();
+}
+}  // namespace
+
 Unit* PartyMemberValue::FindPartyMember(std::vector<Player*>* party, FindPlayerPredicate& predicate)
 {
     for (Player* player : *party)
     {
+        if (!IsSafePartyMember(player))
+            continue;
+
         if (predicate.Check(player) && Check(player))
             return player;
 
@@ -104,6 +120,9 @@ bool PartyMemberValue::Check(Unit* player)
 {
     // return player && player != bot && player->GetMapId() == bot->GetMapId() && bot->IsWithinDistInMap(player,
     // sPlayerbotAIConfig.sightDistance, false);
+    if (!IsSafePartyUnit(player) || !IsSafePartyUnit(bot))
+        return false;
+
     bool isGM = player->ToPlayer() && player->ToPlayer()->IsGameMaster();
     return player && player->GetMapId() == bot->GetMapId() && !isGM &&
            bot->GetDistance(player) < sPlayerbotAIConfig.spellDistance * 2 &&

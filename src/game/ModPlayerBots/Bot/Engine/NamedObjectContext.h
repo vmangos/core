@@ -138,16 +138,21 @@ public:
     using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
     std::unordered_map<std::string, ObjectCreator> creators;
     std::vector<NamedObjectContext<T>*> contexts;
+    std::vector<bool> ownsContexts;
 
     ~SharedNamedObjectContextList()
     {
-        for (typename std::vector<NamedObjectContext<T>*>::const_iterator i = contexts.begin(); i != contexts.end(); i++)
-            delete *i;
+        for (size_t i = 0; i < contexts.size(); ++i)
+        {
+            if (ownsContexts.size() > i && ownsContexts[i] && contexts[i])
+                delete contexts[i];
+        }
     }
 
-    void Add(NamedObjectContext<T>* context)
+    void Add(NamedObjectContext<T>* context, bool owned = true)
     {
         contexts.push_back(context);
+        ownsContexts.push_back(owned);
         for (auto const& iter : context->creators)
             creators[iter.first] = iter.second;
     }

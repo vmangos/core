@@ -38,6 +38,27 @@
 #include "MoveSpline.h"
 #include "Geometry.h"
 
+namespace
+{
+void LogPlayerbotWorldportState(char const* stage, Player* player, Map* targetMap = nullptr)
+{
+    if (!player)
+        return;
+
+    WorldLocation const& dest = player->GetTeleportDest();
+    Map* currentMap = player->FindMap();
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL,
+        "Playerbot worldport %s: player=%s (%u) map=%u inst=%u inWorld=%u teleFar=%u teleNear=%u mapPtr=%p targetMapPtr=%p groupPtr=%p worldMask=%u destMap=%u dest=(%g, %g, %g, %g)",
+        stage,
+        player->GetName(), player->GetGUIDLow(),
+        player->GetMapId(), player->GetInstanceId(),
+        player->IsInWorld(), player->IsBeingTeleportedFar(), player->IsBeingTeleportedNear(),
+        static_cast<void const*>(currentMap), static_cast<void const*>(targetMap),
+        static_cast<void const*>(player->GetGroup()), player->GetWorldMask(),
+        dest.mapId, dest.x, dest.y, dest.z, dest.o);
+}
+}
+
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
 {
     HandleMoveWorldportAckOpcode();
@@ -49,6 +70,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     if (!GetPlayer()->IsBeingTeleportedFar())
         return;
 
+    LogPlayerbotWorldportState("enter", GetPlayer());
+
     // get start teleport coordinates (will used later in fail case)
     WorldLocation oldLoc;
     GetPlayer()->GetPosition(oldLoc);
@@ -59,6 +82,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // possible errors in the coordinate validity check (only cheating case possible)
     if (!MapManager::IsValidMapCoord(loc))
     {
+        LogPlayerbotWorldportState("invalid-destination", GetPlayer());
         sLog.Player(this, LOG_MOVEMENT, LOG_LVL_ERROR, "WorldSession::HandleMoveWorldportAck: Teleported far to a not valid location "
                       "(map: %u, x: %g, y: %g, z: %g). Porting to homebind instead.",
                       loc.mapId, loc.x, loc.y, loc.z);
@@ -82,6 +106,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
         if (!map)
         {
+            LogPlayerbotWorldportState("missing-battleground-map", GetPlayer());
             sLog.Player(this, LOG_MOVEMENT, LOG_LVL_DETAIL, "WorldSession::HandleMoveWorldportAck: Teleported far to nonexistent battleground instance "
                        " (map: %u, x: %g, y: %g, z: %g). Trying to port player to previous location.",
                        loc.mapId, loc.x, loc.y, loc.z);
@@ -109,11 +134,14 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     else
         GetPlayer()->Relocate(loc.x, loc.y, loc.z, loc.o);
 
+    LogPlayerbotWorldportState("post-relocate-pre-add", GetPlayer(), map);
+
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     // the CanEnter checks are done in TeleporTo but conditions may change
     // while the player is in transit, for example the map may get full
     if (!GetPlayer()->GetMap()->Add(GetPlayer()))
     {
+        LogPlayerbotWorldportState("map-add-failed", GetPlayer(), map);
         sLog.Player(this, LOG_MOVEMENT, LOG_LVL_DETAIL, "WorldSession::HandleMoveWorldportAckOpcode: Teleported far but couldn't be added to map "
                    " (map: %u, x: %g, y: %g, z: %g). Trying to port player to previous location.",
                    loc.mapId, loc.x, loc.y, loc.z);
@@ -122,6 +150,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         return;
     }
     GetPlayer()->SetSemaphoreTeleportFar(false);
+    LogPlayerbotWorldportState("post-map-add", GetPlayer(), map);
 
     // battleground state prepare (in case join to BG), at relogin/tele player not invited
     // only add to bg group and object, if the player was invited (else he entered through command)
@@ -144,6 +173,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     }
 
     GetPlayer()->SendInitialPacketsAfterAddToMap();
+    LogPlayerbotWorldportState("post-initial-packets", GetPlayer(), map);
 
     // flight fast teleport case
     if (GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
@@ -195,6 +225,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
+    LogPlayerbotWorldportState("complete", GetPlayer(), map);
 
     // Let the client know its new position by sending a heartbeat!
     // The Windows client figures this out by itself, but the MacOS one does

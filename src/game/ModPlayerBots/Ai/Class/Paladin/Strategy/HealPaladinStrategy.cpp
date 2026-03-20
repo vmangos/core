@@ -36,14 +36,6 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     );
     triggers.push_back(
         new TriggerNode(
-            "medium mana",
-            {
-                NextAction("divine illumination", ACTION_HIGH + 2)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
             "low mana",
             {
                 NextAction("divine favor", ACTION_HIGH + 1)
@@ -60,19 +52,10 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     );
     triggers.push_back(
         new TriggerNode(
-            "medium group heal setting",
-            {
-                NextAction("divine sacrifice", ACTION_CRITICAL_HEAL + 5),
-                NextAction("avenging wrath", ACTION_HIGH + 4),
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
             "party member critical health",
             {
                 NextAction("holy shock on party", ACTION_CRITICAL_HEAL + 6),
-                NextAction("divine sacrifice", ACTION_CRITICAL_HEAL + 5),
+                NextAction("divine favor", ACTION_CRITICAL_HEAL + 5),
                 NextAction("holy light on party", ACTION_CRITICAL_HEAL + 4)
             }
         )
@@ -104,21 +87,4 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     )
 );
 
-    triggers.push_back(
-        new TriggerNode(
-        "beacon of light on main tank",
-        {
-            NextAction("beacon of light on main tank", ACTION_CRITICAL_HEAL + 7)
-        }
-    )
-);
-
-    triggers.push_back(
-        new TriggerNode(
-        "sacred shield on main tank",
-        {
-            NextAction("sacred shield on main tank", ACTION_CRITICAL_HEAL + 6)
-        }
-    )
-);
 }

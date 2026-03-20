@@ -2,6 +2,7 @@
 #include "Chat/Channel.h"
 #include "Group.h"
 #include "Guild/Guild.h"
+#include "Log.h"
 #include "ModPlayerBots/Bot/PlayerbotAI.h"
 #include "ModPlayerBots/Bot/PlayerbotMgr.h"
 #include "ModPlayerBots/Bot/RandomPlayerbotMgr.h"
@@ -27,6 +28,15 @@ bool OnPlayerCanUseChat(Player* fromPlayer, uint32 type, uint32 /*lang*/, std::s
     if (!botAI)
         return true;
 
+    LOG_INFO("playerbots",
+        "ChatBotCommandsCompat whisper: from=%s(%u) toBot=%s(%u) type=%u inWorld=%u teleFar=%u map=%u inst=%u groupPtr=%p worldMask=%u text=\"%s\"",
+        fromPlayer->GetName(), fromPlayer->GetGUIDLow(),
+        receiver->GetName(), receiver->GetGUIDLow(),
+        type, receiver->IsInWorld(), receiver->IsBeingTeleportedFar(),
+        receiver->GetMapId(), receiver->GetInstanceId(),
+        static_cast<void const*>(receiver->GetGroup()), receiver->GetWorldMask(),
+        msg.c_str());
+
     botAI->HandleCommand(type, msg, fromPlayer);
     return msg != "logout";
 }
@@ -37,15 +47,36 @@ bool OnPlayerCanUseChat(Player* fromPlayer, uint32 type, uint32 /*lang*/, std::s
         return true;
 
     std::string const command(msg);
+    uint32 memberCount = 0;
+    uint32 botCount = 0;
+    uint32 deliveredCount = 0;
     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
+        ++memberCount;
         Player* member = itr->GetSource();
         if (!member)
             continue;
 
         if (PlayerbotAI* botAI = PlayerbotsMgr::instance().GetPlayerbotAI(member))
+        {
+            ++botCount;
+            LOG_INFO("playerbots",
+                "ChatBotCommandsCompat group: from=%s(%u) bot=%s(%u) type=%u inWorld=%u teleFar=%u map=%u inst=%u groupPtr=%p worldMask=%u text=\"%s\"",
+                fromPlayer->GetName(), fromPlayer->GetGUIDLow(),
+                member->GetName(), member->GetGUIDLow(),
+                type, member->IsInWorld(), member->IsBeingTeleportedFar(),
+                member->GetMapId(), member->GetInstanceId(),
+                static_cast<void const*>(member->GetGroup()), member->GetWorldMask(),
+                command.c_str());
             botAI->HandleCommand(type, command, fromPlayer);
+            ++deliveredCount;
+        }
     }
+
+    LOG_INFO("playerbots",
+        "ChatBotCommandsCompat group summary: from=%s(%u) groupId=%u type=%u members=%u botsSeen=%u botsDelivered=%u text=\"%s\"",
+        fromPlayer->GetName(), fromPlayer->GetGUIDLow(), group->GetId(), type,
+        memberCount, botCount, deliveredCount, command.c_str());
 
     return true;
 }

@@ -142,8 +142,44 @@ bool IsPlayerbotLookupSafe(Player* player)
     if (!player)
         return false;
 
-    WorldSession* session = player->GetSession();
-    return session && !session->IsLogingOut() && player->IsInWorld() && !player->IsDuringRemoveFromWorld();
+    // Avoid dereferencing WorldSession here. During logout/removal races the
+    // raw session pointer can already be stale, and these lookups only need a
+    // conservative player-lifetime gate before touching the manager maps.
+    return player->GetSession() && !player->IsDuringRemoveFromWorld() &&
+        (player->IsInWorld() || player->IsBeingTeleported());
+}
+
+bool EnsureLiveBotGroupBinding(Player* master, Player* bot)
+{
+    if (!master || !bot)
+        return false;
+
+    Group* group = master->GetGroup();
+    if (!group || !group->IsMember(bot->GetGUID()))
+        return false;
+
+    if (bot->GetGroup() == group)
+        return true;
+
+    uint8 subgroup = group->GetMemberGroup(bot->GetGUID());
+    if (subgroup > MAX_RAID_SUBGROUPS)
+        return false;
+
+    LOG_WARN("playerbots",
+        "Repairing live group bind for bot=%s(%u) master=%s(%u) groupId=%u subgroup=%u oldGroupPtr=%p",
+        bot->GetName(), bot->GetGUIDLow(),
+        master->GetName(), master->GetGUIDLow(),
+        group->GetId(), subgroup,
+        static_cast<void const*>(bot->GetGroup()));
+
+    bot->SetGroup(group, subgroup);
+    bot->SetGroupUpdateFlag(GROUP_UPDATE_FULL);
+    bot->SetAuraUpdateMask(bot->GetAuraApplicationMask());
+    if (Pet* pet = bot->GetPet())
+        pet->SetAuraUpdateMask(pet->GetAuraApplicationMask());
+
+    group->SendUpdate();
+    return bot->GetGroup() == group;
 }
 
 class PlayerbotSessionPacketBridge : public PlayerBotAI
@@ -354,9 +390,27 @@ void PlayerbotHolder::UpdateSessions()
         if (bot->IsBeingTeleported())
         {
             PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+            LOG_INFO("playerbots",
+                "UpdateSessions: teleporting bot=%s(%u) far=%u near=%u inWorld=%u mapId=%u instId=%u mapPtr=%p groupPtr=%p worldMask=%u botAI=%p",
+                bot->GetName(), bot->GetGUIDLow(),
+                bot->IsBeingTeleportedFar(), bot->IsBeingTeleportedNear(), bot->IsInWorld(),
+                bot->GetMapId(), bot->GetInstanceId(),
+                static_cast<void const*>(bot->FindMap()),
+                static_cast<void const*>(bot->GetGroup()),
+                bot->GetWorldMask(),
+                static_cast<void const*>(botAI));
             if (botAI)
             {
                 botAI->HandleTeleportAck();
+            }
+            else if (bot->IsBeingTeleportedFar() && bot->GetSession())
+            {
+                // Fallback: PlayerbotAI not found but bot is stuck in far teleport.
+                // Directly dispatch the worldport ack to avoid leaving the bot in limbo.
+                LOG_WARN("playerbots",
+                    "UpdateSessions: fallback worldport ack for bot=%s(%u) — botAI was null",
+                    bot->GetName(), bot->GetGUIDLow());
+                bot->GetSession()->HandleMoveWorldportAckOpcode();
             }
         }
         else if (bot->IsInWorld())
@@ -616,6 +670,10 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     OnBotLoginInternal(bot);
 
+    // Bots skip normal weapon skill progression, so max all weapon/defense
+    // proficiencies to match the bot's current level.
+    bot->UpdateSkillsToMaxSkillsForLevel();
+
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI)
     {
@@ -737,14 +795,6 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         bot->GetMotionMaster()->MovementExpired();
     }
 
-    // check activity
-    botAI->AllowActivity(ALL_ACTIVITY, true);
-
-    // set delay on login
-    botAI->SetNextCheckDelay(urand(2000, 4000));
-
-    botAI->TellMaster("Hello!", PLAYERBOT_SECURITY_TALK);
-
     if (master && master->GetGroup() && !group)
     {
         Group* mgroup = master->GetGroup();
@@ -754,11 +804,21 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
                 mgroup->ConvertToRaid();
 
             if (mgroup->isRaidGroup())
-                mgroup->AddMember(bot->GetGUID(), bot->GetName());
+            {
+                bool added = mgroup->AddMember(bot->GetGUID(), bot->GetName());
+                LOG_INFO("playerbots",
+                    "OnBotLogin add to existing raid group: bot=%s(%u) master=%s(%u) groupId=%u added=%u members=%u botGroupPtr=%p",
+                    bot->GetName(), bot->GetGUIDLow(), master->GetName(), master->GetGUIDLow(),
+                    mgroup->GetId(), added, mgroup->GetMembersCount(), static_cast<void const*>(bot->GetGroup()));
+            }
         }
         else
         {
-            mgroup->AddMember(bot->GetGUID(), bot->GetName());
+            bool added = mgroup->AddMember(bot->GetGUID(), bot->GetName());
+            LOG_INFO("playerbots",
+                "OnBotLogin add to existing group: bot=%s(%u) master=%s(%u) groupId=%u added=%u members=%u botGroupPtr=%p",
+                bot->GetName(), bot->GetGUIDLow(), master->GetName(), master->GetGUIDLow(),
+                mgroup->GetId(), added, mgroup->GetMembersCount(), static_cast<void const*>(bot->GetGroup()));
         }
     }
     else if (master && !group)
@@ -778,6 +838,13 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
                     sObjectMgr.RemoveGroup(newGroup);
                     delete newGroup;
                 }
+                else
+                {
+                    LOG_INFO("playerbots",
+                        "OnBotLogin created new group: bot=%s(%u) master=%s(%u) groupId=%u members=%u botGroupPtr=%p",
+                        bot->GetName(), bot->GetGUIDLow(), master->GetName(), master->GetGUIDLow(),
+                        newGroup->GetId(), newGroup->GetMembersCount(), static_cast<void const*>(bot->GetGroup()));
+                }
             }
             else
             {
@@ -786,9 +853,33 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         }
         else
         {
-            master->GetGroup()->AddMember(bot->GetGUID(), bot->GetName());
+            Group* masterGroup = master->GetGroup();
+            bool added = masterGroup->AddMember(bot->GetGUID(), bot->GetName());
+            LOG_INFO("playerbots",
+                "OnBotLogin add to master group: bot=%s(%u) master=%s(%u) groupId=%u added=%u members=%u botGroupPtr=%p",
+                bot->GetName(), bot->GetGUIDLow(), master->GetName(), master->GetGUIDLow(),
+                masterGroup->GetId(), added, masterGroup->GetMembersCount(), static_cast<void const*>(bot->GetGroup()));
         }
     }
+
+    if (master && master->GetGroup())
+    {
+        bool liveBound = EnsureLiveBotGroupBinding(master, bot);
+        LOG_INFO("playerbots",
+            "OnBotLogin post-group state: bot=%s(%u) master=%s(%u) masterGroupId=%u liveBound=%u botGroupPtr=%p groupInvitePtr=%p",
+            bot->GetName(), bot->GetGUIDLow(), master->GetName(), master->GetGUIDLow(),
+            master->GetGroup()->GetId(), liveBound,
+            static_cast<void const*>(bot->GetGroup()),
+            static_cast<void const*>(bot->GetGroupInvite()));
+    }
+
+    // check activity
+    botAI->AllowActivity(ALL_ACTIVITY, true);
+
+    // set delay on login
+    botAI->SetNextCheckDelay(urand(2000, 4000));
+
+    botAI->TellMaster("Hello!", PLAYERBOT_SECURITY_TALK);
 
     if (master && botAI)
     {
@@ -819,6 +910,13 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     bot->SaveToDB(false, false);
     bool addClassBot = sRandomPlayerbotMgr.IsAddclassAccount(accountId);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DIAG OnBotLogin: bot=%s accountId=%u addClassBot=%u master=%p isRandomAccount=%u",
+        bot->GetName(), accountId, addClassBot, static_cast<void const*>(master), isRandomAccount);
+    if (addClassBot && master)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DIAG OnBotLogin: bot=%s masterLevel=%u botLevel=%u levelDiff=%d",
+            bot->GetName(), master->GetLevel(), bot->GetLevel(), abs((int)master->GetLevel() - (int)bot->GetLevel()));
+    }
     if (addClassBot && master && abs((int)master->GetLevel() - (int)bot->GetLevel()) > 3)
     {
         // PlayerbotFactory factory(bot, master->GetLevel());
@@ -830,6 +928,17 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
             mixedGearScore = 1;
         PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
         factory.Randomize(false);
+    }
+    else if (addClassBot && master)
+    {
+        // Bot is close in level — skip full Randomize but fix spells and ammo
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DIAG PlayerbotMgr: close-level addclass bot=%s level=%u masterLevel=%u, calling InitSpells+InitAmmo",
+            bot->GetName(), bot->GetLevel(), master->GetLevel());
+        PlayerbotFactory factory(bot, bot->GetLevel());
+        factory.InitSkills();
+        factory.InitClassSpells();
+        factory.InitAvailableSpells();
+        factory.InitAmmo();
     }
 
     // bots join World chat if not solo oriented

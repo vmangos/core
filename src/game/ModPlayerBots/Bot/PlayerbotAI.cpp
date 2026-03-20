@@ -34,6 +34,7 @@
 #include "LootObjectStack.h"
 #include "MapMgr.h"
 #include "MotionMaster.h"
+#include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "NewRpgStrategy.h"
 #include "ObjectGuid.h"
@@ -70,6 +71,92 @@ std::vector<std::string>& split(std::string const s, char delim, std::vector<std
 std::vector<std::string> split(std::string const s, char delim);
 char* strstri(char const* str1, char const* str2);
 std::string& trim(std::string& s);
+
+namespace
+{
+Player* FindOwnedMasterInGroup(Player* bot)
+{
+    if (!bot)
+        return nullptr;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return nullptr;
+
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member || member == bot || !member->IsInWorld())
+            continue;
+
+        if (GET_PLAYERBOT_AI(member))
+            continue;
+
+        if (PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(member))
+            if (mgr->GetPlayerBot(bot->GetGUID()) == bot)
+                return member;
+    }
+
+    return nullptr;
+}
+
+std::string DescribePlayerbotWorldState(Player* player, Player* activeMaster = nullptr)
+{
+    if (!player)
+        return "player=<null>";
+
+    std::ostringstream out;
+    Map* map = player->FindMap();
+    Group* group = player->GetGroup();
+    out << "player=" << player->GetName() << "(" << player->GetGUIDLow() << ")"
+        << " mapId=" << player->GetMapId()
+        << " instId=" << player->GetInstanceId()
+        << " inWorld=" << player->IsInWorld()
+        << " teleFar=" << player->IsBeingTeleportedFar()
+        << " teleNear=" << player->IsBeingTeleportedNear()
+        << " mapPtr=" << static_cast<void const*>(map)
+        << " groupPtr=" << static_cast<void const*>(group)
+        << " worldMask=" << player->GetWorldMask();
+
+    if (activeMaster)
+    {
+        out << " activeMaster=" << activeMaster->GetName() << "(" << activeMaster->GetGUIDLow() << ")"
+            << " masterMapId=" << activeMaster->GetMapId()
+            << " masterInstId=" << activeMaster->GetInstanceId()
+            << " masterInWorld=" << activeMaster->IsInWorld()
+            << " masterGroupPtr=" << static_cast<void const*>(activeMaster->GetGroup())
+            << " masterWorldMask=" << activeMaster->GetWorldMask();
+    }
+    else
+    {
+        out << " activeMaster=<null>";
+    }
+
+    return out.str();
+}
+
+std::string DescribeCommandForLog(std::string const& text)
+{
+    if (text.size() <= 96)
+        return text;
+
+    return text.substr(0, 96) + "...";
+}
+
+Player* RestoreOwnedMasterFromRequester(Player* bot, Player* requester)
+{
+    if (!bot || !requester || sRandomPlayerbotMgr.IsRandomBot(bot))
+        return nullptr;
+
+    if (PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(requester))
+    {
+        if (mgr->GetPlayerBot(bot->GetGUID()) == bot)
+            return requester;
+    }
+
+    return nullptr;
+}
+}
 
 std::set<std::string> PlayerbotAI::unsecuredCommands;
 
@@ -257,7 +344,13 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     // Early return if bot is in invalid state
     if (!bot || !bot->GetSession() || !bot->IsInWorld() || bot->IsBeingTeleported() ||
         bot->GetSession()->IsLogingOut() || bot->IsDuringRemoveFromWorld())
+    {
+        LOG_INFO("playerbots", "DIAG UpdateAI: bot=%s EARLY EXIT invalid state (bot=%p inWorld=%u teleporting=%u)",
+            bot ? bot->GetName() : "null", bot,
+            bot ? (uint32)bot->IsInWorld() : 0,
+            bot ? (uint32)bot->IsBeingTeleported() : 0);
         return;
+    }
 
     // Handle cheat options (set bot health and power if cheats are enabled)
     if (bot->IsAlive() &&
@@ -277,6 +370,19 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
 
     if (!CanUpdateAI())
         return;
+
+    // Dedup TICK log: only print when state or minimal changes
+    {
+        char diagBuf[64];
+        snprintf(diagBuf, sizeof(diagBuf), "%u:%u", (uint32)GetState(), (uint32)minimal);
+        std::string diagKey(diagBuf);
+        if (diagKey != _lastDiagTick)
+        {
+            _lastDiagTick = std::move(diagKey);
+            LOG_INFO("playerbots", "DIAG UpdateAI: bot=%s state=%u minimal=%u",
+                bot->GetName(), (uint32)GetState(), (uint32)minimal);
+        }
+    }
 
     // Handle the current spell
     Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
@@ -382,6 +488,17 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     // Update the bot's group status (moved to helper function)
     UpdateAIGroupMaster();
 
+    // Cross-map recovery must run before full AI update.
+    // Previously this was deep inside DoNextAction() where many early returns
+    // (master teleporting, engine actions, etc.) prevented it from executing.
+    if (TryRecoverToActiveMaster())
+    {
+        LOG_INFO("playerbots", "DIAG UpdateAI: bot=%s TryRecoverToActiveMaster=true, skipping UpdateAIInternal", bot->GetName());
+        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+        YieldThread(GetReactDelay());
+        return;
+    }
+
     // Update internal AI
     UpdateAIInternal(elapsed, minimal);
     YieldThread(GetReactDelay());
@@ -390,14 +507,34 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
 // Helper function for UpdateAI to check group membership and handle removal if necessary
 Player* PlayerbotAI::GetActiveMaster()
 {
-    if (!master)
+    Player* currentMaster = GetMaster();
+    if (!currentMaster)
         return nullptr;
 
-    WorldSession* masterSession = master->GetSession();
-    if (!masterSession || masterSession->IsLogingOut() || !master->IsInWorld() || master->IsDuringRemoveFromWorld())
+    WorldSession* masterSession = currentMaster->GetSession();
+    if (!masterSession || masterSession->IsLogingOut() || !currentMaster->IsInWorld() || currentMaster->IsDuringRemoveFromWorld())
         return nullptr;
 
-    return master;
+    return currentMaster;
+}
+
+Player* PlayerbotAI::GetMaster()
+{
+    if (masterGuid.IsEmpty())
+    {
+        master = nullptr;
+        return nullptr;
+    }
+
+    Player* currentMaster = ObjectAccessor::FindPlayer(masterGuid);
+    master = currentMaster;
+    return currentMaster;
+}
+
+void PlayerbotAI::SetMaster(Player* newMaster)
+{
+    master = newMaster;
+    masterGuid = newMaster ? newMaster->GetObjectGuid() : ObjectGuid::Empty;
 }
 
 void PlayerbotAI::UpdateAIGroupMaster()
@@ -428,6 +565,15 @@ void PlayerbotAI::UpdateAIGroupMaster()
 
     activeMaster = GetActiveMaster();
     PlayerbotAI* masterBotAI = activeMaster ? GET_PLAYERBOT_AI(activeMaster) : nullptr;
+    Player* ownedMaster = !IsRandomBot ? FindOwnedMasterInGroup(bot) : nullptr;
+
+    if (ownedMaster && ownedMaster != activeMaster)
+    {
+        SetMaster(ownedMaster);
+        ResetStrategies();
+        activeMaster = ownedMaster;
+        masterBotAI = nullptr;
+    }
 
     if (!activeMaster || (masterBotAI && !masterBotAI->IsRealPlayer()))
     {
@@ -546,6 +692,9 @@ void PlayerbotAI::HandleCommands()
 {
     ExternalEventHelper helper(aiObjectContext);
 
+    if (!chatCommands.empty())
+        LOG_INFO("playerbots", "DIAG HandleCommands: bot=%s queueSize=%zu", bot->GetName(), chatCommands.size());
+
     for (auto it = chatCommands.begin(); it != chatCommands.end();)
     {
         time_t& checkTime = it->GetTime();
@@ -569,7 +718,11 @@ void PlayerbotAI::HandleCommands()
             continue;
         }
 
-        if (!helper.ParseChatCommand(command, owner) && it->GetType() == CHAT_MSG_WHISPER)
+        bool parsed = helper.ParseChatCommand(command, owner);
+        LOG_INFO("playerbots", "DIAG HandleCommands: bot=%s cmd='%s' from=%s parsed=%u",
+            bot->GetName(), command.c_str(), owner->GetName(), (uint32)parsed);
+
+        if (!parsed && it->GetType() == CHAT_MSG_WHISPER)
         {
             // ostringstream out; out << "Unknown command " << command;
             // TellPlayer(out);
@@ -585,6 +738,26 @@ void PlayerbotAI::HandleCommand(uint32 type, const std::string& text, Player& fr
 {
     if (!bot)
         return;
+
+    Player* activeMaster = GetActiveMaster();
+    if (!activeMaster)
+    {
+        if (Player* restoredMaster = RestoreOwnedMasterFromRequester(bot, &fromPlayer))
+        {
+            LOG_WARN("playerbots",
+                "HandleCommand(ref): restoring master for bot=%s(%u) from requester=%s(%u)",
+                bot->GetName(), bot->GetGUIDLow(),
+                fromPlayer.GetName(), fromPlayer.GetGUIDLow());
+            SetMaster(restoredMaster);
+            activeMaster = restoredMaster;
+        }
+    }
+
+    std::string const state = DescribePlayerbotWorldState(bot, activeMaster);
+    std::string const command = DescribeCommandForLog(text);
+    LOG_INFO("playerbots",
+        "HandleCommand(ref): botState={%s} from=%s(%u) type=%u lang=%u text=\"%s\"",
+        state.c_str(), fromPlayer.GetName(), fromPlayer.GetGUIDLow(), type, lang, command.c_str());
 
     std::string filtered = text;
 
@@ -734,7 +907,7 @@ void PlayerbotAI::HandleCommand(uint32 type, const std::string& text, Player& fr
             if (type == CHAT_MSG_WHISPER)
                 TellPlayer(&fromPlayer, BOT_TEXT("logout_start"));
 
-            if (master && master->GetPlayerbotMgr())
+            if (Player* currentMaster = GetMaster(); currentMaster && currentMaster->GetPlayerbotMgr())
                 SetShouldLogOut(true);
         }
     }
@@ -787,17 +960,56 @@ void PlayerbotAI::HandleTeleportAck()
      * Player may NOT be in world or grid here.
      * Handle this FIRST.
      */
+    if (bot->IsBeingTeleportedFar())
+    {
+        Player* activeMaster = GetActiveMaster();
+        std::string const beforeAck = DescribePlayerbotWorldState(bot, activeMaster);
+        LOG_INFO("playerbots", "HandleTeleportAck: pre-worldport %s", beforeAck.c_str());
+
+        bot->GetSession()->HandleMoveWorldportAckOpcode();
+
+        activeMaster = GetActiveMaster();
+        std::string const afterAck = DescribePlayerbotWorldState(bot, activeMaster);
+        LOG_INFO("playerbots", "HandleTeleportAck: post-worldport %s", afterAck.c_str());
+
+        // A failed worldport can schedule another far teleport (return/homebind). Keep the
+        // temporary trigger-pass flag and let the next ACK complete that flow instead of
+        // tearing down state prematurely.
         if (bot->IsBeingTeleportedFar())
         {
-            bot->GetSession()->HandleMoveWorldportAckOpcode();
+            LOG_INFO("playerbots", "HandleTeleportAck: worldport still pending %s", afterAck.c_str());
+            SetNextCheckDelay(500);
+            return;
+        }
 
-            // after worldport ACK the player should be in a valid map
-            if (!bot->GetMap())
+        if (!bot->FindMap() || !bot->IsInWorld())
+        {
+            LOG_ERROR("playerbots", "HandleTeleportAck: worldport incomplete after ACK %s", afterAck.c_str());
+            SetNextCheckDelay(500);
+            return;
+        }
+
+        // Clear the temporary instance-entry bypass only after the worldport has actually
+        // completed into a valid in-world state.
+        if (bot->HasCheatOption(PLAYER_CHEAT_TRIGGER_PASS))
+            bot->RemoveCheatOption(PLAYER_CHEAT_TRIGGER_PASS);
+
+        if (activeMaster && bot->GetWorldMask() != activeMaster->GetWorldMask())
+        {
+            uint32 newWorldMask = activeMaster->GetWorldMask();
+            LOG_INFO("playerbots",
+                "HandleTeleportAck: resync world mask bot=%s(%u) botMask=%u master=%s(%u) masterMask=%u",
+                bot->GetName(), bot->GetGUIDLow(), bot->GetWorldMask(),
+                activeMaster->GetName(), activeMaster->GetGUIDLow(), newWorldMask);
+            bot->SetWorldMask(newWorldMask);
+            bot->CallForAllControlledUnits([newWorldMask](Unit* unit)
             {
-                LOG_ERROR("playerbot", "Bot %llu has no map after worldport ACK",
-                          static_cast<unsigned long long>(bot->GetGUID()));
-                return;
-            }
+                unit->SetWorldMask(newWorldMask);
+            }, CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
+        }
+
+        LOG_INFO("playerbots", "HandleTeleportAck: pre-reset %s",
+            DescribePlayerbotWorldState(bot, activeMaster).c_str());
 
         // apply instance-related strategies after map attach
         if (sPlayerbotAIConfig.applyInstanceStrategies)
@@ -809,12 +1021,18 @@ void PlayerbotAI::HandleTeleportAck()
         // reset AI state after teleport
         Reset(true);
 
+        LOG_INFO("playerbots", "HandleTeleportAck: post-reset %s",
+            DescribePlayerbotWorldState(bot, GetActiveMaster()).c_str());
+
         // clear movement only AFTER teleport is finalized and bot is in world
         if (bot->IsInWorld() && bot->GetMotionMaster())
         {
             bot->GetMotionMaster()->Clear(true);
             bot->StopMoving();
         }
+
+        LOG_INFO("playerbots", "HandleTeleportAck: finalized %s",
+            DescribePlayerbotWorldState(bot, GetActiveMaster()).c_str());
 
         // simulate far teleport latency (cmangos-style)
         SetNextCheckDelay(urand(2000, 5000));
@@ -957,6 +1175,31 @@ bool PlayerbotAI::IsAllowedCommand(std::string const text)
 
 void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fromPlayer)
 {
+    if (bot && fromPlayer && !GetActiveMaster())
+    {
+        if (Player* restoredMaster = RestoreOwnedMasterFromRequester(bot, fromPlayer))
+        {
+            LOG_WARN("playerbots",
+                "HandleCommand(ptr): restoring master for bot=%s(%u) from requester=%s(%u)",
+                bot->GetName(), bot->GetGUIDLow(),
+                fromPlayer->GetName(), fromPlayer->GetGUIDLow());
+            SetMaster(restoredMaster);
+        }
+    }
+
+    if (bot)
+    {
+        std::string const state = DescribePlayerbotWorldState(bot, GetActiveMaster());
+        std::string const command = DescribeCommandForLog(text);
+        LOG_INFO("playerbots",
+            "HandleCommand(ptr): botState={%s} from=%s(%u) type=%u text=\"%s\"",
+            state.c_str(),
+            fromPlayer ? fromPlayer->GetName() : "<null>",
+            fromPlayer ? fromPlayer->GetGUIDLow() : 0,
+            type,
+            command.c_str());
+    }
+
     if (!GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, type != CHAT_MSG_WHISPER, fromPlayer))
         return;
 
@@ -1089,8 +1332,8 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
                 TellMaster("I'm logging out!");
 
             PlayerbotMgr* masterBotMgr = nullptr;
-            if (master)
-                masterBotMgr = GET_PLAYERBOT_MGR(master);
+            if (Player* currentMaster = GetMaster())
+                masterBotMgr = GET_PLAYERBOT_MGR(currentMaster);
             if (masterBotMgr)
                 masterBotMgr->LogoutPlayerBot(bot->GetGUID());
         }
@@ -1449,6 +1692,7 @@ void PlayerbotAI::ChangeEngine(BotState type)
 
     if (currentEngine != engine)
     {
+        LOG_INFO("playerbots", "DIAG ChangeEngine: bot=%s %u -> %u", bot->GetName(), (uint32)currentState, (uint32)type);
         currentEngine = engine;
         currentState = type;
         ReInitCurrentEngine();
@@ -1491,6 +1735,7 @@ void PlayerbotAI::DoNextAction(bool min)
 {
     if (!bot->IsInWorld() || bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
     {
+        LOG_INFO("playerbots", "DIAG DoNextAction: bot=%s EARLY EXIT teleport/world check", bot->GetName());
         SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
         return;
     }
@@ -1538,15 +1783,23 @@ void PlayerbotAI::DoNextAction(bool min)
 
     bool minimal = !this->AllowActivity();
 
-    currentEngine->DoNextAction(nullptr, 0, (minimal || min));
-
-    // Recovery must run before the minimal early-return so that cross-map
-    // teleport fires even when the bot would otherwise be in passive mode.
-    if (TryRecoverToActiveMaster())
+    // Dedup combined state log: only print when key state changes
     {
-        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
-        return;
+        char diagBuf[128];
+        snprintf(diagBuf, sizeof(diagBuf), "%u:%u:%u:%s:%u",
+            (uint32)GetState(), (uint32)bot->IsInCombat(), (uint32)min,
+            GetMaster() ? GetMaster()->GetName() : "none", (uint32)minimal);
+        std::string diagKey(diagBuf);
+        if (diagKey != _lastDiagAction)
+        {
+            _lastDiagAction = std::move(diagKey);
+            LOG_INFO("playerbots", "DIAG DoNextAction: bot=%s state=%u inCombat=%u master=%s minimal=%u",
+                bot->GetName(), (uint32)GetState(), (uint32)bot->IsInCombat(),
+                GetMaster() ? GetMaster()->GetName() : "none", (uint32)(minimal || min));
+        }
     }
+
+    currentEngine->DoNextAction(nullptr, 0, (minimal || min));
 
     if (minimal)
     {
@@ -1594,7 +1847,16 @@ bool PlayerbotAI::TryRecoverToActiveMaster()
 {
     Player* activeMaster = GetActiveMaster();
     if (!activeMaster || !HasActivePlayerMaster() || !bot->GetGroup() || bot->GetGroup() != activeMaster->GetGroup())
+    {
+        if (master && bot->GetGroup())
+            LOG_DEBUG("playerbots",
+                "TryRecoverToActiveMaster: bot=%s skipped: activeMaster=%s hasActivePlayer=%u groupMatch=%u",
+                bot->GetName(),
+                activeMaster ? activeMaster->GetName() : "null",
+                HasActivePlayerMaster(),
+                activeMaster ? (bot->GetGroup() == activeMaster->GetGroup()) : 0);
         return false;
+    }
 
     if (bot->InBattleground() || activeMaster->InBattleground())
         return false;
@@ -3229,7 +3491,14 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
 
     uint32 CastingTime = !spellInfo->IsChanneled() ? spellInfo->CalcCastTime(bot) : spellInfo->GetDuration();
     // bool interruptOnMove = spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT;
-    if ((CastingTime || spellInfo->IsAutoRepeatRangedSpell()) && bot->isMoving())
+    // Fix stale movement flags: if the bot's movespline is finalized (not actively on a spline)
+    // but movement flags are still set, clear them. This prevents bots from being permanently
+    // stuck in "moving" state after MovePoint completes (DisableSpline only clears MOVEFLAG_FORWARD).
+    if (bot->isMoving() && bot->movespline->Finalized() && !bot->HasUnitState(UNIT_STATE_CHASE | UNIT_STATE_FOLLOW))
+    {
+        bot->StopMoving(true);
+    }
+    if (CastingTime && bot->isMoving())
     {
         if (!sPlayerbotAIConfig.logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster()))
         {
@@ -3604,9 +3873,13 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         }
     }
 
+    // Fix stale movement flags before checking movement for casting
+    if (bot->isMoving() && bot->movespline->Finalized() && !bot->HasUnitState(UNIT_STATE_CHASE | UNIT_STATE_FOLLOW))
+    {
+        bot->StopMoving(true);
+    }
     if (bot->isMoving() && spell->GetCastTime())
     {
-        // bot->StopMoving();
         SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
         spell->cancel();
         delete spell;
@@ -3801,6 +4074,14 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     }
 
     spell->prepare(targets);
+
+    // Fix stale movement flags: if the bot's movespline is finalized (not actively on a spline)
+    // but movement flags are still set, clear them. This prevents bots from being permanently
+    // stuck in "moving" state after MovePoint completes (DisableSpline only clears MOVEFLAG_FORWARD).
+    if (bot->isMoving() && bot->movespline->Finalized() && !bot->HasUnitState(UNIT_STATE_CHASE | UNIT_STATE_FOLLOW))
+    {
+        bot->StopMoving(true);
+    }
 
     if (bot->isMoving() && spell->GetCastTime())
     {
@@ -4282,12 +4563,15 @@ bool IsAlliance(uint8 race)
 
 Player* PlayerbotAI::FindNewMaster()
 {
-    // Ideally we want to have the leader as master.
     Group* group = bot->GetGroup();
-    // Only allow real players as masters unless in battleground.
     if (!group)
         return nullptr;
 
+    if (!sRandomPlayerbotMgr.IsRandomBot(bot))
+        if (Player* ownedMaster = FindOwnedMasterInGroup(bot))
+            return ownedMaster;
+
+    // Ideally we want to have the leader as master.
     Player* groupLeader = GetGroupLeader();
     PlayerbotAI* leaderBotAI = GET_PLAYERBOT_AI(groupLeader);
     if (!leaderBotAI || leaderBotAI->IsRealPlayer())
@@ -4545,7 +4829,10 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     // Early return if bot is in invalid state
     if (!bot || !bot->GetSession() || !bot->IsInWorld() || bot->IsBeingTeleported() ||
         bot->GetSession()->IsLogingOut() || bot->IsDuringRemoveFromWorld())
+    {
+        LOG_DEBUG("playerbots", "DIAG AllowActive: bot=%s DENIED invalid state", bot ? bot->GetName() : "null");
         return false;
+    }
 
     // when botActiveAlone is 100% and smartScale disabled
     if (sPlayerbotAIConfig.botActiveAlone >= 100 && !sPlayerbotAIConfig.botActiveAloneSmartScale)
@@ -4571,6 +4858,9 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         // no activity allowed during bot initialization
         if (_isBotInitializing)
         {
+            LOG_DEBUG("playerbots", "DIAG AllowActive: bot=%s DENIED _isBotInitializing (uptime=%u threshold=%.1f maxRandomBots=%u)",
+                bot->GetName(), (uint32)GameTime::GetUptime(),
+                sPlayerbotAIConfig.maxRandomBots * 0.11, sPlayerbotAIConfig.maxRandomBots);
             return false;
         }
     }
@@ -4728,6 +5018,8 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
 
     if (sPlayerbotAIConfig.botActiveAlone <= 0)
     {
+        LOG_DEBUG("playerbots", "DIAG AllowActive: bot=%s DENIED botActiveAlone=%d <= 0",
+            bot->GetName(), sPlayerbotAIConfig.botActiveAlone);
         return false;
     }
 
@@ -4749,9 +5041,12 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     uint32 ActivityNumber =
         GetFixedBotNumer(100, sPlayerbotAIConfig.botActiveAlone * static_cast<float>(mod) / 100 * 0.01f);
 
-    return ActivityNumber <=
-           (sPlayerbotAIConfig.botActiveAlone * mod) /
-               100;  // The given percentage of bots should be active and rotate 1% of those active bots each minute.
+    uint32 threshold = (sPlayerbotAIConfig.botActiveAlone * mod) / 100;
+    bool result = ActivityNumber <= threshold;
+    if (!result)
+        LOG_DEBUG("playerbots", "DIAG AllowActive: bot=%s DENIED by scaling (ActivityNumber=%u threshold=%u mod=%u botActiveAlone=%d)",
+            bot->GetName(), ActivityNumber, threshold, mod, sPlayerbotAIConfig.botActiveAlone);
+    return result;
 }
 
 bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)

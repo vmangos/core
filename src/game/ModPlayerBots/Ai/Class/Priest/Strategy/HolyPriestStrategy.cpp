@@ -52,22 +52,6 @@ void HolyPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     );
     triggers.push_back(
         new TriggerNode(
-            "shadowfiend",
-            {
-                NextAction("shadowfiend", ACTION_HIGH)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "medium mana",
-            {
-                NextAction("shadowfiend", ACTION_HIGH)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
             "low mana",
             {
                 NextAction("mana burn", ACTION_HIGH)
@@ -94,8 +78,8 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "group heal setting",
             {
-                NextAction("prayer of mending on party", ACTION_MEDIUM_HEAL + 9),
-                NextAction("circle of healing on party", ACTION_MEDIUM_HEAL + 8)
+                NextAction("prayer of healing on party", ACTION_MEDIUM_HEAL + 9),
+                NextAction("renew on party", ACTION_MEDIUM_HEAL + 8)
             }
         )
     );
@@ -104,10 +88,10 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "medium group heal setting",
             {
-                NextAction("divine hymn", ACTION_CRITICAL_HEAL + 7),
-                NextAction("prayer of mending on party", ACTION_CRITICAL_HEAL + 6),
-                NextAction("circle of healing on party", ACTION_CRITICAL_HEAL + 5),
-                NextAction("prayer of healing on party", ACTION_CRITICAL_HEAL + 4)
+                NextAction("prayer of healing on party", ACTION_CRITICAL_HEAL + 7),
+                NextAction("flash heal on party", ACTION_CRITICAL_HEAL + 6),
+                NextAction("renew on party", ACTION_CRITICAL_HEAL + 5),
+                NextAction("greater heal on party", ACTION_CRITICAL_HEAL + 4)
             }
         )
     );
@@ -116,11 +100,10 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "party member critical health",
             {
-                NextAction("guardian spirit on party", ACTION_CRITICAL_HEAL + 6),
                 NextAction("power word: shield on party", ACTION_CRITICAL_HEAL + 5),
-                NextAction("prayer of mending on party", ACTION_CRITICAL_HEAL + 3),
-                NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 2),
-                NextAction("flash heal on party", ACTION_CRITICAL_HEAL + 1),
+                NextAction("flash heal on party", ACTION_CRITICAL_HEAL + 4),
+                NextAction("greater heal on party", ACTION_CRITICAL_HEAL + 3),
+                NextAction("renew on party", ACTION_CRITICAL_HEAL + 1),
             }
         )
     );
@@ -129,10 +112,10 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "party member low health",
             {
-                NextAction("circle of healing on party", ACTION_MEDIUM_HEAL + 4),
-                NextAction("prayer of mending on party", ACTION_MEDIUM_HEAL + 3),
-                NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 2),
-                NextAction("flash heal on party", ACTION_MEDIUM_HEAL + 1)
+                NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 4),
+                NextAction("flash heal on party", ACTION_MEDIUM_HEAL + 3),
+                NextAction("renew on party", ACTION_MEDIUM_HEAL + 2),
+                NextAction("prayer of healing on party", ACTION_MEDIUM_HEAL + 1)
             }
         )
     );
@@ -141,10 +124,10 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "party member medium health",
             {
-                NextAction("circle of healing on party", ACTION_LIGHT_HEAL + 7),
-                NextAction("prayer of mending on party", ACTION_LIGHT_HEAL + 6),
-                NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 5),
-                NextAction("flash heal on party", ACTION_LIGHT_HEAL + 4),
+                NextAction("greater heal on party", ACTION_LIGHT_HEAL + 7),
+                NextAction("flash heal on party", ACTION_LIGHT_HEAL + 6),
+                NextAction("renew on party", ACTION_LIGHT_HEAL + 5),
+                NextAction("prayer of healing on party", ACTION_LIGHT_HEAL + 4),
             }
         )
     );
@@ -154,7 +137,6 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             "party member almost full health",
             {
                 NextAction("renew on party", ACTION_LIGHT_HEAL + 2),
-                NextAction("prayer of mending on party", ACTION_LIGHT_HEAL + 1),
             }
         )
     );

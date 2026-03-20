@@ -1144,11 +1144,24 @@ bool ChatHandler::HandleNamegoCommand(char* args)
         if (HasLowerSecurity(pTarget))
             return false;
 
+        // For bots stuck in BeingTeleportedFar, force-complete the pending teleport
+        // before summoning, rather than rejecting the command.
         if (pTarget->IsBeingTeleported())
         {
-            PSendSysMessage(LANG_IS_TELEPORTED, nameLink.c_str());
-            SetSentErrorMessage(true);
-            return false;
+            if (pTarget->IsBot() && pTarget->IsBeingTeleportedFar())
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC,
+                    "HandleNamegoCommand: clearing stuck far teleport for bot=%s(%u) before summoning",
+                    pTarget->GetName(), pTarget->GetGUIDLow());
+                pTarget->SetSemaphoreTeleportFar(false);
+                pTarget->ResetMap();
+            }
+            else
+            {
+                PSendSysMessage(LANG_IS_TELEPORTED, nameLink.c_str());
+                SetSentErrorMessage(true);
+                return false;
+            }
         }
 
         Map* pMap = pPlayer->GetMap();
@@ -1221,6 +1234,21 @@ bool ChatHandler::HandleGonameCommand(char* args)
     if (pTarget)
     {
         std::string chrNameLink = playerLink(target_name);
+
+        // Bot stuck in BeingTeleportedFar: map pointer is stale, position is
+        // meaningless.  Use the bot's teleport destination instead of its
+        // current (invalid) coordinates.
+        if (pTarget->IsBot() && pTarget->IsBeingTeleportedFar())
+        {
+            WorldLocation const& dest = pTarget->GetTeleportDest();
+            PSendSysMessage(LANG_APPEARING_AT_ONLINE, chrNameLink.c_str());
+            PSendSysMessage("Note: bot is stuck in far teleport, going to teleport destination (map %u).", dest.mapId);
+
+            pPlayer->SaveRecallPosition();
+            float z = dest.z;
+            return HandleGoHelper(pPlayer, dest.mapId, dest.x, dest.y, &z);
+        }
+
         Map* cMap = pTarget->GetMap();
         uint32 instanceId = 0;
         uint32 teleFlags = TELE_TO_GM_MODE;

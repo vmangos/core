@@ -56,10 +56,10 @@ private:
     int32 CalculateMasterMountSpeed(Player* master, const MountData& mountData) const;
     bool CheckForSwiftMount() const;
     std::map<uint32, std::map<int32, std::vector<uint32>>> GetAllMountSpells() const;
-    bool TryForms(Player* master, int32 masterMountType, int32 masterSpeed) const;
-    bool TryPreferredMount(Player* master) const;
+    bool TryForms(Player* master, int32 masterMountType, int32 masterSpeed);
+    bool TryPreferredMount(Player* master);
     uint32 GetMountType(Player* master) const;
-    bool TryRandomMountFiltered(const std::map<int32, std::vector<uint32>>& spells, int32 masterSpeed) const;
+    bool TryRandomMountFiltered(const std::map<int32, std::vector<uint32>>& spells, int32 masterSpeed);
 };
 
 #endif

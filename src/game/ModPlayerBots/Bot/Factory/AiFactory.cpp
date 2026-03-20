@@ -601,6 +601,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     {
         Player* master = facade->GetMaster();
 
+        nonCombatEngine->addStrategy("randombot party", false);
+
         // let 25% of free bots start duels.
         if (!urand(0, 3))
             nonCombatEngine->addStrategy("start duel", false);

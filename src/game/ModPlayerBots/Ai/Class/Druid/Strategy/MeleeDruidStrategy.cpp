@@ -12,7 +12,7 @@ MeleeDruidStrategy::MeleeDruidStrategy(PlayerbotAI* botAI) : CombatStrategy(botA
 std::vector<NextAction> MeleeDruidStrategy::getDefaultActions()
 {
     return {
-        NextAction("faerie fire", ACTION_DEFAULT + 0.1f),
+        NextAction("faerie fire", ACTION_NORMAL + 0.1f),
         NextAction("melee", ACTION_DEFAULT)
     };
 }

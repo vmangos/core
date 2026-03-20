@@ -15,25 +15,19 @@ public:
     {
         creators["flame shock"] = &flame_shock;
         creators["earth shock"] = &earth_shock;
-        creators["lava burst"] = &lava_burst;
+        creators["chain lightning"] = &chain_lightning;
         creators["lightning bolt"] = &lightning_bolt;
-        creators["call of the elements"] = &call_of_the_elements;
         creators["elemental mastery"] = &elemental_mastery;
         creators["stoneclaw totem"] = &stoneclaw_totem;
-        creators["water shield"] = &water_shield;
-        creators["thunderstorm"] = &thunderstorm;
     }
 
 private:
     static ActionNode* flame_shock(PlayerbotAI*) { return new ActionNode("flame shock", {}, {}, {}); }
     static ActionNode* earth_shock(PlayerbotAI*) { return new ActionNode("earth shock", {}, {}, {}); }
-    static ActionNode* lava_burst(PlayerbotAI*) { return new ActionNode("lava burst", {}, {}, {}); }
+    static ActionNode* chain_lightning(PlayerbotAI*) { return new ActionNode("chain lightning", {}, {}, {}); }
     static ActionNode* lightning_bolt(PlayerbotAI*) { return new ActionNode("lightning bolt", {}, {}, {}); }
-    static ActionNode* call_of_the_elements(PlayerbotAI*) { return new ActionNode("call of the elements", {}, {}, {}); }
     static ActionNode* elemental_mastery(PlayerbotAI*) { return new ActionNode("elemental mastery", {}, {}, {}); }
     static ActionNode* stoneclaw_totem(PlayerbotAI*) { return new ActionNode("stoneclaw totem", {}, {}, {}); }
-    static ActionNode* water_shield(PlayerbotAI*) { return new ActionNode("water shield", {}, {}, {}); }
-    static ActionNode* thunderstorm(PlayerbotAI*) { return new ActionNode("thunderstorm", {}, {}, {}); }
 };
 
 // ===== Single Target Strategy =====
@@ -46,8 +40,9 @@ ElementalShamanStrategy::ElementalShamanStrategy(PlayerbotAI* botAI) : GenericSh
 std::vector<NextAction> ElementalShamanStrategy::getDefaultActions()
 {
     return {
-        NextAction("lava burst", 5.2f),
-        NextAction("lightning bolt", 5.0f)
+        NextAction("chain lightning", 5.3f),
+        NextAction("lightning bolt", 5.1f),
+        NextAction("earth shock", 5.0f)
     };
 }
 
@@ -56,15 +51,7 @@ void ElementalShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
 
-    // Totem Triggers
-    triggers.push_back(
-        new TriggerNode(
-            "call of the elements",
-            {
-                NextAction("call of the elements", 60.0f)
-            }
-        )
-    );
+    // Defensive Triggers
     triggers.push_back(
         new TriggerNode(
             "low health",
@@ -102,30 +89,12 @@ void ElementalShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         )
     );
 
-    // Mana Triggers
-    triggers.push_back(
-        new TriggerNode(
-            "water shield",
-            {
-                NextAction("water shield", 19.5f)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "high mana",
-            {
-                NextAction("thunderstorm", 19.0f)
-            }
-        )
-    );
-
     // Range Triggers
     triggers.push_back(
         new TriggerNode(
-            "enemy is close",
+            "enemy too close for spell",
             {
-                NextAction("thunderstorm", 19.0f)
+                NextAction("flee", 39.0f)
             }
         )
     );

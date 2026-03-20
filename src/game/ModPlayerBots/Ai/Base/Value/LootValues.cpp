@@ -8,6 +8,52 @@
 #include "Playerbots.h"
 #include "SharedValueContext.h"
 
+namespace PlayerbotSharedValueBuilders
+{
+DropMap BuildDropMap()
+{
+    DropMap dropMap;
+
+    int32 sEntry = 0;
+
+    CreatureInfoMap const& creatures = sObjectMgr.GetCreatureInfoMap();
+    for (CreatureInfoMap::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+    {
+        sEntry = itr->first;
+
+        if (LootTemplateAccess const* lTemplateA =
+                DropMapValue::GetLootTemplate(ObjectGuid(HIGHGUID_UNIT, sEntry, uint32(1)), LOOT_CORPSE))
+            for (auto const& lItem : lTemplateA->Entries)
+                dropMap.insert(std::make_pair(lItem.itemid, sEntry));
+    }
+
+    GameObjectInfoMap const& gameobjects = sObjectMgr.GetGameObjectInfoMap();
+    for (auto const& itr : gameobjects)
+    {
+        sEntry = itr.first;
+
+        if (LootTemplateAccess const* lTemplateA =
+                DropMapValue::GetLootTemplate(ObjectGuid(HIGHGUID_GAMEOBJECT, sEntry, uint32(1)), LOOT_CORPSE))
+            for (auto const& lItem : lTemplateA->Entries)
+                dropMap.insert(std::make_pair(lItem.itemid, -sEntry));
+    }
+
+    return dropMap;
+}
+
+std::vector<int32> BuildItemDropList(DropMap const& dropMap, uint32 itemId)
+{
+    std::vector<int32> entries;
+
+    auto range = dropMap.equal_range(itemId);
+
+    for (auto itr = range.first; itr != range.second; ++itr)
+        entries.push_back(itr->second);
+
+    return entries;
+}
+}
+
 LootTemplateAccess const* DropMapValue::GetLootTemplate(ObjectGuid guid, LootType type)
 {
     LootTemplate const* lTemplate = nullptr;
@@ -57,50 +103,15 @@ LootTemplateAccess const* DropMapValue::GetLootTemplate(ObjectGuid guid, LootTyp
 
 DropMap* DropMapValue::Calculate()
 {
-    DropMap* dropMap = new DropMap;
-
-    int32 sEntry = 0;
-
-    CreatureInfoMap const& creatures = sObjectMgr.GetCreatureInfoMap();
-    for (CreatureInfoMap::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
-    {
-        sEntry = itr->first;
-
-        if (LootTemplateAccess const* lTemplateA =
-                GetLootTemplate(ObjectGuid(HIGHGUID_UNIT, sEntry, uint32(1)), LOOT_CORPSE))
-            for (auto const& lItem : lTemplateA->Entries)
-                dropMap->insert(std::make_pair(lItem.itemid, sEntry));
-    }
-
-    GameObjectInfoMap const& gameobjects = sObjectMgr.GetGameObjectInfoMap();
-    for (auto const& itr : gameobjects)
-    {
-        sEntry = itr.first;
-
-        if (LootTemplateAccess const* lTemplateA =
-                GetLootTemplate(ObjectGuid(HIGHGUID_GAMEOBJECT, sEntry, uint32(1)), LOOT_CORPSE))
-            for (auto const& lItem : lTemplateA->Entries)
-                dropMap->insert(std::make_pair(lItem.itemid, -sEntry));
-    }
-
-    return dropMap;
+    return new DropMap(PlayerbotSharedValueBuilders::BuildDropMap());
 }
 
 // What items does this entry have in its loot list?
 std::vector<int32> ItemDropListValue::Calculate()
 {
     uint32 itemId = stoi(getQualifier());
-
     DropMap* dropMap = GAI_VALUE(DropMap*, "drop map");
-
-    std::vector<int32> entries;
-
-    auto range = dropMap->equal_range(itemId);
-
-    for (auto itr = range.first; itr != range.second; ++itr)
-        entries.push_back(itr->second);
-
-    return entries;
+    return PlayerbotSharedValueBuilders::BuildItemDropList(*dropMap, itemId);
 }
 
 // What items does this entry have in its loot list?

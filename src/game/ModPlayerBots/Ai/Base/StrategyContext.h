@@ -39,6 +39,7 @@
 #include "PassiveStrategy.h"
 #include "PullStrategy.h"
 #include "QuestStrategies.h"
+#include "RandombotPartyStrategy.h"
 #include "RTSCStrategy.h"
 #include "RacialsStrategy.h"
 #include "RangedCombatStrategy.h"
@@ -120,6 +121,7 @@ public:
         creators["group"] = &StrategyContext::group;
         creators["guild"] = &StrategyContext::guild;
         creators["grind"] = &StrategyContext::grind;
+        creators["randombot party"] = &StrategyContext::randombot_party;
         creators["avoid aoe"] = &StrategyContext::avoid_aoe;
         creators["tank face"] = &StrategyContext::tank_face;
         creators["move random"] = &StrategyContext::move_random;
@@ -193,6 +195,7 @@ private:
     static Strategy* group(PlayerbotAI* botAI) { return new GroupStrategy(botAI); }
     static Strategy* guild (PlayerbotAI* botAI) { return new GuildStrategy(botAI); }
     static Strategy* grind(PlayerbotAI* botAI) { return new GrindingStrategy(botAI); }
+    static Strategy* randombot_party(PlayerbotAI* botAI) { return new RandombotPartyStrategy(botAI); }
     static Strategy* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeStrategy(botAI); }
     static Strategy* tank_face(PlayerbotAI* botAI) { return new TankFaceStrategy(botAI); }
     static Strategy* move_random(PlayerbotAI* botAI) { return new MoveRandomStrategy(botAI); }

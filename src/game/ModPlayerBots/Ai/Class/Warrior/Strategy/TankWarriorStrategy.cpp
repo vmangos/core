@@ -14,64 +14,18 @@ public:
     {
         creators["charge"] = &charge;
         creators["sunder armor"] = &sunder_armor;
-        creators["commanding shout"] = &commanding_shout;
-        creators["devastate"] = &devastate;
-        creators["last stand"] = &last_stand;
-        creators["heroic throw on snare target"] = &heroic_throw_on_snare_target;
-        creators["heroic throw taunt"] = &heroic_throw_taunt;
         creators["taunt"] = &taunt;
         creators["taunt spell"] = &taunt;
-        creators["vigilance"] = &vigilance;
-        creators["enraged regeneration"] = &enraged_regeneration;
+        creators["last stand"] = &last_stand;
     }
 
 private:
-    static ActionNode* heroic_throw_taunt(PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "heroic throw",
-            /*P*/ {},
-            /*A*/ { NextAction("shield slam") },
-            /*C*/ {}
-        );
-    }
-
-    static ActionNode* heroic_throw_on_snare_target(PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "heroic throw on snare target",
-            /*P*/ {},
-            /*A*/ { NextAction("taunt on snare target") },
-            /*C*/ {}
-        );
-    }
-
     static ActionNode* last_stand(PlayerbotAI* botAI)
     {
         return new ActionNode(
             "last stand",
             /*P*/ {},
             /*A*/ { NextAction("intimidating shout") },
-            /*C*/ {}
-        );
-    }
-
-    static ActionNode* devastate(PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "devastate",
-            /*P*/ {},
-            /*A*/ { NextAction("sunder armor") },
-            /*C*/ {}
-        );
-    }
-
-    static ActionNode* commanding_shout(PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "commanding shout",
-            /*P*/ {},
-            /*A*/ { NextAction("battle shout") },
             /*C*/ {}
         );
     }
@@ -101,26 +55,6 @@ private:
         return new ActionNode(
             "taunt",
             /*P*/ {},
-            /*A*/ { NextAction("heroic throw taunt") },
-            /*C*/ {}
-        );
-    }
-
-    static ActionNode* vigilance(PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "vigilance",
-            /*P*/ {},
-            /*A*/ {},
-            /*C*/ {}
-        );
-    }
-
-    static ActionNode* enraged_regeneration(PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "enraged regeneration",
-            /*P*/ {},
             /*A*/ {},
             /*C*/ {}
         );
@@ -135,9 +69,11 @@ TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* botAI) : GenericWarriorStr
 std::vector<NextAction> TankWarriorStrategy::getDefaultActions()
 {
     return {
-        NextAction("devastate", ACTION_DEFAULT + 0.3f),
-        NextAction("revenge", ACTION_DEFAULT + 0.2f),
-        NextAction("demoralizing shout", ACTION_DEFAULT + 0.1f),
+        NextAction("shield slam", ACTION_NORMAL + 0.5f),
+        NextAction("revenge", ACTION_NORMAL + 0.4f),
+        NextAction("sunder armor", ACTION_NORMAL + 0.3f),
+        NextAction("heroic strike", ACTION_NORMAL + 0.2f),
+        NextAction("demoralizing shout", ACTION_NORMAL + 0.1f),
         NextAction("melee", ACTION_DEFAULT)
     };
 }
@@ -146,32 +82,7 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericWarriorStrategy::InitTriggers(triggers);
 
-    triggers.push_back(
-        new TriggerNode(
-            "vigilance",
-            {
-                NextAction("vigilance", ACTION_HIGH + 7)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "enemy out of melee",
-            {
-                NextAction("heroic throw", ACTION_MOVE + 11),
-                NextAction("charge", ACTION_MOVE + 10)
-            }
-        )
-    );
-
-    triggers.push_back(
-        new TriggerNode(
-            "thunder clap and rage",
-            {
-                NextAction("thunder clap", ACTION_MOVE + 11)
-            }
-        )
-    );
+    // Stance — must be in defensive stance
     triggers.push_back(
         new TriggerNode(
             "defensive stance",
@@ -180,14 +91,25 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
+    // Shout buff
     triggers.push_back(
         new TriggerNode(
-            "commanding shout",
+            "battle shout",
             {
-                NextAction("commanding shout", ACTION_HIGH + 8)
+                NextAction("battle shout", ACTION_HIGH + 8)
             }
         )
     );
+    // Gap closer
+    triggers.push_back(
+        new TriggerNode(
+            "enemy out of melee",
+            {
+                NextAction("charge", ACTION_MOVE + 10)
+            }
+        )
+    );
+    // Rage generation
     triggers.push_back(
         new TriggerNode(
             "bloodrage",
@@ -196,11 +118,49 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
+    // Threat — sunder armor when stacks not full
     triggers.push_back(
         new TriggerNode(
             "sunder armor",
             {
-                NextAction("devastate", ACTION_HIGH + 2)
+                NextAction("sunder armor", ACTION_HIGH + 2)
+            }
+        )
+    );
+    // Threat — revenge proc (high threat, low rage)
+    triggers.push_back(
+        new TriggerNode(
+            "revenge",
+            {
+                NextAction("revenge", ACTION_HIGH + 3)
+            }
+        )
+    );
+    // Threat — shield slam and sunder on medium rage
+    triggers.push_back(
+        new TriggerNode(
+            "medium rage available",
+            {
+                NextAction("shield slam", ACTION_HIGH + 2),
+                NextAction("sunder armor", ACTION_HIGH + 1)
+            }
+        )
+    );
+    // Rage dump — heroic strike on high rage
+    triggers.push_back(
+        new TriggerNode(
+            "high rage available",
+            {
+                NextAction("heroic strike", ACTION_HIGH)
+            }
+        )
+    );
+    // AoE threat — thunder clap
+    triggers.push_back(
+        new TriggerNode(
+            "thunder clap and rage",
+            {
+                NextAction("thunder clap", ACTION_HIGH + 4)
             }
         )
     );
@@ -208,11 +168,11 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "medium rage available",
             {
-                NextAction("shield slam", ACTION_HIGH + 2),
-                NextAction("devastate", ACTION_HIGH + 1)
+                NextAction("thunder clap", ACTION_HIGH + 1)
             }
         )
     );
+    // Mitigation — shield block
     triggers.push_back(
         new TriggerNode(
             "shield block",
@@ -221,22 +181,7 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
-    triggers.push_back(
-        new TriggerNode(
-            "revenge",
-            {
-                NextAction("revenge", ACTION_HIGH + 2)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "disarm",
-            {
-                NextAction("disarm", ACTION_HIGH + 1)
-            }
-        )
-    );
+    // Taunt — regain aggro immediately
     triggers.push_back(
         new TriggerNode(
             "lose aggro",
@@ -245,47 +190,7 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
-    triggers.push_back(
-        new TriggerNode(
-            "taunt on snare target",
-            {
-                NextAction("heroic throw on snare target", ACTION_INTERRUPT)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "low health",
-            {
-                NextAction("shield wall", ACTION_MEDIUM_HEAL)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "critical health",
-            {
-                NextAction("last stand", ACTION_EMERGENCY + 3),
-                NextAction("enraged regeneration", ACTION_EMERGENCY + 2)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "high aoe",
-            {
-                NextAction("challenging shout", ACTION_HIGH + 3)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "concussion blow",
-            {
-                NextAction("concussion blow", ACTION_INTERRUPT)
-            }
-        )
-    );
+    // Interrupts
     triggers.push_back(
         new TriggerNode(
             "shield bash",
@@ -302,30 +207,24 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
+    // Snare / stun
     triggers.push_back(
         new TriggerNode(
-            "spell reflection",
+            "concussion blow",
             {
-                NextAction("spell reflection", ACTION_INTERRUPT + 1)
+                NextAction("concussion blow", ACTION_INTERRUPT)
             }
         )
     );
     triggers.push_back(
         new TriggerNode(
-            "victory rush",
+            "disarm",
             {
-                NextAction("victory rush", ACTION_INTERRUPT)
+                NextAction("disarm", ACTION_HIGH + 1)
             }
         )
     );
-    triggers.push_back(
-        new TriggerNode(
-            "sword and board",
-            {
-                NextAction("shield slam", ACTION_INTERRUPT)
-            }
-        )
-    );
+    // Bleeds
     triggers.push_back(
         new TriggerNode(
             "rend",
@@ -336,33 +235,44 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     );
     triggers.push_back(
         new TriggerNode(
-        "rend on attacker",
+            "rend on attacker",
             {
                 NextAction("rend on attacker", ACTION_NORMAL + 1)
             }
         )
     );
+    // AoE taunt
+    triggers.push_back(
+        new TriggerNode(
+            "high aoe",
+            {
+                NextAction("challenging shout", ACTION_HIGH + 3)
+            }
+        )
+    );
+    // Defensives
+    triggers.push_back(
+        new TriggerNode(
+            "low health",
+            {
+                NextAction("shield wall", ACTION_MEDIUM_HEAL)
+            }
+        )
+    );
+    triggers.push_back(
+        new TriggerNode(
+            "critical health",
+            {
+                NextAction("last stand", ACTION_EMERGENCY + 3)
+            }
+        )
+    );
+    // Protect party
     triggers.push_back(
         new TriggerNode(
             "protect party member",
             {
                 NextAction("intervene", ACTION_EMERGENCY)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "high rage available",
-            {
-                NextAction("heroic strike", ACTION_HIGH)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "medium rage available",
-            {
-                NextAction("thunder clap", ACTION_HIGH + 1)
             }
         )
     );

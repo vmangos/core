@@ -6,9 +6,11 @@
 #ifndef _PLAYERBOT_SHAREDVALUECONTEXT_H
 #define _PLAYERBOT_SHAREDVALUECONTEXT_H
 
+#include <sstream>
+
 #include "LootValues.h"
 #include "NamedObjectContext.h"
-#include "Playerbots.h"
+#include "PlayerbotAI.h"
 #include "PvpValues.h"
 #include "QuestValues.h"
 
@@ -25,14 +27,7 @@ public:
     template <class T>
     Value<T>* getGlobalValue(std::string const name)
     {
-        // should never reach here
-        SharedNamedObjectContextList<UntypedValue> sValueContexts;
-        sValueContexts.Add(this);
-        NamedObjectContextList<UntypedValue> valueContexts(sValueContexts);
-        PlayerbotAI* botAI = new PlayerbotAI();
-
-        UntypedValue* value = valueContexts.GetContextObject(name, botAI);
-        delete botAI;
+        UntypedValue* value = this->create(name, &globalBotAI);
         return dynamic_cast<Value<T>*>(value);
     }
 
@@ -51,7 +46,7 @@ public:
     }
 
 private:
-    SharedValueContext() : NamedObjectContext(true)
+    SharedValueContext() : NamedObjectContext(true), globalBotAI()
     {
         creators["bg masters"] = &SharedValueContext::bg_masters;
         creators["drop map"] = &SharedValueContext::drop_map;
@@ -62,7 +57,7 @@ private:
         creators["quest guidp map"] = &SharedValueContext::quest_guidp_map;
         creators["quest givers"] = &SharedValueContext::quest_givers;
     }
-    ~SharedValueContext() = default;
+    ~SharedValueContext() { Clear(); }
 
     SharedValueContext(const SharedValueContext&) = delete;
     SharedValueContext& operator=(const SharedValueContext&) = delete;
@@ -79,6 +74,7 @@ private:
     static UntypedValue* quest_guidp_map(PlayerbotAI* botAI) { return new QuestGuidpMapValue(botAI); }
     static UntypedValue* quest_givers(PlayerbotAI* botAI) { return new QuestGiversValue(botAI); }
 
+    PlayerbotAI globalBotAI;
 };
 
 #define sSharedValueContext SharedValueContext::instance()

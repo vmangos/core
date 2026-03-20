@@ -46,4 +46,13 @@ public:
     bool isUseful() override;
 };
 
+class LeaveNoRealPlayerPartyAction : public LeaveGroupAction
+{
+public:
+    LeaveNoRealPlayerPartyAction(PlayerbotAI* botAI) : LeaveGroupAction(botAI, "leave no real player party") {}
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 #endif

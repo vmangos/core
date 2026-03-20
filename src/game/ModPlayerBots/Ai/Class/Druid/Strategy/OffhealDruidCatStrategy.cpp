@@ -14,12 +14,11 @@ public:
     OffhealDruidCatStrategyActionNodeFactory()
     {
         creators["cat form"] = &cat_form;
-        creators["mangle (cat)"] = &mangle_cat;
+        creators["claw"] = &claw;
         creators["shred"] = &shred;
         creators["rake"] = &rake;
         creators["rip"] = &rip;
         creators["ferocious bite"] = &ferocious_bite;
-        creators["savage roar"] = &savage_roar;
         creators["faerie fire (feral)"] = &faerie_fire_feral;
         creators["healing touch on party"] = &healing_touch_on_party;
         creators["regrowth on party"] = &regrowth_on_party;
@@ -37,12 +36,12 @@ private:
         );
     }
 
-    static ActionNode* mangle_cat([[maybe_unused]] PlayerbotAI* botAI)
+    static ActionNode* claw([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode(
-            "mangle (cat)",
+            "claw",
             /*P*/ {},
-            /*A*/ {},
+            /*A*/ { NextAction("melee") },
             /*C*/ {}
         );
     }
@@ -83,16 +82,6 @@ private:
             "ferocious bite",
             /*P*/ {},
             /*A*/ { NextAction("rip") },
-            /*C*/ {}
-        );
-    }
-
-    static ActionNode* savage_roar([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "savage roar",
-            /*P*/ {},
-            /*A*/ {},
             /*C*/ {}
         );
     }
@@ -146,9 +135,9 @@ OffhealDruidCatStrategy::OffhealDruidCatStrategy(PlayerbotAI* botAI) : FeralDrui
 std::vector<NextAction> OffhealDruidCatStrategy::getDefaultActions()
 {
     return {
-        NextAction("mangle (cat)", ACTION_DEFAULT + 0.5f),
-        NextAction("shred", ACTION_DEFAULT + 0.4f),
-        NextAction("rake", ACTION_DEFAULT + 0.3f),
+        NextAction("claw", ACTION_NORMAL + 0.5f),
+        NextAction("shred", ACTION_NORMAL + 0.4f),
+        NextAction("rake", ACTION_NORMAL + 0.3f),
         NextAction("melee", ACTION_DEFAULT),
         NextAction("cat form", ACTION_DEFAULT - 0.1f)
     };
@@ -163,14 +152,6 @@ void OffhealDruidCatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             "cat form",
             {
                 NextAction("cat form", ACTION_HIGH + 8)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "savage roar",
-            {
-                NextAction("savage roar", ACTION_HIGH + 7)
             }
         )
     );
@@ -200,9 +181,9 @@ void OffhealDruidCatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     );
     triggers.push_back(
         new TriggerNode(
-            "mangle (cat)",
+            "combo points not full",
             {
-                NextAction("mangle (cat)", ACTION_HIGH + 3)
+                NextAction("claw", ACTION_HIGH + 3)
             }
         )
     );
@@ -242,16 +223,7 @@ void OffhealDruidCatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "enemy out of melee",
             {
-                NextAction("feral charge - cat", ACTION_HIGH + 9),
-                NextAction("dash", ACTION_HIGH + 8)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "medium aoe",
-            {
-                NextAction("swipe (cat)", ACTION_HIGH + 3)
+                NextAction("dash", ACTION_HIGH + 9)
             }
         )
     );

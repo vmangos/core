@@ -45,6 +45,11 @@ typedef std::unordered_map<uint32, questRelationGuidps> questGuidpMap;
 //                      questId
 typedef std::unordered_map<uint32, std::vector<GuidPosition>> questGiverMap;
 
+namespace PlayerbotSharedValueBuilders
+{
+entryQuestRelationMap BuildEntryQuestRelationMap();
+}
+
 // Returns the quest relation Flags for all entries and quests
 class EntryQuestRelationMapValue : public SingleCalculatedValue<entryQuestRelationMap>
 {

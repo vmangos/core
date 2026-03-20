@@ -594,6 +594,10 @@ AiPlayerbot.OpenGoSpell = 6477
 AiPlayerbot.RandomBotCombatStrategies = ""
 AiPlayerbot.RandomBotNonCombatStrategies = ""
 
+# Seconds a randombot party leader waits before leaving/disbanding a normal bot-only party.
+# Set to 0 to disable only the auto-leave half of the `randombot party` strategy.
+AiPlayerbot.RandomBotNoRealPlayerPartyTimeout = 300
+
 # Additional altbot strategy overrides.
 AiPlayerbot.CombatStrategies = ""
 AiPlayerbot.NonCombatStrategies = ""
@@ -664,6 +668,14 @@ AiPlayerbot.ZoneBracket.490 = 49,56
 AiPlayerbot.ZoneBracket.618 = 54,60
 AiPlayerbot.ZoneBracket.1377 = 54,60
 
+# Capital cities — bots here will be near max level to look realistic.
+AiPlayerbot.ZoneBracket.1519 = 55,60
+AiPlayerbot.ZoneBracket.1537 = 55,60
+AiPlayerbot.ZoneBracket.1657 = 55,60
+AiPlayerbot.ZoneBracket.1637 = 55,60
+AiPlayerbot.ZoneBracket.1497 = 55,60
+AiPlayerbot.ZoneBracket.1638 = 55,60
+
 ####################################################################################################
 # TELEPORTS
 ####################################################################################################
@@ -673,6 +685,9 @@ AiPlayerbot.RandomBotMaps = 0,1
 
 # Chance bots teleport to a banker or capital city.
 AiPlayerbot.ProbTeleToBankers = 0.25
+AiPlayerbot.ProbTeleToBankersCity = 0.40
+AiPlayerbot.ProbTeleToBankersReserveStarter = 0.15
+AiPlayerbot.ProbTeleToBankersWorld = 0.05
 
 # Capital city banker weighting.
 AiPlayerbot.EnableWeightTeleToCityBankers = 1
@@ -691,6 +706,13 @@ AiPlayerbot.TeleToDalaranWeight = 0
 AiPlayerbot.EnableCapitalCityPopulation = 1
 AiPlayerbot.MinStormwindBots = 20
 AiPlayerbot.MinOrgrimmarBots = 20
+# Additional reserve floors can be layered by zone id.
+# AiPlayerbot.ReserveZone.12 = 8
+# AiPlayerbot.ReserveZone.14 = 8
+AiPlayerbot.ReserveZone.1537 = 10
+AiPlayerbot.ReserveZone.1657 = 8
+AiPlayerbot.ReserveZone.1497 = 10
+AiPlayerbot.ReserveZone.1638 = 8
 AiPlayerbot.CapitalCityMinLevel = 20
 AiPlayerbot.CapitalCityDwellMin = 600
 AiPlayerbot.CapitalCityDwellMax = 1800
@@ -741,6 +763,20 @@ AiPlayerbot.FastReactInBG = 1
 
 # Manager update cadence, in seconds.
 AiPlayerbot.RandomBotUpdateInterval = 20
+AiPlayerbot.EnablePopulationDirector = 1
+AiPlayerbot.PopulationDirectorUpdateInterval = 60
+AiPlayerbot.PopulationDirectorPlayerHeatSigma = 3000
+AiPlayerbot.PopulationDirectorPlayerHeatHalfLife = 900
+AiPlayerbot.PopulationDirectorMinDwell = 600
+AiPlayerbot.PopulationDirectorMaxDwell = 1800
+AiPlayerbot.PopulationDirectorMaxMovesPerTick = 25
+AiPlayerbot.PopulationDirectorZoneMaxDynamicPct = 0.18
+AiPlayerbot.PopulationDirectorWeight.PlayerHeat = 0.55
+AiPlayerbot.PopulationDirectorWeight.LevelMatch = 0.20
+AiPlayerbot.PopulationDirectorWeight.RecentPresence = 0.10
+AiPlayerbot.PopulationDirectorWeight.Diversity = 0.15
+AiPlayerbot.PopulationDirectorWeight.SaturationPenalty = 0.35
+AiPlayerbot.PopulationDirectorHaloRadius = 5000
 
 # How often the manager adjusts the online random bot count.
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
@@ -1059,6 +1095,9 @@ AiPlayerbot.GuildTaskKillTaskDistance = 2000
 # Presentation tweaks and random behavior helpers.
 AiPlayerbot.SuggestDungeonsInLowerCaseRandomly = 0
 AiPlayerbot.RandomBotRpgChance = 0.20
+# Extra internal logging for random-bot questing/population routing. Requires debug log level.
+AiPlayerbot.DebugRandomBotQuesting = 0
+AiPlayerbot.DebugRandomBotPopulation = 0
 AiPlayerbot.RandombotsWalkingRPG = 0
 AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
 

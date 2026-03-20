@@ -14,30 +14,24 @@ public:
     {
         creators["corruption"] = &corruption;
         creators["corruption on attacker"] = &corruption;
-        creators["unstable affliction"] = &unstable_affliction;
-        creators["unstable affliction on attacker"] = &unstable_affliction;
-        creators["haunt"] = &haunt;
+        creators["curse of agony"] = &curse_of_agony;
+        creators["siphon life"] = &siphon_life;
+        creators["drain life"] = &drain_life;
         creators["shadow bolt"] = &shadow_bolt;
         creators["drain soul"] = &drain_soul;
         creators["life tap"] = &life_tap;
-        creators["shadowflame"] = &shadowflame;
-        creators["seed of corruption on attacker"] = &seed_of_corruption;
-        creators["seed of corruption"] = &seed_of_corruption;
         creators["rain of fire"] = &rain_of_fire;
     }
 
 private:
     static ActionNode* corruption(PlayerbotAI*) { return new ActionNode("corruption", {}, {}, {}); }
     static ActionNode* corruption_on_attacker(PlayerbotAI*) { return new ActionNode("corruption on attacker", {}, {}, {}); }
-    static ActionNode* unstable_affliction(PlayerbotAI*) { return new ActionNode("unstable affliction", {}, {}, {}); }
-    static ActionNode* unstable_affliction_on_attacker(PlayerbotAI*) { return new ActionNode("unstable affliction on attacker", {}, {}, {}); }
-    static ActionNode* haunt(PlayerbotAI*) { return new ActionNode("haunt", {}, {}, {}); }
+    static ActionNode* curse_of_agony(PlayerbotAI*) { return new ActionNode("curse of agony", {}, {}, {}); }
+    static ActionNode* siphon_life(PlayerbotAI*) { return new ActionNode("siphon life", {}, {}, {}); }
+    static ActionNode* drain_life(PlayerbotAI*) { return new ActionNode("drain life", {}, {}, {}); }
     static ActionNode* shadow_bolt(PlayerbotAI*) { return new ActionNode("shadow bolt", {}, {}, {}); }
     static ActionNode* drain_soul(PlayerbotAI*) { return new ActionNode("drain soul", {}, {}, {}); }
     static ActionNode* life_tap(PlayerbotAI*) { return new ActionNode("life tap", {}, {}, {}); }
-    static ActionNode* shadowflame(PlayerbotAI*) { return new ActionNode("shadowflame", {}, {}, {}); }
-    static ActionNode* seed_of_corruption_on_attacker(PlayerbotAI*) { return new ActionNode("seed of corruption on attacker", {}, {}, {}); }
-    static ActionNode* seed_of_corruption(PlayerbotAI*) { return new ActionNode("seed of corruption", {}, {}, {}); }
     static ActionNode* rain_of_fire(PlayerbotAI*) { return new ActionNode("rain of fire", {}, {}, {}); }
 };
 
@@ -52,9 +46,10 @@ std::vector<NextAction> AfflictionWarlockStrategy::getDefaultActions()
 {
     return {
        NextAction("corruption", 5.5f),
-       NextAction("unstable affliction", 5.4f),
-       NextAction("haunt", 5.3f),
+       NextAction("curse of agony", 5.4f),
+       NextAction("siphon life", 5.3f),
        NextAction("shadow bolt", 5.2f),
+       NextAction("drain life", 5.1f),
        NextAction("shoot", 5.0f)
     };
 }
@@ -75,33 +70,9 @@ void AfflictionWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers
     );
     triggers.push_back(
         new TriggerNode(
-            "unstable affliction on attacker",
-            {
-                NextAction("unstable affliction on attacker", 19.0f)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
             "corruption",
             {
                 NextAction("corruption", 18.0f)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "unstable affliction",
-            {
-                NextAction("unstable affliction", 17.5f)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "haunt",
-            {
-                NextAction("haunt", 16.5f)
             }
         )
     );
@@ -124,15 +95,7 @@ void AfflictionWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers
         )
     );
 
-    // Life Tap glyph buff, and Life Tap as filler
-    triggers.push_back(
-        new TriggerNode(
-            "life tap glyph buff",
-            {
-                NextAction("life tap", 29.5f)
-            }
-        )
-    );
+    // Life Tap as filler
     triggers.push_back(
         new TriggerNode(
             "life tap",

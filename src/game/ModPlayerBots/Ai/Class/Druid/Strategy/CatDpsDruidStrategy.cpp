@@ -14,10 +14,8 @@ public:
     {
         creators["faerie fire (feral)"] = &faerie_fire_feral;
         creators["melee"] = &melee;
-        creators["feral charge - cat"] = &feral_charge_cat;
         creators["cat form"] = &cat_form;
         creators["claw"] = &claw;
-        creators["mangle (cat)"] = &mangle_cat;
         creators["rake"] = &rake;
         creators["ferocious bite"] = &ferocious_bite;
         creators["rip"] = &rip;
@@ -40,18 +38,8 @@ private:
     {
         return new ActionNode(
             "melee",
-            /*P*/ { NextAction("feral charge - cat") },
-            /*A*/ {},
-            /*C*/ {}
-        );
-    }
-
-    static ActionNode* feral_charge_cat([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "feral charge - cat",
             /*P*/ {},
-            /*A*/ { NextAction("reach melee") },
+            /*A*/ {},
             /*C*/ {}
         );
     }
@@ -72,16 +60,6 @@ private:
             "claw",
             /*P*/ {},
             /*A*/ { NextAction("melee") },
-            /*C*/ {}
-        );
-    }
-
-    static ActionNode* mangle_cat([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "mangle (cat)",
-            /*P*/ {},
-            /*A*/ {},
             /*C*/ {}
         );
     }
@@ -145,7 +123,9 @@ CatDpsDruidStrategy::CatDpsDruidStrategy(PlayerbotAI* botAI) : FeralDruidStrateg
 std::vector<NextAction> CatDpsDruidStrategy::getDefaultActions()
 {
     return {
-        NextAction("tiger's fury", ACTION_DEFAULT + 0.1f)
+        NextAction("claw", ACTION_NORMAL + 0.2f),
+        NextAction("tiger's fury", ACTION_NORMAL + 0.1f),
+        NextAction("melee", ACTION_DEFAULT)
     };
 }
 
@@ -174,7 +154,7 @@ void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "almost full energy available",
             {
-                NextAction("mangle (cat)", ACTION_DEFAULT + 0.3f)
+                NextAction("claw", ACTION_DEFAULT + 0.3f)
             }
         )
     );
@@ -182,7 +162,7 @@ void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "combo points not full and high energy",
             {
-                NextAction("mangle (cat)", ACTION_DEFAULT + 0.3f)
+                NextAction("claw", ACTION_DEFAULT + 0.3f)
             }
         )
     );
@@ -221,13 +201,6 @@ void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     );
     triggers.push_back(
         new TriggerNode(
-            "savage roar", {
-                NextAction("savage roar", ACTION_HIGH + 7)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
             "combo points available",
             {
                 NextAction("rip", ACTION_HIGH + 6)
@@ -252,9 +225,9 @@ void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     );
     triggers.push_back(
         new TriggerNode(
-            "mangle (cat)",
+            "combo points not full",
             {
-                NextAction("mangle (cat)", ACTION_HIGH + 3)
+                NextAction("claw", ACTION_HIGH + 3)
             }
         )
     );
@@ -278,14 +251,6 @@ void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // AOE
     triggers.push_back(
         new TriggerNode(
-            "medium aoe",
-            {
-                NextAction("swipe (cat)", ACTION_HIGH + 3)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
             "light aoe",
             {
                 NextAction("rake on attacker", ACTION_HIGH + 2)
@@ -297,15 +262,7 @@ void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "enemy out of melee",
             {
-                NextAction("feral charge - cat", ACTION_HIGH + 9)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "enemy out of melee",
-            {
-                NextAction("dash", ACTION_HIGH + 8)
+                NextAction("dash", ACTION_HIGH + 9)
             }
         )
     );

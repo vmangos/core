@@ -8,6 +8,29 @@
 #include "SharedDefines.h"
 #include "BroadcastHelper.h"
 
+namespace
+{
+void ResetSpellRelatedValueCaches(PlayerbotAI* botAI)
+{
+    if (!botAI)
+        return;
+
+    AiObjectContext* context = botAI->GetAiObjectContext();
+    if (!context)
+        return;
+
+    for (std::string const& name : context->GetValues())
+    {
+        if (name.rfind("spell id::", 0) == 0 || name.rfind("item for spell::", 0) == 0 ||
+            name.rfind("spell cast useful::", 0) == 0)
+        {
+            if (UntypedValue* value = context->GetUntypedValue(name))
+                value->Reset();
+        }
+    }
+}
+}
+
 bool AutoMaintenanceOnLevelupAction::Execute(Event event)
 {
     AutoPickTalents();
@@ -79,6 +102,7 @@ void AutoMaintenanceOnLevelupAction::LearnTrainerSpells(std::ostringstream* out)
     factory.InitClassSpells();
     factory.InitAvailableSpells();
     factory.InitPet();
+    ResetSpellRelatedValueCaches(botAI);
 }
 
 void AutoMaintenanceOnLevelupAction::LearnQuestSpells(std::ostringstream* out)

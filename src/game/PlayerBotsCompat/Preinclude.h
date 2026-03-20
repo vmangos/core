@@ -237,7 +237,6 @@ typedef bool PlayerbotsDatabaseTransaction;
 #define SchoolMask School
 
 // Naming compatibility
-#define IsQuestRewarded GetQuestRewardStatus
 #define hasInvolvedQuest HasInvolvedQuest
 #define npcflag npc_flags
 #define SubName subname
@@ -597,10 +596,6 @@ typedef uint32 TriggerCastFlags;
 #define RewardChoiceItemCount RewChoiceItemCount
 #define RewardItemId RewItemId
 #define RewardItemIdCount RewItemCount
-
-// Quest status compatibility
-#define RemoveRewardedQuest(id) SetQuestStatus(id, QUEST_STATUS_NONE)
-#define RemoveActiveQuest(id, ...) SetQuestStatus(id, QUEST_STATUS_NONE)
 
 // Movement flags missing in Vanilla
 #define MOVEMENTFLAG_WALKING MOVEFLAG_WALK_MODE

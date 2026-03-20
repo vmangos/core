@@ -16,8 +16,6 @@ public:
         creators["flametongue weapon"] = &flametongue_weapon;
         creators["frostbrand weapon"] = &frostbrand_weapon;
         creators["windfury weapon"] = &windfury_weapon;
-        creators["earthliving weapon"] = &earthliving_weapon;
-        creators["wind shear"] = &wind_shear;
         creators["purge"] = &purge;
     }
 
@@ -43,14 +41,6 @@ private:
                               /*A*/ { NextAction("flametongue weapon") },
                               /*C*/ {});
     }
-    static ActionNode* earthliving_weapon([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("earthliving weapon",
-                              /*P*/ {},
-                              /*A*/ { NextAction("flametongue weapon") },
-                              /*C*/ {});
-    }
-    static ActionNode* wind_shear(PlayerbotAI*) { return new ActionNode("wind shear", {}, {}, {}); }
     static ActionNode* purge(PlayerbotAI*) { return new ActionNode("purge", {}, {}, {}); }
 };
 
@@ -63,22 +53,15 @@ void ShamanNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     NonCombatStrategy::InitTriggers(triggers);
 
-    // Totemic Recall
-    triggers.push_back(new TriggerNode("totemic recall", { NextAction("totemic recall", 60.0f), }));
-
     // Healing/Resurrect Triggers
     triggers.push_back(new TriggerNode("party member dead", { NextAction("ancestral spirit", ACTION_CRITICAL_HEAL + 10), }));
     triggers.push_back(new TriggerNode("party member critical health", {
-                                                                   NextAction("riptide on party", 31.0f),
                                                                    NextAction("healing wave on party", 30.0f) }));
     triggers.push_back(new TriggerNode("party member low health",{
-                                                             NextAction("riptide on party", 29.0f),
                                                              NextAction("healing wave on party", 28.0f) }));
     triggers.push_back(new TriggerNode("party member medium health",{
-                                                                NextAction("riptide on party", 27.0f),
                                                                 NextAction("healing wave on party", 26.0f) }));
     triggers.push_back(new TriggerNode("party member almost full health",{
-                                                                     NextAction("riptide on party", 25.0f),
                                                                      NextAction("lesser healing wave on party", 24.0f) }));
     triggers.push_back(new TriggerNode("group heal setting",{ NextAction("chain heal on party", 27.0f) }));
 
@@ -95,7 +78,7 @@ void ShamanNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     if (tab == 0)  // Elemental
     {
         triggers.push_back(new TriggerNode("main hand weapon no imbue", { NextAction("flametongue weapon", 22.0f), }));
-        triggers.push_back(new TriggerNode("water shield", { NextAction("water shield", 21.0f), }));
+        triggers.push_back(new TriggerNode("lightning shield", { NextAction("lightning shield", 21.0f), }));
     }
     else if (tab == 1)  // Enhancement
     {
@@ -105,8 +88,8 @@ void ShamanNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     }
     else if (tab == 2)  // Restoration
     {
-        triggers.push_back(new TriggerNode("main hand weapon no imbue",{ NextAction("earthliving weapon", 22.0f), }));
-        triggers.push_back(new TriggerNode("water shield", { NextAction("water shield", 20.0f), }));
+        triggers.push_back(new TriggerNode("main hand weapon no imbue",{ NextAction("flametongue weapon", 22.0f), }));
+        triggers.push_back(new TriggerNode("lightning shield", { NextAction("lightning shield", 20.0f), }));
     }
 
     // Buff Triggers while swimming
@@ -114,10 +97,6 @@ void ShamanNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("water walking", { NextAction("water walking", 12.0f), }));
     triggers.push_back(new TriggerNode("water breathing on party", { NextAction("water breathing on party", 11.0f), }));
     triggers.push_back(new TriggerNode("water walking on party", { NextAction("water walking on party", 11.0f), }));
-
-    // Pet Triggers
-    triggers.push_back(new TriggerNode("has pet", { NextAction("toggle pet spell", 60.0f), }));
-    triggers.push_back(new TriggerNode("new pet", { NextAction("set pet stance", 65.0f), }));
 }
 
 void ShamanNonCombatStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

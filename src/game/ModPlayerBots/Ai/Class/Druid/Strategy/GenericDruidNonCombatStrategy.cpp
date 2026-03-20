@@ -112,7 +112,7 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
     triggers.push_back(
         new TriggerNode("party member critical health",
                         {
-                                          NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 7),
+                                          NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 7),
                                           NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 6),
                                           NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 5),
                                           }));
@@ -120,21 +120,21 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
     triggers.push_back(
         new TriggerNode("party member low health",
                         {
-                                          NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 5),
+                                          NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 5),
                                           NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 4),
                                           NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 3),
                                           }));
 
     triggers.push_back(
         new TriggerNode("party member medium health",
-                        { NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 3),
+                        { NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 3),
                                           NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 2),
                                           NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 1),
                                           }));
 
     triggers.push_back(
         new TriggerNode("party member almost full health",
-                        { NextAction("wild growth on party", ACTION_LIGHT_HEAL + 3), NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 2) }));
+                        { NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 3), NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 2) }));
 
     triggers.push_back(
         new TriggerNode("party member remove curse",
@@ -143,22 +143,22 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
         new TriggerNode("new pet", { NextAction("set pet stance", 60.0f) }));
 
     triggers.push_back(new TriggerNode("party member critical health", {
-                       NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 7),
+                       NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 7),
                        NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 6),
                        NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 5),
                        }));
     triggers.push_back(new TriggerNode("party member low health", {
-                       NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 5),
+                       NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 5),
                        NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 4),
                        NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 3),
                        }));
     triggers.push_back(new TriggerNode("party member medium health", {
-                       NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 3),
+                       NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 3),
                        NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 2),
                        NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 1),
                        }));
     triggers.push_back(new TriggerNode("party member almost full health", {
-                       NextAction("wild growth on party", ACTION_LIGHT_HEAL + 3),
+                       NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 3),
                        NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 2),
                        }));
     triggers.push_back(new TriggerNode("party member remove curse", {

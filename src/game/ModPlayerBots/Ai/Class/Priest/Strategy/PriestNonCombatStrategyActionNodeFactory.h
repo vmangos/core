@@ -29,7 +29,7 @@ public:
         creators["lesser heal on party"] = &lesser_heal_on_party;
         creators["flash heal"] = &flash_heal;
         creators["flash heal on party"] = &flash_heal_on_party;
-        creators["circle of healing on party"] = &circle_of_healing;
+        creators["prayer of healing on party"] = &prayer_of_healing_on_party;
         creators["prayer of fortitude on party"] = &prayer_of_fortitude_on_party;
         creators["prayer of spirit on party"] = &prayer_of_spirit_on_party;
     }
@@ -126,12 +126,11 @@ private:
                               /*A*/ {},
                               /*C*/ {});
     }
-    static ActionNode* circle_of_healing([[maybe_unused]] PlayerbotAI* botAI)
+    static ActionNode* prayer_of_healing_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
-        return new ActionNode("circle of healing on party",
+        return new ActionNode("prayer of healing on party",
                               /*P*/ { NextAction("remove shadowform") },
-                              // /*A*/ { NextAction("flash heal on party") },
-                              /*A*/ {},
+                              /*A*/ { NextAction("flash heal on party") },
                               /*C*/ {});
     }
     static ActionNode* prayer_of_fortitude_on_party([[maybe_unused]] PlayerbotAI* botAI)

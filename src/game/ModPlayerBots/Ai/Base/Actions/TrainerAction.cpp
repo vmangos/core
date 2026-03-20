@@ -10,6 +10,29 @@
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 
+namespace
+{
+void ResetSpellRelatedValueCaches(PlayerbotAI* botAI)
+{
+    if (!botAI)
+        return;
+
+    AiObjectContext* context = botAI->GetAiObjectContext();
+    if (!context)
+        return;
+
+    for (std::string const& name : context->GetValues())
+    {
+        if (name.rfind("spell id::", 0) == 0 || name.rfind("item for spell::", 0) == 0 ||
+            name.rfind("spell cast useful::", 0) == 0)
+        {
+            if (UntypedValue* value = context->GetUntypedValue(name))
+                value->Reset();
+        }
+    }
+}
+}
+
 bool TrainerAction::Execute(Event event)
 {
     botAI->TellError("Trainer command is temporarily disabled in Vanilla port.");
@@ -109,6 +132,8 @@ bool MaintenanceAction::Execute(Event event)
         if (sPlayerbotAIConfig.altMaintenanceGemsEnchants && bot->GetLevel() >= sPlayerbotAIConfig.minEnchantingBotLevel)
             factory.ApplyEnchantAndGemsNew();
     }
+
+    ResetSpellRelatedValueCaches(botAI);
 
     bot->DurabilityRepairAll(false, 1.0f);
 

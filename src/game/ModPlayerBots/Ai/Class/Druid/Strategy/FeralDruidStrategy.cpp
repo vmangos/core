@@ -12,7 +12,6 @@ class FeralDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
 public:
     FeralDruidStrategyActionNodeFactory()
     {
-        creators["survival instincts"] = &survival_instincts;
         creators["thorns"] = &thorns;
         creators["omen of clarity"] = &omen_of_clarity;
         creators["cure poison"] = &cure_poison;
@@ -23,14 +22,6 @@ public:
     }
 
 private:
-    static ActionNode* survival_instincts([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("survival instincts",
-                              /*P*/ {},
-                              /*A*/ { NextAction("barkskin") },
-                              /*C*/ {});
-    }
-
     static ActionNode* thorns([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("thorns",
@@ -101,13 +92,11 @@ void FeralDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "enemy out of melee", { NextAction("reach melee", ACTION_HIGH + 1) }));
     triggers.push_back(new TriggerNode(
-        "critical health", { NextAction("survival instincts", ACTION_EMERGENCY + 1) }));
+        "critical health", { NextAction("barkskin", ACTION_EMERGENCY + 1) }));
     triggers.push_back(new TriggerNode(
         "omen of clarity", { NextAction("omen of clarity", ACTION_HIGH + 9) }));
     triggers.push_back(new TriggerNode("player has flag",
                                        { NextAction("dash", ACTION_EMERGENCY + 2) }));
     triggers.push_back(new TriggerNode("enemy flagcarrier near",
                                        { NextAction("dash", ACTION_EMERGENCY + 2) }));
-    triggers.push_back(
-        new TriggerNode("berserk", { NextAction("berserk", ACTION_HIGH + 6) }));
 }

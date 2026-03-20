@@ -153,6 +153,12 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
     ProcessTriggers(minimal);
     PushDefaultActions();
 
+    uint32 queueSizeAfterTriggers = queue.Size();
+
+    // Build diagnostic summary instead of per-action logging
+    std::string diagSummary;
+    diagSummary.reserve(256);
+
     uint32 iterations = 0;
     uint32 iterationsPerTick = queue.Size() * (minimal ? 2 : sPlayerbotAIConfig.iterationsPerTick);
 
@@ -166,7 +172,11 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
         bool skipPrerequisites = basket->isSkipPrerequisites();
 
         if (minimal && (relevance < 100))
+        {
+            if (diagSummary.empty())
+                diagSummary = "SKIP(minimal)";
             continue;
+        }
 
         Event event = basket->getEvent();
         ActionNode* actionNode = queue.Pop();  // NOTE: Pop() deletes basket
@@ -174,6 +184,8 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
         if (!action)
         {
+            if (!diagSummary.empty()) diagSummary += ' ';
+            diagSummary += actionNode->getName() + ":UNK";
             LogAction("A:%s - UNKNOWN", actionNode->getName().c_str());
         }
         else if (action->isUseful())
@@ -186,6 +198,8 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
                 if (relevance <= 0)
                 {
+                    if (!diagSummary.empty()) diagSummary += ' ';
+                    diagSummary += action->getName() + ":ZERO(" + multiplier->getName() + ")";
                     LogAction("Multiplier %s made action %s useless", multiplier->getName().c_str(), action->getName().c_str());
                     break;
                 }
@@ -211,6 +225,8 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
                 if (actionExecuted)
                 {
+                    if (!diagSummary.empty()) diagSummary += ' ';
+                    diagSummary += action->getName() + ":OK";
                     LogAction("A:%s - OK", action->getName().c_str());
                     MultiplyAndPush(actionNode->getContinuers(), relevance, false, event, "cont");
                     lastRelevance = relevance;
@@ -219,18 +235,24 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
                 }
                 else
                 {
+                    if (!diagSummary.empty()) diagSummary += ' ';
+                    diagSummary += action->getName() + ":FAIL";
                     LogAction("A:%s - FAILED", action->getName().c_str());
                     MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.003f, false, event, "alt");
                 }
             }
             else
             {
+                if (!diagSummary.empty()) diagSummary += ' ';
+                diagSummary += action->getName() + ":IMP";
                 LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
                 MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.003f, false, event, "alt");
             }
         }
         else
         {
+            if (!diagSummary.empty()) diagSummary += ' ';
+            diagSummary += action->getName() + ":USELESS";
             LogAction("A:%s - USELESS", action->getName().c_str());
             lastRelevance = relevance;
         }
@@ -244,7 +266,18 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
     }
 
     if (!actionExecuted)
+    {
+        diagSummary += " => no_action";
         LogAction("no actions executed");
+    }
+
+    // Only log if action outcomes changed since last tick
+    if (diagSummary != _lastDiagSummary)
+    {
+        _lastDiagSummary = diagSummary;
+        LOG_INFO("playerbots", "DIAG Engine: bot=%s [min=%u q=%u] %s",
+            botAI->GetBot()->GetName(), (uint32)minimal, queueSizeAfterTriggers, diagSummary.c_str());
+    }
 
     queue.RemoveExpired();
 

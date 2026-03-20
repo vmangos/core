@@ -5,23 +5,25 @@
 
 #include "QuestValues.h"
 
+#include "LootValues.h"
 #include "Playerbots.h"
 #include "SharedValueContext.h"
 
-// What kind of a relation does this entry have with this quest.
-entryQuestRelationMap EntryQuestRelationMapValue::Calculate()
+namespace PlayerbotSharedValueBuilders
 {
-    entryQuestRelationMap rMap;
-
+namespace
+{
+void AddQuestRelations(entryQuestRelationMap& relationMap)
+{
     for (auto relation : sObjectMgr.GetCreatureQuestRelationsMap())
-        rMap[relation.first][relation.second] |= (int)QuestRelationFlag::questGiver;
+        relationMap[relation.first][relation.second] |= (int)QuestRelationFlag::questGiver;
 
     for (auto& creatureInfoPair : sObjectMgr.GetCreatureInfoMap())
     {
         uint32 entry = creatureInfoPair.first;
         auto bounds = sObjectMgr.GetCreatureQuestInvolvedRelationsMapBounds(entry);
         for (auto itr = bounds.first; itr != bounds.second; ++itr)
-            rMap[entry][itr->second] |= (int)QuestRelationFlag::questTaker;
+            relationMap[entry][itr->second] |= (int)QuestRelationFlag::questTaker;
     }
 
     for (auto& goInfoPair : sObjectMgr.GetGameObjectInfoMap())
@@ -29,7 +31,7 @@ entryQuestRelationMap EntryQuestRelationMapValue::Calculate()
         uint32 entry = goInfoPair.first;
         auto bounds = sObjectMgr.GetGOQuestRelationsMapBounds(entry);
         for (auto itr = bounds.first; itr != bounds.second; ++itr)
-            rMap[-(int32)entry][itr->second] |= (int)QuestRelationFlag::questGiver;
+            relationMap[-(int32)entry][itr->second] |= (int)QuestRelationFlag::questGiver;
     }
 
     for (auto& goInfoPair : sObjectMgr.GetGameObjectInfoMap())
@@ -37,10 +39,12 @@ entryQuestRelationMap EntryQuestRelationMapValue::Calculate()
         uint32 entry = goInfoPair.first;
         auto bounds = sObjectMgr.GetGOQuestInvolvedRelationsMapBounds(entry);
         for (auto itr = bounds.first; itr != bounds.second; ++itr)
-            rMap[-(int32)entry][itr->second] |= (int)QuestRelationFlag::questTaker;
+            relationMap[-(int32)entry][itr->second] |= (int)QuestRelationFlag::questTaker;
     }
+}
 
-    // Quest objectives
+void AddQuestObjectiveRelations(entryQuestRelationMap& relationMap, DropMap const& dropMap)
+{
     ObjectMgr::QuestMap const& questMap = sObjectMgr.GetQuestTemplates();
 
     for (auto& questItr : questMap)
@@ -52,26 +56,38 @@ entryQuestRelationMap EntryQuestRelationMapValue::Calculate()
         {
             uint32 relationFlag = 1 << objective;
 
-            // Kill objective
             if (quest->RequiredNpcOrGo[objective])
-                rMap[quest->RequiredNpcOrGo[objective]][questId] |= relationFlag;
+                relationMap[quest->RequiredNpcOrGo[objective]][questId] |= relationFlag;
 
-            // Loot objective
             if (quest->RequiredItemId[objective])
             {
-                for (auto& entry : GAI_VALUE2(std::vector<int32>, "item drop list", quest->RequiredItemId[objective]))
-                    rMap[entry][questId] |= relationFlag;
+                for (auto& entry : BuildItemDropList(dropMap, quest->RequiredItemId[objective]))
+                    relationMap[entry][questId] |= relationFlag;
             }
         }
     }
+}
+}
 
-    return rMap;
+entryQuestRelationMap BuildEntryQuestRelationMap()
+{
+    entryQuestRelationMap relationMap;
+    AddQuestRelations(relationMap);
+    AddQuestObjectiveRelations(relationMap, BuildDropMap());
+    return relationMap;
+}
+}
+
+// What kind of a relation does this entry have with this quest.
+entryQuestRelationMap EntryQuestRelationMapValue::Calculate()
+{
+    return PlayerbotSharedValueBuilders::BuildEntryQuestRelationMap();
 }
 
 // Get all the objective entries for a specific quest.
 void FindQuestObjectData::GetObjectiveEntries()
 {
-    relationMap = GAI_VALUE(entryQuestRelationMap, "entry quest relation");
+    relationMap = PlayerbotSharedValueBuilders::BuildEntryQuestRelationMap();
 }
 
 // Data worker. Checks for a specific creature what quest they are needed for and puts them in the proper place in the

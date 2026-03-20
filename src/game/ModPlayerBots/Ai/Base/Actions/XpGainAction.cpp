@@ -66,6 +66,7 @@ void XpGainAction::GiveXP(uint32 xp, Unit* victim)
     }
 
     uint32 level = bot->GetLevel();
+    uint32 const startLevel = level;
 
     // XP to money conversion processed in Player::RewardQuest
     if (level >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
@@ -96,4 +97,9 @@ void XpGainAction::GiveXP(uint32 xp, Unit* victim)
     }
 
     bot->SetUInt32Value(PLAYER_XP, newXP);
+
+    // Keep weapon/defense skills at max after leveling — bots don't gain
+    // skill points through normal combat usage.
+    if (bot->GetLevel() != startLevel)
+        bot->UpdateSkillsToMaxSkillsForLevel();
 }

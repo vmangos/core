@@ -18,6 +18,7 @@
 #include "Item.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
+#include "ObjectGuid.h"
 #include "PlayerbotAIBase.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSecurity.h"
@@ -529,7 +530,7 @@ public:
     float GetRange(std::string const type);
 
     Player* GetBot() { return bot; }
-    Player* GetMaster() { return master; }
+    Player* GetMaster();
     Player* FindNewMaster();
 
     // Checks if the bot is really a player. Players always have themselves as master.
@@ -569,7 +570,7 @@ public:
     BotCheatMask GetCheat() { return cheatMask; }
     void SetCheat(BotCheatMask mask) { cheatMask = mask; }
 
-    void SetMaster(Player* newMaster) { master = newMaster; }
+    void SetMaster(Player* newMaster);
     AiObjectContext* GetAiObjectContext() { return aiObjectContext; }
     ChatHelper* GetChatHelper() { return &chatHelper; }
     bool IsOpposing(Player* player);
@@ -619,6 +620,8 @@ private:
     void HandleCommands();
     void HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
     bool _isBotInitializing = false;
+    std::string _lastDiagTick;    // dedup key for UpdateAI TICK log
+    std::string _lastDiagAction; // dedup key for DoNextAction log
     inline bool IsValidUnit(const Unit* unit) const
     {
         return unit && unit->IsInWorld();
@@ -631,6 +634,7 @@ private:
 protected:
     Player* bot;
     Player* master;
+    ObjectGuid masterGuid;
     uint32 accountId;
     AiObjectContext* aiObjectContext;
     Engine* currentEngine;

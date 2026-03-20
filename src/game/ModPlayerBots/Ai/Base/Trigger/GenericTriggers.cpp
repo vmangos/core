@@ -534,10 +534,12 @@ bool IsNotBehindTargetTrigger::IsActive()
 
 bool IsNotFacingTargetTrigger::IsActive()
 {
-    if (botAI->HasStrategy("stay", botAI->GetState()))
-    {
+    if (!botAI->IsTank(bot))
         return false;
-    }
+
+    if (botAI->HasStrategy("stay", botAI->GetState()))
+        return false;
+
     return !AI_VALUE2(bool, "facing", "current target");
 }
 

@@ -15,7 +15,7 @@
 
 struct POIInfo
 {
-    G3D::Vector2 pos;
+    WorldPosition pos;
     int32 objectiveIdx;
 };
 
@@ -43,6 +43,8 @@ protected:
     uint32 BestRewardIndex(Quest const* quest);
     bool IsQuestWorthDoing(Quest const* quest);
     bool IsQuestCapableDoing(Quest const* quest);
+    bool QuestFitsPopulationPlan(Quest const* quest);
+    bool DropQuestFromLog(uint16 slot, Quest const* quest, Player* viewer);
 
     /* QUEST RELATED ACTION */
     bool SearchQuestGiverAndAcceptOrReward();

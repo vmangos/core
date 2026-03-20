@@ -18,7 +18,6 @@ public:
         creators["fire blast"] = &fire_blast;
         creators["pyroblast"] = &pyroblast;
         creators["scorch"] = &scorch;
-        creators["living bomb"] = &living_bomb;
         creators["combustion"] = &combustion;
     }
 
@@ -28,7 +27,6 @@ private:
     static ActionNode* fire_blast(PlayerbotAI*) { return new ActionNode("fire blast", {}, {}, {}); }
     static ActionNode* pyroblast(PlayerbotAI*) { return new ActionNode("pyroblast", {}, {}, {}); }
     static ActionNode* scorch(PlayerbotAI*) { return new ActionNode("scorch", {}, {}, {}); }
-    static ActionNode* living_bomb(PlayerbotAI*) { return new ActionNode("living bomb", {}, {}, {}); }
     static ActionNode* combustion(PlayerbotAI*) { return new ActionNode("combustion", {}, {}, {}); }
 };
 
@@ -63,28 +61,10 @@ void FireMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
-    triggers.push_back(
-        new TriggerNode(
-            "living bomb",
-            {
-                NextAction("living bomb", 18.5f)
-            }
-        )
-    );
-
-    // Proc Trigger
-    triggers.push_back(
-        new TriggerNode(
-            "hot streak",
-            {
-                NextAction("pyroblast", 25.0f)
-            }
-        )
-    );
 }
 
-// Combat strategy to run to melee for Dragon's Breath and Blast Wave
-// Disabled by default for the Fire/Frostfire spec
+// Combat strategy to run to melee for Blast Wave
+// Disabled by default for the Fire spec
 // To enable, type "co +firestarter"
 // To disable, type "co -firestarter"
 FirestarterStrategy::FirestarterStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) {}

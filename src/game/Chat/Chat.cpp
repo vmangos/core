@@ -38,6 +38,7 @@
 #include "SpellMgr.h"
 #include "PoolManager.h"
 #include "GameEventMgr.h"
+#include "ObjectAccessor.h"
 #include "ModPlayerBots/Bot/PlayerbotMgr.h"
 
 // Supported shift-links (client generated and server side)
@@ -3758,6 +3759,16 @@ bool ChatHandler::ExtractPlayerTarget(char** args, Player** player /*= nullptr*/
         }
 
         Player* pl = sObjectMgr.GetPlayer(name.c_str());
+
+        // Bots stuck in BeingTeleportedFar have IsInWorld() == false, so
+        // FindPlayerByName (used by GetPlayer) won't find them. Fall back
+        // to FindPlayerByNameNotInWorld for bots that are being teleported.
+        if (!pl)
+        {
+            Player* notInWorld = sObjectAccessor.FindPlayerByNameNotInWorld(name.c_str());
+            if (notInWorld && notInWorld->IsBot() && notInWorld->IsBeingTeleported())
+                pl = notInWorld;
+        }
 
         // if allowed player pointer
         if (player)

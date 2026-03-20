@@ -26,6 +26,7 @@ public:
 private:
     void AddAttackersOf(Group* group, std::unordered_set<Unit*>& targets);
     void AddAttackersOf(Player* player, std::unordered_set<Unit*>& targets);
+    void AddAssistFallbackTarget(Player* player, Unit* candidate, char const* source, std::unordered_set<Unit*>& targets);
     void RemoveNonThreating(std::unordered_set<Unit*>& targets);
     bool hasRealThreat(Unit* attacker);
 };

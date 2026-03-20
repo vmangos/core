@@ -31,6 +31,24 @@
 #include "TravelMgr.h"
 #include "World.h"
 
+static void PersistLowPriorityQuests(Player* bot, PlayerbotAI* botAI)
+{
+    if (!bot || !botAI || botAI->lowPriorityQuest.empty())
+        return;
+
+    std::ostringstream data;
+    bool first = true;
+    for (uint32 questId : botAI->lowPriorityQuest)
+    {
+        if (!first)
+            data << ',';
+        data << questId;
+        first = false;
+    }
+
+    sRandomPlayerbotMgr.SetValue(bot, "low_priority_quests", 1, data.str());
+}
+
 bool TellRpgStatusAction::Execute(Event event)
 {
     Player* owner = event.getOwner();
@@ -197,6 +215,8 @@ bool NewRpgWanderNpcAction::Execute(Event event)
         if (!info.wander_npc.lastReach)
         {
             info.wander_npc.lastReach = getMSTime();
+            sRandomPlayerbotMgr.SetValue(bot, "last_rpg_npc", getMSTime() / IN_MILLISECONDS,
+                std::to_string(info.wander_npc.npcOrGo.GetCounter()));
             if (bot->CanInteractWithQuestGiver(object))
                 InteractWithNpcOrGameObjectForQuest(info.wander_npc.npcOrGo);
             return true;
@@ -278,21 +298,10 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
             return true;
         }
         uint32 rndIdx = urand(0, poiInfo.size() - 1);
-        G3D::Vector2 nearestPoi = poiInfo[rndIdx].pos;
+        WorldPosition nearestPoi = poiInfo[rndIdx].pos;
         int32 objectiveIdx = poiInfo[rndIdx].objectiveIdx;
-
-        float dx = nearestPoi.x, dy = nearestPoi.y;
-
-        // z = MAX_HEIGHT as we do not know accurate z
-        float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetTerrain()->GetWaterLevel(dx, dy, MAX_HEIGHT));
-
-        // double check for GetQuestPOIPosAndObjectiveIdx
-        if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
-            return false;
-
-        WorldPosition pos(bot->GetMapId(), dx, dy, dz);
         botAI->rpgInfo.do_quest.lastReachPOI = 0;
-        botAI->rpgInfo.do_quest.pos = pos;
+        botAI->rpgInfo.do_quest.pos = nearestPoi;
         botAI->rpgInfo.do_quest.objectiveIdx = objectiveIdx;
     }
 
@@ -331,8 +340,8 @@ bool NewRpgDoQuestAction::DoIncompleteQuest()
         {
             // we has reach the poi for more than 5 mins but no progession
             // may not be able to complete this quest, marked as abandoned
-            /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
             botAI->lowPriorityQuest.insert(questId);
+            PersistLowPriorityQuests(bot, botAI);
             botAI->rpgStatistic.questAbandoned++;
             LOG_DEBUG("playerbots", "[New RPG] %s marked as abandoned quest %u", bot->GetName(), questId);
             botAI->rpgInfo.ChangeToIdle();
@@ -366,18 +375,8 @@ bool NewRpgDoQuestAction::DoCompletedQuest()
             return false;
         }
         assert(poiInfo.size() > 0);
-        // now we get the place to get rewarded
-        float dx = poiInfo[0].pos.x, dy = poiInfo[0].pos.y;
-        // z = MAX_HEIGHT as we do not know accurate z
-        float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetTerrain()->GetWaterLevel(dx, dy, MAX_HEIGHT));
-
-        // double check for GetQuestPOIPosAndObjectiveIdx
-        if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
-            return false;
-
-        WorldPosition pos(bot->GetMapId(), dx, dy, dz);
         botAI->rpgInfo.do_quest.lastReachPOI = 0;
-        botAI->rpgInfo.do_quest.pos = pos;
+        botAI->rpgInfo.do_quest.pos = poiInfo[0].pos;
         botAI->rpgInfo.do_quest.objectiveIdx = -1;
     }
 
@@ -398,8 +397,8 @@ bool NewRpgDoQuestAction::DoCompletedQuest()
     if (GetMSTimeDiffToNow(botAI->rpgInfo.do_quest.lastReachPOI) >= poiStayTime)
     {
         // e.g. Can not reward quest to gameobjects
-        /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
         botAI->lowPriorityQuest.insert(questId);
+        PersistLowPriorityQuests(bot, botAI);
         botAI->rpgStatistic.questAbandoned++;
         LOG_DEBUG("playerbots", "[New RPG] %s marked as abandoned quest %u", bot->GetName(), questId);
         botAI->rpgInfo.ChangeToIdle();

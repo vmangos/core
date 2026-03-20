@@ -40,6 +40,7 @@ class Config
     bool GetBoolDefault(char const* name, bool def) const;
     int32 GetIntDefault(char const* name, int32 def) const;
     float GetFloatDefault(char const* name, float def) const;
+    std::vector<std::pair<std::string, std::string>> GetEntriesByPrefix(std::string const& prefix) const;
 
     std::string GetFilename() const;
     bool GetValueHelper(char const* name, std::string& result) const;

@@ -6,6 +6,7 @@
 #include "PlayerbotFactory.h"
 
 #include <random>
+#include <set>
 #include <unordered_set>
 #include <utility>
 
@@ -43,6 +44,7 @@
 #include "World.h"
 #include "AiObjectContext.h"
 #include "ItemPackets.h"
+#include "VanillaAmmoTables.h"
 
 namespace
 {
@@ -2442,6 +2444,8 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_THROWN);
             bot->SetSkill(SKILL_DUAL_WIELD, 0, dualWieldLevel, dualWieldLevel);
             bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
+            if (skillLevel)
+                bot->LearnSpell(750, true);   // Plate Mail proficiency
             bot->SetCanDualWield(dualWieldLevel);
             if (dualWieldLevel)
                 bot->LearnSpell(674, true);  // Dual Wield — ensures flag persists across reloads
@@ -2455,6 +2459,8 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_2H_AXES);
             SetRandomSkill(SKILL_POLEARMS);
             bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
+            if (skillLevel)
+                bot->LearnSpell(750, true);   // Plate Mail proficiency
             break;
         case CLASS_PRIEST:
             SetRandomSkill(SKILL_MACES);
@@ -2471,6 +2477,8 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_DAGGERS);
             SetRandomSkill(SKILL_FIST_WEAPONS);
             bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
+            if (skillLevel)
+                bot->LearnSpell(8737, true);  // Mail proficiency
             break;
         case CLASS_MAGE:
             SetRandomSkill(SKILL_SWORDS);
@@ -2498,6 +2506,8 @@ void PlayerbotFactory::InitSkills()
             SetRandomSkill(SKILL_FIST_WEAPONS);
             SetRandomSkill(SKILL_THROWN);
             bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
+            if (skillLevel)
+                bot->LearnSpell(8737, true);  // Mail proficiency
             // Hunters cannot dual wield in vanilla 1.12
             break;
         case CLASS_ROGUE:
@@ -2545,6 +2555,33 @@ void PlayerbotFactory::InitSkills()
     // }
 }
 
+static uint32 GetProficiencySpellForSkill(uint16 skillId)
+{
+    switch (skillId)
+    {
+        // Weapons
+        case SKILL_AXES:        return 196;
+        case SKILL_2H_AXES:     return 197;
+        case SKILL_BOWS:        return 264;
+        case SKILL_GUNS:        return 266;
+        case SKILL_MACES:       return 198;
+        case SKILL_2H_MACES:    return 199;
+        case SKILL_POLEARMS:    return 200;
+        case SKILL_SWORDS:      return 201;
+        case SKILL_2H_SWORDS:   return 202;
+        case SKILL_STAVES:      return 227;
+        case SKILL_DAGGERS:     return 1180;
+        case SKILL_THROWN:       return 2567;
+        case SKILL_CROSSBOWS:   return 5011;
+        case SKILL_WANDS:       return 5009;
+        // Armor
+        case SKILL_PLATE_MAIL:  return 750;
+        case SKILL_MAIL:        return 8737;
+        case SKILL_SHIELD:      return 9116;
+        default:                return 0;
+    }
+}
+
 void PlayerbotFactory::SetRandomSkill(uint16 id)
 {
     if (!GetSkillRaceClassInfo(id, bot->GetRace(), bot->getClass()))
@@ -2565,58 +2602,109 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
     uint16 step = 1;
 
     // if (!bot->HasSkill(id) || value > curValue)
-    bot->SetSkill(id, step, value, maxValue);
+    bot->SetSkill(id, value, maxValue, step);
+
+    // Learn the proficiency spell so the bot can actually use the weapon/armor type
+    uint32 profSpell = GetProficiencySpellForSkill(id);
+    if (profSpell)
+        bot->LearnSpell(profSpell, true);
 }
 
 void PlayerbotFactory::InitAvailableSpells()
 {
-    // Trainer namespace doesn't exist in Vanilla vMaNGOS - skip for now
-    return;
-#if 0
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DIAG InitAvailableSpells: bot=%s class=%u level=%u",
+        bot->GetName(), bot->getClass(), bot->GetLevel());
+
+    // Build cache of class trainer creature entries (once per class)
     if (trainerIdCache[bot->getClass()].empty())
     {
-        CreatureTemplateContainer const* creatureTemplateContainer = sObjectMgr.GetCreatureTemplates();
-        for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin();
-             i != creatureTemplateContainer->end(); ++i)
+        for (auto const& itr : sObjectMgr.GetCreatureInfoMap())
         {
-            Trainer::Trainer* trainer = sObjectMgr.GetTrainer(i->first);
-
-            if (!trainer)
+            CreatureInfo const* cInfo = itr.second.get();
+            if (!cInfo || !(cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER))
                 continue;
 
-            if (trainer->GetTrainerType() != Trainer::Type::Tradeskill &&
-                trainer->GetTrainerType() != Trainer::Type::Class)
-                continue;
-
-            if (trainer->GetTrainerType() == Trainer::Type::Class &&
-                !trainer->IsTrainerValidForPlayer(bot))
-                continue;
-
-            trainerIdCache[bot->getClass()].push_back(i->first);
+            switch (cInfo->trainer_type)
+            {
+                case TRAINER_TYPE_CLASS:
+                    if (cInfo->trainer_class != bot->getClass())
+                        continue;
+                    break;
+                case TRAINER_TYPE_PETS:
+                    if (bot->getClass() != CLASS_HUNTER)
+                        continue;
+                    break;
+                default:
+                    continue;
+            }
+            trainerIdCache[bot->getClass()].push_back(itr.first);
         }
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DIAG InitAvailableSpells: built trainer cache for class %u, %zu trainers found",
+            bot->getClass(), trainerIdCache[bot->getClass()].size());
     }
-    for (uint32 trainerId : trainerIdCache[bot->getClass()])
+
+    // Helper lambda: learn all GREEN spells from a trainer spell list
+    auto learnFromSpellList = [this](TrainerSpellData const* tSpells) -> bool {
+        if (!tSpells)
+            return false;
+        bool learned = false;
+        for (auto const& itr : tSpells->spellList)
+        {
+            TrainerSpell const* tSpell = &itr.second;
+            if (bot->GetTrainerSpellState(tSpell) != TRAINER_SPELL_GREEN)
+                continue;
+
+            SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(tSpell->spell);
+            if (!spellInfo)
+                continue;
+
+            if (bot->IsSpellFitByClassAndRace(tSpell->spell))
+            {
+                bot->LearnSpell(tSpell->spell, false);
+                learned = true;
+            }
+
+            for (auto const& trigSpellId : spellInfo->EffectTriggerSpell)
+            {
+                if (!trigSpellId)
+                    continue;
+                if (sSpellMgr.IsPrimaryProfessionFirstRankSpell(trigSpellId))
+                    continue;
+                if (!bot->IsSpellFitByClassAndRace(trigSpellId))
+                    continue;
+                bot->LearnSpell(trigSpellId, false);
+                learned = true;
+            }
+        }
+        return learned;
+    };
+
+    // Learn spells from all trainers, looping to handle rank chains
+    bool learnedAnything;
+    do
     {
-        Trainer::Trainer* trainer = sObjectMgr.GetTrainer(trainerId);
-
-        for (auto& spell : trainer->GetSpells())
+        learnedAnything = false;
+        std::set<uint32> checkedTemplates;
+        for (uint32 trainerId : trainerIdCache[bot->getClass()])
         {
-            // simplified version of Trainer::TeachSpell method
+            if (learnFromSpellList(sObjectMgr.GetNpcTrainerSpells(trainerId)))
+                learnedAnything = true;
 
-            Trainer::Spell const* trainerSpell = trainer->GetSpell(spell.SpellId);
-            if (!trainerSpell)
-                continue;
-
-            if (!trainer->CanTeachSpell(bot, trainerSpell))
-                continue;
-
-            if (trainerSpell->IsCastable())
-                bot->CastSpell(bot, trainerSpell->SpellId, true);
-            else
-                bot->LearnSpell(trainerSpell->SpellId, false);
+            CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(trainerId);
+            if (cInfo && cInfo->trainer_id)
+            {
+                if (checkedTemplates.find(cInfo->trainer_id) == checkedTemplates.end())
+                {
+                    checkedTemplates.insert(cInfo->trainer_id);
+                    if (learnFromSpellList(sObjectMgr.GetNpcTrainerTemplateSpells(cInfo->trainer_id)))
+                        learnedAnything = true;
+                }
+            }
         }
-    }
-#endif
+    } while (learnedAnything);
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DIAG InitAvailableSpells: bot=%s finished, spellMap size=%zu",
+        bot->GetName(), bot->GetSpellMap().size());
 }
 
 void PlayerbotFactory::InitClassSpells()
@@ -2626,7 +2714,6 @@ void PlayerbotFactory::InitClassSpells()
     {
         case CLASS_WARRIOR:
             bot->LearnSpell(78, true);
-            bot->LearnSpell(2457, true);
             if (level >= 10)
             {
                 bot->LearnSpell(71, false);    // Defensive Stance
@@ -3058,27 +3145,48 @@ void PlayerbotFactory::InitAmmo()
     if (!subClass)
         return;
 
-    std::vector<uint32> ammoEntryList = sRandomItemMgr.GetAmmo(level, subClass);
-    uint32 entry = 0;
-    for (uint32 tEntry : ammoEntryList)
-    {
-        ItemTemplate const* proto = sObjectMgr.GetItemTemplate(tEntry);
-        if (!proto)
-            continue;
-
-        // disable next expansion ammo
-        if (sPlayerbotAIConfig.limitGearExpansion && bot->GetLevel() <= 60 && tEntry >= 23728)
-            continue;
-
-        if (sPlayerbotAIConfig.limitGearExpansion && bot->GetLevel() <= 70 && tEntry >= 35570)
-            continue;
-
-        entry = tEntry;
-        break;
-    }
-
+    uint32 entry = VanillaAmmoTables::GetAmmoItemId(subClass, bot->GetLevel());
     if (!entry)
         return;
+
+    // Equip ammo pouch/quiver if hunter doesn't already have one
+    if (bot->getClass() == CLASS_HUNTER)
+    {
+        uint32 bagEntry = VanillaAmmoTables::GetAmmoBagItemId(subClass, bot->GetLevel());
+
+        // Check if bot already has an ammo bag equipped
+        bool hasAmmoBag = false;
+        for (uint8 slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; ++slot)
+        {
+            Item* bag = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+            if (bag)
+            {
+                ItemTemplate const* bagProto = bag->GetTemplate();
+                if (bagProto && bagProto->Class == ITEM_CLASS_QUIVER)
+                {
+                    hasAmmoBag = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasAmmoBag)
+        {
+            // Find an empty bag slot and equip the ammo bag
+            for (uint8 slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; ++slot)
+            {
+                if (!bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                {
+                    uint16 dest;
+                    if (bot->CanEquipNewItem(slot, dest, bagEntry, false) == EQUIP_ERR_OK)
+                    {
+                        bot->EquipNewItem(dest, bagEntry, true);
+                    }
+                    break;
+                }
+            }
+        }
+    }
 
     uint32 count = bot->GetItemCount(entry);
     uint32 maxCount = bot->getClass() == CLASS_HUNTER ? 6000 : 1000;
@@ -3090,7 +3198,22 @@ void PlayerbotFactory::InitAmmo()
             newItem->AddToUpdateQueueOf(bot);
         }
     }
-    bot->SetAmmo(entry);
+
+    uint32 ammoToEquip = 0;
+    if (bot->GetItemCount(entry) && bot->CanUseAmmo(entry) == EQUIP_ERR_OK)
+        ammoToEquip = entry;
+    else if (botAI)
+    {
+        if (Item* ammo = botAI->FindAmmo())
+        {
+            uint32 fallbackEntry = ammo->GetEntry();
+            if (bot->CanUseAmmo(fallbackEntry) == EQUIP_ERR_OK)
+                ammoToEquip = fallbackEntry;
+        }
+    }
+
+    if (ammoToEquip)
+        bot->SetAmmo(ammoToEquip);
 }
 
 uint32 PlayerbotFactory::CalcMixedGearScore(uint32 gs, uint32 quality)
@@ -4784,43 +4907,47 @@ void PlayerbotFactory::InitReputation()
     if (!bot)
         return;
 
-    if (bot->GetLevel() < 70)
-        return; // Only apply for level 70+ bots
+    // -------------------------------------------------------------------------
+    // Raid / dungeon faction requirements.
+    // Standing thresholds (non-incremental SetReputation values):
+    //   Friendly = 2999, Honored = 8999, Revered = 20999, Exalted = 42000
+    // team: 0 = both factions, ALLIANCE (469) = alliance only, HORDE (67) = horde only
+    // Add new entries here to grant reputation for future attunements.
+    // -------------------------------------------------------------------------
+    struct FactionReq { uint32 minLevel; uint32 factionId; int32 standing; uint32 team; };
+    static const FactionReq reqs[] =
+    {
+        // --- Vanilla ---
+        {55, 529, 42000, 0},          // Argent Dawn → Exalted (Naxxramas free entry)
 
-    ReputationMgr& repMgr = bot->GetReputationMgr();
-
-    // List of factions that require Honored reputation for heroic keys
-    std::vector<uint32> factions = {
-        1011, // Lower City
-        942,  // Cenarion Expedition
-        989,  // Keepers of Time
-        935   // The Sha'tar
+#if !PB_COMPAT_VANILLA
+        // --- TBC heroic-key factions (Honored) ---
+        {70, 1011, 8999, 0},          // Lower City
+        {70, 942,  8999, 0},          // Cenarion Expedition
+        {70, 989,  8999, 0},          // Keepers of Time
+        {70, 935,  8999, 0},          // The Sha'tar
+        {70, 946,  8999, ALLIANCE},   // Honor Hold (Alliance)
+        {70, 947,  8999, HORDE},      // Thrallmar (Horde)
+#endif
     };
 
-    // Add faction-specific reputation
-    if (bot->GetTeamId() == TEAM_ALLIANCE)
-        factions.push_back(946); // Honor Hold (Alliance)
-    else if (bot->GetTeamId() == TEAM_HORDE)
-        factions.push_back(947); // Thrallmar (Horde)
+    uint32 level = bot->GetLevel();
+    uint32 botTeam = bot->GetTeam();
+    ReputationMgr& repMgr = bot->GetReputationMgr();
 
-    // Set reputation to Honored for each required faction
-    for (uint32 factionId : factions)
+    for (auto const& r : reqs)
     {
-        FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
+        if (level < r.minLevel)
+            continue;
+        if (r.team && botTeam != r.team)
+            continue;
+
+        FactionEntry const* factionEntry = sFactionStore.LookupEntry(r.factionId);
         if (!factionEntry)
             continue;
 
-        // ReputationRankToStanding doesn't exist in Vanilla, set directly to 3000 (honored threshold)
-        int32 honoredRep = 3000;
-
-        // Get bot's current reputation with this faction
-        int32 currentRep = repMgr.GetReputation(factionEntry);
-
-        // Only set reputation if it's lower than the required Honored value
-        if (currentRep < honoredRep)
-        {
-            repMgr.SetReputation(factionEntry, honoredRep);
-        }
+        if (repMgr.GetReputation(factionEntry) < r.standing)
+            repMgr.SetReputation(factionEntry, r.standing);
     }
 }
 
@@ -4828,52 +4955,85 @@ void PlayerbotFactory::InitAttunementQuests()
 {
     uint32 level = bot->GetLevel();
     if (level < 55)
-        return; // Only apply for level 55+ bots
+        return;
 
     uint32 currentXP = bot->GetUInt32Value(PLAYER_XP);
 
-#if !PB_COMPAT_VANILLA
-    // TBC attunement chains do not exist on vanilla builds.
-    std::list<uint32> attunementQuestsTBC = {
-        // Caverns of Time - Part 1
-        10279, // To The Master's Lair
-        10277, // The Caverns of Time
+    // -------------------------------------------------------------------------
+    // Raid / dungeon attunement quests.
+    // team: 0 = both factions, ALLIANCE (469) = alliance only, HORDE (67) = horde only
+    // Add new entries here to grant attunement for future raids / dungeons.
+    // The quest will be force-completed regardless of prerequisite chains.
+    // -------------------------------------------------------------------------
+    struct AttunementQuest { uint32 minLevel; uint32 questId; uint32 team; };
+    static const AttunementQuest vanillaQuests[] =
+    {
+        // Molten Core
+        {55, 7848, 0},            // Attunement to the Core
 
-        // Caverns of Time - Part 2 (Escape from Durnholde Keep)
-        10282, // Old Hillsbrad
-        10283, // Taretha's Diversion
-        10284, // Escape from Durnholde
-        10285, // Return to Andormu
+        // Blackwing Lair
+        {55, 7761, 0},            // Blackhand's Command
 
-        // Caverns of Time - Part 2 (The Black Morass)
-        10296, // The Black Morass
-        10297, // The Opening of the Dark Portal
-        10298, // Hero of the Brood
+        // Onyxia's Lair (each faction has its own chain-ending quest)
+        {55, 6502, ALLIANCE},     // Drakefire Amulet (Alliance)
+        {55, 6602, HORDE},        // For the Horde! (Horde)
 
-        // Magister's Terrace Attunement
-        11481, // Crisis at the Sunwell
-        11482, // Duty Calls
-        11488, // Magisters' Terrace
-        11490, // The Scryer's Scryer
-        11492  // Hard to Kill
+        // Naxxramas (exalted-tier quest = free entry, requires Argent Dawn rep set in InitReputation)
+        {55, 9123, 0},            // The Dread Citadel - Naxxramas
     };
 
-    if (level >= 60)
+    uint32 botTeam = bot->GetTeam();
+    std::list<uint32> questsToComplete;
+
+    for (auto const& q : vanillaQuests)
     {
-        std::list<uint32> questsToComplete;
+        if (level < q.minLevel)
+            continue;
+        if (q.team && botTeam != q.team)
+            continue;
+        if (bot->GetQuestStatus(q.questId) == QUEST_STATUS_NONE)
+            questsToComplete.push_back(q.questId);
+    }
 
-        for (uint32 questId : attunementQuestsTBC)
-        {
-            QuestStatus questStatus = bot->GetQuestStatus(questId);
+#if !PB_COMPAT_VANILLA
+    static const AttunementQuest tbcQuests[] =
+    {
+        // Caverns of Time - Part 1
+        {60, 10279, 0},           // To The Master's Lair
+        {60, 10277, 0},           // The Caverns of Time
 
-            if (questStatus == QUEST_STATUS_NONE)
-                questsToComplete.push_back(questId);
-        }
+        // Caverns of Time - Part 2 (Escape from Durnholde Keep)
+        {60, 10282, 0},           // Old Hillsbrad
+        {60, 10283, 0},           // Taretha's Diversion
+        {60, 10284, 0},           // Escape from Durnholde
+        {60, 10285, 0},           // Return to Andormu
 
-        if (!questsToComplete.empty())
-            InitQuests(questsToComplete, false);
+        // Caverns of Time - Part 2 (The Black Morass)
+        {60, 10296, 0},           // The Black Morass
+        {60, 10297, 0},           // The Opening of the Dark Portal
+        {60, 10298, 0},           // Hero of the Brood
+
+        // Magister's Terrace Attunement
+        {60, 11481, 0},           // Crisis at the Sunwell
+        {60, 11482, 0},           // Duty Calls
+        {60, 11488, 0},           // Magisters' Terrace
+        {60, 11490, 0},           // The Scryer's Scryer
+        {60, 11492, 0},           // Hard to Kill
+    };
+
+    for (auto const& q : tbcQuests)
+    {
+        if (level < q.minLevel)
+            continue;
+        if (q.team && botTeam != q.team)
+            continue;
+        if (bot->GetQuestStatus(q.questId) == QUEST_STATUS_NONE)
+            questsToComplete.push_back(q.questId);
     }
 #endif
+
+    if (!questsToComplete.empty())
+        InitQuests(questsToComplete, false);
 
     // Reset XP so bot's level remains unchanged
     bot->GiveLevel(level);

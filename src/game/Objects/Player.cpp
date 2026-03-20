@@ -2096,6 +2096,16 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
         // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
         SetSemaphoreTeleportFar(true);
 
+        if (IsBot())
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC,
+                "ExecuteTeleportFar: bot=%s(%u) removed from old map, destMap=%u destInst=%u "
+                "isInWorld=%u mapPtr=%p sessionLogout=%u",
+                GetName(), GetGUIDLow(), mapId, instanceId,
+                IsInWorld(), static_cast<void const*>(FindMap()),
+                GetSession()->PlayerLogout());
+        }
+
         if (!GetSession()->PlayerLogout())
         {
             if (data->recover)
@@ -13169,6 +13179,30 @@ void Player::RemoveQuest(uint32 questId)
     }
 }
 
+void Player::RemoveActiveQuest(uint32 questId, bool /*updateAbandonQuest*/)
+{
+    RemoveQuest(questId);
+}
+
+void Player::RemoveRewardedQuest(uint32 questId)
+{
+    QuestStatusMap::iterator itr = mQuestStatus.find(questId);
+    if (itr == mQuestStatus.end())
+        return;
+
+    itr->second.m_rewarded = false;
+    itr->second.m_reward_choice = 0;
+    itr->second.m_explored = false;
+    itr->second.m_timer = 0;
+    for (uint32& count : itr->second.m_itemcount)
+        count = 0;
+    for (uint32& count : itr->second.m_creatureOrGOcount)
+        count = 0;
+
+    if (itr->second.uState != QUEST_NEW)
+        itr->second.uState = QUEST_CHANGED;
+}
+
 void Player::RemoveQuestAtSlot(uint32 slot)
 {
     if (slot < MAX_QUEST_LOG_SIZE)
@@ -13894,6 +13928,15 @@ bool Player::GetQuestRewardStatus(uint32 questId) const
 
         return false;
     }
+    return false;
+}
+
+bool Player::IsQuestRewarded(uint32 questId) const
+{
+    QuestStatusMap::const_iterator itr = mQuestStatus.find(questId);
+    if (itr != mQuestStatus.end())
+        return itr->second.m_rewarded;
+
     return false;
 }
 

@@ -14,6 +14,7 @@
 #include "MapMgr.h"
 #include "PathGenerator.h"
 #include "Playerbots.h"
+#include "RandomPlayerbotMgr.h"
 #include "TransportMgr.h"
 #include "VMapFactory.h"
 #include "Map.h"
@@ -1115,16 +1116,12 @@ bool QuestRelationTravelDestination::isActive(Player* bot)
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     AiObjectContext* context = botAI->GetAiObjectContext();
 
-    if (botAI && !botAI->HasStrategy("rpg quest", BOT_STATE_NON_COMBAT))
+    if (botAI && !botAI->HasStrategy("quest", BOT_STATE_NON_COMBAT))
         return false;
 
     if (relation == 0)
     {
         if ((int32)questTemplate->GetQuestLevel() >= (int32)bot->GetLevel() + (int32)5)
-            return false;
-
-        // skip for now this quest
-        if (getPoints().front()->GetMapId() != bot->GetMapId())
             return false;
 
         if (!bot->GetMap()->GetMapEntry()->IsContinent() || !bot->CanTakeQuest(questTemplate, false))
@@ -1982,7 +1979,22 @@ void TravelMgr::LoadQuestTravelTable()
     bool loadQuestData = true;
     if (loadQuestData)
     {
-        questGuidpMap questMap = SharedValueContext::instance().getGlobalValue<questGuidpMap>("quest guidp map")->Get();
+        // Build the quest object map directly during bootstrap. Going through SharedValueContext here creates
+        // value objects against a temporary PlayerbotAI before the shared AI infrastructure is fully ready.
+        FindQuestObjectData questWorker;
+        auto creatureWorker = [&questWorker](CreatureDataPair const& pair)
+        {
+            questWorker(pair.second);
+            return false;
+        };
+        auto goWorker = [&questWorker](GameObjectDataPair const& pair)
+        {
+            questWorker(pair.second);
+            return false;
+        };
+        sObjectMgr.DoCreatureData(creatureWorker);
+        sObjectMgr.DoGOData(goWorker);
+        questGuidpMap questMap = questWorker.GetResult();
 
         for (auto& q : questMap)
         {
@@ -3962,7 +3974,8 @@ std::vector<TravelDestination*> TravelMgr::getQuestTravelDestinations(Player* bo
             if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
                 continue;
 
-            retTravelLocations.push_back(dest);
+            if (sRandomPlayerbotMgr.IsTravelDestinationInPopulationPlan(bot, dest))
+                retTravelLocations.push_back(dest);
         }
         for (auto& quest : quests)
         {
@@ -3974,7 +3987,9 @@ std::vector<TravelDestination*> TravelMgr::getQuestTravelDestinations(Player* bo
                 if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
                     continue;
 
-                retTravelLocations.push_back(dest);
+                if (sRandomPlayerbotMgr.IsTravelDestinationInPopulationPlan(bot, dest))
+                    if (sRandomPlayerbotMgr.IsTravelDestinationInPopulationPlan(bot, dest))
+                        retTravelLocations.push_back(dest);
             }
 
             if (!ignoreObjectives)
@@ -4003,7 +4018,8 @@ std::vector<TravelDestination*> TravelMgr::getQuestTravelDestinations(Player* bo
             if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
                 continue;
 
-            retTravelLocations.push_back(dest);
+            if (sRandomPlayerbotMgr.IsTravelDestinationInPopulationPlan(bot, dest))
+                retTravelLocations.push_back(dest);
         }
     }
     else
@@ -4023,7 +4039,8 @@ std::vector<TravelDestination*> TravelMgr::getQuestTravelDestinations(Player* bo
                 if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
                     continue;
 
-                retTravelLocations.push_back(dest);
+                if (sRandomPlayerbotMgr.IsTravelDestinationInPopulationPlan(bot, dest))
+                    retTravelLocations.push_back(dest);
             }
 
             if (!ignoreObjectives)
@@ -4038,7 +4055,8 @@ std::vector<TravelDestination*> TravelMgr::getQuestTravelDestinations(Player* bo
                     if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
                         continue;
 
-                    retTravelLocations.push_back(dest);
+                    if (sRandomPlayerbotMgr.IsTravelDestinationInPopulationPlan(bot, dest))
+                        retTravelLocations.push_back(dest);
                 }
         }
     }

@@ -18,11 +18,9 @@ public:
         creators["faerie fire (feral)"] = &faerie_fire_feral;
         creators["bear form"] = &bear_form;
         creators["dire bear form"] = &dire_bear_form;
-        creators["mangle (bear)"] = &mangle_bear;
         creators["maul"] = &maul;
         creators["bash"] = &bash;
         creators["swipe"] = &swipe;
-        creators["lacerate"] = &lacerate;
         creators["demoralizing roar"] = &demoralizing_roar;
         creators["taunt spell"] = &growl;
     }
@@ -88,16 +86,6 @@ private:
         );
     }
 
-    static ActionNode* mangle_bear([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "mangle (bear)",
-            /*P*/ {},
-            /*A*/ {},
-            /*C*/ {}
-        );
-    }
-
     static ActionNode* maul([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode(
@@ -124,16 +112,6 @@ private:
             "swipe",
             /*P*/ {},
             /*A*/ { NextAction("melee") },
-            /*C*/ {}
-        );
-    }
-
-    static ActionNode* lacerate([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "lacerate",
-            /*P*/ {},
-            /*A*/ { NextAction("maul") },
             /*C*/ {}
         );
     }
@@ -167,11 +145,10 @@ BearTankDruidStrategy::BearTankDruidStrategy(PlayerbotAI* botAI) : FeralDruidStr
 std::vector<NextAction> BearTankDruidStrategy::getDefaultActions()
 {
     return {
-        NextAction("mangle (bear)", ACTION_DEFAULT + 0.5f),
-        NextAction("faerie fire (feral)", ACTION_DEFAULT + 0.4f),
-        NextAction("lacerate", ACTION_DEFAULT + 0.3f),
-        NextAction("maul", ACTION_DEFAULT + 0.2f),
-        NextAction("enrage", ACTION_DEFAULT + 0.1f),
+        NextAction("maul", ACTION_NORMAL + 0.5f),
+        NextAction("swipe", ACTION_NORMAL + 0.4f),
+        NextAction("faerie fire (feral)", ACTION_NORMAL + 0.2f),
+        NextAction("enrage", ACTION_NORMAL + 0.1f),
         NextAction("melee", ACTION_DEFAULT)
     };
 }
@@ -216,7 +193,7 @@ void BearTankDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "lose aggro",
             {
-                NextAction("growl", ACTION_HIGH + 8)
+                NextAction("growl", ACTION_INTERRUPT + 1)
             }
         )
     );

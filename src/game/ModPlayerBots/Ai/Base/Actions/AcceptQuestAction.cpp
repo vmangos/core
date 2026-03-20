@@ -10,6 +10,9 @@
 
 bool AcceptAllQuestsAction::ProcessQuest(Quest const* quest, Object* questGiver)
 {
+    if (quest->IsRepeatable() && bot->IsQuestRewarded(quest->GetQuestId()))
+        return false;
+
     Player* viewer = botAI->GetActiveMaster() ? botAI->GetActiveMaster() : GetMaster();
     if (!AcceptQuest(quest, questGiver->GetGUID(), viewer)) return false;
 

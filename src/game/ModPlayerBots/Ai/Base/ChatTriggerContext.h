@@ -56,6 +56,7 @@ public:
         creators["t"] = &ChatTriggerContext::trade;
         creators["nt"] = &ChatTriggerContext::nontrade;
         creators["talents"] = &ChatTriggerContext::talents;
+        creators["skills"] = &ChatTriggerContext::skills;
         creators["spells"] = &ChatTriggerContext::spells;
         creators["co"] = &ChatTriggerContext::co;
         creators["nc"] = &ChatTriggerContext::nc;
@@ -202,6 +203,7 @@ private:
     static Trigger* co(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "co"); }
     static Trigger* nc(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "nc"); }
     static Trigger* dead(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "de"); }
+    static Trigger* skills(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "skills"); }
     static Trigger* spells(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "spells"); }
     static Trigger* talents(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "talents"); }
     static Trigger* equip(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "e"); }

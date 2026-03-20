@@ -14,6 +14,7 @@
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
 #include "RandomPlayerbotMgr.h"
+#include "Mgr/Travel/TravelMgr.h"
 #include "Talentspec.h"
 
 template <class T>
@@ -128,6 +129,29 @@ bool PlayerbotAIConfig::Initialize()
     randomBotMinLevelChance = sConfig.GetFloatDefault("AiPlayerbot.RandomBotMinLevelChance", 0.1f);
     randomBotMaxLevelChance = sConfig.GetFloatDefault("AiPlayerbot.RandomBotMaxLevelChance", 0.1f);
     randomBotRpgChance = sConfig.GetFloatDefault("AiPlayerbot.RandomBotRpgChance", 0.20f);
+    enablePopulationDirector = sConfig.GetBoolDefault("AiPlayerbot.EnablePopulationDirector", true);
+    populationDirectorUpdateInterval = sConfig.GetIntDefault("AiPlayerbot.PopulationDirectorUpdateInterval", 60);
+    populationDirectorPlayerHeatSigma =
+        sConfig.GetFloatDefault("AiPlayerbot.PopulationDirectorPlayerHeatSigma", 3000.0f);
+    populationDirectorPlayerHeatHalfLife =
+        sConfig.GetFloatDefault("AiPlayerbot.PopulationDirectorPlayerHeatHalfLife", 900.0f);
+    populationDirectorMinDwell = sConfig.GetIntDefault("AiPlayerbot.PopulationDirectorMinDwell", 600);
+    populationDirectorMaxDwell = sConfig.GetIntDefault("AiPlayerbot.PopulationDirectorMaxDwell", 1800);
+    populationDirectorMaxMovesPerTick = sConfig.GetIntDefault("AiPlayerbot.PopulationDirectorMaxMovesPerTick", 25);
+    populationDirectorZoneMaxDynamicPct =
+        sConfig.GetFloatDefault("AiPlayerbot.PopulationDirectorZoneMaxDynamicPct", 0.18f);
+    populationDirectorWeightPlayerHeat =
+        sConfig.GetFloatDefault("AiPlayerbot.PopulationDirectorWeight.PlayerHeat", 0.55f);
+    populationDirectorWeightLevelMatch =
+        sConfig.GetFloatDefault("AiPlayerbot.PopulationDirectorWeight.LevelMatch", 0.20f);
+    populationDirectorWeightRecentPresence =
+        sConfig.GetFloatDefault("AiPlayerbot.PopulationDirectorWeight.RecentPresence", 0.10f);
+    populationDirectorWeightDiversity =
+        sConfig.GetFloatDefault("AiPlayerbot.PopulationDirectorWeight.Diversity", 0.15f);
+    populationDirectorWeightSaturationPenalty =
+        sConfig.GetFloatDefault("AiPlayerbot.PopulationDirectorWeight.SaturationPenalty", 0.35f);
+    populationDirectorHaloRadius =
+        sConfig.GetFloatDefault("AiPlayerbot.PopulationDirectorHaloRadius", 5000.0f);
 
     iterationsPerTick = sConfig.GetIntDefault("AiPlayerbot.IterationsPerTick", 10);
 
@@ -142,6 +166,10 @@ bool PlayerbotAIConfig::Initialize()
     randomBotMapsAsString = sConfig.GetStringDefault("AiPlayerbot.RandomBotMaps", "0,1,530,571");
     LoadList<std::vector<uint32>>(randomBotMapsAsString, randomBotMaps);
     probTeleToBankers = sConfig.GetFloatDefault("AiPlayerbot.ProbTeleToBankers", 0.25f);
+    probTeleToBankersCity = sConfig.GetFloatDefault("AiPlayerbot.ProbTeleToBankersCity", probTeleToBankers);
+    probTeleToBankersReserveStarter =
+        sConfig.GetFloatDefault("AiPlayerbot.ProbTeleToBankersReserveStarter", probTeleToBankers);
+    probTeleToBankersWorld = sConfig.GetFloatDefault("AiPlayerbot.ProbTeleToBankersWorld", probTeleToBankers);
     enableWeightTeleToCityBankers = sConfig.GetBoolDefault("AiPlayerbot.EnableWeightTeleToCityBankers", false);
     weightTeleToStormwind = sConfig.GetIntDefault("AiPlayerbot.TeleToStormwindWeight", 2);
     weightTeleToIronforge = sConfig.GetIntDefault("AiPlayerbot.TeleToIronforgeWeight", 1);
@@ -415,10 +443,29 @@ bool PlayerbotAIConfig::Initialize()
         }
     }
 
+    reserveZones.clear();
+    if (minStormwindBots)
+        reserveZones[1519] += minStormwindBots;
+    if (minOrgrimmarBots)
+        reserveZones[1637] += minOrgrimmarBots;
+
+    for (auto const& entry : sConfig.GetEntriesByPrefix("AiPlayerbot.ReserveZone."))
+    {
+        size_t dotPos = entry.first.find_last_of('.');
+        if (dotPos == std::string::npos || dotPos + 1 >= entry.first.size())
+            continue;
+
+        uint32 zoneId = static_cast<uint32>(std::strtoul(entry.first.substr(dotPos + 1).c_str(), nullptr, 10));
+        uint32 minBots = static_cast<uint32>(std::strtoul(entry.second.c_str(), nullptr, 10));
+        if (zoneId && minBots)
+            reserveZones[zoneId] = minBots;
+    }
+
     randomChangeMultiplier = sConfig.GetFloatDefault("AiPlayerbot.RandomChangeMultiplier", 1.0);
 
     randomBotCombatStrategies = sConfig.GetStringDefault("AiPlayerbot.RandomBotCombatStrategies", "");
     randomBotNonCombatStrategies = sConfig.GetStringDefault("AiPlayerbot.RandomBotNonCombatStrategies", "");
+    randomBotNoRealPlayerPartyTimeout = sConfig.GetIntDefault("AiPlayerbot.RandomBotNoRealPlayerPartyTimeout", 300);
     combatStrategies = sConfig.GetStringDefault("AiPlayerbot.CombatStrategies", "");
     nonCombatStrategies = sConfig.GetStringDefault("AiPlayerbot.NonCombatStrategies", "");
     applyInstanceStrategies = sConfig.GetBoolDefault("AiPlayerbot.ApplyInstanceStrategies", true);
@@ -654,6 +701,8 @@ bool PlayerbotAIConfig::Initialize()
     autoTeleportForLevel = sConfig.GetBoolDefault("AiPlayerbot.AutoTeleportForLevel", false);
     autoDoQuests = sConfig.GetBoolDefault("AiPlayerbot.AutoDoQuests", true);
     enableNewRpgStrategy = sConfig.GetBoolDefault("AiPlayerbot.EnableNewRpgStrategy", true);
+    debugRandomBotQuesting = sConfig.GetBoolDefault("AiPlayerbot.DebugRandomBotQuesting", false);
+    debugRandomBotPopulation = sConfig.GetBoolDefault("AiPlayerbot.DebugRandomBotPopulation", false);
 
     RpgStatusProbWeight[RPG_WANDER_RANDOM] = sConfig.GetIntDefault("AiPlayerbot.RpgStatusProbWeight.WanderRandom", 15);
     RpgStatusProbWeight[RPG_WANDER_NPC] = sConfig.GetIntDefault("AiPlayerbot.RpgStatusProbWeight.WanderNpc", 20);
@@ -691,6 +740,7 @@ bool PlayerbotAIConfig::InitializeLate()
     if (World::IsStopped())
         return true;
 
+    TravelMgr::instance().LoadQuestTravelTable();
     sRandomPlayerbotMgr.Init();
 
     PlayerbotGuildMgr::instance().Init();

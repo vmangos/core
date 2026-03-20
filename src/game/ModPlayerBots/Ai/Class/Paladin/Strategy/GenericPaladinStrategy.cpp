@@ -36,8 +36,7 @@ void GenericPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "protect party member",
         { NextAction("blessing of protection on party", ACTION_EMERGENCY + 2) }));
-    triggers.push_back(
-        new TriggerNode("high mana", { NextAction("divine plea", ACTION_HIGH) }));
+    // No vanilla equivalent to divine plea - paladins manage mana via seal of wisdom + judgement
 }
 
 void PaladinCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -79,8 +78,7 @@ void PaladinHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                         {
                             NextAction("hammer of wrath", ACTION_DEFAULT + 0.6f),
                             NextAction("holy shock", ACTION_DEFAULT + 0.5f),
-                            NextAction("shield of righteousness", ACTION_DEFAULT + 0.4f),
-                            NextAction("judgement of light", ACTION_DEFAULT + 0.3f),
+                            NextAction("judgement of light", ACTION_DEFAULT + 0.4f),
                             NextAction("consecration", ACTION_DEFAULT + 0.2f),
                             NextAction("exorcism", ACTION_DEFAULT+ 0.1f),
                             }));

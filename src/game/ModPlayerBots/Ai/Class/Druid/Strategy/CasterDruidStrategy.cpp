@@ -18,7 +18,6 @@ public:
         creators["entangling roots"] = &entangling_roots;
         creators["entangling roots on cc"] = &entangling_roots_on_cc;
         creators["wrath"] = &wrath;
-        creators["starfall"] = &starfall;
         creators["insect swarm"] = &insect_swarm;
         creators["moonfire"] = &moonfire;
         creators["starfire"] = &starfire;
@@ -76,16 +75,6 @@ private:
         );
     }
 
-    static ActionNode* starfall([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "starfall",
-            /*P*/ { NextAction("moonkin form") },
-            /*A*/ {},
-            /*C*/ {}
-        );
-    }
-
     static ActionNode* insect_swarm([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode(
@@ -136,9 +125,8 @@ CasterDruidStrategy::CasterDruidStrategy(PlayerbotAI* botAI) : GenericDruidStrat
 std::vector<NextAction> CasterDruidStrategy::getDefaultActions()
 {
     return {
-        NextAction("starfall", ACTION_HIGH + 1.0f),
-        NextAction("force of nature", ACTION_DEFAULT + 1.0f),
-        NextAction("wrath", ACTION_DEFAULT + 0.1f),
+        NextAction("starfire", ACTION_NORMAL + 0.2f),
+        NextAction("wrath", ACTION_NORMAL + 0.1f),
     };
 }
 
@@ -146,22 +134,6 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericDruidStrategy::InitTriggers(triggers);
 
-    triggers.push_back(
-        new TriggerNode(
-            "eclipse (lunar) cooldown",
-            {
-                NextAction("starfire", ACTION_DEFAULT + 0.2f)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "eclipse (solar) cooldown",
-            {
-                NextAction("wrath", ACTION_DEFAULT + 0.2f)
-            }
-        )
-    );
     triggers.push_back(
         new TriggerNode(
             "insect swarm",
@@ -175,22 +147,6 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             "moonfire",
             {
                 NextAction("moonfire", ACTION_NORMAL + 4)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "eclipse (solar)",
-            {
-                NextAction("wrath", ACTION_NORMAL + 6)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "eclipse (lunar)",
-            {
-                NextAction("starfire", ACTION_NORMAL + 6)
             }
         )
     );

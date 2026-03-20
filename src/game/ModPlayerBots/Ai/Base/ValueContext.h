@@ -64,6 +64,7 @@
 #include "OutfitListValue.h"
 #include "PartyMemberToDispel.h"
 #include "PartyMemberToHeal.h"
+#include "PartyLeadershipValues.h"
 #include "PartyMemberToResurrect.h"
 #include "PartyMemberWithoutAuraValue.h"
 #include "PartyMemberWithoutItemValue.h"
@@ -244,6 +245,7 @@ public:
         creators["party member without food"] = &ValueContext::party_member_without_food;
         creators["party member without water"] = &ValueContext::party_member_without_water;
         creators["death count"] = &ValueContext::death_count;
+        creators["party without real player since"] = &ValueContext::party_without_real_player_since;
 
         creators["bg type"] = &ValueContext::bg_type;
         creators["rpg bg type"] = &ValueContext::rpg_bg_type;
@@ -397,6 +399,10 @@ private:
     static UntypedValue* pet_happy(PlayerbotAI* botAI) { return new PetIsHappyValue(botAI); }
     static UntypedValue* pet_dead(PlayerbotAI* botAI) { return new PetIsDeadValue(botAI); }
     static UntypedValue* has_mana(PlayerbotAI* botAI) { return new HasManaValue(botAI); }
+    static UntypedValue* party_without_real_player_since(PlayerbotAI* botAI)
+    {
+        return new PartyWithoutRealPlayerSinceValue(botAI);
+    }
     static UntypedValue* nearest_game_objects(PlayerbotAI* botAI) { return new NearestGameObjects(botAI); }
     static UntypedValue* nearest_game_objects_no_los(PlayerbotAI* botAI)
     {

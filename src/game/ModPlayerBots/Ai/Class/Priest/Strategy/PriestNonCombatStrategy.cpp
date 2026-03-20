@@ -26,26 +26,26 @@ void PriestNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("party member critical health",
                        { NextAction("renew on party", ACTION_CRITICAL_HEAL + 3),
-                                          NextAction("penance on party", ACTION_CRITICAL_HEAL + 2),
+                                          NextAction("flash heal on party", ACTION_CRITICAL_HEAL + 2),
                                           NextAction("greater heal on party", ACTION_CRITICAL_HEAL + 1) }));
 
     triggers.push_back(
         new TriggerNode("party member low health",
                        { NextAction("renew on party", ACTION_MEDIUM_HEAL + 3),
-                                          NextAction("penance on party", ACTION_MEDIUM_HEAL + 2),
+                                          NextAction("flash heal on party", ACTION_MEDIUM_HEAL + 2),
                                           NextAction("greater heal on party", ACTION_MEDIUM_HEAL + 1) }));
 
     triggers.push_back(
         new TriggerNode("party member medium health",
                        { NextAction("renew on party", ACTION_LIGHT_HEAL + 9),
-                                          NextAction("penance on party", ACTION_LIGHT_HEAL + 8) }));
+                                          NextAction("flash heal on party", ACTION_LIGHT_HEAL + 8) }));
 
     triggers.push_back(
         new TriggerNode("party member almost full health",
                        { NextAction("renew on party", ACTION_LIGHT_HEAL + 3) }));
 
     triggers.push_back(
-        new TriggerNode("group heal setting",{ NextAction("circle of healing on party", 27.0f) }));
+        new TriggerNode("group heal setting",{ NextAction("prayer of healing on party", 27.0f) }));
     triggers.push_back(new TriggerNode("new pet",
                                       { NextAction("set pet stance", 10.0f) }));
 }

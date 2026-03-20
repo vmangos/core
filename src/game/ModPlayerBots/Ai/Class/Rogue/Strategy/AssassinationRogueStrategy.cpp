@@ -8,28 +8,19 @@ class AssassinationRogueStrategyActionNodeFactory : public NamedObjectFactory<Ac
 public:
     AssassinationRogueStrategyActionNodeFactory()
     {
-        creators["mutilate"] = &mutilate;
-        creators["envenom"] = &envenom;
+        creators["sinister strike"] = &sinister_strike;
         creators["backstab"] = &backstab;
         creators["rupture"] = &rupture;
+        creators["kick"] = &kick;
     }
 
 private:
-    static ActionNode* mutilate([[maybe_unused]] PlayerbotAI* botAI)
+    static ActionNode* sinister_strike([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode(
-            "mutilate",
+            "sinister strike",
             /*P*/ {},
-            /*A*/ { NextAction("backstab") },
-            /*C*/ {}
-        );
-    }
-    static ActionNode* envenom([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "envenom",
-            /*P*/ {},
-            /*A*/ { NextAction("rupture") },
+            /*A*/ { NextAction("melee") },
             /*C*/ {}
         );
     }
@@ -51,6 +42,15 @@ private:
             /*C*/ {}
         );
     }
+    static ActionNode* kick([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode(
+            "kick",
+            /*P*/ {},
+            /*A*/ { NextAction("kidney shot") },
+            /*C*/ {}
+        );
+    }
 };
 
 AssassinationRogueStrategy::AssassinationRogueStrategy(PlayerbotAI* ai) : MeleeCombatStrategy(ai)
@@ -61,6 +61,7 @@ AssassinationRogueStrategy::AssassinationRogueStrategy(PlayerbotAI* ai) : MeleeC
 std::vector<NextAction> AssassinationRogueStrategy::getDefaultActions()
 {
     return {
+        NextAction("sinister strike", ACTION_NORMAL + 0.3f),
         NextAction("melee", ACTION_DEFAULT)
     };
 }
@@ -69,34 +70,7 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
 {
     MeleeCombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(
-        new TriggerNode(
-            "high energy available",
-            {
-                NextAction("garrote", ACTION_HIGH + 7),
-                NextAction("ambush", ACTION_HIGH + 6)
-            }
-        )
-    );
-
-    triggers.push_back(
-        new TriggerNode(
-            "high energy available",
-            {
-                NextAction("mutilate", ACTION_NORMAL + 3)
-            }
-        )
-    );
-
-    triggers.push_back(
-        new TriggerNode(
-            "hunger for blood",
-            {
-                NextAction("hunger for blood", ACTION_HIGH + 6),
-            }
-        )
-    );
-
+    // Maintain slice and dice buff (haste)
     triggers.push_back(
         new TriggerNode(
             "slice and dice",
@@ -106,26 +80,28 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         )
     );
 
+    // Spend combo points on finishers
     triggers.push_back(
         new TriggerNode(
-            "combo points 3 available",
+            "combo points available",
             {
-                NextAction("envenom", ACTION_HIGH + 5),
-                NextAction("eviscerate", ACTION_HIGH + 3)
+                NextAction("rupture", ACTION_HIGH + 1),
+                NextAction("eviscerate", ACTION_HIGH)
             }
         )
     );
 
+    // Execute low-health targets
     triggers.push_back(
         new TriggerNode(
             "target with combo points almost dead",
             {
-                NextAction("envenom", ACTION_HIGH + 4),
                 NextAction("eviscerate", ACTION_HIGH + 2)
             }
         )
     );
 
+    // Armor reduction (only if no sunder armor on target)
     triggers.push_back(
         new TriggerNode(
             "expose armor",
@@ -135,15 +111,18 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         )
     );
 
+    // Threat management
     triggers.push_back(
         new TriggerNode(
             "medium threat",
             {
                 NextAction("vanish", ACTION_HIGH),
+                NextAction("feint", ACTION_HIGH - 1)
             }
         )
     );
 
+    // Defensive cooldowns
     triggers.push_back(
         new TriggerNode(
             "low health",
@@ -154,15 +133,7 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         )
     );
 
-    triggers.push_back(
-        new TriggerNode(
-            "critical health",
-            {
-                NextAction("cloak of shadows", ACTION_HIGH + 7)
-            }
-        )
-    );
-
+    // Interrupts
     triggers.push_back(
         new TriggerNode(
             "kick",
@@ -181,29 +152,11 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         )
     );
 
-    triggers.push_back(
-        new TriggerNode(
-            "medium aoe",
-            {
-                NextAction("fan of knives", ACTION_NORMAL + 5),
-            }
-        )
-    );
-
-    triggers.push_back(
-        new TriggerNode(
-            "low tank threat",
-            {
-                NextAction("tricks of the trade on main tank", ACTION_HIGH + 7),
-            }
-        )
-    );
-
+    // Gap closer
     triggers.push_back(
         new TriggerNode(
             "enemy out of melee",
             {
-                NextAction("stealth", ACTION_HIGH + 3),
                 NextAction("sprint", ACTION_HIGH + 2),
                 NextAction("reach melee", ACTION_HIGH + 1),
             }

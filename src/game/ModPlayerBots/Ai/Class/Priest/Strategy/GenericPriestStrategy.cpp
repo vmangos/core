@@ -30,11 +30,7 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("medium mana",
             {
-                NextAction("shadowfiend", ACTION_HIGH + 2),
                 NextAction("inner focus", ACTION_HIGH + 1) }));
-
-    triggers.push_back(
-        new TriggerNode("low mana", { NextAction("hymn of hope", ACTION_HIGH) }));
 
     triggers.push_back(new TriggerNode("enemy too close for spell",
                                        { NextAction("flee", ACTION_MOVE + 9) }));
@@ -65,7 +61,6 @@ void PriestBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
         new TriggerNode("power infusion", { NextAction("power infusion", 41.0f) }));
-    triggers.push_back(new TriggerNode("boost", { NextAction("shadowfiend", 20.0f) }));
 }
 
 void PriestCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -85,8 +80,4 @@ void PriestHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                             NextAction("mind blast", ACTION_DEFAULT + 0.2f),
                             NextAction("shoot", ACTION_DEFAULT) }));
 
-    triggers.push_back(
-        new TriggerNode("medium aoe and healer should attack",
-                        {
-                            NextAction("mind sear", ACTION_DEFAULT + 0.5f) }));
 }

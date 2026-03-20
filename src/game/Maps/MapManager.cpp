@@ -206,7 +206,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         }
         DungeonPersistentState* state = player->GetBoundInstanceSaveForSelfOrGroup(mapid);
         uint32 instanceId = state ? state->GetInstanceId() : 0;
-        if (!player->CheckInstanceCount(instanceId))
+        if (!player->CheckInstanceCount(instanceId) && !player->HasCheatOption(PLAYER_CHEAT_TRIGGER_PASS))
         {
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MAP: Player '%s' can't enter instance %u on map %u. Has already entered too many instances.", player->GetName(), instanceId, mapid);
             player->SendTransferAborted(TRANSFER_ABORT_TOO_MANY_INSTANCES);
@@ -246,9 +246,24 @@ void MapManager::ScheduleNewWorldOnFarTeleport(Player* pPlayer)
         DungeonPersistentState* pSave = pPlayer->GetBoundInstanceSaveForSelfOrGroup(pMapEntry->id);
         if (!pSave || !FindMap(pMapEntry->id, pSave->GetInstanceId()))
         {
+            if (pPlayer->IsBot())
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC,
+                    "ScheduleNewWorldOnFarTeleport: DEFERRED instance creation for bot=%s(%u) destMap=%u "
+                    "hasSave=%u - will be processed by CreateNewInstancesForPlayers thread",
+                    pPlayer->GetName(), pPlayer->GetGUIDLow(), dest.mapId,
+                    pSave ? 1u : 0u);
+            }
             m_scheduledNewInstancesForPlayers.insert(pPlayer);
             return;
         }
+    }
+
+    if (pPlayer->IsBot())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC,
+            "ScheduleNewWorldOnFarTeleport: IMMEDIATE SendNewWorld for bot=%s(%u) destMap=%u isDungeon=%u",
+            pPlayer->GetName(), pPlayer->GetGUIDLow(), dest.mapId, pMapEntry->IsDungeon());
     }
 
     // map already created

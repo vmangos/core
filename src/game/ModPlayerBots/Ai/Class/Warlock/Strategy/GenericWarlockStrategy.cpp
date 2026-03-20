@@ -49,14 +49,7 @@ void GenericWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
-    triggers.push_back(
-        new TriggerNode(
-            "medium threat",
-            {
-                NextAction("soulshatter", 55.0f)
-            }
-        )
-    );
+    // Note: no threat dump available for warlocks in vanilla 1.12 (soulshatter is TBC)
     triggers.push_back(
         new TriggerNode(
             "spell lock",
@@ -107,12 +100,8 @@ void AoEWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "medium aoe",
             {
-                NextAction("immolation aura", 26.0f),
-                NextAction("shadowfury", 23.0f),
-                NextAction("shadowflame", 22.5f),
-                NextAction("seed of corruption on attacker", 22.0f),
-                NextAction("seed of corruption", 21.5f),
-                NextAction("rain of fire", 21.0f)
+                NextAction("rain of fire", 21.0f),
+                NextAction("hellfire", 20.5f)
             }
         )
     );

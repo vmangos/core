@@ -42,7 +42,55 @@ char const* GetSummonSourceTag(char const* source)
 
 bool TeleportPlayerTo(Player* summoner, Player* player, float x, float y, float z, float orientation)
 {
-    return player && summoner && player->TeleportTo(summoner->GetMapId(), x, y, z, orientation);
+    if (!player || !summoner)
+        return false;
+
+    Map* summonerMap = summoner->FindMap();
+
+    // Cross-map dungeon and raid summons must inherit the summoner's active
+    // instance save before the far teleport is scheduled, otherwise the core
+    // may generate a different instance copy for the summoned bot.
+    if (player->GetMapId() != summoner->GetMapId() && summonerMap && summonerMap->Instanceable())
+    {
+        if (DungeonPersistentState* summonState = summoner->GetBoundInstanceSaveForSelfOrGroup(summoner->GetMapId()))
+        {
+            DungeonPersistentState* playerState = player->GetBoundInstanceSaveForSelfOrGroup(summoner->GetMapId());
+            if (playerState != summonState)
+            {
+                player->BindToInstance(summonState, false);
+                LOG_INFO("playerbots",
+                    "Summon bind sync: summoner=%s(%u) bot=%s(%u) map=%u instance=%u",
+                    summoner->GetName(), summoner->GetGUIDLow(),
+                    player->GetName(), player->GetGUIDLow(),
+                    summonState->GetMapId(), summonState->GetInstanceId());
+            }
+        }
+    }
+
+    // For bots teleporting cross-map to dungeon/raid instances, temporarily
+    // enable TRIGGER_PASS to bypass instance entry restrictions (raid group
+    // check, instance count, encounter-in-progress, max players).
+    // The flag is cleared in PlayerbotAI::HandleTeleportAck after the async
+    // far-teleport completes.
+    bool addedTriggerPass = false;
+    PlayerbotAI* ai = GET_PLAYERBOT_AI(player);
+    if (ai && player->GetMapId() != summoner->GetMapId())
+    {
+        if (summonerMap && summonerMap->IsDungeon() && !player->HasCheatOption(PLAYER_CHEAT_TRIGGER_PASS))
+        {
+            player->EnableCheatOption(PLAYER_CHEAT_TRIGGER_PASS);
+            addedTriggerPass = true;
+        }
+    }
+
+    bool result = player->TeleportTo(summoner->GetMapId(), x, y, z, orientation);
+
+    // If the teleport failed (not scheduled), clear the flag immediately.
+    // If it succeeded (far teleport scheduled), keep it — HandleTeleportAck clears it.
+    if (!result && addedTriggerPass)
+        player->RemoveCheatOption(PLAYER_CHEAT_TRIGGER_PASS);
+
+    return result;
 }
 }  // namespace
 
@@ -245,6 +293,15 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
 
     if (!TeleportPlayerTo(summoner, player, destX, destY, destZ, destO))
     {
+        // Log diagnostic info for the first teleport failure
+        Group* grp = player->GetGroup();
+        LOG_INFO("playerbots",
+            "Summon teleport attempt failed (%s): bot=%s (%u) botMap=%u botInst=%u targetMap=%u inGroup=%u isRaid=%u isAlive=%u isBeingTeleported=%u",
+            sourceTag, player->GetName(), player->GetGUIDLow(),
+            player->GetMapId(), player->GetInstanceId(), summoner->GetMapId(),
+            grp ? 1u : 0u, (grp && grp->isRaidGroup()) ? 1u : 0u,
+            player->IsAlive() ? 1u : 0u, player->IsBeingTeleported() ? 1u : 0u);
+
         float fallbackX = summoner->GetPositionX();
         float fallbackY = summoner->GetPositionY();
         float fallbackZ = summoner->GetPositionZ();

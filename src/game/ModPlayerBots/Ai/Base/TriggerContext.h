@@ -14,6 +14,7 @@
 #include "LootTriggers.h"
 #include "NamedObjectContext.h"
 #include "NewRpgStrategy.h"
+#include "PartyTriggers.h"
 #include "Ai/World/Rpg/Trigger/NewRpgTriggers.h"
 #include "PvpTriggers.h"
 #include "RpgTriggers.h"
@@ -156,6 +157,7 @@ public:
         creators["random bot update"] = &TriggerContext::random_bot_update_trigger;
         creators["no non bot players around"] = &TriggerContext::no_non_bot_players_around;
         creators["new player nearby"] = &TriggerContext::new_player_nearby;
+        creators["no real player party timeout"] = &TriggerContext::no_real_player_party_timeout;
         creators["no rpg target"] = &TriggerContext::no_rpg_target;
         creators["has rpg target"] = &TriggerContext::has_rpg_target;
         creators["far from rpg target"] = &TriggerContext::far_from_rpg_target;
@@ -379,6 +381,7 @@ private:
     static Trigger* random_bot_update_trigger(PlayerbotAI* botAI) { return new RandomBotUpdateTrigger(botAI); }
     static Trigger* no_non_bot_players_around(PlayerbotAI* botAI) { return new NoNonBotPlayersAroundTrigger(botAI); }
     static Trigger* new_player_nearby(PlayerbotAI* botAI) { return new NewPlayerNearbyTrigger(botAI); }
+    static Trigger* no_real_player_party_timeout(PlayerbotAI* botAI) { return new NoRealPlayerPartyTimeoutTrigger(botAI); }
 #if !PB_DISABLE_BG_BOT_LOGIC
     static Trigger* bg_waiting(PlayerbotAI* botAI) { return new BgWaitingTrigger(botAI); }
     static Trigger* bg_active(PlayerbotAI* botAI) { return new BgActiveTrigger(botAI); }

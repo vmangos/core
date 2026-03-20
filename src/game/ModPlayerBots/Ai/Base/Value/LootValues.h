@@ -26,6 +26,12 @@ public:
 //                   itemId, entry
 typedef std::unordered_map<uint32, int32> DropMap;
 
+namespace PlayerbotSharedValueBuilders
+{
+DropMap BuildDropMap();
+std::vector<int32> BuildItemDropList(DropMap const& dropMap, uint32 itemId);
+}
+
 // Returns the loot map of all entries
 class DropMapValue : public SingleCalculatedValue<DropMap*>
 {

@@ -8,6 +8,41 @@
 #include "ChatHelper.h"
 #include "LootObjectStack.h"
 #include "Playerbots.h"
+#include "RandomPlayerbotMgr.h"
+
+namespace
+{
+bool IsStarterReserveBot(Player* bot)
+{
+    return bot && sRandomPlayerbotMgr.IsRandomBot(bot) &&
+        sRandomPlayerbotMgr.GetData(bot->GetGUIDLow(), "population_role") == "reserve_starter";
+}
+
+bool DropOutOfPlanQuests(Player* bot, PlayerbotAI* botAI)
+{
+    if (!bot || !botAI)
+        return false;
+
+    bool dropped = false;
+    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(slot);
+        if (!questId)
+            continue;
+
+        Quest const* quest = sObjectMgr.GetQuestTemplate(questId);
+        if (quest && sRandomPlayerbotMgr.IsQuestInPopulationPlan(bot, quest))
+            continue;
+
+        WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
+        packet << slot;
+        bot->GetSession()->HandleQuestLogRemoveQuest(packet);
+        dropped = true;
+    }
+
+    return dropped;
+}
+}
 
 bool ChooseTravelTargetAction::Execute(Event event)
 {
@@ -480,6 +515,11 @@ bool ChooseTravelTargetAction::SetCurrentTarget(TravelTarget* target, TravelTarg
 
 bool ChooseTravelTargetAction::SetQuestTarget(TravelTarget* target, bool onlyCompleted, bool newQuests, bool activeQuests, bool completedQuests)
 {
+    DropOutOfPlanQuests(bot, botAI);
+
+    if (IsStarterReserveBot(bot))
+        return false;
+
     std::vector<TravelDestination*> activeDestinations;
     std::vector<WorldPosition*> activePoints;
     WorldPosition botLocation(bot);
@@ -542,6 +582,11 @@ bool ChooseTravelTargetAction::SetQuestTarget(TravelTarget* target, bool onlyCom
 
 bool ChooseTravelTargetAction::SetNewQuestTarget(TravelTarget* target)
 {
+    DropOutOfPlanQuests(bot, botAI);
+
+    if (IsStarterReserveBot(bot))
+        return false;
+
     std::vector<TravelDestination*> activeDestinations;
     std::vector<WorldPosition*> activePoints;
 

@@ -113,6 +113,7 @@ protected:
     std::map<std::string, Strategy*> strategies;
     float lastRelevance;
     std::string lastAction;
+    std::string _lastDiagSummary; // dedup key for DoNextAction diagnostic log
     uint32 strategyTypeMask;
     NamedObjectFactoryList<ActionNode> actionNodeFactories;
 };

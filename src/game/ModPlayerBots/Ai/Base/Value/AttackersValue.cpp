@@ -68,6 +68,8 @@ GuidVector AttackersValue::Calculate()
 
 void AttackersValue::AddAttackersOf(Group* group, std::unordered_set<Unit*>& targets)
 {
+    size_t const initialTargetCount = targets.size();
+
     Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
     for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
     {
@@ -77,6 +79,21 @@ void AttackersValue::AddAttackersOf(Group* group, std::unordered_set<Unit*>& tar
             continue;
 
         AddAttackersOf(member, targets);
+        AddAssistFallbackTarget(member, member->GetVictim(), "victim", targets);
+
+        ObjectGuid const selectionGuid = member->GetSelectionGuid();
+        if (!selectionGuid.IsEmpty())
+            AddAssistFallbackTarget(member, botAI->GetUnit(selectionGuid), "selection", targets);
+
+        ObjectGuid const targetGuid = member->GetTargetGuid();
+        if (!targetGuid.IsEmpty() && targetGuid != selectionGuid)
+            AddAssistFallbackTarget(member, botAI->GetUnit(targetGuid), "target", targets);
+    }
+
+    if (targets.size() == initialTargetCount)
+    {
+        LOG_DEBUG("playerbots", "DIAG AttackersValue::AddAttackersOf(Group): bot=%s no grouped attackers found",
+            bot->GetName());
     }
 }
 
@@ -112,6 +129,32 @@ void AttackersValue::AddAttackersOf(Player* player, std::unordered_set<Unit*>& t
     }
 }
 
+void AttackersValue::AddAssistFallbackTarget(Player* player, Unit* candidate, char const* source,
+    std::unordered_set<Unit*>& targets)
+{
+    if (!player || !candidate)
+        return;
+
+    bool const engaged = player->IsInCombat() || candidate->IsInCombat() || candidate->GetVictim();
+    if (!engaged)
+    {
+        LOG_DEBUG("playerbots", "DIAG AttackersValue::AddAssistFallbackTarget: bot=%s member=%s source=%s target=%s REJECT inactive engage",
+            bot->GetName(), player->GetName(), source, candidate->GetName());
+        return;
+    }
+
+    if (!IsValidTarget(candidate, bot))
+    {
+        LOG_DEBUG("playerbots", "DIAG AttackersValue::AddAssistFallbackTarget: bot=%s member=%s source=%s target=%s REJECT invalid fallback candidate",
+            bot->GetName(), player->GetName(), source, candidate->GetName());
+        return;
+    }
+
+    targets.insert(candidate);
+    LOG_DEBUG("playerbots", "DIAG AttackersValue::AddAssistFallbackTarget: bot=%s member=%s source=%s target=%s ACCEPT",
+        bot->GetName(), player->GetName(), source, candidate->GetName());
+}
+
 void AttackersValue::RemoveNonThreating(std::unordered_set<Unit*>& targets)
 {
     for (std::unordered_set<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
@@ -133,7 +176,6 @@ bool AttackersValue::hasRealThreat(Unit* attacker)
     return attacker && attacker->IsInWorld() && attacker->IsAlive() && !attacker->IsPolymorphed() &&
            // !attacker->isInRoots() &&
            !attacker->IsFriendlyTo(bot);
-    (attacker->GetThreatMgr().getCurrentVictim() || dynamic_cast<Player*>(attacker));
 }
 
 bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float /*range*/)
@@ -151,30 +193,60 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float /*range
 
     // Validity checks
     if (!attacker->IsInWorld() || attacker->GetMapId() != bot->GetMapId())
+    {
+        LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL world/map inWorld=%u targetMap=%u botMap=%u",
+            bot->GetName(), attacker->GetName(), (uint32)attacker->IsInWorld(), attacker->GetMapId(), bot->GetMapId());
         return false;
+    }
 
     if (attacker->isDead())
+    {
+        LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL dead",
+            bot->GetName(), attacker->GetName());
         return false;
+    }
 
     // Flag checks
     if (attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE_2))
+    {
+        LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL non-attackable-2",
+            bot->GetName(), attacker->GetName());
         return false;
+    }
 
     if (attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER) ||
         attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+    {
+        LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL immune/not-selectable immune=%u notSelectable=%u",
+            bot->GetName(), attacker->GetName(),
+            (uint32)attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER),
+            (uint32)attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE));
         return false;
+    }
 
     // Relationship checks
     if (attacker->IsFriendlyTo(bot))
+    {
+        LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL friendly",
+            bot->GetName(), attacker->GetName());
         return false;
+    }
 
     // Critter exception
     if (attacker->GetCreatureType() == CREATURE_TYPE_CRITTER && !attacker->IsInCombat())
+    {
+        LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL critter not in combat (creatureType=%u)",
+            bot->GetName(), attacker->GetName(), (uint32)attacker->GetCreatureType());
         return false;
+    }
 
     // Visibility check
     if (!attacker->IsVisibleForOrDetect(bot, bot, true))
+    {
+        LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL not visible",
+            bot->GetName(), attacker->GetName());
         return false;
+    }
 
     // PvP prohibition checks (skip for duels)
     if ((attacker->GetObjectGuid().IsPlayer() || attacker->GetObjectGuid().IsPet()) &&
@@ -203,14 +275,22 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float /*range
     // Unflagged player check
     if (attacker->IsPlayer() && !attacker->IsPvP() &&
         (!bot->m_duel || bot->m_duel->opponent != attacker))
+    {
+        LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL player not PvP flagged",
+            bot->GetName(), attacker->GetName());
         return false;
+    }
 
     // Creature-specific checks
     Creature* c = attacker->ToCreature();
     if (c)
     {
         if (c->IsInEvadeMode())
+        {
+            LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL evade mode",
+                bot->GetName(), attacker->GetName());
             return false;
+        }
 
         bool leaderHasThreat = false;
         if (bot->GetGroup() && botAI->GetMaster())
@@ -234,7 +314,16 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float /*range
             c->IsTappedBy(bot);
 
         if (!canAttack)
+        {
+            LOG_DEBUG("playerbots", "DIAG IsPossibleTarget: bot=%s target=%s FAIL canAttack=0 "
+                "(isMemberBotGroup=%u hasAttackTagged=%u leaderHasThreat=%u hasLootRecipient=%u victim=%s tappedByBot=%u)",
+                bot->GetName(), attacker->GetName(),
+                (uint32)isMemberBotGroup, (uint32)(!isMemberBotGroup && botAI->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)),
+                (uint32)leaderHasThreat, (uint32)c->HasLootRecipient(),
+                c->GetVictim() ? c->GetVictim()->GetName() : "none",
+                (uint32)c->IsTappedBy(bot));
             return false;
+        }
     }
 
     return true;
@@ -242,7 +331,14 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float /*range
 
 bool AttackersValue::IsValidTarget(Unit* attacker, Player* bot)
 {
-    return IsPossibleTarget(attacker, bot) && bot->IsWithinLOSInMap(attacker);
+    bool possible = IsPossibleTarget(attacker, bot);
+    bool los = bot->IsWithinLOSInMap(attacker);
+    if (!possible || !los)
+    {
+        LOG_DEBUG("playerbots", "DIAG IsValidTarget: bot=%s target=%s FAIL possible=%u los=%u",
+            bot->GetName(), attacker ? attacker->GetName() : "null", (uint32)possible, (uint32)los);
+    }
+    return possible && los;
     // (attacker->GetThreatMgr().getCurrentVictim() || attacker->GetGuidValue(UNIT_FIELD_TARGET) ||
     // attacker->GetGUID().IsPlayer() || attacker->GetGUID() ==
     // GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Get());

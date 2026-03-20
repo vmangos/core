@@ -18,7 +18,7 @@ std::vector<NextAction> ShadowPriestStrategy::getDefaultActions()
     return {
         NextAction("mind blast", ACTION_DEFAULT + 0.3f),
         NextAction("mind flay", ACTION_DEFAULT + 0.2f),
-        NextAction("shadow word: death", ACTION_DEFAULT + 0.1f), // cast during movement
+        NextAction("shadow word: pain", ACTION_DEFAULT + 0.1f),
         NextAction("shoot", ACTION_DEFAULT)
     };
 }
@@ -37,17 +37,9 @@ void ShadowPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     );
     triggers.push_back(
         new TriggerNode(
-            "low mana",
-            {
-                NextAction("dispersion", ACTION_HIGH + 5)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
             "critical health",
             {
-                NextAction("dispersion", ACTION_HIGH + 5)
+                NextAction("power word: shield", ACTION_HIGH + 5)
             }
         )
     );
@@ -87,42 +79,10 @@ void ShadowPriestAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
-    triggers.push_back(
-        new TriggerNode(
-            "vampiric touch on attacker",
-            {
-                NextAction("vampiric touch on attacker", ACTION_NORMAL + 4)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "mind sear channel check",
-            {
-                NextAction("cancel channel", ACTION_HIGH + 5)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "medium aoe",
-            {
-                NextAction("mind sear", ACTION_HIGH + 4)
-            }
-        )
-    );
 }
 
 void ShadowPriestDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(
-        new TriggerNode(
-            "vampiric touch",
-            {
-                NextAction("vampiric touch", ACTION_HIGH + 3)
-            }
-        )
-    );
     triggers.push_back(
         new TriggerNode(
             "devouring plague",

@@ -175,6 +175,7 @@ public:
         creators["invite nearby"] = &ActionContext::invite_nearby;
         creators["invite guild"] = &ActionContext::invite_guild;
         creators["leave far away"] = &ActionContext::leave_far_away;
+        creators["leave no real player party"] = &ActionContext::leave_no_real_player_party;
         creators["move to dark portal"] = &ActionContext::move_to_dark_portal;
         creators["move from dark portal"] = &ActionContext::move_from_dark_portal;
         creators["use dark portal azeroth"] = &ActionContext::use_dark_portal_azeroth;
@@ -373,6 +374,7 @@ private:
     static Action* invite_nearby(PlayerbotAI* botAI) { return new InviteNearbyToGroupAction(botAI); }
     static Action* invite_guild(PlayerbotAI* botAI) { return new InviteGuildToGroupAction(botAI); }
     static Action* leave_far_away(PlayerbotAI* botAI) { return new LeaveFarAwayAction(botAI); }
+    static Action* leave_no_real_player_party(PlayerbotAI* botAI) { return new LeaveNoRealPlayerPartyAction(botAI); }
     static Action* move_to_dark_portal(PlayerbotAI* botAI) { return new MoveToDarkPortalAction(botAI); }
     static Action* use_dark_portal_azeroth(PlayerbotAI* botAI) { return new DarkPortalAzerothAction(botAI); }
     static Action* move_from_dark_portal(PlayerbotAI* botAI) { return new MoveFromDarkPortalAction(botAI); }

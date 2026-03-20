@@ -11,7 +11,14 @@
 
 bool WithinAreaTrigger::IsActive()
 {
-    LastMovement& movement = context->GetValue<LastMovement&>("last area trigger")->Get();
+    if (!context)
+        return false;
+
+    Value<LastMovement&>* lastMovValue = context->GetValue<LastMovement&>("last area trigger");
+    if (!lastMovValue)
+        return false;
+
+    LastMovement& movement = lastMovValue->Get();
     if (!movement.lastAreaTrigger)
         return false;
 

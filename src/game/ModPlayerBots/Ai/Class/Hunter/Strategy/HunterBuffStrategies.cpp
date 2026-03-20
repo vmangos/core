@@ -30,8 +30,7 @@ HunterBuffDpsStrategy::HunterBuffDpsStrategy(PlayerbotAI* botAI) : NonCombatStra
 void HunterBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
-        new TriggerNode("aspect of the hawk", { NextAction("aspect of the dragonhawk", 20.1f),
-                                                                NextAction("aspect of the hawk", 20.0f) }));
+        new TriggerNode("aspect of the hawk", { NextAction("aspect of the hawk", 20.0f) }));
 }
 
 void HunterNatureResistanceStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -48,6 +47,6 @@ void HunterBuffSpeedStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void HunterBuffManaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("aspect of the viper",
-                                       { NextAction("aspect of the viper", 20.0f) }));
+    triggers.push_back(new TriggerNode("aspect of the hawk",
+                                       { NextAction("aspect of the hawk", 20.0f) }));
 }

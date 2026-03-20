@@ -12,36 +12,14 @@ class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 public:
     DpsRogueStrategyActionNodeFactory()
     {
-        creators["mutilate"] = &mutilate;
         creators["sinister strike"] = &sinister_strike;
         creators["kick"] = &kick;
         creators["kidney shot"] = &kidney_shot;
         creators["backstab"] = &backstab;
-        creators["melee"] = &melee;
         creators["rupture"] = &rupture;
     }
 
 private:
-    static ActionNode* melee([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "melee",
-            /*P*/ {},
-            /*A*/ {
-                NextAction("mutilate") },
-            /*C*/ {}
-        );
-    }
-    static ActionNode* mutilate([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "mutilate",
-            /*P*/ {},
-            /*A*/ {
-                NextAction("sinister strike") },
-            /*C*/ {}
-        );
-    }
     static ActionNode* sinister_strike([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode(
@@ -77,7 +55,7 @@ private:
             "backstab",
             /*P*/ {},
             /*A*/ {
-                NextAction("mutilate") },
+                NextAction("sinister strike") },
             /*C*/ {}
         );
     }
@@ -101,7 +79,7 @@ DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* botAI) : MeleeCombatStrategy(bot
 std::vector<NextAction> DpsRogueStrategy::getDefaultActions()
 {
     return {
-        NextAction("killing spree", ACTION_DEFAULT + 0.1f),
+        NextAction("sinister strike", ACTION_NORMAL + 0.3f),
         NextAction("melee", ACTION_DEFAULT)
     };
 }
@@ -110,25 +88,7 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     MeleeCombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(
-        new TriggerNode(
-            "high energy available",
-            {
-                NextAction("garrote", ACTION_HIGH + 7),
-                NextAction("ambush", ACTION_HIGH + 6)
-            }
-        )
-    );
-
-    triggers.push_back(
-        new TriggerNode(
-            "high energy available",
-            {
-                NextAction("sinister strike", ACTION_NORMAL + 3)
-            }
-        )
-    );
-
+    // Maintain slice and dice buff (haste)
     triggers.push_back(
         new TriggerNode(
             "slice and dice",
@@ -138,6 +98,7 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         )
     );
 
+    // Spend combo points on finishers
     triggers.push_back(
         new TriggerNode(
             "combo points available",
@@ -148,6 +109,7 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         )
     );
 
+    // Execute low-health targets
     triggers.push_back(
         new TriggerNode(
             "target with combo points almost dead",
@@ -157,15 +119,18 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         )
     );
 
+    // Threat management
     triggers.push_back(
         new TriggerNode(
             "medium threat",
             {
-                NextAction("vanish", ACTION_HIGH)
+                NextAction("vanish", ACTION_HIGH),
+                NextAction("feint", ACTION_HIGH - 1)
             }
         )
     );
 
+    // Defensive cooldowns
     triggers.push_back(
         new TriggerNode(
             "low health",
@@ -176,15 +141,7 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         )
     );
 
-    triggers.push_back(
-        new TriggerNode(
-            "critical health",
-            {
-                NextAction("cloak of shadows", ACTION_HIGH + 7)
-            }
-        )
-    );
-
+    // Interrupts
     triggers.push_back(
         new TriggerNode(
             "kick",
@@ -203,6 +160,7 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         )
     );
 
+    // Blade Flurry for AoE (vanilla Combat talent)
     triggers.push_back(
         new TriggerNode(
             "light aoe",
@@ -221,17 +179,7 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         )
     );
 
-    triggers.push_back(
-        new TriggerNode(
-            "enemy out of melee",
-            {
-                NextAction("stealth", ACTION_HIGH + 3),
-                NextAction("sprint", ACTION_HIGH + 2),
-                NextAction("reach melee", ACTION_HIGH + 1)
-            }
-        )
-    );
-
+    // Armor reduction
     triggers.push_back(
         new TriggerNode(
             "expose armor",
@@ -241,11 +189,13 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         )
     );
 
+    // Gap closer
     triggers.push_back(
         new TriggerNode(
-            "low tank threat",
+            "enemy out of melee",
             {
-                NextAction("tricks of the trade on main tank", ACTION_HIGH + 7)
+                NextAction("sprint", ACTION_HIGH + 2),
+                NextAction("reach melee", ACTION_HIGH + 1)
             }
         )
     );
@@ -427,14 +377,6 @@ void RogueAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             "light aoe",
             {
                 NextAction("blade flurry", ACTION_HIGH)
-            }
-        )
-    );
-    triggers.push_back(
-        new TriggerNode(
-            "medium aoe",
-            {
-                NextAction("fan of knives", ACTION_NORMAL + 5)
             }
         )
     );

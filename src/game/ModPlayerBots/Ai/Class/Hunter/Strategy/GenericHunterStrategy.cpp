@@ -16,7 +16,7 @@ public:
         creators["rapid fire"] = &rapid_fire;
         creators["boost"] = &rapid_fire;
         creators["aspect of the pack"] = &aspect_of_the_pack;
-        creators["aspect of the dragonhawk"] = &aspect_of_the_dragonhawk;
+        creators["aspect of the hawk"] = &aspect_of_the_hawk;
         creators["feign death"] = &feign_death;
         creators["wing clip"] = &wing_clip;
         creators["mongoose bite"] = &mongoose_bite;
@@ -41,11 +41,11 @@ private:
                               /*C*/ {});
     }
 
-    static ActionNode* aspect_of_the_dragonhawk([[maybe_unused]] PlayerbotAI* botAI)
+    static ActionNode* aspect_of_the_hawk([[maybe_unused]] PlayerbotAI* botAI)
     {
-        return new ActionNode("aspect of the dragonhawk",
+        return new ActionNode("aspect of the hawk",
                               /*P*/ {},
-                              /*A*/ { NextAction("aspect of the hawk") },
+                              /*A*/ {},
                               /*C*/ {});
     }
 
@@ -104,12 +104,10 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("no ammo", { NextAction("equip upgrades packet action", 30.0f) }));
     triggers.push_back(new TriggerNode("hunter's mark", { NextAction("hunter's mark", 29.5f) }));
     triggers.push_back(new TriggerNode("rapid fire", { NextAction("rapid fire", 29.0f) }));
-    triggers.push_back(new TriggerNode("aspect of the viper", { NextAction("aspect of the viper", 28.0f) }));
-    triggers.push_back(new TriggerNode("aspect of the hawk", { NextAction("aspect of the dragonhawk", 27.5f) }));
+    triggers.push_back(new TriggerNode("aspect of the hawk", { NextAction("aspect of the hawk", 27.5f) }));
 
     // Aggro/Threat/Defensive Triggers
     triggers.push_back(new TriggerNode("has aggro", { NextAction("concussive shot", 20.0f) }));
-    triggers.push_back(new TriggerNode("low tank threat", { NextAction("misdirection on main tank", 27.0f) }));
     triggers.push_back(new TriggerNode("low health", { NextAction("deterrence", 35.0f) }));
     triggers.push_back(new TriggerNode("concussive shot on snare target", { NextAction("concussive shot", 20.0f) }));
     triggers.push_back(new TriggerNode("medium threat", { NextAction("feign death", 35.0f) }));

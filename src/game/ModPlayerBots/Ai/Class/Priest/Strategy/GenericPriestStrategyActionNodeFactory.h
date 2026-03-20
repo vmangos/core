@@ -34,7 +34,6 @@ public:
         creators["flash heal on party"] = &flash_heal_on_party;
         creators["psychic scream"] = &psychic_scream;
         // creators["fade"] = &fade;
-        creators["shadowfiend"] = &shadowfiend;
     }
 
 private:
@@ -211,15 +210,6 @@ private:
         );
     }
 
-    static ActionNode* shadowfiend([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode(
-            "shadowfiend",
-            /*P*/ {},
-            /*A*/ {},
-            /*C*/ {}
-        );
-    }
 };
 
 class CurePriestStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>

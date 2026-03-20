@@ -7,6 +7,7 @@
 #define _PLAYERBOT_TRAVELMGR_H
 
 #include <boost/functional/hash.hpp>
+#include <memory>
 #include <random>
 
 #include "Bot/Engine/AiObject.h"
@@ -504,13 +505,27 @@ public:
     }
     TravelDestination(std::vector<WorldPosition*> points1, float radiusMin1, float radiusMax1)
     {
-        points = points1;
         radiusMin = radiusMin1;
         radiusMax = radiusMax1;
+
+        for (WorldPosition* point : points1)
+            addPoint(point);
     }
     virtual ~TravelDestination() = default;
 
-    void addPoint(WorldPosition* pos) { points.push_back(pos); }
+    void addPoint(WorldPosition const& pos)
+    {
+        ownedPoints.push_back(std::make_unique<WorldPosition>(pos));
+        points.push_back(ownedPoints.back().get());
+    }
+
+    void addPoint(WorldPosition* pos)
+    {
+        if (!pos)
+            return;
+
+        addPoint(*pos);
+    }
 
     void setExpireDelay(uint32 delay) { expireDelay = delay; }
 
@@ -523,6 +538,7 @@ public:
     }
 
     std::vector<WorldPosition*> getPoints(bool ignoreFull = false);
+    std::vector<WorldPosition*> const& getPointsRef() const { return points; }
     uint32 getExpireDelay() { return expireDelay; }
     uint32 getCooldownDelay() { return cooldownDelay; }
 
@@ -560,6 +576,7 @@ public:
     std::vector<WorldPosition*> nextPoint(WorldPosition* pos, bool ignoreFull = true);
 
 protected:
+    std::vector<std::unique_ptr<WorldPosition>> ownedPoints;
     std::vector<WorldPosition*> points;
     float radiusMin = 0;
     float radiusMax = 0;
@@ -647,6 +664,7 @@ public:
     }
 
     bool isCreature();
+    uint32 GetObjective() const { return objective; }
     uint32 ReqCreature();
     uint32 ReqGOId();
     uint32 ReqCount();

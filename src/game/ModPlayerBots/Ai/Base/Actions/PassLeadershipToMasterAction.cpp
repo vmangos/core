@@ -6,26 +6,38 @@
 #include "PassLeadershipToMasterAction.h"
 
 #include "Event.h"
+#include "PartyLeadershipUtils.h"
 #include "Playerbots.h"
 
 bool PassLeadershipToMasterAction::Execute(Event event)
 {
-    if (Player* master = GetMaster())
-        if (master && master != bot && bot->GetGroup() && bot->GetGroup()->IsMember(master->GetGUID()))
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    Player* master = botAI->GetActiveMaster();
+    if (!PartyLeadership::IsActiveRealPlayer(master) || master == bot || !group->IsMember(master->GetGUID()))
+    {
+        master = botAI->FindNewMaster();
+        if (master && master != bot)
+            botAI->SetMaster(master);
+    }
+
+    if (master && master != bot && group->IsMember(master->GetGUID()))
+    {
+        group->ChangeLeader(master->GetGUID());
+
+        if (!message.empty())
+            botAI->TellMasterNoFacing(message);
+
+        if (sRandomPlayerbotMgr.IsRandomBot(bot))
         {
-            bot->GetGroup()->ChangeLeader(master->GetGUID());
-
-            if (!message.empty())
-                botAI->TellMasterNoFacing(message);
-
-            if (sRandomPlayerbotMgr.IsRandomBot(bot))
-            {
-                botAI->ResetStrategies();
-                botAI->Reset();
-            }
-
-            return true;
+            botAI->ResetStrategies();
+            botAI->Reset();
         }
+
+        return true;
+    }
 
     return false;
 }
@@ -37,5 +49,23 @@ bool PassLeadershipToMasterAction::isUseful()
 
 bool GiveLeaderAction::isUseful()
 {
-    return botAI->HasActivePlayerMaster() && bot->GetGroup() && bot->GetGroup()->IsLeader(bot->GetGUID());
+    if (!bot->GetGroup() || !bot->GetGroup()->IsLeader(bot->GetGUID()))
+        return false;
+
+    if (!sRandomPlayerbotMgr.IsRandomBot(bot))
+        return botAI->HasActivePlayerMaster();
+
+    if (!PartyLeadership::IsEligibleRandombotPartyLeader(botAI))
+        return false;
+
+    Player* activeMaster = botAI->GetActiveMaster();
+    if (PartyLeadership::IsActiveRealPlayer(activeMaster) && activeMaster != bot &&
+        bot->GetGroup()->IsMember(activeMaster->GetGUID()))
+    {
+        return true;
+    }
+
+    Player* fallbackMaster = botAI->FindNewMaster();
+    return PartyLeadership::IsActiveRealPlayer(fallbackMaster) && fallbackMaster != bot &&
+           bot->GetGroup()->IsMember(fallbackMaster->GetGUID());
 }

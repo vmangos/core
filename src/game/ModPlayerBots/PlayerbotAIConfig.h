@@ -106,6 +106,9 @@ public:
     bool botAutologin;
     std::string randomBotMapsAsString;
     float probTeleToBankers;
+    float probTeleToBankersCity;
+    float probTeleToBankersReserveStarter;
+    float probTeleToBankersWorld;
     bool enableWeightTeleToCityBankers;
     int weightTeleToStormwind;
     int weightTeleToIronforge;
@@ -137,6 +140,20 @@ public:
     int32 randomGearScoreLimit;
     float randomBotMinLevelChance, randomBotMaxLevelChance;
     float randomBotRpgChance;
+    bool enablePopulationDirector;
+    uint32 populationDirectorUpdateInterval;
+    float populationDirectorPlayerHeatSigma;
+    float populationDirectorPlayerHeatHalfLife;
+    uint32 populationDirectorMinDwell;
+    uint32 populationDirectorMaxDwell;
+    uint32 populationDirectorMaxMovesPerTick;
+    float populationDirectorZoneMaxDynamicPct;
+    float populationDirectorWeightPlayerHeat;
+    float populationDirectorWeightLevelMatch;
+    float populationDirectorWeightRecentPresence;
+    float populationDirectorWeightDiversity;
+    float populationDirectorWeightSaturationPenalty;
+    float populationDirectorHaloRadius;
     uint32 minRandomBots, maxRandomBots;
     uint32 randomBotUpdateInterval, randomBotCountChangeMinInterval, randomBotCountChangeMaxInterval;
     uint32 minRandomBotInWorldTime, maxRandomBotInWorldTime;
@@ -147,6 +164,7 @@ public:
     uint32 permanentlyInWorldTime;
     uint32 minRandomBotPvpTime, maxRandomBotPvpTime;
     uint32 randomBotsPerInterval;
+    uint32 randomBotNoRealPlayerPartyTimeout;
     uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
     uint32 disabledWithoutRealPlayerLoginDelay, disabledWithoutRealPlayerLogoutDelay;
     bool randomBotJoinLfg;
@@ -256,6 +274,7 @@ public:
     bool randomBotLoginAtStartup;
     uint32 randomBotTeleLowerLevel, randomBotTeleHigherLevel;
     std::map<uint32, std::pair<uint32, uint32>> zoneBrackets;
+    std::map<uint32, uint32> reserveZones;
     bool logInGroupOnly, logValuesPerTick;
     bool fleeingEnabled;
     bool summonAtInnkeepersEnabled;
@@ -371,6 +390,8 @@ public:
     bool autoLearnTrainerSpells;
     bool autoDoQuests;
     bool enableNewRpgStrategy;
+    bool debugRandomBotQuesting;
+    bool debugRandomBotPopulation;
     std::unordered_map<NewRpgStatus, uint32> RpgStatusProbWeight;
     bool syncLevelWithPlayers;
     bool autoLearnQuestSpells;
