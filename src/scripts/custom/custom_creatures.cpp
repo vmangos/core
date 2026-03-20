@@ -565,6 +565,7 @@ enum Enchants
     WEP_FIERY,
     WEP_ICY,
     WEP_DEMONSLAYING,
+    WEP1H_STRENGTH,
     WEP1H_AGILITY,
     WEP_SPELLPOWER,
     WEP_HEAL,
@@ -672,6 +673,7 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
             break;
         case EQUIPMENT_SLOT_MAINHAND:
             player->ADD_GOSSIP_ITEM(5, "Crusader",           GOSSIP_SENDER_MAIN, WEP_CRUSADER);
+            player->ADD_GOSSIP_ITEM(5, "1H Strength",        GOSSIP_SENDER_MAIN, WEP1H_STRENGTH);
             player->ADD_GOSSIP_ITEM(5, "1H Agility",         GOSSIP_SENDER_MAIN, WEP1H_AGILITY);
             player->ADD_GOSSIP_ITEM(5, "2H Agility",         GOSSIP_SENDER_MAIN, WEP2H_AGILITY);
             player->ADD_GOSSIP_ITEM(5, "2H INT",             GOSSIP_SENDER_MAIN, WEP2H_INT);
@@ -727,6 +729,10 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
             case WEP_CRUSADER:
                 item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
                 id = 1900;
+                break;
+            case WEP1H_STRENGTH:
+                item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+                id = 2563;
                 break;
             case WEP1H_AGILITY:
                 item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
