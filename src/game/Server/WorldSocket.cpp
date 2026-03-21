@@ -113,9 +113,10 @@ void WorldSocket::DoRecvIncomingData()
         EndianConvertReverse(header->size);
         EndianConvert(header->cmd);
 
-        if ((header->size < 4) || (header->size > 0x2800) || (header->cmd >= NUM_MSG_TYPES))
+        if ((header->size < 4) || (header->size > 0x2800) || IsDefinitelyBogusOpcode(header->cmd))
         {
             sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] WorldSocket::DoRecvIncomingData: client sent malformed packet size = %u, cmd = %u", self->m_socket.GetRemoteIpString().c_str(), header->size, header->cmd);
+            self->CloseSocket(); // We don't want to receive any more packets from this client
             return;
         }
 
@@ -153,12 +154,6 @@ WorldSocket::HandlerResult WorldSocket::_HandleCompleteReceivedPacket(std::uniqu
 {
     uint16 const opcode = packet->GetOpcode();
 
-    if (opcode >= NUM_MSG_TYPES)
-    {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received nonexistent opcode 0x%.4X", opcode);
-        return HandlerResult::Fail;
-    }
-
     if (IsClosing())
         return HandlerResult::Fail;
 
@@ -184,7 +179,7 @@ WorldSocket::HandlerResult WorldSocket::_HandleCompleteReceivedPacket(std::uniqu
                     return HandlerResult::Fail;
                 }
 
-                m_Session->QueuePacket(std::move(packet));
+                m_Session->QueueBinaryPacket(std::move(packet));
                 return HandlerResult::Okay;
         }
     }

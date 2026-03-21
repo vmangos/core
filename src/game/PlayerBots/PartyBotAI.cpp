@@ -563,7 +563,7 @@ void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
         {
             std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_DUEL_ACCEPTED, 8);
             *data << me->GetObjectGuid();
-            me->GetSession()->QueuePacket(std::move(data));
+            me->GetSession()->QueueBinaryPacket(std::move(data));
             return;
         }
     }

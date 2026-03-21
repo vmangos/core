@@ -49,7 +49,7 @@ private:
 #endif
     struct ClientPktHeader
     {
-        uint16 size;
+        uint16 size; // size including `sizeof(cmd)`
         uint32 cmd;
     };
 #if defined( __GNUC__ )

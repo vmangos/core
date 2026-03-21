@@ -211,7 +211,7 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     uint32 action = CHEAT_ACTION_NONE;
 
     auto AddPenaltyForCheat = [&action, &reason, this](bool total, CheatType cheatType, eConfigBoolValues enabledConfig, eConfigUInt32Values thresholdConfig, eConfigUInt32Values penaltyConfig)
-    { 
+    {
         if (sWorld.getConfig(enabledConfig))
         {
             ASSERT(cheatType < CHEATS_COUNT);
@@ -610,7 +610,7 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)) ||
         !pPlayer->movespline->Finalized())
         return 0;
-    
+
     if (pPlayer != me)
         InitNewPlayer(pPlayer);
 
@@ -682,7 +682,7 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
             cheatFlags |= flags;
     }
 
-    if (IsFallEndOpcode(opcode) || 
+    if (IsFallEndOpcode(opcode) ||
         movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
         m_knockBack = false;
 
@@ -697,8 +697,8 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
         {
             me->m_movementInfo.moveFlags = movementInfo.moveFlags;
             me->m_movementInfo.CorrectData();
-        }     
-        
+        }
+
         if (HAS_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP) &&
             sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
         {
@@ -733,7 +733,7 @@ uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movemen
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
         return 0;
-    
+
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
 
@@ -941,7 +941,7 @@ bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
         if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
             return true;
     }
-    
+
     return movementInfo.fallTime != 0 || movementInfo.jump.zspeed != 0.0f;
 }
 
@@ -997,7 +997,7 @@ bool MovementAnticheat::CheckMoveStart(MovementInfo const& movementInfo, uint16 
            !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_FORWARD))
             return true;
     }
-    
+
     if (opcode == MSG_MOVE_START_BACKWARD)
     {
         if (!movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD))
@@ -1065,7 +1065,7 @@ bool MovementAnticheat::CheckMoveStart(MovementInfo const& movementInfo, uint16 
     }
     else
     {
-        
+
         if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) &&
            !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_SWIMMING) &&
            !me->HasCheatOption(PLAYER_CHEAT_FLY))
@@ -1260,7 +1260,7 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
         (opcode == CMSG_MOVE_SPLINE_DONE) ||
         IsInKnockBack() ||
         !GetLastMovementInfo().ctime ||
-        me->IsTaxiFlying() || 
+        me->IsTaxiFlying() ||
         me->IsBeingTeleported())
         return 0;
 
@@ -1477,7 +1477,7 @@ void MovementAnticheat::CheckBotting(uint16 opcode, MovementInfo const& movement
         // we store turns count here
         m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING]++;
     }
-    
+
     m_movementPacketsCount++;
 }
 
@@ -1500,7 +1500,7 @@ bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
         float const distance2d = movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) ?
             GetDistance2D(GetLastMovementInfo().t_pos, movementInfo.t_pos) :
             GetDistance2D(GetLastMovementInfo().pos, movementInfo.pos);
-        
+
         if (distance2d > 1.0f)
             return true;
 
@@ -1512,7 +1512,7 @@ bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
             float const distanceZ = movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) ?
                 std::abs(GetLastMovementInfo().t_pos.z - movementInfo.t_pos.z) :
                 std::abs(GetLastMovementInfo().pos.z - movementInfo.pos.z);
-            
+
             if (distanceZ > 2.0f)
                 return true;
         }

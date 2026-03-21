@@ -84,6 +84,7 @@ class BigNumber;
 class MasterPlayer;
 
 struct OpcodeHandler;
+struct OpcodeHandlerPacketImplDetails;
 struct PlayerBotEntry;
 
 enum PartyOperation
@@ -164,7 +165,7 @@ class PacketFilter
         explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession), m_processLogout(false), m_processType(PACKET_PROCESS_MAX_TYPE) {}
         virtual ~PacketFilter() {}
 
-        virtual bool Process(std::unique_ptr<WorldPacket> const&) { return true; }
+        virtual bool Process(std::unique_ptr<ClientPacket const> const&) { return true; }
         inline bool ProcessLogout() const { return m_processLogout; }
         inline PacketProcessing PacketProcessType() const { return m_processType; }
         inline void SetProcessType(PacketProcessing t) { m_processType = t; }
@@ -185,7 +186,7 @@ class MapSessionFilter : public PacketFilter
         }
         ~MapSessionFilter() override {}
 
-        bool Process(std::unique_ptr<WorldPacket> const& packet) override;
+        bool Process(std::unique_ptr<ClientPacket const> const& packet) override;
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -331,7 +332,8 @@ class WorldSession
         bool m_ah_list_recvd;
 
         bool Update(PacketFilter& updater);
-        void QueuePacket(std::unique_ptr<WorldPacket> new_packet);
+        void QueuePacket(std::unique_ptr<ClientPacket const> packet);
+        void QueueBinaryPacket(std::unique_ptr<WorldPacket> const& binaryPacket);
         bool CanProcessPackets() const; // Returns true iif we can process packets (ie logged in Player, not a bot, etc ...
         void ProcessPackets(PacketFilter& updater);
         bool AllowPacket(uint16 opcode);
@@ -355,7 +357,7 @@ class WorldSession
 
     private:
         void SendPacketImpl(WorldPacket const* packet);
-        void VerifyPacketWasCorrectlyRead(WorldPacket const& recvPacket, ClientPacket const& clientPacket) const;
+        static void VerifyPacketWasCorrectlyRead(WorldPacket const& recvPacket, ClientPacket const& clientPacket);
 
     public:
         void SendPacket(WorldPacket const* packet);
@@ -463,13 +465,20 @@ class WorldSession
         void BuildPartyMemberStatsPacket(Player* player, WorldPacket* data, uint32 updateMask, bool sendAllAuras);
 
     public:                                                 // opcodes handlers
-        template<typename TClientPacket, void (WorldSession::*THandler)(TClientPacket const& packet)>
-        void Handle_Generic(WorldPacket& recvPacket)
+        template<typename TClientPacket>
+        static std::unique_ptr<ClientPacket> Handle_GenericRead(WorldPacket& recvPacket)
         {
-            auto packet = TClientPacket();
-            packet.ReadFromWorldPacket(recvPacket);
-            VerifyPacketWasCorrectlyRead(recvPacket, packet);
-            (this->*THandler)(packet);
+            auto packet = std::make_unique<TClientPacket>();
+            packet->ReadFromWorldPacket(recvPacket);
+            VerifyPacketWasCorrectlyRead(recvPacket, *packet);
+            return packet;
+        }
+
+        template<typename TClientPacket, void (WorldSession::*THandler)(TClientPacket const& packet)>
+        void Handle_GenericPacket(ClientPacket const& packet)
+        {
+            auto const& packetInCorrectForm = dynamic_cast<TClientPacket const&>(packet);
+            (this->*THandler)(packetInCorrectForm);
         }
 
         void Handle_NULL(WorldPacket& recvPacket);          // not used
@@ -828,16 +837,15 @@ class WorldSession
         bool VerifyMovementInfo(MovementInfo const& movementInfo) const;
         void HandleMoverRelocation(Unit* pMover, MovementInfo& movementInfo);
 
-        void ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* packet);
+        void ExecuteOpcode(OpcodeHandlerPacketImplDetails const& opHandle, ClientPacket const& packet);
 
         // logging helper
-        void LogUnexpectedOpcode(WorldPacket* packet, char const*  reason);
-        void LogUnprocessedTail(WorldPacket* packet);
+        void LogUnexpectedOpcode(ClientPacket const& packet, std::string const& reason);
 
         uint32 const m_guid; // unique identifier for each session
         std::shared_ptr<WorldSocket> m_socket;
         std::string m_remoteIpAddress; // might also be "<BOT>"
-        LockedQueue<std::unique_ptr<WorldPacket>, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
+        LockedQueue<std::unique_ptr<ClientPacket const>, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool m_receivedPacketType[PACKET_PROCESS_MAX_TYPE];
         uint32 m_floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
         bool m_connected;

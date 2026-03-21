@@ -34,6 +34,7 @@
 //       table opcodeTable in source when Opcode.h included but WorldSession.h not included
 #include "WorldSession.h"
 #include "Opcodes_active.h"
+#include "nonstd/expected.hpp"
 
 inline bool IsAnyMoveAckOpcode(uint16 opcode)
 {
@@ -131,15 +132,34 @@ enum SessionStatus
 
 class WorldPacket;
 
-struct OpcodeHandler
+struct OpcodeHandlerPacketImplDetails
 {
-    char const* name;
     SessionStatus status;
     PacketProcessing packetProcessing;
-    void (WorldSession::*handler)(WorldPacket& recvPacket);
+    std::unique_ptr<ClientPacket> (*readPacket)(WorldPacket& recvPacket);
+    void (WorldSession::*handler)(ClientPacket const& recvPacket);
 };
 
+enum class UnhandleReason
+{
+    Invalid,
+    Unhandled,
+    AlreadyHandledElsewhere, // should already be handled before the packet reaches this opcode map
+    SendByServer,
+};
+
+struct OpcodeHandler
+{
+    char const* name = "<unknown opcode>";
+    nonstd::expected<OpcodeHandlerPacketImplDetails, UnhandleReason> impl = nonstd::unexpected<UnhandleReason>(UnhandleReason::Unhandled);
+};
+
+// returns true if it's completely out of range
+inline bool IsDefinitelyBogusOpcode(uint16 opcode) { return opcode >= NUM_MSG_TYPES; }
+
+// Will work for any opcode, might return `<unknown opcode>` and without impl
 OpcodeHandler const& LookupOpcodeHandler(uint16 id);
+// Will work for any opcode, might return `<unknown opcode>`
 char const* LookupOpcodeName(uint16 id);
 
 #endif
