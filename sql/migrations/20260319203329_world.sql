@@ -72,7 +72,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (9421, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Truesilver Deposit / Small Thorium Vein', 0),
 (21662, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Truesilver Deposit / Small Thorium Vein', 0);
 
-DELETE FROM `pool_template` WHERE  `entry` = 1331;
+DELETE FROM `pool_template` WHERE  `entry` IN (1331, 8121);
 
 
 -- End of migration.
