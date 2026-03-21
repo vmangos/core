@@ -219,8 +219,8 @@ namespace WorldPackets { namespace Misc
     class ResurrectResponse final : public ClientPacket
     {
     public:
-        ObjectGuid guid;
-        uint8 status = 0;
+        ObjectGuid resurrectorGuid; // the guid of the player who rezzed me
+        bool accept = false;
 
         explicit ResurrectResponse() : ClientPacket(CMSG_RESURRECT_RESPONSE) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;

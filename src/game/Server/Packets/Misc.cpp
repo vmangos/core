@@ -124,8 +124,8 @@ void WorldPackets::Misc::ChatIgnored::ReadFromWorldPacket(WorldPacket& recv_data
 
 void WorldPackets::Misc::ResurrectResponse::ReadFromWorldPacket(WorldPacket& recv_data)
 {
-    recv_data >> guid;
-    recv_data >> status;
+    recv_data >> resurrectorGuid;
+    recv_data >> accept;
 }
 
 void WorldPackets::Misc::ItemTextQuery::ReadFromWorldPacket(WorldPacket& recv_data)
