@@ -73,7 +73,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (21662, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Truesilver Deposit / Small Thorium Vein', 0);
 
 DELETE FROM `pool_pool` WHERE `pool_id` = 25485;
-DELETE FROM `pool_gameobject` WHERE `guid` IN 261416, 261435);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (261416, 261435);
 DELETE FROM `gameobject` WHERE `guid` IN (261416, 261435);
 DELETE FROM `pool_template` WHERE  `entry` IN (1331, 8121, 25485);
 
