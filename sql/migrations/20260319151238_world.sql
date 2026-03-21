@@ -76,7 +76,8 @@ DELETE FROM `pool_template` WHERE `entry` = 1271;
 DELETE FROM `pool_pool` WHERE `pool_id` IN (419, 422, 424);
 DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (419, 422, 424);
 DELETE FROM `gameobject` WHERE `guid` IN (21845, 21872, 21899, 21848, 21875, 21902, 21850, 21877, 21904);
-
+UPDATE `pool_template` SET `description` = 'Mountain Silversage in Un\'Goro Crater' WHERE `entry` = 1218;
+UPDATE `pool_gameobject` SET `description` = 'Mountain Silversage' WHERE `pool_entry` IN (1218);
 
 -- End of migration.
 END IF;
