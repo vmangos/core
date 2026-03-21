@@ -60,14 +60,20 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (25483, @PTEMPLATE+4, 0, 'Western Plaguelands - Group 4 - Truesilver Deposit / Small Thorium Vein', 0),
 (25477, @PTEMPLATE+4, 0, 'Western Plaguelands - Group 4 - Truesilver Deposit / Small Thorium Vein', 0);
 
+DELETE FROM `pool_pool` WHERE `pool_id` IN (9419, 23011, 9420, 9421, 21662);
+UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Group 5' WHERE `entry` IN (9419, 23011, 9420, 9421, 21662);
+UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Group 5' WHERE `pool_entry` IN (9419, 23011, 9420, 9421, 21662);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+5, 1, 'Western Plaguelands - Group 5 - Truesilver Deposit / Small Thorium Vein', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(9419, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Truesilver Deposit / Small Thorium Vein', 0),
+(23011, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Truesilver Deposit / Small Thorium Vein', 0),
+(9420, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Truesilver Deposit / Small Thorium Vein', 0),
+(9421, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Truesilver Deposit / Small Thorium Vein', 0),
+(21662, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Truesilver Deposit / Small Thorium Vein', 0);
+
 DELETE FROM `pool_template` WHERE  `entry` = 1331;
 
-DELETE FROM `pool_pool` WHERE `pool_id` IN (21662);
-UPDATE `pool_template` SET `description`='Western Plaguelands - Weeping Cave - Truesilver Deposit / Small Thorium Vein (Master Pool)' WHERE  `entry`=8121;
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `entry` IN (21662);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Western Plaguelands - Weeping Cave' WHERE `pool_entry` IN (21662);
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
-(21662, 8121, 0, 'Western Plaguelands - Weeping Cave - Truesilver Deposit / Small Thorium Vein', 0);
 
 -- End of migration.
 END IF;
