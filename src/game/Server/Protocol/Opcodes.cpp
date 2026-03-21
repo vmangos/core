@@ -403,8 +403,6 @@ Handlers BuildOpcodeList()
     INVALID_PACKET(SMSG_AI_REACTION,                  Reason::SendByServer);
     DEFINE_HANDLER(CMSG_SET_SELECTION,                STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,        &WorldSession::HandleSetSelectionOpcode);
     INVALID_PACKET(CMSG_SET_TARGET_OBSOLETE,          Reason::Unhandled);
-    INVALID_PACKET(CMSG_UNUSED,                       Reason::Unhandled);
-    INVALID_PACKET(CMSG_UNUSED2,                      Reason::Unhandled);
     DEFINE_HANDLER(CMSG_ATTACKSWING,                  STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,        &WorldSession::HandleAttackSwingOpcode);
     DEFINE_HANDLER(CMSG_ATTACKSTOP,                   STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,        &WorldSession::HandleAttackStopOpcode);
     INVALID_PACKET(SMSG_ATTACKSTART,                  Reason::SendByServer);
