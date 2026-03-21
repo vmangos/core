@@ -441,13 +441,6 @@ void WorldSession::HandleReadItemOpcode(WorldPackets::Item::ReadItem const& pack
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
 }
 
-void WorldSession::HandlePageQuerySkippedOpcode(WorldPacket& recv_data)
-{
-    uint32 itemid;
-    ObjectGuid guid;
-    recv_data >> itemid >> guid;
-}
-
 void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem const& packet)
 {
     if (!packet.itemGuid || !GetPlayer()->IsInWorld())

@@ -124,10 +124,12 @@ struct PackedGuidReader
 class ObjectGuid
 {
     public:                                                 // constructors
-        ObjectGuid() : m_guid(0) {}
-        ObjectGuid(uint64 const& guid) : m_guid(guid) {}    // temporary allowed implicit cast, really bad in connection with operator uint64()
-        ObjectGuid(HighGuid hi, uint32 entry, uint32 counter) : m_guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) {}
-        ObjectGuid(HighGuid hi, uint32 counter) : m_guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) {}
+        constexpr ObjectGuid() : m_guid(0) {}
+        constexpr ObjectGuid(uint64 const& guid) : m_guid(guid) {}    // temporary allowed implicit cast, really bad in connection with operator uint64()
+        constexpr ObjectGuid(HighGuid hi, uint32 entry, uint32 counter) : m_guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) {}
+        constexpr ObjectGuid(HighGuid hi, uint32 counter) : m_guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) {}
+
+        static ObjectGuid const Empty;
 
     //private:
         explicit ObjectGuid(uint32 const& lowGuid) : m_guid(lowGuid) {} // Besoin dans OutdoorPvP par exemple
@@ -138,18 +140,20 @@ class ObjectGuid
 
     public:                                                 // modifiers
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
+        PackedGuid WriteAsPacked() const;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        // TODO: Remove `ReadAsPacked` when transformation is done
+        // TODO: Remove `ReadAsPacked` & `WriteAsPacked` when transformation is done
         PackedGuidReader ReadAsPackedClientBuildAware() { return PackedGuidReader(*this); }
+        PackedGuid WriteAsPackedClientBuildAware() const;
 #else
         ObjectGuid& ReadAsPackedClientBuildAware() { return *this; }
+        uint64 WriteAsPackedClientBuildAware() const { return GetRawValue(); }
 #endif
 
         void Set(uint64 const& guid);
         void Clear() { m_guid = 0; }
 
-        PackedGuid WriteAsPacked() const;
     public:                                                 // accessors
         uint64 const& GetRawValue() const { return m_guid; }
         static HighGuid GetHigh(uint64 guid) { return HighGuid((guid >> 48) & 0x0000FFFF); }
@@ -335,5 +339,8 @@ ByteBuffer& operator<< (ByteBuffer& buf, PackedGuid const& guid);
 ByteBuffer& operator>> (ByteBuffer& buf, PackedGuidReader const& guid);
 
 inline PackedGuid ObjectGuid::WriteAsPacked() const { return PackedGuid(*this); }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+inline PackedGuid ObjectGuid::WriteAsPackedClientBuildAware() const { return WriteAsPacked(); }
+#endif
 
 #endif

@@ -1,7 +1,7 @@
 #include "./NetworkError.h"
 #include "../SystemErrorToString.h"
 
-std::string const& GetErrorBaseString(IO::NetworkError::ErrorType errorType)
+static std::string const& GetErrorBaseString(IO::NetworkError::ErrorType errorType)
 {
     switch (errorType)
     {

@@ -110,6 +110,34 @@ char const* WorldSession::GetPlayerName() const
     return GetPlayer() ? GetPlayer()->GetName() : "<none>";
 }
 
+// Sends a packet to the client.
+void WorldSession::SendPacket(std::unique_ptr<ServerPacket> packet)
+{
+    WorldPacket buffer;
+    { // TODO: This part will be offloaded to an IO thread soon. Only the IO thread will allocate a buffer.
+        buffer.SetOpcode(packet->GetOpcode());
+        buffer.FillPacketTime(WorldTimer::getMSTime());
+        packet->AppendBodyTo(buffer);
+    }
+
+    // There is a maximum size packet.
+    if (buffer.size() > 0x8000)
+    {
+        // Packet will be rejected by client
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[NETWORK] Packet %s size %u is too large. Not sent [Account %u Player %s]", LookupOpcodeName(buffer.GetOpcode()), buffer.size(), GetAccountId(), GetPlayerName());
+        return;
+    }
+
+    if (!m_socket)
+    {
+        if (GetBot() && GetBot()->ai)
+            GetBot()->ai->OnPacketReceived(&buffer); // TODO Direct forward `ServerPacket` to bot in next PR
+        return;
+    }
+
+    SendPacketImpl(&buffer); // TODO Queue `ServerPacket` and serialize it in IO thread
+}
+
 // Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
 {

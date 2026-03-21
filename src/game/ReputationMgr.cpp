@@ -249,7 +249,7 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standi
             }
         }
     }
-    
+
     // spillover done, update faction itself
     bool res = false;
     FactionStateList::iterator faction = m_factions.find(factionEntry->reputationListID);

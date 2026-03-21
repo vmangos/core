@@ -3229,11 +3229,3 @@ uint32 World::GetDelayUntilNextSpellBatchingInterval()
 
     return (getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) - (WorldTimer::getMSTime() % getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY)));
 }
-
-void SessionPacketSendTask::operator()()
-{
-    if (WorldSession* session = sWorld.FindSession(m_accountId))
-    {
-        session->SendPacket(&m_data);
-    }
-}

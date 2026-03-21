@@ -21,6 +21,13 @@ public:
     uint16 GetOpcode() const { return opcode; }
 };
 
+class ServerPacket : public Packet
+{
+public:
+    explicit ServerPacket(uint16 opcode) : Packet(opcode) {}
+    virtual void AppendBodyTo(ByteBuffer& buffer) const = 0;
+};
+
 class ClientPacket : public Packet
 {
 public:
