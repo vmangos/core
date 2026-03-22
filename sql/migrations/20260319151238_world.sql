@@ -72,7 +72,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (425, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Mithril Deposit / Gold Vein / Truesilver Deposit', 0),
 (433, @PTEMPLATE+5, 0, 'Western Plaguelands - Group 5 - Mithril Deposit / Gold Vein / Truesilver Deposit', 0);
 
-DELETE FROM `pool_template` WHERE `entry` = (1271, 419, 422, 424);
+DELETE FROM `pool_template` WHERE `entry` IN (1271, 419, 422, 424);
 DELETE FROM `pool_pool` WHERE `pool_id` IN (419, 422, 424);
 DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (419, 422, 424);
 DELETE FROM `gameobject` WHERE `guid` IN (21845, 21872, 21899, 21848, 21875, 21902, 21850, 21877, 21904);
