@@ -23,4 +23,16 @@ protected:
     Unit* Calculate() override;
 };
 
+class ImportantPartyMemberToResurrect : public PartyMemberValue
+{
+public:
+    ImportantPartyMemberToResurrect(PlayerbotAI* botAI, std::string const name = "important party member to resurrect")
+        : PartyMemberValue(botAI, name)
+    {
+    }
+
+protected:
+    Unit* Calculate() override;
+};
+
 #endif

@@ -53,14 +53,14 @@ public:
     static ObjectGuid GetRandomBot();
     static void Init();
     void Refresh();
-    void Randomize(bool incremental);
+    void Randomize(bool incremental, int forcedSpecNo = -1);
     static std::list<uint32> classQuestIds;
     void ClearEverything();
     void InitSkills();
 
     static uint32 tradeSkills[];
     static float CalculateEnchantScore(uint32 enchant_id, Player* bot);
-    void InitTalentsTree(bool incremental = false, bool use_template = true, bool reset = false);
+    void InitTalentsTree(bool incremental = false, bool use_template = true, bool reset = false, int forcedSpecNo = -1);
     static void InitTalentsBySpecNo(Player* bot, int specNo, bool reset);
     static void InitTalentsByParsedSpecLink(Player* bot, std::vector<std::vector<uint32>> parsedSpecLink, bool reset);
     void InitAvailableSpells();

@@ -8,7 +8,11 @@
 #include <cmath>
 #include <cstdlib>
 #include <iomanip>
+#include <limits>
+#include <mutex>
+#include <sstream>
 #include <string>
+#include <unordered_set>
 
 #include "Corpse.h"
 #include "Event.h"
@@ -41,6 +45,52 @@
 #include "Unit.h"
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
+
+namespace
+{
+long QuantizeCoord(float value)
+{
+    if (!std::isfinite(value))
+        return std::numeric_limits<long>::min();
+
+    return std::lround(value * 10.0f);
+}
+
+bool IsBehindTargetResolutionSafe(Player* bot, Unit* target)
+{
+    if (!bot || !target || !bot->IsInWorld() || !target->IsInWorld() || !bot->FindMap() || !target->FindMap() ||
+        !bot->IsInMap(target) || bot->GetMapId() != target->GetMapId() || bot->GetInstanceId() != target->GetInstanceId() ||
+        bot->GetTransport() || target->GetTransport() || bot->IsBeingTeleported())
+        return false;
+
+    if (target->GetTypeId() == TYPEID_PLAYER && static_cast<Player const*>(target)->IsBeingTeleported())
+        return false;
+
+    return MaNGOS::IsValidMapCoord(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()) &&
+           MaNGOS::IsValidMapCoord(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+}
+
+void WarnOnceRejectedBehindPosition(Player* bot, Unit* target, char const* source, char const* reason, float x, float y, float z)
+{
+    static std::mutex warnMutex;
+    static std::unordered_set<std::string> warnedContexts;
+
+    std::ostringstream key;
+    key << source << '|' << reason << '|' << bot->GetGUIDLow() << '|' << (target ? target->GetGUIDLow() : 0) << '|'
+        << bot->GetMapId() << '|' << bot->GetInstanceId() << '|' << QuantizeCoord(x) << '|' << QuantizeCoord(y) << '|'
+        << QuantizeCoord(z);
+
+    std::lock_guard<std::mutex> lock(warnMutex);
+    if (!warnedContexts.insert(key.str()).second)
+        return;
+
+    std::string const botGuid = bot->GetGuidStr();
+    std::string const targetGuid = target ? target->GetGuidStr() : std::string("none");
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC,
+             "[playerbots] rejected behind position: bot=%s target=%s map=%u instance=%u source=%s x=%.3f y=%.3f z=%.3f reason=%s",
+             botGuid.c_str(), targetGuid.c_str(), bot->GetMapId(), bot->GetInstanceId(), source, x, y, z, reason);
+}
+}
 
 MovementAction::MovementAction(PlayerbotAI* botAI, std::string const name) : Action(botAI, name)
 {
@@ -2167,6 +2217,13 @@ bool SetBehindTargetAction::Execute(Event event)
     if (!target)
         return false;
 
+    if (!IsBehindTargetResolutionSafe(bot, target))
+    {
+        WarnOnceRejectedBehindPosition(bot, target, "SetBehindTargetAction::Execute", "invalid_object_state",
+                                       target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+        return false;
+    }
+
     if (target->GetVictim() == bot)
         return false;
 
@@ -2188,31 +2245,71 @@ bool SetBehindTargetAction::Execute(Event event)
     float dist = std::max(bot->GetExactDist(target), bot->GetMeleeRange(target) / 2) - bot->GetCombatReach() -
                  target->GetCombatReach();
     std::vector<Position> availablePos;
-    float x, y, z;
+    float x = target->GetPositionX();
+    float y = target->GetPositionY();
+    float z = target->GetPositionZ();
     target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle1);
-    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
-                                                       bot->GetPositionZ(), x, y, z))
+    if (!MaNGOS::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
     {
-        /// @todo: movement control now is a mess, prepare to rewrite
-        std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
-        Position pos(x, y, z);
-        float angle = bot->GetAngle(pos.GetPositionX(), pos.GetPositionY());
-        if (CheckLastFlee(angle, infoList))
+        WarnOnceRejectedBehindPosition(bot, target, "SetBehindTargetAction::Execute", "invalid_candidate_coords", x, y, z);
+    }
+    else if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                            bot->GetPositionZ(), x, y, z))
+    {
+        if (!MaNGOS::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
         {
-            availablePos.push_back(Position(x, y, z));
+            WarnOnceRejectedBehindPosition(bot, target, "SetBehindTargetAction::Execute", "invalid_post_collision_coords",
+                                           x, y, z);
+        }
+        else
+        {
+            /// @todo: movement control now is a mess, prepare to rewrite
+            std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
+            Position pos(x, y, z);
+            float angle = bot->GetAngle(pos.GetPositionX(), pos.GetPositionY());
+            if (CheckLastFlee(angle, infoList))
+            {
+                availablePos.push_back(Position(x, y, z));
+            }
         }
     }
-    target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle2);
-    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
-                                                       bot->GetPositionZ(), x, y, z))
+    else
     {
-        std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
-        Position pos(x, y, z);
-        float angle = bot->GetAngle(pos.GetPositionX(), pos.GetPositionY());
-        if (CheckLastFlee(angle, infoList))
+        WarnOnceRejectedBehindPosition(bot, target, "SetBehindTargetAction::Execute", "collision_or_terrain_rejected",
+                                       x, y, z);
+    }
+
+    x = target->GetPositionX();
+    y = target->GetPositionY();
+    z = target->GetPositionZ();
+    target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle2);
+    if (!MaNGOS::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
+    {
+        WarnOnceRejectedBehindPosition(bot, target, "SetBehindTargetAction::Execute", "invalid_candidate_coords", x, y, z);
+    }
+    else if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                            bot->GetPositionZ(), x, y, z))
+    {
+        if (!MaNGOS::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
         {
-            availablePos.push_back(Position(x, y, z));
+            WarnOnceRejectedBehindPosition(bot, target, "SetBehindTargetAction::Execute", "invalid_post_collision_coords",
+                                           x, y, z);
         }
+        else
+        {
+            std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
+            Position pos(x, y, z);
+            float angle = bot->GetAngle(pos.GetPositionX(), pos.GetPositionY());
+            if (CheckLastFlee(angle, infoList))
+            {
+                availablePos.push_back(Position(x, y, z));
+            }
+        }
+    }
+    else
+    {
+        WarnOnceRejectedBehindPosition(bot, target, "SetBehindTargetAction::Execute", "collision_or_terrain_rejected",
+                                       x, y, z);
     }
     if (availablePos.empty())
         return false;

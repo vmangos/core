@@ -25,6 +25,12 @@ typedef std::map<std::string, std::set<std::string> > PlayerBotErrorMap;
 class PlayerbotHolder : public PlayerbotAIBase
 {
 public:
+    struct PendingBotInitRequest
+    {
+        bool forceFactoryRandomize = false;
+        int forcedSpecNo = -1;
+    };
+
     PlayerbotHolder();
     virtual ~PlayerbotHolder(){};
 
@@ -59,9 +65,13 @@ public:
 
     bool IsBotLoading(ObjectGuid guid) const { return botLoading.find(guid) != botLoading.end(); }
     static void SetBotLoading(ObjectGuid guid, bool loading);
+    static bool IsBotLoadingGuid(ObjectGuid guid);
     static bool TryGetPendingBotOwner(ObjectGuid guid, uint32& masterAccountId);
     static void SetPendingBotOwner(ObjectGuid guid, uint32 masterAccountId);
     static void ClearPendingBotOwner(ObjectGuid guid);
+    static bool TryGetPendingBotInitRequest(ObjectGuid guid, PendingBotInitRequest& request);
+    static void SetPendingBotInitRequest(ObjectGuid guid, PendingBotInitRequest const& request);
+    static void ClearPendingBotInitRequest(ObjectGuid guid);
     static void RegisterPendingBotSession(ObjectGuid guid, WorldSession* session);
     static WorldSession* FindPendingBotSession(ObjectGuid guid);
     static void UnregisterPendingBotSession(ObjectGuid guid);
@@ -75,6 +85,7 @@ protected:
     PlayerBotMap playerBots;
     static std::unordered_set<ObjectGuid> botLoading;
     static std::unordered_map<ObjectGuid, uint32> pendingBotOwners;
+    static std::unordered_map<ObjectGuid, PendingBotInitRequest> pendingBotInitRequests;
     static std::unordered_map<ObjectGuid, WorldSession*> pendingBotSessions;
 };
 

@@ -4042,6 +4042,13 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     SpellCastTargets targets;
+    bool const hasLocationLikeEffect = spellInfo->HasEffect(SPELL_EFFECT_TRANS_DOOR) ||
+                                       spellInfo->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA) ||
+                                       spellInfo->HasEffect(SPELL_EFFECT_SUMMON_OBJECT_WILD) ||
+                                       spellInfo->HasEffect(SPELL_EFFECT_SUMMON_OBJECT_SLOT1) ||
+                                       spellInfo->HasEffect(SPELL_EFFECT_SUMMON_OBJECT_SLOT2) ||
+                                       spellInfo->HasEffect(SPELL_EFFECT_SUMMON_OBJECT_SLOT3) ||
+                                       spellInfo->HasEffect(SPELL_EFFECT_SUMMON_OBJECT_SLOT4);
     if (spellInfo->Targets & TARGET_FLAG_ITEM || spellInfo->Targets & TARGET_FLAG_GAMEOBJECT_ITEM)
     {
         Item* item = itemTarget ? itemTarget : aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
@@ -4054,9 +4061,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
             return true;
         }
     }
-    else if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+    else if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION || hasLocationLikeEffect)
     {
-        // WorldLocation aoe = aiObjectContext->GetValue<WorldLocation>("aoe position")->Get();
         targets.setDestination(x, y, z);
     }
     else if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
@@ -4065,15 +4071,15 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     }
     else
     {
+        delete spell;
         return false;
     }
 
     if (spellInfo->Effect[0] == SPELL_EFFECT_OPEN_LOCK || spellInfo->Effect[0] == SPELL_EFFECT_SKINNING)
     {
+        delete spell;
         return false;
     }
-
-    spell->prepare(targets);
 
     // Fix stale movement flags: if the bot's movespline is finalized (not actively on a spline)
     // but movement flags are still set, clear them. This prevents bots from being permanently
@@ -4087,7 +4093,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     {
         // bot->StopMoving();
         SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
-        spell->cancel();
         delete spell;
         return false;
     }
@@ -4097,11 +4102,12 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         LootObject loot = *aiObjectContext->GetValue<LootObject>("loot target");
         if (!loot.IsLootPossible(bot))
         {
-            spell->cancel();
             delete spell;
             return false;
         }
     }
+
+    spell->prepare(targets);
 
     // WaitForSpellCast(spell);
     aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get().Set(spellId, bot->GetGUID(), time(nullptr));

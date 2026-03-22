@@ -39,6 +39,17 @@ public:
     std::string const castString(WorldObject* target) override;
 };
 
+class CastCustomSpellByIdAction : public CastCustomSpellAction
+{
+public:
+    CastCustomSpellByIdAction(PlayerbotAI* botAI, std::string const name = "cast spell by id")
+        : CastCustomSpellAction(botAI, name)
+    {
+    }
+
+    bool Execute(Event event) override;
+};
+
 class CastRandomSpellAction : public ListSpellsAction
 {
 public:

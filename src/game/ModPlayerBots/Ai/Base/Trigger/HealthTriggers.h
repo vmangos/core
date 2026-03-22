@@ -160,6 +160,14 @@ public:
     bool IsActive() override;
 };
 
+class ImportantCombatPartyMemberDeadTrigger : public Trigger
+{
+public:
+    ImportantCombatPartyMemberDeadTrigger(PlayerbotAI* ai) : Trigger(ai, "important combat party member dead", 1) {}
+    std::string const GetTargetName() override { return "important party member to resurrect"; }
+    bool IsActive() override;
+};
+
 class DeadTrigger : public Trigger
 {
 public:

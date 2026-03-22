@@ -276,7 +276,7 @@ void PlayerbotFactory::Prepare()
     }
 }
 
-void PlayerbotFactory::Randomize(bool incremental)
+void PlayerbotFactory::Randomize(bool incremental, int forcedSpecNo)
 {
     // if (sPlayerbotAIConfig.disableRandomLevels)
     // {
@@ -354,7 +354,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (!incremental || !sPlayerbotAIConfig.equipmentPersistence ||
         bot->GetLevel() < sPlayerbotAIConfig.equipmentPersistenceLevel)
     {
-        InitTalentsTree();
+        InitTalentsTree(false, true, false, forcedSpecNo);
     }
     sRandomPlayerbotMgr.SetValue(bot->GetGUIDLow(), "specNo", 0);
     if (botAI)
@@ -1153,56 +1153,73 @@ void PlayerbotFactory::ResetQuests()
     }
 }
 
-void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_template /*true*/, bool reset /*false*/)
+void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_template /*true*/, bool reset /*false*/,
+                                       int forcedSpecNo /*-1*/)
 {
     uint32 specTab;
     uint8 cls = bot->getClass();
-    std::map<uint8, uint32> tabs = AiFactory::GetPlayerSpecTabs(bot);
-    uint32 total_tabs = tabs[0] + tabs[1] + tabs[2];
-    if (increment && total_tabs != 0)
+    if (forcedSpecNo >= 0 && forcedSpecNo < MAX_SPECNO)
     {
-        /// @todo: match current talent with template
-        specTab = AiFactory::GetPlayerSpecTab(bot);
-        /// @todo: fix cat druid hardcode
-        if (bot->getClass() == CLASS_DRUID && specTab == DRUID_TAB_FERAL && bot->GetLevel() >= 20)
+        if (sPlayerbotAIConfig.premadeSpecName[cls][forcedSpecNo].empty())
         {
-            bool isCat = !bot->HasAura(16931);
-            if (!isCat && bot->GetLevel() == 20)
-            {
-                uint32 bearP = sPlayerbotAIConfig.randomClassSpecProb[cls][1];
-                uint32 catP = sPlayerbotAIConfig.randomClassSpecProb[cls][3];
-                if (urand(1, bearP + catP) <= catP)
-                    isCat = true;
-            }
-            if (isCat)
-            {
-                specTab = 3;
-            }
+            LOG_ERROR("playerbots", "Invalid forced spec %d for bot %s class %u", forcedSpecNo, bot->GetName(), cls);
+            forcedSpecNo = -1;
+        }
+        else
+        {
+            specTab = forcedSpecNo;
         }
     }
-    else
+
+    if (forcedSpecNo < 0)
     {
-        uint32 pointSum = 0;
-        for (int i = 0; i < MAX_SPECNO; i++)
+        std::map<uint8, uint32> tabs = AiFactory::GetPlayerSpecTabs(bot);
+        uint32 total_tabs = tabs[0] + tabs[1] + tabs[2];
+        if (increment && total_tabs != 0)
         {
-            pointSum += sPlayerbotAIConfig.randomClassSpecProb[cls][i];
-        }
-        uint32 point = urand(1, pointSum);
-        uint32 currentP = 0;
-        int i;
-        for (i = 0; i < MAX_SPECNO; i++)
-        {
-            currentP += sPlayerbotAIConfig.randomClassSpecProb[cls][i];
-            if (point <= currentP)
+            /// @todo: match current talent with template
+            specTab = AiFactory::GetPlayerSpecTab(bot);
+            /// @todo: fix cat druid hardcode
+            if (bot->getClass() == CLASS_DRUID && specTab == DRUID_TAB_FERAL && bot->GetLevel() >= 20)
             {
-                specTab = i;
-                break;
+                bool isCat = !bot->HasAura(16931);
+                if (!isCat && bot->GetLevel() == 20)
+                {
+                    uint32 bearP = sPlayerbotAIConfig.randomClassSpecProb[cls][1];
+                    uint32 catP = sPlayerbotAIConfig.randomClassSpecProb[cls][3];
+                    if (urand(1, bearP + catP) <= catP)
+                        isCat = true;
+                }
+                if (isCat)
+                {
+                    specTab = 3;
+                }
             }
         }
-        if (i == MAX_SPECNO)
+        else
         {
-            specTab = 0;
-            LOG_ERROR("playerbots", "Fail to select spec num for bot %s! Set to 0.", bot->GetName());
+            uint32 pointSum = 0;
+            for (int i = 0; i < MAX_SPECNO; i++)
+            {
+                pointSum += sPlayerbotAIConfig.randomClassSpecProb[cls][i];
+            }
+            uint32 point = urand(1, pointSum);
+            uint32 currentP = 0;
+            int i;
+            for (i = 0; i < MAX_SPECNO; i++)
+            {
+                currentP += sPlayerbotAIConfig.randomClassSpecProb[cls][i];
+                if (point <= currentP)
+                {
+                    specTab = i;
+                    break;
+                }
+            }
+            if (i == MAX_SPECNO)
+            {
+                specTab = 0;
+                LOG_ERROR("playerbots", "Fail to select spec num for bot %s! Set to 0.", bot->GetName());
+            }
         }
     }
     if (reset)

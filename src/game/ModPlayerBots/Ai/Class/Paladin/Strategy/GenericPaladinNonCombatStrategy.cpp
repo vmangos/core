@@ -18,7 +18,7 @@ void GenericPaladinNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
 {
     NonCombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("party member dead", { NextAction("redemption", ACTION_CRITICAL_HEAL + 10) }));
+    triggers.push_back(new TriggerNode("party member dead", { NextAction("redemption", ACTION_MEDIUM_HEAL) }));
     triggers.push_back(new TriggerNode("party member almost full health", { NextAction("flash of light on party", 25.0f) }));
     triggers.push_back(new TriggerNode("party member medium health", { NextAction("flash of light on party", 26.0f) }));
     triggers.push_back(new TriggerNode("party member low health", { NextAction("holy light on party", 27.0f) }));

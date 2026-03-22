@@ -80,7 +80,7 @@ private:
     static ActionNode* greater_heal_on_party([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("greater heal on party",
-                              /*P*/ {},
+                              /*P*/ { NextAction("remove shadowform") },
                               /*A*/ { NextAction("heal on party") },
                               /*C*/ {});
     }

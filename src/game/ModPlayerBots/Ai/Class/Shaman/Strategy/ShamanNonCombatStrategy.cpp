@@ -54,7 +54,7 @@ void ShamanNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     NonCombatStrategy::InitTriggers(triggers);
 
     // Healing/Resurrect Triggers
-    triggers.push_back(new TriggerNode("party member dead", { NextAction("ancestral spirit", ACTION_CRITICAL_HEAL + 10), }));
+    triggers.push_back(new TriggerNode("party member dead", { NextAction("ancestral spirit", ACTION_MEDIUM_HEAL), }));
     triggers.push_back(new TriggerNode("party member critical health", {
                                                                    NextAction("healing wave on party", 30.0f) }));
     triggers.push_back(new TriggerNode("party member low health",{

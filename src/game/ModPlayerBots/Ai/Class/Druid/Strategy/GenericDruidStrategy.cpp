@@ -109,8 +109,8 @@ void GenericDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("low health", { NextAction("barkskin", ACTION_HIGH + 7) }));
 
-    triggers.push_back(new TriggerNode("combat party member dead",
-                                       { NextAction("rebirth", ACTION_HIGH + 9) }));
+    triggers.push_back(new TriggerNode("important combat party member dead",
+                                       { NextAction("tank rebirth", ACTION_HIGH + 9) }));
     triggers.push_back(new TriggerNode("being attacked",
                                        { NextAction("nature's grasp", ACTION_HIGH + 1) }));
     triggers.push_back(new TriggerNode("new pet", { NextAction("set pet stance", 60.0f) }));

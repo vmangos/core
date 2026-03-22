@@ -217,6 +217,7 @@ public:
         creators["rejuvenation on not full"] = &DruidAiObjectContextInternal::rejuvenation_on_not_full;
         creators["healing touch on party"] = &DruidAiObjectContextInternal::healing_touch_on_party;
         creators["rebirth"] = &DruidAiObjectContextInternal::rebirth;
+        creators["tank rebirth"] = &DruidAiObjectContextInternal::tank_rebirth;
         creators["revive"] = &DruidAiObjectContextInternal::revive;
         creators["barkskin"] = &DruidAiObjectContextInternal::barkskin;
         creators["lacerate"] = &DruidAiObjectContextInternal::lacerate;
@@ -305,6 +306,7 @@ private:
     static Action* rejuvenation_on_not_full(PlayerbotAI* botAI) { return new CastRejuvenationOnNotFullAction(botAI); }
     static Action* healing_touch_on_party(PlayerbotAI* botAI) { return new CastHealingTouchOnPartyAction(botAI); }
     static Action* rebirth(PlayerbotAI* botAI) { return new CastRebirthAction(botAI); }
+    static Action* tank_rebirth(PlayerbotAI* botAI) { return new CastTankRebirthAction(botAI); }
     static Action* revive(PlayerbotAI* botAI) { return new CastReviveAction(botAI); }
     static Action* barkskin(PlayerbotAI* botAI) { return new CastBarkskinAction(botAI); }
     static Action* lacerate(PlayerbotAI* botAI) { return new CastLacerateAction(botAI); }

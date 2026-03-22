@@ -30,6 +30,7 @@
 #include "Policies/SingletonImp.h"
 #include "Util.h"
 #include "SQLStorages.h"
+#include <cmath>
 
 char const* MAP_MAGIC         = "MAPS";
 char const* MAP_VERSION_MAGIC = "z1.4";
@@ -1112,27 +1113,53 @@ float TerrainInfo::GetWaterOrGroundLevel(Position const& position, float* pGroun
 }
 float TerrainInfo::GetWaterOrGroundLevel(float x, float y, float z, float* pGround /*= nullptr*/, bool swim /*= false*/) const
 {
+    if (!MaNGOS::IsValidMapCoord(x, y, z))
+    {
+        if (pGround)
+            *pGround = VMAP_INVALID_HEIGHT_VALUE;
+        return VMAP_INVALID_HEIGHT_VALUE;
+    }
+
     if (const_cast<TerrainInfo*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
         float ground_z = GetHeightStatic(x, y, z, true, DEFAULT_WATER_SEARCH);
+        if (!std::isfinite(ground_z) || ground_z <= INVALID_HEIGHT)
+        {
+            if (pGround)
+                *pGround = VMAP_INVALID_HEIGHT_VALUE;
+            return VMAP_INVALID_HEIGHT_VALUE;
+        }
+
         if (pGround)
             *pGround = ground_z;
 
         GridMapLiquidData liquid_status;
 
         GridMapLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
-        return std::max(res ? (swim ? liquid_status.level - 2.0f : liquid_status.level) : ground_z, ground_z);
+        float const level = res ? (swim ? liquid_status.level - 2.0f : liquid_status.level) : ground_z;
+        if (!std::isfinite(level))
+            return VMAP_INVALID_HEIGHT_VALUE;
+
+        return std::max(level, ground_z);
     }
 
+    if (pGround)
+        *pGround = VMAP_INVALID_HEIGHT_VALUE;
     return VMAP_INVALID_HEIGHT_VALUE;
 }
 
 GridMap* TerrainInfo::GetGrid(float const x, float const y)
 {
+    if (!MaNGOS::IsValidMapCoord(x, y))
+        return nullptr;
+
     // Giperion Elysium: It's reversed. That's ok
     int gx = (int)(32 - y / SIZE_OF_GRIDS);                 // grid x
     int gy = (int)(32 - x / SIZE_OF_GRIDS);                 // grid y
+
+    if (gx < 0 || gx >= MAX_NUMBER_OF_GRIDS || gy < 0 || gy >= MAX_NUMBER_OF_GRIDS)
+        return nullptr;
 
     // quick check if GridMap already loaded
     GridMap* pMap = m_GridMaps[gx][gy];

@@ -41,8 +41,40 @@ private:
     IsTargetOfResurrectSpell predicate;
 };
 
+class FindDeadTankPlayer : public FindDeadPlayer
+{
+public:
+    FindDeadTankPlayer(PlayerbotAI* botAI, PartyMemberValue* value, bool mainTankOnly)
+        : FindDeadPlayer(value), botAI(botAI), mainTankOnly(mainTankOnly)
+    {
+    }
+
+    bool Check(Unit* unit) override
+    {
+        Player* player = unit->ToPlayer();
+        if (!player || !FindDeadPlayer::Check(unit))
+            return false;
+
+        return mainTankOnly ? botAI->IsMainTank(player) : botAI->IsTank(player);
+    }
+
+private:
+    PlayerbotAI* botAI;
+    bool mainTankOnly;
+};
+
 Unit* PartyMemberToResurrect::Calculate()
 {
     FindDeadPlayer finder(this);
     return FindPartyMember(finder);
+}
+
+Unit* ImportantPartyMemberToResurrect::Calculate()
+{
+    FindDeadTankPlayer deadMainTankFinder(botAI, this, true);
+    if (Unit* target = FindPartyMember(deadMainTankFinder))
+        return target;
+
+    FindDeadTankPlayer deadTankFinder(botAI, this, false);
+    return FindPartyMember(deadTankFinder);
 }

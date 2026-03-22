@@ -11,6 +11,8 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
+#include <limits>
+
 size_t FindLastSeparator(std::string const text, std::string const sep)
 {
     size_t pos = text.rfind(sep);
@@ -28,6 +30,31 @@ size_t FindLastSeparator(std::string const text, std::string const sep)
 static inline void ltrim(std::string& s)
 {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+}
+
+static inline void rtrim(std::string& s)
+{
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
+}
+
+static inline void trim(std::string& s)
+{
+    ltrim(s);
+    rtrim(s);
+}
+
+static bool ParseStrictSpellId(std::string const& text, uint32& spellId)
+{
+    if (text.empty() ||
+        !std::all_of(text.begin(), text.end(), [](unsigned char ch) { return std::isdigit(ch); }))
+        return false;
+
+    unsigned long long const parsed = std::strtoull(text.c_str(), nullptr, 10);
+    if (parsed > std::numeric_limits<uint32>::max())
+        return false;
+
+    spellId = static_cast<uint32>(parsed);
+    return true;
 }
 
 bool CastCustomSpellAction::Execute(Event event)
@@ -54,7 +81,7 @@ bool CastCustomSpellAction::Execute(Event event)
             chat->eraseAllSubStr(text, chat->FormatWorldobject(botAI->GetUnit(go)));
         }
 
-        ltrim(text);
+        trim(text);
     }
 
     uint32 spell = 0;
@@ -64,12 +91,12 @@ bool CastCustomSpellAction::Execute(Event event)
         if (onPos != std::string::npos)
         {
             std::string targetName = text.substr(onPos + 4);
-            ltrim(targetName);
+            trim(targetName);
             if (!targetName.empty())
             {
                 // check if spell still exists after we remove " on PlayerName" part
                 std::string truncatedText = text.substr(0, onPos);
-                ltrim(truncatedText);
+                trim(truncatedText);
                 spell = AI_VALUE2(uint32, "spell id", truncatedText);
 
                 if (spell)
@@ -188,6 +215,177 @@ bool CastCustomNcSpellAction::isUseful() { return !bot->IsInCombat(); }
 std::string const CastCustomNcSpellAction::castString(WorldObject* target)
 {
     return "castnc " + chat->FormatWorldobject(target);
+}
+
+bool CastCustomSpellByIdAction::Execute(Event event)
+{
+    // only allow proper vehicle seats
+    if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true))
+        return false;
+
+    Player* master = GetMaster();
+    Unit* target = nullptr;
+    std::string text = event.getParam();
+    std::string const originalText = text;
+    bool hasExplicitTarget = false;
+
+    GuidVector gos = chat->parseGameobjects(text);
+    if (!gos.empty())
+    {
+        for (auto go : gos)
+        {
+            if (!target)
+                target = botAI->GetUnit(go);
+
+            if (!botAI->GetUnit(go) || !botAI->GetUnit(go)->IsInWorld())
+                continue;
+
+            chat->eraseAllSubStr(text, chat->FormatWorldobject(botAI->GetUnit(go)));
+        }
+
+        trim(text);
+    }
+
+    uint32 spellId = 0;
+    if (!target)
+    {
+        size_t onPos = FindLastSeparator(text, " on ");
+        if (onPos != std::string::npos)
+        {
+            std::string targetName = text.substr(onPos + 4);
+            trim(targetName);
+            if (!targetName.empty())
+            {
+                std::string truncatedText = text.substr(0, onPos);
+                trim(truncatedText);
+
+                if (ParseStrictSpellId(truncatedText, spellId))
+                {
+                    if (Player* targetPlayer = ObjectAccessor::FindPlayerByName(targetName.c_str()))
+                    {
+                        target = targetPlayer;
+                        hasExplicitTarget = true;
+                        text = truncatedText;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!target)
+        if (master && master->GetSelectionGuid())
+            target = botAI->GetUnit(master->GetSelectionGuid());
+
+    if (!target)
+        target = bot;
+
+    if (!master)  // Use self as master for permissions.
+        master = bot;
+
+    Item* itemTarget = nullptr;
+
+    size_t pos = FindLastSeparator(text, " ");
+    if (pos != std::string::npos)
+    {
+        std::string const param = text.substr(pos + 1);
+        std::vector<Item*> items = InventoryAction::parseItems(param, ITERATE_ITEMS_IN_BAGS);
+        if (!items.empty())
+        {
+            itemTarget = *items.begin();
+            text = text.substr(0, pos);
+            trim(text);
+        }
+    }
+
+    if (!ParseStrictSpellId(text, spellId))
+    {
+        botAI->TellError("Usage: castid <spellId> [target]");
+        return false;
+    }
+
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    if (!spellInfo)
+    {
+        botAI->TellError("Unknown spell id " + std::to_string(spellId));
+        return false;
+    }
+
+    bool const hasLocationTargetFlags =
+        (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION) || (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION);
+    bool const hasLocationLikeEffect = spellInfo->Effect[EFFECT_0] == SPELL_EFFECT_TRANS_DOOR ||
+                                       spellInfo->Effect[EFFECT_0] == SPELL_EFFECT_PERSISTENT_AREA_AURA ||
+                                       spellInfo->Effect[EFFECT_0] == SPELL_EFFECT_SUMMON_OBJECT_WILD ||
+                                       spellInfo->Effect[EFFECT_0] == SPELL_EFFECT_SUMMON_OBJECT_SLOT1 ||
+                                       spellInfo->Effect[EFFECT_0] == SPELL_EFFECT_SUMMON_OBJECT_SLOT2 ||
+                                       spellInfo->Effect[EFFECT_0] == SPELL_EFFECT_SUMMON_OBJECT_SLOT3 ||
+                                       spellInfo->Effect[EFFECT_0] == SPELL_EFFECT_SUMMON_OBJECT_SLOT4 ||
+                                       spellInfo->Effect[EFFECT_1] == SPELL_EFFECT_TRANS_DOOR ||
+                                       spellInfo->Effect[EFFECT_1] == SPELL_EFFECT_PERSISTENT_AREA_AURA ||
+                                       spellInfo->Effect[EFFECT_1] == SPELL_EFFECT_SUMMON_OBJECT_WILD ||
+                                       spellInfo->Effect[EFFECT_1] == SPELL_EFFECT_SUMMON_OBJECT_SLOT1 ||
+                                       spellInfo->Effect[EFFECT_1] == SPELL_EFFECT_SUMMON_OBJECT_SLOT2 ||
+                                       spellInfo->Effect[EFFECT_1] == SPELL_EFFECT_SUMMON_OBJECT_SLOT3 ||
+                                       spellInfo->Effect[EFFECT_1] == SPELL_EFFECT_SUMMON_OBJECT_SLOT4 ||
+                                       spellInfo->Effect[EFFECT_2] == SPELL_EFFECT_TRANS_DOOR ||
+                                       spellInfo->Effect[EFFECT_2] == SPELL_EFFECT_PERSISTENT_AREA_AURA ||
+                                       spellInfo->Effect[EFFECT_2] == SPELL_EFFECT_SUMMON_OBJECT_WILD ||
+                                       spellInfo->Effect[EFFECT_2] == SPELL_EFFECT_SUMMON_OBJECT_SLOT1 ||
+                                       spellInfo->Effect[EFFECT_2] == SPELL_EFFECT_SUMMON_OBJECT_SLOT2 ||
+                                       spellInfo->Effect[EFFECT_2] == SPELL_EFFECT_SUMMON_OBJECT_SLOT3 ||
+                                       spellInfo->Effect[EFFECT_2] == SPELL_EFFECT_SUMMON_OBJECT_SLOT4;
+    bool const isLocationTargetSpell = hasLocationTargetFlags || hasLocationLikeEffect;
+
+    if (target != bot && !bot->HasInArc(target, CAST_ANGLE_IN_FRONT, sPlayerbotAIConfig.sightDistance))
+    {
+        ServerFacade::instance().SetFacingTo(bot, target);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
+        botAI->HandleCommand(CHAT_MSG_WHISPER, "castid " + originalText, master);
+        return true;
+    }
+
+    std::ostringstream spellName;
+    spellName << ChatHelper::FormatSpell(spellInfo) << " on ";
+
+    if (bot->GetTrader())
+        spellName << "trade item";
+    else if (itemTarget)
+        spellName << chat->FormatItem(itemTarget->GetTemplate());
+    else if (isLocationTargetSpell && !hasExplicitTarget)
+        spellName << "current location";
+    else if (target == bot)
+        spellName << "self";
+    else
+        spellName << target->GetName();
+
+    float castX = master ? master->GetPositionX() : bot->GetPositionX();
+    float castY = master ? master->GetPositionY() : bot->GetPositionY();
+    float castZ = master ? master->GetPositionZ() : bot->GetPositionZ();
+    if (target && (hasExplicitTarget || hasLocationTargetFlags))
+    {
+        castX = target->GetPositionX();
+        castY = target->GetPositionY();
+        castZ = target->GetPositionZ();
+    }
+
+    bool canCast = !bot->GetTrader() &&
+                   (isLocationTargetSpell ? botAI->CanCastSpell(spellId, castX, castY, castZ, true, itemTarget)
+                                         : botAI->CanCastSpell(spellId, target, true, itemTarget));
+    if (!bot->GetTrader() && !canCast)
+    {
+        botAI->TellError("Cannot cast " + spellName.str());
+        return false;
+    }
+
+    bool result = isLocationTargetSpell ? botAI->CastSpell(spellId, castX, castY, castZ, itemTarget)
+                                        : botAI->CastSpell(spellId, target, itemTarget);
+    if (result)
+    {
+        botAI->TellMasterNoFacing("Casting " + spellName.str());
+        return true;
+    }
+
+    botAI->TellError("Cast " + spellName.str() + " is failed");
+    return false;
 }
 
 bool CastRandomSpellAction::AcceptSpell(SpellInfo const* spellInfo)

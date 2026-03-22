@@ -86,6 +86,15 @@ public:
     bool isUseful() override;
 };
 
+class CastTankRebirthAction : public CastRebirthAction
+{
+public:
+    CastTankRebirthAction(PlayerbotAI* botAI) : CastRebirthAction(botAI) {}
+
+    std::string const getName() override { return "tank rebirth"; }
+    std::string const GetTargetName() override { return "important party member to resurrect"; }
+};
+
 class CastMarkOfTheWildAction : public CastBuffSpellAction
 {
 public:

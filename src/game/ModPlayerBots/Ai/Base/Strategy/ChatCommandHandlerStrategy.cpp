@@ -70,6 +70,8 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(
         new TriggerNode("cast", { NextAction("cast custom spell", relevance) }));
     triggers.push_back(
+        new TriggerNode("castid", { NextAction("cast spell by id", relevance) }));
+    triggers.push_back(
         new TriggerNode("castnc", { NextAction("cast custom nc spell", relevance) }));
     triggers.push_back(
         new TriggerNode("revive", { NextAction("spirit healer", relevance) }));
@@ -154,6 +156,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("invite");
     supported.push_back("lfg");
     supported.push_back("spell");
+    supported.push_back("castid");
     supported.push_back("rti");
     supported.push_back("position");
     supported.push_back("summon");

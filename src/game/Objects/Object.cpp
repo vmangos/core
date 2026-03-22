@@ -55,9 +55,145 @@
 #include "packet_builder.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
+#include <cmath>
 
 ////////////////////////////////////////////////////////////
 // Methods of class MovementInfo
+
+namespace
+{
+enum class AllowedPositionZResult
+{
+    Success,
+    InvalidObjectState,
+    InvalidCoords,
+    TerrainUnavailable
+};
+
+bool IsTerrainLookupObjectStateValid(WorldObject const* object)
+{
+    if (!object || !object->IsInWorld() || !object->FindMap() || !object->GetTerrain() || object->GetTransport() ||
+        !object->IsPositionValid())
+        return false;
+
+    if (object->GetTypeId() == TYPEID_PLAYER && static_cast<Player const*>(object)->IsBeingTeleported())
+        return false;
+
+    return true;
+}
+
+AllowedPositionZResult TryUpdateGroundPositionZ(WorldObject const* object, float x, float y, float& z)
+{
+    if (!IsTerrainLookupObjectStateValid(object))
+        return AllowedPositionZResult::InvalidObjectState;
+
+    if (!MaNGOS::IsValidMapCoord(x, y, z))
+        return AllowedPositionZResult::InvalidCoords;
+
+    float const originalZ = z;
+    float const newZ = object->FindMap()->GetHeight(x, y, z, true);
+    if (!std::isfinite(newZ) || newZ <= INVALID_HEIGHT)
+    {
+        z = originalZ;
+        return AllowedPositionZResult::TerrainUnavailable;
+    }
+
+    z = newZ + 0.05f;                                       // just to be sure that we are not a few pixel under the surface
+    return AllowedPositionZResult::Success;
+}
+
+AllowedPositionZResult TryUpdateAllowedPositionZ(WorldObject const* object, float x, float y, float& z)
+{
+    if (!IsTerrainLookupObjectStateValid(object))
+        return AllowedPositionZResult::InvalidObjectState;
+
+    if (!MaNGOS::IsValidMapCoord(x, y, z))
+        return AllowedPositionZResult::InvalidCoords;
+
+    float const originalZ = z;
+    Map* const map = object->FindMap();
+    TerrainInfo const* const terrain = object->GetTerrain();
+    if (!map || !terrain)
+        return AllowedPositionZResult::InvalidObjectState;
+
+    switch (object->GetTypeId())
+    {
+        case TYPEID_UNIT:
+        {
+            if (!static_cast<Creature const*>(object)->CanFly())
+            {
+                bool const canSwim = static_cast<Creature const*>(object)->CanSwim();
+                float ground_z = z;
+                float max_z = canSwim
+                                  ? terrain->GetWaterOrGroundLevel(x, y, z, &ground_z,
+                                                                    !static_cast<Unit const*>(object)->HasAuraType(SPELL_AURA_WATER_WALK))
+                                  : (ground_z = map->GetHeight(x, y, z, true));
+                if (!std::isfinite(ground_z) || !std::isfinite(max_z) || max_z <= INVALID_HEIGHT)
+                {
+                    z = originalZ;
+                    return AllowedPositionZResult::TerrainUnavailable;
+                }
+
+                if (z > max_z)
+                    z = max_z;
+                else if (z < ground_z)
+                    z = ground_z;
+            }
+            else
+            {
+                float const ground_z = map->GetHeight(x, y, z, true);
+                if (!std::isfinite(ground_z) || ground_z <= INVALID_HEIGHT)
+                {
+                    z = originalZ;
+                    return AllowedPositionZResult::TerrainUnavailable;
+                }
+
+                if (z < ground_z)
+                    z = ground_z;
+            }
+            break;
+        }
+        case TYPEID_PLAYER:
+        {
+            float ground_z = z;
+            float const max_z =
+                terrain->GetWaterOrGroundLevel(x, y, z, &ground_z,
+                                               !static_cast<Unit const*>(object)->HasAuraType(SPELL_AURA_WATER_WALK));
+            if (!std::isfinite(ground_z) || !std::isfinite(max_z) || max_z <= INVALID_HEIGHT)
+            {
+                z = originalZ;
+                return AllowedPositionZResult::TerrainUnavailable;
+            }
+
+            if (z > max_z)
+                z = max_z;
+            else if (z < ground_z)
+                z = ground_z;
+            break;
+        }
+        default:
+        {
+            float const ground_z = map->GetHeight(x, y, z, true);
+            if (!std::isfinite(ground_z) || ground_z <= INVALID_HEIGHT)
+            {
+                z = originalZ;
+                return AllowedPositionZResult::TerrainUnavailable;
+            }
+
+            z = ground_z;
+            break;
+        }
+    }
+
+    return AllowedPositionZResult::Success;
+}
+
+bool FinalizeNearPointZ(WorldObject const* owner, WorldObject const* searcher, float x, float y, float& z)
+{
+    return searcher ? TryUpdateAllowedPositionZ(searcher, x, y, z) == AllowedPositionZResult::Success
+                    : TryUpdateGroundPositionZ(owner, x, y, z) == AllowedPositionZResult::Success;
+}
+}
 
 void MovementInfo::Read(ByteBuffer &data)
 {
@@ -1980,69 +2116,12 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
 
 void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
 {
-    float new_z = GetMap()->GetHeight(x, y, z, true);
-    if (new_z > INVALID_HEIGHT)
-        z = new_z + 0.05f;                                  // just to be sure that we are not a few pixel under the surface
+    TryUpdateGroundPositionZ(this, x, y, z);
 }
 
 void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
 {
-    if (GetTransport())
-        return;
-
-    switch (GetTypeId())
-    {
-        case TYPEID_UNIT:
-        {
-            // non fly unit don't must be in air
-            // non swim unit must be at ground (mostly speedup, because it don't must be in water and water level check less fast
-            if (!((Creature const*)this)->CanFly())
-            {
-                bool canSwim = ((Creature const*)this)->CanSwim();
-                float ground_z = z;
-                float max_z = canSwim
-                              ? GetTerrain()->GetWaterOrGroundLevel(x, y, z, &ground_z, !((Unit const*)this)->HasAuraType(SPELL_AURA_WATER_WALK))
-                              : ((ground_z = GetMap()->GetHeight(x, y, z, true)));
-                if (max_z > INVALID_HEIGHT)
-                {
-                    if (z > max_z)
-                        z = max_z;
-                    else if (z < ground_z)
-                        z = ground_z;
-                }
-            }
-            else
-            {
-                float ground_z = GetMap()->GetHeight(x, y, z, true);
-                if (z < ground_z)
-                    z = ground_z;
-            }
-            break;
-        }
-        case TYPEID_PLAYER:
-        {
-            // for server controlled moves playr work same as creature (but it can always swim)
-            {
-                float ground_z = z;
-                float max_z = GetTerrain()->GetWaterOrGroundLevel(x, y, z, &ground_z, !((Unit const*)this)->HasAuraType(SPELL_AURA_WATER_WALK));
-                if (max_z > INVALID_HEIGHT)
-                {
-                    if (z > max_z)
-                        z = max_z;
-                    else if (z < ground_z)
-                        z = ground_z;
-                }
-            }
-            break;
-        }
-        default:
-        {
-            float ground_z = GetMap()->GetHeight(x, y, z, true);
-            if (ground_z > INVALID_HEIGHT)
-                z = ground_z;
-            break;
-        }
-    }
+    TryUpdateAllowedPositionZ(this, x, y, z);
 }
 
 void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
@@ -2620,10 +2699,8 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
     // if detection disabled, return first point
     if (!sWorld.getConfig(CONFIG_BOOL_DETECT_POS_COLLISION))
     {
-        if (searcher)
-            searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
-        else
-            UpdateGroundPositionZ(x, y, z);
+        if (!FinalizeNearPointZ(this, searcher, x, y, z))
+            z = startZ;
         return;
     }
 
@@ -2646,12 +2723,7 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
     // maybe can just place in primary position
     if (selector.CheckOriginal())
     {
-        if (searcher)
-            searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
-        else
-            UpdateGroundPositionZ(x, y, z);
-
-        if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
+        if (FinalizeNearPointZ(this, searcher, x, y, z) && IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
             return;
 
         first_los_conflict = true;                          // first point have LOS problems
@@ -2665,12 +2737,7 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
         GetNearPoint2DAroundPosition(startX, startY, x, y, distance2d, absAngle + angle);
         z = startZ;
 
-        if (searcher)
-            searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
-        else
-            UpdateGroundPositionZ(x, y, z);
-
-        if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
+        if (FinalizeNearPointZ(this, searcher, x, y, z) && IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
             return;
     }
 
@@ -2683,12 +2750,7 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
         GetNearPoint2DAroundPosition(startX, startY, x, y, distance2d, absAngle + angle);
         z = startZ;
 
-        if (searcher)
-            searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
-        else
-            UpdateGroundPositionZ(x, y, z);
-
-        if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
+        if (FinalizeNearPointZ(this, searcher, x, y, z) && IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
             return;
     }
 
@@ -2700,10 +2762,8 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
         x = first_x;
         y = first_y;
 
-        if (searcher)
-            searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
-        else
-            UpdateGroundPositionZ(x, y, z);
+        if (!FinalizeNearPointZ(this, searcher, x, y, z))
+            z = startZ;
 
         return;
     }
@@ -2716,12 +2776,7 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
             GetNearPoint2DAroundPosition(startX, startY, x, y, distance2d, absAngle + angle);
             z = startZ;
 
-            if (searcher)
-                searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
-            else
-                UpdateGroundPositionZ(x, y, z);
-
-            if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
+            if (FinalizeNearPointZ(this, searcher, x, y, z) && IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
                 return;
         }
     }
@@ -2735,12 +2790,7 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
         GetNearPoint2DAroundPosition(startX, startY, x, y, distance2d, absAngle + angle);
         z = startZ;
 
-        if (searcher)
-            searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
-        else
-            UpdateGroundPositionZ(x, y, z);
-
-        if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
+        if (FinalizeNearPointZ(this, searcher, x, y, z) && IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
             return;
     }
 
@@ -2748,10 +2798,8 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
     x = first_x;
     y = first_y;
 
-    if (searcher)
-        searcher->UpdateAllowedPositionZ(x, y, z);          // update to LOS height if available
-    else
-        UpdateGroundPositionZ(x, y, z);
+    if (!FinalizeNearPointZ(this, searcher, x, y, z))
+        z = startZ;
 }
 
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player const* target /*= nullptr*/) const

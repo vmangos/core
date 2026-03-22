@@ -73,12 +73,22 @@ private:
 std::unordered_set<ObjectGuid> BotInitGuard::botsBeingInitialized;
 std::unordered_set<ObjectGuid> PlayerbotHolder::botLoading;
 std::unordered_map<ObjectGuid, uint32> PlayerbotHolder::pendingBotOwners;
+std::unordered_map<ObjectGuid, PlayerbotHolder::PendingBotInitRequest> PlayerbotHolder::pendingBotInitRequests;
 std::unordered_map<ObjectGuid, WorldSession*> PlayerbotHolder::pendingBotSessions;
 
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase(false) {}
 
 namespace
 {
+struct RoleSpecCandidate
+{
+    uint8 classId;
+    int specNo;
+};
+
+char const* const kAddRoleUsage = "usage: addrole ROLE [male|female|0|1]";
+char const* const kAddRoleList = "tank/healer/dps/ranged_dps";
+
 uint32 GetOnlineAccountBotCount()
 {
     uint32 accountBotCount = 0;
@@ -180,6 +190,159 @@ bool EnsureLiveBotGroupBinding(Player* master, Player* bot)
 
     group->SendUpdate();
     return bot->GetGroup() == group;
+}
+
+bool TryParseGender(char const* genderArg, int8& gender, std::string& error)
+{
+    gender = -1;
+    if (!genderArg)
+        return true;
+
+    std::string g = genderArg;
+    std::transform(g.begin(), g.end(), g.begin(), ::tolower);
+
+    if (g == "male" || g == "0")
+        gender = GENDER_MALE;
+    else if (g == "female" || g == "1")
+        gender = GENDER_FEMALE;
+    else
+    {
+        error = "Unknown gender : " + g + " (male/female/0/1)";
+        return false;
+    }
+
+    return true;
+}
+
+bool TryParseClassName(char const* className, uint8& claz)
+{
+    if (!className)
+        return false;
+
+    if (!strcmp(className, "warrior"))
+        claz = CLASS_WARRIOR;
+    else if (!strcmp(className, "paladin"))
+        claz = CLASS_PALADIN;
+    else if (!strcmp(className, "hunter"))
+        claz = CLASS_HUNTER;
+    else if (!strcmp(className, "rogue"))
+        claz = CLASS_ROGUE;
+    else if (!strcmp(className, "priest"))
+        claz = CLASS_PRIEST;
+    else if (!strcmp(className, "shaman"))
+        claz = CLASS_SHAMAN;
+    else if (!strcmp(className, "mage"))
+        claz = CLASS_MAGE;
+    else if (!strcmp(className, "warlock"))
+        claz = CLASS_WARLOCK;
+    else if (!strcmp(className, "druid"))
+        claz = CLASS_DRUID;
+    else if (!strcmp(className, "dk"))
+        claz = CLASS_DEATH_KNIGHT;
+    else
+        return false;
+
+    return true;
+}
+
+char const* GetClassName(uint8 classId)
+{
+    switch (classId)
+    {
+        case CLASS_WARRIOR:
+            return "warrior";
+        case CLASS_PALADIN:
+            return "paladin";
+        case CLASS_HUNTER:
+            return "hunter";
+        case CLASS_ROGUE:
+            return "rogue";
+        case CLASS_PRIEST:
+            return "priest";
+        case CLASS_SHAMAN:
+            return "shaman";
+        case CLASS_MAGE:
+            return "mage";
+        case CLASS_WARLOCK:
+            return "warlock";
+        case CLASS_DRUID:
+            return "druid";
+        case CLASS_DEATH_KNIGHT:
+            return "dk";
+        default:
+            return "unknown";
+    }
+}
+
+std::string GetSpecName(uint8 classId, int specNo)
+{
+    if (classId >= MAX_CLASSES || specNo < 0 || specNo >= MAX_SPECNO)
+        return "unknown";
+
+    std::string const& specName = sPlayerbotAIConfig.premadeSpecName[classId][specNo];
+    return specName.empty() ? "unknown" : specName;
+}
+
+std::string FormatClassSpec(uint8 classId, int specNo)
+{
+    return GetSpecName(classId, specNo) + " " + GetClassName(classId);
+}
+
+std::vector<RoleSpecCandidate> GetRoleCandidates(std::string const& role)
+{
+    if (role == "tank")
+    {
+        return {
+            {CLASS_WARRIOR, 2},
+            {CLASS_PALADIN, 1},
+            {CLASS_DRUID, 1},
+        };
+    }
+
+    if (role == "healer")
+    {
+        return {
+            {CLASS_PALADIN, 0},
+            {CLASS_PRIEST, 0},
+            {CLASS_PRIEST, 1},
+            {CLASS_SHAMAN, 2},
+            {CLASS_DRUID, 2},
+        };
+    }
+
+    if (role == "dps")
+    {
+        return {
+            {CLASS_WARRIOR, 0},
+            {CLASS_WARRIOR, 1},
+            {CLASS_PALADIN, 2},
+            {CLASS_ROGUE, 0},
+            {CLASS_ROGUE, 1},
+            {CLASS_ROGUE, 2},
+            {CLASS_SHAMAN, 1},
+            {CLASS_DRUID, 3},
+        };
+    }
+
+    if (role == "ranged_dps")
+    {
+        return {
+            {CLASS_HUNTER, 0},
+            {CLASS_HUNTER, 1},
+            {CLASS_HUNTER, 2},
+            {CLASS_PRIEST, 2},
+            {CLASS_SHAMAN, 0},
+            {CLASS_MAGE, 0},
+            {CLASS_MAGE, 1},
+            {CLASS_MAGE, 2},
+            {CLASS_WARLOCK, 0},
+            {CLASS_WARLOCK, 1},
+            {CLASS_WARLOCK, 2},
+            {CLASS_DRUID, 0},
+        };
+    }
+
+    return {};
 }
 
 class PlayerbotSessionPacketBridge : public PlayerBotAI
@@ -327,6 +490,11 @@ void PlayerbotHolder::SetBotLoading(ObjectGuid guid, bool loading)
         botLoading.erase(guid);
 }
 
+bool PlayerbotHolder::IsBotLoadingGuid(ObjectGuid guid)
+{
+    return botLoading.find(guid) != botLoading.end();
+}
+
 bool PlayerbotHolder::TryGetPendingBotOwner(ObjectGuid guid, uint32& masterAccountId)
 {
     auto const itr = pendingBotOwners.find(guid);
@@ -345,6 +513,27 @@ void PlayerbotHolder::SetPendingBotOwner(ObjectGuid guid, uint32 masterAccountId
 void PlayerbotHolder::ClearPendingBotOwner(ObjectGuid guid)
 {
     pendingBotOwners.erase(guid);
+    ClearPendingBotInitRequest(guid);
+}
+
+bool PlayerbotHolder::TryGetPendingBotInitRequest(ObjectGuid guid, PendingBotInitRequest& request)
+{
+    auto const itr = pendingBotInitRequests.find(guid);
+    if (itr == pendingBotInitRequests.end())
+        return false;
+
+    request = itr->second;
+    return true;
+}
+
+void PlayerbotHolder::SetPendingBotInitRequest(ObjectGuid guid, PendingBotInitRequest const& request)
+{
+    pendingBotInitRequests[guid] = request;
+}
+
+void PlayerbotHolder::ClearPendingBotInitRequest(ObjectGuid guid)
+{
+    pendingBotInitRequests.erase(guid);
 }
 
 void PlayerbotHolder::RegisterPendingBotSession(ObjectGuid guid, WorldSession* session)
@@ -650,6 +839,8 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
     uint32 pendingMasterAccountId = 0;
     bool expectPlayerMaster = TryGetPendingBotOwner(bot->GetGUID(), pendingMasterAccountId) && pendingMasterAccountId;
+    PendingBotInitRequest pendingInitRequest;
+    bool hasPendingInitRequest = TryGetPendingBotInitRequest(bot->GetGUID(), pendingInitRequest);
 
     SetBotLoading(bot->GetGUID(), false);
     ClearPendingBotOwner(bot->GetGUID());
@@ -910,6 +1101,8 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
     bot->SaveToDB(false, false);
     bool addClassBot = sRandomPlayerbotMgr.IsAddclassAccount(accountId);
+    bool forceFactoryRandomize =
+        hasPendingInitRequest && pendingInitRequest.forceFactoryRandomize && pendingInitRequest.forcedSpecNo >= 0;
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DIAG OnBotLogin: bot=%s accountId=%u addClassBot=%u master=%p isRandomAccount=%u",
         bot->GetName(), accountId, addClassBot, static_cast<void const*>(master), isRandomAccount);
     if (addClassBot && master)
@@ -927,18 +1120,29 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         if (mixedGearScore == 0)
             mixedGearScore = 1;
         PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
-        factory.Randomize(false);
+        factory.Randomize(false, forceFactoryRandomize ? pendingInitRequest.forcedSpecNo : -1);
     }
     else if (addClassBot && master)
     {
-        // Bot is close in level — skip full Randomize but fix spells and ammo
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "DIAG PlayerbotMgr: close-level addclass bot=%s level=%u masterLevel=%u, calling InitSpells+InitAmmo",
-            bot->GetName(), bot->GetLevel(), master->GetLevel());
         PlayerbotFactory factory(bot, bot->GetLevel());
-        factory.InitSkills();
-        factory.InitClassSpells();
-        factory.InitAvailableSpells();
-        factory.InitAmmo();
+        if (forceFactoryRandomize)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL,
+                "DIAG PlayerbotMgr: close-level addrole bot=%s level=%u masterLevel=%u, forcing full Randomize spec=%d",
+                bot->GetName(), bot->GetLevel(), master->GetLevel(), pendingInitRequest.forcedSpecNo);
+            factory.Randomize(false, pendingInitRequest.forcedSpecNo);
+        }
+        else
+        {
+            // Bot is close in level — skip full Randomize but fix spells and ammo
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL,
+                "DIAG PlayerbotMgr: close-level addclass bot=%s level=%u masterLevel=%u, calling InitSpells+InitAmmo",
+                bot->GetName(), bot->GetLevel(), master->GetLevel());
+            factory.InitSkills();
+            factory.InitClassSpells();
+            factory.InitAvailableSpells();
+            factory.InitAmmo();
+        }
     }
 
     // bots join World chat if not solo oriented
@@ -1188,10 +1392,37 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 {
     std::vector<std::string> messages;
 
+    auto const collectAvailableAddclassGuids = [&](uint8 claz, int8 gender) -> std::vector<ObjectGuid>
+    {
+        std::vector<ObjectGuid> availableGuids;
+        uint8 teamId = master->GetTeamId();
+        auto const& guidCache =
+            sRandomPlayerbotMgr.addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
+
+        for (ObjectGuid const& guid : guidCache)
+        {
+            if (gender != -1 && GetOfflinePlayerGender(guid) != gender)
+                continue;
+            if (IsBotLoadingGuid(guid))
+                continue;
+            if (ObjectAccessor::FindConnectedPlayer(guid))
+                continue;
+
+            uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(guid);
+            if (guildId && PlayerbotGuildMgr::instance().IsRealGuild(guildId))
+                continue;
+
+            availableGuids.push_back(guid);
+        }
+
+        return availableGuids;
+    };
+
     if (!*args)
     {
         messages.push_back("usage: list/reload/tweak/self or add/addaccount/init/remove PLAYERNAME\n");
         messages.push_back("usage: addclass CLASSNAME [male|female|0|1]");
+        messages.push_back(kAddRoleUsage);
         return messages;
     }
 
@@ -1201,7 +1432,8 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!cmd)
     {
-        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME or addclass CLASSNAME [male|female]");
+        messages.push_back(
+            "usage: list/reload/tweak/self or add/init/remove PLAYERNAME or addclass CLASSNAME [male|female] or addrole ROLE [male|female]");
         return messages;
     }
 
@@ -1393,94 +1625,114 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
                 "addclass: invalid CLASSNAME(warrior/paladin/hunter/rogue/priest/shaman/mage/warlock/druid/dk)");
             return messages;
         }
-        uint8 claz;
-        if (!strcmp(charname, "warrior"))
-        {
-            claz = 1;
-        }
-        else if (!strcmp(charname, "paladin"))
-        {
-            claz = 2;
-        }
-        else if (!strcmp(charname, "hunter"))
-        {
-            claz = 3;
-        }
-        else if (!strcmp(charname, "rogue"))
-        {
-            claz = 4;
-        }
-        else if (!strcmp(charname, "priest"))
-        {
-            claz = 5;
-        }
-        else if (!strcmp(charname, "shaman"))
-        {
-            claz = 7;
-        }
-        else if (!strcmp(charname, "mage"))
-        {
-            claz = 8;
-        }
-        else if (!strcmp(charname, "warlock"))
-        {
-            claz = 9;
-        }
-        else if (!strcmp(charname, "druid"))
-        {
-            claz = 11;
-        }
-        else if (!strcmp(charname, "dk"))
-        {
-            claz = 6;
-        }
-        else
+        uint8 claz = 0;
+        if (!TryParseClassName(charname, claz))
         {
             messages.push_back("Error: Invalid Class. Try again.");
             return messages;
         }
-        //  Added for gender choice : Parsing gender
-        int8 gender = -1; // -1 = gender will be random
-        if (genderArg)
+        int8 gender = -1;
+        std::string genderError;
+        if (!TryParseGender(genderArg, gender, genderError))
         {
-            std::string g = genderArg;
-            std::transform(g.begin(), g.end(), g.begin(), ::tolower);
-
-            if (g == "male" || g == "0")
-                gender = GENDER_MALE; // 0
-            else if (g == "female" || g == "1")
-                gender = GENDER_FEMALE; // 1
-            else
-            {
-                messages.push_back("Unknown gender : " + g + " (male/female/0/1)");
-                return messages;
-            }
-        } //end
+            messages.push_back(genderError);
+            return messages;
+        }
 
         if (claz == 6 && master->GetLevel() < sWorld.getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL))
         {
             messages.push_back("Your level is too low to summon Deathknight");
             return messages;
         }
-        uint8 teamId = master->GetTeamId();
-        const std::unordered_set<ObjectGuid> &guidCache = sRandomPlayerbotMgr.addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
-        for (const ObjectGuid &guid: guidCache)
+        for (ObjectGuid const& guid : collectAvailableAddclassGuids(claz, gender))
         {
-            // If the user requested a specific gender, skip any character that doesn't match.
-            if (gender != -1 && GetOfflinePlayerGender(guid) != gender)
-                continue;
-            if (botLoading.find(guid) != botLoading.end())
-                continue;
-            if (ObjectAccessor::FindConnectedPlayer(guid))
-                continue;
-            uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(guid);
-            if (guildId && PlayerbotGuildMgr::instance().IsRealGuild(guildId))
-                continue;
             AddPlayerBot(guid, master->GetSession()->GetAccountId());
             messages.push_back("Add class " + std::string(charname));
             return messages;
         }
         messages.push_back("Add class failed, no available characters!");
+        return messages;
+    }
+
+    if (!strcmp(cmd, "addrole"))
+    {
+        if (sPlayerbotAIConfig.addClassCommand == 0 && master->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        {
+            messages.push_back("You do not have permission to create bot by addrole command");
+            return messages;
+        }
+        if (!charname)
+        {
+            messages.push_back("addrole: invalid ROLE (" + std::string(kAddRoleList) + ")");
+            messages.push_back(kAddRoleUsage);
+            return messages;
+        }
+
+        std::string role = charname;
+        std::transform(role.begin(), role.end(), role.begin(), ::tolower);
+
+        std::vector<RoleSpecCandidate> roleCandidates = GetRoleCandidates(role);
+        if (roleCandidates.empty())
+        {
+            messages.push_back("addrole: invalid ROLE (" + std::string(kAddRoleList) + ")");
+            messages.push_back(kAddRoleUsage);
+            return messages;
+        }
+
+        int8 gender = -1;
+        std::string genderError;
+        if (!TryParseGender(genderArg, gender, genderError))
+        {
+            messages.push_back(genderError);
+            return messages;
+        }
+
+        struct AvailableRoleCandidate
+        {
+            RoleSpecCandidate candidate;
+            std::vector<ObjectGuid> guids;
+        };
+
+        std::unordered_map<uint8, std::vector<ObjectGuid>> classAvailability;
+        std::vector<AvailableRoleCandidate> availableCandidates;
+        for (RoleSpecCandidate const& candidate : roleCandidates)
+        {
+            auto itr = classAvailability.find(candidate.classId);
+            if (itr == classAvailability.end())
+            {
+                itr = classAvailability.emplace(candidate.classId, collectAvailableAddclassGuids(candidate.classId, gender)).first;
+            }
+
+            if (itr->second.empty())
+                continue;
+
+            availableCandidates.push_back({candidate, itr->second});
+        }
+
+        if (availableCandidates.empty())
+        {
+            messages.push_back("Add role failed, no available characters!");
+            return messages;
+        }
+
+        AvailableRoleCandidate const& chosenCandidate = availableCandidates[urand(0, availableCandidates.size() - 1)];
+        ObjectGuid chosenGuid = chosenCandidate.guids[urand(0, chosenCandidate.guids.size() - 1)];
+
+        PendingBotInitRequest request;
+        request.forceFactoryRandomize = true;
+        request.forcedSpecNo = chosenCandidate.candidate.specNo;
+        SetPendingBotInitRequest(chosenGuid, request);
+
+        std::string addResult = AddPlayerBot(chosenGuid, master->GetSession()->GetAccountId());
+        if (!addResult.empty())
+        {
+            ClearPendingBotInitRequest(chosenGuid);
+            messages.push_back("Add role failed: " + addResult);
+            return messages;
+        }
+
+        messages.push_back("Add role " + role + ": " +
+            FormatClassSpec(chosenCandidate.candidate.classId, chosenCandidate.candidate.specNo));
         return messages;
     }
 

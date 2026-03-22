@@ -131,6 +131,7 @@ public:
         creators["melee attacker without aura"] = &ValueContext::melee_attacker_without_aura;
         creators["party member to heal"] = &ValueContext::party_member_to_heal;
         creators["party member to resurrect"] = &ValueContext::party_member_to_resurrect;
+        creators["important party member to resurrect"] = &ValueContext::important_party_member_to_resurrect;
         creators["current target"] = &ValueContext::current_target;
         creators["self target"] = &ValueContext::self_target;
         creators["group leader"] = &ValueContext::group_leader;
@@ -449,6 +450,10 @@ private:
     }
     static UntypedValue* party_member_to_heal(PlayerbotAI* botAI) { return new PartyMemberToHeal(botAI); }
     static UntypedValue* party_member_to_resurrect(PlayerbotAI* botAI) { return new PartyMemberToResurrect(botAI); }
+    static UntypedValue* important_party_member_to_resurrect(PlayerbotAI* botAI)
+    {
+        return new ImportantPartyMemberToResurrect(botAI);
+    }
     static UntypedValue* party_member_to_dispel(PlayerbotAI* botAI) { return new PartyMemberToDispel(botAI); }
     static UntypedValue* party_member_to_protect(PlayerbotAI* botAI) { return new PartyMemberToProtect(botAI); }
     static UntypedValue* current_target(PlayerbotAI* botAI) { return new CurrentTargetValue(botAI); }

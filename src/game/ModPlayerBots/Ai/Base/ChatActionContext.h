@@ -157,6 +157,7 @@ public:
         creators["gossip hello"] = &ChatActionContext::gossip_hello;
         creators["cast custom spell"] = &ChatActionContext::cast_custom_spell;
         creators["cast custom nc spell"] = &ChatActionContext::cast_custom_nc_spell;
+        creators["cast spell by id"] = &ChatActionContext::cast_spell_by_id;
         creators["invite"] = &ChatActionContext::invite;
         creators["spell"] = &ChatActionContext::spell;
         creators["rti"] = &ChatActionContext::rti;
@@ -233,6 +234,7 @@ private:
     static Action* spell(PlayerbotAI* botAI) { return new TellSpellAction(botAI); }
     static Action* cast_custom_spell(PlayerbotAI* botAI) { return new CastCustomSpellAction(botAI); }
     static Action* cast_custom_nc_spell(PlayerbotAI* botAI) { return new CastCustomNcSpellAction(botAI); }
+    static Action* cast_spell_by_id(PlayerbotAI* botAI) { return new CastCustomSpellByIdAction(botAI); }
     static Action* tank_attack_chat_shortcut(PlayerbotAI* botAI) { return new TankAttackChatShortcutAction(botAI); }
     static Action* grind_chat_shortcut(PlayerbotAI* botAI) { return new GrindChatShortcutAction(botAI); }
     static Action* flee_chat_shortcut(PlayerbotAI* botAI) { return new FleeChatShortcutAction(botAI); }

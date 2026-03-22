@@ -78,12 +78,12 @@ AiPlayerbot.AutoDoQuests = 1
 # Maximum number of bots a player can control at once.
 AiPlayerbot.MaxAddedBots = 40
 
-# Allow the `addclass` command.
+# Allow the `addclass` and `addrole` commands.
 # 0 = GM only
 # 1 = enabled
 AiPlayerbot.AddClassCommand = 1
 
-# Number of pooled accounts used by the `addclass` command.
+# Number of pooled accounts used by the `addclass` and `addrole` commands.
 AiPlayerbot.AddClassAccountPoolSize = 50
 
 # Invitation policy for player-controlled bots.
