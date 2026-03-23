@@ -59,6 +59,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (7158, @PTEMPLATE+4, 0, 'Tanaris - Group 4 - Truesilver Deposit / Small Thorium Vein', 0);
 
 DELETE FROM `pool_template` WHERE  `entry` = 9915;
+UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 8141;
 
 
 -- End of migration.
