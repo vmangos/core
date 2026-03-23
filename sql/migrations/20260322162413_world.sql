@@ -60,6 +60,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 DELETE FROM `pool_template` WHERE  `entry` = 9915;
 UPDATE `pool_template` SET `max_limit` = 2 WHERE `entry` = 8141;
+UPDATE `pool_template` SET `max_limit` = 1 WHERE  `entry` = 8139;
+UPDATE `pool_template` SET `max_limit` = 1 WHERE  `entry` = 8140;
 
 
 -- End of migration.
