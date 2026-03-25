@@ -48,6 +48,22 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 DELETE FROM `pool_template` WHERE  `entry` = 1927;
 
+SET @PTEMPLATE = 303;
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (7281, 7284, 7282, 7280, 5332, 7283);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Hillsbrad Foothills - Group 1' WHERE `entry` IN (7281, 7284, 7282, 7280, 5332, 7283);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Hillsbrad Foothills - Group 1' WHERE `pool_entry` IN (7281, 7284, 7282, 7280, 5332, 7283);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Hillsbrad Foothills - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(7281, @PTEMPLATE+1, 0, 'Hillsbrad Foothills - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(7284, @PTEMPLATE+1, 0, 'Hillsbrad Foothills - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(7282, @PTEMPLATE+1, 0, 'Hillsbrad Foothills - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(7280, @PTEMPLATE+1, 0, 'Hillsbrad Foothills - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(5332, @PTEMPLATE+1, 0, 'Hillsbrad Foothills - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(7283, @PTEMPLATE+1, 0, 'Hillsbrad Foothills - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+
 -- End of migration.
 END IF;
 END??
