@@ -1441,6 +1441,9 @@ bool GossipSelect_WorldBuffsNPC(Player* player, Creature* creature, uint32 sende
         }
 
         case 4: // Windfury (Only you)
+                // I know this may be a bit too custom, but I think if anyone is using the World Buffs NPC,
+                // They already are cheating. I wish to offer this option, because it's really a dream of
+                // Alliance Warriors to be able to use Windfury ^.^
         {
             // Get the player's main hand weapon
             Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
