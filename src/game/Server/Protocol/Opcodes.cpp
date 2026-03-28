@@ -944,8 +944,6 @@ Handlers BuildOpcodeList()
     return list;
 }
 
-// If you get "Constexpr variable 'handlerList' must be initialized by a constant expression"
-// you have to verify that every MSG type has a handler.
 Handlers const handlerList = BuildOpcodeList();
 
 constexpr OpcodeHandler emptyHandler = {
