@@ -49,7 +49,7 @@ struct get_packet_class<void(WorldSession::*)(PacketClass&)>
     using type = PacketClass;
 };
 
-constexpr Handlers BuildOpcodeList()
+Handlers BuildOpcodeList()
 {
     Handlers list{};
 
@@ -946,7 +946,7 @@ constexpr Handlers BuildOpcodeList()
 
 // If you get "Constexpr variable 'handlerList' must be initialized by a constant expression"
 // you have to verify that every MSG type has a handler.
-constexpr Handlers handlerList = BuildOpcodeList();
+Handlers const handlerList = BuildOpcodeList();
 
 constexpr OpcodeHandler emptyHandler = {
     "<none>",
