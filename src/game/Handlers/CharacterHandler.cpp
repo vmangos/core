@@ -331,17 +331,15 @@ void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CharCreate co
 
 void WorldSession::HandleCharDeleteOpcode(WorldPackets::Character::CharDelete const& packet)
 {
-    ObjectGuid guid = packet.guid;
-
     // can't delete loaded character
-    if (ObjectAccessor::FindPlayerNotInWorld(guid))
+    if (ObjectAccessor::FindPlayerNotInWorld(packet.guid))
         return;
 
     uint32 accountId = 0;
     std::string name;
 
     // is guild leader
-    if (sGuildMgr.GetGuildByLeader(guid))
+    if (sGuildMgr.GetGuildByLeader(packet.guid))
     {
         WorldPacket data(SMSG_CHAR_DELETE, 1);
         data << (uint8)CHAR_DELETE_FAILED;
@@ -349,7 +347,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPackets::Character::CharDelete co
         return;
     }
 
-    uint32 lowguid = guid.GetCounter();
+    uint32 lowguid = packet.guid.GetCounter();
 
     PlayerCacheData* cacheData = sObjectMgr.GetPlayerDataByGUID(lowguid);
     if (!cacheData)
@@ -362,13 +360,13 @@ void WorldSession::HandleCharDeleteOpcode(WorldPackets::Character::CharDelete co
     if (accountId != GetAccountId())
         return;
 
-    sLog.Player(this, LOG_CHAR, "Delete", LOG_LVL_BASIC, "Character %s guid %u", name.c_str(), guid);
+    sLog.Player(this, LOG_CHAR, "Delete", LOG_LVL_BASIC, "Character %s guid %u", name.c_str(), packet.guid);
 
     // If the character is online (ALT-F4 logout for example)
-    if (Player* onlinePlayer = sObjectAccessor.FindPlayer(guid))
+    if (Player* onlinePlayer = sObjectAccessor.FindPlayer(packet.guid))
         onlinePlayer->GetSession()->LogoutPlayer(true);
 
-    Player::DeleteFromDB(guid, GetAccountId());
+    Player::DeleteFromDB(packet.guid, GetAccountId());
 
     WorldPacket data(SMSG_CHAR_DELETE, 1);
     data << (uint8)CHAR_DELETE_SUCCESS;

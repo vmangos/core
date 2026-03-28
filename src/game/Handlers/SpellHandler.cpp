@@ -35,8 +35,6 @@ using namespace Spells;
 
 void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packet)
 {
-    uint8 spellSlot = packet.spellSlot; // the position of the spell id on the item template
-
     // TODO: add targets.read() check
     Player* pUser = _player;
 
@@ -60,9 +58,9 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
         return;
     }
 
-    if (spellSlot >= MAX_ITEM_PROTO_SPELLS ||
-        proto->Spells[spellSlot].SpellId == 0 ||
-        proto->Spells[spellSlot].SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
+    if (packet.spellSlot >= MAX_ITEM_PROTO_SPELLS ||
+        proto->Spells[packet.spellSlot].SpellId == 0 ||
+        proto->Spells[packet.spellSlot].SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
         return;
@@ -135,7 +133,7 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
         pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
 
         // send spell error
-        uint32 spellid = proto->Spells[spellSlot].SpellId;
+        uint32 spellid = proto->Spells[packet.spellSlot].SpellId;
         if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid))
             Spell::SendCastResult(_player, spellInfo, itemCastCheckResult);
         return;
@@ -266,17 +264,15 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPackets::Misc::GameObjectUse c
 
 void WorldSession::HandleCastSpellOpcode(WorldPackets::Spell::CastSpell const& packet)
 {
-    uint32 spellId = packet.spellId;
-
-    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(packet.spellId);
 
     if (!spellInfo)
         return;
 
     // not have spell in spellbook or spell passive and not casted by client
-    if (!_player->HasActiveSpell(spellId) || spellInfo->IsPassiveSpell())
+    if (!_player->HasActiveSpell(packet.spellId) || spellInfo->IsPassiveSpell())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "World: Player %u casts spell %u which he shouldn't have", _player->GetGUIDLow(), spellId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "World: Player %u casts spell %u which he shouldn't have", _player->GetGUIDLow(), packet.spellId);
         //cheater? kick? ban?
         return;
     }
@@ -294,7 +290,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPackets::Spell::CastSpell const& p
         if (target == _player && IsExplicitlySelectedUnitTarget(spellInfo->EffectImplicitTargetA[0]) && !spellInfo->IsPositiveSpell(_player, target))
         {
             WorldPacket data(SMSG_CAST_RESULT, (4 + 1 + 1));
-            data << uint32(spellId);
+            data << uint32(packet.spellId);
             data << uint8(2); // status = fail
             data << uint8(SPELL_FAILED_BAD_TARGETS);
             SendPacket(&data);

@@ -55,37 +55,35 @@ void WorldSession::SendPartyResult(PartyOperation operation, std::string const& 
 
 void WorldSession::HandleGroupInviteOpcode(WorldPackets::Group::GroupInvite const& packet)
 {
-    std::string membername = packet.memberName;
-
     // Attempt add selected player
 
     // Cheating
-    if (!normalizePlayerName(membername))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.memberName)))
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, ERR_BAD_PLAYER_NAME_S);
+        SendPartyResult(PARTY_OP_INVITE, packet.memberName, ERR_BAD_PLAYER_NAME_S);
         return;
     }
 
-    Player* player = sObjectMgr.GetPlayer(membername.c_str());
+    Player* player = sObjectMgr.GetPlayer(packet.memberName.c_str());
 
     // No player
     if (!player)
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, ERR_BAD_PLAYER_NAME_S);
+        SendPartyResult(PARTY_OP_INVITE, packet.memberName, ERR_BAD_PLAYER_NAME_S);
         return;
     }
 
     // Can't group with
     if (!GetPlayer()->IsGameMaster() && !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP) && GetPlayer()->GetTeam() != player->GetTeam())
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, ERR_PLAYER_WRONG_FACTION);
+        SendPartyResult(PARTY_OP_INVITE, packet.memberName, ERR_PLAYER_WRONG_FACTION);
         return;
     }
 
     // Just ignore us
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, ERR_IGNORING_YOU_S);
+        SendPartyResult(PARTY_OP_INVITE, packet.memberName, ERR_IGNORING_YOU_S);
         return;
     }
 
@@ -99,7 +97,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPackets::Group::GroupInvite cons
     // Player already in another group or invited
     if (group2 || player->GetGroupInvite())
     {
-        SendPartyResult(PARTY_OP_INVITE, membername, ERR_ALREADY_IN_GROUP_S);
+        SendPartyResult(PARTY_OP_INVITE, packet.memberName, ERR_ALREADY_IN_GROUP_S);
         return;
     }
 
@@ -149,7 +147,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPackets::Group::GroupInvite cons
     data << GetPlayer()->GetName();
     player->GetSession()->SendPacket(&data);
 
-    SendPartyResult(PARTY_OP_INVITE, membername, ERR_PARTY_RESULT_OK);
+    SendPartyResult(PARTY_OP_INVITE, packet.memberName, ERR_PARTY_RESULT_OK);
 }
 
 void WorldSession::HandleGroupAcceptOpcode(NullClientPacket const& /*packet*/)
@@ -220,16 +218,14 @@ void WorldSession::HandleGroupDeclineOpcode(NullClientPacket const& /*packet*/)
 
 void WorldSession::HandleGroupUninviteGuidOpcode(WorldPackets::Group::GroupUninviteGuid const& packet)
 {
-    ObjectGuid guid = packet.guid;
-
     // can't uninvite yourself
-    if (guid == GetPlayer()->GetObjectGuid())
+    if (packet.guid == GetPlayer()->GetObjectGuid())
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandleGroupUninviteGuidOpcode: leader %s tried to uninvite himself from the group.", GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
-    PartyResult res = GetPlayer()->CanUninviteFromGroup(guid);
+    PartyResult res = GetPlayer()->CanUninviteFromGroup(packet.guid);
     if (res != ERR_PARTY_RESULT_OK)
     {
         SendPartyResult(PARTY_OP_LEAVE, "", res);
@@ -240,13 +236,13 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPackets::Group::GroupUninv
     if (!grp)
         return;
 
-    if (grp->IsMember(guid))
+    if (grp->IsMember(packet.guid))
     {
-        Player::RemoveFromGroup(grp, guid);
+        Player::RemoveFromGroup(grp, packet.guid);
         return;
     }
 
-    if (Player* plr = grp->GetInvited(guid))
+    if (Player* plr = grp->GetInvited(packet.guid))
     {
         plr->UninviteFromGroup();
         return;
@@ -257,14 +253,12 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPackets::Group::GroupUninv
 
 void WorldSession::HandleGroupUninviteOpcode(WorldPackets::Group::GroupUninvite const& packet)
 {
-    std::string membername = packet.memberName;
-
     // player not found
-    if (!normalizePlayerName(membername))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.memberName)))
         return;
 
     // can't uninvite yourself
-    if (GetPlayer()->GetName() == membername)
+    if (GetPlayer()->GetName() == packet.memberName)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandleGroupUninviteOpcode: leader %s tried to uninvite himself from the group.", GetPlayer()->GetGuidStr().c_str());
         return;
@@ -274,7 +268,7 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPackets::Group::GroupUninvite 
     if (!grp)
         return;
 
-    if (ObjectGuid guid = grp->GetMemberGuid(membername))
+    if (ObjectGuid guid = grp->GetMemberGuid(packet.memberName))
     {
         PartyResult res = GetPlayer()->CanUninviteFromGroup(guid);
         if (res != ERR_PARTY_RESULT_OK)
@@ -286,7 +280,7 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPackets::Group::GroupUninvite 
         return;
     }
 
-    if (Player* plr = grp->GetInvited(membername))
+    if (Player* plr = grp->GetInvited(packet.memberName))
     {
         PartyResult res = GetPlayer()->CanUninviteFromGroup(plr->GetObjectGuid());
         if (res != ERR_PARTY_RESULT_OK)
@@ -298,7 +292,7 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPackets::Group::GroupUninvite 
         return;
     }
 
-    SendPartyResult(PARTY_OP_LEAVE, membername, ERR_TARGET_NOT_IN_GROUP_S);
+    SendPartyResult(PARTY_OP_LEAVE, packet.memberName, ERR_TARGET_NOT_IN_GROUP_S);
 }
 
 void WorldSession::HandleGroupSetLeaderOpcode(WorldPackets::Group::GroupSetLeader const& packet)

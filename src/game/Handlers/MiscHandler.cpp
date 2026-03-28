@@ -462,15 +462,13 @@ void WorldSession::HandleAddFriendOpcode(WorldPackets::Misc::AddFriend const& pa
 {
     ASSERT(GetMasterPlayer());
 
-    std::string friendName = packet.friendName;
-
-    if (!normalizePlayerName(friendName))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.friendName)))
         return;
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: %s asked to add friend : '%s'",
-              GetMasterPlayer()->GetName(), friendName.c_str());
+              GetMasterPlayer()->GetName(), packet.friendName.c_str());
 
-    PlayerCacheData const* pData = sObjectMgr.GetPlayerDataByName(friendName);
+    PlayerCacheData const* pData = sObjectMgr.GetPlayerDataByName(packet.friendName);
     if (!pData)
         return;
 
@@ -520,15 +518,13 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPackets::Misc::AddIgnore const& pa
 {
     ASSERT(GetMasterPlayer());
 
-    std::string ignoreName = packet.ignoreName;
-
-    if (!normalizePlayerName(ignoreName))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.ignoreName)))
         return;
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: %s asked to Ignore: '%s'",
-              GetMasterPlayer()->GetName(), ignoreName.c_str());
+              GetMasterPlayer()->GetName(), packet.ignoreName.c_str());
 
-    PlayerCacheData const* pData = sObjectMgr.GetPlayerDataByName(ignoreName);
+    PlayerCacheData const* pData = sObjectMgr.GetPlayerDataByName(packet.ignoreName);
     if (!pData)
         return;
 
@@ -628,7 +624,6 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPackets::Misc::ResurrectRe
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const& packet)
 {
-    uint32 triggerId = packet.triggerId;
     Player* const pPlayer = GetPlayer();
 
     if (pPlayer->HasCheatOption(PLAYER_CHEAT_IGNORE_TRIGGERS))
@@ -636,28 +631,28 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const
 
     if (pPlayer->IsTaxiFlying())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player '%s' (GUID: %u) in flight, ignore Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), triggerId);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player '%s' (GUID: %u) in flight, ignore Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), packet.triggerId);
         return;
     }
 
-    AreaTriggerEntry const* pTrigger = sObjectMgr.GetAreaTrigger(triggerId);
+    AreaTriggerEntry const* pTrigger = sObjectMgr.GetAreaTrigger(packet.triggerId);
     if (!pTrigger)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), triggerId);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), packet.triggerId);
         return;
     }
 
     // check if player in the range of areatrigger
     if (!IsPointInAreaTriggerZone(pTrigger, pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 5.0f))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player '%s' (GUID: %u) too far, ignore Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), triggerId);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player '%s' (GUID: %u) too far, ignore Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), packet.triggerId);
         return;
     }
 
     if (pTrigger->script_id || pTrigger->script_name)
         pPlayer->GetMap()->StartAreaTriggerScript(pTrigger, pPlayer);
 
-    uint32 quest_id = sObjectMgr.GetQuestForAreaTrigger(triggerId);
+    uint32 quest_id = sObjectMgr.GetQuestForAreaTrigger(packet.triggerId);
     if (quest_id && pPlayer->IsAlive() && pPlayer->IsActiveQuest(quest_id))
     {
         Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest_id);
@@ -669,15 +664,15 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const
     }
 
     // enter to tavern, not overwrite city rest
-    if (sObjectMgr.IsTavernAreaTrigger(triggerId))
+    if (sObjectMgr.IsTavernAreaTrigger(packet.triggerId))
     {
         // set resting flag we are in the inn
         if (pPlayer->GetRestType() != REST_TYPE_IN_CITY)
-            pPlayer->SetRestType(REST_TYPE_IN_TAVERN, triggerId);
+            pPlayer->SetRestType(REST_TYPE_IN_TAVERN, packet.triggerId);
         return;
     }
 
-    if (BattlegroundEntranceTrigger const* pBgEntrance = sObjectMgr.GetBattlegroundEntranceTrigger(triggerId))
+    if (BattlegroundEntranceTrigger const* pBgEntrance = sObjectMgr.GetBattlegroundEntranceTrigger(packet.triggerId))
     {
         BattleGround *bg = sBattleGroundMgr.GetBattleGroundTemplate(pBgEntrance->bgTypeId);
         if (!bg)
@@ -698,18 +693,18 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const
     if (pPlayer->InBattleGround())
     {
         if (BattleGround* bg = pPlayer->GetBattleGround())
-            if (bg->HandleAreaTrigger(pPlayer, triggerId))
+            if (bg->HandleAreaTrigger(pPlayer, packet.triggerId))
                 return;
     }
 
     if (ZoneScript* pZoneScript = pPlayer->GetZoneScript())
     {
-        if (pZoneScript->HandleAreaTrigger(_player, triggerId))
+        if (pZoneScript->HandleAreaTrigger(_player, packet.triggerId))
             return;
     }
 
     // nullptr if all values default (non teleport trigger)
-    AreaTriggerTeleport const* pTeleTrigger = sObjectMgr.GetAreaTriggerTeleport(triggerId);
+    AreaTriggerTeleport const* pTeleTrigger = sObjectMgr.GetAreaTriggerTeleport(packet.triggerId);
     if (!pTeleTrigger)
         return;
 
@@ -727,7 +722,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const
         // Special case prior Patch 1.3 to revive your corpse if dead in Molten Core
         if (sWorld.GetWowPatch() <= WOW_PATCH_102)
         {
-            if (corpseMapId == MAP_MOLTEN_CORE && triggerId == 1466)
+            if (corpseMapId == MAP_MOLTEN_CORE && packet.triggerId == 1466)
             {
                 pPlayer->ResurrectPlayer(0.5f);
                 pPlayer->SpawnCorpseBones();
@@ -786,7 +781,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const
                 int locIdx = GetSessionDbLocaleIndex();
                 if (locIdx >= 0)
                 {
-                    AreaTriggerLocale const* locale = sObjectMgr.GetAreaTriggerLocale(triggerId);
+                    AreaTriggerLocale const* locale = sObjectMgr.GetAreaTriggerLocale(packet.triggerId);
                     if (locale)
                     {
                         if (locale->message.size() > size_t(locIdx) && !locale->message[locIdx].empty())
@@ -891,16 +886,13 @@ void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountDa
 
 void WorldSession::HandleSetActionButtonOpcode(WorldPackets::Misc::SetActionButton const& packet)
 {
-    uint8 button = packet.button;
-    uint32 packetData = packet.packetData;
+    uint32 action = ACTION_BUTTON_ACTION(packet.packetData);
+    uint8  type   = ACTION_BUTTON_TYPE(packet.packetData);
 
-    uint32 action = ACTION_BUTTON_ACTION(packetData);
-    uint8  type   = ACTION_BUTTON_TYPE(packetData);
-
-    if (!packetData)
+    if (!packet.packetData)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MISC: Remove action from button %u", button);
-        GetMasterPlayer()->removeActionButton(button);
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MISC: Remove action from button %u", packet.button);
+        GetMasterPlayer()->removeActionButton(packet.button);
     }
     else
     {
@@ -912,12 +904,12 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPackets::Misc::SetActionButt
             case ACTION_BUTTON_ITEM:
                 break;
             default:
-                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MISC: Unknown action button type %u for action %u into button %u", type, action, button);
+                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MISC: Unknown action button type %u for action %u into button %u", type, action, packet.button);
                 return;
         }
-        if (!Player::IsActionButtonDataValid(button, action, type, GetPlayer()))
+        if (!Player::IsActionButtonDataValid(packet.button, action, type, GetPlayer()))
             return;
-        GetMasterPlayer()->addActionButton(button, action, type);
+        GetMasterPlayer()->addActionButton(packet.button, action, type);
     }
 }
 
@@ -954,11 +946,9 @@ void WorldSession::HandlePlayedTime(NullClientPacket const& /*packet*/)
 
 void WorldSession::HandleInspectOpcode(WorldPackets::Misc::Inspect const& packet)
 {
-    ObjectGuid guid = packet.guid;
+    _player->SetSelectionGuid(packet.guid);
 
-    _player->SetSelectionGuid(guid);
-
-    Player* pTarget = sObjectMgr.GetPlayer(guid);
+    Player* pTarget = sObjectMgr.GetPlayer(packet.guid);
     if (!pTarget)
         return;
 
@@ -969,7 +959,7 @@ void WorldSession::HandleInspectOpcode(WorldPackets::Misc::Inspect const& packet
         return;
 
     WorldPacket data(SMSG_INSPECT, 8);
-    data << ObjectGuid(guid);
+    data << ObjectGuid(packet.guid);
     SendPacket(&data);
 }
 
@@ -1123,25 +1113,23 @@ void WorldSession::HandleMoveSetRawPosition(WorldPackets::Misc::MoveSetRawPositi
 
 void WorldSession::HandleWhoisOpcode(WorldPackets::Query::Whois const& packet)
 {
-    std::string charName = packet.charName;
-
     if (GetSecurity() < SEC_ADMINISTRATOR)
     {
         SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
         return;
     }
 
-    if (charName.empty() || !normalizePlayerName(charName))
+    if (packet.charName.empty() || !normalizePlayerName(const_cast<std::string&>(packet.charName)))
     {
         SendNotification(LANG_NEED_CHARACTER_NAME);
         return;
     }
 
-    Player* plr = sObjectMgr.GetPlayer(charName.c_str());
+    Player* plr = sObjectMgr.GetPlayer(packet.charName.c_str());
 
     if (!plr)
     {
-        SendNotification(LANG_PLAYER_NOT_EXIST_OR_OFFLINE, charName.c_str());
+        SendNotification(LANG_PLAYER_NOT_EXIST_OR_OFFLINE, packet.charName.c_str());
         return;
     }
 
@@ -1150,7 +1138,7 @@ void WorldSession::HandleWhoisOpcode(WorldPackets::Query::Whois const& packet)
     std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `username`, `email`, `last_ip` FROM `account` WHERE `id`=%u", accId);
     if (!result)
     {
-        SendNotification(LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND, charName.c_str());
+        SendNotification(LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND, packet.charName.c_str());
         return;
     }
 
@@ -1165,7 +1153,7 @@ void WorldSession::HandleWhoisOpcode(WorldPackets::Query::Whois const& packet)
     if (lastIp.empty())
         lastIp = "Unknown";
 
-    std::string msg = charName + "'s " + "account is " + acc + ", e-mail: " + email + ", last ip: " + lastIp;
+    std::string msg = packet.charName + "'s " + "account is " + acc + ", e-mail: " + email + ", last ip: " + lastIp;
 
     WorldPacket data(SMSG_WHOIS, msg.size() + 1); // max CString length allowed: 256
     data << msg;

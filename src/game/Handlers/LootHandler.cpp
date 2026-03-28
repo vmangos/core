@@ -41,8 +41,6 @@
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPackets::Loot::AutoStoreLootItem const& packet)
 {
-    uint8 lootSlot = packet.lootSlot;
-
     Player*    player = GetPlayer();
     ObjectGuid lguid = player->GetLootGuid();
     Loot*      loot;
@@ -148,7 +146,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPackets::Loot::AutoStoreLo
     QuestItem* ffaitem = nullptr;
     QuestItem* conditem = nullptr;
 
-    LootItem* item = loot->LootItemInSlot(lootSlot, player->GetGUIDLow(), &qitem, &ffaitem, &conditem);
+    LootItem* item = loot->LootItemInSlot(packet.lootSlot, player->GetGUIDLow(), &qitem, &ffaitem, &conditem);
 
     if (!item)
     {
@@ -201,7 +199,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPackets::Loot::AutoStoreLo
             qitem->is_looted = true;
             //freeforall is 1 if everyone's supposed to get the quest item.
             if (item->freeforall || loot->GetPlayerQuestItems().size() == 1)
-                player->SendNotifyLootItemRemoved(lootSlot);
+                player->SendNotifyLootItemRemoved(packet.lootSlot);
             else
                 loot->NotifyQuestItemRemoved(qitem->index);
         }
@@ -209,16 +207,16 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPackets::Loot::AutoStoreLo
         {
             //freeforall case, notify only one player of the removal
             ffaitem->is_looted = true;
-            player->SendNotifyLootItemRemoved(lootSlot);
+            player->SendNotifyLootItemRemoved(packet.lootSlot);
         }
         else if (conditem)
         {
             //not freeforall, notify everyone
             conditem->is_looted = true;
-            loot->NotifyItemRemoved(lootSlot);
+            loot->NotifyItemRemoved(packet.lootSlot);
         }
         else
-            loot->NotifyItemRemoved(lootSlot);
+            loot->NotifyItemRemoved(packet.lootSlot);
 
         //if only one person is supposed to loot the item, then set it to looted
         if (!item->freeforall)

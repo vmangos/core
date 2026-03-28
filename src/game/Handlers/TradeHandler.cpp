@@ -691,30 +691,24 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPackets::Trade::InitiateTrade 
 
 void WorldSession::HandleSetTradeGoldOpcode(WorldPackets::Trade::SetTradeGold const& packet)
 {
-    uint32 gold = packet.gold;
-
     TradeData* my_trade = _player->GetTradeData();
     if (!my_trade || !my_trade->GetTrader())
         return;
     TradeData* his_trade = my_trade->GetTrader()->m_trade;
     if (!his_trade)
         return;
-    if (gold > _player->GetMoney())
+    if (packet.gold > _player->GetMoney())
         return;
 
     // gold can be incorrect, but this is checked at trade finished.
     his_trade->SetAccepted(false);
     his_trade->SetLastModificationTime(time(nullptr));
     my_trade->SetLastModificationTime(time(nullptr));
-    my_trade->SetMoney(gold);
+    my_trade->SetMoney(packet.gold);
 }
 
 void WorldSession::HandleSetTradeItemOpcode(WorldPackets::Trade::SetTradeItem const& packet)
 {
-    // send update
-    uint8 tradeSlot = packet.tradeSlot;
-    uint8 slot = packet.slot;
-
     TradeData* my_trade = _player->GetTradeData();
     if (!my_trade || !my_trade->GetTrader())
         return;
@@ -723,22 +717,22 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPackets::Trade::SetTradeItem co
         return;
 
     // invalid slot number
-    if (tradeSlot >= TRADE_SLOT_COUNT)
+    if (packet.tradeSlot >= TRADE_SLOT_COUNT)
     {
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
         return;
     }
 
     // check cheating, can't fail with correct client operations
-    Item* item = _player->GetItemByPos(packet.bag, slot);
-    if (!item || (tradeSlot != TRADE_SLOT_NONTRADED && !item->CanBeTraded()))
+    Item* item = _player->GetItemByPos(packet.bag, packet.slot);
+    if (!item || (packet.tradeSlot != TRADE_SLOT_NONTRADED && !item->CanBeTraded()))
     {
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
         return;
     }
 
     // prevent trading item from bank slot
-    if (_player->IsBankPos(packet.bag, slot))
+    if (_player->IsBankPos(packet.bag, packet.slot))
     {
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
         return;
@@ -755,7 +749,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPackets::Trade::SetTradeItem co
     his_trade->SetAccepted(false);
     his_trade->SetLastModificationTime(time(nullptr));
     my_trade->SetLastModificationTime(time(nullptr));
-    my_trade->SetItem(TradeSlots(tradeSlot), item);
+    my_trade->SetItem(TradeSlots(packet.tradeSlot), item);
 }
 
 void WorldSession::HandleClearTradeItemOpcode(WorldPackets::Trade::ClearTradeItem const& packet)

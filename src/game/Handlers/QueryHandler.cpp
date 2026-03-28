@@ -149,9 +149,7 @@ void WorldSession::HandleQueryTimeOpcode(NullClientPacket const& /*packet*/)
 // Only _static_ data send in this packet !!!
 void WorldSession::HandleCreatureQueryOpcode(WorldPackets::Query::QueryCreature const& packet)
 {
-    uint32 entry = packet.entry;
-
-    CreatureInfo const* ci = sObjectMgr.GetCreatureTemplate(entry);
+    CreatureInfo const* ci = sObjectMgr.GetCreatureTemplate(packet.entry);
     if (ci)
     {
         std::string const* name = &ci->name;
@@ -160,7 +158,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPackets::Query::QueryCreature 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            CreatureLocale const* cl = sObjectMgr.GetCreatureLocale(entry);
+            CreatureLocale const* cl = sObjectMgr.GetCreatureLocale(packet.entry);
             if (cl)
             {
                 if (cl->Name.size() > size_t(loc_idx) && !cl->Name[loc_idx].empty())
@@ -197,7 +195,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPackets::Query::QueryCreature 
 
         // guess size
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, fixedSize + nameLen + subNameLen);
-        data << uint32(entry);                              // creature entry
+        data << uint32(packet.entry);                       // creature entry
         data.append(name->c_str(), nameLen + 1);
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data.append(subName->c_str(), subNameLen + 1);
@@ -223,9 +221,9 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPackets::Query::QueryCreature 
     else
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_CREATURE_QUERY - Guid: %s Entry: %u NO CREATURE INFO!",
-                  packet.guid.GetString().c_str(), entry);
+                  packet.guid.GetString().c_str(), packet.entry);
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 4);
-        data << uint32(entry | 0x80000000);
+        data << uint32(packet.entry | 0x80000000);
         SendPacket(&data);
     }
 }
@@ -233,16 +231,14 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPackets::Query::QueryCreature 
 // Only _static_ data send in this packet !!!
 void WorldSession::HandleGameObjectQueryOpcode(WorldPackets::Query::QueryGameObject const& packet)
 {
-    uint32 entryID = packet.entryID;
-
-    GameObjectInfo const* info = sObjectMgr.GetGameObjectTemplate(entryID);
+    GameObjectInfo const* info = sObjectMgr.GetGameObjectTemplate(packet.entryID);
     if (info)
     {
         char const* name = info->name.c_str();
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            GameObjectLocale const* gl = sObjectMgr.GetGameObjectLocale(entryID);
+            GameObjectLocale const* gl = sObjectMgr.GetGameObjectLocale(packet.entryID);
             if (gl)
             {
                 if (gl->Name.size() > size_t(loc_idx) && !gl->Name[loc_idx].empty())
@@ -268,7 +264,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPackets::Query::QueryGameObj
         size_t const nameLen = strlen(name);
 
         WorldPacket data(SMSG_GAMEOBJECT_QUERY_RESPONSE, fixedSize + nameLen);
-        data << uint32(entryID);
+        data << uint32(packet.entryID);
         data << uint32(info->type);
         data << uint32(info->displayId);
         data.append(name, nameLen + 1);
@@ -285,9 +281,9 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPackets::Query::QueryGameObj
     else
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: CMSG_GAMEOBJECT_QUERY - Guid: %s Entry: %u Missing gameobject info!",
-                  packet.guid.GetString().c_str(), entryID);
+                  packet.guid.GetString().c_str(), packet.entryID);
         WorldPacket data(SMSG_GAMEOBJECT_QUERY_RESPONSE, 4);
-        data << uint32(entryID | 0x80000000);
+        data << uint32(packet.entryID | 0x80000000);
         SendPacket(&data);
     }
 }
@@ -416,20 +412,18 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPackets::Npc::NpcTextQuery cons
 
 void WorldSession::HandlePageTextQueryOpcode(WorldPackets::Query::QueryPageText const& packet)
 {
-    uint32 pageID = packet.pageID;
-
-    while (pageID)
+    while (packet.pageID)
     {
-        PageText const* pPage = sPageTextStore.LookupEntry<PageText>(pageID);
+        PageText const* pPage = sPageTextStore.LookupEntry<PageText>(packet.pageID);
         // guess size
         WorldPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 50);
-        data << pageID;
+        data << packet.pageID;
 
         if (!pPage)
         {
             data << "Item page missing.";
             data << uint32(0);
-            pageID = 0;
+            const_cast<uint32&>(packet.pageID) = 0;
         }
         else
         {
@@ -438,7 +432,7 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPackets::Query::QueryPageText 
             int loc_idx = GetSessionDbLocaleIndex();
             if (loc_idx >= 0)
             {
-                PageTextLocale const* pl = sObjectMgr.GetPageTextLocale(pageID);
+                PageTextLocale const* pl = sObjectMgr.GetPageTextLocale(packet.pageID);
                 if (pl)
                 {
                     if (pl->text.size() > size_t(loc_idx) && !pl->text[loc_idx].empty())
@@ -448,7 +442,7 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPackets::Query::QueryPageText 
 
             data << text;
             data << uint32(pPage->next_page);
-            pageID = pPage->next_page;
+            const_cast<uint32&>(packet.pageID) = pPage->next_page;
         }
         SendPacket(&data);
     }

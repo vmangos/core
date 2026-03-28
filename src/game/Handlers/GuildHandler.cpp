@@ -73,15 +73,13 @@ void WorldSession::HandleGuildCreateOpcode(WorldPackets::Guild::GuildCreate cons
 
 void WorldSession::HandleGuildInviteOpcode(WorldPackets::Guild::GuildInvite const& packet)
 {
-    std::string invitedName = packet.invitedName;
-
     Player* player = nullptr;
-    if (normalizePlayerName(invitedName))
-        player = ObjectAccessor::FindPlayerByName(invitedName.c_str());
+    if (normalizePlayerName(const_cast<std::string&>(packet.invitedName)))
+        player = ObjectAccessor::FindPlayerByName(packet.invitedName.c_str());
 
     if (!player)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_GUILD_PLAYER_NOT_FOUND_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.invitedName, ERR_GUILD_PLAYER_NOT_FOUND_S);
         return;
     }
 
@@ -101,26 +99,26 @@ void WorldSession::HandleGuildInviteOpcode(WorldPackets::Guild::GuildInvite cons
     // OK result but not send invite
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {
-        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_GUILD_IGNORING_YOU_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.invitedName, ERR_GUILD_IGNORING_YOU_S);
         return;
     }
 
     // not let enemies sign guild charter
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GUILD) && player->GetTeam() != GetPlayer()->GetTeam())
     {
-        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_GUILD_NOT_ALLIED);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.invitedName, ERR_GUILD_NOT_ALLIED);
         return;
     }
 
     if (player->GetGuildId())
     {
-        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_ALREADY_IN_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.invitedName, ERR_ALREADY_IN_GUILD_S);
         return;
     }
 
     if (player->GetGuildIdInvited())
     {
-        SendGuildCommandResult(GUILD_INVITE_S, invitedName, ERR_ALREADY_INVITED_TO_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.invitedName, ERR_ALREADY_INVITED_TO_GUILD_S);
         return;
     }
 
@@ -130,7 +128,7 @@ void WorldSession::HandleGuildInviteOpcode(WorldPackets::Guild::GuildInvite cons
         return;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %s Invited %s to Join his Guild", GetPlayer()->GetName(), invitedName.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %s Invited %s to Join his Guild", GetPlayer()->GetName(), packet.invitedName.c_str());
 
     player->SetGuildIdInvited(GetPlayer()->GetGuildId());
     // Put record into guildlog
@@ -144,9 +142,7 @@ void WorldSession::HandleGuildInviteOpcode(WorldPackets::Guild::GuildInvite cons
 
 void WorldSession::HandleGuildRemoveOpcode(WorldPackets::Guild::GuildRemove const& packet)
 {
-    std::string plName = packet.playerName;
-
-    if (!normalizePlayerName(plName))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.playerName)))
         return;
 
     Player* player = GetPlayer();
@@ -166,10 +162,10 @@ void WorldSession::HandleGuildRemoveOpcode(WorldPackets::Guild::GuildRemove cons
         return;
     }
 
-    MemberSlot* slot = guild->GetMemberSlot(plName);
+    MemberSlot* slot = guild->GetMemberSlot(packet.playerName);
     if (!slot)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, plName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.playerName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
         return;
     }
 
@@ -182,7 +178,7 @@ void WorldSession::HandleGuildRemoveOpcode(WorldPackets::Guild::GuildRemove cons
     // do not allow to kick player with same or higher rights
     if (GetPlayer()->GetRank() >= slot->RankId)
     {
-        SendGuildCommandResult(GUILD_QUIT_S, plName, ERR_GUILD_RANK_TOO_HIGH_S);
+        SendGuildCommandResult(GUILD_QUIT_S, packet.playerName, ERR_GUILD_RANK_TOO_HIGH_S);
         return;
     }
 
@@ -198,7 +194,7 @@ void WorldSession::HandleGuildRemoveOpcode(WorldPackets::Guild::GuildRemove cons
     // Put record into guild log
     guild->LogGuildEvent(GUILD_EVENT_LOG_UNINVITE_PLAYER, player->GetObjectGuid(), memberGuid);
 
-    guild->BroadcastEvent(GE_REMOVED, plName.c_str(), player->GetName());
+    guild->BroadcastEvent(GE_REMOVED, packet.playerName.c_str(), player->GetName());
 }
 
 void WorldSession::HandleGuildAcceptOpcode(NullClientPacket const& /*packet*/)
@@ -270,9 +266,7 @@ void WorldSession::HandleGuildRosterOpcode(NullClientPacket const& /*packet*/)
 
 void WorldSession::HandleGuildPromoteOpcode(WorldPackets::Guild::GuildPromote const& packet)
 {
-    std::string plName = packet.playerName;
-
-    if (!normalizePlayerName(plName))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.playerName)))
         return;
 
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
@@ -287,10 +281,10 @@ void WorldSession::HandleGuildPromoteOpcode(WorldPackets::Guild::GuildPromote co
         return;
     }
 
-    MemberSlot* slot = guild->GetMemberSlot(plName);
+    MemberSlot* slot = guild->GetMemberSlot(packet.playerName);
     if (!slot)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, plName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.playerName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
         return;
     }
 
@@ -305,7 +299,7 @@ void WorldSession::HandleGuildPromoteOpcode(WorldPackets::Guild::GuildPromote co
     // GetPlayer()->GetRank() + 1 is highest rank that current player can promote to
     if (GetPlayer()->GetRank() + 1 >= slot->RankId)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, plName, ERR_GUILD_RANK_TOO_HIGH_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.playerName, ERR_GUILD_RANK_TOO_HIGH_S);
         return;
     }
 
@@ -315,14 +309,12 @@ void WorldSession::HandleGuildPromoteOpcode(WorldPackets::Guild::GuildPromote co
     // Put record into guild log
     guild->LogGuildEvent(GUILD_EVENT_LOG_PROMOTE_PLAYER, GetPlayer()->GetObjectGuid(), slot->guid, newRankId);
 
-    guild->BroadcastEvent(GE_PROMOTION, _player->GetName(), plName.c_str(), guild->GetRankName(newRankId).c_str());
+    guild->BroadcastEvent(GE_PROMOTION, _player->GetName(), packet.playerName.c_str(), guild->GetRankName(newRankId).c_str());
 }
 
 void WorldSession::HandleGuildDemoteOpcode(WorldPackets::Guild::GuildDemote const& packet)
 {
-    std::string plName = packet.playerName;
-
-    if (!normalizePlayerName(plName))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.playerName)))
         return;
 
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
@@ -339,11 +331,11 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPackets::Guild::GuildDemote cons
         return;
     }
 
-    MemberSlot* slot = guild->GetMemberSlot(plName);
+    MemberSlot* slot = guild->GetMemberSlot(packet.playerName);
 
     if (!slot)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, plName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.playerName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
         return;
     }
 
@@ -356,14 +348,14 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPackets::Guild::GuildDemote cons
     // do not allow to demote same or higher rank
     if (GetPlayer()->GetRank() >= slot->RankId)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, plName, ERR_GUILD_RANK_TOO_HIGH_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.playerName, ERR_GUILD_RANK_TOO_HIGH_S);
         return;
     }
 
     // do not allow to demote lowest rank
     if (slot->RankId >= guild->GetLowestRank())
     {
-        SendGuildCommandResult(GUILD_INVITE_S, plName, ERR_GUILD_RANK_TOO_LOW_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.playerName, ERR_GUILD_RANK_TOO_LOW_S);
         return;
     }
 
@@ -373,7 +365,7 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPackets::Guild::GuildDemote cons
     // Put record into guild log
     guild->LogGuildEvent(GUILD_EVENT_LOG_DEMOTE_PLAYER, GetPlayer()->GetObjectGuid(), slot->guid, newRankId);
 
-    guild->BroadcastEvent(GE_DEMOTION, _player->GetName(), plName.c_str(), guild->GetRankName(slot->RankId).c_str());
+    guild->BroadcastEvent(GE_DEMOTION, _player->GetName(), packet.playerName.c_str(), guild->GetRankName(slot->RankId).c_str());
 }
 
 void WorldSession::HandleGuildLeaveOpcode(NullClientPacket const& /*packet*/)
@@ -434,11 +426,9 @@ void WorldSession::HandleGuildDisbandOpcode(NullClientPacket const& /*packet*/)
 
 void WorldSession::HandleGuildLeaderOpcode(WorldPackets::Guild::GuildLeader const& packet)
 {
-    std::string name = packet.playerName;
-
     Player* oldLeader = GetPlayer();
 
-    if (!normalizePlayerName(name))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.playerName)))
         return;
 
     Guild* guild = sGuildMgr.GetGuildById(oldLeader->GetGuildId());
@@ -462,24 +452,22 @@ void WorldSession::HandleGuildLeaderOpcode(WorldPackets::Guild::GuildLeader cons
         return;
     }
 
-    MemberSlot* slot = guild->GetMemberSlot(name);
+    MemberSlot* slot = guild->GetMemberSlot(packet.playerName);
     if (!slot)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, name, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.playerName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
         return;
     }
 
     guild->SetLeader(slot->guid);
     oldSlot->ChangeRank(GR_OFFICER);
 
-    guild->BroadcastEvent(GE_LEADER_CHANGED, oldLeader->GetName(), name.c_str());
+    guild->BroadcastEvent(GE_LEADER_CHANGED, oldLeader->GetName(), packet.playerName.c_str());
 }
 
 void WorldSession::HandleGuildMOTDOpcode(WorldPackets::Guild::GuildMOTD const& packet)
 {
-    std::string MOTD = packet.motd;
-
-    if (utf8length(MOTD).value_or(GUILD_MOTD_MAX_LENGTH + 1) > GUILD_MOTD_MAX_LENGTH)
+    if (utf8length(packet.motd).value_or(GUILD_MOTD_MAX_LENGTH + 1) > GUILD_MOTD_MAX_LENGTH)
     {
         ProcessAnticheatAction("PassiveAnticheat", "Attempt to set guild motd to string longer than client limit.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
         return;
@@ -497,9 +485,8 @@ void WorldSession::HandleGuildMOTDOpcode(WorldPackets::Guild::GuildMOTD const& p
         return;
     }
 
-    guild->SetMOTD(MOTD);
-
-    guild->BroadcastEvent(GE_MOTD, MOTD.c_str());
+    guild->SetMOTD(packet.motd);
+    guild->BroadcastEvent(GE_MOTD, packet.motd.c_str());
 }
 
 void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPackets::Guild::GuildSetPublicNote const& packet)
