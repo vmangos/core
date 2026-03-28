@@ -5,7 +5,12 @@
 #include "SpellDefines.h"
 #include "Item.h"
 #include "Player.h"
+#include "Corpse.h"
+#include "SpellCaster.h"
+#include "GameObject.h"
 #include "TradeData.h"
+#include "Map.h"
+#include "ObjectAccessor.h"
 
 SpellCastTargets::SpellCastTargets()
 {
@@ -17,10 +22,6 @@ SpellCastTargets::SpellCastTargets()
 
     m_srcX = m_srcY = m_srcZ = m_destX = m_destY = m_destZ = 0.0f;
     m_targetMask = 0;
-}
-
-SpellCastTargets::~SpellCastTargets()
-{
 }
 
 void SpellCastTargets::PrepareForSpellSystem(Unit* caster)

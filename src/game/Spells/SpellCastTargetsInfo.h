@@ -12,12 +12,12 @@ class Unit;
 class GameObject;
 class Item;
 class Corpse;
+class Player;
 
 class SpellCastTargets
 {
     public:
         SpellCastTargets();
-        ~SpellCastTargets();
 
         void PrepareForSpellSystem(Unit* caster);
 
@@ -87,7 +87,7 @@ class SpellCastTargets
         // objects (can be used at spell creating and after Update at casting
         Unit* m_unitTarget;
         GameObject* m_GOTarget;
-        Item *m_itemTarget;
+        Item* m_itemTarget;
 
         // object GUID/etc, can be used always
         ObjectGuid m_unitTargetGUID;
