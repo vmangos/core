@@ -379,7 +379,7 @@ void WorldSession::HandleTogglePvP(WorldPackets::Misc::TogglePvP const& packet)
         GetPlayer()->UpdatePvP(true);
 }
 
-void WorldSession::HandleZoneUpdateOpcode(WorldPackets::Misc::ZoneUpdate const& packet)
+void WorldSession::HandleZoneUpdateOpcode(WorldPackets::Misc::ZoneUpdate const& /*packet*/)
 {
     // use server size data
     uint32 newzone, newarea;
@@ -567,7 +567,7 @@ void WorldSession::HandleBugOpcode(WorldPackets::Misc::Bug const& packet)
         packet.suggestion ? "suggestion" : "bug", packet.type.c_str(), packet.content.c_str());
 }
 
-void WorldSession::HandleReclaimCorpseOpcode(WorldPackets::Misc::ReclaimCorpse const& packet)
+void WorldSession::HandleReclaimCorpseOpcode(WorldPackets::Misc::ReclaimCorpse const& /*packet*/)
 {
     if (GetPlayer()->IsAlive())
         return;
@@ -800,8 +800,6 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const
 
 void WorldSession::HandleUpdateAccountData(WorldPackets::Misc::UpdateAccountData const& packet)
 {
-    uint32 decompressedSize = packet.decompressedSize;
-
     NewAccountData::AccountDataType dataType;
     if (GetGameBuild() <= CLIENT_BUILD_1_8_4)
         dataType = ConvertOldAccountDataToNew(packet.type);
@@ -816,19 +814,19 @@ void WorldSession::HandleUpdateAccountData(WorldPackets::Misc::UpdateAccountData
         return;
     }
 
-    if (decompressedSize == 0)                              // erase
+    if (packet.decompressedSize == 0)                       // erase
     {
         SetAccountData(dataType, "");
         return;
     }
 
-    if (decompressedSize > 0xFFFF)
+    if (packet.decompressedSize > 0xFFFF)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "UAD: Account data packet too big, size %u", decompressedSize);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "UAD: Account data packet too big, size %u", packet.decompressedSize);
         return;
     }
 
-    nonstd::optional<std::vector<uint8>> dest = Compression::ZLib::Decompress(packet.compressedData, decompressedSize);
+    nonstd::optional<std::vector<uint8>> dest = Compression::ZLib::Decompress(packet.compressedData, packet.decompressedSize);
     if (!dest)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "UAD: Failed to decompress account data");
@@ -841,18 +839,16 @@ void WorldSession::HandleUpdateAccountData(WorldPackets::Misc::UpdateAccountData
 
 void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountData const& packet)
 {
-    uint32 type = packet.type;
-
     NewAccountData::AccountDataType dataType;
     if (GetGameBuild() <= CLIENT_BUILD_1_8_4)
-        dataType = ConvertOldAccountDataToNew(type);
+        dataType = ConvertOldAccountDataToNew(packet.type);
     else
-        dataType = (NewAccountData::AccountDataType)type;
+        dataType = (NewAccountData::AccountDataType)packet.type;
 
     if (dataType >= NewAccountData::NUM_ACCOUNT_DATA_TYPES)
     {
         std::stringstream oss;
-        oss << "Client requested invalid account data type " << type << " in CMSG_REQUEST_ACCOUNT_DATA.";
+        oss << "Client requested invalid account data type " << packet.type << " in CMSG_REQUEST_ACCOUNT_DATA.";
         ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
         return;
     }
@@ -863,7 +859,7 @@ void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountDa
     if (!size)
     {
         WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 4 + 4);
-        data << uint32(type);                                // use the original type sent by client
+        data << uint32(packet.type);                         // use the original type sent by client
         data << uint32(0);                                   // decompressed length
         SendPacket(&data);
     }
@@ -877,7 +873,7 @@ void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountDa
         }
 
         WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 4 + 4 + compressedData->size() + 1);
-        data << uint32(type);                                   // use the original type sent by client
+        data << uint32(packet.type);                            // use the original type sent by client
         data << uint32(size);                                   // decompressed length
         data.append(*compressedData);                           // compressed data
         SendPacket(&data);
@@ -924,16 +920,14 @@ void WorldSession::HandleNextCinematicCamera(NullClientPacket const& /*packet*/)
 
 void WorldSession::HandleSetActionBarTogglesOpcode(WorldPackets::Misc::SetActionBarToggles const& packet)
 {
-    uint8 actionBar = packet.actionBar;
-
     if (!GetPlayer())                                       // ignore until not logged (check needed because STATUS_AUTHED)
     {
-        if (actionBar != 0)
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored", uint32(actionBar));
+        if (packet.actionBar != 0)
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored", uint32(packet.actionBar));
         return;
     }
 
-    GetPlayer()->SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BARS, actionBar);
+    GetPlayer()->SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BARS, packet.actionBar);
 }
 
 void WorldSession::HandlePlayedTime(NullClientPacket const& /*packet*/)
@@ -965,9 +959,7 @@ void WorldSession::HandleInspectOpcode(WorldPackets::Misc::Inspect const& packet
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPackets::Misc::InspectHonorStats const& packet)
 {
-    ObjectGuid guid = packet.guid;
-
-    Player* pTarget = sObjectMgr.GetPlayer(guid);
+    Player* pTarget = sObjectMgr.GetPlayer(packet.guid);
     if (!pTarget)
         return;
 
@@ -1004,7 +996,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPackets::Misc::InspectHono
     ));
 
     // player guid
-    data << guid;
+    data << packet.guid;
 
     // Highest Rank
     data << (uint8)pTarget->GetHonorMgr().GetHighestRank().rank;

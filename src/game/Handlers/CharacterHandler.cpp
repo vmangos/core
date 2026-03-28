@@ -777,10 +777,8 @@ void WorldSession::HandleShowingCloakOpcode(NullClientPacket const& /*packet*/)
 
 void WorldSession::HandleCharRenameOpcode(WorldPackets::Character::CharRename const& packet)
 {
-    std::string newname = packet.newname;
-
     // prevent character rename to invalid name
-    if (!normalizePlayerName(newname))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.newname)))
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1);
         data << uint8(CHAR_NAME_NO_NAME);
@@ -788,7 +786,7 @@ void WorldSession::HandleCharRenameOpcode(WorldPackets::Character::CharRename co
         return;
     }
 
-    uint8 res = ObjectMgr::CheckPlayerName(newname, true);
+    uint8 res = ObjectMgr::CheckPlayerName(packet.newname, true);
     if (res != CHAR_NAME_SUCCESS)
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1);
@@ -798,7 +796,7 @@ void WorldSession::HandleCharRenameOpcode(WorldPackets::Character::CharRename co
     }
 
     // check name limitations
-    if (GetSecurity() == SEC_PLAYER && sObjectMgr.IsReservedName(newname))
+    if (GetSecurity() == SEC_PLAYER && sObjectMgr.IsReservedName(packet.newname))
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1);
         data << uint8(CHAR_NAME_RESERVED);
@@ -806,13 +804,13 @@ void WorldSession::HandleCharRenameOpcode(WorldPackets::Character::CharRename co
         return;
     }
 
-    std::string escaped_newname = newname;
+    std::string escaped_newname = packet.newname;
     CharacterDatabase.escape_string(escaped_newname);
 
     // make sure that the character belongs to the current account, that rename at login is enabled
     // and that there is no character with the desired new name
     CharacterDatabase.AsyncPQuery(&WorldSession::HandleChangePlayerNameOpcodeCallBack,
-                                  GetAccountId(), newname,
+                                  GetAccountId(), packet.newname,
                                   "SELECT `guid`, `name` FROM `characters` WHERE `guid` = %u AND `account` = %u AND (`character_flags` & %u) = %u AND NOT EXISTS (SELECT NULL FROM `characters` WHERE `name` = '%s')",
                                   packet.guid.GetCounter(), GetAccountId(), CHARACTER_FLAG_RENAME, CHARACTER_FLAG_RENAME, escaped_newname.c_str()
                                  );

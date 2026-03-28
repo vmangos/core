@@ -364,7 +364,7 @@ void Petition::BuildSignatureData(WorldPacket& data) const
     }
 }
 
-bool Petition::Rename(std::string& newname)
+bool Petition::Rename(std::string const& newname)
 {
     std::string db_newname = newname;
     CharacterDatabase.escape_string(db_newname);

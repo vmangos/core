@@ -740,7 +740,7 @@ class WorldSession
         void HandleChatMessageOpcode(WorldPackets::Chat::ChatMessage const& packet);
         void HandleTextEmoteOpcode(WorldPackets::Misc::TextEmote const& packet);
         void HandleChatIgnoredOpcode(WorldPackets::Misc::ChatIgnored const& packet);
-        uint32_t ChatCooldown();
+        uint32 ChatCooldown();
 
         void HandleReclaimCorpseOpcode(WorldPackets::Misc::ReclaimCorpse const& packet);
         void HandleCorpseQueryOpcode(NullClientPacket const& packet);

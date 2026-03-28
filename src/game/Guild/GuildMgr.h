@@ -112,7 +112,7 @@ public:
 
     void BuildSignatureData(WorldPacket& data) const;
 
-    bool Rename(std::string& newname);
+    bool Rename(std::string const& newname);
 
     PetitionSignature* GetSignatureForPlayerGuid(ObjectGuid const& player);
     PetitionSignature* GetSignatureForPlayer(Player* player);

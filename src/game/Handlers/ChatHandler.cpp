@@ -119,7 +119,7 @@ bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)
     return true;
 }
 
-uint32_t WorldSession::ChatCooldown()
+uint32 WorldSession::ChatCooldown()
 {
     ASSERT(GetPlayer());
 

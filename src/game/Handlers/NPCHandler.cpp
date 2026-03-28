@@ -48,19 +48,17 @@ enum StableResultCode
 
 void WorldSession::HandleTabardVendorActivateOpcode(WorldPackets::Npc::TabardVendorActivate const& packet)
 {
-    ObjectGuid guid = packet.guid;
-
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TABARDDESIGNER);
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.guid, UNIT_NPC_FLAG_TABARDDESIGNER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTabardVendorActivateOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTabardVendorActivateOpcode - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
         return;
     }
 
     GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
-    SendTabardVendorActivate(guid);
+    SendTabardVendorActivate(packet.guid);
 }
 
 void WorldSession::SendTabardVendorActivate(ObjectGuid guid)
@@ -262,16 +260,14 @@ void WorldSession::SendTrainingFailure(ObjectGuid guid, uint32 serviceId, uint32
 
 void WorldSession::HandleTrainerBuySpellOpcode(WorldPackets::Npc::TrainerBuySpell const& packet)
 {
-    ObjectGuid guid = packet.guid;
-    uint32 spellId = packet.spellId;
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_TRAINER_BUY_SPELL Trainer: %s, learn spell id is: %u", guid.GetString().c_str(), spellId);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_TRAINER_BUY_SPELL Trainer: %s, learn spell id is: %u", packet.guid.GetString().c_str(), packet.spellId);
 
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.guid, UNIT_NPC_FLAG_TRAINER);
 
     if (!unit || !unit->IsTrainerOf(_player, true) || !unit->IsWithinLOSInMap(_player))
     {
-        SendTrainingFailure(guid, spellId, TRAIN_FAIL_UNAVAILABLE);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTrainerBuySpellOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
+        SendTrainingFailure(packet.guid, packet.spellId, TRAIN_FAIL_UNAVAILABLE);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTrainerBuySpellOpcode - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
         return;
     }
 
@@ -281,28 +277,28 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPackets::Npc::TrainerBuySpel
 
     if (!cSpells && !tSpells)
     {
-        SendTrainingFailure(guid, spellId, TRAIN_FAIL_UNAVAILABLE);
+        SendTrainingFailure(packet.guid, packet.spellId, TRAIN_FAIL_UNAVAILABLE);
         return;
     }
 
     // Try to find the spell in npc_trainer.
-    TrainerSpell const* trainer_spell = cSpells ? cSpells->Find(spellId) : nullptr;
+    TrainerSpell const* trainer_spell = cSpells ? cSpells->Find(packet.spellId) : nullptr;
 
     // Not found, try find it in npc_trainer_template.
     if (!trainer_spell && tSpells)
-        trainer_spell = tSpells->Find(spellId);
+        trainer_spell = tSpells->Find(packet.spellId);
 
     // Not found anywhere, cheating?
     if (!trainer_spell)
     {
-        SendTrainingFailure(guid, spellId, TRAIN_FAIL_UNAVAILABLE);
+        SendTrainingFailure(packet.guid, packet.spellId, TRAIN_FAIL_UNAVAILABLE);
         return;
     }
 
     // Can't be learned, cheat? Or double learn with lags...
     if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
     {
-        SendTrainingFailure(guid, spellId, TRAIN_FAIL_NOT_ENOUGH_SKILL);
+        SendTrainingFailure(packet.guid, packet.spellId, TRAIN_FAIL_NOT_ENOUGH_SKILL);
         return;
     }
 
@@ -314,7 +310,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPackets::Npc::TrainerBuySpel
     // Check money requirement.
     if (_player->GetMoney() < nSpellCost)
     {
-        SendTrainingFailure(guid, spellId, TRAIN_FAIL_NOT_ENOUGH_MONEY);
+        SendTrainingFailure(packet.guid, packet.spellId, TRAIN_FAIL_NOT_ENOUGH_MONEY);
         return;
     }
 
@@ -339,10 +335,10 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPackets::Npc::TrainerBuySpel
     if (cast_result == SPELL_CAST_OK)
     {
         _player->ModifyMoney(-int32(nSpellCost));
-        SendTrainingSuccess(guid, spellId);
+        SendTrainingSuccess(packet.guid, packet.spellId);
     }
     else
-        SendTrainingFailure(guid, spellId, TRAIN_FAIL_UNAVAILABLE);
+        SendTrainingFailure(packet.guid, packet.spellId, TRAIN_FAIL_UNAVAILABLE);
 }
 
 void WorldSession::HandleGossipHelloOpcode(WorldPackets::Npc::GossipHello const& packet)
@@ -510,18 +506,16 @@ void WorldSession::SendBindPoint(Creature* npc)
 
 void WorldSession::HandleListStabledPetsOpcode(WorldPackets::Npc::ListStabledPets const& packet)
 {
-    ObjectGuid npcGUID = packet.npcGuid;
-
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(npcGUID, UNIT_NPC_FLAG_STABLEMASTER);
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.npcGuid, UNIT_NPC_FLAG_STABLEMASTER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleListStabledPetsOpcode - %s not found or you can't interact with him.", npcGUID.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleListStabledPetsOpcode - %s not found or you can't interact with him.", packet.npcGuid.GetString().c_str());
         return;
     }
 
     GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
-    SendStablePet(npcGUID);
+    SendStablePet(packet.npcGuid);
 }
 
 void WorldSession::SendStablePet(ObjectGuid guid)
@@ -795,13 +789,10 @@ void WorldSession::HandleStableSwapPet(WorldPackets::Npc::StableSwapPet const& p
 
 void WorldSession::HandleRepairItemOpcode(WorldPackets::Npc::RepairItem const& packet)
 {
-    ObjectGuid npcGuid = packet.npcGuid;
-    ObjectGuid itemGuid = packet.itemGuid;
-
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(npcGuid, UNIT_NPC_FLAG_REPAIR);
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.npcGuid, UNIT_NPC_FLAG_REPAIR);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleRepairItemOpcode - %s not found or you can't interact with him.", npcGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleRepairItemOpcode - %s not found or you can't interact with him.", packet.npcGuid.GetString().c_str());
         return;
     }
 
@@ -811,20 +802,15 @@ void WorldSession::HandleRepairItemOpcode(WorldPackets::Npc::RepairItem const& p
     // reputation discount
     float discountMod = _player->GetReputationPriceDiscount(unit);
 
-    uint32 TotalCost = 0;
-    if (itemGuid)
+    if (packet.itemGuid)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ITEM: %s repair of %s", npcGuid.GetString().c_str(), itemGuid.GetString().c_str());
-
-        Item* item = _player->GetItemByGuid(itemGuid);
-
-        if (item)
-            TotalCost = _player->DurabilityRepair(item->GetPos(), true, discountMod);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ITEM: %s repair of %s", packet.npcGuid.GetString().c_str(), packet.itemGuid.GetString().c_str());
+        if (Item* item = _player->GetItemByGuid(packet.itemGuid))
+            _player->DurabilityRepair(item->GetPos(), true, discountMod);
     }
     else
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ITEM: %s repair all items", npcGuid.GetString().c_str());
-
-        TotalCost = _player->DurabilityRepairAll(true, discountMod);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ITEM: %s repair all items", packet.npcGuid.GetString().c_str());
+        _player->DurabilityRepairAll(true, discountMod);
     }
 }

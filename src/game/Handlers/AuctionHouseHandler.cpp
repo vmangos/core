@@ -421,9 +421,6 @@ void WorldSession::HandleAuctionSellItem(WorldPackets::AuctionHouse::AuctionSell
 // this function is called when client bids or buys out auction
 void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlaceBid const& packet)
 {
-    uint32 auctionId = packet.auctionId;
-    uint32 price = packet.price;
-
     if (!sWorld.getConfig(CONFIG_BOOL_GM_ALLOW_TRADES) && GetSecurity() > SEC_PLAYER)
     {
         SendAuctionCommandResult(nullptr, AUCTION_BID_PLACED, AUCTION_ERR_RESTRICTED_ACCOUNT);
@@ -436,7 +433,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
         return;
     }
 
-    if (!auctionId || !price)
+    if (!packet.auctionId || !packet.price)
     {
         SendAuctionCommandResult(nullptr, AUCTION_BID_PLACED, AUCTION_ERR_ITEM_NOT_FOUND);
         return;
@@ -456,7 +453,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
     if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
+    AuctionEntry* auction = auctionHouse->GetAuction(packet.auctionId);
     Player* pl = GetPlayer();
 
     if (!auction)
@@ -485,14 +482,14 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
     }
 
     // cheating
-    if (price < auction->startbid)
+    if (packet.price < auction->startbid)
     {
         SendAuctionCommandResult(nullptr, AUCTION_BID_PLACED, AUCTION_ERR_BID_INCREMENT);
         return;
     }
 
     // cheating or client lags
-    if (price <= auction->bid)
+    if (packet.price <= auction->bid)
     {
         // client test but possible in result lags
         SendAuctionCommandResult(auction, AUCTION_BID_PLACED, AUCTION_ERR_HIGHER_BID);
@@ -500,34 +497,34 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
     }
 
     // price too low for next bid if not buyout
-    if ((price < auction->buyout || auction->buyout == 0) &&
-            price < auction->bid + auction->GetAuctionOutBid())
+    if ((packet.price < auction->buyout || auction->buyout == 0) &&
+         packet.price < auction->bid + auction->GetAuctionOutBid())
     {
         // client test but possible in result lags
         SendAuctionCommandResult(auction, AUCTION_BID_PLACED, AUCTION_ERR_BID_INCREMENT);
         return;
     }
 
-    if (price > pl->GetMoney())
+    if (packet.price > pl->GetMoney())
     {
         // you don't have enough money!, client tests!
         // SendAuctionCommandResult(auction->auctionId, AUCTION_ERR_INVENTORY, EQUIP_ERR_NOT_ENOUGH_MONEY);
         return;
     }
 
-    if ((price < auction->buyout) || (auction->buyout == 0))// bid
+    if ((packet.price < auction->buyout) || (auction->buyout == 0))// bid
     {
         if (pl->GetGUIDLow() == auction->bidder)
-            pl->LogModifyMoney(-int32(price - auction->bid), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
+            pl->LogModifyMoney(-int32(packet.price - auction->bid), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
         else
         {
-            pl->LogModifyMoney(-int32(price), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
+            pl->LogModifyMoney(-int32(packet.price), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
             if (auction->bidder)                            // return money to old bidder if present
                 SendAuctionOutbiddedMail(auction);
         }
 
         auction->bidder = pl->GetGUIDLow();
-        auction->bid = price;
+        auction->bid = packet.price;
 
         if (auction_owner)
             auction_owner->GetSession()->SendAuctionOwnerNotification(auction, false);
@@ -581,21 +578,17 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
 // this void is called when auction_owner cancels his auction
 void WorldSession::HandleAuctionRemoveItem(WorldPackets::AuctionHouse::AuctionRemoveItem const& packet)
 {
-    uint32 auctionId = packet.auctionId;
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Cancel AUCTION AuctionID: %u", auctionId);
-
     AuctionHouseEntry const* auctionHouseEntry = GetCheckedAuctionHouseForAuctioneer(packet.auctioneerGuid);
     if (!auctionHouseEntry)
         return;
-
-    // always return pointer
-    AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
 
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
+    // always return pointer
+    AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
+    AuctionEntry* auction = auctionHouse->GetAuction(packet.auctionId);
     Player* pl = GetPlayer();
 
     if (auction && auction->owner == pl->GetGUIDLow())
@@ -632,7 +625,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPackets::AuctionHouse::AuctionRe
     {
         SendAuctionCommandResult(nullptr, AUCTION_REMOVED, AUCTION_ERR_DATABASE);
         // this code isn't possible ... maybe there should be ASSERT
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHEATER : %u, he tried to cancel auction (id: %u) of another player, or auction is nullptr", pl->GetGUIDLow(), auctionId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHEATER : %u, he tried to cancel auction (id: %u) of another player, or auction is nullptr", pl->GetGUIDLow(), packet.auctionId);
         return;
     }
 
@@ -750,8 +743,6 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPackets::AuctionHouse::Aucti
     if (ReceivedAHListRequest())
         return;
 
-    uint32 listfrom = packet.listfrom;
-
     AuctionHouseEntry const* auctionHouseEntry = GetCheckedAuctionHouseForAuctioneer(packet.auctioneerGuid);
     if (!auctionHouseEntry)
         return;
@@ -763,7 +754,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPackets::AuctionHouse::Aucti
     AuctionHouseClientQueryTask task(AUCTION_QUERY_LIST_OWNER);
     task.auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
     task.accountId = GetAccountId();
-    task.listfrom = listfrom;
+    task.listfrom = packet.listfrom;
     SetReceivedAHListRequest(true);
     sWorld.AddAsyncTask({std::move(task)});
 }

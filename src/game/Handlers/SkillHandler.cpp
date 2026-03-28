@@ -61,14 +61,13 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPackets::Skill::TalentWipe
 
 void WorldSession::HandleUnlearnSkillOpcode(WorldPackets::Skill::UnlearnSkill const& packet)
 {
-    uint32 skill_id = packet.skillId;
-    SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(skill_id, GetPlayer()->GetRace(), GetPlayer()->GetClass());
+    SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(packet.skillId, GetPlayer()->GetRace(), GetPlayer()->GetClass());
     if (!rcEntry || !(rcEntry->flags & SKILL_FLAG_UNLEARNABLE))
     {
         std::stringstream reason;
-        reason << "Attempt to unlearn not unlearnable skill #" << skill_id;
+        reason << "Attempt to unlearn not unlearnable skill #" << packet.skillId;
         ProcessAnticheatAction("PassiveAnticheat", reason.str().c_str(), CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
         return;
     }
-    GetPlayer()->SetSkill(skill_id, 0, 0);
+    GetPlayer()->SetSkill(packet.skillId, 0, 0);
 }

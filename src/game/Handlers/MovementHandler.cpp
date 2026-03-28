@@ -797,11 +797,9 @@ void WorldSession::HandleMoveKnockBackAck(WorldPackets::Movement::MoveKnockBackA
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPackets::Movement::MoveSplineDone const& packet)
 {
     uint32 timeNow = World::GetCurrentMSTime();
+    const_cast<MovementInfo&>(packet.movementInfo).UpdateTime(timeNow);
 
-    MovementInfo movementInfo = packet.movementInfo;
-    movementInfo.UpdateTime(timeNow);
-
-    if (!VerifyMovementInfo(movementInfo))
+    if (!VerifyMovementInfo(packet.movementInfo))
         return;
 
     Unit* pMover = _player->GetMover();
@@ -825,38 +823,36 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPackets::Movement::MoveSpline
             return;
 
         // no need to reject future packets in this case
-        if (!_player->GetCheatData()->HandleSplineDone(pPlayerMover, movementInfo, packet.splineId))
+        if (!_player->GetCheatData()->HandleSplineDone(pPlayerMover, const_cast<MovementInfo&>(packet.movementInfo), packet.splineId))
             return;
 
-        if (m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, CMSG_MOVE_SPLINE_DONE))
+        if (m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, const_cast<MovementInfo&>(packet.movementInfo), CMSG_MOVE_SPLINE_DONE))
             return;
     }
 
-    HandleMoverRelocation(pMover, movementInfo);
+    HandleMoverRelocation(pMover, const_cast<MovementInfo&>(packet.movementInfo));
 
-    WorldPacket data(movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING) ? MSG_MOVE_HEARTBEAT : MSG_MOVE_STOP);
+    WorldPacket data(packet.movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING) ? MSG_MOVE_HEARTBEAT : MSG_MOVE_STOP);
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << m_clientMoverGuid.WriteAsPacked();
 #else
     data << m_clientMoverGuid.GetRawValue();
 #endif
-    movementInfo.Write(data);
+    packet.movementInfo.Write(data);
 
     pMover->SendMovementMessageToSet(std::move(data), true, _player);
 }
 
 void WorldSession::HandleSetActiveMoverOpcode(WorldPackets::Misc::SetActiveMover const& packet)
 {
-    ObjectGuid guid = packet.guid;
-
-    if (!guid.IsEmpty())
+    if (!packet.guid.IsEmpty())
     {
         Unit* pMover = _player->GetMover();
-        if (pMover->GetObjectGuid() != guid)
+        if (pMover->GetObjectGuid() != packet.guid)
         {
             sLog.Player(this, LOG_MOVEMENT, LOG_LVL_ERROR, "HandleSetActiveMover: Incorrect mover guid. Mover is %s and should be %s.",
-                pMover->GetGuidStr().c_str(), guid.GetString().c_str());
+                pMover->GetGuidStr().c_str(), packet.guid.GetString().c_str());
             m_clientMoverGuid = pMover->GetObjectGuid();
             return;
         }
@@ -887,7 +883,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPackets::Misc::SetActiveMover
         }
     }
 
-    m_clientMoverGuid = guid;
+    m_clientMoverGuid = packet.guid;
 }
 
 void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPackets::Movement::MoveNotActiveMover const& packet)
@@ -919,15 +915,13 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPackets::Movement::MoveNo
     ObjectGuid oldMoverGuid = m_clientMoverGuid;
 #endif
 
-    MovementInfo movementInfo = packet.movementInfo;
-
     m_clientMoverGuid = ObjectGuid();
 
     // Do not accept packets sent before this time.
     if (timeNow <= m_moveRejectTime)
         return;
 
-    if (!VerifyMovementInfo(movementInfo))
+    if (!VerifyMovementInfo(packet.movementInfo))
         return;
 
     Unit* pMover = _player->GetMap()->GetUnit(oldMoverGuid);
@@ -949,28 +943,28 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPackets::Movement::MoveNo
 
     if (pPlayerMover)
     {
-        if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, packet.GetOpcode())) ||
-            (m_moveRejectTime = _player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, packet.GetOpcode())))
+        if ((m_moveRejectTime = _player->GetCheatData()->HandleFlagTests(pPlayerMover, const_cast<MovementInfo&>(packet.movementInfo), packet.GetOpcode())) ||
+            (m_moveRejectTime = _player->GetCheatData()->HandlePositionTests(pPlayerMover, const_cast<MovementInfo&>(packet.movementInfo), packet.GetOpcode())))
         {
             return;
         }
     }
 
-    HandleMoverRelocation(pMover, movementInfo);
+    HandleMoverRelocation(pMover, const_cast<MovementInfo&>(packet.movementInfo));
 
     // This fixes channeled spells which are interrupted on turning that involve controlling another unit.
     // Example: Eye of Kill'rog will get instantly interrupted because orientation is slightly changed in this packet.
     if (pPlayerMover)
         pPlayerMover->UpdateChannelStartPosition();
 
-    WorldPacket data(movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING) ? MSG_MOVE_HEARTBEAT : MSG_MOVE_STOP);
+    WorldPacket data(packet.movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING) ? MSG_MOVE_HEARTBEAT : MSG_MOVE_STOP);
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << oldMoverGuid.WriteAsPacked();
 #else
     data << oldMoverGuid.GetRawValue();
 #endif
-    movementInfo.Write(data);
+    packet.movementInfo.Write(data);
 
     pMover->SendMovementMessageToSet(std::move(data), true, _player);
 }
@@ -993,16 +987,14 @@ void WorldSession::HandleSummonResponseOpcode(WorldPackets::Misc::SummonResponse
 
 void WorldSession::HandleMoveTimeSkippedOpcode(WorldPackets::Movement::MoveTimeSkipped const& packet)
 {
-    uint32 lag = packet.lag;
-
     Unit* pMover = GetMoverFromGuid(packet.guid);
     if (!pMover)
         return;
 
     if (pMover->m_movementInfo.ctime)
     {
-        pMover->m_movementInfo.stime += lag;
-        pMover->m_movementInfo.ctime += lag;
+        pMover->m_movementInfo.stime += packet.lag;
+        pMover->m_movementInfo.ctime += packet.lag;
     }
 
     // fix an 1.12 client problem with transports
@@ -1020,7 +1012,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPackets::Movement::MoveTimeS
     {
         WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);
         data << pMover->GetPackGUID();
-        data << lag;
+        data << packet.lag;
         pMover->SendMovementMessageToSet(std::move(data), true, _player);
     }
 #endif

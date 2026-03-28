@@ -11,7 +11,7 @@ namespace WorldPackets { namespace Spell
     {
     public:
         uint32               spellId = 0;
-        SpellCastTargetsInfo targets;
+        SpellCastTargets     targets;
 
         explicit CastSpell() : ClientPacket(CMSG_CAST_SPELL) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
@@ -23,7 +23,7 @@ namespace WorldPackets { namespace Spell
         uint8 bagIndex;
         uint8 slot;
         uint8 spellSlot; // the position of the spell id on the item template
-        SpellCastTargetsInfo targets;
+        SpellCastTargets targets;
 
         explicit UseItem() : ClientPacket(CMSG_USE_ITEM), bagIndex(0), slot(0), spellSlot(0) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;

@@ -35,14 +35,11 @@ using namespace Spells;
 
 void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packet)
 {
-    // TODO: add targets.read() check
     Player* pUser = _player;
 
     // ignore for remote control state
     if (!pUser->IsSelfMover())
-    {
         return;
-    }
 
     Item *pItem = pUser->GetItemByPos(packet.bagIndex, packet.slot);
     if (!pItem)
@@ -112,10 +109,10 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
         }
     }
 
-    SpellCastTargets targets = SpellCastTargets::FromSpellCastTargetsInfo(packet.targets, pUser);
-
+    const_cast<SpellCastTargets&>(packet.targets).PrepareForSpellSystem(_player);
     SpellCastResult itemCastCheckResult = SPELL_CAST_OK;
-    if (!pItem->IsTargetValidForItemUse(targets.getUnitTarget()))
+
+    if (!pItem->IsTargetValidForItemUse(packet.targets.getUnitTarget()))
         itemCastCheckResult = SPELL_FAILED_BAD_TARGETS;
     else if (pUser->IsShapeShifted())
     {
@@ -139,7 +136,7 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
         return;
     }
 
-    pUser->CastItemUseSpell(pItem, targets);
+    pUser->CastItemUseSpell(pItem, const_cast<SpellCastTargets&>(packet.targets));
 }
 
 void WorldSession::HandleOpenItemOpcode(WorldPackets::Spell::OpenItem const& packet)
@@ -278,12 +275,11 @@ void WorldSession::HandleCastSpellOpcode(WorldPackets::Spell::CastSpell const& p
     }
 
     // client provided targets
-    SpellCastTargets targets = SpellCastTargets::FromSpellCastTargetsInfo(packet.targets, _player);
-
+    const_cast<SpellCastTargets&>(packet.targets).PrepareForSpellSystem(_player);
     SpellEntry const* originalSpellInfo = spellInfo;
 
     // auto-selection buff level base at target level (in spellInfo)
-    if (Unit* target = targets.getUnitTarget())
+    if (Unit* target = packet.targets.getUnitTarget())
     {
         // Cannot cast negative spells on yourself. Handle it here since casting negative
         // spells on yourself is frequently used within the core itself for certain mechanics.
@@ -309,7 +305,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPackets::Spell::CastSpell const& p
             DoLootRelease(lootGuid);
     }
 
-    Spell* spell = new Spell(_player, spellInfo, false, ObjectGuid(), nullptr, targets.getUnitTarget());
+    Spell* spell = new Spell(_player, spellInfo, false, ObjectGuid(), nullptr, packet.targets.getUnitTarget());
 
     // Spell has been down-ranked, remember what client wanted to cast.
     if (spellInfo != originalSpellInfo)
@@ -317,7 +313,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPackets::Spell::CastSpell const& p
 
     // Nostalrius : Ivina
     spell->SetClientStarted(true);
-    spell->prepare(std::move(targets));
+    spell->prepare(std::move(const_cast<SpellCastTargets&>(packet.targets)));
 }
 
 void WorldSession::HandleCancelCastOpcode(WorldPackets::Spell::CancelCast const& packet)
@@ -336,9 +332,7 @@ void WorldSession::HandleCancelCastOpcode(WorldPackets::Spell::CancelCast const&
 
 void WorldSession::HandleCancelAuraOpcode(WorldPackets::Spell::CancelAura const& packet)
 {
-    uint32 spellId = packet.spellId;
-
-    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(packet.spellId);
     if (!spellInfo)
         return;
 
@@ -356,7 +350,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPackets::Spell::CancelAura const&
     if (spellInfo->IsPassiveSpell())
         return;
 
-    if (!IsPositiveSpell(spellId))
+    if (!IsPositiveSpell(packet.spellId))
     {
         // ignore for remote control state
         if (!_player->IsSelfMover())
@@ -395,25 +389,23 @@ void WorldSession::HandleCancelAuraOpcode(WorldPackets::Spell::CancelAura const&
     if (spellInfo->IsChanneledSpell())
     {
         if (Spell* curSpell = _player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            if (curSpell->m_spellInfo->Id == spellId)
+            if (curSpell->m_spellInfo->Id == packet.spellId)
                 _player->InterruptSpell(CURRENT_CHANNELED_SPELL);
         return;
     }
 
-    SpellAuraHolder* holder = _player->GetSpellAuraHolder(spellId);
+    SpellAuraHolder* holder = _player->GetSpellAuraHolder(packet.spellId);
 
     // not own area auras can't be cancelled (note: maybe need to check for aura on holder and not general on spell)
     if (holder && holder->GetCasterGuid() != _player->GetObjectGuid() && holder->GetSpellProto()->HasAreaAuraEffect())
         return;
 
     // non channeled case
-    _player->RemoveAurasDueToSpellByCancel(spellId);
+    _player->RemoveAurasDueToSpellByCancel(packet.spellId);
 }
 
 void WorldSession::HandlePetCancelAuraOpcode(WorldPackets::Pet::PetCancelAura const& packet)
 {
-    ObjectGuid guid = packet.guid;
-
     // ignore for remote control state
     if (!_player->IsSelfMover())
         return;
@@ -422,12 +414,12 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPackets::Pet::PetCancelAura co
     if (!spellInfo)
         return;
 
-    Creature* pet = GetPlayer()->GetMap()->GetAnyTypeCreature(guid);
+    Creature* pet = GetPlayer()->GetMap()->GetAnyTypeCreature(packet.guid);
 
     if (!pet)
         return;
 
-    if (guid != GetPlayer()->GetPetGuid() && guid != GetPlayer()->GetCharmGuid())
+    if (packet.guid != GetPlayer()->GetPetGuid() && packet.guid != GetPlayer()->GetCharmGuid())
         return;
 
     if (!pet->IsAlive())

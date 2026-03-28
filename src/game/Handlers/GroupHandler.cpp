@@ -360,25 +360,23 @@ void WorldSession::HandleLootMethodOpcode(WorldPackets::Group::LootMethod const&
 
 void WorldSession::HandleLootRoll(WorldPackets::Loot::LootRoll const& packet)
 {
-    uint8 rollType = packet.rollType;
-
     Group* group = GetPlayer()->GetGroup();
     if (!group)
         return;
 
-    if (rollType >= MAX_ROLL_FROM_CLIENT)
+    if (packet.rollType >= MAX_ROLL_FROM_CLIENT)
         return;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME))
     {
         SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
-        rollType = ROLL_PASS;
+        const_cast<uint8&>(packet.rollType) = ROLL_PASS;
     }
 #endif
 
     // everything is fine, do it, if false then some cheating problem found (result not used in pre-3.0)
-    group->CountRollVote(GetPlayer(), packet.lootedTarget, packet.itemSlot, RollVote(rollType));
+    group->CountRollVote(GetPlayer(), packet.lootedTarget, packet.itemSlot, RollVote(packet.rollType));
 }
 
 void WorldSession::HandleMinimapPingOpcode(WorldPackets::Group::MinimapPing const& packet)
@@ -386,12 +384,6 @@ void WorldSession::HandleMinimapPingOpcode(WorldPackets::Group::MinimapPing cons
     if (!GetPlayer()->GetGroup())
         return;
 
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode MSG_MINIMAP_PING X: %f, Y: %f", x, y);
-
-    /** error handling **/
-    /********************/
-
-    // everything is fine, do it
     WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
     data << GetPlayer()->GetObjectGuid();
     data << float(packet.x);
@@ -401,22 +393,19 @@ void WorldSession::HandleMinimapPingOpcode(WorldPackets::Group::MinimapPing cons
 
 void WorldSession::HandleRandomRollOpcode(WorldPackets::Group::RandomRoll const& packet)
 {
-    uint32 minimum = packet.minimum;
-    uint32 maximum = packet.maximum;
-
     /** error handling **/
-    if (minimum > maximum || maximum > 10000) // < 32768 for urand call
+    if (packet.minimum > packet.maximum || packet.maximum > 10000) // < 32768 for urand call
         return;
     /********************/
 
     // everything is fine, do it
-    uint32 roll = urand(minimum, maximum);
+    uint32 roll = urand(packet.minimum, packet.maximum);
 
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ROLL: MIN: %u, MAX: %u, ROLL: %u", minimum, maximum, roll);
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ROLL: MIN: %u, MAX: %u, ROLL: %u", packet.minimum, packet.maximum, roll);
 
     WorldPacket data(MSG_RANDOM_ROLL, 4 + 4 + 4 + 8);
-    data << uint32(minimum);
-    data << uint32(maximum);
+    data << uint32(packet.minimum);
+    data << uint32(packet.maximum);
     data << uint32(roll);
     data << GetPlayer()->GetObjectGuid();
 
@@ -480,9 +469,7 @@ void WorldSession::HandleGroupRaidConvertOpcode(NullClientPacket const& /*packet
 
 void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPackets::Group::GroupChangeSubGroup const& packet)
 {
-    uint8 groupNr = packet.groupNr;
-
-    if (groupNr >= MAX_RAID_SUBGROUPS)
+    if (packet.groupNr >= MAX_RAID_SUBGROUPS)
         return;
 
     // we will get correct pointer for group here, so we don't have to check if group is BG raid
@@ -495,17 +482,17 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPackets::Group::GroupCha
         !group->IsAssistant(GetPlayer()->GetObjectGuid()))
         return;
 
-    if (!group->HasFreeSlotSubGroup(groupNr))
+    if (!group->HasFreeSlotSubGroup(packet.groupNr))
         return;
     /********************/
 
     // everything is fine, do it
     if (Player* player = sObjectMgr.GetPlayer(packet.name.c_str()))
-        group->ChangeMembersGroup(player, groupNr);
+        group->ChangeMembersGroup(player, packet.groupNr);
     else
     {
         if (ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(packet.name))
-            group->ChangeMembersGroup(guid, groupNr);
+            group->ChangeMembersGroup(guid, packet.groupNr);
     }
 }
 
@@ -520,6 +507,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPackets::Group::GroupSwapS
         !group->IsAssistant(GetPlayer()->GetObjectGuid()))
         return;
     /********************/
+
     // If both players are online do swap with Player objects, else
     // do swap with Guids
     Player* player = sObjectMgr.GetPlayer(packet.name.c_str());
@@ -780,9 +768,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/
 void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPackets::Group::RequestPartyMemberStats const& packet)
 {
-    ObjectGuid guid = packet.guid;
-
-    Player* player = HashMapHolder<Player>::Find(guid);
+    Player* player = HashMapHolder<Player>::Find(packet.guid);
 
     if (!player || !player->IsInSameRaidWith(_player))
     {
@@ -792,9 +778,9 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPackets::Group::Requ
         WorldPacket data(SMSG_PARTY_MEMBER_STATS, 8 + 4 + 1);
 #endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data << guid.WriteAsPacked();
+        data << packet.guid.WriteAsPacked();
 #else
-        data << guid;
+        data << packet.guid;
 #endif
         data << uint32(GROUP_UPDATE_FLAG_STATUS);
         data << uint8(MEMBER_STATUS_OFFLINE);

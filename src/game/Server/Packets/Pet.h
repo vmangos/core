@@ -115,7 +115,7 @@ namespace WorldPackets { namespace Pet
     public:
         ObjectGuid           petGuid;
         uint32               spellId = 0;
-        SpellCastTargetsInfo targets;
+        SpellCastTargets     targets;
 
         explicit PetCastSpell() : ClientPacket(CMSG_PET_CAST_SPELL) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;

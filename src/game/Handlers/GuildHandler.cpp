@@ -491,10 +491,9 @@ void WorldSession::HandleGuildMOTDOpcode(WorldPackets::Guild::GuildMOTD const& p
 
 void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPackets::Guild::GuildSetPublicNote const& packet)
 {
-    std::string name = packet.playerName;
-
-    if (!normalizePlayerName(name))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.playerName)))
         return;
+
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
 
     if (!guild)
@@ -509,10 +508,10 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPackets::Guild::GuildSetP
         return;
     }
 
-    MemberSlot* slot = guild->GetMemberSlot(name);
+    MemberSlot* slot = guild->GetMemberSlot(packet.playerName);
     if (!slot)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, name, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.playerName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
         return;
     }
 
@@ -529,9 +528,7 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPackets::Guild::GuildSetP
 
 void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPackets::Guild::GuildSetOfficerNote const& packet)
 {
-    std::string plName = packet.playerName;
-
-    if (!normalizePlayerName(plName))
+    if (!normalizePlayerName(const_cast<std::string&>(packet.playerName)))
         return;
 
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
@@ -547,10 +544,10 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPackets::Guild::GuildSet
         return;
     }
 
-    MemberSlot* slot = guild->GetMemberSlot(plName);
+    MemberSlot* slot = guild->GetMemberSlot(packet.playerName);
     if (!slot)
     {
-        SendGuildCommandResult(GUILD_INVITE_S, plName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
+        SendGuildCommandResult(GUILD_INVITE_S, packet.playerName, ERR_GUILD_PLAYER_NOT_IN_GUILD_S);
         return;
     }
 
@@ -567,9 +564,6 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPackets::Guild::GuildSet
 
 void WorldSession::HandleGuildRankOpcode(WorldPackets::Guild::GuildRank const& packet)
 {
-    uint32 rankId = packet.rankId;
-    uint32 rights = packet.rights;
-
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
     if (!guild)
     {
@@ -589,12 +583,12 @@ void WorldSession::HandleGuildRankOpcode(WorldPackets::Guild::GuildRank const& p
         return;
     }
 
-    guild->SetRankName(rankId, packet.rankName);
+    guild->SetRankName(packet.rankId, packet.rankName);
 
-    if (rankId == GR_GUILDMASTER)                           // prevent loss leader rights
-        rights = GR_RIGHT_ALL;
+    if (packet.rankId == GR_GUILDMASTER)                    // prevent loss leader rights
+        const_cast<uint32&>(packet.rights) = GR_RIGHT_ALL;
 
-    guild->SetRankRights(rankId, rights);
+    guild->SetRankRights(packet.rankId, packet.rights);
 
     guild->Query(this);
     guild->Roster();                                        // broadcast for tab rights update
