@@ -412,18 +412,19 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPackets::Npc::NpcTextQuery cons
 
 void WorldSession::HandlePageTextQueryOpcode(WorldPackets::Query::QueryPageText const& packet)
 {
-    while (packet.pageID)
+    uint32 pageID = packet.pageID;
+    while (pageID)
     {
-        PageText const* pPage = sPageTextStore.LookupEntry<PageText>(packet.pageID);
+        PageText const* pPage = sPageTextStore.LookupEntry<PageText>(pageID);
         // guess size
         WorldPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 50);
-        data << packet.pageID;
+        data << pageID;
 
         if (!pPage)
         {
             data << "Item page missing.";
             data << uint32(0);
-            const_cast<uint32&>(packet.pageID) = 0;
+            pageID = 0;
         }
         else
         {
@@ -432,7 +433,7 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPackets::Query::QueryPageText 
             int loc_idx = GetSessionDbLocaleIndex();
             if (loc_idx >= 0)
             {
-                PageTextLocale const* pl = sObjectMgr.GetPageTextLocale(packet.pageID);
+                PageTextLocale const* pl = sObjectMgr.GetPageTextLocale(pageID);
                 if (pl)
                 {
                     if (pl->text.size() > size_t(loc_idx) && !pl->text[loc_idx].empty())
@@ -442,7 +443,7 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPackets::Query::QueryPageText 
 
             data << text;
             data << uint32(pPage->next_page);
-            const_cast<uint32&>(packet.pageID) = pPage->next_page;
+            pageID = pPage->next_page;
         }
         SendPacket(&data);
     }

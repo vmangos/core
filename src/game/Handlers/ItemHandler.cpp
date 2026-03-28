@@ -498,15 +498,17 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem const& pack
         return;
     }
 
+    uint8 actualCount = packet.count;
+
     // special case at auto sell (sell all)
-    if (packet.count == 0)
+    if (actualCount == 0)
     {
-        const_cast<uint8&>(packet.count) = pItem->GetCount();
+        actualCount = pItem->GetCount();
     }
     else
     {
         // prevent sell more items that exist in stack (possible only not from client)
-        if (packet.count > pItem->GetCount())
+        if (actualCount > pItem->GetCount())
         {
             _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, packet.itemGuid, 0);
             return;
@@ -527,7 +529,7 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem const& pack
         return;
     }
 
-    uint32 money = pProto->SellPrice * packet.count;
+    uint32 money = pProto->SellPrice * actualCount;
 
     for (auto i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
@@ -582,18 +584,18 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem const& pack
         }
     }
 
-    if (packet.count < pItem->GetCount())              // need split items
+    if (actualCount < pItem->GetCount())              // need split items
     {
-        Item *pNewItem = pItem->CloneItem(packet.count, _player);
+        Item *pNewItem = pItem->CloneItem(actualCount, _player);
         if (!pNewItem)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: HandleSellItemOpcode - could not create clone of item %u; count = %u", pItem->GetEntry(), packet.count);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: HandleSellItemOpcode - could not create clone of item %u; count = %u", pItem->GetEntry(), actualCount);
             _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, packet.itemGuid, 0);
             return;
         }
 
-        pItem->SetCount(pItem->GetCount() - packet.count);
-        _player->ItemRemovedQuestCheck(pItem->GetEntry(), packet.count);
+        pItem->SetCount(pItem->GetCount() - actualCount);
+        _player->ItemRemovedQuestCheck(pItem->GetEntry(), actualCount);
         if (_player->IsInWorld())
             pItem->SendCreateUpdateToPlayer(_player);
         pItem->SetState(ITEM_CHANGED, _player);

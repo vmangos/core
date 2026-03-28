@@ -585,10 +585,11 @@ void WorldSession::HandleGuildRankOpcode(WorldPackets::Guild::GuildRank const& p
 
     guild->SetRankName(packet.rankId, packet.rankName);
 
+    uint32 newRights = packet.rights;
     if (packet.rankId == GR_GUILDMASTER)                    // prevent loss leader rights
-        const_cast<uint32&>(packet.rights) = GR_RIGHT_ALL;
+        newRights = GR_RIGHT_ALL;
 
-    guild->SetRankRights(packet.rankId, packet.rights);
+    guild->SetRankRights(packet.rankId, newRights);
 
     guild->Query(this);
     guild->Roster();                                        // broadcast for tab rights update

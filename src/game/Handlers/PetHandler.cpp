@@ -337,8 +337,9 @@ void WorldSession::HandlePetRename(WorldPackets::Pet::PetRename const& packet)
     pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME);
 
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.escape_string(const_cast<std::string&>(packet.name));
-    CharacterDatabase.PExecute("UPDATE `character_pet` SET `name` = '%s', `renamed` = '1' WHERE `owner_guid` = '%u' AND `id` = '%u'", packet.name.c_str(), _player->GetGUIDLow(), pet->GetCharmInfo()->GetPetNumber());
+    std::string safeName = packet.name;
+    CharacterDatabase.escape_string(safeName);
+    CharacterDatabase.PExecute("UPDATE `character_pet` SET `name` = '%s', `renamed` = '1' WHERE `owner_guid` = '%u' AND `id` = '%u'", safeName.c_str(), _player->GetGUIDLow(), pet->GetCharmInfo()->GetPetNumber());
     CharacterDatabase.CommitTransaction();
 
     pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(nullptr)));
