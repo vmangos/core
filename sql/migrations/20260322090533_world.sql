@@ -55,6 +55,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (1399, @PTEMPLATE+4, 0, 'Un\'Goro Crater - Group 4 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
 
 DELETE FROM `pool_template` WHERE  `entry` = 1210;
+UPDATE `pool_template` SET `description`='Ooze Covered Truesilver Deposit / Ooze Covered Thorium Vein - Un\'Goro Crater - Group 1 - Master' WHERE  `entry`=1222 AND `patch_min`=0 AND `patch_max`=10;
+UPDATE `pool_template` SET `description`='Ooze Covered Truesilver Deposit / Ooze Covered Thorium Vein - Un\'Goro Crater - Group 2 - Master' WHERE  `entry`=1223 AND `patch_min`=0 AND `patch_max`=10;
 
 
 -- End of migration.
