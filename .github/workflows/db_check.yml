@@ -12,6 +12,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest # 18.04 has mysql5.7 and latest(20.04) has mysql8
+    permissions:
+      contents: read
 
     # ... some other config ...
 

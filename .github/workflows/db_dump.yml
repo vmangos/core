@@ -15,6 +15,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest # 18.04 has mysql5.7 and latest(20.04) has mysql8
+    permissions:
+      contents: read
 
     # ... some other config ...
 
@@ -142,6 +144,13 @@ jobs:
           name: snapshot-db-sqlite-dump
           path: "${{github.workspace}}/dbexport/db-sqlite-${{steps.vars.outputs.sha_short}}.zip"
 
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
     - name: Download artifact snapshot-db-dump
       uses: actions/download-artifact@v4
       with:
@@ -163,7 +172,7 @@ jobs:
     - name: Upload snapshot
       uses: "crowbarmaster/GH-Automatic-Releases@latest"
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        repo_token: "${{ github.token }}"
         automatic_release_tag: "db_latest"
         prerelease: true
         title: "Development DB Dump(${{ steps.date.outputs.time }})"
