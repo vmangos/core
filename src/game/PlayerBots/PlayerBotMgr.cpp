@@ -876,7 +876,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
         std::string option = arg1;
         if (option == "warrior")
             botClass = CLASS_WARRIOR;
-        else if (option == "paladin" && pPlayer->GetTeam() == ALLIANCE)
+        else if (option == "paladin") // && pPlayer->GetTeam() == ALLIANCE)
             botClass = CLASS_PALADIN;
         else if (option == "hunter")
             botClass = CLASS_HUNTER;
@@ -884,7 +884,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
             botClass = CLASS_ROGUE;
         else if (option == "priest")
             botClass = CLASS_PRIEST;
-        else if (option == "shaman" && pPlayer->GetTeam() == HORDE)
+        else if (option == "shaman") // && pPlayer->GetTeam() == HORDE)
             botClass = CLASS_SHAMAN;
         else if (option == "mage")
             botClass = CLASS_MAGE;
@@ -927,10 +927,17 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
 
     uint8 botRace = SelectRandomRaceForClass(botClass, pPlayer->GetTeam());
     if (!botRace)
-    {
+    {   
+        if (botClass == CLASS_SHAMAN)
+            botRace = SelectRandomRaceForClass(botClass, HORDE);
+        else if (botClass == CLASS_PALADIN)
+            botRace = SelectRandomRaceForClass(botClass, ALLIANCE);
+        else
+        {
         SendSysMessage("Unable to select race for bot.");
         SetSentErrorMessage(true);
         return false;
+        }
     }
 
     float x, y, z;
