@@ -2251,6 +2251,61 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
     return nullptr;
 }
 
+Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSingleSpellEntry, SpellEntry const* pGroupSpellEntry, SpellEntry const*& pSelectedSpellEntry) const
+{
+    pSelectedSpellEntry = nullptr;
+
+    if (!pSingleSpellEntry && !pGroupSpellEntry)
+        return nullptr;
+
+    if (!pSingleSpellEntry)
+    {
+        pSelectedSpellEntry = pGroupSpellEntry;
+        return SelectBuffTarget(pGroupSpellEntry);
+    }
+
+    if (!pGroupSpellEntry)
+    {
+        pSelectedSpellEntry = pSingleSpellEntry;
+        return SelectBuffTarget(pSingleSpellEntry);
+    }
+
+    Player* pFirstMissingMember = nullptr;
+    uint8 missingMemberCount = 0;
+    Group* pGroup = me->GetGroup();
+    if (pGroup)
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* pMember = itr->getSource())
+            {
+                if (!me->IsValidHelpfulTarget(pMember) ||
+                    pMember->IsGameMaster() ||
+                    !me->IsWithinLOSInMap(pMember) ||
+                    !me->IsWithinDist(pMember, 30.0f) ||
+                    !IsValidBuffTarget(pMember, pSingleSpellEntry) ||
+                    !IsValidBuffTarget(pMember, pGroupSpellEntry))
+                    continue;
+
+                if (!pFirstMissingMember)
+                    pFirstMissingMember = pMember;
+
+                ++missingMemberCount;
+                if (missingMemberCount > 1)
+                {
+                    pSelectedSpellEntry = pGroupSpellEntry;
+                    return pFirstMissingMember;
+                }
+            }
+        }
+    }
+
+    if (missingMemberCount == 1)
+        pSelectedSpellEntry = pSingleSpellEntry;
+
+    return pFirstMissingMember;
+}
+
 Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
 {
     Group* pGroup = me->GetGroup();
