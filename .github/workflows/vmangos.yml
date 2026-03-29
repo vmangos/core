@@ -36,6 +36,8 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       #matrix declaration
       matrix:
