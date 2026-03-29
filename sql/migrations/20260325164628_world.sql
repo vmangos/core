@@ -113,6 +113,11 @@ DELETE FROM `pool_pool` WHERE `pool_id` IN (22958, 22960, 22965, 22967);
 DELETE FROM `pool_gameobject` WHERE `pool_entry` IN ( 22958, 22960, 22965, 22967);
 DELETE FROM `gameobject` WHERE `guid` IN ( 23495, 23524, 23497, 23526, 23502, 23531, 23504, 23533);
 
+UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Truesilver Deposit - Silithus - Group 1 - Master' WHERE  `entry`=4096 AND `patch_min`=0 AND `patch_max`=10;
+UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Truesilver Deposit - Silithus - Group 2 - Master' WHERE  `entry`=4097 AND `patch_min`=0 AND `patch_max`=10;
+UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Truesilver Deposit - Silithus - Group 3 - Master' WHERE  `entry`=4098 AND `patch_min`=0 AND `patch_max`=10;
+UPDATE `pool_template` SET `description`='Gold Vein / Mithril Deposit / Truesilver Deposit - Silithus - Group 4 - Master' WHERE  `entry`=4099 AND `patch_min`=0 AND `patch_max`=10;
+
 
 -- End of migration.
 END IF;
