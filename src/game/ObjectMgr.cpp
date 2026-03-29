@@ -12107,6 +12107,7 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
             ItemPrototype const* pItem = GetItemPrototype(item.itemId);
 
             pPlayer->SatisfyItemRequirements(pItem);
+            pPlayer->DestroyItemCount(item.itemId, 1, true);
             pPlayer->StoreNewItemInBestSlots(item.itemId, 1, item.enchantId);
         }
     }
