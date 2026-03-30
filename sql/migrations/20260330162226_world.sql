@@ -165,7 +165,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (1757, @PTEMPLATE+14, 0, 'Badlands - Group 14 - Silver Vein / Gold Vein / Iron Deposit', 0),
 (1758, @PTEMPLATE+14, 0, 'Badlands - Group 14 - Silver Vein / Gold Vein / Iron Deposit', 0);
 
-SET @PTEMPLATE = 297;
+SET @PTEMPLATE = 325;
 
 DELETE FROM `pool_pool` WHERE `pool_id` IN (5555, 5554, 5556, 5553);
 UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Badlands - Group 1' WHERE `entry` IN (5555, 5554, 5556, 5553);
