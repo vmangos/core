@@ -143,7 +143,41 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (1752, @PTEMPLATE+12, 0, 'Badlands - Group 12 - Silver Vein / Gold Vein / Iron Deposit', 0),
 (1753, @PTEMPLATE+12, 0, 'Badlands - Group 12 - Silver Vein / Gold Vein / Iron Deposit', 0);
 
-DELETE FROM `pool_template` WHERE  `entry` IN (8110, 1287);
+DELETE FROM `pool_pool` WHERE `pool_id` IN (1762, 1754, 1755, 1761);
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Badlands - Group 13' WHERE `entry` IN (1762, 1754, 1755, 1761);
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Badlands - Group 13' WHERE `pool_entry` IN (1762, 1754, 1755, 1761);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+13, 1, 'Silver Vein / Gold Vein / Iron Deposit - Badlands - Group 13 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(1762, @PTEMPLATE+13, 0, 'Badlands - Group 13 - Silver Vein / Gold Vein / Iron Deposit', 0),
+(1754, @PTEMPLATE+13, 0, 'Badlands - Group 13 - Silver Vein / Gold Vein / Iron Deposit', 0),
+(1755, @PTEMPLATE+13, 0, 'Badlands - Group 13 - Silver Vein / Gold Vein / Iron Deposit', 0),
+(1761, @PTEMPLATE+13, 0, 'Badlands - Group 13 - Silver Vein / Gold Vein / Iron Deposit', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (1760, 1759, 1758);
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Badlands - Group 14' WHERE `entry` IN (1760, 1759, 1758);
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Badlands - Group 14' WHERE `pool_entry` IN (1760, 1759, 1758);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+14, 1, 'Silver Vein / Gold Vein / Iron Deposit - Badlands - Group 14 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(1760, @PTEMPLATE+14, 0, 'Badlands - Group 14 - Silver Vein / Gold Vein / Iron Deposit', 0),
+(1759, @PTEMPLATE+14, 0, 'Badlands - Group 14 - Silver Vein / Gold Vein / Iron Deposit', 0),
+(1758, @PTEMPLATE+14, 0, 'Badlands - Group 14 - Silver Vein / Gold Vein / Iron Deposit', 0);
+
+SET @PTEMPLATE = 297;
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (5555, 5554, 5556, 5553);
+UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Badlands - Group 1' WHERE `entry` IN (5555, 5554, 5556, 5553);
+UPDATE `pool_gameobject` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Badlands - Group 1' WHERE `pool_entry` IN (5555, 5554, 5556, 5553);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Gold Vein / Mithril Deposit / Truesilver Deposit - Badlands - Group 1 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(5555, @PTEMPLATE+1, 0, 'Badlands - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(5554, @PTEMPLATE+1, 0, 'Badlands - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(5556, @PTEMPLATE+1, 0, 'Badlands - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0),
+(5553, @PTEMPLATE+1, 0, 'Badlands - Group 1 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
+
+DELETE FROM `pool_template` WHERE  `entry` IN (8110, 1287, 8108);
 UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=8109 AND `patch_min`=0 AND `patch_max`=10;
 
 -- End of migration.
