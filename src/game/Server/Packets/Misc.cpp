@@ -235,7 +235,7 @@ void WorldPackets::Misc::Bug::ReadFromWorldPacket(WorldPacket& recv_data)
     recv_data >> type;
 }
 
-
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
 void WorldPackets::Misc::WardenData::ReadFromWorldPacket(WorldPacket& recv_data)
 {
     uint32 const remaining = recv_data.size() - recv_data.rpos();
@@ -243,3 +243,4 @@ void WorldPackets::Misc::WardenData::ReadFromWorldPacket(WorldPacket& recv_data)
     if (!data.empty())
         recv_data.read(data.data(), data.size());
 }
+#endif

@@ -1190,6 +1190,7 @@ void WorldSession::HandleRequestPetInfoOpcode(NullClientPacket const& /*packet *
         _player->CharmSpellInitialize();
 }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
 void WorldSession::HandleWardenDataOpcode(WorldPackets::Misc::WardenData const& packet)
 {
     if (!m_warden)
@@ -1204,3 +1205,4 @@ void WorldSession::HandleWardenDataOpcode(WorldPackets::Misc::WardenData const& 
         m_warden->m_packetDataQueue.emplace(packet.data);
     }
 }
+#endif
