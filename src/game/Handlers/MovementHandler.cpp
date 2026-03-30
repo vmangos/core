@@ -371,15 +371,15 @@ void WorldSession::HandleMovementOpcodes(WorldPackets::Movement::MovementPacket 
 #if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_9_4
     if (opcode == MSG_MOVE_FALL_LAND)
     {
-        if (!movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+        if (!packet.movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
             opcode = MSG_MOVE_STOP;
-        else if (movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD))
+        else if (packet.movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD))
             opcode = MSG_MOVE_START_BACKWARD;
-        else if (movementInfo.HasMovementFlag(MOVEFLAG_FORWARD))
+        else if (packet.movementInfo.HasMovementFlag(MOVEFLAG_FORWARD))
             opcode = MSG_MOVE_START_FORWARD;
-        else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_LEFT))
+        else if (packet.movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_LEFT))
             opcode = MSG_MOVE_START_STRAFE_LEFT;
-        else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_RIGHT))
+        else if (packet.movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_RIGHT))
             opcode = MSG_MOVE_START_STRAFE_RIGHT;
         else
             opcode = MSG_MOVE_HEARTBEAT;
