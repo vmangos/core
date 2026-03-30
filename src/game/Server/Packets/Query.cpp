@@ -20,6 +20,10 @@ void WorldPackets::Query::QueryGameObject::ReadFromWorldPacket(WorldPacket& recv
 void WorldPackets::Query::QueryPageText::ReadFromWorldPacket(WorldPacket& recv_data)
 {
     recv_data >> pageID;
+    if (recv_data.rpos() < recv_data.size())
+    { // optional, see 5875 at 0x0056485D
+        recv_data.read_skip<uint64>(); // object guid, not used
+    }
 }
 
 void WorldPackets::Query::Whois::ReadFromWorldPacket(WorldPacket& recv_data)
