@@ -162,6 +162,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `inst
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (1760, @PTEMPLATE+14, 0, 'Badlands - Group 14 - Silver Vein / Gold Vein / Iron Deposit', 0),
 (1759, @PTEMPLATE+14, 0, 'Badlands - Group 14 - Silver Vein / Gold Vein / Iron Deposit', 0),
+(1757, @PTEMPLATE+14, 0, 'Badlands - Group 14 - Silver Vein / Gold Vein / Iron Deposit', 0),
 (1758, @PTEMPLATE+14, 0, 'Badlands - Group 14 - Silver Vein / Gold Vein / Iron Deposit', 0);
 
 SET @PTEMPLATE = 297;
