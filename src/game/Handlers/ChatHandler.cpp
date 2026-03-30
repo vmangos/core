@@ -220,7 +220,7 @@ void WorldSession::HandleChatMessageOpcode(WorldPackets::Chat::ChatMessage const
             }
         }
 
-        if (packet.type != CHAT_MSG_AFK && packet.type != CHAT_MSG_DND)
+        if (packet.type != CHAT_MSG_AFK && packet.type != CHAT_MSG_DND) // is not AFK or DND message update
         {
             if (packet.type != CHAT_MSG_WHISPER) // whisper checked later
             {
@@ -234,13 +234,14 @@ void WorldSession::HandleChatMessageOpcode(WorldPackets::Chat::ChatMessage const
                 }
             }
 
-            if (packet.lang != LANG_ADDON && GetMasterPlayer())
+            if (GetMasterPlayer())
                 GetMasterPlayer()->UpdateSpeakTime(); // Anti chat flood
+
+            // process message
+            if (!SanitizeChatMessageAndProcessCommand(const_cast<std::string&>(packet.message), packet.lang, packet.type)) // <-- includes `CheckChatMessageValidity`
+                return;
         }
     }
-
-    if (!SanitizeChatMessageAndProcessCommand(const_cast<std::string&>(packet.message), packet.lang, packet.type)) // <-- includes `CheckChatMessageValidity`
-        return;
 
     /** Enable various spam chat detections */
     if (packet.lang != LANG_ADDON)
