@@ -36,6 +36,21 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 DELETE FROM `pool_template` WHERE  `entry` = 1349;
 
+SET @PTEMPLATE = 295;
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (4058, 4056, 4059, 4057);
+UPDATE `pool_template` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Searing Gorge - Group 1' WHERE `entry` IN (4058, 4056, 4059, 4057);
+UPDATE `pool_gameobject` SET `description` = 'Silver Vein / Gold Vein / Iron Deposit - Searing Gorge - Group 1' WHERE `pool_entry` IN (4058, 4056, 4059, 4057);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Silver Vein / Gold Vein / Iron Deposit - Searing Gorge - Group 1 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(4058, @PTEMPLATE+1, 0, 'Searing Gorge - Group 1 - Silver Vein / Gold Vein / Iron Deposit', 0),
+(4056, @PTEMPLATE+1, 0, 'Searing Gorge - Group 1 - Silver Vein / Gold Vein / Iron Deposit', 0),
+(4059, @PTEMPLATE+1, 0, 'Searing Gorge - Group 1 - Silver Vein / Gold Vein / Iron Deposit', 0),
+(4057, @PTEMPLATE+1, 0, 'Searing Gorge - Group 1 - Silver Vein / Gold Vein / Iron Deposit', 0);
+
+DELETE FROM `pool_template` WHERE  `entry` = 4351;
+
 -- End of migration.
 END IF;
 END??
