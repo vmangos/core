@@ -877,7 +877,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             {
                 case IDLE_MOTION_TYPE:
                 case FOLLOW_MOTION_TYPE:
-                    me->GetMotionMaster()->MoveChase(pVictim);
+                    me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
                     break;
             }
         }
