@@ -1,0 +1,86 @@
+# Build and publish the Windows development release on pushes to development.
+name: Windows Development Release
+
+on:
+  push:
+    branches:
+      - development
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - '.github/workflows/development-db-dump.yaml'
+      - '.github/workflows/pr-sql-check.yaml'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+      - 'LICENSE'
+      - 'README.md'
+      - 'sql/**'
+
+concurrency:
+  group: windows-development-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Windows development release
+    runs-on: windows-2022
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Build release binaries
+        shell: bash # Windows runners default to PowerShell.
+        run: |
+          set -euo pipefail
+          mkdir -p build
+          cd build
+          cmake -DUSE_EXTRACTORS=1 -G "Visual Studio 17 2022" -A x64 ..
+          "/c/Program Files/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe" "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m
+
+      - name: Set release archive filename
+        run: |
+          echo "ARCHIVE_FILENAME=dev-$(git rev-parse --short HEAD).zip" >> $env:GITHUB_ENV
+
+      - name: Create release archive
+        run: |
+          Set-StrictMode -Version Latest
+          Set-Location "${{ github.workspace }}/bin"
+          Copy-Item -Force "${{ github.workspace }}/dep/windows/lib/x64_release/libmySQL.dll" "${{ github.workspace }}/bin/Release/libmySQL.dll"
+          Copy-Item -Force "${{ github.workspace }}/dep/windows/lib/x64_release/libeay32.dll" "${{ github.workspace }}/bin/Release/libeay32.dll"
+
+          7z a -tzip "${{ env.ARCHIVE_FILENAME }}" Release
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-development-build
+          path: "${{ github.workspace }}/bin/${{ env.ARCHIVE_FILENAME }}"
+
+  publish:
+    name: Publish Windows development release
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download release artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: windows-development-build
+          merge-multiple: true
+          path: release-assets
+
+      - name: Publish release snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./.github/scripts/publish-moving-release.sh latest "Development Build" release-assets
