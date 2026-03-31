@@ -1006,13 +1006,13 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #                  0 (instant underwater breathing damage start)
 #
 #    MirrorTimer.Environmental.Max
-#        Generic environmental (lava/slime/etc) damage delay max timer value (in secs)
+#        Generic environmental damage delay max timer value (in secs); only lava is affected by this
 #        Default:  1
 #                  0 (instant in liquid damage start)
 #
 #    EnvironmentalDamage.Min
 #    EnvironmentalDamage.Max
-#        Generic environmental (lava/slime/etc) damage taken on tick
+#        Generic environmental damage taken on tick; only lava is affected by this
 #        Default:  605-610
 #
 #    MaxPrimaryTradeSkill

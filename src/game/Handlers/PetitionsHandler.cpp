@@ -38,37 +38,13 @@
 #define GUILD_CHARTER_COST          1000                    // 10 S
 #define CHARTER_DISPLAY_ID          16161
 
-void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
+void WorldSession::HandlePetitionBuyOpcode(WorldPackets::Petition::PetitionBuy const& packet)
 {
-    ObjectGuid guidNPC;
-    uint32 unk2;
-    std::string name;
-
-    recv_data >> guidNPC;                                   // NPC GUID
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint64>();                          // 0
-    recv_data >> name;                                      // name
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint32>();                          // 0
-    recv_data.read_skip<uint16>();                          // 0
-    recv_data.read_skip<uint8>();                           // 0
-
-    recv_data >> unk2;                                      // index
-    recv_data.read_skip<uint32>();                          // 0
-
     // prevent cheating
-    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(guidNPC, UNIT_NPC_FLAG_PETITIONER);
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(packet.guidNPC, UNIT_NPC_FLAG_PETITIONER);
     if (!pCreature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandlePetitionBuyOpcode - %s not found or you can't interact with him.", guidNPC.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandlePetitionBuyOpcode - %s not found or you can't interact with him.", packet.guidNPC.GetString().c_str());
         return;
     }
 
@@ -97,24 +73,24 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
     uint32 charterid = GUILD_CHARTER;
     uint32 cost = GUILD_CHARTER_COST;
 
-    if (sGuildMgr.GetGuildByName(name))
+    if (sGuildMgr.GetGuildByName(packet.name))
     {
-        SendGuildCommandResult(GUILD_CREATE_S, name, ERR_GUILD_NAME_EXISTS_S);
+        SendGuildCommandResult(GUILD_CREATE_S, packet.name, ERR_GUILD_NAME_EXISTS_S);
         return;
     }
-    if (sObjectMgr.IsReservedName(name) || !ObjectMgr::IsValidCharterName(name))
+    if (sObjectMgr.IsReservedName(packet.name) || !ObjectMgr::IsValidCharterName(packet.name))
     {
-        SendGuildCommandResult(GUILD_CREATE_S, name, ERR_GUILD_NAME_INVALID);
+        SendGuildCommandResult(GUILD_CREATE_S, packet.name, ERR_GUILD_NAME_INVALID);
         return;
     }
 
     // Check guild petition name (use whisper type - 6)
     if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
     {
-        if (a->filterMessage(name))
+        if (a->filterMessage(packet.name))
         {
             sWorld.LogChat(this, "Guild", "Attempt to create guild petition with spam name");
-            SendGuildCommandResult(GUILD_CREATE_S, name, ERR_GUILD_NAME_INVALID);
+            SendGuildCommandResult(GUILD_CREATE_S, packet.name, ERR_GUILD_NAME_INVALID);
             return;
         }
     }
@@ -153,21 +129,18 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
     charter->SetState(ITEM_CHANGED, _player);
     _player->SendNewItem(charter, 1, true, false);
 
-    sGuildMgr.CreatePetition(petitionId, _player, charter->GetObjectGuid(), name);
+    sGuildMgr.CreatePetition(petitionId, _player, charter->GetObjectGuid(), packet.name);
 
     _player->SaveInventoryAndGoldToDB();
 }
 
-void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
+void WorldSession::HandlePetitionShowSignOpcode(WorldPackets::Petition::PetitionShowSignatures const& packet)
 {
-    ObjectGuid itemguid;
-    recv_data >> itemguid;                                   // item guid
-
     // if guild petition and has guild => error, return;
     if (_player->GetGuildId())
         return;
 
-    Item *charter = _player->GetItemByGuid(itemguid);
+    Item *charter = _player->GetItemByGuid(packet.itemGuid);
     if (!charter)
         return;
 
@@ -177,7 +150,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
     if (!petition)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PetitionHandler] No petition exists for petition ID %u, yet charter exists with guid %u for owner %s",
-            petitionGuid, itemguid.GetCounter(), _player->GetGuidStr().c_str());
+            petitionGuid, packet.itemGuid.GetCounter(), _player->GetGuidStr().c_str());
 
         return;
     }
@@ -185,7 +158,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
     uint8 signs = petition->GetSignatureCount();
 
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
-    data << itemguid;                               // item guid
+    data << packet.itemGuid;                        // item guid
     data << _player->GetObjectGuid();               // owner guid
     data << petitionGuid;                           // petition guid
     data << signs;                                  // sign's count
@@ -195,19 +168,14 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recv_data)
+void WorldSession::HandlePetitionQueryOpcode(WorldPackets::Petition::QueryPetition const& packet)
 {
-    uint32 petitionGuid;
-    ObjectGuid itemGuid;
-    recv_data >> petitionGuid;                          // petition guid
-    recv_data >> itemGuid;                              // item guid
-
-    Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
+    Petition* petition = sGuildMgr.GetPetitionById(packet.petitionGuid);
     if (!petition)
         return;
 
     WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + petition->GetName().size() + 1 + 2 + 4 * 11));
-    data << uint32(petitionGuid);                           // int m_petitionID;
+    data << uint32(packet.petitionGuid);                    // int m_petitionID;
     data << ObjectGuid(petition->GetOwnerGuid());           // unsigned __int64 m_petitioner;
     data << petition->GetName();                            // char m_title[256];
     data << uint8(0);                                       // char m_bodyText[4096];
@@ -228,57 +196,45 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recv_data)
+void WorldSession::HandlePetitionRenameOpcode(WorldPackets::Petition::PetitionRename const& packet)
 {
-    ObjectGuid itemGuid;
-    std::string newname;
-
-    recv_data >> itemGuid;                              // item
-    recv_data >> newname;                               // new name
-
-    Item *charter = _player->GetItemByGuid(itemGuid);
+    Item *charter = _player->GetItemByGuid(packet.itemGuid);
     if (!charter)
         return;
 
-    if (sGuildMgr.GetGuildByName(newname))
+    if (sGuildMgr.GetGuildByName(packet.newName))
     {
-        SendGuildCommandResult(GUILD_CREATE_S, newname, ERR_GUILD_NAME_EXISTS_S);
+        SendGuildCommandResult(GUILD_CREATE_S, packet.newName, ERR_GUILD_NAME_EXISTS_S);
         return;
     }
-    if (sObjectMgr.IsReservedName(newname) || !ObjectMgr::IsValidCharterName(newname))
+    if (sObjectMgr.IsReservedName(packet.newName) || !ObjectMgr::IsValidCharterName(packet.newName))
     {
-        SendGuildCommandResult(GUILD_CREATE_S, newname, ERR_GUILD_NAME_INVALID);
+        SendGuildCommandResult(GUILD_CREATE_S, packet.newName, ERR_GUILD_NAME_INVALID);
         return;
     }
 
     uint32 petitionGuid = charter->GetEnchantmentId(EnchantmentSlot(0));
-
     Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
     if (!petition)
         return;
 
-    if (petition->Rename(newname))
+    if (petition->Rename(packet.newName))
     {
-        WorldPacket data(MSG_PETITION_RENAME, (8 + newname.size() + 1));
-        data << ObjectGuid(itemGuid);
-        data << newname;
+        WorldPacket data(MSG_PETITION_RENAME, (8 + packet.newName.size() + 1));
+        data << ObjectGuid(packet.itemGuid);
+        data << packet.newName;
         SendPacket(&data);
     }
 }
 
-void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
+void WorldSession::HandlePetitionSignOpcode(WorldPackets::Petition::PetitionSign const& packet)
 {
-    ObjectGuid itemGuid;
-    uint8 unk;
-    recv_data >> itemGuid;                              // item guid
-    recv_data >> unk;
-
-    Petition* petition = sGuildMgr.GetPetitionByCharterGuid(itemGuid);
+    Petition* petition = sGuildMgr.GetPetitionByCharterGuid(packet.itemGuid);
 
     if (!petition)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PetitionHandler] No petition exists for charter with guid %u for signer %s",
-            itemGuid.GetCounter(), _player->GetGuidStr().c_str());
+            packet.itemGuid.GetCounter(), _player->GetGuidStr().c_str());
         return;
     }
 
@@ -288,7 +244,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
     if (petition->GetOwnerGuid() == _player->GetObjectGuid())
     {
         WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
-        data << ObjectGuid(itemGuid);
+        data << ObjectGuid(packet.itemGuid);
         data << ObjectGuid(_player->GetObjectGuid());
         data << uint32(PETITION_SIGN_CANT_SIGN_OWN);
         SendPacket(&data);
@@ -331,7 +287,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
     if (PetitionSignature* signature = petition->GetSignatureForPlayer(_player))
     {
         WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
-        data << ObjectGuid(itemGuid);
+        data << ObjectGuid(packet.itemGuid);
         data << ObjectGuid(_player->GetObjectGuid());
         data << uint32(PETITION_SIGN_ALREADY_SIGNED);
 
@@ -350,7 +306,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "PETITION SIGN: %u by %s", petition->GetId(), _player->GetGuidStr().c_str());
 
         WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
-        data << ObjectGuid(itemGuid);
+        data << ObjectGuid(packet.itemGuid);
         data << ObjectGuid(_player->GetObjectGuid());
         data << uint32(PETITION_SIGN_OK);
 
@@ -368,14 +324,11 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recv_data)
+void WorldSession::HandlePetitionDeclineOpcode(WorldPackets::Petition::PetitionDecline const& packet)
 {
-    ObjectGuid itemGuid;
-    recv_data >> itemGuid;                              // item guid
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Petition %s declined by %s", packet.itemGuid.GetString().c_str(), _player->GetGuidStr().c_str());
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Petition %s declined by %s", itemGuid.GetString().c_str(), _player->GetGuidStr().c_str());
-
-    Petition* petition = sGuildMgr.GetPetitionByCharterGuid(itemGuid);
+    Petition* petition = sGuildMgr.GetPetitionByCharterGuid(packet.itemGuid);
 
     if (!petition)
         return;
@@ -390,14 +343,9 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
+void WorldSession::HandleOfferPetitionOpcode(WorldPackets::Petition::OfferPetition const& packet)
 {
-    ObjectGuid itemGuid;
-    ObjectGuid playerGuid;
-    recv_data >> itemGuid;                              // item guid
-    recv_data >> playerGuid;                            // player guid
-
-    Player* player = ObjectAccessor::FindPlayer(playerGuid);
+    Player* player = ObjectAccessor::FindPlayer(packet.playerGuid);
     if (!player)
         return;
 
@@ -425,29 +373,29 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
         return;
     }
 
-    Item *charter = _player->GetItemByGuid(itemGuid);
+    Item const* charter = _player->GetItemByGuid(packet.itemGuid);
     if (!charter)
         return;
 
     uint32 petitionGuid = charter->GetEnchantmentId(EnchantmentSlot(0));
 
-    Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
+    Petition const* petition = sGuildMgr.GetPetitionById(petitionGuid);
     if (!petition)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PetitionHandler] No petition exists for charter with guid %u for signer %s",
-            itemGuid.GetCounter(), _player->GetGuidStr().c_str());
+            charter->GetObjectGuid().GetCounter(), _player->GetGuidStr().c_str());
         return;
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OFFER PETITION: petition %u to %s", petitionGuid, playerGuid.GetString().c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OFFER PETITION: petition %u to %s", petitionGuid, player->GetName());
 
     // Get petition signs count
     uint8 signs = petition->GetSignatureCount();
 
     // Send response
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
-    data << ObjectGuid(itemGuid);                           // item guid
-    data << ObjectGuid(_player->GetObjectGuid());           // owner guid
+    data << charter->GetObjectGuid();                       // item guid
+    data << _player->GetObjectGuid();                       // owner guid
     data << uint32(petitionGuid);                           // petition guid
     data << uint8(signs);                                   // sign's count
 
@@ -455,12 +403,9 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
     player->GetSession()->SendPacket(&data);
 }
 
-void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
+void WorldSession::HandleTurnInPetitionOpcode(WorldPackets::Petition::TurnInPetition const& packet)
 {
-    ObjectGuid itemGuid;
-    recv_data >> itemGuid;
-
-    Item *charter = _player->GetItemByGuid(itemGuid);
+    Item *charter = _player->GetItemByGuid(packet.itemGuid);
     if (!charter)
         return;
 
@@ -471,7 +416,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
     if (!petition)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PetitionHandler] No petition exists for charter with guid %u for guild master %s",
-            itemGuid.GetCounter(), _player->GetGuidStr().c_str());
+            packet.itemGuid.GetCounter(), _player->GetGuidStr().c_str());
         return;
     }
 
@@ -535,14 +480,12 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recv_data)
+void WorldSession::HandlePetitionShowListOpcode(WorldPackets::Petition::PetitionShow const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
-    SendPetitionShowList(guid);
+    SendPetitionShowList(packet.petitionerNpcGuid);
 }
 
-void WorldSession::SendPetitionShowList(ObjectGuid& guid)
+void WorldSession::SendPetitionShowList(ObjectGuid guid)
 {
     Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_PETITIONER);
     if (!pCreature)

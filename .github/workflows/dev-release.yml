@@ -19,6 +19,8 @@ on:
 jobs:
   build:
     runs-on: windows-2022
+    permissions:
+      contents: read
 
     steps:
     #git checkout
@@ -76,6 +78,13 @@ jobs:
           name: snapshot-devbuild
           path: "${{github.workspace}}/bin/${{env.ARCHIVE_FILENAME}}"
 
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
     - name: Download artifact snapshot-Release
       uses: actions/download-artifact@v4
       with:
@@ -92,7 +101,7 @@ jobs:
     - name: Upload snapshot
       uses: "crowbarmaster/GH-Automatic-Releases@latest"
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        repo_token: "${{ github.token }}"
         automatic_release_tag: "latest"
         prerelease: true
         title: "Development Build(${{ steps.date.outputs.time }})"

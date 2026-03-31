@@ -208,7 +208,7 @@ extern int main(int argc, char** argv)
 
     (void)sRealmdPatchCache; // <-- This will initialize the singleton. Which will preload all known patches.
     (void)sAsyncSystemTimer; // <-- Pre-Initialize SystemTimer
-    IO::Multithreading::RenameCurrentThread("Main");
+    IO::Multithreading::RenameCurrentThread("realmd-main");
 
     // cleanup query
     // set expired bans to inactive

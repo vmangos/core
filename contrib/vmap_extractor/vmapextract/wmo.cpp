@@ -474,7 +474,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
                     liquidEntry = 3;        // magma
                     break;
                 case 3:
-                    if (filename.find("Stratholme_raid") != string::npos)
+                    if (rootWMO->RootWMOID == 4489) // Stratholme_raid.wmo WMOID == 4489
                     {
                         liquidEntry = 21;   // Naxxramas slime
                     }

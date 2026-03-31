@@ -33,25 +33,7 @@
 //       struct OpcodeHandler in this header and Opcode.cpp and get totally wrong data from
 //       table opcodeTable in source when Opcode.h included but WorldSession.h not included
 #include "WorldSession.h"
-
-// List of Opcodes
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-#include "Opcodes_1_12_1.h"
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-#include "Opcodes_1_11_2.h"
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-#include "Opcodes_1_10_2.h"
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-#include "Opcodes_1_9_4.h"
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-#include "Opcodes_1_8_4.h"
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-#include "Opcodes_1_7_1.h"
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
-#include "Opcodes_1_6_1.h"
-#else
-#include "Opcodes_1_5_1.h"
-#endif
+#include "Opcodes_active.h"
 
 inline bool IsAnyMoveAckOpcode(uint16 opcode)
 {
@@ -157,58 +139,8 @@ struct OpcodeHandler
     void (WorldSession::*handler)(WorldPacket& recvPacket);
 };
 
-typedef std::map< uint16, OpcodeHandler> OpcodeMap;
-
-class Opcodes
-{
-    public:
-        Opcodes();
-        ~Opcodes();
-    public:
-        void BuildOpcodeList();
-        void StoreOpcode(uint16 Opcode,char const* name, SessionStatus status, PacketProcessing process, void (WorldSession::*handler)(WorldPacket& recvPacket))
-        {
-            OpcodeHandler& ref = mOpcodeMap[Opcode];
-            ref.name = name;
-            ref.status = status;
-            ref.packetProcessing = process;
-            ref.handler = handler;
-        }
-
-        // Lookup opcode
-        inline OpcodeHandler const* LookupOpcode(uint16 id) const
-        {
-            OpcodeMap::const_iterator itr = mOpcodeMap.find(id);
-            if (itr != mOpcodeMap.end())
-                return &itr->second;
-            return nullptr;
-        }
-
-        // compatible with other mangos branches access
-
-        inline OpcodeHandler const& operator[] (uint16 id) const
-        {
-            OpcodeMap::const_iterator itr = mOpcodeMap.find(id);
-            if (itr != mOpcodeMap.end())
-                return itr->second;
-            return emptyHandler;
-        }
-
-        static OpcodeHandler const emptyHandler;
-
-        OpcodeMap mOpcodeMap;
-
-};
-
-#define opcodeTable MaNGOS::Singleton<Opcodes>::Instance()
-
-// Lookup opcode name for human understandable logging
-inline char const* LookupOpcodeName(uint16 id)
-{
-    if (OpcodeHandler const* op = opcodeTable.LookupOpcode(id))
-        return op->name;
-    return "Received unknown opcode, it's more than max!";
-}
+OpcodeHandler const& LookupOpcodeHandler(uint16 id);
+char const* LookupOpcodeName(uint16 id);
 
 #endif
 // @}

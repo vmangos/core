@@ -100,7 +100,6 @@ struct AuctionHouseClientQuery
     uint8 levelmax;
     uint8 usable;
     uint32 listfrom, auctionSlotID, auctionMainCategory, auctionSubCategory, quality;
-    uint32 outbiddedCount;
     std::vector<uint32> outbiddedAuctionIds;
 };
 

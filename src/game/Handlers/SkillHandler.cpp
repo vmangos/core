@@ -29,23 +29,17 @@
 #include "UpdateMask.h"
 #include "Anticheat.h"
 
-void WorldSession::HandleLearnTalentOpcode(WorldPacket& recv_data)
+void WorldSession::HandleLearnTalentOpcode(WorldPackets::Skill::LearnTalent const& packet)
 {
-    uint32 talent_id, requested_rank;
-    recv_data >> talent_id >> requested_rank;
-
-    _player->LearnTalent(talent_id, requested_rank);
+    _player->LearnTalent(packet.talent_id, packet.requested_rank);
 }
 
-void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recv_data)
+void WorldSession::HandleTalentWipeConfirmOpcode(WorldPackets::Skill::TalentWipeConfirm const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
-
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTalentWipeConfirmOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTalentWipeConfirmOpcode - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
         return;
     }
 
@@ -65,17 +59,15 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recv_data)
     unit->CastSpell(_player, 14867, true);                  //spell: "Untalent Visual Effect"
 }
 
-void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recv_data)
+void WorldSession::HandleUnlearnSkillOpcode(WorldPackets::Skill::UnlearnSkill const& packet)
 {
-    uint32 skill_id;
-    recv_data >> skill_id;
-    SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(skill_id, GetPlayer()->GetRace(), GetPlayer()->GetClass());
+    SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(packet.skillId, GetPlayer()->GetRace(), GetPlayer()->GetClass());
     if (!rcEntry || !(rcEntry->flags & SKILL_FLAG_UNLEARNABLE))
     {
         std::stringstream reason;
-        reason << "Attempt to unlearn not unlearnable skill #" << skill_id;
+        reason << "Attempt to unlearn not unlearnable skill #" << packet.skillId;
         ProcessAnticheatAction("PassiveAnticheat", reason.str().c_str(), CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
         return;
     }
-    GetPlayer()->SetSkill(skill_id, 0, 0);
+    GetPlayer()->SetSkill(packet.skillId, 0, 0);
 }

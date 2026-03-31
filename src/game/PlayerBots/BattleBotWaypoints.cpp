@@ -84,9 +84,9 @@ void WSG_AtAllianceFlag(BattleBotAI* pAI)
                 if (pAI->me->IsWithinDistInMap(pFlag, INTERACTION_DISTANCE))
                 {
                     pAI->ClearPath();
-                    WorldPacket data(CMSG_GAMEOBJ_USE);
-                    data << pFlag->GetObjectGuid();
-                    pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
+                    WorldPackets::Misc::GameObjectUse packet;
+                    packet.guid = pFlag->GetObjectGuid();
+                    pAI->me->GetSession()->HandleGameObjectUseOpcode(packet);
                     return;
                 }
                 else
@@ -104,7 +104,7 @@ void WSG_AtAllianceFlag(BattleBotAI* pAI)
             }
         }
     }
-    
+
     pAI->MoveToNextPoint();
 }
 
@@ -119,9 +119,9 @@ void WSG_AtHordeFlag(BattleBotAI* pAI)
                 if (pAI->me->IsWithinDistInMap(pFlag, INTERACTION_DISTANCE))
                 {
                     pAI->ClearPath();
-                    WorldPacket data(CMSG_GAMEOBJ_USE);
-                    data << pFlag->GetObjectGuid();
-                    pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
+                    WorldPackets::Misc::GameObjectUse packet;
+                    packet.guid = pFlag->GetObjectGuid();
+                    pAI->me->GetSession()->HandleGameObjectUseOpcode(packet);
                     return;
                 }
                 else
@@ -206,7 +206,7 @@ void AtFlag(BattleBotAI* pAI, std::vector<uint32> const& vFlagIds)
             }
         }
     }
-    
+
     pAI->MoveToNextPoint();
 }
 
@@ -1750,7 +1750,7 @@ std::vector<BattleBotPath*> const vPaths_NoReverseAllowed =
 void BattleBotAI::MovementInform(uint32 movementType, uint32 data)
 {
     if (movementType == POINT_MOTION_TYPE)
-    { 
+    {
         if (m_currentPath && m_currentPath->at(data).pFunc)
             (*m_currentPath->at(data).pFunc)(this);
         else
@@ -1926,7 +1926,7 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
                 }
             }
         }
-        
+
         if (std::find(vPaths_NoReverseAllowed.begin(), vPaths_NoReverseAllowed.end(), pPath) != vPaths_NoReverseAllowed.end())
             continue;
 
@@ -1963,7 +1963,7 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
     {
         if (closestPoint == 0)
             return false;
-            
+
     }
     else
     {
@@ -2054,7 +2054,7 @@ bool BattleBotAI::StartNewPathToObjective()
                 {
                     if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED)))
                         if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
-                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);  
+                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                 }
 
                 if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0))
@@ -2102,7 +2102,7 @@ bool BattleBotAI::StartNewPathToObjective()
                         if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
                             return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                 }
-                
+
                 // Chance to defend.
                 if (roll_chance_u(25))
                 {
