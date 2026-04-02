@@ -30,22 +30,33 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.job_name }}
+    name: Build on ${{ matrix.job_name }} (client build ${{ matrix.client_build }})
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
     strategy:
       matrix:
+        client_build:
+          - 5875
+          - 5464
+          - 5302
+          - 5086
+          - 4878
+          - 4695
+          - 4544
+          - 4449
+        os:
+          - ubuntu-24.04
+          - windows-2022
         include:
           - os: ubuntu-24.04
             c_compiler: gcc
             cxx_compiler: g++
-            compiler: gcc
             job_name: Ubuntu GCC
           - os: ubuntu-24.04
             c_compiler: clang
             cxx_compiler: clang++
-            compiler: clang
+            install_clang: true
             job_name: Ubuntu Clang
           - os: windows-2022
             job_name: Windows Visual Studio
@@ -67,7 +78,7 @@ jobs:
             zlib1g-dev
 
       - name: Install Clang compiler
-        if: matrix.compiler == 'clang'
+        if: matrix.install_clang
         run: sudo apt install -y --no-install-recommends clang
 
       - name: Build and install on Ubuntu
@@ -81,7 +92,8 @@ jobs:
             -DCMAKE_CXX_COMPILER="${{ matrix.cxx_compiler }}" \
             -DCMAKE_INSTALL_PREFIX="../_install" \
             -DBUILD_EXTRACTORS=1 \
-            -DENABLE_MAILSENDER=1
+            -DENABLE_MAILSENDER=1 \
+            -DSUPPORTED_CLIENT_BUILD="${{ matrix.client_build }}"
           make -j"$(nproc)"
           make install
 
@@ -97,5 +109,5 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           mkdir -p build
           cd build
-          cmake -DBUILD_EXTRACTORS=1 -DENABLE_MAILSENDER=1 -G "Visual Studio 17 2022" -A x64 ..
+          cmake -DBUILD_EXTRACTORS=1 -DENABLE_MAILSENDER=1 -DSUPPORTED_CLIENT_BUILD="${{ matrix.client_build }}" -G "Visual Studio 17 2022" -A x64 ..
           "/c/Program Files/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe" "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m
