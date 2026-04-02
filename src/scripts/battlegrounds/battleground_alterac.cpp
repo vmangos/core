@@ -1603,7 +1603,6 @@ struct AV_NpcEventAI : public npc_escortAI
     bool   b_isSpeechDone;
     uint32 Event_Timer;
     uint32 Point;
-    char   sMessage[200];
     bool    m_bWarRiderSummoned;
     uint32 m_uiDespawn_Timer;
     float  av_x;
@@ -1620,6 +1619,8 @@ struct AV_NpcEventAI : public npc_escortAI
         b_isNPCMovedToChannelingPointWB         = false;
         b_isNPCStartedMovingToChannelingPointWB = false;
         m_bWarRiderSummoned = false;
+        Event_Timer = 0;
+        Point = 0;
         m_uiDespawn_Timer = 0;
         b_isDead = false;
         av_x = m_creature->GetPositionX();
@@ -3106,7 +3107,6 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
     /** An assault if available */
     if (b_objectiveReached)
     {
-        //        pCreature->MonsterSay(sMessage, 0, 0);
         m_minRepAssault = 3;
 
         if (pCreature->GetEntry() != AV_NPC_MARSHAL_TERAVAINE)

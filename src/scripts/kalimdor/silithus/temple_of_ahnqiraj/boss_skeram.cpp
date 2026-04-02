@@ -96,7 +96,7 @@ struct boss_skeramAI : public ScriptedAI
         m_creature->SetVisibility(VISIBILITY_ON);
 
         ImageA = nullptr;
-        ImageA = nullptr;
+        ImageB = nullptr;
         ControlledPlayerGUID.Clear();
 
         // The raised ledges around Skeram's platforms are a pathing nightmare, there is no
