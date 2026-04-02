@@ -55,7 +55,7 @@ Handlers BuildOpcodeList()
             /*status*/ (requiredState), \
             /*packetProcessing*/ (schedulingStrategy), \
             /*readPacket*/ static_cast<std::unique_ptr<ClientPacket>(*)(WorldPacket&)>(&WorldSession::Handle_GenericRead<get_packet_class<decltype(handlerPtr)>::type>), \
-            /*handler*/ static_cast<void (WorldSession::*)(const ClientPacket&)>(&WorldSession::Handle_GenericPacket<get_packet_class<decltype(handlerPtr)>::type, (handlerPtr)>) \
+            /*handler*/ static_cast<void (WorldSession::*)(ClientPacket const&)>(&WorldSession::Handle_GenericPacket<get_packet_class<decltype(handlerPtr)>::type, (handlerPtr)>) \
         };\
     }
 
