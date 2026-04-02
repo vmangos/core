@@ -813,7 +813,10 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     }
 
     if (me->HasUnitState(UNIT_STATE_CAN_NOT_REACT_OR_LOST_CONTROL))
+    {
+        BreakCrowdControlEffects();
         return;
+    }
 
     if (me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
     {

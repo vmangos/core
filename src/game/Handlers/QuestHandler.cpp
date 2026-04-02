@@ -33,16 +33,14 @@
 #include "ScriptMgr.h"
 #include "Group.h"
 
-void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recv_data)
+void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPackets::Quest::QuestgiverStatusQuery const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
     uint8 dialogStatus = DIALOG_STATUS_NONE;
 
-    Object* questgiver = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
+    Object* questgiver = _player->GetObjectByTypeMask(packet.guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
     if (!questgiver)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver %s", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver %s", packet.guid.GetString().c_str());
         return;
     }
 
@@ -75,19 +73,16 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recv_data)
     }
 
     //inform client about status of quest
-    _player->PlayerTalkClass->SendQuestGiverStatus(dialogStatus, guid);
+    _player->PlayerTalkClass->SendQuestGiverStatus(dialogStatus, packet.guid);
 }
 
-void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recv_data)
+void WorldSession::HandleQuestgiverHelloOpcode(WorldPackets::Quest::QuestgiverHello const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
-
-    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(packet.guid, UNIT_NPC_FLAG_NONE);
 
     if (!pCreature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleQuestgiverHelloOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleQuestgiverHelloOpcode - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
         return;
     }
 
@@ -109,18 +104,14 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recv_data)
     _player->SendPreparedGossip(pCreature);
 }
 
-void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)
+void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPackets::Quest::QuestgiverAcceptQuest const& packet)
 {
-    ObjectGuid guid;
-    uint32 quest;
-    recv_data >> guid >> quest;
-
-    Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_GAMEOBJECT_PLAYER_OR_ITEM);
+    Object* pObject = _player->GetObjectByTypeMask(packet.guid, TYPEMASK_CREATURE_GAMEOBJECT_PLAYER_OR_ITEM);
 
     // no or incorrect quest giver
     if (!pObject
-            || (pObject->GetTypeId() != TYPEID_PLAYER && !pObject->HasQuest(quest))
-            || (pObject->GetTypeId() == TYPEID_PLAYER && !((Player*)pObject)->CanShareQuest(quest))
+            || (pObject->GetTypeId() != TYPEID_PLAYER && !pObject->HasQuest(packet.quest))
+            || (pObject->GetTypeId() == TYPEID_PLAYER && !((Player*)pObject)->CanShareQuest(packet.quest))
        )
     {
         _player->PlayerTalkClass->CloseGossip();
@@ -135,7 +126,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)
         return;
     }
 
-    Quest const* qInfo = sObjectMgr.GetQuestTemplate(quest);
+    Quest const* qInfo = sObjectMgr.GetQuestTemplate(packet.quest);
     if (qInfo)
     {
         // prevent cheating
@@ -203,8 +194,8 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)
                 }
             }
 
-            if (_player->CanCompleteQuest(quest))
-                _player->CompleteQuest(quest);
+            if (_player->CanCompleteQuest(packet.quest))
+                _player->CompleteQuest(packet.quest);
 
             _player->PlayerTalkClass->CloseGossip();
 
@@ -219,30 +210,23 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)
     _player->ClearQuestShareInfo();
 }
 
-void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recv_data)
+void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPackets::Quest::QuestgiverQueryQuest const& packet)
 {
-    ObjectGuid guid;
-    uint32 quest;
-    recv_data >> guid >> quest;
-
     // Verify that the guid is valid and is a questgiver or involved in the requested quest
-    Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_GAMEOBJECT_OR_ITEM);
-    if (!pObject || (!pObject->HasQuest(quest) && !pObject->HasInvolvedQuest(quest)))
+    Object* pObject = _player->GetObjectByTypeMask(packet.guid, TYPEMASK_CREATURE_GAMEOBJECT_OR_ITEM);
+    if (!pObject || (!pObject->HasQuest(packet.quest) && !pObject->HasInvolvedQuest(packet.quest)))
     {
         _player->PlayerTalkClass->CloseGossip();
         return;
     }
 
-    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest))
+    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.quest))
         _player->PlayerTalkClass->SendQuestGiverQuestDetails(pQuest, pObject->GetObjectGuid(), true);
 }
 
-void WorldSession::HandleQuestQueryOpcode(WorldPacket& recv_data)
+void WorldSession::HandleQuestQueryOpcode(WorldPackets::Quest::QueryQuest const& packet)
 {
-    uint32 quest;
-    recv_data >> quest;
-
-    Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest);
+    Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.questEntry);
     if (!pQuest)
         return;
 
@@ -420,15 +404,13 @@ void WorldSession::HandleQuestQueryOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recv_data)
+void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPackets::Quest::QuestgiverChooseReward const& packet)
 {
-    uint32 quest, reward;
-    ObjectGuid guid;
-    recv_data >> guid >> quest >> reward;
+    ObjectGuid guid = packet.guid;
 
-    if (reward >= QUEST_REWARD_CHOICES_COUNT)
+    if (packet.reward >= QUEST_REWARD_CHOICES_COUNT)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName(), _player->GetGUIDLow(), reward);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName(), _player->GetGUIDLow(), packet.reward);
         return;
     }
 
@@ -436,7 +418,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recv_data)
     if (!pObject)
         return;
 
-    if (!pObject->HasInvolvedQuest(quest))
+    if (!pObject->HasInvolvedQuest(packet.quest))
         return;
 
     if (!GetPlayer()->IsAlive())
@@ -451,12 +433,12 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recv_data)
             return;
     }
 
-    Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest);
+    Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.quest);
     if (pQuest)
     {
-        if (_player->CanRewardQuest(pQuest, reward, true))
+        if (_player->CanRewardQuest(pQuest, packet.reward, true))
         {
-            _player->RewardQuest(pQuest, reward, pObject);
+            _player->RewardQuest(pQuest, packet.reward, pObject);
 
             // Send next quest
             if (Quest const* nextquest = _player->GetNextQuest(guid, pQuest))
@@ -469,14 +451,10 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recv_data)
+void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPackets::Quest::QuestgiverRequestReward const& packet)
 {
-    uint32 quest;
-    ObjectGuid guid;
-    recv_data >> guid >> quest;
-
-    Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
-    if (!pObject || !pObject->HasInvolvedQuest(quest))
+    Object* pObject = _player->GetObjectByTypeMask(packet.guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
+    if (!pObject || !pObject->HasInvolvedQuest(packet.quest))
         return;
 
     if (!GetPlayer()->IsAlive())
@@ -491,46 +469,37 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recv_data)
             return;
     }
 
-    if (_player->CanCompleteQuest(quest))
-        _player->CompleteQuest(quest);
+    if (_player->CanCompleteQuest(packet.quest))
+        _player->CompleteQuest(packet.quest);
 
-    if (_player->GetQuestStatus(quest) != QUEST_STATUS_COMPLETE)
+    if (_player->GetQuestStatus(packet.quest) != QUEST_STATUS_COMPLETE)
         return;
 
-    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest))
-        _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
+    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.quest))
+        _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, packet.guid, true);
 }
 
-void WorldSession::HandleQuestgiverCancel(WorldPacket& /*recv_data*/)
+void WorldSession::HandleQuestgiverCancel(NullClientPacket const& /*packet*/)
 {
     _player->PlayerTalkClass->CloseGossip();
 }
 
-void WorldSession::HandleQuestLogSwapQuest(WorldPacket& recv_data)
+void WorldSession::HandleQuestLogSwapQuest(WorldPackets::Quest::QuestLogSwapQuest const& packet)
 {
-    uint8 slot1, slot2;
-    recv_data >> slot1 >> slot2;
-
-    if (slot1 == slot2 || slot1 >= MAX_QUEST_LOG_SIZE || slot2 >= MAX_QUEST_LOG_SIZE)
+    if (packet.slot1 == packet.slot2 || packet.slot1 >= MAX_QUEST_LOG_SIZE || packet.slot2 >= MAX_QUEST_LOG_SIZE)
         return;
 
-    GetPlayer()->SwapQuestSlot(slot1, slot2);
+    GetPlayer()->SwapQuestSlot(packet.slot1, packet.slot2);
 }
 
-void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recv_data)
+void WorldSession::HandleQuestLogRemoveQuest(WorldPackets::Quest::QuestLogRemoveQuest const& packet)
 {
-    uint8 slot;
-    recv_data >> slot;
-
-    _player->RemoveQuestAtSlot(slot);
+    _player->RemoveQuestAtSlot(packet.slot);
 }
 
-void WorldSession::HandleQuestConfirmAccept(WorldPacket& recv_data)
+void WorldSession::HandleQuestConfirmAccept(WorldPackets::Quest::QuestConfirmAccept const& packet)
 {
-    uint32 quest;
-    recv_data >> quest;
-
-    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest))
+    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.questId))
     {
         if (!pQuest->HasQuestFlag(QUEST_FLAGS_PARTY_ACCEPT))
             return;
@@ -539,7 +508,7 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recv_data)
         if (!questShareInfo)
             return;
 
-        if (questShareInfo->QuestId != quest)
+        if (questShareInfo->QuestId != packet.questId)
             return;
 
         Player* pOriginalPlayer = ObjectAccessor::FindPlayer(questShareInfo->PlayerGuid);
@@ -560,10 +529,10 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recv_data)
                 return;
         }
 
-        if (Quest const* qInfo = sObjectMgr.GetQuestTemplate(quest))
+        if (Quest const* qInfo = sObjectMgr.GetQuestTemplate(packet.questId))
         {
             if (qInfo->HasQuestFlag(QUEST_FLAGS_SHARABLE))
-                if (!pOriginalPlayer->IsCurrentQuest(quest))
+                if (!pOriginalPlayer->IsCurrentQuest(packet.questId))
                     return;
             if (!qInfo->HasQuestFlag(QuestFlags(QUEST_FLAGS_SHARABLE | QUEST_FLAGS_PARTY_ACCEPT)))
                 return;
@@ -579,36 +548,29 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recv_data)
+void WorldSession::HandleQuestgiverCompleteQuest(WorldPackets::Quest::QuestgiverCompleteQuest const& packet)
 {
-    uint32 quest;
-    ObjectGuid guid;
-    recv_data >> guid >> quest;
-
-    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest))
+    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.quest))
     {
-        if (_player->GetQuestStatus(quest) != QUEST_STATUS_COMPLETE)
+        if (_player->GetQuestStatus(packet.quest) != QUEST_STATUS_COMPLETE)
         {
             if (pQuest->IsRepeatable())
-                _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanCompleteRepeatableQuest(pQuest), false);
+                _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, packet.guid, _player->CanCompleteRepeatableQuest(pQuest), false);
             else
-                _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanRewardQuest(pQuest, false), false);
+                _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, packet.guid, _player->CanRewardQuest(pQuest, false), false);
         }
         else
-            _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanRewardQuest(pQuest, false), false);
+            _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, packet.guid, _player->CanRewardQuest(pQuest, false), false);
     }
 }
 
-void WorldSession::HandleQuestgiverQuestAutoLaunch(WorldPacket& /*recvPacket*/)
+void WorldSession::HandleQuestgiverQuestAutoLaunch(NullClientPacket const& /*packet*/)
 {
 }
 
-void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
+void WorldSession::HandlePushQuestToParty(WorldPackets::Quest::PushQuestToParty const& packet)
 {
-    uint32 questId;
-    recvPacket >> questId;
-
-    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(questId))
+    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.questId))
     {
         if (Group* pGroup = _player->GetGroup())
         {
@@ -627,7 +589,7 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
                     continue;
                 }
 
-                if (pPlayer->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
+                if (pPlayer->GetQuestStatus(packet.questId) == QUEST_STATUS_COMPLETE)
                 {
                     _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_FINISH_QUEST);
                     continue;
@@ -664,12 +626,8 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
+void WorldSession::HandleQuestPushResult(WorldPackets::Quest::QuestPushResult const& packet)
 {
-    ObjectGuid guid;
-    uint8 msg;
-    recvPacket >> guid >> msg;
-
     auto const& questShareInfo = _player->GetQuestShareInfo();
     if (!questShareInfo)
         return;
@@ -678,7 +636,7 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
     {
         WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
         data << _player->GetObjectGuid();
-        data << uint8(msg);                             // enum QuestShareMessages
+        data << uint8(packet.msg);                             // enum QuestShareMessages
         pPlayer->GetSession()->SendPacket(&data);
     }
 

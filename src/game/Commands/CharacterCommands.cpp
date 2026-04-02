@@ -727,7 +727,7 @@ bool ChatHandler::HandleLevelUpCommand(char* args)
             pCreature->SetLevel(newlevel);
             pCreature->InitStatsForLevel();
             pCreature->UpdateAllStats();
-        }     
+        }
 
         PSendSysMessage(LANG_YOU_CHANGE_LVL, pCreature->GetName(), newlevel);
     }
@@ -919,7 +919,7 @@ bool ChatHandler::HandleRemoveRidingCommand(char* args)
     }
 
     auto it = skills.find(args);
-    
+
     if (it == skills.end())
     {
         std::stringstream options;
@@ -1159,13 +1159,13 @@ bool ChatHandler::HandleGroupInfoCommand(char* args)
     for (std::size_t i = 0, j = names.size(); i != j; ++i)
     {
         stream << names[i];
-        
+
         if (i + 1 != j)
         {
             stream << ", ";
         }
     }
-    
+
     PSendSysMessage(LANG_GROUP_INFO, (group->isRaidGroup() ? "Raid" : "Party"),
                     playerLink(std::to_string(group->GetId())).c_str(), playerLink(group->GetLeaderName()).c_str(),
                     group->GetMembersCount(), stream.str().c_str());
@@ -1197,7 +1197,7 @@ bool ChatHandler::HandleMountCommand(char* /*args*/)
         SetSentErrorMessage(true);
         return false;
     }
-    
+
     Creature* target = GetSelectedCreature();
     if (!target)
     {
@@ -2026,7 +2026,7 @@ bool ChatHandler::HandleCharacterPremadeGearCommand(char* args)
         SendSysMessage(LANG_NO_CHAR_SELECTED);
         return false;
     }
-        
+
     if (!*args)
     {
         PSendSysMessage("Listing available premade templates for %s:", pPlayer->GetName());
@@ -2209,7 +2209,7 @@ bool ChatHandler::HandleCharacterPremadeSaveSpecCommand(char* args)
         {
             Field* fields = result->Fetch();
             uint32 spellId = fields[0].GetUInt32();
-            
+
             if (!sSpellMgr.GetSpellEntry(spellId))
                 continue;
 
@@ -2561,7 +2561,7 @@ bool ChatHandler::HandleHonorSetRPCommand(char *args)
     float value;
     if (!ExtractFloat(&args, value))
         return false;
-    
+
     target->GetHonorMgr().SetRankPoints(value);
     target->GetHonorMgr().Update();
     PSendSysMessage("You have changed rank points of %s to %g.", target->GetName(), value);
@@ -2612,10 +2612,10 @@ bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
                         pNewSpell->HasAttribute(SPELL_ATTR_DO_NOT_DISPLAY) ||
                         pNewSpell->HasAttribute(SPELL_ATTR_EX2_USE_SHAPESHIFT_BAR))
                         continue;
-                } 
+                }
 
                 pPlayer->LearnSpell(spellId, false);
-            }  
+            }
         }
     }
 
@@ -2793,7 +2793,7 @@ bool ChatHandler::HandleLearnAllMyTalentsCommand(char* /*args*/)
 bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
 {
     Player* pPlayer = m_session->GetPlayer();
-    
+
     uint32 trainerId;
     if (ExtractUInt32(&args, trainerId))
     {
@@ -3475,7 +3475,7 @@ bool ChatHandler::HandleDeleteItemCommand(char* args)
                     SetSentErrorMessage(true);
                     return false;
                 }
-                
+
                 if (!CharacterDatabase.DirectPExecute("DELETE FROM `character_inventory` WHERE `item_guid` = %u", guid))
                 {
                     SendSysMessage("Encountered an error while attempting to remove item from inventory");
@@ -4428,7 +4428,7 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
         return false;
 
     uint32 mountId = atoi(args);
-    
+
     if (!sObjectMgr.GetCreatureDisplayInfoAddon(mountId))
     {
         SendSysMessage(LANG_NO_MOUNT);
@@ -5400,7 +5400,7 @@ bool ChatHandler::HandlePetLoyaltyCommand(char* args)
         return false;
 
     pet->ModifyLoyalty(loyaltyPoints);
-    
+
     return true;
 }
 
@@ -5423,22 +5423,22 @@ bool ChatHandler::HandlePetInfoCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleChannelJoinCommand(char* c)
+bool ChatHandler::HandleChannelJoinCommand(char* args)
 {
-    WorldPacket pkt(CMSG_JOIN_CHANNEL, 4);
-    pkt << c;
-    pkt << ""; // Pass
+    WorldPackets::Channel::JoinChannel pkt;
+    pkt.channelName = args;
+    pkt.channelPassword = "";
     m_session->HandleJoinChannelOpcode(pkt);
-    PSendSysMessage("Joined channel \"%s\"", c);
+    PSendSysMessage("Joined channel \"%s\"", pkt.channelName.c_str());
     return true;
 }
 
-bool ChatHandler::HandleChannelLeaveCommand(char* c)
+bool ChatHandler::HandleChannelLeaveCommand(char* args)
 {
-    WorldPacket pkt(CMSG_LEAVE_CHANNEL, 4);
-    pkt << c;
+    WorldPackets::Channel::LeaveChannel pkt;
+    pkt.channelName = args;
     m_session->HandleLeaveChannelOpcode(pkt);
-    PSendSysMessage("Left channel \"%s\"", c);
+    PSendSysMessage("Left channel \"%s\"", pkt.channelName.c_str());
     return true;
 }
 
@@ -5872,7 +5872,7 @@ bool ChatHandler::HandleListVisibleGuidsCommand(char* args)
     }
 
     PSendSysMessage("Listing guids visible by %s", pPlayer->GetName());
-    
+
     for (auto const& guid : pPlayer->m_visibleGUIDs)
         PSendSysMessage("- %s", guid.GetString().c_str());
 

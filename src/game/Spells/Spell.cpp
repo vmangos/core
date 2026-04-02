@@ -54,227 +54,6 @@ using namespace Spells;
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
-SpellCastTargets::SpellCastTargets()
-{
-    m_unitTarget = nullptr;
-    m_itemTarget = nullptr;
-    m_GOTarget   = nullptr;
-
-    m_itemTargetEntry  = 0;
-
-    m_srcX = m_srcY = m_srcZ = m_destX = m_destY = m_destZ = 0.0f;
-    m_targetMask = 0;
-}
-
-SpellCastTargets::~SpellCastTargets()
-{
-}
-
-void SpellCastTargets::setUnitTarget(Unit* target)
-{
-    if (!target)
-        return;
-
-    m_destX = target->GetPositionX();
-    m_destY = target->GetPositionY();
-    m_destZ = target->GetPositionZ();
-    m_unitTarget = target;
-    m_unitTargetGUID = target->GetObjectGuid();
-    m_targetMask |= TARGET_FLAG_UNIT;
-}
-
-void SpellCastTargets::setDestination(float x, float y, float z)
-{
-    m_destX = x;
-    m_destY = y;
-    m_destZ = z;
-    m_targetMask |= TARGET_FLAG_DEST_LOCATION;
-}
-
-void SpellCastTargets::setSource(float x, float y, float z)
-{
-    m_srcX = x;
-    m_srcY = y;
-    m_srcZ = z;
-    m_targetMask |= TARGET_FLAG_SOURCE_LOCATION;
-}
-
-void SpellCastTargets::setGOTarget(GameObject* target)
-{
-    m_GOTarget = target;
-    m_GOTargetGUID = target->GetObjectGuid();
-    //    m_targetMask |= TARGET_FLAG_GAMEOBJECT;
-}
-
-void SpellCastTargets::setItemTarget(Item* item)
-{
-    if (!item)
-        return;
-
-    m_itemTarget = item;
-    m_itemTargetGUID = item->GetObjectGuid();
-    m_itemTargetEntry = item->GetEntry();
-    m_targetMask |= TARGET_FLAG_ITEM;
-}
-
-void SpellCastTargets::setTradeItemTarget(Player* caster)
-{
-    m_itemTargetGUID = ObjectGuid(uint64(TRADE_SLOT_NONTRADED));
-    m_itemTargetEntry = 0;
-    m_targetMask |= TARGET_FLAG_TRADE_ITEM;
-
-    Update(caster);
-}
-
-void SpellCastTargets::setCorpseTarget(Corpse* corpse)
-{
-    m_CorpseTargetGUID = corpse->GetObjectGuid();
-}
-
-void SpellCastTargets::Update(SpellCaster* pCaster)
-{
-    m_GOTarget   = m_GOTargetGUID ? pCaster->GetMap()->GetGameObject(m_GOTargetGUID) : nullptr;
-    m_unitTarget = m_unitTargetGUID ?
-                   (m_unitTargetGUID == pCaster->GetObjectGuid() ? pCaster->ToUnit() : ObjectAccessor::GetUnit(*pCaster, m_unitTargetGUID)) :
-                   nullptr;
-
-    m_itemTarget = nullptr;
-    if (Player* pPlayer = pCaster->ToPlayer())
-    {
-        if (m_targetMask & TARGET_FLAG_ITEM)
-            m_itemTarget = pPlayer->GetItemByGuid(m_itemTargetGUID);
-        else if (m_targetMask & TARGET_FLAG_TRADE_ITEM)
-        {
-            if (TradeData* pTrade = pPlayer->GetTradeData())
-                if (m_itemTargetGUID.GetRawValue() < TRADE_SLOT_COUNT)
-                    m_itemTarget = pTrade->GetTraderData()->GetItem(TradeSlots(m_itemTargetGUID.GetRawValue()));
-        }
-
-        if (m_itemTarget)
-            m_itemTargetEntry = m_itemTarget->GetEntry();
-    }
-}
-
-void SpellCastTargets::read(ByteBuffer& data, Unit* caster)
-{
-    data >> m_targetMask;
-
-    if (m_targetMask == TARGET_FLAG_SELF)
-    {
-        m_destX = caster->GetPositionX();
-        m_destY = caster->GetPositionY();
-        m_destZ = caster->GetPositionZ();
-        m_unitTarget = caster;
-        m_unitTargetGUID = caster->GetObjectGuid();
-        return;
-    }
-
-    // TARGET_FLAG_UNIT_MINIPET is used for non-combat pets, maybe other?
-    if (m_targetMask & (TARGET_FLAG_UNIT))
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data >> m_unitTargetGUID.ReadAsPacked();
-#else
-        data >> m_unitTargetGUID;
-#endif
-
-    if (m_targetMask & (TARGET_FLAG_GAMEOBJECT))
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data >> m_GOTargetGUID.ReadAsPacked();
-#else
-        data >> m_GOTargetGUID;
-#endif
-
-    if (m_targetMask & (TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_CORPSE_ENEMY))
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data >> m_CorpseTargetGUID.ReadAsPacked();
-#else
-        data >> m_CorpseTargetGUID;
-#endif
-
-    if ((m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM)) && caster->IsPlayer())
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data >> m_itemTargetGUID.ReadAsPacked();
-#else
-        data >> m_itemTargetGUID;
-#endif
-
-    if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
-    {
-        data >> m_srcX >> m_srcY >> m_srcZ;
-        if (!MaNGOS::IsValidMapCoord(m_srcX, m_srcY, m_srcZ))
-            throw ByteBufferException(false, data.rpos(), 0, data.size());
-    }
-
-    if (m_targetMask & TARGET_FLAG_DEST_LOCATION)
-    {
-        data >> m_destX >> m_destY >> m_destZ;
-        if (!MaNGOS::IsValidMapCoord(m_destX, m_destY, m_destZ))
-            throw ByteBufferException(false, data.rpos(), 0, data.size());
-    }
-
-    if (m_targetMask & TARGET_FLAG_STRING)
-        data >> m_strTarget;
-
-    // find real units/GOs
-    Update(caster);
-}
-
-void SpellCastTargets::write(ByteBuffer& data) const
-{
-    data << uint16(m_targetMask);
-
-    if (m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_GAMEOBJECT | TARGET_FLAG_CORPSE_ALLY))
-    {
-        if (m_targetMask & TARGET_FLAG_UNIT)
-        {
-            if (m_unitTarget)
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-                data << m_unitTarget->GetPackGUID();
-#else
-                data << m_unitTarget->GetGUID();
-#endif
-            else
-                data << uint8(0);
-        }
-        else if (m_targetMask & (TARGET_FLAG_GAMEOBJECT))
-        {
-            if (m_GOTarget)
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-                data << m_GOTarget->GetPackGUID();
-#else
-                data << m_GOTarget->GetGUID();
-#endif
-            else
-                data << uint8(0);
-        }
-        else if (m_targetMask & (TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_CORPSE_ENEMY))
-            data << m_CorpseTargetGUID.WriteAsPacked();
-        else
-            data << uint8(0);
-    }
-
-    if (m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM))
-    {
-        if (m_itemTarget)
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-            data << m_itemTarget->GetPackGUID();
-#else
-            data << m_itemTarget->GetGUID();
-#endif
-        else
-            data << uint8(0);
-    }
-
-    if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
-        data << m_srcX << m_srcY << m_srcZ;
-
-    if (m_targetMask & TARGET_FLAG_DEST_LOCATION)
-        data << m_destX << m_destY << m_destZ;
-
-    if (m_targetMask & TARGET_FLAG_STRING)
-        data << m_strTarget;
-}
-
 Spell::Spell(Unit* caster, SpellEntry const* info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
     m_spellInfo(info), m_triggeredBySpellInfo(triggeredBy), m_triggeredByParentSpellInfo(triggeredByParent), m_caster(caster), m_casterUnit(caster), m_IsTriggeredSpell(triggered)
 {
@@ -6899,7 +6678,7 @@ bool Spell::ValidateExplicitTargetMask() const
     if (!pPlayer)
         return true;
 
-    static constexpr uint32 verifiableTargetFlags[] = { TARGET_FLAG_UNIT , TARGET_FLAG_ITEM , TARGET_FLAG_SOURCE_LOCATION , TARGET_FLAG_DEST_LOCATION  , TARGET_FLAG_GAMEOBJECT };
+    static constexpr uint32 verifiableTargetFlags[] = { TARGET_FLAG_UNIT , TARGET_FLAG_ITEM , TARGET_FLAG_TRADE_ITEM, TARGET_FLAG_SOURCE_LOCATION , TARGET_FLAG_DEST_LOCATION  , TARGET_FLAG_GAMEOBJECT, TARGET_FLAG_CORPSE_ENEMY, TARGET_FLAG_CORPSE_ALLY };
     uint32 const allowedTargetMask = m_spellInfo->AllowedTargetMask;
     uint32 const expectedTargetMask = m_spellInfo->Targets;
 
@@ -6920,14 +6699,55 @@ bool Spell::ValidateExplicitTargetMask() const
             pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
             return false;
         }
+    }
 
-        if (!(m_targets.m_targetMask & flag) && (expectedTargetMask & flag))
-        {
-            std::stringstream oss;
-            oss << "Casting spell " << m_spellInfo->Id << " with expected " << SpellCastTargetFlagToString(flag) << " (" << flag << ") not included in the target mask (" << m_targets.m_targetMask << ")";
-            pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
-            return false;
-        }
+    auto PrintExpectedFlag = [&](uint32 flag)
+    {
+        std::stringstream oss;
+        oss << "Casting spell " << m_spellInfo->Id << " with expected " << SpellCastTargetFlagToString(flag) << " (" << flag << ") not included in the target mask (" << m_targets.m_targetMask << ")";
+        pPlayer->GetSession()->ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
+    };
+
+    if (!(m_targets.m_targetMask & TARGET_FLAG_UNIT) && (expectedTargetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_UNIT_RAID | TARGET_FLAG_UNIT_PARTY | TARGET_FLAG_UNIT_ENEMY | TARGET_FLAG_UNIT_ALLY | TARGET_FLAG_UNIT_DEAD | TARGET_FLAG_UNIT_MINIPET)))
+    {
+        PrintExpectedFlag(TARGET_FLAG_UNIT);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM)) && (expectedTargetMask & TARGET_FLAG_ITEM))
+    {
+        PrintExpectedFlag(TARGET_FLAG_ITEM);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & TARGET_FLAG_SOURCE_LOCATION) && (expectedTargetMask & TARGET_FLAG_SOURCE_LOCATION))
+    {
+        PrintExpectedFlag(TARGET_FLAG_SOURCE_LOCATION);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) && (expectedTargetMask & TARGET_FLAG_DEST_LOCATION))
+    {
+        PrintExpectedFlag(TARGET_FLAG_DEST_LOCATION);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & TARGET_FLAG_GAMEOBJECT) && (expectedTargetMask & TARGET_FLAG_GAMEOBJECT))
+    {
+        PrintExpectedFlag(TARGET_FLAG_GAMEOBJECT);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_GAMEOBJECT)) && (expectedTargetMask & TARGET_FLAG_LOCKED))
+    {
+        PrintExpectedFlag(TARGET_FLAG_LOCKED);
+        return false;
+    }
+
+    if (!(m_targets.m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_CORPSE_ALLY)) && (expectedTargetMask & (TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_CORPSE_ALLY)))
+    {
+        PrintExpectedFlag(expectedTargetMask & (TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_CORPSE_ALLY));
+        return false;
     }
 
     return true;

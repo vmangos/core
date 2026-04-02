@@ -323,8 +323,9 @@ void IO::Networking::AsyncSocket::CloseSocket()
 
     // shutdown the native socket to prevent new operations
     ::shutdown(m_descriptor.GetNativeSocket(), SD_BOTH);
-    // interrupt and fail all pending IOCP events and post them to the completion queue
-    ::CancelIoEx(reinterpret_cast<HANDLE>(m_descriptor.GetNativeSocket()), nullptr);
+    
+    // Alternative to this is calling CancelIoEx but it doesn't exist on XP.
+    m_descriptor.CloseSocket();
 }
 
 /// The callback is invoked in the IO thread

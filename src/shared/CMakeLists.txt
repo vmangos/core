@@ -54,6 +54,8 @@ set (shared_SRCS
     Crypto/Hash/MD5.cpp
     Crypto/Hash/SHA1.h
     Crypto/Hash/SHA1.cpp
+    Compression/ZLib.h
+    Compression/ZLib.cpp
     Database/Database.h
     Database/DatabaseCallback.h
     Database/DatabaseEnv.h
@@ -251,6 +253,7 @@ target_include_directories(shared PUBLIC
   ${CMAKE_BINARY_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
+  ${ZLIB_INCLUDE_DIRS}
 )
 
 if(WIN32)
@@ -283,6 +286,12 @@ endif()
 
 if (ENABLE_CPPTRACE)
   target_link_libraries(shared PRIVATE cpptrace::cpptrace)
+endif()
+
+if(WIN32)
+  target_link_libraries(shared PUBLIC zlib)
+else()
+  target_link_libraries(shared PUBLIC ${ZLIB_LIBRARIES})
 endif()
 
 SET_TARGET_PROPERTIES(shared PROPERTIES FOLDER "Game Libs")

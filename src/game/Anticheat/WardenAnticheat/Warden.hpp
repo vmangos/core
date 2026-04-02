@@ -169,7 +169,7 @@ class Warden
 
         static void LoadScriptedScans();
 
-        void HandlePacket(WorldPacket& recvData);
+        void HandlePacket(ByteBuffer recvData);
 
         bool IsUsingMaiev() const { return m_maiev; }
         WardenModule const* GetModule() const { return m_module; }
@@ -183,8 +183,8 @@ class Warden
         virtual void GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
             std::string& renderer, std::string& proxifier) const = 0;
 
-        std::vector<WorldPacket> m_packetQueue;
-        std::mutex m_packetQueueMutex;
+        std::queue<std::vector<uint8>> m_packetDataQueue;
+        std::mutex m_packetDataQueueMutex;
 
         // used by maiev string hash check
         mutable std::string m_hashString;

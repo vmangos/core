@@ -44,7 +44,7 @@ AccountMgr::~AccountMgr()
 
 AccountOpResult AccountMgr::CreateAccount(std::string username, std::string password)
 {
-    if (utf8length(username) > MAX_ACCOUNT_STR)
+    if (utf8length(username).value_or(MAX_ACCOUNT_STR + 1) > MAX_ACCOUNT_STR)
         return AOR_NAME_TOO_LONG;                           // username's too long
 
     normalizeString(username);
@@ -119,10 +119,10 @@ AccountOpResult AccountMgr::ChangeUsername(uint32 accid, std::string new_uname, 
     if (!result)
         return AOR_NAME_NOT_EXIST;                          // account doesn't exist
 
-    if (utf8length(new_uname) > MAX_ACCOUNT_STR)
+    if (utf8length(new_uname).value_or(MAX_ACCOUNT_STR + 1) > MAX_ACCOUNT_STR)
         return AOR_NAME_TOO_LONG;
 
-    if (utf8length(new_passwd) > MAX_ACCOUNT_STR)
+    if (utf8length(new_passwd).value_or(MAX_ACCOUNT_STR + 1) > MAX_ACCOUNT_STR)
         return AOR_PASS_TOO_LONG;
 
     normalizeString(new_uname);
@@ -160,7 +160,7 @@ AccountOpResult AccountMgr::ChangePassword(uint32 accid, std::string new_passwd,
     else
         normalizeString(username);                       // account doesn't exist
 
-    if (utf8length(new_passwd) > MAX_ACCOUNT_STR)
+    if (utf8length(new_passwd).value_or(MAX_ACCOUNT_STR + 1) > MAX_ACCOUNT_STR)
         return AOR_PASS_TOO_LONG;
 
     normalizeString(new_passwd);
@@ -376,7 +376,7 @@ void AccountMgr::LoadAccountBanList(bool silent)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading account_banned ...");
 
     std::unique_ptr<QueryResult> banresult(LoginDatabase.PQuery("SELECT `id`, `unbandate`, `bandate` FROM `account_banned` WHERE `active` = 1 AND (`unbandate` > UNIX_TIMESTAMP() OR `bandate` = `unbandate`)"));
-    
+
     if (!banresult)
     {
         if (!silent)
@@ -539,7 +539,7 @@ AccountPersistentData& AccountMgr::GetAccountPersistentData(uint32 accountId)
         if (itr != m_accountPersistentData.end())
             return itr->second;
     }
-    
+
     {
         std::lock_guard<std::shared_timed_mutex> guard(m_accountPersistentDataMutex);
         return m_accountPersistentData[accountId];

@@ -2354,6 +2354,7 @@ void Spell::EffectSummon(SpellEffectIndex effIdx)
     spawnCreature->InitializeDefaultName();
     spawnCreature->AIM_Initialize();
     spawnCreature->InitPetCreateSpells();
+    spawnCreature->UpdateAllStats();
     spawnCreature->SetHealth(spawnCreature->GetMaxHealth());
     spawnCreature->SetPower(POWER_MANA, spawnCreature->GetMaxPower(POWER_MANA));
 
@@ -3229,6 +3230,7 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
 
     newSummon->AIM_Initialize();
     newSummon->InitPetCreateSpells();
+    newSummon->UpdateAllStats();
     newSummon->SetHealth(newSummon->GetMaxHealth());
     newSummon->SetPower(POWER_MANA, newSummon->GetMaxPower(POWER_MANA));
 

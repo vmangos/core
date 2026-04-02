@@ -44,12 +44,6 @@ class ByteBufferException
         size_t size;
 };
 
-template<class T>
-struct Unused
-{
-    Unused() {}
-};
-
 class ByteBuffer
 {
     public:
@@ -80,6 +74,25 @@ class ByteBuffer
             _wpos = rhs._wpos;
             _storage = std::move(rhs._storage);
             return *this;
+        }
+
+        static ByteBuffer from(std::vector<uint8> const& v)
+        {
+            ByteBuffer buf;
+            buf._storage = v;
+            buf._rpos = 0;
+            buf._wpos = buf._storage.size();
+            return buf;
+        }
+
+        // `std::move` v into the buffer
+        static ByteBuffer from(std::vector<uint8>&& v)
+        {
+            ByteBuffer buf;
+            buf._storage = std::move(v);
+            buf._rpos = 0;
+            buf._wpos = buf._storage.size();
+            return buf;
         }
 
         void clear()
@@ -186,7 +199,7 @@ class ByteBuffer
 
         ByteBuffer& operator>>(bool& value)
         {
-            value = read<char>() > 0 ? true : false;
+            value = read<char>() != 0;
             return *this;
         }
 
@@ -276,17 +289,9 @@ class ByteBuffer
                 value.assign((char*)(&_storage[startPos]), _rpos - startPos);
                 _rpos++;
             }
-            
+
             return *this;
         }
-
-        template<class T>
-        ByteBuffer& operator>>(Unused<T> const&)
-        {
-            read_skip<T>();
-            return *this;
-        }
-
 
         uint8 operator[](size_t pos) const
         {

@@ -3954,6 +3954,13 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, SpellEntry const* pSpellInfo,
         // Do not use dismounting spells when target is not mounted (there are 4 such spells).
         if (!pTarget->IsMounted() && pSpellInfo->IsDismountSpell())
             return SPELL_FAILED_ONLY_MOUNTED;
+
+        // Do not summon multiple of same guardian mob.
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (pSpellInfo->Effect[i] == SPELL_EFFECT_SUMMON_GUARDIAN && GetGuardianCountWithEntry(pSpellInfo->EffectMiscValue[i]))
+                return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+        }
     }
 
     // Interrupt any previous spell

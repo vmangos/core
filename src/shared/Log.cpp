@@ -130,9 +130,8 @@ void Log::InitSmartlogEntries(std::string const& str)
     uint32 entry;
     std::istringstream ss(str);
 
-    while (ss)
+    while (ss >> entry)
     {
-        ss >> entry;
         m_smartlogExtraEntries.insert(entry);
     }
 }
@@ -147,9 +146,8 @@ void Log::InitSmartlogGuids(std::string const& str)
     uint32 entry;
     std::istringstream ss(str);
 
-    while (ss)
+    while (ss >> entry)
     {
-        ss >> entry;
         m_smartlogExtraGuids.insert(entry);
     }
 }

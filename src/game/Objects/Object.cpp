@@ -59,7 +59,7 @@
 ////////////////////////////////////////////////////////////
 // Methods of class MovementInfo
 
-void MovementInfo::Read(ByteBuffer &data)
+void MovementInfo::Read(ByteBuffer& data)
 {
     stime = WorldTimer::getMSTime();
     data >> moveFlags;
@@ -103,6 +103,53 @@ void MovementInfo::Read(ByteBuffer &data)
     }
 }
 
+void MovementInfo::FillFrom(MovementInfo const& info)
+{
+    stime = WorldTimer::getMSTime();
+    moveFlags = info.moveFlags;
+    ctime = info.ctime;
+    pos.x = info.pos.x;
+    pos.y = info.pos.y;
+    pos.z = info.pos.z;
+    pos.o = info.pos.o;
+
+    if (HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    {
+        t_guid = info.t_guid;
+        t_pos.x = info.t_pos.x;
+        t_pos.y = info.t_pos.y;
+        t_pos.z = info.t_pos.z;
+        t_pos.o = info.t_pos.o;
+    }
+
+    if (HasMovementFlag(MOVEFLAG_SWIMMING))
+        s_pitch = info.s_pitch;
+
+    fallTime = info.fallTime;
+
+    if (HasMovementFlag(MOVEFLAG_JUMPING))
+    {
+        jump.zspeed = info.jump.zspeed;
+        jump.cosAngle = info.jump.cosAngle;
+        jump.sinAngle = info.jump.sinAngle;
+        jump.xyspeed = info.jump.xyspeed;
+        if (!jump.startClientTime)
+        {
+            jump.startClientTime = ctime;
+            jump.start = pos;
+        }
+    }
+    else
+    {
+        jump.startClientTime = 0;
+    }
+
+    if (HasMovementFlag(MOVEFLAG_SPLINE_ELEVATION))
+    {
+        splineElevation = info.splineElevation;                                     // unknown
+    }
+}
+
 void MovementInfo::CorrectData()
 {
     // Nostalrius: remove incompatible flags, causing client freezes for example
@@ -141,7 +188,7 @@ void MovementInfo::CorrectData()
 #undef REMOVE_VIOLATING_FLAGS
 }
 
-void MovementInfo::Write(ByteBuffer &data) const
+void MovementInfo::Write(ByteBuffer& data) const
 {
     data << moveFlags;
     data << stime;
@@ -298,7 +345,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     buf << GetGUID();
 #endif
     buf << uint8(m_objectTypeId);
-    
+
     BuildMovementUpdate(&buf, updateFlags);
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
@@ -566,7 +613,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
     if (IsCreature())
         m.moveFlags = m.moveFlags & ~MOVEFLAG_ROOT;
     *data << m;
-    
+
     if (Unit const* unit = ToUnit())
     {
         *data << float(unit->GetSpeed(MOVE_WALK));
@@ -589,7 +636,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
 {
     if (!target)
         return;
-    
+
     bool const ShowHealthValues = sWorld.getConfig(CONFIG_BOOL_OBJECT_HEALTH_VALUE_SHOW);
 
     bool IsActivateToQuest = false;
@@ -827,7 +874,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                             continue;
                         }
                     }
-                    *data << m_uint32Values[index];     
+                    *data << m_uint32Values[index];
                 }
                 else if (index == UNIT_FIELD_TARGET+1)
                 {
@@ -1021,7 +1068,7 @@ uint16 Object::GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*&
                     if (plr->IsInSameRaidWith(target))
                         visibleFlag |= UF_FLAG_GROUP_ONLY;
             }
-            
+
             break;
         }
         /*
@@ -1782,7 +1829,7 @@ bool WorldObject::CanReachWithMeleeSpellAttack(WorldObject const* pVictim, float
     if (!pVictim || !pVictim->IsInWorld())
         return false;
 
-    float reach = IsUnit() && pVictim->IsUnit() ? 
+    float reach = IsUnit() && pVictim->IsUnit() ?
         static_cast<Unit const*>(this)->GetCombatReachToTarget(static_cast<Unit const*>(pVictim), true, flat_mod) : ATTACK_DISTANCE;
 
     // This check is not related to bounding radius
@@ -1821,7 +1868,7 @@ float WorldObject::GetLeewayBonusRadius() const
     {
         if ((pPlayer->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED) || pPlayer->m_movementInfo.HasMovementFlag(MOVEFLAG_JUMPING))
             return LEEWAY_BONUS_RANGE;
-    }  
+    }
 
     return 0.0f;
 }
@@ -1903,7 +1950,7 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         rand_z = z;
         return true;
     }
-    
+
     Map const* pMap = GetMap();
     Unit const* pUnit = ToUnit();
 
@@ -1940,7 +1987,7 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
             }
         }
     }
-    
+
     {
         // Otherwise, we find a position on the ground, or in water, or in lava (not for players)
         uint32 moveAllowed = NAV_GROUND | NAV_WATER;
@@ -2405,7 +2452,7 @@ Creature* Map::SummonCreature(uint32 entry, float x, float y, float z, float ang
     // Active state set before added to map
     pCreature->SetActiveObjectState(asActiveObject);
     pCreature->Summon(spwtype, despwtime);
-    
+
     // Creature Linking, Initial load is handled like respawn
     if (pCreature->IsLinkingEventTrigger())
         GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, pCreature);
@@ -3513,7 +3560,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
         return REP_FRIENDLY;
 
     // always friendly to charmer or owner
-    if (IsUnit() && target->IsUnit() && 
+    if (IsUnit() && target->IsUnit() &&
         static_cast<Unit const*>(this)->GetCharmerOrOwnerOrOwnGuid() == static_cast<Unit const*>(target)->GetCharmerOrOwnerOrOwnGuid())
         return REP_FRIENDLY;
 

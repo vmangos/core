@@ -1,0 +1,112 @@
+# Validate SQL changes and publish database dumps on pushes to development.
+name: Development Database Dump
+
+on:
+  push:
+    branches:
+      - development
+    paths:
+      - '.github/scripts/export-and-verify-sql-dumps.sh'
+      - '.github/scripts/prepare-sql-test-environment.sh'
+      - '.github/scripts/publish-moving-release.sh'
+      - '.github/workflows/development-db-dump.yaml'
+      - '**/*.sql'
+
+env:
+  WORLD_DB_ARCHIVE: world_full_14_june_2021
+
+concurrency:
+  group: development-db-dump-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build database dump artifacts
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Prepare SQL test environment
+        run: ./.github/scripts/prepare-sql-test-environment.sh "${{ env.WORLD_DB_ARCHIVE }}"
+
+      - name: Export and verify MySQL dumps
+        run: ./.github/scripts/export-and-verify-sql-dumps.sh "${{ github.workspace }}/database-artifacts"
+
+      - name: Install SQLite conversion tools
+        run: |
+          set -euo pipefail
+          sudo apt update
+          sudo apt install -y --no-install-recommends mawk sqlite3
+          git clone --depth 1 "https://github.com/dumblob/mysql2sqlite" "${{ github.workspace }}/mysql2sqlite"
+          chmod +x "${{ github.workspace }}/mysql2sqlite/mysql2sqlite"
+
+      - name: Convert MySQL dumps to SQLite
+        run: |
+          set -euo pipefail
+          workspace="${{ github.workspace }}"
+          converter="$workspace/mysql2sqlite/mysql2sqlite"
+          dump_dir="$workspace/database-artifacts/mysql-dump"
+          sqlite_dir="$workspace/database-artifacts/sqlite-dump"
+
+          mkdir -p "$sqlite_dir"
+          "$converter" "$dump_dir/mangos.sql" | sqlite3 "$sqlite_dir/mangos.sqlite"
+          "$converter" "$dump_dir/logon.sql" | sqlite3 "$sqlite_dir/logon.sqlite"
+          "$converter" "$dump_dir/logs.sql" | sqlite3 "$sqlite_dir/logs.sqlite"
+          "$converter" "$dump_dir/characters.sql" | sqlite3 "$sqlite_dir/characters.sqlite"
+
+      - name: Set archive file suffix
+        id: git_info
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Create database archives
+        run: |
+          set -euo pipefail
+          cd "${{ github.workspace }}/database-artifacts"
+          7z a -tzip db-${{ steps.git_info.outputs.sha_short }}.zip mysql-dump
+          7z a -tzip db-sqlite-${{ steps.git_info.outputs.sha_short }}.zip sqlite-dump
+
+      - name: Upload MySQL dump artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: development-mysql-dump
+          path: "${{ github.workspace }}/database-artifacts/db-${{ steps.git_info.outputs.sha_short }}.zip"
+
+      - name: Upload SQLite dump artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: development-sqlite-dump
+          path: "${{ github.workspace }}/database-artifacts/db-sqlite-${{ steps.git_info.outputs.sha_short }}.zip"
+
+  publish:
+    name: Publish database dump release
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download MySQL dump artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: development-mysql-dump
+          path: release-assets
+
+      - name: Download SQLite dump artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: development-sqlite-dump
+          path: release-assets
+
+      - name: Publish release snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./.github/scripts/publish-moving-release.sh db_latest "Development DB Dump" release-assets

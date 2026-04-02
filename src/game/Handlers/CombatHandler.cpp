@@ -29,15 +29,12 @@
 #include "Player.h"
 #include "Map.h"
 
-void WorldSession::HandleAttackSwingOpcode(WorldPacket& recv_data)
+void WorldSession::HandleAttackSwingOpcode(WorldPackets::Combat::AttackSwing const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
-
-    if (!guid.IsUnit())
+    if (!packet.targetGuid.IsUnit())
         return;
 
-    Unit* pEnemy = _player->GetMap()->GetUnit(guid);
+    Unit* pEnemy = _player->GetMap()->GetUnit(packet.targetGuid);
 
     if (!pEnemy)
     {
@@ -64,7 +61,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recv_data)
     _player->Attack(pEnemy, true);
 }
 
-void WorldSession::HandleAttackStopOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleAttackStopOpcode(NullClientPacket const& /*packet*/)
 {
     GetPlayer()->AttackStop();
 
@@ -80,16 +77,14 @@ void WorldSession::HandleAttackStopOpcode(WorldPacket& /*recv_data*/)
     GetPlayer()->ResetExtraAttacks();
 }
 
-void WorldSession::HandleSetSheathedOpcode(WorldPacket& recv_data)
+void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed const& packet)
 {
-    uint32 sheathed;
-    recv_data >> sheathed;
-    if (sheathed >= MAX_SHEATH_STATE)
+    if (packet.sheathed >= MAX_SHEATH_STATE)
         return;
 
     GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_SHEATHING_CANCELS);
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_SHEATHING_CANCELS);
-    GetPlayer()->SetSheath(SheathState(sheathed));
+    GetPlayer()->SetSheath(SheathState(packet.sheathed));
 }
 
 void WorldSession::SendAttackStop(Unit const* enemy)

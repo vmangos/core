@@ -502,7 +502,7 @@ void Warden::ApplyPenalty(std::string message, WardenActions penalty, std::share
     });
 }
 
-void Warden::HandlePacket(WorldPacket& recvData)
+void Warden::HandlePacket(ByteBuffer recvData)
 {
     // initialize decrypt packet
     DecryptData(const_cast<uint8*>(recvData.contents()), recvData.size());
@@ -658,18 +658,20 @@ void Warden::HandlePacket(WorldPacket& recvData)
 void Warden::Update()
 {
     {
-        std::vector<WorldPacket> packetQueue;
+        std::queue<std::vector<uint8>> packetQueue;
 
         {
-            std::lock_guard<std::mutex> lock(m_packetQueueMutex);
-            std::swap(packetQueue, m_packetQueue);
+            std::lock_guard<std::mutex> lock(m_packetDataQueueMutex);
+            std::swap(packetQueue, m_packetDataQueue);
         }
 
-        for (auto& packet : packetQueue)
+        while (packetQueue.size())
         {
+            std::vector<uint8> packetData = std::move(packetQueue.front());
+            packetQueue.pop();
             try
             {
-                HandlePacket(packet);
+                HandlePacket(ByteBuffer::from(std::move(packetData)));
             }
             catch (ByteBufferException &)
             {
