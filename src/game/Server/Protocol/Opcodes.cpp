@@ -54,8 +54,8 @@ Handlers BuildOpcodeList()
         ref.impl = OpcodeHandlerPacketImplDetails{ \
             /*status*/ (requiredState), \
             /*packetProcessing*/ (schedulingStrategy), \
-            /*readPacket*/ &WorldSession::Handle_GenericRead<get_packet_class<decltype(handlerPtr)>::type>, \
-            /*handler*/ &WorldSession::Handle_GenericPacket<get_packet_class<decltype(handlerPtr)>::type, (handlerPtr)> \
+            /*readPacket*/ static_cast<std::unique_ptr<ClientPacket>(*)(WorldPacket&)>(&WorldSession::Handle_GenericRead<get_packet_class<decltype(handlerPtr)>::type>), \
+            /*handler*/ static_cast<void (WorldSession::*)(const ClientPacket&)>(&WorldSession::Handle_GenericPacket<get_packet_class<decltype(handlerPtr)>::type, (handlerPtr)>) \
         };\
     }
 
@@ -938,7 +938,7 @@ Handlers BuildOpcodeList()
 
 Handlers const handlerList = BuildOpcodeList();
 
-constexpr OpcodeHandler emptyHandler;
+OpcodeHandler emptyHandler;
 
 OpcodeHandler const& LookupOpcodeHandler(uint16 id)
 {
