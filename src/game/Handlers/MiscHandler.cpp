@@ -826,15 +826,20 @@ void WorldSession::HandleUpdateAccountData(WorldPackets::Misc::UpdateAccountData
         return;
     }
 
-    nonstd::optional<std::vector<uint8>> dest = Compression::ZLib::Decompress(packet.compressedData, packet.decompressedSize);
-    if (!dest)
+    nonstd::optional<std::vector<uint8>> uncompressedData = Compression::ZLib::Decompress(
+        packet.compressedData,
+        packet.decompressedSize,
+        Compression::ZLib::ChecksumOption::IgnoreChecksum // client might not provide ADLER32 checksum
+    );
+
+    if (!uncompressedData)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "UAD: Failed to decompress account data");
         return;
     }
 
-    std::string adata(reinterpret_cast<char const*>(dest->data()), dest->size());
-    SetAccountData(dataType, adata);
+    std::string uncompressedString(reinterpret_cast<char const*>(uncompressedData->data()), uncompressedData->size());
+    SetAccountData(dataType, uncompressedString);
 }
 
 void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountData const& packet)

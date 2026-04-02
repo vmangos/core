@@ -9,9 +9,15 @@
 
 namespace Compression { namespace ZLib
 {
+    enum class ChecksumOption
+    {
+        ValidateChecksum,
+        IgnoreChecksum
+    };
+
     /// Decompress `input` into a buffer of `decompressedSize` bytes.
     /// Returns nullopt if decompression fails.
-    nonstd::optional<std::vector<uint8>> Decompress(std::vector<uint8> const& input, uint32 decompressedSize);
+    nonstd::optional<std::vector<uint8>> Decompress(std::vector<uint8> const& input, uint32 decompressedSize, ChecksumOption option = ChecksumOption::ValidateChecksum);
 
     /// Compress `data` using zlib's default compression level.
     /// Returns nullopt if compression fails.
