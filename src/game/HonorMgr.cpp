@@ -183,6 +183,14 @@ void HonorMaintenancer::InactiveDecayRankPoints()
 
 void HonorMaintenancer::SetCityRanks()
 {
+    // A direct transaction is needed to keep the clear-and-reassign sequence
+    // ordered if CharacterDatabase.WorkerThreads is > 1
+    if (!CharacterDatabase.BeginTransaction())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HonorMaintenancer::SetCityRanks: failed to start transaction.");
+        return;
+    }
+
     CharacterDatabase.Execute("UPDATE `characters` SET `extra_flags` = `extra_flags` & ~0x0400");
 
     std::map<uint8, std::pair<uint32, uint32>> highestStandingInRace =
@@ -222,12 +230,16 @@ void HonorMaintenancer::SetCityRanks()
         if (lowGuid > 0)
             CharacterDatabase.PExecute("UPDATE `characters` SET `extra_flags` = `extra_flags` | 0x0400 WHERE `guid` = %u", standing.second.first);
     }
+
+    CharacterDatabase.CommitTransactionDirect();
 }
 
 void HonorMaintenancer::FlushRankPoints()
 {
-    // Imediatly reset honor standing before flushing
-    CharacterDatabase.Execute("UPDATE `characters` SET `honor_standing` = 0 WHERE `honor_standing` > 0");
+    // Use DirectExecute/DirectPExecute so data is committed before the next
+    // maintenance period reads it back (when processing multiple outstanding
+    // periods)
+    CharacterDatabase.DirectExecute("UPDATE `characters` SET `honor_standing` = 0 WHERE `honor_standing` > 0");
 
     for (auto& pair : m_weeklyScores)
     {
@@ -242,7 +254,7 @@ void HonorMaintenancer::FlushRankPoints()
         if (currentRank.visualRank > 0 && (currentRank.visualRank > highestRank.visualRank))
             highestRank = currentRank;
 
-        CharacterDatabase.PExecute("UPDATE `characters` SET `honor_highest_rank` = %u, `honor_rank_points` = %.1f, `honor_standing` = %u, "
+        CharacterDatabase.DirectPExecute("UPDATE `characters` SET `honor_highest_rank` = %u, `honor_rank_points` = %.1f, `honor_standing` = %u, "
             "`honor_last_week_hk` = %u, `honor_stored_hk` = (`honor_stored_hk` + %u), `honor_stored_dk` = (`honor_stored_dk` + %u), `honor_last_week_cp` = %.1f WHERE `guid` = %u",
             highestRank.rank,
             finiteAlways(weeklyScore.newRp), weeklyScore.standing,
@@ -251,7 +263,7 @@ void HonorMaintenancer::FlushRankPoints()
     }
 
     // Not includes weekend day, for correct view in honor tab for group "Yesterday"
-    CharacterDatabase.PExecute("DELETE FROM `character_honor_cp` WHERE `date` < %u", GetWeekEndDay());
+    CharacterDatabase.DirectPExecute("DELETE FROM `character_honor_cp` WHERE `date` < %u", GetWeekEndDay());
 }
 
 void HonorMaintenancer::DoMaintenance()
@@ -259,34 +271,57 @@ void HonorMaintenancer::DoMaintenance()
     if (!m_markerToStart)
         return;
 
-    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Honor maintenance starting.");
-
-    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Load weekly players scores.");
-    LoadWeeklyScores();
-    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Load standing lists.");
-    LoadStandingLists();
-    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Distribute rank points for Alliance.");
-    DistributeRankPoints(ALLIANCE);
-    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Distribute rank points for Horde.");
-    DistributeRankPoints(HORDE);
-    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Decay rank points for inactive players.");
-    InactiveDecayRankPoints();
-
-    if (sWorld.getConfig(CONFIG_BOOL_ENABLE_CITY_PROTECTOR))
+    // Process all outstanding maintenance periods in a single run, so the
+    // server doesn't need multiple restarts to catch up
+    uint32 const totalPeriods = (sWorld.GetGameDay() - m_nextMaintenanceDay) / 7 + 1;
+    uint32 periodsProcessed = 0;
+    while (m_markerToStart)
     {
-        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Assign city titles.");
-        SetCityRanks();
+        ++periodsProcessed;
+
+        // Clear data from any previous iteration
+        m_weeklyScores.clear();
+        m_allianceStandingList.clear();
+        m_hordeStandingList.clear();
+        m_inactiveStandingList.clear();
+
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Honor maintenance starting (period %u/%u).",
+            periodsProcessed, totalPeriods);
+
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Load weekly players scores.");
+        LoadWeeklyScores();
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Load standing lists.");
+        LoadStandingLists();
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Distribute rank points for Alliance.");
+        DistributeRankPoints(ALLIANCE);
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Distribute rank points for Horde.");
+        DistributeRankPoints(HORDE);
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Decay rank points for inactive players.");
+        InactiveDecayRankPoints();
+
+        if (sWorld.getConfig(CONFIG_BOOL_ENABLE_CITY_PROTECTOR))
+        {
+            sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Assign city titles.");
+            SetCityRanks();
+        }
+
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Flush rank points.");
+        FlushRankPoints();
+
+        CreateCalculationReport();
+
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Honor maintenance finished (period %u/%u).", periodsProcessed, totalPeriods);
+
+        ToggleMaintenanceMarker();
+        SetMaintenanceDays(GetNextMaintenanceDay());
+
+        // Check if there are more outstanding periods to process
+        if (sWorld.GetGameDay() >= m_nextMaintenanceDay)
+            ToggleMaintenanceMarker(); // Set marker back to true for next iteration
     }
 
-    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Flush rank points.");
-    FlushRankPoints();
-
-    CreateCalculationReport();
-
-    sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Honor maintenance finished.");
-
-    ToggleMaintenanceMarker();
-    SetMaintenanceDays(GetNextMaintenanceDay());
+    if (periodsProcessed > 1)
+        sLog.Out(LOG_HONOR, LOG_LVL_BASIC, "[MAINTENANCE] Processed %u outstanding honor maintenance periods.", periodsProcessed);
 }
 
 void HonorMaintenancer::CreateCalculationReport()
@@ -595,7 +630,7 @@ void HonorMaintenancer::CheckMaintenanceDay()
 void HonorMaintenancer::ToggleMaintenanceMarker()
 {
     m_markerToStart = !m_markerToStart;
-    CharacterDatabase.PExecute("INSERT INTO `saved_variables` (`key`, `honor_maintenance_marker`) VALUES (0, %u) "
+    CharacterDatabase.DirectPExecute("INSERT INTO `saved_variables` (`key`, `honor_maintenance_marker`) VALUES (0, %u) "
         "ON DUPLICATE KEY UPDATE `honor_maintenance_marker` = %u", m_markerToStart, m_markerToStart);
 }
 
@@ -606,7 +641,7 @@ void HonorMaintenancer::SetMaintenanceDays(uint32 last, uint32 next)
     if (!next)
         m_nextMaintenanceDay = m_lastMaintenanceDay + 7;
 
-    CharacterDatabase.PExecute("INSERT INTO `saved_variables` (`key`, `honor_last_maintenance_day`, `honor_next_maintenance_day`) VALUES (0, %u, %u) "
+    CharacterDatabase.DirectPExecute("INSERT INTO `saved_variables` (`key`, `honor_last_maintenance_day`, `honor_next_maintenance_day`) VALUES (0, %u, %u) "
         "ON DUPLICATE KEY UPDATE `honor_last_maintenance_day` = %u, `honor_next_maintenance_day` = %u",
         m_lastMaintenanceDay, m_nextMaintenanceDay, m_lastMaintenanceDay, m_nextMaintenanceDay);
 }
