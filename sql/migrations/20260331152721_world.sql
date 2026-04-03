@@ -37,7 +37,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (3204, @PTEMPLATE+2, 0, 'Thousand Needles - Group 2 - Gold Vein / Mithril Deposit / Truesilver Deposit', 0);
 
 DELETE FROM `pool_template` WHERE  `entry` = 1132;
-UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=397 AND `patch_min`=0 AND `patch_max`=10;
+UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=397 AND `patch_min`=0 AND `patch_max`=10;
 
 
 -- End of migration.
