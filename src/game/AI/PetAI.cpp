@@ -366,12 +366,14 @@ void PetAI::UpdateAllies()
         return;
 
     //owner is in group; group members filled in already (no raid -> subgroupcount = whole count)
-    if (group && !group->isRaidGroup() && m_AllySet.size() == (group->GetMembersCount() + 2))
+    if (group && !group->isRaidGroup() && m_AllySet.size() == (group->GetMembersCount() + 1))
         return;
 
     m_AllySet.clear();
     m_AllySet.insert(m_creature->GetObjectGuid());
-    if (group)                                             //add group
+    m_AllySet.insert(owner->GetObjectGuid()); // Owner must always be a valid friendly autocast target
+
+    if (group)
     {
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
@@ -385,8 +387,6 @@ void PetAI::UpdateAllies()
             m_AllySet.insert(target->GetObjectGuid());
         }
     }
-    else                                                    //remove group
-        m_AllySet.insert(owner->GetObjectGuid());
 }
 
 void PetAI::KilledUnit(Unit* victim)
@@ -523,7 +523,7 @@ std::pair<Unit*, ePetSelectTargetReason> PetAI::SelectNextTarget() const
     Unit* owner = m_creature->GetCharmerOrOwner();
     if (!owner)
         return std::make_pair(nullptr, PSTR_FAIL_NO_OWNER);
-    
+
     if (Creature const* pOwnerCreature = owner->ToCreature())
     {
         // Owner is creature and is evading. We must not re-aggro.
@@ -552,7 +552,7 @@ std::pair<Unit*, ePetSelectTargetReason> PetAI::SelectNextTarget() const
     {
         if (Unit* pVictim = owner->GetVictim())
         {
-            if (!pVictim->HasAuraPetShouldAvoidBreaking() && 
+            if (!pVictim->HasAuraPetShouldAvoidBreaking() &&
                (!m_creature->GetCharmInfo()->IsAtStay() || m_creature->CanReachWithMeleeAutoAttack(pVictim)))
                 return std::make_pair(pVictim, PSTR_SUCCESS_OWNER_VICTIM);
         }
@@ -727,7 +727,7 @@ bool PetAI::CanAttack(Unit* target)
     // CC - mobs under crowd control can be attacked if owner commanded
     if (target->HasAuraPetShouldAvoidBreaking())
         return m_creature->GetCharmInfo()->IsCommandAttack();
-        
+
     // Returning - pets ignore attacks only if owner clicked follow
     if (m_creature->GetCharmInfo()->IsReturning())
         return !m_creature->GetCharmInfo()->IsCommandFollow();
@@ -801,4 +801,3 @@ void PetAI::AttackedBy(Unit* attacker)
     // Continue to evaluate and attack if necessary
     AttackStart(attacker);
 }
-
