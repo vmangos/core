@@ -561,7 +561,7 @@ void SpellMgr::LoadSpellGroups()
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_group` does not exist", itr->second);
                 mSpellGroupSpell.erase(itr++);
             }
-            // Necessaire pour le fix "Un sort plus puissant est deja actif".
+            // Needed for the fix "A more powerful spell is already active".
             /*else if (GetSpellRank(itr->second) > 1)
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_group` is not first rank of spell", itr->second);
@@ -647,9 +647,9 @@ bool SpellMgr::ListMorePowerfulSpells(uint32 spellId, std::vector<uint32>& list)
     {
         if (itr.second == spellId)
         {
-            // Un sort peut etre dans plusieurs groupes. On s'interesse au groupe 'SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN'
+            // A spell can be in multiple groups. We care about the 'SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN' group
             SpellGroupStackMap::const_iterator found = mSpellGroupStack.find(itr.first);
-            // Ce groupe n'a pas de regle ... Pas d'entree dans 'spell_group_stack_rule' ?
+            // This group has no rule... No entry in 'spell_group_stack_rule'?
             if (found == mSpellGroupStack.end())
                 continue;
             SpellGroupStackRule stackRule = found->second;
@@ -690,9 +690,9 @@ bool SpellMgr::ListLessPowerfulSpells(uint32 spellId, std::vector<uint32>& list)
     {
         if (itr.second == spellId)
         {
-            // Un sort peut etre dans plusieurs groupes. On s'interesse au groupe 'SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN'
+            // A spell can be in multiple groups. We care about the 'SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN' group
             SpellGroupStackMap::const_iterator found = mSpellGroupStack.find(itr.first);
-            // Ce groupe n'a pas de regle ... Pas d'entree dans 'spell_group_stack_rule' ?
+            // This group has no rule... No entry in 'spell_group_stack_rule'?
             if (found == mSpellGroupStack.end())
                 continue;
             SpellGroupStackRule stackRule = found->second;

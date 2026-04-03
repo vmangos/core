@@ -4464,8 +4464,8 @@ void Spell::SendSpellStart()
     if (m_spellInfo->IsRangedSpell())
         castFlags |= CAST_FLAG_AMMO;
 
-    // Youfie <Nostalrius> : Sandtrap : dans le combatlog il n'y a plus de debuff avant l'apparition du Sand trap
-    // Seul truc pas Blizz-like : c'est le joueur qui caste le sort, et pas Kurinaxx ; faudra fix dans le script de Kurinaxx quand le core sera debug pour le supporter
+    // Youfie <Nostalrius> : Sandtrap : no debuff in the combat log before the Sand trap appears
+    // Only non Blizz-like thing: the player casts the spell instead of Kurinaxx; needs to be fixed in the Kurinaxx script when the core supports it
     if (m_spellInfo->Id == 25648)
         castFlags = CAST_FLAG_HIDDEN_COMBATLOG;
 
@@ -5637,7 +5637,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             // TODO: this check can be applied and for player to prevent cheating when IsPositiveSpell will return always correct result.
             // check target for pet/charmed casts (not self targeted), self targeted cast used for area effects and etc
-            // Nostalrius : pas de status positif / negatif pour les sorts de dispel (marche en offensif comme defensif)
+            // Nostalrius : no positive/negative status for dispel spells (works both offensively and defensively)
             if (!explicit_target_mode && m_caster->IsCreature() && m_casterUnit->GetCharmerOrOwnerGuid() && !m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL))
             {
                 // check correctness positive/negative cast target (pet cast real check and cheating check)
@@ -6196,7 +6196,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }
 
-    if (m_spellInfo->IsNonPeriodicDispel() && !m_IsTriggeredSpell) // Buff Abolir le poison non concerne par exemple (Debuff a chaque tic)
+    if (m_spellInfo->IsNonPeriodicDispel() && !m_IsTriggeredSpell) // Abolish Poison buff not concerned for example (debuff on each tick)
     {
         uint32 dispelMask     = 0;
         bool bFoundOneDispell = false;
@@ -6762,8 +6762,8 @@ bool Spell::CanAutoCast(Unit* target)
 
     ObjectGuid targetguid = target->GetObjectGuid();
 
-    // Nostalrius - par exemple roder ne doit pas se declencher si on envoie le pet attaquer.
-    // Sinon le pet revient a cause de cet attribut :
+    // Nostalrius - e.g. prowl should not trigger if we send the pet to attack.
+    // Otherwise the pet returns because of this attribute:
     if (m_spellInfo->HasAttribute(SPELL_ATTR_CANCELS_AUTO_ATTACK_COMBAT) && m_casterUnit->GetVictim())
         return false;
 
@@ -7889,7 +7889,7 @@ SpellCastResult Spell::CanOpenLock(SpellEffectIndex effIndex, uint32 lockId, Ski
 
                 skillId = SkillByLockType(LockType(lockInfo->Index[j]));
 
-                if ((skillId != SKILL_NONE) || (LockType(lockInfo->Index[j]) == LOCKTYPE_BLASTING))    // Ustaag <Nostalrius> : ajout pour prise en compte des charges de Seaforium (item ingenieur)
+                if ((skillId != SKILL_NONE) || (LockType(lockInfo->Index[j]) == LOCKTYPE_BLASTING))    // Ustaag <Nostalrius> : added to account for Seaforium charges (engineering item)
                 {
                     // skill bonus provided by casting spell (mostly item spells)
                     // add the damage modifier from the spell casted (cheat lock / skeleton key etc.) (use m_currentBasePoints, CalculateDamage returns wrong value)

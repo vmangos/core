@@ -287,7 +287,7 @@ struct mob_flesh_hunterAI : public ScriptedAI
             m_creature->SetInCombatWith(who);
             who->SetInCombatWith(m_creature);
 
-            // Poursuite à 25m
+            // Chase at 25m
             m_creature->GetMotionMaster()->MoveCaster(who, 25.0f);
         }
     }

@@ -924,7 +924,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                     break;
                 case OWNER_PERMISSION:
                     //slot_type = LOOT_SLOT_TYPE_OWNER;
-                    slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT; // Sinon pas de loot auto ...
+                    slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT; // Otherwise no auto-loot ...
                     break;
                 default:
                     break;

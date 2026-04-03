@@ -2674,7 +2674,7 @@ bool ChatHandler::HandleEscortAddWpCommand(char *args)
                            creatureEntry, waypointId,
                            finiteAlways(pPlayer->GetPositionX()), finiteAlways(pPlayer->GetPositionY()), finiteAlways(pPlayer->GetPositionZ()),
                            waittime);
-    PSendSysMessage("Point de passage %u ajoute pour la creature %u (attente %u ms)", waypointId, creatureEntry, waittime);
+    PSendSysMessage("Waypoint %u added for creature %u (wait %u ms)", waypointId, creatureEntry, waittime);
     return true;
 }
 

@@ -1779,7 +1779,7 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
         uiHordeCount    = 0;
 
         BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BgQueueTypeId(BattleGroundTypeId(bgTypeId));
-        // Doit etre une référence (&), sinon crash par la suite ...
+        // Must be a reference (&), otherwise crash later on ...
         BattleGroundQueue& queue = sBattleGroundMgr.m_battleGroundQueues[bgQueueTypeId];
         for (const auto& itr : queue.m_queuedPlayers)
         {

@@ -967,8 +967,7 @@ bool Aura::CanProcFrom(SpellEntry const* spell, uint32 EventProcEx, uint32 procE
     // Check EffectClassMask (stored in EffectItemType)
     uint64 mask = sSpellMgr.GetSpellAffectMask(GetId(), GetEffIndex());
 
-    // Nostalrius: c'est la moindre des choses d'utiliser un peu 'spell_proc_event' non ?
-    // [Google translated] Nostalrius: it's the least we can do to use 'spell_proc_event' a little bit, right?
+    // Nostalrius: it's the least we can do to use 'spell_proc_event' a little bit, right?
     if (!mask)
         if (SpellProcEventEntry const* entry = sSpellMgr.GetSpellProcEvent(GetId()))
             mask = entry->spellFamilyMask[GetEffIndex()];

@@ -464,7 +464,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         if (mode == PET_SAVE_AS_CURRENT && !IsAlive())
             mode = PET_SAVE_NOT_IN_SLOT;
 
-        // On recup l'info dans le cache
+        // Retrieve info from the cache
         uint32 ownerLow = GetOwnerGuid().GetCounter();
         m_pTmpCache = sCharacterDatabaseCache.GetCharacterPetCacheByOwnerAndId(ownerLow, m_charmInfo->GetPetNumber());
         bool bInCache = (m_pTmpCache != nullptr);
@@ -511,7 +511,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         }
 
         // save pet
-        // On sauvegarde dans le cache
+        // Save to the cache
         m_pTmpCache->id = m_charmInfo->GetPetNumber();
         m_pTmpCache->ownerGuid = ownerLow;
         m_pTmpCache->entry = GetEntry();
@@ -585,12 +585,12 @@ void Pet::SavePetToDB(PetSaveMode mode)
         savePet.Execute();
 
         CharacterDatabase.CommitTransaction();
-        if (!bInCache) // Nouveau dans le cache.
+        if (!bInCache) // New in the cache.
         {
             sCharacterDatabaseCache.InsertCharacterPet(m_pTmpCache);
             m_pTmpCache = nullptr;
         }
-        // On ne doit pas l'utiliser comme ca.
+        // Do not keep a reference to cache-owned data.
         m_pTmpCache = nullptr;
     }
     else
@@ -1808,7 +1808,7 @@ void Pet::_SaveAuras()
         {
             SpellEntry const* spellInfo = holder->GetSpellProto();
             if (spellInfo->EffectApplyAuraName[j] == SPELL_AURA_MOD_STEALTH ||
-                    spellInfo->EffectApplyAuraName[j] == SPELL_AURA_MOD_POSSESS_PET || // Nostalrius : Fix crash avec "oeil de la bete"
+                    spellInfo->EffectApplyAuraName[j] == SPELL_AURA_MOD_POSSESS_PET || // Nostalrius : Fix crash with "Eyes of the Beast"
                     spellInfo->Effect[j] == SPELL_EFFECT_APPLY_AREA_AURA_PET)
             {
                 save = false;

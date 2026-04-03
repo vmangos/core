@@ -993,7 +993,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
             pGroupTap = pPlayerTap->GetGroup();
     }
 
-    // Nostalrius: Loots desactives / map (retire ici l'XP et les reputs)
+    // Nostalrius: Loot disabled per map (removes XP and reputation here)
     bool allowLoot = !sObjectMgr.IsMapLootDisabled(GetMapId());
     // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
     if (allowLoot && pPlayerTap && pPlayerTap != pVictim)
@@ -1505,7 +1505,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
 
             float reducePercent = frand(low,high);
 
-            // sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "SkillDiff = %i, reducePercent = %f", SkillDiff, reducePercent); // Pour tests & débug via la console
+            // sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "SkillDiff = %i, reducePercent = %f", SkillDiff, reducePercent); // For testing & debugging via the console
 
             damageInfo->cleanDamage += uint32((1.0f - reducePercent) * damageInfo->totalDamage);
             damageInfo->totalDamage = uint32(reducePercent * damageInfo->totalDamage);
@@ -1843,7 +1843,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
     if (spell)
         schoolMask = spell->m_spellSchoolMask;
 
-    // Nostalrius : immune ?
+    // Nostalrius : immune?
     if (IsImmuneToSchoolMask(schoolMask) && !(spellProto && spellProto->HasAttribute(SPELL_ATTR_NO_IMMUNITIES)))
     {
         (*absorb) = damage;
@@ -1855,7 +1855,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
     // Magic damage, check for resists
     bool canResist = (schoolMask & SPELL_SCHOOL_MASK_NORMAL) == 0;
 
-    // NOSTALRIUS: Sorts binaires ne sont pas résistés.
+    // NOSTALRIUS: Binary spells are not resisted.
     if (canResist && spellProto && spellProto->IsBinary())
         canResist = false;
     else if (spellProto && spellProto->AttributesEx4 & SPELL_ATTR_EX4_IGNORE_RESISTANCES)
@@ -2045,7 +2045,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
 
             uint32 splitted = currentAbsorb;
             uint32 splitted_absorb = 0;
-            // Nostalrius : la reflection (bene de sacrifice par exemple) ne fait pas forcement des degats (si pala sous bouclier divin)
+            // Nostalrius : reflection (e.g. blessing of sacrifice) does not necessarily deal damage (if paladin is under divine shield)
             uint32 reflectAbsorb = 0;
             int32 reflectResist = 0;
             // We avoid an infinite loop
@@ -3731,7 +3731,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
             continue;
         }
 
-        if (i_spellProto->HasAura(SPELL_AURA_CHANNEL_DEATH_ITEM)) // Plusieurs demo par exemple peuvent mettre un siphon d'ame.
+        if (i_spellProto->HasAura(SPELL_AURA_CHANNEL_DEATH_ITEM)) // Multiple warlocks can each apply a drain soul for example.
             continue;
 
         SpellSpecific i_spellId_spec = Spells::GetSpellSpecific(i_spellId);
@@ -4725,7 +4725,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     if (!victim || victim == this)
         return false;
 
-    // Nostalrius : verifications de bon sens
+    // Nostalrius : sanity checks
     if (victim->IsDeleted() || IsDeleted())
         return false;
 
@@ -5261,7 +5261,7 @@ bool Unit::CanAttack(Unit const* target, bool force) const
 void Unit::AddGuardian(Pet* pet)
 {
     m_guardianPets.insert(pet->GetObjectGuid());
-    pet->SetWorldMask(GetWorldMask()); // Nostalrius : phasing
+    pet->SetWorldMask(GetWorldMask()); // Nostalrius: phasing
 }
 
 void Unit::RemoveGuardian(Pet* pet)
@@ -7694,7 +7694,7 @@ void Unit::TauntApply(Unit* taunter)
     if (target && target == taunter)
         return;
 
-    // Nostalrius : Correction bug sheep/fear
+    // Nostalrius : Fix sheep/fear bug
     if (!HasAuraType(SPELL_AURA_MOD_FEAR) && !HasAuraType(SPELL_AURA_MOD_CONFUSE))
     {
         SetInFront(taunter);
@@ -7726,7 +7726,7 @@ void Unit::TauntFadeOut(Unit* taunter)
 
     if (m_threatManager.isThreatListEmpty())
     {
-        // Nostalrius - pas d'evade quand on charm quelque chose.
+        // Nostalrius - no evade when charming something.
         if (!GetCharmGuid())
             OnLeaveCombat();
 
@@ -7739,7 +7739,7 @@ void Unit::TauntFadeOut(Unit* taunter)
     m_threatManager.tauntFadeOut(taunter);
     target = m_threatManager.getHostileTarget();
 
-    // Nostalrius : Correction bug sheep/fear
+    // Nostalrius : Fix sheep/fear bug
     if (target && target != taunter && !HasAuraType(SPELL_AURA_MOD_FEAR) && !HasAuraType(SPELL_AURA_MOD_CONFUSE))
     {
         SetInFront(target);
@@ -7811,7 +7811,7 @@ bool Unit::SelectHostileTarget()
 
     if (target)
     {
-        // Nostalrius : Correction bug sheep/fear
+        // Nostalrius : Fix sheep/fear bug
         if (!HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_PENDING_STUNNED | UNIT_STATE_FEIGN_DEATH | UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING) && (!HasAuraType(SPELL_AURA_MOD_FEAR) || HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !HasAuraType(SPELL_AURA_MOD_CONFUSE))
         {
             SetInFront(target);
@@ -7824,7 +7824,7 @@ bool Unit::SelectHostileTarget()
     if (((Creature*)this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
         return false;
 
-    // no target but something prevent go to evade mode // Nostalrius - fix evade quand CM.
+    // no target but something prevent go to evade mode // Nostalrius - fix evade when charmed.
     if (!IsInCombat() || HasAuraType(SPELL_AURA_MOD_TAUNT) || GetCharmerGuid())
         return false;
 
@@ -7902,7 +7902,7 @@ void Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, W
     float mod = 1.0f;
 
     // Some diminishings applies to mobs too (for example, Stun)
-    // Nostalrius: fix DR sur les pets.
+    // Nostalrius: fix DR on pets.
     bool pvp = (IsLikePlayer() && caster->IsLikePlayer());
     if ((Spells::GetDiminishingReturnsGroupType(group) == DRTYPE_PLAYER && pvp) || Spells::GetDiminishingReturnsGroupType(group) == DRTYPE_ALL)
     {

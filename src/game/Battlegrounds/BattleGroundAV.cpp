@@ -1191,9 +1191,9 @@ void BattleGroundAV::PopulateMineNode(uint8 mine, BattleGroundAVTeamIndex teamId
 
     if (actualFactionUpgrade == actualMineOwner)
     {
-        // En cas de defense : l event est déjà spawn -> juste set le mode.
+        // In case of defense: the event is already spawned -> just set the mode.
         SetSpawnEventMode(BG_AV_MINE_EVENT + mine, actualMineOwner + mineDefender * 3, RESPAWN_FORCED);
-        // En cas de prise du flag (destroy node)
+        // In case of flag capture (destroy node)
         SpawnEvent(BG_AV_MINE_EVENT + mine, actualMineOwner + mineDefender * 3, true, true);
     }
     else
@@ -1241,9 +1241,9 @@ void BattleGroundAV::PopulateNode(BG_AV_Nodes node)
     {
         if (m_nodes[node].state == POINT_CONTROLLED)
         {
-            // En cas de defense : l event est déjà spawn -> juste set le mode.
+            // In case of defense: the event is already spawned -> just set the mode.
             SetSpawnEventMode(BG_AV_NODES_MAX + node, newteamIdx * BG_AV_MAX_GRAVETYPES + defenderTypeNew, RESPAWN_FORCED);
-            // En cas de prise du flag (destroy node)
+            // In case of flag capture (destroy node)
             SpawnEvent(BG_AV_NODES_MAX + node, newteamIdx * BG_AV_MAX_GRAVETYPES + defenderTypeNew, true, true);
             delay = 5;
         }
@@ -1661,10 +1661,10 @@ void BattleGroundAV::Reset()
 
 /* Reap <Nostalrius> */
 /*
-Valide une quête de type alterac:
-SetQuestSlotCounter-> Visuel "Complete Quest" dans le journal de quête. (Deco reco disparais il faut donc modifier la fonction pour que sa le modifie dans `character_queststatus`)
-SetQuestStatus-> Validation dans la bdd.
-SendQuestCompleteEvent -> Affiche au joueur que une quête est validée.
+Validates an Alterac-type quest:
+SetQuestSlotCounter -> Visual "Complete Quest" in the quest log. (On disconnect/reconnect it disappears, so the function must be modified to update it in `character_queststatus`)
+SetQuestStatus -> Validation in the DB.
+SendQuestCompleteEvent -> Shows the player that a quest is validated.
 */
 void BattleGroundAV::CompleteQuestForAll(uint32 questId)
 {

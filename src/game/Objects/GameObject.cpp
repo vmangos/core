@@ -347,7 +347,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                 case GAMEOBJECT_TYPE_TRAP:
                 {
                     // Arming Time for GAMEOBJECT_TYPE_TRAP (6)
-                    /* Ivina < Nostalrius > : toujours appliquer le startDelay. Retirer le delai de la DB si jamais un piege n'en a pas. */
+                    /* Ivina < Nostalrius > : always apply the startDelay. Remove the delay from the DB if a trap doesn't have one. */
                     // Unit* owner = GetOwner();
                     // if (owner && ((Player*)owner)->IsInCombat())
                     if (GetGOInfo()->trap.startDelay)
