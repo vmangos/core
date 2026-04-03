@@ -6794,7 +6794,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     // on a ffa realm, ffa is toggled together with pvp flag
     if (sWorld.IsFFAPvPRealm())
         SetFFAPvP(IsPvP() && !IsGameMaster() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING));
-	
+
     if ((zoneEntry->Flags & AREA_FLAG_CAPITAL) && !pvpInfo.inPvPEnforcedArea) // in capital city
         SetRestType(REST_TYPE_IN_CITY);
     else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && GetRestType() != REST_TYPE_IN_TAVERN)
@@ -9812,7 +9812,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, ItemPrototype con
         if (not_loading)
         {
             // World of Warcraft Client Patch 1.6.0 (2005-07-12)
-            // - It will no longer be possible to swap any equipment while stunned. 
+            // - It will no longer be possible to swap any equipment while stunned.
             // May be here should be more stronger checks; STUNNED checked
             // ROOT, CONFUSED, DISTRACTED, FLEEING this needs to be checked.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
@@ -13015,7 +13015,7 @@ void Player::AddQuest(Quest const* pQuest, Object* questGiver)
                 GetMap()->ScriptsStart(sQuestStartScripts, pQuest->GetQuestStartScript(), pQuestGiver->GetObjectGuid(), GetObjectGuid());
 
     }
-    
+
     // remove start item if not need
     if (questGiver && questGiver->IsType(TYPEMASK_ITEM))
     {
@@ -20107,7 +20107,7 @@ uint32 Player::GetBaseWeaponSkillValue(WeaponAttackType attType) const
     return GetSkillValuePure(skill);
 }
 
-void Player::ResurectUsingRequestData()
+void Player::ResurrectUsingRequestData()
 {
     // Teleport before resurrecting by player, otherwise the player might get attacked from creatures near his corpse
     if (m_resurrectData.resurrectorGuid.IsPlayer())

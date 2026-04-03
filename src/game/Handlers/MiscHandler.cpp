@@ -601,25 +601,19 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPackets::Misc::ReclaimCorpse c
 
 void WorldSession::HandleResurrectResponseOpcode(WorldPackets::Misc::ResurrectResponse const& packet)
 {
-    if (!packet.guid) // Cheating attempt
-    {
-        ProcessAnticheatAction("PassiveAnticheat", "Instant resurrect hack detected", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
-        return;
-    }
-
     if (GetPlayer()->IsAlive())
         return;
 
-    if (packet.status == 0)
+    if (!packet.accept)
     {
-        GetPlayer()->ClearResurrectRequestData();           // reject
+        GetPlayer()->ClearResurrectRequestData(); // player denied rezz attempt
         return;
     }
 
-    if (!GetPlayer()->IsRessurectRequestedBy(packet.guid))
+    if (!GetPlayer()->IsRessurectRequestedBy(packet.resurrectorGuid))
         return;
 
-    GetPlayer()->ResurectUsingRequestData();                // will call spawncorpsebones
+    GetPlayer()->ResurrectUsingRequestData();     // will call SpawnCorpseBones
 }
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const& packet)

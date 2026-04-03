@@ -805,7 +805,7 @@ class Player final: public Unit
         void SetPvPDeath(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_PVP_DEATH; else m_ExtraFlags &= ~PLAYER_EXTRA_PVP_DEATH; }
         bool IsGMVisible() const { return !(m_ExtraFlags & PLAYER_EXTRA_GM_INVISIBLE); }
         void SetGMVisible(bool on, bool notify = false);
-        
+
         void SetCheatFly(bool on, bool notify = false);
         void SetCheatFixedZ(bool on, bool notify = false);
         void SetCheatBeastmaster(bool on, bool notify = false);
@@ -1245,7 +1245,7 @@ class Player final: public Unit
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
         /*********************************************************/
-        
+
     private:
         void _SaveAuras();
         void _SaveInventory();
@@ -1309,7 +1309,7 @@ class Player final: public Unit
         void UnsummonPetTemporaryIfAny();
         void ResummonPetTemporaryUnSummonedIfAny();
         bool IsPetNeedBeTemporaryUnsummoned() const;
-        
+
         /*********************************************************/
         /***                   SPELL SYSTEM                    ***/
         /*********************************************************/
@@ -1828,7 +1828,7 @@ class Player final: public Unit
         /***              ENVIRONMENTAL SYSTEM                 ***/
         /*********************************************************/
 
-    protected: 
+    protected:
         uint8 m_environmentFlags = ENVIRONMENT_FLAG_NONE;
         float m_environmentBreathingMultiplier = 1.0f;
         MirrorTimer m_mirrorTimers[MirrorTimer::NUM_TIMERS] = { MirrorTimer::FATIGUE, MirrorTimer::BREATH, MirrorTimer::FEIGNDEATH, MirrorTimer::ENVIRONMENTAL };
@@ -1897,7 +1897,7 @@ class Player final: public Unit
         /*********************************************************/
         /***                    TAXI SYSTEM                    ***/
         /*********************************************************/
-        
+
     private:
         PlayerTaxi m_taxi;
     public:
@@ -2062,10 +2062,10 @@ class Player final: public Unit
             m_resurrectData.mana = mana;
         }
         void ClearResurrectRequestData() { SetResurrectRequestData(ObjectGuid(), 0, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0); }
-        bool IsRessurectRequestedBy(ObjectGuid guid) const { return m_resurrectData.resurrectorGuid == guid; }
+        bool IsRessurectRequestedBy(ObjectGuid guid) const { return !m_resurrectData.resurrectorGuid.IsEmpty() && m_resurrectData.resurrectorGuid == guid; }
         bool IsRessurectRequested() const { return !m_resurrectData.resurrectorGuid.IsEmpty(); }
         ObjectGuid const& GetResurrector() const { return m_resurrectData.resurrectorGuid; }
-        void ResurectUsingRequestData();
+        void ResurrectUsingRequestData();
 
         static bool IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player const* player);
         void RefreshBitsForVisibleUnits(UpdateMask* mask, uint32 objectTypeMask = TYPEMASK_UNIT);
@@ -2390,7 +2390,7 @@ class Player final: public Unit
     public:
         void SendTransferAborted(uint8 reason) const;
         void SendInstanceResetWarning(uint32 mapId, uint32 resetTime) const;
-        
+
         void ResetInstances(InstanceResetMethod method);
         void ResetPersonalInstanceOnLeaveDungeon(uint32 mapId);
         void SendResetInstanceSuccess(uint32 MapId) const;

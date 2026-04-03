@@ -35,6 +35,7 @@ class NullClientPacket final : public ClientPacket
 {
 public:
     NullClientPacket() : ClientPacket(OPCODE_WILL_BE_SET_IN_READ_FUNCTION) {}
+    explicit NullClientPacket(uint16 opcode) : ClientPacket(opcode) {}
 
     void ReadFromWorldPacket(WorldPacket& recv_data) override
     {
