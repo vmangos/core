@@ -55,8 +55,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (4045, @PTEMPLATE+4, 0, 'Searing Gorge - Group 4 - Truesilver Deposit / Small Thorium Vein / Dark Iron Deposit', 0);
 
 DELETE FROM `pool_template` WHERE  `entry` = 4350;
-UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=333 AND `patch_min`=0 AND `patch_max`=10;
-UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=331 AND `patch_min`=0 AND `patch_max`=10;
+UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=333 AND `patch_min`=0 AND `patch_max`=10;
+UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=331 AND `patch_min`=0 AND `patch_max`=10;
 
 -- End of migration.
 END IF;
