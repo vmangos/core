@@ -67,6 +67,10 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 DELETE FROM `pool_template` WHERE  `entry` = 1279;
 UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=8112 AND `patch_min`=0 AND `patch_max`=10;
+DELETE FROM `gameobject` WHERE `guid` IN (2627, 2628, 2629);
+DELETE FROM `pool_gameobject` WHERE `pool_entry` = 1347;
+DELETE FROM `pool_pool` WHERE `pool_id` = 1347;
+DELETE FROM `pool_template` WHERE `entry` = 1347;
 
 -- End of migration.
 END IF;
