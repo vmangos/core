@@ -41,6 +41,7 @@
 #include "Language.h"
 #include "Chat.h"
 #include "MasterPlayer.h"
+#include "PlayerBroadcaster.h"
 #include "Crypto/Hash/MD5.h"
 
 // select opcodes appropriate for processing in Map::Update context for current session state

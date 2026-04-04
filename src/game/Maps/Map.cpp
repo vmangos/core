@@ -435,7 +435,9 @@ bool Map::Add(Player* player)
     if (!player->GetSession()->PlayerLoading())
         player->GetSession()->ClearIncomingPacketsByType(PACKET_PROCESS_MOVEMENT);
 
-    player->m_broadcaster->SetInstanceId(GetInstanceId());
+    if (player->m_broadcaster)
+        player->m_broadcaster->SetInstanceId(GetInstanceId());
+
     return true;
 }
 
@@ -444,7 +446,8 @@ void Map::ExistingPlayerLogin(Player* player)
     // Reset visibility list
     for (ObjectGuidSet::const_iterator it = player->m_visibleGUIDs.begin(); it != player->m_visibleGUIDs.end(); ++it)
         if (Player* other = GetPlayer(*it))
-            other->m_broadcaster->RemoveListener(player);
+            if (other->m_broadcaster)
+                other->m_broadcaster->RemoveListener(player);
     player->m_visibleGUIDs.clear();
 
     SendInitTransports(player);
@@ -1306,7 +1309,8 @@ void Map::Remove(Player* player, bool remove)
 
     for (ObjectGuidSet::const_iterator it = player->m_visibleGUIDs.begin(); it != player->m_visibleGUIDs.end(); ++it)
         if (Player* other = GetPlayer(*it))
-            other->m_broadcaster->RemoveListener(player);
+            if (other->m_broadcaster)
+                other->m_broadcaster->RemoveListener(player);
 
     player->ResetMap();
     if (remove)
