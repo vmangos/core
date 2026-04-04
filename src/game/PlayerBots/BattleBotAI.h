@@ -45,7 +45,7 @@ public:
     {
         return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o);
     }
-  
+
     void OnPlayerLogin() final;
     void UpdateAI(uint32 const diff) final;
     void OnPacketReceived(WorldPacket const* packet) final;
@@ -67,7 +67,8 @@ public:
     void OnLeaveBattleGround();
 
     void UpdateFlagCarrierAI();
-    void UpdateBattleGroundAI();
+    bool UpdateBattleGroundAI();
+    bool TryUseBattleGroundFlag(uint32 entry);
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;
     void UpdateInCombatAI_Paladin() final;
