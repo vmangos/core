@@ -313,6 +313,10 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`, `patch`, `RewOnKillRepF
 INSERT INTO `creature_onkill_reputation` (`creature_id`, `patch`, `RewOnKillRepFaction1`, `MaxStanding1`, `IsTeamAward1`, `RewOnKillRepValue1`, `TeamDependent`) VALUES
 (13698, 0, 609, 7, 0, -250, 0);
 
+-- Rep gain for Ratchet Bruiser (3502)
+-- -125 with Ratchet (470) ; Count: 1
+INSERT INTO `creature_onkill_reputation` (`creature_id`, `patch`, `RewOnKillRepFaction1`, `MaxStanding1`, `IsTeamAward1`, `RewOnKillRepValue1`, `TeamDependent`) VALUES
+(3502, 0, 470, 7, 0, -125, 0);
 
 -- End of migration.
 END IF;
