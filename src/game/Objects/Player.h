@@ -2171,7 +2171,7 @@ class Player final: public Unit
         ReputationRank GetReputationRank(uint32 faction_id) const;
         void RewardReputation(Unit const* pVictim, float rate);
         void RewardReputation(Quest const* pQuest);
-        int32 CalculateReputationGain(ReputationSource source, int32 rep, int32 faction, uint32 creatureOrQuestLevel = 0, bool noAuraBonus = false);
+        int32 CalculateReputationGain(ReputationSource source, int32 rep, int32 faction, uint32 creatureOrQuestLevel = 0);
         void SetTemporaryAtWarWithFaction(uint32 factionId) { m_temporaryAtWarFactions.insert(factionId); }
         void ClearTemporaryWarWithFactions();
 
