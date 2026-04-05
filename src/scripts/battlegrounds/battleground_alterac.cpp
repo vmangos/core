@@ -39,7 +39,7 @@ enum
     SAY_VANNDAR_FIGHT6    = 8843
 };
 
-uint16 const vandar_fight_texts[] = { SAY_VANNDAR_FIGHT1 , SAY_VANNDAR_FIGHT2, SAY_VANNDAR_FIGHT3, SAY_VANNDAR_FIGHT4, SAY_VANNDAR_FIGHT5,  SAY_VANNDAR_FIGHT6 };
+static uint16 const vandar_fight_texts[] = { SAY_VANNDAR_FIGHT1 , SAY_VANNDAR_FIGHT2, SAY_VANNDAR_FIGHT3, SAY_VANNDAR_FIGHT4, SAY_VANNDAR_FIGHT5,  SAY_VANNDAR_FIGHT6 };
 
 #define POSITION_VANNDAR_CENTER_X        722.4f
 #define POSITION_VANNDAR_CENTER_Y        -11.0f
@@ -68,7 +68,7 @@ class npc_alterac_bossHelper
             std::list<Creature*> creaturesLinked;
             for (uint32 entry : m_linkedEntries)
                 GetCreatureListWithEntryInGrid(creaturesLinked, me, entry, 100.0f);
-            for (const auto& it : creaturesLinked)
+            for (auto const& it : creaturesLinked)
                 if (it->IsAlive() && !it->IsInCombat())
                 {
                     ThreatListCopier* c = new ThreatListCopier(it);
@@ -285,40 +285,13 @@ enum
     SAY_DREKTHAR_FIGHT6    = 8849
 };
 
-uint16 const drekthar_fight_texts[] = { SAY_DREKTHAR_FIGHT1, SAY_DREKTHAR_FIGHT2, SAY_DREKTHAR_FIGHT3, SAY_DREKTHAR_FIGHT4, SAY_DREKTHAR_FIGHT5, SAY_DREKTHAR_FIGHT6 };
+static uint16 const drekthar_fight_texts[] = { SAY_DREKTHAR_FIGHT1, SAY_DREKTHAR_FIGHT2, SAY_DREKTHAR_FIGHT3, SAY_DREKTHAR_FIGHT4, SAY_DREKTHAR_FIGHT5, SAY_DREKTHAR_FIGHT6 };
 
 #define    POSITION_DKT_CENTER_X         -1370.9f
 #define    POSITION_DKT_CENTER_Y          -219.8f
 
 // Duros 12121 Drakan 12122
-
-/*
-
-8269 +118 +60% 2min
-8599 +60 +30% 2 min
-12795 +60 +30%
-15061 non
-15097 non
-15716 non
-
-18501 non
-19516 +0 +9%
-19953 +500 +50% 10 sec
-23537 +240 +50%
-24318 +50% +65% 2 min
-effet 1 = mod damage done
-effet 2 = mod spaad
-25503 ours
-26527 +250 +75% 2 min
-27897 explo arc
-28131 +25% +40% 5 min
-28468 +150%
-28747 +100% +50% 10 min
-28798 +150% +75% 30 min
-
-Correct : damage + 167%, speed 50%
-*/
-/* Il doit repop les 2 chiens quand il est reset */
+// He needs to respawn both dogs when he resets.
 
 struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 {
@@ -364,13 +337,13 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
         std::list<Creature*> m_Wolf;
         GetCreatureListWithEntryInGrid(m_Wolf, m_creature, 12121, 100.0f);
-        for (const auto& it : m_Wolf)
+        for (auto const& it : m_Wolf)
             if (!it->IsAlive())
                 it->Respawn();
         m_Wolf.clear();
 
         GetCreatureListWithEntryInGrid(m_Wolf, m_creature, 12122, 100.0f);
-        for (const auto& it : m_Wolf)
+        for (auto const& it : m_Wolf)
             if (!it->IsAlive())
                 it->Respawn();
         m_Wolf.clear();
@@ -568,10 +541,7 @@ struct npc_BalindaAI : public ScriptedAI
         Reset();
     }
 
-    // ScriptedInstance* m_pInstance; // remplacer par BG?
-
     uint32 m_uiGlobalCooldown;
-
     uint32 m_uiFireball_Timer;
     uint32 m_uiFrostbolt_Timer;
     uint32 m_uiConeOfCold_Timer;
@@ -584,7 +554,6 @@ struct npc_BalindaAI : public ScriptedAI
     void Reset() override
     {
         m_uiGlobalCooldown = 0;
-
         m_uiFireball_Timer = 0;
         m_uiFrostbolt_Timer = 0;
         m_uiConeOfCold_Timer = 1500;
@@ -670,7 +639,7 @@ struct npc_BalindaAI : public ScriptedAI
             {
                 uint32 uiTargetInRangeCount = 0;
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                for (const auto i : tList)
+                for (auto const i : tList)
                 {
                     if (m_creature->IsWithinDistInMap(i->getTarget(), 6.0f))
                         uiTargetInRangeCount++;
@@ -805,7 +774,6 @@ struct npc_GalvangarAI : public ScriptedAI
     }
 
     uint32 m_uiGlobalCooldown;
-
     uint32 m_uiWhirlwind_Timer;
     uint32 m_uiMortalStrike_Timer;
     uint32 m_uiCleave_Timer;
@@ -912,7 +880,7 @@ struct npc_GalvangarAI : public ScriptedAI
             {
                 uint32 uiTargetInRangeCount = 0;
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                for (const auto i : tList)
+                for (auto const i : tList)
                 {
                     if (m_creature->IsWithinDistInMap(i->getTarget(), 6.0f))
                         uiTargetInRangeCount++;
@@ -1006,11 +974,9 @@ struct npc_WarMasterAI : public ScriptedAI
 {
     npc_WarMasterAI(Creature* pCreature) : ScriptedAI(pCreature), m_isKilled(false)
     {
-        // m_pInstance = (ScriptedInstance*)m_creature->GetInstanceData();
         Reset();
     }
 
-    // ScriptedInstance* m_pInstance; // remplacer par BG?
     uint32 m_uiGlobalCooldown;
     uint32 m_uiCharge_Timer;
     uint32 m_uiCleave_Timer;
@@ -1257,61 +1223,11 @@ struct npc_AlteracBowmanAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-    void GetAIInformation(ChatHandler& reader) override
-    {
-        reader.PSendSysMessage("npc_AlteracBowmanAI::GetAIInformation");
-        reader.PSendSysMessage("victim: %s", m_creature->GetVictim() ? m_creature->GetVictim()->GetName() : "nullptr");
-        reader.PSendSysMessage("evade_mode: %u", m_creature->IsInEvadeMode());
-        ScriptedAI::GetAIInformation(reader);
-    }
 };
 
 CreatureAI* GetAI_npc_AlteracBowman(Creature* m_creature)
 {
     return new npc_AlteracBowmanAI(m_creature);
-}
-
-/*######
-## npc_AlteracDardosh
-######*/
-
-struct npc_AlteracDardoshAI : public ScriptedAI
-{
-    npc_AlteracDardoshAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        // m_pInstance = (ScriptedInstance*)m_creature->GetInstanceData();
-        Reset();
-    }
-
-    // ScriptedInstance* m_pInstance; // remplacer par BG?
-    uint32 m_uiCleave_Timer;
-
-    void Reset() override
-    {
-        m_uiCleave_Timer = 1000;
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (m_uiCleave_Timer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
-                m_uiCleave_Timer = 3000;
-        }
-        else
-            m_uiCleave_Timer -= diff;
-
-        DoMeleeAttackIfReady();
-
-    }
-};
-
-CreatureAI* GetAI_npc_AlteracDardosh(Creature* m_creature)
-{
-    return new npc_AlteracDardoshAI(m_creature);
 }
 
 /*********************************************
@@ -1420,18 +1336,15 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
 {
     AV_NpcEventTroopsAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
-        isLeaderDead    = false;
-        leaderDie_Timer = 600000;//600000;
-        isAggro         = false;
-        isOnHisOwn      = false;
+        m_isLeaderDead    = false;
+        m_leaderDieTimer = 600000;
+        m_isOnHisOwn      = false;
         Reset();
     }
 
-    bool   isAggro;
-    bool   isOnHisOwn;
-    bool   isLeaderDead;
-    uint32 Point;
-    uint32 leaderDie_Timer;
+    bool   m_isOnHisOwn;
+    bool   m_isLeaderDead;
+    uint32 m_leaderDieTimer;
 
     void Reset() override
     {
@@ -1439,9 +1352,9 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
         if (m_creature->GetEntry() == AV_NPC_RAMRIDER)
             m_creature->Mount(2786);
         else if (m_creature->GetEntry() == AV_NPC_WOLFRIDER)
-            m_creature->Mount(10278);
+            m_creature->Mount(1166);
 
-        if (m_creature->GetRespawnDelay() == 432000  && !isOnHisOwn)
+        if (m_creature->GetRespawnDelay() == 432000  && !m_isOnHisOwn)
         {
             if (AV_NpcEventTroopsAI* pEscortAI = dynamic_cast<AV_NpcEventTroopsAI*>(m_creature->AI()))
             {
@@ -1449,11 +1362,11 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
                 {
                     pEscortAI->Start(true, 0, nullptr, false);
                     pEscortAI->setCurrentWP(getCurrentWP());
-                    isOnHisOwn = true;
+                    m_isOnHisOwn = true;
                 }
             }
         }
-        else if (isOnHisOwn)
+        else if (m_isOnHisOwn)
             SetEscortPaused(false);
 
     }
@@ -1466,7 +1379,6 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
             m_creature->Unmount();
 
         /** Stop escort AI once aggro is detected */
-        isAggro = true;
         SetEscortPaused(true);
     }
 
@@ -1476,30 +1388,30 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
 
     void UpdateEscortAI(uint32 const uiDiff) override
     {
-        uint32 commander_id = 0;
+        uint32 commanderId = 0;
 
         if (m_creature->GetEntry() == AV_NPC_WOLFRIDER)
-            commander_id = AV_NPC_WOLFRIDER_CMD;
+            commanderId = AV_NPC_WOLFRIDER_CMD;
         else if (m_creature->GetEntry() == AV_NPC_RAMRIDER)
-            commander_id = AV_NPC_RAMRIDER_CMD;
+            commanderId = AV_NPC_RAMRIDER_CMD;
 
-        if (!isLeaderDead && commander_id != 0)
+        if (!m_isLeaderDead && commanderId != 0)
         {
             std::list<Creature*> m_RamRiderList;
-            GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, commander_id, 200.0f);
-            for (const auto& it : m_RamRiderList)
+            GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, commanderId, 200.0f);
+            for (auto const& it : m_RamRiderList)
                 if (it->IsDead())
-                    isLeaderDead = true;
+                    m_isLeaderDead = true;
             m_RamRiderList.clear();
         }
-        else if (isLeaderDead)
+        else if (m_isLeaderDead)
         {
-            if (leaderDie_Timer < uiDiff)
+            if (m_leaderDieTimer < uiDiff)
             {
                 m_creature->DisappearAndDie();
             }
             else
-                leaderDie_Timer -= uiDiff;
+                m_leaderDieTimer -= uiDiff;
         }
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -1591,41 +1503,37 @@ struct AV_NpcEventAI : public npc_escortAI
 
     uint32 m_uiTransform_Timer;
     uint32 m_uiDisappear_Timer;
-    bool   b_isTransformed;
-    bool   b_isCavalrySpawned;
-    bool   b_isNPCMovedToChannelingPointWB;
-    bool   b_isNPCStartedMovingToChannelingPointWB;
-    uint32 m_faction_id;
-    bool   b_isTroopsSpawned;
-    bool   isAggro;
-    bool   isGobSummoned;
-    bool   b_isDead;
-    bool   b_isSpeechDone;
-    uint32 Event_Timer;
-    uint32 Point;
-    bool    m_bWarRiderSummoned;
+    bool   m_isTransformed;
+    bool   m_isCavalrySpawned;
+    bool   m_isNPCMovedToChannelingPointWB;
+    bool   m_isNPCStartedMovingToChannelingPointWB;
+    uint32 m_factionId;
+    bool   m_troopsSpawned;
+    bool   m_aggro;
+    bool   m_gobSummoned;
+    bool   m_isDead;
+    bool   m_speechDone;
+    uint32 m_eventTimer;
+    uint32 m_point;
+    bool   m_bWarRiderSummoned;
     uint32 m_uiDespawn_Timer;
-    float  av_x;
-    float  av_y;
-    float  av_z;
+    Position m_spawnPoint;
 
     AV_NpcEventAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
         m_bRenferalBoss                         = false;
         m_bThurlogaBoss                         = false;
-        b_isSpeechDone                          = false;
-        isAggro                                 = false;
-        isGobSummoned                           = false;
-        b_isNPCMovedToChannelingPointWB         = false;
-        b_isNPCStartedMovingToChannelingPointWB = false;
+        m_speechDone                            = false;
+        m_aggro                                 = false;
+        m_gobSummoned                           = false;
+        m_isNPCMovedToChannelingPointWB         = false;
+        m_isNPCStartedMovingToChannelingPointWB = false;
         m_bWarRiderSummoned = false;
-        Event_Timer = 0;
-        Point = 0;
+        m_eventTimer = 0;
+        m_point = 0;
         m_uiDespawn_Timer = 0;
-        b_isDead = false;
-        av_x = m_creature->GetPositionX();
-        av_y = m_creature->GetPositionY();
-        av_z = m_creature->GetPositionZ();
+        m_isDead = false;
+        m_spawnPoint = m_creature->GetPosition();
 
         /** Re initialize escort state */
         //SetEscortPaused(false);
@@ -1641,78 +1549,78 @@ struct AV_NpcEventAI : public npc_escortAI
             {
                 if (bg->getPlayerGoStatus(BG_TEAM_HORDE, BG_AV_GROUND_ASSAULT) && creature_entry == AV_NPC_QUARTERMASTER)
                 {
-                    if (!b_isTroopsSpawned)
+                    if (!m_troopsSpawned)
                     {
-                        b_isTroopsSpawned = true;
+                        m_troopsSpawned = true;
                         bg->setPlayerGoStatus(BG_TEAM_HORDE, BG_AV_GROUND_ASSAULT, false);
                         m_creature->SummonCreature(AV_NPC_WARMASTER_CMD,
                                                    -470.38f, -51.84f, 41, 5.93f, TEMPSUMMON_CORPSE_DESPAWN, 10000);
 
-                        uint32 m_uiRessourcesLevel = bg->getReinforcementLevelGroundUnit(BG_TEAM_HORDE);
-                        uint32 m_uiTroopsType;
-                        switch (m_uiRessourcesLevel)
+                        uint32 ressourcesLevel = bg->getReinforcementLevelGroundUnit(BG_TEAM_HORDE);
+                        uint32 troopsType;
+                        switch (ressourcesLevel)
                         {
                             case AV_NPC_BASIC:
-                                m_uiTroopsType = AV_NPC_FROSTWOLF_REAVER;
+                                troopsType = AV_NPC_FROSTWOLF_REAVER;
                                 break;
                             case AV_NPC_SEASONED:
-                                m_uiTroopsType = AV_NPC_SEASONED_REAVER;
+                                troopsType = AV_NPC_SEASONED_REAVER;
                                 break;
                             case AV_NPC_VETERAN:
-                                m_uiTroopsType = AV_NPC_VETERAN_REAVER;
+                                troopsType = AV_NPC_VETERAN_REAVER;
                                 break;
                             case AV_NPC_CHAMPION:
-                                m_uiTroopsType = AV_NPC_CHAMPION_REAVER;
+                                troopsType = AV_NPC_CHAMPION_REAVER;
                                 break;
                             default:
-                                m_uiTroopsType = AV_NPC_FROSTWOLF_REAVER;
+                                troopsType = AV_NPC_FROSTWOLF_REAVER;
                                 break;
                         }
 
                         /** Formula to spawn corresponding NPC */
-                        float m_uiX = -472.2f;
-                        float m_uiY = -48.4f;
-                        float m_uiO = 5.93f;
-                        int32 m_uiCoeff = 0;
+                        float x = -472.2f;
+                        float y = -48.4f;
+                        float o = 5.93f;
+                        int32 coeff = 0;
                         for (int i = 0; i < 10; i++)
                         {
                             if (i == 5)
                             {
-                                m_uiX = -474.8f;
-                                m_uiY = -48.7f;
-                                m_uiCoeff = 0;
+                                x = -474.8f;
+                                y = -48.7f;
+                                coeff = 0;
                             }
-                            m_creature->SummonCreature(m_uiTroopsType,
-                                                       m_uiX - 0.4f * m_uiCoeff,
-                                                       m_uiY - 1.6f * m_uiCoeff,
+                            m_creature->SummonCreature(troopsType,
+                                                       x - 0.4f * coeff,
+                                                       y - 1.6f * coeff,
                                                        41.3f,
-                                                       m_uiO,
+                                                       o,
                                                        TEMPSUMMON_CORPSE_DESPAWN, 10000);
-                            m_uiCoeff = m_uiCoeff + 1;
+                            coeff = coeff + 1;
                         }
                     }
                 }
                 else if (bg->getPlayerGoStatus(BG_TEAM_ALLIANCE, BG_AV_GROUND_ASSAULT) && creature_entry == AV_NPC_QUARTERMASTER_A)
                 {
-                    if (!b_isTroopsSpawned)
+                    if (!m_troopsSpawned)
                     {
-                        b_isTroopsSpawned = true;
+                        m_troopsSpawned = true;
                         bg->setPlayerGoStatus(BG_TEAM_ALLIANCE, BG_AV_GROUND_ASSAULT, false);
                         m_creature->SummonCreature(AV_NPC_MARSHAL_TERAVAINE,
                                                    -243.75f, -431.32f, 20, 2.59f, TEMPSUMMON_CORPSE_DESPAWN, 10000);
 
-                        uint32 m_uiRessourcesLevel = bg->getReinforcementLevelGroundUnit(BG_TEAM_ALLIANCE);
-                        uint32 m_uiTroopsType = AV_NPC_STORMPIKE_COMMANDO;
-                        switch (m_uiRessourcesLevel)
+                        uint32 ressourcesLevel = bg->getReinforcementLevelGroundUnit(BG_TEAM_ALLIANCE);
+                        uint32 troopsType = AV_NPC_STORMPIKE_COMMANDO;
+                        switch (ressourcesLevel)
                         {
                             case AV_NPC_SEASONED:
-                                m_uiTroopsType = AV_NPC_SEASONED_COMMANDO;
+                                troopsType = AV_NPC_SEASONED_COMMANDO;
                                 break;
                             case AV_NPC_VETERAN:
-                                m_uiTroopsType = AV_NPC_VETERAN_COMMANDO;
+                                troopsType = AV_NPC_VETERAN_COMMANDO;
                                 break;
                             case AV_NPC_CHAMPION:
-                                m_uiTroopsType = AV_NPC_CHAMPION_COMMANDO;
+                                troopsType = AV_NPC_CHAMPION_COMMANDO;
                                 break;
                         }
 
@@ -1728,7 +1636,7 @@ struct AV_NpcEventAI : public npc_escortAI
                                 y = -432.42f;
                             }
 
-                            m_creature->SummonCreature(m_uiTroopsType,
+                            m_creature->SummonCreature(troopsType,
                                                        x - i % 5,
                                                        y - i % 5,
                                                        20.2f,
@@ -1749,9 +1657,9 @@ struct AV_NpcEventAI : public npc_escortAI
             {
                 if (bg->getPlayerGoStatus(BG_TEAM_HORDE, BG_AV_CAVALRY_ASSAULT) && creature_entry == AV_NPC_WOLFRIDER_CMD)
                 {
-                    if (!b_isCavalrySpawned)
+                    if (!m_isCavalrySpawned)
                     {
-                        b_isCavalrySpawned = true;
+                        m_isCavalrySpawned = true;
                         bg->setPlayerGoStatus(BG_TEAM_HORDE, BG_AV_CAVALRY_ASSAULT, false);
 
                         /** Formula to spawn corresponding NPC */
@@ -1777,9 +1685,9 @@ struct AV_NpcEventAI : public npc_escortAI
                 }
                 if (bg->getPlayerGoStatus(BG_TEAM_ALLIANCE, BG_AV_CAVALRY_ASSAULT) && creature_entry == AV_NPC_RAMRIDER_CMD)
                 {
-                    if (!b_isCavalrySpawned)
+                    if (!m_isCavalrySpawned)
                     {
-                        b_isCavalrySpawned = true;
+                        m_isCavalrySpawned = true;
                         bg->setPlayerGoStatus(BG_TEAM_ALLIANCE, BG_AV_CAVALRY_ASSAULT, false);
 
                         /** Formula to spawn corresponding NPC */
@@ -1823,10 +1731,10 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     if (m_uiTransform_Timer < uiDiff)
                     {
-                        if (!b_isTransformed)
+                        if (!m_isTransformed)
                         {
                             m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                            b_isTransformed = true;
+                            m_isTransformed = true;
 
                             m_creature->SetDisplayId(WAR_RIDER_DISPLAY_ID);
                             if (creature_entry == AV_NPC_ENTRY_GUSE ||
@@ -1850,7 +1758,7 @@ struct AV_NpcEventAI : public npc_escortAI
                     else
                         m_uiTransform_Timer -= uiDiff;
 
-                    if (b_isTransformed)
+                    if (m_isTransformed)
                     {
                         if (m_uiDisappear_Timer < uiDiff)
                         {
@@ -1893,17 +1801,17 @@ struct AV_NpcEventAI : public npc_escortAI
 
     void JustRespawned() override
     {
-        b_isSpeechDone = false;
-        isGobSummoned = false;
+        m_speechDone = false;
+        m_gobSummoned = false;
         m_bThurlogaBoss = false;
         m_bRenferalBoss = false;
-        b_isDead = false;
-        isAggro = false;
-        Point = 0;
+        m_isDead = false;
+        m_aggro = false;
+        m_point = 0;
 
-        DoTeleportTo(av_x, av_y, av_z);
-        m_creature->SetHomePosition(av_x, av_y, av_z, 0.0f);
-        m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, av_x, av_y, av_z);
+        m_creature->NearTeleportTo(m_spawnPoint);
+        m_creature->SetHomePosition(m_spawnPoint.x, m_spawnPoint.y, m_spawnPoint.z, m_spawnPoint.o);
+        m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, m_spawnPoint.x, m_spawnPoint.y, m_spawnPoint.z);
 
         npc_escortAI::Stop();
         npc_escortAI::JustRespawned();
@@ -1913,7 +1821,7 @@ struct AV_NpcEventAI : public npc_escortAI
         {
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 1000.0f);
-            for (const auto& it : m_RamRiderList)
+            for (auto const& it : m_RamRiderList)
             {
                 it->Unmount();
                 it->Respawn();
@@ -1925,7 +1833,7 @@ struct AV_NpcEventAI : public npc_escortAI
         {
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 1000.0f);
-            for (const auto& it : m_RamRiderList)
+            for (auto const& it : m_RamRiderList)
             {
                 it->Unmount();
                 it->Respawn();
@@ -1935,10 +1843,10 @@ struct AV_NpcEventAI : public npc_escortAI
         else if (m_creature->GetEntry() == AV_NPC_WOLFRIDER_CMD)
         {
             Stop();
-            b_isCavalrySpawned = false;
+            m_isCavalrySpawned = false;
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_WOLFRIDER, 1000.0f);
-            for (const auto& it : m_RamRiderList)
+            for (auto const& it : m_RamRiderList)
             {
                 it->DisappearAndDie();
             }
@@ -1949,7 +1857,7 @@ struct AV_NpcEventAI : public npc_escortAI
             Stop();
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_WOLFRIDER, 1000.0f);
-            for (const auto& it : m_RamRiderList)
+            for (auto const& it : m_RamRiderList)
             {
                 it->SetRespawnDelay(5 * DAY);
                 it->SetDeathState(JUST_DIED);
@@ -1968,15 +1876,15 @@ struct AV_NpcEventAI : public npc_escortAI
         if (m_creature->GetEntry() == AV_NPC_RAMRIDER_CMD)
             m_creature->Mount(2786);
         else if (m_creature->GetEntry() == AV_NPC_WOLFRIDER_CMD)
-            m_creature->Mount(10278);
+            m_creature->Mount(1166);
         else if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA &&
-                 b_isNPCStartedMovingToChannelingPointWB &&
-                 !b_isNPCMovedToChannelingPointWB)
-            m_creature->Mount(12245);
+                 m_isNPCStartedMovingToChannelingPointWB &&
+                 !m_isNPCMovedToChannelingPointWB)
+            m_creature->Mount(12242);
         else if (m_creature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL &&
-                 b_isNPCStartedMovingToChannelingPointWB &&
-                 !b_isNPCMovedToChannelingPointWB)
-            m_creature->Mount(6080);
+                 m_isNPCStartedMovingToChannelingPointWB &&
+                 !m_isNPCMovedToChannelingPointWB)
+            m_creature->Mount(9695);
 
         if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
         {
@@ -1995,17 +1903,17 @@ struct AV_NpcEventAI : public npc_escortAI
 
         m_uiTransform_Timer = 5000;
         m_uiDisappear_Timer = 5000;
-        b_isTransformed = false;
-        b_isTroopsSpawned = false;
-        b_isCavalrySpawned = false;
+        m_isTransformed = false;
+        m_troopsSpawned = false;
+        m_isCavalrySpawned = false;
 
-        b_isDead = false;
+        m_isDead = false;
 
-        if (isAggro)
+        if (m_aggro)
         {
             SetEscortPaused(false);
             m_creature->SetWalk(false);
-            isAggro = false;
+            m_aggro = false;
         }
     }
 
@@ -2017,14 +1925,14 @@ struct AV_NpcEventAI : public npc_escortAI
             m_creature->Unmount();
         else if ((m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA ||
                   m_creature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL) &&
-                 b_isNPCStartedMovingToChannelingPointWB &&
-                 !b_isNPCMovedToChannelingPointWB)
+                 m_isNPCStartedMovingToChannelingPointWB &&
+                 !m_isNPCMovedToChannelingPointWB)
             m_creature->Unmount();
 
         if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
             m_creature->CastSpell(m_creature, SPELL_EARTHBIND_TOTEM, false);
 
-        isAggro = true;
+        m_aggro = true;
         SetEscortPaused(true);
     }
 
@@ -2041,21 +1949,21 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     SetEscortPaused(true);
                     DoScriptText(SAY_WOLFRIDER_CMD, m_creature);
-                    Event_Timer = 6000;
-                    Point = i;
+                    m_eventTimer = 6000;
+                    m_point = i;
                 }
                 break;
             case 3:
                 if (m_creature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL)
                 {
-                    b_isNPCStartedMovingToChannelingPointWB = true;
+                    m_isNPCStartedMovingToChannelingPointWB = true;
                     m_creature->SetWalk(false);
-                    m_creature->Mount(6080);
+                    m_creature->Mount(9695);
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 40.0f);
-                    for (const auto& it : m_RamRiderList)
-                        it->Mount(9695); //2786
+                    for (auto const& it : m_RamRiderList)
+                        it->Mount(9695);
                     m_RamRiderList.clear();
                 }
                 break;
@@ -2064,35 +1972,35 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     SetEscortPaused(true);
                     DoScriptText(SAY_RAMRIDER_CMD, m_creature);
-                    Event_Timer = 6000;
-                    Point = i;
+                    m_eventTimer = 6000;
+                    m_point = i;
                 }
                 break;
             case 6:
                 if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
                 {
-                    b_isNPCStartedMovingToChannelingPointWB = true;
-                    m_creature->Mount(12245);
+                    m_isNPCStartedMovingToChannelingPointWB = true;
+                    m_creature->Mount(12242);
                     m_creature->SetWalk(false);
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 40.0f);
-                    for (const auto& it : m_RamRiderList)
-                        it->Mount(10278);
+                    for (auto const& it : m_RamRiderList)
+                        it->Mount(1166);
                     m_RamRiderList.clear();
                 }
                 break;
             case 42:
                 if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
                 {
-                    b_isNPCStartedMovingToChannelingPointWB = true;
-                    b_isNPCMovedToChannelingPointWB = true;
+                    m_isNPCStartedMovingToChannelingPointWB = true;
+                    m_isNPCMovedToChannelingPointWB = true;
                     m_creature->Unmount();
                     m_creature->SetWalk(true);
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 40.0f);
-                    for (const auto& it : m_RamRiderList)
+                    for (auto const& it : m_RamRiderList)
                         it->Unmount();
                     m_RamRiderList.clear();
                 }
@@ -2105,27 +2013,27 @@ struct AV_NpcEventAI : public npc_escortAI
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 30.0f);
-                    for (const auto& it : m_RamRiderList)
+                    for (auto const& it : m_RamRiderList)
                         it->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
                     m_RamRiderList.clear();
 
                     m_creature->SummonGameObject(OBJECT_WB_H_INVOCATION, -360.139f, -133.403f, 26.4856f, 4.41568f, 0, 0, -0.803857f, 0.594823f, -1, false);
                     m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f);
                     Stop();//SetEscortPaused(true);
-                    isGobSummoned = true;
+                    m_gobSummoned = true;
                 }
                 break;
             case 48:
                 if (m_creature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL)
                 {
-                    b_isNPCStartedMovingToChannelingPointWB = true;
-                    b_isNPCMovedToChannelingPointWB = true;
+                    m_isNPCStartedMovingToChannelingPointWB = true;
+                    m_isNPCMovedToChannelingPointWB = true;
                     m_creature->Unmount();
                     m_creature->SetWalk(true);
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 40.0f);
-                    for (const auto& it : m_RamRiderList)
+                    for (auto const& it : m_RamRiderList)
                         it->Unmount();
                     m_RamRiderList.clear();
                 }
@@ -2138,14 +2046,14 @@ struct AV_NpcEventAI : public npc_escortAI
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 30.0f);
-                    for (const auto& it : m_RamRiderList)
+                    for (auto const& it : m_RamRiderList)
                         it->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
                     m_RamRiderList.clear();
 
                     m_creature->SummonGameObject(OBJECT_WB_A_INVOCATION, -199.993f, -343.217f, 6.77662f, 3.68265f, 0, 0, -0.96363f, 0.267241f, -1, false);
                     m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f);
                     Stop();//SetEscortPaused(true);
-                    isGobSummoned = true;
+                    m_gobSummoned = true;
                 }
                 break;
             case 66:
@@ -2217,39 +2125,39 @@ struct AV_NpcEventAI : public npc_escortAI
     void JustDied(Unit* pWho) override
     {
         /** Unlock speech for Cavalry again */
-        b_isSpeechDone = false;
-        isAggro = false;
+        m_speechDone = false;
+        m_aggro = false;
 
-        if (!b_isDead)
+        if (!m_isDead)
         {
-            uint32 m_followers = 0;
+            uint32 followers = 0;
 
             if (m_creature->GetEntry() == AV_NPC_RAMRIDER_CMD)
-                m_followers = AV_NPC_RAMRIDER;
+                followers = AV_NPC_RAMRIDER;
             else if (m_creature->GetEntry() == AV_NPC_WOLFRIDER_CMD)
-                m_followers = AV_NPC_WOLFRIDER;
+                followers = AV_NPC_WOLFRIDER;
             else if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
-                m_followers = AV_NPC_FROSTWOLF_SHAMAN;
+                followers = AV_NPC_FROSTWOLF_SHAMAN;
             else if (m_creature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL)
-                m_followers = AV_NPC_DRUID_OF_THE_GROVE;
+                followers = AV_NPC_DRUID_OF_THE_GROVE;
             else if (m_creature->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
             {
                 if (BattleGroundMap* bgMap = dynamic_cast<BattleGroundMap*>(m_creature->GetMap()))
                 {
                     if (BattleGroundAV* bg = dynamic_cast<BattleGroundAV*>(bgMap->GetBG()))
                     {
-                        uint32 m_uiRessourcesLevel = bg->getReinforcementLevelGroundUnit(BG_TEAM_ALLIANCE);
-                        m_followers = AV_NPC_STORMPIKE_COMMANDO;
-                        switch (m_uiRessourcesLevel)
+                        uint32 ressourcesLevel = bg->getReinforcementLevelGroundUnit(BG_TEAM_ALLIANCE);
+                        followers = AV_NPC_STORMPIKE_COMMANDO;
+                        switch (ressourcesLevel)
                         {
                             case AV_NPC_SEASONED:
-                                m_followers = AV_NPC_SEASONED_COMMANDO;
+                                followers = AV_NPC_SEASONED_COMMANDO;
                                 break;
                             case AV_NPC_VETERAN:
-                                m_followers = AV_NPC_VETERAN_COMMANDO;
+                                followers = AV_NPC_VETERAN_COMMANDO;
                                 break;
                             case AV_NPC_CHAMPION:
-                                m_followers = AV_NPC_CHAMPION_COMMANDO;
+                                followers = AV_NPC_CHAMPION_COMMANDO;
                                 break;
                         }
                     }
@@ -2261,23 +2169,23 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     if (BattleGroundAV* bg = dynamic_cast<BattleGroundAV*>(bgMap->GetBG()))
                     {
-                        uint32 m_uiRessourcesLevel = bg->getReinforcementLevelGroundUnit(BG_TEAM_HORDE);
-                        switch (m_uiRessourcesLevel)
+                        uint32 ressourcesLevel = bg->getReinforcementLevelGroundUnit(BG_TEAM_HORDE);
+                        switch (ressourcesLevel)
                         {
                             case AV_NPC_BASIC:
-                                m_followers = AV_NPC_FROSTWOLF_REAVER;
+                                followers = AV_NPC_FROSTWOLF_REAVER;
                                 break;
                             case AV_NPC_SEASONED:
-                                m_followers = AV_NPC_SEASONED_REAVER;
+                                followers = AV_NPC_SEASONED_REAVER;
                                 break;
                             case AV_NPC_VETERAN:
-                                m_followers = AV_NPC_VETERAN_REAVER;
+                                followers = AV_NPC_VETERAN_REAVER;
                                 break;
                             case AV_NPC_CHAMPION:
-                                m_followers = AV_NPC_CHAMPION_REAVER;
+                                followers = AV_NPC_CHAMPION_REAVER;
                                 break;
                             default:
-                                m_followers = AV_NPC_FROSTWOLF_REAVER;
+                                followers = AV_NPC_FROSTWOLF_REAVER;
                                 break;
                         }
                     }
@@ -2285,8 +2193,8 @@ struct AV_NpcEventAI : public npc_escortAI
             }
 
             std::list<Creature*> m_RamRiderList;
-            GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, m_followers, 100.0f);
-            for (const auto& it : m_RamRiderList)
+            GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, followers, 100.0f);
+            for (auto const& it : m_RamRiderList)
             {
                 if (AV_NpcEventTroopsAI* pEscortAI = dynamic_cast<AV_NpcEventTroopsAI*>(it->AI()))
                 {
@@ -2297,7 +2205,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 }
             }
             m_RamRiderList.clear();
-            b_isDead = true;
+            m_isDead = true;
         }
     }
 
@@ -2404,21 +2312,21 @@ struct AV_NpcEventAI : public npc_escortAI
 
             /** Cavalry creature */
             case AV_NPC_WOLFRIDER_CMD:
-                if (!b_isCavalrySpawned)
+                if (!m_isCavalrySpawned)
                     checkCavalryStatus(uiDiff, AV_NPC_WOLFRIDER_CMD);
                 break;
             case AV_NPC_RAMRIDER_CMD:
-                if (!b_isCavalrySpawned)
+                if (!m_isCavalrySpawned)
                     checkCavalryStatus(uiDiff, AV_NPC_RAMRIDER_CMD);
                 break;
 
             /** Troops creature */
             case AV_NPC_QUARTERMASTER:
-                if (!b_isTroopsSpawned)
+                if (!m_troopsSpawned)
                     checkTroopsStatus(uiDiff, AV_NPC_QUARTERMASTER);
                 break;
             case AV_NPC_QUARTERMASTER_A:
-                if (!b_isTroopsSpawned)
+                if (!m_troopsSpawned)
                     checkTroopsStatus(uiDiff, AV_NPC_QUARTERMASTER_A);
                 break;
 
@@ -2426,20 +2334,20 @@ struct AV_NpcEventAI : public npc_escortAI
                 break;
         }
 
-        if (Event_Timer <= uiDiff)
+        if (m_eventTimer <= uiDiff)
         {
-            switch (Point)
+            switch (m_point)
             {
                 case 2:
                     if (m_creature->GetEntry() == AV_NPC_WOLFRIDER_CMD)
                     {
-                        if (!b_isSpeechDone)
+                        if (!m_speechDone)
                         {
-                            b_isSpeechDone = true;
+                            m_speechDone = true;
 
                             std::list<Creature*> m_RamRiderList;
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_WOLFRIDER, 50.0f);
-                            for (const auto& it : m_RamRiderList)
+                            for (auto const& it : m_RamRiderList)
                             {
                                 DoScriptText(SAY_WARCRY_HORDE, it);
                                 it->SetWalk(false);
@@ -2451,19 +2359,19 @@ struct AV_NpcEventAI : public npc_escortAI
                             m_RamRiderList.clear();
                         }
                         SetEscortPaused(false);
-                        Event_Timer = 0;
+                        m_eventTimer = 0;
                     }
                     break;
                 case 5:
                     if (m_creature->GetEntry() == AV_NPC_RAMRIDER_CMD)
                     {
-                        if (!b_isSpeechDone)
+                        if (!m_speechDone)
                         {
-                            b_isSpeechDone = true;
+                            m_speechDone = true;
 
                             std::list<Creature*> m_RamRiderList;
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_RAMRIDER, 20.0f);
-                            for (const auto& it : m_RamRiderList)
+                            for (auto const& it : m_RamRiderList)
                             {
                                 DoScriptText(SAY_WARCRY_ALIANCE, it);
                                 it->SetWalk(false);
@@ -2475,7 +2383,7 @@ struct AV_NpcEventAI : public npc_escortAI
                             m_RamRiderList.clear();
                         }
                         SetEscortPaused(false);
-                        Event_Timer = 0;
+                        m_eventTimer = 0;
                     }
                     break;
                 default:
@@ -2483,12 +2391,12 @@ struct AV_NpcEventAI : public npc_escortAI
             }
         }
         else
-            Event_Timer -= uiDiff;
+            m_eventTimer -= uiDiff;
 
         if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
         {
             GameObject* pInvocation = m_creature->FindNearestGameObject(OBJECT_WB_H_INVOCATION, 250.0f);
-            if (isGobSummoned && !pInvocation && m_creature->GetDistance(-360.16f, -130.41f, 27.07f) < 100)
+            if (m_gobSummoned && !pInvocation && m_creature->GetDistance(-360.16f, -130.41f, 27.07f) < 100)
             {
                 if (!m_bThurlogaBoss)
                 {
@@ -2504,7 +2412,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 100.0f);
-                    for (const auto& it : m_RamRiderList)
+                    for (auto const& it : m_RamRiderList)
                     {
                         it->Unmount();
                         it->DisappearAndDie();
@@ -2520,7 +2428,7 @@ struct AV_NpcEventAI : public npc_escortAI
         else if (m_creature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL)
         {
             GameObject* pInvocation = m_creature->FindNearestGameObject(OBJECT_WB_A_INVOCATION, 250.0f);
-            if (isGobSummoned && !pInvocation && m_creature->GetDistance(-199.64f, -342.7f, 7.67f) < 100.0f)
+            if (m_gobSummoned && !pInvocation && m_creature->GetDistance(-199.64f, -342.7f, 7.67f) < 100.0f)
             {
                 if (!m_bRenferalBoss)
                 {
@@ -2535,7 +2443,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 100.0f);
-                    for (const auto& it : m_RamRiderList)
+                    for (auto const& it : m_RamRiderList)
                     {
                         it->Unmount();
                         it->DisappearAndDie();
@@ -2573,9 +2481,9 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
         (pQuest->GetQuestId() != QUEST_TAMED_FROSTWOLVES &&  pQuest->GetQuestId() != QUEST_TAMED_RAMS))
         return false;
 
-    uint32 m_faction_id           = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
-    uint32 m_ressources_delivered = pQuest->ReqItemCount[0];
-    uint32 m_challenge;
+    uint32 factionId           = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
+    uint32 ressourcesDelivered = pQuest->ReqItemCount[0];
+    uint32 challenge;
 
     if (BattleGround* bg = pPlayer->GetBattleGround())
     {
@@ -2586,8 +2494,8 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
             if (pQuest->GetQuestId() == QUEST_TAMED_FROSTWOLVES ||
                 pQuest->GetQuestId() == QUEST_TAMED_RAMS)
             {
-                m_challenge            = BG_AV_TAMED_CAVALRY_ASSAULT;
-                m_ressources_delivered = 1;
+                challenge = BG_AV_TAMED_CAVALRY_ASSAULT;
+                ressourcesDelivered = 1;
             }
             else
             {
@@ -2595,32 +2503,32 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
                 {
                     case ITEM_STORMPIKE_BLOOD_HORDE:
                     case ITEM_STORM_CRYSTAL:
-                        m_challenge = BG_AV_BLOOD_WORLDBOSS_ASSAULT;
+                        challenge = BG_AV_BLOOD_WORLDBOSS_ASSAULT;
                         break;
                     case ITEM_FROSTWOLF_HIDE:
                     case ITEM_ALTERAC_RAM_HIDE:
-                        m_challenge = BG_AV_HIDE_CAVALRY_ASSAULT;
+                        challenge = BG_AV_HIDE_CAVALRY_ASSAULT;
                         break;
                     case ITEM_STORMPIKE_SOLDIER_FLESH:
                     case ITEM_FROSTWOLF_SOLDIER_MEDAL:
-                        m_challenge = BG_AV_SOLDIER_AIR_ASSAULT;
+                        challenge = BG_AV_SOLDIER_AIR_ASSAULT;
                         break;
                     case ITEM_STORMPIKE_LIEUTENANT_FLESH:
                     case ITEM_FROSTWOLF_LIEUTENANT_MEDAL:
-                        m_challenge = BG_AV_LIEUTENANT_AIR_ASSAULT;
+                        challenge = BG_AV_LIEUTENANT_AIR_ASSAULT;
                         break;
                     case ITEM_STORMPIKE_COMMANDER_FLESH:
                     case ITEM_FROSTWOLF_COMMANDER_MEDAL:
-                        m_challenge = BG_AV_COMMANDER_AIR_ASSAULT;
+                        challenge = BG_AV_COMMANDER_AIR_ASSAULT;
                         break;
                     case ITEM_IRONDEEP_SUPPLIES:
-                        m_challenge = BG_AV_IRONDEEP_GROUND_ASSAULT;
+                        challenge = BG_AV_IRONDEEP_GROUND_ASSAULT;
                         break;
                     case ITEM_COLDTOOTH_SUPPLIES:
-                        m_challenge = BG_AV_COLDTOOTH_GROUND_ASSAULT;
+                        challenge = BG_AV_COLDTOOTH_GROUND_ASSAULT;
                         break;
                     case 17422:
-                        m_challenge = 0;
+                        challenge = 0;
                         return false;
                         break;
 
@@ -2631,11 +2539,11 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
             }
 
             ((BattleGroundAV*)bg)->setChallengeInvocationCounter(
-                m_faction_id,
-                m_challenge,
-                m_ressources_delivered);
+                factionId,
+                challenge,
+                ressourcesDelivered);
 
-            if ((m_challenge == BG_AV_BLOOD_WORLDBOSS_ASSAULT) && ((BattleGroundAV*)bg)->isWorldBossChallengeInvocationReady(m_faction_id))
+            if ((challenge == BG_AV_BLOOD_WORLDBOSS_ASSAULT) && ((BattleGroundAV*)bg)->isWorldBossChallengeInvocationReady(factionId))
             {
                 uint32 playerFactionId = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
                 ((BattleGroundAV*)bg)->resetWorldBossChallengeInvocation(playerFactionId);
@@ -2708,51 +2616,45 @@ enum
  * to launch the corresponding assault. */
 bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 {
-    bool   b_objectiveReached = false;
-    bool   b_objectiveGlobalAirAssaultSoldier    = false;
-    bool   b_objectiveGlobalAirAssaultLieutenant = false;
-    bool   b_objectiveGlobalAirAssaultCommander  = false;
-    uint32 m_faction_id = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
-    uint32 m_actual_ressources = 0;
-    uint32 m_actual_ressources2 = 0;
-    uint32 m_objective_ressources = 0;
-    uint32 m_challenge = 0;
-    uint32 m_minRepAssault = 0;
-
+    bool   objectiveReached = false;
+    bool   objectiveGlobalAirAssaultSoldier    = false;
+    bool   objectiveGlobalAirAssaultLieutenant = false;
+    bool   objectiveGlobalAirAssaultCommander  = false;
+    uint32 factionId = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
+    uint32 actualRessources = 0;
+    uint32 actualRessources2 = 0;
+    uint32 objectiveRessources = 0;
+    uint32 challenge = 0;
+    uint32 minRepAssault = 0;
     uint16 uiMessage = 0;
     uint16 uiMessageGlobalAirAssault = 0;
 
     if (pCreature->GetEntry() == AV_NPC_QUARTERMASTER_A || pCreature->GetEntry() == AV_NPC_QUARTERMASTER)
     {
-        m_challenge = BG_AV_NB_CHALLENGES;
+        challenge = BG_AV_NB_CHALLENGES;
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
 
         if (BattleGroundMap* bgMap = dynamic_cast<BattleGroundMap*>(pCreature->GetMap()))
         {
             if (BattleGroundAV* bg = dynamic_cast<BattleGroundAV*>(bgMap->GetBG()))
             {
-
-                m_actual_ressources  = bg->getChallengeInvocationCounter(m_faction_id, BG_AV_IRONDEEP_GROUND_ASSAULT);
-                m_actual_ressources2 = bg->getChallengeInvocationCounter(m_faction_id, BG_AV_COLDTOOTH_GROUND_ASSAULT);
-
+                actualRessources = bg->getChallengeInvocationCounter(factionId, BG_AV_IRONDEEP_GROUND_ASSAULT);
+                actualRessources2 = bg->getChallengeInvocationCounter(factionId, BG_AV_COLDTOOTH_GROUND_ASSAULT);
             }
         }
 
-        if (m_actual_ressources + m_actual_ressources2 > 230)
-            m_challenge = m_challenge + 14;
-        else if (m_actual_ressources + m_actual_ressources2 > 140)
-            m_challenge = m_challenge + 12;
-        else if (m_actual_ressources > 210 && m_actual_ressources2 > 50)
-            m_challenge = m_challenge + 14;
-        else if (m_actual_ressources > 110 && m_actual_ressources2 > 20)
-            m_challenge = m_challenge + 12;
+        if (actualRessources + actualRessources2 > 230)
+            challenge = challenge + 14;
+        else if (actualRessources + actualRessources2 > 140)
+            challenge = challenge + 12;
+        else if (actualRessources > 210 && actualRessources2 > 50)
+            challenge = challenge + 14;
+        else if (actualRessources > 110 && actualRessources2 > 20)
+            challenge = challenge + 12;
         else
-            m_challenge = m_challenge + 13;
+            challenge = challenge + 13;
 
-
-
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_GROUND_ASSAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_GROUND_ASSAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + challenge + 1);
 
         //        if (pCreature->IsVendor())
         //            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
@@ -2764,48 +2666,48 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 
     if (pCreature->GetEntry() == AV_NPC_ENTRY_MURGOT || pCreature->GetEntry() == AV_NPC_ENTRY_REGZAR)
     {
-        m_challenge = BG_AV_NB_CHALLENGES;
+        challenge = BG_AV_NB_CHALLENGES;
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
         if (BattleGroundMap* bgMap = dynamic_cast<BattleGroundMap*>(pCreature->GetMap()))
         {
             if (BattleGroundAV* bg = dynamic_cast<BattleGroundAV*>(bgMap->GetBG()))
             {
-                m_actual_ressources = bg->GetActualArmorRessources(m_faction_id);
-                if (m_actual_ressources < 500)
+                actualRessources = bg->GetActualArmorRessources(factionId);
+                if (actualRessources < 500)
                 {
-                    if (m_actual_ressources <= 200)
-                        m_challenge = m_challenge + 0;
-                    else if (m_actual_ressources < 400)
-                        m_challenge = m_challenge + 1;
+                    if (actualRessources <= 200)
+                        challenge = challenge + 0;
+                    else if (actualRessources < 400)
+                        challenge = challenge + 1;
                     else
-                        m_challenge = m_challenge + 4;
+                        challenge = challenge + 4;
                 }
-                else if (m_actual_ressources < 1000)
+                else if (actualRessources < 1000)
                 {
-                    if (m_actual_ressources <= 700)
-                        m_challenge = m_challenge + 0;
-                    else if (m_actual_ressources < 900)
-                        m_challenge = m_challenge + 2;
+                    if (actualRessources <= 700)
+                        challenge = challenge + 0;
+                    else if (actualRessources < 900)
+                        challenge = challenge + 2;
                     else
-                        m_challenge = m_challenge + 5;
+                        challenge = challenge + 5;
                 }
-                else if (m_actual_ressources < 1500)
+                else if (actualRessources < 1500)
                 {
-                    if (m_actual_ressources <= 1200)
-                        m_challenge = m_challenge + 0;
-                    else if (m_actual_ressources < 1400)
-                        m_challenge = m_challenge + 3;
+                    if (actualRessources <= 1200)
+                        challenge = challenge + 0;
+                    else if (actualRessources < 1400)
+                        challenge = challenge + 3;
                     else
-                        m_challenge = m_challenge + 6;
+                        challenge = challenge + 6;
                 }
-                switch (bg->getReinforcementLevelGroundUnit(m_faction_id))
+                switch (bg->getReinforcementLevelGroundUnit(factionId))
                 {
                     case AV_NPC_BASIC:
-                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NEXT_UPGRADE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
+                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NEXT_UPGRADE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + challenge + 1);
 
                         if ((pPlayer->GetReputationRank(ID_REPUTATION_FROSTWOLF) >= REP_HONORED ||
-                             pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= REP_HONORED) && m_actual_ressources >= 500)
+                             pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= REP_HONORED) && actualRessources >= 500)
                         {
                             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UPGRADE_SEASONED, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 500 + 1);
                         }
@@ -2813,10 +2715,10 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                         pPlayer->SEND_GOSSIP_MENU(6073, pCreature->GetGUID());
                         break;
                     case AV_NPC_SEASONED:
-                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NEXT_UPGRADE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
+                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NEXT_UPGRADE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + challenge + 1);
 
                         if ((pPlayer->GetReputationRank(ID_REPUTATION_FROSTWOLF) >= REP_HONORED ||
-                             pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= REP_HONORED) && m_actual_ressources >= 1000)
+                             pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= REP_HONORED) && actualRessources >= 1000)
                         {
                             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UPGRADE_VETERAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000 + 1);
                         }
@@ -2824,10 +2726,10 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                         pPlayer->SEND_GOSSIP_MENU(6217, pCreature->GetGUID());
                         break;
                     case AV_NPC_VETERAN:
-                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NEXT_UPGRADE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
+                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NEXT_UPGRADE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + challenge + 1);
 
                         if ((pPlayer->GetReputationRank(ID_REPUTATION_FROSTWOLF) >= REP_HONORED ||
-                             pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= REP_HONORED) && m_actual_ressources >= 1500)
+                             pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= REP_HONORED) && actualRessources >= 1500)
                         {
                             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UPGRADE_CHAMPION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1500 + 1);
                         }
@@ -2856,7 +2758,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
             pCreature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
         }
 
-        if (pCreature->GetDistance(-1338.6f, -328.16f, 90.8f) > 15.0f && m_faction_id == BG_TEAM_HORDE)
+        if (pCreature->GetDistance(-1338.6f, -328.16f, 90.8f) > 15.0f && factionId == BG_TEAM_HORDE)
         {
             if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pCreature->AI()))
             {
@@ -2880,7 +2782,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
              pCreature->GetEntry() == AV_NPC_ENTRY_VIPORE)
     {
 
-        if (pCreature->GetDistance(575.116f, -51.90f, 37.62f) > 15.0f && m_faction_id == BG_TEAM_ALLIANCE)
+        if (pCreature->GetDistance(575.116f, -51.90f, 37.62f) > 15.0f && factionId == BG_TEAM_ALLIANCE)
         {
             if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pCreature->AI()))
             {
@@ -2911,10 +2813,10 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
     {
         for (QuestRelationsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
         {
-            uint32 quest_id = itr->second;
-            if (!quest_id)
+            uint32 questId = itr->second;
+            if (!questId)
                 continue;
-            Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest_id);
+            Quest const* pQuest = sObjectMgr.GetQuestTemplate(questId);
             if (!pQuest)
                 continue;
             if (pQuest->ReqItemId[0] == 0)
@@ -2929,8 +2831,8 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                     if (pQuest->GetQuestId() == QUEST_TAMED_FROSTWOLVES ||
                         pQuest->GetQuestId() == QUEST_TAMED_RAMS)
                     {
-                        m_challenge     = BG_AV_TAMED_CAVALRY_ASSAULT;
-                        m_minRepAssault = ((BattleGroundAV*)bg)->
+                        challenge     = BG_AV_TAMED_CAVALRY_ASSAULT;
+                        minRepAssault = ((BattleGroundAV*)bg)->
                                           getMinReputationNeeded(BG_AV_CAVALRY_ASSAULT);
                     }
                     else
@@ -2939,73 +2841,73 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                         {
                             case ITEM_FROSTWOLF_HIDE:
                             case ITEM_ALTERAC_RAM_HIDE:
-                                m_challenge = BG_AV_HIDE_CAVALRY_ASSAULT;
-                                m_minRepAssault = ((BattleGroundAV*)bg)->
+                                challenge = BG_AV_HIDE_CAVALRY_ASSAULT;
+                                minRepAssault = ((BattleGroundAV*)bg)->
                                                   getMinReputationNeeded(BG_AV_CAVALRY_ASSAULT);
                                 break;
                             case ITEM_STORMPIKE_SOLDIER_FLESH:
                             case ITEM_FROSTWOLF_SOLDIER_MEDAL:
-                                m_challenge = BG_AV_SOLDIER_AIR_ASSAULT;
-                                m_minRepAssault = ((BattleGroundAV*)bg)->
+                                challenge = BG_AV_SOLDIER_AIR_ASSAULT;
+                                minRepAssault = ((BattleGroundAV*)bg)->
                                                   getMinReputationNeeded(BG_AV_AIR_ASSAULT_BEACON_SOLDIER);
                                 break;
                             case ITEM_STORMPIKE_LIEUTENANT_FLESH:
                             case ITEM_FROSTWOLF_LIEUTENANT_MEDAL:
-                                m_challenge = BG_AV_LIEUTENANT_AIR_ASSAULT;
-                                m_minRepAssault = ((BattleGroundAV*)bg)->
+                                challenge = BG_AV_LIEUTENANT_AIR_ASSAULT;
+                                minRepAssault = ((BattleGroundAV*)bg)->
                                                   getMinReputationNeeded(BG_AV_AIR_ASSAULT_BEACON_LIEUTENANT);
                                 break;
                             case ITEM_STORMPIKE_COMMANDER_FLESH:
                             case ITEM_FROSTWOLF_COMMANDER_MEDAL:
-                                m_challenge = BG_AV_COMMANDER_AIR_ASSAULT;
-                                m_minRepAssault = ((BattleGroundAV*)bg)->
+                                challenge = BG_AV_COMMANDER_AIR_ASSAULT;
+                                minRepAssault = ((BattleGroundAV*)bg)->
                                                   getMinReputationNeeded(BG_AV_AIR_ASSAULT_BEACON_COMMANDER);
                                 break;
                             case ITEM_IRONDEEP_SUPPLIES:
-                                m_challenge = BG_AV_IRONDEEP_GROUND_ASSAULT;
-                                m_minRepAssault = ((BattleGroundAV*)bg)->
+                                challenge = BG_AV_IRONDEEP_GROUND_ASSAULT;
+                                minRepAssault = ((BattleGroundAV*)bg)->
                                                   getMinReputationNeeded(BG_AV_GROUND_ASSAULT);
                                 break;
                             case ITEM_COLDTOOTH_SUPPLIES:
-                                m_challenge = BG_AV_COLDTOOTH_GROUND_ASSAULT;
-                                m_minRepAssault = ((BattleGroundAV*)bg)->
+                                challenge = BG_AV_COLDTOOTH_GROUND_ASSAULT;
+                                minRepAssault = ((BattleGroundAV*)bg)->
                                                   getMinReputationNeeded(BG_AV_GROUND_ASSAULT);
                                 break;
 
                             default:
-                                m_challenge = BG_AV_WRONG_VALUE;
-                                m_minRepAssault = 0; // Give neutral value in case of
+                                challenge = BG_AV_WRONG_VALUE;
+                                minRepAssault = 0; // Give neutral value in case of
                                 break;
                         }
                     }
 
                     /** Display a message regarding ressources status for corresponding event */
-                    if (m_challenge != BG_AV_WRONG_VALUE)
+                    if (challenge != BG_AV_WRONG_VALUE)
                     {
-                        m_actual_ressources = ((BattleGroundAV*)bg)->
+                        actualRessources = ((BattleGroundAV*)bg)->
                                               getChallengeInvocationCounter(
-                                                  m_faction_id,
-                                                  m_challenge);
-                        m_objective_ressources = ((BattleGroundAV*)bg)->
+                                                  factionId,
+                                                  challenge);
+                        objectiveRessources = ((BattleGroundAV*)bg)->
                                                  getChallengeInvocationGoals(
-                                                     m_faction_id,
-                                                     m_challenge);
+                                                     factionId,
+                                                     challenge);
 
                     }
                     else /** Error case */
                     {
-                        m_actual_ressources = 0;
-                        m_objective_ressources = 1;
+                        actualRessources = 0;
+                        objectiveRessources = 1;
                     }
 
                     /** Check if the corresponding amount of ressources is OK pour an assault */
-                    if (m_actual_ressources >= m_objective_ressources)
+                    if (actualRessources >= objectiveRessources)
                     {
-                        switch (m_challenge)
+                        switch (challenge)
                         {
                             case BG_AV_SOLDIER_AIR_ASSAULT:
-                                b_objectiveReached = ((BattleGroundAV*)bg)->
-                                                     isAerialChallengeInvocationReady(m_faction_id,
+                                objectiveReached = ((BattleGroundAV*)bg)->
+                                                     isAerialChallengeInvocationReady(factionId,
                                                              BG_AV_AIR_ASSAULT_BEACON_SOLDIER);
 
                                 if (pPlayer->GetTeam() == ALLIANCE)
@@ -3015,8 +2917,8 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                                 break;
 
                             case BG_AV_LIEUTENANT_AIR_ASSAULT:
-                                b_objectiveReached = ((BattleGroundAV*)bg)->
-                                                     isAerialChallengeInvocationReady(m_faction_id,
+                                objectiveReached = ((BattleGroundAV*)bg)->
+                                                     isAerialChallengeInvocationReady(factionId,
                                                              BG_AV_AIR_ASSAULT_BEACON_LIEUTENANT);
 
                                 if (pPlayer->GetTeam() == ALLIANCE)
@@ -3026,8 +2928,8 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                                 break;
 
                             case BG_AV_COMMANDER_AIR_ASSAULT:
-                                b_objectiveReached = ((BattleGroundAV*)bg)->
-                                                     isAerialChallengeInvocationReady(m_faction_id,
+                                objectiveReached = ((BattleGroundAV*)bg)->
+                                                     isAerialChallengeInvocationReady(factionId,
                                                              BG_AV_AIR_ASSAULT_BEACON_COMMANDER);
 
                                 if (pPlayer->GetTeam() == ALLIANCE)
@@ -3038,16 +2940,16 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 
                             case BG_AV_HIDE_CAVALRY_ASSAULT:
                             case BG_AV_TAMED_CAVALRY_ASSAULT:
-                                b_objectiveReached = ((BattleGroundAV*)bg)->
-                                                     isCavalryChallengeInvocationReady(m_faction_id);
+                                objectiveReached = ((BattleGroundAV*)bg)->
+                                                     isCavalryChallengeInvocationReady(factionId);
 
                                 uiMessage = GOSSIP_ASSAULT_CAVALRY;
                                 break;
 
                             case BG_AV_IRONDEEP_GROUND_ASSAULT:
                             case BG_AV_COLDTOOTH_GROUND_ASSAULT:
-                                b_objectiveReached = ((BattleGroundAV*)bg)->
-                                                     isGroundChallengeInvocationReady(m_faction_id);
+                                objectiveReached = ((BattleGroundAV*)bg)->
+                                                     isGroundChallengeInvocationReady(factionId);
 
                                 uiMessage = GOSSIP_ASSAULT_GROUND;
                                 break;
@@ -3058,35 +2960,35 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                     }
                     /** Specific case for global air assault : needs 3 aerial resources ready */
                     if (((BattleGroundAV*)bg)->
-                        isAerialChallengeInvocationReady(m_faction_id, BG_AV_AIR_ASSAULT_GLOBAL_SOLDIER) &&
+                        isAerialChallengeInvocationReady(factionId, BG_AV_AIR_ASSAULT_GLOBAL_SOLDIER) &&
                         (pCreature->GetEntry() == AV_NPC_ENTRY_GUSE ||
                          pCreature->GetEntry() == AV_NPC_ENTRY_SLIDORE))
                     {
-                        b_objectiveGlobalAirAssaultSoldier = true;
+                        objectiveGlobalAirAssaultSoldier = true;
                         if (pCreature->GetEntry() == AV_NPC_ENTRY_GUSE)
                             uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_GUSE;
                         else
                             uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_SLIDORE;
                     }
                     if (((BattleGroundAV*)bg)->
-                        isAerialChallengeInvocationReady(m_faction_id,
+                        isAerialChallengeInvocationReady(factionId,
                                                          BG_AV_AIR_ASSAULT_GLOBAL_LIEUTENANT) &&
                         (pCreature->GetEntry() == AV_NPC_ENTRY_JEZTOR ||
                          pCreature->GetEntry() == AV_NPC_ENTRY_VIPORE))
                     {
-                        b_objectiveGlobalAirAssaultLieutenant = true;
+                        objectiveGlobalAirAssaultLieutenant = true;
                         if (pCreature->GetEntry() == AV_NPC_ENTRY_JEZTOR)
                             uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_JEZTOR;
                         else
                             uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_VIPORE;
                     }
                     if (((BattleGroundAV*)bg)->
-                        isAerialChallengeInvocationReady(m_faction_id,
+                        isAerialChallengeInvocationReady(factionId,
                                                          BG_AV_AIR_ASSAULT_GLOBAL_COMMANDER) &&
                         (pCreature->GetEntry() == AV_NPC_ENTRY_MULVERICK ||
                          pCreature->GetEntry() == AV_NPC_ENTRY_ICHMAN))
                     {
-                        b_objectiveGlobalAirAssaultCommander = true;
+                        objectiveGlobalAirAssaultCommander = true;
                         if (pCreature->GetEntry() == AV_NPC_ENTRY_MULVERICK)
                             uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_MULV;
                         else
@@ -3100,21 +3002,21 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
     if (pCreature->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
     {
         uiMessage = GOSSIP_ASSAULT_CAVALRY;
-        b_objectiveReached = true;
-        m_challenge = BG_AV_IRONDEEP_GROUND_ASSAULT;
+        objectiveReached = true;
+        challenge = BG_AV_IRONDEEP_GROUND_ASSAULT;
     }
 
     /** An assault if available */
-    if (b_objectiveReached)
+    if (objectiveReached)
     {
-        m_minRepAssault = 3;
+        minRepAssault = 3;
 
         if (pCreature->GetEntry() != AV_NPC_MARSHAL_TERAVAINE)
             pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
         /** Check if the player got enough reputation to launch the assault */
-        if (pPlayer->GetReputationRank(ID_REPUTATION_FROSTWOLF) >= m_minRepAssault ||
-            pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= m_minRepAssault)
+        if (pPlayer->GetReputationRank(ID_REPUTATION_FROSTWOLF) >= minRepAssault ||
+            pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= minRepAssault)
         {
             /** TODO in case of a standard aerial attack, NPC needs to give a beacon
              * to the player : it's a completed quest player needs to validate to receive
@@ -3124,9 +3026,9 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
                                      uiMessage,
                                      GOSSIP_SENDER_MAIN,
-                                     GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
+                                     GOSSIP_ACTION_INFO_DEF + challenge + 1);
 
-            if (b_objectiveGlobalAirAssaultSoldier &&
+            if (objectiveGlobalAirAssaultSoldier &&
                 (pCreature->GetEntry() == AV_NPC_ENTRY_GUSE ||
                  pCreature->GetEntry() == AV_NPC_ENTRY_SLIDORE))
             {
@@ -3136,7 +3038,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                                          GOSSIP_SENDER_MAIN,
                                          GOSSIP_ACTION_INFO_DEF + BG_AV_AIR_ASSAULT_GLOBAL_SOLDIER + 1 + 50);
             }
-            else if (b_objectiveGlobalAirAssaultLieutenant &&
+            else if (objectiveGlobalAirAssaultLieutenant &&
                      (pCreature->GetEntry() == AV_NPC_ENTRY_JEZTOR ||
                       pCreature->GetEntry() == AV_NPC_ENTRY_VIPORE))
             {
@@ -3146,7 +3048,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                                          GOSSIP_SENDER_MAIN,
                                          GOSSIP_ACTION_INFO_DEF + BG_AV_AIR_ASSAULT_GLOBAL_LIEUTENANT + 1 + 50);
             }
-            else if (b_objectiveGlobalAirAssaultCommander &&
+            else if (objectiveGlobalAirAssaultCommander &&
                      (pCreature->GetEntry() == AV_NPC_ENTRY_MULVERICK ||
                       pCreature->GetEntry() == AV_NPC_ENTRY_ICHMAN))
             {
@@ -3191,22 +3093,22 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
         {
             if (BattleGround* bg = pPlayer->GetBattleGround())
             {
-                uint32 currentCounter = ((BattleGroundAV*)bg)->getChallengeInvocationCounter(m_faction_id, BG_AV_BLOOD_WORLDBOSS_ASSAULT);
+                uint32 currentCounter = ((BattleGroundAV*)bg)->getChallengeInvocationCounter(factionId, BG_AV_BLOOD_WORLDBOSS_ASSAULT);
                 uint32 gossipOptionBroadcastID = 0;
                 uint8 gossipOptionID = 0;
 
                 if (currentCounter >= 160)
                 {
                     gossipOptionID = 2;
-                    gossipOptionBroadcastID = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS3 : GOSSIP_THURLOGA_BOSS3;
+                    gossipOptionBroadcastID = (factionId == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS3 : GOSSIP_THURLOGA_BOSS3;
                 }
                 else if (currentCounter >= 100)
                 {
                     gossipOptionID = 1;
-                    gossipOptionBroadcastID = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS2 : GOSSIP_THURLOGA_BOSS2;
+                    gossipOptionBroadcastID = (factionId == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS2 : GOSSIP_THURLOGA_BOSS2;
                 }
                 else
-                    gossipOptionBroadcastID = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS1 : GOSSIP_THURLOGA_BOSS1;
+                    gossipOptionBroadcastID = (factionId == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS1 : GOSSIP_THURLOGA_BOSS1;
 
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, gossipOptionBroadcastID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + BG_AV_BLOOD_WORLDBOSS_ASSAULT + 200 + gossipOptionID);
             }
@@ -3223,34 +3125,34 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 
 struct AV_npc_troops_chief_EventAI : public npc_escortAI
 {
-    uint32 m_faction_id;
-    bool   isAggro;
-    bool   b_isSpeechDone;
-    uint32 Event_Timer;
-    uint32 Point;
+    uint32 m_factionId;
+    bool   m_aggro;
+    bool   m_speechDone;
+    uint32 m_eventTimer;
+    uint32 m_point;
 
     AV_npc_troops_chief_EventAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
-        b_isSpeechDone = false;
-        isAggro = false;
+        m_speechDone = false;
+        m_aggro = false;
         Reset();
     }
 
     void Reset() override
     {
-        if (isAggro)
+        if (m_aggro)
         {
             SetEscortPaused(false);
             float fPosX, fPosY, fPosZ;
             m_creature->GetCombatStartPosition(fPosX, fPosY, fPosZ);
             m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, fPosX, fPosY, fPosZ);
-            isAggro = false;
+            m_aggro = false;
         }
     }
 
     void Aggro(Unit* pWho) override
     {
-        isAggro = true;
+        m_aggro = true;
         SetEscortPaused(true);
     }
 
@@ -3263,15 +3165,15 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
                 {
                     SetEscortPaused(true);
                     DoScriptText(SAY_RAMRIDER_CMD, m_creature);
-                    Event_Timer = 6000;
-                    Point = i;
+                    m_eventTimer = 6000;
+                    m_point = i;
                 }
                 else if (m_creature->GetEntry() == AV_NPC_WARMASTER_CMD)
                 {
                     SetEscortPaused(true);
                     DoScriptText(SAY_WOLFRIDER_CMD, m_creature);
-                    Event_Timer = 6000;
-                    Point = i;
+                    m_eventTimer = 6000;
+                    m_point = i;
                 }
                 break;
             case 48:
@@ -3295,15 +3197,15 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
 
     void JustDied(Unit* pWho) override
     {
-        isAggro = false;
+        m_aggro = false;
         // Unlock speech for Cavalry again
-        b_isSpeechDone = false;
-        uint32 m_uiTroopsType = 0;
+        m_speechDone = false;
+        uint32 troopsType = 0;
 
         if (m_creature->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
-            m_uiTroopsType = AV_NPC_FROSTWOLF_REAVER;
+            troopsType = AV_NPC_FROSTWOLF_REAVER;
         else if (m_creature->GetEntry() == AV_NPC_WARMASTER_CMD)
-            m_uiTroopsType = AV_NPC_STORMPIKE_COMMANDO;
+            troopsType = AV_NPC_STORMPIKE_COMMANDO;
         else
             return;
 
@@ -3312,8 +3214,8 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
         for (int i = 0; i < 4; i++)
         {
             std::list<Creature*> m_RamRiderList;
-            GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, m_uiTroopsType + i, 100.0f);
-            for (const auto& it : m_RamRiderList)
+            GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, troopsType + i, 100.0f);
+            for (auto const& it : m_RamRiderList)
             {
                 /** Start escort for troops since leader is dead */
                 if (AV_npc_troops_chief_EventAI* pEscortAI = dynamic_cast<AV_npc_troops_chief_EventAI*>(it->AI()))
@@ -3327,39 +3229,39 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
 
     void UpdateEscortAI(uint32 const uiDiff) override
     {
-        uint32 m_uiTroopsType = 0;
-        uint16 m_uiWarcryBC;
+        uint32 troopsType = 0;
+        uint16 warcryBC;
 
         if (m_creature->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
         {
-            m_uiTroopsType = AV_NPC_STORMPIKE_COMMANDO;
-            m_uiWarcryBC = SAY_WARCRY_ALIANCE;
+            troopsType = AV_NPC_STORMPIKE_COMMANDO;
+            warcryBC = SAY_WARCRY_ALIANCE;
         }
         else if (m_creature->GetEntry() == AV_NPC_WARMASTER_CMD)
         {
-            m_uiTroopsType = AV_NPC_FROSTWOLF_REAVER;
-            m_uiWarcryBC = SAY_WARCRY_HORDE;
+            troopsType = AV_NPC_FROSTWOLF_REAVER;
+            warcryBC = SAY_WARCRY_HORDE;
         }
 
-        if (Event_Timer <= uiDiff)
+        if (m_eventTimer <= uiDiff)
         {
-            switch (Point)
+            switch (m_point)
             {
                 case 2:
                 {
-                    if (!b_isSpeechDone)
+                    if (!m_speechDone)
                     {
-                        b_isSpeechDone = true;
+                        m_speechDone = true;
                         m_creature->SetWalk(false);
                         /** Loop to check all 4 possibles kind of troops for each faction
                          * This method is used since every possible kind got an idea incremented one by one */
                         for (int i = 0; i < 4; i++)
                         {
                             std::list<Creature*> m_RamRiderList;
-                            GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, m_uiTroopsType + i, 40.0f);
-                            for (const auto& it : m_RamRiderList)
+                            GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, troopsType + i, 40.0f);
+                            for (auto const& it : m_RamRiderList)
                             {
-                                DoScriptText(m_uiWarcryBC, it);
+                                DoScriptText(warcryBC, it);
                                 it->SetWalk(false);
 
                                 /** Link all the troops to the leader */
@@ -3372,7 +3274,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
                         }
                     }
                     SetEscortPaused(false);
-                    Event_Timer = 0;
+                    m_eventTimer = 0;
                     break;
                 }
 
@@ -3381,7 +3283,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
             }
         }
         else
-            Event_Timer -= uiDiff;
+            m_eventTimer -= uiDiff;
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -3396,7 +3298,7 @@ bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Q
     if (!pQuest->ReqItemId[0] || !pQuest->ReqItemCount[0])
         return false;
 
-    uint32 m_faction_id           = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
+    uint32 factionId = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
 
     if (pQuestGiver->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
     {
@@ -3416,8 +3318,8 @@ bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Q
             if (pQuest->GetQuestId() == QUEST_TROOPS_ORDER_H ||
                 pQuest->GetQuestId() == QUEST_TROOPS_ORDER_A)
             {
-                ((BattleGroundAV*)bg)->resetGroundChallengeInvocation(m_faction_id);
-                ((BattleGroundAV*)bg)->setPlayerGoStatus(m_faction_id, BG_AV_GROUND_ASSAULT, true);
+                ((BattleGroundAV*)bg)->resetGroundChallengeInvocation(factionId);
+                ((BattleGroundAV*)bg)->setPlayerGoStatus(factionId, BG_AV_GROUND_ASSAULT, true);
 
                 if (AV_npc_troops_chief_EventAI* pEscortAI = dynamic_cast<AV_npc_troops_chief_EventAI*>(pQuestGiver->AI()))
                 {
@@ -3791,7 +3693,7 @@ struct AV_WarRiderAI : public ScriptedAI
     {
         m_creature->SetCasterChaseDistance(25.0f);
         m_creature->SetWanderDistance(55.0f);
-        isMovingToPoint = false;
+        m_isMovingToPoint = false;
         Reset();
     }
 
@@ -3800,12 +3702,10 @@ struct AV_WarRiderAI : public ScriptedAI
     uint32 m_uiFireball_Timer;
     uint32 m_uiFireballVolley_Timer;
     uint32 m_uiStunBombAttack_Timer;
-    bool isAttacking;
-    bool isMovingToPoint;
+    bool m_isMovingToPoint;
 
     void Reset() override
     {
-        isAttacking = false;
         m_creature->SetFly(true);
         m_creature->SetWalk(false);
         m_uiCurrentWaypoint      = 0;
@@ -3821,7 +3721,7 @@ struct AV_WarRiderAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (!isMovingToPoint)
+        if (!m_isMovingToPoint)
         {
             float x, y, z;
             switch (m_creature->GetEntry())
@@ -3845,11 +3745,10 @@ struct AV_WarRiderAI : public ScriptedAI
             }
             //m_creature->GetMotionMaster()->MovePoint(0, x, y, z);
             m_creature->SetHomePosition(x, y, z, 0.);
-            isMovingToPoint = true;
+            m_isMovingToPoint = true;
             EnterEvadeMode();
             return;
         }
-
 
         /** Patrol moving in circle from the spawn position */
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -4082,12 +3981,12 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
 {
     AV_NpcEventWorldBoss_H_AI(Creature* pCreature) : av_world_boss_baseai(pCreature, BG_AV_BOSS_LOKHOLAR_H)
     {
-        isAggro = false;
-        isEngageModeStarted = false;
-        isInvocated = false;
+        m_aggro = false;
+        m_isEngageModeStarted = false;
+        m_isInvocated = false;
 
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (const auto& i : liste)
+        for (auto const& i : liste)
         {
             if (i.getSource()->IsAlive())
                 i.getSource()->RemoveAurasDueToSpell(11206);
@@ -4099,22 +3998,22 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         /** Once WB is invocated, suppress invocation rune to disable further invocation (only one per Battleground) */
         std::list<GameObject*> invocationObjectList;
         GetGameObjectListWithEntryInGrid(invocationObjectList, m_creature, OBJECT_WB_H_INVOCATION, 200.0f);
-        for (const auto& it : invocationObjectList)
+        for (auto const& it : invocationObjectList)
             it->Delete();
 
         /** Stop invocation from Frostwolf Shaman */
         std::list<Creature*> ramRidersList;
         GetCreatureListWithEntryInGrid(ramRidersList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 200.0f);
-        for (const auto& it : ramRidersList)
+        for (auto const& it : ramRidersList)
             it->InterruptNonMeleeSpells(true);
 
         /** Stop invocation from Thurloga */
         std::list<Creature*> thurlogaList;
         GetCreatureListWithEntryInGrid(thurlogaList, m_creature, AV_NPC_PRIMALIST_THURLOGA, 200.0f);
-        for (const auto& it : thurlogaList)
+        for (auto const& it : thurlogaList)
             it->InterruptNonMeleeSpells(true);
 
-        isYelling = false;
+        m_isYelling = false;
         Reset();
     }
 
@@ -4124,12 +4023,12 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
     uint32 m_uiFrostShockTimer;
     uint32 m_uiIceBlastTimer;
     uint32 m_uiIceTombTimer;
-    bool   isAggro;
-    bool   isEngageModeStarted;
-    uint32 Point;
+    bool   m_aggro;
+    bool   m_isEngageModeStarted;
+    uint32 m_point;
     uint32 m_uiEngageTimer;
-    bool   isInvocated;
-    bool   isYelling;
+    bool   m_isInvocated;
+    bool   m_isYelling;
 
     void Reset() override
     {
@@ -4140,20 +4039,20 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         m_uiIceBlastTimer   = 9000;
         m_uiIceTombTimer    = 5500;
 
-        if (isAggro)
+        if (m_aggro)
         {
             SetEscortPaused(false);
             float fPosX, fPosY, fPosZ;
             m_creature->GetCombatStartPosition(fPosX, fPosY, fPosZ);
             m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, fPosX, fPosY, fPosZ);
             m_creature->SetWalk(true);
-            isAggro = false;
+            m_aggro = false;
         }
     }
 
     void Aggro(Unit* pWho) override
     {
-        isAggro = true;
+        m_aggro = true;
         SetEscortPaused(true);
     }
 
@@ -4185,7 +4084,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
 
     void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (!isYelling)
+        if (!m_isYelling)
         {
             DoScriptText(SAY_LOKHOLAR_SPAWN_1, m_creature);
 
@@ -4194,22 +4093,22 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
             si.talk.textId[0] = SAY_LOKHOLAR_SPAWN_2;
             m_creature->GetMap()->ScriptCommandStart(si, 3, m_creature->GetObjectGuid(), m_creature->GetObjectGuid());
 
-            isYelling = true;
+            m_isYelling = true;
         }
 
-        if (!isInvocated)
+        if (!m_isInvocated)
         {
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
             m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
             m_creature->SetWanderDistance(55.0f);
             m_creature->SetWalk(false);
-            isInvocated = true;
+            m_isInvocated = true;
         }
-        if (m_uiEngageTimer < uiDiff && !isEngageModeStarted)
+        if (m_uiEngageTimer < uiDiff && !m_isEngageModeStarted)
         {
             /** Start waypoint path system */
             Start(false, 0, nullptr, false);
-            isEngageModeStarted = true;
+            m_isEngageModeStarted = true;
         }
         else
             m_uiEngageTimer -= uiDiff;
@@ -4289,15 +4188,15 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 {
     AV_NpcEventWorldBoss_A_AI(Creature* pCreature) : av_world_boss_baseai(pCreature, BG_AV_BOSS_IVUS_A)
     {
-        isAggro = false;
-        isEngageModeStarted = false;
+        m_aggro = false;
+        m_isEngageModeStarted = false;
 
         /** Once invocation is done, World Boss doesn't start waypoint path for 10 minutes. */
         m_uiEngageTimer = 1000; //600000;
-        isInvocated = false;
+        m_isInvocated = false;
 
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (const auto& i : liste)
+        for (auto const& i : liste)
         {
             if (i.getSource()->IsAlive())
                 i.getSource()->RemoveAurasDueToSpell(11206);
@@ -4306,21 +4205,21 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
         /** Once WB is invocated, suppress invocation rune to disable further invocation (only one per Battleground) */
         std::list<GameObject*> m_invocationObjectList;
         GetGameObjectListWithEntryInGrid(m_invocationObjectList, m_creature, OBJECT_WB_A_INVOCATION, 200.0f);
-        for (const auto& it : m_invocationObjectList)
+        for (auto const& it : m_invocationObjectList)
             it->Delete();
         m_invocationObjectList.clear();
 
         /** Stop invocation from Druid of the Grove */
         std::list<Creature*> m_RamRiderList;
         GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 200.0f);
-        for (const auto& it : m_RamRiderList)
+        for (auto const& it : m_RamRiderList)
             it->InterruptNonMeleeSpells(true);
         m_RamRiderList.clear();
 
         /** Stop invocation from Renferal */
         std::list<Creature*> m_RenferalList;
         GetCreatureListWithEntryInGrid(m_RenferalList, m_creature, AV_NPC_ARCHDRUID_RENFERAL, 200.0f);
-        for (const auto& it : m_RenferalList)
+        for (auto const& it : m_RenferalList)
             it->InterruptNonMeleeSpells(true);
         m_RenferalList.clear();
 
@@ -4332,11 +4231,11 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
     uint32 m_uiMoonFireTimer;
     uint32 m_uiStarFireTimer;
     uint32 m_uiWrathTimer;
-    bool   isAggro;
-    bool   isEngageModeStarted;
-    uint32 Point;
+    bool   m_aggro;
+    bool   m_isEngageModeStarted;
+    uint32 m_point;
     uint32 m_uiEngageTimer;
-    bool   isInvocated;
+    bool   m_isInvocated;
 
     void Reset() override
     {
@@ -4346,20 +4245,20 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
         m_uiStarFireTimer   = 10000;
         m_uiWrathTimer      = 1000;
 
-        if (isAggro)
+        if (m_aggro)
         {
             SetEscortPaused(false);
             float fPosX, fPosY, fPosZ;
             m_creature->GetCombatStartPosition(fPosX, fPosY, fPosZ);
             m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, fPosX, fPosY, fPosZ);
             m_creature->SetWalk(true);
-            isAggro = false;
+            m_aggro = false;
         }
     }
 
     void Aggro(Unit* pWho) override
     {
-        isAggro = true;
+        m_aggro = true;
         SetEscortPaused(true);
     }
 
@@ -4376,21 +4275,21 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
     void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (!isInvocated)
+        if (!m_isInvocated)
         {
             DoScriptText(SAY_IVUS_SPAWNED, m_creature);
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
             m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
             m_creature->SetWanderDistance(55.0f);
             m_creature->SetWalk(false);
-            isInvocated = true;
+            m_isInvocated = true;
         }
 
-        if (m_uiEngageTimer < uiDiff && !isEngageModeStarted)
+        if (m_uiEngageTimer < uiDiff && !m_isEngageModeStarted)
         {
             /** Start waypoint path system */
             Start(false, 0, nullptr, false);
-            isEngageModeStarted = true;
+            m_isEngageModeStarted = true;
         }
         else
             m_uiEngageTimer -= uiDiff;
@@ -4445,162 +4344,6 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
 enum
 {
-    COMMANDER_RANDOLPH          = 13139,
-    COMMANDER_DARDOSH           = 13140,
-    COMMANDER_MULFORT           = 13153,
-    COMMANDER_LOUIS             = 13154,
-    COMMANDER_DUFFY             = 13319,
-    COMMANDER_KARL              = 13320,
-
-    LIEUTENANT_SPENCER          = 13138,
-    LIEUTENANT_LARGENT          = 13296,
-    LIEUTENANT_STOUTHANDLE      = 13297,
-    LIEUTENANT_GREYWAND         = 13298,
-    LIEUTENANT_LONADIN          = 13299,
-    LIEUTENANT_MANCUSO          = 13300,
-    COMMANDER_MORTIMER          = 13318,
-
-    LIEUTENANT_GRUMMUS          = 13145, //no mount for sure
-    LIEUTENANT_LEWIS            = 13147,
-    LIEUTENANT_MURP             = 13146, //no mount for sure
-    LIEUTENANT_STRONGHOOF       = 13143,
-    LIEUTENANT_VOLTALAR         = 13144,
-    LIEUTENANT_RUGBA            = 13137,
-    COMMANDER_MALGOR            = 13152,
-
-    MOUNT_WAR_KODO              = 14348, //OK
-    MOUNT_WAR_HORSE             = 14337, //OK
-    MOUNT_WAR_BLUE_STRIDER      =  6569, //OK
-    MOUNT_WAR_WOLF              = 14334, //OK
-    MOUNT_WAR_RAM               = 14577,
-    MOUNT_SKELETAL_HORSE        = 10672, //OK
-    MOUNT_WAR_RAPTOR            = 14388, //OK
-    MOUNT_NIGHTSABER            = 9991   //OK
-};
-
-struct AV_CommanderAI : public ScriptedAI
-{
-    AV_CommanderAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-        m_uiGripOfCommand_Timer = 0;
-    }
-
-    uint32 m_uiGripOfCommand_Timer;
-
-    void Reset() override
-    {
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        switch (m_creature->GetEntry())
-        {
-            case COMMANDER_RANDOLPH:
-            case COMMANDER_DARDOSH:
-            case COMMANDER_MULFORT:
-            case COMMANDER_LOUIS:
-            case COMMANDER_DUFFY:
-            case COMMANDER_KARL:
-                // Aura of command
-                if (m_uiGripOfCommand_Timer < uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, 21172) == CAST_OK)
-                        m_uiGripOfCommand_Timer = 9000;
-                }
-                else
-                    m_uiGripOfCommand_Timer -= uiDiff;
-                break;
-        }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-struct AV_DismountAI : public ScriptedAI
-{
-    AV_DismountAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-        m_uiGripOfCommand_Timer = 0;
-    }
-
-    uint32 m_uiMount;
-    uint32 m_uiGripOfCommand_Timer;
-
-    void Reset() override
-    {
-        switch (m_creature->GetEntry())
-        {
-            case LIEUTENANT_LONADIN:
-                m_uiMount = MOUNT_NIGHTSABER;
-                break;
-            case LIEUTENANT_VOLTALAR:
-                m_uiMount = MOUNT_WAR_RAPTOR;
-                break;
-            case LIEUTENANT_LEWIS:
-                m_uiMount = MOUNT_SKELETAL_HORSE;
-                break;
-            case LIEUTENANT_STOUTHANDLE:
-            case COMMANDER_MORTIMER:
-                m_uiMount = MOUNT_WAR_RAM;
-                break;
-            case LIEUTENANT_RUGBA:
-            case COMMANDER_MALGOR:
-                m_uiMount = MOUNT_WAR_WOLF;
-                break;
-            case LIEUTENANT_GREYWAND:
-                m_uiMount = MOUNT_WAR_BLUE_STRIDER;
-                break;
-            case LIEUTENANT_STRONGHOOF:
-                m_uiMount = MOUNT_WAR_KODO;
-                break;
-            case LIEUTENANT_LARGENT:
-            case LIEUTENANT_SPENCER:
-            case LIEUTENANT_MANCUSO:
-                m_uiMount = MOUNT_WAR_HORSE;
-                break;
-            default:
-                break;
-        }
-
-        m_creature->Mount(m_uiMount);
-    }
-
-    void Aggro(Unit* pWho) override
-    {
-        m_creature->Unmount();
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        switch (m_creature->GetEntry())
-        {
-            case COMMANDER_MALGOR:
-            case COMMANDER_MORTIMER:
-                // Aura of command
-                if (m_uiGripOfCommand_Timer < uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, 21172) == CAST_OK)
-                        m_uiGripOfCommand_Timer = 9000;
-                }
-                else
-                    m_uiGripOfCommand_Timer -= uiDiff;
-                break;
-        }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-enum
-{
     SPELL_FROST_SHOCK      =   21401,
     SPELL_LIGHTNING_SHIELD =   12550,
 };
@@ -4610,44 +4353,38 @@ struct FrostwolfShamanAI : public ScriptedAI
 {
     FrostwolfShamanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        b_isUsingMount = false;
-        b_isChanneling = false;
+        m_isUsingMount = false;
+        m_isChanneling = false;
         Reset();
     }
 
     uint32 m_uiFrostShock_Timer;
     uint32 m_uiHealingWave_Timer;
     uint32 m_uiLightningShield_Timer;
-    bool   b_isUsingMount;
-    bool   b_isFirstAggro;
-    bool   b_isChanneling;
+    bool   m_isUsingMount;
+    bool   m_isChanneling;
 
     void Reset() override
     {
         m_creature->CastSpell(m_creature, SPELL_LIGHTNING_SHIELD, false);
         m_uiFrostShock_Timer = 5000;
         m_uiHealingWave_Timer = 0;
-        b_isFirstAggro = true;
-        if (b_isUsingMount)
-            m_creature->Mount(10278);
-        if (b_isChanneling)
+        if (m_isUsingMount)
+            m_creature->Mount(1166);
+        if (m_isChanneling)
             m_creature->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
     }
 
-    void Aggro(Unit* pWho) override
+    void EnterCombat(Unit* pWho) override
     {
-        if (b_isFirstAggro)
+        m_isUsingMount = m_creature->IsMounted();
+        if (m_creature->HasAura(AV_INVOCATION_SPELL))
         {
-            b_isUsingMount = m_creature->IsMounted();
-            b_isFirstAggro = false;
-            if (m_creature->HasAura(AV_INVOCATION_SPELL))
-            {
-                b_isChanneling = true;
-                m_creature->InterruptNonMeleeSpells(true);
-            }
-            else
-                b_isChanneling = false;
+            m_isChanneling = true;
+            m_creature->InterruptNonMeleeSpells(true);
         }
+        else
+            m_isChanneling = false;
         m_creature->Unmount();
     }
 
@@ -4691,44 +4428,38 @@ struct DruidOfTheGroveAI : public ScriptedAI
 {
     DruidOfTheGroveAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        b_isUsingMount = false;
-        b_isChanneling = false;
+        m_isUsingMount = false;
+        m_isChanneling = false;
         Reset();
     }
 
     uint32 m_uiEntanglingRoots_Timer;
     uint32 m_uiStarFire_Timer;
     uint32 m_uiThorns_Timer;
-    bool   b_isUsingMount;
-    bool   b_isFirstAggro;
-    bool   b_isChanneling;
+    bool   m_isUsingMount;
+    bool   m_isChanneling;
 
     void Reset() override
     {
         m_creature->CastSpell(m_creature, SPELL_THORNS, false);
         m_uiEntanglingRoots_Timer = 3000;
         m_uiStarFire_Timer = 0;
-        b_isFirstAggro = true;
-        if (b_isUsingMount)
-            m_creature->Mount(9695); //10278
-        if (b_isChanneling)
+        if (m_isUsingMount)
+            m_creature->Mount(9695);
+        if (m_isChanneling)
             m_creature->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
     }
 
-    void Aggro(Unit* pWho) override
+    void EnterCombat(Unit* pWho) override
     {
-        if (b_isFirstAggro)
+        m_isUsingMount = m_creature->IsMounted();
+        if (m_creature->HasAura(AV_INVOCATION_SPELL))
         {
-            b_isUsingMount = m_creature->IsMounted();
-            b_isFirstAggro = false;
-            if (m_creature->HasAura(AV_INVOCATION_SPELL))
-            {
-                b_isChanneling = true;
-                m_creature->InterruptNonMeleeSpells(true);
-            }
-            else
-                b_isChanneling = false;
+            m_isChanneling = true;
+            m_creature->InterruptNonMeleeSpells(true);
         }
+        else
+            m_isChanneling = false;
         m_creature->Unmount();
     }
 
@@ -4760,16 +4491,6 @@ struct DruidOfTheGroveAI : public ScriptedAI
 CreatureAI* GetAI_FrostwolfShamanAI(Creature* pCreature)
 {
     return new FrostwolfShamanAI(pCreature);
-}
-
-CreatureAI* GetAI_AV_DismountAI(Creature* pCreature)
-{
-    return new AV_DismountAI(pCreature);
-}
-
-CreatureAI* GetAI_AV_CommanderAI(Creature* pCreature)
-{
-    return new AV_CommanderAI(pCreature);
 }
 
 CreatureAI* GetAI_npc_worldboss_A_AV(Creature* pCreature)
@@ -4966,9 +4687,9 @@ struct AV_mineNpcAI : public ScriptedAI
 
     void JustRespawned() override
     {
-        uint32 m_newEntry = SelectCreatureEntry();
-        if (m_newEntry != 0 && m_creature->GetEntry() != m_newEntry)
-            m_creature->UpdateEntry(m_newEntry);
+        uint32 newEntry = SelectCreatureEntry();
+        if (newEntry != 0 && m_creature->GetEntry() != newEntry)
+            m_creature->UpdateEntry(newEntry);
     }
 
     uint32 SelectCreatureEntry() const
@@ -4981,16 +4702,16 @@ struct AV_mineNpcAI : public ScriptedAI
         if (!bgAv)
             return 0;
 
-        uint32 m_factionId;
+        uint32 factionId;
         if (m_creature->GetFactionTemplateId() == 85)
-            m_factionId = 1;
+            factionId = 1;
         else
-            m_factionId = 0;
+            factionId = 0;
 
         switch (m_originalEntry)
         {
             case 13089:
-                switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
+                switch (bgAv->getReinforcementLevelGroundUnit(factionId))
                 {
                     case AV_NPC_BASIC:
                         return 13089;
@@ -5004,7 +4725,7 @@ struct AV_mineNpcAI : public ScriptedAI
                 return 0;
 
             case 13097:
-                switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
+                switch (bgAv->getReinforcementLevelGroundUnit(factionId))
                 {
                     case AV_NPC_BASIC:
                         return 13097;
@@ -5018,7 +4739,7 @@ struct AV_mineNpcAI : public ScriptedAI
                 return 0;
 
             case 13099:
-                switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
+                switch (bgAv->getReinforcementLevelGroundUnit(factionId))
                 {
                     case AV_NPC_BASIC:
                         return 13099;
@@ -5032,7 +4753,7 @@ struct AV_mineNpcAI : public ScriptedAI
                 return 0;
 
             case 13081:
-                switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
+                switch (bgAv->getReinforcementLevelGroundUnit(factionId))
                 {
                     case AV_NPC_BASIC:
                         return 13081;
@@ -5046,7 +4767,7 @@ struct AV_mineNpcAI : public ScriptedAI
                 return 0;
 
             case 13080:
-                switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
+                switch (bgAv->getReinforcementLevelGroundUnit(factionId))
                 {
                     case AV_NPC_BASIC:
                         return 13080;
@@ -5060,7 +4781,7 @@ struct AV_mineNpcAI : public ScriptedAI
                 return 0;
 
             case 13098:
-                switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
+                switch (bgAv->getReinforcementLevelGroundUnit(factionId))
                 {
                     case AV_NPC_BASIC:
                         return 13098;
@@ -5074,7 +4795,7 @@ struct AV_mineNpcAI : public ScriptedAI
                 return 0;
 
             case 13096:
-                switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
+                switch (bgAv->getReinforcementLevelGroundUnit(factionId))
                 {
                     case AV_NPC_BASIC:
                         return 13096;
@@ -5088,7 +4809,7 @@ struct AV_mineNpcAI : public ScriptedAI
                 return 0;
 
             case 13087:
-                switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
+                switch (bgAv->getReinforcementLevelGroundUnit(factionId))
                 {
                     case AV_NPC_BASIC:
                         return 13087;
@@ -5106,9 +4827,9 @@ struct AV_mineNpcAI : public ScriptedAI
 
     void UpdateAI(uint32 const diff) override
     {
-        uint32 m_newEntry = SelectCreatureEntry();
-        if (m_newEntry != 0 && m_creature->GetEntry() != m_newEntry)
-            m_creature->UpdateEntry(m_newEntry);
+        uint32 newEntry = SelectCreatureEntry();
+        if (newEntry != 0 && m_creature->GetEntry() != newEntry)
+            m_creature->UpdateEntry(newEntry);
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -5181,16 +4902,6 @@ void AddSC_bg_alterac()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "AV_dismount";
-    newscript->GetAI = &GetAI_AV_DismountAI;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "AV_commander";
-    newscript->GetAI = &GetAI_AV_CommanderAI;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "npc_frostwolf_shaman";
     newscript->GetAI = &GetAI_FrostwolfShamanAI;
     newscript->RegisterSelf();
@@ -5245,12 +4956,6 @@ void AddSC_bg_alterac()
     newscript->Name = "npc_AlteracBowman";
     newscript->GetAI = &GetAI_npc_AlteracBowman;
     newscript->RegisterSelf();
-    /*
-    newscript = new Script;
-    newscript->Name = "npc_AlteracDardosh";
-    newscript->GetAI = &GetAI_npc_AlteracDardosh;
-    newscript->RegisterSelf();
-    */
 
     newscript = new Script;
     newscript->Name = "npc_worldboss_h_av";
