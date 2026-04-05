@@ -1065,7 +1065,7 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.warrior.pDefensiveStance))
                         m_spells.warrior.pDefensiveStance = pSpellEntry;
                 }
-                else if (pSpellEntry->SpellName[0].find("Charge") != std::string::npos)
+                else if (pSpellEntry->SpellName[0] == "Charge")
                 {
                     if (IsHigherRankSpell(m_spells.warrior.pCharge))
                         m_spells.warrior.pCharge = pSpellEntry;
