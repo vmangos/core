@@ -84,6 +84,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (17063, @PTEMPLATE+6, 0, 'Swamp of Sorrows - Group 6 - Silver Vein / Gold Vein / Iron Deposit', 0);
 
 DELETE FROM `pool_template` WHERE  `entry` = 1318;
+UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=8119 AND `patch_min`=0 AND `patch_max`=10;
 
 -- End of migration.
 END IF;
