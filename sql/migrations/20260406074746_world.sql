@@ -110,7 +110,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `inst
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (1488, @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0),
 (1491, @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0),
-(14441), @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0),
+(14441, @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0),
 (1487, @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0),
 (1489, @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0);
 
