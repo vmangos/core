@@ -8,7 +8,7 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES ('20260403142051');
 -- Add your query below.
 
-SET @PTEMPLATE = 293;
+SET @PTEMPLATE = 5097;
 
 DELETE FROM `pool_pool` WHERE `pool_id` IN (990, 989, 988, 995, 987, 986);
 UPDATE `pool_template` SET `description` = 'Gold Vein / Mithril Deposit / Truesilver Deposit - Eastern Plaguelands - Group 1' WHERE `entry` IN (990, 989, 988, 995, 987, 986);
