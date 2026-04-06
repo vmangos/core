@@ -103,14 +103,14 @@ DELETE FROM `pool_template` WHERE  `entry` IN (1211, 8118);
 SET @PTEMPLATE = 3553;
 
 DELETE FROM `pool_pool` WHERE `pool_id` IN (1488, 1491, 14441, 1487, 1489);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Group 1' WHERE `entry` IN (1488, 1491, 144441, 1487, 1489);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Group 1' WHERE `pool_entry` IN (1488, 1491, 144441, 1487, 1489);
+UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Group 1' WHERE `entry` IN (1488, 1491, 14441, 1487, 1489);
+UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Group 1' WHERE `pool_entry` IN (1488, 1491, 14441, 1487, 1489);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+1, 1, 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Group 1 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
 (1488, @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0),
 (1491, @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0),
-(14441),
+(14441), @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0),
 (1487, @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0),
 (1489, @PTEMPLATE+1, 0, 'Un\'Goro Crater - Group 1 - Truesilver Deposit / Rich Thorium Vein', 0);
 
