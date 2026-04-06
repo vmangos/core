@@ -2667,6 +2667,8 @@ void CombatBotBaseAI::EquipPremadeGearTemplate()
     }
 }
 
+namespace
+{
 inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
 {
     switch (playerClass)
@@ -2697,6 +2699,7 @@ inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
         }
     }
     return ITEM_MOD_STAMINA;
+}
 }
 
 void CombatBotBaseAI::EquipRandomGearInEmptySlots()
