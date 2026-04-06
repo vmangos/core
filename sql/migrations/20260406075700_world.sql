@@ -83,6 +83,11 @@ UPDATE `gameobject` SET `patch_min` = 0 WHERE `id`=165658 AND (`map` = 230 OR `m
 UPDATE `pool_gameobject` SET `patch_min` = 0 WHERE `pool_entry` = 25622 OR `pool_entry` = 25609;
 update `pool_template` SET `patch_min` = 0 WHERE `entry` = 25609 OR `entry` = 25622;
 
+-- Remove Rogue Plaguebloom
+DELETE FROM `gameobject` WHERE `guid` = 20108;
+DELETE FROM `pool_gameobject` WHERE `guid` = 20108;
+
+
 -- End of migration.
 END IF;
 END??
