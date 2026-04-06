@@ -33,6 +33,7 @@ Crypto::Hash::HMACSHA1::Generator::Generator(std::vector<uint8> const& key)
 Crypto::Hash::HMACSHA1::Generator::Generator(uint8 const* key, size_t len)
 {
 #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+    // OpenSSL 3.x
     m_mac = EVP_MAC_fetch(nullptr, "HMAC", nullptr);
     MANGOS_ASSERT(m_mac != nullptr);
     m_ctx = EVP_MAC_CTX_new(m_mac);
@@ -43,9 +44,14 @@ Crypto::Hash::HMACSHA1::Generator::Generator(uint8 const* key, size_t len)
     params[1] = OSSL_PARAM_construct_end();
 
     MANGOS_ASSERT(EVP_MAC_init(m_ctx, key, len, params) == 1);
-#else
+#elif OPENSSL_VERSION_NUMBER < 0x10100000L
+    // OpenSSL 1.0.x
     m_ctx = new HMAC_CTX;
     HMAC_CTX_init(m_ctx);
+    HMAC_Init_ex(m_ctx, key, static_cast<int>(len), EVP_sha1(), nullptr);
+#else
+    // OpenSSL 1.1.x
+    m_ctx = HMAC_CTX_new();
     HMAC_Init_ex(m_ctx, key, static_cast<int>(len), EVP_sha1(), nullptr);
 #endif
 }
@@ -53,11 +59,16 @@ Crypto::Hash::HMACSHA1::Generator::Generator(uint8 const* key, size_t len)
 Crypto::Hash::HMACSHA1::Generator::~Generator()
 {
 #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+    // OpenSSL 3.x
     EVP_MAC_CTX_free(m_ctx);
     EVP_MAC_free(m_mac);
-#else
+#elif OPENSSL_VERSION_NUMBER < 0x10100000L
+    // OpenSSL 1.0.x
     HMAC_CTX_cleanup(m_ctx);
     delete m_ctx;
+#else
+    // OpenSSL 1.1.x
+    HMAC_CTX_free(m_ctx);
 #endif
 }
 
