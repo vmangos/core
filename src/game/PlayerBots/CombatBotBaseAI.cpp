@@ -33,25 +33,71 @@ enum CombatBotSpells
     SPELL_TAME_BEAST = 13481,
     SPELL_REVIVE_PET = 982,
     SPELL_CALL_PET = 883,
-
-    PET_WOLF    = 565,
-    PET_CAT     = 681,
-    PET_BEAR    = 822,
-    PET_CRAB    = 831,
-    PET_GORILLA = 1108,
-    PET_BIRD    = 1109,
-    PET_BOAR    = 1190,
-    PET_BAT     = 1554,
-    PET_CROC    = 1693,
-    PET_SPIDER  = 1781,
-    PET_OWL     = 1997,
-    PET_STRIDER = 2322,
-    PET_SCORPID = 3127,
-    PET_SERPENT = 3247,
-    PET_RAPTOR  = 3254,
-    PET_TURTLE  = 3461,
-    PET_HYENA   = 4127,
 };
+
+namespace
+{
+bool HasUsableHunterPetSpellData(uint32 petEntry)
+{
+    PetCreateSpellEntry const* createSpells = sObjectMgr.GetPetCreateSpellEntry(petEntry);
+    if (!createSpells)
+        return false;
+
+    for (uint32 spellId : createSpells->spellId)
+    {
+        if (!spellId)
+            break; // Match Pet::InitPetCreateSpells(), which stops at the first empty slot.
+
+        SpellEntry const* learnSpellInfo = sSpellMgr.GetSpellEntry(spellId);
+        if (!learnSpellInfo)
+            continue;
+
+        uint32 petSpellId = spellId;
+        if (learnSpellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL ||
+            learnSpellInfo->Effect[0] == SPELL_EFFECT_LEARN_PET_SPELL)
+            petSpellId = learnSpellInfo->EffectTriggerSpell[0];
+
+        SpellEntry const* petSpellInfo = sSpellMgr.GetSpellEntry(petSpellId);
+        if (petSpellInfo && petSpellInfo->IsAutocastable())
+            return true;
+    }
+
+    return false;
+}
+
+uint32 SelectHunterBotPetEntry()
+{
+    static std::vector<uint32> const petEntries = []()
+    {
+        std::vector<uint32> entries;
+
+        for (const auto& itr : sObjectMgr.GetCreatureInfoMap())
+        {
+            CreatureInfo const* cInfo = itr.second.get();
+            if (!cInfo || !cInfo->IsTameable())
+                continue;
+
+            // Exclude some special case creatures.
+            if (cInfo->npc_flags || cInfo->script_id || cInfo->spawn_spell_id)
+                continue;
+
+            // Exclude creatures that don't have at last one usable Hunter pet spell.
+            if (HasUsableHunterPetSpellData(cInfo->entry))
+                entries.push_back(cInfo->entry);
+        }
+
+        if (entries.empty())
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CombatBotBaseAI::SelectHunterBotPetEntry: No valid hunter bot pet entries found for patch %u.", sWorld.GetWowPatch());
+
+        return entries;
+    }();
+
+    if (petEntries.empty())
+        return 0;
+
+    return SelectRandomContainerElement(petEntries);
+}
+}
 
 void CombatBotBaseAI::AutoAssignRole()
 {
@@ -2388,9 +2434,10 @@ void CombatBotBaseAI::SummonPetIfNeeded()
             return;
         }
 
-        uint32 petId = PickRandomValue( PET_WOLF, PET_CAT, PET_BEAR, PET_CRAB, PET_GORILLA, PET_BIRD,
-                                        PET_BOAR, PET_BAT, PET_CROC, PET_SPIDER, PET_OWL, PET_STRIDER,
-                                        PET_SCORPID, PET_SERPENT, PET_RAPTOR, PET_TURTLE, PET_HYENA );
+        uint32 petId = SelectHunterBotPetEntry();
+        if (!petId)
+            return;
+
         if (Creature* pCreature = me->SummonCreature(petId,
             me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f,
             TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 3000, false, 3000))
