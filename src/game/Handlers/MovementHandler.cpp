@@ -1124,7 +1124,7 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
 
             if (undermap)
                 if (pPlayerMover->UndermapRecall())
-                    sLog.Player(this, LOG_MOVEMENT, LOG_LVL_MINIMAL, "[UNDERMAP] Teleporting to safe position. MapId: %u Pos: %g %g %g", pPlayerMover->GetName(), pPlayerMover->GetGUIDLow(), pPlayerMover->GetMapId(), pPlayerMover->GetPositionX(), pPlayerMover->GetPositionY(), pPlayerMover->GetPositionZ());
+                    sLog.Player(this, LOG_MOVEMENT, LOG_LVL_MINIMAL, "[UNDERMAP] Player: %s (GUID: %u) Teleporting to safe position. MapId: %u Pos: %g %g %g", pPlayerMover->GetName(), pPlayerMover->GetGUIDLow(), pPlayerMover->GetMapId(), pPlayerMover->GetPositionX(), pPlayerMover->GetPositionY(), pPlayerMover->GetPositionZ());
         }
         else if (pPlayerMover->CanFreeMove())
             pPlayerMover->SaveNoUndermapPosition(pMover->m_movementInfo.GetPos().x, pMover->m_movementInfo.GetPos().y, pMover->m_movementInfo.GetPos().z + 3.0f, pMover->m_movementInfo.GetPos().o);

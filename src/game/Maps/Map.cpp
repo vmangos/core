@@ -2132,7 +2132,7 @@ bool DungeonMap::CanEnter(Player* player)
 
     if (m_resetAfterUnload)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[DungeonReset] %s attempted to enter map %u, instance %u during reset", player->GetName(), m_instanceId);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[DungeonReset] %s attempted to enter map %u, instance %u during reset", player->GetName(), GetId(), m_instanceId);
         player->SendTransferAborted(TRANSFER_ABORT_NOT_FOUND);
         return false;
     }

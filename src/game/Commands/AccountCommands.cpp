@@ -578,7 +578,7 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
         if (sAccountMgr.IsAccountBanned(it))
             continue;
         sWorld.BanAccount(BAN_ACCOUNT, accountsIdToName[it], 0, reason, m_session ? m_session->GetPlayerName() : "");
-        PSendSysMessage("Account '%s' permanently banned.", accountsIdToName[it].c_str(), reason);
+        PSendSysMessage("Account '%s' permanently banned. Reason: %s", accountsIdToName[it].c_str(), reason);
         ++bannedCount;
     }
     PSendSysMessage("%u accounts banned for %s (%u on this IP)", bannedCount, reason, accountsIdToName.size());
