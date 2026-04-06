@@ -2328,8 +2328,45 @@ Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
     return nullptr;
 }
 
+void CombatBotBaseAI::InitializeBotPetAutocast()
+{
+    if (!me)
+        return;
+
+    Pet* pet = me->GetPet();
+    if (!pet || pet->GetPetAutoSpellSize() > 0)
+        return;
+
+    CharmInfo* charmInfo = pet->GetCharmInfo();
+    if (!charmInfo)
+        return;
+
+    for (uint8 i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
+    {
+        UnitActionBarEntry const* actionBarEntry = charmInfo->GetActionBarEntry(i);
+        if (!actionBarEntry || !actionBarEntry->IsActionBarForSpell())
+            continue;
+
+        uint32 spellId = actionBarEntry->GetAction();
+        if (!spellId || !pet->HasSpell(spellId))
+            continue;
+
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+        if (!spellInfo || !spellInfo->IsAutocastable())
+            continue;
+
+        pet->ToggleAutocast(spellId, true);
+        charmInfo->SetSpellAutocast(spellId, true);
+    }
+}
+
 void CombatBotBaseAI::SummonPetIfNeeded()
 {
+    // Only initialize autocast for spells the current pet already knows.
+    // Bot pets do not currently simulate trainer/grimoire-based pet spell
+    // learning.
+    InitializeBotPetAutocast();
+
     if (me->GetClass() == CLASS_HUNTER)
     {
         if (me->GetCharmGuid())

@@ -92,6 +92,7 @@ public:
     void ResetSpellData();
     void AddAllSpellReagents();
     void SummonPetIfNeeded();
+    void InitializeBotPetAutocast();
     void LearnArmorProficiencies();
     void LearnPremadeSpecForClass();
     void EquipPremadeGearTemplate();
