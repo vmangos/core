@@ -100,7 +100,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 DELETE FROM `pool_template` WHERE  `entry` IN (1211, 8118);
 
-SET @PTEMPLATE = 3553;
+SET @PTEMPLATE = 3556;
 
 DELETE FROM `pool_pool` WHERE `pool_id` IN (1488, 1491, 14441, 1487, 1489);
 UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Group 1' WHERE `entry` IN (1488, 1491, 14441, 1487, 1489);
