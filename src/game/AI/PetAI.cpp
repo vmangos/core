@@ -371,7 +371,7 @@ void PetAI::UpdateAllies()
 
     m_AllySet.clear();
     m_AllySet.insert(m_creature->GetObjectGuid());
-    m_AllySet.insert(owner->GetObjectGuid()); // Owner must always be a valid friendly target
+    m_AllySet.insert(owner->GetObjectGuid()); // The pet owner must always be a valid friendly target.
 
     if (group)
     {
