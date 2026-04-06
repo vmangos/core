@@ -1110,7 +1110,7 @@ bool ConditionEntry::IsValid()
         {
             if (m_value1 > 10)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Patch condition (entry %u, type %u) has an invalid value in value1 (must be 0..10), skipping.", m_entry, m_condition, m_value1);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Patch condition (entry %u, type %u, value1 %u) has an invalid value in value1 (must be 0..10), skipping.", m_entry, m_condition, m_value1);
                 return false;
             }
             if (m_value2 > 2)

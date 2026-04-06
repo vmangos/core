@@ -522,7 +522,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
             sBattleGroundMgr.ScheduleQueueUpdate(bgQueueTypeId, bgTypeId, _player->GetBattleGroundBracketIdFromLevel(bgTypeId));
             SendPacket(&data);
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Battleground: player %s (%u) left queue for bgtype %u, queue type %u.", _player->GetName(), _player->GetGUIDLow(), bg->GetTypeID(), bgQueueTypeId);
-            sLog.Out(LOG_BG, LOG_LVL_DETAIL, "[%u,%u] %s:%u [%u:%s] leaves queue",
+            sLog.Out(LOG_BG, LOG_LVL_DETAIL, "[%u,%u] %s:%u [%u:%s] leaves queue, bgTypeId: %u",
                      bg->GetMapId(), bg->GetInstanceID(),
                      _player->GetName(),
                      _player->GetGUIDLow(),
