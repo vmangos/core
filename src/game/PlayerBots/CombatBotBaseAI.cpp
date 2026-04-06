@@ -2406,6 +2406,41 @@ void CombatBotBaseAI::InitializeBotPetAutocast()
     }
 }
 
+std::vector<uint32> CombatBotBaseAI::CollectWarlockBotSummonSpells() const
+{
+    std::vector<uint32> summons;
+    if (!me)
+        return summons;
+
+    if (me->HasSpell(SPELL_SUMMON_IMP))
+        summons.push_back(SPELL_SUMMON_IMP);
+    if (me->HasSpell(SPELL_SUMMON_VOIDWALKER))
+        summons.push_back(SPELL_SUMMON_VOIDWALKER);
+    if (me->HasSpell(SPELL_SUMMON_FELHUNTER))
+        summons.push_back(SPELL_SUMMON_FELHUNTER);
+    if (me->HasSpell(SPELL_SUMMON_SUCCUBUS))
+        summons.push_back(SPELL_SUMMON_SUCCUBUS);
+
+    if (!summons.empty())
+        return summons;
+
+    // Fall back to the earliest summon quest requirements when no premade spec
+    // provides the summon spells (intended for bots that are below level 19
+    // where no premade spec exists, but still includes higher levels for
+    // completeness' sake).
+    uint32 level = me->GetLevel();
+    if (level >= 1)
+        summons.push_back(SPELL_SUMMON_IMP);
+    if (level >= 10)
+        summons.push_back(SPELL_SUMMON_VOIDWALKER);
+    if (level >= 20)
+        summons.push_back(SPELL_SUMMON_SUCCUBUS);
+    if (level >= 30)
+        summons.push_back(SPELL_SUMMON_FELHUNTER);
+
+    return summons;
+}
+
 void CombatBotBaseAI::SummonPetIfNeeded()
 {
     // Only initialize autocast for spells the current pet already knows.
@@ -2451,15 +2486,7 @@ void CombatBotBaseAI::SummonPetIfNeeded()
         if (me->GetPetGuid() || me->GetCharmGuid())
             return;
 
-        std::vector<uint32> vSummons;
-        if (me->HasSpell(SPELL_SUMMON_IMP))
-            vSummons.push_back(SPELL_SUMMON_IMP);
-        if (me->HasSpell(SPELL_SUMMON_VOIDWALKER))
-            vSummons.push_back(SPELL_SUMMON_VOIDWALKER);
-        if (me->HasSpell(SPELL_SUMMON_FELHUNTER))
-            vSummons.push_back(SPELL_SUMMON_FELHUNTER);
-        if (me->HasSpell(SPELL_SUMMON_SUCCUBUS))
-            vSummons.push_back(SPELL_SUMMON_SUCCUBUS);
+        std::vector<uint32> vSummons = CollectWarlockBotSummonSpells();
         if (!vSummons.empty())
             me->CastSpell(me, SelectRandomContainerElement(vSummons), true);
     }

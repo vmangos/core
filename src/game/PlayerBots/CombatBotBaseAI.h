@@ -5,6 +5,8 @@
 #include "SpellEntry.h"
 #include "Player.h"
 
+#include <vector>
+
 struct HealSpellCompare
 {
     bool operator() (SpellEntry const* const lhs, SpellEntry const* const rhs) const
@@ -93,6 +95,7 @@ public:
     void AddAllSpellReagents();
     void SummonPetIfNeeded();
     void InitializeBotPetAutocast();
+    std::vector<uint32> CollectWarlockBotSummonSpells() const;
     void LearnArmorProficiencies();
     void LearnPremadeSpecForClass();
     void EquipPremadeGearTemplate();
