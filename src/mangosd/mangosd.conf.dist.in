@@ -74,19 +74,19 @@ RealmID = 1
 DataDir = "."
 LogsDir = ""
 HonorDir = ""
-LoginDatabase.Info              = "127.0.0.1;3306;mangos;mangos;realmd"
-LoginDatabase.Connections       = 1
-LoginDatabase.WorkerThreads     = 1
-WorldDatabase.Info              = "127.0.0.1;3306;mangos;mangos;mangos"
-WorldDatabase.Connections       = 1
-WorldDatabase.WorkerThreads     = 1
-CharacterDatabase.Info          = "127.0.0.1;3306;mangos;mangos;characters"
-CharacterDatabase.Connections   = 1
+LoginDatabase.Info = "127.0.0.1;3306;mangos;mangos;realmd"
+LoginDatabase.Connections = 1
+LoginDatabase.WorkerThreads = 1
+WorldDatabase.Info = "127.0.0.1;3306;mangos;mangos;mangos"
+WorldDatabase.Connections = 1
+WorldDatabase.WorkerThreads = 1
+CharacterDatabase.Info = "127.0.0.1;3306;mangos;mangos;characters"
+CharacterDatabase.Connections = 1
 CharacterDatabase.WorkerThreads = 1
-LogsDatabase.Info               = "127.0.0.1;3306;mangos;mangos;logs"
-LogsDatabase.Connections        = 1
-LogsDatabase.WorkerThreads      = 1
-Database.AliveCheckInternal     = 600
+LogsDatabase.Info = "127.0.0.1;3306;mangos;mangos;logs"
+LogsDatabase.Connections = 1
+LogsDatabase.WorkerThreads = 1
+Database.AliveCheckInternal = 600
 WorldServerPort = 8085
 BindIP = "0.0.0.0"
 
@@ -274,7 +274,7 @@ PlayerSave.Interval = 900000
 PlayerSave.Stats.MinLevel = 0
 PlayerSave.Stats.SaveOnlyOnLogout = 1
 Terrain.Preload.Continents = 0
-Terrain.Preload.Instances  = 0
+Terrain.Preload.Instances = 0
 vmap.enableLOS = 1
 vmap.enableHeight = 1
 vmap.enableIndoorCheck = 1
@@ -290,41 +290,41 @@ CleanCharacterDB = 1
 ReusableGuidPoolSize = 100000
 
 # Optimization / load mitigation settings
-Continents.Instanciate                      = 0
-Continents.InactivePlayers.SkipUpdates      = 0
-MapUpdate.ReduceGridActivationDist.Tick     = 0
-MapUpdate.IncreaseGridActivationDist.Tick   = 0
-MapUpdate.MinGridActivationDistance         = 0
-MapUpdate.ReduceVisDist.Tick                = 0
-MapUpdate.IncreaseVisDist.Tick              = 0
-MapUpdate.MinVisibilityDistance             = 0
+Continents.Instanciate = 0
+Continents.InactivePlayers.SkipUpdates = 0
+MapUpdate.ReduceGridActivationDist.Tick = 0
+MapUpdate.IncreaseGridActivationDist.Tick = 0
+MapUpdate.MinGridActivationDistance = 0
+MapUpdate.ReduceVisDist.Tick = 0
+MapUpdate.IncreaseVisDist.Tick = 0
+MapUpdate.MinVisibilityDistance = 0
 
 # Maps with no player for more than $UpdateTime (ms) will no longer be updated (0 to disable)
-MapUpdate.Empty.UpdateTime                  = 0
+MapUpdate.Empty.UpdateTime = 0
 
 # Per-map threading
-MapUpdate.Instanced.UpdateThreads       = 2
+MapUpdate.Instanced.UpdateThreads = 2
 
 # Per-map subthreads (not for instanced maps)
-MapUpdate.ObjectsUpdate.MaxThreads      = 4
-MapUpdate.ObjectsUpdate.Timeout         = 100
-MapUpdate.VisibilityUpdate.MaxThreads   = 4
-MapUpdate.VisibilityUpdate.Timeout      = 100
+MapUpdate.ObjectsUpdate.MaxThreads = 4
+MapUpdate.ObjectsUpdate.Timeout = 100
+MapUpdate.VisibilityUpdate.MaxThreads = 4
+MapUpdate.VisibilityUpdate.Timeout = 100
 
 # Hardcode multithreading options
-MapUpdate.UpdatePacketsDiff             = 100
-MapUpdate.UpdatePlayersDiff             = 100
-MapUpdate.UpdateCellsDiff               = 100
+MapUpdate.UpdatePacketsDiff = 100
+MapUpdate.UpdatePlayersDiff = 100
+MapUpdate.UpdateCellsDiff = 100
 
 # Parallelized execution of cells from same map
 #   MTCells.Threads       Number of different cells to update at the sametime
 #   MTCells.SafeDistance  2 cells wont be updated at the same time if they are at an inferior distance from each other (thread race issues)
-MapUpdate.Continents.MTCells.Threads               = 0
-MapUpdate.Continents.MTCells.SafeDistance          = 1066
-Continents.MotionUpdate.Threads         = 0
+MapUpdate.Continents.MTCells.Threads = 0
+MapUpdate.Continents.MTCells.SafeDistance = 1066
+Continents.MotionUpdate.Threads = 0
 
 # Number of threads for async tasks (/who, list AH items ...)
-AsyncTasks.Threads                      = 1
+AsyncTasks.Threads = 1
 AsyncQueriesTickTimeout = 0
 
 # Movement extrapolation system - not stable now
@@ -702,27 +702,27 @@ CharLogDump = 0
 
 GmLogPerAccount = 0
 
-LogsDB.GM                   = 0
-LogsDB.Chat                 = 0
-LogsDB.Characters           = 0
-LogsDB.LevelUp              = 0
-LogsDB.Loot                 = 0
-LogsDB.Trades               = 0
-LogsDB.Transactions         = 0
-LogsDB.Battlegrounds        = 0
-Smartlog.Death              = 0
-Smartlog.LongCombat         = 0
+LogsDB.GM = 0
+LogsDB.Chat = 0
+LogsDB.Characters = 0
+LogsDB.LevelUp = 0
+LogsDB.Loot = 0
+LogsDB.Trades = 0
+LogsDB.Transactions = 0
+LogsDB.Battlegrounds = 0
+Smartlog.Death = 0
+Smartlog.LongCombat = 0
 Smartlog.LongCombatDuration = 1800
 
-PerformanceLog.SlowWorldUpdate          = 100
-PerformanceLog.SlowMapSystemUpdate      = 100
-PerformanceLog.SlowSessionsUpdate       = 100
-PerformanceLog.SlowUniqueSessionUpdate  = 20
-PerformanceLog.SlowMapUpdate            = 100
-PerformanceLog.SlowAsynQueries          = 100
-PerformanceLog.SlowPackets              = 20
-PerformanceLog.SlowMapPackets           = 60
-PerformanceLog.SlowPacketBroadcast      = 0
+PerformanceLog.SlowWorldUpdate = 100
+PerformanceLog.SlowMapSystemUpdate = 100
+PerformanceLog.SlowSessionsUpdate = 100
+PerformanceLog.SlowUniqueSessionUpdate = 20
+PerformanceLog.SlowMapUpdate = 100
+PerformanceLog.SlowAsynQueries = 100
+PerformanceLog.SlowPackets = 20
+PerformanceLog.SlowMapPackets = 60
+PerformanceLog.SlowPacketBroadcast = 0
 
 ###################################################################################################################
 # SERVER SETTINGS
@@ -1547,16 +1547,16 @@ Antiflood.Sanction = 8
 #
 ###################################################################################################
 
-Warden.WinEnabled            = 0
-Warden.OSXEnabled            = 0
-Warden.PlayersOnly           = 0
-Warden.NumScans              = 10
-Warden.ClientResponseDelay   = 30
-Warden.ScanFrequency         = 15
-Warden.DefaultPenalty        = 0
-Warden.BanDuration           = 86400
-Warden.DebugLog              = 0
-Warden.ModuleDir             = "warden_modules"
+Warden.WinEnabled = 0
+Warden.OSXEnabled = 0
+Warden.PlayersOnly = 0
+Warden.NumScans = 10
+Warden.ClientResponseDelay = 30
+Warden.ScanFrequency = 15
+Warden.DefaultPenalty = 0
+Warden.BanDuration = 86400
+Warden.DebugLog = 0
+Warden.ModuleDir = "warden_modules"
 
 ###################################################################################################
 # MOVEMENT ANTICHEAT SETTINGS
@@ -2333,23 +2333,23 @@ Movement.PendingAckResponseTime = 4000
 #
 ###################################################################################################################
 
-GM.LoginState            = 2
-GM.Visible               = 2
-GM.AcceptTickets         = 2
-GM.Chat                  = 2
-GM.WhisperingTo          = 2
-GM.InGMList.Level        = 3
-GM.InWhoList.Level       = 3
-GM.LogTrade              = 1
-GM.StartLevel            = 1
-GM.LowerSecurity         = 0
-GM.CreditOnDie           = 1
-GM.AllowTrades           = 1
-GM.AllowPublicChannels   = 0
-GMTickets.Enable         = 1
-GMTickets.MinLevel       = 0
+GM.LoginState = 2
+GM.Visible = 2
+GM.AcceptTickets = 2
+GM.Chat = 2
+GM.WhisperingTo = 2
+GM.InGMList.Level = 3
+GM.InWhoList.Level = 3
+GM.LogTrade = 1
+GM.StartLevel = 1
+GM.LowerSecurity = 0
+GM.CreditOnDie = 1
+GM.AllowTrades = 1
+GM.AllowPublicChannels = 0
+GMTickets.Enable = 1
+GMTickets.MinLevel = 0
 GMTickets.Admin.Security = 7
-GM.CheatGod              = 1
+GM.CheatGod = 1
 
 ###################################################################################################################
 # VISIBILITY AND RADIUSES
@@ -2402,17 +2402,17 @@ GM.CheatGod              = 1
 #
 ###################################################################################################################
 
-Visibility.GroupMode               = 0
-Visibility.Distance.Continents     = 100
+Visibility.GroupMode = 0
+Visibility.Distance.Continents = 100
 Visibility.Distance.Continents.Min = 60
-Visibility.Distance.Instances      = 170
-Visibility.Distance.BG             = 180
-Visibility.Distance.InFlight       = 100
-Visibility.Distance.Grey.Unit      = 1
-Visibility.Distance.Grey.Object    = 10
-Visibility.RelocationLowerLimit    = 10
+Visibility.Distance.Instances = 170
+Visibility.Distance.BG = 180
+Visibility.Distance.InFlight = 100
+Visibility.Distance.Grey.Unit = 1
+Visibility.Distance.Grey.Object = 10
+Visibility.RelocationLowerLimit = 10
 Visibility.AIRelocationNotifyDelay = 1000
-Visibility.ForceActiveObjects      = 1
+Visibility.ForceActiveObjects = 1
 
 ###################################################################################################################
 # SERVER RATES
@@ -2603,9 +2603,9 @@ Rate.Drop.Item.Legendary = 1
 Rate.Drop.Item.Artifact = 1
 Rate.Drop.Item.Referenced = 1
 Rate.Drop.Money = 1
-Rate.XP.Kill    = 1
+Rate.XP.Kill = 1
 Rate.XP.Kill.Elite = 1
-Rate.XP.Quest   = 1
+Rate.XP.Quest = 1
 Rate.XP.Explore = 1
 Rate.XP.Personal.Min = 1
 Rate.XP.Personal.Max = 1
@@ -2619,15 +2619,15 @@ Rate.Auction.Cut = 1
 Auction.Deposit.Min = 0
 Auction.AccountConcurrentLimit = 0
 Rate.Mining.Amount = 1
-Rate.Mining.Next   = 1
+Rate.Mining.Next = 1
 Rate.Talent = 1
 Rate.RespecBaseCost = 1
 Rate.RespecMultiplicativeCost = 5
 Rate.RespecMaxMultiplier = 10
 Rate.RespecMinMultiplier = 2
 Rate.Reputation.Gain = 1
-Rate.Reputation.LowLevel.Kill    = 0.2
-Rate.Reputation.LowLevel.Quest   = 1
+Rate.Reputation.LowLevel.Kill = 0.2
+Rate.Reputation.LowLevel.Quest = 1
 Rate.InstanceResetTime = 1
 SkillGain.Crafting = 1
 SkillGain.Defense = 1
@@ -2635,9 +2635,9 @@ SkillGain.Gathering = 1
 SkillGain.Weapon = 1
 SkillChance.Orange = 100
 SkillChance.Yellow = 75
-SkillChance.Green  = 25
-SkillChance.Grey   = 0
-SkillChance.MiningSteps   = 0
+SkillChance.Green = 25
+SkillChance.Grey = 0
+SkillChance.MiningSteps = 0
 SkillChance.SkinningSteps = 0
 SkillFail.Loot.Fishing = 0
 SkillFail.Gain.Fishing = 0
@@ -2650,7 +2650,7 @@ Death.CorpseReclaimDelay.PvE = 1
 Death.Bones.World = 1
 Death.Bones.Battleground = 1
 Corpses.UpdateMinutes = 20
-Bones.ExpireMinutes   = 60
+Bones.ExpireMinutes = 60
 Death.Ghost.RunSpeed.World = 1.0
 Death.Ghost.RunSpeed.Battleground = 1.0
 Rate.WarEffortResourceComplete = 0.0
@@ -3030,21 +3030,21 @@ BattleBot.AutoJoin = 0
 ###################################################################################################################
 #    Mail flooding mitigation
 ###################################################################################################################
-MailSpam.ExpireSecs                             = 0
-MailSpam.MaxMails                               = 2
-MailSpam.Level                                  = 1
-MailSpam.Money                                  = 0
-MailSpam.Item                                   = 0
+MailSpam.ExpireSecs = 0
+MailSpam.MaxMails = 2
+MailSpam.Level = 1
+MailSpam.Money = 0
+MailSpam.Item = 0
 
 ###################################################################################################################
 #    Dynamic respawn rates - Disabled by default
 ###################################################################################################################
-DynamicRespawn.Range                    = -1
-DynamicRespawn.PercentPerPlayer         = 0
-DynamicRespawn.MaxReductionRate         = 0
-DynamicRespawn.MinRespawnTime           = 0
-DynamicRespawn.AffectRespawnTimeBelow   = 0
-DynamicRespawn.AffectLevelBelow         = 0
-DynamicRespawn.PlayersThreshold         = 0
-DynamicRespawn.PlayersMaxLevelDiff      = 0
+DynamicRespawn.Range = -1
+DynamicRespawn.PercentPerPlayer = 0
+DynamicRespawn.MaxReductionRate = 0
+DynamicRespawn.MinRespawnTime = 0
+DynamicRespawn.AffectRespawnTimeBelow = 0
+DynamicRespawn.AffectLevelBelow = 0
+DynamicRespawn.PlayersThreshold = 0
+DynamicRespawn.PlayersMaxLevelDiff = 0
 
