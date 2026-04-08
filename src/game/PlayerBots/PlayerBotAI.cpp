@@ -48,6 +48,29 @@ void PlayerBotAI::UpdateAI(uint32 const diff)
         me->GetSession()->HandleMoveWorldportAck();
 }
 
+void PlayerBotAI::PrepareForLogout()
+{
+    if (!me || !me->IsDead())
+        return;
+
+    me->GetHostileRefManager().deleteReferences();
+
+    if (me->GetCorpse())
+    {
+        me->SpawnCorpseBones();
+        return;
+    }
+
+    // Dead bots that have not released yet do not have a corpse object.
+    // Create one and immediately convert it to bones so the bot can log out
+    // without leaving a persistent body behind.
+    if (me->GetDeathState() == CORPSE)
+    {
+        me->BuildPlayerRepop();
+        me->SpawnCorpseBones();
+    }
+}
+
 void PlayerBotAI::Remove()
 {
     if (me)

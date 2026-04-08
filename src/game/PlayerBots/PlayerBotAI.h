@@ -41,6 +41,7 @@ class PlayerBotAI: public PlayerAI
         virtual void OnPacketReceived(WorldPacket const* /*packet*/) {} // server has sent a packet to this session
         void UpdateAI(uint32 const /*diff*/) override; // Handle delayed teleports
         virtual void OnPlayerLogin() {}
+        virtual void PrepareForLogout();
         virtual void BeforeAddToMap(Player* player) {} // me=nullptr at call
         // Helpers
         bool SpawnNewPlayer(WorldSession* sess, uint8 classId, uint32 raceId, uint32 mapId, uint32 instanceId, float dx, float dy, float dz, float o, Player* pClone = nullptr);

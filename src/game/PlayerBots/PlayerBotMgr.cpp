@@ -235,7 +235,10 @@ void PlayerBotMgr::Update(uint32 diff)
             if (iter->second->requestRemoval)
             {
                 if (iter->second->ai && iter->second->ai->me)
+                {
+                    iter->second->ai->PrepareForLogout();
                     iter->second->ai->me->RemoveFromGroup();
+                }
 
                 DeleteBot(iter);
 
