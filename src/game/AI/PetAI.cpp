@@ -369,9 +369,11 @@ void PetAI::UpdateAllies()
     if (group && !group->isRaidGroup() && m_AllySet.size() == (group->GetMembersCount() + 1))
         return;
 
+    // Cache potential friendly targets here. Charmed owner/group members are
+    // filtered later by spell target validation before the pet actually casts.
     m_AllySet.clear();
     m_AllySet.insert(m_creature->GetObjectGuid());
-    m_AllySet.insert(owner->GetObjectGuid()); // The pet owner must always be a valid friendly target.
+    m_AllySet.insert(owner->GetObjectGuid()); // The pet owner must always be included.
 
     if (group)
     {
