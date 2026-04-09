@@ -265,7 +265,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 DELETE FROM `pool_template` WHERE `entry` IN (1186, 2533, 8074);
 DELETE FROM `pool_pool` WHERE `pool_id`= 2533;
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 2533;
-DELETE FROM `gameoobject` WHERE `guid` IN (23214, 23242);
+DELETE FROM `gameobject` WHERE `guid` IN (23214, 23242);
 
 UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=8072 AND `patch_min`=0 AND `patch_max`=10;
 UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=8073 AND `patch_min`=0 AND `patch_max`=10;
