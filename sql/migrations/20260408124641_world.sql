@@ -123,6 +123,153 @@ DELETE FROM `pool_template` WHERE  `entry` = 1112;
 UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=8020;
 UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=8036;
 
+SET @PTEMPLATE = 4930;
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (10031, 2551, 10032, 7026, 10033, 2554);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 1' WHERE `entry` IN (10031, 2551, 10032, 7026, 10033, 2554);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 1' WHERE `pool_entry` IN (10031, 2551, 10032, 7026, 10033, 2554);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 1 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(10031, @PTEMPLATE+1, 0, 'Loch Modan - Group 1 - Tin Vein / Silver Vein', 0),
+(2551, @PTEMPLATE+1, 0, 'Loch Modan - Group 1 - Tin Vein / Silver Vein', 0),
+(10032, @PTEMPLATE+1, 0, 'Loch Modan - Group 1 - Tin Vein / Silver Vein', 0),
+(7026, @PTEMPLATE+1, 0, 'Loch Modan - Group 1 - Tin Vein / Silver Vein', 0),
+(10033, @PTEMPLATE+1, 0, 'Loch Modan - Group 1 - Tin Vein / Silver Vein', 0),
+(2554, @PTEMPLATE+1, 0, 'Loch Modan - Group 1 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (10034, 10035, 10036, 2548, 2547, 10037);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 2' WHERE `entry` IN (10034, 10035, 10036, 2548, 2547, 10037);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 2' WHERE `pool_entry` IN (10034, 10035, 10036, 2548, 2547, 10037);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+2, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 2 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(10034, @PTEMPLATE+2, 0, 'Loch Modan - Group 2 - Tin Vein / Silver Vein', 0),
+(10035, @PTEMPLATE+2, 0, 'Loch Modan - Group 2 - Tin Vein / Silver Vein', 0),
+(10036, @PTEMPLATE+2, 0, 'Loch Modan - Group 2 - Tin Vein / Silver Vein', 0),
+(2548, @PTEMPLATE+2, 0, 'Loch Modan - Group 2 - Tin Vein / Silver Vein', 0),
+(2547, @PTEMPLATE+2, 0, 'Loch Modan - Group 2 - Tin Vein / Silver Vein', 0),
+(10037, @PTEMPLATE+2, 0, 'Loch Modan - Group 2 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (2543, 23018, 7028, 10020, 2545, 10021);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 3' WHERE `entry` IN (2543, 23018, 7028, 10020, 2545, 10021);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 3' WHERE `pool_entry` IN (2543, 23018, 7028, 10020, 2545, 10021);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+3, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 3 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(2543, @PTEMPLATE+3, 0, 'Loch Modan - Group 3 - Tin Vein / Silver Vein', 0),
+(23018, @PTEMPLATE+3, 0, 'Loch Modan - Group 3 - Tin Vein / Silver Vein', 0),
+(7028, @PTEMPLATE+3, 0, 'Loch Modan - Group 3 - Tin Vein / Silver Vein', 0),
+(10020, @PTEMPLATE+3, 0, 'Loch Modan - Group 3 - Tin Vein / Silver Vein', 0),
+(2545, @PTEMPLATE+3, 0, 'Loch Modan - Group 3 - Tin Vein / Silver Vein', 0),
+(10021, @PTEMPLATE+3, 0, 'Loch Modan - Group 3 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (10022, 10023, 10024, 7024, 2546, 17030);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 4' WHERE `entry` IN (10022, 10023, 10024, 7024, 2546, 17030);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 4' WHERE `pool_entry` IN (10022, 10023, 10024, 7024, 2546, 17030);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+4, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 4 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(10022, @PTEMPLATE+4, 0, 'Loch Modan - Group 4 - Tin Vein / Silver Vein', 0),
+(10023, @PTEMPLATE+4, 0, 'Loch Modan - Group 4 - Tin Vein / Silver Vein', 0),
+(10024, @PTEMPLATE+4, 0, 'Loch Modan - Group 4 - Tin Vein / Silver Vein', 0),
+(7024, @PTEMPLATE+4, 0, 'Loch Modan - Group 4 - Tin Vein / Silver Vein', 0),
+(2546, @PTEMPLATE+4, 0, 'Loch Modan - Group 4 - Tin Vein / Silver Vein', 0),
+(17030, @PTEMPLATE+4, 0, 'Loch Modan - Group 4 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (10025, 2536, 2535, 2534, 2537, 10026);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 5' WHERE `entry` IN (10025, 2536, 2535, 2534, 2537, 10026);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 5' WHERE `pool_entry` IN (10025, 2536, 2535, 2534, 2537, 10026);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+5, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 5 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(10025, @PTEMPLATE+5, 0, 'Loch Modan - Group 5 - Tin Vein / Silver Vein', 0),
+(2536, @PTEMPLATE+5, 0, 'Loch Modan - Group 5 - Tin Vein / Silver Vein', 0),
+(2535, @PTEMPLATE+5, 0, 'Loch Modan - Group 5 - Tin Vein / Silver Vein', 0),
+(2534, @PTEMPLATE+5, 0, 'Loch Modan - Group 5 - Tin Vein / Silver Vein', 0),
+(2537, @PTEMPLATE+5, 0, 'Loch Modan - Group 5 - Tin Vein / Silver Vein', 0),
+(10026, @PTEMPLATE+5, 0, 'Loch Modan - Group 5 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (23017, 2539, 2542, 10027, 10028, 2541);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 6' WHERE `entry` IN (23017, 2539, 2542, 10027, 10028, 2541);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 6' WHERE `pool_entry` IN (23017, 2539, 2542, 10027, 10028, 2541);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+6, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 6 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(23017, @PTEMPLATE+6, 0, 'Loch Modan - Group 6 - Tin Vein / Silver Vein', 0),
+(2539, @PTEMPLATE+6, 0, 'Loch Modan - Group 6 - Tin Vein / Silver Vein', 0),
+(2542, @PTEMPLATE+6, 0, 'Loch Modan - Group 6 - Tin Vein / Silver Vein', 0),
+(10027, @PTEMPLATE+6, 0, 'Loch Modan - Group 6 - Tin Vein / Silver Vein', 0),
+(10028, @PTEMPLATE+6, 0, 'Loch Modan - Group 6 - Tin Vein / Silver Vein', 0),
+(2541, @PTEMPLATE+6, 0, 'Loch Modan - Group 6 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (7021, 10039, 10040, 10041, 7020, 10042);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 7' WHERE `entry` IN (7021, 10039, 10040, 10041, 7020, 10042);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 7' WHERE `pool_entry` IN (7021, 10039, 10040, 10041, 7020, 10042);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+7, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 7 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(7021, @PTEMPLATE+7, 0, 'Loch Modan - Group 7 - Tin Vein / Silver Vein', 0),
+(10039, @PTEMPLATE+7, 0, 'Loch Modan - Group 7 - Tin Vein / Silver Vein', 0),
+(10040, @PTEMPLATE+7, 0, 'Loch Modan - Group 7 - Tin Vein / Silver Vein', 0),
+(10041, @PTEMPLATE+7, 0, 'Loch Modan - Group 7 - Tin Vein / Silver Vein', 0),
+(7020, @PTEMPLATE+7, 0, 'Loch Modan - Group 7 - Tin Vein / Silver Vein', 0),
+(10042, @PTEMPLATE+7, 0, 'Loch Modan - Group 7 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (7025, 2532, 2531, 10029, 2529);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 8' WHERE `entry` IN (7025, 2532, 2531, 10029, 2529);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 8' WHERE `pool_entry` IN (7025, 2532, 2531, 10029, 2529);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+8, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 8 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(7025, @PTEMPLATE+8, 0, 'Loch Modan - Group 8 - Tin Vein / Silver Vein', 0),
+(2532, @PTEMPLATE+8, 0, 'Loch Modan - Group 8 - Tin Vein / Silver Vein', 0),
+(2531, @PTEMPLATE+8, 0, 'Loch Modan - Group 8 - Tin Vein / Silver Vein', 0),
+(10029, @PTEMPLATE+8, 0, 'Loch Modan - Group 8 - Tin Vein / Silver Vein', 0),
+(2529, @PTEMPLATE+8, 0, 'Loch Modan - Group 8 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (7022, 7023, 10043, 10030, 2527);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 9' WHERE `entry` IN (7022, 7023, 10043, 10030, 2527);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 9' WHERE `pool_entry` IN (7022, 7023, 10043, 10030, 2527);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+9, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 9 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(7022, @PTEMPLATE+9, 0, 'Loch Modan - Group 9 - Tin Vein / Silver Vein', 0),
+(7023, @PTEMPLATE+9, 0, 'Loch Modan - Group 9 - Tin Vein / Silver Vein', 0),
+(10043, @PTEMPLATE+9, 0, 'Loch Modan - Group 9 - Tin Vein / Silver Vein', 0),
+(10030, @PTEMPLATE+9, 0, 'Loch Modan - Group 9 - Tin Vein / Silver Vein', 0),
+(2527, @PTEMPLATE+9, 0, 'Loch Modan - Group 9 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (2550, 2552, 7027, 10038);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 10' WHERE `entry` IN (2550, 2552, 7027, 10038);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 10' WHERE `pool_entry` IN (2550, 2552, 7027, 10038);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+10, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 10 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(2550, @PTEMPLATE+10, 0, 'Loch Modan - Group 10 - Tin Vein / Silver Vein', 0),
+(2552, @PTEMPLATE+10, 0, 'Loch Modan - Group 10 - Tin Vein / Silver Vein', 0),
+(7027, @PTEMPLATE+10, 0, 'Loch Modan - Group 10 - Tin Vein / Silver Vein', 0),
+(10038, @PTEMPLATE+10, 0, 'Loch Modan - Group 10 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_pool` WHERE `pool_id` IN (2538, 2544, 2540, 2553);
+UPDATE `pool_template` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 11' WHERE `entry` IN (2538, 2544, 2540, 2553);
+UPDATE `pool_gameobject` SET `description` = 'Tin Vein / Silver Vein - Loch Modan - Group 11' WHERE `pool_entry` IN (2538, 2544, 2540, 2553);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+11, 1, 'Tin Vein / Silver Vein - Loch Modan - Group 11 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(2538, @PTEMPLATE+11, 0, 'Loch Modan - Group 11 - Tin Vein / Silver Vein', 0),
+(2544, @PTEMPLATE+11, 0, 'Loch Modan - Group 11 - Tin Vein / Silver Vein', 0),
+(2540, @PTEMPLATE+11, 0, 'Loch Modan - Group 11 - Tin Vein / Silver Vein', 0),
+(2553, @PTEMPLATE+11, 0, 'Loch Modan - Group 11 - Tin Vein / Silver Vein', 0);
+
+DELETE FROM `pool_template` WHERE `entry` IN (1186, 2533, 8074);
+DELETE FROM `pool_pool` WHERE `pool_id`= 2533;
+DELETE FROM `pool_gameobject` WHERE `pool_entry` = 2533;
+DELETE FROM `gameoobject` WHERE `guid` IN (23214, 23242);
+
+UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=8072 AND `patch_min`=0 AND `patch_max`=10;
+UPDATE `pool_template` SET `max_limit`=1 WHERE  `entry`=8073 AND `patch_min`=0 AND `patch_max`=10;
+
 -- End of migration.
 END IF;
 END??
