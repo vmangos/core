@@ -100,21 +100,21 @@ DELETE FROM `pool_template` WHERE `entry` = 298;
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 298;
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+1, 1, 'Lesser Bloodstone Ore - Arathi Highlands - Group 1 - Master', 0, 0, 0, 10);
+(@PTEMPLATE+1, 1, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 1 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (112801, @PTEMPLATE+1, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 1'),
 (25342, @PTEMPLATE+1, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 1'),
 (45341, @PTEMPLATE+1, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 1');
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+2, 1, 'Lesser Bloodstone Ore - Arathi Highlands - Group 2 - Master', 0, 0, 0, 10);
+(@PTEMPLATE+2, 1, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 2 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (25332, @PTEMPLATE+2, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 2'),
 (25337, @PTEMPLATE+2, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 2'),
 (112800, @PTEMPLATE+2, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 2');
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
-(@PTEMPLATE+3, 1, 'Lesser Bloodstone Ore - Arathi Highlands - Group 3 - Master', 0, 0, 0, 10);
+(@PTEMPLATE+3, 1, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 3 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (25335, @PTEMPLATE+3, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 3'),
 (112802, @PTEMPLATE+3, 'Lesser Bloodstone Deposit - Arathi Highlands - Group 3'),
