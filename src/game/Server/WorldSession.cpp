@@ -996,7 +996,7 @@ void WorldSession::SetAccountData(NewAccountData::AccountDataType type, const st
         {
             std::string escapedData = data;
             CharacterDatabase.escape_string(escapedData);
-            CharacterDatabase.PExecute("REPLACE INTO `account_data` VALUES (%u, %u, %u, '%s')", GetAccountId(), uint32(type), uint64(currentTime), escapedData.c_str());
+            CharacterDatabase.PExecute("REPLACE INTO `account_data` VALUES (%u, %u, %llu, '%s')", GetAccountId(), uint32(type), uint64(currentTime), escapedData.c_str());
         }
     }
     else
@@ -1013,7 +1013,7 @@ void WorldSession::SetAccountData(NewAccountData::AccountDataType type, const st
         {
             std::string escapedData = data;
             CharacterDatabase.escape_string(escapedData);
-            CharacterDatabase.PExecute("REPLACE INTO `character_account_data` VALUES (%u, %u, %u, '%s')", m_currentPlayerGuid.GetCounter(), uint32(type), uint64(currentTime), escapedData.c_str());
+            CharacterDatabase.PExecute("REPLACE INTO `character_account_data` VALUES (%u, %u, %llu, '%s')", m_currentPlayerGuid.GetCounter(), uint32(type), uint64(currentTime), escapedData.c_str());
         }
     }
 
