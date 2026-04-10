@@ -235,7 +235,15 @@ void PlayerBotMgr::Update(uint32 diff)
             if (iter->second->requestRemoval)
             {
                 if (iter->second->ai && iter->second->ai->me)
+                {
+                    if (!iter->second->ai->me->IsAlive())
+                    {
+                        // don't leave permanent corpse
+                        iter->second->ai->me->ResurrectPlayer(1.0f);
+                        iter->second->ai->me->SpawnCorpseBones();
+                    }
                     iter->second->ai->me->RemoveFromGroup();
+                }
 
                 DeleteBot(iter);
 
