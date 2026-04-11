@@ -8,7 +8,7 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES ('20260411162511');
 -- Add your query below.
 
-SET @PTEMPLATE = 3601;
+SET @PTEMPLATE = 4348;
 DELETE FROM `pool_template` WHERE `entry` = 1216;
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 1216;
 
