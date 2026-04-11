@@ -86,7 +86,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (21277, @PTEMPLATE+5, 'Copper Vein - Hillsbrad Foothills - Group 5'),
 (21251, @PTEMPLATE+5, 'Copper Vein - Hillsbrad Foothills - Group 5');
 
-SET @PTEMPLATE = 4949;
+SET @PTEMPLATE = 4950;
 
 DELETE FROM `pool_template` WHERE `entry` IN (270, 1156);
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 1156;
