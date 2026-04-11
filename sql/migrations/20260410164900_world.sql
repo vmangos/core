@@ -88,8 +88,9 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 
 SET @PTEMPLATE = 4949;
 
-DELETE FROM `pool_template` WHERE `entry` = 1156;
+DELETE FROM `pool_template` WHERE `entry` IN (270, 1156);
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 1156;
+DELETE FROM `pool_gameobject` WHERE `guid` = 14920;
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+1, 2, 'Copper Vein - Wetlands - Group 1 - Master', 0, 0, 0, 10);
