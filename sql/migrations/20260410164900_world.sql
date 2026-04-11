@@ -101,7 +101,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (14900, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1'),
 (5286, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1');
 
-(@PTEMPLATE+2, 2, 'Copper Vein - Wetlands - Group 2 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (14870, @PTEMPLATE+2, 'Copper Vein - Wetlands - Group 2'),
 (5474, @PTEMPLATE+2, 'Copper Vein - Wetlands - Group 2'),
