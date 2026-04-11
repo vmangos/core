@@ -50,8 +50,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (1780, @PTEMPLATE+3, 0, 'Un\'Goro Crater - Group 3 - Truesilver Deposit / Small Thorium Vein', 0);
 
 DELETE FROM `pool_pool` WHERE `pool_id` IN (1802, 1794, 1803, 1801, 14416, 1791);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Un\'Goro Crater - Group 4' WHERE `entry` IN (1802, 1784, 1803, 1801, 14416, 1791);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Un\'Goro Crater - Group 4' WHERE `pool_entry` IN (1802, 1784, 1803, 1801, 14416, 1791);
+UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Un\'Goro Crater - Group 4' WHERE `entry` IN (1802, 1794, 1803, 1801, 14416, 1791);
+UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Small Thorium Vein - Un\'Goro Crater - Group 4' WHERE `pool_entry` IN (1802, 1794, 1803, 1801, 14416, 1791);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+4, 1, 'Truesilver Deposit / Small Thorium Vein - Un\'Goro Crater - Group 4 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
