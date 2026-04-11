@@ -27,7 +27,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (16303, @PTEMPLATE+2, 'Blindweed - Un\'Goro Crater - Group 2'),
 (16378, @PTEMPLATE+2, 'Blindweed - Un\'Goro Crater - Group 2'),
 (17590, @PTEMPLATE+2, 'Blindweed - Un\'Goro Crater - Group 2'),
-(22186, @PTEMPLATE+2, 'Blindweed - Un\'Goro Crater - Group 2');
+(22186, @PTEMPLATE+2, 'Blindweed - Un\'Goro Crater - Group 2'),
 (22187, @PTEMPLATE+2, 'Blindweed - Un\'Goro Crater - Group 2'),
 (68348, @PTEMPLATE+2, 'Blindweed - Un\'Goro Crater - Group 2');
 
