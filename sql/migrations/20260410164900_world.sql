@@ -101,6 +101,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (14900, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1'),
 (5286, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1');
 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+2, 2, 'Copper Vein - Wetlands - Group 2 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (14870, @PTEMPLATE+2, 'Copper Vein - Wetlands - Group 2'),
 (5474, @PTEMPLATE+2, 'Copper Vein - Wetlands - Group 2'),
@@ -109,6 +111,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (100578, @PTEMPLATE+2, 'Copper Vein - Wetlands - Group 2'),
 (4716, @PTEMPLATE+2, 'Copper Vein - Wetlands - Group 2');
 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+3, 2, 'Copper Vein - Wetlands - Group 3 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (5048, @PTEMPLATE+3, 'Copper Vein - Wetlands - Group 3'),
@@ -118,6 +121,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (14875, @PTEMPLATE+3, 'Copper Vein - Wetlands - Group 3'),
 (14920, @PTEMPLATE+3, 'Copper Vein - Wetlands - Group 3');
 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+4, 2, 'Copper Vein - Wetlands - Group 4 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (14862, @PTEMPLATE+4, 'Copper Vein - Wetlands - Group 4'),
@@ -126,6 +130,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (34133, @PTEMPLATE+4, 'Copper Vein - Wetlands - Group 4'),
 (33849, @PTEMPLATE+4, 'Copper Vein - Wetlands - Group 4');
 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+5, 2, 'Copper Vein - Wetlands - Group 5 - Master', 0, 0, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (14894, @PTEMPLATE+5, 'Copper Vein - Wetlands - Group 5'),
