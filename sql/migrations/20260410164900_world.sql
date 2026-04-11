@@ -96,8 +96,8 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `inst
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (15031, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1'),
 (15030, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1'),
-(5283 , @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1'),
-(5288 , @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1'),
+(5283, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1'),
+(5288, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1'),
 (14900, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1'),
 (5286, @PTEMPLATE+1, 'Copper Vein - Wetlands - Group 1');
 
