@@ -26,12 +26,9 @@ fi
 world_db_archive="$1"
 workspace="${GITHUB_WORKSPACE:?GITHUB_WORKSPACE must be set}"
 mysql_container_id="${MYSQL_CONTAINER_ID:?MYSQL_CONTAINER_ID must be set}"
-mysql_packet_megabytes=128
-mysql_packet_limit="${mysql_packet_megabytes}M"
-# MySQL runtime SET expects a numeric value and does not support suffixes like M.
-mysql_packet_bytes=$((mysql_packet_megabytes * 1024 * 1024))
+mysql_packet_limit_bytes=$((128 * 1024 * 1024)) # 128M
 mysqladmin_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot)
-mysql_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot --max_allowed_packet="$mysql_packet_limit")
+mysql_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot --max_allowed_packet="$mysql_packet_limit_bytes")
 
 import_sql_file() {
   local database="$1"
@@ -64,7 +61,7 @@ done
 echo "Database is ready!"
 
 echo "Configuring MySQL packet size..."
-docker exec "$mysql_container_id" mysql "${mysql_client_args[@]}" -e "SET GLOBAL max_allowed_packet=$mysql_packet_bytes;"
+docker exec "$mysql_container_id" mysql "${mysql_client_args[@]}" -e "SET GLOBAL max_allowed_packet=$mysql_packet_limit_bytes;"
 
 echo "Downloading base world database..."
 world_db_archive_path="$workspace/$world_db_archive.7z"

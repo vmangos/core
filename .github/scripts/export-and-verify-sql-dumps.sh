@@ -26,9 +26,8 @@ fi
 output_dir="$1"
 dump_dir="$output_dir/mysql-dump"
 mysql_container_id="${MYSQL_CONTAINER_ID:?MYSQL_CONTAINER_ID must be set}"
-mysql_packet_megabytes=128
-mysql_packet_limit="${mysql_packet_megabytes}M"
-mysql_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot --max_allowed_packet="$mysql_packet_limit")
+mysql_packet_limit_bytes=$((128 * 1024 * 1024)) # 128M
+mysql_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot --max_allowed_packet="$mysql_packet_limit_bytes")
 
 dump_database() {
   local database="$1"
