@@ -142,6 +142,60 @@ namespace WorldPackets { namespace Guild
         explicit GuildRank() : ClientPacket(CMSG_GUILD_RANK) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
+    // --- Server Packets ---
+
+    class GuildInviteNotification final : public ServerPacket
+    {
+    public:
+        std::string inviterName;
+        std::string guildName;
+
+        explicit GuildInviteNotification() : ServerPacket(SMSG_GUILD_INVITE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GuildDeclineNotification final : public ServerPacket
+    {
+    public:
+        std::string playerName;
+
+        explicit GuildDeclineNotification() : ServerPacket(SMSG_GUILD_DECLINE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GuildCommandResult final : public ServerPacket
+    {
+    public:
+        uint32 command = 0;
+        std::string str;
+        uint32 result = 0;
+
+        explicit GuildCommandResult() : ServerPacket(SMSG_GUILD_COMMAND_RESULT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GuildInfo final : public ServerPacket
+    {
+    public:
+        std::string guildName;
+        uint32 createdDay = 0;
+        uint32 createdMonth = 0;
+        uint32 createdYear = 0;
+        uint32 memberCount = 0;
+        uint32 accountCount = 0;
+
+        explicit GuildInfo() : ServerPacket(SMSG_GUILD_INFO) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SaveGuildEmblemResult final : public ServerPacket
+    {
+    public:
+        uint32 error = 0;
+
+        explicit SaveGuildEmblemResult() : ServerPacket(MSG_SAVE_GUILD_EMBLEM) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
 }} // namespace WorldPackets::Guild
 
 #endif // MANGOS_PACKETS_GUILD_H

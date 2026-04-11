@@ -1211,7 +1211,7 @@ bool ChatHandler::HandleDebugSetValueByNameCommand(char* args)
                 break;
             }
         }
-       
+
     }
     else
         SendSysMessage("Wrong field name.");
@@ -2190,7 +2190,7 @@ bool ChatHandler::HandleDebugMonsterChatCommand(char* args)
     uint32 chatType;
     if (!ExtractUInt32(&args, chatType))
         return false;
-    
+
     std::ostringstream oss;
     oss << "Chat" << int(chatType);
     std::string rightText = oss.str();
@@ -2252,7 +2252,7 @@ bool ChatHandler::HandleDebugMonsterChatCommand(char* args)
     data << uint8(0);
     pTarget->SendMessageToSet(&data, true);
 #else // 1.11.2 client
-    
+
     if (chatType == 11 || chatType == 12 || chatType == 89 || chatType == 13 || chatType == 26)
     {
         data << uint32(strlen(pSender->GetName()) + 1);

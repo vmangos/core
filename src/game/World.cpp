@@ -2758,14 +2758,22 @@ void World::ShutdownCancel()
 // Send a server message to the user(s)
 void World::SendServerMessage(ServerMessageType type, char const* text, Player* player)
 {
-    WorldPacket data(SMSG_SERVER_MESSAGE, 50);              // guess size
-    data << uint32(type);
-    data << text;
+    auto packet = std::make_unique<WorldPackets::Misc::ServerMessage>();
+    packet->messageType = static_cast<uint32>(type);
+    packet->text = text;
 
     if (player)
-        player->GetSession()->SendPacket(&data);
+    {
+        player->GetSession()->SendPacket(std::move(packet));
+    }
     else
+    {
+        // TODO Use broadcaster which does the binary conversion automatically
+        WorldPacket data;
+        data.SetOpcode(packet->GetOpcode());
+        packet->AppendBodyTo(data);
         SendGlobalMessage(&data);
+    }
 }
 
 void World::UpdateSessions(uint32 diff)

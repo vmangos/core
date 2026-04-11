@@ -89,15 +89,12 @@ void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed con
 
 void WorldSession::SendAttackStop(Unit const* enemy)
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    WorldPacket data(SMSG_ATTACKSTOP, (4 + 20));            // we guess size
-    data << GetPlayer()->GetPackGUID();
-    data << (enemy ? enemy->GetPackGUID() : PackedGuid());  // must be packed guid
-#else
-    WorldPacket data(SMSG_ATTACKSTOP);
-    data << GetPlayer()->GetGUID();
-    data << (enemy ? enemy->GetGUID() : uint64());
-#endif
-    data << uint32(0);                                      // unk, can be 1 also
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Combat::AttackStop>();
+    packet->attackerGuid = GetPlayer()->GetObjectGuid();
+    if (enemy)
+    {
+        packet->victimGuid = enemy->GetObjectGuid();
+        packet->isDead = enemy->IsDead();
+    }
+    SendPacket(std::move(packet));
 }

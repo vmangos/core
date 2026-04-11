@@ -60,10 +60,10 @@ void WorldSession::SendAuctionHello(Unit* unit)
     // always return pointer
     AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit);
 
-    WorldPacket data(MSG_AUCTION_HELLO, 12);
-    data << unit->GetObjectGuid();
-    data << uint32(ahEntry->houseId);
-    SendPacket(&data);
+    auto helloResponse = std::make_unique<WorldPackets::AuctionHouse::AuctionHelloResponse>();
+    helloResponse->auctioneerGuid = unit->GetObjectGuid();
+    helloResponse->houseId = ahEntry->houseId;
+    SendPacket(std::move(helloResponse));
 }
 
 // call this method when player bids, creates, or deletes auction
@@ -98,60 +98,50 @@ void WorldSession::SendAuctionCommandResult(AuctionEntry* auc, AuctionAction Act
 // this function sends notification, if bidder is online
 void WorldSession::SendAuctionBidderNotification(AuctionEntry* auction, bool won)
 {
-    WorldPacket data(SMSG_AUCTION_BIDDER_NOTIFICATION, (8 * 4));
-    data << uint32(auction->GetHouseId());
-    data << uint32(auction->Id);
-    data << ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
-
+    auto notification = std::make_unique<WorldPackets::AuctionHouse::AuctionBidderNotification>();
+    notification->houseId = auction->GetHouseId();
+    notification->auctionId = auction->Id;
+    notification->bidderGuid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
     // if 0, client shows ERR_AUCTION_WON_S, else ERR_AUCTION_OUTBID_S
-    data << uint32(won ? 0 : auction->bid);
-    data << uint32(auction->GetAuctionOutBid());            // AuctionOutBid?
-    data << uint32(auction->itemTemplate);
+    notification->bidOrZero = won ? 0 : auction->bid;
+    notification->outBid = auction->GetAuctionOutBid();
+    notification->itemTemplate = auction->itemTemplate;
 
     Item *item = sAuctionMgr.GetAItem(auction->itemGuidLow);
-    uint32 randomId = item ? item->GetItemRandomPropertyId() : 0;
+    notification->randomPropertyId = item ? item->GetItemRandomPropertyId() : 0;
 
-    data << uint32(randomId);                               // random property (value > 0) or suffix (value < 0)
-
-    SendPacket(&data);
+    SendPacket(std::move(notification));
 }
 
 // this void causes on client to display: "Your auction sold"
 void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction, bool sold)
 {
-    WorldPacket data(SMSG_AUCTION_OWNER_NOTIFICATION, (7 * 4));
-    data << uint32(auction->Id);
-    data << uint32(auction->bid);                           // if 0, client shows ERR_AUCTION_EXPIRED_S, else ERR_AUCTION_SOLD_S (works only when guid==0)
-    data << uint32(auction->GetAuctionOutBid());            // AuctionOutBid?
+    auto notification = std::make_unique<WorldPackets::AuctionHouse::AuctionOwnerNotification>();
+    notification->auctionId = auction->Id;
+    notification->bid = auction->bid;
+    notification->outBid = auction->GetAuctionOutBid();
 
-    ObjectGuid guid = ObjectGuid();
     if (!sold)                                               // not sold yet
-        guid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);// bidder==0 and !sold for expired auctions, so it will show error message properly
+        notification->bidderGuid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
 
-    // if guid!=0, client updates auctions with new bid, outbid and bidderGuid, else it shows error messages as described above
-    data << guid;                                           // bidder guid
-    data << uint32(auction->itemTemplate);                  // item entry
+    notification->itemTemplate = auction->itemTemplate;
 
     Item *item = sAuctionMgr.GetAItem(auction->itemGuidLow);
-    uint32 randomId = item ? item->GetItemRandomPropertyId() : 0;
+    notification->randomPropertyId = item ? item->GetItemRandomPropertyId() : 0;
 
-    data << uint32(randomId);                               // random property (value > 0) or suffix (value < 0)
-    SendPacket(&data);
+    SendPacket(std::move(notification));
 }
 
 // shows ERR_AUCTION_REMOVED_S
 void WorldSession::SendAuctionRemovedNotification(AuctionEntry* auction)
 {
-    WorldPacket data(SMSG_AUCTION_REMOVED_NOTIFICATION, (3 * 4));
-    data << uint32(auction->Id);
-    data << uint32(auction->itemTemplate);
-
     Item *item = sAuctionMgr.GetAItem(auction->itemGuidLow);
-    uint32 randomId = item ? item->GetItemRandomPropertyId() : 0;
 
-    data << uint32(randomId);                               // random property (value > 0) or suffix (value < 0)
-
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::AuctionHouse::AuctionRemovedNotification>();
+    packet->auctionId = auction->Id;
+    packet->itemTemplate = auction->itemTemplate;
+    packet->randomPropertyId = item ? item->GetItemRandomPropertyId() : 0;
+    SendPacket(std::move(packet));
 }
 
 // this function sends mail to old bidder

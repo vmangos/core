@@ -1,5 +1,7 @@
 #include "Trade.h"
 
+#include "SharedDefines.h"
+
 void WorldPackets::Trade::InitiateTrade::ReadFromWorldPacket(WorldPacket& recv_data)
 {
     recv_data >> tradeTargetGuid;
@@ -27,3 +29,26 @@ void WorldPackets::Trade::AcceptTrade::ReadFromWorldPacket(WorldPacket& recv_dat
     // some unused variable with is set to 1 when the player got TRADE_STATUS_OPEN_WINDOW at least once in this session
     recv_data.read_skip<uint32>();
 }
+
+void WorldPackets::Trade::TradeStatus::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << status;
+    switch (status)
+    {
+        case TRADE_STATUS_BEGIN_TRADE:
+            buffer << playerGuid;
+            break;
+        case TRADE_STATUS_CLOSE_WINDOW:
+            buffer << closeResult;
+            buffer << closeUnk;
+            buffer << closeItemLimitCategory;
+            break;
+        case TRADE_STATUS_ONLY_CONJURED:
+            buffer << slot;
+            break;
+        default:
+            break;
+    }
+}
+
+

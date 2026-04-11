@@ -4,6 +4,7 @@
 #include "Packet.h"
 #include "ObjectGuid.h"
 #include <string>
+#include <vector>
 
 namespace WorldPackets { namespace Petition
 {
@@ -91,6 +92,76 @@ namespace WorldPackets { namespace Petition
         explicit PetitionBuy() : ClientPacket(CMSG_PETITION_BUY) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
+    // --- Server Packets ---
+
+    class PetitionSignResults final : public ServerPacket
+    {
+    public:
+        ObjectGuid itemGuid;
+        ObjectGuid playerGuid;
+        uint32 result = 0;
+
+        explicit PetitionSignResults() : ServerPacket(SMSG_PETITION_SIGN_RESULTS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class TurnInPetitionResults final : public ServerPacket
+    {
+    public:
+        uint32 result = 0;
+
+        explicit TurnInPetitionResults() : ServerPacket(SMSG_TURN_IN_PETITION_RESULTS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PetitionQueryResponse final : public ServerPacket
+    {
+    public:
+        uint32 petitionGuid = 0;
+        ObjectGuid ownerGuid;
+        std::string name;
+        uint32 flags = 0;
+        uint32 minSignatures = 0;
+        uint32 maxSignatures = 0;
+
+        explicit PetitionQueryResponse() : ServerPacket(SMSG_PETITION_QUERY_RESPONSE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PetitionRenameResult final : public ServerPacket
+    {
+    public:
+        ObjectGuid itemGuid;
+        std::string newName;
+
+        explicit PetitionRenameResult() : ServerPacket(MSG_PETITION_RENAME) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PetitionDeclineResult final : public ServerPacket
+    {
+    public:
+        ObjectGuid playerGuid;
+
+        explicit PetitionDeclineResult() : ServerPacket(MSG_PETITION_DECLINE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PetitionShowList final : public ServerPacket
+    {
+    public:
+        ObjectGuid npcGuid;
+        uint8 count = 0;
+        uint32 index = 0;
+        uint32 charterEntry = 0;
+        uint32 charterDisplayId = 0;
+        uint32 charterCost = 0;
+        uint32 unknown = 0;
+
+        explicit PetitionShowList() : ServerPacket(SMSG_PETITION_SHOWLIST) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Petition
 
 #endif // MANGOS_PACKETS_PETITION_H

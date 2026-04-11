@@ -72,3 +72,17 @@ void WorldPackets::Quest::QuestPushResult::ReadFromWorldPacket(WorldPacket& recv
     recv_data >> guid;
     recv_data >> msg;
 }
+
+// --- Server Packets ---
+
+void WorldPackets::Quest::QuestPushResultResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << senderGuid;
+    buffer << msg;
+}
+
+void WorldPackets::Quest::QuestLogFull::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+

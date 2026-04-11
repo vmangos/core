@@ -131,3 +131,39 @@ void WorldPackets::Item::BuybackItem::ReadFromWorldPacket(WorldPacket& recv_data
     recv_data >> slot;
 #endif
 }
+
+void WorldPackets::Item::BuyBankSlotResult::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << result;
+}
+
+void WorldPackets::Item::ItemNameQueryResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << itemId;
+    buffer << name;
+}
+
+void WorldPackets::Item::ReadItemOk::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << itemGuid;
+    buffer << itemGuid;
+}
+
+void WorldPackets::Item::ReadItemFailed::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << itemGuid;
+    buffer << reason;
+    buffer << itemGuid;
+}
+
+void WorldPackets::Item::ItemEnchantTimeUpdate::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << itemGuid;
+    buffer << slot;
+    buffer << duration;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    buffer << playerGuid;
+#endif
+}
+
+

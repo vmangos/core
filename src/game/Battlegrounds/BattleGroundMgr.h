@@ -70,11 +70,11 @@ enum BattleGroundQueueGroupTypes
 };
 #define BG_QUEUE_GROUP_TYPES_COUNT 4
 
-enum BattleGroundGroupJoinStatus
+enum BattleGroundGroupJoinStatus : uint32
 {
-    BG_GROUPJOIN_DESERTERS = -2,
-    BG_GROUPJOIN_FAILED = -1    // actually, any negative except 2
-                                // any other value is a MapID meaning successful join
+    BG_GROUPJOIN_DESERTERS = static_cast<uint32>(-2),
+    BG_GROUPJOIN_FAILED = static_cast<uint32>(-1) // actually, any negative except 2
+    // any other value is a MapID meaning successful join
 };
 
 class BattleGround;

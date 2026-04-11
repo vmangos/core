@@ -36,3 +36,29 @@ void WorldPackets::Query::ItemNameQuery::ReadFromWorldPacket(WorldPacket& recv_d
     recv_data >> itemId;
     recv_data.read_skip<uint64>(); // guid, not used
 }
+
+void WorldPackets::Query::QueryTimeResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << time;
+}
+
+void WorldPackets::Query::NameQueryResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << playerGuid;
+    buffer << name;
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+    buffer << realmName;
+#endif
+    buffer << race;
+    buffer << gender;
+    buffer << class_;
+}
+
+void WorldPackets::Query::PageTextQueryResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << pageId;
+    buffer << text;
+    buffer << nextPageId;
+}
+
+

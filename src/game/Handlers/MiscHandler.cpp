@@ -297,10 +297,10 @@ void WorldSession::HandleLogoutRequestOpcode(NullClientPacket const& /*packet*/)
 
     if (reason)
     {
-        WorldPacket data(SMSG_LOGOUT_RESPONSE, 1 + 4);
-        data << uint32(reason);
-        data << uint8(0);
-        SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Misc::LogoutResponse>();
+        packet->reason = reason;
+        packet->instant = 0;
+        SendPacket(std::move(packet));
         LogoutRequest(0);
         return;
     }
@@ -310,10 +310,10 @@ void WorldSession::HandleLogoutRequestOpcode(NullClientPacket const& /*packet*/)
         GetPlayer()->IsTaxiFlying() ||
         GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
     {
-        WorldPacket data(SMSG_LOGOUT_RESPONSE, 1 + 4);
-        data << uint32(0);
-        data << uint8(1);
-        SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Misc::LogoutResponse>();
+        packet->reason = 0;
+        packet->instant = 1;
+        SendPacket(std::move(packet));
         LogoutPlayer(true);
         return;
     }
@@ -332,10 +332,10 @@ void WorldSession::HandleLogoutRequestOpcode(NullClientPacket const& /*packet*/)
 
     GetPlayer()->ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_LOGGING_OUT, true);
 
-    WorldPacket data(SMSG_LOGOUT_RESPONSE, 1 + 4);
-    data << uint32(0);
-    data << uint8(0);
-    SendPacket(&data);
+    auto logoutPacket = std::make_unique<WorldPackets::Misc::LogoutResponse>();
+    logoutPacket->reason = 0;
+    logoutPacket->instant = 0;
+    SendPacket(std::move(logoutPacket));
     LogoutRequest(time(nullptr));
 }
 
@@ -347,8 +347,7 @@ void WorldSession::HandleLogoutCancelOpcode(NullClientPacket const& /*packet*/)
 {
     LogoutRequest(0);
 
-    WorldPacket data(SMSG_LOGOUT_CANCEL_ACK, 0);
-    SendPacket(&data);
+    SendPacket(std::make_unique<WorldPackets::Misc::LogoutCancelAck>());
 
     // not remove flags if can't free move - its not set in Logout request code.
     if (GetPlayer()->CanFreeMove())
@@ -391,9 +390,9 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPackets::Misc::ZoneUpdate const& 
     // Note: There might be a better place to perform this trigger
     if (m_clientOS == CLIENT_OS_MAC && GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
     {
-        WorldPacket data(SMSG_STANDSTATE_UPDATE, 1);
-        data << GetPlayer()->GetStandState();
-        GetPlayer()->GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Misc::StandStateUpdate>();
+        packet->standState = GetPlayer()->GetStandState();
+        GetPlayer()->GetSession()->SendPacket(std::move(packet));
     }
 }
 
@@ -861,10 +860,10 @@ void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountDa
     uint32 size = adata->data.size();
     if (!size)
     {
-        WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 4 + 4);
-        data << uint32(packet.type);                         // use the original type sent by client
-        data << uint32(0);                                   // decompressed length
-        SendPacket(&data);
+        auto accountDataPacket = std::make_unique<WorldPackets::Misc::UpdateAccountDataResponse>();
+        accountDataPacket->type = packet.type;                         // use the original type sent by client
+        accountDataPacket->decompressedLength = 0;                     // decompressed length
+        SendPacket(std::move(accountDataPacket));
     }
     else
     {
@@ -875,11 +874,11 @@ void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountDa
             return;
         }
 
-        WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 4 + 4 + compressedData->size() + 1);
-        data << uint32(packet.type);                            // use the original type sent by client
-        data << uint32(size);                                   // decompressed length
-        data.append(*compressedData);                           // compressed data
-        SendPacket(&data);
+        auto accountDataPacket = std::make_unique<WorldPackets::Misc::UpdateAccountDataResponse>();
+        accountDataPacket->type = packet.type;                            // use the original type sent by client
+        accountDataPacket->decompressedLength = size;                     // decompressed length
+        accountDataPacket->compressedData = std::move(*compressedData);   // compressed data
+        SendPacket(std::move(accountDataPacket));
     }
 }
 
@@ -935,10 +934,10 @@ void WorldSession::HandleSetActionBarTogglesOpcode(WorldPackets::Misc::SetAction
 
 void WorldSession::HandlePlayedTime(NullClientPacket const& /*packet*/)
 {
-    WorldPacket data(SMSG_PLAYED_TIME, 4 + 4);
-    data << uint32(_player->GetTotalPlayedTime());
-    data << uint32(_player->GetLevelPlayedTime());
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::PlayedTime>();
+    packet->totalPlayedTime = _player->GetTotalPlayedTime();
+    packet->levelPlayedTime = _player->GetLevelPlayedTime();
+    SendPacket(std::move(packet));
 }
 
 void WorldSession::HandleInspectOpcode(WorldPackets::Misc::Inspect const& packet)
@@ -955,9 +954,9 @@ void WorldSession::HandleInspectOpcode(WorldPackets::Misc::Inspect const& packet
     if (_player->IsValidAttackTarget(pTarget))
         return;
 
-    WorldPacket data(SMSG_INSPECT, 8);
-    data << ObjectGuid(packet.guid);
-    SendPacket(&data);
+    auto inspectPacket = std::make_unique<WorldPackets::Misc::InspectResponse>();
+    inspectPacket->guid = packet.guid;
+    SendPacket(std::move(inspectPacket));
 }
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPackets::Misc::InspectHonorStats const& packet)
@@ -972,87 +971,68 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPackets::Misc::InspectHono
     if (_player->IsValidAttackTarget(pTarget))
         return;
 
-    WorldPacket data(MSG_INSPECT_HONOR_STATS, (
-        8
-        + 1
-        + 4
-        + 4
-        + 4
-// World of Warcraft Client Patch 1.6.0 (2005-07-12)
-// - There is a new "This Week" section of the Honor tab, which will display PvP accomplishments of the current week.
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
-        + 4
-#endif
-        + 4
-        + 4
-        + 4
-        + 4
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
-        + 4
-#endif
-        + 4
-// World of Warcraft Client Patch 1.6.0 (2005-07-12)
-// - There is now a progress bar on the Honor tab of your character window that displays how close you are to your next rank.
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
-        + 1
-#endif
-    ));
+    auto honorStats = std::make_unique<WorldPackets::Misc::InspectHonorStatsResponse>();
 
     // player guid
-    data << packet.guid;
+    honorStats->playerGuid = packet.guid;
+
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is a new "This Week" section of the Honor tab, which will display PvP accomplishments of the current week.
+// World of Warcraft Client Patch 1.6.0 (2005-07-12)
+// - There is now a progress bar on the Honor tab of your character window that displays how close you are to your next rank.
 
     // Highest Rank
-    data << (uint8)pTarget->GetHonorMgr().GetHighestRank().rank;
+    honorStats->highestRank = pTarget->GetHonorMgr().GetHighestRank().rank;
 
     // Today Honorable and Dishonorable Kills
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_SESSION_KILLS);
+    honorStats->sessionKills = pTarget->GetUInt32Value(PLAYER_FIELD_SESSION_KILLS);
 
     // Yesterday Honorable Kills
-    data << pTarget->GetUInt16Value(PLAYER_FIELD_YESTERDAY_KILLS, 0);
+    honorStats->yesterdayHK = pTarget->GetUInt16Value(PLAYER_FIELD_YESTERDAY_KILLS, 0);
 
     // Unknown (deprecated, yesterday dishonourable?)
-    data << (uint16)0;
+    honorStats->unknownOld1 = 0;
 
     // Last Week Honorable Kills
-    data << pTarget->GetUInt16Value(PLAYER_FIELD_LAST_WEEK_KILLS, 0);
+    honorStats->lastWeekHK = pTarget->GetUInt16Value(PLAYER_FIELD_LAST_WEEK_KILLS, 0);
 
     // Unknown (deprecated, last week dishonourable?)
-    data << (uint16)0;
+    honorStats->unknownOld2 = 0;
 
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     // This Week Honorable kills
-    data << pTarget->GetUInt16Value(PLAYER_FIELD_THIS_WEEK_KILLS, 0);
+    honorStats->thisWeekHK = pTarget->GetUInt16Value(PLAYER_FIELD_THIS_WEEK_KILLS, 0);
 
     // Unknown (deprecated, this week dishonourable?)
-    data << (uint16)0;
+    honorStats->unknownOld3 = 0;
 #endif
 
     // Lifetime Honorable Kills
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
+    honorStats->lifetimeHK = pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
 
     // Lifetime Dishonorable Kills
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS);
+    honorStats->lifetimeDHK = pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS);
 
     // Yesterday Honor
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
+    honorStats->yesterdayHonor = pTarget->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
 
     // Last Week Honor
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
+    honorStats->lastWeekHonor = pTarget->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
 
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     // This Week Honor
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
+    honorStats->thisWeekHonor = pTarget->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
 #endif
 
     // Last Week Standing
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
+    honorStats->lastWeekRank = pTarget->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
 
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     // Rank progress bar
-    data << (uint8)pTarget->GetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR);
+    honorStats->rankBar = pTarget->GetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR);
 #endif
 
-    SendPacket(&data);
+    SendPacket(std::move(honorStats));
 }
 
 void WorldSession::HandleTeleportToUnitOpcode(WorldPackets::Misc::TeleportToUnit const& packet)
@@ -1150,9 +1130,9 @@ void WorldSession::HandleWhoisOpcode(WorldPackets::Query::Whois const& packet)
 
     std::string msg = packet.charName + "'s " + "account is " + acc + ", e-mail: " + email + ", last ip: " + lastIp;
 
-    WorldPacket data(SMSG_WHOIS, msg.size() + 1); // max CString length allowed: 256
-    data << msg;
-    _player->GetSession()->SendPacket(&data);
+    auto whoisPacket = std::make_unique<WorldPackets::Misc::WhoisResponse>();
+    whoisPacket->message = msg;
+    _player->GetSession()->SendPacket(std::move(whoisPacket));
 }
 
 void WorldSession::HandleFarSightOpcode(WorldPackets::Misc::FarSight const& packet)

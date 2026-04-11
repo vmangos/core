@@ -159,6 +159,17 @@ namespace WorldPackets { namespace Channel
         explicit ChannelModerate() : ClientPacket(CMSG_CHANNEL_MODERATE) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
+    // --- Server Packets ---
+
+    class ChannelNotify final : public ServerPacket
+    {
+    public:
+        uint8 type = 0;
+        std::string channelName;
+
+        explicit ChannelNotify() : ServerPacket(SMSG_CHANNEL_NOTIFY) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
 }} // namespace WorldPackets::Channel
 
 #endif // MANGOS_PACKETS_CHANNEL_H

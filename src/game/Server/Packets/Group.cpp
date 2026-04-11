@@ -1,4 +1,5 @@
 #include "Group.h"
+#include "Group/Group.h"
 
 void WorldPackets::Group::GroupInvite::ReadFromWorldPacket(WorldPacket& recv_data)
 {
@@ -88,5 +89,45 @@ void WorldPackets::Group::RaidReadyCheck::ReadFromWorldPacket(WorldPacket& recv_
         recv_data >> s;
         state = s;
     }
+}
+#endif
+
+void WorldPackets::Group::PartyCommandResult::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << operation;
+    buffer << memberName;
+    buffer << result;
+}
+
+void WorldPackets::Group::GroupInviteNotification::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << inviterName;
+}
+
+void WorldPackets::Group::GroupDeclineNotification::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << playerName;
+}
+
+void WorldPackets::Group::GroupUninviteNotification::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+void WorldPackets::Group::GroupDestroyed::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+void WorldPackets::Group::RaidReadyCheckResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << senderGuid;
+    buffer << state;
+}
+
+void WorldPackets::Group::RaidTargetUpdateDelta::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << uint8(0); // 0 = delta update
+    buffer << iconId;
+    buffer << targetGuid;
 }
 #endif

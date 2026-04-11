@@ -40,6 +40,7 @@ class Map;
 class BattleGround;
 class DungeonPersistentState;
 class Field;
+class Creature;
 class Unit;
 struct LFGGroupQueueInfo;
 
@@ -287,7 +288,7 @@ class Group
 
         void ChangeMembersGroup(ObjectGuid guid, uint8 group);
         void ChangeMembersGroup(Player* player, uint8 group);
-        
+
         void SwapMembersGroup(ObjectGuid guid, ObjectGuid swapGuid);
         void SwapMembersGroup(Player* player, Player* swapPlayer);
 

@@ -69,3 +69,16 @@ void WorldPackets::Pet::PetCastSpell::ReadFromWorldPacket(WorldPacket& recv_data
     recv_data >> targets;
 }
 #endif
+
+// --- Server Packets ---
+
+void WorldPackets::Pet::PetNameInvalid::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+void WorldPackets::Pet::PetNameQueryResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << petNumber;
+    buffer << name;
+    buffer << nameTimestamp;
+}

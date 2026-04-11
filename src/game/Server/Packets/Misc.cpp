@@ -249,3 +249,114 @@ void WorldPackets::Misc::WardenData::ReadFromWorldPacket(WorldPacket& recv_data)
         recv_data.read(data.data(), data.size());
 }
 #endif
+
+// --- Server Packets ---
+
+void WorldPackets::Misc::LogoutComplete::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+void WorldPackets::Misc::LogoutCancelAck::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+void WorldPackets::Misc::StandStateUpdate::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << standState;
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+void WorldPackets::Misc::PlayTimeWarning::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << flag;
+    buffer << timeLeftInSeconds;
+}
+#endif
+
+void WorldPackets::Misc::LogoutResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << reason;
+    buffer << instant;
+}
+
+void WorldPackets::Misc::PlayedTime::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << totalPlayedTime;
+    buffer << levelPlayedTime;
+}
+
+void WorldPackets::Misc::InspectResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << guid;
+}
+
+void WorldPackets::Misc::WhoisResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << message;
+}
+
+void WorldPackets::Misc::UpdateAccountDataResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << type;
+    buffer << decompressedLength;
+    buffer.append(compressedData.data(), compressedData.size());
+}
+
+void WorldPackets::Misc::InspectHonorStatsResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << playerGuid;
+    buffer << highestRank;
+    buffer << sessionKills;
+    buffer << yesterdayHK;
+    buffer << unknownOld1;
+    buffer << lastWeekHK;
+    buffer << unknownOld2;
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+    buffer << thisWeekHK;
+    buffer << unknownOld3;
+#endif
+    buffer << lifetimeHK;
+    buffer << lifetimeDHK;
+    buffer << yesterdayHonor;
+    buffer << lastWeekHonor;
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+    buffer << thisWeekHonor;
+#endif
+    buffer << lastWeekRank;
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+    buffer << rankBar;
+#endif
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+void WorldPackets::Misc::WeatherUpdate::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << weatherType;
+    buffer << grade;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    buffer << soundId;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    buffer << instantChange;
+#endif
+}
+#endif
+
+void WorldPackets::Misc::ServerMessage::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << messageType;
+    buffer << text;
+}
+
+void WorldPackets::Misc::MeetingstoneJoinFailed::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << reason;
+}
+
+void WorldPackets::Misc::MeetingstoneSetQueue::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << areaId;
+    buffer << status;
+}
+
+

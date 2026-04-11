@@ -2954,8 +2954,7 @@ bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
                         if (uint32 taxiNode = sObjectMgr.GetNearestTaxiNode(data->position.x, data->position.y, data->position.z, data->position.mapId, player->GetTeam()))
                             if (player->GetTaxi().SetTaximaskNode(taxiNode))
                             {
-                                WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
-                                GetSession()->SendPacket(&msg);
+                                GetSession()->SendPacket(std::make_unique<WorldPackets::Taxi::NewTaxiPath>());
                             }
             }
     }

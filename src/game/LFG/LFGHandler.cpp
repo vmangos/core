@@ -126,15 +126,21 @@ void WorldSession::HandleMeetingStoneInfoOpcode(NullClientPacket const& /*packet
 
 void WorldSession::SendMeetingstoneFailed(uint8 status)
 {
-    WorldPacket data(SMSG_MEETINGSTONE_JOINFAILED, 1);
-    data << uint8(status);
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::MeetingstoneJoinFailed>();
+    packet->reason = status;
+    SendPacket(std::move(packet));
 }
 
 void WorldSession::SendMeetingstoneSetqueue(uint32 areaid, uint8 status)
 {
-    WorldPacket data(SMSG_MEETINGSTONE_SETQUEUE, 5);
-    data << uint32(areaid);
-    data << uint8(status);
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::MeetingstoneSetQueue>();
+
+    packet->areaId = areaid;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+    packet->idempotencyToken = 0; // TODO: Must forward this but there are soo many callsites of `SendMeetingstoneSetqueue`
+#else
+    packet->status = status;
+#endif
+
+    SendPacket(std::move(packet));
 }

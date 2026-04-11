@@ -3,6 +3,7 @@
 
 #include "Packet.h"
 #include "SharedDefines.h"
+#include "nonstd/optional.hpp"
 #include <string>
 #include <vector>
 
@@ -50,6 +51,44 @@ namespace WorldPackets { namespace GmTicket
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
 #endif
+
+    // --- Server Packets ---
+
+    class GmTicketUpdateTextResponse final : public ServerPacket
+    {
+    public:
+        uint32 response = 0;
+
+        explicit GmTicketUpdateTextResponse() : ServerPacket(SMSG_GMTICKET_UPDATETEXT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GmTicketDeleteTicketResponse final : public ServerPacket
+    {
+    public:
+        uint32 response = 0;
+
+        explicit GmTicketDeleteTicketResponse() : ServerPacket(SMSG_GMTICKET_DELETETICKET) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GmTicketCreateResponse final : public ServerPacket
+    {
+    public:
+        uint32 response = 0;
+
+        explicit GmTicketCreateResponse() : ServerPacket(SMSG_GMTICKET_CREATE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GmTicketSystemStatus final : public ServerPacket
+    {
+    public:
+        uint32 status = 0;
+
+        explicit GmTicketSystemStatus() : ServerPacket(SMSG_GMTICKET_SYSTEMSTATUS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
 
 }} // namespace WorldPackets::GmTicket
 

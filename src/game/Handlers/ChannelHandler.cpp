@@ -29,10 +29,10 @@ void WorldSession::HandleJoinChannelOpcode(WorldPackets::Channel::JoinChannel co
     // Channel name must begin with a letter.
     if (packet.channelName.empty() || (uint8(packet.channelName[0]) <= 127 && !isalpha(packet.channelName[0])))
     {
-        WorldPacket data(SMSG_CHANNEL_NOTIFY, 1 + packet.channelName.size() + 1);
-        data << uint8(CHAT_INVALID_NAME_NOTICE);
-        data << packet.channelName;
-        SendPacket(&data);
+        auto notifyPacket = std::make_unique<WorldPackets::Channel::ChannelNotify>();
+        notifyPacket->type = CHAT_INVALID_NAME_NOTICE;
+        notifyPacket->channelName = packet.channelName;
+        SendPacket(std::move(notifyPacket));
         return;
     }
 

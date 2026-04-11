@@ -4,6 +4,7 @@
 #include "Packet.h"
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
+#include <string>
 
 namespace WorldPackets { namespace Quest
 {
@@ -131,6 +132,25 @@ namespace WorldPackets { namespace Quest
         explicit QuestPushResult() : ClientPacket(MSG_QUEST_PUSH_RESULT) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
+    // --- Server Packets ---
+
+    class QuestPushResultResponse final : public ServerPacket
+    {
+    public:
+        ObjectGuid senderGuid;  // guid of the player who sent the quest share
+        uint8 msg = 0;          // enum QuestShareMessages
+
+        explicit QuestPushResultResponse() : ServerPacket(MSG_QUEST_PUSH_RESULT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class QuestLogFull final : public ServerPacket
+    {
+    public:
+        explicit QuestLogFull() : ServerPacket(SMSG_QUESTLOG_FULL) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Quest
 
 #endif // MANGOS_PACKETS_QUEST_H

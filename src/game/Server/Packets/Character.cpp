@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "SharedDefines.h"
 
 void WorldPackets::Character::CharCreate::ReadFromWorldPacket(WorldPacket& recv_data)
 {
@@ -32,3 +33,29 @@ void WorldPackets::Character::CharRename::ReadFromWorldPacket(WorldPacket& recv_
     recv_data >> guid;
     recv_data >> newname;
 }
+
+void WorldPackets::Character::CharCreateResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << result;
+}
+
+void WorldPackets::Character::CharDeleteResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << result;
+}
+
+void WorldPackets::Character::CharacterLoginFailed::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << result;
+}
+
+void WorldPackets::Character::LoginVerifyWorld::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << location.mapId;
+    buffer << location.x;
+    buffer << location.y;
+    buffer << location.z;
+    buffer << location.o;
+}
+
+

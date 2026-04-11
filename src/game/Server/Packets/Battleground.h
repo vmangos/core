@@ -95,6 +95,17 @@ namespace WorldPackets { namespace Battleground
         explicit BattlefieldJoin() : ClientPacket(CMSG_BATTLEFIELD_JOIN) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
+    // --- Server Packets ---
+
+    class GroupJoinedBattleground final : public ServerPacket
+    {
+    public:
+        uint32 result = 0;
+
+        explicit GroupJoinedBattleground() : ServerPacket(SMSG_GROUP_JOINED_BATTLEGROUND) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Battleground
 
 #endif // MANGOS_PACKETS_BATTLEGROUND_H

@@ -44,6 +44,8 @@
 #include "PlayerBroadcaster.h"
 #include "Crypto/Hash/MD5.h"
 
+#include <limits>
+
 // select opcodes appropriate for processing in Map::Update context for current session state
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
 {
@@ -74,7 +76,7 @@ WorldSession::WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, Account
     m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_playerSave(false), m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)),
     m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr), m_cheatData(nullptr),
     m_bot(nullptr), m_clientOS(CLIENT_OS_UNKNOWN), m_clientPlatform(CLIENT_PLATFORM_UNKNOWN), m_gameBuild(0), m_verifiedEmail(true),
-    m_charactersCount(10), m_characterMaxLevel(0), m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr), m_receivedPacketType{},
+    m_charactersCount(std::numeric_limits<uint32>::max()), m_characterMaxLevel(0), m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr), m_receivedPacketType{},
     m_floodPacketsCount{}, m_tutorials{}
 {
     m_remoteIpAddress = sock ? sock->GetRemoteIpString() : "<BOT>";
@@ -422,10 +424,10 @@ void WorldSession::CheckPlayedTimeLimit(time_t now)
 void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 timeLeftInSeconds)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-    WorldPacket data(SMSG_PLAY_TIME_WARNING, sizeof(uint32) + sizeof(int32));
-    data << uint32(flag);
-    data << int32(timeLeftInSeconds);
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::PlayTimeWarning>();
+    packet->flag = static_cast<uint32>(flag);
+    packet->timeLeftInSeconds = timeLeftInSeconds;
+    SendPacket(std::move(packet));
 #endif
 }
 
@@ -840,8 +842,7 @@ void WorldSession::LogoutPlayer(bool Save)
         SetPlayer(nullptr);                                    // deleted in Remove/DeleteFromWorld call
 
         // Send the 'logout complete' packet to the client
-        WorldPacket data(SMSG_LOGOUT_COMPLETE, 0);
-        SendPacket(&data);
+        SendPacket(std::make_unique<WorldPackets::Misc::LogoutComplete>());
 
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
     }

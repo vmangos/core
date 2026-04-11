@@ -65,6 +65,21 @@ namespace WorldPackets { namespace Spell
         explicit CancelChanneling() : ClientPacket(CMSG_CANCEL_CHANNELLING) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
+    // --- Server Packets ---
+
+    // Simplified SMSG_CAST_RESULT for a basic spell failure (status=2) with no extra data.
+    // For complex failures with additional payload (e.g. cooldown time, required area),
+    // use the full Spell::SendCastResult() path in Spell.cpp instead.
+    class CastResultSimpleFailure final : public ServerPacket
+    {
+    public:
+        uint32 spellId;
+        uint8 reason;
+
+        explicit CastResultSimpleFailure(uint32 spellId, uint8 reason)
+            : ServerPacket(SMSG_CAST_RESULT), spellId(spellId), reason(reason) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
 }} // namespace WorldPackets::Spell
 
 #endif // MANGOS_PACKETS_SPELL_H

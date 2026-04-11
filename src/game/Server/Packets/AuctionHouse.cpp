@@ -62,3 +62,36 @@ void WorldPackets::AuctionHouse::AuctionListItems::ReadFromWorldPacket(WorldPack
     recv_data >> usable;
 }
 
+void WorldPackets::AuctionHouse::AuctionRemovedNotification::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << auctionId;
+    buffer << itemTemplate;
+    buffer << randomPropertyId;
+}
+
+void WorldPackets::AuctionHouse::AuctionHelloResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << auctioneerGuid;
+    buffer << houseId;
+}
+
+void WorldPackets::AuctionHouse::AuctionBidderNotification::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << houseId;
+    buffer << auctionId;
+    buffer << bidderGuid;
+    buffer << bidOrZero;
+    buffer << outBid;
+    buffer << itemTemplate;
+    buffer << randomPropertyId;
+}
+
+void WorldPackets::AuctionHouse::AuctionOwnerNotification::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << auctionId;
+    buffer << bid;
+    buffer << outBid;
+    buffer << bidderGuid;
+    buffer << itemTemplate;
+    buffer << randomPropertyId;
+}

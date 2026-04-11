@@ -811,7 +811,7 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
         if (spaceLeft <= 0)
             break;
         count++;
-        
+
         if (Player* pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr.first)))
         {
             data << pl->GetObjectGuid();

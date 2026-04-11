@@ -43,14 +43,13 @@
     -FIX sending PartyMemberStats
 */
 
-void WorldSession::SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res)
+void WorldSession::SendPartyResult(PartyOperation operation, std::string const& memberName, PartyResult res)
 {
-    WorldPacket data(SMSG_PARTY_COMMAND_RESULT, (4 + member.size() + 1 + 4));
-    data << uint32(operation);
-    data << member; // max len 48
-    data << uint32(res);
-
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Group::PartyCommandResult>();
+    packet->operation = operation;
+    packet->memberName = memberName;
+    packet->result = res;
+    SendPacket(std::move(packet));
 }
 
 void WorldSession::HandleGroupInviteOpcode(WorldPackets::Group::GroupInvite const& packet)
@@ -143,9 +142,9 @@ void WorldSession::HandleGroupInviteOpcode(WorldPackets::Group::GroupInvite cons
     }
 
     // ok, we do it
-    WorldPacket data(SMSG_GROUP_INVITE, 10); // guess size
-    data << GetPlayer()->GetName();
-    player->GetSession()->SendPacket(&data);
+    auto invitePacket = std::make_unique<WorldPackets::Group::GroupInviteNotification>();
+    invitePacket->inviterName = GetPlayer()->GetName();
+    player->GetSession()->SendPacket(std::move(invitePacket));
 
     SendPartyResult(PARTY_OP_INVITE, packet.memberName, ERR_PARTY_RESULT_OK);
 }
@@ -211,9 +210,9 @@ void WorldSession::HandleGroupDeclineOpcode(NullClientPacket const& /*packet*/)
         return;
 
     // report
-    WorldPacket data(SMSG_GROUP_DECLINE, 10); // guess size
-    data << GetPlayer()->GetName();
-    leader->GetSession()->SendPacket(&data);
+    auto declinePacket = std::make_unique<WorldPackets::Group::GroupDeclineNotification>();
+    declinePacket->playerName = GetPlayer()->GetName();
+    leader->GetSession()->SendPacket(std::move(declinePacket));
 }
 
 void WorldSession::HandleGroupUninviteGuidOpcode(WorldPackets::Group::GroupUninviteGuid const& packet)
@@ -579,10 +578,10 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPackets::Group::RaidReadyChec
         // Forward to the raid leader
         if (Player* gleader = sObjectMgr.GetPlayer(group->GetLeaderGuid()))
         {
-            WorldPacket data(MSG_RAID_READY_CHECK, 9);
-            data << GetPlayer()->GetObjectGuid();
-            data << uint8(packet.state.value());
-            gleader->GetSession()->SendPacket(&data);
+            auto response = std::make_unique<WorldPackets::Group::RaidReadyCheckResponse>();
+            response->senderGuid = GetPlayer()->GetObjectGuid();
+            response->state = packet.state.value();
+            gleader->GetSession()->SendPacket(std::move(response));
         }
     }
 }

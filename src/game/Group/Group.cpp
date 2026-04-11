@@ -79,7 +79,7 @@ void Roll::targetObjectBuildLink()
 //============== Group ==============================
 //===================================================
 
-Group::Group() : m_Id(0), m_leaderLastOnline(0), m_groupType(GROUPTYPE_NORMAL), 
+Group::Group() : m_Id(0), m_leaderLastOnline(0), m_groupType(GROUPTYPE_NORMAL),
                  m_bgGroup(nullptr), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON),
                  m_subGroupsCounts(nullptr), m_groupTeam(TEAM_NONE), m_LFGAreaId(0)
 {
@@ -454,18 +454,25 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 removeMethod)
                 }, 1);
             }
 
-            WorldPacket data;
-
             if (removeMethod == GROUP_KICK)
             {
-                data.Initialize(SMSG_GROUP_UNINVITE, 0);
-                player->GetSession()->SendPacket(&data);
+                player->GetSession()->SendPacket(std::make_unique<WorldPackets::Group::GroupUninviteNotification>());
 
                 if (IsInLFG())
                 {
-                    data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
-                    data << 0 << uint8(MEETINGSTONE_STATUS_PARTY_MEMBER_REMOVED_PARTY_REMOVED);
+                    WorldPackets::Misc::MeetingstoneSetQueue packet;
+                    packet.areaId = 0;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+                    packet.idempotencyToken = 0;
+#else
+                    packet.status = MEETINGSTONE_STATUS_PARTY_MEMBER_REMOVED_PARTY_REMOVED;
+#endif
+                    // TODO Use broadcaster which does the binary conversion automatically
+                    WorldPacket data;
+                    data.SetOpcode(packet.GetOpcode());
+                    packet.AppendBodyTo(data);
                     BroadcastPacket(&data, true);
+
                     leftGroup = true;
                     sWorld.GetLFGQueue().GetMessager().AddMessage([groupId = GetId()](LFGQueue* queue)
                     {
@@ -485,8 +492,17 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 removeMethod)
 
                 if (!leaderChanged)
                 {
-                    data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
-                    data << m_LFGAreaId << uint8(MEETINGSTONE_STATUS_PARTY_MEMBER_LEFT_LFG);
+                    WorldPackets::Misc::MeetingstoneSetQueue packet;
+                    packet.areaId = m_LFGAreaId;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+                    packet.idempotencyToken = 0;
+#else
+                    packet.status = MEETINGSTONE_STATUS_PARTY_MEMBER_LEFT_LFG;
+#endif
+                    // TODO Use broadcaster which does the binary conversion automatically
+                    WorldPacket data;
+                    data.SetOpcode(packet.GetOpcode());
+                    packet.AppendBodyTo(data);
                     BroadcastPacket(&data, true);
                 }
             }
@@ -496,6 +512,7 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 removeMethod)
                 group->SendUpdate();
             else
             {
+                WorldPacket data;
                 data.Initialize(SMSG_GROUP_LIST, 24);
                 data << uint64(0) << uint64(0) << uint64(0);
                 player->GetSession()->SendPacket(&data);
@@ -580,8 +597,7 @@ void Group::Disband(bool hideDestroy, ObjectGuid initiator)
         WorldPacket data;
         if (!hideDestroy)
         {
-            data.Initialize(SMSG_GROUP_DESTROYED, 0);
-            player->GetSession()->SendPacket(&data);
+            player->GetSession()->SendPacket(std::make_unique<WorldPackets::Group::GroupDestroyed>());
         }
 
         //we already removed player from group and in player->GetGroup() is his original group, send update
@@ -756,13 +772,18 @@ bool Group::FillPremadeLFG(ObjectGuid const& plrGuid, Classes playerClass, LfgRo
 
 void Group::SendLootStartRoll(uint32 CountDown, Roll const& r)
 {
-    WorldPacket data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4));
-    data << r.lootedTargetGUID;                             // creature guid what we're looting
-    data << uint32(r.itemSlot);                             // item slot in loot
-    data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
-    data << uint32(0);                                      // randomSuffix - not used ?
-    data << uint32(r.itemRandomPropId);                     // item random property ID
-    data << uint32(CountDown);                              // the countdown time to choose "need" or "greed"
+    auto packet = std::make_unique<WorldPackets::Loot::LootStartRoll>();
+    packet->lootedTargetGuid = r.lootedTargetGUID;
+    packet->itemSlot = r.itemSlot;
+    packet->itemEntryId = r.itemid;
+    packet->randomSuffix = 0;
+    packet->itemRandomPropId = r.itemRandomPropId;
+    packet->countdownTime = CountDown;
+
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket data;
+    data.SetOpcode(packet->GetOpcode());
+    packet->AppendBodyTo(data);
 
     for (const auto& itr : r.playerVote)
     {
@@ -779,15 +800,20 @@ void Group::SendLootStartRoll(uint32 CountDown, Roll const& r)
 
 void Group::SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, Roll const& r)
 {
-    WorldPacket data(SMSG_LOOT_ROLL, (8 + 4 + 8 + 4 + 4 + 4 + 1 + 1));
-    data << r.lootedTargetGUID;                             // creature guid that we're looting
-    data << uint32(r.itemSlot);
-    data << targetGuid;                                     // player guid
-    data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
-    data << uint32(0);                                      // randomSuffix - not used?
-    data << uint32(r.itemRandomPropId);                     // Item random property ID
-    data << uint8(rollNumber);                              // 0: "Need for: [item name]" > 127: "you passed on: [item name]"      Roll number
-    data << uint8(rollType);                                // 0: "Need for: [item name]" 0: "You have selected need for [item name] 1: need roll 2: greed roll
+    auto packet = std::make_unique<WorldPackets::Loot::LootRollResponse>();
+    packet->lootedTargetGuid = r.lootedTargetGUID;
+    packet->itemSlot = r.itemSlot;
+    packet->rollerGuid = targetGuid;
+    packet->itemEntryId = r.itemid;
+    packet->randomSuffix = 0;
+    packet->itemRandomPropId = r.itemRandomPropId;
+    packet->rollNumber = rollNumber;
+    packet->rollType = rollType;
+
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket data;
+    data.SetOpcode(packet->GetOpcode());
+    packet->AppendBodyTo(data);
 
     for (const auto& itr : r.playerVote)
     {
@@ -802,15 +828,20 @@ void Group::SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 r
 
 void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, Roll const& r)
 {
-    WorldPacket data(SMSG_LOOT_ROLL_WON, (8 + 4 + 4 + 4 + 4 + 8 + 1 + 1));
-    data << r.lootedTargetGUID;                             // creature guid what we're looting
-    data << uint32(r.itemSlot);                             // item slot in loot
-    data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
-    data << uint32(0);                                      // randomSuffix - not used ?
-    data << uint32(r.itemRandomPropId);                     // Item random property
-    data << targetGuid;                                     // guid of the player who won.
-    data << uint8(rollNumber);                              // rollnumber related to SMSG_LOOT_ROLL
-    data << uint8(rollType);                                // Rolltype related to SMSG_LOOT_ROLL
+    auto packet = std::make_unique<WorldPackets::Loot::LootRollWon>();
+    packet->lootedTargetGuid = r.lootedTargetGUID;
+    packet->itemSlot = r.itemSlot;
+    packet->itemEntryId = r.itemid;
+    packet->randomSuffix = 0;
+    packet->itemRandomPropId = r.itemRandomPropId;
+    packet->winnerGuid = targetGuid;
+    packet->rollNumber = rollNumber;
+    packet->rollType = uint8(rollType);
+
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket data;
+    data.SetOpcode(packet->GetOpcode());
+    packet->AppendBodyTo(data);
 
     for (const auto& itr : r.playerVote)
     {
@@ -825,12 +856,17 @@ void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, Roll
 
 void Group::SendLootAllPassed(Roll const& r)
 {
-    WorldPacket data(SMSG_LOOT_ALL_PASSED, (8 + 4 + 4 + 4 + 4));
-    data << r.lootedTargetGUID;                             // creature guid what we're looting
-    data << uint32(r.itemSlot);                             // item slot in loot
-    data << uint32(r.itemid);                               // The itemEntryId for the item that shall be rolled for
-    data << uint32(r.itemRandomPropId);                     // Item random property ID
-    data << uint32(0);                                      // Item random suffix ID - not used ?
+    auto packet = std::make_unique<WorldPackets::Loot::LootAllPassed>();
+    packet->lootedTargetGuid = r.lootedTargetGUID;
+    packet->itemSlot = r.itemSlot;
+    packet->itemEntryId = r.itemid;
+    packet->itemRandomPropId = r.itemRandomPropId;
+    packet->randomSuffixId = 0;
+
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket data;
+    data.SetOpcode(packet->GetOpcode());
+    packet->AppendBodyTo(data);
 
     for (const auto& itr : r.playerVote)
     {
@@ -1057,15 +1093,15 @@ void Group::SendLootStartRollsForPlayer(Player* pPlayer)
             if (!countDown)
                 continue;
 
-            WorldPacket data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4));
-            data << roll->lootedTargetGUID;                   // creature guid what we're looting
-            data << uint32(roll->itemSlot);                   // item slot in loot
-            data << uint32(roll->itemid);                     // the itemEntryId for the item that shall be rolled for
-            data << uint32(0);                                // randomSuffix - not used ?
-            data << uint32(roll->itemRandomPropId);           // item random property ID
-            data << uint32(countDown);                        // the countdown time to choose "need" or "greed"
+            auto packet = std::make_unique<WorldPackets::Loot::LootStartRoll>();
+            packet->lootedTargetGuid = roll->lootedTargetGUID;
+            packet->itemSlot = roll->itemSlot;
+            packet->itemEntryId = roll->itemid;
+            packet->randomSuffix = 0;
+            packet->itemRandomPropId = roll->itemRandomPropId;
+            packet->countdownTime = countDown;
 
-            pPlayer->GetSession()->SendPacket(&data);
+            pPlayer->GetSession()->SendPacket(std::move(packet));
         }
     }
 }
@@ -1250,10 +1286,14 @@ void Group::SetTargetIcon(uint8 id, ObjectGuid targetGuid)
     m_targetIcons[id] = targetGuid;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    WorldPacket data(MSG_RAID_TARGET_UPDATE, (1 + 1 + 8));
-    data << uint8(0); // 1 - full icon list, 0 - delta update
-    data << uint8(id);
-    data << targetGuid;
+    WorldPackets::Group::RaidTargetUpdateDelta deltaPacket;
+    deltaPacket.iconId = id;
+    deltaPacket.targetGuid = targetGuid;
+
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket data;
+    data.SetOpcode(deltaPacket.GetOpcode());
+    deltaPacket.AppendBodyTo(data);
     BroadcastPacket(&data, true);
 #endif
 }
@@ -1347,7 +1387,7 @@ void Group::SendUpdate()
                 markedTargets = std::make_unique<WorldPacket>(MSG_RAID_TARGET_UPDATE, (1 + TARGET_ICON_COUNT * 9));
                 *markedTargets << uint8(1); // 1 - full icon list, 0 - delta update
             }
-                
+
             *markedTargets << uint8(i);
             *markedTargets << m_targetIcons[i];
         }

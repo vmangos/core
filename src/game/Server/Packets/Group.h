@@ -5,6 +5,9 @@
 #include "ObjectGuid.h"
 #include "nonstd/optional.hpp"
 
+#include <string>
+#include <vector>
+
 namespace WorldPackets { namespace Group
 {
     class GroupInvite final : public ClientPacket
@@ -142,6 +145,85 @@ namespace WorldPackets { namespace Group
 
         explicit RaidReadyCheck() : ClientPacket(MSG_RAID_READY_CHECK) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
+    };
+#endif
+
+    // --- Server Packets ---
+
+    static constexpr uint8 PARTY_MAX_POSITIVE_AURAS = 32;  // MAX_POSITIVE_AURAS
+    static constexpr uint8 PARTY_MAX_NEGATIVE_AURAS = 16;  // MAX_AURAS - MAX_POSITIVE_AURAS
+
+    struct PartyMemberAuraData
+    {
+        uint32 positiveAuraMask = 0;
+        uint16 positiveAuras[PARTY_MAX_POSITIVE_AURAS] = {};
+        uint16 negativeAuraMask = 0;
+        uint16 negativeAuras[PARTY_MAX_NEGATIVE_AURAS] = {};
+    };
+
+    class PartyCommandResult final : public ServerPacket
+    {
+    public:
+        uint32 operation = 0;
+        std::string memberName; // max len 48
+        uint32 result = 0;
+
+        explicit PartyCommandResult() : ServerPacket(SMSG_PARTY_COMMAND_RESULT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GroupInviteNotification final : public ServerPacket
+    {
+    public:
+        std::string inviterName;
+
+        explicit GroupInviteNotification() : ServerPacket(SMSG_GROUP_INVITE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GroupDeclineNotification final : public ServerPacket
+    {
+    public:
+        std::string playerName;
+
+        explicit GroupDeclineNotification() : ServerPacket(SMSG_GROUP_DECLINE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GroupUninviteNotification final : public ServerPacket
+    {
+    public:
+        explicit GroupUninviteNotification() : ServerPacket(SMSG_GROUP_UNINVITE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GroupDestroyed final : public ServerPacket
+    {
+    public:
+        explicit GroupDestroyed() : ServerPacket(SMSG_GROUP_DESTROYED) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    class RaidReadyCheckResponse final : public ServerPacket
+    {
+    public:
+        ObjectGuid senderGuid;  // guid of the player who answered
+        uint8 state = 0;        // ready state
+
+        explicit RaidReadyCheckResponse() : ServerPacket(MSG_RAID_READY_CHECK) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    // Delta update: a single icon was changed (mode byte = 0)
+    class RaidTargetUpdateDelta final : public ServerPacket
+    {
+    public:
+        uint8 iconId = 0;
+        ObjectGuid targetGuid;
+
+        explicit RaidTargetUpdateDelta() : ServerPacket(MSG_RAID_TARGET_UPDATE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
 

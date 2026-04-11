@@ -285,15 +285,16 @@ void LFGMgr::UpdateGroup(Group* group, bool join, ObjectGuid playerGuid)
 
 void LFGMgr::BuildSetQueuePacket(WorldPacket& data, uint32 areaId, uint8 status)
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
-    data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
-    data << uint32(areaId);
-    data << uint8(status);
+    WorldPackets::Misc::MeetingstoneSetQueue packet;
+    packet.areaId = areaId;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+    packet.idempotencyToken = 0; // TODO: Must forward this but there are soo many callsites of `BuildSetQueuePacket`
 #else
-    data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 12);
-    data << uint64(status);
-    data << uint32(areaId);
+    packet.status = status;
 #endif
+
+    // TODO Use broadcaster which does the binary conversion automatically
+    packet.AppendBodyTo(data);
 }
 
 void LFGMgr::BuildMemberAddedPacket(WorldPacket& data, ObjectGuid plrGuid)

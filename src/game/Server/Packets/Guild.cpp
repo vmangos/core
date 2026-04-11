@@ -81,3 +81,36 @@ void WorldPackets::Guild::GuildRank::ReadFromWorldPacket(WorldPacket& recv_data)
     recv_data >> rights;
     recv_data >> rankName;
 }
+
+void WorldPackets::Guild::GuildInviteNotification::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << inviterName;
+    buffer << guildName;
+}
+
+void WorldPackets::Guild::GuildDeclineNotification::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << playerName;
+}
+
+void WorldPackets::Guild::GuildCommandResult::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << command;
+    buffer << str;
+    buffer << result;
+}
+
+void WorldPackets::Guild::GuildInfo::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << guildName;
+    buffer << createdDay;
+    buffer << createdMonth;
+    buffer << createdYear;
+    buffer << memberCount;
+    buffer << accountCount;
+}
+
+void WorldPackets::Guild::SaveGuildEmblemResult::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << error;
+}

@@ -634,10 +634,10 @@ void WorldSession::HandleQuestPushResult(WorldPackets::Quest::QuestPushResult co
 
     if (Player* pPlayer = ObjectAccessor::FindPlayer(questShareInfo->PlayerGuid))
     {
-        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
-        data << _player->GetObjectGuid();
-        data << uint8(packet.msg);                             // enum QuestShareMessages
-        pPlayer->GetSession()->SendPacket(&data);
+        auto response = std::make_unique<WorldPackets::Quest::QuestPushResultResponse>();
+        response->senderGuid = _player->GetObjectGuid();
+        response->msg = packet.msg;                                // enum QuestShareMessages
+        pPlayer->GetSession()->SendPacket(std::move(response));
     }
 
     _player->ClearQuestShareInfo();
