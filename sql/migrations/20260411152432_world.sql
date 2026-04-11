@@ -155,9 +155,6 @@ UPDATE `pool_gameobject` SET `description`='Dreamfoil - Azshara - Group 11' WHER
 UPDATE `pool_template` SET `description`='Dreamfoil - Azshara - Group 12 - Master' WHERE `entry` = 3953;
 UPDATE `pool_gameobject` SET `description`='Dreamfoil - Azshara - Group 12' WHERE `pool_entry` = 3953;
 
-DELETE FROM `pool_template` WHERE  `entry`=21603;
-DELETE FROM `pool_template` WHERE  `entry`=21604;
-
 UPDATE `pool_template` SET `description`='Azshara - Azsharite Formation' WHERE  `entry` IN (3600, 3762, 3763, 3764, 3765, 3766, 3767, 3768, 3769, 3770, 3771, 3772, 3773, 3774, 3775, 3776, 3777, 3778, 3779, 3780, 3781, 3782, 3783, 3784, 3785, 3786, 3787, 3788, 3789, 3790, 3791, 3792, 3793, 3794, 3795, 3796, 3797, 3798, 3799, 3800, 3801, 3802, 3803, 3804, 3805, 3806, 3807, 3808, 3809, 3810, 3811, 3812, 3813, 3814);
 
 
