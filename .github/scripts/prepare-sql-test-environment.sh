@@ -25,12 +25,18 @@ fi
 
 world_db_archive="$1"
 workspace="${GITHUB_WORKSPACE:?GITHUB_WORKSPACE must be set}"
-mysql_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot)
+mysql_container_id="${MYSQL_CONTAINER_ID:?MYSQL_CONTAINER_ID must be set}"
+mysql_packet_megabytes=128
+mysql_packet_limit="${mysql_packet_megabytes}M"
+# MySQL runtime SET expects a numeric value and does not support suffixes like M.
+mysql_packet_bytes=$((mysql_packet_megabytes * 1024 * 1024))
+mysqladmin_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot)
+mysql_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot --max_allowed_packet="$mysql_packet_limit")
 
 import_sql_file() {
   local database="$1"
   local file_path="$2"
-  docker exec -i mysqldb mysql "${mysql_client_args[@]}" "$database" < "$file_path"
+  docker exec -i "$mysql_container_id" mysql "${mysql_client_args[@]}" "$database" <"$file_path"
 }
 
 apply_migration_file() {
@@ -43,16 +49,10 @@ apply_migration_file() {
   fi
 }
 
-echo "Stopping preinstalled MySQL service..."
-sudo service mysql stop
-
-echo "Starting MySQL container..."
-sudo docker run --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql:5.6 --max_allowed_packet=128M
-
 echo "Waiting for database availability..."
 max_attempts=30
 attempt=0
-until docker exec mysqldb mysqladmin "${mysql_client_args[@]}" ping --silent &> /dev/null; do
+until docker exec "$mysql_container_id" mysqladmin "${mysqladmin_client_args[@]}" ping --silent &>/dev/null; do
   attempt=$((attempt + 1))
   if [ "$attempt" -gt "$max_attempts" ]; then
     echo "Database failed to become ready in time!" >&2
@@ -63,6 +63,9 @@ until docker exec mysqldb mysqladmin "${mysql_client_args[@]}" ping --silent &> 
 done
 echo "Database is ready!"
 
+echo "Configuring MySQL packet size..."
+docker exec "$mysql_container_id" mysql "${mysql_client_args[@]}" -e "SET GLOBAL max_allowed_packet=$mysql_packet_bytes;"
+
 echo "Downloading base world database..."
 world_db_archive_path="$workspace/$world_db_archive.7z"
 curl --fail --location --silent --show-error \
@@ -72,7 +75,7 @@ curl --fail --location --silent --show-error \
 
 echo "Creating source databases..."
 for database in realmd characters mangos logs; do
-  docker exec mysqldb mysql "${mysql_client_args[@]}" -e "CREATE DATABASE IF NOT EXISTS $database DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+  docker exec "$mysql_container_id" mysql "${mysql_client_args[@]}" -e "CREATE DATABASE IF NOT EXISTS $database DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
 done
 
 echo "Importing schema and base data..."

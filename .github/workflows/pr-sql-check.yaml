@@ -18,13 +18,30 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+    services:
+      mysql56:
+        # Public Docker Hub pulls on GitHub-hosted runners are exempt from
+        # Docker Hub rate limits:
+        # https://docs.github.com/actions/reference/limits#docker-hubs-rate-limit-for-github-actions
+        image: mysql:5.6
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
 
       - name: Prepare SQL test environment
+        env:
+          MYSQL_CONTAINER_ID: ${{ job.services.mysql56.id }}
         run: ./.github/scripts/prepare-sql-test-environment.sh "${{ env.WORLD_DB_ARCHIVE }}"
 
       - name: Export and verify migrated databases
+        env:
+          MYSQL_CONTAINER_ID: ${{ job.services.mysql56.id }}
         run: ./.github/scripts/export-and-verify-sql-dumps.sh "${{ github.workspace }}/database-artifacts"

@@ -25,18 +25,21 @@ fi
 
 output_dir="$1"
 dump_dir="$output_dir/mysql-dump"
-mysql_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot)
+mysql_container_id="${MYSQL_CONTAINER_ID:?MYSQL_CONTAINER_ID must be set}"
+mysql_packet_megabytes=128
+mysql_packet_limit="${mysql_packet_megabytes}M"
+mysql_client_args=(--host=127.0.0.1 --protocol=TCP -u root -proot --max_allowed_packet="$mysql_packet_limit")
 
 dump_database() {
   local database="$1"
   local file_path="$2"
-  docker exec mysqldb mysqldump "${mysql_client_args[@]}" "$database" > "$file_path"
+  docker exec "$mysql_container_id" mysqldump "${mysql_client_args[@]}" "$database" >"$file_path"
 }
 
 import_sql_file() {
   local database="$1"
   local file_path="$2"
-  docker exec -i mysqldb mysql "${mysql_client_args[@]}" "$database" < "$file_path"
+  docker exec -i "$mysql_container_id" mysql "${mysql_client_args[@]}" "$database" <"$file_path"
 }
 
 mkdir -p "$dump_dir"
@@ -49,7 +52,7 @@ dump_database characters "$dump_dir/characters.sql"
 
 echo "Creating verification databases..."
 for database in realmd_verify characters_verify mangos_verify logs_verify; do
-  docker exec mysqldb mysql "${mysql_client_args[@]}" -e "CREATE DATABASE IF NOT EXISTS $database DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+  docker exec "$mysql_container_id" mysql "${mysql_client_args[@]}" -e "CREATE DATABASE IF NOT EXISTS $database DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
 done
 
 echo "Reimporting exported dumps..."

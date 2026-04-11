@@ -35,7 +35,7 @@ trap 'rm -f "$notes_file"' EXIT
 git fetch --force --tags origin
 previous_sha="$(git rev-parse -q --verify "refs/tags/$release_tag^{commit}" 2>/dev/null || true)"
 
-echo "## Commits" > "$notes_file"
+echo "## Commits" >"$notes_file"
 
 if [ -n "$previous_sha" ] && [ "$previous_sha" != "$GITHUB_SHA" ]; then
   git_log_args=(--reverse --format='%H%x09%s' "$previous_sha..$GITHUB_SHA")
@@ -45,13 +45,14 @@ fi
 
 git log "${git_log_args[@]}" | while IFS=$'\t' read -r commit_sha subject; do
   short_sha="${commit_sha:0:7}"
+  bullet_sha="- $short_sha"
   if [[ "$subject" =~ \(\#([0-9]+)\) ]]; then
     pr_number="${BASH_REMATCH[1]}"
-    printf -- '- %s: %s [#%s](%s/pull/%s)\n' "$short_sha" "$subject" "$pr_number" "$repo_url" "$pr_number"
+    printf '%s: %s [#%s](%s/pull/%s)\n' "$bullet_sha" "$subject" "$pr_number" "$repo_url" "$pr_number"
   else
-    printf -- '- %s: %s\n' "$short_sha" "$subject"
+    printf '%s: %s\n' "$bullet_sha" "$subject"
   fi
-done >> "$notes_file"
+done >>"$notes_file"
 
 if gh release view "$release_tag" >/dev/null 2>&1; then
   gh release delete "$release_tag" --yes
