@@ -740,9 +740,11 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGU
     }
 
     data << uint32(pQuest->GetRewOrReqMoney());
-
-    data << uint32(0);              // unused
+    data << uint32(pQuest->GetQuestFlags());
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     data << uint32(pQuest->GetRewSpell());                  // reward spell, this spell will display (icon) (casted if RewSpellCast==0)
+#endif
+
     GetMenuSession()->SendPacket(&data);
 }
 
