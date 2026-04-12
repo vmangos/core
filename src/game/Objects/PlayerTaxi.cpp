@@ -50,12 +50,32 @@ void PlayerTaxi::LoadTaxiMask(char const* data)
     }
 }
 
-void PlayerTaxi::AppendTaximaskTo(ByteBuffer& data, bool all)
+void PlayerTaxi::AppendTaximaskTo(ByteBuffer& data, bool all, uint32 raceId)
 {
     if (all)
     {
-        for (uint32 i : sTaxiNodesMask)
-            data << uint32(i);              // all existing nodes
+        if ((1 << (raceId - 1)) & RACEMASK_ALLIANCE)        // alliance nodes
+        {
+            data << uint32(3456411898);
+            data << uint32(2148078929);
+            data << uint32(49991);
+            data << uint32(0);
+            data << uint32(0);
+            data << uint32(0);
+            data << uint32(0);
+            data << uint32(0);
+        }
+        else if ((1 << (raceId - 1)) & RACEMASK_HORDE)      // horde nodes
+        {
+            data << uint32(830166528);
+            data << uint32(315656872);
+            data << uint32(56504);
+            data << uint32(0);
+            data << uint32(0);
+            data << uint32(0);
+            data << uint32(0);
+            data << uint32(0);
+        }
     }
     else
     {
