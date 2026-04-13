@@ -9266,7 +9266,7 @@ void Unit::SendPetCastFail(uint32 spellid, SpellCastResult msg)
     {
         WorldPacket data(SMSG_PET_CAST_FAILED, 4 + 1 + 1);
         data << uint32(spellid);
-        data << uint8(2); // 1.12: for SMSG_CAST_RESULT probably 2 = failure, 0 = success.
+        data << static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
         data << uint8(msg);
         pOwner->GetSession()->SendPacket(&data);
     }

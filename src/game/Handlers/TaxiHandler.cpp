@@ -128,7 +128,7 @@ bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
 
         auto taxiStatus = std::make_unique<WorldPackets::Taxi::TaxiNodeStatus>();
         taxiStatus->guid = unit->GetObjectGuid();
-        taxiStatus->known = 1;
+        taxiStatus->known = true;
         SendPacket(std::move(taxiStatus));
 
         return true;

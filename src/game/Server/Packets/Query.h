@@ -77,7 +77,7 @@ namespace WorldPackets { namespace Query
         ObjectGuid playerGuid;
         std::string name;
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-        std::string realmName;
+        std::string realmName; // realm name for cross-realm BG usage
 #endif
         uint32 race = 0;
         uint32 gender = 0;

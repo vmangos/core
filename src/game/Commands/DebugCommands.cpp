@@ -200,7 +200,7 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
 
     WorldPacket data(SMSG_CAST_RESULT, 4 + 1 + 1);
     data << uint32(133);
-    data << uint8(2);
+    data << static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
     data << uint8(failnum);
     if (failarg1 || failarg2)
         data << uint32(failarg1);

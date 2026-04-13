@@ -1,4 +1,6 @@
 #include "Spell.h"
+#include "SharedDefines.h"
+#include "SpellDefines.h"
 
 void WorldPackets::Spell::CastSpell::ReadFromWorldPacket(WorldPacket& recv_data)
 {
@@ -38,6 +40,6 @@ void WorldPackets::Spell::CancelChanneling::ReadFromWorldPacket(WorldPacket& rec
 void WorldPackets::Spell::CastResultSimpleFailure::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << spellId;
-    buffer << uint8(2); // status = fail
+    buffer << static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
     buffer << reason;
 }

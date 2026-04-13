@@ -93,6 +93,6 @@ void WorldPackets::Channel::ChannelModerate::ReadFromWorldPacket(WorldPacket& re
 
 void WorldPackets::Channel::ChannelNotify::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << uint8(type);
+    buffer << type;
     buffer << channelName;
 }

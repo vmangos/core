@@ -83,20 +83,22 @@ void WorldPackets::Petition::PetitionQueryResponse::AppendBodyTo(ByteBuffer& buf
     buffer << petitionGuid;
     buffer << ownerGuid;
     buffer << name;
-    buffer << uint8(0);                                     // bodyText
+    buffer << bodyText;
     buffer << flags;
     buffer << minSignatures;
     buffer << maxSignatures;
-    buffer << uint32(0);                                    // deadLine
-    buffer << uint32(0);                                    // issueDate
-    buffer << uint32(0);                                    // allowedGuildID
-    buffer << uint32(0);                                    // allowedClasses
-    buffer << uint32(0);                                    // allowedRaces
-    buffer << uint16(0);                                    // allowedGender
-    buffer << uint32(0);                                    // allowedMinLevel
-    buffer << uint32(0);                                    // allowedMaxLevel
-    buffer << uint32(0);                                    // choicetext
-    buffer << uint32(0);                                    // numChoices
+    buffer << deadlineTimestamp;
+    buffer << creationTimestamp;
+    buffer << allowedGuildID;
+    buffer << allowedClasses;
+    buffer << allowedRaces;
+    buffer << allowedGender;
+    buffer << allowedMinLevel;
+    buffer << allowedMaxLevel;
+    buffer << static_cast<uint32>(choices.size());
+    for (const auto& choice : choices)
+        buffer << choice;
+    buffer << defaultChoice;
 }
 
 void WorldPackets::Petition::PetitionRenameResult::AppendBodyTo(ByteBuffer& buffer) const
@@ -113,12 +115,15 @@ void WorldPackets::Petition::PetitionDeclineResult::AppendBodyTo(ByteBuffer& buf
 void WorldPackets::Petition::PetitionShowList::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << npcGuid;
-    buffer << count;
-    buffer << index;
-    buffer << charterEntry;
-    buffer << charterDisplayId;
-    buffer << charterCost;
-    buffer << unknown;
+    buffer << static_cast<uint8>(entries.size());
+    for (const auto& entry : entries)
+    {
+        buffer << entry.index;
+        buffer << entry.charterEntry;
+        buffer << entry.charterDisplayId;
+        buffer << entry.charterCost;
+        buffer << entry.entryFlags;
+    }
 }
 
 

@@ -4401,7 +4401,7 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCas
 
     if (result != SPELL_CAST_OK && !spellInfo->HasAttribute(SPELL_ATTR_EX2_DO_NOT_REPORT_SPELL_FAILURE))
     {
-        data << uint8(2); // status = fail
+        data << static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
         data << uint8(spellInfo->IsPassiveSpell() ? SPELL_FAILED_DONT_REPORT : result);                                  // problem
         switch (result)
         {
@@ -4431,7 +4431,9 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCas
         }
     }
     else
-        data << uint8(0);
+    {
+        data << static_cast<uint8>(SPELL_RESULT_STATUS_OKAY);
+    }
 
     caster->GetSession()->SendPacket(&data);
 }

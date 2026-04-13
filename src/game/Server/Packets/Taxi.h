@@ -54,7 +54,7 @@ namespace WorldPackets { namespace Taxi
     {
     public:
         ObjectGuid guid;
-        uint8 known = 0;
+        bool known = false;
 
         explicit TaxiNodeStatus() : ServerPacket(SMSG_TAXINODE_STATUS) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;

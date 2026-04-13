@@ -39,9 +39,6 @@ void WorldSession::SendNameQueryOpcode(Player* p)
     auto nameResponse = std::make_unique<WorldPackets::Query::NameQueryResponse>();
     nameResponse->playerGuid = p->GetObjectGuid();
     nameResponse->name = p->GetName();
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-    nameResponse->realmName = "";                           // realm name for cross realm BG usage
-#endif
     nameResponse->race = p->GetRace();
     nameResponse->gender = p->GetGender();
     nameResponse->class_ = p->GetClass();
@@ -56,9 +53,6 @@ void WorldSession::SendNameQueryOpcodeFromDB(ObjectGuid guid)
         auto nameResponse = std::make_unique<WorldPackets::Query::NameQueryResponse>();
         nameResponse->playerGuid = ObjectGuid(HIGHGUID_PLAYER, pData->uiGuid);
         nameResponse->name = pData->sName;
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-        nameResponse->realmName = "";
-#endif
         nameResponse->race = pData->uiRace;
         nameResponse->gender = pData->uiGender;
         nameResponse->class_ = pData->uiClass;
@@ -92,9 +86,6 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult* result, uint32
     auto nameResponse = std::make_unique<WorldPackets::Query::NameQueryResponse>();
     nameResponse->playerGuid = ObjectGuid(HIGHGUID_PLAYER, lowguid);
     nameResponse->name = name;
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-    nameResponse->realmName = "";
-#endif
     nameResponse->race = pRace;
     nameResponse->gender = pGender;
     nameResponse->class_ = pClass;

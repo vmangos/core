@@ -492,16 +492,16 @@ void WorldSession::SendPetitionShowList(ObjectGuid guid)
     if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    uint8 count = 1;
+    WorldPackets::Petition::PetitionShowListEntry entry;
+    entry.index = 1;
+    entry.charterEntry = GUILD_CHARTER;
+    entry.charterDisplayId = CHARTER_DISPLAY_ID;
+    entry.charterCost = GUILD_CHARTER_COST;
+    entry.entryFlags = 1; // must be `&1` to show it in the UI
 
     auto showList = std::make_unique<WorldPackets::Petition::PetitionShowList>();
     showList->npcGuid = guid;
-    showList->count = 1;
-    showList->index = 1;
-    showList->charterEntry = GUILD_CHARTER;
-    showList->charterDisplayId = CHARTER_DISPLAY_ID;
-    showList->charterCost = GUILD_CHARTER_COST;
-    showList->unknown = 1;
+    showList->entries = { entry };
     SendPacket(std::move(showList));
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sent SMSG_PETITION_SHOWLIST");
 }

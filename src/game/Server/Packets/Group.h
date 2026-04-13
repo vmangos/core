@@ -150,17 +150,6 @@ namespace WorldPackets { namespace Group
 
     // --- Server Packets ---
 
-    static constexpr uint8 PARTY_MAX_POSITIVE_AURAS = 32;  // MAX_POSITIVE_AURAS
-    static constexpr uint8 PARTY_MAX_NEGATIVE_AURAS = 16;  // MAX_AURAS - MAX_POSITIVE_AURAS
-
-    struct PartyMemberAuraData
-    {
-        uint32 positiveAuraMask = 0;
-        uint16 positiveAuras[PARTY_MAX_POSITIVE_AURAS] = {};
-        uint16 negativeAuraMask = 0;
-        uint16 negativeAuras[PARTY_MAX_NEGATIVE_AURAS] = {};
-    };
-
     class PartyCommandResult final : public ServerPacket
     {
     public:

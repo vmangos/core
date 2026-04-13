@@ -3,7 +3,6 @@
 
 #include "Packet.h"
 #include "SharedDefines.h"
-#include "nonstd/optional.hpp"
 #include <string>
 #include <vector>
 
