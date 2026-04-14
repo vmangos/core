@@ -1,5 +1,5 @@
 #include "Spell.h"
-#include "SharedDefines.h"
+#include "Spells/Spell.h"
 #include "SpellDefines.h"
 
 void WorldPackets::Spell::CastSpell::ReadFromWorldPacket(WorldPacket& recv_data)
@@ -39,7 +39,7 @@ void WorldPackets::Spell::CancelChanneling::ReadFromWorldPacket(WorldPacket& rec
 
 void WorldPackets::Spell::CastResultSimpleFailure::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << spellId;
+    buffer << spellEntry->Id;
     buffer << static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
     buffer << reason;
 }

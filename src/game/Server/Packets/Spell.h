@@ -5,6 +5,8 @@
 #include "SpellCastTargetsInfo.h"
 #include "ObjectGuid.h"
 
+class SpellEntry;
+
 namespace WorldPackets { namespace Spell
 {
     class CastSpell final : public ClientPacket
@@ -73,11 +75,11 @@ namespace WorldPackets { namespace Spell
     class CastResultSimpleFailure final : public ServerPacket
     {
     public:
-        uint32 spellId;
+        ::SpellEntry const* spellEntry; // SpellEntry pointers are always valid even when `.reload`
         uint8 reason;
 
-        explicit CastResultSimpleFailure(uint32 spellId, uint8 reason)
-            : ServerPacket(SMSG_CAST_RESULT), spellId(spellId), reason(reason) {}
+        explicit CastResultSimpleFailure(::SpellEntry const* spellEntry, uint8 reason)
+            : ServerPacket(SMSG_CAST_RESULT), spellEntry(spellEntry), reason(reason) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 }} // namespace WorldPackets::Spell
