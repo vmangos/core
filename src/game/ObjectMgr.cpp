@@ -541,100 +541,63 @@ void ObjectMgr::SetPlayerWorldMask(uint64 const guid, uint32 newWorldMask)
 
 uint32 ObjectMgr::GetSavedVariable(uint32 index, uint32 defaultValue, bool* exist)
 {
-    SavedVariablesVector::iterator it;
-    for (it = m_SavedVariables.begin(); it != m_SavedVariables.end(); ++it)
+    auto it = m_SavedVariables.find(index);
+    if (it != m_SavedVariables.end())
     {
-        if (it->uiIndex == index)
-        {
-            if (exist)
-                (*exist) = true;
-            return it->uiValue;
-        }
+        if (exist)
+            *exist = true;
+        return it->second.uiValue;
     }
+
     if (exist)
-        (*exist) = false;
+        *exist = false;
     return defaultValue;
 }
 
-SavedVariable& ObjectMgr::_InsertVariable(uint32 index, uint32 value, bool saved)
+void ObjectMgr::_SaveVariable(uint32 index, SavedVariable& toSave)
 {
-    SavedVariable tmp;
-    tmp.uiIndex      = index;
-    tmp.uiValue      = value;
-    tmp.bSavedInDb   = saved;
-
-    m_SavedVariables.push_back(tmp);
-    return m_SavedVariables[m_SavedVariables.size()-1];
-}
-
-void ObjectMgr::_SaveVariable(SavedVariable const& toSave)
-{
-    // Must do this in a transaction, else if worker threads > 1 we could do one before the other
-    // when order is important...
-    WorldDatabase.BeginTransaction();
-    WorldDatabase.PExecute("DELETE FROM `variables` WHERE `index` = %u", toSave.uiIndex);
-    WorldDatabase.PExecute("INSERT INTO `variables` (`index`, `value`) VALUES (%u, %u)", toSave.uiIndex, toSave.uiValue);
-    WorldDatabase.CommitTransaction();
+    CharacterDatabase.PExecute("REPLACE INTO `world_persistent_variables` (`index`, `value`) VALUES (%u, %u)", index, toSave.uiValue);
+    toSave.bSavedInDb = true;
 }
 
 void ObjectMgr::InitSavedVariable(uint32 index, uint32 value)
 {
-    SavedVariablesVector::iterator it;
-    // Already registered?
-    for (it = m_SavedVariables.begin(); it != m_SavedVariables.end(); ++it)
-        if (it->uiIndex == index)
-            return;
-    
-    // If we are there, it means that the variable does not exist.
-    SavedVariable& variable = _InsertVariable(index, value, true);
-    _SaveVariable(variable);
+    // Only insert if not already registered
+    auto result = m_SavedVariables.emplace(index, SavedVariable{value, false});
+    if (result.second)
+        _SaveVariable(index, result.first->second);
 }
 
 void ObjectMgr::SetSavedVariable(uint32 index, uint32 value, bool autoSave)
 {
-    for (auto& itr : m_SavedVariables)
+    auto it = m_SavedVariables.find(index);
+
+    if (it != m_SavedVariables.end())
     {
-        if (itr.uiIndex == index)
-        {
-            // If the value has not changed.
-            if (itr.uiValue == value)
-                return;
-
-            itr.uiValue = value;
-            if (autoSave)
-                _SaveVariable(itr);
-            else
-                itr.bSavedInDb = false;
+        // If the value has not changed.
+        if (it->second.uiValue == value)
             return;
-        }
+
+        it->second.uiValue = value;
+        if (autoSave)
+            _SaveVariable(index, it->second);
+        else
+            it->second.bSavedInDb = false;
+        return;
     }
-    // If we are here, it means that the variable does not exist.
-    SavedVariable& variable = _InsertVariable(index, value, autoSave);
+
+    // Variable does not exist yet, create it.
+    auto& variable = m_SavedVariables[index] = {value, autoSave};
     if (autoSave)
-        _SaveVariable(variable);
+        _SaveVariable(index, variable);
 }
 
-void ObjectMgr::LoadVariable(uint32 index, uint32* variable, uint32 defaultValue, uint32 maxValue, uint32 minValue)
-{
-    bool inIndex = false;
-    (*variable) = GetSavedVariable(index, defaultValue, &inIndex);
-    uint32 originalValue = (*variable);
-    if (maxValue != 0 && (*variable) > maxValue)
-        (*variable) = defaultValue;
-    if ((*variable) < minValue)
-        (*variable) = defaultValue;
-    if (!inIndex)
-        _InsertVariable(index, (*variable), true);
-    if (originalValue != (*variable))
-        SetSavedVariable(index, (*variable), true);
-}
 void ObjectMgr::SaveVariables()
 {
-    SavedVariablesVector::iterator it;
-    for (it = m_SavedVariables.begin(); it != m_SavedVariables.end(); ++it)
+    for (auto& it : m_SavedVariables)
     {
-        if (!it->bSavedInDb)
-            _SaveVariable(*it);
+        if (!it.second.bSavedInDb)
+            _SaveVariable(it.first, it.second);
     }
 }
 
@@ -642,7 +605,7 @@ void ObjectMgr::LoadSavedVariable()
 {
     m_SavedVariables.clear();
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `index`, `value` FROM `variables`"));
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `index`, `value` FROM `world_persistent_variables`"));
 
     uint32 total_count = 0;
 
@@ -652,23 +615,24 @@ void ObjectMgr::LoadSavedVariable()
         bar.step();
 
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u saved variables", total_count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u world persistent variables", total_count);
         return;
     }
 
+    m_SavedVariables.reserve(result->GetRowCount());
     BarGoLink bar(result->GetRowCount());
 
     do
     {
         bar.step();
         Field* fields = result->Fetch();
-        _InsertVariable(fields[0].GetUInt32(), fields[1].GetUInt32(), true);
+        m_SavedVariables.emplace(fields[0].GetUInt32(), SavedVariable{fields[1].GetUInt32(), true});
         ++total_count;
     }
     while (result->NextRow());
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u saved variables", total_count);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u world persistent variables", total_count);
 }
 
 // Caching player data

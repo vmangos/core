@@ -434,11 +434,10 @@ class IdGenerator
 
 struct SavedVariable
 {
-    uint32 uiIndex;
     uint32 uiValue;
     bool bSavedInDb;
 };
-typedef std::vector<SavedVariable> SavedVariablesVector;
+typedef std::unordered_map<uint32 /*index*/, SavedVariable> SavedVariablesMap;
 
 struct PlayerCacheData
 {
@@ -1316,17 +1315,15 @@ class ObjectMgr
         std::map<uint32, uint32> m_PlayerPhases;
 
         // Saving Variables
-        SavedVariable& _InsertVariable(uint32 index, uint32 value, bool saved);
-        void _SaveVariable(SavedVariable const& toSave);
+        void _SaveVariable(uint32 index, SavedVariable& toSave);
 
         void InitSavedVariable(uint32 index, uint32 value);
         uint32 GetSavedVariable(uint32 index, uint32 defaultValue = 0, bool* exist = nullptr);
         void SetSavedVariable(uint32 index, uint32 value, bool SaveToDb = false);
-        void LoadVariable(uint32 index, uint32* variable, uint32 defaultValue, uint32 maxValue=0, uint32 minValue=0);
 
         void LoadSavedVariable();
         void SaveVariables();
-        SavedVariablesVector m_SavedVariables;
+        SavedVariablesMap m_SavedVariables;
 
         // Caching Player Data
         void LoadPlayerCacheData(uint32 lowGuid = 0);
