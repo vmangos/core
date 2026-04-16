@@ -6408,7 +6408,7 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 
     // Diplomacy racial does not affect rep loss. Tested on classic.
     float repMod = rep < 0 ? 0.0f : (float)GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN);
 
-    // faction specific auras only seem to apply to kills
+    // Faction specific auras only seem to apply to kills.
     if (source == REPUTATION_SOURCE_KILL)
         repMod += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, faction);
 
@@ -6428,56 +6428,49 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 
     //      60                  5                   20 %
 
     float rate;
-    float diffLvlRate;
-    uint32 diffLvl = 0;
     switch (source)
     {
         case REPUTATION_SOURCE_KILL:
-            rate = sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL);
-            // Ustaag <Nostalrius> : a priori, deja gere ailleurs... deque le mob est gris, la reput est divisee par 5.
-            /*if (MaNGOS::XP::GetGrayLevel(GetLevel()) >= creatureOrQuestLevel)
-                diffLvl = MaNGOS::XP::GetGrayLevel(GetLevel()) - creatureOrQuestLevel;
-            else
-                diffLvl = 0;*/
+            // Rep loss is not affected by the mob being gray. Tested on classic.
+            rate = rep > 0  && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(GetLevel()) 
+                ? sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL) : 1.0f;
             break;
         case REPUTATION_SOURCE_QUEST:
-            rate = sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_QUEST);
+        {
+            uint32 diffLvl = 0;
             if (GetLevel() >= creatureOrQuestLevel + 5)
                 diffLvl = GetLevel() - creatureOrQuestLevel - 5;
             else
                 diffLvl = 0;
+
+            switch (diffLvl)
+            {
+                case 0:
+                    rate = 1.0f;
+                    break;
+                case 1:
+                    rate = 0.8f;
+                    break;
+                case 2:
+                    rate = 0.6f;
+                    break;
+                case 3:
+                    rate = 0.4f;
+                    break;
+                default:
+                    rate = 0.2f;
+                    break;
+            }
+
             break;
+        }
         case REPUTATION_SOURCE_SPELL:
         default:
             rate = 1.0f;
             break;
     }
 
-    switch (diffLvl)
-    {
-        case 0:
-            diffLvlRate = 1.0f;
-            break;
-        case 1:
-            diffLvlRate = 0.8f;
-            break;
-        case 2:
-            diffLvlRate = 0.6f;
-            break;
-        case 3:
-            diffLvlRate = 0.4f;
-            break;
-        default:
-            diffLvlRate = 0.2f;
-            break;
-    }
-
-    // Ustaag <Nostalrius> : uniquement pour les quetes, cf. plus haut
-    if (source == REPUTATION_SOURCE_QUEST)
-        percent *= diffLvlRate;
-
-    if (rate != 1.0f && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(GetLevel()))
-        percent *= rate;
+    percent *= rate;
 
     if (percent <= 0.0f)
         return 0;

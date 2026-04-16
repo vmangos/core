@@ -2494,10 +2494,6 @@ Visibility.ForceActiveObjects = 1
 #         Reputation Gain form low level kill (grey creture)
 #         Default: 0.2
 #
-#    Rate.Reputation.LowLevel.Quest
-#         Reputation Gain rate
-#         Default: 1
-#
 #    Rate.InstanceResetTime
 #        Multiplier for the number of days in between global raid resets.
 #        Default: 1
@@ -2619,7 +2615,6 @@ Rate.RespecMaxMultiplier = 10
 Rate.RespecMinMultiplier = 2
 Rate.Reputation.Gain = 1
 Rate.Reputation.LowLevel.Kill = 0.2
-Rate.Reputation.LowLevel.Quest = 1
 Rate.InstanceResetTime = 1
 SkillGain.Crafting = 1
 SkillGain.Defense = 1
