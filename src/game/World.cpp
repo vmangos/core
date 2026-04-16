@@ -1339,8 +1339,8 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
     sInstanceStatistics.LoadFromDB();
 
-    // Chargements des variables (necessaire pour le OutdoorJcJ)
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading saved variables ...");
+    // Loads world persistent variables (War Effort, Stranglethorn Vale Fishing, ...)
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading world_persistent_variables...");
     sObjectMgr.LoadSavedVariable();
 
 
