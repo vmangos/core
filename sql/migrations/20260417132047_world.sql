@@ -906,7 +906,7 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 (@MOVID, '25', '-8068.548', '-5235.0225', '2.4442408', '100', '0', '0', 0),
 (@MOVID, '26', '-8071.25', '-5222.223', '0.58224404', '100', '0', '0', 0);
 
-SET @MOVID=23293;
+SET @MOVID=22722;
 DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, '7855', '1', '-7850', '-5087.5', '5.516257', '0.64330601692199710000', 300,300, '0', '2');
@@ -953,8 +953,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 (@MOVID, '38', '-7847.328', '-5086.914', '5.5957875', '100', '0', '0', 0);
 
 UPDATE `creature` SET `wander_distance`=0 WHERE `movement_type` = 2;
-
-DELETE FROM `creature` WHERE `guid` = 22722;
 
 INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES
 (23369, 0, 0, 0, -1, 0, 1, 234, NULL),
