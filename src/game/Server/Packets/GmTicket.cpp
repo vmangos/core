@@ -1,5 +1,7 @@
 #include "GmTicket.h"
 
+#include "GMTicketMgr.h"
+
 void WorldPackets::GmTicket::GmTicketCreate::ReadFromWorldPacket(WorldPacket& recv_data)
 {
     uint8 type;
@@ -59,6 +61,21 @@ void WorldPackets::GmTicket::GmTicketCreateResponse::AppendBodyTo(ByteBuffer& bu
 void WorldPackets::GmTicket::GmTicketSystemStatus::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << status;
+}
+
+void WorldPackets::GmTicket::GmTicketGetTicket::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << status;
+    if (status == GMTICKET_STATUS_HASTEXT)
+    {
+        buffer << message;
+        buffer << ticketType;
+        buffer << lastModifiedAge;
+        buffer << oldestTicketAge;
+        buffer << estimatedWaitTime;
+        buffer << escalationStatus;
+        buffer << openedByGMStatus;
+    }
 }
 
 

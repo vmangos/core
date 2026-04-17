@@ -37,7 +37,7 @@ void WorldSession::HandleGuildQueryOpcode(WorldPackets::Guild::GuildQuery const&
 {
     if (Guild* guild = sGuildMgr.GetGuildById(packet.guildId))
     {
-        guild->Query(this);
+        guild->SendQueryResponse(this);
         return;
     }
 
@@ -261,7 +261,7 @@ void WorldSession::HandleGuildInfoOpcode(NullClientPacket const& /*packet*/)
 void WorldSession::HandleGuildRosterOpcode(NullClientPacket const& /*packet*/)
 {
     if (Guild* guild = sGuildMgr.GetGuildById(_player->GetGuildId()))
-        guild->Roster(this);
+        guild->SendGuildRoster(this);
 }
 
 void WorldSession::HandleGuildPromoteOpcode(WorldPackets::Guild::GuildPromote const& packet)
@@ -523,7 +523,7 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPackets::Guild::GuildSetP
 
     slot->SetPNOTE(packet.note);
 
-    guild->Roster(this);
+    guild->SendGuildRoster(this);
 }
 
 void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPackets::Guild::GuildSetOfficerNote const& packet)
@@ -559,7 +559,7 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPackets::Guild::GuildSet
 
     slot->SetOFFNOTE(packet.note);
 
-    guild->Roster(this);
+    guild->SendGuildRoster(this);
 }
 
 void WorldSession::HandleGuildRankOpcode(WorldPackets::Guild::GuildRank const& packet)
@@ -591,8 +591,8 @@ void WorldSession::HandleGuildRankOpcode(WorldPackets::Guild::GuildRank const& p
 
     guild->SetRankRights(packet.rankId, newRights);
 
-    guild->Query(this);
-    guild->Roster();                                        // broadcast for tab rights update
+    guild->SendQueryResponse(this);
+    guild->SendGuildRoster();                                        // broadcast for tab rights update
 }
 
 void WorldSession::HandleGuildAddRankOpcode(WorldPackets::Guild::GuildAddRank const& packet)
@@ -621,8 +621,8 @@ void WorldSession::HandleGuildAddRankOpcode(WorldPackets::Guild::GuildAddRank co
 
     guild->CreateRank(packet.rankName, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
 
-    guild->Query(this);
-    guild->Roster();                                        // broadcast for tab rights update
+    guild->SendQueryResponse(this);
+    guild->SendGuildRoster();                                        // broadcast for tab rights update
 }
 
 void WorldSession::HandleGuildDelRankOpcode(NullClientPacket const& /*packet*/)
@@ -642,8 +642,8 @@ void WorldSession::HandleGuildDelRankOpcode(NullClientPacket const& /*packet*/)
 
     guild->DelRank();
 
-    guild->Query(this);
-    guild->Roster();                                        // broadcast for tab rights update
+    guild->SendQueryResponse(this);
+    guild->SendGuildRoster();                                        // broadcast for tab rights update
 }
 
 void WorldSession::SendGuildCommandResult(uint32 typecmd, std::string const& str, uint32 cmdresult)
@@ -724,7 +724,7 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPackets::Guild::SaveGuildEmb
     //"Guild Emblem saved."
     SendSaveGuildEmblem(ERR_GUILDEMBLEM_SUCCESS);
 
-    guild->Query(this);
+    guild->SendQueryResponse(this);
 }
 
 void WorldSession::SendSaveGuildEmblem(uint32 msg)

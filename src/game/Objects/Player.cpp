@@ -6434,7 +6434,7 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 
     {
         case REPUTATION_SOURCE_KILL:
             // Rep loss is not affected by the mob being gray. Tested on classic.
-            rate = rep > 0  && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(GetLevel()) 
+            rate = rep > 0  && creatureOrQuestLevel <= MaNGOS::XP::GetGrayLevel(GetLevel())
                 ? sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL) : 1.0f;
             break;
         case REPUTATION_SOURCE_QUEST:
@@ -12567,9 +12567,9 @@ void Player::SendPreparedQuest(ObjectGuid guid)
     // multiply entries
     else
     {
-        QEmote qe;
-        qe._Delay = 0;
-        qe._Emote = 0;
+        QuestNpcEmoteInfo qe;
+        qe.delay = 0;
+        qe.emote = 0;
         std::string title;
 
         // need pet case for some quests
@@ -12589,8 +12589,8 @@ void Player::SendPreparedQuest(ObjectGuid guid)
                 {
                     if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(gossiptext->Options[0].BroadcastTextID))
                     {
-                        qe._Emote = bct->emoteId1;
-                        qe._Delay = bct->emoteDelay1;
+                        qe.emote = bct->emoteId1;
+                        qe.delay = bct->emoteDelay1;
                         int locIdx = GetSession()->GetSessionDbLocaleIndex();
                         title = bct->GetText(locIdx, pCreature->GetGender(), false);
                     }
@@ -14444,39 +14444,40 @@ void Player::SendQuestCompleteEvent(uint32 questId) const
 {
     if (questId)
     {
-        WorldPacket data(SMSG_QUESTUPDATE_COMPLETE, 4);
-        data << uint32(questId);
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Quest::QuestUpdateComplete>();
+        packet->questId = questId;
+        GetSession()->SendPacket(std::move(packet));
     }
 }
 
 void Player::SendQuestReward(Quest const* pQuest, uint32 XP) const
 {
-    uint32 questid = pQuest->GetQuestId();
-    WorldPacket data(SMSG_QUESTGIVER_QUEST_COMPLETE, (4 + 4 + 4 + 4 + 4 + pQuest->GetRewItemsCount() * 8));
-    data << questid;
-    data << uint32(0x03);
+    auto packet = std::make_unique<WorldPackets::Quest::QuestGiverQuestComplete>();
+    packet->questId = pQuest->GetQuestId();
+    packet->unknown = 0x03;
 
     if (GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
     {
-        data << XP;
-        data << uint32(pQuest->GetRewOrReqMoney());
+        packet->xp = XP;
+        packet->money = pQuest->GetRewOrReqMoney();
     }
     else
     {
-        data << uint32(0);
-        data << uint32(pQuest->GetRewOrReqMoney() + pQuest->GetRewMoneyMaxLevelAtComplete());
+        packet->xp = 0;
+        packet->money = pQuest->GetRewOrReqMoney() + pQuest->GetRewMoneyMaxLevelAtComplete();
     }
-    data << uint32(pQuest->GetRewItemsCount());             // max is 5
 
     for (uint32 i = 0; i < pQuest->GetRewItemsCount(); ++i)
     {
+        WorldPackets::Quest::QuestRewardItem item;
         if (pQuest->RewItemId[i] > 0)
-            data << pQuest->RewItemId[i] << pQuest->RewItemCount[i];
-        else
-            data << uint32(0) << uint32(0);
+        {
+            item.itemId = pQuest->RewItemId[i];
+            item.itemCount = pQuest->RewItemCount[i];
+        }
+        packet->rewardItems.push_back(item);
     }
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 }
 
 // Sent when a quest is failed to be given off at questtaker. Specifically handled reasons:
@@ -14486,10 +14487,10 @@ void Player::SendQuestFailedAtTaker(uint32 questId, uint32 reason) const
 {
     if (questId)
     {
-        WorldPacket data(SMSG_QUESTGIVER_QUEST_FAILED, 8);
-        data << uint32(questId);
-        data << uint32(reason);
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Quest::QuestGiverQuestFailed>();
+        packet->questId = questId;
+        packet->reason = reason;
+        GetSession()->SendPacket(std::move(packet));
     }
 }
 
@@ -14497,9 +14498,9 @@ void Player::SendQuestFailed(uint32 questId) const
 {
     if (questId)
     {
-        WorldPacket data(SMSG_QUESTUPDATE_FAILED, 4);
-        data << questId;
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Quest::QuestUpdateFailed>();
+        packet->questId = questId;
+        GetSession()->SendPacket(std::move(packet));
     }
 }
 
@@ -14507,17 +14508,17 @@ void Player::SendQuestTimerFailed(uint32 questId) const
 {
     if (questId)
     {
-        WorldPacket data(SMSG_QUESTUPDATE_FAILEDTIMER, 4);
-        data << uint32(questId);
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Quest::QuestUpdateFailedTimer>();
+        packet->questId = questId;
+        GetSession()->SendPacket(std::move(packet));
     }
 }
 
 void Player::SendCanTakeQuestResponse(uint32 msg) const
 {
-    WorldPacket data(SMSG_QUESTGIVER_QUEST_INVALID, 4);
-    data << uint32(msg);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Quest::QuestGiverQuestInvalid>();
+    packet->msg = msg;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendQuestConfirmAccept(Quest const* pQuest, Player const* pReceiver) const
@@ -14537,11 +14538,11 @@ void Player::SendQuestConfirmAccept(Quest const* pQuest, Player const* pReceiver
             }
         }
 
-        WorldPacket data(SMSG_QUEST_CONFIRM_ACCEPT, (4 + strTitle.size() + 8));
-        data << uint32(pQuest->GetQuestId());
-        data << strTitle;
-        data << GetObjectGuid();
-        pReceiver->GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Quest::QuestConfirmAcceptResponse>();
+        packet->questId = pQuest->GetQuestId();
+        packet->questTitle = std::move(strTitle);
+        packet->senderGuid = GetObjectGuid();
+        pReceiver->GetSession()->SendPacket(std::move(packet));
     }
 }
 
@@ -14549,10 +14550,10 @@ void Player::SendPushToPartyResponse(Player const* pPlayer, uint8 msg) const
 {
     if (pPlayer)
     {
-        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
-        data << pPlayer->GetObjectGuid();
-        data << uint8(msg);                                 // enum QuestShareMessages
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Quest::QuestPushResultResponse>();
+        packet->senderGuid = pPlayer->GetObjectGuid();
+        packet->msg = msg;                                 // enum QuestShareMessages
+        GetSession()->SendPacket(std::move(packet));
     }
 }
 
@@ -14564,10 +14565,10 @@ void Player::SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32
         MANGOS_ASSERT(batchCount < 64 && "Quest slot count store is limited to 6 bits 2^6 = 64 (0..63)");
 
         // Update quest watcher and fire QUEST_WATCH_UPDATE for the current batch
-        WorldPacket data(SMSG_QUESTUPDATE_ADD_ITEM, (4 + 4));
-        data << pQuest->ReqItemId[item_idx];
-        data << batchCount;
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Quest::QuestUpdateAddItem>();
+        packet->itemId = pQuest->ReqItemId[item_idx];
+        packet->count = batchCount;
+        GetSession()->SendPacket(std::move(packet));
 
         // Update player field and fire UNIT_QUEST_LOG_CHANGED for self for the current batch
         uint16 slot = FindQuestSlot(pQuest->GetQuestId());
@@ -14589,13 +14590,13 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* pQuest, ObjectGuid guid
         entry = (-entry) | 0x80000000;
 
     // Update quest watcher and fire QUEST_WATCH_UPDATE
-    WorldPacket data(SMSG_QUESTUPDATE_ADD_KILL, (4 * 4 + 8));
-    data << uint32(pQuest->GetQuestId());
-    data << uint32(entry);
-    data << uint32(count);
-    data << uint32(pQuest->ReqCreatureOrGOCount[ creatureOrGO_idx ]);
-    data << guid;
-    GetSession()->SendPacket(&data);
+    auto addKillPacket = std::make_unique<WorldPackets::Quest::QuestUpdateAddKill>();
+    addKillPacket->questId = pQuest->GetQuestId();
+    addKillPacket->entry = static_cast<uint32>(entry);
+    addKillPacket->count = count;
+    addKillPacket->required = pQuest->ReqCreatureOrGOCount[ creatureOrGO_idx ];
+    addKillPacket->guid = guid;
+    GetSession()->SendPacket(std::move(addKillPacket));
 
     // Update player field and fire UNIT_QUEST_LOG_CHANGED for self
     uint16 slot = FindQuestSlot(pQuest->GetQuestId());

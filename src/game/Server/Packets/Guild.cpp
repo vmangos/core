@@ -114,3 +114,60 @@ void WorldPackets::Guild::SaveGuildEmblemResult::AppendBodyTo(ByteBuffer& buffer
 {
     buffer << error;
 }
+
+void WorldPackets::Guild::GuildQueryResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << guildId;
+    buffer << guildName;
+    for (auto const& rankName : rankNames)
+        buffer << rankName;
+
+    // Emblem
+    buffer << emblemStyle;
+    buffer << emblemColor;
+    buffer << borderStyle;
+    buffer << borderColor;
+    buffer << backgroundColor;
+}
+
+void WorldPackets::Guild::GuildEvent::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << event;
+    buffer << static_cast<uint8>(params.size());
+    for (auto const& str : params)
+        buffer << str;
+    if (!affectedPlayerGuid.IsEmpty())
+        buffer << affectedPlayerGuid;
+}
+
+void WorldPackets::Guild::GuildRoster::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << static_cast<uint32>(rosterMembers.size());
+    buffer << motd;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    buffer << guildInfo;
+#endif
+
+    buffer << static_cast<uint32>(rankRights.size());
+    for (auto const& rights : rankRights)
+        buffer << rights;
+
+    for (auto const& member : rosterMembers)
+    {
+        buffer << member.guid;
+        buffer << member.presenceFlags;
+        buffer << member.name;
+        buffer << member.rankId;
+        buffer << member.level;
+        buffer << member.classId;
+        buffer << member.zoneId;
+        if (!member.presenceFlags) // member is offline
+            buffer << member.lastOnlineTime;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+        else
+            buffer << uint8(0);
+#endif
+        buffer << member.publicNote;
+        buffer << member.officerNote;
+    }
+}

@@ -89,6 +89,24 @@ namespace WorldPackets { namespace GmTicket
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class GmTicketGetTicket final : public ServerPacket
+    {
+    public:
+        uint32 status = 0;         // GMTICKET_STATUS_HASTEXT (0x06) or GMTICKET_STATUS_DEFAULT (0x0A)
+
+        // following fields are only serialized when status == GMTICKET_STATUS_HASTEXT (0x06)
+        std::string message;
+        uint8 ticketType = 0;
+        float lastModifiedAge = 0.0f;
+        float oldestTicketAge = 0.0f;
+        float estimatedWaitTime = 0.0f; // Estimated wait time ?
+        uint8 escalationStatus = 0;     // escalated data
+        uint8 openedByGMStatus = 0;     // whether or not it has been viewed
+
+        explicit GmTicketGetTicket() : ServerPacket(SMSG_GMTICKET_GETTICKET) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::GmTicket
 
 #endif // MANGOS_PACKETS_GMTICKET_H

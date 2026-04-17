@@ -592,73 +592,83 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
     return members.empty();
 }
 
-void Guild::BroadcastToGuild(WorldSession* session, char const* msg, uint32 language)
+void Guild::BroadcastToGuild(WorldSession const* senderSession, char const* msg, uint32 language)
 {
-    if (!session)
+    if (!senderSession)
         return;
 
-    MasterPlayer* pPlayer = session->GetMasterPlayer();
-    if (!pPlayer || !HasRankRight(pPlayer->GetRank(), GR_RIGHT_GCHATSPEAK))
+    MasterPlayer const* senderPlayer = senderSession->GetMasterPlayer();
+    if (!senderPlayer || !HasRankRight(senderPlayer->GetRank(), GR_RIGHT_GCHATSPEAK))
         return;
 
+    // TODO Use broadcaster which does the binary conversion automatically
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, msg, Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, msg, Language(language), senderPlayer->GetChatTag(), senderPlayer->GetObjectGuid(), senderPlayer->GetName());
 
     for (const auto& member : members)
     {
         if (!HasRankRight(member.second.RankId, GR_RIGHT_GCHATLISTEN))
             continue;
 
-        MasterPlayer* pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
+        MasterPlayer const* target = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
 
-        if (pl && pl->GetSession() && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
-            pl->GetSession()->SendPacket(&data);
+        if (target && target->GetSession() && !target->GetSocial()->HasIgnore(senderSession->GetMasterPlayer()->GetObjectGuid()))
+            target->GetSession()->SendPacket(&data);
     }
 }
 
-void Guild::BroadcastToOfficers(WorldSession* session, char const* msg, uint32 language)
+void Guild::BroadcastChatMsgToOfficers(WorldSession const* senderSession, char const* msg, uint32 language)
 {
-    if (!session)
+    if (!senderSession)
         return;
 
-    MasterPlayer* pPlayer = session->GetMasterPlayer();
-    if (!pPlayer || !HasRankRight(pPlayer->GetRank(), GR_RIGHT_OFFCHATSPEAK))
+    MasterPlayer const* senderPlayer = senderSession->GetMasterPlayer();
+    if (!senderPlayer || !HasRankRight(senderPlayer->GetRank(), GR_RIGHT_OFFCHATSPEAK))
         return;
 
+    // TODO Use broadcaster which does the binary conversion automatically
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_OFFICER, msg, Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_OFFICER, msg, Language(language), senderPlayer->GetChatTag(), senderPlayer->GetObjectGuid(), senderPlayer->GetName());
 
     for (const auto& member : members)
     {
         if (!HasRankRight(member.second.RankId, GR_RIGHT_OFFCHATLISTEN))
             continue;
 
-        MasterPlayer* pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
+        MasterPlayer const* target = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
 
-        if (pl && pl->GetSession() && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
-            pl->GetSession()->SendPacket(&data);
+        if (target && target->GetSession() && !target->GetSocial()->HasIgnore(senderPlayer->GetObjectGuid()))
+            target->GetSession()->SendPacket(&data);
     }
 }
 
-void Guild::BroadcastPacket(WorldPacket* packet)
+void Guild::BroadcastPacket(std::unique_ptr<ServerPacket> packet) const
 {
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket binaryPacket = WorldPacket(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+
     for (const auto& member : members)
     {
         Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
         if (player)
-            player->GetSession()->SendPacket(packet);
+            player->GetSession()->SendPacket(&binaryPacket);
     }
 }
 
-void Guild::BroadcastPacketToRank(WorldPacket* packet, uint32 rankId)
+void Guild::BroadcastPacketToRank(std::unique_ptr<ServerPacket> packet, uint32 rankId) const
 {
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket binaryPacket = WorldPacket(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+
     for (const auto& member : members)
     {
         if (member.second.RankId == rankId)
         {
             Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
             if (player)
-                player->GetSession()->SendPacket(packet);
+                player->GetSession()->SendPacket(&binaryPacket);
         }
     }
 }
@@ -696,7 +706,7 @@ void Guild::DelRank()
     m_Ranks.pop_back();
 }
 
-std::string Guild::GetRankName(uint32 rankId)
+std::string Guild::GetRankName(uint32 rankId) const
 {
     if (rankId >= m_Ranks.size())
         return "<unknown>";
@@ -704,7 +714,7 @@ std::string Guild::GetRankName(uint32 rankId)
     return m_Ranks[rankId].Name;
 }
 
-uint32 Guild::GetRankRights(uint32 rankId)
+uint32 Guild::GetRankRights(uint32 rankId) const
 {
     if (rankId >= m_Ranks.size())
         return 0;
@@ -757,7 +767,7 @@ void Guild::Disband()
     sGuildMgr.RemoveGuild(m_Id);
 }
 
-inline uint8 GetGuildRosterFlagsForPlayer(Player* pPlayer)
+inline uint8 GetGuildRosterFlagsForPlayer(Player const* pPlayer)
 {
     uint8 flags = GRF_ONLINE;
     if (pPlayer->IsAFK())
@@ -767,110 +777,107 @@ inline uint8 GetGuildRosterFlagsForPlayer(Player* pPlayer)
     return flags;
 }
 
-void Guild::Roster(WorldSession* session /*= nullptr*/)
+inline int32 GetGuildRosterMemberSerializedSize(WorldPackets::Guild::GuildRosterMember const& member)
 {
-    // we can only guess size
-    WorldPacket data(SMSG_GUILD_ROSTER, (4 + MOTD.length() + 1 + GINFO.length() + 1 + 4 + m_Ranks.size() * 4 + members.size() * 50));
+    int32 size =
+        sizeof(ObjectGuid) +               // player guid
+        sizeof(uint8) +                    // online indicator
+        member.name.length() + 1 +         // name + null
+        sizeof(uint32) +                   // rank id
+        sizeof(uint8) +                    // level
+        sizeof(uint8) +                    // class
+        sizeof(uint32) +                   // zone id
+        member.publicNote.length() + 1 +   // player note + null
+        member.officerNote.length() + 1;   // officer note + null
+
+    if (!member.presenceFlags)
+        size += sizeof(float);             // last online time for offline members
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+    else
+        size += sizeof(uint8);             // online marker for old clients
+#endif
+
+    return size;
+}
+
+void Guild::SendGuildRoster(WorldSession* session /*= nullptr*/) const
+{
+    auto roster = std::make_unique<WorldPackets::Guild::GuildRoster>();
     int32 spaceLeft = GUILD_ROSTER_MAX_LENGTH;
 
-    size_t count_pos = data.wpos();
-    data << uint32(0); // members count placeholder
-    spaceLeft -= sizeof(uint32);
-    data << MOTD;
-    spaceLeft -= (MOTD.length() + 1);
+    roster->motd = MOTD;
+    spaceLeft -= (sizeof(uint32) + MOTD.length() + 1);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << GINFO;
+    roster->guildInfo = GINFO;
     spaceLeft -= (GINFO.length() + 1);
 #endif
 
-    data << uint32(m_Ranks.size());
-    spaceLeft -= sizeof(uint32);
     for (const auto& itr : m_Ranks)
-        data << uint32(itr.Rights);
-    spaceLeft -= (m_Ranks.size() * sizeof(uint32));
+        roster->rankRights.push_back(itr.Rights);
+    spaceLeft -= (sizeof(uint32) + m_Ranks.size() * sizeof(uint32));
 
-    uint32 count = 0;
+    bool canViewOfficerNote = session && HasRankRight(session->GetPlayer()->GetRank(), GR_RIGHT_VIEWOFFNOTE);
+
     for (const auto& itr : members)
     {
-        int32 spaceNeeded =
-            sizeof(ObjectGuid) +          // player guid
-            sizeof(uint8) +               // online indicator
-            itr.second.Name.length() +    // name
-            1 +                           // null byte for name
-            sizeof(uint32) +              // rank id
-            sizeof(uint8) +               // level
-            sizeof(uint8) +               // class
-            sizeof(uint32) +              // zone id
-            sizeof(float) +               // last online time
-            itr.second.Pnote.length() +   // player note
-            1 +                           // null byte for player note
-            itr.second.OFFnote.length() + // officer note
-            1;                            // null byte for officer note
-
-        spaceLeft -= spaceNeeded;
-        if (spaceLeft <= 0)
-            break;
-        count++;
-
+        WorldPackets::Guild::GuildRosterMember member;
         if (Player* pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr.first)))
         {
-            data << pl->GetObjectGuid();
-            data << uint8(GetGuildRosterFlagsForPlayer(pl));
-            data << itr.second.Name;
-            data << uint32(itr.second.RankId);
-            data << uint8(pl->GetLevel());
-            data << uint8(pl->GetClass());
-            data << uint32(pl->GetCachedZoneId());
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
-            data << uint8(0);
-#endif
-            data << itr.second.Pnote;
-            data << ((session && HasRankRight(session->GetPlayer()->GetRank(), GR_RIGHT_VIEWOFFNOTE)) ? itr.second.OFFnote : "");
+            member.guid = pl->GetObjectGuid();
+            member.presenceFlags = GetGuildRosterFlagsForPlayer(pl);
+            member.name = itr.second.Name;
+            member.rankId = itr.second.RankId;
+            member.level = pl->GetLevel();
+            member.classId = pl->GetClass();
+            member.zoneId = pl->GetCachedZoneId();
         }
         else
         {
-            data << ObjectGuid(HIGHGUID_PLAYER, itr.first);
-            data << uint8(0);
-            data << itr.second.Name;
-            data << uint32(itr.second.RankId);
-            data << uint8(itr.second.Level);
-            data << uint8(itr.second.Class);
-            data << uint32(itr.second.ZoneId);
-            data << float(float(time(nullptr) - itr.second.LogoutTime) / uint64(DAY));
-            data << itr.second.Pnote;
-            data << ((session && HasRankRight(session->GetPlayer()->GetRank(), GR_RIGHT_VIEWOFFNOTE)) ? itr.second.OFFnote : "");
+            member.guid = ObjectGuid(HIGHGUID_PLAYER, itr.first);
+            member.presenceFlags = 0; // offline
+            member.name = itr.second.Name;
+            member.rankId = itr.second.RankId;
+            member.level = itr.second.Level;
+            member.classId = itr.second.Class;
+            member.zoneId = itr.second.ZoneId;
+            member.lastOnlineTime = float(float(time(nullptr) - itr.second.LogoutTime) / uint64(DAY));
         }
+        member.publicNote = itr.second.Pnote;
+        member.officerNote = canViewOfficerNote ? itr.second.OFFnote : "";
+
+        int32 spaceNeeded = GetGuildRosterMemberSerializedSize(member);
+        if (spaceLeft < spaceNeeded)
+            break;
+
+        spaceLeft -= spaceNeeded;
+        roster->rosterMembers.push_back(std::move(member));
     }
-    data.put<uint32>(count_pos, count);
 
     if (session)
-        session->SendPacket(&data);
+        session->SendPacket(std::move(roster));
     else
-        BroadcastPacket(&data);
+        BroadcastPacket(std::move(roster));
 }
 
-void Guild::Query(WorldSession* session)
+void Guild::SendQueryResponse(WorldSession* session) const
 {
-    WorldPacket data(SMSG_GUILD_QUERY_RESPONSE, (4 + 48 + 10 * 32 + 5 * 4)); // guess size; max: name(96), rankname(64)
+    auto queryResponse = std::make_unique<WorldPackets::Guild::GuildQueryResponse>();
+    queryResponse->guildId = m_Id;
+    queryResponse->guildName = m_Name;
 
-    data << uint32(m_Id);
-    data << m_Name;
-
-    for (size_t i = 0 ; i < GUILD_RANKS_MAX_COUNT; ++i)     // show always 10 ranks
+    for (size_t i = 0; i < GUILD_RANKS_MAX_COUNT; ++i) // show always 10 ranks
     {
         if (i < m_Ranks.size())
-            data << m_Ranks[i].Name;
-        else
-            data << uint8(0);                               // null string
+            queryResponse->rankNames[i] = m_Ranks[i].Name;
     }
 
-    data << int32(m_EmblemStyle);
-    data << int32(m_EmblemColor);
-    data << int32(m_BorderStyle);
-    data << int32(m_BorderColor);
-    data << int32(m_BackgroundColor);
+    queryResponse->emblemStyle = m_EmblemStyle;
+    queryResponse->emblemColor = m_EmblemColor;
+    queryResponse->borderStyle = m_BorderStyle;
+    queryResponse->borderColor = m_BorderColor;
+    queryResponse->backgroundColor = m_BackgroundColor;
 
-    session->SendPacket(&data);
+    session->SendPacket(std::move(queryResponse));
 }
 
 void Guild::SetEmblem(int32 emblemStyle, int32 emblemColor, int32 borderStyle, int32 borderColor, int32 backgroundColor)
@@ -983,30 +990,19 @@ ObjectGuid Guild::GetGuildInviter(ObjectGuid playerGuid) const
     return ObjectGuid();
 }
 
-void Guild::BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 /*=nullptr*/, char const* str2 /*=nullptr*/, char const* str3 /*=nullptr*/)
+void Guild::BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 /*=nullptr*/, char const* str2 /*=nullptr*/, char const* str3 /*=nullptr*/) const
 {
-    uint8 strCount = !str1 ? 0 : (!str2 ? 1 : (!str3 ? 2 : 3));
-
-    WorldPacket data(SMSG_GUILD_EVENT, 1 + 1 + 1 * strCount + (guid.IsEmpty() ? 0 : 8));
-    data << uint8(event);
-    data << uint8(strCount);
+    auto packet = std::make_unique<WorldPackets::Guild::GuildEvent>();
+    packet->event = event;
 
     if (str3)
-    {
-        data << str1;
-        data << str2;
-        data << str3;
-    }
+        packet->params = { str1, str2, str3 };
     else if (str2)
-    {
-        data << str1;
-        data << str2;
-    }
+        packet->params = { str1, str2 };
     else if (str1)
-        data << str1;
+        packet->params = { str1 };
 
-    if (!guid.IsEmpty())
-        data << guid;
+    packet->affectedPlayerGuid = guid;
 
-    BroadcastPacket(&data);
+    BroadcastPacket(std::move(packet));
 }

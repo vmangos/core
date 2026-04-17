@@ -77,7 +77,7 @@ void GameEventMgr::StartEvent(uint16 event_id, bool overwrite /*=false*/, bool r
         return;
     }
     ApplyNewEvent(event_id, resume);
-    
+
     //invoke enable on hardcoded events
     if (mGameEvent[event_id].hardcoded && !mGameEvent[event_id].disabled)
     {
@@ -130,7 +130,7 @@ void GameEventMgr::EnableEvent(uint16 event_id, bool enable)
     // change state
     mGameEvent[event_id].disabled = disabled;
     WorldDatabase.PExecute("UPDATE `game_event` SET `disabled` = '%u' WHERE `entry` = '%u'", disabled, event_id);
-   
+
     // we take no action if event needs to be started: GameEvent system will start it for us on its next iteration
     if (!IsActiveEvent(event_id))
         return;
