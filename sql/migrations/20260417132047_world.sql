@@ -977,6 +977,20 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (583, 52, 23371, 23364, 23348, 23351, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (582, 52, 23370, 23353, 23345, 0, 0);
 
+-- Events list for Southsea Swashbuckler
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(785801, 7858, 595, 1, 0, 100, 1, 10000, 30000, 10000, 30000, 785801, 0, 0, 'Southsea Swashbuckler - Emote Talk - OOC');
+DELETE FROM `creature_ai_scripts` WHERE `id`=785801;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(785801, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southsea Swashbuckler - Emote Talk');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (595, -2, 594, 593, 592, 591, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (594, 52, 23387, 23396, 23383, 23404, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (593, 52, 23375, 23377, 23397, 23386, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (592, 52, 23380, 23400, 23378, 23381, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (591, 52, 23389, 0, 0, 0, 0);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 4 WHERE `guid` IN (23401, 23379);
+
 -- End of migration.
 END IF;
 END??
