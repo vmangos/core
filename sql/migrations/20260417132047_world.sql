@@ -954,6 +954,8 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 UPDATE `creature` SET `wander_distance`=0 WHERE `movement_type` = 2;
 
+DELETE FROM `creature` WHERE `guid` = 23298;
+
 INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES
 (23369, 0, 0, 0, -1, 0, 1, 234, NULL),
 (23358, 0, 0, 0, -1, 0, 1, 234, NULL),
