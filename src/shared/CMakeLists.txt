@@ -262,6 +262,12 @@ if(WIN32)
   target_include_directories(shared PUBLIC
     ${CMAKE_SOURCE_DIR}/dep/windows/include
   )
+
+  if(MINGW)
+    target_include_directories(shared PRIVATE
+      ${CMAKE_SOURCE_DIR}/dep/src/libseh
+    )
+  endif()
 endif()
 
 if (REQUIRES_LIBCURL)
@@ -284,6 +290,14 @@ endif(UNIX)
 
 if(WIN32)
   target_link_libraries(shared PUBLIC ws2_32 mswsock)
+
+  if(MINGW)
+    # MinGW needs libseh for the debugger thread-name SEH handler in
+    # CreateThread.cpp.
+    # MinGW also needs an explicit winmm link because it does not honor
+    # TimePeriod.cpp's Winmm.lib pragma.
+    target_link_libraries(shared PRIVATE libseh winmm)
+  endif()
 endif()
 
 if (ENABLE_CPPTRACE)

@@ -12,6 +12,12 @@
 #include "G3D/debugAssert.h"
 #include "G3D/GMutex.h"
 
+#ifdef __MINGW32__
+// MinGW needs libseh's SEH macros for this debugger thread-name exception.
+// The include needs to be outside of the G3D namespace.
+#include <seh.h>
+#endif
+
 namespace G3D {
 
 namespace _internal {
@@ -90,10 +96,6 @@ typedef struct tagTHREADNAME_INFO {
    DWORD dwFlags; // Reserved for future use, must be zero.
 } THREADNAME_INFO;
 #pragma pack(pop)
-
-#ifdef __MINGW32__
-#include <seh.h>
-#endif
 
 static void SetThreadName(DWORD dwThreadID, const char* threadName) {
     THREADNAME_INFO info;

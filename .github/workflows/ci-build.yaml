@@ -1,4 +1,5 @@
-# Build on Ubuntu with GCC and Clang, plus a Windows Visual Studio build.
+# Build on Ubuntu with GCC and Clang, plus Windows Visual Studio and MinGW64
+# builds.
 name: CI Build
 
 on:
@@ -30,8 +31,8 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.job_name }} (client build ${{ matrix.client_build }})
-    runs-on: ${{ matrix.os }}
+    name: Build on ${{ matrix.config.job_name }} (client build ${{ matrix.client_build }})
+    runs-on: ${{ matrix.config.os }}
     permissions:
       contents: read
     strategy:
@@ -45,10 +46,7 @@ jobs:
           - 4695
           - 4544
           - 4449
-        os:
-          - ubuntu-24.04
-          - windows-2022
-        include:
+        config:
           - os: ubuntu-24.04
             c_compiler: gcc
             cxx_compiler: g++
@@ -60,13 +58,16 @@ jobs:
             job_name: Ubuntu Clang
           - os: windows-2022
             job_name: Windows Visual Studio
+          - os: windows-2022
+            job_name: Windows MinGW
+            use_mingw: true
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
 
       - name: Install Ubuntu build dependencies
-        if: matrix.os == 'ubuntu-24.04'
+        if: matrix.config.os == 'ubuntu-24.04'
         run: |
           sudo apt update
           sudo apt install -y --no-install-recommends \
@@ -78,18 +79,32 @@ jobs:
             zlib1g-dev
 
       - name: Install Clang compiler
-        if: matrix.install_clang
+        if: matrix.config.install_clang
         run: sudo apt install -y --no-install-recommends clang
 
+      - name: Set up MSYS2 (MINGW64)
+        if: matrix.config.use_mingw
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            base-devel
+            git
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-curl
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-ninja
+
       - name: Build and install on Ubuntu
-        if: matrix.os == 'ubuntu-24.04'
+        if: matrix.config.os == 'ubuntu-24.04'
         run: |
           set -euo pipefail
           mkdir -p build _install
           cd build
           cmake ../ \
-            -DCMAKE_C_COMPILER="${{ matrix.c_compiler }}" \
-            -DCMAKE_CXX_COMPILER="${{ matrix.cxx_compiler }}" \
+            -DCMAKE_C_COMPILER="${{ matrix.config.c_compiler }}" \
+            -DCMAKE_CXX_COMPILER="${{ matrix.config.cxx_compiler }}" \
             -DCMAKE_INSTALL_PREFIX="../_install" \
             -DBUILD_EXTRACTORS=1 \
             -DENABLE_MAILSENDER=1 \
@@ -97,8 +112,8 @@ jobs:
           make -j"$(nproc)"
           make install
 
-      - name: Build and install on Windows
-        if: matrix.os == 'windows-2022'
+      - name: Build and install on Windows (Visual Studio)
+        if: matrix.config.os == 'windows-2022' && !matrix.config.use_mingw
         shell: bash # Windows runners default to PowerShell.
         run: |
           set -euo pipefail
@@ -111,3 +126,13 @@ jobs:
           cd build
           cmake -DBUILD_EXTRACTORS=1 -DENABLE_MAILSENDER=1 -DSUPPORTED_CLIENT_BUILD="${{ matrix.client_build }}" -G "Visual Studio 17 2022" -A x64 ..
           "/c/Program Files/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe" "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m
+
+      - name: Build and install on Windows (MinGW)
+        if: matrix.config.use_mingw
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          mkdir -p build
+          cd build
+          cmake -DBUILD_EXTRACTORS=1 -DENABLE_MAILSENDER=1 -DSUPPORTED_CLIENT_BUILD="${{ matrix.client_build }}" -DCMAKE_BUILD_TYPE=Release -G Ninja ..
+          cmake --build . --parallel

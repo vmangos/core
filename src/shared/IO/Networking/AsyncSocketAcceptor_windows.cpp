@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <chrono>
+#include <thread>
 
 #include <WinSock2.h>
 #include <MSWSock.h> // TODO: Currently just needed for ::AcceptEx, maybe its better if we get this func-ptr at runtime, just like Microsoft recommends it

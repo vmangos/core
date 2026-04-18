@@ -131,7 +131,7 @@ class ByteBuffer
             return *this;
         }
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(__MINGW64__)
         ByteBuffer& operator<<(time_t value)
         {
             append<time_t>(value);
@@ -227,7 +227,7 @@ class ByteBuffer
             return *this;
         }
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(__MINGW64__)
         ByteBuffer& operator >> (time_t& value)
         {
             value = read<time_t>();

@@ -4,6 +4,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef WIN32_LEAN_AND_MEAN
+#if defined(__MINGW32__)
+#include <seh.h>
+#endif
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <pthread.h>
 #endif
@@ -49,6 +52,17 @@ void IO::Multithreading::RenameCurrentThread(std::string const& name)
     info.dwThreadID = GetCurrentThreadId();
     info.dwFlags = 0;
 
+#if defined(__MINGW32__)
+    // MinGW lacks SEH __try/__except syntax, so the libseh macros are used.
+    __seh_try
+    {
+        RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+    }
+    __seh_except(EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    __seh_end_except
+#else
     __try
     {
         RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
@@ -56,6 +70,7 @@ void IO::Multithreading::RenameCurrentThread(std::string const& name)
     __except(EXCEPTION_EXECUTE_HANDLER)
     {
     }
+#endif
 #elif defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     ::pthread_setname_np(pthread_self(), name.c_str());
 #elif defined(__APPLE__)

@@ -46,13 +46,10 @@ jobs:
           echo "ARCHIVE_FILENAME=dev-$(git rev-parse --short HEAD).zip" >> $env:GITHUB_ENV
 
       - name: Create release archive
+        shell: bash # Windows runners default to PowerShell.
         run: |
-          Set-StrictMode -Version Latest
-          Set-Location "${{ github.workspace }}/bin"
-          Copy-Item -Force "${{ github.workspace }}/dep/windows/lib/x64_release/libmySQL.dll" "${{ github.workspace }}/bin/Release/libmySQL.dll"
-          Copy-Item -Force "${{ github.workspace }}/dep/windows/lib/x64_release/libeay32.dll" "${{ github.workspace }}/bin/Release/libeay32.dll"
-
-          7z a -tzip "${{ env.ARCHIVE_FILENAME }}" Release
+          set -euo pipefail
+          ./.github/scripts/package-windows-release.sh x64 "$ARCHIVE_FILENAME"
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v7
@@ -83,4 +80,4 @@ jobs:
       - name: Publish release snapshot
         env:
           GH_TOKEN: ${{ github.token }}
-        run: ./.github/scripts/publish-moving-release.sh latest "Development Build" release-assets
+        run: ./.github/scripts/publish-moving-release.sh latest "Windows Development Build" release-assets

@@ -27,7 +27,7 @@ release_tag="$1"
 release_title_prefix="$2"
 asset_dir="$3"
 repo_url="https://github.com/$GITHUB_REPOSITORY"
-release_title="$release_title_prefix($(date -u +%F))"
+release_title="$release_title_prefix ($(date -u +%F))"
 notes_file="$(mktemp)"
 
 trap 'rm -f "$notes_file"' EXIT
