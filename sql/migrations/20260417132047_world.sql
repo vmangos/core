@@ -962,6 +962,19 @@ INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`,
 (23349, 0, 0, 0, -1, 0, 1, 234, NULL),
 (23363, 0, 0, 0, -1, 0, 1, 234, NULL);
 
+-- Events list for Southsea Dock Worker
+DELETE FROM `creature_ai_events` WHERE `creature_id`=7857;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(785701, 7857, 585, 1, 0, 100, 1, 10000, 30000, 10000, 30000, 785701, 0, 0, 'Southsea Dock Worker - Emote Talk - OOC'),
+(785702, 7857, 0, 2, 0, 100, 4, 15, 0, 0, 0, 785702, 0, 0, 'Southsea Dock Worker - Flee at 15% HP');
+DELETE FROM `creature_ai_scripts` WHERE `id`=785701;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(785701, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southsea Dock Worker - Emote Talk');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (585, -2, 584, 583, 582, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (584, 52, 23372, 23365, 23357, 23350, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (583, 52, 23371, 23364, 23348, 23351, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (582, 52, 23370, 23353, 23345, 0, 0);
+
 -- End of migration.
 END IF;
 END??
