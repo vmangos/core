@@ -989,7 +989,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (592, 52, 23380, 23400, 23378, 23381, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (591, 52, 23389, 0, 0, 0, 0);
 
-UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 4 WHERE `guid` IN (23401, 23379, 23307, 23327);
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 4 WHERE `guid` IN (23401, 23379, 23307, 23327, 23376, 23403);
 DELETE FROM `creature_movement` WHERE `id` IN (23307, 23327);
 
 -- End of migration.
