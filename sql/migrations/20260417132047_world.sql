@@ -989,6 +989,24 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (592, 52, 23380, 23400, 23378, 23381, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (591, 52, 23389, 0, 0, 0, 0);
 
+-- Events list for Southsea Pirate
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(785501, 7855, 621, 1, 0, 100, 1, 10000, 30000, 10000, 30000, 785501, 0, 0, 'Southsea Pirate - Emote Talk - OOC');
+DELETE FROM `creature_ai_scripts` WHERE `id`=785501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(785501, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southsea Pirate - Emote Talk');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (621, -2, 620, 619, 618, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (620, 52, 23302, 23332, 23330, 23299, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (619, 52, 23314, 23334, 23306, 23290, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (618, 52, 23294, 23304, 23313, 23301, 0);
+
+-- Events list for Southsea Freebooter
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(785602, 7856, 621, 1, 0, 100, 1, 10000, 30000, 10000, 30000, 785602, 0, 0, 'Southsea Freebooter - Emote Talk - OOC');
+DELETE FROM `creature_ai_scripts` WHERE `id`=785602;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(785602, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southsea Freebooter - Emote Talk');
+
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 4 WHERE `guid` IN (23401, 23379, 23307, 23327, 23376, 23403);
 DELETE FROM `creature_movement` WHERE `id` IN (23307, 23327);
 
