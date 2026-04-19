@@ -861,8 +861,8 @@ struct boss_thaddiusAI : public ScriptedAI
             playerVec.push_back(p.getSource());
         }
         std::shuffle(playerVec.begin(), playerVec.end(), m_random);
-        int i = 0;
-        int firstHalf = playerVec.size() / 2;
+        size_t i = 0;
+        size_t firstHalf = playerVec.size() / 2;
         for (i; i < firstHalf; i++)
         {
             Player* pPlayer = playerVec[i];

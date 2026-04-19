@@ -507,7 +507,7 @@ bool ChatHandler::HandleNpcSpawnSetAurasCommand(char* args)
     {
         delete const_cast<CreatureDataAddon*>(pAddonEntry)->auras;
         const_cast<CreatureDataAddon*>(pAddonEntry)->auras = new uint32[auras.size()+1];
-        for (int i = 0; i < auras.size(); i++)
+        for (size_t i = 0; i < auras.size(); i++)
             const_cast<uint32*>(const_cast<CreatureDataAddon*>(pAddonEntry)->auras)[i] = atoi(auras[i].c_str());
         const_cast<uint32*>(const_cast<CreatureDataAddon*>(pAddonEntry)->auras)[auras.size()] = 0;
         WorldDatabase.PExecuteLog("UPDATE `creature_addon` SET `auras`='%s' WHERE `guid`=%u", args, pCreature->GetDBTableGUIDLow());

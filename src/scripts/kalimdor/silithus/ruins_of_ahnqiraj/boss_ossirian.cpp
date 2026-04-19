@@ -115,8 +115,7 @@ struct boss_ossirianAI : public ScriptedAI
 
         if (!TornadoGUIDs.empty())
         {
-            int i = -1;
-            while (++i < TornadoGUIDs.size())
+            for (size_t i = 0; i < TornadoGUIDs.size(); ++i)
             {
                 Creature *Crea = m_creature->GetMap()->GetCreature(TornadoGUIDs[i]);
                 if (Crea)
@@ -203,8 +202,7 @@ struct boss_ossirianAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
         if (!TornadoGUIDs.empty())
         {
-            int i = -1;
-            while (++i < TornadoGUIDs.size())
+            for (size_t i = 0; i < TornadoGUIDs.size(); ++i)
             {
                 Creature *Crea = m_creature->GetMap()->GetCreature(TornadoGUIDs[i]);
                 if (Crea)
@@ -268,8 +266,7 @@ struct boss_ossirianAI : public ScriptedAI
 
         if (!TmpThreatList.empty())
         {
-            int i = -1;
-            while (++i < TmpThreatList.size())
+            for (size_t i = 0; i < TmpThreatList.size(); ++i)
             {
                 if (Unit* unit = m_creature->GetMap()->GetUnit(TmpThreatList[i]))
                 {

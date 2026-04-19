@@ -18150,7 +18150,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const
         }
 
         // add last path nodes
-        for (int i = lastOutNode; i < sTaxiPathNodesByPath[lastPath].size(); ++i)
+        for (size_t i = lastOutNode; i < sTaxiPathNodesByPath[lastPath].size(); ++i)
             m_taxi.AddTaxiPathNode(sTaxiPathNodesByPath[lastPath][i]);
         m_taxi.AddTaxiDestination(lastNode);
     }
