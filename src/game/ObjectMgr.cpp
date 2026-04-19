@@ -5318,8 +5318,11 @@ void ObjectMgr::LoadGroups()
 void ObjectMgr::LoadQuests()
 {
     // For reload case
-    m_QuestTemplatesMap.clear();
-
+    for (auto const& itr : m_QuestTemplatesMap)
+    {
+        if (itr.second)
+            itr.second->SetQuestActiveState(false);
+    }
     m_ExclusiveQuestGroups.clear();
 
     //                                                                0        1         2             3           4             5       6                  7                8                9
@@ -5378,8 +5381,12 @@ void ObjectMgr::LoadQuests()
         bar.step();
         Field* fields = result->Fetch();
 
-        std::unique_ptr<Quest> newQuest = std::make_unique<Quest>(fields);
-        m_QuestTemplatesMap[newQuest->GetQuestId()] = std::move(newQuest);
+        uint32 entry = fields[0].GetUInt32();
+        std::unique_ptr<Quest>& pInfo = m_QuestTemplatesMap[entry];
+        if (!pInfo)
+            pInfo = std::make_unique<Quest>();
+
+        pInfo->LoadFromDB(fields);
     }
     while (result->NextRow());
 
