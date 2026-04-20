@@ -54,6 +54,15 @@ UPDATE `creature` SET `id` = 9690, `id2` = 9691 WHERE `id` IN (9690, 9691);
 -- Entropic Beast (9878) should share spawn with Entropic Horror (9879)
 UPDATE `creature` SET `id` = 9878, `id2` = 9879 WHERE `id` IN (9878, 9879);
 
+-- Carrion Lurker (1821) should share spawn with Diseased Wolf (1817)
+UPDATE `creature` SET `id` = 1817, `id2` = 1821 WHERE `id` IN (1817, 1821);
+
+-- Diseased Grizzly (1816) should share spawn with Plague Lurker (1824)
+UPDATE `creature` SET `id` = 1816, `id2` = 1824 WHERE `id` IN (1816, 1824);
+
+-- Diseased Black Bear (1815) should share spawn with Venom Mist Lurker (1822)
+UPDATE `creature` SET `id` = 1815, `id2` = 1822 WHERE `id` IN (1815, 1822);
+
 -- Add Missing Complete Scripts
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (5218, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6553, 0, 0, 0, 0, 0, 0, 0, 0, 'Felstone Field Cauldron: Scourge Cauldron - Talk'),
