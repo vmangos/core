@@ -1154,13 +1154,13 @@ void GameEventMgr::UpdateSilithusPVP()
         {
             sLog.Out(LOG_BG, LOG_LVL_DETAIL, "[SilithusPVPEvent] started %u", SILITHUS_PVP_EVENT_ON);
             StartEvent(SILITHUS_PVP_EVENT_ON);
-            sWorld.SendGlobalText("Les collecteurs de Silithystes sont repares! Depechez vous de revenir en Silithus et reprenez le travail soldat!", nullptr);
+            sWorld.SendGlobalText("The Silithyst collectors have been repaired! Hurry back to Silithus and get back to work, soldier!", nullptr);
         }
     }
     else if (IsActiveEvent(SILITHUS_PVP_EVENT_ON))
     {
         sLog.Out(LOG_BG, LOG_LVL_DETAIL, "[SilithusPVPEvent] stopped %u", SILITHUS_PVP_EVENT_ON);
         StopEvent(SILITHUS_PVP_EVENT_ON);
-        sWorld.SendGlobalText("Le sable a enraille nos collecteurs de Silithystes, la collecte est interrompue en Silithus", nullptr);
+        sWorld.SendGlobalText("Sand has jammed our Silithyst collectors, collection is suspended in Silithus.", nullptr);
     }
 }

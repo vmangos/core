@@ -139,11 +139,11 @@ static EventLocations aTyrandeLocations[] = //TODO : add waypoints, or spawn fur
 {
     // Tyrande should appear along the pathway, but because of the missing pathfinding we'll summon here closer to Eranikus
     //{7948.89f, -2575.58f, 490.05f, 3.03f}, // tyrande spawn loc
-    {7955.826172f, -2369.380856f, 486.537537f, 4.812577f}, //tyrande spawn au loin
-    {7972.298828f, -2519.744873f, 487.863190f, 0.0f },//point sur le 2e pont avant le soucis de pathfinding.
-    {7972.312500f, -2521.717773f, 488.041565f, 0.0f },//point sur le 2e pont après le soucis de pathfinding.
-    {7976.151367f, -2549.361084f, 490.079834f, 0.0f },//point pour éviter de courrir sur la rembarde du pont.
-    {7939.48352f, -2577.439941f, 488.615326f, 0.0f },//point avant dernier pont pour approprier.
+    {7955.826172f, -2369.380856f, 486.537537f, 4.812577f}, //tyrande spawn far away
+    {7972.298828f, -2519.744873f, 487.863190f, 0.0f },//point on the 2nd bridge before the pathfinding issue.
+    {7972.312500f, -2521.717773f, 488.041565f, 0.0f },//point on the 2nd bridge after the pathfinding issue.
+    {7976.151367f, -2549.361084f, 490.079834f, 0.0f },//point to avoid running on the bridge railing.
+    {7939.48352f, -2577.439941f, 488.615326f, 0.0f },//point before the last bridge to position correctly.
     {7888.32f, -2566.25f, 487.02f, 0.0f }, // tyrande heal loc
     {7901.83f, -2565.24f, 488.04f, 0.0f }, // tyrande eranikus loc
 };
@@ -443,8 +443,8 @@ struct npc_keeper_remulosAI : public npc_escortAI
                             // Despawn Remulos after the outro is finished - he will respawn automatically at his home position after a few min
                             DoScriptText(SAY_REMULOS_OUTRO_2, m_creature);
                             //m_creature->ForcedDespawn(3000);
-                            // Alita : piqué ce morceau de code à ScriptedFollowerAI.h, car NON il ne se replaçait pas forcément correctement (p-etre lié à mon code dans evade mode)
-                            //Ustaag <Nostalrius> : vilain fix des mobs qui voulaient pas respawn à leur point de spawn
+                            // Alita: borrowed this piece of code from ScriptedFollowerAI.h, because NO it didn't necessarily reposition itself correctly (maybe related to my code in evade mode)
+                            //Ustaag <Nostalrius>: ugly fix for mobs that wouldn't respawn at their spawn point
                             //m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(),nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                             m_creature->NearTeleportTo(m_creature->GetHomePosition());
                             m_creature->ForcedDespawn();

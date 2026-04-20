@@ -69,7 +69,7 @@ bool ChatHandler::HandleSpellEffectsCommand(char *args)
     SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(spellId);
     if (!pSpell)
     {
-        PSendSysMessage("Sort %u inexistant dans les DBCs.", spellId);
+        PSendSysMessage("Spell %u does not exist in the DBCs.", spellId);
         SetSentErrorMessage(true);
         return false;
     }

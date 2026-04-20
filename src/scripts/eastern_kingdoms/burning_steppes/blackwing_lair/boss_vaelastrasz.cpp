@@ -36,7 +36,7 @@ enum Vaelestrasz : uint32
     // Inflicts 555-645 Fire damage to nearby enemies.
     SPELL_FIRE_NOVA             = 23462,
 
-    // Inflicts 925 to 1075 (600 à 700) damage on enemies in a cone behind the caster, knocking them back.
+    // Inflicts 925 to 1075 (600 to 700) damage on enemies in a cone behind the caster, knocking them back.
     SPELL_TAIL_SWEEP            = 15847,
 
     // TO FIX : explode at the end

@@ -46,13 +46,13 @@ enum
     // Hakkar's spells
     // ---------------
 
-    SPELL_BLOODSIPHON_STUN       = 24324, // Joueur assomme
-    SPELL_BLOODSIPHON_DAMAGE     = 24323, // "Votre sang est empoisonne"
-    SPELL_BLOODSIPHON_HEAL       = 24322, // "Inflige 200 points de dégâts par seconde. Donne à Hakkar 1000 points de vie par seconde." -> Rend de la vie aux joueurs ...
+    SPELL_BLOODSIPHON_STUN       = 24324, // Player stunned
+    SPELL_BLOODSIPHON_DAMAGE     = 24323, // "Your blood is Poisonous!"
+    SPELL_BLOODSIPHON_HEAL       = 24322, // "Deals 200 damage per second. Feeding Hakkar 1000 health per second."
     SPELL_CORRUPTEDBLOOD         = 24328,
     SPELL_CAUSEINSANITY          = 24327,
     SPELL_WILLOFHAKKAR           = 24178,
-    // SPELL_ENRAGE                 = 24318,
+    SPELL_ENRAGE                 = 24318,
     SPELL_BERSERK                = 27680,
 
     // Aspects of High Priests
@@ -60,7 +60,7 @@ enum
 
     SPELL_ASPECT_OF_JEKLIK       = 24687, // silence 4 sec
     SPELL_ASPECT_OF_VENOXIS      = 24688, // poison
-    SPELL_ASPECT_OF_MARLI        = 24686, // étourdi 5 sec
+    SPELL_ASPECT_OF_MARLI        = 24686, // stunned 5 sec
     SPELL_ASPECT_OF_THEKAL       = 24689, // enrage qqs sec
     SPELL_ASPECT_OF_ARLOKK       = 24690, // vanish qqs secs
 
