@@ -233,6 +233,11 @@ void AuthSocket::_HandleLogonChallenge()
             return;
         }
 
+        if (actualBodySize > sizeof(sAuthLogonChallengeBody))
+        { // Reject oversized body to prevent heap buffer overflow
+            return;
+        }
+
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] got header, body is %#04x bytes", actualBodySize);
 
         // Read the remaining of the packet
@@ -481,6 +486,9 @@ void AuthSocket::_HandleLogonProof()
     // Read the packet
     std::shared_ptr<sAuthLogonProof_C> lp = std::make_shared<sAuthLogonProof_C>();
     size_t expectedSize = sizeof(sAuthLogonProof_C);
+    // Regression-Guard: expectedSize must never exceed the allocated buffer.
+    static_assert(sizeof(sAuthLogonProof_C_Pre_1_11_0) <= sizeof(sAuthLogonProof_C),
+        "Pre-1.11.0 proof struct must fit inside sAuthLogonProof_C buffer");
     if (m_build < 5428) { // Pin support was added in 1.11.0, so if an older client connects, we need to skip those fields
         lp->securityFlags = SECURITY_FLAG_NONE;
         expectedSize = sizeof(sAuthLogonProof_C_Pre_1_11_0);
@@ -831,6 +839,11 @@ void AuthSocket::_HandleReconnectChallenge()
 
         if (actualBodySize < sizeof(sAuthLogonChallengeBody) - AUTH_LOGON_MAX_NAME) // TODO: @cMangos: Why is here "-10" and not AUTH_LOGON_MAX_NAME
         { // The paket is too small and has no username???
+            return;
+        }
+
+        if (actualBodySize > sizeof(sAuthLogonChallengeBody))
+        { // Reject oversized body to prevent heap buffer overflow
             return;
         }
 
