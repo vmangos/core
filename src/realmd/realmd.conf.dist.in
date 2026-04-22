@@ -202,3 +202,45 @@ MailCertChecks = 1
 SendGridKey = ""
 GeolockGUID = ""
 MaxSessionDuration = 300
+
+###################################################################################################################
+#    LOGIN THROTTLE SETTINGS
+#
+#    Two-stage in-memory throttle against login abuse on realmd:
+#      (1) request-flood guard via ThrottleCount / ThrottleDuration — caps all
+#          logon and reconnect challenges from a single IP regardless of outcome.
+#      (2) brute-force guard via WrongPassThrottleCount / WrongPassThrottleDuration —
+#          locks out an IP after repeated wrong-password failures. A successful
+#          login clears the failure counter.
+#
+#    ThrottleCount
+#        Maximum number of logon/reconnect challenges per IP within ThrottleDuration.
+#        Set to 0 to disable the request-flood guard entirely.
+#        Default: 200
+#
+#    ThrottleDuration
+#        Sliding window for the request-flood guard, in seconds.
+#        Default: 300
+#
+#    WrongPassThrottleCount
+#        Maximum wrong-password failures per IP within WrongPassThrottleDuration
+#        before further logon challenges are rejected outright.
+#        Set to 0 to disable the brute-force guard entirely.
+#        Default: 5
+#
+#    WrongPassThrottleDuration
+#        Sliding window for the brute-force guard, in seconds.
+#        Default: 600
+#
+#    ThrottleCleanupSecs
+#        How often to evict idle throttle entries from memory (in seconds).
+#        Prevents memory growth from tracking many unique IPs.
+#        Default: 60
+#
+###################################################################################################################
+
+ThrottleCount = 200
+ThrottleDuration = 300
+WrongPassThrottleCount = 5
+WrongPassThrottleDuration = 600
+ThrottleCleanupSecs = 60

@@ -32,6 +32,7 @@
 #include "Log.h"
 #include "Errors.h"
 #include "AuthSocket.h"
+#include "LoginThrottle.h"
 #include "SystemConfig.h"
 #include "revision.h"
 #include "Util.h"
@@ -215,6 +216,7 @@ extern int main(int argc, char** argv)
     LoginDatabase.Execute("DELETE FROM `ip_banned` WHERE `unbandate`<=UNIX_TIMESTAMP() AND `unbandate`<>`bandate`");
     LoginDatabase.CommitTransaction();
 
+    uint32 throttleCleanupIntervalSecs = sConfig.GetIntDefault("ThrottleCleanupSecs", 60);
     std::string bindIp = sConfig.GetStringDefault("BindIP", "0.0.0.0");
     uint16 bindPort = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
 
@@ -325,6 +327,7 @@ extern int main(int argc, char** argv)
     // maximum counter for next ping
     uint32 numLoops = (sConfig.GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000)); // TODO make this loop like mangosd
     uint32 loopCounter = 0;
+    uint32 throttleCleanupCounter = 0;
 
     auto ioThread = IO::Multithreading::CreateThread("MainIoCtx", [&ioCtx]()
     {
@@ -338,6 +341,12 @@ extern int main(int argc, char** argv)
     while (!stopEvent)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        if (++throttleCleanupCounter >= throttleCleanupIntervalSecs)
+        {
+            throttleCleanupCounter = 0;
+            CleanupLoginThrottle();
+        }
 
         if ((++loopCounter) == numLoops) // TODO make this loop like mangosd
         {

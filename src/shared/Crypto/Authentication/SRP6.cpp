@@ -26,6 +26,11 @@
 #include <openssl/crypto.h>
 #include <openssl/sha.h>
 
+bool Crypto::ConstantTimeEquals(void const* a, void const* b, std::size_t length)
+{
+    return CRYPTO_memcmp(a, b, length) == 0;
+}
+
 SRP6::SRP6()
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
@@ -155,9 +160,8 @@ void SRP6::HashSessionKey(void)
 
 bool SRP6::Proof(uint8 const* lp_M, int l)
 {
-    // Needs a minimum length l for M's byte array to
-    // avoid memcmp accessing data out of bounds!
-    if (!memcmp(M.AsByteArray(l).data(), lp_M, l))
+    // M's byte array is padded to length l to avoid out-of-bounds read.
+    if (Crypto::ConstantTimeEquals(M.AsByteArray(l).data(), lp_M, l))
         return false;
 
     return true;
@@ -165,7 +169,16 @@ bool SRP6::Proof(uint8 const* lp_M, int l)
 
 bool SRP6::ProofVerifier(std::string vC)
 {
-    return vC == v.AsHexStr();
+    BigNumber clientV;
+    if (clientV.SetHexStr(vC.c_str()) == 0)
+        return false;
+
+    if (clientV.GetNumBytes() > 32)
+        return false;
+
+    auto const serverBytes = v.AsByteArray(32);
+    auto const clientBytes = clientV.AsByteArray(32);
+    return Crypto::ConstantTimeEquals(serverBytes.data(), clientBytes.data(), serverBytes.size());
 }
 
 Crypto::Hash::SHA1::Digest SRP6::Finalize()

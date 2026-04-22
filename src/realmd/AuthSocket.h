@@ -32,6 +32,7 @@
 #include "IO/Filesystem/FileHandle.h"
 #include "Policies/ObjectConstructorTraits.h"
 #include "AuthPackets.h"
+#include <functional>
 
 enum LockFlag
 {
@@ -94,6 +95,13 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, MaNGOS::Poli
         };
 
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
+
+        // Reads the shared header/body of logon and reconnect challenges, validates sizes,
+        // extracts build/os/platform/locale/login, enforces the locale allowlist, and hands
+        // the parsed body to `onBody`. On any failure returns without invoking `onBody`
+        // (socket closes implicitly).
+        void ReadChallengeRequest(char const* logPrefix, std::function<void(std::shared_ptr<sAuthLogonChallengeBody> const&)> onBody);
+        static bool IsAllowedLocale(std::string const& locale);
 
         SRP6 srp;
         BigNumber m_reconnectProof;
