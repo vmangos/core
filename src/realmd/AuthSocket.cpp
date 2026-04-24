@@ -357,7 +357,7 @@ void AuthSocket::_HandleLogonChallenge()
         uint32 wrongPassThrottleCount    = sConfig.GetIntDefault("WrongPassThrottleCount", 5);
         uint32 wrongPassThrottleDuration = sConfig.GetIntDefault("WrongPassThrottleDuration", 600);
         uint32 wrongPassCount = 0;
-        if (IsWrongPassLimitReached(clientIpAddress, wrongPassThrottleCount, wrongPassThrottleDuration, wrongPassCount))
+        if (wrongPassThrottleCount > 0 && IsWrongPassLimitReached(clientIpAddress, wrongPassThrottleCount, wrongPassThrottleDuration, wrongPassCount))
         {
             sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] IP '%s' is brute-force locked: %u failures in last %u seconds (limit %u)",
                      clientIpAddress.c_str(), wrongPassCount, wrongPassThrottleDuration, wrongPassThrottleCount);
@@ -465,16 +465,20 @@ void AuthSocket::_HandleLogonChallenge()
 
             std::string databaseV = fields[3].GetCppString();
             std::string databaseS = fields[4].GetCppString();
-            bool broken = false;
 
             if (!self->srp.SetVerifier(databaseV.c_str()) || !self->srp.SetSalt(databaseS.c_str()))
             {
                 *pkt << uint8(WOW_FAIL_FAIL_NOACCESS);
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[AuthChallenge] Broken v/s values in database for account %s!", self->m_login.c_str());
-                broken = true;
+                self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
+                {
+                    if (error)
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write() Error: %s", error.ToString().c_str());
+                });
+                return;
             }
 
-            if ((!locked || (locked && (self->m_lockFlags & FIXED_PIN || self->m_lockFlags & TOTP))) && !broken)
+            if (!locked || (locked && (self->m_lockFlags & FIXED_PIN || self->m_lockFlags & TOTP)))
             {
                 uint32 pendingAccountId = fields[0].GetUInt32();
 
@@ -513,7 +517,7 @@ void AuthSocket::_HandleLogonChallenge()
                     pkt->append(self->srp.GetGeneratorModulo().AsByteArray());
                     *pkt << uint8(32);
                     pkt->append(self->srp.GetPrime().AsByteArray(32));
-                    pkt->append(s.AsByteArray());// 32 bytes
+                    pkt->append(s.AsByteArray(32));// 32 bytes
                     pkt->append(VersionChallenge.data(), VersionChallenge.size());
 
                     // figure out whether we need to display the PIN grid
@@ -1067,12 +1071,12 @@ void AuthSocket::_HandleRealmList()
         // check for too frequent requests
         auto const minDelay = sConfig.GetIntDefault("MinRealmListDelay", 1);
         auto const now = std::chrono::steady_clock::now();
-        if (self->m_lastRealmListRequest.has_value())
+        if (minDelay > 0 && self->m_lastRealmListRequest.has_value())
         {
             auto const delay = std::chrono::duration_cast<std::chrono::seconds>(now - self->m_lastRealmListRequest.value()).count();
             if (delay < minDelay)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "user %s IP %s is sending CMD_REALM_LIST too frequently. Delay = %d seconds", self->m_login.c_str(), self->GetRemoteIpString().c_str(), delay);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "user %s IP %s is sending CMD_REALM_LIST too frequently. Delay = %lld seconds", self->m_login.c_str(), self->GetRemoteIpString().c_str(), static_cast<long long>(delay));
 
                 self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
                 return;
@@ -1250,7 +1254,7 @@ void AuthSocket::_HandleXferResume()
     m_socket.Read(reinterpret_cast<char*>(startPosPtr.get()), sizeof(int64), [self = shared_from_this(), startPosPtr](IO::NetworkError const& error, std::size_t)
     {
         int64 startPos = *startPosPtr;
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[XFER] User '%s' wants to resume download at byte %llu", self->m_safelogin.c_str(), startPos);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[XFER] User '%s' wants to resume download at byte %lld", self->m_safelogin.c_str(), static_cast<long long>(startPos));
 
         if (startPos >= self->m_pendingPatchFile->GetTotalFileSize() || startPos < 0)
         {
