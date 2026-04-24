@@ -19,11 +19,11 @@
 // 5246 - Intimidating Shout
 struct WarriorIntimidatingShoutScript : SpellScript
 {
-    bool OnCheckTarget(Spell const* spell, Unit* target, SpellEffectIndex /*eff*/) const final
+    bool OnCheckTarget(Spell const* spell, Unit* target, SpellEffectIndex eff) const final
     {
         // Exception: Intimidating Shout
         // The AoE fear does not apply to spell main target (that is stunned by another aura)
-        if (target == spell->m_targets.getUnitTarget())
+        if (target == spell->m_targets.getUnitTarget() && eff != EFFECT_INDEX_0)
             return false;
         return true;
     }
