@@ -26,16 +26,13 @@ namespace
 {
     struct ThrottleEntry
     {
-        std::vector<std::chrono::steady_clock::time_point> challengeAttempts;
         std::vector<std::chrono::steady_clock::time_point> failureAttempts;
 
-        bool Empty() const { return challengeAttempts.empty() && failureAttempts.empty(); }
+        bool Empty() const { return failureAttempts.empty(); }
 
         std::chrono::steady_clock::time_point LastActivity() const
         {
-            auto lastChallenge = challengeAttempts.empty() ? std::chrono::steady_clock::time_point{} : challengeAttempts.back();
-            auto lastFailure   = failureAttempts.empty()   ? std::chrono::steady_clock::time_point{} : failureAttempts.back();
-            return std::max(lastChallenge, lastFailure);
+            return failureAttempts.empty() ? std::chrono::steady_clock::time_point{} : failureAttempts.back();
         }
     };
 
@@ -51,51 +48,6 @@ namespace
         v.erase(std::remove_if(v.begin(), v.end(), [cutoff](auto const& t) { return t < cutoff; }), v.end());
     }
 } // namespace
-
-bool RecordLoginChallenge(std::string const& ip, uint32 maxAttempts, uint32 windowSeconds, uint32& outCount)
-{
-    auto now = std::chrono::steady_clock::now();
-    auto cutoff = now - std::chrono::seconds(windowSeconds);
-
-    std::lock_guard<std::mutex> lock(g_throttleMutex);
-
-    // Defend against memory exhaustion: if the map is at its hard cap and this is a new IP,
-    // evict stale entries first. If still full, treat the attempt as throttled.
-    auto existing = g_throttleMap.find(ip);
-    if (existing == g_throttleMap.end() && g_throttleMap.size() >= kMaxThrottleEntries)
-    {
-        auto staleCutoff = now - std::chrono::minutes(10);
-        for (auto it = g_throttleMap.begin(); it != g_throttleMap.end(); )
-        {
-            if (it->second.Empty() || it->second.LastActivity() < staleCutoff)
-                it = g_throttleMap.erase(it);
-            else
-                ++it;
-        }
-        if (g_throttleMap.size() >= kMaxThrottleEntries)
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[LoginThrottle] Map full (%zu entries). Dropping challenge from %s",
-                     g_throttleMap.size(), ip.c_str());
-            outCount = maxAttempts;
-            return true;
-        }
-    }
-
-    auto& entry = g_throttleMap[ip];
-    PruneOldTimestamps(entry.challengeAttempts, cutoff);
-
-    if (entry.challengeAttempts.size() >= maxAttempts)
-    {
-        outCount = static_cast<uint32>(entry.challengeAttempts.size());
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[LoginThrottle] Challenge limit hit for IP %s: %u attempts in last %u seconds (limit: %u)",
-                 ip.c_str(), outCount, windowSeconds, maxAttempts);
-        return true;
-    }
-
-    entry.challengeAttempts.push_back(now);
-    outCount = static_cast<uint32>(entry.challengeAttempts.size());
-    return false;
-}
 
 bool IsWrongPassLimitReached(std::string const& ip, uint32 maxFailures, uint32 windowSeconds, uint32& outCount)
 {
@@ -126,6 +78,28 @@ void RecordWrongPassword(std::string const& ip, uint32 windowSeconds)
     auto cutoff = now - std::chrono::seconds(windowSeconds);
 
     std::lock_guard<std::mutex> lock(g_throttleMutex);
+
+    // Defend against memory exhaustion: if the map is at its hard cap and this is a new IP,
+    // evict stale entries first. If still full, drop the record.
+    auto existing = g_throttleMap.find(ip);
+    if (existing == g_throttleMap.end() && g_throttleMap.size() >= kMaxThrottleEntries)
+    {
+        auto staleCutoff = now - std::chrono::minutes(10);
+        for (auto it = g_throttleMap.begin(); it != g_throttleMap.end(); )
+        {
+            if (it->second.Empty() || it->second.LastActivity() < staleCutoff)
+                it = g_throttleMap.erase(it);
+            else
+                ++it;
+        }
+        if (g_throttleMap.size() >= kMaxThrottleEntries)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[LoginThrottle] Map full (%zu entries). Dropping wrong-password record from %s",
+                     g_throttleMap.size(), ip.c_str());
+            return;
+        }
+    }
+
     auto& entry = g_throttleMap[ip];
     PruneOldTimestamps(entry.failureAttempts, cutoff);
     entry.failureAttempts.push_back(now);

@@ -19,12 +19,6 @@
 #include "Common.h"
 #include <string>
 
-// Records one logon/reconnect challenge from this IP, regardless of outcome.
-// Returns true if the challenge-per-window limit is already exceeded and the
-// request should be rejected before expensive processing (SRP6 etc.).
-// On return, outCount holds the attempt count currently associated with the IP.
-bool RecordLoginChallenge(std::string const& ip, uint32 maxAttempts, uint32 windowSeconds, uint32& outCount);
-
 // Returns true if this IP has reached the wrong-password failure limit within
 // the window and further logon challenges should be rejected outright.
 // Does not mutate the entry — failures are recorded only on actual password mismatch.

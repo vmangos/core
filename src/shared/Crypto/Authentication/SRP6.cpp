@@ -19,17 +19,12 @@
 #include "Common.h"
 #include "Log.h"
 #include "Errors.h"
+#include "Crypto/ConstantTimeCompare.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "Crypto/Encoding/Base32.h"
 #include "SRP6.h"
 
-#include <openssl/crypto.h>
 #include <openssl/sha.h>
-
-bool Crypto::ConstantTimeEquals(void const* a, void const* b, std::size_t length)
-{
-    return CRYPTO_memcmp(a, b, length) == 0;
-}
 
 SRP6::SRP6()
 {

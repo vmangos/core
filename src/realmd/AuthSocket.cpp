@@ -24,6 +24,7 @@
 */
 
 #include "Common.h"
+#include "Crypto/ConstantTimeCompare.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "Crypto/Encoding/Base32.h"
 #include "Database/DatabaseEnv.h"
@@ -353,7 +354,7 @@ void AuthSocket::_HandleLogonChallenge()
             return;
         }
 
-        // Stage 1: reject early if this IP is currently locked out due to recent wrong-password failures.
+        // Reject early if this IP is currently locked out due to recent wrong-password failures.
         uint32 wrongPassThrottleCount    = sConfig.GetIntDefault("WrongPassThrottleCount", 5);
         uint32 wrongPassThrottleDuration = sConfig.GetIntDefault("WrongPassThrottleDuration", 600);
         uint32 wrongPassCount = 0;
@@ -371,29 +372,6 @@ void AuthSocket::_HandleLogonChallenge()
                     self->DoRecvIncomingData();
             });
             return;
-        }
-
-        // Stage 2: request-flood guard — caps raw challenges regardless of outcome to protect the SRP6 path.
-        uint32 throttleCount    = sConfig.GetIntDefault("ThrottleCount", 200);
-        uint32 throttleDuration = sConfig.GetIntDefault("ThrottleDuration", 300);
-        if (throttleCount > 0)
-        {
-            uint32 currentAttempts = 0;
-            if (RecordLoginChallenge(clientIpAddress, throttleCount, throttleDuration, currentAttempts))
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Too many login attempts from '%s' (%u) within last %u seconds (limit %u)",
-                         clientIpAddress.c_str(), currentAttempts, throttleDuration, throttleCount);
-                *pkt << uint8(WOW_FAIL_DB_BUSY);
-
-                self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
-                {
-                    if (error)
-                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write() Error: %s", error.ToString().c_str());
-                    else
-                        self->DoRecvIncomingData();
-                });
-                return;
-            }
         }
 
         // Get the account details from the account table
@@ -938,20 +916,6 @@ void AuthSocket::_HandleReconnectChallenge()
 
     ReadChallengeRequest("ReconnectChallenge", [self = shared_from_this()](std::shared_ptr<sAuthLogonChallengeBody> const& body) -> void
     {
-        // Request-flood guard — mirrors the logon-challenge path so reconnects cannot be used to bypass it.
-        uint32 throttleCount    = sConfig.GetIntDefault("ThrottleCount", 200);
-        uint32 throttleDuration = sConfig.GetIntDefault("ThrottleDuration", 300);
-        if (throttleCount > 0)
-        {
-            uint32 currentAttempts = 0;
-            if (RecordLoginChallenge(self->GetRemoteIpString(), throttleCount, throttleDuration, currentAttempts))
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[ReconnectChallenge] Too many attempts from '%s' (%u) within last %u seconds (limit %u)",
-                         self->GetRemoteIpString().c_str(), currentAttempts, throttleDuration, throttleCount);
-                return; // implicit close — reconnect has no defined error packet at this stage
-            }
-        }
-
         std::unique_ptr<QueryResult> queryResult = LoginDatabase.PQuery("SELECT `sessionkey`, `id` FROM `account` WHERE `username` = '%s'", self->m_safelogin.c_str());
 
         // Stop if the account is not found
