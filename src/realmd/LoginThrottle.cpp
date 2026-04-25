@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026-present VMaNGOS <https://github.com/vmangos>
+// SPDX-License-Identifier: GPL-2.0-only
+
 #include "LoginThrottle.h"
 #include "Log.h"
 #include <algorithm>
@@ -8,16 +11,39 @@
 
 namespace
 {
-    struct ThrottleEntry
+    class ThrottleEntry
     {
-        std::vector<std::chrono::steady_clock::time_point> failureAttempts;
-
-        bool IsEmpty() const { return failureAttempts.empty(); }
+    public:
+        bool IsEmpty() const { return m_failureAttempts.empty(); }
 
         std::chrono::steady_clock::time_point LastActivity() const
         {
-            return failureAttempts.empty() ? std::chrono::steady_clock::time_point{} : failureAttempts.back();
+            return m_failureAttempts.empty() ? std::chrono::steady_clock::time_point{} : m_failureAttempts.back();
         }
+
+        size_t CountSince(std::chrono::steady_clock::time_point cutoff)
+        {
+            PruneOlderThan(cutoff);
+            return m_failureAttempts.size();
+        }
+
+        void RegisterActivity(std::chrono::steady_clock::time_point now,
+                              std::chrono::steady_clock::time_point cutoff)
+        {
+            PruneOlderThan(cutoff);
+            m_failureAttempts.push_back(now);
+        }
+
+    private:
+        void PruneOlderThan(std::chrono::steady_clock::time_point cutoff)
+        {
+            m_failureAttempts.erase(
+                std::remove_if(m_failureAttempts.begin(), m_failureAttempts.end(),
+                               [cutoff](auto const& t) { return t < cutoff; }),
+                m_failureAttempts.end());
+        }
+
+        std::vector<std::chrono::steady_clock::time_point> m_failureAttempts;
     };
 
     // Hard cap on throttle map size to prevent memory exhaustion from IP spoofing / IPv6 fan-out.
@@ -25,12 +51,6 @@ namespace
 
     std::mutex g_throttleMutex;
     std::unordered_map<std::string, ThrottleEntry> g_throttleMap;
-
-    void PruneOldTimestamps(std::vector<std::chrono::steady_clock::time_point>& v,
-                            std::chrono::steady_clock::time_point cutoff)
-    {
-        v.erase(std::remove_if(v.begin(), v.end(), [cutoff](auto const& t) { return t < cutoff; }), v.end());
-    }
 } // namespace
 
 bool IsWrongPassLimitReached(std::string const& ip, uint32 maxFailures, uint32 windowSeconds, uint32& outCount)
@@ -51,8 +71,7 @@ bool IsWrongPassLimitReached(std::string const& ip, uint32 maxFailures, uint32 w
         return false;
     }
 
-    PruneOldTimestamps(it->second.failureAttempts, cutoff);
-    outCount = static_cast<uint32>(it->second.failureAttempts.size());
+    outCount = static_cast<uint32>(it->second.CountSince(cutoff));
     return outCount >= maxFailures;
 }
 
@@ -68,10 +87,9 @@ void RecordWrongPassword(std::string const& ip, uint32 windowSeconds)
     auto existing = g_throttleMap.find(ip);
     if (existing == g_throttleMap.end() && g_throttleMap.size() >= kMaxThrottleEntries)
     {
-        auto staleCutoff = now - std::chrono::minutes(10);
         for (auto it = g_throttleMap.begin(); it != g_throttleMap.end(); )
         {
-            if (it->second.IsEmpty() || it->second.LastActivity() < staleCutoff)
+            if (it->second.IsEmpty() || it->second.LastActivity() < cutoff)
                 it = g_throttleMap.erase(it);
             else
                 ++it;
@@ -84,25 +102,20 @@ void RecordWrongPassword(std::string const& ip, uint32 windowSeconds)
         }
     }
 
-    auto& entry = g_throttleMap[ip];
-    PruneOldTimestamps(entry.failureAttempts, cutoff);
-    entry.failureAttempts.push_back(now);
+    g_throttleMap[ip].RegisterActivity(now, cutoff);
 }
 
 void ClearWrongPasswordCount(std::string const& ip)
 {
     std::lock_guard<std::mutex> lock(g_throttleMutex);
-    auto it = g_throttleMap.find(ip);
-    if (it != g_throttleMap.end())
-        it->second.failureAttempts.clear();
+    g_throttleMap.erase(ip);
 }
 
-void CleanupLoginThrottle()
+void CleanupLoginThrottle(uint32 windowSeconds)
 {
     std::lock_guard<std::mutex> lock(g_throttleMutex);
 
-    // Drop entries that have been inactive for 10 minutes
-    auto cutoff = std::chrono::steady_clock::now() - std::chrono::minutes(10);
+    auto cutoff = std::chrono::steady_clock::now() - std::chrono::seconds(windowSeconds);
     uint32 removed = 0;
     for (auto it = g_throttleMap.begin(); it != g_throttleMap.end(); )
     {

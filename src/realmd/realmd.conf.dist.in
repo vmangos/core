@@ -3,7 +3,7 @@
 ############################################
 
 [RealmdConf]
-ConfVersion=2024091701
+ConfVersion=2026042501
 
 ###################################################################################################################
 # REALMD SETTINGS
@@ -210,17 +210,17 @@ MaxSessionDuration = 300
 #    wrong-password failures within a sliding window. A successful login
 #    clears the failure counter.
 #
-#    WrongPassThrottleCount
-#        Maximum wrong-password failures per IP within WrongPassThrottleDuration
+#    WrongPass.ThrottleCount
+#        Maximum wrong-password failures per IP within WrongPass.ThrottleDuration
 #        before further logon challenges are rejected outright.
 #        Set to 0 to disable the brute-force guard entirely.
 #        Default: 5
 #
-#    WrongPassThrottleDuration
+#    WrongPass.ThrottleDuration
 #        Sliding window for the brute-force guard, in seconds.
 #        Default: 600
 #
 ###################################################################################################################
 
-WrongPassThrottleCount = 5
-WrongPassThrottleDuration = 600
+WrongPass.ThrottleCount = 5
+WrongPass.ThrottleDuration = 600

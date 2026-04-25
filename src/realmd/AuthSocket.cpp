@@ -355,8 +355,8 @@ void AuthSocket::_HandleLogonChallenge()
         }
 
         // Reject early if this IP is currently locked out due to recent wrong-password failures.
-        uint32 wrongPassThrottleCount    = sConfig.GetIntDefault("WrongPassThrottleCount", 5);
-        uint32 wrongPassThrottleDuration = sConfig.GetIntDefault("WrongPassThrottleDuration", 600);
+        uint32 wrongPassThrottleCount    = sConfig.GetIntDefault("WrongPass.ThrottleCount", 5);
+        uint32 wrongPassThrottleDuration = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 600);
         uint32 wrongPassCount = 0;
         if (wrongPassThrottleCount > 0 && IsWrongPassLimitReached(clientIpAddress, wrongPassThrottleCount, wrongPassThrottleDuration, wrongPassCount))
         {
@@ -852,7 +852,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong password!", m_login.c_str (), GetRemoteIpString().c_str());
 
         // Record the failure for the in-memory brute-force guard.
-        uint32 wrongPassThrottleDuration = sConfig.GetIntDefault("WrongPassThrottleDuration", 600);
+        uint32 wrongPassThrottleDuration = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 600);
         RecordWrongPassword(GetRemoteIpString(), wrongPassThrottleDuration);
 
         uint32 MaxWrongPassCount = sConfig.GetIntDefault("WrongPass.MaxCount", 0);

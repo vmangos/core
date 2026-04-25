@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026-present VMaNGOS <https://github.com/vmangos>
+// SPDX-License-Identifier: GPL-2.0-only
+
 #pragma once
 
 #include "Common.h"
@@ -13,4 +16,4 @@ void RecordWrongPassword(std::string const& ip, uint32 windowSeconds);
 void ClearWrongPasswordCount(std::string const& ip);
 
 // Evicts stale entries from the throttle map. Call periodically from the realmd main loop.
-void CleanupLoginThrottle();
+void CleanupLoginThrottle(uint32 windowSeconds);
