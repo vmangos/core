@@ -19,7 +19,7 @@
 #include "Common.h"
 #include "Log.h"
 #include "Errors.h"
-#include "Crypto/ConstantTimeCompare.h"
+#include "Crypto/CryptoUtils.h"
 #include "Crypto/Hash/HMACSHA1.h"
 #include "Crypto/Encoding/Base32.h"
 #include "SRP6.h"

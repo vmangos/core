@@ -42,8 +42,8 @@ set (shared_SRCS
     Config/ConfigEnv.h
     Crypto/BigNumber.h
     Crypto/BigNumber.cpp
-    Crypto/ConstantTimeCompare.h
-    Crypto/ConstantTimeCompare.cpp
+    Crypto/CryptoUtils.h
+    Crypto/CryptoUtils.cpp
     Crypto/InitializeCrypto.h
     Crypto/InitializeCrypto.cpp
     Crypto/Authentication/SRP6.h
