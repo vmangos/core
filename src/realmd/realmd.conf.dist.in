@@ -214,13 +214,13 @@ MaxSessionDuration = 300
 #        Maximum wrong-password failures per IP within WrongPass.ThrottleDuration
 #        before further logon challenges are rejected outright.
 #        Set to 0 to disable the brute-force guard entirely.
-#        Default: 5
+#        Default: 10
 #
 #    WrongPass.ThrottleDuration
 #        Sliding window for the brute-force guard, in seconds.
-#        Default: 600
+#        Default: 60
 #
 ###################################################################################################################
 
-WrongPass.ThrottleCount = 5
-WrongPass.ThrottleDuration = 600
+WrongPass.ThrottleCount = 10
+WrongPass.ThrottleDuration = 60

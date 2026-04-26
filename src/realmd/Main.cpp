@@ -345,7 +345,7 @@ extern int main(int argc, char** argv)
         if (++throttleCleanupCounter >= kThrottleCleanupIntervalSecs)
         {
             throttleCleanupCounter = 0;
-            CleanupLoginThrottle(sConfig.GetIntDefault("WrongPass.ThrottleDuration", 600));
+            CleanupLoginThrottle(sConfig.GetIntDefault("WrongPass.ThrottleDuration", 60));
         }
 
         if ((++loopCounter) == numLoops) // TODO make this loop like mangosd
