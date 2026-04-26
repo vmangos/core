@@ -71,8 +71,8 @@ namespace
 
 WrongPasswordThrottleResult GetWrongPasswordAttemptsForIp(std::string const& ip)
 {
-    uint32 windowSeconds = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 60);
-    uint32 maxFailures = sConfig.GetIntDefault("WrongPass.ThrottleCount", 10);
+    uint32 windowSeconds = sConfig.GetIntDefault("WrongPass.ThrottleWindowDurationSec", 60);
+    uint32 maxFailures = sConfig.GetIntDefault("WrongPass.MaxAttempts", 10);
 
     auto cutoff = std::chrono::steady_clock::now() - std::chrono::seconds(windowSeconds);
 
@@ -93,7 +93,7 @@ WrongPasswordThrottleResult::WrongPasswordThrottleResult(uint32 failedAttempts, 
 
 void RecordWrongPasswordAttempt(std::string const& ip)
 {
-    uint32 windowSeconds = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 60);
+    uint32 windowSeconds = sConfig.GetIntDefault("WrongPass.ThrottleWindowDurationSec", 60);
 
     auto now = std::chrono::steady_clock::now();
     auto cutoff = now - std::chrono::seconds(windowSeconds);
@@ -131,7 +131,7 @@ void ClearWrongPasswordCount(std::string const& ip)
 
 void CleanupStaleLoginThrottles()
 {
-    uint32 windowSeconds = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 60);
+    uint32 windowSeconds = sConfig.GetIntDefault("WrongPass.ThrottleWindowDurationSec", 60);
 
     std::lock_guard<std::mutex> lock(g_throttleMutex);
 
