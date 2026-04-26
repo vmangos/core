@@ -533,6 +533,7 @@ void AuthSocket::_HandleLogonChallenge()
         else
         { // no account
             *pkt << (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
+            RecordWrongPasswordAttempt(safeIp);
         }
 
         self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
