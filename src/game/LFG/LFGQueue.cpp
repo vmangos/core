@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "ObjectMgr.h"
 #include "Group.h"
+#include "Server/Packets/Misc.h"
 
 #include <array>
 
@@ -151,11 +152,7 @@ void LFGQueue::Update()
                     sWorld.GetMessager().AddMessage([groupId = qGroup->first](World* world)
                     {
                         Group* group = sObjectMgr.GetGroupById(groupId);
-                        
-                        WorldPacket data;
-                        LFGMgr::BuildInProgressPacket(data);
-
-                        group->BroadcastPacket(&data, true);
+                        group->BroadcastPacket(std::move(std::make_unique<WorldPackets::Misc::MeetingstoneInProgress>()), true);
                     });
                 }
                 else
@@ -191,9 +188,12 @@ void LFGQueue::Update()
                     Player* leader = sObjectMgr.GetPlayer(leaderGuid);
                     Player* member = sObjectMgr.GetPlayer(memberGuid);
 
-                    WorldPacket data;
-                    LFGMgr::BuildMemberAddedPacket(data, member->GetObjectGuid());
+                    WorldPackets::Misc::MeetingstoneMemberAdded packet;
+                    packet.playerGuid = member->GetObjectGuid();
 
+                    // TODO Use broadcaster which does the binary conversion automatically
+                    WorldPacket data(packet.GetOpcode(), 8);
+                    packet.AppendBodyTo(data);
                     leader->GetSession()->SendPacket(&data);
 
                     Group* newQueueGroup = new Group;
@@ -256,10 +256,14 @@ void LFGQueue::AddGroup(LFGGroupQueueInfo const& groupInfo, uint32 groupId)
     {
         Group* group = sObjectMgr.GetGroupById(groupId);
 
-        WorldPacket data;
-        LFGMgr::BuildSetQueuePacket(data, areaId, MEETINGSTONE_STATUS_JOINED_QUEUE);
-
-        group->BroadcastPacket(&data, true);
+        auto packet = std::make_unique<WorldPackets::Misc::MeetingstoneSetQueue>();
+        packet->areaId = areaId;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+        packet->idempotencyToken = 0; // TODO: Must forward this
+#else
+        packet->status = MEETINGSTONE_STATUS_JOINED_QUEUE;
+#endif
+        group->BroadcastPacket(std::move(packet), true);
     });
 }
 
@@ -373,9 +377,9 @@ bool LFGQueue::FindRoleToGroup(ObjectGuid playerGuid, uint32 groupId, LfgRoles r
             Group* group = sObjectMgr.GetGroupById(groupId);
             Player* player = sObjectMgr.GetPlayer(playerGuid);
 
-            WorldPacket data;
-            LFGMgr::BuildMemberAddedPacket(data, playerGuid);
-            group->BroadcastPacket(&data, true);
+            auto packet = std::make_unique<WorldPackets::Misc::MeetingstoneMemberAdded>();
+            packet->playerGuid = playerGuid;
+            group->BroadcastPacket(std::move(packet), true);
 
             // Add member to the group.
             group->AddMember(playerGuid, player->GetName(), GROUP_LFG);
@@ -401,8 +405,17 @@ void LFGQueue::RemovePlayerFromQueue(ObjectGuid playerGuid, PlayerLeaveMethod le
                     {
                         if (player->GetSession())
                         {
-                            WorldPacket data;
-                            LFGMgr::BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_LEAVE_QUEUE);
+                            WorldPackets::Misc::MeetingstoneSetQueue packet;
+                            packet.areaId = 0;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+                            packet.idempotencyToken = 0; // TODO: Must forward this
+#else
+                            packet.status = MEETINGSTONE_STATUS_LEAVE_QUEUE;
+#endif
+
+                            // TODO Use broadcaster which does the binary conversion automatically
+                            WorldPacket data(packet.GetOpcode());
+                            packet.AppendBodyTo(data);
                             player->GetSession()->SendPacket(&data);
                         }
 
@@ -427,20 +440,33 @@ void LFGQueue::RemoveGroupFromQueue(uint32 groupId, GroupLeaveMethod leaveMethod
             {
                 if (leaveMethod == GROUP_CLIENT_LEAVE)
                 {
-                    WorldPacket data;
-                    LFGMgr::BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_LEAVE_QUEUE);
-                    grp->BroadcastPacket(&data, true);
+                    auto packet = std::make_unique<WorldPackets::Misc::MeetingstoneSetQueue>();
+                    packet->areaId = 0;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+                    packet->idempotencyToken = 0; // TODO: Must forward this
+#else
+                    packet->status = MEETINGSTONE_STATUS_LEAVE_QUEUE;
+#endif
+                    grp->BroadcastPacket(std::move(packet), true);
                 }
                 else
                 {
                     // Send complete information to party
-                    WorldPacket data;
-                    LFGMgr::BuildCompletePacket(data);
-                    grp->BroadcastPacket(&data, true);
+                    {
+                        grp->BroadcastPacket(std::move(std::make_unique<WorldPackets::Misc::MeetingstoneComplete>()), true);
+                    }
 
                     // Reset UI for party
-                    LFGMgr::BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_NONE);
-                    grp->BroadcastPacket(&data, true);
+                    {
+                        auto packet = std::make_unique<WorldPackets::Misc::MeetingstoneSetQueue>();
+                        packet->areaId = 0;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+                        packet->idempotencyToken = 0; // TODO: Must forward this
+#else
+                        packet->status = MEETINGSTONE_STATUS_NONE;
+#endif
+                        grp->BroadcastPacket(std::move(packet), true);
+                    }
                 }
 
                 grp->SetLFGAreaId(0);

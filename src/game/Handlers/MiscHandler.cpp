@@ -1174,7 +1174,7 @@ void WorldSession::HandleRequestPetInfoOpcode(NullClientPacket const& /*packet *
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
-void WorldSession::HandleWardenDataOpcode(WorldPackets::Misc::WardenData const& packet)
+void WorldSession::HandleWardenDataOpcode(WorldPackets::Warden::WardenData const& packet)
 {
     if (!m_warden)
     {

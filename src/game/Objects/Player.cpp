@@ -3202,13 +3202,11 @@ void Player::GiveLevel(uint32 level)
                 if (!bg)
                     bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
 
-                WorldPacket data;
                 RemoveBattleGroundQueueId(bgQueueTypeId);  // must be called this way, because if you move this call to queue->removeplayer, it causes bugs
-                sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, bg, queueSlot, STATUS_NONE, 0, 0);
                 bgQueue.RemovePlayer(GetObjectGuid(), true);
                 // player left queue, we should update it
                 sBattleGroundMgr.ScheduleQueueUpdate(bgQueueTypeId, bgTypeId, GetBattleGroundBracketIdFromLevel(bgTypeId, GetLevel()));
-                GetSession()->SendPacket(&data);
+                GetSession()->SendPacket(sBattleGroundMgr.BuildBattleGroundStatusPacket(bg, queueSlot, STATUS_NONE, 0, 0));
             }
         }
     }

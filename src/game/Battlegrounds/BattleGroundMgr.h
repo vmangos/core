@@ -22,9 +22,11 @@
 #ifndef __BATTLEGROUNDMGR_H
 #define __BATTLEGROUNDMGR_H
 
+#include <memory>
 #include <vector>
 
 #include "Common.h"
+#include "Packet.h"
 #include "Policies/Singleton.h"
 #include "BattleGround.h"
 
@@ -205,15 +207,17 @@ class BattleGroundMgr
 
         /* Packet Building */
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-        void BuildPlayerJoinedBattleGroundPacket(WorldPacket* data, Player* player);
-        void BuildPlayerLeftBattleGroundPacket(WorldPacket* data, ObjectGuid guid);
+        std::unique_ptr<ServerPacket> BuildPlayerJoinedBattleGroundPacket(Player* player);
+        std::unique_ptr<ServerPacket> BuildPlayerLeftBattleGroundPacket(ObjectGuid guid);
 #endif
-        void BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattleGroundTypeId bgTypeId);
-        void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, int32 status);
-        void BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value);
-        void BuildPvpLogDataPacket(WorldPacket* data, BattleGround* bg);
-        void BuildBattleGroundStatusPacket(WorldPacket* data, BattleGround* bg, uint8 queueSlot, uint8 statusID, uint32 time1, uint32 time2);
-        void BuildPlaySoundPacket(WorldPacket* data, uint32 soundid);
+        std::unique_ptr<ServerPacket> BuildBattleGroundListPacket(ObjectGuid guid, Player* player, BattleGroundTypeId bgTypeId);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
+        std::unique_ptr<ServerPacket> BuildGroupJoinedBattlegroundPacket(int32 status);
+        std::unique_ptr<ServerPacket> BuildPvpLogDataPacket(BattleGround const* bg);
+#endif
+        std::unique_ptr<ServerPacket> BuildUpdateWorldStatePacket(uint32 field, uint32 value);
+        std::unique_ptr<ServerPacket> BuildBattleGroundStatusPacket(BattleGround* bg, uint8 queueSlot, uint8 statusID, uint32 time1, uint32 time2);
+        std::unique_ptr<ServerPacket> BuildPlaySoundPacket(uint32 soundid);
 
         /* Battlegrounds */
         BattleGroundSet::iterator GetBattleGroundsBegin(BattleGroundTypeId bgTypeId) { return m_battleGrounds[bgTypeId].begin(); };

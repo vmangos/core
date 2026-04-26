@@ -359,33 +359,33 @@ void Warden::ReadScanResults(ByteBuffer& buff)
 
 void Warden::SendPacket(ByteBuffer const& buff)
 {
-    WorldPacket pkt(SMSG_WARDEN_DATA, buff.wpos());
-    pkt.append(buff);
+    auto packet = std::make_unique<WorldPackets::Warden::WardenDataServer>();
+    packet->encryptedData.append(buff);
 
-    // we specifically append the packet copy, rather than the input copy, to avoid
+    // we specifically encrypt the packet copy, rather than the input copy, to avoid
     // creating side-effects for this function
-    EncryptData(const_cast<uint8*>(pkt.contents()), pkt.wpos());
+    EncryptData(const_cast<uint8*>(packet->encryptedData.contents()), packet->encryptedData.wpos());
 
-    sWorld.GetMessager().AddMessage([packet = std::move(pkt), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
+    sWorld.GetMessager().AddMessage([packet = std::move(packet), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world) mutable
     {
         if (WorldSession* session = world->FindSession(accountId))
         {
             if (session->GetGUID() == sessionGuid)
-                session->SendPacket(&packet);
+                session->SendPacket(std::move(packet));
         }
     });
 }
 
 void Warden::SendPacketDirect(ByteBuffer const& buff, WorldSession* session)
 {
-    WorldPacket pkt(SMSG_WARDEN_DATA, buff.wpos());
-    pkt.append(buff);
+    auto packet = std::make_unique<WorldPackets::Warden::WardenDataServer>();
+    packet->encryptedData.append(buff);
 
-    // we specifically append the packet copy, rather than the input copy, to avoid
+    // we specifically encrypt the packet copy, rather than the input copy, to avoid
     // creating side-effects for this function
-    EncryptData(const_cast<uint8*>(pkt.contents()), pkt.wpos());
+    EncryptData(const_cast<uint8*>(packet->encryptedData.contents()), packet->encryptedData.wpos());
 
-    session->SendPacket(&pkt);
+    session->SendPacket(std::move(packet));
 }
 
 void Warden::KickSession() const

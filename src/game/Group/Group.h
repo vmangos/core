@@ -34,6 +34,7 @@
 
 #include <map>
 #include <vector>
+#include <memory>
 
 class WorldSession;
 class Map;
@@ -42,6 +43,7 @@ class DungeonPersistentState;
 class Field;
 class Creature;
 class Unit;
+class ServerPacket;
 struct LFGGroupQueueInfo;
 
 #define MAX_GROUP_SIZE 5
@@ -331,8 +333,9 @@ class Group
         void UpdatePlayerOnlineStatus(Player* player, bool online = true);
         void UpdateOfflineLeader(time_t time, uint32 delay);
         void BroadcastGroupUpdate();
-                                                            // ignore: GUID of player that will be ignored
-        void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group=-1, ObjectGuid ignore = ObjectGuid());
+        /// ignore: GUID of the player that will not receive the packet
+        void BroadcastPacket(std::unique_ptr<ServerPacket> packet, bool ignorePlayersInBGRaid, int raidSubGroup=-1, ObjectGuid ignore = ObjectGuid());
+        void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int raidSubGroup=-1, ObjectGuid ignore = ObjectGuid());
         void BroadcastReadyCheck(WorldPacket* packet);
         void OfflineReadyCheck();
 

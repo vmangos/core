@@ -359,18 +359,33 @@ namespace WorldPackets { namespace Misc
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
-    class WardenData final : public ClientPacket
+    // --- Server Packets ---
+
+    // SMSG_MEETINGSTONE_MEMBER_ADDED: notifies group members that a new player was added via LFG
+    class MeetingstoneMemberAdded final : public ServerPacket
     {
     public:
-        std::vector<uint8> data;
+        ObjectGuid playerGuid; // guid of the player that was added
 
-        explicit WardenData() : ClientPacket(CMSG_WARDEN_DATA) {}
-        void ReadFromWorldPacket(WorldPacket& recv_data) override;
+        explicit MeetingstoneMemberAdded() : ServerPacket(SMSG_MEETINGSTONE_MEMBER_ADDED) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
     };
-#endif
 
-    // --- Server Packets ---
+    // SMSG_MEETINGSTONE_IN_PROGRESS: empty body; sent periodically while the LFG queue is still searching
+    class MeetingstoneInProgress final : public ServerPacket
+    {
+    public:
+        explicit MeetingstoneInProgress() : ServerPacket(SMSG_MEETINGSTONE_IN_PROGRESS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    // SMSG_MEETINGSTONE_COMPLETE: empty body; sent when the LFG search completes successfully
+    class MeetingstoneComplete final : public ServerPacket
+    {
+    public:
+        explicit MeetingstoneComplete() : ServerPacket(SMSG_MEETINGSTONE_COMPLETE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
 
     class LogoutComplete final : public ServerPacket
     {

@@ -241,13 +241,7 @@ void WorldPackets::Misc::Bug::ReadFromWorldPacket(WorldPacket& recv_data)
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
-void WorldPackets::Misc::WardenData::ReadFromWorldPacket(WorldPacket& recv_data)
-{
-    uint32 const remaining = recv_data.size() - recv_data.rpos();
-    data.resize(remaining);
-    if (!data.empty())
-        recv_data.read(data.data(), data.size());
-}
+// NOTE: WardenData (CMSG) / WardenDataServer (SMSG) serialization lives in `Packets/Warden.cpp`.
 #endif
 
 // --- Server Packets ---
@@ -362,6 +356,19 @@ void WorldPackets::Misc::MeetingstoneSetQueue::AppendBodyTo(ByteBuffer& buffer) 
     buffer << idempotencyToken;
     buffer << areaId;
 #endif
+}
+
+void WorldPackets::Misc::MeetingstoneMemberAdded::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << playerGuid;
+}
+
+void WorldPackets::Misc::MeetingstoneInProgress::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+void WorldPackets::Misc::MeetingstoneComplete::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
 }
 
 

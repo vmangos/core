@@ -57,9 +57,11 @@
 #include "Packets/Query.h"
 #include "Packets/Quest.h"
 #include "Packets/Skill.h"
+#include "Packets/Social.h"
 #include "Packets/Spell.h"
 #include "Packets/Taxi.h"
 #include "Packets/Trade.h"
+#include "Packets/Warden.h"
 
 #include <memory>
 
@@ -595,7 +597,7 @@ class WorldSession
 #endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         void HandleRaidTargetUpdateOpcode(WorldPackets::Group::RaidTargetUpdate const& packet);
-        void HandleRaidReadyCheckOpcode(WorldPackets::Group::RaidReadyCheck const& packet);
+        void HandleRaidReadyCheckOpcode(WorldPackets::Group::RaidReadyCheckFromClient const& packet);
 #endif
         void HandleGroupRaidConvertOpcode(NullClientPacket const& packet);
         void HandleGroupChangeSubGroupOpcode(WorldPackets::Group::GroupChangeSubGroup const& packet);
@@ -826,7 +828,7 @@ class WorldSession
 #endif
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
-        void HandleWardenDataOpcode(WorldPackets::Misc::WardenData const& packet);
+        void HandleWardenDataOpcode(WorldPackets::Warden::WardenData const& packet);
 #endif
         void HandleMinimapPingOpcode(WorldPackets::Group::MinimapPing const& packet);
         void HandleRandomRollOpcode(WorldPackets::Group::RandomRoll const& packet);

@@ -41,11 +41,6 @@ class LFGMgr
         void AddToQueue(Player* leader, uint32 queAreaID);
         void UpdateGroup(Group* group, bool join, ObjectGuid playerGuid);
 
-        static void BuildSetQueuePacket(WorldPacket& data, uint32 areaId, uint8 status);
-        static void BuildMemberAddedPacket(WorldPacket& data, ObjectGuid plrGuid);
-        static void BuildInProgressPacket(WorldPacket& data);
-        static void BuildCompletePacket(WorldPacket& data);
-
         static LfgRoles CalculateRoles(Classes playerClass);
         static LfgRoles CalculateTalentRoles(Player* player);
         static uint32 GetHighestTalentTree(Player* player);
