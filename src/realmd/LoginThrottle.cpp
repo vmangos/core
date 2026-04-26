@@ -16,6 +16,9 @@
 
 #include "LoginThrottle.h"
 #include "Log.h"
+#include "Config/Config.h"
+#include "nonstd/saturating_cast.hpp"
+
 #include <algorithm>
 #include <chrono>
 #include <mutex>
@@ -34,10 +37,10 @@ namespace
             return m_failureAttempts.empty() ? std::chrono::steady_clock::time_point{} : m_failureAttempts.back();
         }
 
-        size_t CountSince(std::chrono::steady_clock::time_point cutoff)
+        uint32 CountSince(std::chrono::steady_clock::time_point cutoff)
         {
             PruneOlderThan(cutoff);
-            return m_failureAttempts.size();
+            return nonstd::saturating_cast<uint32>(m_failureAttempts.size());
         }
 
         void RegisterActivity(std::chrono::steady_clock::time_point now,
@@ -66,13 +69,10 @@ namespace
     std::unordered_map<std::string, ThrottleEntry> g_throttleMap;
 } // namespace
 
-bool IsWrongPassLimitReached(std::string const& ip, uint32 maxFailures, uint32 windowSeconds, uint32& outCount)
+WrongPasswordThrottleResult GetWrongPasswordAttemptsForIp(std::string const& ip)
 {
-    if (maxFailures == 0)
-    {
-        outCount = 0;
-        return false;
-    }
+    uint32 windowSeconds = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 60);
+    uint32 maxFailures = sConfig.GetIntDefault("WrongPass.ThrottleCount", 10);
 
     auto cutoff = std::chrono::steady_clock::now() - std::chrono::seconds(windowSeconds);
 
@@ -80,16 +80,21 @@ bool IsWrongPassLimitReached(std::string const& ip, uint32 maxFailures, uint32 w
     auto it = g_throttleMap.find(ip);
     if (it == g_throttleMap.end())
     {
-        outCount = 0;
-        return false;
+        return WrongPasswordThrottleResult(0, maxFailures); // So far no failed attempts were recorded for this IP
     }
 
-    outCount = static_cast<uint32>(it->second.CountSince(cutoff));
-    return outCount >= maxFailures;
+    uint32 failedAttempts = it->second.CountSince(cutoff);
+    return WrongPasswordThrottleResult(failedAttempts, maxFailures);
 }
 
-void RecordWrongPassword(std::string const& ip, uint32 windowSeconds)
+WrongPasswordThrottleResult::WrongPasswordThrottleResult(uint32 failedAttempts, uint32 maxAttempts) : failedAttempts(failedAttempts), maxAttempts(maxAttempts)
 {
+}
+
+void RecordWrongPasswordAttempt(std::string const& ip)
+{
+    uint32 windowSeconds = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 60);
+
     auto now = std::chrono::steady_clock::now();
     auto cutoff = now - std::chrono::seconds(windowSeconds);
 
@@ -124,8 +129,10 @@ void ClearWrongPasswordCount(std::string const& ip)
     g_throttleMap.erase(ip);
 }
 
-void CleanupLoginThrottle(uint32 windowSeconds)
+void CleanupStaleLoginThrottles()
 {
+    uint32 windowSeconds = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 60);
+
     std::lock_guard<std::mutex> lock(g_throttleMutex);
 
     auto cutoff = std::chrono::steady_clock::now() - std::chrono::seconds(windowSeconds);

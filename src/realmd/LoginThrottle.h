@@ -19,14 +19,30 @@
 #include "Common.h"
 #include <string>
 
+struct WrongPasswordThrottleResult
+{
+    uint32 failedAttempts;
+    uint32 maxAttempts;
+
+    bool IsBeingThrottled() const
+    {
+        if (maxAttempts == 0)
+            return false; // Per configuration, no throttling is applied
+
+        return failedAttempts >= maxAttempts;
+    }
+
+    explicit WrongPasswordThrottleResult(uint32 failedAttempts, uint32 maxAttempts);
+};
+
 // Returns true if this IP has hit the wrong-password limit within the window. Read-only.
-bool IsWrongPassLimitReached(std::string const& ip, uint32 maxFailures, uint32 windowSeconds, uint32& outCount);
+WrongPasswordThrottleResult GetWrongPasswordAttemptsForIp(std::string const& ip);
 
 // Records one wrong-password event for this IP. Call after an SRP6 mismatch.
-void RecordWrongPassword(std::string const& ip, uint32 windowSeconds);
+void RecordWrongPasswordAttempt(std::string const& ip);
 
 // Clears the wrong-password counter for this IP. Call on any successful login.
 void ClearWrongPasswordCount(std::string const& ip);
 
 // Evicts stale entries from the throttle map. Call periodically from the realmd main loop.
-void CleanupLoginThrottle(uint32 windowSeconds);
+void CleanupStaleLoginThrottles();

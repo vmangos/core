@@ -355,13 +355,11 @@ void AuthSocket::_HandleLogonChallenge()
         }
 
         // Reject early if this IP is currently locked out due to recent wrong-password failures.
-        uint32 wrongPassThrottleCount    = sConfig.GetIntDefault("WrongPass.ThrottleCount", 10);
-        uint32 wrongPassThrottleDuration = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 60);
-        uint32 wrongPassCount = 0;
-        if (wrongPassThrottleCount > 0 && IsWrongPassLimitReached(clientIpAddress, wrongPassThrottleCount, wrongPassThrottleDuration, wrongPassCount))
+        auto wrongPassResult = GetWrongPasswordAttemptsForIp(clientIpAddress);
+        if (wrongPassResult.IsBeingThrottled())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] IP '%s' is brute-force locked: %u failures in last %u seconds (limit %u)",
-                     clientIpAddress.c_str(), wrongPassCount, wrongPassThrottleDuration, wrongPassThrottleCount);
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] IP '%s' is temporarily locked after %u failed attempts",
+                     clientIpAddress.c_str(), wrongPassResult.failedAttempts);
             *pkt << uint8(WOW_FAIL_DB_BUSY);
 
             self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
@@ -852,8 +850,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong password!", m_login.c_str (), GetRemoteIpString().c_str());
 
         // Record the failure for the in-memory brute-force guard.
-        uint32 wrongPassThrottleDuration = sConfig.GetIntDefault("WrongPass.ThrottleDuration", 60);
-        RecordWrongPassword(GetRemoteIpString(), wrongPassThrottleDuration);
+        RecordWrongPasswordAttempt(GetRemoteIpString());
 
         uint32 MaxWrongPassCount = sConfig.GetIntDefault("WrongPass.MaxCount", 0);
         if(MaxWrongPassCount > 0)

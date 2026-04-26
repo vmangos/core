@@ -83,6 +83,7 @@ set (shared_SRCS
     nonstd/expected.hpp
     nonstd/nodiscard.hpp
     nonstd/optional.hpp
+    nonstd/saturating_cast.hpp
     TimePeriod.h
     ByteBuffer.cpp
     Common.cpp
