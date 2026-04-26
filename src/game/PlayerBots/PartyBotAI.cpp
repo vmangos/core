@@ -745,6 +745,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         {
             if (me->GetPowerPercent(POWER_MANA) >= 20.0f)
                 me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+        }
         return;
     }
 
