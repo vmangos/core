@@ -543,7 +543,7 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
 
     std::string ip = ipStr;
     LoginDatabase.escape_string(ip);
-    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `id` >= %u AND `last_ip` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), minId, ip.c_str());
+    std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `id` >= %u AND `last_ip` LIKE CONCAT('%s','%%')", minId, ip.c_str());
     if (!result)
     {
         PSendSysMessage("No account found on IP '%s'", ip.c_str());
@@ -842,7 +842,7 @@ bool ChatHandler::HandleBanListCharacterCommand(char* args)
 
     std::string filter = cFilter;
     CharacterDatabase.escape_string(filter);
-    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `account` FROM `characters` WHERE `name` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), filter.c_str());
+    std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT `account` FROM `characters` WHERE `name` LIKE CONCAT('%s','%%')", filter.c_str());
     if (!result)
     {
         PSendSysMessage(LANG_BANLIST_NOCHARACTER);
@@ -870,7 +870,7 @@ bool ChatHandler::HandleBanListAccountCommand(char* args)
     else
     {
         result = LoginDatabase.PQuery("SELECT `account`.`id`, `username` FROM `account`, `account_banned`"
-                                      " WHERE `account`.`id` = `account_banned`.`id` AND `active` = 1 AND `username` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " GROUP BY `account`.`id`",
+                                      " WHERE `account`.`id` = `account_banned`.`id` AND `active` = 1 AND `username` LIKE CONCAT('%s','%%')" " GROUP BY `account`.`id`",
                                       filter.c_str());
     }
 
@@ -980,7 +980,7 @@ bool ChatHandler::HandleBanListIPCommand(char* args)
     else
     {
         result = LoginDatabase.PQuery("SELECT `ip`,`bandate`,`unbandate`,`bannedby`,`banreason` FROM `ip_banned`"
-                                      " WHERE (`bandate`=`unbandate` OR `unbandate`>UNIX_TIMESTAMP()) AND `ip` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'")
+                                      " WHERE (`bandate`=`unbandate` OR `unbandate`>UNIX_TIMESTAMP()) AND `ip` LIKE CONCAT('%s','%%')"
                                       " ORDER BY `unbandate`", filter.c_str());
     }
 
@@ -1147,7 +1147,7 @@ bool ChatHandler::HandleMuteCommand(char* args)
             pAura->SetAuraMaxDuration(notspeaktime * MINUTE * IN_MILLISECONDS);
             pAura->RefreshHolder();
         }
-            
+
         target->PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notspeaktime);
     }
 
@@ -1207,7 +1207,7 @@ bool ChatHandler::HandleUnmuteCommand(char* args)
     {
         target->RemoveAurasDueToSpell(SPELL_PLAYER_MUTED_VISUAL);
         target->PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
-    } 
+    }
 
     std::string nameLink = playerLink(target_name);
 

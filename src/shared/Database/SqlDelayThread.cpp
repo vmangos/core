@@ -38,9 +38,7 @@ SqlDelayThread::~SqlDelayThread()
 
 void SqlDelayThread::run()
 {
-    #ifndef DO_POSTGRESQL
     mysql_thread_init();
-    #endif
 
     uint32 const loopSleepDelay = 10;
 
@@ -64,9 +62,7 @@ void SqlDelayThread::run()
         }
     }
 
-    #ifndef DO_POSTGRESQL
     mysql_thread_end();
-    #endif
 }
 
 void SqlDelayThread::Stop()
