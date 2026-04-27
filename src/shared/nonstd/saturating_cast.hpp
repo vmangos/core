@@ -26,7 +26,7 @@ namespace nonstd
     /// Converts the value to a value of type `To`,
     /// clamping the value between the minimum and maximum values of type `To`.
     template <typename To, typename From>
-    NODISCARD("") static constexpr To saturating_cast(From value)
+    NODISCARD("") static To saturating_cast(From value)
     {
         if (value > static_cast<From>(std::numeric_limits<To>::max()))
         {
