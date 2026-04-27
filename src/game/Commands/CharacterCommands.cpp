@@ -1374,7 +1374,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool u
 
                 CharacterDatabase.escape_string(searchString);
 
-                resultChar = CharacterDatabase.PQuery("SELECT `guid`, `deleted_name`, `deleted_account`, `deleted_time` FROM `characters` WHERE `deleted_time` IS NOT NULL AND `deleted_name` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT 0,50", searchString.c_str());
+                resultChar = CharacterDatabase.PQuery("SELECT `guid`, `deleted_name`, `deleted_account`, `deleted_time` FROM `characters` WHERE `deleted_time` IS NOT NULL AND `deleted_name` LIKE CONCAT('%s','%%')" " LIMIT 0,50", searchString.c_str());
             }
         }
         else
@@ -1389,7 +1389,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool u
                     return false;
 
                 LoginDatabase.escape_string(searchString);
-                std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), searchString.c_str());
+                std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` LIKE CONCAT('%s','%%')", searchString.c_str());
                 std::vector<uint32> list;
                 if (result)
                 {
