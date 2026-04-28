@@ -1,6 +1,8 @@
 
 if(MSVC)
   include("${ROOT_DIR}/cmake/compiler/msvc/settings.cmake")
+elseif(MINGW)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=write-strings")
 endif()
 
 # Added by Giperion, in WIN32 output all compiled files in one directory

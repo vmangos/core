@@ -12,7 +12,8 @@ if(GCC_SANITIZE)
   #set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fsanitize=unsigned-integer-overflow")
 endif()
 
-set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} --no-warnings -fexceptions -fnon-call-exceptions -pipe")
+# TODO: Remove `--no-warnings` and fix the code instead of hiding the errors
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Werror=write-strings -fexceptions -fnon-call-exceptions -pipe")
 if(BUILD_FOR_HOST_CPU)
   set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -march=native")
 endif()

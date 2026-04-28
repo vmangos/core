@@ -54,8 +54,7 @@ public:
     ExResult extended_error() const;
 
 private:
-    //static constexpr std::string_view uri = "https://api.sendgrid.com/v3/mail/send"sv;
-    static constexpr char* uri = "https://api.sendgrid.com/v3/mail/send";
+    static constexpr char const* uri = "https://api.sendgrid.com/v3/mail/send";
 
     const std::string _api_key;
     const std::string _template_name;
