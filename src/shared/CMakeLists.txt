@@ -256,6 +256,7 @@ target_include_directories(shared PUBLIC
   ${OPENSSL_INCLUDE_DIR}
   ${ZLIB_INCLUDE_DIRS}
 )
+target_compile_definitions(shared PUBLIC OPENSSL_NO_DEPRECATED) # Disable the usage of deprecated OpenSSL functions
 
 if(WIN32)
   target_include_directories(shared PUBLIC

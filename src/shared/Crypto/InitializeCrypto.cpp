@@ -128,9 +128,20 @@ static bool CryptoSelfCheck()
     return isOkay;
 }
 
+static char const* GetOpenSslRuntimeVersion()
+{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    // OpenSSL 1.0.x
+    return SSLeay_version(SSLEAY_VERSION);
+#else
+    // OpenSSL 1.1.x / OpenSSL 3
+    return OpenSSL_version(OPENSSL_VERSION);
+#endif
+}
+
 bool Crypto::InitializeCryptoAndPrintVersion()
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "OpenSSL Headers: %s | OpenSSL Library: %s", OPENSSL_VERSION_TEXT, GetOpenSslRuntimeVersion());
 
 #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
     if (!OSSL_PROVIDER_available(nullptr, "legacy"))
