@@ -13,7 +13,7 @@
 #include <thread>
 #include <type_traits>
 
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 namespace MMAP
