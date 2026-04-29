@@ -34,7 +34,6 @@ set (shared_SRCS
     Threading.h
     Timer.h
     Util.h
-    WheatyExceptionReport.h
     Config/Config.h
     Config/ConfigEnv.h
     Crypto/BigNumber.h
@@ -80,7 +79,6 @@ set (shared_SRCS
     Threading.cpp
     Util.cpp
     Duration.h
-    WheatyExceptionReport.cpp
     Auth/AuthCrypt.h
     Auth/AuthCrypt.cpp
     Config/Config.cpp
@@ -116,18 +114,9 @@ if(WIN32)
     migrations_list.h
   )
 
-  if (NOT MSVC)
-    list(REMOVE_ITEM shared_SRCS
-      WheatyExceptionReport.cpp
-      WheatyExceptionReport.h
-    )
-  endif()
-
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
 else()
   list(REMOVE_ITEM shared_SRCS
-    WheatyExceptionReport.cpp
-    WheatyExceptionReport.h
     ServiceWin32.cpp
     ServiceWin32.h
     revision.h
