@@ -1,4 +1,4 @@
-// Copyright 2006 Nemanja Trifunovic
+// Copyright 2018 Nemanja Trifunovic
 
 /*
 Permission is hereby granted, free of charge, to any person or organization
@@ -25,22 +25,46 @@ DEALINGS IN THE SOFTWARE.
 */
 
 
-#ifndef UTF8_FOR_CPP_2675DCD0_9480_4c0c_B92A_CC14C027B731
-#define UTF8_FOR_CPP_2675DCD0_9480_4c0c_B92A_CC14C027B731
+#ifndef UTF8_FOR_CPP_a184c22c_d012_11e8_a8d5_f2801f1b9fd1
+#define UTF8_FOR_CPP_a184c22c_d012_11e8_a8d5_f2801f1b9fd1
 
-/*
-To control the C++ language version used by the library, you can define UTF_CPP_CPLUSPLUS macro
-and set it to one of the values used by the __cplusplus predefined macro.
+#include "checked.h"
 
-For instance,
-    #define UTF_CPP_CPLUSPLUS 199711L
-will cause the UTF-8 CPP library to use only types and language features available in the C++ 98 standard.
-Some library features will be disabled.
+namespace utf8
+{
+    inline void append16(utfchar32_t cp, std::u16string& s)
+    {
+        append16(cp, std::back_inserter(s));
+    }
 
-If you leave UTF_CPP_CPLUSPLUS undefined, it will be internally assigned to __cplusplus.
-*/
+    inline std::string utf16to8(const std::u16string& s)
+    {
+        std::string result;
+        utf16to8(s.begin(), s.end(), std::back_inserter(result));
+        return result;
+    }
 
-#include "utf8/checked.h"
-#include "utf8/unchecked.h"
+    inline std::u16string utf8to16(const std::string& s)
+    {
+        std::u16string result;
+        utf8to16(s.begin(), s.end(), std::back_inserter(result));
+        return result;
+    }
+
+    inline std::string utf32to8(const std::u32string& s)
+    {
+        std::string result;
+        utf32to8(s.begin(), s.end(), std::back_inserter(result));
+        return result;
+    }
+
+    inline std::u32string utf8to32(const std::string& s)
+    {
+        std::u32string result;
+        utf8to32(s.begin(), s.end(), std::back_inserter(result));
+        return result;
+    }
+} // namespace utf8
 
 #endif // header guard
+
