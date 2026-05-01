@@ -24,6 +24,13 @@ UPDATE `creature` SET `wander_distance` = 40 WHERE `id` IN (6380, 6377, 6379, 63
 UPDATE `creature` SET `movement_type` = 1 WHERE `guid` IN (35139, 35167);
 UPDATE `creature` SET `wander_distance` = 70 WHERE `id` IN (6148, 6147, 6146) AND `movement_type` = 1;
 
+-- Decaying Horror (1813) should share spawn with Devouring Ooze (1808) and Rotting Behemoth (1812)
+UPDATE `creature` SET `id` = 1808, `id2` = 1812, `id3` = 1813 WHERE `id` IN (1808, 1813, 1812);
+
+-- Vile Slime (1806) should share spawn with Rotting Behemoth (1812)
+UPDATE `creature` SET `id` = 1806, `id2` = 1812 WHERE `id` IN (1806);
+UPDATE `creature` SET `id` = 1806, `id2` = 1812, `id3` = 0 WHERE `guid` IN (46751);
+
 -- Frenzied Plaguehound (8598) should share spawn with Monstrous Plaguebat (8602)
 UPDATE `creature` SET `id` = 8598, `id2` = 8602 WHERE `id` IN (8598, 8602);
 
