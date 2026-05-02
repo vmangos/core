@@ -1538,6 +1538,12 @@ enum
     BCT_STRANGE_NOISE = 10755, // %s emits a strange noise.
 };
 
+static G3D::Vector2 const plagueWingEntrancePos[2] =
+{
+    { 2971.66f, -3481.36f },
+    { 2958.53f, -3468.17f }
+};
+
 struct mob_naxxramasGarboyleAI : public ScriptedAI
 {
     mob_naxxramasGarboyleAI(Creature* pCreature)
@@ -1598,6 +1604,13 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
+
+        // Gargoyles cannot leave the plague wing. Tested on Classic.
+        if (!Geometry::IsPointLeftOfLine(plagueWingEntrancePos[0], plagueWingEntrancePos[1], m_creature->GetPosition()))
+        {
+            EnterEvadeMode();
+            return;
+        }
 
         if (m_creature->GetHealthPercent() < 30.0f && !m_creature->IsNonMeleeSpellCasted() && !m_creature->HasAura(SPELL_STONESKIN))
         {
