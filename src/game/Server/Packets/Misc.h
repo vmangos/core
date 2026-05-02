@@ -7,6 +7,7 @@
 #include "nonstd/optional.hpp"
 #include <string>
 #include <vector>
+#include <array>
 
 namespace WorldPackets { namespace Misc
 {
@@ -550,6 +551,72 @@ namespace WorldPackets { namespace Misc
 #endif
 
         explicit MeetingstoneSetQueue() : ServerPacket(SMSG_MEETINGSTONE_SETQUEUE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PvpCredit final : public ServerPacket
+    {
+    public:
+        int32 honor = 0;          // Amount of honor gained
+        ObjectGuid victimGuid;    // GUID of the killed unit (empty if no victim)
+        int32 victimRank = 0;     // Rank of the victim (0 = no rank, 19 = racial leader)
+
+        explicit PvpCredit() : ServerPacket(SMSG_PVP_CREDIT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    struct ForcedReactionEntry
+    {
+        uint32 factionId = 0;       // Faction ID (Faction.dbc)
+        uint32 reputationRank = 0;  // Reputation rank
+    };
+
+    class SetForcedReactions final : public ServerPacket
+    {
+    public:
+        std::vector<ForcedReactionEntry> forcedReactions;
+
+        explicit SetForcedReactions() : ServerPacket(SMSG_SET_FORCED_REACTIONS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    struct FactionStandingEntry
+    {
+        uint32 reputationListId = 0; // Reputation list ID
+        int32 standing = 0;          // Reputation standing
+    };
+
+    class SetFactionStanding final : public ServerPacket  // last check 2.4.0
+    {
+    public:
+        std::vector<FactionStandingEntry> factionStandings;
+
+        explicit SetFactionStanding() : ServerPacket(SMSG_SET_FACTION_STANDING) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    struct FactionInitEntry
+    {
+        uint8 flags = 0;    // Faction flags
+        int32 standing = 0; // Reputation standing
+    };
+
+    class InitializeFactions final : public ServerPacket
+    {
+    public:
+        static constexpr uint32 MAX_FACTION_COUNT = 64;
+        std::array<FactionInitEntry, MAX_FACTION_COUNT> factions;
+
+        explicit InitializeFactions() : ServerPacket(SMSG_INITIALIZE_FACTIONS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SetFactionVisible final : public ServerPacket
+    {
+    public:
+        uint32 reputationListId = 0; // Reputation list ID to make visible
+
+        explicit SetFactionVisible() : ServerPacket(SMSG_SET_FACTION_VISIBLE) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

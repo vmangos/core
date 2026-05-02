@@ -371,4 +371,44 @@ void WorldPackets::Misc::MeetingstoneComplete::AppendBodyTo(ByteBuffer& /*buffer
 {
 }
 
+void WorldPackets::Misc::PvpCredit::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << honor;
+    buffer << victimGuid;
+    buffer << victimRank;
+}
 
+void WorldPackets::Misc::SetForcedReactions::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << static_cast<uint32>(forcedReactions.size());
+    for (const auto& reaction : forcedReactions)
+    {
+        buffer << reaction.factionId;       // faction_id (Faction.dbc)
+        buffer << reaction.reputationRank;  // reputation rank
+    }
+}
+
+void WorldPackets::Misc::SetFactionStanding::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << static_cast<uint32>(factionStandings.size());
+    for (const auto& entry : factionStandings)
+    {
+        buffer << entry.reputationListId;
+        buffer << entry.standing;
+    }
+}
+
+void WorldPackets::Misc::InitializeFactions::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << static_cast<uint32>(factions.size());
+    for (const auto& faction : factions)
+    {
+        buffer << faction.flags;
+        buffer << faction.standing;
+    }
+}
+
+void WorldPackets::Misc::SetFactionVisible::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << reputationListId;
+}

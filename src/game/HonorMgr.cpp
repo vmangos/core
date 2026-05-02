@@ -13,6 +13,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "Packets/Misc.h"
 
 #include <fstream>
 
@@ -1062,24 +1063,17 @@ void HonorMgr::SendPVPCredit(Unit const* victim, float honor)
     if (!m_owner)
         return;
 
-    WorldPacket data(SMSG_PVP_CREDIT, 4 + 8 + 4);
-    data << int32(honor);
+    auto packet = std::make_unique<WorldPackets::Misc::PvpCredit>();
+    packet->honor = static_cast<int32>(honor);
 
-    if (!victim)
+    if (victim)
     {
-        data << int64(0);
-        data << int32(0);
-    }
-    else
-    {
-        data << victim->GetObjectGuid();
+        packet->victimGuid = victim->GetObjectGuid();
 
         if (victim->IsCreature())
         {
-            if (((Creature*)victim)->IsRacialLeader())
-                data << int32(19);
-            else
-                data << int32(0);
+            if (victim->ToCreature()->IsRacialLeader())
+                packet->victimRank = 19;
         }
         else if (victim->IsPlayer())
         {
@@ -1088,12 +1082,12 @@ void HonorMgr::SendPVPCredit(Unit const* victim, float honor)
             // we need to send first rank instead.
             // https://youtu.be/hef06Cs6Q34?t=191
             // New classic client does this on its own.
-            int32 rank = ((Player const*)victim)->GetHonorMgr().GetRank().rank;
+            int32 rank = victim->ToPlayer()->GetHonorMgr().GetRank().rank;
             if (!rank)
-                rank = (HONOR_RANK_COUNT - POSITIVE_HONOR_RANK_COUNT) + 1;
-            data << uint32(rank);
+                rank = (HONOR_RANK_COUNT - POSITIVE_HONOR_RANK_COUNT) + 1; // At least "Scout"
+            packet->victimRank = rank;
         }
     }
 
-    m_owner->SendDirectMessage(&data);
+    m_owner->GetSession()->SendPacket(std::move(packet));
 }
