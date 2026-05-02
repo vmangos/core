@@ -41,7 +41,7 @@ struct WIN_SYSTEM_INFO {
         struct {
             uint16 wProcessorArchitecture;
             uint16 wReserved;
-        };
+        } oemInfo;
     };
     uint32 dwPageSize;
     uint32 lpMinimumApplicationAddress;

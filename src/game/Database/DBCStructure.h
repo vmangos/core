@@ -685,18 +685,6 @@ struct TalentTabEntry
     //char* internalname;                                   // 14       m_backgroundFile
 };
 
-struct TaxiNodesEntry
-{
-    uint32    ID;                                           // 0        m_ID
-    uint32    map_id;                                       // 1        m_ContinentID
-    float     x;                                            // 2        m_x
-    float     y;                                            // 3        m_y
-    float     z;                                            // 4        m_z
-    std::array<std::string, MAX_DBC_LOCALE> name{};         // 5-12     m_Name_lang
-                                                            // 13 string flags
-    uint32    MountCreatureID[2];                           // 14-15    m_MountCreatureID[2] horde[14]-alliance[15]
-};
-
 struct TaxiPathEntry
 {
     uint32    ID;
@@ -796,6 +784,19 @@ struct WorldSafeLocsEntry
 #else
 #pragma pack(pop)
 #endif
+// ^^^ Data packed area above this line. Only use primitive data types. ^^^
+
+struct TaxiNodesEntry
+{
+    uint32    ID;                                           // 0        m_ID
+    uint32    map_id;                                       // 1        m_ContinentID
+    float     x;                                            // 2        m_x
+    float     y;                                            // 3        m_y
+    float     z;                                            // 4        m_z
+    std::array<std::string, MAX_DBC_LOCALE> name{};         // 5-12     m_Name_lang
+    // 13 string flags
+    uint32    MountCreatureID[2];                           // 14-15    m_MountCreatureID[2] horde[14]-alliance[15]
+};
 
 typedef std::unordered_set<uint32> SpellCategorySet;
 typedef std::unordered_map<uint32,SpellCategorySet > SpellCategoriesStore;

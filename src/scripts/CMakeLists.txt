@@ -327,6 +327,7 @@ include_directories(
 add_library(${LIBRARY_NAME} STATIC
   ${SCRIPTS_SRCS}
 )
+mangos_target_flags(${LIBRARY_NAME})
 
 SET_TARGET_PROPERTIES (${LIBRARY_NAME} PROPERTIES FOLDER "Game Libs")
 

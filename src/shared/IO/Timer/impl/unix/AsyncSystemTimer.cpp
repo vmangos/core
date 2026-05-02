@@ -27,7 +27,7 @@ std::shared_ptr<IO::Timer::TimerHandle> IO::Timer::AsyncSystemTimer::_ScheduleFu
     {
         std::lock_guard<std::mutex> lock(m_orderedPendingTimer_mutex);
 
-        bool isNewFirstEntry;
+        bool isNewFirstEntry = false;
         if (m_orderedPendingTimer.empty() || (m_orderedPendingTimer.end()->m_whenToTriggerMe < newEntry.m_whenToTriggerMe))
         { // we can just append the new timer to the end
             isNewFirstEntry = m_orderedPendingTimer.empty();

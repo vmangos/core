@@ -49,8 +49,8 @@ void LoadGameObjectModelList()
     char buff[500];
     while (!feof(model_list_file))
     {
-        fread(&displayId, sizeof(uint32), 1, model_list_file);
-        fread(&name_length, sizeof(uint32), 1, model_list_file);
+        IgnoreResult(fread(&displayId, sizeof(uint32), 1, model_list_file));
+        IgnoreResult(fread(&name_length, sizeof(uint32), 1, model_list_file));
 
         if (name_length >= sizeof(buff))
         {
@@ -58,10 +58,10 @@ void LoadGameObjectModelList()
             break;
         }
 
-        fread(&buff, sizeof(char), name_length, model_list_file);
+        IgnoreResult(fread(&buff, sizeof(char), name_length, model_list_file));
         Vector3 v1, v2;
-        fread(&v1, sizeof(Vector3), 1, model_list_file);
-        fread(&v2, sizeof(Vector3), 1, model_list_file);
+        IgnoreResult(fread(&v1, sizeof(Vector3), 1, model_list_file));
+        IgnoreResult(fread(&v2, sizeof(Vector3), 1, model_list_file));
 
         model_list.insert(ModelList::value_type(displayId, GameobjectModelData(std::string(buff, name_length), AABox(v1, v2))));
     }

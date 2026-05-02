@@ -55,6 +55,7 @@ endif()
 add_executable(${EXECUTABLE_NAME}
   ${EXECUTABLE_SRCS}
 )
+mangos_target_flags(${EXECUTABLE_NAME})
 
 target_link_libraries(${EXECUTABLE_NAME}
   shared

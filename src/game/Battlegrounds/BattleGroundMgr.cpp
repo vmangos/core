@@ -791,7 +791,7 @@ bool BattleGroundQueue::CheckCreateNewBg(BattleGroundTypeId bgTypeId, BattleGrou
         std::shuffle(m_queuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].begin(),
             m_queuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].end(),
             std::default_random_engine(seed));
-        sLog.Out(LOG_BG, LOG_LVL_DETAIL, "Alterac queue randomized (%u alliance vs %u horde)",
+        sLog.Out(LOG_BG, LOG_LVL_DETAIL, "Alterac queue randomized (%zu alliance vs %zu horde)",
             m_queuedGroups[bracketId][BG_QUEUE_NORMAL_ALLIANCE].size(),
             m_queuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].size());
     }

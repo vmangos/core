@@ -19,7 +19,7 @@
 
 /* ScriptData
 SDName: Boss_Twinemperors
-SD%Complete: 
+SD%Complete:
 SDComment: uncertain which dialogue should be used on enrage
 SDCategory: Temple of Ahn'Qiraj
 Rewrtten by Gemt
@@ -34,10 +34,10 @@ EndScriptData */
 enum eSpells
 {
     SPELL_BERSERK               = 26662,
-    
+
     SPELL_TWIN_TELEPORT_SCRIPT  = 799,   // should have a script effect, dosent seem to have one.
     SPELL_TWIN_TELEPORT_MSG     = 800,   // CTRA watches for this spell to start its teleport timer
-    SPELL_TWIN_TELEPORT_VISUAL  = 26638, 
+    SPELL_TWIN_TELEPORT_VISUAL  = 26638,
 
     SPELL_HEAL_BROTHER          = 7393,
 
@@ -75,17 +75,17 @@ enum eScriptTexts
     SAY_VEKLOR_KILL_2    = -1531021, // like a fly in a web
     SAY_VEKLOR_KILL_3    = -1531022, // your brash arrogance
     SAY_VEKLOR_SPECIAL   = -1531025, // to decorate our halls (wipe)
-                                           
+
     SAY_VEKNILASH_AGGRO_1 = -1531026, // ah, lambs to the slaughter
     SAY_VEKNILASH_AGGRO_2 = -1531027, // let none survive
     SAY_VEKNILASH_AGGRO_3 = -1531028, // join me brother, there is blood to be shed
     SAY_VEKNILASH_AGGRO_4 = -1531029, // look brother, fresh bloood
     SAY_VEKNILASH_SLAY    = 11455,    // your fate is sealed
     SAY_VEKNILASH_SPECIAL = -1531032, // Shall be your undoing (wipe)
-                                        
+
     //death is handled by instance_temple_of_ahnqiraj.cpp
     //NOTE: according to wowwiki, the *_SLAY emotes are used during enrage,
-    //      while "Oblivion will engulf you", "Like a fly in a web" and "your brash arrogance" 
+    //      while "Oblivion will engulf you", "Like a fly in a web" and "your brash arrogance"
     //      is used on killing player. Not been able to confirm this.
 };
 
@@ -118,15 +118,15 @@ static constexpr uint32 MUTATE_BUG_MAX_CD           = 15000;
 
 // Vek'lor constants
 static constexpr float  ARCANE_BURST_RANGE          = 10.0f;    // How close must a player be if VL should cast AB
-static constexpr uint32 ARCANE_BURST_MIN_CD         = 5000;     
+static constexpr uint32 ARCANE_BURST_MIN_CD         = 5000;
 static constexpr uint32 ARCANE_BURST_MAX_CD         = 10000;
 static constexpr uint32 BLIZZARD_MIN_CD             = 15000;    // todo: no source on blizzard cooldown. Duration is 10s
 static constexpr uint32 BLIZZARD_MAX_CD             = 20000;
 static constexpr uint32 VEKLOR_DIST                 = 20;       // Vek'lor chase to this distance
-static constexpr uint32 SHADOWBOLT_RANGED_MIN_CD    = 1800;     
-static constexpr uint32 SHADOWBOLT_RANGED_MAX_CD    = 2500;     
-static constexpr uint32 SHADOWBOLT_MELEE_MIN_CD     = 2000;     
-static constexpr uint32 SHADOWBOLT_MELEE_MAX_CD     = 10000;    
+static constexpr uint32 SHADOWBOLT_RANGED_MIN_CD    = 1800;
+static constexpr uint32 SHADOWBOLT_RANGED_MAX_CD    = 2500;
+static constexpr uint32 SHADOWBOLT_MELEE_MIN_CD     = 2000;
+static constexpr uint32 SHADOWBOLT_MELEE_MAX_CD     = 10000;
 static constexpr uint32 VEKLOR_PULL_YELL_DELAY      = 3000;     // Vek'lors pull yell happens after Vek'nilash
 static constexpr uint32 EXPLODE_BUG_MIN_CD          = 7000;
 static constexpr uint32 EXPLODE_BUG_MAX_CD          = 10000;
@@ -172,7 +172,7 @@ struct mob_TwinsBug : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
-        
+
         if (pierceArmorTimer < diff) {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PIERCE_ARMOR) == CAST_OK)
                 pierceArmorTimer = urand(5000, 9000);
@@ -184,7 +184,7 @@ struct mob_TwinsBug : public ScriptedAI
             if(DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ACID_SPIT) == CAST_OK)
                 acidSpitTimer = urand(6000, 12000);
         }
-        else 
+        else
             acidSpitTimer -= diff;
 
         DoMeleeAttackIfReady();
@@ -195,11 +195,11 @@ struct boss_twinemperorsAI : public ScriptedAI
 {
     instance_temple_of_ahnqiraj* m_pInstance;
     uint32 EnrageTimer;
-    
+
     uint32 justTeleportedTimer;
-    bool justTeleported;    
+    bool justTeleported;
     bool didPullDialogue;
-    
+
     uint32 bugMutationTimer;
     uint32 respawnBugTimer;
 
@@ -216,7 +216,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     ObjectGuid closestTargetAfterTP;
 
-    boss_twinemperorsAI(Creature* pCreature) : 
+    boss_twinemperorsAI(Creature* pCreature) :
         ScriptedAI(pCreature)
     {
 
@@ -321,7 +321,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        if (m_pInstance) 
+        if (m_pInstance)
         {
             if (m_pInstance->GetData(TYPE_TWINS) == IN_PROGRESS)
             {
@@ -340,7 +340,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             pCreature->AI()->AttackStart(pWho);
             bOpenEntrance = true;
         }
-        
+
         if (m_pInstance && !bOpenEntrance)
             if (GameObject* pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR))
                 m_pInstance->DoResetDoor(pGo->GetGUID());
@@ -399,7 +399,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         {
             return;
         }
-      
+
         if (justTeleported)
         {
             // Delaying selection of new closest player until first update after TP
@@ -451,7 +451,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         HandleBugSpell(diff);
         TryHealBrother(diff);
         //HandleDeadBugs(diff); // they respawn by themself...
-        
+
         // We skip updating emperor-specific spells during teleport stun
         if (!justTeleported)
         {
@@ -461,7 +461,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     Creature* GetOtherBoss()
     {
-        if (m_pInstance) 
+        if (m_pInstance)
             return m_pInstance->GetSingleCreatureFromStorage(m_creature->GetEntry() == NPC_VEKLOR ? NPC_VEKNILASH : NPC_VEKLOR);
         return nullptr;
     }
@@ -485,7 +485,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     void OnEndTeleport()
     {
         justTeleported = false;
-        
+
         if (Player* closestPlayer = m_pInstance->GetMap()->GetPlayer(closestTargetAfterTP))
         {
             closestTargetAfterTP = closestPlayer->GetGUID();
@@ -495,7 +495,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         {
             sLog.Out(LOG_SCRIPTS, LOG_LVL_BASIC, "Twins unable to select closest target after TP stun end");
         }
-        
+
 
         OnEndTeleportVirtual();
     }
@@ -545,7 +545,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             bugMutationTimer -= diff;
         }
     }
-    
+
     void CheckEnrage(uint32 diff)
     {
         if (EnrageTimer < diff && !m_creature->HasAura(SPELL_BERSERK))
@@ -553,11 +553,11 @@ struct boss_twinemperorsAI : public ScriptedAI
             // Wait with casting enrage until after TP idle
             if (justTeleported) return;
 
-            // just force-apply berserk if it's time. No dilly-dally. 
+            // just force-apply berserk if it's time. No dilly-dally.
             m_creature->CastSpell(m_creature, SPELL_BERSERK, true);
             EnrageTimer = 60000 * 5; // resetting to duration of enrage
         }
-        else 
+        else
         {
             EnrageTimer -= diff;
         }
@@ -580,7 +580,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (tList.size() > 1 && skipTopAggro)
             ++i;
 
-        for (i; i != tList.end(); ++i)
+        for (; i != tList.end(); ++i)
         {
             Player* pPlayer = (*i)->getTarget()->ToPlayer();
             if (!pPlayer) continue;
@@ -760,11 +760,11 @@ struct boss_veklorAI : public boss_twinemperorsAI
 
     void OnEndTeleportVirtual() override
     {
-        // Seems rather random if he starts with an AB instantly or delays it 
+        // Seems rather random if he starts with an AB instantly or delays it
         // when looking at vanilla videos, so possibly because the timer is not reset?
         //arcaneBurstTimer = ARCANE_BURST_TP_CD;
 
-        shadowBoltTimer = 0; 
+        shadowBoltTimer = 0;
     }
 
     void UpdateBlizzard(uint32 diff)
@@ -797,18 +797,18 @@ struct boss_veklorAI : public boss_twinemperorsAI
             arcaneBurstTimer -= diff;
         }
     }
-    
+
     void UpdateEmperor(uint32 diff) override
     {
         // Vek'lor does his yell second, so we wait out pullDialogueTimer before yelling
-        if (!didPullDialogue) 
+        if (!didPullDialogue)
         {
-            if (pullDialogueTimer < diff) 
+            if (pullDialogueTimer < diff)
             {
                 didPullDialogue = true;
                 DoScriptText(PickRandomValue(SAY_VEKLOR_AGGRO_1, SAY_VEKLOR_AGGRO_2), m_creature);
             }
-            else 
+            else
             {
                 pullDialogueTimer -= diff;
             }
@@ -817,19 +817,19 @@ struct boss_veklorAI : public boss_twinemperorsAI
         // Always update blizzard and arcane burst, regardless of melee or not
         UpdateBlizzard(diff);
         updateArcaneBurst(diff);
-   
+
         Unit* victim = m_creature->GetVictim();
-        if (!victim) 
+        if (!victim)
             return;
 
         bool isMelee = m_creature->CanReachWithMeleeAutoAttack(victim);
         bool isInLos = m_creature->IsWithinLOSInMap(victim);
-        
+
         // Overriding shadowboltTimer if we're not in melee and we have not casted
-        // shadowbolt in at least SHADOWBOLT_RANGED_CD time. This will mostly be the 
-        // case if target was in melee, but then moved out, in which case we should 
+        // shadowbolt in at least SHADOWBOLT_RANGED_CD time. This will mostly be the
+        // case if target was in melee, but then moved out, in which case we should
         // instantly re-cast a new shadowbolt unless it was just casted.
-        if (!isMelee && timeSinceLastSB > SHADOWBOLT_RANGED_MAX_CD) 
+        if (!isMelee && timeSinceLastSB > SHADOWBOLT_RANGED_MAX_CD)
         {
             shadowBoltTimer = 0;
         }
@@ -844,22 +844,22 @@ struct boss_veklorAI : public boss_twinemperorsAI
         {
             if(m_creature->GetStandState() != UNIT_STAND_STATE_STAND)
                 m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-            if (shadowBoltTimer < diff) 
+            if (shadowBoltTimer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLT) == CAST_OK) 
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLT) == CAST_OK)
                 {
                     timeSinceLastSB = 0;
-                    if (isMelee) 
+                    if (isMelee)
                     {
                         // Looks like VL should prioritize shadowbolt differently if
                         // target is in melee range. He seems to get a random cooldown on it, and meleeing when he can.
                         // https://www.youtube.com/watch?v=SNOmg7kE68U&t=53s
                         // https://www.youtube.com/watch?v=dCrDisOWOjU
-                        // This may just be some bugged/different behaviour in blizzards spell-priority system, 
+                        // This may just be some bugged/different behaviour in blizzards spell-priority system,
                         // but I believe the effect should be the same by adding a random cooldown.
                         shadowBoltTimer = urand(SHADOWBOLT_MELEE_MIN_CD, SHADOWBOLT_MELEE_MAX_CD);
                     }
-                    else 
+                    else
                     {
                         // When not in melee range, there is only a ~2 sec cooldown on shadowbolt, even though
                         // the cast-time is only 1.5 seconds.
@@ -868,7 +868,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
                     }
                 }
             }
-            else 
+            else
             {
                 shadowBoltTimer -= diff;
             }
@@ -888,7 +888,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
     uint32 UpperCut_Timer;
     uint32 UnbalancingStrike_Timer;
     uint32 Scarabs_Timer;
-    
+
     void Reset() override
     {
         SharedReset();
@@ -955,10 +955,10 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         std::advance(it, candidates.size() - 1);
         return (*it)->getTarget();
     }
-    
+
     void UpdateEmperor(uint32 diff) override
-    {       
-        // Vek'nilash goes first, instantly does his yell when we are in combat. 
+    {
+        // Vek'nilash goes first, instantly does his yell when we are in combat.
         if (!didPullDialogue)
         {
             didPullDialogue = true;

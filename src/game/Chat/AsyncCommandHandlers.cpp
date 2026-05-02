@@ -333,7 +333,7 @@ void PlayerCharacterLookupDisplayTask::operator()()
 // Handle the result and create a display task to run in the world update
 void PlayerSearchHandler::HandlePlayerCharacterLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
 {
-    sWorld.AddAsyncTask(std::move(PlayerCharacterLookupDisplayTask(std::move(result), accountId, limit)));
+    sWorld.AddAsyncTask(PlayerCharacterLookupDisplayTask(std::move(result), accountId, limit));
 }
 
 void PlayerSearchHandler::ShowPlayerListHelper(std::unique_ptr<QueryResult> result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)
@@ -429,7 +429,7 @@ void AccountSearchDisplayTask::operator ()()
 
 void AccountSearchHandler::HandleAccountLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 limit)
 {
-    sWorld.AddAsyncTask(std::move(AccountSearchDisplayTask(std::move(result), accountId, limit)));
+    sWorld.AddAsyncTask(AccountSearchDisplayTask(std::move(result), accountId, limit));
 }
 
 void AccountSearchHandler::ShowAccountListHelper(std::unique_ptr<QueryResult> result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title)

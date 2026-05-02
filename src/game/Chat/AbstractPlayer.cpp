@@ -9,9 +9,6 @@ template<typename T>
 PlayerWrapper<T>::PlayerWrapper(T *pl) : player(*pl) {}
 
 template<typename T>
-PlayerWrapper<T>::PlayerWrapper() : player(*((T*)nullptr)) {}
-
-template<typename T>
 PlayerWrapper<T>::PlayerWrapper(const PlayerWrapper<T> &other) : player(other.player) {}
 
 template <typename T>

@@ -115,8 +115,6 @@ bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)
         default:
             return true;
     }
-
-    return true;
 }
 
 uint32 WorldSession::ChatCooldown()

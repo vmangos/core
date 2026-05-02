@@ -235,6 +235,7 @@ source_group("Log"
 add_library(shared STATIC
   ${shared_SRCS}
 )
+mangos_target_flags(shared)
 
 target_include_directories(shared PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}

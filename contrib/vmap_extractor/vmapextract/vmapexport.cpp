@@ -55,6 +55,11 @@
 
 //-----------------------------------------------------------------------------
 
+template<typename T>
+static void IgnoreResult(T const&)
+{
+}
+
 extern ArchiveSet gOpenArchives;
 
 typedef struct
@@ -148,8 +153,8 @@ bool ExtractSingleWmo(std::string& fname)
     const char* rchr = strrchr(plain_name, '_');
     if (rchr != NULL)
     {
-        char cpy[4];
-        strncpy((char*)cpy, rchr, 4);
+        char cpy[5] {};
+        strncpy(cpy, rchr, sizeof(cpy) - 1);
         for (int i = 0; i < 4; ++i)
         {
             int m = cpy[i];
@@ -426,7 +431,7 @@ int main(int argc, char** argv)
             printf("Your output directory seems to be polluted, please use an empty directory!\n");
             printf("<press return to exit>");
             char garbage[2];
-            scanf("%c", garbage);
+            IgnoreResult(scanf("%c", garbage));
             return 1;
         }
     }

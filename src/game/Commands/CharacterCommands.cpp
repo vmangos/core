@@ -50,7 +50,8 @@ bool ChatHandler::HandleCharacterAIInfoCommand(char* /*args*/)
     }
 
     PSendSysMessage("AI info for %s", pTarget->GetObjectGuid().GetString().c_str());
-    char const* cstrAIClass = pTarget->AI() ? typeid(*pTarget->AI()).name() : " - ";
+    auto* pAI = pTarget->AI();
+    char const* cstrAIClass = pAI ? typeid(*pAI).name() : " - ";
     PSendSysMessage("Current AI: %s", cstrAIClass);
     MovementGeneratorType moveType = pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType();
     PSendSysMessage(LANG_NPC_MOTION_TYPE, MotionMaster::GetMovementGeneratorTypeName(moveType), moveType);
@@ -4747,7 +4748,7 @@ bool ChatHandler::HandleModifyEnergyCommand(char* args)
     if (!ExtractUInt32(&args, energyMax))
         energyMax = std::max(chr->GetMaxPower(POWER_ENERGY), energyMin);
 
-    if (energyMin < 0 || energyMax < 0 || energyMax < energyMin)
+    if (energyMax < energyMin)
     {
         SendSysMessage(LANG_BAD_VALUE);
         SetSentErrorMessage(true);
@@ -4786,7 +4787,7 @@ bool ChatHandler::HandleModifyRageCommand(char* args)
     if (!ExtractUInt32(&args, rageMax))
         rageMax = std::max(chr->GetMaxPower(POWER_RAGE) / 10, rageMin);
 
-    if (rageMin < 0 || rageMax < 0 || rageMax < rageMin)
+    if (rageMax < rageMin)
     {
         SendSysMessage(LANG_BAD_VALUE);
         SetSentErrorMessage(true);

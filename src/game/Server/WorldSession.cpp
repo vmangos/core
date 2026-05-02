@@ -1060,7 +1060,9 @@ void WorldSession::SendAccountDataTimes()
     using namespace Crypto::Hash;
 
     bool const isOldClient = GetGameBuild() <= CLIENT_BUILD_1_8_4;
-    uint32 const dataCount = isOldClient ? OldAccountData::NUM_ACCOUNT_DATA_TYPES : NewAccountData::NUM_ACCOUNT_DATA_TYPES;
+    uint32 const dataCount = isOldClient
+                ? static_cast<uint32>(OldAccountData::NUM_ACCOUNT_DATA_TYPES)
+                : static_cast<uint32>(NewAccountData::NUM_ACCOUNT_DATA_TYPES);
     WorldPacket data(SMSG_ACCOUNT_DATA_MD5, dataCount * MD5::Digest::size());
     for (uint32 index = 0; index < NewAccountData::NUM_ACCOUNT_DATA_TYPES; ++index)
     {

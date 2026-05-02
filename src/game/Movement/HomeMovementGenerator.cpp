@@ -43,7 +43,10 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 
     if (!owner.HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE))
     {
-        float x, y, z, o;
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+        float o = 0.0f;
         bool setFacing = false;
         // at apply we can select more nice return points base at current movegen
         if (owner.GetMotionMaster()->empty() || !owner.GetMotionMaster()->top()->GetResetPosition(owner, x, y, z))
@@ -68,7 +71,7 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
         else // too far away or no path
             owner.NearTeleportTo(x, y, z, setFacing ? o : owner.GetOrientation());
     }
-    
+
     arrived = false;
 
     owner.ClearUnitState(UNIT_STATE_ALL_DYN_STATES);

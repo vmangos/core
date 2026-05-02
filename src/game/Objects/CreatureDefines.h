@@ -340,33 +340,6 @@ struct EquipmentEntry
     uint32 item[3] = { 0, 0, 0 };
 };
 
-struct EquipmentTemplate
-{
-    uint32 totalProbability = 0;
-    std::vector<EquipmentEntry> equipment;
-
-    EquipmentEntry const* ChooseEquipmentEntry() const
-    {
-        if (!totalProbability)
-            return nullptr;
-
-        uint32 const roll = urand(0, totalProbability - 1);
-        uint32 sum = 0;
-
-        for (auto const& itr : equipment)
-        {
-            if (!itr.probability)
-                continue;
-
-            sum += itr.probability;
-            if (roll < sum)
-                return &itr;
-        }
-
-        return nullptr;
-    }
-};
-
 #define MAX_CREATURE_IDS_PER_SPAWN 5
 
 // from `creature` table
@@ -470,6 +443,36 @@ struct CreatureClassLevelStats
 #else
 #pragma pack(pop)
 #endif
+
+// ^^^ Data packed area above this line. Only use primitive data types. ^^^
+
+struct EquipmentTemplate
+{
+    uint32 totalProbability = 0;
+    std::vector<EquipmentEntry> equipment;
+
+    EquipmentEntry const* ChooseEquipmentEntry() const
+    {
+        if (!totalProbability)
+            return nullptr;
+
+        uint32 const roll = urand(0, totalProbability - 1);
+        uint32 sum = 0;
+
+        for (auto const& itr : equipment)
+        {
+            if (!itr.probability)
+                continue;
+
+            sum += itr.probability;
+            if (roll < sum)
+                return &itr;
+        }
+
+        return nullptr;
+    }
+};
+
 
 struct CreatureLocale
 {

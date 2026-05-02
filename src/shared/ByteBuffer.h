@@ -495,7 +495,7 @@ class ByteBuffer
             memcpy(&_storage[pos], src, cnt);
         }
 
-        void hexlike() const;
+        void PrintAsHex() const;
 
     private:
         // limited for internal use because can "append" any unexpected type (like pointer and etc) with hard detection problem

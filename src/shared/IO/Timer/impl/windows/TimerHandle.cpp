@@ -11,7 +11,7 @@ IO::Timer::TimerHandle::TimerHandle(IO::Timer::AsyncSystemTimer *systemTimer, st
 void IO::Timer::TimerHandle::Cancel()
 {
     m_asyncSystemTimer->m_pendingTimers_mutex.lock();
-    bool wasRemoved = m_asyncSystemTimer->m_pendingTimers.erase(shared_from_this());
+    bool wasRemoved = m_asyncSystemTimer->m_pendingTimers.erase(shared_from_this()) != 0;
     m_asyncSystemTimer->m_pendingTimers_mutex.unlock();
     if (!wasRemoved)
         return; // The timer was already removed, so we don't want to re-execute it again.

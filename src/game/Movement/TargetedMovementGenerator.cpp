@@ -203,7 +203,7 @@ void ChaseMovementGenerator<T>::_setTargetLocation(T &owner)
         m_bReachable = true;
 
     m_bRecalculateTravel = false;
-    if (!transport && owner.HasDistanceCasterMovement() && 
+    if (!transport && owner.HasDistanceCasterMovement() &&
         path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
     {
         if (!owner.movespline->Finalized())
@@ -414,7 +414,7 @@ template<class T>
 bool ChaseMovementGenerator<T>::TargetWithinBoundsPercentDistance(T &owner, Unit* target, float pct) const
 {
     float radius = std::min(target->GetObjectBoundingRadius(), owner.GetObjectBoundingRadius());
-        
+
     radius *= pct;
 
     return owner.GetDistanceSqr(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()) < radius;
@@ -464,11 +464,11 @@ void ChaseMovementGenerator<T>::DoSpreadIfNeeded(T &owner, Unit* target)
         m_bCanSpread = false;
         return;
     }
-    
+
     float const my_angle = target->GetAngle(&owner);
     float const his_angle = target->GetAngle(pSpreadingTarget);
     float const new_angle = (his_angle > my_angle) ? my_angle - frand(0.4f, 1.0f) : my_angle + frand(0.4f, 1.0f);
-    
+
     float x, y, z;
     target->GetNearPoint(&owner, x, y, z, owner.GetObjectBoundingRadius(), frand(0.8f, (target->GetAttackers().size() > 5 ? 4.0f : 2.0f)), new_angle);
 
@@ -582,7 +582,7 @@ void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
     float x, y, z;
 
     // Can switch transports during follow movement.
-    GenericTransport* transport = transport = i_target.getTarget()->GetTransport();
+    GenericTransport* transport = i_target.getTarget()->GetTransport();
     if (transport != owner.GetTransport())
     {
         if (owner.GetTransport())
@@ -653,7 +653,7 @@ void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
 
     // Prevent redundant moves
     // He is flying too high for me. Moving a few meters wont change anything.
-    if (path.Length() < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) 
+    if (path.Length() < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f)
     {
         if (owner.IsWithinLOSInMap(i_target.getTarget()))
         {
@@ -667,7 +667,7 @@ void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
     m_bTargetReached = false;
 
     init.Move(&path);
-    
+
     float dist = path.Length();
     float speed = i_target->GetSpeedForMovementInfo(i_target->m_movementInfo);
     if (!speed)
@@ -730,7 +730,7 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
     {
         m_checkDistanceTimer.Reset(100);
         //More distance let have better performance, less distance let have more sensitive reaction at target move.
-        if (!owner.movespline->Finalized() && 
+        if (!owner.movespline->Finalized() &&
                  ((!m_fOffset && i_target->IsWithinDist(&owner, 0.0f)) ||
                  (i_target->IsPlayer() && !i_target->IsMoving() &&
                  Geometry::GetDistance3D(owner.movespline->FinalDestination(), i_target->GetPosition()) > (m_fOffset + owner.GetObjectBoundingRadius() + i_target->GetObjectBoundingRadius() + 0.5f) &&
@@ -752,7 +752,7 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             }
             else if (m_bTargetOnTransport)
                 targetMoved = true;
-            
+
             if (!targetMoved)
                 targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.1f);
 
@@ -785,7 +785,7 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
     }
     else if (m_bRecalculateTravel)
         owner.GetMotionMaster()->SetNeedAsyncUpdate();
-        
+
     return true;
 }
 

@@ -122,13 +122,14 @@ World::World():
     m_allowMovement(true),
     m_gameTime(time(nullptr)),
     m_timeZoneOffset(0),
-    m_gameDay((m_gameTime + m_timeZoneOffset) / DAY),
-    m_startTime(m_gameTime),
     m_wowPatch(WOW_PATCH_102),
     m_defaultDbcLocale(LOCALE_enUS),
     m_timeRate(1.0f),
     m_canProcessAsyncPackets(false)
 {
+    m_gameDay = (m_gameTime + m_timeZoneOffset) / DAY;
+    m_startTime = m_gameTime,
+
     m_ShutdownMask = 0;
     m_ShutdownTimer = 0;
     m_maxActiveSessionCount = 0;

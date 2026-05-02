@@ -520,7 +520,7 @@ endif()
 if(WIN32)
   #allow exceptions in destructors
   if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:implicitNoexcept-")
+    set(GAME_EXTRA_CXX_FLAGS "/Zc:implicitNoexcept-")
   endif()
 endif()
 
@@ -626,6 +626,10 @@ source_group("Anticheat"
 add_library(game STATIC
   ${game_SRCS}
 )
+mangos_target_flags(game)
+if(GAME_EXTRA_CXX_FLAGS)
+  target_compile_options(game PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${GAME_EXTRA_CXX_FLAGS}>)
+endif()
 
 SET_TARGET_PROPERTIES (game PROPERTIES FOLDER "Game Libs")
 

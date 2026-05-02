@@ -1677,9 +1677,6 @@ inline uint32 GetBattleGrounMapIdByTypeId(BattleGroundTypeId bgTypeId)
         case BATTLEGROUND_AB:   return MAP_ARATHI_BASIN;
         default:                return 0;   //none
     }
-
-    // impossible, just make compiler happy
-    return 0;
 }
 
 enum MailResponseType

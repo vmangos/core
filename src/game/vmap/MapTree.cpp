@@ -28,6 +28,8 @@
 #include <iomanip>
 #include <limits>
 
+#include "Util.h"
+
 using G3D::Vector3;
 
 namespace VMAP
@@ -379,7 +381,7 @@ namespace VMAP
                     // update tree
                     uint32 referencedVal;
 
-                    fread(&referencedVal, sizeof(uint32), 1, rf);
+                    IgnoreResult(fread(&referencedVal, sizeof(uint32), 1, rf));
                     if (!iLoadedSpawns.count(referencedVal))
                     {
                         if (referencedVal > iNTreeValues)
@@ -462,7 +464,7 @@ namespace VMAP
                     // update tree
                     uint32 referencedVal;
 
-                    fread(&referencedVal, sizeof(uint32), 1, tf);
+                    IgnoreResult(fread(&referencedVal, sizeof(uint32), 1, tf));
                     if (!iLoadedSpawns.count(referencedVal))
                     {
                         if (referencedVal > iNTreeValues)
@@ -530,7 +532,7 @@ namespace VMAP
                         // update tree
                         uint32 referencedNode;
 
-                        fread(&referencedNode, sizeof(uint32), 1, tf);
+                        IgnoreResult(fread(&referencedNode, sizeof(uint32), 1, tf));
                         if (!iLoadedSpawns.count(referencedNode))
                             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Trying to unload non-referenced model '%s' (ID:%u)", spawn.name.c_str(), spawn.ID);
                         else if (--iLoadedSpawns[referencedNode] == 0)

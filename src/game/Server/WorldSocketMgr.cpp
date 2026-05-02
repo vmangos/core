@@ -64,7 +64,7 @@ void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socke
 {
     // Attach descriptor to AsyncSocket and configure it before attaching it to the WorldSocket
     IO::IoContext* ioContext = GetLeastUsedIoContext();
-    auto worldSocket = std::make_shared<WorldSocket>(std::move(IO::Networking::AsyncSocket(ioContext, std::move(socketDescriptor))));
+    auto worldSocket = std::make_shared<WorldSocket>(IO::Networking::AsyncSocket(ioContext, std::move(socketDescriptor)));
     std::string const& socketIp = worldSocket->m_socket.GetRemoteIpString();
 
     if (IO::NetworkError initError = worldSocket->m_socket.InitializeAndFixateMemoryLocation())

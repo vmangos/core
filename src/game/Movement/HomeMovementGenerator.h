@@ -33,14 +33,14 @@ class HomeMovementGenerator<Creature>
     public:
 
         HomeMovementGenerator(): arrived(false) {}
-        ~HomeMovementGenerator() {}
+        ~HomeMovementGenerator() override {}
 
         void Initialize(Creature &);
         void Finalize(Creature &);
         void Interrupt(Creature &) {}
         void Reset(Creature &);
         bool Update(Creature &, uint32 const&);
-        MovementGeneratorType GetMovementGeneratorType() const { return HOME_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return HOME_MOTION_TYPE; }
 
     private:
         void _setTargetLocation(Creature &);

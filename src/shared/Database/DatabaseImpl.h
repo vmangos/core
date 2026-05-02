@@ -54,7 +54,7 @@ bool
 Database::AsyncQuery(Class* object, void (Class::*method)(std::unique_ptr<QueryResult>), char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class>(object, method, std::move(std::unique_ptr<QueryResult>(nullptr))), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class>(object, method, std::unique_ptr<QueryResult>(nullptr)), m_pResultQueue));
     return true;
 }
 
@@ -63,7 +63,7 @@ bool
 Database::AsyncQueryUnsafe(Class* object, void (Class::*method)(std::unique_ptr<QueryResult>), char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    MaNGOS::QueryCallback<Class>* cb = new MaNGOS::QueryCallback<Class>(object, method, std::move(std::unique_ptr<QueryResult>(nullptr)));
+    MaNGOS::QueryCallback<Class>* cb = new MaNGOS::QueryCallback<Class>(object, method, std::unique_ptr<QueryResult>(nullptr));
     cb->threadSafe = false;
     AddToDelayQueue(new SqlQuery(sql, cb, m_pResultQueue));
     return true;
@@ -74,7 +74,7 @@ bool
 Database::AsyncQuery(Class* object, void (Class::*method)(std::unique_ptr<QueryResult>, ParamType1), ParamType1 param1, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1>(object, method, std::move(std::unique_ptr<QueryResult>(nullptr)), param1), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1>(object, method, std::unique_ptr<QueryResult>(nullptr), param1), m_pResultQueue));
     return true;
 }
 template<class Class, typename ParamType1>
@@ -82,7 +82,7 @@ bool
 Database::AsyncQueryUnsafe(Class* object, void (Class::*method)(std::unique_ptr<QueryResult>, ParamType1), ParamType1 param1, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    MaNGOS::QueryCallback<Class, ParamType1>* cb = new MaNGOS::QueryCallback<Class, ParamType1>(object, method, std::move(std::unique_ptr<QueryResult>(nullptr)), param1);
+    MaNGOS::QueryCallback<Class, ParamType1>* cb = new MaNGOS::QueryCallback<Class, ParamType1>(object, method, std::unique_ptr<QueryResult>(nullptr), param1);
     cb->threadSafe = false;
     AddToDelayQueue(new SqlQuery(sql, cb, m_pResultQueue));
     return true;
@@ -93,7 +93,7 @@ bool
 Database::AsyncQuery(Class* object, void (Class::*method)(std::unique_ptr<QueryResult>, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2>(object, method, std::move(std::unique_ptr<QueryResult>(nullptr)), param1, param2), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2>(object, method, std::unique_ptr<QueryResult>(nullptr), param1, param2), m_pResultQueue));
     return true;
 }
 
@@ -102,7 +102,7 @@ bool
 Database::AsyncQuery(Class* object, void (Class::*method)(std::unique_ptr<QueryResult>, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2, ParamType3>(object, method, std::move(std::unique_ptr<QueryResult>(nullptr)), param1, param2, param3), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2, ParamType3>(object, method, std::unique_ptr<QueryResult>(nullptr), param1, param2, param3), m_pResultQueue));
     return true;
 }
 
@@ -113,7 +113,7 @@ bool
 Database::AsyncQuery(void (*method)(std::unique_ptr<QueryResult>, ParamType1), ParamType1 param1, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1>(method, std::move(std::unique_ptr<QueryResult>(nullptr)), param1), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1>(method, std::unique_ptr<QueryResult>(nullptr), param1), m_pResultQueue));
     return true;
 }
 
@@ -122,7 +122,7 @@ bool
 Database::AsyncQuery(void (*method)(std::unique_ptr<QueryResult>, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1, ParamType2>(method, std::move(std::unique_ptr<QueryResult>(nullptr)), param1, param2), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1, ParamType2>(method, std::unique_ptr<QueryResult>(nullptr), param1, param2), m_pResultQueue));
     return true;
 }
 
@@ -131,7 +131,7 @@ bool
 Database::AsyncQuery(void (*method)(std::unique_ptr<QueryResult>, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1, ParamType2, ParamType3>(method, std::move(std::unique_ptr<QueryResult>(nullptr)), param1, param2, param3), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1, ParamType2, ParamType3>(method, std::unique_ptr<QueryResult>(nullptr), param1, param2, param3), m_pResultQueue));
     return true;
 }
 
@@ -140,7 +140,7 @@ bool
 Database::AsyncQueryUnsafe(void (*method)(std::unique_ptr<QueryResult>, ParamType1), ParamType1 param1, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    MaNGOS::SQueryCallback<ParamType1>* cb = new MaNGOS::SQueryCallback<ParamType1>(method, std::move(std::unique_ptr<QueryResult>(nullptr)), param1);
+    MaNGOS::SQueryCallback<ParamType1>* cb = new MaNGOS::SQueryCallback<ParamType1>(method, std::unique_ptr<QueryResult>(nullptr), param1);
     cb->threadSafe = false;
     AddToDelayQueue(new SqlQuery(sql, cb, m_pResultQueue));
     return true;
@@ -151,7 +151,7 @@ bool
 Database::AsyncQueryUnsafe(void(*method)(std::unique_ptr<QueryResult>, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
-    MaNGOS::SQueryCallback<ParamType1, ParamType2>* cb = new MaNGOS::SQueryCallback<ParamType1, ParamType2>(method, std::move(std::unique_ptr<QueryResult>(nullptr)), param1, param2);
+    MaNGOS::SQueryCallback<ParamType1, ParamType2>* cb = new MaNGOS::SQueryCallback<ParamType1, ParamType2>(method, std::unique_ptr<QueryResult>(nullptr), param1, param2);
     cb->threadSafe = false;
     AddToDelayQueue(new SqlQuery(sql, cb, m_pResultQueue));
     return true;
@@ -254,14 +254,14 @@ bool
 Database::DelayQueryHolder(Class* object, void (Class::*method)(std::unique_ptr<QueryResult>, SqlQueryHolder*), SqlQueryHolder* holder)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, std::move(std::unique_ptr<QueryResult>(nullptr)), holder), this, m_pResultQueue);
+    return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, std::unique_ptr<QueryResult>(nullptr), holder), this, m_pResultQueue);
 }
 template<class Class>
 bool
 Database::DelayQueryHolderUnsafe(Class* object, void (Class::*method)(std::unique_ptr<QueryResult>, SqlQueryHolder*), SqlQueryHolder* holder)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    MaNGOS::QueryCallback<Class, SqlQueryHolder*>* cb = new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, std::move(std::unique_ptr<QueryResult>(nullptr)), holder);
+    MaNGOS::QueryCallback<Class, SqlQueryHolder*>* cb = new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, std::unique_ptr<QueryResult>(nullptr), holder);
     cb->threadSafe = false;
     return holder->Execute(cb, this, m_pResultQueue);
 }
@@ -270,7 +270,7 @@ bool
 Database::DelayQueryHolder(Class* object, void (Class::*method)(std::unique_ptr<QueryResult>, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*, ParamType1>(object, method, std::move(std::unique_ptr<QueryResult>(nullptr)), holder, param1), this, m_pResultQueue);
+    return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*, ParamType1>(object, method, std::unique_ptr<QueryResult>(nullptr), holder, param1), this, m_pResultQueue);
 }
 
 // -- QueryHolder static --
@@ -279,7 +279,7 @@ bool
 Database::DelayQueryHolder(void (*method)(std::unique_ptr<QueryResult>, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    return holder->Execute(new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, std::move(std::unique_ptr<QueryResult>(nullptr)), holder, param1), this, m_pResultQueue);
+    return holder->Execute(new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, std::unique_ptr<QueryResult>(nullptr), holder, param1), this, m_pResultQueue);
 }
 
 template<typename ParamType1>
@@ -287,7 +287,7 @@ bool
 Database::DelayQueryHolderUnsafe(void (*method)(std::unique_ptr<QueryResult>, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>* cb = new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, std::move(std::unique_ptr<QueryResult>(nullptr)), holder, param1);
+    MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>* cb = new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, std::unique_ptr<QueryResult>(nullptr), holder, param1);
     cb->threadSafe = false;
     return holder->Execute(cb, this, m_pResultQueue);
 }

@@ -190,7 +190,7 @@ WorldSocket::HandlerResult WorldSocket::_HandleCompleteReceivedPacket(std::uniqu
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
         {
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Dumping error-causing packet:");
-            packet->hexlike();
+            packet->PrintAsHex();
         }
 
         if (sWorld.getConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET))
@@ -203,11 +203,9 @@ WorldSocket::HandlerResult WorldSocket::_HandleCompleteReceivedPacket(std::uniqu
 
         return HandlerResult::Okay;
     }
-
-    MANGOS_ASSERT(false); // This should never be reached
 }
 
-/// This function will resolve the ip-addresse of the current host
+/// This function will resolve the ip-address of the current host
 /// For example if you hostname is called "world.mycoolserver.com" and it points to 123.45.66.7 it will be added to the server list
 /// Also 127.0.0.1 will be added as a fallback
 /// This list is later used to determine if clients try to connect to this server without registering at realmd first

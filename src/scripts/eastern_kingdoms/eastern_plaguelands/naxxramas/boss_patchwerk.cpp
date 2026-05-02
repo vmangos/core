@@ -41,8 +41,6 @@ enum PatchwerkData
     SPELL_SLIMEBOLT       = 32309  // Added in patch 1.12
 };
 
-constexpr float MELEE_DISTANCE = 5.0; 
-
 enum ePatchwerkEvents
 {
     EVENT_BERSERK = 1,
@@ -56,7 +54,7 @@ static constexpr uint32 HATEFUL_CD              = 1200;
 // 30 sec after berserk he starts throwing slime at ppl
 // this was added in 1.12.1 to cope with guilds kiting him
 static constexpr uint32 SLIMEBOLT_INITIAL       = BERSERK_TIMER + 30000;
-static constexpr uint32 SLIMEBOLT_REPEAT_CD     = 5000; 
+static constexpr uint32 SLIMEBOLT_REPEAT_CD     = 5000;
 
 struct boss_patchwerkAI : public ScriptedAI
 {
@@ -112,7 +110,7 @@ struct boss_patchwerkAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_PATCHWERK, IN_PROGRESS);
-            
+
         m_events.ScheduleEvent(EVENT_BERSERK, BERSERK_TIMER);
         m_events.ScheduleEvent(EVENT_HATEFULSTRIKE, HATEFUL_CD);
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
@@ -124,7 +122,7 @@ struct boss_patchwerkAI : public ScriptedAI
     {
         // The ability is used on highest HP target in melee
         // current tank cannot be hit by hateful as long as there are other players in melee
-        
+
         // todo: can it hit anything other than players?
 
         SpellEntry const* pHatefulStrike = sSpellMgr.GetSpellEntry(SPELL_HATEFUL_STRIKE);
@@ -135,7 +133,7 @@ struct boss_patchwerkAI : public ScriptedAI
         }
 
         Unit* mainTank = m_creature->GetVictim();
-        
+
         // Shouldnt really be possible, but hey, weirder things have happened
         if (!mainTank)
             return;
@@ -152,7 +150,7 @@ struct boss_patchwerkAI : public ScriptedAI
             // Only top 4 players on threat in melee range are targetted.
             if (threatListPosition > 3)
                 break;
-            
+
             Player* pTempTarget = iter->getTarget()->ToPlayer();
             if (!pTempTarget)
                 continue;
@@ -166,7 +164,7 @@ struct boss_patchwerkAI : public ScriptedAI
             if (pTempTarget->IsImmuneToSpell(pHatefulStrike, false))
                 continue;
 
-            // Skipping maintank, only using him if there is no other viable target 
+            // Skipping maintank, only using him if there is no other viable target
             // todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
             if (iter->getUnitGuid() != mainTankGuid)
             {

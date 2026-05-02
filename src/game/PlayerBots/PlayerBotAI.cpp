@@ -243,7 +243,12 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         return;
     }
     // MOVEMENT AI
-    float x, y, z = 0; // Where to go
+
+    // Target pos (where to go)
+    float x = 0;
+    float y = 0;
+    float z = 0;
+
     float r = 10;
     if (me->movespline->Finalized())
     {

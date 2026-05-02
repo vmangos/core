@@ -241,7 +241,7 @@ extern int main(int argc, char** argv)
     listener->AutoAcceptSocketsUntilClose([ctx = ioCtx.get(), trustedProxyIps](IO::Networking::SocketDescriptor socketDescriptor)
     {
         // Create a socket and attach it to our global ioCtx
-        auto authSocket = std::make_shared<AuthSocket>(std::move(IO::Networking::AsyncSocket(ctx, std::move(socketDescriptor))));
+        auto authSocket = std::make_shared<AuthSocket>(IO::Networking::AsyncSocket(ctx, std::move(socketDescriptor)));
 
         if (IO::NetworkError initError = authSocket->m_socket.InitializeAndFixateMemoryLocation())
         {

@@ -790,7 +790,7 @@ bool ChatHandler::HandleInstanceUnbindCommand(char* args)
     Player* player = GetSelectedPlayer();
     if (!player || GetAccessLevel() < SEC_BASIC_ADMIN)
         player = m_session->GetPlayer();
-   
+
     uint32 mapid = 0;
     bool got_map = false;
 
@@ -813,7 +813,7 @@ bool ChatHandler::HandleInstanceGroupUnbindCommand(char* args)
     if (!*args)
         return false;
 
-    Player* player = player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
     if (!player || player->InBattleGround())
         return false;
 

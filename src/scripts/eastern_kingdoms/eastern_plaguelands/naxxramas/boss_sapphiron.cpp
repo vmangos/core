@@ -50,13 +50,13 @@ enum SapphironData
     SPELL_WING_BUFFET       = 29328, // is it the spell he does on takeoff, or another one?
 
     SPELL_SAPPHIRON_DIES = 29357, // adds camera-shake.
-    
+
     GO_ICEBLOCK = 181247,
 
     MOVE_POINT_LIFTOFF = 1,
     MOVE_POINT_FLYPOINT = 2,
 
-    NPC_WING_BUFFET = 17025, 
+    NPC_WING_BUFFET = 17025,
     NPC_BLIZZARD = 16474
 };
 
@@ -157,7 +157,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32&) override 
+    void DamageTaken(Unit* pDoneBy, uint32&) override
     {
         if (m_creature->GetMeleeZLimit() < 1.0f)
         {
@@ -300,7 +300,7 @@ struct boss_sapphironAI : public ScriptedAI
 
     void UpdateReachable(uint32 update_diff)
     {
-        bool unreachableTarget = 
+        bool unreachableTarget =
             !m_creature->GetMotionMaster()->empty() &&
              m_creature->GetVictim() &&
              m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
@@ -342,7 +342,7 @@ struct boss_sapphironAI : public ScriptedAI
                     m_forceTargetUpdateTimer -= uiDiff;
             }
         }
-        else 
+        else
         {
             if (m_creature->GetThreatManager().isThreatListEmpty())
             {
@@ -391,7 +391,7 @@ struct boss_sapphironAI : public ScriptedAI
                 case EVENT_LAND:
                 {
                     iceboltTargets.clear();
-                    // in case something is delayed, and we're not finished 
+                    // in case something is delayed, and we're not finished
                     // casting the frost breath
                     if (m_creature->IsNonMeleeSpellCasted())
                     {
@@ -561,7 +561,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         std::vector<Unit*> suitableUnits;
         auto it = threatlist.begin();
         ++it; // skip tank
-        for (it; it != threatlist.end(); ++it)
+        for (; it != threatlist.end(); ++it)
         {
             if (Player* pTarget = (*it)->getTarget()->ToPlayer())
             {

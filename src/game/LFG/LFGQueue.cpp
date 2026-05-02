@@ -152,7 +152,7 @@ void LFGQueue::Update()
                     sWorld.GetMessager().AddMessage([groupId = qGroup->first](World* world)
                     {
                         Group* group = sObjectMgr.GetGroupById(groupId);
-                        group->BroadcastPacket(std::move(std::make_unique<WorldPackets::Misc::MeetingstoneInProgress>()), true);
+                        group->BroadcastPacket(std::make_unique<WorldPackets::Misc::MeetingstoneInProgress>(), true);
                     });
                 }
                 else
@@ -453,7 +453,7 @@ void LFGQueue::RemoveGroupFromQueue(uint32 groupId, GroupLeaveMethod leaveMethod
                 {
                     // Send complete information to party
                     {
-                        grp->BroadcastPacket(std::move(std::make_unique<WorldPackets::Misc::MeetingstoneComplete>()), true);
+                        grp->BroadcastPacket(std::make_unique<WorldPackets::Misc::MeetingstoneComplete>(), true);
                     }
 
                     // Reset UI for party

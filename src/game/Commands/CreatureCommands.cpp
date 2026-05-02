@@ -145,8 +145,9 @@ bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
 bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
 {
     Creature* pTarget = GetSelectedCreature();
+    auto* targetAi = pTarget->AI();
 
-    if (!pTarget || !pTarget->AI())
+    if (!pTarget || !targetAi)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
@@ -157,7 +158,7 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
 
     std::string strScript = pTarget->GetScriptName();
     std::string strAI = pTarget->GetAIName();
-    char const* cstrAIClass = pTarget->AI() ? typeid(*pTarget->AI()).name() : " - ";
+    char const* cstrAIClass = targetAi ? typeid(*targetAi).name() : " - ";
 
     PSendSysMessage(LANG_NPC_AI_NAMES,
                     strAI.empty() ? " - " : strAI.c_str(),
@@ -169,8 +170,8 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
         PSendSysMessage("Charm React State: %s", ReactStateToString(pCharmInfo->GetReactState()));
         PSendSysMessage("Charm Command State: %s", CommandStateToString(pCharmInfo->GetCommandState()));
     }
-    PSendSysMessage(LANG_NPC_AI_MOVE, GetOnOffStr(pTarget->AI()->IsCombatMovementEnabled()));
-    PSendSysMessage(LANG_NPC_AI_ATTACK, GetOnOffStr(pTarget->AI()->IsMeleeAttackEnabled()));
+    PSendSysMessage(LANG_NPC_AI_MOVE, GetOnOffStr(targetAi->IsCombatMovementEnabled()));
+    PSendSysMessage(LANG_NPC_AI_ATTACK, GetOnOffStr(targetAi->IsMeleeAttackEnabled()));
     MovementGeneratorType moveType = pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType();
     PSendSysMessage(LANG_NPC_MOTION_TYPE, MotionMaster::GetMovementGeneratorTypeName(moveType), moveType);
     if (!pTarget->movespline->Finalized())
@@ -180,7 +181,7 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
         TempSummonType despawnType = static_cast<TemporarySummon*>(pTarget)->GetDespawnType();
         PSendSysMessage("Despawn Type: %s (%u)", TempSummonTypeToString(despawnType), despawnType);
     }
-    pTarget->AI()->GetAIInformation(*this);
+    targetAi->GetAIInformation(*this);
 
     return true;
 }
@@ -759,7 +760,7 @@ bool ChatHandler::HandleNpcSpawnSetRespawnTimeCommand(char* args)
     pData->spawntimesecsmax = timeMax;
     pCreature->SetRespawnDelay((timeMin + timeMax) / 2);
     WorldDatabase.PExecuteLog("UPDATE `creature` SET `spawntimesecsmin`=%u, `spawntimesecsmax`=%u WHERE `guid`=%u", timeMin, timeMax, pCreature->GetDBTableGUIDLow());
-    
+
     PSendSysMessage("Respawn time for guid %u updated to %u-%u.", pCreature->GetDBTableGUIDLow(), timeMin, timeMax);
     return true;
 }
@@ -1683,16 +1684,16 @@ bool ChatHandler::HandleNpcGroupLinkCommand(char * args)
     uint32 leaderGuidCounter = 0;
     if (!ExtractUInt32(&args, leaderGuidCounter))
         return false;
-    
+
     ExtractUInt32(&args, options);
-    
+
     Creature* leader = target->GetMap()->GetCreature(CreatureGroupsManager::ConvertDBGuid(leaderGuidCounter));
     if (!leader)
     {
         PSendSysMessage("Leader not found");
         return false;
     }
-    
+
     WorldDatabase.PExecute("DELETE FROM `creature_linking` WHERE `guid`=%u", target->GetGUIDLow());
         WorldDatabase.PExecute("INSERT INTO `creature_linking` SET `guid`=%u, `master_guid`=%u, `flag`='%u'",
             target->GetGUIDLow(), leaderGuidCounter, options);
@@ -2487,8 +2488,8 @@ bool ChatHandler::HandleWpExportCommand(char* args)
     outfile.open(export_str);
 
     std::string table;
-    char const* key_field;
-    uint32 key;
+    char const* key_field = nullptr;
+    uint32 key = 0;
     switch (wpOrigin)
     {
         case PATH_FROM_ENTRY: key = wpOwner->GetEntry();    key_field = "entry";    table = "creature_movement_template"; break;
@@ -2535,7 +2536,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
 
     CreatureInfo const* cInfo = nullptr;
     Creature const* pCreature = GetSelectedCreature();
-    uint32 cr_id;
+    uint32 cr_id = 0;
 
     // optional number or [name] Shift-click form |color|Hcreature_entry:creature_id|h[name]|h|r
     if (*args && ExtractUint32KeyFromLink(&args, "Hcreature_entry", cr_id))

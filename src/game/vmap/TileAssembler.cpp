@@ -25,6 +25,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include "Util.h"
+
 using G3D::Vector3;
 using G3D::AABox;
 using G3D::inf;
@@ -348,8 +350,8 @@ namespace VMAP
         char buff[500];
         while (!feof(model_list))
         {
-            fread(&displayId, sizeof(uint32), 1, model_list);
-            fread(&name_length, sizeof(uint32), 1, model_list);
+            IgnoreResult(fread(&displayId, sizeof(uint32), 1, model_list));
+            IgnoreResult(fread(&name_length, sizeof(uint32), 1, model_list));
 
             if (name_length >= sizeof(buff))
             {
@@ -357,7 +359,7 @@ namespace VMAP
                 break;
             }
 
-            fread(&buff, sizeof(char), name_length, model_list);
+            IgnoreResult(fread(&buff, sizeof(char), name_length, model_list));
             std::string model_name(buff, name_length);
 
             WorldModel_Raw raw_model;

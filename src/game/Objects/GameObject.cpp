@@ -1154,7 +1154,7 @@ bool GameObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject c
                     return false;
             }
         }
-        
+
     }
 
     // check distance
@@ -1514,7 +1514,7 @@ void GameObject::Use(Unit* user)
 
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
-            
+
             if (!user->IsWithinLOSInMap(this, false))
                 return;
 
@@ -1892,7 +1892,7 @@ void GameObject::Use(Unit* user)
                     if (!sScriptMgr.OnProcessEvent(info->flagdrop.eventID, player, this, true))
                         GetMap()->ScriptsStart(sEventScripts, info->flagdrop.eventID, player->GetObjectGuid(), GetObjectGuid());
                 }
-                
+
                 spellId = info->flagdrop.pickupSpell;
             }
             break;
@@ -2184,7 +2184,7 @@ bool GameObject::PlayerCanUse(Player* pPlayer)
 {
     if (pPlayer->IsGameMaster())
         return true;
-    
+
     if (!IsVisible())
         return false;
 
@@ -2412,7 +2412,7 @@ void GameObject::GetLosCheckPosition(float& x, float& y, float& z) const
         z = pos.z;
         return;
     }
-    
+
     GetPosition(x, y, z);
     z += 1.0f;
 }
@@ -2505,10 +2505,13 @@ uint32 GameObject::GetLevel() const
 
 bool GameObject::IsAtInteractDistance(Player const* player, uint32 maxRange) const
 {
-    SpellEntry const* spellInfo;
-    if (maxRange || (spellInfo = GetSpellForLock(player)))
+    SpellEntry const* spellInfo = nullptr;
+    if (maxRange == 0)
+        spellInfo = GetSpellForLock(player);
+
+    if (maxRange || spellInfo)
     {
-        if (maxRange == 0.f)
+        if (maxRange == 0)
         {
             SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
             maxRange = srange ? srange->maxRange : 0;

@@ -29,6 +29,11 @@
 #undef max
 #include "libmpq/mpq_libmpq.h"
 
+template<typename T>
+static void IgnoreResult(T const&)
+{
+}
+
 using namespace std;
 
 WMORoot::WMORoot(std::string& filename)
@@ -572,7 +577,7 @@ WMOInstance::WMOInstance(MPQFile& f, const char* WmoInstName, uint32 mapID, uint
 
     fseek(input, 8, SEEK_SET); // get the correct no of vertices
     int nVertices;
-    fread(&nVertices, sizeof(int), 1, input);
+    IgnoreResult(fread(&nVertices, sizeof(int), 1, input));
     fclose(input);
 
     if (nVertices == 0)

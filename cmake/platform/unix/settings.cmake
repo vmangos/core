@@ -12,8 +12,43 @@ if(GCC_SANITIZE)
   #set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fsanitize=unsigned-integer-overflow")
 endif()
 
-# TODO: Remove `--no-warnings` and fix the code instead of hiding the errors
-set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Werror=write-strings -fexceptions -fnon-call-exceptions -pipe")
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fexceptions -fnon-call-exceptions -pipe")
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wall -Werror")
+
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-reorder") # ... will be initialized after ...
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-unused-variable") # unused variable
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-unused-but-set-variable") # set but not used
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-unused-private-field") # private field is not used
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-instantiation-after-specialization") # explicit instantiation of that occurs after an explicit specialization has no effect
+
+  # TODO Stuff we definitely want to fix:
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-unused-lambda-capture") # lambda capture 'xxx' is not used
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-undefined-var-template") # instantiation of variable xxx required here, but no definition is available
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-delete-non-abstract-non-virtual-dtor") # destructor called on non-final class that has virtual function but non-virtual destructor
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-tautological-undefined-compare") # comparing the pointer of a reference
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-undefined-bool-conversion") # comparing the pointer of a reference
+else() # gcc
+
+  # TODO Stuff we definitely want to fix:
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-nonnull-compare") # comparing the pointer of a reference
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-format-truncation") # output truncated before the last format character
+endif()
+
+# TODO Stuff we definitely want to fix:
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-cpp") # You are using an incompatible mysql version!
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-format") # format error stack / crash
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-sign-compare") # comparison of integer expressions of different signedness
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-switch") # numeration value ‘xxx’ not handled in switch
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-unused-function") # functions that we ""inlined"" in .h files but are included everywhere and not used. TODO should be move to cpp file
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-parentheses") # suggest parentheses around assignment used as truth value TODO if intended use parathesis
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-address") # retrieving the pointer of reference
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-address-of-packed-member") # taking address of packed member of may result in an unaligned pointer value
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-overloaded-virtual") # hidden overloaded virtual function
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-tautological-constant-out-of-range-compare") # Sometimes used for MAGNOS_ASSERT
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-strict-aliasing") # dereferencing type-punned pointer will break strict-aliasing rules
+
 if(BUILD_FOR_HOST_CPU)
   set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -march=native")
 endif()
@@ -31,7 +66,5 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   endif()
 endif()
 
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${BUILD_ADDITIONAL_FLAGS}")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${BUILD_ADDITIONAL_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${BUILD_ADDITIONAL_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${BUILD_ADDITIONAL_FLAGS}")
+set(MANGOS_C_FLAGS "${BUILD_ADDITIONAL_FLAGS}")
+set(MANGOS_CXX_FLAGS "${BUILD_ADDITIONAL_FLAGS}")

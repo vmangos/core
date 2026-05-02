@@ -16,9 +16,9 @@
 
 /* ScriptData
 SDName: Boss_Thaddius
-SD%Complete: 
-SDComment: 
-SDCategory: 
+SD%Complete:
+SDComment:
+SDCategory:
 EndScriptData */
 
 /* ContentData
@@ -85,7 +85,7 @@ enum eThaddius
     SPELL_NEGATIVE_CHARGE_APPLY     = 28084,
     SPELL_NEGATIVE_CHARGE_TICK      = 28085,
     SPELL_NEGATIVE_CHARGE_AMP       = 29660
-};  
+};
 
 enum eCoils
 {
@@ -138,7 +138,7 @@ static constexpr uint32 ENRAGE_TIMER = 1000 * 60 * 5;   // 5 min enrage once p2 
 static uint32 PolarityShiftTimer(bool initial = false) { return initial ? 1000 * 10 : 1000 * 30; }
 
                                                         // Chain lightning timer. TODO: confirm timers. Atm is guess
-static uint32 ChainLightningTimer() { return urand(5000, 7000); } 
+static uint32 ChainLightningTimer() { return urand(5000, 7000); }
 
 static constexpr float addPositions[2][4] =
 {
@@ -194,7 +194,7 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
 
         DoCastSpellIfCan(m_creature, m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN);
     }
- 
+
     void UpdateAI(uint32 const uiDiff) override
     {
         if (Creature* add = m_pInstance->GetCreature(m_guid))
@@ -268,7 +268,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
 
     uint32 WarstompTimer()
     {
-        // best guess timer based on 
+        // best guess timer based on
         // https://www.youtube.com/watch?v=GmE5JufAcT0
         // and https://www.youtube.com/watch?v=3hen_d6cb-Y
         return urand(15000, 20000);
@@ -281,9 +281,9 @@ struct boss_thaddiusAddsAI : public ScriptedAI
     }
     uint32 MagneticPullTimer()
     {
-        // Every 20 seconds, but from videos can be seen to drift a tiny bit. 
+        // Every 20 seconds, but from videos can be seen to drift a tiny bit.
         // guides mention 20.5sec, so lets just make it that.
-        return 20500; 
+        return 20500;
     }
     uint32 StaticFiledTimer()
     {
@@ -439,7 +439,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
                         m_events.Repeat(StaticFiledTimer());
                     else
                         m_events.Repeat(100);
-                    break;  
+                    break;
                 case EVENT_POWERSURGE:
                     if (DoCastSpellIfCan(m_creature, SPELL_POWERSURGE) == CAST_OK)
                         m_events.Repeat(PowerSurgeTimer());
@@ -563,7 +563,7 @@ struct boss_thaddiusAI : public ScriptedAI
 
         // Simply unsummoning the add and the coil creature if they still exist
         if(addCreature)
-        { 
+        {
             if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(addCreature))
                 tmpSumm->UnSummon();
             else
@@ -663,7 +663,7 @@ struct boss_thaddiusAI : public ScriptedAI
         addGuids[which] = 0;
     }
 
-    void SummonedCreatureDespawn(Creature* pC) override 
+    void SummonedCreatureDespawn(Creature* pC) override
     {
         if (!m_pInstance)
             return;
@@ -679,7 +679,7 @@ struct boss_thaddiusAI : public ScriptedAI
     void Reset() override
     {
         m_events.Reset();
-        m_uiBallLightningTimer = 1000;      
+        m_uiBallLightningTimer = 1000;
         m_Phase = THAD_NOT_STARTED;
         killSayCooldown = 0;
     }
@@ -733,7 +733,7 @@ struct boss_thaddiusAI : public ScriptedAI
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_THADDIUS, DONE);
-            
+
             //they will despawn themself.
             // Make them TEMPSUMMON_TIMED_DEAD_DESPAWN with 10-20sec despawn time,
             /*
@@ -861,15 +861,14 @@ struct boss_thaddiusAI : public ScriptedAI
             playerVec.push_back(p.getSource());
         }
         std::shuffle(playerVec.begin(), playerVec.end(), m_random);
-        size_t i = 0;
         size_t firstHalf = playerVec.size() / 2;
-        for (i; i < firstHalf; i++)
+        for (size_t i = 0; i < firstHalf; i++)
         {
             Player* pPlayer = playerVec[i];
             RemoveDebuffsFromPlayer(pPlayer);
             pPlayer->CastSpell(pPlayer, SPELL_POSITIVE_CHARGE_APPLY, true);
         }
-        for (i; i < playerVec.size(); i++)
+        for (size_t i = 0; i < playerVec.size(); i++)
         {
             Player* pPlayer = playerVec[i];
             RemoveDebuffsFromPlayer(pPlayer);
@@ -926,8 +925,8 @@ struct boss_thaddiusAI : public ScriptedAI
                     break;
             }
         }
-        
-        // m_uiBallLightningTimer reinitialized to 1sec after a successfull melee attack, and only negated if target is oor. 
+
+        // m_uiBallLightningTimer reinitialized to 1sec after a successfull melee attack, and only negated if target is oor.
         // This will prevent the boss from starting to spam balls of lightning if the boss is being moved with lag or something
         if (!DoMeleeAttackIfReady())
         {
@@ -942,7 +941,7 @@ struct boss_thaddiusAI : public ScriptedAI
         }
         else
         {
-            m_uiBallLightningTimer = 1000; 
+            m_uiBallLightningTimer = 1000;
         }
 
         // If we did not perform a melee attack, but MH or OH attack was ready, and we were not in melee range,

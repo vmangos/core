@@ -64,11 +64,11 @@ enum SqlStmtFieldType
 class SqlStmtFieldData
 {
     public:
-        SqlStmtFieldData() : m_type(FIELD_NONE) { m_binaryData.ui64 = 0; }
+        SqlStmtFieldData() {}
         ~SqlStmtFieldData() {}
 
         template<typename T>
-        SqlStmtFieldData(T param) { set(param); }
+        explicit SqlStmtFieldData(T param) { set(param); }
 
         template<typename T1>
         void set(T1 param1);
@@ -117,8 +117,8 @@ class SqlStmtFieldData
         }
 
     private:
-        SqlStmtFieldType m_type;
-        SqlStmtField m_binaryData;
+        SqlStmtFieldType m_type = FIELD_NONE;
+        SqlStmtField m_binaryData{};
         std::string m_szStringData;
 };
 

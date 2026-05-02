@@ -230,7 +230,7 @@ void Warden::SendModuleToClient()
 
 std::vector<std::shared_ptr<Scan const>> Warden::SelectScans(ScanFlags flags) const
 {
-    return std::move(sWardenScanMgr.GetRandomScans(static_cast<ScanFlags>(flags | GetScanFlags()), m_clientBuild));
+    return sWardenScanMgr.GetRandomScans(static_cast<ScanFlags>(flags | GetScanFlags()), m_clientBuild);
 }
 
 void Warden::EnqueueScans(std::vector<std::shared_ptr<Scan const>>&& scans)
@@ -267,7 +267,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans)
         if (request + (*i)->requestSize > MaxRequest || reply + (*i)->replySize > MaxReply ||
             m_pendingScans.size() >= sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_NUM_SCANS))
         {
-            m_enqueuedScans = std::move(std::vector<std::shared_ptr<Scan const>>(i, m_enqueuedScans.end()));
+            m_enqueuedScans = std::vector<std::shared_ptr<Scan const>>(i, m_enqueuedScans.end());
             queueUpdated = true;
             break;
         }

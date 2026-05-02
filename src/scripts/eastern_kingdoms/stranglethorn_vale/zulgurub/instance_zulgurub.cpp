@@ -466,7 +466,7 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
                     randomBoss = BOSS_WUSHOOLAY;
 
 
-    if(randomBoss < 0 || randomBoss > 16000)
+    if (randomBoss > 16000)
         return false;
 
     //DEBUG

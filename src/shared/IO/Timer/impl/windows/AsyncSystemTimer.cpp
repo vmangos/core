@@ -49,7 +49,7 @@ void CALLBACK IO::Timer::AsyncSystemTimer::_timerQueueTimeoutCallback(PVOID opaq
     delete handleRawSharedPtr;
 
     timerHandle->m_asyncSystemTimer->m_pendingTimers_mutex.lock();
-    bool wasRemovedByMe = timerHandle->m_asyncSystemTimer->m_pendingTimers.erase(timerHandle);
+    bool wasRemovedByMe = timerHandle->m_asyncSystemTimer->m_pendingTimers.erase(timerHandle) != 0;
     timerHandle->m_asyncSystemTimer->m_pendingTimers_mutex.unlock();
     if (!wasRemovedByMe)
         return; // The timer was already removed, so we don't want to re-execute it again.

@@ -42,7 +42,7 @@ void ByteBuffer::append(uint8 const* src, size_t cnt)
     _wpos += cnt;
 }
 
-void ByteBuffer::hexlike() const
+void ByteBuffer::PrintAsHex() const
 {
     if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
         return;
@@ -78,5 +78,5 @@ void ByteBuffer::hexlike() const
         ss << buf << " ";
 
     }
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, ss.str().c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "%s", ss.str().c_str());
 }

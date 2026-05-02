@@ -15,10 +15,13 @@
  */
 
 #include "TimePeriod.h"
+#include "Platform/CompilerDefs.h"
 
 #ifdef _WIN32
-	#include <Windows.h>
-	#pragma comment(lib, "Winmm.lib")
+    #include <Windows.h>
+#if COMPILER == COMPILER_MICROSOFT
+    #pragma comment(lib, "Winmm.lib")
+#endif
 #endif
 
 // That's right, this only does something on Windows
@@ -33,8 +36,8 @@ ScopedTimerPeriod set_time_period(const std::chrono::milliseconds ms)
       timeEndPeriod(count);
     });
 
-	return sf;
+    return sf;
 #else
-	return { true, [] {} };
+    return { true, [] {} };
 #endif
 }

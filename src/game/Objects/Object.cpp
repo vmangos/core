@@ -3304,14 +3304,14 @@ void WorldObject::SetActiveObjectState(bool on)
 
     bool world = IsInWorld();
 
-    Map* map;
+    Map* map = nullptr;
     if (world)
     {
         map = GetMap();
         if (GetTypeId() == TYPEID_UNIT)
-            map->Remove((Creature*)this, false);
+            map->Remove(static_cast<Creature*>(this), false);
         else
-            map->Remove((GameObject*)this, false);
+            map->Remove(static_cast<GameObject*>(this), false);
     }
 
     m_isActiveObject = on;
@@ -3319,9 +3319,9 @@ void WorldObject::SetActiveObjectState(bool on)
     if (world)
     {
         if (GetTypeId() == TYPEID_UNIT)
-            map->Add((Creature*)this);
+            map->Add(static_cast<Creature*>(this));
         else
-            map->Add((GameObject*)this);
+            map->Add(static_cast<GameObject*>(this));
     }
 }
 

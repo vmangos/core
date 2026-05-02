@@ -2585,7 +2585,7 @@ enum
 
     GOSSIP_ASSAULT_CAVALRY = 8903,
     GOSSIP_ASSAULT_GROUND = 9050,
-    
+
     GOSSIP_ASSAULT_AIR_GUSE = 10341,
     GOSSIP_ASSAULT_AIR_SLIDORE = 10351,
     GOSSIP_ASSAULT_AIR_JEZTOR = 10343,
@@ -3241,6 +3241,10 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
         {
             troopsType = AV_NPC_FROSTWOLF_REAVER;
             warcryBC = SAY_WARCRY_HORDE;
+        }
+        else
+        {
+            return;
         }
 
         if (m_eventTimer <= uiDiff)

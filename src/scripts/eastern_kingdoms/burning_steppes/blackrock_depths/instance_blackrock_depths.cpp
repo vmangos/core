@@ -475,7 +475,6 @@ struct instance_blackrock_depths : ScriptedInstance
                 // of Shadowforge Senators in the Throne Room
                 if (Creature* pDagran = instance->GetCreature(GetData64(DATA_EMPEROR)))
                 {
-                    uint32 uiTextId;
 
                     if (!pDagran->IsAlive())
                         return;
@@ -483,12 +482,13 @@ struct instance_blackrock_depths : ScriptedInstance
                     if (m_uiDagranTimer > 0)
                         return;
 
+                    uint32 uiTextId;
                     switch (urand(0, 3))
                     {
                         case 0: uiTextId = YELL_SENATOR_1; break;
                         case 1: uiTextId = YELL_SENATOR_2; break;
                         case 2: uiTextId = YELL_SENATOR_3; break;
-                        case 3: uiTextId = YELL_SENATOR_4; break;
+                        default: uiTextId = YELL_SENATOR_4; break;
                     }
                     DoScriptText(uiTextId, pDagran);
                     m_uiDagranTimer = 45000;    // set a timer of 45 sec to avoid Emperor Thaurissan to spam yells in case many senators are killed in a short amount of time
@@ -769,7 +769,7 @@ struct instance_blackrock_depths : ScriptedInstance
             case TYPE_ROCKNOT:
                 if (uiData == SPECIAL)
                     ++m_uiBarAleCount;
-                else 
+                else
                 {
                     if (uiData == DONE)
                         HandleBarPatrons(PATRON_PISSED);
@@ -1064,7 +1064,7 @@ struct instance_blackrock_depths : ScriptedInstance
             case GO_JAIL_DOOR_CREST:  return m_bDoorCrestOpened;
             case GO_JAIL_DOOR_JAZ:    return m_bDoorJazOpened;
             case GO_JAIL_DOOR_SHILL:  return m_bDoorShillOpened;
-            case GO_JAIL_DOOR_SUPPLY: return m_bDoorSupplyOpened; 
+            case GO_JAIL_DOOR_SUPPLY: return m_bDoorSupplyOpened;
             case TYPE_FLAMELASH:
                 return m_auiEncounter[20];
         }
@@ -1134,7 +1134,7 @@ struct instance_blackrock_depths : ScriptedInstance
             case GO_JAIL_DOOR_SUPPLY:
                 return m_uiGoJailSupplyRoomGUID;
             case GO_JAIL_SUPPLY_CRATE:
-                return m_uiGoJailSupplyCrateGUID; 
+                return m_uiGoJailSupplyCrateGUID;
             case GO_DWARF_RUNE_A01:
                 return m_uiDwarfRuneA01GUID;
             case GO_DWARF_RUNE_B01:
@@ -1167,7 +1167,7 @@ struct instance_blackrock_depths : ScriptedInstance
                 m_uiDagranTimer = 0;
             else
                 m_uiDagranTimer -= uiDiff;
-        }  
+        }
 
         // Every second some of the patrons will do one random emote if they are not hostile (i.e. Plugger event is not done/in progress)
         if (m_uiPatronEmoteTimer)

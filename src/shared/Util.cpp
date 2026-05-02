@@ -380,7 +380,7 @@ nonstd::optional<size_t> utf8length(std::string const& utf8str)
         char const* endPtr = startPtr + utf8str.size();
         return utf8::distance(startPtr, endPtr);
     }
-    catch(std::exception)
+    catch (std::exception const&)
     {
         return nonstd::nullopt;
     }
@@ -414,7 +414,7 @@ bool Utf8toWStr(std::string const& utf8str, std::wstring& wstr, size_t max_len)
             wstr.resize(max_len);
         }
     }
-    catch (std::exception)
+    catch (std::exception const&)
     {
         wstr = L"";
         return false;
@@ -436,7 +436,7 @@ bool WStrToUtf8(std::wstring& wstr, std::string& utf8str)
 
         utf8str = utf8str2;
     }
-    catch (std::exception)
+    catch (std::exception const&)
     {
         utf8str = "";
         return false;

@@ -564,7 +564,7 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPackets::Group::RaidReadyChec
         /********************/
 
         // everything is fine, do it
-        group->BroadcastPacket(std::move(std::make_unique<WorldPackets::Group::RaidReadyCheckFromServer_Request>()), false, -1);
+        group->BroadcastPacket(std::make_unique<WorldPackets::Group::RaidReadyCheckFromServer_Request>(), false, -1);
 
         group->OfflineReadyCheck();
     }

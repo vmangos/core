@@ -57,8 +57,4 @@
 #  pragma error "FATAL ERROR: Unknown compiler."
 #endif
 
-#if COMPILER == COMPILER_MICROSOFT
-#  pragma warning( disable : 4267 )                         // conversion from 'size_t' to 'int', possible loss of data
-#  pragma warning( disable : 4786 )                         // identifier was truncated to '255' characters in the debug information
-#endif
 #endif

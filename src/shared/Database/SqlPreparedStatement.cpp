@@ -155,6 +155,7 @@ void SqlPlainPreparedStatement::DataToString(SqlStmtFieldData const& data, std::
 {
     switch (data.type())
     {
+        case FIELD_NONE:    MANGOS_ASSERT(false);                           break;
         case FIELD_BOOL:    fmt << "'" << uint32(data.toBool()) << "'";     break;
         case FIELD_UI8:     fmt << "'" << uint32(data.toUint8()) << "'";    break;
         case FIELD_UI16:    fmt << "'" << uint32(data.toUint16()) << "'";   break;
