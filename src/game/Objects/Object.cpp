@@ -1959,12 +1959,16 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
     // 1st case we can fly => Position in the air, easy.
     if (pUnit && pUnit->CanFly())
     {
-        float randAngle1 = rand_norm_f() * 2 * M_PI;
-        float randAngle2 = rand_norm_f() * 2 * M_PI;
+        float theta = rand_norm_f() * 2.0f * M_PI;
+        float u = rand_norm_f() * 2.0f - 1.0f;
         float randDist = rand_norm_f() * distance;
-        rand_x = x + randDist * cos(randAngle1) * sin(randAngle2);
-        rand_y = y + randDist * sin(randAngle2) * sin(randAngle2);
-        rand_z = z + randDist * sin(randAngle2);
+
+        float sinPhi = sqrtf(1.0f - u * u); // Radius of sphere at z
+
+        rand_x = x + randDist * sinPhi * cos(theta);
+        rand_y = y + randDist * sinPhi * sin(theta);
+        rand_z = z + randDist * u;
+
         // May happen in the border of the map
         if (!MaNGOS::IsValidMapCoord(x, y, z) || !MaNGOS::IsValidMapCoord(rand_x, rand_y, rand_z))
             return false;
