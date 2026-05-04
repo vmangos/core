@@ -1,0 +1,142 @@
+# Build and publish the Linux development release on pushes to development.
+name: Linux Development Release
+
+on:
+  push:
+    branches:
+      - development
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - '.github/workflows/development-db-dump.yaml'
+      - '.github/workflows/pr-sql-check.yaml'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+      - 'LICENSE'
+      - 'README.md'
+      - 'sql/**'
+
+concurrency:
+  group: linux-development-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Linux development release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Ubuntu build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            libmysqlclient-dev \
+            libssl-dev \
+            patchelf \
+            zlib1g-dev
+
+      - name: Build release binaries
+        run: |
+          set -euo pipefail
+          mkdir -p build _install
+          cd build
+          cmake ../ \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/_install" \
+            -DBUILD_EXTRACTORS=1 \
+            -DBUILD_FOR_HOST_CPU=0 \
+            -DCONF_DIR:STRING=./etc \
+            -DDEBUG_SYMBOLS=0
+          make -j"$(nproc)"
+          make install
+
+      - name: Set release archive filename
+        run: |
+          echo "ARCHIVE_FILENAME=dev-linux-amd64-$(git rev-parse --short HEAD).tar.gz" >>"$GITHUB_ENV"
+
+      - name: Create release archive
+        run: |
+          set -euo pipefail
+          ./.github/scripts/package-linux-release.sh _install "$ARCHIVE_FILENAME"
+
+      - name: Smoke test release
+        run: |
+          set -euo pipefail
+          cat >smoke-test-linux-release.sh <<'SMOKE_TEST'
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          mkdir -p /tmp/vmangos-release
+          tar -xzf /tmp/release.tar.gz -C /tmp/vmangos-release
+
+          /tmp/vmangos-release/vmangos-linux-amd64/bin/realmd --version
+          /tmp/vmangos-release/vmangos-linux-amd64/bin/mangosd --version
+
+          while IFS= read -r -d '' file; do
+            magic="$(head -c 4 "$file" 2>/dev/null || true)"
+            if [ "$magic" = $'\177ELF' ]; then
+              ldd "$file"
+            fi
+          done < <(find /tmp/vmangos-release/vmangos-linux-amd64 -type f -print0) >/tmp/ldd-output.txt
+
+          if grep -q "not found" /tmp/ldd-output.txt; then
+            cat /tmp/ldd-output.txt
+            exit 1
+          fi
+          SMOKE_TEST
+
+          docker run --rm --platform linux/amd64 \
+            -v "$GITHUB_WORKSPACE/bin/$ARCHIVE_FILENAME:/tmp/release.tar.gz:ro" \
+            -v "$PWD/smoke-test-linux-release.sh:/tmp/smoke-test-linux-release.sh:ro" \
+            ubuntu:24.04 \
+            bash /tmp/smoke-test-linux-release.sh
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-development-build
+          path: "${{ github.workspace }}/bin/${{ env.ARCHIVE_FILENAME }}"
+
+  publish:
+    name: Publish Linux development release
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download release artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: linux-development-build
+          merge-multiple: true
+          path: release-assets
+
+      - name: Write release notes preamble
+        run: |
+          cat >linux-release-notes.md <<'RELEASE_NOTES'
+          ## Compatibility
+
+          This Linux development build is for `amd64` systems using `glibc` 2.39 or newer.
+          It is built on Ubuntu 24.04 and bundles non-`glibc` runtime libraries.
+          It is not expected to run on Alpine/`musl` or older `glibc` systems.
+
+          RELEASE_NOTES
+
+      - name: Publish release snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./.github/scripts/publish-moving-release.sh linux_latest "Linux Development Build" release-assets linux-release-notes.md
