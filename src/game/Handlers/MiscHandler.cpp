@@ -19,31 +19,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
-#include "Language.h"
-#include "Database/DatabaseEnv.h"
-#include "Database/DatabaseImpl.h"
-#include "WorldPacket.h"
-#include "Opcodes.h"
-#include "Log.h"
-#include "Player.h"
-#include "Group.h"
-#include "World.h"
-#include "GuildMgr.h"
-#include "ObjectMgr.h"
-#include "WorldSession.h"
-#include "ScriptMgr.h"
-#include "Compression/ZLib.h"
-#include "ObjectAccessor.h"
-#include "Object.h"
+#include "Anticheat.h"
 #include "BattleGround.h"
 #include "BattleGroundMgr.h"
+#include "Common.h"
+#include "Compression/ZLib.h"
+#include "Conditions.h"
+#include "Database/DatabaseEnv.h"
+#include "Database/DatabaseImpl.h"
+#include "Group.h"
+#include "GuildMgr.h"
+#include "Language.h"
+#include "Log.h"
+#include "MasterPlayer.h"
+#include "Object.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 #include "ZoneScript.h"
-#include "Conditions.h"
-#include "Anticheat.h"
-#include "MasterPlayer.h"
 
 void WorldSession::HandleRepopRequestOpcode(NullClientPacket const& /*packet*/)
 {
@@ -72,8 +72,8 @@ class WhoListClientQueryTask
 public:
     uint32 accountId;
     uint32 levelMin, levelMax, raceMask, classMask, zonesCount, strCount;
-    uint32 zoneIds[10];                                     // 10 is client limit
-    std::wstring str[4];                                    // 4 is client limit
+    uint32 zoneIds[10]; // 10 is client limit
+    std::wstring str[4]; // 4 is client limit
     std::wstring wplayerName, wguildName;
     void operator()()
     {
@@ -93,9 +93,9 @@ public:
         uint32 const zone = sess->GetPlayer()->GetCachedZoneId();
         bool const notInBattleground = !((zone == 2597) || (zone == 3277) || (zone == 3358));
 
-        WorldPacket data(SMSG_WHO, 50);                         // guess size
-        data << uint32(clientCount);                            // clientCount place holder, listed count
-        data << uint32(clientCount);                            // clientCount place holder, online count
+        WorldPacket data(SMSG_WHO, 50); // guess size
+        data << uint32(clientCount); // clientCount place holder, listed count
+        data << uint32(clientCount); // clientCount place holder, online count
 
         // TODO: Guard Player map
         HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
@@ -178,7 +178,7 @@ public:
                 continue;
 
             std::string aName;
-            if (const auto *areaEntry = AreaEntry::GetById(pzoneId))
+            if (const auto* areaEntry = AreaEntry::GetById(pzoneId))
             {
                 aName = areaEntry->Name;
                 sObjectMgr.GetAreaLocaleString(areaEntry->Id, sess->GetSessionDbLocaleIndex(), &aName);
@@ -189,9 +189,7 @@ public:
             {
                 if (!str[i].empty())
                 {
-                    if (wgname.find(str[i]) != std::wstring::npos ||
-                        wpname.find(str[i]) != std::wstring::npos ||
-                        Utf8FitTo(aName, str[i]))
+                    if (wgname.find(str[i]) != std::wstring::npos || wpname.find(str[i]) != std::wstring::npos || Utf8FitTo(aName, str[i]))
                     {
                         sShow = true;
                         break;
@@ -202,15 +200,15 @@ public:
             if (!sShow)
                 continue;
 
-            data << pname;                                      // player name
-            data << gname;                                      // guild name
-            data << uint32(lvl);                                // player level
-            data << uint32(classId);                            // player class
-            data << uint32(raceId);                             // player race
-            data << uint32(pzoneId);                            // player zone id
+            data << pname; // player name
+            data << gname; // guild name
+            data << uint32(lvl); // player level
+            data << uint32(classId); // player class
+            data << uint32(raceId); // player race
+            data << uint32(pzoneId); // player zone id
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
-            data << uint32(pPlayer->GetWhoListPartyStatus());   // not actually displayed anywhere
+            data << uint32(pPlayer->GetWhoListPartyStatus()); // not actually displayed anywhere
 #endif
             // 50 is maximum player count sent to client
             if ((++clientCount) == 49)
@@ -218,8 +216,8 @@ public:
         }
 
         uint32 count = m.size();
-        data.put(0, clientCount);                               // insert right count, listed count
-        data.put(4, count > 49 ? count : clientCount);          // insert right count, online count
+        data.put(0, clientCount); // insert right count, listed count
+        data.put(4, count > 49 ? count : clientCount); // insert right count, online count
 
         sess->SendPacket(&data);
     }
@@ -231,7 +229,7 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Misc::Who const& packet)
         return;
 
     if (packet.zoneIds.size() > 10 || packet.searchTerms.size() > 4) // client limits: 10 zones, 4 search strings
-        return;                                                // can't be received from real client or broken packet
+        return; // can't be received from real client or broken packet
 
     WhoListClientQueryTask task;
     task.accountId = GetAccountId();
@@ -240,7 +238,7 @@ void WorldSession::HandleWhoOpcode(WorldPackets::Misc::Who const& packet)
     task.raceMask = packet.raceMask;
     task.classMask = packet.classMask;
     task.zonesCount = static_cast<uint32>(packet.zoneIds.size());
-    task.strCount   = static_cast<uint32>(packet.searchTerms.size());
+    task.strCount = static_cast<uint32>(packet.searchTerms.size());
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Minlvl %u, maxlvl %u, name %s, guild %s, racemask %u, classmask %u, zones %u, strings %u", task.levelMin, task.levelMax, packet.playerName.c_str(), packet.guildName.c_str(), task.raceMask, task.classMask, task.zonesCount, task.strCount);
 
@@ -291,9 +289,9 @@ void WorldSession::HandleLogoutRequestOpcode(NullClientPacket const& /*packet*/)
     if (GetPlayer()->IsInCombat())
         reason = 1;
     else if (GetPlayer()->m_movementInfo.HasMovementFlag(MovementFlags(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)))
-        reason = 3;                      // is jumping or falling
+        reason = 3; // is jumping or falling
     else if (GetPlayer()->HasAura(9454)) // frozen by GM via freeze command
-        reason = 2;                      // FIXME - Need the correct value
+        reason = 2; // FIXME - Need the correct value
 
     if (reason)
     {
@@ -306,9 +304,7 @@ void WorldSession::HandleLogoutRequestOpcode(NullClientPacket const& /*packet*/)
     }
 
     // instant logout in taverns/cities or on taxi or for admins, gm's, mod's if its enabled in mangosd.conf
-    if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ||
-        GetPlayer()->IsTaxiFlying() ||
-        GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
+    if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || GetPlayer()->IsTaxiFlying() || GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
     {
         auto packet = std::make_unique<WorldPackets::Misc::LogoutResponse>();
         packet->reason = 0;
@@ -321,9 +317,7 @@ void WorldSession::HandleLogoutRequestOpcode(NullClientPacket const& /*packet*/)
     // not set flags if player can't free move to prevent lost state at logout cancel
     if (GetPlayer()->CanFreeMove())
     {
-        if (GetPlayer()->GetStandState() == UNIT_STAND_STATE_STAND &&
-           !GetPlayer()->IsMounted() &&
-           !(GetPlayer()->GetUnitMovementFlags() & (MOVEFLAG_SWIMMING | MOVEFLAG_SPLINE_ENABLED)))
+        if (GetPlayer()->GetStandState() == UNIT_STAND_STATE_STAND && !GetPlayer()->IsMounted() && !(GetPlayer()->GetUnitMovementFlags() & (MOVEFLAG_SWIMMING | MOVEFLAG_SPLINE_ENABLED)))
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
 
         GetPlayer()->SetRooted(true);
@@ -339,9 +333,7 @@ void WorldSession::HandleLogoutRequestOpcode(NullClientPacket const& /*packet*/)
     LogoutRequest(time(nullptr));
 }
 
-void WorldSession::HandlePlayerLogoutOpcode(NullClientPacket const& /*packet*/)
-{
-}
+void WorldSession::HandlePlayerLogoutOpcode(NullClientPacket const& /*packet*/) {}
 
 void WorldSession::HandleLogoutCancelOpcode(NullClientPacket const& /*packet*/)
 {
@@ -352,7 +344,7 @@ void WorldSession::HandleLogoutCancelOpcode(NullClientPacket const& /*packet*/)
     // not remove flags if can't free move - its not set in Logout request code.
     if (GetPlayer()->CanFreeMove())
     {
-        //!we can move again
+        //! we can move again
         GetPlayer()->SetRooted(false);
 
         //! Stand Up
@@ -401,7 +393,7 @@ void WorldSession::HandleSetSelectionOpcode(WorldPackets::Misc::SetSelection con
     _player->SetSelectionGuid(packet.guid);
 
     // update reputation list if need
-    Unit* unit = ObjectAccessor::GetUnit(*_player, packet.guid);   // can select group members at diff maps
+    Unit* unit = ObjectAccessor::GetUnit(*_player, packet.guid); // can select group members at diff maps
 
     if (unit)
         if (FactionTemplateEntry const* factionTemplateEntry = unit->GetFactionTemplateEntry())
@@ -430,21 +422,19 @@ void WorldSession::HandleSetSelectionOpcode(WorldPackets::Misc::SetSelection con
     }
 }
 
-void WorldSession::HandleSetMouseOverTargetOpcode(WorldPackets::Misc::SetTarget const& packet)
-{
-}
+void WorldSession::HandleSetMouseOverTargetOpcode(WorldPackets::Misc::SetTarget const& packet) {}
 
 void WorldSession::HandleStandStateChangeOpcode(WorldPackets::Misc::StandStateChange const& packet)
 {
     switch (packet.animState)
     {
-        case UNIT_STAND_STATE_STAND:
-        case UNIT_STAND_STATE_SIT:
-        case UNIT_STAND_STATE_SLEEP:
-        case UNIT_STAND_STATE_KNEEL:
-            break;
-        default:
-            return;
+    case UNIT_STAND_STATE_STAND:
+    case UNIT_STAND_STATE_SIT:
+    case UNIT_STAND_STATE_SLEEP:
+    case UNIT_STAND_STATE_KNEEL:
+        break;
+    default:
+        return;
     }
 
     if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM))
@@ -468,8 +458,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPackets::Misc::AddFriend const& pa
     if (!normalizePlayerName(const_cast<std::string&>(packet.friendName)))
         return;
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: %s asked to add friend : '%s'",
-              GetMasterPlayer()->GetName(), packet.friendName.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: %s asked to add friend : '%s'", GetMasterPlayer()->GetName(), packet.friendName.c_str());
 
     PlayerCacheData const* pData = sObjectMgr.GetPlayerDataByName(packet.friendName);
     if (!pData)
@@ -524,8 +513,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPackets::Misc::AddIgnore const& pa
     if (!normalizePlayerName(const_cast<std::string&>(packet.ignoreName)))
         return;
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: %s asked to Ignore: '%s'",
-              GetMasterPlayer()->GetName(), packet.ignoreName.c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: %s asked to Ignore: '%s'", GetMasterPlayer()->GetName(), packet.ignoreName.c_str());
 
     PlayerCacheData const* pData = sObjectMgr.GetPlayerDataByName(packet.ignoreName);
     if (!pData)
@@ -563,61 +551,20 @@ void WorldSession::HandleDelIgnoreOpcode(WorldPackets::Misc::DelIgnore const& pa
     sSocialMgr.SendFriendStatus(GetMasterPlayer(), FRIEND_IGNORE_REMOVED, packet.ignoreGuid, false);
 }
 
-void WorldSession::HandleBugOpcode(WorldPackets::Misc::Bug const& packet)
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WorldSession::HandleBugOpcode: Player %s (AccountId: %u) reported a %s: [%s] %s",
-        GetPlayer() ? GetPlayer()->GetName() : "(none)", GetAccountId(),
-        packet.suggestion ? "suggestion" : "bug", packet.type.c_str(), packet.content.c_str());
-}
+void WorldSession::HandleBugOpcode(WorldPackets::Misc::Bug const& packet) { sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WorldSession::HandleBugOpcode: Player %s (AccountId: %u) reported a %s: [%s] %s", GetPlayer() ? GetPlayer()->GetName() : "(none)", GetAccountId(), packet.suggestion ? "suggestion" : "bug", packet.type.c_str(), packet.content.c_str()); }
 
 void WorldSession::HandleReclaimCorpseOpcode(WorldPackets::Misc::ReclaimCorpse const& /*packet*/)
 {
-    if (GetPlayer()->IsAlive())
-        return;
-
-    // body not released yet
-    if (!GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
-        return;
-
-    Corpse* corpse = GetPlayer()->GetCorpse();
-
-    if (!corpse)
-        return;
-
-    // prevent resurrect before 30-sec delay after body release not finished
-    if (corpse->GetGhostTime() + GetPlayer()->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP) > time(nullptr))
-        return;
-
-    if (!corpse->IsWithinDistInMap(GetPlayer(), CORPSE_RECLAIM_RADIUS, true))
-        return;
-
-    // Prevent exploit: die with hellfire during battleground preparation, and resurrect after the door.
-    if (BattleGround const* bg = GetPlayer()->GetBattleGround())
-        if (bg->GetStatus() != STATUS_IN_PROGRESS)
-            return;
-    // resurrect
-    GetPlayer()->ResurrectPlayer(GetPlayer()->InBattleGround() ? 1.0f : 0.5f);
-
-    // spawn bones
-    GetPlayer()->SpawnCorpseBones();
+    GetPlayer()->SendSysMessage("You are banished to the Shadowlands");
+    return;
 }
 
 void WorldSession::HandleResurrectResponseOpcode(WorldPackets::Misc::ResurrectResponse const& packet)
 {
-    if (GetPlayer()->IsAlive())
-        return;
-
-    if (!packet.accept)
-    {
-        GetPlayer()->ClearResurrectRequestData(); // player denied rezz attempt
-        return;
-    }
-
-    if (!GetPlayer()->IsRessurectRequestedBy(packet.resurrectorGuid))
-        return;
-
-    GetPlayer()->ResurrectUsingRequestData();     // will call SpawnCorpseBones
+    GetPlayer()->SendSysMessage("You are banished to the Shadowlands");
+    return;
 }
+
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const& packet)
 {
@@ -671,12 +618,11 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPackets::Misc::AreaTrigger const
 
     if (BattlegroundEntranceTrigger const* pBgEntrance = sObjectMgr.GetBattlegroundEntranceTrigger(packet.triggerId))
     {
-        BattleGround *bg = sBattleGroundMgr.GetBattleGroundTemplate(pBgEntrance->bgTypeId);
+        BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(pBgEntrance->bgTypeId);
         if (!bg)
             return;
 
-        if ((pPlayer->GetLevel() < bg->GetMinLevel() || pPlayer->GetLevel() > bg->GetMaxLevel()) ||
-            (pPlayer->GetTeam() != pBgEntrance->team))
+        if ((pPlayer->GetLevel() < bg->GetMinLevel() || pPlayer->GetLevel() > bg->GetMaxLevel()) || (pPlayer->GetTeam() != pBgEntrance->team))
         {
             SendAreaTriggerMessage("You must be in the %s and at least %u%s level to enter.", pPlayer->GetTeam() == ALLIANCE ? "Horde" : "Alliance", bg->GetMinLevel(), bg->GetMinLevel() % 2 ? "st" : "th");
             return;
@@ -811,7 +757,7 @@ void WorldSession::HandleUpdateAccountData(WorldPackets::Misc::UpdateAccountData
         return;
     }
 
-    if (packet.decompressedSize == 0)                       // erase
+    if (packet.decompressedSize == 0) // erase
     {
         SetAccountData(dataType, "");
         return;
@@ -823,10 +769,8 @@ void WorldSession::HandleUpdateAccountData(WorldPackets::Misc::UpdateAccountData
         return;
     }
 
-    nonstd::optional<std::vector<uint8>> uncompressedData = Compression::ZLib::Decompress(
-        packet.compressedData,
-        packet.decompressedSize,
-        Compression::ZLib::ChecksumOption::IgnoreChecksum // client might not provide ADLER32 checksum
+    nonstd::optional<std::vector<uint8>> uncompressedData = Compression::ZLib::Decompress(packet.compressedData, packet.decompressedSize,
+                                                                                          Compression::ZLib::ChecksumOption::IgnoreChecksum // client might not provide ADLER32 checksum
     );
 
     if (!uncompressedData)
@@ -861,8 +805,8 @@ void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountDa
     if (!size)
     {
         auto accountDataPacket = std::make_unique<WorldPackets::Misc::UpdateAccountDataResponse>();
-        accountDataPacket->type = packet.type;                         // use the original type sent by client
-        accountDataPacket->decompressedLength = 0;                     // decompressed length
+        accountDataPacket->type = packet.type; // use the original type sent by client
+        accountDataPacket->decompressedLength = 0; // decompressed length
         SendPacket(std::move(accountDataPacket));
     }
     else
@@ -875,9 +819,9 @@ void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountDa
         }
 
         auto accountDataPacket = std::make_unique<WorldPackets::Misc::UpdateAccountDataResponse>();
-        accountDataPacket->type = packet.type;                            // use the original type sent by client
-        accountDataPacket->decompressedLength = size;                     // decompressed length
-        accountDataPacket->compressedData = std::move(*compressedData);   // compressed data
+        accountDataPacket->type = packet.type; // use the original type sent by client
+        accountDataPacket->decompressedLength = size; // decompressed length
+        accountDataPacket->compressedData = std::move(*compressedData); // compressed data
         SendPacket(std::move(accountDataPacket));
     }
 }
@@ -885,7 +829,7 @@ void WorldSession::HandleRequestAccountData(WorldPackets::Misc::RequestAccountDa
 void WorldSession::HandleSetActionButtonOpcode(WorldPackets::Misc::SetActionButton const& packet)
 {
     uint32 action = ACTION_BUTTON_ACTION(packet.packetData);
-    uint8  type   = ACTION_BUTTON_TYPE(packet.packetData);
+    uint8 type = ACTION_BUTTON_TYPE(packet.packetData);
 
     if (!packet.packetData)
     {
@@ -896,14 +840,14 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPackets::Misc::SetActionButt
     {
         switch (type)
         {
-            case ACTION_BUTTON_MACRO:
-            case ACTION_BUTTON_CMACRO:
-            case ACTION_BUTTON_SPELL:
-            case ACTION_BUTTON_ITEM:
-                break;
-            default:
-                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MISC: Unknown action button type %u for action %u into button %u", type, action, packet.button);
-                return;
+        case ACTION_BUTTON_MACRO:
+        case ACTION_BUTTON_CMACRO:
+        case ACTION_BUTTON_SPELL:
+        case ACTION_BUTTON_ITEM:
+            break;
+        default:
+            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "MISC: Unknown action button type %u for action %u into button %u", type, action, packet.button);
+            return;
         }
         if (!Player::IsActionButtonDataValid(packet.button, action, type, GetPlayer()))
             return;
@@ -911,18 +855,13 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPackets::Misc::SetActionButt
     }
 }
 
-void WorldSession::HandleCompleteCinematic(NullClientPacket const& /*packet*/)
-{
-    GetPlayer()->CinematicEnd();
-}
+void WorldSession::HandleCompleteCinematic(NullClientPacket const& /*packet*/) { GetPlayer()->CinematicEnd(); }
 
-void WorldSession::HandleNextCinematicCamera(NullClientPacket const& /*packet*/)
-{
-}
+void WorldSession::HandleNextCinematicCamera(NullClientPacket const& /*packet*/) {}
 
 void WorldSession::HandleSetActionBarTogglesOpcode(WorldPackets::Misc::SetActionBarToggles const& packet)
 {
-    if (!GetPlayer())                                       // ignore until not logged (check needed because STATUS_AUTHED)
+    if (!GetPlayer()) // ignore until not logged (check needed because STATUS_AUTHED)
     {
         if (packet.actionBar != 0)
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored", uint32(packet.actionBar));
@@ -976,10 +915,10 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPackets::Misc::InspectHono
     // player guid
     honorStats->playerGuid = packet.guid;
 
-// World of Warcraft Client Patch 1.6.0 (2005-07-12)
-// - There is a new "This Week" section of the Honor tab, which will display PvP accomplishments of the current week.
-// World of Warcraft Client Patch 1.6.0 (2005-07-12)
-// - There is now a progress bar on the Honor tab of your character window that displays how close you are to your next rank.
+    // World of Warcraft Client Patch 1.6.0 (2005-07-12)
+    // - There is a new "This Week" section of the Honor tab, which will display PvP accomplishments of the current week.
+    // World of Warcraft Client Patch 1.6.0 (2005-07-12)
+    // - There is now a progress bar on the Honor tab of your character window that displays how close you are to your next rank.
 
     // Highest Rank
     honorStats->highestRank = pTarget->GetHonorMgr().GetHighestRank().rank;
@@ -1050,7 +989,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPackets::Misc::WorldTeleport c
     // Received opcode CMSG_WORLD_TELEPORT
     // Time is ***, map=1, x=16226.000000, y=16257.000000, z=13.200000, orient=1.57079637
 
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode CMSG_WORLD_TELEPORT");
+    // sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode CMSG_WORLD_TELEPORT");
 
     if (GetPlayer()->IsTaxiFlying())
     {
@@ -1070,7 +1009,7 @@ void WorldSession::HandleMoveSetRawPosition(WorldPackets::Misc::MoveSetRawPositi
 {
     // write in client console: setrawpos x y z o
     // For now, it is implemented like worldport but on the same map. Consider using MSG_MOVE_SET_RAW_POSITION_ACK.
-    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Set to: X=%f, Y=%f, Z=%f, orient=%f", packet.location.x, packet.location.y, packet.location.z, packet.location.o);
+    // sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Set to: X=%f, Y=%f, Z=%f, orient=%f", packet.location.x, packet.location.y, packet.location.z, packet.location.o);
 
     if (!GetPlayer()->IsInWorld() || GetPlayer()->IsTaxiFlying())
     {
@@ -1143,14 +1082,14 @@ void WorldSession::HandleFarSightOpcode(WorldPackets::Misc::FarSight const& pack
 
     switch (packet.op)
     {
-        case 0:
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Removed FarSight from %s", _player->GetGuidStr().c_str());
-            _player->GetCamera().ResetView(false);
-            break;
-        case 1:
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Added FarSight %s to %s", _player->GetFarSightGuid().GetString().c_str(), _player->GetGuidStr().c_str());
-            _player->GetCamera().SetView(obj, false);
-            break;
+    case 0:
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Removed FarSight from %s", _player->GetGuidStr().c_str());
+        _player->GetCamera().ResetView(false);
+        break;
+    case 1:
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Added FarSight %s to %s", _player->GetFarSightGuid().GetString().c_str(), _player->GetGuidStr().c_str());
+        _player->GetCamera().SetView(obj, false);
+        break;
     }
 }
 
@@ -1178,8 +1117,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPackets::Warden::WardenData const
 {
     if (!m_warden)
     {
-        sLog.Player(GetAccountId(), LOG_ANTICHEAT, LOG_LVL_MINIMAL,
-            "HandleWardenDataOpcode: warden interface not found!");
+        sLog.Player(GetAccountId(), LOG_ANTICHEAT, LOG_LVL_MINIMAL, "HandleWardenDataOpcode: warden interface not found!");
         return;
     }
 
