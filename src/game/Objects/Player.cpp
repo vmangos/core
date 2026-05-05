@@ -7911,6 +7911,14 @@ void Player::SendLoot(ObjectGuid guid, LootType lootType, Player const* pVictim)
                 SendLootRelease(guid);
                 return;
             }
+
+            // skinning range already checked during spell cast
+            if (lootType != LOOT_INSIGNIA && !bones->IsWithinDistInMap(this, INTERACTION_DISTANCE, true, SizeFactor::None))
+            {
+                SendLootError(guid, LOOT_ERROR_TOO_FAR);
+                return;
+            }
+
             loot = &bones->loot;
 
             if (!bones->lootForBody)
