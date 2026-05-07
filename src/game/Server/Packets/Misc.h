@@ -567,9 +567,6 @@ namespace WorldPackets { namespace Misc
 
     struct ForcedReactionEntry
     {
-        ForcedReactionEntry() = default;
-        ForcedReactionEntry(uint32 faction, uint32 rank) : factionId(faction), reputationRank(rank) {}
-
         uint32 factionId = 0;       // Faction ID (Faction.dbc)
         uint32 reputationRank = 0;  // Reputation rank
     };
@@ -585,9 +582,6 @@ namespace WorldPackets { namespace Misc
 
     struct FactionStandingEntry
     {
-        FactionStandingEntry() = default;
-        FactionStandingEntry(uint32 repId, int32 repStanding) : reputationListId(repId), standing(repStanding) {}
-
         uint32 reputationListId = 0; // Reputation list ID
         int32 standing = 0;          // Reputation standing
     };
@@ -620,11 +614,41 @@ namespace WorldPackets { namespace Misc
     class SetFactionVisible final : public ServerPacket
     {
     public:
-        uint32 reputationListId = 0; // Reputation list ID to make visible
+        uint32 reputationListId = 0;
 
         explicit SetFactionVisible() : ServerPacket(SMSG_SET_FACTION_VISIBLE) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
+
+    class PlayMusic final : public ServerPacket
+    {
+    public:
+        uint32 musicId = 0;
+
+        explicit PlayMusic() : ServerPacket(SMSG_PLAY_MUSIC) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class Notification final : public ServerPacket
+    {
+    public:
+        std::string message; // Notification message
+
+        explicit Notification() : ServerPacket(SMSG_NOTIFICATION) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    /** Tell a client to invalidate all cached entries for a given player (like the name) */
+    class InvalidatePlayer final : public ServerPacket
+    {
+    public:
+        ObjectGuid playerGuid;
+
+        explicit InvalidatePlayer() : ServerPacket(SMSG_INVALIDATE_PLAYER) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+#endif
 
 }} // namespace WorldPackets::Misc
 

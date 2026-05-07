@@ -2177,6 +2177,15 @@ bool WorldObject::IsPositionValid() const
     return MaNGOS::IsValidMapCoord(m_position.x, m_position.y, m_position.z, m_position.o);
 }
 
+void WorldObject::SendMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self) const
+{
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket binaryPacket;
+    binaryPacket.SetOpcode(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+    SendMessageToSet(&binaryPacket, self);
+}
+
 void WorldObject::SendMessageToSet(WorldPacket* data, bool /*bToSelf*/) const
 {
     //if object is in world, map for it already created!
@@ -2831,8 +2840,13 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player const* target /*= null
 
 void WorldObject::PlayDirectMusic(uint32 music_id, Player const* target /*= nullptr*/) const
 {
-    WorldPacket data(SMSG_PLAY_MUSIC, 4);
-    data << uint32(music_id);
+    WorldPackets::Misc::PlayMusic playMusic;
+    playMusic.musicId = music_id;
+
+    WorldPacket data;
+    data.SetOpcode(playMusic.GetOpcode());
+    playMusic.AppendBodyTo(data);
+
     if (target)
         target->SendDirectMessage(&data);
     else

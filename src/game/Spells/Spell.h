@@ -267,7 +267,7 @@ class Spell
         bool CanAutoCast(Unit* target);
         PetTameFailureReason CheckTamingSpell(Player* caster, bool gm);
 
-        static void SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result);
+        static void SendCastResult(Player const* caster, SpellEntry const* spellInfo, SpellCastResult result);
         void SendCastResult(SpellCastResult result);
         void SendSpellStart();
         void SendSpellGo();

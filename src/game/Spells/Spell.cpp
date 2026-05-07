@@ -4394,26 +4394,27 @@ void Spell::SendCastResult(SpellCastResult result)
     SendCastResult((Player*)m_caster, m_originalSpellInfo ? m_originalSpellInfo : m_spellInfo, result);
 }
 
-void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result)
+void Spell::SendCastResult(Player const* caster, SpellEntry const* spellInfo, SpellCastResult result)
 {
-    WorldPacket data(SMSG_CAST_RESULT, (4 + 1 + 1));
-    data << uint32(spellInfo->Id);
+    auto packet = std::make_unique<WorldPackets::Spell::CastResult>();
+    packet->spellId = spellInfo->Id;
+    packet->failureReason = result;
 
     if (result != SPELL_CAST_OK && !spellInfo->HasAttribute(SPELL_ATTR_EX2_DO_NOT_REPORT_SPELL_FAILURE))
     {
-        data << static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
-        data << uint8(spellInfo->IsPassiveSpell() ? SPELL_FAILED_DONT_REPORT : result);                                  // problem
+        packet->result = static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
+        packet->failureReason = static_cast<uint8>(spellInfo->IsPassiveSpell() ? SPELL_FAILED_DONT_REPORT : result);
         switch (result)
         {
             case SPELL_FAILED_NOT_READY:
                 if (spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
-                    data << uint32(caster->IsSpellOnPermanentCooldown(*spellInfo));
+                    packet->failureArg1 = caster->IsSpellOnPermanentCooldown(*spellInfo);
                 break;
             case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
-                data << uint32(spellInfo->RequiresSpellFocus);
+                packet->failureArg1 = spellInfo->RequiresSpellFocus;
                 break;
             case SPELL_FAILED_REQUIRES_AREA:
-                data << uint32(sSpellMgr.GetRequiredAreaForSpell(spellInfo->Id));
+                packet->failureArg1 = sSpellMgr.GetRequiredAreaForSpell(spellInfo->Id);
                 break;
             case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
@@ -4422,9 +4423,8 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCas
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             case SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND:
 #endif
-                data << uint32(spellInfo->EquippedItemClass);
-                data << uint32(spellInfo->EquippedItemSubClassMask);
-                data << uint32(spellInfo->EquippedItemInventoryTypeMask);
+                packet->failureArg1 = spellInfo->EquippedItemClass;
+                packet->failureArg2 = spellInfo->EquippedItemSubClassMask;
                 break;
             default:
                 break;
@@ -4432,10 +4432,10 @@ void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCas
     }
     else
     {
-        data << static_cast<uint8>(SPELL_RESULT_STATUS_OKAY);
+        packet->result = static_cast<uint8>(SPELL_RESULT_STATUS_OKAY);
     }
 
-    caster->GetSession()->SendPacket(&data);
+    caster->GetSession()->SendPacket(std::move(packet));
 }
 
 static void WriteGuidHelper(WorldPacket& data, Object* pCaster)

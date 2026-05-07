@@ -4,6 +4,7 @@
 #include "Packet.h"
 #include "SpellCastTargetsInfo.h"
 #include "ObjectGuid.h"
+#include "nonstd/optional.hpp"
 
 class SpellEntry;
 
@@ -82,6 +83,42 @@ namespace WorldPackets { namespace Spell
             : ServerPacket(SMSG_CAST_RESULT), spellEntry(spellEntry), reason(reason) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
+
+    class CastResult final : public ServerPacket
+    {
+    public:
+        uint32 spellId = 0;
+        uint8 result = 0;
+        uint8 failureReason = 0;
+        nonstd::optional<uint32> failureArg1; // optional argument 1
+        nonstd::optional<uint32> failureArg2; // optional argument 2
+
+        explicit CastResult() : ServerPacket(SMSG_CAST_RESULT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PlaySpellVisual final : public ServerPacket
+    {
+    public:
+        ObjectGuid casterGuid;
+        uint32 spellVisualId = 0; // spell visual id
+
+        explicit PlaySpellVisual() : ServerPacket(SMSG_PLAY_SPELL_VISUAL) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    class PlaySpellImpact final : public ServerPacket
+    {
+    public:
+        ObjectGuid targetGuid;
+        uint32 spellVisualId = 0; // spell visual id
+
+        explicit PlaySpellImpact() : ServerPacket(SMSG_PLAY_SPELL_IMPACT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+#endif
+
 }} // namespace WorldPackets::Spell
 
 #endif // MANGOS_PACKETS_SPELL_H

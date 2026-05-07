@@ -2145,8 +2145,7 @@ void World::Update(uint32 diff)
         sTerrainMgr.Update(diff);
 }
 
-// Send a packet to all players (except self if mentioned)
-void World::SendGlobalMessage(WorldPacket* packet, WorldSession* self, uint32 team)
+void World::SendGlobalMessage(WorldPacket const* binaryPacket, WorldSession const* self, uint32 team)
 {
     for (const auto& itr : m_sessions)
     {
@@ -2154,12 +2153,22 @@ void World::SendGlobalMessage(WorldPacket* packet, WorldSession* self, uint32 te
         {
             if (session != self)
             {
-                Player* player = session->GetPlayer();
+                Player const* player = session->GetPlayer();
                 if (player && player->IsInWorld() && (team == TEAM_NONE || player->GetTeam() == team))
-                    session->SendPacket(packet);
+                    session->SendPacket(binaryPacket);
             }
         }
     }
+}
+
+// Send a packet to all players (except self if mentioned)
+void World::SendGlobalMessage(std::unique_ptr<ServerPacket const> packet, WorldSession const* self, uint32 team)
+{
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket binaryPacket;
+    binaryPacket.SetOpcode(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+    SendGlobalMessage(&binaryPacket, self, team);
 }
 
 namespace MaNGOS
@@ -2379,23 +2388,22 @@ void World::SendGMText(int32 string_id, ...)
 // DEPRICATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
 void World::SendGlobalText(char const* text, WorldSession* self)
 {
-    WorldPacket data;
-
     // need copy to prevent corruption by strtok call in LineFromMessage original string
     char* buf = mangos_strdup(text);
     char* pos = buf;
 
     while (char* line = ChatHandler::LineFromMessage(pos))
     {
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, line);
-        SendGlobalMessage(&data, self);
+        WorldPacket binaryPacket;
+        ChatHandler::BuildChatPacket(binaryPacket, CHAT_MSG_SYSTEM, line);
+        SendGlobalMessage(&binaryPacket, self);
     }
 
     delete [] buf;
 }
 
 // Send a packet to all players (or players selected team) in the zone (except self if mentioned)
-void World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self, uint32 team)
+void World::SendZoneMessage(uint32 zone, WorldPacket const* binaryPacket, WorldSession const* self, uint32 team)
 {
     for (const auto& itr : m_sessions)
     {
@@ -2408,7 +2416,7 @@ void World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self
                    (player->GetZoneId() == zone) &&
                    (team == TEAM_NONE || player->GetTeam() == team))
                 {
-                    session->SendPacket(packet);
+                    session->SendPacket(binaryPacket);
                 }
             }
         }
@@ -2416,7 +2424,7 @@ void World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self
 }
 
 // Send a System Message to all players in the zone (except self if mentioned)
-void World::SendZoneText(uint32 zone, char const* text, WorldSession* self, uint32 team)
+void World::SendZoneText(uint32 zone, char const* text, WorldSession const* self, uint32 team)
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, text);
@@ -2763,17 +2771,9 @@ void World::SendServerMessage(ServerMessageType type, char const* text, Player* 
     packet->text = text;
 
     if (player)
-    {
         player->GetSession()->SendPacket(std::move(packet));
-    }
     else
-    {
-        // TODO Use broadcaster which does the binary conversion automatically
-        WorldPacket data;
-        data.SetOpcode(packet->GetOpcode());
-        packet->AppendBodyTo(data);
-        SendGlobalMessage(&data);
-    }
+        SendGlobalMessage(std::move(packet));
 }
 
 void World::UpdateSessions(uint32 diff)
@@ -3089,9 +3089,9 @@ bool World::configNoReload(bool reload, eConfigBoolValues index, char const* fie
 void World::InvalidatePlayerDataToAllClient(ObjectGuid guid)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
-    data << guid;
-    SendGlobalMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::InvalidatePlayer>();
+    packet->playerGuid = guid;
+    SendGlobalMessage(std::move(packet));
 #endif
 }
 
