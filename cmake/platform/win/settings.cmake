@@ -2,7 +2,10 @@
 if(MSVC)
   include("${ROOT_DIR}/cmake/compiler/msvc/settings.cmake")
 elseif(MINGW) # Allows same flags as GCC
-  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wall -Werror")
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wall")
+  if(BUILD_WARNINGS_AS_ERROR)
+    set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Werror")
+  endif()
   set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-reorder") # ... will be initialized after ...
   set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-unused-variable") # unused variable
   set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-unused-but-set-variable") # set but not used

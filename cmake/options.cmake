@@ -1,6 +1,7 @@
 
 # Generic boolean options
 option(BUILD_FOR_HOST_CPU             "Build specifically for the host CPU via `-march=native` (might not run on different machines)" ON)
+option(BUILD_WARNINGS_AS_ERROR        "Treat compiler warnings as errors (/WX on MSVC, -Werror on GCC/Clang)"                         OFF)
 option(USE_SCRIPTS                    "Build scripts"                                                                                 ON)
 option(BUILD_EXTRACTORS               "Build extractors"                                                                              OFF)
 option(BUILD_REALMMERGE               "Build helper tool for merging character databases"                                             OFF)
@@ -66,6 +67,7 @@ message(STATUS
     USE_PCH                   Use precompiled headers
     USE_PCH_OLD               Use precompiled headers
     BUILD_FOR_HOST_CPU        Build specifically for the host CPU via `-march=native` (might not run on different machines)
+    BUILD_WARNINGS_AS_ERROR   Treat compiler warnings as errors (/WX on MSVC, -Werror on GCC/Clang)
     USE_SCRIPTS               Build scripts
     BUILD_EXTRACTORS          Build extractors
     BUILD_REALMMERGE          Build helper tool for merging character databases

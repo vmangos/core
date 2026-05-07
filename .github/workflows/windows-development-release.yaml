@@ -38,7 +38,7 @@ jobs:
           set -euo pipefail
           mkdir -p build
           cd build
-          cmake -DBUILD_EXTRACTORS=1 -G "Visual Studio 17 2022" -A x64 ..
+          cmake -DBUILD_EXTRACTORS=1 -DBUILD_WARNINGS_AS_ERROR=1 -G "Visual Studio 17 2022" -A x64 ..
           "/c/Program Files/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe" "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m
 
       - name: Set release archive filename

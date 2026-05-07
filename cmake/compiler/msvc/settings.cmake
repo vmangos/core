@@ -78,7 +78,10 @@ endif()
 if (MSVC_VERSION GREATER_EQUAL 1930)
   # >= Visual Studio 2022
   # For newer version of Visual Studio we can guarantee that our code works ""warning-free""
-  set(MSVC_ADDITIONAL_FLAGS "${MSVC_ADDITIONAL_FLAGS} /Wall /WX") # Treat warnings as errors
+  set(MSVC_ADDITIONAL_FLAGS "${MSVC_ADDITIONAL_FLAGS} /Wall")
+endif()
+if(BUILD_WARNINGS_AS_ERROR)
+  set(MSVC_ADDITIONAL_FLAGS "${MSVC_ADDITIONAL_FLAGS} /WX") # Treat warnings as errors
 endif()
 if (MSVC_VERSION GREATER_EQUAL 1940)
   # >= Visual Studio 2026

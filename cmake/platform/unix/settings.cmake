@@ -13,7 +13,10 @@ if(GCC_SANITIZE)
 endif()
 
 set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fexceptions -fnon-call-exceptions -pipe")
-set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wall -Werror")
+set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wall")
+if(BUILD_WARNINGS_AS_ERROR)
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Werror")
+endif()
 
 set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-reorder") # ... will be initialized after ...
 set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -Wno-unused-variable") # unused variable
