@@ -70,24 +70,10 @@ namespace WorldPackets { namespace Spell
     };
     // --- Server Packets ---
 
-    // Simplified SMSG_CAST_RESULT for a basic spell failure (status=2) with no extra data.
-    // For complex failures with additional payload (e.g. cooldown time, required area),
-    // use the full Spell::SendCastResult() path in Spell.cpp instead.
-    class CastResultSimpleFailure final : public ServerPacket
-    {
-    public:
-        ::SpellEntry const* spellEntry; // SpellEntry pointers are always valid even when `.reload`
-        uint8 reason;
-
-        explicit CastResultSimpleFailure(::SpellEntry const* spellEntry, uint8 reason)
-            : ServerPacket(SMSG_CAST_RESULT), spellEntry(spellEntry), reason(reason) {}
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
-
     class CastResult final : public ServerPacket
     {
     public:
-        uint32 spellId = 0;
+        ::SpellEntry const* spellEntry;
         uint8 result = 0;
         uint8 failureReason = 0;
         nonstd::optional<uint32> failureArg1; // optional argument 1
@@ -101,7 +87,7 @@ namespace WorldPackets { namespace Spell
     {
     public:
         ObjectGuid casterGuid;
-        uint32 spellVisualId = 0; // spell visual id
+        uint32 spellVisualId = 0; // SpellVisualKit.dbc index
 
         explicit PlaySpellVisual() : ServerPacket(SMSG_PLAY_SPELL_VISUAL) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;

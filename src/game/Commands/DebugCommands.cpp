@@ -198,8 +198,11 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
     if (!ExtractOptUInt32(&args, failarg2, 0))
         return false;
 
+    SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(133); // Fireball
+    MANGOS_ASSERT(spellEntry);
+
     auto packet = std::make_unique<WorldPackets::Spell::CastResult>();
-    packet->spellId = 133;
+    packet->spellEntry = spellEntry;
     packet->result = static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
     packet->failureReason = static_cast<uint8>(failnum);
     packet->failureArg1 = failarg1;
@@ -1735,11 +1738,7 @@ bool ChatHandler::HandleSendSpellVisualCommand(char *args)
     auto packet = std::make_unique<WorldPackets::Spell::PlaySpellVisual>();
     packet->casterGuid = m_session->GetPlayer()->GetObjectGuid();
     packet->spellVisualId = uiPlayId;
-
-    WorldPacket data;
-    data.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(data);
-    pTarget->SendMessageToSet(&data, true);
+    pTarget->SendMessageToSet(std::move(packet), true);
     m_session->GetPlayer()->SendSpellGo(pTarget, uiPlayId);
 
     // Channeled case
@@ -1771,11 +1770,7 @@ bool ChatHandler::HandleSendSpellImpactCommand(char *args)
     auto packet = std::make_unique<WorldPackets::Spell::PlaySpellImpact>();
     packet->targetGuid = pTarget->GetObjectGuid();
     packet->spellVisualId = uiPlayId;
-
-    WorldPacket data;
-    data.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(data);
-    pTarget->SendMessageToSet(&data, true);
+    pTarget->SendMessageToSet(std::move(packet), true);
 #endif
     return true;
 }

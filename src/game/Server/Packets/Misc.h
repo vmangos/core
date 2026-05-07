@@ -629,6 +629,15 @@ namespace WorldPackets { namespace Misc
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class PlaySound final : public ServerPacket
+    {
+    public:
+        uint32 soundId = 0;
+
+        explicit PlaySound() : ServerPacket(SMSG_PLAY_SOUND) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
     class Notification final : public ServerPacket
     {
     public:

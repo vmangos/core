@@ -124,11 +124,6 @@ void WorldPackets::Battleground::UpdateWorldState::AppendBodyTo(ByteBuffer& buff
     buffer << value;
 }
 
-void WorldPackets::Battleground::PlaySound::AppendBodyTo(ByteBuffer& buffer) const
-{
-    buffer << soundId;
-}
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
 void WorldPackets::Battleground::BattlegroundPlayerJoined::AppendBodyTo(ByteBuffer& buffer) const
 {

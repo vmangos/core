@@ -2830,27 +2830,22 @@ void WorldObject::PlayDistanceSound(uint32 sound_id, Player const* target /*= nu
 
 void WorldObject::PlayDirectSound(uint32 sound_id, Player const* target /*= nullptr*/) const
 {
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(sound_id);
+    auto packet = std::make_unique<WorldPackets::Misc::PlaySound>();
+    packet->soundId = sound_id;
     if (target)
-        target->SendDirectMessage(&data);
+        target->GetSession()->SendPacket(std::move(packet));
     else
-        SendMessageToSet(&data, true);
+        SendMessageToSet(std::move(packet), true);
 }
 
 void WorldObject::PlayDirectMusic(uint32 music_id, Player const* target /*= nullptr*/) const
 {
-    WorldPackets::Misc::PlayMusic playMusic;
-    playMusic.musicId = music_id;
-
-    WorldPacket data;
-    data.SetOpcode(playMusic.GetOpcode());
-    playMusic.AppendBodyTo(data);
-
+    auto packet = std::make_unique<WorldPackets::Misc::PlayMusic>();
+    packet->musicId = music_id;
     if (target)
-        target->SendDirectMessage(&data);
+        target->GetSession()->SendPacket(std::move(packet));
     else
-        SendMessageToSet(&data, true);
+        SendMessageToSet(std::move(packet), true);
 }
 
 void WorldObject::UpdateVisibilityAndView()

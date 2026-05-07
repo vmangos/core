@@ -4397,7 +4397,7 @@ void Spell::SendCastResult(SpellCastResult result)
 void Spell::SendCastResult(Player const* caster, SpellEntry const* spellInfo, SpellCastResult result)
 {
     auto packet = std::make_unique<WorldPackets::Spell::CastResult>();
-    packet->spellId = spellInfo->Id;
+    packet->spellEntry = spellInfo;
     packet->failureReason = result;
 
     if (result != SPELL_CAST_OK && !spellInfo->HasAttribute(SPELL_ATTR_EX2_DO_NOT_REPORT_SPELL_FAILURE))

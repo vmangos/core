@@ -418,6 +418,11 @@ void WorldPackets::Misc::PlayMusic::AppendBodyTo(ByteBuffer& buffer) const
     buffer << musicId;
 }
 
+void WorldPackets::Misc::PlaySound::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << soundId;
+}
+
 void WorldPackets::Misc::Notification::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << message;

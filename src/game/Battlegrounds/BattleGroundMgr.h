@@ -217,7 +217,7 @@ class BattleGroundMgr
 #endif
         std::unique_ptr<ServerPacket> BuildUpdateWorldStatePacket(uint32 field, uint32 value);
         std::unique_ptr<ServerPacket> BuildBattleGroundStatusPacket(BattleGround* bg, uint8 queueSlot, uint8 statusID, uint32 time1, uint32 time2);
-        std::unique_ptr<ServerPacket> BuildPlaySoundPacket(uint32 soundid);
+        std::unique_ptr<ServerPacket> BuildPlaySoundPacket(uint32 soundId);
 
         /* Battlegrounds */
         BattleGroundSet::iterator GetBattleGroundsBegin(BattleGroundTypeId bgTypeId) { return m_battleGrounds[bgTypeId].begin(); };

@@ -1147,11 +1147,10 @@ std::unique_ptr<ServerPacket> BattleGroundMgr::BuildUpdateWorldStatePacket(uint3
     return packet;
 }
 
-std::unique_ptr<ServerPacket> BattleGroundMgr::BuildPlaySoundPacket(uint32 soundid)
+std::unique_ptr<ServerPacket> BattleGroundMgr::BuildPlaySoundPacket(uint32 soundId)
 {
-    auto packet = std::make_unique<WorldPackets::Battleground::PlaySound>();
-    packet->soundId = soundid;
-
+    auto packet = std::make_unique<WorldPackets::Misc::PlaySound>();
+    packet->soundId = soundId;
     return packet;
 }
 
