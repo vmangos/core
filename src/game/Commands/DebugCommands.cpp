@@ -2370,21 +2370,19 @@ bool ChatHandler::HandleDebugPvPCreditCommand(char *args)
     If uiHonorValue=0 : "Dishonorable Kill"
     */
     auto packet = std::make_unique<WorldPackets::Misc::PvpCredit>();
-
     if (pSelection->GetTypeId() == TYPEID_PLAYER)
     {
         uint32 uiHonorValue = urand(1, 100);
         packet->honor = uiHonorValue;
-        packet->victimGuid = pSelection->GetObjectGuid();
         PSendSysMessage("Honorable Kill : Rank %3u and Honor %3u.", uiRankValue, uiHonorValue);
     }
-    else // Victoire deshonorante
+    else // Dishonorable kill
     {
         packet->honor = 0;
-        packet->victimGuid = pSelection->GetObjectGuid();
         PSendSysMessage("Dishonorable Kill.");
         uiRankValue = 0;
     }
+    packet->victimGuid = pSelection->GetObjectGuid();
     packet->victimRank = uiRankValue;
     m_session->SendPacket(std::move(packet));
 
