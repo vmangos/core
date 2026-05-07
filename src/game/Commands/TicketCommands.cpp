@@ -97,9 +97,9 @@ bool ChatHandler::HandleGMTicketCloseByIdCommand(char* args)
     // Inform player, who submitted this ticket, that it is closed
     if (Player* submitter = ticket->GetPlayer())
     {
-        WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
-        data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
-        submitter->GetSession()->SendPacket(&data);
+        auto deletePacket = std::make_unique<WorldPackets::GmTicket::GmTicketDeleteTicketResponse>();
+        deletePacket->response = GMTICKET_RESPONSE_TICKET_DELETED;
+        submitter->GetSession()->SendPacket(std::move(deletePacket));
     }
     return true;
 }
@@ -228,9 +228,9 @@ bool ChatHandler::HandleGMTicketDeleteByIdCommand(char* args)
     if (Player* player = ticket->GetPlayer())
     {
         // Force abandon ticket
-        WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
-        data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
-        player->GetSession()->SendPacket(&data);
+        auto deletePacket = std::make_unique<WorldPackets::GmTicket::GmTicketDeleteTicketResponse>();
+        deletePacket->response = GMTICKET_RESPONSE_TICKET_DELETED;
+        player->GetSession()->SendPacket(std::move(deletePacket));
     }
 
     return true;

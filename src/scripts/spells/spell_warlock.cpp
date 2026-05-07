@@ -328,7 +328,7 @@ struct WarlockCreateHealthstoneScript : SpellScript
     {
         Player* pCaster = spell->m_caster->ToPlayer();
         if (!pCaster)
-            SPELL_CAST_OK;
+            return SPELL_CAST_OK;
 
         uint32 const itemId = GetItemId(pCaster, spell->m_spellInfo->Id);
         if (!itemId)
@@ -356,7 +356,7 @@ struct WarlockCreateHealthstoneScript : SpellScript
         uint32 const itemId = GetItemId(spell->GetUnitTarget(), spell->m_spellInfo->Id);
         if (!itemId)
             return true;
-        
+
         spell->DoCreateItem(effIdx, itemId);
         return true;
     }

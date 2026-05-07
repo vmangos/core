@@ -129,7 +129,6 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
         return false;
     }
     newChar->Relocate(x, y, z, o);
-    sObjectMgr.InsertPlayerInCache(newChar);
     newChar->SetMap(map);
     newChar->SaveRecallPosition();
     newChar->CreatePacketBroadcaster();
@@ -142,6 +141,7 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
         delete newChar;
         return false;
     }
+    sObjectMgr.InsertPlayerInCache(newChar);
     sess->SetPlayer(newChar);
     sess->SetMasterPlayer(mPlayer);
     sObjectAccessor.AddObject(newChar);
@@ -243,7 +243,12 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         return;
     }
     // MOVEMENT AI
-    float x, y, z = 0; // Where to go
+
+    // Target pos (where to go)
+    float x = 0;
+    float y = 0;
+    float z = 0;
+
     float r = 10;
     if (me->movespline->Finalized())
     {

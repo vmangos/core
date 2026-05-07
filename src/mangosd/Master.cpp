@@ -113,7 +113,7 @@ std::unique_ptr<IO::Networking::AsyncSocketAcceptor> SetupRemoteAccessServer(IO:
     raServer->AutoAcceptSocketsUntilClose([ioCtx](IO::Networking::SocketDescriptor socketDescriptor)
     {
         // Create a socket and attach it to our global ioCtx
-        std::make_shared<RASocket>(std::move(IO::Networking::AsyncSocket(ioCtx, std::move(socketDescriptor))))->Start();
+        std::make_shared<RASocket>(IO::Networking::AsyncSocket(ioCtx, std::move(socketDescriptor)))->Start();
     });
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting Remote access listener on %s:%d", raBindIp.c_str(), raBindPort);
 

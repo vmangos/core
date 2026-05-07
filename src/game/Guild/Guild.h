@@ -136,7 +136,7 @@ enum GuildEvents
     GE_SIGNED_OFF                   = 0x0D,                 // ERR_FRIEND_OFFLINE_S
 };
 
-enum GuildRosterFlags
+enum GuildRosterPresenceFlags
 {
     GRF_ONLINE                      = 0x01,
     GRF_AFK                         = 0x02,
@@ -283,13 +283,13 @@ class Guild
         bool LoadRanksFromDB(const std::unique_ptr<QueryResult>& guildRanksResult);
         bool LoadMembersFromDB(const std::unique_ptr<QueryResult>& guildMembersResult);
 
-        void BroadcastToGuild(WorldSession* session, char const* msg, uint32 language = LANG_UNIVERSAL);
-        void BroadcastToOfficers(WorldSession* session, char const* msg, uint32 language = LANG_UNIVERSAL);
-        void BroadcastPacketToRank(WorldPacket* packet, uint32 rankId);
-        void BroadcastPacket(WorldPacket* packet);
+        void BroadcastToGuild(WorldSession const* senderSession, char const* msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastChatMsgToOfficers(WorldSession const* senderSession, char const* msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastPacketToRank(std::unique_ptr<ServerPacket> packet, uint32 rankId) const;
+        void BroadcastPacket(std::unique_ptr<ServerPacket> packet) const;
 
-        void BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 = nullptr, char const* str2 = nullptr, char const* str3 = nullptr);
-        void BroadcastEvent(GuildEvents event, char const* str1 = nullptr, char const* str2 = nullptr, char const* str3 = nullptr)
+        void BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 = nullptr, char const* str2 = nullptr, char const* str3 = nullptr) const;
+        void BroadcastEvent(GuildEvents event, char const* str1 = nullptr, char const* str2 = nullptr, char const* str3 = nullptr) const
         {
             BroadcastEvent(event, ObjectGuid(), str1, str2, str3);
         }
@@ -305,15 +305,15 @@ class Guild
 
         void CreateRank(std::string name,uint32 rights);
         void DelRank();
-        std::string GetRankName(uint32 rankId);
-        uint32 GetRankRights(uint32 rankId);
+        std::string GetRankName(uint32 rankId) const;
+        uint32 GetRankRights(uint32 rankId) const;
         uint32 GetRanksSize() const { return m_Ranks.size(); }
 
         void SetRankName(uint32 rankId, std::string name);
         void SetRankRights(uint32 rankId, uint32 rights);
-        bool HasRankRight(uint32 rankId, uint32 right)
+        bool HasRankRight(uint32 rankId, uint32 right) const
         {
-            return ((GetRankRights(rankId) & right) != GR_RIGHT_EMPTY) ? true : false;
+            return (GetRankRights(rankId) & right) != GR_RIGHT_EMPTY;
         }
 
         int32 GetRank(ObjectGuid guid)
@@ -337,13 +337,13 @@ class Guild
             return nullptr;
         }
 
-        void Roster(WorldSession* session = nullptr);          // nullptr = broadcast
-        void Query(WorldSession* session);
+        void SendGuildRoster(WorldSession* session = nullptr) const;          // nullptr = broadcast
+        void SendQueryResponse(WorldSession* session) const;
 
         // Guild EventLog
-        void   LoadGuildEventLogFromDB();
-        void   DisplayGuildEventLog(WorldSession* session);
-        void   LogGuildEvent(uint8 eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
+        void LoadGuildEventLogFromDB();
+        void DisplayGuildEventLog(WorldSession* session);
+        void LogGuildEvent(uint8 eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
         std::list<GuildEventLogEntry> const& GetGuildEventLog() const { return m_GuildEventLog; }
         ObjectGuid GetGuildInviter(ObjectGuid playerGuid) const;
 

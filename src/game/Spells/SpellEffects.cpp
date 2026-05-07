@@ -353,7 +353,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 {
                     if (!m_casterUnit)
                         return;
-                   
+
                     Unit* pCaster = m_casterUnit;
                     uint32 spellId = PickRandomValue(9002, 9003, 9004);
                     pCaster->m_Events.AddLambdaEventAtOffset([pCaster, spellId]
@@ -631,7 +631,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 {
                     if (!unitTarget)
                         return;
-                    
+
                     switch (unitTarget->GetEntry())
                     {
                         case 1891: // Pyrewood Watcher
@@ -838,7 +838,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                                       ? 17269                             // Create Resonating Skull
                                       : 17270;                            // Create Bone Dust
 
-                    
+
                     m_casterUnit->CastSpell(m_casterUnit, spellId, true, nullptr);
                     return;
                 }
@@ -852,7 +852,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     if (m_casterUnit->GetThreatManager().getThreat(unitTarget))
                         m_casterUnit->GetThreatManager().modifyThreatPercent(unitTarget, -100);
-                    
+
                     uint32 spellId = PickRandomValue(17863, 17939, 17943, 17944, 17946, 17948);
                     m_casterUnit->CastSpell(unitTarget, spellId, true);
                     return;
@@ -881,7 +881,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                             break;
                         }
                     }
-                    
+
                     return;
                 }
                 case 19411:                                 // Lava Bomb
@@ -908,7 +908,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     if (!m_originalCaster)
                         return;
-                    
+
                     int32 damage;
                     if (unitTarget->IsPlayer()) // damage from 100 - 500 based on proximity - max range 25
                         damage = dither(100 + ((25 - std::min(m_originalCaster->GetCombatDistance(unitTarget), 25.f)) / 25.f) * 400);
@@ -1751,7 +1751,7 @@ void Spell::EffectPowerBurn(SpellEffectIndex effIdx)
         if (Player* modOwner = m_casterUnit->GetSpellModOwner())
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_MULTIPLE_VALUE, multiplier);
     }
-    
+
     newDamage = newDamage * multiplier;
     m_damage += newDamage;
 }
@@ -1941,7 +1941,7 @@ void Spell::EffectPersistentAA(SpellEffectIndex effIdx)
     if (GameObject* pGo = ToGameObject(pCaster))
         if (Unit* pOwner = pGo->GetOwner())
             pCaster = pOwner;
-    
+
     if (!pCaster)
         pCaster = m_caster;
 
@@ -3345,12 +3345,12 @@ void Spell::EffectWeaponDmg(SpellEffectIndex effIdx)
                 break;
         }
     }
-    
+
     float weaponDamagePercentMod = 1.0f;                    // SPELL_EFFECT_WEAPON_PERCENT_DAMAGE pct that is applied to both fixed bonus damage bonus of other effects and to base weapon swing damage
     bool normalized = false;                                // whether the spell has SPELL_EFFECT_NORMALIZED_WEAPON_DMG
     float bonus = 0.f;                                      // fixed bonus damage from SPELL_EFFECT_WEAPON_DAMAGE, SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL,
                                                               // and SPELL_EFFECT_NORMALIZED_WEAPON_DMG. (If creature and has no weapon, also from SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
-    
+
     for (uint8 j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         switch (m_spellInfo->Effect[j])
@@ -3776,7 +3776,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
 
                     bool gender = unitTarget->GetGender();
                     uint32 spellId = 0;
-                    uint32 spells[8] = { 
+                    uint32 spells[8] = {
                         gender == GENDER_MALE ? 24708u : 24709u,   // Pirate
                         gender == GENDER_MALE ? 24711u : 24710u,   // Ninja
                         gender == GENDER_MALE ? 24712u : 24713u,   // Leper
@@ -4279,6 +4279,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                             case 26528: // Winter Reindeer
                                 entryToCheck = 15706;
                                 break;
+                            default:
+                                return;
                         }
                         // Remove minipet without consuming a snowball (only if it's the same pet)
                         if (player->GetMiniPet() && player->GetMiniPet()->GetEntry() == entryToCheck)
@@ -4463,7 +4465,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
             {
                 if (!unitTarget || !unitTarget->CanHaveThreatList() || !m_casterUnit)
                     return;
-                
+
                 if (unitTarget->GetThreatManager().getThreat(m_casterUnit))
                     unitTarget->GetThreatManager().addThreat(m_casterUnit, damage * m_casterUnit->GetAttackTime(BASE_ATTACK) / 1000);
             }

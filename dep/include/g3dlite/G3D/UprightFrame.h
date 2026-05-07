@@ -31,13 +31,13 @@ public:
     /** In radians about the Y-axis */
     float           yaw;
 
-    UprightFrame(const Vector3& t = Vector3::zero(), float p = 0, float y = 0) 
+    UprightFrame(const Vector3& t = Vector3::zero(), float p = 0, float y = 0)
         : translation(t), pitch(p), yaw(y) {}
 
     UprightFrame(const CoordinateFrame& cframe);
 
     /** Constructs an UprightFrame from an Any object.
-        
+
         The Any format for UprightFrame is:
 
         pitch = ##,
@@ -45,7 +45,7 @@ public:
         yaw = ##
     */
     explicit UprightFrame(const Any& any);
-    
+
     Any toAny() const;
 
     UprightFrame& operator=(const Any& any);
@@ -74,15 +74,14 @@ public:
     void deserialize(class BinaryInput& b);
 };
 
-/** 
+/**
     \brief Shortest-path linear velocity spline for camera positions.  Always keeps the camera from rolling.
 
     \sa G3D::UprightSplineManipulator, G3D::UprightFrame
 */
 class UprightSpline : public Spline<UprightFrame> {
 protected:
-
-    virtual void ensureShortestPath(UprightFrame* A, int N) const {
+    void ensureShortestPath(UprightFrame* A, int N) const override {
         UprightFrame::unwrapYaw(A, N);
     }
 
@@ -91,7 +90,7 @@ public:
 
 
     /** Constructs an UprightSpline from an Any object.
-        
+
         The Any format for UprightSpline is:
 
         controls = (UprightFrame, ...),

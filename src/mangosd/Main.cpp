@@ -31,9 +31,9 @@
 #include "Master.h"
 #include "SystemConfig.h"
 #include "revision.h"
-#include <openssl/opensslv.h>
-#include <openssl/crypto.h>
 #include "ArgparserForServer.h"
+
+#include "Crypto/InitializeCrypto.h"
 
 #ifdef WIN32
 #include "ServiceWin32.h"
@@ -112,8 +112,6 @@ extern int main(int argc, char **argv)
 #endif
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [world-daemon]", _FULLVERSION);
-    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "<Ctrl-C> to stop." );
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "\n\n"
         "MM     MM MM   MM         MM   MM  MMMMM   MMMMM   MMMMM\n"
         "MM     MM MM   MM         MM   MM MMM MMM MM   MM MMM MMM\n"
@@ -126,14 +124,15 @@ extern int main(int argc, char **argv)
         "    M     MM   MM MM  MMM MM   MM  MMMMMM  MMMMM   MMMMM\n"
         "                  MMMMMM\n"
         "                          https://github.com/vmangos\n\n");
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s", sConfig.GetFilename().c_str());
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core Revision: " _FULLVERSION);
-    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-    if (SSLeay() < 0x009080bfL )
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [world-daemon]", _FULLVERSION);
+    if (!Crypto::InitializeCryptoAndPrintVersion())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
-        sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "WARNING: Minimal required version [OpenSSL 0.9.8k]");
+        sLog.WaitBeforeContinueIfNeed();
+        return EXIT_FAILURE;
     }
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "<Ctrl-C> to stop.");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s", sConfig.GetFilename().c_str());
 
     // Set progress bars show mode
     BarGoLink::SetOutputState(sConfig.GetBoolDefault("ShowProgressBars", true));

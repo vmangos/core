@@ -412,7 +412,6 @@ enum eConfigFloatValues
     CONFIG_FLOAT_RATE_XP_EXPLORE,
     CONFIG_FLOAT_RATE_REPUTATION_GAIN,
     CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL,
-    CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_QUEST,
     CONFIG_FLOAT_RATE_CREATURE_NORMAL_HP,
     CONFIG_FLOAT_RATE_CREATURE_ELITE_ELITE_HP,
     CONFIG_FLOAT_RATE_CREATURE_ELITE_RAREELITE_HP,
@@ -633,17 +632,6 @@ enum RealmType
                                                             // replaced by REALM_PVP in realm list
 };
 
-class SessionPacketSendTask
-{
-public:
-    SessionPacketSendTask(SessionPacketSendTask const&) = delete;
-    SessionPacketSendTask(uint32 accountId, WorldPacket& data) : m_accountId(accountId), m_data(data) {}
-    void operator ()();
-private:
-    uint32 m_accountId;
-    WorldPacket m_data;
-};
-
 // Storage class for commands issued for delayed execution
 struct CliCommandHolder
 {
@@ -653,7 +641,7 @@ struct CliCommandHolder
     uint32 m_cliAccountId;                                  // 0 for console and real account id for RA/soap
     AccountTypes m_cliAccessLevel;
     void* m_callbackArg;
-    char *m_command;
+    char* m_command;
     Print* m_print;
     CommandFinished* m_commandFinished;
 

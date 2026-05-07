@@ -49,7 +49,7 @@ bool BuildRawData(std::string const& hexData, std::vector<uint8>& out)
 
     out.resize(hexData.length() / 2);
 
-    for (auto i = 0; i < out.size(); ++i)
+    for (size_t i = 0; i < out.size(); ++i)
     {
         auto const byte = curr.substr(0, 2);
         curr = curr.substr(2);
@@ -348,7 +348,7 @@ std::vector<std::shared_ptr<Scan const>> WardenScanMgr::GetRandomScans(ScanFlags
         reply += scan->replySize;
     }
 
-    return std::move(matches);
+    return matches;
 }
 
 #endif

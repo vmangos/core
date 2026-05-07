@@ -27,7 +27,7 @@ public:
     PhysicsFrameSpline(const Any& any);
 
     bool operator==(const PhysicsFrameSpline& a) const;
- 
+
     bool operator!=(const PhysicsFrameSpline& a) const {
         return ! ((*this) == a);
     }
@@ -35,8 +35,8 @@ public:
     /** Mutates all underlying PhysicsFrames by scaling their translation by \param scaleFactor */
     void scaleControlPoints(float scaleFactor);
 
-    virtual void correct(PhysicsFrame& frame) const;
-    virtual void ensureShortestPath(PhysicsFrame* A, int N) const;
+    void correct(PhysicsFrame& frame) const override;
+    void ensureShortestPath(PhysicsFrame* A, int N) const override;
 
     virtual Any toAny(const std::string& myName) const override {
         return Spline<PhysicsFrame>::toAny(myName);

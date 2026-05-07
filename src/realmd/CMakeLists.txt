@@ -20,6 +20,8 @@ set(EXECUTABLE_SRCS
   AuthPackets.h
   AuthCodes.h
   AuthSocket.h
+  LoginThrottle.h
+  LoginThrottle.cpp
   RealmList.h
   AuthSocket.cpp
   RealmList.cpp
@@ -53,6 +55,7 @@ endif()
 add_executable(${EXECUTABLE_NAME}
   ${EXECUTABLE_SRCS}
 )
+mangos_target_flags(${EXECUTABLE_NAME})
 
 target_link_libraries(${EXECUTABLE_NAME}
   shared

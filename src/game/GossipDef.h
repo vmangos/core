@@ -264,9 +264,9 @@ class QuestMenu
             return m_qItems.empty();
         }
 
-        bool HasItem(uint32 questid);
+        bool HasItem(uint32 questid) const;
 
-        QuestMenuItem const& GetItem(uint16 Id)
+        QuestMenuItem const& GetItem(uint16 Id) const
         {
             return m_qItems[Id];
         }
@@ -307,10 +307,10 @@ class PlayerMenu
         /*********************************************************/
         /***                    QUEST SYSTEM                   ***/
         /*********************************************************/
-        void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID);
-        void SendQuestGiverQuestList(QEmote eEmote, std::string const& Title, ObjectGuid guid);
-        void SendQuestGiverQuestDetails(Quest const* pQuest, ObjectGuid npcGUID, bool ActivateAccept);
-        void SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGUID, bool EnbleNext);
-        void SendQuestGiverRequestItems(Quest const* pQuest, ObjectGuid npcGUID, bool Completable, bool CloseOnCancel);
+        void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) const;
+        void SendQuestGiverQuestList(QuestNpcEmoteInfo fallbackEmote, std::string const& Title, ObjectGuid guid) const;
+        void SendQuestGiverQuestDetails(Quest const* pQuest, ObjectGuid npcGUID, bool ActivateAccept) const;
+        void SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGuid, bool EnbleNext) const;
+        void SendQuestGiverRequestItems(Quest const* pQuest, ObjectGuid npcGuid, bool isComplete, bool closeOnCancel) const;
 };
 #endif

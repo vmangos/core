@@ -32,6 +32,7 @@
 #include "IO/Filesystem/FileHandle.h"
 #include "Policies/ObjectConstructorTraits.h"
 #include "AuthPackets.h"
+#include <functional>
 
 enum LockFlag
 {
@@ -95,6 +96,13 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, MaNGOS::Poli
 
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
 
+        // Reads the shared header/body of logon and reconnect challenges, validates sizes,
+        // extracts build/os/platform/locale/login, enforces the locale allowlist, and hands
+        // the parsed body to `onBody`. On any failure returns without invoking `onBody`
+        // (socket closes implicitly).
+        void ReadChallengeRequest(char const* logPrefix, std::function<void(std::shared_ptr<sAuthLogonChallengeBody> const&)> onBody);
+        static bool IsAllowedLocale(std::string const& locale);
+
         SRP6 srp;
         BigNumber m_reconnectProof;
 
@@ -113,11 +121,11 @@ class AuthSocket : public std::enable_shared_from_this<AuthSocket>, MaNGOS::Poli
         uint32 m_gridSeed = 0;
         uint32 m_geoUnlockPIN = 0;
 
-        static constexpr uint32 Win = 'Win';
-        static constexpr uint32 OSX = 'OSX';
+        static constexpr uint32 Win = 0x57696E; // Win
+        static constexpr uint32 OSX = 0x4F5358; // OSX
 
-        static constexpr uint32 X86 = 'x86';
-        static constexpr uint32 PPC = 'PPC';
+        static constexpr uint32 X86 = 0x783836; // x86
+        static constexpr uint32 PPC = 0x505043; // PPC
 
         std::string m_os;
         std::string m_platform;

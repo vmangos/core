@@ -80,7 +80,7 @@ static bool findtoknth(std::string &str, int n, std::string::size_type &s, std::
     return e != std::string::npos;
 }
 
-std::string gettoknth(std::string &str, int n)
+static std::string gettoknth(std::string &str, int n)
 {
     std::string::size_type s = 0, e = 0;
     if (!findtoknth(str, n, s, e))
@@ -89,7 +89,7 @@ std::string gettoknth(std::string &str, int n)
     return str.substr(s, e - s);
 }
 
-bool findnth(std::string &str, int n, std::string::size_type &s, std::string::size_type &e)
+static bool findnth(std::string &str, int n, std::string::size_type &s, std::string::size_type &e)
 {
     s = str.find("VALUES ('") + 9;
     if (s == std::string::npos)
@@ -117,17 +117,18 @@ bool findnth(std::string &str, int n, std::string::size_type &s, std::string::si
     return true;
 }
 
-std::string gettablename(std::string &str)
+static std::string gettablename(std::string &str)
 {
-    std::string::size_type s = 13;
-    std::string::size_type e = str.find(_TABLE_SIM_, s);
-    if (e == std::string::npos)
+    // Find the tablename in "INSERT INTO `tablename` ..."
+    auto startIndex = sizeof("INSERT INTO `");
+    auto endIndex = str.find('`', startIndex);
+    if (endIndex == std::string::npos)
         return "";
 
-    return str.substr(s, e - s);
+    return str.substr(startIndex, endIndex - startIndex);
 }
 
-bool changenth(std::string &str, int n, char const* with, bool insert = false, bool nonzero = false)
+static bool changenth(std::string &str, int n, char const* with, bool insert = false, bool nonzero = false)
 {
     std::string::size_type s, e;
     if (!findnth(str, n, s, e))
@@ -143,7 +144,7 @@ bool changenth(std::string &str, int n, char const* with, bool insert = false, b
     return true;
 }
 
-std::string getnth(std::string &str, int n)
+static std::string getnth(std::string &str, int n)
 {
     std::string::size_type s, e;
     if (!findnth(str, n, s, e))
@@ -152,7 +153,7 @@ std::string getnth(std::string &str, int n)
     return str.substr(s, e - s);
 }
 
-bool changetoknth(std::string &str, int n, char const* with, bool insert = false, bool nonzero = false)
+static bool changetoknth(std::string &str, int n, char const* with, bool insert = false, bool nonzero = false)
 {
     std::string::size_type s = 0, e = 0;
     if (!findtoknth(str, n, s, e))
@@ -167,7 +168,7 @@ bool changetoknth(std::string &str, int n, char const* with, bool insert = false
     return true;
 }
 
-uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32>& guidMap, uint32 hiGuid)
+static uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32>& guidMap, uint32 hiGuid)
 {
     std::map<uint32, uint32>::const_iterator itr = guidMap.find(oldGuid);
     if (itr != guidMap.end())
@@ -178,7 +179,7 @@ uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32>& guidMap, uint32
     return newguid;
 }
 
-bool changeGuid(std::string &str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
+static bool changeGuid(std::string &str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
     uint32 oldGuid = atoi(getnth(str, n).c_str());
@@ -191,7 +192,7 @@ bool changeGuid(std::string &str, int n, std::map<uint32, uint32>& guidMap, uint
     return changenth(str, n, chritem, false, nonzero);
 }
 
-bool changetokGuid(std::string &str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
+static bool changetokGuid(std::string &str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
     uint32 oldGuid = atoi(gettoknth(str, n).c_str());
@@ -204,13 +205,13 @@ bool changetokGuid(std::string &str, int n, std::map<uint32, uint32>& guidMap, u
     return changetoknth(str, n, chritem, false, nonzero);
 }
 
-std::string CreateDumpString(char const* tableName, const std::unique_ptr<QueryResult>& result)
+static std::string CreateDumpString(char const* tableName, const std::unique_ptr<QueryResult>& result)
 {
     if (!tableName || !result)
         return "";
 
     std::ostringstream ss;
-    ss << "INSERT INTO " << _TABLE_SIM_ << tableName << _TABLE_SIM_ << " VALUES (";
+    ss << "INSERT INTO " << '`' << tableName << '`' << " VALUES (";
     Field* fields = result->Fetch();
     for (uint32 i = 0; i < result->GetFieldCount(); ++i)
     {
@@ -260,7 +261,7 @@ std::string PlayerDumpWriter::GenerateWhereStr(char const* field, GUIDs const& g
     return wherestr.str();
 }
 
-void StoreGUID(const std::unique_ptr<QueryResult>& result, uint32 field, std::set<uint32>& guids)
+static void StoreGUID(const std::unique_ptr<QueryResult>& result, uint32 field, std::set<uint32>& guids)
 {
     Field* fields = result->Fetch();
     uint32 guid = fields[field].GetUInt32();
@@ -268,7 +269,7 @@ void StoreGUID(const std::unique_ptr<QueryResult>& result, uint32 field, std::se
         guids.insert(guid);
 }
 
-void StoreGUID(const std::unique_ptr<QueryResult>& result, uint32 data, uint32 field, std::set<uint32>& guids)
+static void StoreGUID(const std::unique_ptr<QueryResult>& result, uint32 data, uint32 field, std::set<uint32>& guids)
 {
     Field* fields = result->Fetch();
     std::string dataStr = fields[data].GetCppString();
@@ -678,7 +679,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     uint64 newMaxItemGuid = sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed() + uint64(items.size());
     MANGOS_ASSERT(newMaxItemGuid < UINT32_MAX);
     sObjectMgr.m_ItemGuids.SetMaxUsedGuid(newMaxItemGuid, "Item");
-    
+
     uint64 newMaxMailId = sObjectMgr.m_MailIds.GetNextAfterMaxUsed() + uint64(mails.size());
     MANGOS_ASSERT(newMaxMailId < UINT32_MAX);
     sObjectMgr.m_MailIds.SetMaxUsedGuid(newMaxMailId, "Mail");

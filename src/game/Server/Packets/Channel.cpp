@@ -90,3 +90,9 @@ void WorldPackets::Channel::ChannelModerate::ReadFromWorldPacket(WorldPacket& re
 {
     recv_data >> channelName;
 }
+
+void WorldPackets::Channel::ChannelNotify::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << type;
+    buffer << channelName;
+}

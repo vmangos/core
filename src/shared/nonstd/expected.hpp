@@ -57,7 +57,7 @@
 #if (__cplusplus > 201103L) && !defined(TL_EXPECTED_GCC49)
 #include <cassert>
 #define TL_ASSERT(x) assert(x)
-#else 
+#else
 #define TL_ASSERT(x)
 #endif
 #endif
@@ -199,7 +199,7 @@ constexpr bool operator>=(const unexpected<E> &lhs, const unexpected<E> &rhs) {
 }
 
 template <class E>
-unexpected<typename std::decay<E>::type> make_unexpected(E &&e) {
+constexpr unexpected<typename std::decay<E>::type> make_unexpected(E &&e) {
   return unexpected<typename std::decay<E>::type>(std::forward<E>(e));
 }
 
@@ -628,9 +628,9 @@ template <class E> struct expected_storage_base<void, E, false, true> {
   //no constexpr for GCC 4/5 bug
   #else
   TL_EXPECTED_MSVC2015_CONSTEXPR
-  #endif 
+  #endif
   expected_storage_base() : m_has_val(true) {}
-     
+
   constexpr expected_storage_base(no_init_t) : m_val(), m_has_val(false) {}
 
   constexpr expected_storage_base(in_place_t) : m_has_val(true) {}
@@ -1018,7 +1018,7 @@ struct expected_copy_assign_base<T, E, false> : expected_move_base<T, E> {
   expected_copy_assign_base(const expected_copy_assign_base &rhs) = default;
 
   expected_copy_assign_base(expected_copy_assign_base &&rhs) = default;
-  expected_copy_assign_base &operator=(const expected_copy_assign_base &rhs) {
+  TL_EXPECTED_11_CONSTEXPR expected_copy_assign_base &operator=(const expected_copy_assign_base &rhs) {
     this->assign(rhs);
     return *this;
   }
@@ -1060,7 +1060,7 @@ struct expected_move_assign_base<T, E, false>
   expected_move_assign_base &
   operator=(const expected_move_assign_base &rhs) = default;
 
-  expected_move_assign_base &
+  TL_EXPECTED_11_CONSTEXPR expected_move_assign_base &
   operator=(expected_move_assign_base &&rhs) noexcept(
       std::is_nothrow_move_constructible<T>::value
           &&std::is_nothrow_move_assignable<T>::value) {
@@ -1528,8 +1528,8 @@ public:
   constexpr expected() = default;
   constexpr expected(const expected &rhs) = default;
   constexpr expected(expected &&rhs) = default;
-  expected &operator=(const expected &rhs) = default;
-  expected &operator=(expected &&rhs) = default;
+  TL_EXPECTED_11_CONSTEXPR expected &operator=(const expected &rhs) = default;
+  TL_EXPECTED_11_CONSTEXPR expected &operator=(expected &&rhs) = default;
 
   template <class... Args,
             detail::enable_if_t<std::is_constructible<T, Args &&...>::value> * =
@@ -1680,7 +1680,7 @@ public:
            std::is_constructible<T, U>::value &&
            std::is_assignable<G &, U>::value &&
            std::is_nothrow_move_constructible<E>::value)> * = nullptr>
-  expected &operator=(U &&v) {
+  TL_EXPECTED_11_CONSTEXPR expected &operator=(U &&v) {
     if (has_value()) {
       val() = std::forward<U>(v);
     } else {
@@ -1731,7 +1731,7 @@ public:
   template <class G = E,
             detail::enable_if_t<std::is_nothrow_copy_constructible<G>::value &&
                                 std::is_assignable<G &, G>::value> * = nullptr>
-  expected &operator=(const unexpected<G> &rhs) {
+  TL_EXPECTED_11_CONSTEXPR expected &operator=(const unexpected<G> &rhs) {
     if (!has_value()) {
       err() = rhs;
     } else {
@@ -1746,7 +1746,7 @@ public:
   template <class G = E,
             detail::enable_if_t<std::is_nothrow_move_constructible<G>::value &&
                                 std::is_move_assignable<G>::value> * = nullptr>
-  expected &operator=(unexpected<G> &&rhs) noexcept {
+  TL_EXPECTED_11_CONSTEXPR expected &operator=(unexpected<G> &&rhs) noexcept {
     if (!has_value()) {
       err() = std::move(rhs);
     } else {

@@ -41,7 +41,10 @@
 #include "Language.h"
 #include "Chat.h"
 #include "MasterPlayer.h"
+#include "PlayerBroadcaster.h"
 #include "Crypto/Hash/MD5.h"
+
+#include <limits>
 
 // select opcodes appropriate for processing in Map::Update context for current session state
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
@@ -56,7 +59,7 @@ static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& o
 }
 
 
-bool MapSessionFilter::Process(std::unique_ptr<WorldPacket> const& packet)
+bool MapSessionFilter::Process(std::unique_ptr<ClientPacket const> const& packet)
 {
     OpcodeHandler const& opHandle = LookupOpcodeHandler(packet->GetOpcode());
     // let's check if our opcode can be really processed in Map::Update()
@@ -73,7 +76,7 @@ WorldSession::WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, Account
     m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_playerSave(false), m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)),
     m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr), m_cheatData(nullptr),
     m_bot(nullptr), m_clientOS(CLIENT_OS_UNKNOWN), m_clientPlatform(CLIENT_PLATFORM_UNKNOWN), m_gameBuild(0), m_verifiedEmail(true),
-    m_charactersCount(10), m_characterMaxLevel(0), m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr), m_receivedPacketType{},
+    m_charactersCount(std::numeric_limits<uint32>::max()), m_characterMaxLevel(0), m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr), m_receivedPacketType{},
     m_floodPacketsCount{}, m_tutorials{}
 {
     m_remoteIpAddress = sock ? sock->GetRemoteIpString() : "<BOT>";
@@ -107,6 +110,34 @@ WorldSession::~WorldSession()
 char const* WorldSession::GetPlayerName() const
 {
     return GetPlayer() ? GetPlayer()->GetName() : "<none>";
+}
+
+// Sends a packet to the client.
+void WorldSession::SendPacket(std::unique_ptr<ServerPacket> packet)
+{
+    WorldPacket buffer;
+    { // TODO: This part will be offloaded to an IO thread soon. Only the IO thread will allocate a buffer.
+        buffer.SetOpcode(packet->GetOpcode());
+        buffer.FillPacketTime(WorldTimer::getMSTime());
+        packet->AppendBodyTo(buffer);
+    }
+
+    // There is a maximum size packet.
+    if (buffer.size() > 0x8000)
+    {
+        // Packet will be rejected by client
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[NETWORK] Packet %s size %u is too large. Not sent [Account %u Player %s]", LookupOpcodeName(buffer.GetOpcode()), buffer.size(), GetAccountId(), GetPlayerName());
+        return;
+    }
+
+    if (!m_socket)
+    {
+        if (GetBot() && GetBot()->ai)
+            GetBot()->ai->OnPacketReceived(&buffer); // TODO Direct forward `ServerPacket` to bot in next PR
+        return;
+    }
+
+    SendPacketImpl(&buffer); // TODO Queue `ServerPacket` and serialize it in IO thread
 }
 
 // Send a packet to the client
@@ -175,7 +206,7 @@ void WorldSession::SendPacketImpl(WorldPacket const* packet)
     m_socket->SendPacket(*packet);
 }
 
-void WorldSession::VerifyPacketWasCorrectlyRead(WorldPacket const& recvPacket, ClientPacket const& clientPacket) const
+void WorldSession::VerifyPacketWasCorrectlyRead(WorldPacket const& recvPacket, ClientPacket const& clientPacket)
 {
     if (clientPacket.GetOpcode() != recvPacket.GetOpcode())
     {
@@ -242,7 +273,7 @@ void WorldSession::SendMovementPacket(WorldPacket const* packet)
 }
 #endif
 
-uint32 GetChatPacketProcessingType(uint32 chatType)
+PacketProcessing GetChatPacketProcessingType(uint32 chatType)
 {
     switch (chatType)
     {
@@ -268,62 +299,75 @@ uint32 GetChatPacketProcessingType(uint32 chatType)
         case CHAT_MSG_EMOTE:
         case CHAT_MSG_YELL:
             return PACKET_PROCESS_MAP;
+
+        default:
+            return PACKET_PROCESS_WORLD;
+    }
+}
+
+void WorldSession::QueuePacket(std::unique_ptr<ClientPacket const> packet)
+{
+    // Can't sniff non-binary packets :( So bots will not appear in the packet log
+
+    OpcodeHandler const& opHandle = LookupOpcodeHandler(packet->GetOpcode());
+    MANGOS_ASSERT(opHandle.impl.has_value()); // How can you call `QueuePacket` with incorrect opcode? You invoked QueuePacket manually with a wrong packet!
+
+    PacketProcessing processingStrategy = opHandle.impl->packetProcessing;
+
+    // Handle chat packets on async thread when possible
+    if (packet->GetOpcode() == CMSG_MESSAGECHAT)
+    {
+        auto const* chatMessage = dynamic_cast<WorldPackets::Chat::ChatMessage const*>(packet.get());
+        MANGOS_ASSERT(chatMessage); // Should never happen if it's coming from `QueueBinaryPacket`
+        processingStrategy = GetChatPacketProcessingType(chatMessage->type);
     }
 
-    return PACKET_PROCESS_WORLD;
+    if (processingStrategy >= PACKET_PROCESS_MAX_TYPE)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) will be skipped", opHandle.name, packet->GetOpcode());
+        return;
+    }
+
+    // put into the correct processing queue
+    m_recvQueue[processingStrategy].add(std::move(packet));
 }
 
 // Add an incoming packet to the queue
-void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> newPacket)
+void WorldSession::QueueBinaryPacket(std::unique_ptr<WorldPacket> const& binaryPacket)
 {
     if (m_sniffFile)
-        m_sniffFile->WritePacket(*newPacket, true, time(nullptr));
+        m_sniffFile->WritePacket(*binaryPacket, true, time(nullptr));
 
-    if (_player && MovementAnticheat::IsLoggedOpcode(newPacket->GetOpcode()))
-        GetCheatData()->LogMovementPacket(true, *newPacket);
+    if (_player && MovementAnticheat::IsLoggedOpcode(binaryPacket->GetOpcode()))
+        GetCheatData()->LogMovementPacket(true, *binaryPacket);
 
-    uint32 processing;
-
-    // Handle chat packets on async thread when possible
-    if (newPacket->GetOpcode() == CMSG_MESSAGECHAT && newPacket->size() >= sizeof(uint32))
+    OpcodeHandler const& opHandle = LookupOpcodeHandler(binaryPacket->GetOpcode());
+    if (!opHandle.impl.has_value()) // check if an unhandled packet
     {
-        processing = GetChatPacketProcessingType(*((uint32*)newPacket->contents()));
-    }
-    else
-    {
-        OpcodeHandler const& opHandle = LookupOpcodeHandler(newPacket->GetOpcode());
-        processing = opHandle.packetProcessing;
-
-        if (processing >= PACKET_PROCESS_MAX_TYPE)
+        if (m_socket)
         {
-            /*
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) will be skipped",
-                LookupOpcodeName(newPacket->GetOpcode()),
-                newPacket->GetOpcode());
-            */
-            return;
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[%s] Received unhandled opcode %s (0x%.4X) will be skipped", m_socket->GetRemoteIpString().c_str(), opHandle.name, binaryPacket->GetOpcode());
         }
+        else
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[SESSION] Received unhandled opcode %s (0x%.4X) will be skipped", opHandle.name, binaryPacket->GetOpcode());
+        }
+        return;
     }
 
-    m_recvQueue[processing].add(std::move(newPacket));
+    // parsing the packet
+    std::unique_ptr<ClientPacket const> clientPacket = opHandle.impl->readPacket(*binaryPacket);
+    VerifyPacketWasCorrectlyRead(*binaryPacket, *clientPacket);
+
+    QueuePacket(std::move(clientPacket));
 }
 
 // Logging helper for unexpected opcodes
-void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, char const* reason)
+void WorldSession::LogUnexpectedOpcode(ClientPacket const& packet, std::string const& reason)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: received unexpected opcode %s (0x%.4X) %s",
-                  LookupOpcodeName(packet->GetOpcode()),
-                  packet->GetOpcode(),
-                  reason);
-}
-
-// Logging helper for unexpected opcodes
-void WorldSession::LogUnprocessedTail(WorldPacket* packet)
-{
-    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: opcode %s (0x%.4X) have unprocessed tail data (read stop at " SIZEFMTD " from " SIZEFMTD ")",
-                  LookupOpcodeName(packet->GetOpcode()),
-                  packet->GetOpcode(),
-                  packet->rpos(), packet->wpos());
+    uint16 opcode = packet.GetOpcode();
+    char const* opcodeName = LookupOpcodeName(opcode);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: received unexpected opcode %s (0x%.4X) %s", opcodeName, opcode, reason.c_str());
 }
 
 bool WorldSession::HasTrialRestrictions() const
@@ -380,10 +424,10 @@ void WorldSession::CheckPlayedTimeLimit(time_t now)
 void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 timeLeftInSeconds)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-    WorldPacket data(SMSG_PLAY_TIME_WARNING, sizeof(uint32) + sizeof(int32));
-    data << uint32(flag);
-    data << int32(timeLeftInSeconds);
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::PlayTimeWarning>();
+    packet->flag = static_cast<uint32>(flag);
+    packet->timeLeftInSeconds = timeLeftInSeconds;
+    SendPacket(std::move(packet));
 #endif
 }
 
@@ -448,8 +492,8 @@ bool WorldSession::Update(PacketFilter& updater)
                 m_warden = nullptr;
             }
 
-            if (GetPlayer())
-                GetPlayer()->DeletePacketBroadcaster();
+            if (GetPlayer() && GetPlayer()->m_broadcaster)
+                GetPlayer()->m_broadcaster->ChangeSocket(nullptr);
 
             // Character stays IG for 2 minutes
             return ForcePlayerLogoutDelay();
@@ -504,7 +548,7 @@ bool WorldSession::CanProcessPackets() const
 
 void WorldSession::ProcessPackets(PacketFilter& updater)
 {
-    std::unique_ptr<WorldPacket> packet;
+    std::unique_ptr<ClientPacket const> packet;
     m_receivedPacketType[updater.PacketProcessType()] = false;
     while (CanProcessPackets() && m_recvQueue[updater.PacketProcessType()].next(packet, updater))
     {
@@ -513,10 +557,13 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
             break;
 
         OpcodeHandler const& opHandle = LookupOpcodeHandler(packet->GetOpcode());
+        MANGOS_ASSERT(opHandle.impl.has_value()); // Only queue packets with handler!
+        OpcodeHandlerPacketImplDetails const& handlerDetails = opHandle.impl.value();
+
         try
         {
             uint32 packetTime = WorldTimer::getMSTime();
-            switch (opHandle.status)
+            switch (opHandle.impl->status)
             {
                 case STATUS_LOGGEDIN:
 
@@ -524,33 +571,33 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
                     {
                         // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
                         if (!m_playerRecentlyLogout)
-                            LogUnexpectedOpcode(packet.get(), "the player has not logged in yet");
+                            LogUnexpectedOpcode(*packet, "the player has not logged in yet");
                     }
                     else if (_player->IsInWorld())
-                        ExecuteOpcode(opHandle, packet.get());
+                        ExecuteOpcode(handlerDetails, *packet);
 
                     // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
                     break;
                 case STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT:
                     if (!_player && !m_playerRecentlyLogout)
-                        LogUnexpectedOpcode(packet.get(), "the player has not logged in yet and not recently logout");
+                        LogUnexpectedOpcode(*packet, "the player has not logged in yet and not recently logout");
                     else
                         // not expected _player or must checked in packet hanlder
-                        ExecuteOpcode(opHandle, packet.get());
+                        ExecuteOpcode(handlerDetails, *packet);
                     break;
                 case STATUS_TRANSFER:
                     if (!_player)
-                        LogUnexpectedOpcode(packet.get(), "the player has not logged in yet");
+                        LogUnexpectedOpcode(*packet, "the player has not logged in yet");
                     else if (_player->IsInWorld())
-                        LogUnexpectedOpcode(packet.get(), "the player is still in world");
+                        LogUnexpectedOpcode(*packet, "the player is still in world");
                     else
-                        ExecuteOpcode(opHandle, packet.get());
+                        ExecuteOpcode(handlerDetails, *packet);
                     break;
                 case STATUS_AUTHED:
                     // prevent cheating with skip queue wait
                     if (m_inQueue)
                     {
-                        LogUnexpectedOpcode(packet.get(), "the player is still in queue");
+                        LogUnexpectedOpcode(*packet, "the player is still in queue");
                         break;
                     }
 
@@ -558,22 +605,16 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
                     // and before other STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes.
                     m_playerRecentlyLogout = false;
 
-                    ExecuteOpcode(opHandle, packet.get());
+                    ExecuteOpcode(handlerDetails, *packet);
                     break;
                 case STATUS_NEVER:
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received not allowed opcode %s (0x%.4X)",
-                                  opHandle.name,
-                                  packet->GetOpcode());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received not allowed opcode %s (0x%.4X)", opHandle.name, packet->GetOpcode());
                     break;
                 case STATUS_UNHANDLED:
-                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: received not handled opcode %s (0x%.4X)",
-                              opHandle.name,
-                              packet->GetOpcode());
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: received not handled opcode %s (0x%.4X)", opHandle.name, packet->GetOpcode());
                     break;
                 default:
-                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received wrong-status-req opcode %s (0x%.4X)",
-                                  opHandle.name,
-                                  packet->GetOpcode());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received wrong-status-req opcode %s (0x%.4X)", opHandle.name, packet->GetOpcode());
                     break;
             }
             packetTime = WorldTimer::getMSTimeDiffToNow(packetTime);
@@ -582,14 +623,7 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
         }
         catch (ByteBufferException &)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::Update ByteBufferException occured while parsing a packet (opcode:0x%x) from client %s, accountid=%i.",
-                          packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
-            if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
-            {
-                sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Dumping error causing packet:");
-                packet->hexlike();
-            }
-
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::Update ByteBufferException occured while parsing a packet (opcode:0x%x) from client %s, accountid=%i.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
             if (sWorld.getConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET))
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Disconnecting session [account id %u / address %s] for badly formatted packet.",
@@ -808,8 +842,7 @@ void WorldSession::LogoutPlayer(bool Save)
         SetPlayer(nullptr);                                    // deleted in Remove/DeleteFromWorld call
 
         // Send the 'logout complete' packet to the client
-        WorldPacket data(SMSG_LOGOUT_COMPLETE, 0);
-        SendPacket(&data);
+        SendPacket(std::make_unique<WorldPackets::Misc::LogoutComplete>());
 
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
     }
@@ -997,7 +1030,7 @@ void WorldSession::SetAccountData(NewAccountData::AccountDataType type, const st
         {
             std::string escapedData = data;
             CharacterDatabase.escape_string(escapedData);
-            CharacterDatabase.PExecute("REPLACE INTO `account_data` VALUES (%u, %u, %u, '%s')", GetAccountId(), uint32(type), uint64(currentTime), escapedData.c_str());
+            CharacterDatabase.PExecute("REPLACE INTO `account_data` VALUES (%u, %u, %llu, '%s')", GetAccountId(), uint32(type), uint64(currentTime), escapedData.c_str());
         }
     }
     else
@@ -1014,7 +1047,7 @@ void WorldSession::SetAccountData(NewAccountData::AccountDataType type, const st
         {
             std::string escapedData = data;
             CharacterDatabase.escape_string(escapedData);
-            CharacterDatabase.PExecute("REPLACE INTO `character_account_data` VALUES (%u, %u, %u, '%s')", m_currentPlayerGuid.GetCounter(), uint32(type), uint64(currentTime), escapedData.c_str());
+            CharacterDatabase.PExecute("REPLACE INTO `character_account_data` VALUES (%u, %u, %llu, '%s')", m_currentPlayerGuid.GetCounter(), uint32(type), uint64(currentTime), escapedData.c_str());
         }
     }
 
@@ -1027,7 +1060,9 @@ void WorldSession::SendAccountDataTimes()
     using namespace Crypto::Hash;
 
     bool const isOldClient = GetGameBuild() <= CLIENT_BUILD_1_8_4;
-    uint32 const dataCount = isOldClient ? OldAccountData::NUM_ACCOUNT_DATA_TYPES : NewAccountData::NUM_ACCOUNT_DATA_TYPES;
+    uint32 const dataCount = isOldClient
+                ? static_cast<uint32>(OldAccountData::NUM_ACCOUNT_DATA_TYPES)
+                : static_cast<uint32>(NewAccountData::NUM_ACCOUNT_DATA_TYPES);
     WorldPacket data(SMSG_ACCOUNT_DATA_MD5, dataCount * MD5::Digest::size());
     for (uint32 index = 0; index < NewAccountData::NUM_ACCOUNT_DATA_TYPES; ++index)
     {
@@ -1121,7 +1156,7 @@ uint32 WorldSession::GetTutorialInt(uint32 intId) const
     return m_tutorials[intId];
 }
 
-void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* packet)
+void WorldSession::ExecuteOpcode(OpcodeHandlerPacketImplDetails const& opHandlerImpl, ClientPacket const& packet)
 {
     // need prevent do internal far teleports in handlers because some handlers do lot steps
     // or call code that can do far teleports in some conditions unexpectedly for generic way work code
@@ -1129,7 +1164,7 @@ void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* pac
         _player->SetCanDelayTeleport(true);
 
     //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[%s] Recvd packet : %u/0x%x (%s)", GetUsername().c_str(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
-    (this->*opHandle.handler)(*packet);
+    (this->*opHandlerImpl.handler)(packet);
 
     if (_player)
     {
@@ -1141,8 +1176,6 @@ void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* pac
         if (_player->IsHasDelayedTeleport())
             _player->TeleportTo(_player->m_teleportDest, _player->m_teleportOptions);
     }
-    if (packet->rpos() < packet->wpos() && sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
-        LogUnprocessedTail(packet);
 }
 
 void WorldSession::InitWarden()

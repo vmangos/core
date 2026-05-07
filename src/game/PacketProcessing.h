@@ -31,7 +31,7 @@ enum PacketProcessing
      * On a single map (one thread), it is safe to:
      * - Call Player::TeleportTo
      * - Add a global Corpse in ObjectAccessor ON THE CURRENT MAP
-    /*
+     *
      * PACKET_PROCESS_WORLD
      * Thread safe environment for this packet.
      */

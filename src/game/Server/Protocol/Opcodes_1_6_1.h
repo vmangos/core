@@ -319,8 +319,6 @@ enum OpcodesList
     SMSG_AI_REACTION                           = 316,
     CMSG_SET_SELECTION                         = 317,
     CMSG_SET_TARGET_OBSOLETE                   = 318,
-    CMSG_UNUSED                                = 319,
-    CMSG_UNUSED2                               = 320,
     CMSG_ATTACKSWING                           = 321,
     CMSG_ATTACKSTOP                            = 322,
     SMSG_ATTACKSTART                           = 323,

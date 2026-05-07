@@ -174,26 +174,14 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPackets::Petition::QueryPetiti
     if (!petition)
         return;
 
-    WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + petition->GetName().size() + 1 + 2 + 4 * 11));
-    data << uint32(packet.petitionGuid);                    // int m_petitionID;
-    data << ObjectGuid(petition->GetOwnerGuid());           // unsigned __int64 m_petitioner;
-    data << petition->GetName();                            // char m_title[256];
-    data << uint8(0);                                       // char m_bodyText[4096];
-    data << uint32(1);                                      // int m_flags;
-    data << uint32(9);                                      // int m_minSignatures;
-    data << uint32(9);                                      // int m_maxSignatures;
-    data << uint32(0);                                      // int m_deadLine;
-    data << uint32(0);                                      // int m_issueDate;
-    data << uint32(0);                                      // int m_allowedGuildID;
-    data << uint32(0);                                      // int m_allowedClasses;
-    data << uint32(0);                                      // int m_allowedRaces;
-    data << uint16(0);                                      // __int16 m_allowedGender;
-    data << uint32(0);                                      // int m_allowedMinLevel;
-    data << uint32(0);                                      // int m_allowedMaxLevel;
-    data << uint32(0);                                      // char m_choicetext[10][64];
-    // for (int i=0; i<field13; ++i) data << chartSignersName[i];   Probably, names of the petition signers
-    data << uint32(0);                                      // int m_numChoices;
-    SendPacket(&data);
+    auto response = std::make_unique<WorldPackets::Petition::PetitionQueryResponse>();
+    response->petitionGuid = packet.petitionGuid;
+    response->ownerGuid = ObjectGuid(petition->GetOwnerGuid());
+    response->name = petition->GetName();
+    response->flags = 1;
+    response->minSignatures = 9;
+    response->maxSignatures = 9;
+    SendPacket(std::move(response));
 }
 
 void WorldSession::HandlePetitionRenameOpcode(WorldPackets::Petition::PetitionRename const& packet)
@@ -220,10 +208,10 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPackets::Petition::PetitionRe
 
     if (petition->Rename(packet.newName))
     {
-        WorldPacket data(MSG_PETITION_RENAME, (8 + packet.newName.size() + 1));
-        data << ObjectGuid(packet.itemGuid);
-        data << packet.newName;
-        SendPacket(&data);
+        auto renameResult = std::make_unique<WorldPackets::Petition::PetitionRenameResult>();
+        renameResult->itemGuid = packet.itemGuid;
+        renameResult->newName = packet.newName;
+        SendPacket(std::move(renameResult));
     }
 }
 
@@ -243,11 +231,11 @@ void WorldSession::HandlePetitionSignOpcode(WorldPackets::Petition::PetitionSign
 
     if (petition->GetOwnerGuid() == _player->GetObjectGuid())
     {
-        WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
-        data << ObjectGuid(packet.itemGuid);
-        data << ObjectGuid(_player->GetObjectGuid());
-        data << uint32(PETITION_SIGN_CANT_SIGN_OWN);
-        SendPacket(&data);
+        auto signPacket = std::make_unique<WorldPackets::Petition::PetitionSignResults>();
+        signPacket->itemGuid = packet.itemGuid;
+        signPacket->playerGuid = _player->GetObjectGuid();
+        signPacket->result = PETITION_SIGN_CANT_SIGN_OWN;
+        SendPacket(std::move(signPacket));
         return;
     }
 
@@ -286,13 +274,13 @@ void WorldSession::HandlePetitionSignOpcode(WorldPackets::Petition::PetitionSign
     //not allow sign another player from already sign player account
     if (PetitionSignature* signature = petition->GetSignatureForPlayer(_player))
     {
-        WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
-        data << ObjectGuid(packet.itemGuid);
-        data << ObjectGuid(_player->GetObjectGuid());
-        data << uint32(PETITION_SIGN_ALREADY_SIGNED);
+        auto signPacket = std::make_unique<WorldPackets::Petition::PetitionSignResults>();
+        signPacket->itemGuid = packet.itemGuid;
+        signPacket->playerGuid = _player->GetObjectGuid();
+        signPacket->result = PETITION_SIGN_ALREADY_SIGNED;
 
         // close at signer side
-        SendPacket(&data);
+        SendPacket(std::move(signPacket));
 
         // Update for owner if online. Note: Unsure if this is the correct message,
         // but sending SMSG_PETITION_SIGN_RESULTS does nothing for the owner here
@@ -305,13 +293,13 @@ void WorldSession::HandlePetitionSignOpcode(WorldPackets::Petition::PetitionSign
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "PETITION SIGN: %u by %s", petition->GetId(), _player->GetGuidStr().c_str());
 
-        WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
-        data << ObjectGuid(packet.itemGuid);
-        data << ObjectGuid(_player->GetObjectGuid());
-        data << uint32(PETITION_SIGN_OK);
+        auto signPacket = std::make_unique<WorldPackets::Petition::PetitionSignResults>();
+        signPacket->itemGuid = packet.itemGuid;
+        signPacket->playerGuid = _player->GetObjectGuid();
+        signPacket->result = PETITION_SIGN_OK;
 
         // close at signer side
-        SendPacket(&data);
+        SendPacket(std::move(signPacket));
 
         // update signs count on charter, required testing...
         //Item *item = _player->GetItemByGuid(petitionguid));
@@ -320,7 +308,13 @@ void WorldSession::HandlePetitionSignOpcode(WorldPackets::Petition::PetitionSign
 
         // update for owner if online
         if (Player* owner = sObjectMgr.GetPlayer(petition->GetOwnerGuid()))
-            owner->GetSession()->SendPacket(&data);
+        {
+            auto ownerPacket = std::make_unique<WorldPackets::Petition::PetitionSignResults>();
+            ownerPacket->itemGuid = packet.itemGuid;
+            ownerPacket->playerGuid = _player->GetObjectGuid();
+            ownerPacket->result = PETITION_SIGN_OK;
+            owner->GetSession()->SendPacket(std::move(ownerPacket));
+        }
     }
 }
 
@@ -337,9 +331,9 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPackets::Petition::PetitionD
     Player* owner = sObjectMgr.GetPlayer(petition->GetOwnerGuid());
     if (owner)                                              // petition owner online
     {
-        WorldPacket data(MSG_PETITION_DECLINE, 8);
-        data << _player->GetObjectGuid();
-        owner->GetSession()->SendPacket(&data);
+        auto declineResult = std::make_unique<WorldPackets::Petition::PetitionDeclineResult>();
+        declineResult->playerGuid = _player->GetObjectGuid();
+        owner->GetSession()->SendPacket(std::move(declineResult));
     }
 }
 
@@ -429,9 +423,9 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPackets::Petition::TurnInPeti
     // Collect petition info data
     if (_player->GetGuildId())
     {
-        WorldPacket data(SMSG_TURN_IN_PETITION_RESULTS, 4);
-        data << uint32(PETITION_SIGN_ALREADY_IN_GUILD); // already in guild
-        _player->GetSession()->SendPacket(&data);
+        auto turnInPacket = std::make_unique<WorldPackets::Petition::TurnInPetitionResults>();
+        turnInPacket->result = PETITION_SIGN_ALREADY_IN_GUILD; // already in guild
+        _player->GetSession()->SendPacket(std::move(turnInPacket));
         return;
     }
 
@@ -440,9 +434,9 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPackets::Petition::TurnInPeti
 
     if (!petition->IsComplete())
     {
-        WorldPacket data(SMSG_TURN_IN_PETITION_RESULTS, 4);
-        data << uint32(PETITION_SIGN_NEED_MORE); // need more signatures...
-        SendPacket(&data);
+        auto turnInPacket = std::make_unique<WorldPackets::Petition::TurnInPetitionResults>();
+        turnInPacket->result = PETITION_SIGN_NEED_MORE; // need more signatures...
+        SendPacket(std::move(turnInPacket));
         return;
     }
 
@@ -475,9 +469,9 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPackets::Petition::TurnInPeti
     // created
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "TURN IN PETITION %u", petitionGuid);
 
-    WorldPacket data(SMSG_TURN_IN_PETITION_RESULTS, 4);
-    data << uint32(PETITION_SIGN_OK);
-    SendPacket(&data);
+    auto turnInPacket = std::make_unique<WorldPackets::Petition::TurnInPetitionResults>();
+    turnInPacket->result = PETITION_SIGN_OK;
+    SendPacket(std::move(turnInPacket));
 }
 
 void WorldSession::HandlePetitionShowListOpcode(WorldPackets::Petition::PetitionShow const& packet)
@@ -498,25 +492,16 @@ void WorldSession::SendPetitionShowList(ObjectGuid guid)
     if (GetPlayer()->HasUnitState(UNIT_STATE_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    uint8 count = 1;
+    WorldPackets::Petition::PetitionShowListEntry entry;
+    entry.index = 1;
+    entry.charterEntry = GUILD_CHARTER;
+    entry.charterDisplayId = CHARTER_DISPLAY_ID;
+    entry.charterCost = GUILD_CHARTER_COST;
+    entry.entryFlags = 1; // must be `&1` to show it in the UI
 
-    WorldPacket data(SMSG_PETITION_SHOWLIST, 8 + 1 + 4 * 6);
-    data << guid;                                           // npc guid
-    data << count;                                          // count; allowed values 1-10
-    data << uint32(1);                                      // index
-    data << uint32(GUILD_CHARTER);                          // charter entry
-    data << uint32(CHARTER_DISPLAY_ID);                     // charter display id
-    data << uint32(GUILD_CHARTER_COST);                     // charter cost
-    data << uint32(1);                                      // unknown
-    //data << uint32(9);                                    // [-ZERO] required signs?
-    //for(uint8 i = 0; i < count; ++i)
-    //{
-    //    data << uint32(i);                        // index
-    //    data << uint32(GUILD_CHARTER);            // charter entry
-    //    data << uint32(CHARTER_DISPLAY_ID);       // charter display id
-    //    data << uint32(GUILD_CHARTER_COST+i);     // charter cost
-    //    data << uint32(1);                        // unknown
-    //}
-    SendPacket(&data);
+    auto showList = std::make_unique<WorldPackets::Petition::PetitionShowList>();
+    showList->npcGuid = guid;
+    showList->entries = { entry };
+    SendPacket(std::move(showList));
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sent SMSG_PETITION_SHOWLIST");
 }

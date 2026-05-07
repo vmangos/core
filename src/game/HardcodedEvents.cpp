@@ -114,7 +114,7 @@ void ElementalInvasion::StartLocalBoss(uint8 index, uint32 stage, uint8 delay)
     // Similarly, if the boss is dead but we're delaying the despawn, start the
     // event. Must do this or the next time the event is triggered the boss will
     // be spawned dead
-    if (((stage == STAGE_BOSS_DOWN && delay > 0) || stage == STAGE_BOSS) && 
+    if (((stage == STAGE_BOSS_DOWN && delay > 0) || stage == STAGE_BOSS) &&
             !sGameEventMgr.IsActiveEvent(InvasionData[index].eventBoss))
         sGameEventMgr.StartEvent(InvasionData[index].eventBoss, true);
 }
@@ -611,7 +611,7 @@ void ScourgeInvasionEvent::LogNextZoneTime()
     time_t now = time(nullptr);
     uint32 timer = 0;
     uint32 zoneid = 0;
-    
+
     for (const auto& invasionPoint : invasionPoints)
     {
         if (invasionPoint.zoneId == sObjectMgr.GetSavedVariable(VARIABLE_SI_LAST_ATTACK_ZONE))
@@ -714,7 +714,7 @@ void ScourgeInvasionEvent::Update()
     }
 
     // Waiting until all invasions have been loaded. OnEnable will return true
-    // if no invasions are supposed to be started, so this will only be the case if any of the 
+    // if no invasions are supposed to be started, so this will only be the case if any of the
     // maps required for a current invasionZone were not yet loaded
     if (!invasion1Loaded || !invasion2Loaded || !invasion3Loaded || !invasion4Loaded || !invasion5Loaded || !invasion6Loaded)
         return;
@@ -778,7 +778,7 @@ uint32 ScourgeInvasionEvent::GetNextUpdateDelay()
 }
 
 void ScourgeInvasionEvent::Enable()
-{ 
+{
     invasion1Loaded = OnEnable(ZONEID_TANARIS, VARIABLE_TANARIS_ATTACK_TIME);
     invasion2Loaded = OnEnable(ZONEID_BLASTED_LANDS, VARIABLE_BLASTED_LANDS_ATTACK_TIME);
     invasion3Loaded = OnEnable(ZONEID_EASTERN_PLAGUELANDS, VARIABLE_EASTERN_PLAGUELANDS_ATTACK_TIME);
@@ -799,16 +799,16 @@ void ScourgeInvasionEvent::Disable()
         Map* mapPtr = GetMap(zone.map, zone.mouthPos);
         if (!mapPtr)
             continue;
-        
+
         Creature* pMouth = mapPtr->GetCreature(zone.mouthGuid);
-        
+
         if (!pMouth)
             continue;
 
         pMouth->RemoveFromWorld();
         pMouth->DeleteLater();
     }
-    
+
     for (CityAttack& zone : attackPoints)
     {
         if (!zone.pallidGuid)
@@ -1068,7 +1068,7 @@ bool ScourgeInvasionEvent::SummonPallid(CityAttack* zone, uint32 spawnLocId)
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::SummonPallid unable to access required map (%d). Retrying next update.", zone->map);
         return false;
     }
-    
+
     if (Creature* pPallid = pMap->SummonCreature(PickRandomValue(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), position.x, position.y, position.z, position.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
         pPallid->GetMotionMaster()->Clear(false, true);
@@ -1162,7 +1162,7 @@ uint32 ScourgeInvasionEvent::GetActiveZones()
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "ScourgeInvasionEvent::GetActiveZones no map for zone %d.", invasionPoint.map);
             continue;
         }
-        
+
         Creature* pMouth = mapPtr->GetCreature(invasionPoint.mouthGuid);
         if (pMouth)
             i++;
@@ -1196,7 +1196,7 @@ void ScourgeInvasionEvent::UpdateWorldState()
 {
     // Updating map icon worlstate
     int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT);
-    
+
     int REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
     int REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
     int REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
@@ -1209,7 +1209,7 @@ void ScourgeInvasionEvent::UpdateWorldState()
         previousRemainingCounts[2] != REMAINING_BURNING_STEPPES ||
         previousRemainingCounts[3] != REMAINING_EASTERN_PLAGUELANDS ||
         previousRemainingCounts[4] != REMAINING_TANARIS ||
-        previousRemainingCounts[5] != REMAINING_WINTERSPRING) 
+        previousRemainingCounts[5] != REMAINING_WINTERSPRING)
     {
         previousRemainingCounts[0] = REMAINING_AZSHARA;
         previousRemainingCounts[1] = REMAINING_BLASTED_LANDS;
@@ -1620,8 +1620,6 @@ uint32 WarEffortEvent::GetNextUpdateDelay()
         default:
             return max_ge_check_delay;
     }
-
-    return max_ge_check_delay;
 }
 
 void WarEffortEvent::EnableAndStartEvent(uint16 event_id)

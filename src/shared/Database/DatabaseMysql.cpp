@@ -19,8 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef DO_POSTGRESQL
-
 #include <errmsg.h>
 #include <mysqld_error.h>
 #include "Log.h"
@@ -529,4 +527,3 @@ enum_field_types MySqlPreparedStatement::ToMySQLType(SqlStmtFieldData const& dat
 
     return dataType;
 }
-#endif

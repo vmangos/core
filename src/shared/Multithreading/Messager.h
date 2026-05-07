@@ -21,32 +21,58 @@
 
 #include <vector>
 #include <mutex>
-#include <functional>
+#include <memory>
+#include <type_traits>
+#include <utility>
 
 template <class T>
 class Messager
 {
-    public:
-        void AddMessage(const std::function<void(T*)>& message)
+    private:
+        // Type-erased holder for any callable invocable as void(T*).
+        // Unlike std::function, this only requires the callable to be MoveConstructible,
+        // allowing capture of move-only types such as std::unique_ptr
+        // (C++14 has no std::move_only_function).
+        struct IMessage
         {
+            virtual ~IMessage() = default;
+            virtual void Invoke(T* object) = 0;
+        };
+
+        template <class F>
+        struct MessageImpl final : IMessage
+        {
+            F callable;
+
+            template <class U>
+            explicit MessageImpl(U&& c) : callable(std::forward<U>(c)) {}
+
+            void Invoke(T* object) override { callable(object); }
+        };
+
+    public:
+        template <class F>
+        void AddMessage(F&& message)
+        {
+            using Decayed = std::decay_t<F>;
+            std::unique_ptr<IMessage> holder(new MessageImpl<Decayed>(std::forward<F>(message)));
             std::lock_guard<std::mutex> guard(m_messageMutex);
-            m_messageVector.push_back(message);
+            m_messageVector.push_back(std::move(holder));
         }
+
         void Execute(T* object)
         {
-            std::vector<std::function<void(T*)>> messageVectorCopy;
+            std::vector<std::unique_ptr<IMessage>> messageVectorCopy;
             {
                 std::lock_guard<std::mutex> guard(m_messageMutex);
                 std::swap(m_messageVector, messageVectorCopy);
             }
             for (auto& message : messageVectorCopy)
-                message(object);
-
-            messageVectorCopy.clear();
+                message->Invoke(object);
         }
     private:
-        std::vector<std::function<void(T*)>> m_messageVector;
-        std::mutex m_messageMutex;  
+        std::vector<std::unique_ptr<IMessage>> m_messageVector;
+        std::mutex m_messageMutex;
 };
 
 #endif

@@ -858,7 +858,7 @@ void MapPersistentStateManager::PackInstances()
 
 void MapPersistentStateManager::ScheduleInstanceResets()
 {
-    // Schedule normal dungeon resets on start up. Must be done after CleanupInstances() 
+    // Schedule normal dungeon resets on start up. Must be done after CleanupInstances()
     // and PackInstances()
     m_Scheduler.ScheduleAllDungeonResets();
 }

@@ -22,8 +22,9 @@
 #include "ReputationMgr.h"
 #include "Player.h"
 #include "Opcodes.h"
-#include "WorldPacket.h"
 #include "ObjectMgr.h"
+#include "Packets/Misc.h"
+
 #include <numeric>
 
 int32 const ReputationMgr::PointsInRank[MAX_REPUTATION_RANK] = {36000, 3000, 3000, 3000, 6000, 12000, 21000, 1000};
@@ -118,27 +119,26 @@ uint32 ReputationMgr::GetDefaultStateFlags(FactionEntry const* factionEntry) con
 
 void ReputationMgr::SendForceReactions()
 {
-    WorldPacket data;
-    data.Initialize(SMSG_SET_FORCED_REACTIONS, 4 + m_forcedReactions.size() * (4 + 4));
-    data << uint32(m_forcedReactions.size());
-    for (const auto& itr : m_forcedReactions)
+    auto packet = std::make_unique<WorldPackets::Misc::SetForcedReactions>();
+    for (auto const& itr : m_forcedReactions)
     {
-        data << uint32(itr.first);                         // faction_id (Faction.dbc)
-        data << uint32(itr.second);                        // reputation rank
+        WorldPackets::Misc::ForcedReactionEntry entry;
+        entry.factionId = itr.first;
+        entry.reputationRank = itr.second;
+        packet->forcedReactions.push_back(entry);
     }
-    m_player->SendDirectMessage(&data);
+    m_player->GetSession()->SendPacket(std::move(packet));
 }
 
 void ReputationMgr::SendState(FactionState const* faction)
 {
-    uint32 count = 1;
-
-    WorldPacket data(SMSG_SET_FACTION_STANDING, (16));      // last check 2.4.0
-    size_t p_count = data.wpos();
-    data << (uint32) count;                                 // placeholder
-
-    data << (uint32) faction->ReputationListID;
-    data << (uint32) faction->Standing;
+    auto packet = std::make_unique<WorldPackets::Misc::SetFactionStanding>();
+    {
+        WorldPackets::Misc::FactionStandingEntry entry;
+        entry.reputationListId = faction->ReputationListID;
+        entry.standing = faction->Standing;
+        packet->factionStandings.push_back(entry);
+    }
 
     for (auto& itr : m_factions)
     {
@@ -148,50 +148,30 @@ void ReputationMgr::SendState(FactionState const* faction)
             subFaction.needSend = false;
             if (subFaction.ReputationListID != faction->ReputationListID)
             {
-                data << (uint32)subFaction.ReputationListID;
-                data << (uint32)subFaction.Standing;
-                ++count;
+                WorldPackets::Misc::FactionStandingEntry entry;
+                entry.reputationListId = subFaction.ReputationListID;
+                entry.standing = subFaction.Standing;
+                packet->factionStandings.push_back(entry);
             }
         }
     }
 
-    data.put<uint32>(p_count, count);
-    m_player->SendDirectMessage(&data);
+    m_player->GetSession()->SendPacket(std::move(packet));
 }
 
 void ReputationMgr::SendInitialReputations()
 {
-    WorldPacket data(SMSG_INITIALIZE_FACTIONS, (4 + 64 * 5));
-    data << uint32(0x00000040);
-
-    RepListID a = 0;
+    auto packet = std::make_unique<WorldPackets::Misc::InitializeFactions>();
 
     for (auto& itr : m_factions)
     {
-        // fill in absent fields
-        for (; a != itr.first; a++)
-        {
-            data << uint8(0x00);
-            data << uint32(0x00000000);
-        }
-
         // fill in encountered data
-        data << uint8(itr.second.Flags);
-        data << uint32(itr.second.Standing);
-
+        packet->factions[itr.first].flags = static_cast<uint8>(itr.second.Flags);
+        packet->factions[itr.first].standing = itr.second.Standing;
         itr.second.needSend = false;
-
-        ++a;
     }
 
-    // fill in absent fields
-    for (; a != 64; a++)
-    {
-        data << uint8(0x00);
-        data << uint32(0x00000000);
-    }
-
-    m_player->SendDirectMessage(&data);
+    m_player->GetSession()->SendPacket(std::move(packet));
 }
 
 void ReputationMgr::SendVisible(FactionState const* faction) const
@@ -200,9 +180,9 @@ void ReputationMgr::SendVisible(FactionState const* faction) const
         return;
 
     // make faction visible in reputation list at client
-    WorldPacket data(SMSG_SET_FACTION_VISIBLE, 4);
-    data << faction->ReputationListID;
-    m_player->SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::SetFactionVisible>();
+    packet->reputationListId = faction->ReputationListID;
+    m_player->GetSession()->SendPacket(std::move(packet));
 }
 
 void ReputationMgr::Initialize()
@@ -249,7 +229,7 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standi
             }
         }
     }
-    
+
     // spillover done, update faction itself
     bool res = false;
     FactionStateList::iterator faction = m_factions.find(factionEntry->reputationListID);

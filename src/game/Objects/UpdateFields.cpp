@@ -47,6 +47,7 @@ template<std::size_t SIZE>
 static std::array<uint16, SIZE> SetupUpdateFieldFlagsArray(uint8 objectTypeMask)
 {
     std::array<uint16, SIZE> flagsArray;
+    flagsArray.fill(0);
     for (auto const& itr : g_updateFieldsData)
     {
         if ((itr.objectTypeMask & objectTypeMask) == 0)

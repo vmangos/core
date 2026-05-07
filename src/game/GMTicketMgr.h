@@ -29,6 +29,7 @@ class Field;
 class QueryResult;
 class WorldPacket;
 class WorldSession;
+namespace WorldPackets { namespace GmTicket { class GmTicketGetTicket; } }
 
 // from blizzard lua
 enum GMTicketSystemStatus
@@ -136,7 +137,7 @@ public:
     void SaveToDB() const;
     void DeleteFromDB();
 
-    void WritePacket(WorldPacket& data) const;
+    void FillPacket(WorldPackets::GmTicket::GmTicketGetTicket& packet) const;
     void SendResponse(WorldSession* session) const;
 
     void TeleportTo(Player* player) const;

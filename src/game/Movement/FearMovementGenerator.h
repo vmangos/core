@@ -23,11 +23,11 @@ template<class T>
 class FearMovementGenerator : public MovementGeneratorMedium< T, FearMovementGenerator<T> >
 {
 public:
-    explicit FearMovementGenerator(ObjectGuid fright) : 
+    explicit FearMovementGenerator(ObjectGuid fright) :
         i_initialFleeTime(DEFAULT_INIT_FLEE_TIME), _timeInitDone(false), _pointInitDone(false), _forceWalking(false),
         _customSpeed(-1.0f), i_frightGuid(fright), i_nextCheckTime(0), _forceUpdate(false)
     {
-        
+
     }
 
     void Initialize(T &);
@@ -37,7 +37,7 @@ public:
     bool Update(T &, uint32 const&);
 
     void UnitSpeedChanged() override { _forceUpdate = true; }
-    MovementGeneratorType GetMovementGeneratorType() const { return FLEEING_MOTION_TYPE; }
+    MovementGeneratorType GetMovementGeneratorType() const override { return FLEEING_MOTION_TYPE; }
 
     ShortTimeTracker i_initialFleeTime;
     bool _timeInitDone;
@@ -45,14 +45,14 @@ public:
 
 protected:
     bool _forceWalking;
-    float _customSpeed;   
+    float _customSpeed;
 
 private:
     void _setTargetLocation(T &owner);
     bool _getPoint(T &owner, float &x, float &y, float &z);
 
     ObjectGuid i_frightGuid;
-    TimeTracker i_nextCheckTime;    
+    TimeTracker i_nextCheckTime;
     bool _forceUpdate;
 };
 
@@ -60,12 +60,12 @@ class TimedFearMovementGenerator : public FearMovementGenerator<Creature>
 {
 public:
     TimedFearMovementGenerator(ObjectGuid fright, uint32 time);
-   
-    bool Update(Unit &, uint32 const&);
-    void Initialize(Unit &);
-    void Finalize(Unit &);
 
-    MovementGeneratorType GetMovementGeneratorType() const { return TIMED_FLEEING_MOTION_TYPE; }
+    bool Update(Unit &, uint32 const&) override;
+    void Initialize(Unit &) override;
+    void Finalize(Unit &) override;
+
+    MovementGeneratorType GetMovementGeneratorType() const override { return TIMED_FLEEING_MOTION_TYPE; }
 
 private:
     TimeTracker i_totalFleeTime;

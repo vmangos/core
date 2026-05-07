@@ -3,6 +3,8 @@
 
 #include "Packet.h"
 #include "ObjectGuid.h"
+#include <string>
+#include <vector>
 
 namespace WorldPackets { namespace Guild
 {
@@ -142,6 +144,116 @@ namespace WorldPackets { namespace Guild
         explicit GuildRank() : ClientPacket(CMSG_GUILD_RANK) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
+    // --- Server Packets ---
+
+    class GuildInviteNotification final : public ServerPacket
+    {
+    public:
+        std::string inviterName;
+        std::string guildName;
+
+        explicit GuildInviteNotification() : ServerPacket(SMSG_GUILD_INVITE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GuildDeclineNotification final : public ServerPacket
+    {
+    public:
+        std::string playerName;
+
+        explicit GuildDeclineNotification() : ServerPacket(SMSG_GUILD_DECLINE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GuildCommandResult final : public ServerPacket
+    {
+    public:
+        uint32 command = 0;
+        std::string str;
+        uint32 result = 0;
+
+        explicit GuildCommandResult() : ServerPacket(SMSG_GUILD_COMMAND_RESULT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GuildInfo final : public ServerPacket
+    {
+    public:
+        std::string guildName;
+        uint32 createdDay = 0;
+        uint32 createdMonth = 0;
+        uint32 createdYear = 0;
+        uint32 memberCount = 0;
+        uint32 accountCount = 0;
+
+        explicit GuildInfo() : ServerPacket(SMSG_GUILD_INFO) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SaveGuildEmblemResult final : public ServerPacket
+    {
+    public:
+        uint32 error = 0;
+
+        explicit SaveGuildEmblemResult() : ServerPacket(MSG_SAVE_GUILD_EMBLEM) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GuildQueryResponse final : public ServerPacket
+    {
+    public:
+        uint32 guildId = 0;
+        std::string guildName;
+        std::string rankNames[10]; // always 10 ranks
+        int32 emblemStyle = 0;
+        int32 emblemColor = 0;
+        int32 borderStyle = 0;
+        int32 borderColor = 0;
+        int32 backgroundColor = 0;
+
+        explicit GuildQueryResponse() : ServerPacket(SMSG_GUILD_QUERY_RESPONSE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GuildEvent final : public ServerPacket
+    {
+    public:
+        uint8 event = 0;
+        std::vector<std::string> params;
+        ObjectGuid affectedPlayerGuid;
+
+        explicit GuildEvent() : ServerPacket(SMSG_GUILD_EVENT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    struct GuildRosterMember
+    {
+        ObjectGuid guid;
+        uint8 presenceFlags = 0;     // offline = 0, online = GRF_ONLINE, GRF_AFK, GRF_DND
+        std::string name;
+        uint32 rankId = 0;
+        uint8 level = 0;
+        uint8 classId = 0;
+        uint32 zoneId = 0;
+        float lastOnlineTime = 0.0f; // time in days since last login (only for offline members)
+        std::string publicNote;
+        std::string officerNote;     // empty if viewer has no permission
+    };
+
+    class GuildRoster final : public ServerPacket
+    {
+    public:
+        std::string motd;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        std::string guildInfo;
+#endif
+        std::vector<uint32> rankRights;
+        std::vector<GuildRosterMember> rosterMembers;
+
+        explicit GuildRoster() : ServerPacket(SMSG_GUILD_ROSTER) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Guild
 
 #endif // MANGOS_PACKETS_GUILD_H

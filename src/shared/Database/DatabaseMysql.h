@@ -19,8 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef DO_POSTGRESQL
-
 #ifndef _DATABASEMYSQL_H
 #define _DATABASEMYSQL_H
 
@@ -128,5 +126,4 @@ class DatabaseMysql : public Database
         static size_t db_count;
 };
 
-#endif
 #endif

@@ -30,7 +30,9 @@ void WorldPackets::Movement::MoveSpeedAck::ReadFromWorldPacket(WorldPacket& recv
     recv_data >> movementCounter;
 #endif
     recv_data >> movementInfo;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     recv_data >> speed;
+#endif
 }
 
 void WorldPackets::Movement::MoveFlagChangeAck::ReadFromWorldPacket(WorldPacket& recv_data)

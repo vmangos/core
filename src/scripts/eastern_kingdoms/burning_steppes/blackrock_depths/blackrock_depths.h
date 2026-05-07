@@ -80,7 +80,7 @@ enum
     NPC_DOPEREL                = 9040,
     NPC_RIBBLY_S_CRONY         = 10043,
     NPC_ARENA_SPECTATOR        = 8916,
-    //NPC_PANZOR               = 8923, Ustaag : gérer par la DB
+    //NPC_PANZOR               = 8923, Ustaag: handled by the DB
     NPC_GOLEM_RAVAGE           = 8906,
     NPC_WRATH_HAMMER_CONSTRUCT = 8907,
     NPC_GOLEM_LORD_ARGELMACH   = 8983,

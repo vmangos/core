@@ -214,16 +214,16 @@ void Weather::SendWeatherUpdateToPlayer(Player* player)
     NormalizeGrade();
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-    WorldPacket data(SMSG_WEATHER, 4 + 4 + 4 + 1);
-    data << uint32(m_type);
-    data << float(m_grade);
+    auto packet = std::make_unique<WorldPackets::Misc::WeatherUpdate>();
+    packet->weatherType = m_type;
+    packet->grade = m_grade;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << uint32(GetSound()); // 1.12 soundid
+    packet->soundId = GetSound();
 #endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    data << uint8(0);           // 1 = instant change, 0 = smooth change
+    packet->instantChange = false;
 #endif
-    player->GetSession()->SendPacket(&data);
+    player->GetSession()->SendPacket(std::move(packet));
 #endif
 }
 

@@ -1065,7 +1065,7 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.warrior.pDefensiveStance))
                         m_spells.warrior.pDefensiveStance = pSpellEntry;
                 }
-                else if (pSpellEntry->SpellName[0].find("Charge") != std::string::npos)
+                else if (pSpellEntry->SpellName[0] == "Charge")
                 {
                     if (IsHigherRankSpell(m_spells.warrior.pCharge))
                         m_spells.warrior.pCharge = pSpellEntry;
@@ -2447,8 +2447,10 @@ void CombatBotBaseAI::LearnPremadeSpecForClass()
     {
         // Use gm command to learn spells on trainers and items.
         LearnRandomTalents();
-        ChatHandler(me).HandleLearnAllTrainerCommand("");
-        ChatHandler(me).HandleLearnAllItemsCommand("");
+        char trainerArgs[] = "";
+        char itemArgs[] = "";
+        ChatHandler(me).HandleLearnAllTrainerCommand(trainerArgs);
+        ChatHandler(me).HandleLearnAllItemsCommand(itemArgs);
     }
 }
 
@@ -3311,7 +3313,7 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             if (!me)
                 return;
 
-            std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(MSG_MOVE_WORLDPORT_ACK);
+            auto data = std::make_unique<NullClientPacket>(MSG_MOVE_WORLDPORT_ACK);
             me->GetSession()->QueuePacket(std::move(data));
             break;
         }
@@ -3320,12 +3322,12 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             if (!me)
                 return;
 
-            std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(MSG_MOVE_TELEPORT_ACK);
-            *data << me->GetObjectGuid();
+            auto data = std::make_unique<WorldPackets::Movement::MoveTeleportAck>();
+            data->guid = me->GetObjectGuid();
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            *data << me->GetLastCounterForMovementChangeType(TELEPORT);
+            data->movementCounter = me->GetLastCounterForMovementChangeType(TELEPORT);
 #endif
-            *data << uint32(time(nullptr));
+            data->time = uint32(time(nullptr));
             me->GetSession()->QueuePacket(std::move(data));
             break;
         }
@@ -3345,13 +3347,12 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             uint32 status = *((uint32*)(*packet).contents());
             if (status == TRADE_STATUS_BEGIN_TRADE)
             {
-                std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_BEGIN_TRADE);
+                auto data = std::make_unique<NullClientPacket>(CMSG_BEGIN_TRADE);
                 me->GetSession()->QueuePacket(std::move(data));
             }
             else if (status == TRADE_STATUS_TRADE_ACCEPT)
             {
-                std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_ACCEPT_TRADE);
-                *data << uint32(1);
+                auto data = std::make_unique<WorldPackets::Trade::AcceptTrade>();
                 me->GetSession()->QueuePacket(std::move(data));
             }
             else if (status == TRADE_STATUS_TRADE_COMPLETE)
@@ -3366,9 +3367,9 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             if (!me)
                 return;
 
-            std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_RESURRECT_RESPONSE);
-            *data << me->GetResurrector();
-            *data << uint8(1);
+            auto data = std::make_unique<WorldPackets::Misc::ResurrectResponse>();
+            data->resurrectorGuid = me->GetResurrector();
+            data->accept = true;
             me->GetSession()->QueuePacket(std::move(data));
             break;
         }
@@ -3400,10 +3401,10 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             uint64 guid = *((uint64*)(*packet).contents());
             uint32 slot = *(((uint32*)(*packet).contents()) + 2);
 
-            std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_LOOT_ROLL);
-            *data << uint64(guid);
-            *data << uint32(slot);
-            *data << uint8(0); // pass
+            auto data = std::make_unique<WorldPackets::Loot::LootRoll>();
+            data->lootedTarget = ObjectGuid(guid);
+            data->itemSlot = slot;
+            data->rollType = ROLL_PASS;
             me->GetSession()->QueuePacket(std::move(data));
             return;
         }

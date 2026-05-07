@@ -32,24 +32,22 @@ bool GOHello_go_stone_of_binding(Player* pPlayer, GameObject* pGo)
     // 141857 <= 7669 Servant of Grol
     // 141858 <= 7670 Servant of Allistarj
     // 141859 <= 7671 Servant of Sevine
-    Creature* pCreature = nullptr;
+
     switch(pGo->GetEntry())
     {
         case 141812:
-            pCreature = pGo->FindNearestCreature(7668, 30.000000, true);//servant of razelikh
+            pGo->CastSpell(nullptr, 10805, true); //servant of razelikh
             break;
         case 141857:
-            pCreature = pGo->FindNearestCreature(7669, 30.000000, true);//servant of grol
+            pGo->CastSpell(nullptr, 10834, true); //servant of grol
             break;
         case 141858:
-            pCreature = pGo->FindNearestCreature(7670, 30.000000, true);//servant of allistarj
+            pGo->CastSpell(nullptr, 10836, true); //servant of allistarj
             break;
         case 141859:
-            pCreature = pGo->FindNearestCreature(7671, 30.000000, true);//servant of sevine
+            pGo->CastSpell(nullptr, 10835, true); //servant of sevine
             break;
     }
-    if (pCreature)
-        pCreature->CastSpell(pCreature, 12938, true);
     return false;
 }
 

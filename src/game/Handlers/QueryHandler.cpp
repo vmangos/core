@@ -36,22 +36,13 @@ void WorldSession::SendNameQueryOpcode(Player* p)
     if (!p)
         return;
 
-    // guess size
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 25 + 1 + 4 + 4 + 4));   // guess size
-    data << ObjectGuid(p->GetObjectGuid());
-    data << p->GetName();                                   // CString(48): played name
-    data << "";                                             // CString(256): realm name for cross realm BG usage
-#else
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 25 + 4 + 4 + 4));   // guess size
-    data << ObjectGuid(p->GetObjectGuid());
-    data << p->GetName();                                   // CString(48): played name
-#endif
-    data << uint32(p->GetRace());
-    data << uint32(p->GetGender());
-    data << uint32(p->GetClass());
-
-    SendPacket(&data);
+    auto nameResponse = std::make_unique<WorldPackets::Query::NameQueryResponse>();
+    nameResponse->playerGuid = p->GetObjectGuid();
+    nameResponse->name = p->GetName();
+    nameResponse->race = p->GetRace();
+    nameResponse->gender = p->GetGender();
+    nameResponse->class_ = p->GetClass();
+    SendPacket(std::move(nameResponse));
 }
 
 void WorldSession::SendNameQueryOpcodeFromDB(ObjectGuid guid)
@@ -59,34 +50,14 @@ void WorldSession::SendNameQueryOpcodeFromDB(ObjectGuid guid)
     // Using the cache...
     if (PlayerCacheData* pData = sObjectMgr.GetPlayerDataByGUID(guid.GetCounter()))
     {
-        std::string name = pData->sName;
-
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-        WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 1 + 4 + 4 + 4));
-        data << ObjectGuid(HIGHGUID_PLAYER, pData->uiGuid);
-        data << name;                                       // CString(48): played name
-        data << "";                                         // CString(256): realm name for cross realm BG usage
-#else
-        WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 4 + 4 + 4));
-        data << ObjectGuid(HIGHGUID_PLAYER, pData->uiGuid);
-        data << name;
-#endif
-        data << uint32(pData->uiRace);
-        data << uint32(pData->uiGender);
-        data << uint32(pData->uiClass);
-
-        SendPacket(&data);
+        auto nameResponse = std::make_unique<WorldPackets::Query::NameQueryResponse>();
+        nameResponse->playerGuid = ObjectGuid(HIGHGUID_PLAYER, pData->uiGuid);
+        nameResponse->name = pData->sName;
+        nameResponse->race = pData->uiRace;
+        nameResponse->gender = pData->uiGender;
+        nameResponse->class_ = pData->uiClass;
+        SendPacket(std::move(nameResponse));
     }
-
-    // The old method was to query the database,
-    // but why would a client request the info of a player who was never logged in during the _current_ server uptime?
-    /*
-    CharacterDatabase.AsyncPQuery(&WorldSession::SendNameQueryOpcodeFromDBCallBack, GetAccountId(),
-    //          0     1     2     3       4
-        "SELECT guid, name, race, gender, class "
-        "FROM characters WHERE guid = '%u'",
-        guid.GetCounter());
-    */
 }
 
 void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult* result, uint32 accountId)
@@ -112,22 +83,14 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult* result, uint32
         pClass       = fields[4].GetUInt8();
     }
 
-    // guess size
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 1 + 4 + 4 + 4));
-    data << ObjectGuid(HIGHGUID_PLAYER, lowguid);
-    data << name;
-    data << "";                                            // realm name for cross realm BG usage
-#else
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 4 + 4 + 4));
-    data << ObjectGuid(HIGHGUID_PLAYER, lowguid);
-    data << name;
-#endif
-    data << uint32(pRace);                                  // race
-    data << uint32(pGender);                                // gender
-    data << uint32(pClass);                                 // class
+    auto nameResponse = std::make_unique<WorldPackets::Query::NameQueryResponse>();
+    nameResponse->playerGuid = ObjectGuid(HIGHGUID_PLAYER, lowguid);
+    nameResponse->name = name;
+    nameResponse->race = pRace;
+    nameResponse->gender = pGender;
+    nameResponse->class_ = pClass;
+    session->SendPacket(std::move(nameResponse));
 
-    session->SendPacket(&data);
     delete result;
 }
 
@@ -184,7 +147,9 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPackets::Query::QueryCreature 
             + sizeof(uint32) // pet_spell_list_id
 #endif
             + sizeof(uint32)  // display_id
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
             + sizeof(uint8)  // civilian
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             + sizeof(uint8) // racial_leader
 #endif
@@ -212,7 +177,9 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPackets::Query::QueryCreature 
         data << uint32(ci->pet_spell_list_id);              // Id from CreatureSpellData.dbc
 #endif
         data << uint32(ci->display_id[0]);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         data << uint8(ci->civilian);
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         data << uint8(ci->racial_leader);
 #endif
@@ -416,14 +383,13 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPackets::Query::QueryPageText 
     while (pageID)
     {
         PageText const* pPage = sPageTextStore.LookupEntry<PageText>(pageID);
-        // guess size
-        WorldPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 50);
-        data << pageID;
+        auto pageResponse = std::make_unique<WorldPackets::Query::PageTextQueryResponse>();
+        pageResponse->pageId = pageID;
 
         if (!pPage)
         {
-            data << "Item page missing.";
-            data << uint32(0);
+            pageResponse->text = "Item page missing.";
+            pageResponse->nextPageId = 0;
             pageID = 0;
         }
         else
@@ -441,17 +407,17 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPackets::Query::QueryPageText 
                 }
             }
 
-            data << text;
-            data << uint32(pPage->next_page);
+            pageResponse->text = text;
+            pageResponse->nextPageId = pPage->next_page;
             pageID = pPage->next_page;
         }
-        SendPacket(&data);
+        SendPacket(std::move(pageResponse));
     }
 }
 
 void WorldSession::SendQueryTimeResponse()
 {
-    WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4);
-    data << uint32(time(nullptr));
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Query::QueryTimeResponse>();
+    packet->time = static_cast<uint32>(time(nullptr));
+    SendPacket(std::move(packet));
 }

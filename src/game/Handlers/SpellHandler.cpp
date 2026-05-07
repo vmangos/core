@@ -285,11 +285,8 @@ void WorldSession::HandleCastSpellOpcode(WorldPackets::Spell::CastSpell const& p
         // spells on yourself is frequently used within the core itself for certain mechanics.
         if (target == _player && IsExplicitlySelectedUnitTarget(spellInfo->EffectImplicitTargetA[0]) && !spellInfo->IsPositiveSpell(_player, target))
         {
-            WorldPacket data(SMSG_CAST_RESULT, (4 + 1 + 1));
-            data << uint32(packet.spellId);
-            data << uint8(2); // status = fail
-            data << uint8(SPELL_FAILED_BAD_TARGETS);
-            SendPacket(&data);
+            auto castPacket = std::make_unique<WorldPackets::Spell::CastResultSimpleFailure>(spellInfo, SPELL_FAILED_BAD_TARGETS);
+            SendPacket(std::move(castPacket));
             return;
         }
 

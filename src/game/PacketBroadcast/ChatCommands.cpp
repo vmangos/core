@@ -8,7 +8,7 @@ bool ChatHandler::HandlePBCastStatsCommand(char*)
     MovementBroadcaster* bcaster = sWorld.GetBroadcaster();
     auto const& stats = bcaster->GetStats();
     PSendSysMessage("PacketBroadcast: %u threads.", stats.size());
-    for (int i = 0; i < stats.size(); ++i)
+    for (size_t i = 0; i < stats.size(); ++i)
         PSendSysMessage("Thread #%02u: Update %03ums | %u packets",
             i, stats[i].update_time, stats[i].num_packets);
     PSendSysMessage("Created %u broadcasters | Deleted %u",

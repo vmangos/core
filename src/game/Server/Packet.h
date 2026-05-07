@@ -21,6 +21,13 @@ public:
     uint16 GetOpcode() const { return opcode; }
 };
 
+class ServerPacket : public Packet
+{
+public:
+    explicit ServerPacket(uint16 opcode) : Packet(opcode) {}
+    virtual void AppendBodyTo(ByteBuffer& buffer) const = 0;
+};
+
 class ClientPacket : public Packet
 {
 public:
@@ -35,6 +42,7 @@ class NullClientPacket final : public ClientPacket
 {
 public:
     NullClientPacket() : ClientPacket(OPCODE_WILL_BE_SET_IN_READ_FUNCTION) {}
+    explicit NullClientPacket(uint16 opcode) : ClientPacket(opcode) {}
 
     void ReadFromWorldPacket(WorldPacket& recv_data) override
     {

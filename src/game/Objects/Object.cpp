@@ -824,7 +824,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
 
                     *data << uint32(faction);
                 }
-                // RAID ally-horde : pas de flag FFA
+                // RAID ally-horde : no FFA flag
                 else if (index == PLAYER_FLAGS && (m_uint32Values[index] & PLAYER_FLAGS_FFA_PVP))
                 {
                     Player* owner = ((Unit*)this)->GetCharmerOrOwnerPlayerOrPlayerItself();
@@ -939,6 +939,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     else if (IsType(TYPEMASK_CORPSE))
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
@@ -965,6 +966,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
+#endif
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
     else if (IsType(TYPEMASK_ITEM))
     {
@@ -1957,12 +1959,16 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
     // 1st case we can fly => Position in the air, easy.
     if (pUnit && pUnit->CanFly())
     {
-        float randAngle1 = rand_norm_f() * 2 * M_PI;
-        float randAngle2 = rand_norm_f() * 2 * M_PI;
+        float theta = rand_norm_f() * 2.0f * M_PI;
+        float u = rand_norm_f() * 2.0f - 1.0f;
         float randDist = rand_norm_f() * distance;
-        rand_x = x + randDist * cos(randAngle1) * sin(randAngle2);
-        rand_y = y + randDist * sin(randAngle2) * sin(randAngle2);
-        rand_z = z + randDist * sin(randAngle2);
+
+        float sinPhi = sqrtf(1.0f - u * u); // Radius of sphere at z
+
+        rand_x = x + randDist * sinPhi * cos(theta);
+        rand_y = y + randDist * sinPhi * sin(theta);
+        rand_z = z + randDist * u;
+
         // May happen in the border of the map
         if (!MaNGOS::IsValidMapCoord(x, y, z) || !MaNGOS::IsValidMapCoord(rand_x, rand_y, rand_z))
             return false;
@@ -3298,14 +3304,14 @@ void WorldObject::SetActiveObjectState(bool on)
 
     bool world = IsInWorld();
 
-    Map* map;
+    Map* map = nullptr;
     if (world)
     {
         map = GetMap();
         if (GetTypeId() == TYPEID_UNIT)
-            map->Remove((Creature*)this, false);
+            map->Remove(static_cast<Creature*>(this), false);
         else
-            map->Remove((GameObject*)this, false);
+            map->Remove(static_cast<GameObject*>(this), false);
     }
 
     m_isActiveObject = on;
@@ -3313,9 +3319,9 @@ void WorldObject::SetActiveObjectState(bool on)
     if (world)
     {
         if (GetTypeId() == TYPEID_UNIT)
-            map->Add((Creature*)this);
+            map->Add(static_cast<Creature*>(this));
         else
-            map->Add((GameObject*)this);
+            map->Add(static_cast<GameObject*>(this));
     }
 }
 

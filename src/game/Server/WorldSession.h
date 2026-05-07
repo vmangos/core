@@ -57,9 +57,13 @@
 #include "Packets/Query.h"
 #include "Packets/Quest.h"
 #include "Packets/Skill.h"
+#include "Packets/Social.h"
 #include "Packets/Spell.h"
 #include "Packets/Taxi.h"
 #include "Packets/Trade.h"
+#include "Packets/Warden.h"
+
+#include <memory>
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -84,6 +88,7 @@ class BigNumber;
 class MasterPlayer;
 
 struct OpcodeHandler;
+struct OpcodeHandlerPacketImplDetails;
 struct PlayerBotEntry;
 
 enum PartyOperation
@@ -164,7 +169,7 @@ class PacketFilter
         explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession), m_processLogout(false), m_processType(PACKET_PROCESS_MAX_TYPE) {}
         virtual ~PacketFilter() {}
 
-        virtual bool Process(std::unique_ptr<WorldPacket> const&) { return true; }
+        virtual bool Process(std::unique_ptr<ClientPacket const> const&) { return true; }
         inline bool ProcessLogout() const { return m_processLogout; }
         inline PacketProcessing PacketProcessType() const { return m_processType; }
         inline void SetProcessType(PacketProcessing t) { m_processType = t; }
@@ -185,7 +190,7 @@ class MapSessionFilter : public PacketFilter
         }
         ~MapSessionFilter() override {}
 
-        bool Process(std::unique_ptr<WorldPacket> const& packet) override;
+        bool Process(std::unique_ptr<ClientPacket const> const& packet) override;
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -331,7 +336,8 @@ class WorldSession
         bool m_ah_list_recvd;
 
         bool Update(PacketFilter& updater);
-        void QueuePacket(std::unique_ptr<WorldPacket> new_packet);
+        void QueuePacket(std::unique_ptr<ClientPacket const> packet);
+        void QueueBinaryPacket(std::unique_ptr<WorldPacket> const& binaryPacket);
         bool CanProcessPackets() const; // Returns true iif we can process packets (ie logged in Player, not a bot, etc ...
         void ProcessPackets(PacketFilter& updater);
         bool AllowPacket(uint16 opcode);
@@ -355,15 +361,18 @@ class WorldSession
 
     private:
         void SendPacketImpl(WorldPacket const* packet);
-        void VerifyPacketWasCorrectlyRead(WorldPacket const& recvPacket, ClientPacket const& clientPacket) const;
+        static void VerifyPacketWasCorrectlyRead(WorldPacket const& recvPacket, ClientPacket const& clientPacket);
 
     public:
+        /// Sends a packet to the client.
+        void SendPacket(std::unique_ptr<ServerPacket> packet);
+        /// @deprecated Use SendPacket with ServerPacket class
         void SendPacket(WorldPacket const* packet);
         void SendMovementPacket(WorldPacket const* packet);
         void SendNotification(char const* format, ...) ATTR_PRINTF(2, 3);
         void SendNotification(int32 string_id, ...);
         void SendPetNameInvalid(uint32 error, std::string const& name);
-        void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res);
+        void SendPartyResult(PartyOperation operation, std::string const& memberName, PartyResult res);
         void SendAreaTriggerMessage(char const* Text, ...) ATTR_PRINTF(2, 3);
         void SendQueryTimeResponse();
 
@@ -461,15 +470,21 @@ class WorldSession
         // Group
         void BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data);
         void BuildPartyMemberStatsPacket(Player* player, WorldPacket* data, uint32 updateMask, bool sendAllAuras);
-
     public:                                                 // opcodes handlers
-        template<typename TClientPacket, void (WorldSession::*THandler)(TClientPacket const& packet)>
-        void Handle_Generic(WorldPacket& recvPacket)
+        template<typename TClientPacket>
+        static std::unique_ptr<ClientPacket> Handle_GenericRead(WorldPacket& recvPacket)
         {
-            auto packet = TClientPacket();
-            packet.ReadFromWorldPacket(recvPacket);
-            VerifyPacketWasCorrectlyRead(recvPacket, packet);
-            (this->*THandler)(packet);
+            auto packet = std::make_unique<TClientPacket>();
+            packet->ReadFromWorldPacket(recvPacket);
+            VerifyPacketWasCorrectlyRead(recvPacket, *packet);
+            return packet;
+        }
+
+        template<typename TClientPacket, void (WorldSession::*THandler)(TClientPacket const& packet)>
+        void Handle_GenericPacket(ClientPacket const& packet)
+        {
+            auto const& packetInCorrectForm = dynamic_cast<TClientPacket const&>(packet);
+            (this->*THandler)(packetInCorrectForm);
         }
 
         void Handle_NULL(WorldPacket& recvPacket);          // not used
@@ -534,6 +549,7 @@ class WorldSession
         void HandleTogglePvP(WorldPackets::Misc::TogglePvP const& packet);
         void HandleZoneUpdateOpcode(WorldPackets::Misc::ZoneUpdate const& packet);
         void HandleSetSelectionOpcode(WorldPackets::Misc::SetSelection const& packet);
+        void HandleSetMouseOverTargetOpcode(WorldPackets::Misc::SetTarget const& packet);
         void HandleStandStateChangeOpcode(WorldPackets::Misc::StandStateChange const& packet);
         void HandleEmoteOpcode(WorldPackets::Misc::Emote const& packet);
         void HandleFriendListOpcode(NullClientPacket const& packet);
@@ -576,10 +592,12 @@ class WorldSession
         void HandleGroupDisbandOpcode(NullClientPacket const& packet);
         void HandleLootMethodOpcode(WorldPackets::Group::LootMethod const& packet);
         void HandleLootRoll(WorldPackets::Loot::LootRoll const& packet);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         void HandleRequestPartyMemberStatsOpcode(WorldPackets::Group::RequestPartyMemberStats const& packet);
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         void HandleRaidTargetUpdateOpcode(WorldPackets::Group::RaidTargetUpdate const& packet);
-        void HandleRaidReadyCheckOpcode(WorldPackets::Group::RaidReadyCheck const& packet);
+        void HandleRaidReadyCheckOpcode(WorldPackets::Group::RaidReadyCheckFromClient const& packet);
 #endif
         void HandleGroupRaidConvertOpcode(NullClientPacket const& packet);
         void HandleGroupChangeSubGroupOpcode(WorldPackets::Group::GroupChangeSubGroup const& packet);
@@ -767,7 +785,6 @@ class WorldSession
         void HandleCompleteCinematic(NullClientPacket const& packet);
         void HandleNextCinematicCamera(NullClientPacket const& packet);
 
-        void HandlePageQuerySkippedOpcode(WorldPacket& recvPacket);
         void HandlePageTextQueryOpcode(WorldPackets::Query::QueryPageText const& packet);
 
         void HandleTutorialFlagOpcode(WorldPackets::Misc::TutorialFlag const& packet);
@@ -806,10 +823,12 @@ class WorldSession
         void HandleBattlefieldStatusOpcode(NullClientPacket const& packet);
         void HandleBattleFieldPortOpcode(WorldPackets::Battleground::BattleFieldPort const& packet);
         void HandleBattlefieldListOpcode(WorldPackets::Battleground::BattlefieldListRequest const& packet);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         void HandleLeaveBattlefieldOpcode(WorldPackets::Battleground::LeaveBattlefield const& packet);
+#endif
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
-        void HandleWardenDataOpcode(WorldPackets::Misc::WardenData const& packet);
+        void HandleWardenDataOpcode(WorldPackets::Warden::WardenData const& packet);
 #endif
         void HandleMinimapPingOpcode(WorldPackets::Group::MinimapPing const& packet);
         void HandleRandomRollOpcode(WorldPackets::Group::RandomRoll const& packet);
@@ -817,8 +836,10 @@ class WorldSession
         void HandleWhoisOpcode(WorldPackets::Query::Whois const& packet);
         void HandleResetInstancesOpcode(NullClientPacket const& packet);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         void HandleAreaSpiritHealerQueryOpcode(WorldPackets::Battleground::AreaSpiritHealerQuery const& packet);
         void HandleAreaSpiritHealerQueueOpcode(WorldPackets::Battleground::AreaSpiritHealerQueue const& packet);
+#endif
         void HandleSelfResOpcode(NullClientPacket const& packet);
 
     private:
@@ -828,16 +849,15 @@ class WorldSession
         bool VerifyMovementInfo(MovementInfo const& movementInfo) const;
         void HandleMoverRelocation(Unit* pMover, MovementInfo& movementInfo);
 
-        void ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* packet);
+        void ExecuteOpcode(OpcodeHandlerPacketImplDetails const& opHandle, ClientPacket const& packet);
 
         // logging helper
-        void LogUnexpectedOpcode(WorldPacket* packet, char const*  reason);
-        void LogUnprocessedTail(WorldPacket* packet);
+        void LogUnexpectedOpcode(ClientPacket const& packet, std::string const& reason);
 
         uint32 const m_guid; // unique identifier for each session
         std::shared_ptr<WorldSocket> m_socket;
         std::string m_remoteIpAddress; // might also be "<BOT>"
-        LockedQueue<std::unique_ptr<WorldPacket>, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
+        LockedQueue<std::unique_ptr<ClientPacket const>, std::mutex> m_recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool m_receivedPacketType[PACKET_PROCESS_MAX_TYPE];
         uint32 m_floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
         bool m_connected;
@@ -873,7 +893,7 @@ class WorldSession
         bool m_playerRecentlyLogout;
         bool m_playerSave;
         uint32 m_exhaustionState;
-        uint32 m_charactersCount;
+        uint32 m_charactersCount;                           // init with max, to prevent character creation before amount is recalculated in CharEnum handler
         uint32 m_characterMaxLevel;
         BigNumber m_sessionKey;
         AccountData m_accountData[NewAccountData::NUM_ACCOUNT_DATA_TYPES];

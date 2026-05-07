@@ -108,7 +108,7 @@ public:
     void SetTeam(Team team) { m_team = team; }
 
     uint8 GetSignatureCount() const { return static_cast<uint8>(m_signatures.size()); }
-    const PetitionSignatureList& GetSignatureList() { return m_signatures; }
+    const PetitionSignatureList& GetSignatureList() const { return m_signatures; }
 
     void BuildSignatureData(WorldPacket& data) const;
 
@@ -146,7 +146,7 @@ public:
 
     void SaveToDB();
 
-    ObjectGuid const& GetSignatureGuid() { return m_playerGuid; }
+    ObjectGuid const& GetSignatureGuid() const { return m_playerGuid; }
     uint32 GetSignatureAccountId() const { return m_playerAccount; }
 
 private:

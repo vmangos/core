@@ -115,8 +115,6 @@ bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)
         default:
             return true;
     }
-
-    return true;
 }
 
 uint32 WorldSession::ChatCooldown()
@@ -507,7 +505,7 @@ void WorldSession::HandleChatMessageOpcode(WorldPackets::Chat::ChatMessage const
         {
             if (GetMasterPlayer()->GetGuildId())
                 if (Guild* guild = sGuildMgr.GetGuildById(GetMasterPlayer()->GetGuildId()))
-                    guild->BroadcastToOfficers(this, packet.message.c_str(), packet.lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
+                    guild->BroadcastChatMsgToOfficers(this, packet.message.c_str(), packet.lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
 
             if (packet.lang != LANG_ADDON)
                 sWorld.LogChat(this, "Officer", packet.message.c_str(), nullptr, GetMasterPlayer()->GetGuildId());
@@ -767,21 +765,19 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPackets::Misc::ChatIgnored const
 
 void WorldSession::SendPlayerNotFoundNotice(std::string const& name)
 {
-    WorldPacket data(SMSG_CHAT_PLAYER_NOT_FOUND, name.size() + 1);
-    data << name;
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Chat::ChatPlayerNotFound>();
+    packet->name = name;
+    SendPacket(std::move(packet));
 }
 
 void WorldSession::SendWrongFactionNotice()
 {
-    WorldPacket data(SMSG_CHAT_WRONG_FACTION, 0);
-    SendPacket(&data);
+    SendPacket(std::make_unique<WorldPackets::Chat::ChatWrongFaction>());
 }
 
 void WorldSession::SendChatRestrictedNotice()
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    WorldPacket data(SMSG_CHAT_RESTRICTED, 0);
-    SendPacket(&data);
+    SendPacket(std::make_unique<WorldPackets::Chat::ChatRestricted>());
 #endif
 }

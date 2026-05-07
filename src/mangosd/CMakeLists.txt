@@ -82,6 +82,7 @@ set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "${DEFINITIONS}")
 add_executable(${EXECUTABLE_NAME}
   ${EXECUTABLE_SRCS}
 )
+mangos_target_flags(${EXECUTABLE_NAME})
 
 if(USE_SCRIPTS)
   target_link_libraries(${EXECUTABLE_NAME}

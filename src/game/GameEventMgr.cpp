@@ -77,7 +77,7 @@ void GameEventMgr::StartEvent(uint16 event_id, bool overwrite /*=false*/, bool r
         return;
     }
     ApplyNewEvent(event_id, resume);
-    
+
     //invoke enable on hardcoded events
     if (mGameEvent[event_id].hardcoded && !mGameEvent[event_id].disabled)
     {
@@ -130,7 +130,7 @@ void GameEventMgr::EnableEvent(uint16 event_id, bool enable)
     // change state
     mGameEvent[event_id].disabled = disabled;
     WorldDatabase.PExecute("UPDATE `game_event` SET `disabled` = '%u' WHERE `entry` = '%u'", disabled, event_id);
-   
+
     // we take no action if event needs to be started: GameEvent system will start it for us on its next iteration
     if (!IsActiveEvent(event_id))
         return;
@@ -1154,13 +1154,13 @@ void GameEventMgr::UpdateSilithusPVP()
         {
             sLog.Out(LOG_BG, LOG_LVL_DETAIL, "[SilithusPVPEvent] started %u", SILITHUS_PVP_EVENT_ON);
             StartEvent(SILITHUS_PVP_EVENT_ON);
-            sWorld.SendGlobalText("Les collecteurs de Silithystes sont repares! Depechez vous de revenir en Silithus et reprenez le travail soldat!", nullptr);
+            sWorld.SendGlobalText("The Silithyst collectors have been repaired! Hurry back to Silithus and get back to work, soldier!", nullptr);
         }
     }
     else if (IsActiveEvent(SILITHUS_PVP_EVENT_ON))
     {
         sLog.Out(LOG_BG, LOG_LVL_DETAIL, "[SilithusPVPEvent] stopped %u", SILITHUS_PVP_EVENT_ON);
         StopEvent(SILITHUS_PVP_EVENT_ON);
-        sWorld.SendGlobalText("Le sable a enraille nos collecteurs de Silithystes, la collecte est interrompue en Silithus", nullptr);
+        sWorld.SendGlobalText("Sand has jammed our Silithyst collectors, collection is suspended in Silithus.", nullptr);
     }
 }

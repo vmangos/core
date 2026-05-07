@@ -5,6 +5,8 @@
 #include "SpellCastTargetsInfo.h"
 #include "ObjectGuid.h"
 
+class SpellEntry;
+
 namespace WorldPackets { namespace Spell
 {
     class CastSpell final : public ClientPacket
@@ -64,6 +66,21 @@ namespace WorldPackets { namespace Spell
 
         explicit CancelChanneling() : ClientPacket(CMSG_CANCEL_CHANNELLING) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
+    };
+    // --- Server Packets ---
+
+    // Simplified SMSG_CAST_RESULT for a basic spell failure (status=2) with no extra data.
+    // For complex failures with additional payload (e.g. cooldown time, required area),
+    // use the full Spell::SendCastResult() path in Spell.cpp instead.
+    class CastResultSimpleFailure final : public ServerPacket
+    {
+    public:
+        ::SpellEntry const* spellEntry; // SpellEntry pointers are always valid even when `.reload`
+        uint8 reason;
+
+        explicit CastResultSimpleFailure(::SpellEntry const* spellEntry, uint8 reason)
+            : ServerPacket(SMSG_CAST_RESULT), spellEntry(spellEntry), reason(reason) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 }} // namespace WorldPackets::Spell
 

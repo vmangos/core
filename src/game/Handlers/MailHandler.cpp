@@ -840,10 +840,10 @@ void WorldSession::HandleItemTextQuery(WorldPackets::Misc::ItemTextQuery const& 
 
     // TODO: some check needed, if player has item with guid mailId, or has mail with id mailId
 
-    WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, (4 + 10)); // guess size
-    data << packet.itemTextId;
-    data << sObjectMgr.GetItemText(packet.itemTextId);
-    SendPacket(&data);
+    auto textPacket = std::make_unique<WorldPackets::Mail::ItemTextQueryResponse>();
+    textPacket->itemTextId = packet.itemTextId;
+    textPacket->text = sObjectMgr.GetItemText(packet.itemTextId);
+    SendPacket(std::move(textPacket));
 }
 
 /**
@@ -906,12 +906,9 @@ void WorldSession::HandleQueryNextMailTime(NullClientPacket const& /*packet*/)
 {
     MasterPlayer* player = GetMasterPlayer();
     ASSERT(player);
-    WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 8);
-    if (player->HasUnreadMail())
-        data << float(0);
-    else
-        data << float(-86400.0f);
-    SendPacket(&data);
+    auto nextMailTime = std::make_unique<WorldPackets::Mail::QueryNextMailTimeResponse>();
+    nextMailTime->nextMailTime = player->HasUnreadMail() ? 0.0f : -float(DAY);
+    SendPacket(std::move(nextMailTime));
 }
 
 /*! @} */

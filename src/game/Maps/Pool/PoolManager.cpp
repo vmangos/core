@@ -235,7 +235,7 @@ PoolObject* PoolGroup<T>::RollOne(SpawnedPoolData& spawns, uint32 triggerFrom)
     {
         // Fill a list of possible rolls
         std::vector<uint32> possible_rolls;
-        for (int i = 0; i < EqualChanced.size(); ++i)
+        for (uint32 i = 0; i < EqualChanced.size(); ++i)
             if (EqualChanced[i].CanBeSpawned() && (EqualChanced[i].guid == triggerFrom || !spawns.IsSpawnedObject<T>(EqualChanced[i].guid)))
                 possible_rolls.push_back(i);
         if (!possible_rolls.empty())
@@ -384,7 +384,7 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
         }
         else if (!EqualChanced.empty())
         {
-            for (int i = 0; i < EqualChanced.size(); ++i)
+            for (size_t i = 0; i < EqualChanced.size(); ++i)
             {
                 if (count && GetPoolObjectRespawnTime(mapState, EqualChanced[i].guid))
                 {

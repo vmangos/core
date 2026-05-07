@@ -241,7 +241,7 @@ void Creature::AddToWorld()
         if (GetDeathState() == ALIVE || GetDeathState() == JUST_ALIVED)
             m_creatureGroup->OnRespawn(this);
     }
-        
+
     Unit::AddToWorld();
 
     if (!m_AI)
@@ -617,7 +617,7 @@ bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData 
         SetVisibilityModifier(VISIBILITY_DISTANCE_GIGANTIC);
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
             SetActiveObjectState(true);
-    } 
+    }
     else if (HasExtraFlag(CREATURE_FLAG_EXTRA_INFINITE_AOI))
     {
         SetVisibilityModifier(MAX_VISIBILITY_DISTANCE);
@@ -821,9 +821,9 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 break;
 
             // Youfie - <Nostalrius>
-            // Cf. fix de Daemon [c1491] & mon autre bricolage de celui-ci [c1527)
-            // Les mobs 11357, 8901, 14826 etc. : ont des minuscules temps de repop. Sans rajouter cette condition, tous les
-            // mobs spawn via un event/script despawn (loots avec) au bout de genre 25s, sans qu'on puisse le changer dans la DB car pas de GUID fixe.
+            // Cf. Daemon's fix [c1491] & my other patch on top of it [c1527)
+            // Mobs 11357, 8901, 14826 etc. have very short respawn times. Without this condition, all
+            // mobs spawned via event/script despawn (loot included) after about 25s, with no way to change it in the DB since there is no fixed GUID.
             if (m_corpseDecayTimer <= update_diff || (m_respawnTime <= time(nullptr) && GetDBTableGUIDLow() && !IsPet()))
             {
                 if (IsInWorld())                            // can be despawned by update pool
@@ -1082,9 +1082,6 @@ void Creature::RegenerateHealth()
     {
         addvalue = maxValue / 3;
     }
-
-    if (addvalue < 0)
-        addvalue = 0;
 
     ModifyHealth(addvalue);
 }
@@ -1894,7 +1891,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
 
     if (data->spawn_flags & SPAWN_FLAG_ACTIVE)
         m_isActiveObject = true;
-    
+
     if (data->visibility_mod)
         m_visibilityModifier = data->visibility_mod;
 
@@ -2010,7 +2007,7 @@ void Creature::LoadDefaultEquipment(GameEventCreatureData const* eventData)
         if (HasStaticFlag(CREATURE_STATIC_FLAG_CAN_WIELD_LOOT))
         {
             GenerateLootForBody(nullptr, nullptr);
-            
+
             bool hasMainHand = false;
             bool hasOffHand = false;
             bool hasRanged = false;
@@ -2345,7 +2342,7 @@ void Creature::ForcedDespawn(uint32 msTimeToDespawn /*= 0*/, uint32 secsTimeToRe
         return;
     }
 
-    uint32 oldRespawnDelay;
+    uint32 oldRespawnDelay = 0;
     if (secsTimeToRespawn)
     {
         oldRespawnDelay = m_respawnDelay;
@@ -2478,7 +2475,7 @@ void Creature::CallForHelp(float radius)
 {
     if (radius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
         return;
-    
+
     MaNGOS::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
     MaNGOS::CreatureWorker<MaNGOS::CallOfHelpCreatureInRangeDo> worker(this, u_do);
     Cell::VisitGridObjects(this, worker, radius);
@@ -3246,7 +3243,7 @@ time_t Creature::GetRespawnTimeEx() const
 
 void Creature::GetRespawnCoord(float &x, float &y, float &z, float* ori, float* dist) const
 {
-    // Nostalrius : pouvoir changer point de spawn d'un mob -> Creature::SetHomePosition
+    // Nostalrius : allow changing a mob's spawn point -> Creature::SetHomePosition
     if (m_homePosition.x > 0.1f || m_homePosition.x < -0.1f)
     {
         x = m_homePosition.x;
@@ -3483,6 +3480,7 @@ void Creature::ClearTemporaryFaction()
 
 void Creature::SendAreaSpiritHealerQueryOpcode(Player* pl)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     uint32 next_resurrect = 0;
     if (Spell* pcurSpell = GetCurrentSpell(CURRENT_CHANNELED_SPELL))
         next_resurrect = pcurSpell->GetCastedTime();
@@ -3490,6 +3488,7 @@ void Creature::SendAreaSpiritHealerQueryOpcode(Player* pl)
     data << ObjectGuid(GetObjectGuid());
     data << uint32(next_resurrect);
     pl->SendDirectMessage(&data);
+#endif
 }
 
 void Creature::DisappearAndDie()

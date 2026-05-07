@@ -269,12 +269,6 @@ if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   endif()
 endif()
 
-if(WIN32)
-  if(MINGW)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
-  endif()
-endif()
-
 # Used in game ScriptMgr, not need here
 list(REMOVE_ITEM SCRIPTS_SRCS ScriptLoader.cpp)
 list(REMOVE_ITEM SCRIPTS_SRCS ScriptLoader_noscripts.cpp)
@@ -330,15 +324,10 @@ include_directories(
   ${MYSQL_INCLUDE_DIR}
 )
 
-if(NOT USE_STD_MALLOC)
-  include_directories(
-    ${TBB_INCLUDE_DIRS}
-  )
-endif()
-
 add_library(${LIBRARY_NAME} STATIC
   ${SCRIPTS_SRCS}
 )
+mangos_target_flags(${LIBRARY_NAME})
 
 SET_TARGET_PROPERTIES (${LIBRARY_NAME} PROPERTIES FOLDER "Game Libs")
 

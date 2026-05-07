@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include "IO/NativeAliases.h"
+#include "nonstd/nodiscard.hpp"
 
 namespace IO { namespace Filesystem {
 
@@ -30,14 +31,14 @@ namespace IO { namespace Filesystem {
 
         void Seek(SeekDirection direction, int64_t offset);
 
-        [[nodiscard]]
+        NODISCARD("")
         uint64_t GetTotalFileSize() const;
 
-        [[nodiscard]]
+        NODISCARD("")
         std::chrono::system_clock::time_point GetLastModifyDate() const;
 
         /// Returns the file path used to open this file
-        [[nodiscard]]
+        NODISCARD("")
         std::string GetFilePath() const;
 
     protected:
@@ -59,7 +60,7 @@ namespace IO { namespace Filesystem {
         uint64_t ReadSync(uint8_t* dest, uint64_t amountToRead);
         inline uint64_t ReadSync(int8_t* dest, uint64_t amountToRead) { return ReadSync((uint8_t*) dest, amountToRead); };
 
-        [[nodiscard]]
+        NODISCARD("")
         std::unique_ptr<IO::Filesystem::FileHandleReadonly> DuplicateFileHandle();
     };
 

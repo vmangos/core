@@ -54,7 +54,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
             WorldDatabase.escape_string(name);
             result = WorldDatabase.PQuery(
                          "SELECT guid, id, position_x, position_y, position_z, orientation, map, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
-                         "FROM gameobject,gameobject_template WHERE gameobject_template.entry = gameobject.id AND map = %i AND name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'")" ORDER BY order_ ASC LIMIT 1",
+                         "FROM gameobject,gameobject_template WHERE gameobject_template.entry = gameobject.id AND map = %i AND name LIKE CONCAT('%%','%s','%%')"" ORDER BY order_ ASC LIMIT 1",
                          pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), pl->GetMapId(), name.c_str());
         }
     }
@@ -161,7 +161,7 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
             if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
                 pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
         }
-    }  
+    }
 
     if (!pGameObject)
     {
@@ -169,7 +169,7 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
         SetSentErrorMessage(true);
         return false;
     }
-    
+
     PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u",
         pGameObject->GetEntry(),
         pGameObject->GetGUIDLow(),

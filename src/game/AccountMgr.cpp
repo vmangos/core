@@ -189,18 +189,16 @@ uint32 AccountMgr::GetId(std::string username)
     std::unique_ptr<QueryResult> result = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` = '%s'", username.c_str());
     if (!result)
         return 0;
-    else
-    {
-        uint32 id = (*result)[0].GetUInt32();
-        return id;
-    }
+
+    uint32 id = (*result)[0].GetUInt32();
+    return id;
 }
 
 void AccountMgr::Load()
 {
     LoadAccountData();
     LoadAccountBanList();
-    LoadIPBanList(std::move(LoginDatabase.Query(LOAD_IP_BANS_QUERY)));
+    LoadIPBanList(LoginDatabase.Query(LOAD_IP_BANS_QUERY));
     LoadAccountWarnings();
 }
 

@@ -7,9 +7,15 @@
 #include <string>
 #include <vector>
 
+#include <openssl/opensslv.h>
+
 class BigNumber;
 
+#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+typedef struct evp_md_ctx_st EVP_MD_CTX;
+#else
 typedef struct MD5state_st MD5_CTX;
+#endif
 
 namespace Crypto { namespace Hash { namespace MD5
 {
@@ -43,7 +49,11 @@ namespace Crypto { namespace Hash { namespace MD5
         Digest GetDigest();
 
     private:
+#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+        EVP_MD_CTX* m_ctx;
+#else
         MD5_CTX* m_ctx;
+#endif
     };
 }}} // namespace Crypto::Hash::MD5
 

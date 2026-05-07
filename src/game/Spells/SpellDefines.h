@@ -542,7 +542,7 @@ enum SpellAuraInterruptFlags
     AURA_INTERRUPT_MOVING_CANCELS                   = 0x00000008,   // 3
     AURA_INTERRUPT_TURNING_CANCELS                  = 0x00000010,   // 4
     AURA_INTERRUPT_ANIM_CANCELS                     = 0x00000020,   // 5    used by Feign Death
-    AURA_INTERRUPT_DISMOUNT_CANCELS                 = 0x00000040,   // 6 
+    AURA_INTERRUPT_DISMOUNT_CANCELS                 = 0x00000040,   // 6
     AURA_INTERRUPT_UNDER_WATER_CANCELS              = 0x00000080,   // 7    removed by entering water
     AURA_INTERRUPT_ABOVE_WATER_CANCELS              = 0x00000100,   // 8    removed by leaving water
     AURA_INTERRUPT_SHEATHING_CANCELS                = 0x00000200,   // 9
@@ -1204,7 +1204,7 @@ enum SpellCategories
     SPELLCATEGORY_HOLY_FIRE = 451,
     SPELLCATEGORY_ICE_BARRIER = 471,
     SPELLCATEGORY_ASTRAL_RECALL = 511,
-    SPELLCATEGORY_NATURES_GRASP = 531, 
+    SPELLCATEGORY_NATURES_GRASP = 531,
     SPELLCATEGORY_AURA_OF_THE_PIOUS = 551,
     SPELLCATEGORY_HURRICANE = 571,
     SPELLCATEGORY_TOTEM_MANA_TIDE = 591,
@@ -1298,6 +1298,12 @@ enum SpellSpecific
     SPELL_FOOD_AND_DRINK    = 22,
     SPELL_NEGATIVE_HASTE    = 23,
     SPELL_SNARE             = 24,
+};
+
+enum SpellCastResultStatus : uint8
+{
+    SPELL_RESULT_STATUS_OKAY = 0,
+    SPELL_RESULT_STATUS_FAIL = 2
 };
 
 #endif

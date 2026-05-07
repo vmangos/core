@@ -145,7 +145,7 @@ class MovementAnticheat
         uint32 m_movementPacketsCount = 0;
         TurnType m_turnType = TURN_NONE;
 
-        // Wallclimb limits - initialized from vmangos.conf 
+        // Wallclimb limits - initialized from vmangos.conf
         static float m_wallSlope;
         static float m_wallSlopeHigh;
 

@@ -19,7 +19,7 @@ Full rewrite by Gemt
 
 Current semi-unknowns:
 The aoe manaburn; not seen it used in videos, despite all original vanilla guides mentioning it.
-Probably because its pretty much a wipe if ranged/healers are hit by it. 
+Probably because its pretty much a wipe if ranged/healers are hit by it.
 While Decrepit fever is very aggressive on its cooldown after a dance phase, the mana burn does not seem to be,
 so we should give "plenty" of time for casters to get to the platform, and tank to move the boss away.
 
@@ -40,7 +40,7 @@ enum HeiganData
     SAY_AGGRO2              = 13042,
     SAY_AGGRO3              = 13043,
     SAY_SLAY                = 13045,
-    
+
     SAY_TAUNT1              = 13046,
     SAY_TAUNT2              = 13047,
     SAY_TAUNT3              = 13048,
@@ -91,14 +91,14 @@ static uint8 const numSections = 4;
 };*/
 
 // in tunnel
-static constexpr float safespotFissures[3][3] = 
-{   
+static constexpr float safespotFissures[3][3] =
+{
     {2747.0f, -3754.0f, 274.0f},
     {2805.8f, -3695.88f, 273.61f},
     {2812.95f, -3703.52f, 273.61f},
 };
 
-static constexpr float sect1SafeSpot[3][3] = 
+static constexpr float sect1SafeSpot[3][3] =
 {
     { 2799.5f, -3691.0f, 273.62f },
     { 2810.67f, -3706.06f, 275.0f },
@@ -107,7 +107,7 @@ static constexpr float sect1SafeSpot[3][3] =
 
 static constexpr float sect2SafeSpot[3] = { 2790.51f, -3690.45f, 273.622f };
 static constexpr float sect3SafeSpot[3] = { 2778.40f, -3702.645f, 273.621f };
-static constexpr float sect4SafeSpot[3][3] = 
+static constexpr float sect4SafeSpot[3][3] =
 {
     { 2777.2f, -3712.41f, 273.63f },
     { 2783.06f, -3717.7f, 273.63f },
@@ -350,7 +350,7 @@ struct boss_heiganAI : public ScriptedAI
         std::vector<Unit*> candidates;
         auto it = tl.begin();
         ++it; // skip the tank
-        for (it; it != tl.end(); it++)
+        for (; it != tl.end(); ++it)
         {
             if (Player* pUnit = (*it)->getTarget()->ToPlayer())
             {
@@ -373,7 +373,7 @@ struct boss_heiganAI : public ScriptedAI
             candidates.erase(candidates.begin() + idx);
             portedPlayersThisPhase.push_back(target->GetObjectGuid());
             // getting the spell visual to show both where you were TPed from and where you are TPed too
-            if (Creature* pCreature = m_creature->SummonCreature(NPC_PLAGUE_WAVE, 
+            if (Creature* pCreature = m_creature->SummonCreature(NPC_PLAGUE_WAVE,
                 target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(),
                 TEMPSUMMON_TIMED_DESPAWN, 2000))
             {

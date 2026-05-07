@@ -50,10 +50,10 @@ struct PageTextLocale
 
 #define MAX_NPC_TEXT_OPTIONS 8
 
-struct QEmote
+struct QuestNpcEmoteInfo
 {
-    uint32 _Emote;
-    uint32 _Delay;
+    uint32 emote;
+    uint32 delay;
 };
 
 struct NpcTextOption

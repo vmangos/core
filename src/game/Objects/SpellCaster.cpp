@@ -823,7 +823,9 @@ void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log) con
     data << uint32(log->damage);                            // damage amount
     data << uint8(log->school);                             // damage school
     data << uint32(log->absorb);                            // AbsorbedDamage
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
     data << int32(log->resist);                             // resist
+#endif
     data << uint8(log->periodicLog);                        // if 1, then client show spell name (example: %s's ranged shot hit %s for %u school or %s suffers %u school damage from %s's spell_name
     data << uint8(false);                                   // unused
     data << uint32(log->blocked);                           // blocked

@@ -66,6 +66,11 @@ void MaNGOS::Errors::PrintStacktrace(int skipFrames, int maxFrames)
 #endif
 }
 
+
+#if COMPILER == COMPILER_MICROSOFT
+#pragma warning(push)
+#pragma warning(disable: 4702) // Disable unreachable code warning
+#endif
 [[noreturn]]
 void MaNGOS::Errors::PrintStacktraceAndThrow(char const* filename, int line, char const* functionName, char const* failedExpression, char const* message)
 {
@@ -85,3 +90,6 @@ void MaNGOS::Errors::PrintStacktraceAndThrow(char const* filename, int line, cha
     // Just in case the std::runtime_error was ignored by a debugger, we throw an assert.
     assert("MANGOS_ASSERT throw was skipped" && false);
 }
+#if COMPILER == COMPILER_MICROSOFT
+#pragma warning(pop)
+#endif

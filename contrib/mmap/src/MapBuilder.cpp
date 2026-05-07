@@ -538,10 +538,10 @@ namespace MMAP
         float agentHeight = 1.0f;
         float agentRadius = 0.5f;
         float agentMaxClimb = 2.0f;
-        const static float BASE_UNIT_DIM = 0.13f;
+        const static float BASE_UNIT_DIM_MAP_BUILDER = 0.13f; // Differs from BASE_UNIT_DIM which is `0.2666666`. Dont ask me why.
 
-        config.cs = BASE_UNIT_DIM;
-        config.ch = BASE_UNIT_DIM;
+        config.cs = BASE_UNIT_DIM_MAP_BUILDER;
+        config.ch = BASE_UNIT_DIM_MAP_BUILDER;
         config.walkableSlopeAngle = 50.0f;
         config.walkableHeight = (int)ceilf(agentHeight / config.ch);
         config.walkableClimb = (int)floorf(agentMaxClimb / config.ch);

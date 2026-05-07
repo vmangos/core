@@ -18,7 +18,7 @@
 
 #include "SendgridMail.h"
 #include "Config/Config.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include <curl/curl.h>
 #include <utility>
 
@@ -68,7 +68,7 @@ SendgridMail::Result SendgridMail::send()
     list = curl_slist_append(list, auth.c_str());
     list = curl_slist_append(list, "Content-Type: application/json");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
-    
+
     if (sConfig.GetBoolDefault("MailCertChecks", true))
     {
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);

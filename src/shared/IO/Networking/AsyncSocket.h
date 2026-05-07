@@ -7,7 +7,7 @@
 #include "IO/Context/AsyncIoOperation.h"
 #include "IO/NativeAliases.h"
 #include "IO/ReadableBuffer.h"
-
+#include "nonstd/nodiscard.hpp"
 #include "Policies/ObjectConstructorTraits.h"
 
 #include <memory>
@@ -37,7 +37,7 @@ namespace IO { namespace Networking {
             /// the memory address of this socket class is directly registered in ::epoll/::kqueue.
             /// This makes it a bit harder to use this class, but improves performance a little bit.
             /// This cannot be undone. You have to destruct the socket.
-            [[nodiscard("Check the returning error code and close the socket in case of an error")]]
+            NODISCARD("Check the returning error code and close the socket in case of an error")
             IO::NetworkError InitializeAndFixateMemoryLocation();
 
             /// If set to true, it asks the OS to disables "Nagle's algorithm" for this socket.

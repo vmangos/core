@@ -18,8 +18,10 @@
 #include "Opcodes_1_7_1.h"
 #elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
 #include "Opcodes_1_6_1.h"
-#else
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
 #include "Opcodes_1_5_1.h"
+#else
+#include "Opcodes_1_4_2.h"
 #endif
 
 #endif // MANGOS_OPCODES_ACTIVE_LIST_H

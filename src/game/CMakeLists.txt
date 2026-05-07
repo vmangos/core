@@ -217,9 +217,11 @@ set (game_SRCS
     Server/Packets/Query.cpp
     Server/Packets/Quest.cpp
     Server/Packets/Skill.cpp
+    Server/Packets/Social.cpp
     Server/Packets/Spell.cpp
     Server/Packets/Taxi.cpp
     Server/Packets/Trade.cpp
+    Server/Packets/Warden.cpp
     Server/WorldSession.cpp
     Server/WorldSocket.cpp
     Server/WorldSocketMgr.cpp
@@ -467,9 +469,11 @@ set (game_SRCS
     Server/Packets/Query.h
     Server/Packets/Quest.h
     Server/Packets/Skill.h
+    Server/Packets/Social.h
     Server/Packets/Spell.h
     Server/Packets/Taxi.h
     Server/Packets/Trade.h
+    Server/Packets/Warden.h
     Server/WorldPacket.h
     Server/WorldSession.h
     Server/WorldSocket.h
@@ -516,9 +520,7 @@ endif()
 if(WIN32)
   #allow exceptions in destructors
   if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:implicitNoexcept-")
-  elseif(MINGW)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+    set(GAME_EXTRA_CXX_FLAGS "/Zc:implicitNoexcept-")
   endif()
 endif()
 
@@ -579,12 +581,6 @@ include_directories(
   ${ZLIB_INCLUDE_DIRS}
 )
 
-if(NOT USE_STD_MALLOC)
-  include_directories(
-    ${TBB_INCLUDE_DIRS}
-  )
-endif()
-
 if(WIN32)
   include_directories(
     ${CMAKE_SOURCE_DIR}/dep/windows/include
@@ -630,6 +626,10 @@ source_group("Anticheat"
 add_library(game STATIC
   ${game_SRCS}
 )
+mangos_target_flags(game)
+if(GAME_EXTRA_CXX_FLAGS)
+  target_compile_options(game PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${GAME_EXTRA_CXX_FLAGS}>)
+endif()
 
 SET_TARGET_PROPERTIES (game PROPERTIES FOLDER "Game Libs")
 

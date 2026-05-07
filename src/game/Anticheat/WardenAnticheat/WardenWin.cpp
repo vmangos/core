@@ -539,10 +539,10 @@ void WardenWin::LoadScriptedScans()
         buff.read(reinterpret_cast<uint8*>(&wardenWin->m_sysInfo), sizeof(wardenWin->m_sysInfo));
 
         // for classic, tbc, and wotlk, the architecute should never be anything other than x86 (0)
-        if (!!wardenWin->m_sysInfo.wProcessorArchitecture)
+        if (!!wardenWin->m_sysInfo.oemInfo.wProcessorArchitecture)
         {
             sLog.OutWarden(wardenWin, LOG_LVL_BASIC, "Incorrect architecture reported (%u)",
-                wardenWin->m_sysInfo.wProcessorArchitecture);
+                wardenWin->m_sysInfo.oemInfo.wProcessorArchitecture);
 
             return true;
         }
@@ -1429,7 +1429,7 @@ void WardenWin::Update()
         stmt.addUInt32(m_accountId);
         stmt.addString(m_sessionIP);
         stmt.addUInt32(realmID);
-        stmt.addString(ArchitectureString(m_sysInfo.wProcessorArchitecture));
+        stmt.addString(ArchitectureString(m_sysInfo.oemInfo.wProcessorArchitecture));
         stmt.addString(CPUTypeAndRevision(m_sysInfo.dwProcessorType, m_sysInfo.wProcessorRevision));
         stmt.addUInt32(activeProcCount);
         stmt.addUInt32(m_sysInfo.dwNumberOfProcessors);
@@ -1495,7 +1495,7 @@ void WardenWin::GetPlayerInfo(std::string& clock, std::string& fingerprint, std:
     {
         std::stringstream s;
 
-        s << "Architecture: " << ArchitectureString(m_sysInfo.wProcessorArchitecture)
+        s << "Architecture: " << ArchitectureString(m_sysInfo.oemInfo.wProcessorArchitecture)
             << " CPU Type: " << CPUTypeAndRevision(m_sysInfo.dwProcessorType, m_sysInfo.wProcessorRevision)
             << " Page Size: 0x" << std::hex << std::uppercase << m_sysInfo.dwPageSize << std::dec;
 

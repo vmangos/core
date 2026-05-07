@@ -36,38 +36,9 @@
 
 void WorldSession::SendTradeStatus(TradeStatus status)
 {
-    WorldPacket data;
-
-    switch (status)
-    {
-        case TRADE_STATUS_BEGIN_TRADE:
-            data.Initialize(SMSG_TRADE_STATUS, 4 + 8);
-            data << uint32(status);
-            data << uint64(0);
-            break;
-        case TRADE_STATUS_OPEN_WINDOW:
-            data.Initialize(SMSG_TRADE_STATUS, 4 + 4);
-            data << uint32(status);
-            break;
-        case TRADE_STATUS_CLOSE_WINDOW:
-            data.Initialize(SMSG_TRADE_STATUS, 4 + 4 + 1 + 4);
-            data << uint32(status);
-            data << uint32(0);
-            data << uint8(0);
-            data << uint32(0);
-            break;
-        case TRADE_STATUS_ONLY_CONJURED:
-            data.Initialize(SMSG_TRADE_STATUS, 4 + 1);
-            data << uint32(status);
-            data << uint8(0);
-            break;
-        default:
-            data.Initialize(SMSG_TRADE_STATUS, 4);
-            data << uint32(status);
-            break;
-    }
-
-    SendPacket(&data);
+    auto tradePacket = std::make_unique<WorldPackets::Trade::TradeStatus>();
+    tradePacket->status = status;
+    SendPacket(std::move(tradePacket));
 }
 
 void WorldSession::HandleIgnoreTradeOpcode(NullClientPacket const& /*packet*/)
@@ -683,10 +654,10 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPackets::Trade::InitiateTrade 
     _player->m_trade->SetScamPreventionDelay(200);
     pOther->m_trade->SetScamPreventionDelay(200);
 
-    WorldPacket data(SMSG_TRADE_STATUS, 12);
-    data << uint32(TRADE_STATUS_BEGIN_TRADE);
-    data << ObjectGuid(_player->GetObjectGuid());
-    pOther->GetSession()->SendPacket(&data);
+    auto tradePacket = std::make_unique<WorldPackets::Trade::TradeStatus>();
+    tradePacket->status = TRADE_STATUS_BEGIN_TRADE;
+    tradePacket->playerGuid = _player->GetObjectGuid();
+    pOther->GetSession()->SendPacket(std::move(tradePacket));
 }
 
 void WorldSession::HandleSetTradeGoldOpcode(WorldPackets::Trade::SetTradeGold const& packet)

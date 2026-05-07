@@ -7,6 +7,7 @@
 #include "nonstd/optional.hpp"
 #include <string>
 #include <vector>
+#include <array>
 
 namespace WorldPackets { namespace Misc
 {
@@ -121,6 +122,16 @@ namespace WorldPackets { namespace Misc
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
 
+    class SetTarget final : public ClientPacket
+    {
+    public:
+        ObjectGuid guid;
+
+        explicit SetTarget() : ClientPacket(CMSG_SET_TARGET_OBSOLETE) {}
+        void ReadFromWorldPacket(WorldPacket& recv_data) override;
+    };
+
+
     class FarSight final : public ClientPacket
     {
     public:
@@ -219,8 +230,8 @@ namespace WorldPackets { namespace Misc
     class ResurrectResponse final : public ClientPacket
     {
     public:
-        ObjectGuid guid;
-        uint8 status = 0;
+        ObjectGuid resurrectorGuid; // the guid of the player who rezzed me
+        bool accept = false;
 
         explicit ResurrectResponse() : ClientPacket(CMSG_RESURRECT_RESPONSE) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
@@ -349,16 +360,271 @@ namespace WorldPackets { namespace Misc
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
-    class WardenData final : public ClientPacket
+    // --- Server Packets ---
+
+    // SMSG_MEETINGSTONE_MEMBER_ADDED: notifies group members that a new player was added via LFG
+    class MeetingstoneMemberAdded final : public ServerPacket
     {
     public:
-        std::vector<uint8> data;
+        ObjectGuid playerGuid; // guid of the player that was added
 
-        explicit WardenData() : ClientPacket(CMSG_WARDEN_DATA) {}
-        void ReadFromWorldPacket(WorldPacket& recv_data) override;
+        explicit MeetingstoneMemberAdded() : ServerPacket(SMSG_MEETINGSTONE_MEMBER_ADDED) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    // SMSG_MEETINGSTONE_IN_PROGRESS: empty body; sent periodically while the LFG queue is still searching
+    class MeetingstoneInProgress final : public ServerPacket
+    {
+    public:
+        explicit MeetingstoneInProgress() : ServerPacket(SMSG_MEETINGSTONE_IN_PROGRESS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    // SMSG_MEETINGSTONE_COMPLETE: empty body; sent when the LFG search completes successfully
+    class MeetingstoneComplete final : public ServerPacket
+    {
+    public:
+        explicit MeetingstoneComplete() : ServerPacket(SMSG_MEETINGSTONE_COMPLETE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class LogoutComplete final : public ServerPacket
+    {
+    public:
+        explicit LogoutComplete() : ServerPacket(SMSG_LOGOUT_COMPLETE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class LogoutCancelAck final : public ServerPacket
+    {
+    public:
+        explicit LogoutCancelAck() : ServerPacket(SMSG_LOGOUT_CANCEL_ACK) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class StandStateUpdate final : public ServerPacket
+    {
+    public:
+        uint8 standState = 0;
+
+        explicit StandStateUpdate() : ServerPacket(SMSG_STANDSTATE_UPDATE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    class PlayTimeWarning final : public ServerPacket
+    {
+    public:
+        uint32 flag = 0;
+        int32 timeLeftInSeconds = 0;
+
+        explicit PlayTimeWarning() : ServerPacket(SMSG_PLAY_TIME_WARNING) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
+
+    class LogoutResponse final : public ServerPacket
+    {
+    public:
+        uint32 reason = 0;
+        uint8 instant = 0;
+
+        explicit LogoutResponse() : ServerPacket(SMSG_LOGOUT_RESPONSE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PlayedTime final : public ServerPacket
+    {
+    public:
+        uint32 totalPlayedTime = 0;
+        uint32 levelPlayedTime = 0;
+
+        explicit PlayedTime() : ServerPacket(SMSG_PLAYED_TIME) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class InspectResponse final : public ServerPacket
+    {
+    public:
+        ObjectGuid guid;
+
+        explicit InspectResponse() : ServerPacket(SMSG_INSPECT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class WhoisResponse final : public ServerPacket
+    {
+    public:
+        std::string message; // max CString length allowed: 256
+
+        explicit WhoisResponse() : ServerPacket(SMSG_WHOIS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class UpdateAccountDataResponse final : public ServerPacket
+    {
+    public:
+        uint32 type = 0;
+        uint32 decompressedLength = 0;
+        std::vector<uint8> compressedData;
+
+        explicit UpdateAccountDataResponse() : ServerPacket(SMSG_UPDATE_ACCOUNT_DATA) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class InspectHonorStatsResponse final : public ServerPacket
+    {
+    public:
+        ObjectGuid playerGuid;
+        uint8 highestRank = 0;          // Highest Rank
+        uint32 sessionKills = 0;        // Today Honorable and Dishonorable Kills
+        uint16 yesterdayHK = 0;         // Yesterday Honorable Kills
+        uint16 unknownOld1 = 0;         // Unknown (deprecated, yesterday dishonourable?)
+        uint16 lastWeekHK = 0;          // Last Week Honorable Kills
+        uint16 unknownOld2 = 0;         // Unknown (deprecated, last week dishonourable?)
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+        uint16 thisWeekHK = 0;          // This Week Honorable kills
+        uint16 unknownOld3 = 0;         // Unknown (deprecated, this week dishonourable?)
+#endif
+        uint32 lifetimeHK = 0;          // Lifetime Honorable Kills
+        uint32 lifetimeDHK = 0;         // Lifetime Dishonorable Kills
+        uint32 yesterdayHonor = 0;      // Yesterday Honor
+        uint32 lastWeekHonor = 0;       // Last Week Honor
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+        uint32 thisWeekHonor = 0;       // This Week Honor
+#endif
+        uint32 lastWeekRank = 0;        // Last Week Standing
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+        uint8 rankBar = 0;              // Rank progress bar
+#endif
+
+        explicit InspectHonorStatsResponse() : ServerPacket(MSG_INSPECT_HONOR_STATS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    class WeatherUpdate final : public ServerPacket
+    {
+    public:
+        uint32 weatherType = 0;
+        float grade = 0.0f;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        uint32 soundId = 0;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        bool instantChange = false;     // true = instant change, false = smooth change
+#endif
+
+        explicit WeatherUpdate() : ServerPacket(SMSG_WEATHER) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+#endif
+
+    class ServerMessage final : public ServerPacket
+    {
+    public:
+        uint32 messageType = 0;
+        std::string text;
+
+        explicit ServerMessage() : ServerPacket(SMSG_SERVER_MESSAGE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class MeetingstoneJoinFailed final : public ServerPacket
+    {
+    public:
+        uint8 reason = 0;
+
+        explicit MeetingstoneJoinFailed() : ServerPacket(SMSG_MEETINGSTONE_JOINFAILED) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class MeetingstoneSetQueue final : public ServerPacket
+    {
+    public:
+        uint32 areaId = 0;
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+        uint64 idempotencyToken = 0; // Guess: Incrementing counter. Must change for every response. TODO: Maybe use ms timestamp to enforce a new id on every packet
+#else
+        uint8 status = 0;
+#endif
+
+        explicit MeetingstoneSetQueue() : ServerPacket(SMSG_MEETINGSTONE_SETQUEUE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PvpCredit final : public ServerPacket
+    {
+    public:
+        int32 honor = 0;          // Amount of honor gained
+        ObjectGuid victimGuid;    // GUID of the killed unit (empty if no victim)
+        int32 victimRank = 0;     // Rank of the victim (0 = no rank, 19 = racial leader)
+
+        explicit PvpCredit() : ServerPacket(SMSG_PVP_CREDIT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    struct ForcedReactionEntry
+    {
+        ForcedReactionEntry() = default;
+        ForcedReactionEntry(uint32 faction, uint32 rank) : factionId(faction), reputationRank(rank) {}
+
+        uint32 factionId = 0;       // Faction ID (Faction.dbc)
+        uint32 reputationRank = 0;  // Reputation rank
+    };
+
+    class SetForcedReactions final : public ServerPacket
+    {
+    public:
+        std::vector<ForcedReactionEntry> forcedReactions;
+
+        explicit SetForcedReactions() : ServerPacket(SMSG_SET_FORCED_REACTIONS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    struct FactionStandingEntry
+    {
+        FactionStandingEntry() = default;
+        FactionStandingEntry(uint32 repId, int32 repStanding) : reputationListId(repId), standing(repStanding) {}
+
+        uint32 reputationListId = 0; // Reputation list ID
+        int32 standing = 0;          // Reputation standing
+    };
+
+    class SetFactionStanding final : public ServerPacket  // last check 2.4.0
+    {
+    public:
+        std::vector<FactionStandingEntry> factionStandings;
+
+        explicit SetFactionStanding() : ServerPacket(SMSG_SET_FACTION_STANDING) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    struct FactionInitEntry
+    {
+        uint8 flags = 0;    // Faction flags
+        int32 standing = 0; // Reputation standing
+    };
+
+    class InitializeFactions final : public ServerPacket
+    {
+    public:
+        static constexpr uint32 MAX_FACTION_COUNT = 64;
+        std::array<FactionInitEntry, MAX_FACTION_COUNT> factions;
+
+        explicit InitializeFactions() : ServerPacket(SMSG_INITIALIZE_FACTIONS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SetFactionVisible final : public ServerPacket
+    {
+    public:
+        uint32 reputationListId = 0; // Reputation list ID to make visible
+
+        explicit SetFactionVisible() : ServerPacket(SMSG_SET_FACTION_VISIBLE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
 
 }} // namespace WorldPackets::Misc
 

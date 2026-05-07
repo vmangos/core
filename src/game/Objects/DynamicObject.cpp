@@ -107,7 +107,7 @@ bool DynamicObject::Create(uint32 guidlow, WorldObject* caster, uint32 spellId, 
     SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(spellId);
     if (!spellProto)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DynamicObject (spell %u) not created. Spell not exist!", spellId, GetPositionX(), GetPositionY());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DynamicObject (spell %u) not created. Spell not exist! Position: X: %f, Y: %f", spellId, GetPositionX(), GetPositionY());
         return false;
     }
 

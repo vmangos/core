@@ -63,3 +63,23 @@ void WorldPackets::Mail::MailCreateTextItem::ReadFromWorldPacket(WorldPacket& re
     recv_data >> mailTemplateId;
 #endif
 }
+
+// --- Server Packets ---
+
+void WorldPackets::Mail::ReceivedMail::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << notifyDelay;
+}
+
+void WorldPackets::Mail::ItemTextQueryResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << itemTextId;
+    buffer << text;
+}
+
+void WorldPackets::Mail::QueryNextMailTimeResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << nextMailTime;
+}
+
+

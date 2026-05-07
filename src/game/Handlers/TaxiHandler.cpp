@@ -51,10 +51,10 @@ void WorldSession::SendTaxiStatus(ObjectGuid guid)
     if (curloc == 0)
         return;
 
-    WorldPacket data(SMSG_TAXINODE_STATUS, 9);
-    data << ObjectGuid(guid);
-    data << uint8(GetPlayer()->m_taxi.IsTaximaskNodeKnown(curloc) ? 1 : 0);
-    SendPacket(&data);
+    auto taxiPacket = std::make_unique<WorldPackets::Taxi::TaxiNodeStatus>();
+    taxiPacket->guid = guid;
+    taxiPacket->known = GetPlayer()->m_taxi.IsTaximaskNodeKnown(curloc) ? 1 : 0;
+    SendPacket(std::move(taxiPacket));
 }
 
 void WorldSession::HandleTaxiQueryAvailableNodes(WorldPackets::Taxi::TaxiQueryAvailableNodes const& packet)
@@ -124,13 +124,12 @@ bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
 
     if (GetPlayer()->m_taxi.SetTaximaskNode(curloc))
     {
-        WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
-        SendPacket(&msg);
+        SendPacket(std::make_unique<WorldPackets::Taxi::NewTaxiPath>());
 
-        WorldPacket update(SMSG_TAXINODE_STATUS, 9);
-        update << ObjectGuid(unit->GetObjectGuid());
-        update << uint8(1);
-        SendPacket(&update);
+        auto taxiStatus = std::make_unique<WorldPackets::Taxi::TaxiNodeStatus>();
+        taxiStatus->guid = unit->GetObjectGuid();
+        taxiStatus->known = true;
+        SendPacket(std::move(taxiStatus));
 
         return true;
     }
