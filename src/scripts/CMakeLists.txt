@@ -121,7 +121,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/hillsbrad_foothills/hillsbrad_foothills.cpp
     eastern_kingdoms/hinterlands/hinterlands.cpp
     eastern_kingdoms/loch_modan/loch_modan.cpp
-    eastern_kingdoms/redridge_mountains/redridge_mountains.cpp
     eastern_kingdoms/searing_gorge/searing_gorge.cpp
     eastern_kingdoms/silverpine_forest/silverpine_forest.cpp
     eastern_kingdoms/silverpine_forest/shadowfang_keep/instance_shadowfang_keep.cpp
