@@ -1227,7 +1227,7 @@ void Aura::TriggerSpell()
                         if (int32 mana = triggerTarget->GetMaxPower(POWER_MANA))
                         {
                             mana /= 10;
-                            triggerTarget->EnergizeBySpell(triggerTarget, 23493, mana, POWER_MANA);
+                            triggerTarget->EnergizeBySpell(triggerTarget, sSpellMgr.GetSpellEntry(23493), mana, POWER_MANA);
                         }
                         return;
                     }
@@ -1295,7 +1295,7 @@ void Aura::TriggerSpell()
                         if (target->GetPower(POWER_MANA) >= 10)
                         {
                             target->ModifyPower(POWER_MANA, -10);
-                            target->SendEnergizeSpellLog(target, 27746, -10, POWER_MANA);
+                            target->SendEnergizeSpellLog(target, sSpellMgr.GetSpellEntry(27746), -10, POWER_MANA);
                         }
                         else
                             target->RemoveAurasDueToSpell(27746);
@@ -5772,7 +5772,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 SpellMissInfo result = pCaster->SpellHitResult(target, spellProto, GetEffIndex(), false);
                 if (result != SPELL_MISS_NONE)
                 {
-                    pCaster->SendSpellMiss(target, GetId(), result);
+                    pCaster->SendSpellMiss(target, spellProto, result);
                     return;
                 }
             }
@@ -5780,7 +5780,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // Check for immune (not use charges)
             if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
             {
-                pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                pCaster->SendSpellOrDamageImmune(target, spellProto);
                 return;
             }
 
@@ -5885,7 +5885,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 SpellMissInfo result = pCaster->SpellHitResult(target, spellProto, GetEffIndex(), false);
                 if (result != SPELL_MISS_NONE)
                 {
-                    pCaster->SendSpellMiss(target, GetId(), result);
+                    pCaster->SendSpellMiss(target, spellProto, result);
                     return;
                 }
             }
@@ -5893,7 +5893,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // Check for immune
             if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
             {
-                pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                pCaster->SendSpellOrDamageImmune(target, spellProto);
                 return;
             }
 
@@ -5916,7 +5916,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             pCaster->DealDamageMods(target, pdamage, &absorb);
 
-            pCaster->SendSpellNonMeleeDamageLog(target, GetId(), pdamage, spellProto->GetSpellSchoolMask(), absorb, resist, true, 0);
+            pCaster->SendSpellNonMeleeDamageLog(target, GetSpellProto(), pdamage, spellProto->GetSpellSchoolMask(), absorb, resist, true, 0);
 
             float multiplier = spellProto->EffectMultipleValue[GetEffIndex()] > 0 ? spellProto->EffectMultipleValue[GetEffIndex()] : 1;
 
@@ -5972,7 +5972,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             if (target->IsImmuneToSchool(spellProto, (1 << GetEffIndex())))
             {
-                pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                pCaster->SendSpellOrDamageImmune(target, spellProto);
                 return;
             }
 
@@ -6047,7 +6047,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                     uint32 damage = gain;
                     uint32 absorb = 0;
                     pCaster->DealDamageMods(pCaster, damage, &absorb);
-                    pCaster->SendSpellNonMeleeDamageLog(pCaster, GetId(), damage, spellProto->GetSpellSchoolMask(), absorb, 0, true, 0, false);
+                    pCaster->SendSpellNonMeleeDamageLog(pCaster, GetSpellProto(), damage, spellProto->GetSpellSchoolMask(), absorb, 0, true, 0, false);
 
                     CleanDamage cleanDamage =  CleanDamage(0, BASE_ATTACK, MELEE_HIT_NORMAL, absorb, 0);
                     pCaster->DealDamage(pCaster, damage, &cleanDamage, NODAMAGE, spellProto->GetSpellSchoolMask(), spellProto, true);
@@ -6082,7 +6082,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 SpellMissInfo result = pCaster->SpellHitResult(target, spellProto, GetEffIndex(), false);
                 if (result != SPELL_MISS_NONE)
                 {
-                    pCaster->SendSpellMiss(target, GetId(), result);
+                    pCaster->SendSpellMiss(target, spellProto, result);
                     return;
                 }
             }
@@ -6090,7 +6090,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // Check for immune (not use charges)
             if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
             {
-                pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                pCaster->SendSpellOrDamageImmune(target, spellProto);
                 return;
             }
 
@@ -6162,7 +6162,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             {
                 if (target->IsImmuneToSchool(spellProto, (1 << GetEffIndex())))
                 {
-                    pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                    pCaster->SendSpellOrDamageImmune(target, spellProto);
                     return;
                 }
             }
@@ -6211,7 +6211,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             {
                 if (target->IsImmuneToSchool(spellProto, (1 << GetEffIndex())))
                 {
-                    pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                    pCaster->SendSpellOrDamageImmune(target, spellProto);
                     return;
                 }
             }
@@ -6252,7 +6252,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // Check for immune (not use charges)
             if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
             {
-                pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                pCaster->SendSpellOrDamageImmune(target, spellProto);
                 return;
             }
 
@@ -6271,7 +6271,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             gain = rand_ditheru(gain * spellProto->EffectMultipleValue[GetEffIndex()]);
 
             // maybe has to be sent different to client, but not by SMSG_PERIODICAURALOG
-            SpellNonMeleeDamage damageInfo(pCaster, target, spellProto->Id, SpellSchools(spellProto->School));
+            SpellNonMeleeDamage damageInfo(pCaster, target, spellProto, SpellSchools(spellProto->School));
             damageInfo.periodicLog = true;
             damageInfo.reflected = GetHolder()->IsReflected();
 

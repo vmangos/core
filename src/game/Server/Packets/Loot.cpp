@@ -93,4 +93,3 @@ void WorldPackets::Loot::LootRemoved::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << lootSlot;
 }
-

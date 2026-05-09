@@ -65,3 +65,15 @@ void WorldPackets::Combat::EnvironmentalDamageLog::AppendBodyTo(ByteBuffer& buff
     buffer << resist;
 #endif
 }
+
+void WorldPackets::Combat::FeignDeathResisted::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+void WorldPackets::Combat::SpellDamageShield::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << victimGuid;
+    buffer << attackerGuid;
+    buffer << damage;
+    buffer << school;
+}

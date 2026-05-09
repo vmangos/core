@@ -20,6 +20,8 @@
 #include "Common.h"
 #include "Timer.h"
 
+class SpellEntry;
+
 class MirrorTimer
 {
 public:
@@ -43,7 +45,7 @@ public:
         STATUS_UPDATE = 2,
     };
 
-    MirrorTimer(Type type) : m_type(type), m_scale(-1), m_spellId(0), m_status(UNCHANGED), m_active(false), m_frozen(false) {}
+    MirrorTimer(Type type) : m_type(type), m_scale(-1), m_maybeSpellEntry(nullptr), m_status(UNCHANGED), m_active(false), m_frozen(false) {}
 
     bool     IsActive() const { return m_active; }
     bool     IsRegenerating() const { return (m_scale > 0); }
@@ -53,14 +55,16 @@ public:
     uint32   GetRemaining() const { return (m_tracker.GetInterval() - m_tracker.GetCurrent()); }
     uint32   GetDuration() const { return m_tracker.GetInterval(); }
     int32    GetScale() const { return m_scale; }
-    uint32   GetSpellId() const { return m_spellId; }
+
+    /** might be nullptr */
+    SpellEntry const* GetMaybeSpellEntry() const { return m_maybeSpellEntry; }
 
     Status   FetchStatus();
 
     void Stop();
 
-    void Start(uint32 interval, uint32 spellId = 0);
-    void Start(uint32 current, uint32 max, uint32 spellId);
+    void Start(uint32 interval, SpellEntry const* maybeSpellEntry = nullptr);
+    void Start(uint32 current, uint32 max, SpellEntry const* spellEntry);
 
     void SetRemaining(uint32 duration);
     void SetDuration(uint32 duration);
@@ -74,7 +78,7 @@ public:
 private:
     Type m_type;
     int32 m_scale;
-    uint32 m_spellId;
+    SpellEntry const* m_maybeSpellEntry; // might be nullptr
 
     ShortIntervalTimer m_tracker;
     ShortIntervalTimer m_pulse;

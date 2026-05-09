@@ -65,7 +65,10 @@ struct HunterReadinessScript : SpellScript
             if (Player* pPlayer = spell->m_caster->ToPlayer())
             {
                 // immediately finishes the cooldown for hunter abilities
-                auto cdCheck = [](SpellEntry const & spellEntry) -> bool { return (spellEntry.SpellFamilyName == SPELLFAMILY_HUNTER && spellEntry.Id != 23989 && spellEntry.GetRecoveryTime() > 0); };
+                auto cdCheck = [](SpellEntry const* spellEntry) -> bool
+                {
+                    return (spellEntry->SpellFamilyName == SPELLFAMILY_HUNTER && spellEntry->Id != 23989 && spellEntry->GetRecoveryTime() > 0);
+                };
                 pPlayer->RemoveSomeCooldown(cdCheck);
             }
         }
@@ -89,7 +92,10 @@ struct HunterRefocusScript : SpellScript
             {
                 // Refocus : "Instantly clears the cooldowns of Aimed Shot, Multishot, Volley, and Arcane Shot."
                 uint32 spellid = spell->m_spellInfo->Id;
-                auto cdCheck = [spellid](SpellEntry const & spellEntry) -> bool { return (spellEntry.IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_ARCANE_SHOT, CF_HUNTER_MULTI_SHOT, CF_HUNTER_VOLLEY, CF_HUNTER_AIMED_SHOT>() && spellEntry.Id != spellid && spellEntry.GetRecoveryTime() > 0); };
+                auto cdCheck = [spellid](SpellEntry const* spellEntry) -> bool
+                {
+                    return (spellEntry->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_ARCANE_SHOT, CF_HUNTER_MULTI_SHOT, CF_HUNTER_VOLLEY, CF_HUNTER_AIMED_SHOT>() && spellEntry->Id != spellid && spellEntry->GetRecoveryTime() > 0);
+                };
                 pPlayer->RemoveSomeCooldown(cdCheck);
             }
         }

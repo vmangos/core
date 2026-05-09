@@ -7,6 +7,8 @@
 #include "SpellCastTargetsInfo.h"
 #include <string>
 
+class SpellEntry;
+
 namespace WorldPackets { namespace Pet
 {
     class QueryPetName final : public ClientPacket
@@ -204,6 +206,17 @@ namespace WorldPackets { namespace Pet
         uint8 reason = 0; // PetTameFailureReason enum value
 
         explicit PetTameFailure() : ServerPacket(SMSG_PET_TAME_FAILURE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PetCastFailed final : public ServerPacket
+    {
+    public:
+        ::SpellEntry const* spellEntry = nullptr;
+        uint8 status = 0;  // SPELL_RESULT_STATUS_FAIL
+        uint8 reason = 0;  // SpellCastResult enum value
+
+        explicit PetCastFailed() : ServerPacket(SMSG_PET_CAST_FAILED) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

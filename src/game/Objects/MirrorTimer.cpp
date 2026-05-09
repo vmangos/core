@@ -16,6 +16,8 @@
 
 #include "MirrorTimer.h"
 
+#include "SpellEntry.h"
+
 MirrorTimer::Status MirrorTimer::FetchStatus()
 {
     Status status = m_status;
@@ -34,7 +36,7 @@ void MirrorTimer::Stop()
     }
 }
 
-void MirrorTimer::Start(uint32 interval, uint32 spellId/* = 0*/)
+void MirrorTimer::Start(uint32 interval, SpellEntry const* maybeSpellEntry/* = nullptr*/)
 {
     if (m_scale < 0)
     {
@@ -43,16 +45,16 @@ void MirrorTimer::Start(uint32 interval, uint32 spellId/* = 0*/)
         m_pulse.SetInterval(2 * IN_MILLISECONDS);
         m_tracker.SetCurrent(0);
         m_tracker.SetInterval(interval);
-        m_spellId = spellId;
+        m_maybeSpellEntry = maybeSpellEntry;
         m_status = FULL_UPDATE;
     }
     else
         Stop();
 }
 
-void MirrorTimer::Start(uint32 current, uint32 max, uint32 spellId)
+void MirrorTimer::Start(uint32 current, uint32 max, SpellEntry const* spellEntry)
 {
-    Start(max, spellId);
+    Start(max, spellEntry);
 
     if (m_active)
     {

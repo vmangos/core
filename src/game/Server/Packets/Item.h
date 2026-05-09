@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+class SpellEntry;
+
 namespace WorldPackets { namespace Item
 {
     class QueryItem final : public ClientPacket
@@ -340,6 +342,29 @@ namespace WorldPackets { namespace Item
 #endif
 
         explicit ItemPushResult() : ServerPacket(SMSG_ITEM_PUSH_RESULT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class ItemCooldown final : public ServerPacket
+    {
+    public:
+        ObjectGuid itemGuid;
+        ::SpellEntry const* spellEntry = nullptr;
+
+        explicit ItemCooldown() : ServerPacket(SMSG_ITEM_COOLDOWN) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class EnchantmentLog final : public ServerPacket
+    {
+    public:
+        ObjectGuid casterGuid; // enchanter; empty means enchant has faded
+        ObjectGuid ownerGuid;  // item owner
+        uint32 itemEntry = 0;
+        uint32 spellId = 0;
+        bool showAffiliation = false; // only used if casterGuid is not empty
+
+        explicit EnchantmentLog() : ServerPacket(SMSG_ENCHANTMENTLOG) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

@@ -1,5 +1,7 @@
 #include "Npc.h"
 
+#include "SpellEntry.h"
+
 void WorldPackets::Npc::GossipHello::ReadFromWorldPacket(WorldPacket& recv_data)
 {
     recv_data >> npcGuid;
@@ -104,7 +106,7 @@ void WorldPackets::Npc::StableResult::AppendBodyTo(ByteBuffer& buffer) const
 void WorldPackets::Npc::TrainerBuySucceeded::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << trainerGuid;
-    buffer << spellId;
+    buffer << spellEntry->Id;
 }
 
 void WorldPackets::Npc::TrainerBuyFailed::AppendBodyTo(ByteBuffer& buffer) const
@@ -133,4 +135,3 @@ void WorldPackets::Npc::BinderConfirm::AppendBodyTo(ByteBuffer& buffer) const
     buffer << binderGuid;
 }
 #endif
-

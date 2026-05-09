@@ -1333,7 +1333,7 @@ class Player final: public Unit
         TrainerSpellState GetTrainerSpellState(TrainerSpell const* pTrainerSpell) const;
         bool IsSpellFitByClassAndRace(uint32 spellId, uint32* pReqlevel = nullptr) const;
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
-        void SendSpellRemoved(uint32 spellId) const;
+        void SendSpellRemoved(SpellEntry const* spellEntry) const;
         void LearnSpell(uint32 spellId, bool dependent, bool talent = false);
         void RemoveSpell(uint32 spellId, bool disabled = false, bool learn_low_rank = true);
         void ResetSpells();
@@ -1375,10 +1375,10 @@ class Player final: public Unit
         void RemoveSpellCategoryCooldown(uint32 category, bool updateClient = true) final;
         void RemoveAllCooldowns(bool sendOnly = false) final;
         void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) final;
-        void RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32>* spellAlreadySent = nullptr);
-        void SendClearCooldown(uint32 spellId, Unit const* target) const;
+        void RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<SpellEntry const*>* spellAlreadySent = nullptr);
+        void SendClearCooldown(SpellEntry const* spellEntry, Unit const* target) const;
         void SendClearAllCooldowns(Unit const* target) const;
-        void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
+        void SendSpellCooldown(SpellEntry const* spellEntry, Milliseconds cooldown, ObjectGuid target) const;
         void _LoadSpellCooldowns(std::unique_ptr<QueryResult> result);
         void _SaveSpellCooldowns() const;
 
@@ -1388,10 +1388,10 @@ class Player final: public Unit
             auto spellCDItr = m_cooldownMap.begin();
             while (spellCDItr != m_cooldownMap.end())
             {
-                SpellEntry const* entry = sSpellMgr.GetSpellEntry(spellCDItr->first);
-                if (entry && check(*entry))
+                SpellEntry const* entry = spellCDItr->first;
+                if (check(entry))
                 {
-                    SendClearCooldown(spellCDItr->first, this);
+                    SendClearCooldown(entry, this);
                     spellCDItr = m_cooldownMap.erase(spellCDItr);
                 }
                 else
@@ -1836,7 +1836,7 @@ class Player final: public Unit
 
         void SetEnvironmentFlags(EnvironmentFlags flags, bool apply);
 
-        void SendMirrorTimerStart(uint32 type, uint32 remaining, uint32 duration, int32 scale, bool paused = false, uint32 spellId = 0);
+        void SendMirrorTimerStart(uint32 type, uint32 remaining, uint32 duration, int32 scale, bool paused = false, SpellEntry const* maybeSpellEntry = nullptr);
         void SendMirrorTimerStop(uint32 type);
         void SendMirrorTimerPause(uint32 type, bool state);
 

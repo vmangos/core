@@ -868,16 +868,16 @@ void Player::SetEnvironmentFlags(EnvironmentFlags flags, bool apply)
         m_mirrorTimers[MirrorTimer::ENVIRONMENTAL].SetScale((m_environmentFlags & ENVIRONMENT_MASK_LIQUID_HAZARD) ? -1 : 10);
 }
 
-void Player::SendMirrorTimerStart(uint32 type, uint32 remaining, uint32 duration, int32 scale, bool paused/* = false*/, uint32 spellId/* = 0*/)
+void Player::SendMirrorTimerStart(uint32 type, uint32 remaining, uint32 duration, int32 scale, bool paused/* = false*/, SpellEntry const* maybeSpellEntry/* = nullptr*/)
 {
-    WorldPacket data(SMSG_START_MIRROR_TIMER, (4 + 4 + 4 + 4 + 1 + 4));
-    data << uint32(type);
-    data << uint32(remaining);
-    data << uint32(duration);
-    data << int32(scale);
-    data << uint8(paused);
-    data << uint32(spellId);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::StartMirrorTimer>();
+    packet->timerType = type;
+    packet->remaining = remaining;
+    packet->duration = duration;
+    packet->scale = scale;
+    packet->paused = paused;
+    packet->maybeSpellEntry = maybeSpellEntry;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendMirrorTimerStop(uint32 type)
@@ -901,7 +901,7 @@ void Player::FreezeMirrorTimers(bool state)
 {
     for (auto& timer : m_mirrorTimers)
     {
-        if (!timer.GetSpellId())
+        if (!timer.GetMaybeSpellEntry())
             timer.SetFrozen(state);
     }
 }
@@ -921,7 +921,7 @@ void Player::SendMirrorTimers(bool forced/*= false*/)
         switch (status)
         {
             case MirrorTimer::FULL_UPDATE:
-                SendMirrorTimerStart(timer.GetType(), timer.GetRemaining(), timer.GetDuration(), timer.GetScale(), timer.IsFrozen(), timer.GetSpellId());
+                SendMirrorTimerStart(timer.GetType(), timer.GetRemaining(), timer.GetDuration(), timer.GetScale(), timer.IsFrozen(), timer.GetMaybeSpellEntry());
                 break;
             case MirrorTimer::STATUS_UPDATE:
                 if (!timer.IsActive())
@@ -930,7 +930,7 @@ void Player::SendMirrorTimers(bool forced/*= false*/)
                 {
                     // NOTE: Replaced with full resend due to clientside UI bug, details inside
                     // SendMirrorTimerPause(timer.GetType(), timer.IsFrozen());
-                    SendMirrorTimerStart(timer.GetType(), timer.GetRemaining(), timer.GetDuration(), timer.GetScale(), timer.IsFrozen(), timer.GetSpellId());
+                    SendMirrorTimerStart(timer.GetType(), timer.GetRemaining(), timer.GetDuration(), timer.GetScale(), timer.IsFrozen(), timer.GetMaybeSpellEntry());
                 }
                 break;
             default:
@@ -954,7 +954,7 @@ void Player::UpdateMirrorTimers(uint32 diff, bool send/* = true*/)
             {
                 if (active)
                 {
-                    if (timer.GetSpellId())
+                    if (timer.GetMaybeSpellEntry())
                     {
                         if (auto buff = GetMirrorTimerBuff(type))
                             m_mirrorTimers[type].SetRemaining(uint32(std::abs(buff->GetAuraDuration())));
@@ -968,7 +968,7 @@ void Player::UpdateMirrorTimers(uint32 diff, bool send/* = true*/)
                 else
                 {
                     if (auto buff = GetMirrorTimerBuff(type))
-                        m_mirrorTimers[type].Start(uint32(std::abs(buff->GetAuraDuration())), uint32(std::abs(buff->GetAuraMaxDuration())), buff->GetId());
+                        m_mirrorTimers[type].Start(uint32(std::abs(buff->GetAuraDuration())), uint32(std::abs(buff->GetAuraMaxDuration())), buff->GetSpellProto());
                     else
                         m_mirrorTimers[type].Start(GetMirrorTimerMaxDuration(type));
                 }
@@ -3607,13 +3607,13 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
                 if (next_active_spell_id)
                 {
                     // update spell ranks in spellbook and action bar
-                    WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
-                    data << uint16(spellId);
-                    data << uint16(next_active_spell_id);
-                    GetSession()->SendPacket(&data);
+                    auto supercededPacket = std::make_unique<WorldPackets::Spell::SupercededSpell>();
+                    supercededPacket->oldSpellEntry = spellInfo;
+                    supercededPacket->newSpellEntry = sSpellMgr.GetSpellEntry(next_active_spell_id);
+                    GetSession()->SendPacket(std::move(supercededPacket));
                 }
                 else
-                    SendSpellRemoved(spellId);
+                    SendSpellRemoved(spellInfo);
             }
 
             return active;                                  // learn (show in spell book if active now)
@@ -3703,10 +3703,10 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
                         {
                             if (IsInWorld())                // not send spell (re-/over-)learn packets at loading
                             {
-                                WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
-                                data << uint16(m_spell.first);
-                                data << uint16(spellId);
-                                GetSession()->SendPacket(&data);
+                                auto supercededPacket = std::make_unique<WorldPackets::Spell::SupercededSpell>();
+                                supercededPacket->oldSpellEntry = sSpellMgr.GetSpellEntry(m_spell.first);
+                                supercededPacket->newSpellEntry = sSpellMgr.GetSpellEntry(spellId);
+                                GetSession()->SendPacket(std::move(supercededPacket));
                             }
 
                             // mark old spell as disable (SMSG_SUPERCEDED_SPELL replace it in client by new)
@@ -3719,10 +3719,10 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
                         {
                             if (IsInWorld())                // not send spell (re-/over-)learn packets at loading
                             {
-                                WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
-                                data << uint16(spellId);
-                                data << uint16(m_spell.first);
-                                GetSession()->SendPacket(&data);
+                                auto supercededPacket = std::make_unique<WorldPackets::Spell::SupercededSpell>();
+                                supercededPacket->oldSpellEntry = sSpellMgr.GetSpellEntry(spellId);
+                                supercededPacket->newSpellEntry = sSpellMgr.GetSpellEntry(m_spell.first);
+                                GetSession()->SendPacket(std::move(supercededPacket));
                             }
 
                             // mark new spell as disable (not learned yet for client and will not learned)
@@ -3828,9 +3828,9 @@ void Player::LearnSpell(uint32 spellId, bool dependent, bool talent)
     // prevent duplicated entires in spell book, also not send if not in world (loading)
     if (learning && IsInWorld())
     {
-        WorldPacket data(SMSG_LEARNED_SPELL, 4);
-        data << uint32(spellId);
-        GetSession()->SendPacket(&data);
+        auto learnedPacket = std::make_unique<WorldPackets::Spell::LearnedSpell>();
+        learnedPacket->spellEntry = sSpellMgr.GetSpellEntry(spellId);
+        GetSession()->SendPacket(std::move(learnedPacket));
     }
 
     // learn all disabled higher ranks (recursive) - skip for talent spells
@@ -3931,6 +3931,7 @@ void Player::RemoveSpell(uint32 spellId, bool disabled, bool learnLowRank)
     // activate lesser rank in spellbook/action bar, and cast it if need
     bool previousActivated = false;
 
+    auto spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (uint32 previousId = sSpellMgr.GetPrevSpellInChain(spellId))
     {
         uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(previousId);
@@ -3962,10 +3963,10 @@ void Player::RemoveSpell(uint32 spellId, bool disabled, bool learnLowRank)
                     if (AddSpell(previousId, true, false, spell.dependent, spell.disabled))
                     {
                         // downgrade spell ranks in spellbook and action bar
-                        WorldPacket data(SMSG_SUPERCEDED_SPELL, 4);
-                        data << uint16(spellId);
-                        data << uint16(previousId);
-                        GetSession()->SendPacket(&data);
+                        auto supercededPacket = std::make_unique<WorldPackets::Spell::SupercededSpell>();
+                        supercededPacket->oldSpellEntry = spellInfo;
+                        supercededPacket->newSpellEntry = sSpellMgr.GetSpellEntry(previousId);
+                        GetSession()->SendPacket(std::move(supercededPacket));
                         previousActivated = true;
                     }
                 }
@@ -3975,7 +3976,7 @@ void Player::RemoveSpell(uint32 spellId, bool disabled, bool learnLowRank)
 
     // remove from spell book if not replaced by lesser rank
     if (!previousActivated)
-        SendSpellRemoved(spellId);
+        SendSpellRemoved(spellInfo);
 }
 
 void Player::_LoadSpellCooldowns(std::unique_ptr<QueryResult> result)
@@ -6883,7 +6884,7 @@ void Player::DuelComplete(DuelCompleteType type)
     if (type != DUEL_INTERRUPTED)
     {
         auto packet = std::make_unique<WorldPackets::Duel::DuelWinner>();
-        packet->fled = (type != DUEL_WON);                  // 0 = just won; 1 = fled
+        packet->fled = (type != DUEL_WON);         // 0 = just won; 1 = fled
         packet->winnerName = m_duel->opponent->GetName();
         packet->loserName = GetName();
         SendObjectMessageToSet(std::move(packet), true);
@@ -12048,17 +12049,26 @@ void Player::BuildEnchantmentLog(WorldPacket& data, ObjectGuid casterGuid, uint3
 
 void Player::SendEnchantmentLog(ObjectGuid casterGuid, uint32 itemId, uint32 spellId) const
 {
-    WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4 + 1));
-    BuildEnchantmentLog(data, casterGuid, itemId, spellId, false);
-    GetSession()->SendPacket(&data); // only to self
+    auto selfEnchant = std::make_unique<WorldPackets::Item::EnchantmentLog>();
+    selfEnchant->ownerGuid = GetObjectGuid();
+    selfEnchant->casterGuid = casterGuid; // message says enchant has faded if empty
+    selfEnchant->itemEntry = itemId;
+    selfEnchant->spellId = spellId;
+    selfEnchant->showAffiliation = false; // only to self
+    GetSession()->SendPacket(std::move(selfEnchant));
 
-    // Unapply should probably be sent only to self, because affiliation is not used
-    // when casterGuid is empty. Broadcast only when there is a casterGuid for a new enchant.
+    // If the previous message had an empty casterGuid, we removed the enchantment,
+    // so the unapply message should probably be sent only to self.
+    // But if it has a casterGuid, we want to broadcast the new enchantment.
     if (!casterGuid.IsEmpty())
     {
-        WorldPacket data2(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4 + 1));
-        BuildEnchantmentLog(data2, casterGuid, itemId, spellId, true);
-        SendMessageToSet(&data2, false); // exclude self
+        auto newEnchant = std::make_unique<WorldPackets::Item::EnchantmentLog>();
+        newEnchant->ownerGuid = GetObjectGuid();
+        newEnchant->casterGuid = casterGuid;
+        newEnchant->itemEntry = itemId;
+        newEnchant->spellId = spellId;
+        newEnchant->showAffiliation = true;
+        SendMessageToSet(std::move(newEnchant), false); // exclude self
     }
 }
 
@@ -17209,8 +17219,7 @@ void Player::SendAutoRepeatCancel() const
 
 void Player::SendFeignDeathResisted() const
 {
-    WorldPacket data(SMSG_FEIGN_DEATH_RESISTED, 0);
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::make_unique<WorldPackets::Combat::FeignDeathResisted>());
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience) const
@@ -19255,7 +19264,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     {
         auto packet = std::make_unique<WorldPackets::Misc::LoginSetTimeSpeed>();
         packet->gameTime = sWorld.GetGameTime();
-        packet->gameSpeedMinutesPerSecond = (1.0f/60.0f); // 1 minute per 60 seconds
+        packet->gameSpeedMinutesPerSecond = 1.0f/60.0f; // 1 minute per 60 seconds
         GetSession()->SendPacket(std::move(packet));
     }
 
@@ -19368,10 +19377,10 @@ void Player::ApplyEquipCooldown(Item const* pItem)
 
         AddCooldown(spellentry, nullptr, false, 30 * IN_MILLISECONDS);
 
-        WorldPacket data(SMSG_ITEM_COOLDOWN, 12);
-        data << ObjectGuid(pItem->GetObjectGuid());
-        data << uint32(spellData.SpellId);
-        GetSession()->SendPacket(&data);
+        auto itemCooldownPacket = std::make_unique<WorldPackets::Item::ItemCooldown>();
+        itemCooldownPacket->itemGuid = pItem->GetObjectGuid();
+        itemCooldownPacket->spellEntry = spellentry;
+        GetSession()->SendPacket(std::move(itemCooldownPacket));
     }
 }
 
@@ -21097,35 +21106,37 @@ void Player::_SaveBGData()
     m_bgData.m_needSave = false;
 }
 
-void Player::SendClearCooldown(uint32 spellId, Unit const* target) const
+void Player::SendClearCooldown(SpellEntry const* spellEntry, Unit const* target) const
 {
-    WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
-    data << uint32(spellId);
-    data << target->GetObjectGuid();
-    SendDirectMessage(&data);
+    auto clearCooldownPacket = std::make_unique<WorldPackets::Spell::ClearCooldown>();
+    clearCooldownPacket->spellEntry = spellEntry;
+    clearCooldownPacket->targetGuid = target->GetObjectGuid();
+    GetSession()->SendPacket(std::move(clearCooldownPacket));
 }
 
 void Player::SendClearAllCooldowns(Unit const* target) const
 {
-    WorldPacket data(SMSG_COOLDOWN_CHEAT, 8);
-    data << target->GetObjectGuid();
-    SendDirectMessage(&data);
+    auto cooldownCheatPacket = std::make_unique<WorldPackets::Spell::CooldownCheat>();
+    cooldownCheatPacket->targetGuid = target->GetObjectGuid();
+    GetSession()->SendPacket(std::move(cooldownCheatPacket));
 }
 
-void Player::SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const
+void Player::SendSpellCooldown(SpellEntry const* spellEntry, Milliseconds cooldown, ObjectGuid target) const
 {
-    WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 4 + 4);
-    data << target;
-    data << uint32(spellId);
-    data << uint32(cooldown);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Spell::SpellCooldown>();
+    packet->casterGuid = target;
+    WorldPackets::Spell::SpellCooldownEntry cooldownEntry;
+    cooldownEntry.spellEntry = spellEntry;
+    cooldownEntry.cooldown = cooldown;
+    packet->cooldownEntries.emplace_back(cooldownEntry);
+    GetSession()->SendPacket(std::move(packet));
 }
 
-void Player::SendSpellRemoved(uint32 spellId) const
+void Player::SendSpellRemoved(SpellEntry const* spellEntry) const
 {
-    WorldPacket data(SMSG_REMOVED_SPELL, 4);
-    data << uint16(spellId);
-    GetSession()->SendPacket(&data);
+    auto removedSpellPacket = std::make_unique<WorldPackets::Spell::RemovedSpell>();
+    removedSpellPacket->spellEntry = spellEntry;
+    GetSession()->SendPacket(std::move(removedSpellPacket));
 }
 
 void Player::SendChannelUpdate(uint32 time) const
@@ -22246,7 +22257,7 @@ void Player::AddGCD(SpellEntry const* spellEntry, uint32 /*forcedDuration = 0*/,
         return;
 
     // send to client
-    SendSpellCooldown(spellEntry->Id, 0, GetObjectGuid());
+    SendSpellCooldown(spellEntry, Milliseconds(0), GetObjectGuid());
 }
 
 void Player::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* itemProto /*= nullptr*/, bool permanent /*= false*/, uint32 forcedDuration /*= 0*/)
@@ -22280,7 +22291,7 @@ void Player::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* item
     bool haveToSendEvent = false;
     bool wasPermanent = false;
     uint32 oldItemId = 0;
-    auto cdDataItr = m_cooldownMap.FindBySpellId(spellEntry->Id);
+    auto cdDataItr = m_cooldownMap.FindBySpellEntry(spellEntry);
     if (cdDataItr != m_cooldownMap.end())
     {
         auto& cdData = cdDataItr->second;
@@ -22334,20 +22345,22 @@ void Player::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* item
             if (spellCategory && spellEntry->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
             {
                 auto itr = m_cooldownMap.FindByCategory(spellCategory);
-                if (itr != m_cooldownMap.end() && (*itr).second->GetSpellEntry() != spellEntry)
+                if (itr != m_cooldownMap.end() && itr->second->GetSpellEntry() != spellEntry)
                 {
-                    WorldPacket data(SMSG_COOLDOWN_EVENT, (4 + 8));
-                    data << uint32((*itr).second->GetSpellEntry()->Id);
-                    data << GetObjectGuid();
-                    SendDirectMessage(&data);
+                    auto cooldownEventPacket = std::make_unique<WorldPackets::Spell::CooldownEvent>();
+                    cooldownEventPacket->spellEntry = itr->second->GetSpellEntry();
+                    cooldownEventPacket->casterGuid = GetObjectGuid();
+                    GetSession()->SendPacket(std::move(cooldownEventPacket));
                 }
             }
 
             // Send activate cooldown timer (possible 0) at client side
-            WorldPacket data(SMSG_COOLDOWN_EVENT, (4 + 8));
-            data << uint32(spellEntry->Id);
-            data << GetObjectGuid();
-            SendDirectMessage(&data);
+            {
+                auto cooldownEventPacket = std::make_unique<WorldPackets::Spell::CooldownEvent>();
+                cooldownEventPacket->spellEntry = spellEntry;
+                cooldownEventPacket->casterGuid = GetObjectGuid();
+                GetSession()->SendPacket(std::move(cooldownEventPacket));
+            }
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sending SMSG_COOLDOWN_EVENT with spell id = %u", spellEntry->Id);
         }
     }
@@ -22367,10 +22380,10 @@ void Player::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* item
 
 void Player::RemoveSpellCooldown(SpellEntry const* spellEntry, bool updateClient /*= true*/)
 {
-    m_cooldownMap.RemoveBySpellId(spellEntry->Id);
+    m_cooldownMap.RemoveBySpellEntry(spellEntry);
 
     if (updateClient)
-        SendClearCooldown(spellEntry->Id, this);
+        SendClearCooldown(spellEntry, this);
 }
 
 void Player::RemoveSpellCategoryCooldown(uint32 category, bool updateClient /*= true*/)
@@ -22381,14 +22394,14 @@ void Player::RemoveSpellCategoryCooldown(uint32 category, bool updateClient /*= 
 
     auto& cdData = spellItr->second;
     if (updateClient)
-        SendClearCooldown(cdData->GetSpellEntry()->Id, this);
+        SendClearCooldown(cdData->GetSpellEntry(), this);
 
     m_cooldownMap.erase(spellItr);
 }
 
 void Player::RemoveAllCooldowns(bool sendOnly /*= false*/)
 {
-    std::set<uint32> spellsSent;
+    std::set<SpellEntry const*> spellsSent;
     // not reset gcd (usually small enough)
 
     // reset normal cd
@@ -22397,8 +22410,8 @@ void Player::RemoveAllCooldowns(bool sendOnly /*= false*/)
         auto& cdData = cdItr.second;
         if (!cdData->IsPermanent())
         {
-            SendClearCooldown(cdData->GetSpellEntry()->Id, this);
-            spellsSent.emplace(cdData->GetSpellEntry()->Id);
+            SendClearCooldown(cdData->GetSpellEntry(), this);
+            spellsSent.emplace(cdData->GetSpellEntry());
         }
     }
 
@@ -22463,7 +22476,7 @@ void Player::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
     SpellCaster::LockOutSpells(schoolMask, duration);
 }
 
-void Player::RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32>* spellAlreadySent /*= nullptr*/)
+void Player::RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<SpellEntry const*>* spellAlreadySent /*= nullptr*/)
 {
     for (auto ownerSpellItr : GetSpellMap())
     {
@@ -22479,13 +22492,13 @@ void Player::RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32
 
         if (spellAlreadySent)
         {
-            if (spellAlreadySent->find(spellEntry->Id) != spellAlreadySent->end())
+            if (spellAlreadySent->find(spellEntry) != spellAlreadySent->end())
                 continue;
 
-            spellAlreadySent->emplace(spellEntry->Id);
+            spellAlreadySent->emplace(spellEntry);
         }
 
-        SendClearCooldown(spellEntry->Id, this);
+        SendClearCooldown(spellEntry, this);
     }
 }
 

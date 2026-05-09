@@ -64,3 +64,128 @@ void WorldPackets::Spell::PlaySpellImpact::AppendBodyTo(ByteBuffer& buffer) cons
     buffer << spellVisualId;
 }
 #endif
+
+void WorldPackets::Spell::SpellLogMiss::AppendBodyTo(ByteBuffer& buffer) const
+{
+    bool constexpr useExtendedInfo = false; // Seems unused in client
+
+    buffer << spellEntry->Id;
+    buffer << casterGuid;
+    buffer << useExtendedInfo;
+    buffer << static_cast<uint32>(missEntries.size());
+    for (auto const& entry : missEntries)
+    {
+        buffer << entry.targetGuid;
+        buffer << static_cast<uint8>(entry.missInfo);
+        if (useExtendedInfo)
+        {
+            buffer << 0.0f;
+            buffer << 0.0f;
+        }
+    }
+}
+
+void WorldPackets::Spell::ProcResist::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid;
+    buffer << targetGuid;
+    buffer << spellEntry->Id;
+    buffer << logFormat;
+}
+
+void WorldPackets::Spell::SpellOrDamageImmune::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid;
+    buffer << targetGuid;
+    buffer << spellEntry->Id;
+    buffer << logFormat;
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+void WorldPackets::Spell::SpellHealLog::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << targetGuid.WriteAsPacked();
+    buffer << healerGuid.WriteAsPacked();
+    buffer << spellEntry->Id;
+    buffer << healAmount;
+    buffer << isCritical;
+}
+
+void WorldPackets::Spell::SpellEnergizeLog::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << targetGuid.WriteAsPacked();
+    buffer << casterGuid.WriteAsPacked();
+    buffer << spellEntry->Id;
+    buffer << powerType;
+    buffer << amount;
+}
+#endif
+
+void WorldPackets::Spell::SpellNonMeleeDamageLog::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << targetGuid.WriteAsPackedClientBuildAware();
+    buffer << attackerGuid.WriteAsPackedClientBuildAware();
+    buffer << spellEntry->Id;
+    buffer << damage;
+    buffer << school;
+    buffer << absorbedDamage;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+    buffer << resist;
+#endif
+    buffer << periodicLog;
+    buffer << unused;
+    buffer << blocked;
+    buffer << hitInfo;
+    buffer << extendedData;
+}
+
+void WorldPackets::Spell::SpellCooldown::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid;
+    for (auto const& cooldownEntry : cooldownEntries)
+    {
+        buffer << cooldownEntry.spellEntry->Id;
+        buffer << static_cast<uint32>(cooldownEntry.cooldown.count());
+    }
+}
+
+void WorldPackets::Spell::ClearCooldown::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << spellEntry->Id;
+    buffer << targetGuid;
+}
+
+void WorldPackets::Spell::CooldownCheat::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << targetGuid;
+}
+
+void WorldPackets::Spell::CooldownEvent::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << spellEntry->Id;
+    buffer << casterGuid;
+}
+
+void WorldPackets::Spell::SupercededSpell::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << static_cast<uint16>(oldSpellEntry->Id);
+    buffer << static_cast<uint16>(newSpellEntry->Id);
+}
+
+void WorldPackets::Spell::LearnedSpell::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << static_cast<uint16>(spellEntry->Id);
+    buffer << static_cast<int16>(0); // not used
+}
+
+void WorldPackets::Spell::RemovedSpell::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << static_cast<uint16>(spellEntry->Id);
+}
+
+void WorldPackets::Spell::SetSpellModifier::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << effectIndex;
+    buffer << modOp;
+    buffer << value;
+}

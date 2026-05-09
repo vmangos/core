@@ -1,5 +1,7 @@
 #include "Pet.h"
 
+#include "SpellEntry.h"
+
 void WorldPackets::Pet::QueryPetName::ReadFromWorldPacket(WorldPacket& recv_data)
 {
     recv_data >> petNumber;
@@ -121,5 +123,12 @@ void WorldPackets::Pet::PetUnlearnConfirm::AppendBodyTo(ByteBuffer& buffer) cons
 
 void WorldPackets::Pet::PetTameFailure::AppendBodyTo(ByteBuffer& buffer) const
 {
+    buffer << reason;
+}
+
+void WorldPackets::Pet::PetCastFailed::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << spellEntry->Id;
+    buffer << status;
     buffer << reason;
 }

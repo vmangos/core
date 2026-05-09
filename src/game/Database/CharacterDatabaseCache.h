@@ -5,14 +5,16 @@
 #include "ObjectGuid.h"
 #include "DBCEnums.h"
 
+class SpellEntry;
+
 // pet_spell_cooldown
-struct PetSpellCoodown
+struct PetSpellCooldown
 {
-    uint32 spell = 0;
-    uint64 time = 0;
+    SpellEntry const* spell = nullptr;
+    TimePoint whenReadyAgainTime{};
 };
 
-typedef std::vector<PetSpellCoodown> PetSpellCDs;
+typedef std::vector<PetSpellCooldown> PetSpellCDs;
 
 // pet_spell
 struct PetSpellCache
