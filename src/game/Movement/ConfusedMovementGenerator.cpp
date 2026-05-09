@@ -93,6 +93,7 @@ void ConfusedMovementGenerator<Player>::Finalize(Player &unit)
     unit.ClearUnitState(UNIT_STATE_CONFUSED);
     unit.StopMoving();
     unit.UpdateControl();
+    unit.SetWalk(false);
 }
 
 template<>
