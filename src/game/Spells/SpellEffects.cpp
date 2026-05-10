@@ -1050,7 +1050,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         uint32 spellid = m_casterUnit->GetUInt32Value(UNIT_CREATED_BY_SPELL);
                         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid);
                         if (spellInfo)
-                            pOwner->AddCooldown(*spellInfo);
+                            pOwner->AddCooldown(spellInfo);
                     }
                     return;
                 }
@@ -3674,7 +3674,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(23851);
                     ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(19462);
                     if (spellInfo && itemProto)
-                        unitTarget->AddCooldown(*spellInfo, itemProto);
+                        unitTarget->AddCooldown(spellInfo, itemProto);
                     return;
                 }
                 case 24194:                                 // Uther's Tribute

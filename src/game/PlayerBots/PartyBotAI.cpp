@@ -208,7 +208,7 @@ bool PartyBotAI::DrinkAndEat()
         if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(PB_SPELL_FOOD))
         {
             me->CastSpell(me, pSpellEntry, true);
-            me->RemoveSpellCooldown(*pSpellEntry);
+            me->RemoveSpellCooldown(pSpellEntry);
         }
         return true;
     }
@@ -224,7 +224,7 @@ bool PartyBotAI::DrinkAndEat()
         if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(PB_SPELL_DRINK))
         {
             me->CastSpell(me, pSpellEntry, true);
-            me->RemoveSpellCooldown(*pSpellEntry);
+            me->RemoveSpellCooldown(pSpellEntry);
         }
         return true;
     }
@@ -2754,7 +2754,7 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
                 (me->GetHealthPercent() < 10.0f))
             {
                 if (m_spells.rogue.pPreparation &&
-                    !me->IsSpellReady(m_spells.rogue.pVanish->Id) &&
+                    !me->IsSpellReady(m_spells.rogue.pVanish) &&
                     CanTryToCastSpell(me, m_spells.rogue.pPreparation))
                 {
                     if (DoCastSpell(me, m_spells.rogue.pPreparation) == SPELL_CAST_OK)
