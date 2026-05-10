@@ -26,7 +26,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 Unit* SpellCaster::SelectMagnetTarget(Unit* victim, Spell* spell, SpellEffectIndex eff)
 {

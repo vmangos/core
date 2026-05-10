@@ -38,7 +38,7 @@
 #include "ScriptMgr.h"
 #include "Util.h"
 #include "Anticheat.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPackets::Loot::AutoStoreLootItem const& packet)
 {

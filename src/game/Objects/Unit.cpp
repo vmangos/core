@@ -58,7 +58,7 @@
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
 #include "Errors.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 #include "ScriptMgr.h"
 
 //#define DEBUG_DEBUFF_LIMIT

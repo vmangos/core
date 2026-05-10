@@ -50,7 +50,7 @@
 #include "MovementPacketSender.h"
 #include "ZoneScript.h"
 #include "LoveIsInTheAir.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 using namespace Spells;
 

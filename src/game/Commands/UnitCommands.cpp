@@ -26,7 +26,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 bool ChatHandler::HandleGUIDCommand(char* /*args*/)
 {

@@ -16,7 +16,7 @@
 #include "BattleGroundMgr.h"
 #include "MapManager.h"
 #include "Language.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 #include "Spell.h"
 
 INSTANTIATE_SINGLETON_1(PlayerBotMgr);

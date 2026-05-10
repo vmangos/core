@@ -23,7 +23,7 @@
 #define CREATUREAIIMPL_H
 
 #include "CreatureAI.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 template<class REAL_AI>
 inline CreatureAI*

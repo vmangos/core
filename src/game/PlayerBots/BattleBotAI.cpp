@@ -30,7 +30,7 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Chat.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 #include "TargetedMovementGenerator.h"
 
 enum BattleBotSpells

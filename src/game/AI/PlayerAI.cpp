@@ -24,7 +24,7 @@
 #include "MotionMaster.h"
 #include "Spell.h"
 #include "Map.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 void PlayerAI::Remove()
 {

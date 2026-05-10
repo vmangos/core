@@ -28,7 +28,7 @@
 #include "Conditions.h"
 #include "Group.h"
 #include "BattleGroundMgr.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 static eConfigFloatValues const qualityToRate[MAX_ITEM_QUALITY] =
 {

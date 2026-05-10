@@ -48,7 +48,7 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 #include "Geometry.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 bool QuaternionData::isUnit() const
 {

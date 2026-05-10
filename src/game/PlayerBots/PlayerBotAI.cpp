@@ -23,7 +23,7 @@
 #include "ObjectMgr.h"
 #include "MapManager.h"
 #include "MoveSpline.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 bool PlayerBotAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
 {

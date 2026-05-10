@@ -37,7 +37,7 @@
 #include "LFGMgr.h"
 #include "LFGQueue.h"
 #include "UpdateMask.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 #include <array>
 

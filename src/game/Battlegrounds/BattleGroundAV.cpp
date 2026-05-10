@@ -28,7 +28,7 @@
 #include "Language.h"
 #include "WorldPacket.h"
 #include "Chat.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 #include "World.h"
 
 

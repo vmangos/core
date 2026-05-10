@@ -17,8 +17,8 @@
 #ifndef MANGOS_RANDOM_H
 #define MANGOS_RANDOM_H
 
-#include "Common.h"
-#include "Duration.h"
+#include "../Common.h"
+#include "../Duration.h"
 
 #include <cmath>
 #include <iterator>

@@ -30,7 +30,7 @@
 #include "CreatureAI.h"
 #include "Pet.h"
 #include "Group.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
 {

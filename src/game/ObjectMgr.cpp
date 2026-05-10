@@ -53,7 +53,7 @@
 #include "HardcodedEvents.h"
 #include "Conditions.h"
 #include "RealmZone.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 #include <limits>
 

@@ -54,7 +54,7 @@
 #include "packet_builder.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 ////////////////////////////////////////////////////////////
 // Methods of class MovementInfo

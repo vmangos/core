@@ -53,7 +53,7 @@
 #include "CreatureLinkingMgr.h"
 #include "TemporarySummon.h"
 #include "GuardMgr.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {

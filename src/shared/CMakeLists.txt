@@ -36,7 +36,7 @@ set (shared_SRCS
     ThreadSpecificPtr.h
     ThreadSpecificPtr.cpp
     Timer.h
-    Random.h
+    Utilities/Random.h
     Util.h
     Config/Config.h
     Config/ConfigEnv.h
@@ -90,7 +90,7 @@ set (shared_SRCS
     ServiceWin32.cpp
     ThreadPool.cpp
     Util.cpp
-    Random.cpp
+    Utilities/Random.cpp
     Duration.h
     Auth/AuthCrypt.h
     Auth/AuthCrypt.cpp

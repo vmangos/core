@@ -38,8 +38,8 @@
 #include "World.h"
 #include "ScriptMgr.h"
 #include "Conditions.h"
-#include "Random.h"
- // VMAPS
+#include "Utilities/Random.h"
+// VMAPS
 #include "VMapFactory.h"
 #include "ModelInstance.h"
 #include "GameObjectModel.h"

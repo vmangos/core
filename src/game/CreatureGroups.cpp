@@ -21,7 +21,7 @@
 #include "ObjectMgr.h"
 #include "CreatureAI.h"
 #include "BattleGround.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 void CreatureGroup::AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags)
 {

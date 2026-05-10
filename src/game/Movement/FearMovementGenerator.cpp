@@ -11,7 +11,7 @@
 #include "PathFinder.h"
 #include "MoveMap.h"
 #include "Map.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 template<class T>
 void FearMovementGenerator<T>::_setTargetLocation(T &owner)

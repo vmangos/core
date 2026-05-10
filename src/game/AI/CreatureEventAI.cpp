@@ -30,7 +30,7 @@
 #include "GuardMgr.h"
 #include "Conditions.h"
 #include "Map.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 bool CreatureEventAIHolder::UpdateRepeatTimer(Creature* creature, uint32 repeatMin, uint32 repeatMax)
 {

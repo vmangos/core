@@ -47,7 +47,7 @@
 #include "TradeData.h"
 #include "Geometry.h"
 #include "Anticheat.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 using namespace Spells;
 

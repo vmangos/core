@@ -47,7 +47,7 @@
 #include "MoveMapSharedDefines.h"
 #include "GameEventMgr.h"
 #include "InstanceData.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 

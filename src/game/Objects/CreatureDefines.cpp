@@ -16,7 +16,7 @@
 
 #include "CreatureDefines.h"
 
-#include "Random.h"
+#include "Utilities/Random.h"
 
 uint32 CreatureData::GetRandomRespawnTime() const
 {

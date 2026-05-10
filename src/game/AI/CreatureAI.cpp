@@ -26,7 +26,7 @@
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "Group.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 #include <unordered_set>
 

@@ -26,7 +26,7 @@
 #include "Log.h"
 #include "MapPersistentStateMgr.h"
 #include "MapManager.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 #include "World.h"
 #include "Policies/SingletonImp.h"
 

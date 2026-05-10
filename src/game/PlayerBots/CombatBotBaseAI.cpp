@@ -10,7 +10,7 @@
 #include "SpellAuras.h"
 #include "Chat.h"
 #include "CharacterDatabaseCache.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 #include <random>
 

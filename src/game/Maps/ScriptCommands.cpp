@@ -27,7 +27,7 @@
 #include "ObjectMgr.h"
 #include "Group.h"
 #include "CreatureGroups.h"
-#include "Random.h"
+#include "Utilities/Random.h"
 
 // Script commands should return false by default.
 // If they return true the rest of the script is aborted.
