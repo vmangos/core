@@ -10,6 +10,8 @@
 #include "SpellAuras.h"
 #include "Chat.h"
 #include "CharacterDatabaseCache.h"
+#include "Random.h"
+
 #include <random>
 
 enum CombatBotSpells

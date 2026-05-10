@@ -28,15 +28,12 @@
 #include "IO/Networking/IpAddress.h"
 
 #include "utf8cpp/utf8.h"
-#include "mersennetwister/MersenneTwister.h"
 
 #include <cstdarg>
 
 #if PLATFORM == PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
-
-thread_local MTRand mtRand;
 
 Tokenizer::Tokenizer(std::string const& src, char const sep, uint32 vectorReserve)
 {
@@ -95,55 +92,6 @@ uint32 WorldTimer::getMSTime()
     using namespace std::chrono;
 
     return static_cast<uint32>(duration_cast<milliseconds>(steady_clock::now().time_since_epoch() - GetApplicationStartTime().time_since_epoch()).count());
-}
-
-//////////////////////////////////////////////////////////////////////////
-int32 irand (int32 min, int32 max)
-{
-    return int32 (mtRand.randInt(max - min)) + min;
-}
-
-uint32 urand (uint32 min, uint32 max)
-{
-    return mtRand.randInt(max - min) + min;
-}
-
-float frand (float min, float max)
-{
-    return mtRand.randExc (max - min) + min;
-}
-
-int32 rand32 ()
-{
-    return mtRand.randInt ();
-}
-
-double rand_norm(void)
-{
-    return mtRand.randExc ();
-}
-
-float rand_norm_f(void)
-{
-    return (float)mtRand.randExc ();
-}
-
-double rand_chance (void)
-{
-    return mtRand.randExc (100.0);
-}
-
-float rand_chance_f(void)
-{
-    return (float)mtRand.randExc (100.0);
-}
-
-Milliseconds randtime(Milliseconds const& min, Milliseconds const& max)
-{
-    long long diff = max.count() - min.count();
-    MANGOS_ASSERT(diff >= 0);
-    MANGOS_ASSERT(diff <= (uint32)-1);
-    return min + Milliseconds(urand(0, diff));
 }
 
 Tokens StrSplit(std::string const& src, std::string const& sep)
@@ -583,16 +531,6 @@ void HexStrToByteArray(std::string const& str, uint8* out, bool reverse /*= fals
         char buffer[3] = { str[i], str[i + 1], '\0' };
         out[j++] = strtoul(buffer, nullptr, 16);
     }
-}
-
-int32 dither(float v)
-{
-    return std::copysign(std::floor(std::abs(v) + frand(0,1)), v);
-}
-
-uint32 ditheru(float v)
-{
-    return std::copysign(std::floor(std::abs(v) + frand(0,1)), v);
 }
 
 void SetByteValue(uint32& variable, uint8 offset, uint8 value)

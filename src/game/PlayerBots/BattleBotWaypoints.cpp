@@ -26,6 +26,7 @@
 #include "BattleGroundAV.h"
 #include "BattleGroundWS.h"
 #include "Geometry.h"
+#include "Random.h"
 
 using namespace Geometry;
 

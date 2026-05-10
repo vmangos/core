@@ -31,8 +31,8 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "Log.h"
-#include "Util.h"
 #include "ProgressBar.h"
+#include "Random.h"
 
 INSTANTIATE_SINGLETON_1(WeatherMgr);
 

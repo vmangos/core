@@ -25,10 +25,11 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "ProgressBar.h"
+#include "Random.h"
+#include "World.h"
+
 #include <list>
 #include <vector>
-#include "Util.h"
-#include "World.h"
 
 struct EnchStoreItem
 {

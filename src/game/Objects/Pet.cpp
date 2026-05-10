@@ -32,6 +32,7 @@
 #include "CreatureAI.h"
 #include "Util.h"
 #include "CharacterDatabaseCache.h"
+#include "Random.h"
 
 //numbers represent minutes * 100 while happy (you get 100 loyalty points per min while happy)
 uint32 const Pet::LevelUpLoyalty[6] =
@@ -643,7 +644,7 @@ void Pet::SetDeathState(DeathState s)                       // overwrite virtual
             ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        
+
         // Despawn after 1 hour for hunter pets.
         if (GetPetType() == HUNTER_PET)
             m_corpseDecayTimer = 3600000;
@@ -1144,7 +1145,7 @@ void Pet::DelayedUnsummon(uint32 timeMSToDespawn, PetSaveMode mode)
     if (timeMSToDespawn)
     {
         UnsummonPetDelayEvent *pEvent = new UnsummonPetDelayEvent(*this, mode);
-        
+
         m_Events.AddEvent(pEvent, m_Events.CalculateTime(timeMSToDespawn));
         return;
     }
@@ -1264,7 +1265,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 #else
         SetInt32Value(UNIT_MOD_CAST_SPEED, creature->GetInt32Value(UNIT_MOD_CAST_SPEED));
 #endif
-        
+
         SetLoyaltyLevel(REBELLIOUS);
     }
     return true;

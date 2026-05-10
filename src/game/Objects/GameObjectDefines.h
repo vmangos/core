@@ -20,7 +20,6 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "ObjectDefines.h"
-#include "Util.h"
 
 enum GameobjectTypes
 {
@@ -829,7 +828,7 @@ struct GameObjectData
 
     uint32 instanciatedContinentInstanceId;
     uint32 ComputeRespawnDelay(uint32 baseDelay) const;
-    uint32 GetRandomRespawnTime() const { return urand(uint32(spawntimesecsmin), uint32(spawntimesecsmax)); }
+    uint32 GetRandomRespawnTime() const;
 };
 
 struct GameObjectDisplayInfoAddon

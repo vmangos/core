@@ -47,6 +47,7 @@
 #include "TradeData.h"
 #include "Geometry.h"
 #include "Anticheat.h"
+#include "Random.h"
 
 using namespace Spells;
 
@@ -1257,11 +1258,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     if (m_healing && unitTarget->IsAlive())
     {
         bool crit = target->isCrit;
-        uint32 addhealth = ditheru(m_healing);
+        uint32 addhealth = rand_ditheru(m_healing);
         if (crit)
         {
             procEx |= PROC_EX_CRITICAL_HIT;
-            addhealth = ditheru(pCaster->SpellCriticalHealingBonus(m_spellInfo, m_healing, nullptr));
+            addhealth = rand_ditheru(pCaster->SpellCriticalHealingBonus(m_spellInfo, m_healing, nullptr));
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
             // If healing crits, we need to update the execute log data.
@@ -7303,7 +7304,7 @@ SpellCastResult Spell::CheckItems()
                         if (!target->IsPlayer())
                             return SPELL_FAILED_BAD_TARGETS;
 
-                        uint32 count = std::max(1, dither(CalculateDamage(SpellEffectIndex(i), target)));
+                        uint32 count = std::max(1, rand_dither(CalculateDamage(SpellEffectIndex(i), target)));
                         ItemPosCountVec dest;
                         uint32 no_space = 0;
                         InventoryResult msg = static_cast<Player*>(target)->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->EffectItemType[i], count, &no_space);

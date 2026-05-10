@@ -168,6 +168,7 @@ set (game_SRCS
     Objects/Bag.cpp
     Objects/Corpse.cpp
     Objects/Creature.cpp
+    Objects/CreatureDefines.cpp
     Objects/DynamicObject.cpp
     Objects/GameObject.cpp
     Objects/Item.cpp

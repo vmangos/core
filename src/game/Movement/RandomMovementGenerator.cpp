@@ -21,6 +21,7 @@
 #include "Util.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
+#include "Random.h"
 
 void RandomMovementGenerator::_setRandomLocation(Creature &creature)
 {
