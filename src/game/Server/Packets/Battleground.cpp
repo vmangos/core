@@ -118,12 +118,6 @@ void WorldPackets::Battleground::PvpLogData::AppendBodyTo(ByteBuffer& buffer) co
 }
 #endif
 
-void WorldPackets::Battleground::UpdateWorldState::AppendBodyTo(ByteBuffer& buffer) const
-{
-    buffer << field;
-    buffer << value;
-}
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
 void WorldPackets::Battleground::BattlegroundPlayerJoined::AppendBodyTo(ByteBuffer& buffer) const
 {

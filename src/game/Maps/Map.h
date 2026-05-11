@@ -58,6 +58,7 @@ class MapPersistentState;
 class WorldPersistentState;
 class DungeonPersistentState;
 class BattleGroundPersistentState;
+class ServerPacket;
 class ChatHandler;
 class BattleGround;
 class WeatherSystem;
@@ -450,6 +451,7 @@ class Map : public GridRefManager<NGridType>
         bool ActiveObjectsNearGrid(uint32 x,uint32 y) const;
 
         // Send a Packet to all players in the map
+        void SendToPlayers(std::unique_ptr<ServerPacket const> packet, Team team = TEAM_NONE) const;
         void SendToPlayers(WorldPacket const* data, Team team = TEAM_NONE) const;
         void SendDefenseMessage(int32 textId, uint32 zoneId) const;
         void SendMonsterTextToMap(int32 textId, Language language, ChatMsg chatMsg, uint32 creatureId, WorldObject const* pSource = nullptr, Unit const* pTarget = nullptr);

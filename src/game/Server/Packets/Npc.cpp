@@ -119,4 +119,18 @@ void WorldPackets::Npc::TabardVendorActivateResponse::AppendBodyTo(ByteBuffer& b
     buffer << tabardVendorNpcGuid;
 }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
+void WorldPackets::Npc::AreaSpiritHealerTime::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << spiritHealerGuid;
+    buffer << nextResurrectTime;
+}
+#endif
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+void WorldPackets::Npc::BinderConfirm::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << binderGuid;
+}
+#endif
 

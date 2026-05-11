@@ -3,6 +3,7 @@
 
 #include "Packet.h"
 #include "ObjectGuid.h"
+#include <string>
 
 namespace WorldPackets { namespace Duel
 {
@@ -36,6 +37,35 @@ namespace WorldPackets { namespace Duel
     {
     public:
         explicit DuelInBounds() : ServerPacket(SMSG_DUEL_INBOUNDS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class DuelComplete final : public ServerPacket
+    {
+    public:
+        bool started = false; // false if interrupted, true if actually completed
+
+        explicit DuelComplete() : ServerPacket(SMSG_DUEL_COMPLETE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class DuelWinner final : public ServerPacket
+    {
+    public:
+        bool fled = false; // true = loser fled, false = loser was defeated
+        std::string winnerName;
+        std::string loserName;
+
+        explicit DuelWinner() : ServerPacket(SMSG_DUEL_WINNER) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class DuelCountdown final : public ServerPacket
+    {
+    public:
+        uint32 countdown = 0; // countdown in seconds
+
+        explicit DuelCountdown() : ServerPacket(SMSG_DUEL_COUNTDOWN) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

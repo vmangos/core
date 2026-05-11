@@ -994,9 +994,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "AddObject at SpellEfects.cpp EffectDummy");
                     map->Add(pGameObj);
 
-                    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
-                    data << ObjectGuid(pGameObj->GetObjectGuid());
-                    m_caster->SendMessageToSet(&data, true);
+                    pGameObj->SendObjectSpawnAnim();
 
                     return;
                 }
@@ -5146,9 +5144,7 @@ void Spell::EffectSummonObject(SpellEffectIndex effIdx)
     m_casterUnit->AddGameObject(pGameObj);
 
     map->Add(pGameObj);
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
-    data << ObjectGuid(pGameObj->GetObjectGuid());
-    m_casterUnit->SendMessageToSet(&data, true);
+    pGameObj->SendObjectSpawnAnim();
 
     m_casterUnit->m_ObjectSlotGuid[slot] = pGameObj->GetObjectGuid();
 
@@ -5821,13 +5817,13 @@ void Spell::EffectBind(SpellEffectIndex effIdx)
     player->SetHomebindToLocation(loc, areaId);
 
     // binding
-    WorldPacket data(SMSG_BINDPOINTUPDATE, (4 + 4 + 4 + 4 + 4));
-    data << float(loc.x);
-    data << float(loc.y);
-    data << float(loc.z);
-    data << uint32(loc.mapId);
-    data << uint32(areaId);
-    player->SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::BindpointUpdate>();
+    packet->x = loc.x;
+    packet->y = loc.y;
+    packet->z = loc.z;
+    packet->mapId = loc.mapId;
+    packet->areaId = areaId;
+    player->GetSession()->SendPacket(std::move(packet));
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "New Home Position X is %f", loc.x);
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "New Home Position Y is %f", loc.y);
@@ -5836,10 +5832,10 @@ void Spell::EffectBind(SpellEffectIndex effIdx)
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "New Home AreaId is %u", areaId);
 
     // zone update
-    data.Initialize(SMSG_PLAYERBOUND, 8 + 4);
-    data << m_caster->GetObjectGuid();
-    data << uint32(areaId);
-    player->SendDirectMessage(&data);
+    auto playerBoundPacket = std::make_unique<WorldPackets::Misc::PlayerBound>();
+    playerBoundPacket->binderGuid = m_caster->GetObjectGuid();
+    playerBoundPacket->areaId = areaId;
+    player->GetSession()->SendPacket(std::move(playerBoundPacket));
 }
 
 void Spell::EffectDespawnObject(SpellEffectIndex effIdx)

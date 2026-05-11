@@ -670,6 +670,7 @@ class WorldObject : public Object
         template<class DelivererType>
         void SendObjectMessageToSetImpl(WorldPacket* data, bool self, WorldObject const* except = nullptr) const;
     public:
+        void SendObjectMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except = nullptr) const;
         void SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except = nullptr) const;
         void SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except = nullptr);
 

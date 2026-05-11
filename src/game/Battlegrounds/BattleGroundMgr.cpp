@@ -1140,10 +1140,9 @@ std::unique_ptr<ServerPacket> BattleGroundMgr::BuildGroupJoinedBattlegroundPacke
 
 std::unique_ptr<ServerPacket> BattleGroundMgr::BuildUpdateWorldStatePacket(uint32 field, uint32 value)
 {
-    auto packet = std::make_unique<WorldPackets::Battleground::UpdateWorldState>();
+    auto packet = std::make_unique<WorldPackets::Misc::UpdateWorldState>();
     packet->field = field;
     packet->value = value;
-
     return packet;
 }
 

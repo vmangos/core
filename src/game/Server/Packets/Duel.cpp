@@ -19,3 +19,20 @@ void WorldPackets::Duel::DuelOutOfBounds::AppendBodyTo(ByteBuffer& /*buffer*/) c
 void WorldPackets::Duel::DuelInBounds::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
 }
+
+void WorldPackets::Duel::DuelComplete::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << started;
+}
+
+void WorldPackets::Duel::DuelWinner::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << fled; // 0 = just won; 1 = fled
+    buffer << winnerName;
+    buffer << loserName;
+}
+
+void WorldPackets::Duel::DuelCountdown::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << countdown; // seconds
+}

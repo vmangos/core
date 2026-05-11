@@ -142,6 +142,71 @@ namespace WorldPackets { namespace Pet
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    // SMSG_PET_BROKEN: empty body; sent when a pet loyalty drops to 0 and it runs away
+    class PetBroken final : public ServerPacket
+    {
+    public:
+        explicit PetBroken() : ServerPacket(SMSG_PET_BROKEN) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PetActionFeedback final : public ServerPacket
+    {
+    public:
+        uint8 message = 0; // pet action feedback message code
+
+        explicit PetActionFeedback() : ServerPacket(SMSG_PET_ACTION_FEEDBACK) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    class PetActionSound final : public ServerPacket
+    {
+    public:
+        ObjectGuid petGuid;
+        uint32 soundId = 0; // pet talk sound ID
+
+        explicit PetActionSound() : ServerPacket(SMSG_PET_ACTION_SOUND) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+#endif
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+    class PetMode final : public ServerPacket
+    {
+    public:
+        ObjectGuid petGuid;
+        uint8 reactState = 0;
+        uint8 commandState = 0;
+        uint8 flag1 = 0;        // always 0
+        uint8 enabledFlags = 0; // 0x0 = enabled, 0x8 = disabled
+
+        explicit PetMode() : ServerPacket(SMSG_PET_MODE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+#endif
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    class PetUnlearnConfirm final : public ServerPacket
+    {
+    public:
+        ObjectGuid petGuid;
+        uint32 cost = 0; // cost in copper to reset pet skills
+
+        explicit PetUnlearnConfirm() : ServerPacket(SMSG_PET_UNLEARN_CONFIRM) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+#endif
+
+    class PetTameFailure final : public ServerPacket
+    {
+    public:
+        uint8 reason = 0; // PetTameFailureReason enum value
+
+        explicit PetTameFailure() : ServerPacket(SMSG_PET_TAME_FAILURE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Pet
 
 #endif // MANGOS_PACKETS_PET_H

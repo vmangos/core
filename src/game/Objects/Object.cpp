@@ -498,9 +498,9 @@ void Object::DestroyForPlayer(Player const* target) const
 {
     MANGOS_ASSERT(target);
 
-    WorldPacket data(SMSG_DESTROY_OBJECT, 8);
-    data << GetObjectGuid();
-    target->GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+    packet->objectGuid = GetObjectGuid();
+    target->GetSession()->SendPacket(std::move(packet));
 }
 
 void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
@@ -2253,6 +2253,13 @@ void WorldObject::SendObjectMessageToSetImpl(WorldPacket* data, bool self, World
     cell.Visit(p, message, *GetMap(), *this, std::max(GetMap()->GetVisibilityDistance(), GetVisibilityModifier()));
 }
 
+void WorldObject::SendObjectMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except) const
+{
+    WorldPacket data(packet->GetOpcode());
+    packet->AppendBodyTo(data);
+    SendObjectMessageToSet(&data, self, except);
+}
+
 void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except) const
 {
     SendObjectMessageToSetImpl<ObjectViewersDeliverer>(data, self, except);
@@ -2293,16 +2300,16 @@ void WorldObject::SendMessageToSetExcept(WorldPacket* data, Player const* skippe
 
 void WorldObject::SendObjectSpawnAnim() const
 {
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
-    data << GetObjectGuid();
-    SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Misc::GameObjectSpawnAnim>();
+    packet->gameObjectGuid = GetObjectGuid();
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
 void WorldObject::SendObjectDeSpawnAnim() const
 {
-    WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-    data << GetObjectGuid();
-    SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Misc::GameObjectDespawnAnim>();
+    packet->gameObjectGuid = GetObjectGuid();
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
 bool WorldObject::IsWithinVisibilityDistanceOf(Unit const* viewer, WorldObject const* viewPoint, bool inVisibleList) const
@@ -2819,13 +2826,13 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player const* target /*= nullptr*/) const
 {
     // Nostalrius: ignored by client if unit is not loaded
-    WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4 + 8);
-    data << uint32(sound_id);
-    data << GetObjectGuid();
+    auto packet = std::make_unique<WorldPackets::Misc::PlayObjectSound>();
+    packet->soundId = sound_id;
+    packet->sourceGuid = GetObjectGuid();
     if (target)
-        target->SendDirectMessage(&data);
+        target->GetSession()->SendPacket(std::move(packet));
     else
-        SendObjectMessageToSet(&data, true);
+        SendObjectMessageToSet(std::move(packet), true);
 }
 
 void WorldObject::PlayDirectSound(uint32 sound_id, Player const* target /*= nullptr*/) const

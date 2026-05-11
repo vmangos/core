@@ -83,4 +83,14 @@ void WorldPackets::Loot::LootAllPassed::AppendBodyTo(ByteBuffer& buffer) const
     buffer << randomSuffixId;
 }
 
+void WorldPackets::Loot::LootReleaseResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << lootedGuid;
+    buffer << result;
+}
+
+void WorldPackets::Loot::LootRemoved::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << lootSlot;
+}
 

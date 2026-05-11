@@ -1834,6 +1834,14 @@ uint32 Map::GetPlayersCountExceptGMs() const
     return count;
 }
 
+void Map::SendToPlayers(std::unique_ptr<ServerPacket const> packet, Team team) const
+{
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket data(packet->GetOpcode());
+    packet->AppendBodyTo(data);
+    SendToPlayers(&data, team);
+}
+
 void Map::SendToPlayers(WorldPacket const* data, Team team) const
 {
     for (const auto& itr : m_mapRefManager)

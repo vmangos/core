@@ -818,8 +818,7 @@ void Pet::ModifyLoyalty(int32 addvalue)
             m_loyaltyPoints = 0;
             if (Player* owner = GetOwnerPlayer())
             {
-                WorldPacket data(SMSG_PET_BROKEN, 0);
-                owner->GetSession()->SendPacket(&data);
+                owner->GetSession()->SendPacket(std::make_unique<WorldPackets::Pet::PetBroken>());
 
                 //run away
                 Unsummon(PET_SAVE_AS_DELETED, owner);
@@ -2368,12 +2367,11 @@ void Pet::SetEnabled(bool on)
     if (!owner || !GetCharmInfo())
         return;
 
-    WorldPacket data(SMSG_PET_MODE, 12);
-    data << GetObjectGuid();
-    data << uint8(GetCharmInfo()->GetReactState());
-    data << uint8(GetCharmInfo()->GetCommandState());
-    data << uint8(0);
-    data << uint8(m_enabled ? 0x0 : 0x8);
-    owner->GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Pet::PetMode>();
+    packet->petGuid = GetObjectGuid();
+    packet->reactState = GetCharmInfo()->GetReactState();
+    packet->commandState = GetCharmInfo()->GetCommandState();
+    packet->enabledFlags = m_enabled ? 0x0 : 0x8;
+    owner->GetSession()->SendPacket(std::move(packet));
 #endif
 }
