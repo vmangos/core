@@ -107,17 +107,7 @@ typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::millisec
 inline float finiteAlways(float f) { return std::isfinite(f) ? f : 0.0f; }
 
 /// Case-insensitive check whether str starts with prefix
-inline bool StringStartsWithCaseInsensitive(std::string const& str, std::string const& prefix)
-{
-    std::size_t const n = prefix.length();
-    if (str.length() < n)
-        return false;
-#if COMPILER == COMPILER_MICROSOFT
-    return _strnicmp(str.c_str(), prefix.c_str(), n) == 0;
-#else
-    return strncasecmp(str.c_str(), prefix.c_str(), n) == 0;
-#endif
-}
+bool StringStartsWithCaseInsensitive(std::string const& str, std::string const& prefix);
 
 #define atol(a) strtoul(a, nullptr, 10)
 
