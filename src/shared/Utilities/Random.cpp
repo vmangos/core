@@ -20,12 +20,13 @@
 #include "mersennetwister/MersenneTwister.h"
 
 #include <cmath>
+#include <algorithm>
 
 thread_local MTRand mtRand;
 
 int32 irand(int32 minInclusive, int32 maxInclusive)
 {
-    return int32(mtRand.randInt(maxInclusive - minInclusive)) + minInclusive;
+    return static_cast<int32>(mtRand.randInt(maxInclusive - minInclusive)) + minInclusive;
 }
 
 uint32 urand(uint32 minInclusive, uint32 maxInclusive)
