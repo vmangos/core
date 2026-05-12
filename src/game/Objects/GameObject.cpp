@@ -803,7 +803,7 @@ void GameObject::FinishRitual()
         // take spell cooldown
         if (Player* pOwner = ::ToPlayer(GetOwner()))
             if (SpellEntry const* createBySpell = sSpellMgr.GetSpellEntry(GetSpellId()))
-                pOwner->AddCooldown(*createBySpell);
+                pOwner->AddCooldown(createBySpell);
         if (!info->summoningRitual.ritualPersistent)
             SetLootState(GO_JUST_DEACTIVATED);
         // Only ritual of doom deals a second spell

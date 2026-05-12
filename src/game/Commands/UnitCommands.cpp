@@ -2643,7 +2643,7 @@ bool ChatHandler::HandleCooldownClearCommand(char* args)
             return false;
         }
 
-        target->RemoveSpellCooldown(*spellEntry);
+        target->RemoveSpellCooldown(spellEntry);
         PSendSysMessage(LANG_REMOVE_COOLDOWN, spell_id, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
     }
     return true;

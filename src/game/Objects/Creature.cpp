@@ -3204,29 +3204,29 @@ void Creature::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
     SpellCaster::LockOutSpells(schoolMask, duration);
 }
 
-void Creature::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* /*itemProto*/, bool /*permanent*/, uint32 forcedDuration)
+void Creature::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* /*itemProto*/, bool /*permanent*/, uint32 forcedDuration)
 {
-    uint32 recTime = forcedDuration ? forcedDuration : spellEntry.RecoveryTime;
-    if (recTime || spellEntry.CategoryRecoveryTime)
+    uint32 recTime = forcedDuration ? forcedDuration : spellEntry->RecoveryTime;
+    if (recTime || spellEntry->CategoryRecoveryTime)
     {
-        uint32 categoryRecTime = spellEntry.CategoryRecoveryTime;
+        uint32 categoryRecTime = spellEntry->CategoryRecoveryTime;
         if (Player* modOwner = GetSpellModOwner())
         {
             if (recTime)
-                modOwner->ApplySpellMod(spellEntry.Id, SPELLMOD_COOLDOWN, recTime);
-            else if (spellEntry.Category && categoryRecTime)
-                modOwner->ApplySpellMod(spellEntry.Id, SPELLMOD_COOLDOWN, categoryRecTime);
+                modOwner->ApplySpellMod(spellEntry->Id, SPELLMOD_COOLDOWN, recTime);
+            else if (spellEntry->Category && categoryRecTime)
+                modOwner->ApplySpellMod(spellEntry->Id, SPELLMOD_COOLDOWN, categoryRecTime);
         }
 
-        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, spellEntry.Category, categoryRecTime);
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTime, spellEntry->Category, categoryRecTime);
     }
-    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry.GetCastTime(this))
+    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry->GetCastTime(this))
     {
         // Forced cooldown on using instant spells during mind control to prevent abuse.
         recTime = 10 * IN_MILLISECONDS;
-        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, 0, 0);
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTime, 0, 0);
         if (Player const* player = ::ToPlayer(GetCharmer()))
-            player->SendSpellCooldown(spellEntry.Id, recTime, GetObjectGuid());
+            player->SendSpellCooldown(spellEntry->Id, recTime, GetObjectGuid());
     }
 }
 
@@ -4210,7 +4210,7 @@ void Creature::StartCooldownForSummoner()
                 if (Unit* pOwner = GetOwner())
                 {
                     AddCreatureState(CSTATE_IMPOSED_COOLDOWN);
-                    pOwner->AddCooldown(*pSpellInfo); // Remove infinity cooldown
+                    pOwner->AddCooldown(pSpellInfo); // Remove infinity cooldown
                 }
             }
         }

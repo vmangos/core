@@ -351,7 +351,7 @@ float SpellCaster::MeleeSpellMissChance(Unit const* pVictim, WeaponAttackType at
 
         // Bonuses from attacker aura and ratings
         hitChance += pUnit->GetWeaponBasedAuraModifier(attType, SPELL_AURA_MOD_HIT_CHANCE);
-    } 
+    }
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from
     // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking players Weapon Skill.
@@ -433,7 +433,7 @@ SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit const* pVictim, SpellEntry c
     }
     // Check creatures flags_extra for disable parry
     if (Creature const* pCreatureVictim = pVictim->ToCreature())
-    { 
+    {
         if (pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_PARRY))
             canParry = false;
         if (pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_BLOCK))
@@ -567,10 +567,10 @@ int32 SpellCaster::MagicSpellHitChance(Unit const* pVictim, SpellEntry const* sp
             modOwner->ApplySpellMod(spell->Id, SPELLMOD_RESIST_MISS_CHANCE, modHitChance, spellPtr);
         }
     }
-    
+
     // Chance hit from victim SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE auras
     modHitChance += pVictim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE, schoolMask);
-    
+
     // Reduce spell hit chance for Area of effect spells from victim SPELL_AURA_MOD_AOE_AVOIDANCE aura
     if (spell->IsAreaOfEffectSpell())
     {
@@ -583,14 +583,14 @@ int32 SpellCaster::MagicSpellHitChance(Unit const* pVictim, SpellEntry const* sp
         resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->Mechanic);
     // Apply mod
     modHitChance -= resist_mech;
-    
+
     // Chance resist debuff
     modHitChance -= pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DEBUFF_RESISTANCE, int32(spell->Dispel));
-    
+
     // Increase hit chance from attacker SPELL_AURA_MOD_SPELL_HIT_CHANCE and attacker ratings
     if (Unit* pUnit = ToUnit())
         modHitChance += int32(pUnit->m_modSpellHitChance);
-    
+
     // Nostalrius: sorts binaires.
     if (spell->IsBinary())
     {
@@ -708,7 +708,7 @@ uint32 SpellCaster::SpellCriticalDamageBonus(SpellEntry const* spellProto, uint3
         if (Player* modOwner = pUnit->GetSpellModOwner())
             modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CRIT_DAMAGE_BONUS, crit_bonus, spell);
     }
-    
+
 
     if (!pVictim)
         return damage += crit_bonus;
@@ -1260,7 +1260,7 @@ float SpellCaster::SpellHealingBonusDone(Unit const* pVictim, SpellEntry const* 
         if (Player* modOwner = pUnit->GetSpellModOwner())
             modOwner->ApplySpellMod(spellProto->Id, damagetype == DOT ? SPELLMOD_DOT : SPELLMOD_DAMAGE, heal, spell);
     }
-    
+
     return heal < 0 ? 0 : heal;
 }
 
@@ -1288,7 +1288,7 @@ float SpellCaster:: SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
             }
         }
     }
-    
+
     return AdvertisedBenefit;
 }
 
@@ -1469,7 +1469,7 @@ int32 SpellCaster::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
             }
         }
     }
-    
+
     return DoneAdvertisedBenefit;
 }
 
@@ -2132,13 +2132,13 @@ SpellCastResult SpellCaster::CastSpell(float x, float y, float z, SpellEntry con
     return spell->prepare(std::move(targets), triggeredByAura);
 }
 
-void SpellCaster::AddGCD(SpellEntry const& spellEntry, uint32 forcedDuration /*= 0*/, bool /*updateClient = false*/)
+void SpellCaster::AddGCD(SpellEntry const* spellEntry, uint32 forcedDuration /*= 0*/, bool /*updateClient = false*/)
 {
-    uint32 gcdRecTime = forcedDuration ? forcedDuration : spellEntry.StartRecoveryTime;
+    uint32 gcdRecTime = forcedDuration ? forcedDuration : spellEntry->StartRecoveryTime;
     if (!gcdRecTime)
         return;
 
-    m_GCDCatMap.emplace(spellEntry.StartRecoveryCategory, std::chrono::milliseconds(gcdRecTime) + sWorld.GetCurrentClockTime());
+    m_GCDCatMap.emplace(spellEntry->StartRecoveryCategory, std::chrono::milliseconds(gcdRecTime) + sWorld.GetCurrentClockTime());
 }
 
 bool SpellCaster::HasGCD(SpellEntry const* spellEntry) const
@@ -2152,11 +2152,11 @@ bool SpellCaster::HasGCD(SpellEntry const* spellEntry) const
     return !m_GCDCatMap.empty();
 }
 
-void SpellCaster::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* /*itemProto = nullptr*/, bool /*permanent = false*/, uint32 forcedDuration /*= 0*/)
+void SpellCaster::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* /*itemProto = nullptr*/, bool /*permanent = false*/, uint32 forcedDuration /*= 0*/)
 {
-    uint32 recTimeDuration = forcedDuration ? forcedDuration : spellEntry.RecoveryTime;
-    if (recTimeDuration || spellEntry.CategoryRecoveryTime)
-        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTimeDuration, spellEntry.Category, spellEntry.CategoryRecoveryTime);
+    uint32 recTimeDuration = forcedDuration ? forcedDuration : spellEntry->RecoveryTime;
+    if (recTimeDuration || spellEntry->CategoryRecoveryTime)
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTimeDuration, spellEntry->Category, spellEntry->CategoryRecoveryTime);
 }
 
 void SpellCaster::UpdateCooldowns(TimePoint const& now)
@@ -2198,9 +2198,9 @@ bool SpellCaster::CheckLockout(SpellSchoolMask schoolMask) const
     return false;
 }
 
-bool SpellCaster::GetExpireTime(SpellEntry const& spellEntry, TimePoint& expireTime, bool& isPermanent) const
+bool SpellCaster::GetExpireTime(SpellEntry const* spellEntry, TimePoint& expireTime, bool& isPermanent) const
 {
-    auto spellItr = m_cooldownMap.FindBySpellId(spellEntry.Id);
+    auto spellItr = m_cooldownMap.FindBySpellId(spellEntry->Id);
     if (spellItr != m_cooldownMap.end())
     {
         auto& cdData = spellItr->second;
@@ -2223,16 +2223,16 @@ bool SpellCaster::GetExpireTime(SpellEntry const& spellEntry, TimePoint& expireT
     return false;
 }
 
-bool SpellCaster::IsSpellReady(SpellEntry const& spellEntry, ItemPrototype const* itemProto /*= nullptr*/) const
+bool SpellCaster::IsSpellReady(SpellEntry const* spellEntry, ItemPrototype const* itemProto /*= nullptr*/) const
 {
-    uint32 spellCategory = spellEntry.Category;
+    uint32 spellCategory = spellEntry->Category;
 
     // overwrite category by provided category in item prototype during item cast if need
     if (itemProto)
     {
         for (const auto& Spell : itemProto->Spells)
         {
-            if (Spell.SpellId == spellEntry.Id)
+            if (Spell.SpellId == spellEntry->Id)
             {
                 spellCategory = Spell.SpellCategory;
                 break;
@@ -2240,32 +2240,23 @@ bool SpellCaster::IsSpellReady(SpellEntry const& spellEntry, ItemPrototype const
         }
     }
 
-    if (m_cooldownMap.FindBySpellId(spellEntry.Id) != m_cooldownMap.end())
+    if (m_cooldownMap.FindBySpellId(spellEntry->Id) != m_cooldownMap.end())
         return false;
 
     if (spellCategory && m_cooldownMap.FindByCategory(spellCategory) != m_cooldownMap.end())
         return false;
 
-    if (spellEntry.PreventionType == SPELL_PREVENTION_TYPE_SILENCE && CheckLockout(spellEntry.GetSpellSchoolMask()))
+    if (spellEntry->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && CheckLockout(spellEntry->GetSpellSchoolMask()))
         return false;
 
     return true;
 }
 
-bool SpellCaster::IsSpellReady(uint32 spellId, ItemPrototype const* itemProto /*= nullptr*/) const
-{
-    SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
-    if (!spellEntry)
-        return false;
-
-    return IsSpellReady(*spellEntry, itemProto);
-}
-
-bool SpellCaster::IsSpellOnPermanentCooldown(SpellEntry const& spellEntry) const
+bool SpellCaster::IsSpellOnPermanentCooldown(SpellEntry const* spellEntry) const
 {
     TimePoint now = World::GetCurrentClockTime();
 
-    auto itr = m_cooldownMap.FindBySpellId(spellEntry.Id);
+    auto itr = m_cooldownMap.FindBySpellId(spellEntry->Id);
     if (itr != m_cooldownMap.end() && !(*itr).second->IsSpellCDExpired(now))
         return itr->second->IsPermanent();
 
@@ -2281,18 +2272,9 @@ void SpellCaster::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
     }
 }
 
-void SpellCaster::RemoveSpellCooldown(uint32 spellId, bool updateClient /*= true*/)
+void SpellCaster::RemoveSpellCooldown(SpellEntry const* spellEntry, bool /*updateClient = true*/)
 {
-    SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
-    if (!spellEntry)
-        return;
-
-    RemoveSpellCooldown(*spellEntry, updateClient);
-}
-
-void SpellCaster::RemoveSpellCooldown(SpellEntry const& spellEntry, bool /*updateClient = true*/)
-{
-    m_cooldownMap.RemoveBySpellId(spellEntry.Id);
+    m_cooldownMap.RemoveBySpellId(spellEntry->Id);
 }
 
 void SpellCaster::RemoveSpellCategoryCooldown(uint32 category, bool /*updateClient = true*/)

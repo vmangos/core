@@ -212,7 +212,7 @@ void PetAI::UpdateAI(uint32 const diff)
                 continue;
 
             // check spell cooldown
-            if (!m_creature->IsSpellReady(spellInfo->Id))
+            if (!m_creature->IsSpellReady(spellInfo))
                 continue;
 
             if (spellInfo->IsPositiveSpell())
@@ -523,7 +523,7 @@ std::pair<Unit*, ePetSelectTargetReason> PetAI::SelectNextTarget() const
     Unit* owner = m_creature->GetCharmerOrOwner();
     if (!owner)
         return std::make_pair(nullptr, PSTR_FAIL_NO_OWNER);
-    
+
     if (Creature const* pOwnerCreature = owner->ToCreature())
     {
         // Owner is creature and is evading. We must not re-aggro.
@@ -552,7 +552,7 @@ std::pair<Unit*, ePetSelectTargetReason> PetAI::SelectNextTarget() const
     {
         if (Unit* pVictim = owner->GetVictim())
         {
-            if (!pVictim->HasAuraPetShouldAvoidBreaking() && 
+            if (!pVictim->HasAuraPetShouldAvoidBreaking() &&
                (!m_creature->GetCharmInfo()->IsAtStay() || m_creature->CanReachWithMeleeAutoAttack(pVictim)))
                 return std::make_pair(pVictim, PSTR_SUCCESS_OWNER_VICTIM);
         }
@@ -727,7 +727,7 @@ bool PetAI::CanAttack(Unit* target)
     // CC - mobs under crowd control can be attacked if owner commanded
     if (target->HasAuraPetShouldAvoidBreaking())
         return m_creature->GetCharmInfo()->IsCommandAttack();
-        
+
     // Returning - pets ignore attacks only if owner clicked follow
     if (m_creature->GetCharmInfo()->IsReturning())
         return !m_creature->GetCharmInfo()->IsCommandFollow();

@@ -2807,7 +2807,7 @@ bool CombatBotBaseAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* p
     if (m_preventCasting)
         return false;
 
-    if (!me->IsSpellReady(pSpellEntry->Id))
+    if (!me->IsSpellReady(pSpellEntry))
         return false;
 
     if (me->HasGCD(pSpellEntry))
@@ -3090,7 +3090,7 @@ bool CombatBotBaseAI::UseItemEffect(Item* pItem, bool onlyToBreakCC)
         {
             if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(itr.SpellId))
             {
-                if (me->IsSpellReady(*pSpellEntry, pProto))
+                if (me->IsSpellReady(pSpellEntry, pProto))
                 {
                     if (onlyToBreakCC && !pSpellEntry->HasAttribute(SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT))
                         continue;

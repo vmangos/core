@@ -517,7 +517,7 @@ SpellAuraProcResult Unit::TriggerProccedSpell(Unit* target, int32* basepoints, S
     if (!target || (target != this && !target->IsAlive()))
         return SPELL_AURA_PROC_FAILED;
 
-    if (!IsSpellReady(*spellInfo))
+    if (!IsSpellReady(spellInfo))
         return SPELL_AURA_PROC_FAILED;
 
     if (basepoints && (basepoints[EFFECT_INDEX_0] || basepoints[EFFECT_INDEX_1] || basepoints[EFFECT_INDEX_2]))
@@ -530,7 +530,7 @@ SpellAuraProcResult Unit::TriggerProccedSpell(Unit* target, int32* basepoints, S
         CastSpell(target, spellInfo, true, castItem, triggeredByAura, originalCaster, nullptr, triggeredByParent);
 
     if (cooldown)
-        AddCooldown(*spellInfo, nullptr, false, cooldown);
+        AddCooldown(spellInfo, nullptr, false, cooldown);
 
     return SPELL_AURA_PROC_OK;
 }

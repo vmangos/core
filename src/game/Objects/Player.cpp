@@ -3522,7 +3522,7 @@ void Player::SendInitialSpells() const
             catCDDuration |= 0x80000000;
         }
 
-        data << uint16(cdData->GetSpellId());
+        data << uint16(cdData->GetSpellEntry()->Id);
         data << uint16(cdData->GetItemId());                // cast item id
         data << uint16(cdData->GetCategory());              // spell category
         data << uint32(spellCDDuration);                    // cooldown
@@ -4050,7 +4050,7 @@ void Player::_LoadSpellCooldowns(std::unique_ptr<QueryResult> result)
             if (spellRecTime == std::chrono::milliseconds::zero() && catRecTime == std::chrono::milliseconds::zero())
                 continue;
 
-            m_cooldownMap.AddCooldown(curTime, spellId, uint32(spellRecTime.count()), category, uint32(catRecTime.count()), itemId);
+            m_cooldownMap.AddCooldown(curTime, spellEntry, uint32(spellRecTime.count()), category, uint32(catRecTime.count()), itemId);
 #ifdef _DEBUG
             uint32 spellCDDuration = std::chrono::duration_cast<std::chrono::seconds>(spellRecTime).count();
             uint32 catCDDuration = std::chrono::duration_cast<std::chrono::seconds>(catRecTime).count();
@@ -4089,7 +4089,7 @@ void Player::_SaveSpellCooldowns() const
 
             stmt = CharacterDatabase.CreateStatement(insertSpellCooldown, "INSERT INTO `character_spell_cooldown` (`guid`, `spell`, `spell_expire_time`, `category`, `category_expire_time`, `item_id`) VALUES( ?, ?, ?, ?, ?, ?)");
             stmt.addUInt32(GetGUIDLow());
-            stmt.addUInt32(cdData->GetSpellId());
+            stmt.addUInt32(cdData->GetSpellEntry()->Id);
             stmt.addUInt64(spellExpireTime);
             stmt.addUInt32(cdData->GetCategory());
             stmt.addUInt64(catExpireTime);
@@ -10495,7 +10495,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 #else
                     m_weaponChangeTimer = (GetClass() == CLASS_ROGUE) ? 1000 : spellProto->StartRecoveryTime;
 #endif
-                    AddGCD(*spellProto, 0, true);
+                    AddGCD(spellProto, 0, true);
                 }
             }
 #endif
@@ -19328,7 +19328,7 @@ void Player::ApplyEquipCooldown(Item const* pItem)
         if (!spellentry)
             continue;
 
-        AddCooldown(*spellentry, nullptr, false, 30 * IN_MILLISECONDS);
+        AddCooldown(spellentry, nullptr, false, 30 * IN_MILLISECONDS);
 
         WorldPacket data(SMSG_ITEM_COOLDOWN, 12);
         data << ObjectGuid(pItem->GetObjectGuid());
@@ -19939,6 +19939,29 @@ void Player::RemoveItemDependentAurasAndCasts(Item const* pItem)
     }
 }
 
+enum : uint32
+{
+    // Soulstone Resurrection aura
+    SPELL_SOULSTONE_RES_R1_PASSIVE  = 20707, // rank 1
+    SPELL_SOULSTONE_RES_R2_PASSIVE  = 20762, // rank 2
+    SPELL_SOULSTONE_RES_R3_PASSIVE  = 20763, // rank 3
+    SPELL_SOULSTONE_RES_R4_PASSIVE  = 20764, // rank 4
+    SPELL_SOULSTONE_RES_R5_PASSIVE  = 20765, // rank 5
+
+    SPELL_SOULSTONE_RES_R1_EFFECT   = 3026,  // rank 1
+    SPELL_SOULSTONE_RES_R2_EFFECT   = 20758, // rank 2
+    SPELL_SOULSTONE_RES_R3_EFFECT   = 20759, // rank 3
+    SPELL_SOULSTONE_RES_R4_EFFECT   = 20760, // rank 4
+    SPELL_SOULSTONE_RES_R5_EFFECT   = 20761, // rank 5
+
+    SPELL_TWISTING_NETHER_PASSIVE   = 23701, // Twisting Nether (passive, from item)
+    SPELL_TWISTING_NETHER_EFFECT    = 23700, // Twisting Nether (internal effect)
+
+    SPELL_REINCARNATION_PASSIVE     = 20608, // Reincarnation (passive, learnable)
+    SPELL_REINCARNATION_EFFECT      = 21169, // Reincarnation (internal effect)
+    ITEM_ANKH                       = 17030, // Ankh
+};
+
 uint32 Player::SelectResurrectionSpellId() const
 {
     // search priceless resurrection possibilities
@@ -19952,20 +19975,20 @@ uint32 Player::SelectResurrectionSpellId() const
         {
             switch (dummyAura->GetId())
             {
-                case 20707:
-                    spellId =  3026;
+                case SPELL_SOULSTONE_RES_R1_PASSIVE:
+                    spellId = SPELL_SOULSTONE_RES_R1_EFFECT;
                     break;        // rank 1
-                case 20762:
-                    spellId = 20758;
+                case SPELL_SOULSTONE_RES_R2_PASSIVE:
+                    spellId = SPELL_SOULSTONE_RES_R2_EFFECT;
                     break;        // rank 2
-                case 20763:
-                    spellId = 20759;
+                case SPELL_SOULSTONE_RES_R3_PASSIVE:
+                    spellId = SPELL_SOULSTONE_RES_R3_EFFECT;
                     break;        // rank 3
-                case 20764:
-                    spellId = 20760;
+                case SPELL_SOULSTONE_RES_R4_PASSIVE:
+                    spellId = SPELL_SOULSTONE_RES_R4_EFFECT;
                     break;        // rank 4
-                case 20765:
-                    spellId = 20761;
+                case SPELL_SOULSTONE_RES_R5_PASSIVE:
+                    spellId = SPELL_SOULSTONE_RES_R5_EFFECT;
                     break;        // rank 5
                 default:
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unhandled spell %u: S.Resurrection", dummyAura->GetId());
@@ -19975,16 +19998,19 @@ uint32 Player::SelectResurrectionSpellId() const
             prio = 3;
         }
         // Twisting Nether                                  // prio: 2 (max)
-        else if (dummyAura->GetId() == 23701 && roll_chance_i(10))
+        else if (dummyAura->GetId() == SPELL_TWISTING_NETHER_PASSIVE && roll_chance_i(10))
         {
             prio = 2;
-            spellId = 23700;
+            spellId = SPELL_TWISTING_NETHER_EFFECT;
         }
     }
 
     // Reincarnation (passive spell)                        // prio: 1
-    if (prio < 1 && HasSpell(20608) && IsSpellReady(21169) && HasItemCount(17030, EFFECT_INDEX_1))
-        spellId = 21169;
+    if (prio < 1 && HasSpell(SPELL_REINCARNATION_PASSIVE))
+    {
+        if (IsSpellReady(sSpellMgr.GetSpellEntry(SPELL_REINCARNATION_EFFECT)) && HasItemCount(ITEM_ANKH, 1))
+            spellId = SPELL_REINCARNATION_EFFECT;
+    }
 
     return spellId;
 }
@@ -21100,7 +21126,7 @@ bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown)
         // Initiate hearthstone cooldown
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(8690);
         ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(6948);
-        AddCooldown(*spellInfo, itemProto);
+        AddCooldown(spellInfo, itemProto);
     }
     MapEntry const* pMapEntry = sMapStorage.LookupEntry<MapEntry>(m_homebind.mapId);
     if (!pMapEntry || pMapEntry->Instanceable() ||
@@ -22143,19 +22169,19 @@ void Player::CreatePacketBroadcaster()
 }
 
 
-void Player::AddGCD(SpellEntry const& spellEntry, uint32 /*forcedDuration = 0*/, bool updateClient /*= false*/)
+void Player::AddGCD(SpellEntry const* spellEntry, uint32 /*forcedDuration = 0*/, bool updateClient /*= false*/)
 {
-    int32 gcdDuration = spellEntry.StartRecoveryTime;
-    if (!spellEntry.StartRecoveryCategory && !gcdDuration)
+    int32 gcdDuration = spellEntry->StartRecoveryTime;
+    if (!spellEntry->StartRecoveryCategory && !gcdDuration)
         return;
 
     // gcd modifier auras applied only to self spells and only player have mods for this
-    ApplySpellMod(spellEntry.Id, SPELLMOD_GLOBAL_COOLDOWN, gcdDuration);
+    ApplySpellMod(spellEntry->Id, SPELLMOD_GLOBAL_COOLDOWN, gcdDuration);
 
     // apply haste rating
-    if (spellEntry.StartRecoveryCategory == SPELLCATEGORY_GLOBAL && gcdDuration == 1500 &&
-        spellEntry.DmgClass != SPELL_DAMAGE_CLASS_MELEE && spellEntry.DmgClass != SPELL_DAMAGE_CLASS_RANGED &&
-        !spellEntry.HasAttribute(SPELL_ATTR_USES_RANGED_SLOT) && !spellEntry.HasAttribute(SPELL_ATTR_IS_ABILITY))
+    if (spellEntry->StartRecoveryCategory == SPELLCATEGORY_GLOBAL && gcdDuration == 1500 &&
+        spellEntry->DmgClass != SPELL_DAMAGE_CLASS_MELEE && spellEntry->DmgClass != SPELL_DAMAGE_CLASS_RANGED &&
+        !spellEntry->HasAttribute(SPELL_ATTR_USES_RANGED_SLOT) && !spellEntry->HasAttribute(SPELL_ATTR_IS_ABILITY))
     {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
         gcdDuration = int32(float(gcdDuration) * GetFloatValue(UNIT_MOD_CAST_SPEED));
@@ -22181,21 +22207,21 @@ void Player::AddGCD(SpellEntry const& spellEntry, uint32 /*forcedDuration = 0*/,
         return;
 
     // send to client
-    SendSpellCooldown(spellEntry.Id, 0, GetObjectGuid());
+    SendSpellCooldown(spellEntry->Id, 0, GetObjectGuid());
 }
 
-void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto /*= nullptr*/, bool permanent /*= false*/, uint32 forcedDuration /*= 0*/)
+void Player::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* itemProto /*= nullptr*/, bool permanent /*= false*/, uint32 forcedDuration /*= 0*/)
 {
-    uint32 spellCategory = spellEntry.Category;
-    uint32 recTime = spellEntry.RecoveryTime; // int because of spellmod calculations
-    uint32 categoryRecTime = spellEntry.CategoryRecoveryTime; // int because of spellmod calculations
+    uint32 spellCategory = spellEntry->Category;
+    uint32 recTime = spellEntry->RecoveryTime; // int because of spellmod calculations
+    uint32 categoryRecTime = spellEntry->CategoryRecoveryTime; // int because of spellmod calculations
     uint32 itemId = 0;
 
     auto pickCooldowns = [&](ItemPrototype const* itemProto)
     {
         for (const auto& Spell : itemProto->Spells)
         {
-            if (Spell.SpellId == spellEntry.Id)
+            if (Spell.SpellId == spellEntry->Id)
             {
                 if (Spell.SpellCategory)
                     spellCategory = Spell.SpellCategory;
@@ -22215,13 +22241,13 @@ void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* item
     bool haveToSendEvent = false;
     bool wasPermanent = false;
     uint32 oldItemId = 0;
-    auto cdDataItr = m_cooldownMap.FindBySpellId(spellEntry.Id);
+    auto cdDataItr = m_cooldownMap.FindBySpellId(spellEntry->Id);
     if (cdDataItr != m_cooldownMap.end())
     {
         auto& cdData = cdDataItr->second;
         if (!cdData->IsPermanent() && (!cdData->IsSpellCDExpired(sWorld.GetCurrentClockTime()) || !cdData->IsCatCDExpired(sWorld.GetCurrentClockTime())))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player::AddCooldown> Spell(%u) try to add and already existing cooldown?", spellEntry.Id);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player::AddCooldown> Spell(%u) try to add and already existing cooldown?", spellEntry->Id);
             return;
         }
         wasPermanent = cdData->IsPermanent();
@@ -22232,7 +22258,7 @@ void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* item
 
     if (permanent)
     {
-        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, spellCategory, categoryRecTime, itemId, true);
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTime, spellCategory, categoryRecTime, itemId, true);
         return;
     }
 
@@ -22242,15 +22268,15 @@ void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* item
     {
         // shoot spells used equipped item cooldown values already assigned in GetAttackTime(RANGED_ATTACK)
         // prevent 0 cooldowns set by another way
-        if (spellEntry.HasAttribute(SPELL_ATTR_USES_RANGED_SLOT) && !spellEntry.HasAttribute(SPELL_ATTR_EX2_DO_NOT_RESET_COMBAT_TIMERS))
+        if (spellEntry->HasAttribute(SPELL_ATTR_USES_RANGED_SLOT) && !spellEntry->HasAttribute(SPELL_ATTR_EX2_DO_NOT_RESET_COMBAT_TIMERS))
             recTime += GetFloatValue(UNIT_FIELD_RANGEDATTACKTIME);
     }
 
     // blizzlike code for choosing which is recTime > categoryRecTime after spellmod application
     if (recTime)
-        ApplySpellMod(spellEntry.Id, SPELLMOD_COOLDOWN, recTime);
+        ApplySpellMod(spellEntry->Id, SPELLMOD_COOLDOWN, recTime);
     else if (spellCategory && categoryRecTime)
-        ApplySpellMod(spellEntry.Id, SPELLMOD_COOLDOWN, categoryRecTime);
+        ApplySpellMod(spellEntry->Id, SPELLMOD_COOLDOWN, categoryRecTime);
 
     if (recTime || categoryRecTime || wasPermanent)
     {
@@ -22260,19 +22286,19 @@ void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* item
 
         // ready to add the cooldown
         if (recTime || categoryRecTime) // only send event if was permanent but no cds
-            m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, spellCategory, categoryRecTime, itemId);
+            m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTime, spellCategory, categoryRecTime, itemId);
 
         // after some aura fade or potion activation we have to send cooldown event to start cd client side
         if (haveToSendEvent)
         {
             // client keeps track of category cd by original spellId
-            if (spellCategory && spellEntry.HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
+            if (spellCategory && spellEntry->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
             {
                 auto itr = m_cooldownMap.FindByCategory(spellCategory);
-                if (itr != m_cooldownMap.end() && (*itr).second->GetSpellId() != spellEntry.Id)
+                if (itr != m_cooldownMap.end() && (*itr).second->GetSpellEntry() != spellEntry)
                 {
                     WorldPacket data(SMSG_COOLDOWN_EVENT, (4 + 8));
-                    data << uint32((*itr).second->GetSpellId());
+                    data << uint32((*itr).second->GetSpellEntry()->Id);
                     data << GetObjectGuid();
                     SendDirectMessage(&data);
                 }
@@ -22280,10 +22306,10 @@ void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* item
 
             // Send activate cooldown timer (possible 0) at client side
             WorldPacket data(SMSG_COOLDOWN_EVENT, (4 + 8));
-            data << uint32(spellEntry.Id);
+            data << uint32(spellEntry->Id);
             data << GetObjectGuid();
             SendDirectMessage(&data);
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sending SMSG_COOLDOWN_EVENT with spell id = %u", spellEntry.Id);
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sending SMSG_COOLDOWN_EVENT with spell id = %u", spellEntry->Id);
         }
     }
 
@@ -22300,12 +22326,12 @@ void Player::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* item
     }
 }
 
-void Player::RemoveSpellCooldown(SpellEntry const& spellEntry, bool updateClient /*= true*/)
+void Player::RemoveSpellCooldown(SpellEntry const* spellEntry, bool updateClient /*= true*/)
 {
-    m_cooldownMap.RemoveBySpellId(spellEntry.Id);
+    m_cooldownMap.RemoveBySpellId(spellEntry->Id);
 
     if (updateClient)
-        SendClearCooldown(spellEntry.Id, this);
+        SendClearCooldown(spellEntry->Id, this);
 }
 
 void Player::RemoveSpellCategoryCooldown(uint32 category, bool updateClient /*= true*/)
@@ -22316,7 +22342,7 @@ void Player::RemoveSpellCategoryCooldown(uint32 category, bool updateClient /*= 
 
     auto& cdData = spellItr->second;
     if (updateClient)
-        SendClearCooldown(cdData->GetSpellId(), this);
+        SendClearCooldown(cdData->GetSpellEntry()->Id, this);
 
     m_cooldownMap.erase(spellItr);
 }
@@ -22332,8 +22358,8 @@ void Player::RemoveAllCooldowns(bool sendOnly /*= false*/)
         auto& cdData = cdItr.second;
         if (!cdData->IsPermanent())
         {
-            SendClearCooldown(cdData->GetSpellId(), this);
-            spellsSent.emplace(cdData->GetSpellId());
+            SendClearCooldown(cdData->GetSpellEntry()->Id, this);
+            spellsSent.emplace(cdData->GetSpellEntry()->Id);
         }
     }
 
@@ -22378,7 +22404,7 @@ void Player::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
 
         TimePoint expireTime;
         bool isInfinite;
-        bool spellCDFound = GetExpireTime(*spellEntry, expireTime, isInfinite);
+        bool spellCDFound = GetExpireTime(spellEntry, expireTime, isInfinite);
 
         if ((schoolMask & spellEntry->GetSpellSchoolMask()) && (!spellCDFound || expireTime < lockoutExpireTime))
         {
@@ -22455,8 +22481,8 @@ void Player::CastHighestStealthRank()
         return;
 
     // reset cooldown on it if needed
-    if (!IsSpellReady(*stealthSpellEntry))
-        RemoveSpellCooldown(*stealthSpellEntry);
+    if (!IsSpellReady(stealthSpellEntry))
+        RemoveSpellCooldown(stealthSpellEntry);
 
     CastSpell(nullptr, stealthSpellEntry, true);
 }
