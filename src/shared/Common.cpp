@@ -21,6 +21,10 @@
 
 #include "Common.h"
 
+#if COMPILER != COMPILER_MICROSOFT
+#include <strings.h>
+#endif
+
 char const* localeNames[MAX_LOCALE] = {
   "enUS",                                                   // also enGB
   "koKR",
@@ -48,6 +52,18 @@ LocaleNameStr const fullLocaleNameList[] =
     { "ruRU", LOCALE_ruRU },
     { NULL,   LOCALE_enUS }
 };
+
+bool StringStartsWithCaseInsensitive(std::string const& str, std::string const& prefix)
+{
+    std::size_t const n = prefix.length();
+    if (str.length() < n)
+        return false;
+#if COMPILER == COMPILER_MICROSOFT
+    return _strnicmp(str.c_str(), prefix.c_str(), n) == 0;
+#else
+    return strncasecmp(str.c_str(), prefix.c_str(), n) == 0;
+#endif
+}
 
 LocaleConstant GetLocaleByName(std::string const& name)
 {

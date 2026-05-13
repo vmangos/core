@@ -105,7 +105,7 @@ SqlPlainPreparedStatement::SqlPlainPreparedStatement(std::string const& fmt, Sql
 {
     m_bPrepared = true;
     m_nParams = std::count(m_szFmt.begin(), m_szFmt.end(), '?');
-    m_bIsQuery = strnicmp(m_szFmt.c_str(), "select", 6) == 0;
+    m_bIsQuery = StringStartsWithCaseInsensitive(m_szFmt, "select");
 }
 
 void SqlPlainPreparedStatement::bind(SqlStmtParameters const& holder)
