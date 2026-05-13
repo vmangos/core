@@ -87,9 +87,6 @@ typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::millisec
 
 #else
 
-#  define stricmp strcasecmp
-#  define strnicmp strncasecmp
-
 #  define I32FMT "%08X"
 #  if ACE_SIZEOF_LONG == 8
 #    define I64FMT "%016lX"
@@ -108,6 +105,9 @@ typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::millisec
 
 /// Will always return a finite float. If the provided float is infinite it will return 0
 inline float finiteAlways(float f) { return std::isfinite(f) ? f : 0.0f; }
+
+/// Case-insensitive check whether str starts with prefix
+bool StringStartsWithCaseInsensitive(std::string const& str, std::string const& prefix);
 
 #define atol(a) strtoul(a, nullptr, 10)
 
