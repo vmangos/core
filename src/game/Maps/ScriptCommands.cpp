@@ -1739,8 +1739,10 @@ bool Map::ScriptCommand_RemoveSpellCooldown(ScriptInfo const& script, WorldObjec
     }
 
     if (script.removeCooldown.spellId)
+    {
         if (SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(script.removeCooldown.spellId))
             pSource->RemoveSpellCooldown(spellEntry, true);
+    }
     else
         pSource->RemoveAllCooldowns();
 
