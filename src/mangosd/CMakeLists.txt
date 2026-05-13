@@ -37,7 +37,6 @@ if(WIN32)
 endif()
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
   ${CMAKE_SOURCE_DIR}/src/framework
   ${CMAKE_SOURCE_DIR}/src/framework/Network
   ${CMAKE_SOURCE_DIR}/src/game

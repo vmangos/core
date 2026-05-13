@@ -22,10 +22,6 @@ add_executable(${EXECUTABLE_NAME} adtfile.cpp dbcfile.cpp gameobject_extract.cpp
 mangos_target_flags(${EXECUTABLE_NAME})
 SET_TARGET_PROPERTIES (${EXECUTABLE_NAME} PROPERTIES FOLDER Extractors)
 
-include_directories(
-  ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
-)
-
 if(UNIX)
   find_package(ZLIB REQUIRED)
   if(ZLIB_FOUND)

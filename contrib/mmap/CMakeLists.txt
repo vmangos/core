@@ -31,7 +31,6 @@ include_directories(
     ../../src/game/vmap
     ../../src/game/Maps
     ../../src/game/Commands
-    ../../dep/include/g3dlite
     ../../src/framework
     ../../dep/recastnavigation/
     ../../dep/recastnavigation/Detour/Include
