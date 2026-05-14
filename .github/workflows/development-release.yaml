@@ -1,5 +1,5 @@
-# Build and publish the Linux development release on pushes to development.
-name: Linux Development Release
+# Build and publish the development release on pushes to development.
+name: Development Release
 
 on:
   push:
@@ -18,11 +18,11 @@ on:
       - 'sql/**'
 
 concurrency:
-  group: linux-development-release-${{ github.ref }}
+  group: development-release-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-linux:
     name: Build Linux development release
     runs-on: ubuntu-24.04
     permissions:
@@ -105,9 +105,48 @@ jobs:
           name: linux-development-build
           path: "${{ github.workspace }}/bin/${{ env.ARCHIVE_FILENAME }}"
 
+  build-windows:
+    name: Build Windows development release
+    runs-on: windows-2022
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Build release binaries
+        shell: bash # Windows runners default to PowerShell.
+        run: |
+          set -euo pipefail
+          mkdir -p build
+          cd build
+          cmake ../ \
+            -DBUILD_EXTRACTORS=1 \
+            -DBUILD_WARNINGS_AS_ERROR=1 \
+            -G "Visual Studio 17 2022" \
+            -A x64
+          "/c/Program Files/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe" "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m
+
+      - name: Set release archive filename
+        run: |
+          echo "ARCHIVE_FILENAME=dev-windows-amd64-$(git rev-parse --short HEAD).zip" >> $env:GITHUB_ENV
+
+      - name: Create release archive
+        shell: bash # Windows runners default to PowerShell.
+        run: |
+          set -euo pipefail
+          ./.github/scripts/package-windows-release.sh x64 "$ARCHIVE_FILENAME"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-development-build
+          path: "${{ github.workspace }}/bin/${{ env.ARCHIVE_FILENAME }}"
+
   publish:
-    name: Publish Linux development release
-    needs: build
+    name: Publish development release
+    needs: [build-linux, build-windows]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -118,19 +157,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download release artifact
+      - name: Download Linux release artifact
         uses: actions/download-artifact@v8
         with:
-          pattern: linux-development-build
-          merge-multiple: true
+          name: linux-development-build
+          path: release-assets
+
+      - name: Download Windows release artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: windows-development-build
           path: release-assets
 
       - name: Write release notes preamble
         run: |
-          cat >linux-release-notes.md <<'RELEASE_NOTES'
-          ## Compatibility
+          cat >release-notes.md <<'RELEASE_NOTES'
+          ## Linux compatibility
 
-          This Linux development build is for `amd64` systems using `glibc` 2.39 or newer.
+          The Linux build is for `amd64` systems using `glibc` 2.39 or newer.
           It is built on Ubuntu 24.04 and bundles non-`glibc` runtime libraries.
           It is not expected to run on Alpine/`musl` or older `glibc` systems.
 
@@ -139,4 +183,4 @@ jobs:
       - name: Publish release snapshot
         env:
           GH_TOKEN: ${{ github.token }}
-        run: ./.github/scripts/publish-moving-release.sh linux_latest "Linux Development Build" release-assets linux-release-notes.md
+        run: ./.github/scripts/publish-moving-release.sh latest "Development Build" release-assets release-notes.md
