@@ -35,7 +35,7 @@ struct ShamanFlametongueProcDummyScript : SpellScript
             float weaponSpeed = (1.0f / float(IN_MILLISECONDS)) * spell->m_CastItem->GetProto()->Delay;
             float totalDamage = (spell->damage + 3.85f * spellDamage) * 0.01f * weaponSpeed;
 
-            spell->m_caster->CastCustomSpell(spell->GetUnitTarget(), 10444, dither(totalDamage), {}, {}, true, spell->m_CastItem);
+            spell->m_caster->CastCustomSpell(spell->GetUnitTarget(), 10444, rand_dither(totalDamage), {}, {}, true, spell->m_CastItem);
         }
         return true;
     }
@@ -55,7 +55,7 @@ struct ShamanManaTideAuraScript : public AuraScript
         uint32 triggerSpellId = aura->GetSpellProto()->EffectTriggerSpell[aura->GetEffIndex()];
         if (triggerSpellId)
         {
-            int32 ditheredAmount = dither(aura->GetModifier()->m_amount);
+            int32 ditheredAmount = rand_dither(aura->GetModifier()->m_amount);
             target->CastCustomSpell(target, triggerSpellId, ditheredAmount, {}, {}, true, nullptr, aura);
             // Prevent default cast
             spellInfo = nullptr;

@@ -30,6 +30,7 @@
 #include "TemporarySummon.h"
 #include "GameObjectAI.h"
 #include "Geometry.h"
+#include "Utilities/Random.h"
 
 //-----------------------------------------------//
 template<class T, typename D>

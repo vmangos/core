@@ -29,6 +29,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Group.h"
+#include "Utilities/Random.h"
 #include "SocialMgr.h"
 #include "Util.h"
 

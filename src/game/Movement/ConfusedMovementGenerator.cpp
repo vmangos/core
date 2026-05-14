@@ -23,6 +23,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "PathFinder.h"
+#include "Utilities/Random.h"
 #include "Transport.h"
 
 template<class T>

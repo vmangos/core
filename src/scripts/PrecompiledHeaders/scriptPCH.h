@@ -30,5 +30,6 @@
 #include "World.h"
 #include "Weather.h"
 #include "TotemAI.h"
+#include "Utilities/Random.h"
 
 #endif

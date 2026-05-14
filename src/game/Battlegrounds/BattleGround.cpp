@@ -36,6 +36,7 @@
 #include "Formulas.h"
 #include "GridNotifiersImpl.h"
 #include "Chat.h"
+#include "Utilities/Random.h"
 #include "ScriptMgr.h"
 
 namespace MaNGOS

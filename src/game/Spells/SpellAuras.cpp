@@ -50,6 +50,7 @@
 #include "MovementPacketSender.h"
 #include "ZoneScript.h"
 #include "LoveIsInTheAir.h"
+#include "Utilities/Random.h"
 
 using namespace Spells;
 
@@ -1425,7 +1426,7 @@ void Aura::TriggerSpell()
                             lRage = 100;
                         target->ModifyPower(POWER_RAGE, -lRage);
                         float FRTriggerBasePoints = lRage * LifePerRage / 10;
-                        target->CastCustomSpell(target, 22845, dither(FRTriggerBasePoints), {}, {}, true, nullptr, this);
+                        target->CastCustomSpell(target, 22845, rand_dither(FRTriggerBasePoints), {}, {}, true, nullptr, this);
                         return;
                     }
                     default:
@@ -4856,7 +4857,7 @@ void Aura::HandleAuraModIncreaseHealth(bool apply, bool Real)
                 {
                     target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, m_modifier.m_amount, apply);
                     target->ModifyHealth(m_modifier.m_amount);
-                    int32 healAmount = dither(target->GetMaxHealth() * 0.15f);
+                    int32 healAmount = rand_dither(target->GetMaxHealth() * 0.15f);
                     target->CastCustomSpell(target, 23783, healAmount, {}, {}, true, nullptr, this);
                 }
                 else
@@ -5742,7 +5743,7 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
 
             m_modifier.m_amount += DoneActualBenefit;
 
-            m_modifier.m_amount = dither(m_modifier.m_amount);
+            m_modifier.m_amount = rand_dither(m_modifier.m_amount);
         }
     }
 }
@@ -5830,7 +5831,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 fdamage = target->MeleeDamageBonusTaken(pCaster, fdamage, attackType, spellProto, GetEffIndex(), DOT, GetStackAmount());
             }
 
-            uint32 pdamage = ditheru(std::max(fdamage, 0.f)); // prevent negative damage due to sickness
+            uint32 pdamage = rand_ditheru(fdamage);
             uint32 const originalDamage = pdamage;
 
             target->CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), DOT, pdamage, &absorb, &resist, spellProto);
@@ -5900,7 +5901,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             int32 resist = 0;
             CleanDamage cleanDamage =  CleanDamage(0, BASE_ATTACK, MELEE_HIT_NORMAL, 0, 0);
 
-            float fdamage = ditheru(m_modifier.m_amount > 0 ? m_modifier.m_amount : 0);
+            float fdamage = rand_ditheru(m_modifier.m_amount > 0 ? m_modifier.m_amount : 0);
 
             if (GetAuraScript())
                 GetAuraScript()->OnPeriodicCalculateAmount(this, fdamage);
@@ -5999,7 +6000,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             else
                 fdamage = amount;
 
-            uint32 pdamage = ditheru(target->SpellHealingBonusTaken(pCaster, spellProto, GetEffIndex(), fdamage, DOT, GetStackAmount()));
+            uint32 pdamage = rand_ditheru(target->SpellHealingBonusTaken(pCaster, spellProto, GetEffIndex(), fdamage, DOT, GetStackAmount()));
 
             // Don't heal target if it is already at max health. We still need
             // to do procs on the tick, however
@@ -6175,7 +6176,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 break;
 
             // ignore non positive values (can be result apply spellmods to aura damage
-            float fdamage = ditheru(m_modifier.m_amount > 0 ? m_modifier.m_amount : 0);
+            float fdamage = rand_ditheru(m_modifier.m_amount > 0 ? m_modifier.m_amount : 0);
 
             if (GetAuraScript())
                 GetAuraScript()->OnPeriodicCalculateAmount(this, fdamage);
@@ -6224,7 +6225,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (GetAuraScript())
                 GetAuraScript()->OnPeriodicCalculateAmount(this, amount);
 
-            uint32 pdamage = ditheru(target->GetMaxPower(POWER_MANA) * amount / 100);
+            uint32 pdamage = rand_ditheru(target->GetMaxPower(POWER_MANA) * amount / 100);
 
             DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %s energize %s for %u mana inflicted by %u",
                               GetCasterGuid().GetString().c_str(), target->GetGuidStr().c_str(), pdamage, GetId());
@@ -6265,9 +6266,9 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (GetAuraScript())
                 GetAuraScript()->OnPeriodicCalculateAmount(this, fdamage);
 
-            uint32 gain = uint32(-target->ModifyPower(powerType, -dither(fdamage)));
+            uint32 gain = uint32(-target->ModifyPower(powerType, -rand_dither(fdamage)));
 
-            gain = ditheru(gain * spellProto->EffectMultipleValue[GetEffIndex()]);
+            gain = rand_ditheru(gain * spellProto->EffectMultipleValue[GetEffIndex()]);
 
             // maybe has to be sent different to client, but not by SMSG_PERIODICAURALOG
             SpellNonMeleeDamage damageInfo(pCaster, target, spellProto->Id, SpellSchools(spellProto->School));

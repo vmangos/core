@@ -53,6 +53,8 @@
 #include "HardcodedEvents.h"
 #include "Conditions.h"
 #include "RealmZone.h"
+#include "Utilities/Random.h"
+
 #include <limits>
 
 INSTANTIATE_SINGLETON_1(ObjectMgr);

@@ -17,6 +17,8 @@
 
 #include "EventMap.h"
 
+#include "Utilities/Random.h"
+
 void EventMap::Reset()
 {
     _eventMap.clear();
@@ -32,6 +34,11 @@ void EventMap::SetPhase(uint8 phase)
         _phase = uint8(1 << (phase - 1));
 }
 
+void EventMap::ScheduleEvent(uint32 eventId, Milliseconds const& minTime, Milliseconds const& maxTime, uint32 group, uint32 phase)
+{
+    ScheduleEvent(eventId, urand(uint32(minTime.count()), uint32(maxTime.count())), group, phase);
+}
+
 void EventMap::ScheduleEvent(uint32 eventId, uint32 time, uint32 group /*= 0*/, uint8 phase /*= 0*/)
 {
     if (group && group <= 8)
@@ -41,6 +48,16 @@ void EventMap::ScheduleEvent(uint32 eventId, uint32 time, uint32 group /*= 0*/, 
         eventId |= (1 << (phase + 23));
 
     _eventMap.insert(EventStore::value_type(_time + time, eventId));
+}
+
+void EventMap::RescheduleEvent(uint32 eventId, Milliseconds const& minTime, Milliseconds const& maxTime, uint32 group, uint32 phase)
+{
+    RescheduleEvent(eventId, urand(uint32(minTime.count()), uint32(maxTime.count())), group, phase);
+}
+
+void EventMap::Repeat(uint32 minTime, uint32 maxTime)
+{
+    Repeat(urand(minTime, maxTime));
 }
 
 uint32 EventMap::ExecuteEvent()

@@ -28,6 +28,7 @@
 #include "Language.h"
 #include "WorldPacket.h"
 #include "Chat.h"
+#include "Utilities/Random.h"
 #include "World.h"
 
 
@@ -129,7 +130,7 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
         m_challengeMinReputationNeeded[i] = REP_NEUTRAL; /** Real value REP_REVERED */
 
     // World of Warcraft Client Patch 1.6.0 (2005-07-12)
-    // The minimum reputation needed to send a cavalry charge has been 
+    // The minimum reputation needed to send a cavalry charge has been
     // reduced to Honored.
     m_challengeMinReputationNeeded[BG_AV_CAVALRY_ASSAULT]               = sWorld.GetWowPatch() < WOW_PATCH_106 ? REP_REVERED : REP_HONORED;
     m_challengeMinReputationNeeded[BG_AV_GROUND_ASSAULT]                = REP_HONORED;
@@ -401,12 +402,12 @@ void BattleGroundAV::HandleKillUnit(Creature* creature, Player* killer)
             {
                 ChangeMineOwner(BG_AV_SOUTH_MINE, GetAVTeamIndexByTeamId(killer->GetTeam()));
                 CompleteQuestForAll(7122);
-            }   
+            }
             else if (killer->GetTeam() == HORDE)
             {
                 ChangeMineOwner(BG_AV_SOUTH_MINE, GetAVTeamIndexByTeamId(killer->GetTeam()));
                 CompleteQuestForAll(7124);
-            }   
+            }
             else // Never happens, this function HandleKillUnit is only called if a player kill a unit
                 ChangeMineOwner(BG_AV_SOUTH_MINE, BG_AV_TEAM_NEUTRAL);
             break;
@@ -527,7 +528,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                 sprintf(sMessageRemaining,"Thanks for the supplies, %s",player->GetName());
                 ((Creature*)questGiver)->MonsterSay(sMessageRemaining, 0, 0);
 
-                if (m_teamQuestStatus[teamIdx][0] == 500)                    
+                if (m_teamQuestStatus[teamIdx][0] == 500)
                 {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28418, ALLIANCE);
@@ -537,7 +538,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                    sprintf(sMessageRemaining,"Seasoned units are entering the battle!");
                    ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
                 }
-                else if (m_teamQuestStatus[teamIdx][0] == 1000)                    
+                else if (m_teamQuestStatus[teamIdx][0] == 1000)
                 {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28419, ALLIANCE);
@@ -547,7 +548,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                     sprintf(sMessageRemaining,"Veteran units are entering the battle!");
                     ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
                 }
-                else if (m_teamQuestStatus[teamIdx][0] == 1500)                    
+                else if (m_teamQuestStatus[teamIdx][0] == 1500)
                 {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28420, ALLIANCE);
@@ -600,7 +601,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                     if (m_nodes[i].owner == teamIdx && m_nodes[i].state == POINT_CONTROLLED)
                         PopulateNode(i);
             }
-*/ 
+*/
            break;
         case BG_AV_QUEST_A_COMMANDER1:
         case BG_AV_QUEST_H_COMMANDER1:
@@ -964,7 +965,7 @@ void BattleGroundAV::EndBattleGround(Team winner)
             RewardHonorToTeam(uint32(GetBonusHonorFromKill(towersSurvived[i] * BG_AV_KILL_SURVIVING_TOWER) * GetHonorModifier()), team[i]);
         }
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: EndbattleGround: bgteam: %u towers:%u honor:%u rep:%u", i, towersSurvived[i], GetBonusHonorFromKill(towersSurvived[i] * BG_AV_KILL_SURVIVING_TOWER), towersSurvived[i] * BG_AV_REP_SURVIVING_TOWER);
-        
+
         // World of Warcraft Client Patch 1.7.0 (2005-09-13)
         // - Alterac Valley now correctly rewards honor for owning graveyards at
         //   the end of the game.

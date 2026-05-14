@@ -26,6 +26,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
+#include "Utilities/Random.h"
 
 Unit* SpellCaster::SelectMagnetTarget(Unit* victim, Spell* spell, SpellEffectIndex eff)
 {
@@ -1024,7 +1025,7 @@ void SpellCaster::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float da
     }
     else
         damage = 0;
-    damageInfo->damage = ditheru(damage);
+    damageInfo->damage = rand_ditheru(damage);
 }
 
 /**

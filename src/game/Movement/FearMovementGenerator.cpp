@@ -11,6 +11,7 @@
 #include "PathFinder.h"
 #include "MoveMap.h"
 #include "Map.h"
+#include "Utilities/Random.h"
 
 template<class T>
 void FearMovementGenerator<T>::_setTargetLocation(T &owner)
@@ -251,7 +252,7 @@ bool TimedFearMovementGenerator::Update(Unit & owner, uint32 const&  time_diff)
         owner.ClearUnitState(UNIT_STATE_FLEEING_MOVE);
         return true;
     }
-    
+
     i_totalFleeTime.Update(time_diff);
 
     if (i_totalFleeTime.Passed())

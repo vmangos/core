@@ -51,10 +51,10 @@
 #include "Chat.h"
 #include "MonsterChatBuilder.h"
 #include "Anticheat.h"
-
 #include "packet_builder.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
+#include "Utilities/Random.h"
 
 ////////////////////////////////////////////////////////////
 // Methods of class MovementInfo

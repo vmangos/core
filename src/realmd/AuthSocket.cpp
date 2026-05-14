@@ -38,6 +38,7 @@
 #include "ClientPatchCache.h"
 #include "Memory/NoDeleter.h"
 #include "Errors.h"
+#include "Utilities/Random.h"
 
 #include "IO/Networking/Utils.h"
 #include "IO/Networking/AsyncSocket.h"
@@ -51,6 +52,7 @@
 #endif
 
 #include <ctime>
+
 //#include "Util.h" -- for commented utf8ToUpperOnlyLatin
 
 typedef struct AuthHandler
@@ -508,7 +510,7 @@ void AuthSocket::_HandleLogonChallenge()
                     {
                         sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", self->m_login.c_str(), self->GetRemoteIpString().c_str());
 
-                        uint32 gridSeedPkt = self->m_gridSeed = static_cast<uint32>(rand32());
+                        uint32 gridSeedPkt = self->m_gridSeed = randu32();
                         EndianConvert(gridSeedPkt);
                         self->m_serverSecuritySalt.SetRand(16 * 8); // 16 bytes random
 

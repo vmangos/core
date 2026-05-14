@@ -26,6 +26,7 @@
 #include "Log.h"
 #include "MapPersistentStateMgr.h"
 #include "MapManager.h"
+#include "Utilities/Random.h"
 #include "World.h"
 #include "Policies/SingletonImp.h"
 
@@ -1200,7 +1201,7 @@ struct SpawnPoolInMapsWorker
 void PoolManager::SpawnPoolInMaps(uint16 pool_id, bool instantly)
 {
     PoolTemplateData& poolTemplate = m_poolTemplate[pool_id];
-    
+
     SpawnPoolInMapsWorker worker(*this, pool_id, instantly);
     sMapPersistentStateMgr.DoForAllStatesWithMapId(poolTemplate.mapEntry->id, poolTemplate.InstanceId, worker);
 }

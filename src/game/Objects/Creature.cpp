@@ -53,6 +53,61 @@
 #include "CreatureLinkingMgr.h"
 #include "TemporarySummon.h"
 #include "GuardMgr.h"
+#include "Utilities/Random.h"
+
+uint32 CreatureData::GetRandomRespawnTime() const
+{
+    return urand(spawntimesecsmin, spawntimesecsmax);
+}
+
+uint32 CreatureData::ChooseCreatureId() const
+{
+    uint32 creatureId = 0;
+    uint32 creatureIdCount = 0;
+    for (; creatureIdCount < MAX_CREATURE_IDS_PER_SPAWN && creature_id[creatureIdCount]; ++creatureIdCount);
+
+    if (creatureIdCount)
+        creatureId = creature_id[urand(0, creatureIdCount - 1)];
+
+    if (!creatureId)
+        creatureId = 1;
+
+    return creatureId;
+}
+
+bool CreatureData::HasCreatureId(uint32 id) const
+{
+    return std::find(creature_id.begin(), creature_id.end(), id) != creature_id.end();
+}
+
+uint32 CreatureData::GetCreatureIdCount() const
+{
+    uint32 creatureIdCount = 0;
+    while (creatureIdCount < MAX_CREATURE_IDS_PER_SPAWN && creature_id[creatureIdCount])
+        ++creatureIdCount;
+    return creatureIdCount;
+}
+
+EquipmentEntry const* EquipmentTemplate::ChooseEquipmentEntry() const
+{
+    if (!totalProbability)
+        return nullptr;
+
+    uint32 const roll = urand(0, totalProbability - 1);
+    uint32 sum = 0;
+
+    for (auto const& itr : equipment)
+    {
+        if (!itr.probability)
+            continue;
+
+        sum += itr.probability;
+        if (roll < sum)
+            return &itr;
+    }
+
+    return nullptr;
+}
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {

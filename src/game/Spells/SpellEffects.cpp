@@ -47,6 +47,7 @@
 #include "MoveMapSharedDefines.h"
 #include "GameEventMgr.h"
 #include "InstanceData.h"
+#include "Utilities/Random.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 
@@ -285,14 +286,17 @@ void Spell::EffectEnvironmentalDMG(SpellEffectIndex effIdx)
     if (!unitTarget || !unitTarget->IsAlive())
         return;
 
+    int32 const finalDamage = rand_dither(damage);
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)unitTarget)->EnvironmentalDamage(DAMAGE_FIRE, dither(damage));
+    {
+        static_cast<Player*>(unitTarget)->EnvironmentalDamage(DAMAGE_FIRE, finalDamage);
+    }
     else
     {
         uint32 absorb = 0;
         int32 resist = 0;
-        unitTarget->CalculateDamageAbsorbAndResist(m_caster, m_spellInfo->GetSpellSchoolMask(), SPELL_DIRECT_DAMAGE, dither(damage), &absorb, &resist, m_spellInfo);
-        m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, dither(damage), m_spellInfo->GetSpellSchoolMask(), absorb, resist, false, 0, false);
+        unitTarget->CalculateDamageAbsorbAndResist(m_caster, m_spellInfo->GetSpellSchoolMask(), SPELL_DIRECT_DAMAGE, finalDamage, &absorb, &resist, m_spellInfo);
+        m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, finalDamage, m_spellInfo->GetSpellSchoolMask(), absorb, resist, false, 0, false);
 
     }
 }
@@ -911,10 +915,10 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
 
                     int32 damage;
                     if (unitTarget->IsPlayer()) // damage from 100 - 500 based on proximity - max range 25
-                        damage = dither(100 + ((25 - std::min(m_originalCaster->GetCombatDistance(unitTarget), 25.f)) / 25.f) * 400);
+                        damage = rand_dither(100 + ((25 - std::min(m_originalCaster->GetCombatDistance(unitTarget), 25.f)) / 25.f) * 400);
                     else if (unitTarget->GetEntry() == 15370) // buru
                     {
-                        damage = dither(unitTarget->GetHealth() * 15 / 100); // 15% hp for buru
+                        damage = rand_dither(unitTarget->GetHealth() * 15 / 100); // 15% hp for buru
 
                         if (unitTarget->GetVictim())
                             unitTarget->GetThreatManager().modifyThreatPercent(unitTarget->GetVictim(), -100);
@@ -936,7 +940,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     pPlayer->CastSpell(pPlayer, 23230, true);
 #endif
 
-                    damage = dither(damage * (pPlayer->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100);
+                    damage = rand_dither(damage * (pPlayer->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100);
                     if (damage > 0)
                         pPlayer->CastCustomSpell(pPlayer, 23234, (int32)(damage), {}, {}, true, nullptr);
                     return;
@@ -1701,7 +1705,7 @@ void Spell::EffectPowerDrain(SpellEffectIndex effIdx)
         float gain = new_damage * manaMultiplier;
 
         if (m_casterUnit)
-            m_casterUnit->ModifyPower(POWER_MANA, dither(gain));
+            m_casterUnit->ModifyPower(POWER_MANA, rand_dither(gain));
 
         info.powerDrain.multiplier = manaMultiplier;
     }
@@ -1821,7 +1825,7 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
         damage = unitTarget->GetHealth();
 
     if (m_casterUnit && m_casterUnit->IsAlive())
-        m_casterUnit->DealHeal(m_casterUnit, ditheru(damage * healMultiplier), m_spellInfo);
+        m_casterUnit->DealHeal(m_casterUnit, rand_ditheru(damage * healMultiplier), m_spellInfo);
 
     // Non delayed spells bonus damage is added later
     if (!m_delayed)
@@ -4418,7 +4422,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                 if (!unitTarget || !unitTarget->IsAlive())
                     return;
 
-                int32 heal = dither(damage);
+                int32 heal = rand_dither(damage);
                 if (m_casterUnit)
                 {
                     if (m_casterUnit->HasAura(28853))
@@ -5173,8 +5177,8 @@ void Spell::EffectResurrect(SpellEffectIndex effIdx)
     if (pTarget->IsRessurectRequested())      // already have one active request
         return;
 
-    uint32 health = ditheru(pTarget->GetMaxHealth() * damage / 100);
-    uint32 mana   = ditheru(pTarget->GetMaxPower(POWER_MANA) * damage / 100);
+    uint32 health = rand_ditheru(pTarget->GetMaxHealth() * damage / 100);
+    uint32 mana   = rand_ditheru(pTarget->GetMaxPower(POWER_MANA) * damage / 100);
 
     pTarget->SetResurrectRequestData(m_caster->GetObjectGuid(), m_caster->GetMapId(), m_caster->GetInstanceId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), m_caster->GetOrientation(), health, mana);
     SendResurrectRequest(pTarget, m_casterUnit && m_casterUnit->IsSpiritHealer());
@@ -5292,8 +5296,8 @@ void Spell::EffectSelfResurrect(SpellEffectIndex effIdx)
     Player* plr = ((Player*)unitTarget);
     plr->ResurrectPlayer(0.0f);
 
-    plr->SetHealth(ditheru(health));
-    plr->SetPower(POWER_MANA, ditheru(mana));
+    plr->SetHealth(rand_ditheru(health));
+    plr->SetPower(POWER_MANA, rand_ditheru(mana));
     plr->SetPower(POWER_RAGE, 0);
     plr->SetPower(POWER_ENERGY, plr->GetMaxPower(POWER_ENERGY));
 

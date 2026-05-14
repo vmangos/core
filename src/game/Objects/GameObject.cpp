@@ -48,6 +48,7 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 #include "Geometry.h"
+#include "Utilities/Random.h"
 
 bool QuaternionData::isUnit() const
 {
@@ -701,6 +702,11 @@ uint32 GameObjectData::ComputeRespawnDelay(uint32 respawnDelay) const
     if (spawn_flags & SPAWN_FLAG_DYNAMIC_RESPAWN_TIME && sWorld.GetActiveSessionCount() > BLIZZLIKE_REALM_POPULATION)
         respawnDelay = uint32(float(respawnDelay * BLIZZLIKE_REALM_POPULATION) / float(sWorld.GetActiveSessionCount()));
     return respawnDelay;
+}
+
+uint32 GameObjectData::GetRandomRespawnTime() const
+{
+    return urand(static_cast<uint32>(spawntimesecsmin), static_cast<uint32>(spawntimesecsmax));
 }
 
 void GameObject::JustDespawnedWaitingRespawn()

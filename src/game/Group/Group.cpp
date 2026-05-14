@@ -33,13 +33,14 @@
 #include "BattleGround.h"
 #include "MapManager.h"
 #include "MapPersistentStateMgr.h"
-#include "Util.h"
 #include "LootMgr.h"
 #include "LFGMgr.h"
 #include "LFGQueue.h"
 #include "UpdateMask.h"
+#include "Utilities/Random.h"
 
 #include <array>
+
 
 GroupMemberStatus GetGroupMemberStatus(Player const* member = nullptr)
 {

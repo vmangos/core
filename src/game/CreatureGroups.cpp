@@ -21,6 +21,7 @@
 #include "ObjectMgr.h"
 #include "CreatureAI.h"
 #include "BattleGround.h"
+#include "Utilities/Random.h"
 
 void CreatureGroup::AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags)
 {
@@ -500,7 +501,7 @@ void CreatureGroupsManager::Load()
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad creature id %u", creatureId);
                 continue;
             }
-            
+
             if (leaderGuid.IsEmpty())
             {
                 if (!sObjectMgr.IsExistingCreatureGuid(fields[0].GetUInt32()))
@@ -526,7 +527,7 @@ void CreatureGroupsManager::Load()
                     sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
                     continue;
                 }
-                
+
                 currentGroup->m_entryLimits[creatureId] = std::make_pair(minCount, maxCount);
             }
         } while (result->NextRow());

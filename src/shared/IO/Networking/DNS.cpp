@@ -2,6 +2,7 @@
 #include "./Internal.h"
 #include "Log.h"
 #include "Errors.h"
+#include "Utilities/Random.h"
 #include "Util.h"
 #include "IO/SystemErrorToString.h"
 
