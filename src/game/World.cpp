@@ -1775,7 +1775,7 @@ void World::SetInitialWorldSettings()
     time(&curr);
     local = *(localtime(&curr));                            // dereference and assign
     char isoDate[128];
-    sprintf(isoDate, "%04d-%02d-%02d %02d:%02d:%02d",
+    snprintf(isoDate, sizeof(isoDate), "%04d-%02d-%02d %02d:%02d:%02d",
             local.tm_year + 1900, local.tm_mon + 1, local.tm_mday, local.tm_hour, local.tm_min, local.tm_sec);
 
     LoginDatabase.PExecute("INSERT INTO `uptime` (`realmid`, `starttime`, `startstring`, `revision`) VALUES('%u', " UI64FMTD ", '%s', '%s')",

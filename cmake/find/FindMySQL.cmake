@@ -17,11 +17,20 @@ if( UNIX )
     "preferred path to MySQL (mysql_config)"
   )
 
-  find_program(MYSQL_CONFIG NAMES mysql_config mariadb_config
-    ${MYSQL_CONFIG_PREFER_PATH}
-    /usr/local/mysql/bin/
-    /usr/local/bin/
-    /usr/bin/
+  find_program(MYSQL_CONFIG
+    NAMES
+      mysql_config
+      mariadb_config
+    HINTS
+      ${MYSQL_CONFIG_PREFER_PATH}
+    PATHS
+      /usr/local/mysql/bin/
+      /usr/local/bin/
+      /usr/bin/
+      /opt/homebrew/opt/mysql-client/bin/
+      /opt/homebrew/opt/mysql/bin/
+      /usr/local/opt/mysql-client/bin/
+      /usr/local/opt/mysql/bin/
   )
 
   if( MYSQL_CONFIG )
@@ -72,6 +81,14 @@ find_path(MYSQL_INCLUDE_DIR
     /usr/local/include
     /usr/local/include/mysql
     /usr/local/mysql/include
+    /opt/homebrew/opt/mysql-client/include
+    /opt/homebrew/opt/mysql-client/include/mysql
+    /opt/homebrew/opt/mysql/include
+    /opt/homebrew/opt/mysql/include/mysql
+    /usr/local/opt/mysql-client/include
+    /usr/local/opt/mysql-client/include/mysql
+    /usr/local/opt/mysql/include
+    /usr/local/opt/mysql/include/mysql
     "C:/Program Files/MySQL/include"
     "C:/Program Files/MySQL/MySQL Server 5.0/include"
     "C:/Program Files/MySQL/MySQL Server 5.1/include"
@@ -97,6 +114,14 @@ foreach(LIB ${MYSQL_ADD_LIBRARIES})
       /usr/local/lib
       /usr/local/lib/mysql
       /usr/local/mysql/lib
+      /opt/homebrew/opt/mysql-client/lib
+      /opt/homebrew/opt/mysql-client/lib/mysql
+      /opt/homebrew/opt/mysql/lib
+      /opt/homebrew/opt/mysql/lib/mysql
+      /usr/local/opt/mysql-client/lib
+      /usr/local/opt/mysql-client/lib/mysql
+      /usr/local/opt/mysql/lib
+      /usr/local/opt/mysql/lib/mysql
     DOC "Specify the location of the mysql library here."
   )
 endforeach(LIB ${MYSQL_ADD_LIBRARY})

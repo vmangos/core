@@ -60,7 +60,8 @@ bool WinServiceInstall()
         return false;
     }
 
-    std::strcat(path, " -s run");
+    size_t pathLen = strlen(path);
+    snprintf(path + pathLen, sizeof(path) - pathLen, " -s run");
 
     SC_HANDLE service = CreateService(serviceControlManager,
         serviceName,                                // name of service

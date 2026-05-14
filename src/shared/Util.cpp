@@ -504,7 +504,7 @@ std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse 
     std::ostringstream ss;
     for (int32 i = init; i != end; i += op) {
         char buffer[4];
-        sprintf(buffer, "%02X", bytes[i]);
+        snprintf(buffer, sizeof(buffer), "%02X", bytes[i]);
         ss << buffer;
     }
 

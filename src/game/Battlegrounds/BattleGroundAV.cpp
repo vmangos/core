@@ -454,7 +454,7 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player* player)
 
     if (resources%500 == 0 && m_teamQuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
     {
-        sprintf(sMessageRemaining,"Thanks for the supplies, %s",player->GetName());
+        snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Thanks for the supplies, %s",player->GetName());
         ((Creature*)questGiver)->MonsterSay(sMessageRemaining, 0, 0);
 
         if (resources == 500)
@@ -464,7 +464,7 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player* player)
             else
                 CastSpellOnTeam(28418, HORDE);
 
-            sprintf(sMessageRemaining,"Seasoned units are entering the battle!");
+            snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Seasoned units are entering the battle!");
             ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
         }
         else if (resources == 1000)
@@ -474,7 +474,7 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player* player)
             else
                 CastSpellOnTeam(28419, HORDE);
 
-            sprintf(sMessageRemaining,"Veteran units are entering the battle!");
+            snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Veteran units are entering the battle!");
             ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
         }
         else if (resources == 1500)
@@ -484,7 +484,7 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player* player)
             else
                 CastSpellOnTeam(28420, HORDE);
 
-            sprintf(sMessageRemaining,"Champion units are entering the battle!");
+            snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Champion units are entering the battle!");
             ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
         }
     }
@@ -525,7 +525,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
 
 /*            if (m_teamQuestStatus[teamIdx][0]%500 == 0 && m_teamQuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
             {
-                sprintf(sMessageRemaining,"Thanks for the supplies, %s",player->GetName());
+                snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Thanks for the supplies, %s",player->GetName());
                 ((Creature*)questGiver)->MonsterSay(sMessageRemaining, 0, 0);
 
                 if (m_teamQuestStatus[teamIdx][0] == 500)
@@ -535,7 +535,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                     else
                         CastSpellOnTeam(28418, HORDE);
 
-                   sprintf(sMessageRemaining,"Seasoned units are entering the battle!");
+                   snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Seasoned units are entering the battle!");
                    ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
                 }
                 else if (m_teamQuestStatus[teamIdx][0] == 1000)
@@ -545,7 +545,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                     else
                         CastSpellOnTeam(28419, HORDE);
 
-                    sprintf(sMessageRemaining,"Veteran units are entering the battle!");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Veteran units are entering the battle!");
                     ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
                 }
                 else if (m_teamQuestStatus[teamIdx][0] == 1500)
@@ -555,7 +555,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                     else
                         CastSpellOnTeam(28420, HORDE);
 
-                    sprintf(sMessageRemaining,"Champion units are entering the battle!");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Champion units are entering the battle!");
                     ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
                 }
 
@@ -610,9 +610,9 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             if (m_teamQuestStatus[teamIdx][1] == 90)
             {
                 if (teamIdx == 0)
-                    sprintf(sMessageRemaining,"Soldiers of Stormpike, come to my aid! The beacon must be planted.");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Soldiers of Stormpike, come to my aid! The beacon must be planted.");
                 else
-                    sprintf(sMessageRemaining,"Soldiers of the Horde, come to my aid! The beacon must be planted.");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Soldiers of the Horde, come to my aid! The beacon must be planted.");
 
                 questGiver->MonsterYell(sMessageRemaining, 0, 0);
             }
@@ -624,9 +624,9 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             if (m_teamQuestStatus[teamIdx][2] == 60)
             {
                 if (teamIdx == 0)
-                    sprintf(sMessageRemaining,"Soldiers of Stormpike, come to my aid! The beacon must be planted.");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Soldiers of Stormpike, come to my aid! The beacon must be planted.");
                 else
-                    sprintf(sMessageRemaining,"Soldiers of the Horde, come to my aid! The beacon must be planted.");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Soldiers of the Horde, come to my aid! The beacon must be planted.");
 
                 questGiver->MonsterYell(sMessageRemaining, 0, 0);
             }
@@ -638,9 +638,9 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             if (m_teamQuestStatus[teamIdx][3] == 30)
             {
                 if (teamIdx == 0)
-                    sprintf(sMessageRemaining,"Soldiers of Stormpike, come to my aid! The beacon must be planted.");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Soldiers of Stormpike, come to my aid! The beacon must be planted.");
                 else
-                    sprintf(sMessageRemaining,"Soldiers of the Horde, come to my aid! The beacon must be planted.");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Soldiers of the Horde, come to my aid! The beacon must be planted.");
 
                 questGiver->MonsterYell(sMessageRemaining, 0, 0);
             }
@@ -657,9 +657,9 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             if (m_teamQuestStatus[teamIdx][4] == 200)
             {
                 if (teamIdx == 0)
-                    sprintf(sMessageRemaining,"Soldiers of Stormpike, aid and protect us! The Forest Lord has granted us his protection. The portal must now be opened!");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Soldiers of Stormpike, aid and protect us! The Forest Lord has granted us his protection. The portal must now be opened!");
                 else
-                    sprintf(sMessageRemaining,"Soldiers of Frostwolf, come to my aid! The Ice Lord has granted us his protection. He's accepted the offering! The time has come to unleash him upon the Stormpike Army!");
+                    snprintf(sMessageRemaining, sizeof(sMessageRemaining),"Soldiers of Frostwolf, come to my aid! The Ice Lord has granted us his protection. He's accepted the offering! The time has come to unleash him upon the Stormpike Army!");
 
                 questGiver->MonsterYell(sMessageRemaining, 0, 0);
             }
