@@ -30,7 +30,6 @@ include_directories(
     ../../src/game
     ../../src/game/vmap
     ../../src/game/Commands
-    ../../dep/include/g3dlite
     ../../src/framework
     ${ACE_INCLUDE_DIR}
     ../../dep/recastnavigation/

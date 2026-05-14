@@ -28,7 +28,6 @@ include_directories(../../src/shared)
 include_directories(../../src/game/)
 include_directories(../../src/game/vmap/)
 include_directories(../../src/game/Commands/)
-include_directories(../../dep/include/g3dlite/)
 include_directories(../../src/framework/)
 include_directories(${ACE_INCLUDE_DIR})
 
