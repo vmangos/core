@@ -24,6 +24,7 @@ G3D-v9.0 hotfix7.diff - 2016-10-10 - fix warning on clang 3.8 backported from G3
 G3D-v9.0 hotfix8.diff - 2017-03-07 - fix MSVC 2017 build
 G3D-v9.0 hotfix9.diff - 2020-07-13 - warning fixes
 G3D-v9.0 hotfix10.diff - 2017-11-11 - static analysis issue fix
+G3D-v9.0 hotfix10a-vmangos.diff - 2026-05-14 - fix is_standard_layout_v/is_trivial_v C++17 helpers not available in C++14
 G3D-v9.0 hotfix11.diff - 2017-11-11 - static analysis issue fix
 G3D-v9.0 hotfix12.diff - 2020-02-23 - ARM64 build fix
 G3D-v9.0 hotfix13.diff - 2020-08-04 - MSVC build fix with /permissive-
@@ -35,3 +36,4 @@ G3D-v9.0 hotfix18.diff - 2024-02-17 - ARM64 support on MSVC
 G3D-v9.0 hotfix19.diff - 2024-06-09 - clang build fix on windows
 G3D-v9.0 hotfix20.diff - 2026-05-07 - gcc build fix on windows
 G3D-v9.0 hotfix21.diff - 2026-05-07 - gcc 16 warning fix
+G3D-v9.0 hotfix22a-vmangos.diff - 2026-05-14 - add NOMINMAX guard before Windows.h includes to prevent min/max macro leaking
