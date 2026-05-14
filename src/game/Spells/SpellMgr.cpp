@@ -782,7 +782,7 @@ struct DoSpellThreat
         else
         {
             SpellThreatEntry const& r_ste = spellItr->second;
-            if (ste.threat == r_ste.threat && ste.multiplier == r_ste.multiplier && ste.ap_bonus == r_ste.ap_bonus)
+            if (ste.threat == r_ste.threat && ste.multiplier == r_ste.multiplier && ste.inverseEffectMask == r_ste.inverseEffectMask)
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_threat` as custom rank has same data as Rank 1, so redundant", spell_id);
         }
     }
@@ -806,12 +806,14 @@ struct DoSpellThreat
 
         // flat threat bonus and attack power bonus currently only work properly when all
         // effects have same targets, otherwise, we'd need to seperate it by effect index
-        if (ste.threat || ste.ap_bonus != 0.f)
+        if (ste.inverseEffectMask == 0 && ste.threat != 0)
         {
+            uint32 const* effect = spell->Effect;
             uint32 const* targetA = spell->EffectImplicitTargetA;
-            if ((targetA[EFFECT_INDEX_1] && targetA[EFFECT_INDEX_1] != targetA[EFFECT_INDEX_0]) ||
-                    (targetA[EFFECT_INDEX_2] && targetA[EFFECT_INDEX_2] != targetA[EFFECT_INDEX_0]))
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_threat` has effects with different targets, threat may be assigned incorrectly", spell->Id);
+            if ((effect[EFFECT_INDEX_0] && effect[EFFECT_INDEX_1] && targetA[EFFECT_INDEX_0] != targetA[EFFECT_INDEX_1]) ||
+                (effect[EFFECT_INDEX_0] && effect[EFFECT_INDEX_2] && targetA[EFFECT_INDEX_0] != targetA[EFFECT_INDEX_2]) ||
+                (effect[EFFECT_INDEX_1] && effect[EFFECT_INDEX_2] && targetA[EFFECT_INDEX_1] != targetA[EFFECT_INDEX_2]))
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_threat` has effects with different targets, threat may be assigned incorrectly. Consider using inverse effect mask.", spell->Id);
         }
         ++count;
     }
@@ -834,7 +836,7 @@ void SpellMgr::LoadSpellThreats()
     mSpellThreatMap.clear();                                // need for reload case
 
     //                                                                0        1         2             3
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `Threat`, `multiplier`, `ap_bonus` FROM `spell_threat` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `threat`, `multiplier`, `inverse_effect_mask` FROM `spell_threat` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -859,7 +861,7 @@ void SpellMgr::LoadSpellThreats()
         SpellThreatEntry ste;
         ste.threat = fields[1].GetUInt16();
         ste.multiplier = fields[2].GetFloat();
-        ste.ap_bonus = fields[3].GetFloat();
+        ste.inverseEffectMask = fields[3].GetUInt8();
 
         rankHelper.RecordRank(ste, entry);
 

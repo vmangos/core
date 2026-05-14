@@ -5442,13 +5442,10 @@ void Spell::HandleThreatSpells()
 
     SpellThreatEntry const* threatEntry = sSpellMgr.GetSpellThreatEntry(m_spellInfo->Id);
 
-    if (!threatEntry || (!threatEntry->threat && threatEntry->ap_bonus == 0.0f))
+    if (!threatEntry || !threatEntry->threat)
         return;
 
     float threat = threatEntry->threat;
-    if (threatEntry->ap_bonus != 0.0f)
-        threat += threatEntry->ap_bonus * m_casterUnit->GetTotalAttackPowerValue(m_spellInfo->GetWeaponAttackType());
-
     bool positive = true;
     uint8 effectMask = 0;
     for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -5470,6 +5467,9 @@ void Spell::HandleThreatSpells()
     for (const auto& ihit : m_UniqueTargetInfo)
     {
         if (ihit.missCondition != SPELL_MISS_NONE)
+            continue;
+
+        if (!threatEntry->CanCauseThreatOnMask(ihit.effectMask))
             continue;
 
         Unit* target = m_casterUnit->GetObjectGuid() == ihit.targetGUID ? m_casterUnit : ObjectAccessor::GetUnit(*m_casterUnit, ihit.targetGUID);
