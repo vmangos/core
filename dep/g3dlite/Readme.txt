@@ -1,8 +1,8 @@
 # G3D Lite
 
-Changes taken from https://github.com/TrinityCore/TrinityCore/tree/ddba74567c9f6e9cf4596ea9b052d254a0ee50f6/dep/g3dlite
+Changes taken from https://github.com/TrinityCore/TrinityCore/tree/a4cdde85c2adc6613006d25cd124e73b7a7a9e87/dep/g3dlite
 
-Due to issues with G3D normally requiring X11 and the ZIP-library, the library version in this sourcetree contains a modified version.
+ Due to issues with G3D normally requiring X11 and the ZIP-library, the library version in this sourcetree contains a modified version.
 The applied patches are added as .diff-files to the repository for future reference (knowing what was changed is quite handy).
 
 G3D-v8.0_hotfix1.diff - 2010-08-27 - remove dependency on zip/z11 libraries, add support for 64-bit arch
@@ -30,3 +30,8 @@ G3D-v9.0 hotfix13.diff - 2020-08-04 - MSVC build fix with /permissive-
 G3D-v9.0 hotfix14.diff - 2022-01-16 - warning fixes
 G3D-v9.0 hotfix15.diff - 2022-02-11 - purge Windows.h includes from public headers
 G3D-v9.0 hotfix16.diff - 2022-02-11 - Fix *BSD compile errors
+G3D-v9.0 hotfix17.diff - 2023-03-25 - Fix macOS compile errors
+G3D-v9.0 hotfix18.diff - 2024-02-17 - ARM64 support on MSVC
+G3D-v9.0 hotfix19.diff - 2024-06-09 - clang build fix on windows
+G3D-v9.0 hotfix20.diff - 2026-05-07 - gcc build fix on windows
+G3D-v9.0 hotfix21.diff - 2026-05-07 - gcc 16 warning fix

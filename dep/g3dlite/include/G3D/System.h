@@ -22,10 +22,7 @@
 #include <string>
 
 #ifdef G3D_WINDOWS
-#   ifndef NOMINMAX
-#       define NOMINMAX 1
-#   endif
-#   include <Windows.h>
+#include <Windows.h>
 #endif
 
 #if defined(__aarch64__)

@@ -42,6 +42,7 @@
 #ifdef G3D_WINDOWS
 
 #   include <conio.h>
+#   include <crtdbg.h>
 #   include <sys/timeb.h>
 #   include "G3D/RegistryUtil.h"
 #include <Ole2.h>
@@ -1695,7 +1696,7 @@ std::string System::currentTimeString() {
 // Windows 64-bit
 void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, uint32& edx) {
 #if !defined(_M_ARM) && !defined(_M_ARM64) && !defined(_M_HYBRID_X86_ARM64) && !defined(_M_ARM64EC)
-	int regs[4] = {eax, ebx, ecx, edx};
+	int regs[4] = {(int)eax, (int)ebx, (int)ecx, (int)edx};
 	__cpuid(regs, func);
 #else
 	int regs[4] = { 0, 0, 0, 0 };
@@ -1725,7 +1726,7 @@ void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, ui
 #if ! defined(__PIC__) || defined(__x86_64__)
     // AT&T assembler syntax
     asm volatile(
-                 "movl $0, %%ecx   \n\n" /* Wipe ecx */
+                 "xor %%ecx, %%ecx \n\n" /* Wipe ecx */
                  "cpuid            \n\t"
                  : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
                  : "a"(func));
@@ -1733,7 +1734,7 @@ void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, ui
     // AT&T assembler syntax
     asm volatile(
                  "pushl %%ebx      \n\t" /* save ebx */
-                 "movl $0, %%ecx   \n\n" /* Wipe ecx */
+                 "xor %%ecx, %%ecx \n\n" /* Wipe ecx */
                  "cpuid            \n\t"
                  "movl %%ebx, %1   \n\t" /* save what cpuid just put in %ebx */
                  "popl %%ebx       \n\t" /* restore the old ebx */

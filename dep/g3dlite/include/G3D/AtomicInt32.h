@@ -13,9 +13,6 @@
 #include "G3D/g3dmath.h"
 
 #if defined(G3D_WINDOWS)
-#   ifndef NOMINMAX
-#       define NOMINMAX 1
-#   endif
 #   include <Windows.h>
 #elif defined(G3D_OSX)
 #   include <libkern/OSAtomic.h>

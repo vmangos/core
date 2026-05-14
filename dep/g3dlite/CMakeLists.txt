@@ -15,59 +15,71 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-set(g3dlite_SRCS
-  source/AABox.cpp
-  source/Any.cpp
-  source/AnyTableReader.cpp
-  source/BinaryFormat.cpp
-  source/BinaryInput.cpp
-  source/BinaryOutput.cpp
-  source/Box.cpp
-  source/Capsule.cpp
-  source/CollisionDetection.cpp
-  source/CoordinateFrame.cpp
-  source/Crypto.cpp
-  source/Cylinder.cpp
-  source/debugAssert.cpp
-  source/FileSystem.cpp
-  source/fileutils.cpp
-  source/format.cpp
-  source/g3dfnmatch.cpp
-  source/g3dmath.cpp
-  source/GThread.cpp
-  source/Line.cpp
-  source/LineSegment.cpp
-  source/Log.cpp
-  source/Matrix3.cpp
-  source/Matrix4.cpp
-  source/MemoryManager.cpp
-  source/PhysicsFrame.cpp
-  source/Plane.cpp
-  source/prompt.cpp
-  source/Quat.cpp
-  source/Random.cpp
-  source/Ray.cpp
-  source/RegistryUtil.cpp
-  source/Sphere.cpp
-  source/stringutils.cpp
-  source/System.cpp
-  source/TextInput.cpp
-  source/TextOutput.cpp
-  source/Triangle.cpp
-  source/uint128.cpp
-  source/UprightFrame.cpp
-  source/Vector2.cpp
-  source/Vector3.cpp
-  source/Vector4.cpp
-)
+add_library(g3dlite STATIC)
 
-add_library(g3dlite STATIC ${g3dlite_SRCS})
+target_sources(g3dlite
+  PRIVATE
+    source/AABox.cpp
+    source/Any.cpp
+    source/AnyTableReader.cpp
+    source/BinaryFormat.cpp
+    source/BinaryInput.cpp
+    source/BinaryOutput.cpp
+    source/Box.cpp
+    source/Capsule.cpp
+    source/CollisionDetection.cpp
+    source/CoordinateFrame.cpp
+    source/Crypto.cpp
+    source/Cylinder.cpp
+    source/debugAssert.cpp
+    source/FileSystem.cpp
+    source/fileutils.cpp
+    source/format.cpp
+    source/g3dfnmatch.cpp
+    source/g3dmath.cpp
+    source/GThread.cpp
+    source/Line.cpp
+    source/LineSegment.cpp
+    source/Log.cpp
+    source/Matrix3.cpp
+    source/Matrix4.cpp
+    source/MemoryManager.cpp
+    source/PhysicsFrame.cpp
+    source/Plane.cpp
+    source/prompt.cpp
+    source/Quat.cpp
+    source/Random.cpp
+    source/Ray.cpp
+    source/RegistryUtil.cpp
+    source/Sphere.cpp
+    source/stringutils.cpp
+    source/System.cpp
+    source/TextInput.cpp
+    source/TextOutput.cpp
+    source/Triangle.cpp
+    source/uint128.cpp
+    source/UprightFrame.cpp
+    source/Vector2.cpp
+    source/Vector3.cpp
+    source/Vector4.cpp)
 
-target_include_directories(g3dlite
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source
-  PRIVATE ${CMAKE_SOURCE_DIR}/dep/include
-  PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+target_sources(g3dlite
+  PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS include
+    FILES
+      include/G3D/AABox.h
+      include/G3D/BoundsTrait.h
+      include/G3D/Box.h
+      include/G3D/CoordinateFrame.h
+      include/G3D/g3dmath.h
+      include/G3D/Matrix3.h
+      include/G3D/Matrix4.h
+      include/G3D/Plane.h
+      include/G3D/Quat.h
+      include/G3D/Ray.h
+      include/G3D/Vector3.h
+      include/G3D/Vector4.h)
 
 if((CMAKE_SYSTEM_NAME MATCHES "Linux" AND NOT NOJEM) OR TSAN)
   target_compile_definitions(g3dlite
