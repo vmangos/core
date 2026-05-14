@@ -11,9 +11,8 @@
 #include "G3D/stringutils.h"
 #include "G3D/BinaryInput.h"
 #include <algorithm>
-#include <cctype>
 
-#ifdef _MSC_VER
+#ifdef G3D_WINDOWS
 extern "C" {    
     // Define functions for ffmpeg since we don't link in gcc's c library
     extern int strncasecmp(const char *string1, const char *string2, size_t count) { return _strnicmp(string1, string2, count); }
@@ -216,20 +215,14 @@ int stringPtrCompare(
 
 std::string toUpper(const std::string& x) {
     std::string result = x;
-    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c)
-    {
-        return std::toupper(c);
-    });
+    std::transform(result.begin(), result.end(), result.begin(), toupper);
     return result;
 }
 
 
 std::string toLower(const std::string& x) {
     std::string result = x;
-    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c)
-    {
-        return std::tolower(c);
-    });
+    std::transform(result.begin(), result.end(), result.begin(), tolower);
     return result;
 }
 

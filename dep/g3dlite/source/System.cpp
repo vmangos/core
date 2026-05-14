@@ -45,11 +45,7 @@
 #   include <sys/timeb.h>
 #   include "G3D/RegistryUtil.h"
 #include <Ole2.h>
-#ifdef _MSC_VER
 #include <intrin.h>
-#else
-#include <x86intrin.h>
-#endif
 
 #elif defined(G3D_LINUX) 
 
@@ -82,6 +78,10 @@
     #include <CoreServices/CoreServices.h>
 #endif
 
+// SIMM include
+#if !defined(_M_ARM) && !defined(_M_ARM64) && !defined(_M_HYBRID_X86_ARM64) && !defined(_M_ARM64EC) && !defined(__aarch64__)
+#include <xmmintrin.h>
+#endif
 
 namespace G3D {
     
@@ -209,6 +209,10 @@ void System::init() {
 
 		case PROCESSOR_ARCHITECTURE_ARM:
 			arch = "ARM";
+			break;
+
+		case PROCESSOR_ARCHITECTURE_ARM64:
+			arch = "ARM64";
 			break;
 
         default:
@@ -549,11 +553,8 @@ static bool checkForCPUID() {
     // all known supported architectures have cpuid
     // add cases for incompatible architectures if they are added
     // e.g., if we ever support __powerpc__ being defined again
-#   if defined (__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_AMD64)
+
     return true;
-#   else
-    return false;
-# endif
 }
 
 
@@ -1290,10 +1291,6 @@ public:
 
         if (ptr == NULL) {
 #           ifdef G3D_WINDOWS
-
-#ifndef _CrtCheckMemory
-#define _CrtCheckMemory() ((int)1)
-#endif
                 // Check for memory corruption
                 alwaysAssertM(_CrtCheckMemory() == TRUE, "Heap corruption detected.");
 #           endif
@@ -1697,15 +1694,29 @@ std::string System::currentTimeString() {
 
 // Windows 64-bit
 void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, uint32& edx) {
+#if !defined(_M_ARM) && !defined(_M_ARM64) && !defined(_M_HYBRID_X86_ARM64) && !defined(_M_ARM64EC)
 	int regs[4] = {eax, ebx, ecx, edx};
 	__cpuid(regs, func);
+#else
+	int regs[4] = { 0, 0, 0, 0 };
+#endif
 	eax = regs[0];
 	ebx = regs[1];
 	ecx = regs[2];
 	edx = regs[3];
 }
 
-#elif defined (__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_AMD64)
+#elif defined(__aarch64__) || defined(G3D_OSX) && ! defined(G3D_OSX_INTEL)
+
+// non-x86 CPU; no CPUID
+void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, uint32& edx) {
+    eax = 0;
+    ebx = 0;
+    ecx = 0;
+    edx = 0;
+}
+
+#else
 
 // See http://sam.zoy.org/blog/2007-04-13-shlib-with-non-pic-code-have-inline-assembly-and-pic-mix-well
 // for a discussion of why the second version saves ebx; it allows 32-bit code to compile with the -fPIC option.
@@ -1729,16 +1740,6 @@ void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, ui
                  : "=a"(eax), "=r"(ebx), "=c"(ecx), "=d"(edx)
                  : "a"(func));
 #endif
-}
-
-#else
-
-// non-x86 CPU; no CPUID
-void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, uint32& edx) {
-    eax = 0;
-    ebx = 0;
-    ecx = 0;
-    edx = 0;
 }
 
 #endif

@@ -15,8 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# file(GLOB g3dlite_SRCS source/*.cpp) # don't need all of them
-
 set(g3dlite_SRCS
   source/AABox.cpp
   source/Any.cpp
@@ -63,16 +61,19 @@ set(g3dlite_SRCS
   source/Vector4.cpp
 )
 
-add_library(g3dlite STATIC
-  ${g3dlite_SRCS}
-)
+add_library(g3dlite STATIC ${g3dlite_SRCS})
 
 target_include_directories(g3dlite
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source
   PRIVATE ${CMAKE_SOURCE_DIR}/dep/include
-  PRIVATE ${CMAKE_SOURCE_DIR}/dep/src/libseh
   PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+if((CMAKE_SYSTEM_NAME MATCHES "Linux" AND NOT NOJEM) OR TSAN)
+  target_compile_definitions(g3dlite
+    PRIVATE
+      NO_BUFFERPOOL)
+endif()
 
 SET_TARGET_PROPERTIES(g3dlite PROPERTIES FOLDER "3rd Party")
 
