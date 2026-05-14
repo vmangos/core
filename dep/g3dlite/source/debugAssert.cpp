@@ -4,7 +4,7 @@
  Windows implementation of assertion routines.
 
  @maintainer Morgan McGuire, graphics3d.com
-
+ 
  @created 2001-08-26
  @edited  2009-06-02
  */
@@ -86,7 +86,7 @@ static void createErrorMessage(
 
         // The last error value.  (Which is preserved across the call).
         DWORD lastErr = GetLastError();
-
+    
         // The decoded message from FormatMessage
         LPTSTR formatMsg = NULL;
 
@@ -131,8 +131,8 @@ static void createErrorMessage(
 
     // Build the message.
     outMessage =
-        G3D::format("%s%s%sExpression: %s%s%s:%d%s%s%s",
-                 message.c_str(), newline, newline, expression, newline,
+        G3D::format("%s%s%sExpression: %s%s%s:%d%s%s%s", 
+                 message.c_str(), newline, newline, expression, newline, 
                  filename, lineNumber, newline, newline, le.c_str());
 }
 
@@ -171,7 +171,7 @@ bool _handleDebugAssert_(
 #    endif
 
     switch (result) {
-    // -1 shouldn't actually occur because it means
+    // -1 shouldn't actually occur because it means 
     // that we're in release mode.
     case -1:
     case cBreak:
@@ -181,7 +181,7 @@ bool _handleDebugAssert_(
     case cIgnore:
         return false;
         break;
-
+   
     case cAbort:
         exit(-1);
         break;
@@ -215,7 +215,7 @@ bool _handleErrorCheck_(
 
     static const char* choices[] = {"Ok"};
 
-    const std::string& m =
+    const std::string& m = 
         std::string("An internal error has occured in this program and it will now close.  "
         "The specific error is below. More information has been saved in \"") +
             Log::getCommonLogFilename() + "\".\n\n" + dialogText;
@@ -256,7 +256,7 @@ void _releaseInputGrab_() {
         // Allow the cursor full access to the screen
         GetClipCursor(&oldCursorRect);
         ClipCursor(NULL);
-
+        
     #elif defined(G3D_LINUX)
 #if 0 /* G3DFIX: Disabled to avoid requirement for X11 libraries */
         if (x11Display != NULL) {
@@ -269,7 +269,7 @@ void _releaseInputGrab_() {
                 Cursor c = XCreateFontCursor(x11Display, 68);
                 XDefineCursor(x11Display, x11Window, c);
             }
-            XSync(x11Display, false);
+            XSync(x11Display, false);           
             XAllowEvents(x11Display, AsyncPointer, CurrentTime);
             XFlush(x11Display);
         }
@@ -297,7 +297,7 @@ void _restoreInputGrab_() {
                 ShowCursor(false);
             }
         }
-
+        
     #elif defined(G3D_LINUX)
         // TODO: Linux
     #elif defined(G3D_OSX)
@@ -307,7 +307,7 @@ void _restoreInputGrab_() {
 
 
 }; // internal namespace
-
+ 
 void setAssertionHook(AssertionHook hook) {
     G3D::_internal::_debugHook = hook;
 }
@@ -337,7 +337,7 @@ ConsolePrintHook consolePrintHook() {
 std::string __cdecl debugPrint(const std::string& s) {
 #   ifdef G3D_WINDOWS
         const int MAX_STRING_LEN = 1024;
-
+    
         // Windows can't handle really long strings sent to
         // the console, so we break the string.
         if (s.size() < MAX_STRING_LEN) {
