@@ -539,6 +539,37 @@ void PartyBotAI::AddToPlayerGroup()
     }
 }
 
+void PartyBotAI::LootCorpsesForMe()
+{
+    for (auto itr = m_corpsesToLoot.begin(); itr != m_corpsesToLoot.end();)
+    {
+        Creature* pCreature = me->GetMap()->GetCreature(*itr);
+        if (!pCreature || pCreature->loot.isLooted() || pCreature->loot.roundRobinPlayer != me->GetGUID() || !me->IsInVisibleList_Unsafe(pCreature))
+        {
+            itr = m_corpsesToLoot.erase(itr);
+            continue;
+        }
+
+        if (pCreature->IsWithinDistInMap(me, me->GetMaxLootDistance(pCreature), true, SizeFactor::None))
+        {
+            {
+                auto data = std::make_unique<WorldPackets::Loot::LootUnit>();
+                data->guid = *itr;
+                me->GetSession()->QueuePacket(std::move(data));
+            }
+
+            {
+                auto data = std::make_unique<WorldPackets::Loot::LootRelease>();
+                data->guid = *itr;
+                me->GetSession()->QueuePacket(std::move(data));
+            }
+        }
+
+        // only remove once we are confirmed to no longer be the round robin player above
+        ++itr;
+    }
+}
+
 void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
 {
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
@@ -557,6 +588,24 @@ void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
             std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_DUEL_ACCEPTED, 8);
             *data << me->GetObjectGuid();
             me->GetSession()->QueuePacket(std::move(data));
+            return;
+        }
+        case SMSG_PARTYKILLLOG:
+        {
+            if (!me)
+                return;
+
+            if (Group const* pGroup = me->GetGroup())
+            {
+                if (pGroup->GetLootMethod() == ROUND_ROBIN ||
+                    pGroup->GetLootMethod() == GROUP_LOOT ||
+                    pGroup->GetLootMethod() == NEED_BEFORE_GREED)
+                {
+                    ObjectGuid victimGuid = *(((uint64*)(*packet).contents()) + 1);
+                    m_corpsesToLoot.insert(victimGuid);
+                }
+            }
+            
             return;
         }
     }
@@ -772,6 +821,8 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                 me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
             return;
         }
+
+        LootCorpsesForMe();
 
         // Teleport to leader if too far away.
         if (!me->IsWithinDistInMap(pLeader, 100.0f) && !IsInDuel())
