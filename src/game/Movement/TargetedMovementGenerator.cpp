@@ -204,7 +204,7 @@ void ChaseMovementGenerator<T>::_setTargetLocation(T &owner)
 
     m_bRecalculateTravel = false;
     if (!transport && owner.HasDistanceCasterMovement() &&
-        path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
+        path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance()))
     {
         if (!owner.movespline->Finalized())
             owner.StopMoving();
