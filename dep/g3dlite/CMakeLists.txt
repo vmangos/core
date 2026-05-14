@@ -89,6 +89,12 @@ endif()
 
 SET_TARGET_PROPERTIES(g3dlite PROPERTIES FOLDER "3rd Party")
 
+# Disable all warnings for g3dlite, as it's a 3rd party library and we don't want to be spammed with warnings from it.
+target_compile_options(g3dlite PRIVATE
+  $<$<CXX_COMPILER_ID:MSVC>:/w>
+  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-w>
+)
+
 if(WIN32)
   target_include_directories(g3dlite PRIVATE ${CMAKE_SOURCE_DIR}/dep/windows/include/zlib)
   if(MINGW)
