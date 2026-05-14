@@ -3016,6 +3016,20 @@ void CombatBotBaseAI::UpdateVisualHonorRankBasedOnItems()
     me->SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_HIGHEST_HONOR_RANK, m_visualHonorRank);
 }
 
+void CombatBotBaseAI::BeginChasing(Unit* pVictim) const
+{
+    if ((m_role == ROLE_RANGE_DPS || m_role == ROLE_HEALER) &&
+        IsRangedDamageClass(me->GetClass()) &&
+       !IsAttackSpeedOverridenForm(me->GetShapeshiftForm()) &&
+       (me->GetPowerPercent(POWER_MANA) > 10.0f || me->GetWeaponForAttack(RANGED_ATTACK, true, true)))
+        me->SetCasterChaseDistance(25.0f);
+    else if (me->HasDistanceCasterMovement())
+        me->SetCasterChaseDistance(0.0f);
+
+    // we use dist = 1 always so we can specify angle, instead of spreading around target like mobs
+    me->GetMotionMaster()->MoveChase(pVictim, 1.0f, m_role == ROLE_MELEE_DPS ? M_PI_F : 0.0f);
+}
+
 bool CombatBotBaseAI::SummonShamanTotems()
 {
     if (m_spells.shaman.pAirTotem &&

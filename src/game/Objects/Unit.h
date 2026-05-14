@@ -1434,9 +1434,9 @@ class Unit : public SpellCaster
         void DisableSpline();
 
         // Caster movement
-        float GetMinChaseDistance(Unit const* target) const;
+        float GetMinChaseDistance() const { return m_casterChaseDistance; }
         float GetMaxChaseDistance(Unit const* target) const;
-        bool HasDistanceCasterMovement() const { return (m_casterChaseDistance >= 1.0f); }
+        bool HasDistanceCasterMovement() const { return (m_casterChaseDistance > 0.0f); }
         void SetCasterChaseDistance(float dist) { m_casterChaseDistance = dist; }
 
         Movement::MoveSpline* movespline;

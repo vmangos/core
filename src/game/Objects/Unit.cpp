@@ -11199,13 +11199,6 @@ Unit* Unit::SelectNearestTarget(float dist) const
     return target;
 }
 
-float Unit::GetMinChaseDistance(Unit const* victim) const
-{
-    if (m_casterChaseDistance > 1.0f)
-        return m_casterChaseDistance;
-    return GetObjectBoundingRadius();
-}
-
 float Unit::GetMaxChaseDistance(Unit const* victim) const
 {
     if (m_casterChaseDistance > 1.0f)
