@@ -14,9 +14,9 @@ ALTER TABLE `spell_threat`
 	ADD COLUMN `inverse_effect_mask` TINYINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'mask for effect indexes to which flat threat bonus does not apply' AFTER `multiplier`,
 	DROP COLUMN `ap_bonus`;
 
-UPDATE `spell_threat` SET `inverse_effect_mask`=1 WHERE  `entry`=126;
+UPDATE `spell_threat` SET `inverse_effect_mask`=1 WHERE `entry`=126;
 UPDATE `spell_threat` SET `inverse_effect_mask`=1 WHERE `entry`=6196;
-UPDATE `spell_threat` SET `inverse_effect_mask`=2 WHERE  `entry`=22812
+UPDATE `spell_threat` SET `inverse_effect_mask`=2 WHERE `entry`=22812;
 
 
 -- End of migration.
