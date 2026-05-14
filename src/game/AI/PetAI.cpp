@@ -366,12 +366,16 @@ void PetAI::UpdateAllies()
         return;
 
     //owner is in group; group members filled in already (no raid -> subgroupcount = whole count)
-    if (group && !group->isRaidGroup() && m_AllySet.size() == (group->GetMembersCount() + 2))
+    if (group && !group->isRaidGroup() && m_AllySet.size() == (group->GetMembersCount() + 1))
         return;
 
+    // Cache potential friendly targets here. Charmed owner/group members are
+    // filtered later by spell target validation before the pet actually casts.
     m_AllySet.clear();
     m_AllySet.insert(m_creature->GetObjectGuid());
-    if (group)                                             //add group
+    m_AllySet.insert(owner->GetObjectGuid()); // The pet owner must always be included.
+
+    if (group)
     {
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
@@ -385,8 +389,6 @@ void PetAI::UpdateAllies()
             m_AllySet.insert(target->GetObjectGuid());
         }
     }
-    else                                                    //remove group
-        m_AllySet.insert(owner->GetObjectGuid());
 }
 
 void PetAI::KilledUnit(Unit* victim)
@@ -801,4 +803,3 @@ void PetAI::AttackedBy(Unit* attacker)
     // Continue to evaluate and attack if necessary
     AttackStart(attacker);
 }
-
