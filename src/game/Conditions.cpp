@@ -129,7 +129,7 @@ bool ConditionEntry::Meets(WorldObject const* target, Map const* map, WorldObjec
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CONDITION %u type %u used with bad parameters, called from %s, used with target: %s, map %i, source %s",
             m_entry, m_condition, conditionSourceToStr[conditionSourceType], target ? target->GetGuidStr().c_str() : "<nullptr>", map ? map->GetId() : -1, source ? source->GetGuidStr().c_str() : "<nullptr>");
         return false;
-    } 
+    }
 
     bool result = Evaluate(target, map, source, conditionSourceType);
 
@@ -156,7 +156,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                 return true;
             if (m_value4 && sConditionStorage.LookupEntry<ConditionEntry>(m_value4)->Meets(target, map, source, conditionSourceType))
                 return true;
-            
+
             return sConditionStorage.LookupEntry<ConditionEntry>(m_value1)->Meets(target, map, source, conditionSourceType) || sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(target, map, source, conditionSourceType);
         }
         case CONDITION_AND:
@@ -472,7 +472,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_HEALTH_PERCENT:
         {
             auto const hp_percent = static_cast<int64>(target->ToUnit()->GetHealthPercent());
-            
+
             switch (m_value2)
             {
                 case 0:
@@ -508,11 +508,11 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             switch (m_value2)
             {
                 case 0:
-                    return target->GetReactionTo(source) == m_value1;
+                    return target->GetReactionTo(source) == static_cast<ReputationRank>(m_value1);
                 case 1:
-                    return target->GetReactionTo(source) >= m_value1;
+                    return target->GetReactionTo(source) >= static_cast<ReputationRank>(m_value1);
                 case 2:
-                    return target->GetReactionTo(source) <= m_value1;
+                    return target->GetReactionTo(source) <= static_cast<ReputationRank>(m_value1);
             }
             return false;
         }
@@ -589,7 +589,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                     return (dbGuid == m_value1) || (dbGuid == m_value2) || (dbGuid == m_value3) || (dbGuid == m_value4);
             }
             else if (Creature const* pCreature = source->ToCreature())
-            { 
+            {
                 if (uint32 dbGuid = pCreature->GetDBTableGUIDLow())
                     return (dbGuid == m_value1) || (dbGuid == m_value2) || (dbGuid == m_value3) || (dbGuid == m_value4);
             }
@@ -745,7 +745,7 @@ bool ConditionEntry::CheckParamRequirements(WorldObject const* target, Map const
                 return true;
             return false;
     }
-    
+
     return true;
 }
 

@@ -197,7 +197,7 @@ uint32 GetRandomGuardText()
         case 6:
             return 8183; // ...nerves of thorium.
     }
-    return 8184; // A living legend... 
+    return 8184; // A living legend...
 }
 
 void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
@@ -919,7 +919,7 @@ void npc_squire_roweAI::UpdateAI(uint32 const uiDiff)
                     WindsorSummon.x,
                     WindsorSummon.y,
                     WindsorSummon.z,
-                    WindsorSummon.o, TEMPSUMMON_MANUAL_DESPAWN, 1.5 * HOUR * IN_MILLISECONDS, true))
+                    WindsorSummon.o, TEMPSUMMON_MANUAL_DESPAWN, 90 * MINUTE * IN_MILLISECONDS, true))
                 {
                     auto pWindsorAI = static_cast<npc_reginald_windsorAI*>(pWindsor->AI());
 
@@ -1036,7 +1036,7 @@ bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*p
         WindsorSummon.x,
         WindsorSummon.y,
         WindsorSummon.z,
-        WindsorSummon.o, TEMPSUMMON_MANUAL_DESPAWN, 1.5 * HOUR * IN_MILLISECONDS, true))
+        WindsorSummon.o, TEMPSUMMON_MANUAL_DESPAWN, 90 * MINUTE * IN_MILLISECONDS, true))
     {
         auto pWindsorAI = static_cast<npc_reginald_windsorAI*>(pWindsor->AI());
 

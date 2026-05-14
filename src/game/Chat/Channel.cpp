@@ -55,18 +55,18 @@ Channel::Channel(std::string const& name)
     }
     else                                                    // it's custom channel
     {
-        if (!normalizePlayerName(m_name, (size_t)128))
+        if (!normalizePlayerName(m_name, 128)) // Capitalizes the first letter
         {
             m_name = "INVALIDCHANNEL";
             m_announce = false;
         }
 
-        if (m_name == u8"World")
+        if (m_name == "World")
         {
             m_flags |= CHANNEL_FLAG_GENERAL;
             m_announce = false;
         }
-        else if (m_name == u8"China" || m_name == u8"中国")
+        else if (m_name == "China" || m_name == "\xE4\xB8\xAD\xE5\x9B\xBD") // The hex-sequence is the utf8 version of "China" in Mandarin
         {
             m_flags |= CHANNEL_FLAG_CUSTOM;
             m_announce = false;
@@ -232,7 +232,7 @@ void Channel::KickOrBan(ObjectGuid guid, char const* targetName, bool ban)
         SendToOne(&data, guid);
         return;
     }
-    
+
     bool changeowner = (m_ownerGuid == targetGuid);
 
     if (sec < SEC_GAMEMASTER && changeowner && guid != m_ownerGuid)

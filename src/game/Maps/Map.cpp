@@ -2888,8 +2888,8 @@ void Map::SendObjectUpdates()
     if (threads < m_objUpdatesThreads)
         m_objUpdatesThreads = threads;
 #endif
-    if (threads > objectsCount)
-        threads = objectsCount;
+    if (static_cast<uint32>(threads) > objectsCount)
+        threads = static_cast<int>(objectsCount);
     int step = objectsCount / threads;
 
     ASSERT(step > 0);

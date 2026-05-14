@@ -74,8 +74,13 @@ std::string TimeToTimestampStr(time_t t);
 
 inline uint32 secsToTimeBitFields(time_t secs)
 {
-    tm* lt = localtime(&secs);
-    return (lt->tm_year - 100) << 24 | lt->tm_mon  << 20 | (lt->tm_mday - 1) << 14 | lt->tm_wday << 11 | lt->tm_hour << 6 | lt->tm_min;
+    tm localTime;
+#if PLATFORM == PLATFORM_WINDOWS
+    localtime_s(&localTime, &secs);
+#else
+    localtime_r(&secs, &localTime);
+#endif
+    return (localTime.tm_year - 100) << 24 | localTime.tm_mon  << 20 | (localTime.tm_mday - 1) << 14 | localTime.tm_wday << 11 | localTime.tm_hour << 6 | localTime.tm_min;
 }
 
 inline void ApplyModUInt32Var(uint32& var, int32 val, bool apply)

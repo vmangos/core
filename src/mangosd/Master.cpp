@@ -53,7 +53,9 @@
 
 #ifndef WIN32
 #include "PosixDaemon.h"
+#include <unistd.h>
 #endif
+
 #include <signal.h>
 
 #ifdef WIN32

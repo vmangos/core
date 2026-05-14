@@ -69,7 +69,7 @@ Crypto::Hash::MD5::Digest ClientPatchCache::CalculateAndCacheHash(std::unique_pt
 
     uint64_t totalRead = 0;
 
-    do { // Read the file chunk by chunk and add insert it into our MD5_Update
+    do { // Read the file chunk by chunk and add it to the MD5 digest.
         uint64_t actuallyRead = fileHandle->ReadSync(buffer.data(), CHECK_CHUNK_SIZE);
         md5.UpdateData(buffer.data(), (size_t) actuallyRead);
 

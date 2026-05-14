@@ -39,6 +39,9 @@ typedef std::unordered_map<uint32, BattleGroundTypeId> BattleMastersMap;
 typedef std::unordered_map<uint32, std::vector<BattleGroundEventIdx> > CreatureBattleEventIndexesMap;
 typedef std::unordered_map<uint32, std::vector<BattleGroundEventIdx> > GameObjectBattleEventIndexesMap;
 
+// Sentinel key used for the default (unregistered) event entry in the battle event index maps.
+constexpr uint32 BG_UNREGISTERED_GUID = static_cast<uint32>(-1);
+
 #define COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME 10
 #define OFFLINE_BG_QUEUE_TIME                 60*1000 // in ms
 
@@ -270,14 +273,14 @@ class BattleGroundMgr
             CreatureBattleEventIndexesMap::const_iterator itr = m_creatureBattleEventIndexMap.find(dbGuid);
             if (itr != m_creatureBattleEventIndexMap.end())
                 return itr->second[0];
-            return m_creatureBattleEventIndexMap.find(-1)->second[0];
+            return m_creatureBattleEventIndexMap.find(BG_UNREGISTERED_GUID)->second[0];
         }
         BattleGroundEventIdx GetGameObjectEventIndex(uint32 dbGuid) const
         {
             GameObjectBattleEventIndexesMap::const_iterator itr = m_gameObjectBattleEventIndexMap.find(dbGuid);
             if (itr != m_gameObjectBattleEventIndexMap.end())
                 return itr->second[0];
-            return m_gameObjectBattleEventIndexMap.find(-1)->second[0];
+            return m_gameObjectBattleEventIndexMap.find(BG_UNREGISTERED_GUID)->second[0];
         }
         // Nostalrius: allow multiple events per creature ... Avoid when possible.
         std::vector<BattleGroundEventIdx> const& GetCreatureEventsVector(uint32 dbGuid) const
@@ -285,14 +288,14 @@ class BattleGroundMgr
             CreatureBattleEventIndexesMap::const_iterator itr = m_creatureBattleEventIndexMap.find(dbGuid);
             if (itr != m_creatureBattleEventIndexMap.end())
                 return itr->second;
-            return m_creatureBattleEventIndexMap.find(-1)->second;
+            return m_creatureBattleEventIndexMap.find(BG_UNREGISTERED_GUID)->second;
         }
         std::vector<BattleGroundEventIdx> const& GetGameObjectEventsVector(uint32 dbGuid) const
         {
             GameObjectBattleEventIndexesMap::const_iterator itr = m_gameObjectBattleEventIndexMap.find(dbGuid);
             if (itr != m_gameObjectBattleEventIndexMap.end())
                 return itr->second;
-            return m_gameObjectBattleEventIndexMap.find(-1)->second;
+            return m_gameObjectBattleEventIndexMap.find(BG_UNREGISTERED_GUID)->second;
         }
 
         bool isTesting() const { return m_testing; }

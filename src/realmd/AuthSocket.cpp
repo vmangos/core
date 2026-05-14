@@ -1176,13 +1176,13 @@ void AuthSocket::_HandleXferResume()
         return;
     }
 
-    auto startPosPtr = std::make_shared<int64>();
-    m_socket.Read(reinterpret_cast<char*>(startPosPtr.get()), sizeof(int64), [self = shared_from_this(), startPosPtr](IO::NetworkError const& error, std::size_t)
+    auto startPosPtr = std::make_shared<uint64>();
+    m_socket.Read(reinterpret_cast<char*>(startPosPtr.get()), sizeof(uint64), [self = shared_from_this(), startPosPtr](IO::NetworkError const& error, std::size_t)
     {
-        int64 startPos = *startPosPtr;
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[XFER] User '%s' wants to resume download at byte %lld", self->m_safelogin.c_str(), static_cast<long long>(startPos));
+        uint64 startPos = *startPosPtr;
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[XFER] User '%s' wants to resume download at byte %llu", self->m_safelogin.c_str(), startPos);
 
-        if (startPos >= self->m_pendingPatchFile->GetTotalFileSize() || startPos < 0)
+        if (startPos >= self->m_pendingPatchFile->GetTotalFileSize())
         {
             sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[XFER] User '%s' tried to resume download outside file bounds", self->m_safelogin.c_str());
             return;

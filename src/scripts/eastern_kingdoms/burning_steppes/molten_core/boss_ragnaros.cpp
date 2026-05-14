@@ -144,7 +144,7 @@ struct boss_ragnarosAI : ScriptedAI
         m_uiLavaBurstTertiaryTimer  = 0;
 
         m_uiSubmergeTimer           = 3*MINUTE*IN_MILLISECONDS;   // P1
-        m_uiAttackTimer             = 1.5*MINUTE*IN_MILLISECONDS; // P2
+        m_uiAttackTimer             = 90*IN_MILLISECONDS; // P2
         m_uiEmergeStateTimer        = 0;
         m_uiEnterCombatTimer        = 0;
 
@@ -412,7 +412,7 @@ struct boss_ragnarosAI : ScriptedAI
                     HasSubmergedOnce = true;
                     IsBanished = true;
                     m_uiSubmergeTimer = 3 * MINUTE*IN_MILLISECONDS;
-                    m_uiAttackTimer = 1.5*MINUTE*IN_MILLISECONDS;
+                    m_uiAttackTimer = 90*IN_MILLISECONDS;
                     return;
                 }
             }
