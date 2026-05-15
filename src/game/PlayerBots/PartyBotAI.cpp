@@ -834,7 +834,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             me->GetMotionMaster()->Clear(false, true);
             me->GetMotionMaster()->MoveIdle();
             char name[128] = {};
-            strcpy(name, pLeader->GetName());
+            snprintf(name, sizeof(name), "%s", pLeader->GetName());
             ChatHandler(me).HandleGonameCommand(name);
             return;
         }

@@ -4038,14 +4038,14 @@ std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation(uint32 guid)
         {
             char buffer[100];
             char const* format = GetMangosString(LANG_NPC_GO_INFO_POOL_EVENT_STRING);
-            sprintf(buffer, format, pool_id, event_id);
+            snprintf(buffer, sizeof(buffer), format, pool_id, event_id);
             str = buffer;
         }
         else
         {
             char buffer[100];
             char const* format = GetMangosString(LANG_NPC_GO_INFO_POOL_STRING);
-            sprintf(buffer, format, pool_id);
+            snprintf(buffer, sizeof(buffer), format, pool_id);
             str = buffer;
         }
     }
@@ -4053,7 +4053,7 @@ std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation(uint32 guid)
     {
         char buffer[100];
         char const* format = GetMangosString(LANG_NPC_GO_INFO_EVENT_STRING);
-        sprintf(buffer, format, event_id);
+        snprintf(buffer, sizeof(buffer), format, event_id);
         str = buffer;
     }
 

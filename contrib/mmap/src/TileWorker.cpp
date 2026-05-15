@@ -252,7 +252,7 @@ namespace MMAP
     bool TileWorker::duDumpPolyMeshToObj(rcPolyMesh& pmesh, uint32 mapID, uint32 tileY, uint32 tileX)
     {
         char fname[256];
-        sprintf(fname, "meshes/map%03u%02u%02unavmesh.obj", mapID, tileY, tileX);
+        snprintf(fname, sizeof(fname), "meshes/map%03u%02u%02unavmesh.obj", mapID, tileY, tileX);
         FILE* objFile = fopen(fname, "wb");
         if (!objFile)
         {
@@ -301,7 +301,7 @@ namespace MMAP
     {
 
         char fname[256];
-        sprintf(fname, "meshes/map%03u%02u%02unavmeshdetail.obj", mapID, tileY, tileX);
+        snprintf(fname, sizeof(fname), "meshes/map%03u%02u%02unavmeshdetail.obj", mapID, tileY, tileX);
         FILE* objFile = fopen(fname, "wb");
 
         if (!objFile)
@@ -346,7 +346,7 @@ namespace MMAP
     bool TileWorker::shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY)
     {
         char fileName[255];
-        sprintf(fileName, "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
+        snprintf(fileName, sizeof(fileName), "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
         FILE* file = fopen(fileName, "rb");
         if (!file)
         {
@@ -422,7 +422,7 @@ namespace MMAP
     {
         // console output
         char tileString[20];
-        sprintf(tileString, "[Map %03i] [%02i,%02i]: ", mapID, tileX, tileY);
+        snprintf(tileString, sizeof(tileString), "[Map %03i] [%02i,%02i]: ", mapID, tileX, tileY);
         printf("%s Building movemap tiles...                          \r", tileString);
 
         IntermediateValues iv;
@@ -868,12 +868,12 @@ namespace MMAP
 
             // file output
             char fileName[255];
-            sprintf(fileName, "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
+            snprintf(fileName, sizeof(fileName), "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
             FILE* file = fopen(fileName, "wb");
             if (!file)
             {
                 char message[1024];
-                sprintf(message, "[Map %03i] Failed to open %s for writing!             \n", mapID, fileName);
+                snprintf(message, sizeof(message), "[Map %03i] Failed to open %s for writing!             \n", mapID, fileName);
                 perror(message);
                 navMesh->removeTile(tileRef, nullptr, nullptr);
                 continue;
@@ -904,7 +904,7 @@ namespace MMAP
                 //iv.writeIV(mapID, tileX, tileY);
                 // Write navmesh data
                 char fname[256];
-                sprintf(fname, "meshes/map%03u%02u%02u.nav", mapID, tileY, tileX);
+                snprintf(fname, sizeof(fname), "meshes/map%03u%02u%02u.nav", mapID, tileY, tileX);
                 FILE* file = fopen(fname, "wb");
                 if (file)
                 {

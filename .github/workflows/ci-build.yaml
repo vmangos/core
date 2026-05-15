@@ -65,6 +65,10 @@ jobs:
               job_name: Ubuntu Clang
           - client_build: 5875
             config:
+              os: macos-26
+              job_name: macOS Clang
+          - client_build: 5875
+            config:
               os: windows-2022
               job_name: Windows Visual Studio
           - client_build: 5875
@@ -92,6 +96,10 @@ jobs:
       - name: Install Clang compiler
         if: matrix.config.install_clang
         run: sudo apt install -y --no-install-recommends clang
+
+      - name: Install macOS build dependencies
+        if: matrix.config.os == 'macos-26'
+        run: brew install mysql-client
 
       - name: Set up MSYS2 (MINGW64)
         if: matrix.config.use_mingw
@@ -122,6 +130,21 @@ jobs:
             -DBUILD_WARNINGS_AS_ERROR=1 \
             -DSUPPORTED_CLIENT_BUILD="${{ matrix.client_build }}"
           make -j"$(nproc)"
+          make install
+
+      - name: Build and install on macOS
+        if: matrix.config.os == 'macos-26'
+        run: |
+          set -euo pipefail
+          mkdir -p build _install
+          cd build
+          cmake ../ \
+            -DCMAKE_INSTALL_PREFIX="../_install" \
+            -DBUILD_EXTRACTORS=1 \
+            -DENABLE_MAILSENDER=1 \
+            -DBUILD_WARNINGS_AS_ERROR=1 \
+            -DSUPPORTED_CLIENT_BUILD="${{ matrix.client_build }}"
+          make -j"$(sysctl -n hw.ncpu)"
           make install
 
       - name: Build and install on Windows (Visual Studio)
