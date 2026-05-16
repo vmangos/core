@@ -91,7 +91,7 @@ typedef struct tagTHREADNAME_INFO {
 } THREADNAME_INFO;
 #pragma pack(pop)
 
-static LONG ExceptionIgnorer(PEXCEPTION_POINTERS ex)
+static LONG WINAPI ExceptionIgnorer(PEXCEPTION_POINTERS ex)
 {
    return ex->ExceptionRecord->ExceptionCode == MS_VC_EXCEPTION ? EXCEPTION_CONTINUE_EXECUTION : EXCEPTION_CONTINUE_SEARCH;
 }
