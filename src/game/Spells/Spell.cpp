@@ -7528,7 +7528,7 @@ SpellCastResult Spell::CheckItems()
                         InventoryResult msg = static_cast<Player*>(target)->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->EffectItemType[i], count, &no_space);
                         if (msg != EQUIP_ERR_OK)
                         {
-                            static_cast<Player*>(target)->SendEquipError(msg, nullptr, nullptr, m_spellInfo->EffectItemType[i]);
+                            static_cast<Player*>(target)->SendEquipError(msg, nullptr, nullptr, 0, m_spellInfo->EffectItemType[i]);
                             return SPELL_FAILED_DONT_REPORT;
                         }
                     }

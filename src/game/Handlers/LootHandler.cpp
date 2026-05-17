@@ -233,7 +233,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
         player->OnReceivedItem(newitem);
     }
     else
-        player->SendEquipError(msg, nullptr, nullptr, item->itemid);
+        player->SendEquipError(msg, nullptr, nullptr, 0, item->itemid);
 }
 
 void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
@@ -731,7 +731,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
     InventoryResult msg = target->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item.itemid, item.count);
     if (msg != EQUIP_ERR_OK)
     {
-        target->SendEquipError(msg, nullptr, nullptr, item.itemid);
+        target->SendEquipError(msg, nullptr, nullptr, 0, item.itemid);
 
         // send duplicate of error massage to master looter
         if (msg == EQUIP_ERR_BAG_FULL || msg == EQUIP_ERR_INVENTORY_FULL)
