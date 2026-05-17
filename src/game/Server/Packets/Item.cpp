@@ -203,7 +203,7 @@ void WorldPackets::Item::InventoryChangeFailure::AppendBodyTo(ByteBuffer& buffer
             buffer << requiredLevel;
         buffer << item1Guid;
         buffer << item2Guid;
-        buffer << bagTypeSubclass;
+        buffer << bagSlot;
     }
 }
 

@@ -11685,7 +11685,7 @@ void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
     }
 }
 
-void Player::SendEquipError(InventoryResult msg, Item const* pItem, Item const* pItem2, uint8 slot, uint32 itemid /*= 0*/) const
+void Player::SendEquipError(InventoryResult msg, Item const* pItem, Item const* pItem2, uint8 bagSlot /*=0*/, uint32 itemid /*= 0*/) const
 {
     auto packet = std::make_unique<WorldPackets::Item::InventoryChangeFailure>();
     packet->reason = msg;
@@ -11699,7 +11699,7 @@ void Player::SendEquipError(InventoryResult msg, Item const* pItem, Item const* 
         }
         packet->item1Guid = pItem ? pItem->GetObjectGuid() : ObjectGuid();
         packet->item2Guid = pItem2 ? pItem2->GetObjectGuid() : ObjectGuid();
-        packet->bagTypeSubclass = slot; // specifies slot of target bag that has storing condition
+        packet->bagSlot = bagSlot;
     }
     GetSession()->SendPacket(std::move(packet));
 }

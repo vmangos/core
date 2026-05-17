@@ -315,7 +315,7 @@ namespace WorldPackets { namespace Item
         uint32 requiredLevel = 0;  // only used for EQUIP_ERR_CANT_EQUIP_LEVEL_I
         ObjectGuid item1Guid;      // first involved item guid (empty if no item)
         ObjectGuid item2Guid;      // second involved item guid (empty if no second item)
-        uint8 bagTypeSubclass = 0; // bag type subclass
+        uint8 bagSlot = 0;         // slot of target bag that has storing condition (can be InventorySlots or BankBagSlots)
 
         explicit InventoryChangeFailure() : ServerPacket(SMSG_INVENTORY_CHANGE_FAILURE) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
