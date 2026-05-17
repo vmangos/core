@@ -1128,7 +1128,7 @@ void Group::CountSingleLooterRoll(Roll* roll)
         {
             item->is_blocked = false;
             item->lootOwner = playerGuid;
-            player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+            player->SendEquipError(msg, nullptr, nullptr, 0, roll->itemid);
         }
     }
 
@@ -1189,7 +1189,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                 {
                     item->is_blocked = false;
                     item->lootOwner = maxguid;
-                    player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                    player->SendEquipError(msg, nullptr, nullptr, 0, roll->itemid);
                 }
             }
             else
@@ -1239,7 +1239,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                 else
                 {
                     item->is_blocked = false;
-                    player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                    player->SendEquipError(msg, nullptr, nullptr, 0, roll->itemid);
                 }
             }
         }

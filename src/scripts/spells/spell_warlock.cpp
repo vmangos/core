@@ -338,7 +338,7 @@ struct WarlockCreateHealthstoneScript : SpellScript
         InventoryResult msg = pCaster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
         if (msg != EQUIP_ERR_OK)
         {
-            pCaster->SendEquipError(msg, nullptr, nullptr, itemId);
+            pCaster->SendEquipError(msg, nullptr, nullptr, 0, itemId);
             return SPELL_FAILED_DONT_REPORT;
         }
 
