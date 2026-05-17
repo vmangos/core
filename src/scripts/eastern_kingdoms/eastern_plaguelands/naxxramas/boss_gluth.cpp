@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: Boss_Gluth
-SD%Complete: 
+SD%Complete:
 SDComment:
 SDCategory: Naxxramas
 EndScriptData */
@@ -84,7 +84,7 @@ struct boss_gluthAI : public ScriptedAI
     EventMap m_events;
 
     uint32 five_percent;
-    
+
     void Reset() override
     {
         m_events.Reset();
@@ -109,10 +109,10 @@ struct boss_gluthAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* pWho) override
     {
-        // He should aggro just at the edge of the sewer pipe players jump from 
-        if (pWho->GetTypeId() == TYPEID_PLAYER 
-            && !m_creature->IsInCombat() 
-            && m_creature->IsWithinDistInMap(pWho, 49.0f) 
+        // He should aggro just at the edge of the sewer pipe players jump from
+        if (pWho->GetTypeId() == TYPEID_PLAYER
+            && !m_creature->IsInCombat()
+            && m_creature->IsWithinDistInMap(pWho, 49.0f)
             && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
             AttackStart(pWho);
@@ -124,7 +124,7 @@ struct boss_gluthAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GLUTH, IN_PROGRESS);
-        
+
         m_events.ScheduleEvent(EVENT_MORTAL_WOUND,    MORTAL_WOUND_CD);
         m_events.ScheduleEvent(EVENT_DECIMATE,        DECIMATE_CD);
         m_events.ScheduleEvent(EVENT_FRENZY,          FRENZY_CD);
@@ -235,8 +235,8 @@ struct boss_gluthAI : public ScriptedAI
                 case EVENT_EVADE_CHECK:
                 {
                     m_events.Repeat(Seconds(5));
-                    float curZ = m_creature->GetPositionZ();
-                    if (curZ < 293.0f && curZ > 300.0f) // avoid getting stuck in wall on pull
+                    float curZ = m_creature->GetPositionZ(); // encounter floor at ~297.78f
+                    if (curZ < 293.0f || curZ > 300.0f) // avoid getting stuck in wall on pull
                     {
                         EnterEvadeMode();
                     }
