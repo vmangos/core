@@ -379,7 +379,7 @@ uint32 CreatureGroup::ChooseCreatureId(ObjectGuid guid, CreatureData const* pDat
             if (nonSpawnedMembers.empty())
                 return itr.first;
 
-            int otherSpawnsWithEntryCount = 0;
+            int32 otherSpawnsWithEntryCount = 0;
             for (auto const& memberGuid : nonSpawnedMembers)
             {
                 if (CreatureData const* pMemberData = sObjectMgr.GetCreatureData(memberGuid.GetCounter()))

@@ -36,7 +36,7 @@ void IO::IoContext::RunUntilShutdown()
     DWORD bytesWritten = 0;
     DWORD constexpr maxWait = INFINITE;
 
-    m_runningThreadsCount++;
+    ++m_runningThreadsCount;
     while (m_isRunning)
     {
         bool isOkay = ::GetQueuedCompletionStatus(m_completionPort, &bytesWritten, &completionKey, reinterpret_cast<LPOVERLAPPED *>(&task), maxWait);
@@ -55,7 +55,7 @@ void IO::IoContext::RunUntilShutdown()
             std::this_thread::yield(); // wait one os tick to try again
         }
     }
-    m_runningThreadsCount--;
+    --m_runningThreadsCount;
 }
 
 bool IO::IoContext::IsRunning() const

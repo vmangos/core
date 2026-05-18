@@ -22680,7 +22680,7 @@ void Log::PlayerLogHeaderToFile(uint32 accountId, WorldSession const* session, L
 
 static bool IsPlayerLoggingEnabledToDB(LogType logType, LogLevel logLevel)
 {
-    if (logLevel > sLog.GetDbLevel())
+    if (static_cast<uint32>(logLevel) > sLog.GetDbLevel())
         return false;
 
     switch (logType)

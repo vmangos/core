@@ -210,9 +210,9 @@ extern LocaleNameStr const fullLocaleNameList[];
 //operator new[] based version of strdup() function! Release memory by using operator delete[] !
 inline char* mangos_strdup(char const* source)
 {
-    size_t size = strlen(source) + 1;
+    size_t size = std::strlen(source) + 1;
     char* dest = new char[size];
-    memcpy(dest, source, size);
+    std::memcpy(dest, source, size);
     return dest;
 }
 
