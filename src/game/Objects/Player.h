@@ -399,7 +399,7 @@ enum WhoListPartyStatus
 };
 #endif
 
-enum ActivateTaxiReplies
+enum ActivateTaxiReplies : uint32
 {
     ERR_TAXIOK                      = 0,
     ERR_TAXIUNSPECIFIEDSERVERERROR  = 1,
@@ -993,7 +993,7 @@ class Player final: public Unit
 #else
         uint32 GetMaxKeyringSize() const { return 0; }
 #endif
-        void SendEquipError(InventoryResult msg, Item const* pItem = nullptr, Item const* pItem2 = nullptr, uint8 slot = 0, uint32 itemid = 0) const;
+        void SendEquipError(InventoryResult msg, Item const* pItem = nullptr, Item const* pItem2 = nullptr, uint8 bagSlot = 0, uint32 itemid = 0) const;
         void SendBuyError(BuyResult msg, Creature const* pCreature, uint32 item, uint32 param) const;
         void SendSellError(SellResult msg, Creature const* pCreature, ObjectGuid itemGuid, uint32 param) const;
         void SendOpenContainer(ObjectGuid itemGuid) const;
@@ -1987,6 +1987,7 @@ class Player final: public Unit
         void DestroyForPlayer(Player const* target) const override;
         void SendLogXPGain(uint32 givenXP, Unit const* victim, uint32 restXP) const;
 
+        void SendMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self) const override;
         void SendMessageToSet(WorldPacket* data, bool self) const override;
         void SendMessageToSetInRange(WorldPacket* data, float fist, bool self) const override;
         void SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool own_team_only) const;
@@ -2394,8 +2395,8 @@ class Player final: public Unit
 
         void ResetInstances(InstanceResetMethod method);
         void ResetPersonalInstanceOnLeaveDungeon(uint32 mapId);
-        void SendResetInstanceSuccess(uint32 MapId) const;
-        void SendResetInstanceFailed(uint32 reason, uint32 MapId) const;
+        void SendResetInstanceSuccess(uint32 mapId) const;
+        void SendResetInstanceFailed(uint32 reason, uint32 mapId) const;
         void SendResetFailedNotify();
         bool CheckInstanceCount(uint32 instanceId) const;
         void AddInstanceEnterTime(uint32 instanceId, time_t enterTime) const;

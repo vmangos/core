@@ -767,8 +767,7 @@ uint32 Player::EnvironmentalDamage(EnvironmentalDamageType type, uint32 damage)
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "We are fall to death, loosing 10 percents durability");
         DurabilityLossAll(0.10f, false);
         // durability lost message
-        WorldPacket data2(SMSG_DURABILITY_DAMAGE_DEATH, 0);
-        GetSession()->SendPacket(&data2);
+        GetSession()->SendPacket(std::make_unique<WorldPackets::Misc::DurabilityDamageDeath>());
     }
 
     return damage;
@@ -883,19 +882,19 @@ void Player::SendMirrorTimerStart(uint32 type, uint32 remaining, uint32 duration
 
 void Player::SendMirrorTimerStop(uint32 type)
 {
-    WorldPacket data(SMSG_STOP_MIRROR_TIMER, 4);
-    data << uint32(type);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::StopMirrorTimer>();
+    packet->timerType = type;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendMirrorTimerPause(uint32 type, bool state)
 {
     // Note: Default UI handler for this is bugged, args dont match
     // Gotta do a full update with SMSG_START_MIRROR_TIMER to avoid lua errors
-    WorldPacket data(SMSG_PAUSE_MIRROR_TIMER, (4 + 1));
-    data << uint32(type);
-    data << uint8(state);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::PauseMirrorTimer>();
+    packet->timerType = type;
+    packet->paused = state;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::FreezeMirrorTimers(bool state)
@@ -1834,9 +1833,9 @@ bool Player::SwitchInstance(uint32 newInstanceId)
 
     for (const auto& guid : m_visibleGUIDs)
     {
-        WorldPacket data(SMSG_DESTROY_OBJECT, 8);
-        data << guid;
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+        packet->objectGuid = guid;
+        GetSession()->SendPacket(std::move(packet));
     }
 
     ASSERT(pNewMap->Add(this));
@@ -2063,15 +2062,12 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
         if (!GetSession()->PlayerLogout())
         {
             // send transfer packet to display load screen
-            WorldPacket data(SMSG_TRANSFER_PENDING, (4 + 4 + 4));
-            data << uint32(mapId);
+            auto packet = std::make_unique<WorldPackets::Misc::TransferPending>();
+            packet->mapId = mapId;
             if (m_transport)
-            {
-                data << uint32(m_transport->GetEntry());
-                data << uint32(GetMapId());
-            }
-            GetCheatData()->LogMovementPacket(false, data);
-            GetSession()->SendPacket(&data);
+                packet->transportInfo = WorldPackets::Misc::TransferPendingTransportInfo{ m_transport->GetEntry(), GetMapId() };
+            GetCheatData()->LogMovementPacket(*packet);
+            GetSession()->SendPacket(std::move(packet));
         }
 
         // remove from old map now
@@ -2114,23 +2110,9 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
 void Player::SendNewWorld()
 {
     // transfer finished, inform client to start load
-    WorldPacket data(SMSG_NEW_WORLD, (20));
-    data << uint32(m_teleportDest.mapId);
-    if (m_transport)
-    {
-        data << m_movementInfo.GetTransportPos().x;
-        data << m_movementInfo.GetTransportPos().y;
-        data << m_movementInfo.GetTransportPos().z;
-        data << m_movementInfo.GetTransportPos().o;
-    }
-    else
-    {
-        data << m_teleportDest.x;
-        data << m_teleportDest.y;
-        data << m_teleportDest.z;
-        data << m_teleportDest.o;
-    }
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::NewWorld>();
+    packet->location = m_transport ? m_movementInfo.GetTransportPos().WithMapId(m_teleportDest.mapId) : m_teleportDest;
+    GetSession()->SendPacket(std::move(packet));
     SendSavedInstances();
 }
 
@@ -3047,16 +3029,16 @@ uint32 Player::GetWhoListPartyStatus() const
 
 void Player::SendLogXPGain(uint32 givenXP, Unit const* victim, uint32 restXP) const
 {
-    WorldPacket data(SMSG_LOG_XPGAIN, 21);
-    data << (victim ? victim->GetObjectGuid() : ObjectGuid());// guid
-    data << uint32(givenXP + restXP);                       // given experience
-    data << uint8(victim ? 0 : 1);                          // 00-kill_xp type, 01-non_kill_xp type
+    auto packet = std::make_unique<WorldPackets::Misc::LogXpGain>();
+    packet->victimGuid = victim ? victim->GetObjectGuid() : ObjectGuid();
+    packet->totalXp = givenXP + restXP;
+    packet->xpType = victim ? 0 : 1; // 00-kill_xp type, 01-non_kill_xp type
     if (victim)
     {
-        data << uint32(givenXP);                            // experience without rested bonus
-        data << float(1);                                   // 1 - none 0 - 100% group bonus output
+        packet->baseXp = givenXP;    // experience without rested bonus
+        packet->groupBonus = 1.0f;   // 1=none 0=100% group bonus output
     }
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::GiveXP(uint32 xp, Unit const* victim)
@@ -3225,19 +3207,14 @@ void Player::GiveLevel(uint32 level)
         + (int32(GetManaBonusFromIntellect(info.stats[STAT_INTELLECT])) - int32(GetManaBonusFromIntellect(GetCreateStat(STAT_INTELLECT)))));
 
     // send levelup info to client
-    WorldPacket data(SMSG_LEVELUP_INFO, (4 + 4 + MAX_POWERS * 4 + MAX_STATS * 4));
-    data << uint32(level);
-    data << hp;
-    data << uint32(GetPowerType() == POWER_MANA ? mana : 0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    data << uint32(0);
-    // end for
+    auto packet = std::make_unique<WorldPackets::Misc::LevelUpInfo>();
+    packet->level = level;
+    packet->healthGain = hp;
+    packet->powerGains[0] = GetPowerType() == POWER_MANA ? mana : 0;
     for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)         // Stats loop (0-4)
-        data << uint32(int32(info.stats[i]) - GetCreateStat(Stats(i)));
+        packet->statGains[i] = static_cast<uint32>(int32(info.stats[i]) - GetCreateStat(Stats(i)));
 
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 
     SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr.GetXPForLevel(level));
 
@@ -6167,6 +6144,13 @@ void Player::SaveRecallPosition()
     m_recallO = GetOrientation();
 }
 
+void Player::SendMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self) const
+{
+    WorldPacket binaryPacket(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+    SendMessageToSet(&binaryPacket, self);
+}
+
 void Player::SendMessageToSet(WorldPacket* data, bool self) const
 {
     if (IsInWorld())
@@ -6203,9 +6187,9 @@ void Player::SendDirectMessage(WorldPacket* data) const
 
 void Player::SendCinematicStart(uint32 CinematicSequenceId)
 {
-    WorldPacket data(SMSG_TRIGGER_CINEMATIC, 4);
-    data << uint32(CinematicSequenceId);
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::TriggerCinematic>();
+    packet->cinematicSequenceId = CinematicSequenceId;
+    GetSession()->SendPacket(std::move(packet));
 
     CinematicStart(CinematicSequenceId);
 }
@@ -6884,18 +6868,25 @@ void Player::DuelComplete(DuelCompleteType type)
     if (!m_duel || m_duel->finished)
         return;
 
-    WorldPacket data(SMSG_DUEL_COMPLETE, (1));
-    data << (uint8)((type != DUEL_INTERRUPTED) ? 1 : 0);
-    GetSession()->SendPacket(&data);
-    m_duel->opponent->GetSession()->SendPacket(&data);
+    {
+        // TODO Use broadcaster to send it to self and opponent
+        auto packet = std::make_unique<WorldPackets::Duel::DuelComplete>();
+        packet->started = (type != DUEL_INTERRUPTED);
+        GetSession()->SendPacket(std::move(packet));
+    }
+    {
+        auto packet = std::make_unique<WorldPackets::Duel::DuelComplete>();
+        packet->started = (type != DUEL_INTERRUPTED);
+        m_duel->opponent->GetSession()->SendPacket(std::move(packet));
+    }
 
     if (type != DUEL_INTERRUPTED)
     {
-        data.Initialize(SMSG_DUEL_WINNER, (1 + 20));        // we guess size
-        data << (uint8)((type == DUEL_WON) ? 0 : 1);        // 0 = just won; 1 = fled
-        data << m_duel->opponent->GetName();
-        data << GetName();
-        SendObjectMessageToSet(&data, true);
+        auto packet = std::make_unique<WorldPackets::Duel::DuelWinner>();
+        packet->fled = (type != DUEL_WON);                  // 0 = just won; 1 = fled
+        packet->winnerName = m_duel->opponent->GetName();
+        packet->loserName = GetName();
+        SendObjectMessageToSet(std::move(packet), true);
     }
 
     //Remove Duel Flag object
@@ -7735,19 +7726,19 @@ void Player::RemovedInsignia(Player* looterPlr, Corpse* corpse)
     if (!corpse)
         return;
 
-    WorldPacket data(SMSG_PLAYER_SKINNED,1);
-    data << uint8(0);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::PlayerSkinned>();
+    packet->freeRepop = 0;
+    GetSession()->SendPacket(std::move(packet));
 
     sObjectAccessor.ConvertCorpseForPlayer(GetObjectGuid(), looterPlr);
 }
 
 void Player::SendLootRelease(ObjectGuid guid) const
 {
-    WorldPacket data(SMSG_LOOT_RELEASE_RESPONSE, (8 + 1));
-    data << guid;
-    data << uint8(1);
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Loot::LootReleaseResponse>();
+    packet->lootedGuid = guid;
+    packet->result = 1;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendLootError(ObjectGuid guid, LootError error) const
@@ -8172,16 +8163,17 @@ void Player::SendLootMoneyNotify(uint32 amount) const
 
 void Player::SendNotifyLootItemRemoved(uint8 lootSlot) const
 {
-    WorldPacket data(SMSG_LOOT_REMOVED, 1);
-    data << uint8(lootSlot);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Loot::LootRemoved>();
+    packet->lootSlot = lootSlot;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendUpdateWorldState(uint32 state, uint32 value) const
 {
-    WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
-    WriteUpdateWorldStatePair(data, state, value);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::UpdateWorldState>();
+    packet->field = state;
+    packet->value = value;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 // TODO: Determine what these values mean, if anything.
@@ -8413,9 +8405,9 @@ float Player::ComputeRest(time_t timePassed, bool offline /*= false*/, bool inRe
 void Player::SetBindPoint(ObjectGuid guid) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-    WorldPacket data(SMSG_BINDER_CONFIRM, 8);
-    data << ObjectGuid(guid);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Npc::BinderConfirm>();
+    packet->binderGuid = guid;
+    GetSession()->SendPacket(std::move(packet));
 #endif
 }
 
@@ -8434,10 +8426,10 @@ void Player::SendPetSkillWipeConfirm() const
     if (!pet)
         return;
 
-    WorldPacket data(SMSG_PET_UNLEARN_CONFIRM, (8 + 4));
-    data << ObjectGuid(pet->GetObjectGuid());
-    data << uint32(pet->GetResetTalentsCost());
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Pet::PetUnlearnConfirm>();
+    packet->petGuid = pet->GetObjectGuid();
+    packet->cost = pet->GetResetTalentsCost();
+    GetSession()->SendPacket(std::move(packet));
 #endif
 }
 
@@ -11693,52 +11685,48 @@ void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
     }
 }
 
-void Player::SendEquipError(InventoryResult msg, Item const* pItem, Item const* pItem2, uint8 slot, uint32 itemid /*= 0*/) const
+void Player::SendEquipError(InventoryResult msg, Item const* pItem, Item const* pItem2, uint8 bagSlot /*=0*/, uint32 itemid /*= 0*/) const
 {
-    WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I ? 22 : (msg == EQUIP_ERR_OK ? 1 : 18)));
-    data << uint8(msg);
+    auto packet = std::make_unique<WorldPackets::Item::InventoryChangeFailure>();
+    packet->reason = msg;
 
     if (msg != EQUIP_ERR_OK)
     {
         if (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I)
         {
             ItemPrototype const* proto = pItem ? pItem->GetProto() : sObjectMgr.GetItemPrototype(itemid);
-            data << uint32(proto ? proto->RequiredLevel : 0);
+            packet->requiredLevel = proto ? proto->RequiredLevel : 0;
         }
-        data << (pItem ? pItem->GetObjectGuid() : ObjectGuid()); // closes loot, cancels spell, unlocks item
-        data << (pItem2 ? pItem2->GetObjectGuid() : ObjectGuid()); // only unlocks item
-        data << uint8(slot); // specifies slot of target bag that has storing condition
+        packet->item1Guid = pItem ? pItem->GetObjectGuid() : ObjectGuid();
+        packet->item2Guid = pItem2 ? pItem2->GetObjectGuid() : ObjectGuid();
+        packet->bagSlot = bagSlot;
     }
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendOpenContainer(ObjectGuid itemGuid) const
 {
-    WorldPacket data(SMSG_OPEN_CONTAINER, 8);   // opens the main bag in the UI
-    data << itemGuid;
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Item::OpenContainer>();
+    packet->itemGuid = itemGuid;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendBuyError(BuyResult msg, Creature const* pCreature, uint32 item, uint32 /*param*/) const
 {
-    WorldPacket data(SMSG_BUY_FAILED, (8 + 4 + 1));
-    data << (pCreature ? pCreature->GetObjectGuid() : ObjectGuid());
-    data << uint32(item);
-    //if (param > 0)
-    //    data << uint32(param);    // [-ZERO]
-    data << uint8(msg);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Item::BuyFailed>();
+    packet->vendorGuid = pCreature ? pCreature->GetObjectGuid() : ObjectGuid();
+    packet->itemEntry = item;
+    packet->reason = msg;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendSellError(SellResult msg, Creature const* pCreature, ObjectGuid itemGuid, uint32 /*param*/) const
 {
-    WorldPacket data(SMSG_SELL_ITEM, (8 + 8 + /*(param ? 4 : 0) +*/ 1)); // last check [ZERO]
-    data << (pCreature ? pCreature->GetObjectGuid() : ObjectGuid());
-    data << ObjectGuid(itemGuid);
-    //if (param > 0)
-    //    data << uint32(param);    // [-ZERO]
-    data << uint8(msg);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Item::SellItemResponse>();
+    packet->vendorGuid = pCreature ? pCreature->GetObjectGuid() : ObjectGuid();
+    packet->itemGuid = itemGuid;
+    packet->reason = msg;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 Player* Player::GetTrader() const
@@ -12064,8 +12052,8 @@ void Player::SendEnchantmentLog(ObjectGuid casterGuid, uint32 itemId, uint32 spe
     BuildEnchantmentLog(data, casterGuid, itemId, spellId, false);
     GetSession()->SendPacket(&data); // only to self
 
-    // unapply message should probably be sent only to self
-    // given that affiliation is not used in this case
+    // Unapply should probably be sent only to self, because affiliation is not used
+    // when casterGuid is empty. Broadcast only when there is a casterGuid for a new enchant.
     if (!casterGuid.IsEmpty())
     {
         WorldPacket data2(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4 + 1));
@@ -12091,28 +12079,29 @@ void Player::SendNewItem(Item const* item, uint32 count, bool received, bool cre
     if (!item)                                              // prevent crash
         return;
 
-    // last check 2.0.10
-    WorldPacket data(SMSG_ITEM_PUSH_RESULT, (8 + 4 + 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4));
-    data << GetObjectGuid();                                // player GUID
-    data << uint32(received);                               // 0=looted, 1=from npc
-    data << uint32(created);                                // 0=received, 1=created
-    data << uint32(showInChat);                             // showInChat
-    data << uint8(item->GetBagSlot());                      // bagslot
-    // item slot, but when added to stack: 0xFFFFFFFF
+    static constexpr uint32 STACKED_ITEM_SLOT_MARKER = 0xFFFFFFFFu;
+
+    auto packet = std::make_unique<WorldPackets::Item::ItemPushResult>();
+    packet->playerGuid = GetObjectGuid();
+    packet->received = received; // 0=looted, 1=from npc
+    packet->created = created;   // 0=received, 1=created
+    packet->showInChat = showInChat;
+    packet->bagSlot = item->GetBagSlot();
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    data << uint32((item->GetCount() == count) ? item->GetSlot() : -1);
+    // item slot, but when added to an already existing stack its 0xFFFFFFFF
+    packet->itemSlot = (item->GetCount() == count) ? item->GetSlot() : STACKED_ITEM_SLOT_MARKER;
 #endif
-    data << uint32(item->GetEntry());                       // item id
-    data << uint32(item->GetItemSuffixFactor());            // SuffixFactor
-    data << uint32(item->GetItemRandomPropertyId());        // random item property id
+    packet->itemEntry = item->GetEntry();
+    packet->suffixFactor = item->GetItemSuffixFactor();
+    packet->randomPropertyId = item->GetItemRandomPropertyId();
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    data << uint32(count);                                  // count of items
+    packet->count = count;
 #endif
 
     if (broadcast && GetGroup())
-        GetGroup()->BroadcastPacket(&data, true);
+        GetGroup()->BroadcastPacket(std::move(packet), true);
     else
-        GetSession()->SendPacket(&data);
+        GetSession()->SendPacket(std::move(packet));
 }
 
 /*********************************************************/
@@ -12978,9 +12967,9 @@ uint32 Player::CountFreeInventorySlots() const
 
 void Player::SendPetTameFailure(PetTameFailureReason reason) const
 {
-    WorldPacket data(SMSG_PET_TAME_FAILURE, 1);
-    data << uint8(reason);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Pet::PetTameFailure>();
+    packet->reason = reason;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::AddQuest(Quest const* pQuest, Object* questGiver)
@@ -16170,7 +16159,6 @@ void Player::SendSavedInstances() const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     bool hasBeenSaved = false;
-    WorldPacket data;
 
     std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     for (const auto& itr : m_boundInstances)
@@ -16183,9 +16171,11 @@ void Player::SendSavedInstances() const
     }
 
     //Send opcode 811. true or false means, whether you have current raid instances
-    data.Initialize(SMSG_UPDATE_INSTANCE_OWNERSHIP, 4);
-    data << uint32(hasBeenSaved);
-    GetSession()->SendPacket(&data);
+    {
+        auto packet = std::make_unique<WorldPackets::Misc::UpdateInstanceOwnership>();
+        packet->hasBeenSaved = hasBeenSaved;
+        GetSession()->SendPacket(std::move(packet));
+    }
 
     if (!hasBeenSaved)
         return;
@@ -16194,9 +16184,9 @@ void Player::SendSavedInstances() const
     {
         if (itr.second.perm)
         {
-            data.Initialize(SMSG_UPDATE_LAST_INSTANCE, 4);
-            data << uint32(itr.second.state->GetMapId());
-            GetSession()->SendPacket(&data);
+            auto packet = std::make_unique<WorldPackets::Misc::UpdateLastInstance>();
+            packet->mapId = itr.second.state->GetMapId();
+            GetSession()->SendPacket(std::move(packet));
         }
     }
 #endif
@@ -17214,8 +17204,7 @@ void Player::SendAttackSwingBadFacingAttack() const
 
 void Player::SendAutoRepeatCancel() const
 {
-    WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, 0);
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::make_unique<WorldPackets::Misc::CancelAutoRepeat>());
 }
 
 void Player::SendFeignDeathResisted() const
@@ -17226,19 +17215,19 @@ void Player::SendFeignDeathResisted() const
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience) const
 {
-    WorldPacket data(SMSG_EXPLORATION_EXPERIENCE, 8);
-    data << uint32(Area);
-    data << uint32(Experience);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::ExplorationExperience>();
+    packet->areaId = Area;
+    packet->experience = Experience;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendFactionAtWar(uint32 reputationId, bool apply) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    WorldPacket data(SMSG_SET_FACTION_ATWAR, 4 + 1);
-    data << uint32(reputationId);
-    data << uint8(apply ? FACTION_FLAG_AT_WAR : 0);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::FactionAtWarChange>();
+    packet->reputationId = reputationId;
+    packet->flags = apply ? FACTION_FLAG_AT_WAR : 0;
+    GetSession()->SendPacket(std::move(packet));
 #endif
 }
 
@@ -17329,23 +17318,23 @@ void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
     }
 }
 
-void Player::SendResetInstanceSuccess(uint32 MapId) const
+void Player::SendResetInstanceSuccess(uint32 mapId) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    WorldPacket data(SMSG_INSTANCE_RESET, 4);
-    data << uint32(MapId);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::InstanceReset>();
+    packet->mapId = mapId;
+    GetSession()->SendPacket(std::move(packet));
 #endif
 }
 
-void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId) const
+void Player::SendResetInstanceFailed(uint32 reason, uint32 mapId) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     // reason: see enum InstanceResetFailReason
-    WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 8);
-    data << uint32(reason);
-    data << uint32(MapId);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::InstanceResetFailed>();
+    packet->reason = reason;
+    packet->mapId = mapId;
+    GetSession()->SendPacket(std::move(packet));
 #endif
 }
 
@@ -17955,9 +17944,10 @@ void Player::DropModCharge(SpellModifier* mod, Spell* spell)
 // send Proficiency
 void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask) const
 {
-    WorldPacket data(SMSG_SET_PROFICIENCY, 1 + 4);
-    data << uint8(itemClass) << uint32(itemSubclassMask);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Skill::SetProficiency>();
+    packet->itemClass = itemClass;
+    packet->itemSubclassMask = itemSubclassMask;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 exceptPetitionId)
@@ -18006,9 +17996,9 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const
     // not let cheating with start flight in time of logout process || if casting not finished || while in combat || if not use Spell's with EffectSendTaxi
     if (GetSession()->IsLogingOut() || IsInCombat())
     {
-        WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-        data << uint32(ERR_TAXIPLAYERBUSY);
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+        packet->replyCode = ERR_TAXIPLAYERBUSY;
+        GetSession()->SendPacket(std::move(packet));
         return false;
     }
 
@@ -18030,26 +18020,26 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const
         // not let cheating with start flight mounted
         if (IsMounted())
         {
-            WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-            data << uint32(ERR_TAXIPLAYERALREADYMOUNTED);
-            GetSession()->SendPacket(&data);
+            auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+            packet->replyCode = ERR_TAXIPLAYERALREADYMOUNTED;
+            GetSession()->SendPacket(std::move(packet));
             return false;
         }
 
         if (IsInDisallowedMountForm())
         {
-            WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-            data << uint32(ERR_TAXIPLAYERSHAPESHIFTED);
-            GetSession()->SendPacket(&data);
+            auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+            packet->replyCode = ERR_TAXIPLAYERSHAPESHIFTED;
+            GetSession()->SendPacket(std::move(packet));
             return false;
         }
 
         // not let cheating with start flight in time of logout process || if casting not finished || while in combat || if not use Spell's with EffectSendTaxi
         if (IsNonMeleeSpellCasted(false))
         {
-            WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-            data << uint32(ERR_TAXIPLAYERBUSY);
-            GetSession()->SendPacket(&data);
+            auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+            packet->replyCode = ERR_TAXIPLAYERBUSY;
+            GetSession()->SendPacket(std::move(packet));
             return false;
         }
     }
@@ -18080,9 +18070,9 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const
     TaxiNodesEntry const* node = sObjectMgr.GetTaxiNodeEntry(sourceNode);
     if (!node)
     {
-        WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-        data << uint32(ERR_TAXINOSUCHPATH);
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+        packet->replyCode = ERR_TAXINOSUCHPATH;
+        GetSession()->SendPacket(std::move(packet));
         return false;
     }
 
@@ -18095,18 +18085,18 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const
                 (node->z - GetPositionZ()) * (node->z - GetPositionZ()) >
                 (2 * INTERACTION_DISTANCE) * (2 * INTERACTION_DISTANCE) * (2 * INTERACTION_DISTANCE))
         {
-            WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-            data << uint32(ERR_TAXITOOFARAWAY);
-            GetSession()->SendPacket(&data);
+            auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+            packet->replyCode = ERR_TAXITOOFARAWAY;
+            GetSession()->SendPacket(std::move(packet));
             return false;
         }
     }
     // node must have pos if taxi master case (npc != nullptr)
     else if (npc)
     {
-        WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-        data << uint32(ERR_TAXIUNSPECIFIEDSERVERERROR);
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+        packet->replyCode = ERR_TAXIUNSPECIFIEDSERVERERROR;
+        GetSession()->SendPacket(std::move(packet));
         return false;
     }
 
@@ -18209,9 +18199,9 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const
     // in spell case allow display id to be 0
     if ((mount_display_id == 0 && spellid == 0) || sourcePath == 0)
     {
-        WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-        data << uint32(ERR_TAXIUNSPECIFIEDSERVERERROR);
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+        packet->replyCode = ERR_TAXIUNSPECIFIEDSERVERERROR;
+        GetSession()->SendPacket(std::move(packet));
         m_taxi.ClearTaxiDestinations();
         return false;
     }
@@ -18220,9 +18210,9 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const
 
     if (money < totalCost)
     {
-        WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-        data << uint32(ERR_TAXINOTENOUGHMONEY);
-        GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+        packet->replyCode = ERR_TAXINOTENOUGHMONEY;
+        GetSession()->SendPacket(std::move(packet));
         m_taxi.ClearTaxiDestinations();
         return false;
     }
@@ -18250,9 +18240,9 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature const
     if (GetPet())
         RemovePet(PET_SAVE_REAGENTS);
 
-    WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
-    data << uint32(ERR_TAXIOK);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Taxi::ActivateTaxiReply>();
+    packet->replyCode = ERR_TAXIOK;
+    GetSession()->SendPacket(std::move(packet));
 
     GetSession()->SendDoFlight(mount_display_id, sourcePath);
 
@@ -18423,16 +18413,16 @@ UnitDismountResult Player::Unmount(bool from_aura)
 
 void Player::SendMountResult(UnitMountResult result) const
 {
-    WorldPacket data(SMSG_MOUNTRESULT, 4);
-    data << uint32(result);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::MountResult>();
+    packet->result = result;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendDismountResult(UnitDismountResult result) const
 {
-    WorldPacket data(SMSG_DISMOUNTRESULT, 4);
-    data << uint32(result);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::DismountResult>();
+    packet->result = result;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::InitDataForForm(bool reapplyMods)
@@ -18636,12 +18626,12 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
     uint32 new_count = pCreature->UpdateVendorItemCurrentCount(crItem, totalCount);
 
-    WorldPacket data(SMSG_BUY_ITEM, 8 + 4 + 4 + 4);
-    data << pCreature->GetObjectGuid();
-    data << uint32(vendorslot + 1);                 // numbered from 1 at client
-    data << uint32(crItem->maxcount > 0 ? new_count : 0xFFFFFFFF);
-    data << uint32(count);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Item::BuyItemResponse>();
+    packet->vendorGuid = pCreature->GetObjectGuid();
+    packet->vendorSlot = vendorslot + 1;
+    packet->newCount = crItem->maxcount > 0 ? new_count : 0xFFFFFFFF;
+    packet->purchaseCount = count;
+    GetSession()->SendPacket(std::move(packet));
 
     SendNewItem(pItem, totalCount, true, false, false);
 
@@ -18650,10 +18640,10 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
 void Player::SendRaidGroupOnlyError(uint32 timer, RaidGroupError error) const
 {
-    WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
-    data << uint32(timer);
-    data << uint32(error);            // error used only when timer = 0
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::RaidGroupOnly>();
+    packet->timer = timer;
+    packet->errorCode = error;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::UpdateHomebindTime(uint32 time)
@@ -19232,16 +19222,19 @@ void Player::SetGroup(Group* group, int8 subgroup)
 
 void Player::SendInitialPacketsBeforeAddToMap()
 {
-    WorldPacket data(SMSG_SET_REST_START, 4);
-    data << uint32(0);                                      // rest state time
-    GetSession()->SendPacket(&data);
+    {
+        auto packet = std::make_unique<WorldPackets::Misc::SetRestStart>();
+        packet->restStateTime = 0;
+        GetSession()->SendPacket(std::move(packet));
+    }
 
     // Homebind
-    data.Initialize(SMSG_BINDPOINTUPDATE, 5 * 4);
-    data << m_homebind.x << m_homebind.y << m_homebind.z;
-    data << (uint32) m_homebind.mapId;
-    data << (uint32) m_homebindAreaId;
-    GetSession()->SendPacket(&data);
+    {
+        auto packet = std::make_unique<WorldPackets::Misc::BindpointUpdate>();
+        packet->location = m_homebind;
+        packet->areaId = m_homebindAreaId;
+        GetSession()->SendPacket(std::move(packet));
+    }
 
     // SMSG_SET_PROFICIENCY
     // SMSG_UPDATE_AURA_DURATION
@@ -19259,10 +19252,12 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     // SMSG_SET_AURA_SINGLE
 
-    data.Initialize(SMSG_LOGIN_SETTIMESPEED, 4 + 4);
-    data << uint32(secsToTimeBitFields(sWorld.GetGameTime()));
-    data << (float)0.01666667f;                             // game speed
-    GetSession()->SendPacket(&data);
+    {
+        auto packet = std::make_unique<WorldPackets::Misc::LoginSetTimeSpeed>();
+        packet->gameTime = sWorld.GetGameTime();
+        packet->gameSpeedMinutesPerSecond = (1.0f/60.0f); // 1 minute per 60 seconds
+        GetSession()->SendPacket(std::move(packet));
+    }
 
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
     if (IsTaxiFlying())
@@ -19326,9 +19321,9 @@ void Player::SendUpdateToOutOfRangeGroupMembers()
 
 void Player::SendTransferAborted(uint8 reason) const
 {
-    WorldPacket data(SMSG_TRANSFER_ABORTED, 1);
-    data << uint8(reason);                                  // transfer abort reason
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::TransferAborted>();
+    packet->reason = reason;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendInstanceResetWarning(uint32 mapId, uint32 resetTime) const
@@ -19344,11 +19339,11 @@ void Player::SendInstanceResetWarning(uint32 mapId, uint32 resetTime) const
         type = RAID_INSTANCE_WARNING_MIN;
     else
         type = RAID_INSTANCE_WARNING_MIN_SOON;
-    WorldPacket data(SMSG_RAID_INSTANCE_MESSAGE, 4 + 4 + 4);
-    data << uint32(type);
-    data << uint32(mapId);
-    data << uint32(resetTime);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::RaidInstanceMessage>();
+    packet->messageType = type;
+    packet->mapId = mapId;
+    packet->resetTime = resetTime;
+    GetSession()->SendPacket(std::move(packet));
 #endif
 }
 
@@ -19757,11 +19752,11 @@ void Player::SendSummonRequest(ObjectGuid summonerGuid, uint32 mapId, uint32 zon
 {
     SetSummonPoint(mapId, x, y, z);
 
-    WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
-    data << summonerGuid;                    // summoner guid
-    data << uint32(zoneId);                  // summoner zone
-    data << uint32(MAX_PLAYER_SUMMON_DELAY * IN_MILLISECONDS); // auto decline after msecs
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::SummonRequest>();
+    packet->summonerGuid = summonerGuid;
+    packet->zoneId = zoneId;
+    packet->autoDeclineDelay = MAX_PLAYER_SUMMON_DELAY * IN_MILLISECONDS;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SummonIfPossible(bool agree)
@@ -20243,11 +20238,11 @@ void Player::ResurrectUsingRequestData()
 void Player::SetClientControl(Unit const* target, uint8 allowMove) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
-    data << target->GetPackGUID();
-    data << uint8(allowMove);
-    GetCheatData()->LogMovementPacket(false, data);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::ClientControlUpdate>();
+    packet->moverGuid = target->GetObjectGuid();
+    packet->allowMove = allowMove;
+    GetCheatData()->LogMovementPacket(*packet);
+    GetSession()->SendPacket(std::move(packet));
 #endif
 }
 
@@ -20374,9 +20369,9 @@ void Player::SendCorpseReclaimDelay(bool load) const
         delay = GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP);
 
     //! corpse reclaim delay 30 * 1000ms or longer at often deaths
-    WorldPacket data(SMSG_CORPSE_RECLAIM_DELAY, 4);
-    data << uint32(delay * IN_MILLISECONDS);
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::CorpseReclaimDelay>();
+    packet->delayMs = delay * IN_MILLISECONDS;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 Player* Player::GetNextRandomRaidMember(float radius)
@@ -21268,9 +21263,9 @@ void Player::SetRestType(RestType restType, uint32 areaTriggerId /*= 0*/)
 
 void Player::SendDuelCountdown(uint32 counter) const
 {
-    WorldPacket data(SMSG_DUEL_COUNTDOWN, 4);
-    data << uint32(counter);                                // seconds
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Duel::DuelCountdown>();
+    packet->countdown = counter;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::RemoveAI()
@@ -21834,9 +21829,9 @@ void Player::SendDestroyGroupMembers(bool includingSelf)
         {
             if (!includingSelf && itr.guid == GetObjectGuid())
                 continue;
-            WorldPacket data(SMSG_DESTROY_OBJECT, 8);
-            data << itr.guid;
-            GetSession()->SendPacket(&data);
+            auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+            packet->objectGuid = itr.guid;
+            GetSession()->SendPacket(std::move(packet));
             m_visibleGUIDs.erase(itr.guid);
 
             if (Player* player = GetMap()->GetPlayer(itr.guid))

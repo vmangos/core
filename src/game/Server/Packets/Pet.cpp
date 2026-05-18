@@ -82,3 +82,44 @@ void WorldPackets::Pet::PetNameQueryResponse::AppendBodyTo(ByteBuffer& buffer) c
     buffer << name;
     buffer << nameTimestamp;
 }
+
+void WorldPackets::Pet::PetBroken::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+void WorldPackets::Pet::PetActionFeedback::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << message;
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+void WorldPackets::Pet::PetActionSound::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << petGuid;
+    buffer << soundId;
+}
+#endif
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+void WorldPackets::Pet::PetMode::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << petGuid;
+    buffer << reactState;
+    buffer << commandState;
+    buffer << flag1;
+    buffer << enabledFlags;
+}
+#endif
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+void WorldPackets::Pet::PetUnlearnConfirm::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << petGuid;
+    buffer << cost;
+}
+#endif
+
+void WorldPackets::Pet::PetTameFailure::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << reason;
+}

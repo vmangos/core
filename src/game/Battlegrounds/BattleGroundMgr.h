@@ -19,15 +19,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BATTLEGROUNDMGR_H
-#define __BATTLEGROUNDMGR_H
+#ifndef MANGOS_BATTLEGROUNDMGR_H
+#define MANGOS_BATTLEGROUNDMGR_H
 
 #include <memory>
 #include <vector>
 
 #include "Common.h"
 #include "Packet.h"
-#include "Policies/Singleton.h"
 #include "BattleGround.h"
 
 typedef std::map<uint32, BattleGround*> BattleGroundSet;
@@ -325,4 +324,6 @@ class BattleGroundMgr
 };
 
 #define sBattleGroundMgr MaNGOS::Singleton<BattleGroundMgr>::Instance()
-#endif
+
+#endif // MANGOS_BATTLEGROUNDMGR_H
+

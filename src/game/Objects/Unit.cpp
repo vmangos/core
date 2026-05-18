@@ -999,9 +999,13 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
     // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
     if (allowLoot && pPlayerTap && pPlayerTap != pVictim)
     {
-        WorldPacket data(SMSG_PARTYKILLLOG, (8 + 8));   //send event PARTY_KILL
-        data << pPlayerTap->GetObjectGuid();            //player with killing blow
-        data << pVictim->GetObjectGuid();              //victim
+        WorldPackets::Combat::PartyKillLog partyKillLogPacket;
+        partyKillLogPacket.killerGuid = pPlayerTap->GetObjectGuid(); // player with killing blow
+        partyKillLogPacket.victimGuid = pVictim->GetObjectGuid();
+
+        // TODO Use broadcaster which does the binary conversion automatically, also dont forget to add pPlayerTap
+        WorldPacket data(partyKillLogPacket.GetOpcode(), (8 + 8));    // send event PARTY_KILL
+        partyKillLogPacket.AppendBodyTo(data);
 
         Player* looter = pPlayerTap;
         if (pGroupTap)
@@ -1174,8 +1178,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "We are dead, loosing 10 percents durability");
             pPlayerVictim->DurabilityLossAll(0.10f, false);
             // durability lost message
-            WorldPacket data(SMSG_DURABILITY_DAMAGE_DEATH, 0);
-            pPlayerVictim->GetSession()->SendPacket(&data);
+            pPlayerVictim->GetSession()->SendPacket(std::make_unique<WorldPackets::Misc::DurabilityDamageDeath>());
         }
     }
     else                                                // creature died
@@ -1766,10 +1769,10 @@ void Unit::TriggerDamageShields(Unit* pVictim)
 
 void Unit::HandleEmoteCommand(uint32 emoteId)
 {
-    WorldPacket data(SMSG_EMOTE, 4 + 8);
-    data << uint32(emoteId);
-    data << GetObjectGuid();
-    SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Misc::EmoteNotify>();
+    packet->emoteId = emoteId;
+    packet->unitGuid = GetObjectGuid();
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
 void Unit::HandleEmoteState(uint32 emoteId)
@@ -2474,11 +2477,10 @@ float Unit::CalculateDamage(WeaponAttackType attType, bool normalized, uint8 ind
 
 void Unit::SendMeleeAttackStart(Unit const* pVictim) const
 {
-    WorldPacket data(SMSG_ATTACKSTART, 8 + 8);
-    data << GetObjectGuid();
-    data << pVictim->GetObjectGuid();
-
-    SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Combat::AttackStart>();
+    packet->attackerGuid = GetObjectGuid();
+    packet->victimGuid = pVictim->GetObjectGuid();
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
 void Unit::SendMeleeAttackStop(Unit const* pVictim) const
@@ -2486,16 +2488,11 @@ void Unit::SendMeleeAttackStop(Unit const* pVictim) const
     if (!pVictim)
         return;
 
-    WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));         // guess size, max is 9+9+4
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << GetPackGUID();
-    data << pVictim->GetPackGUID();                          // can be 0x00...
-#else
-    data << GetGUID();
-    data << pVictim->GetGUID();                          // can be 0x00...
-#endif
-    data << uint32(0);                                      // can be 0x1
-    SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Combat::AttackStop>();
+    packet->attackerGuid = GetObjectGuid();
+    packet->victimGuid = pVictim->GetObjectGuid();
+    packet->isDead = pVictim->IsDead();
+    SendObjectMessageToSet(std::move(packet), true);
     DETAIL_FILTER_LOG(LOG_FILTER_COMBAT, "%s %u stopped attacking %s %u", (IsPlayer() ? "player" : "creature"), GetGUIDLow(), (pVictim->IsPlayer() ? "player" : "creature"), pVictim->GetGUIDLow());
 }
 
@@ -5397,19 +5394,18 @@ bool Unit::UnsummonOldPetBeforeNewSummon(uint32 newPetEntry, bool canUnsummon)
 
 void Unit::SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const
 {
-    WorldPacket data(SMSG_ENVIRONMENTALDAMAGELOG, (8 + 1 + 4 + 4 + 4));
-    data << GetObjectGuid();
-    data << uint8(type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
-    data << uint32(damage);
+    auto packet = std::make_unique<WorldPackets::Combat::EnvironmentalDamageLog>();
+    packet->victimGuid = GetObjectGuid();
+    packet->damageType = (type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
+    packet->damage = damage;
 
     // World of Warcraft Client Patch 1.7.0 (2005-09-13)
     // - Absorbed and resisted environmental damage is now shown in the combat log.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-    data << uint32(absorb);
-    data << int32(resist);
+    packet->absorb = absorb;
+    packet->resist = resist;
 #endif
-
-    SendMessageToSet(&data, true);
+    SendMessageToSet(std::move(packet), true);
 }
 
 uint32 Unit::GetSpellRank(SpellEntry const* spellInfo) const
@@ -9277,9 +9273,9 @@ void Unit::SendPetActionFeedback(uint8 msg)
 {
     if (Player* pOwner = GetOwnerPlayer())
     {
-        WorldPacket data(SMSG_PET_ACTION_FEEDBACK, 1);
-        data << uint8(msg);
-        pOwner->GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Pet::PetActionFeedback>();
+        packet->message = msg;
+        pOwner->GetSession()->SendPacket(std::move(packet));
     }
 }
 
@@ -9288,10 +9284,10 @@ void Unit::SendPetTalk(uint32 pettalk)
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     if (Player* pOwner = GetOwnerPlayer())
     {
-        WorldPacket data(SMSG_PET_ACTION_SOUND, 8 + 4);
-        data << GetObjectGuid();
-        data << uint32(pettalk);
-        pOwner->GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Pet::PetActionSound>();
+        packet->petGuid = GetObjectGuid();
+        packet->soundId = pettalk;
+        pOwner->GetSession()->SendPacket(std::move(packet));
     }
 #endif
 }
@@ -9300,10 +9296,10 @@ void Unit::SendPetAIReaction()
 {
     if (Player* pOwner = GetOwnerPlayer())
     {
-        WorldPacket data(SMSG_AI_REACTION, 8 + 4);
-        data << GetObjectGuid();
-        data << uint32(AI_REACTION_HOSTILE);
-        pOwner->GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Misc::AiReaction>();
+        packet->unitGuid = GetObjectGuid();
+        packet->reaction = static_cast<uint32>(AI_REACTION_HOSTILE);
+        pOwner->GetSession()->SendPacket(std::move(packet));
     }
 }
 
@@ -9545,9 +9541,9 @@ void Unit::SetStandState(uint8 state)
 
     if (IsPlayer())
     {
-        WorldPacket data(SMSG_STANDSTATE_UPDATE, 1);
-        data << (uint8)state;
-        ((Player*)this)->GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Misc::StandStateUpdate>();
+        packet->standState = static_cast<uint8>(state);
+        ((Player*)this)->GetSession()->SendPacket(std::move(packet));
         ((Player*)this)->ClearScheduledStandUp();
     }
 }

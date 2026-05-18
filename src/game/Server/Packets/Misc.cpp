@@ -434,3 +434,249 @@ void WorldPackets::Misc::InvalidatePlayer::AppendBodyTo(ByteBuffer& buffer) cons
     buffer << playerGuid;
 }
 #endif
+
+void WorldPackets::Misc::DestroyObject::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << objectGuid;
+}
+
+void WorldPackets::Misc::AiReaction::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << unitGuid;
+    buffer << reaction;
+}
+
+void WorldPackets::Misc::ZoneUnderAttack::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << areaId;
+}
+
+void WorldPackets::Misc::PlayObjectSound::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << soundId;
+    buffer << sourceGuid;
+}
+
+void WorldPackets::Misc::GameObjectSpawnAnim::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << gameObjectGuid;
+}
+
+void WorldPackets::Misc::GameObjectDespawnAnim::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << gameObjectGuid;
+}
+
+void WorldPackets::Misc::StopMirrorTimer::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << timerType;
+}
+
+void WorldPackets::Misc::PauseMirrorTimer::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << timerType;
+    buffer << paused;
+}
+
+void WorldPackets::Misc::TransferPending::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << mapId;
+    if (transportInfo)
+    {
+        buffer << transportInfo->transportEntry;
+        buffer << transportInfo->oldMapId;
+    }
+}
+
+void WorldPackets::Misc::NewWorld::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << location.mapId;
+    buffer << location.x;
+    buffer << location.y;
+    buffer << location.z;
+    buffer << location.o;
+}
+
+void WorldPackets::Misc::LogXpGain::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << victimGuid;
+    buffer << totalXp;
+    buffer << xpType;
+    if (xpType == 0) // kill xp
+    {
+        buffer << baseXp;
+        buffer << groupBonus;
+    }
+}
+
+void WorldPackets::Misc::LevelUpInfo::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << level;
+    buffer << healthGain;
+    for (uint32 i = 0; i < 5; ++i)
+        buffer << powerGains[i];
+    for (uint32 i = 0; i < 5; ++i)
+        buffer << statGains[i];
+}
+
+void WorldPackets::Misc::TriggerCinematic::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << cinematicSequenceId;
+}
+
+void WorldPackets::Misc::PlayerSkinned::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << freeRepop;
+}
+
+void WorldPackets::Misc::DurabilityDamageDeath::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+void WorldPackets::Misc::CancelAutoRepeat::AppendBodyTo(ByteBuffer& /*buffer*/) const
+{
+}
+
+void WorldPackets::Misc::ExplorationExperience::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << areaId;
+    buffer << experience;
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+void WorldPackets::Misc::FactionAtWarChange::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << reputationId;
+    buffer << flags;
+}
+#endif
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+void WorldPackets::Misc::InstanceReset::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << mapId;
+}
+
+void WorldPackets::Misc::InstanceResetFailed::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << reason;
+    buffer << mapId;
+}
+#endif
+
+void WorldPackets::Misc::MountResult::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << result;
+}
+
+void WorldPackets::Misc::DismountResult::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << result;
+}
+
+void WorldPackets::Misc::RaidGroupOnly::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << timer;
+    buffer << errorCode;
+}
+
+void WorldPackets::Misc::SetRestStart::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << restStateTime;
+}
+
+void WorldPackets::Misc::BindpointUpdate::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << location.x;
+    buffer << location.y;
+    buffer << location.z;
+    buffer << location.mapId;
+    buffer << areaId;
+}
+
+void WorldPackets::Misc::PlayerBound::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << binderGuid;
+    buffer << areaId;
+}
+
+static uint32 secsToTimeBitFields(time_t secs)
+{
+    tm localTime;
+#if PLATFORM == PLATFORM_WINDOWS
+    localtime_s(&localTime, &secs);
+#else
+    localtime_r(&secs, &localTime);
+#endif
+    return (localTime.tm_year - 100) << 24 | localTime.tm_mon  << 20 | (localTime.tm_mday - 1) << 14 | localTime.tm_wday << 11 | localTime.tm_hour << 6 | localTime.tm_min;
+}
+
+void WorldPackets::Misc::LoginSetTimeSpeed::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << secsToTimeBitFields(gameTime);
+    buffer << gameSpeedMinutesPerSecond;
+}
+
+void WorldPackets::Misc::TransferAborted::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << reason;
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+void WorldPackets::Misc::RaidInstanceMessage::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << messageType;
+    buffer << mapId;
+    buffer << resetTime;
+}
+#endif
+
+void WorldPackets::Misc::SummonRequest::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << summonerGuid;
+    buffer << zoneId;
+    buffer << autoDeclineDelay;
+}
+
+void WorldPackets::Misc::CorpseReclaimDelay::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << delayMs;
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+void WorldPackets::Misc::UpdateInstanceOwnership::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << hasBeenSaved;
+}
+
+void WorldPackets::Misc::UpdateLastInstance::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << mapId;
+}
+#endif
+
+void WorldPackets::Misc::EmoteNotify::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << emoteId;
+    buffer << unitGuid;
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+void WorldPackets::Misc::ClientControlUpdate::AppendBodyTo(ByteBuffer& buffer) const
+{
+    // This packet uses the packed guid format; the old sender serialized target->GetPackGUID() directly.
+    buffer << moverGuid.WriteAsPacked();
+    buffer << allowMove;
+}
+#endif
+
+void WorldPackets::Misc::UpdateWorldState::AppendBodyTo(ByteBuffer& buffer) const
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    buffer << field;
+    buffer << value;
+#else
+    buffer << static_cast<uint16>(field);
+    buffer << static_cast<uint16>(value);
+#endif
+}

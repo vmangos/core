@@ -2489,12 +2489,10 @@ bool Creature::IsVisibleInGridForPlayer(Player const* pl) const
 
 void Creature::SendAIReaction(AiReaction reactionType)
 {
-    WorldPacket data(SMSG_AI_REACTION, 12);
-
-    data << GetObjectGuid();
-    data << uint32(reactionType);
-
-    ((WorldObject*)this)->SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Misc::AiReaction>();
+    packet->unitGuid = GetObjectGuid();
+    packet->reaction = static_cast<uint32>(reactionType);
+    SendObjectMessageToSet(std::move(packet), true);
 
     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "WORLD: Sent SMSG_AI_REACTION, type %u.", reactionType);
 }
@@ -2898,9 +2896,9 @@ void Creature::SendZoneUnderAttackMessage(Player const* attacker)
         areaAttackedCooldowns[areaId] = now;
         Team enemyTeam = attacker->GetTeam();
 
-        WorldPacket data(SMSG_ZONE_UNDER_ATTACK, 4);
-        data << uint32(areaId);
-        GetMap()->SendToPlayers(&data, (enemyTeam == ALLIANCE ? HORDE : ALLIANCE));
+        auto packet = std::make_unique<WorldPackets::Misc::ZoneUnderAttack>();
+        packet->areaId = areaId;
+        GetMap()->SendToPlayers(std::move(packet), (enemyTeam == ALLIANCE ? HORDE : ALLIANCE));
     }
 }
 
@@ -3539,10 +3537,10 @@ void Creature::SendAreaSpiritHealerQueryOpcode(Player* pl)
     uint32 next_resurrect = 0;
     if (Spell* pcurSpell = GetCurrentSpell(CURRENT_CHANNELED_SPELL))
         next_resurrect = pcurSpell->GetCastedTime();
-    WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 8 + 4);
-    data << ObjectGuid(GetObjectGuid());
-    data << uint32(next_resurrect);
-    pl->SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Npc::AreaSpiritHealerTime>();
+    packet->spiritHealerGuid = GetObjectGuid();
+    packet->nextResurrectTime = next_resurrect;
+    pl->GetSession()->SendPacket(std::move(packet));
 #endif
 }
 

@@ -1,4 +1,5 @@
 #include "Item.h"
+#include "ItemDefines.h"
 
 void WorldPackets::Item::QueryItem::ReadFromWorldPacket(WorldPacket& recv_data)
 {
@@ -166,4 +167,60 @@ void WorldPackets::Item::ItemEnchantTimeUpdate::AppendBodyTo(ByteBuffer& buffer)
 #endif
 }
 
+void WorldPackets::Item::OpenContainer::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << itemGuid;
+}
 
+void WorldPackets::Item::BuyFailed::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << vendorGuid;
+    buffer << itemEntry;
+    buffer << reason;
+}
+
+void WorldPackets::Item::SellItemResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << vendorGuid;
+    buffer << itemGuid;
+    buffer << reason;
+}
+
+void WorldPackets::Item::BuyItemResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << vendorGuid;
+    buffer << vendorSlot;
+    buffer << newCount;
+    buffer << purchaseCount;
+}
+
+void WorldPackets::Item::InventoryChangeFailure::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << reason;
+    if (reason != static_cast<uint8>(EQUIP_ERR_OK))
+    {
+        if (reason == static_cast<uint8>(EQUIP_ERR_CANT_EQUIP_LEVEL_I))
+            buffer << requiredLevel;
+        buffer << item1Guid;
+        buffer << item2Guid;
+        buffer << bagSlot;
+    }
+}
+
+void WorldPackets::Item::ItemPushResult::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << playerGuid;
+    buffer << received;
+    buffer << created;
+    buffer << showInChat;
+    buffer << bagSlot;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    buffer << itemSlot;
+#endif
+    buffer << itemEntry;
+    buffer << suffixFactor;
+    buffer << randomPropertyId;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    buffer << count;
+#endif
+}

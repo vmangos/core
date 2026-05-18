@@ -26,7 +26,7 @@
 #include "Progression.h"
 #include "ByteBuffer.h"
 
-enum WorldStates 
+enum WorldStates
 {
     // Ahn'Qiraj War Effort
 
@@ -159,16 +159,6 @@ enum WorldStates
 inline void WriteInitialWorldStatePair(ByteBuffer& data, uint32 state, int32 value)
 #else
 inline void WriteInitialWorldStatePair(ByteBuffer& data, uint16 state, int16 value)
-#endif
-{
-    data << state;
-    data << value;
-}
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-inline void WriteUpdateWorldStatePair(ByteBuffer& data, uint32 state, int32 value)
-#else
-inline void WriteUpdateWorldStatePair(ByteBuffer& data, uint16 state, int16 value)
 #endif
 {
     data << state;

@@ -42,3 +42,26 @@ void WorldPackets::Combat::AttackStop::AppendBodyTo(ByteBuffer& buffer) const
     buffer << victimGuid.WriteAsPackedClientBuildAware();
     buffer << static_cast<uint32>(isDead); // is 32bit on client
 }
+
+void WorldPackets::Combat::AttackStart::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << attackerGuid;
+    buffer << victimGuid;
+}
+
+void WorldPackets::Combat::PartyKillLog::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << killerGuid;
+    buffer << victimGuid;
+}
+
+void WorldPackets::Combat::EnvironmentalDamageLog::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << victimGuid;
+    buffer << damageType;
+    buffer << damage;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    buffer << absorb;
+    buffer << resist;
+#endif
+}

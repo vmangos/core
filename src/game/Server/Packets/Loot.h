@@ -134,6 +134,25 @@ namespace WorldPackets { namespace Loot
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class LootReleaseResponse final : public ServerPacket
+    {
+    public:
+        ObjectGuid lootedGuid; // guid of the looted target
+        uint8 result = 1;      // always 1
+
+        explicit LootReleaseResponse() : ServerPacket(SMSG_LOOT_RELEASE_RESPONSE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class LootRemoved final : public ServerPacket
+    {
+    public:
+        uint8 lootSlot = 0; // slot of the removed loot item
+
+        explicit LootRemoved() : ServerPacket(SMSG_LOOT_REMOVED) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Loot
 
 #endif // MANGOS_PACKETS_LOOT_H
