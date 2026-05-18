@@ -19231,10 +19231,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // Homebind
     {
         auto packet = std::make_unique<WorldPackets::Misc::BindpointUpdate>();
-        packet->x = m_homebind.x;
-        packet->y = m_homebind.y;
-        packet->z = m_homebind.z;
-        packet->mapId = m_homebind.mapId;
+        packet->location = m_homebind;
         packet->areaId = m_homebindAreaId;
         GetSession()->SendPacket(std::move(packet));
     }

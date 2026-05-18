@@ -5818,10 +5818,7 @@ void Spell::EffectBind(SpellEffectIndex effIdx)
 
     // binding
     auto packet = std::make_unique<WorldPackets::Misc::BindpointUpdate>();
-    packet->x = loc.x;
-    packet->y = loc.y;
-    packet->z = loc.z;
-    packet->mapId = loc.mapId;
+    packet->location = loc;
     packet->areaId = areaId;
     player->GetSession()->SendPacket(std::move(packet));
 

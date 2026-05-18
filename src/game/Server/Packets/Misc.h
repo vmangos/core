@@ -903,10 +903,7 @@ namespace WorldPackets { namespace Misc
     class BindpointUpdate final : public ServerPacket
     {
     public:
-        float x = 0.0f;
-        float y = 0.0f;
-        float z = 0.0f;
-        uint32 mapId = 0;
+        WorldLocation location;
         uint32 areaId = 0;
 
         explicit BindpointUpdate() : ServerPacket(SMSG_BINDPOINTUPDATE) {}

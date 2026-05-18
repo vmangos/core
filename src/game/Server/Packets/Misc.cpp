@@ -587,10 +587,10 @@ void WorldPackets::Misc::SetRestStart::AppendBodyTo(ByteBuffer& buffer) const
 
 void WorldPackets::Misc::BindpointUpdate::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << x;
-    buffer << y;
-    buffer << z;
-    buffer << mapId;
+    buffer << location.x;
+    buffer << location.y;
+    buffer << location.z;
+    buffer << location.mapId;
     buffer << areaId;
 }
 
