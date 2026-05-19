@@ -738,6 +738,7 @@ namespace WorldPackets { namespace Misc
 
     struct TransferPendingTransportInfo
     {
+        TransferPendingTransportInfo(uint32 transport, uint32 map) : transportEntry(transport), oldMapId(map) {};
         uint32 transportEntry = 0;
         uint32 oldMapId = 0;
     };

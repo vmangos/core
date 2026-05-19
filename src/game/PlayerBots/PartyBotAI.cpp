@@ -541,37 +541,6 @@ void PartyBotAI::AddToPlayerGroup()
     }
 }
 
-void PartyBotAI::LootCorpsesForMe()
-{
-    for (auto itr = m_corpsesToLoot.begin(); itr != m_corpsesToLoot.end();)
-    {
-        Creature* pCreature = me->GetMap()->GetCreature(*itr);
-        if (!pCreature || pCreature->loot.isLooted() || pCreature->loot.roundRobinPlayer != me->GetGUID() || !me->IsInVisibleList_Unsafe(pCreature))
-        {
-            itr = m_corpsesToLoot.erase(itr);
-            continue;
-        }
-
-        if (pCreature->IsWithinDistInMap(me, me->GetMaxLootDistance(pCreature), true, SizeFactor::None))
-        {
-            {
-                auto data = std::make_unique<WorldPackets::Loot::LootUnit>();
-                data->guid = *itr;
-                me->GetSession()->QueuePacket(std::move(data));
-            }
-
-            {
-                auto data = std::make_unique<WorldPackets::Loot::LootRelease>();
-                data->guid = *itr;
-                me->GetSession()->QueuePacket(std::move(data));
-            }
-        }
-
-        // only remove once we are confirmed to no longer be the round robin player above
-        ++itr;
-    }
-}
-
 void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
 {
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
@@ -604,7 +573,18 @@ void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
                     pGroup->GetLootMethod() == NEED_BEFORE_GREED)
                 {
                     ObjectGuid victimGuid = *(((uint64*)(*packet).contents()) + 1);
-                    m_corpsesToLoot.insert(victimGuid);
+                    if (Creature* pCreature = me->GetMap()->GetCreature(victimGuid))
+                    {
+                        pCreature->m_Events.AddLambdaEventAtOffset([pCreature, guid = me->GetGUID()]()
+                        {
+                            if (pCreature->loot.roundRobinPlayer == guid)
+                            {
+                                // unassign loot from bot so real players can loot
+                                pCreature->loot.roundRobinPlayer = 0;
+                                pCreature->ForceValuesUpdateAtIndex(UNIT_DYNAMIC_FLAGS);
+                            }
+                        }, 1);
+                    }
                 }
             }
             
@@ -823,8 +803,6 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                 me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
             return;
         }
-
-        LootCorpsesForMe();
 
         // Teleport to leader if too far away.
         if (!me->IsWithinDistInMap(pLeader, 100.0f) && !IsInDuel())
