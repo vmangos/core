@@ -125,7 +125,6 @@ extern int main(int argc, char** argv)
         break;
 #endif
     }
-
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [realm-daemon]", _FULLVERSION);
     if (!Crypto::InitializeCryptoAndPrintVersion())
     {

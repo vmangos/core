@@ -211,7 +211,7 @@ private:
 template<typename T>
 std::unique_ptr<ThreadPool> & operator<<(std::unique_ptr<ThreadPool> & tp, T &&f)
 {
-    (*tp) << std::forward<T>(f);
+    tp->operator<<(std::forward<T>(f));
     return tp;
 }
 

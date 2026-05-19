@@ -167,25 +167,6 @@ namespace WorldPackets { namespace Battleground
     };
 #endif
 
-    class UpdateWorldState final : public ServerPacket
-    {
-    public:
-        uint32 field = 0;  // world state field id
-        uint32 value = 0;  // new value
-
-        explicit UpdateWorldState() : ServerPacket(SMSG_UPDATE_WORLD_STATE) {}
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
-
-    class PlaySound final : public ServerPacket
-    {
-    public:
-        uint32 soundId = 0; // id of the sound entry to play
-
-        explicit PlaySound() : ServerPacket(SMSG_PLAY_SOUND) {}
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     class BattlegroundPlayerJoined final : public ServerPacket
     {

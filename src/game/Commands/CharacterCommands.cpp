@@ -3549,7 +3549,7 @@ bool ChatHandler::HandleAddItemSetCommand(char* args)
             }
             else
             {
-                pl->SendEquipError(msg, nullptr, nullptr, itr.second.ItemId);
+                pl->SendEquipError(msg, nullptr, nullptr, 0, itr.second.ItemId);
                 PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itr.second.ItemId, 1);
             }
         }

@@ -139,7 +139,7 @@ struct WarlockLifeTapScript : SpellScript
 
             dmg = spell->m_casterUnit->SpellDamageBonusDone(spell->m_casterUnit, spell->m_spellInfo, effIdx, dmg > 0 ? dmg : 0, SPELL_DIRECT_DAMAGE);
             dmg = spell->m_casterUnit->SpellDamageBonusTaken(spell->m_casterUnit, spell->m_spellInfo, effIdx, dmg, SPELL_DIRECT_DAMAGE);
-            int32 idmg = dither(dmg);
+            int32 idmg = rand_dither(dmg);
 
             if (int32(spell->m_casterUnit->GetHealth()) > idmg)
             {
@@ -338,7 +338,7 @@ struct WarlockCreateHealthstoneScript : SpellScript
         InventoryResult msg = pCaster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
         if (msg != EQUIP_ERR_OK)
         {
-            pCaster->SendEquipError(msg, nullptr, nullptr, itemId);
+            pCaster->SendEquipError(msg, nullptr, nullptr, 0, itemId);
             return SPELL_FAILED_DONT_REPORT;
         }
 

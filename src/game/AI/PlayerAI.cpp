@@ -24,6 +24,7 @@
 #include "MotionMaster.h"
 #include "Spell.h"
 #include "Map.h"
+#include "Utilities/Random.h"
 
 void PlayerAI::Remove()
 {
@@ -75,7 +76,7 @@ bool PlayerAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTrig
         }
         return true;
     }
-    
+
     return false;
 }
 
@@ -155,9 +156,9 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
         else
             ++it;
     }
-    
+
     me->GetMotionMaster()->Clear();
-    
+
     if (caster && caster->ToCreature())
         if (Unit* victim = caster->ToCreature()->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             UpdateTarget(victim);

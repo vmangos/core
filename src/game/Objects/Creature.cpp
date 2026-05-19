@@ -53,6 +53,61 @@
 #include "CreatureLinkingMgr.h"
 #include "TemporarySummon.h"
 #include "GuardMgr.h"
+#include "Utilities/Random.h"
+
+uint32 CreatureData::GetRandomRespawnTime() const
+{
+    return urand(spawntimesecsmin, spawntimesecsmax);
+}
+
+uint32 CreatureData::ChooseCreatureId() const
+{
+    uint32 creatureId = 0;
+    uint32 creatureIdCount = 0;
+    for (; creatureIdCount < MAX_CREATURE_IDS_PER_SPAWN && creature_id[creatureIdCount]; ++creatureIdCount);
+
+    if (creatureIdCount)
+        creatureId = creature_id[urand(0, creatureIdCount - 1)];
+
+    if (!creatureId)
+        creatureId = 1;
+
+    return creatureId;
+}
+
+bool CreatureData::HasCreatureId(uint32 id) const
+{
+    return std::find(creature_id.begin(), creature_id.end(), id) != creature_id.end();
+}
+
+uint32 CreatureData::GetCreatureIdCount() const
+{
+    uint32 creatureIdCount = 0;
+    while (creatureIdCount < MAX_CREATURE_IDS_PER_SPAWN && creature_id[creatureIdCount])
+        ++creatureIdCount;
+    return creatureIdCount;
+}
+
+EquipmentEntry const* EquipmentTemplate::ChooseEquipmentEntry() const
+{
+    if (!totalProbability)
+        return nullptr;
+
+    uint32 const roll = urand(0, totalProbability - 1);
+    uint32 sum = 0;
+
+    for (auto const& itr : equipment)
+    {
+        if (!itr.probability)
+            continue;
+
+        sum += itr.probability;
+        if (roll < sum)
+            return &itr;
+    }
+
+    return nullptr;
+}
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
@@ -2434,12 +2489,10 @@ bool Creature::IsVisibleInGridForPlayer(Player const* pl) const
 
 void Creature::SendAIReaction(AiReaction reactionType)
 {
-    WorldPacket data(SMSG_AI_REACTION, 12);
-
-    data << GetObjectGuid();
-    data << uint32(reactionType);
-
-    ((WorldObject*)this)->SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Misc::AiReaction>();
+    packet->unitGuid = GetObjectGuid();
+    packet->reaction = static_cast<uint32>(reactionType);
+    SendObjectMessageToSet(std::move(packet), true);
 
     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "WORLD: Sent SMSG_AI_REACTION, type %u.", reactionType);
 }
@@ -2843,9 +2896,9 @@ void Creature::SendZoneUnderAttackMessage(Player const* attacker)
         areaAttackedCooldowns[areaId] = now;
         Team enemyTeam = attacker->GetTeam();
 
-        WorldPacket data(SMSG_ZONE_UNDER_ATTACK, 4);
-        data << uint32(areaId);
-        GetMap()->SendToPlayers(&data, (enemyTeam == ALLIANCE ? HORDE : ALLIANCE));
+        auto packet = std::make_unique<WorldPackets::Misc::ZoneUnderAttack>();
+        packet->areaId = areaId;
+        GetMap()->SendToPlayers(std::move(packet), (enemyTeam == ALLIANCE ? HORDE : ALLIANCE));
     }
 }
 
@@ -3204,29 +3257,29 @@ void Creature::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
     SpellCaster::LockOutSpells(schoolMask, duration);
 }
 
-void Creature::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* /*itemProto*/, bool /*permanent*/, uint32 forcedDuration)
+void Creature::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* /*itemProto*/, bool /*permanent*/, uint32 forcedDuration)
 {
-    uint32 recTime = forcedDuration ? forcedDuration : spellEntry.RecoveryTime;
-    if (recTime || spellEntry.CategoryRecoveryTime)
+    uint32 recTime = forcedDuration ? forcedDuration : spellEntry->RecoveryTime;
+    if (recTime || spellEntry->CategoryRecoveryTime)
     {
-        uint32 categoryRecTime = spellEntry.CategoryRecoveryTime;
+        uint32 categoryRecTime = spellEntry->CategoryRecoveryTime;
         if (Player* modOwner = GetSpellModOwner())
         {
             if (recTime)
-                modOwner->ApplySpellMod(spellEntry.Id, SPELLMOD_COOLDOWN, recTime);
-            else if (spellEntry.Category && categoryRecTime)
-                modOwner->ApplySpellMod(spellEntry.Id, SPELLMOD_COOLDOWN, categoryRecTime);
+                modOwner->ApplySpellMod(spellEntry->Id, SPELLMOD_COOLDOWN, recTime);
+            else if (spellEntry->Category && categoryRecTime)
+                modOwner->ApplySpellMod(spellEntry->Id, SPELLMOD_COOLDOWN, categoryRecTime);
         }
 
-        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, spellEntry.Category, categoryRecTime);
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTime, spellEntry->Category, categoryRecTime);
     }
-    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry.GetCastTime(this))
+    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry->GetCastTime(this))
     {
         // Forced cooldown on using instant spells during mind control to prevent abuse.
         recTime = 10 * IN_MILLISECONDS;
-        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, 0, 0);
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTime, 0, 0);
         if (Player const* player = ::ToPlayer(GetCharmer()))
-            player->SendSpellCooldown(spellEntry.Id, recTime, GetObjectGuid());
+            player->SendSpellCooldown(spellEntry->Id, recTime, GetObjectGuid());
     }
 }
 
@@ -3484,10 +3537,10 @@ void Creature::SendAreaSpiritHealerQueryOpcode(Player* pl)
     uint32 next_resurrect = 0;
     if (Spell* pcurSpell = GetCurrentSpell(CURRENT_CHANNELED_SPELL))
         next_resurrect = pcurSpell->GetCastedTime();
-    WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 8 + 4);
-    data << ObjectGuid(GetObjectGuid());
-    data << uint32(next_resurrect);
-    pl->SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Npc::AreaSpiritHealerTime>();
+    packet->spiritHealerGuid = GetObjectGuid();
+    packet->nextResurrectTime = next_resurrect;
+    pl->GetSession()->SendPacket(std::move(packet));
 #endif
 }
 
@@ -4210,7 +4263,7 @@ void Creature::StartCooldownForSummoner()
                 if (Unit* pOwner = GetOwner())
                 {
                     AddCreatureState(CSTATE_IMPOSED_COOLDOWN);
-                    pOwner->AddCooldown(*pSpellInfo); // Remove infinity cooldown
+                    pOwner->AddCooldown(pSpellInfo); // Remove infinity cooldown
                 }
             }
         }

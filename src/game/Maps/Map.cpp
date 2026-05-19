@@ -1834,6 +1834,14 @@ uint32 Map::GetPlayersCountExceptGMs() const
     return count;
 }
 
+void Map::SendToPlayers(std::unique_ptr<ServerPacket const> packet, Team team) const
+{
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket data(packet->GetOpcode());
+    packet->AppendBodyTo(data);
+    SendToPlayers(&data, team);
+}
+
 void Map::SendToPlayers(WorldPacket const* data, Team team) const
 {
     for (const auto& itr : m_mapRefManager)
@@ -2888,8 +2896,8 @@ void Map::SendObjectUpdates()
     if (threads < m_objUpdatesThreads)
         m_objUpdatesThreads = threads;
 #endif
-    if (threads > objectsCount)
-        threads = objectsCount;
+    if (static_cast<uint32>(threads) > objectsCount)
+        threads = static_cast<int>(objectsCount);
     int step = objectsCount / threads;
 
     ASSERT(step > 0);

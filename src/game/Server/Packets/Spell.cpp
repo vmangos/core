@@ -37,9 +37,30 @@ void WorldPackets::Spell::CancelChanneling::ReadFromWorldPacket(WorldPacket& rec
     recv_data >> spellId;
 }
 
-void WorldPackets::Spell::CastResultSimpleFailure::AppendBodyTo(ByteBuffer& buffer) const
+void WorldPackets::Spell::CastResult::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << spellEntry->Id;
-    buffer << static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
-    buffer << reason;
+    buffer << result;
+    if (result == static_cast<uint8>(SPELL_RESULT_STATUS_FAIL))
+    {
+        buffer << failureReason;
+        if (failureArg1 || failureArg2)
+            buffer << failureArg1.value_or(0);
+        if (failureArg2)
+            buffer << *failureArg2;
+    }
 }
+
+void WorldPackets::Spell::PlaySpellVisual::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid;
+    buffer << spellVisualId;
+}
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+void WorldPackets::Spell::PlaySpellImpact::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << targetGuid;
+    buffer << spellVisualId;
+}
+#endif

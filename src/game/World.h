@@ -37,6 +37,7 @@
 #include "LFGQueue.h"
 #include "LockedQueue.h"
 
+#include <atomic>
 #include <map>
 #include <set>
 #include <list>
@@ -45,6 +46,7 @@
 #include <unordered_map>
 #include <thread>
 
+class ServerPacket;
 class Object;
 class WorldSession;
 class Player;
@@ -668,7 +670,7 @@ class ThreadPool;
 class World
 {
     public:
-        static volatile uint32 m_worldLoopCounter;
+        static std::atomic<uint32> m_worldLoopCounter;
 
         World();
         ~World();
@@ -756,9 +758,10 @@ class World
         void SendGMTicketText(char const* text);
         void SendGMText(int32 string_id, ...);
         void SendGlobalText(char const* text, WorldSession* self);
-        void SendGlobalMessage(WorldPacket* packet, WorldSession* self = 0, uint32 team = 0);
-        void SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, uint32 team = 0);
-        void SendZoneText(uint32 zone, char const* text, WorldSession* self = 0, uint32 team = 0);
+        void SendGlobalMessage(WorldPacket const* binaryPacket, WorldSession const* self = nullptr, uint32 team = 0);
+        void SendGlobalMessage(std::unique_ptr<ServerPacket const> packet, WorldSession const* self = nullptr, uint32 team = 0);
+        void SendZoneMessage(uint32 zone, WorldPacket const* binaryPacket, WorldSession const* self = nullptr, uint32 team = 0);
+        void SendZoneText(uint32 zone, char const* text, WorldSession const* self = nullptr, uint32 team = 0);
         void SendServerMessage(ServerMessageType type, char const* text = "", Player* player = nullptr);
 
         // Are we in the middle of a shutdown?

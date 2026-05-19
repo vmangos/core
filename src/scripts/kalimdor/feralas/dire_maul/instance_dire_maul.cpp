@@ -1100,7 +1100,7 @@ struct GordokBruteAI : public ScriptedAI
                 break;
             case 2:
                 char eMessage[100];
-                sprintf(eMessage, "Raaar!!! Me smash %s!",pWho->GetName());
+                snprintf(eMessage, sizeof(eMessage), "Raaar!!! Me smash %s!",pWho->GetName());
                 m_creature->MonsterSay(eMessage);
                 break;
             default:
@@ -1136,7 +1136,7 @@ struct GordokBruteAI : public ScriptedAI
         if (m_creature->GetHealthPercent() < 30.0f && !m_bEnrage)
         {
             char eMessage[100];
-            sprintf(eMessage, "Gordok Brute puts his club away and begins swinging wildly!");
+            snprintf(eMessage, sizeof(eMessage), "Gordok Brute puts his club away and begins swinging wildly!");
             m_creature->LoadEquipment(0, true);
             m_creature->MonsterTextEmote(eMessage, nullptr, false);
 

@@ -37,6 +37,7 @@
 #include "Database/DatabaseEnv.h"
 #include "Progression.h"
 #include "Errors.h"
+#include "Utilities/Random.h"
 
 #include <string>
 #include <vector>
@@ -765,7 +766,7 @@ void WardenWin::LoadScriptedScans()
 
             strings.emplace_back(hypervisor.Driver);
 
-            auto const seed = static_cast<uint32>(rand32());
+            uint32 const seed = randu32();
 
             scan << opcode << seed;
 
@@ -807,7 +808,7 @@ void WardenWin::LoadScriptedScans()
     // builder
     [](Warden const* warden, std::vector<std::string>& strings, ByteBuffer& scan)
     {
-        auto const seed = static_cast<uint32>(rand32());
+        uint32 const seed = randu32();
 
         scan << static_cast<uint8>(warden->GetModule()->opcodes[FIND_CODE_BY_HASH] ^ warden->GetXor())
              << seed;

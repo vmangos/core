@@ -165,7 +165,7 @@ void AddSC_elwynn_forest();
 void AddSC_hillsbrad_foothills();
 void AddSC_hinterlands();
 void AddSC_loch_modan();
-void AddSC_redridge_mountains();
+//void AddSC_redridge_mountains();
 void AddSC_searing_gorge();
 void AddSC_silverpine_forest();
 void AddSC_stormwind_city();
@@ -409,7 +409,7 @@ void AddScripts()
     AddSC_hillsbrad_foothills();
     AddSC_hinterlands();
     AddSC_loch_modan();
-    AddSC_redridge_mountains();
+    //AddSC_redridge_mountains();
     AddSC_searing_gorge();
     AddSC_silverpine_forest();
     AddSC_stormwind_city();

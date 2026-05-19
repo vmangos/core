@@ -42,6 +42,7 @@
 #include "WardenWin.hpp"
 #include "WardenMac.hpp"
 #include "WardenScanMgr.hpp"
+#include "Utilities/Random.h"
 
 #include <zlib.h>
 #include <algorithm>

@@ -211,16 +211,13 @@ bool MoveSplineInitArgs::_checkPathBounds() const
 {
     if (!(flags & MoveSplineFlag::Mask_CatmullRom) && path.size() > 2)
     {
-        enum
-        {
-            MAX_OFFSET = (1 << 11) / 2,
-        };
+        float constexpr maxOffset = static_cast<float>((1 << 11) / 2);
         Vector3 middle = (path.front() + path.back()) / 2;
         Vector3 offset;
         for (uint32 i = 1; i < path.size() - 1; ++i)
         {
             offset = path[i] - middle;
-            if (fabs(offset.x) >= MAX_OFFSET || fabs(offset.y) >= MAX_OFFSET || fabs(offset.z) >= MAX_OFFSET)
+            if (fabs(offset.x) >= maxOffset || fabs(offset.y) >= maxOffset || fabs(offset.z) >= maxOffset)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MoveSplineInitArgs::_checkPathBounds check failed");
                 return false;

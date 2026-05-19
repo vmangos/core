@@ -4,8 +4,8 @@
 #include "ProgressBar.h"
 #include "Policies/SingletonImp.h"
 #include "Util.h"
-
 #include "AutoBroadCastMgr.h"
+#include "Utilities/Random.h"
 
 INSTANTIATE_SINGLETON_1(AutoBroadCastMgr);
 

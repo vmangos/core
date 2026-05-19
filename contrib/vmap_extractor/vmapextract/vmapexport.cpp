@@ -143,7 +143,7 @@ bool ExtractSingleWmo(std::string& fname)
     char* plain_name = GetPlainName(&fname[0]);
     FixNameCase(plain_name, strlen(plain_name));
     FixNameSpaces(plain_name, strlen(plain_name));
-    sprintf(szLocalFile, "%s/%s", szWorkDirWmo, plain_name);
+    snprintf(szLocalFile, sizeof(szLocalFile), "%s/%s", szWorkDirWmo, plain_name);
 
     if (FileExists(szLocalFile))
         return true;
@@ -191,10 +191,10 @@ bool ExtractSingleWmo(std::string& fname)
         for (uint32 i = 0; i < froot.nGroups; ++i)
         {
             char temp[1024];
-            strcpy(temp, fname.c_str());
+            snprintf(temp, sizeof(temp), "%s", fname.c_str());
             temp[fname.length() - 4] = 0;
             char groupFileName[1024];
-            sprintf(groupFileName, "%s_%03d.wmo", temp, i);
+            snprintf(groupFileName, sizeof(groupFileName), "%s_%03d.wmo", temp, i);
             //printf("Trying to open groupfile %s\n",groupFileName);
 
             string s = groupFileName;
@@ -247,8 +247,8 @@ bool ParsMapFiles()
     StringSet failedPaths;
     for (unsigned int i = 0; i < map_count; ++i)
     {
-        sprintf(id, "%03u", map_ids[i].id);
-        sprintf(fn, "World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
+        snprintf(id, sizeof(id), "%03u", map_ids[i].id);
+        snprintf(fn, sizeof(fn), "World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
         WDTFile WDT(fn, map_ids[i].name);
         if (WDT.init(id, map_ids[i].id))
         {
@@ -283,9 +283,9 @@ bool ParsMapFiles()
 void getGamePath()
 {
 #ifdef _WIN32
-    strcpy(input_path, "Data\\");
+    snprintf(input_path, sizeof(input_path), "Data\\");
 #else
-    strcpy(input_path, "Data/");
+    snprintf(input_path, sizeof(input_path), "Data/");
 #endif
 }
 
@@ -298,11 +298,11 @@ bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
     {
         if (i != 1)
         {
-            sprintf(path, "%s-%d.MPQ", scanmatch, i);
+            snprintf(path, sizeof(path), "%s-%d.MPQ", scanmatch, i);
         }
         else
         {
-            sprintf(path, "%s.MPQ", scanmatch);
+            snprintf(path, sizeof(path), "%s.MPQ", scanmatch);
         }
         if (FILE* h = fopen(path, "rb"))
         {
@@ -326,21 +326,21 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
 
     // open expansion and common files
     printf("Opening data files from data directory.\n");
-    sprintf(path, "%sterrain.MPQ", input_path);
+    snprintf(path, sizeof(path), "%sterrain.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%smodel.MPQ", input_path);
+    snprintf(path, sizeof(path), "%smodel.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%stexture.MPQ", input_path);
+    snprintf(path, sizeof(path), "%stexture.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%swmo.MPQ", input_path);
+    snprintf(path, sizeof(path), "%swmo.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%sbase.MPQ", input_path);
+    snprintf(path, sizeof(path), "%sbase.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%smisc.MPQ", input_path);
+    snprintf(path, sizeof(path), "%smisc.MPQ", input_path);
 
     // now, scan for the patch levels in the core dir
     printf("Scanning patch levels from data directory.\n");
-    sprintf(path, "%spatch", input_path);
+    snprintf(path, sizeof(path), "%spatch", input_path);
     if (!scan_patches(path, pArchiveNames))
         return (false);
 
@@ -366,9 +366,12 @@ bool processArgv(int argc, char** argv)
             if ((i + 1) < argc)
             {
                 hasInputPathParam = true;
-                strcpy(input_path, argv[i + 1]);
+                snprintf(input_path, sizeof(input_path), "%s", argv[i + 1]);
                 if (input_path[strlen(input_path) - 1] != '\\' && input_path[strlen(input_path) - 1] != '/')
-                    strcat(input_path, "/");
+                {
+                    size_t inputPathLen = strlen(input_path);
+                    snprintf(input_path + inputPathLen, sizeof(input_path) - inputPathLen, "/");
+                }
                 ++i;
             }
             else
@@ -482,7 +485,7 @@ int main(int argc, char** argv)
         for (unsigned int x = 0; x < map_count; ++x)
         {
             map_ids[x].id = dbc->getRecord(x).getUInt(0);
-            strcpy(map_ids[x].name, dbc->getRecord(x).getString(1));
+            snprintf(map_ids[x].name, sizeof(map_ids[x].name), "%s", dbc->getRecord(x).getString(1));
             printf("Map - %s\n", map_ids[x].name);
         }
 

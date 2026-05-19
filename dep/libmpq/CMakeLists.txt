@@ -61,3 +61,9 @@ else()
 endif()
 
 SET_TARGET_PROPERTIES (libmpq PROPERTIES FOLDER "3rd Party")
+
+# Disable build warnings for external dependencies
+target_compile_options(libmpq PRIVATE
+  $<$<CXX_COMPILER_ID:MSVC>:/w>
+  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-w>
+)

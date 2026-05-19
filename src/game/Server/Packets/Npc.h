@@ -206,6 +206,29 @@ namespace WorldPackets { namespace Npc
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
+    class AreaSpiritHealerTime final : public ServerPacket
+    {
+    public:
+        ObjectGuid spiritHealerGuid;
+        uint32 nextResurrectTime = 0; // time in ms until next resurrection
+
+        explicit AreaSpiritHealerTime() : ServerPacket(SMSG_AREA_SPIRIT_HEALER_TIME) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+#endif
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    class BinderConfirm final : public ServerPacket
+    {
+    public:
+        ObjectGuid binderGuid; // guid of the innkeeper or binder
+
+        explicit BinderConfirm() : ServerPacket(SMSG_BINDER_CONFIRM) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+#endif
+
 }} // namespace WorldPackets::Npc
 
 #endif // MANGOS_PACKETS_NPC_H

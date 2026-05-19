@@ -32,6 +32,7 @@
 #include "CreatureAI.h"
 #include "Util.h"
 #include "CharacterDatabaseCache.h"
+#include "Utilities/Random.h"
 
 //numbers represent minutes * 100 while happy (you get 100 loyalty points per min while happy)
 uint32 const Pet::LevelUpLoyalty[6] =
@@ -643,7 +644,7 @@ void Pet::SetDeathState(DeathState s)                       // overwrite virtual
             ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        
+
         // Despawn after 1 hour for hunter pets.
         if (GetPetType() == HUNTER_PET)
             m_corpseDecayTimer = 3600000;
@@ -817,8 +818,7 @@ void Pet::ModifyLoyalty(int32 addvalue)
             m_loyaltyPoints = 0;
             if (Player* owner = GetOwnerPlayer())
             {
-                WorldPacket data(SMSG_PET_BROKEN, 0);
-                owner->GetSession()->SendPacket(&data);
+                owner->GetSession()->SendPacket(std::make_unique<WorldPackets::Pet::PetBroken>());
 
                 //run away
                 Unsummon(PET_SAVE_AS_DELETED, owner);
@@ -1144,7 +1144,7 @@ void Pet::DelayedUnsummon(uint32 timeMSToDespawn, PetSaveMode mode)
     if (timeMSToDespawn)
     {
         UnsummonPetDelayEvent *pEvent = new UnsummonPetDelayEvent(*this, mode);
-        
+
         m_Events.AddEvent(pEvent, m_Events.CalculateTime(timeMSToDespawn));
         return;
     }
@@ -1264,7 +1264,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 #else
         SetInt32Value(UNIT_MOD_CAST_SPEED, creature->GetInt32Value(UNIT_MOD_CAST_SPEED));
 #endif
-        
+
         SetLoyaltyLevel(REBELLIOUS);
     }
     return true;
@@ -1557,7 +1557,7 @@ void Pet::_LoadSpellCooldowns()
             cdData << uint32(uint32(spellRecTime.count()));
             ++cdCount;
 
-            m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellId, uint32(spellRecTime.count()));
+            m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, uint32(spellRecTime.count()));
 #ifdef _DEBUG
             uint32 spellCDDuration = std::chrono::duration_cast<std::chrono::seconds>(spellRecTime).count();
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Adding spell cooldown to %s, SpellID(%u), recDuration(%us).", GetGuidStr().c_str(), spellId, spellCDDuration);
@@ -2367,12 +2367,11 @@ void Pet::SetEnabled(bool on)
     if (!owner || !GetCharmInfo())
         return;
 
-    WorldPacket data(SMSG_PET_MODE, 12);
-    data << GetObjectGuid();
-    data << uint8(GetCharmInfo()->GetReactState());
-    data << uint8(GetCharmInfo()->GetCommandState());
-    data << uint8(0);
-    data << uint8(m_enabled ? 0x0 : 0x8);
-    owner->GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Pet::PetMode>();
+    packet->petGuid = GetObjectGuid();
+    packet->reactState = GetCharmInfo()->GetReactState();
+    packet->commandState = GetCharmInfo()->GetCommandState();
+    packet->enabledFlags = m_enabled ? 0x0 : 0x8;
+    owner->GetSession()->SendPacket(std::move(packet));
 #endif
 }

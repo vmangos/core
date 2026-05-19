@@ -259,7 +259,7 @@ bool find_rev()
         if(!local && !origins[i][0]) continue;
 
         if(local) snprintf(cmd, MAX_CMD, "git log HEAD --pretty=\"format:%%s\"");
-        else sprintf(cmd, "git log %s/%s --pretty=\"format:%%s\"", origins[i], remote_branch);
+        else snprintf(cmd, MAX_CMD, "git log %s/%s --pretty=\"format:%%s\"", origins[i], remote_branch);
         if( (cmd_pipe = popen( cmd, "r" )) == NULL )
             continue;
 
@@ -318,7 +318,7 @@ bool write_rev_nr()
 {
     printf("+ writing revision_nr.h\n");
     char rev_str[256];
-    sprintf(rev_str, "%04d", rev);
+    snprintf(rev_str, sizeof(rev_str), "%04d", rev);
     std::string header = generateNrHeader(rev_str);
 
     char prefixed_file[MAX_PATH];

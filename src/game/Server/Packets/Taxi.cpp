@@ -43,4 +43,8 @@ void WorldPackets::Taxi::NewTaxiPath::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
 }
 
+void WorldPackets::Taxi::ActivateTaxiReply::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << replyCode;
+}
 

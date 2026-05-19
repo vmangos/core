@@ -26,6 +26,8 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Chat.h"
+#include "Utilities/Random.h"
+
 #include <random>
 
 enum PartyBotSpells
@@ -208,7 +210,7 @@ bool PartyBotAI::DrinkAndEat()
         if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(PB_SPELL_FOOD))
         {
             me->CastSpell(me, pSpellEntry, true);
-            me->RemoveSpellCooldown(*pSpellEntry);
+            me->RemoveSpellCooldown(pSpellEntry);
         }
         return true;
     }
@@ -224,7 +226,7 @@ bool PartyBotAI::DrinkAndEat()
         if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(PB_SPELL_DRINK))
         {
             me->CastSpell(me, pSpellEntry, true);
-            me->RemoveSpellCooldown(*pSpellEntry);
+            me->RemoveSpellCooldown(pSpellEntry);
         }
         return true;
     }
@@ -338,14 +340,7 @@ bool PartyBotAI::AttackStart(Unit* pVictim)
 
     if (me->Attack(pVictim, true))
     {
-        if (GetRole() == ROLE_RANGE_DPS &&
-            me->GetPowerPercent(POWER_MANA) > 10.0f &&
-            me->GetCombatDistance(pVictim) > 8.0f)
-            me->SetCasterChaseDistance(25.0f);
-        else if (me->HasDistanceCasterMovement())
-            me->SetCasterChaseDistance(0.0f);
-
-        me->GetMotionMaster()->MoveChase(pVictim, 1.0f, GetRole() == ROLE_MELEE_DPS ? 3.0f : 0.0f);
+        BeginChasing(pVictim);
         return true;
     }
 
@@ -546,6 +541,37 @@ void PartyBotAI::AddToPlayerGroup()
     }
 }
 
+void PartyBotAI::LootCorpsesForMe()
+{
+    for (auto itr = m_corpsesToLoot.begin(); itr != m_corpsesToLoot.end();)
+    {
+        Creature* pCreature = me->GetMap()->GetCreature(*itr);
+        if (!pCreature || pCreature->loot.isLooted() || pCreature->loot.roundRobinPlayer != me->GetGUID() || !me->IsInVisibleList_Unsafe(pCreature))
+        {
+            itr = m_corpsesToLoot.erase(itr);
+            continue;
+        }
+
+        if (pCreature->IsWithinDistInMap(me, me->GetMaxLootDistance(pCreature), true, SizeFactor::None))
+        {
+            {
+                auto data = std::make_unique<WorldPackets::Loot::LootUnit>();
+                data->guid = *itr;
+                me->GetSession()->QueuePacket(std::move(data));
+            }
+
+            {
+                auto data = std::make_unique<WorldPackets::Loot::LootRelease>();
+                data->guid = *itr;
+                me->GetSession()->QueuePacket(std::move(data));
+            }
+        }
+
+        // only remove once we are confirmed to no longer be the round robin player above
+        ++itr;
+    }
+}
+
 void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
 {
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
@@ -564,6 +590,24 @@ void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
             auto data = std::make_unique<WorldPackets::Duel::DuelAccepted>();
             data->playerGuid = me->GetObjectGuid();
             me->GetSession()->QueuePacket(std::move(data));
+            return;
+        }
+        case SMSG_PARTYKILLLOG:
+        {
+            if (!me)
+                return;
+
+            if (Group const* pGroup = me->GetGroup())
+            {
+                if (pGroup->GetLootMethod() == ROUND_ROBIN ||
+                    pGroup->GetLootMethod() == GROUP_LOOT ||
+                    pGroup->GetLootMethod() == NEED_BEFORE_GREED)
+                {
+                    ObjectGuid victimGuid = *(((uint64*)(*packet).contents()) + 1);
+                    m_corpsesToLoot.insert(victimGuid);
+                }
+            }
+            
             return;
         }
     }
@@ -780,6 +824,8 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             return;
         }
 
+        LootCorpsesForMe();
+
         // Teleport to leader if too far away.
         if (!me->IsWithinDistInMap(pLeader, 100.0f) && !IsInDuel())
         {
@@ -788,7 +834,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             me->GetMotionMaster()->Clear(false, true);
             me->GetMotionMaster()->MoveIdle();
             char name[128] = {};
-            strcpy(name, pLeader->GetName());
+            snprintf(name, sizeof(name), "%s", pLeader->GetName());
             ChatHandler(me).HandleGonameCommand(name);
             return;
         }
@@ -877,7 +923,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             {
                 case IDLE_MOTION_TYPE:
                 case FOLLOW_MOTION_TYPE:
-                    me->GetMotionMaster()->MoveChase(pVictim);
+                    BeginChasing(pVictim);
                     break;
             }
         }
@@ -1344,7 +1390,7 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
                 && !me->CanReachWithMeleeAutoAttack(pVictim))
             {
-                me->GetMotionMaster()->MoveChase(pVictim);
+                BeginChasing(pVictim);
             }
         }
     }
@@ -1523,7 +1569,7 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
-            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+            BeginChasing(pVictim);
         }
 
         if (m_spells.hunter.pVolley &&
@@ -1744,7 +1790,7 @@ void PartyBotAI::UpdateInCombatAI_Mage()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
-            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+            BeginChasing(pVictim);
         }
         else if (GetAttackersInRangeCount(10.0f))
         {
@@ -2116,7 +2162,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
-            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+            BeginChasing(pVictim);
         }
 
         if (me->GetShapeshiftForm() == FORM_NONE)
@@ -2314,7 +2360,7 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
-            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+            BeginChasing(pVictim);
         }
 
         if (m_spells.warlock.pHowlofTerror &&
@@ -2607,7 +2653,7 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && !me->CanReachWithMeleeAutoAttack(pVictim))
         {
-            me->GetMotionMaster()->MoveChase(pVictim);
+            BeginChasing(pVictim);
         }
 
         if (me->GetPower(POWER_RAGE) > 300)
@@ -2754,7 +2800,7 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
                 (me->GetHealthPercent() < 10.0f))
             {
                 if (m_spells.rogue.pPreparation &&
-                    !me->IsSpellReady(m_spells.rogue.pVanish->Id) &&
+                    !me->IsSpellReady(m_spells.rogue.pVanish) &&
                     CanTryToCastSpell(me, m_spells.rogue.pPreparation))
                 {
                     if (DoCastSpell(me, m_spells.rogue.pPreparation) == SPELL_CAST_OK)
@@ -3089,7 +3135,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
                 && !me->CanReachWithMeleeAutoAttack(pVictim))
             {
-                me->GetMotionMaster()->MoveChase(pVictim);
+                BeginChasing(pVictim);
             }
 
             if (me->HasAuraType(SPELL_AURA_MOD_STEALTH))
@@ -3193,7 +3239,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
                 && !me->CanReachWithMeleeAutoAttack(pVictim))
             {
-                me->GetMotionMaster()->MoveChase(pVictim);
+                BeginChasing(pVictim);
             }
 
             if (m_spells.druid.pFeralCharge &&
@@ -3257,7 +3303,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE &&
                 me->GetDistance(pVictim) > 30.0f)
             {
-                me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+                BeginChasing(pVictim);
             }
             else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
                     (pVictim->GetVictim() == me) &&

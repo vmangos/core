@@ -37,8 +37,11 @@
 #include "Timer.h"
 #include "Camera.h"
 #include "Cell.h"
+
+#include <memory>
 #include <string>
 
+class ServerPacket;
 class WorldPacket;
 class UpdateData;
 class Corpse;
@@ -659,6 +662,7 @@ class WorldObject : public Object
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
         // Send to players
+        virtual void SendMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self) const;
         virtual void SendMessageToSet(WorldPacket* data, bool self) const;
 
         // Send to players who have object at client
@@ -666,6 +670,7 @@ class WorldObject : public Object
         template<class DelivererType>
         void SendObjectMessageToSetImpl(WorldPacket* data, bool self, WorldObject const* except = nullptr) const;
     public:
+        void SendObjectMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except = nullptr) const;
         void SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except = nullptr) const;
         void SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except = nullptr);
 
@@ -697,7 +702,7 @@ class WorldObject : public Object
 
         void SendObjectSpawnAnim() const;
         void SendObjectDeSpawnAnim() const;
-        
+
         bool IsControlledByPlayer() const;
         bool IsLikePlayer() const;
         virtual Player* GetAffectingPlayer() const { return nullptr; }

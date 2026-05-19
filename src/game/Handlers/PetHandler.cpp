@@ -28,9 +28,9 @@
 #include "Opcodes.h"
 #include "Spell.h"
 #include "CreatureAI.h"
-#include "Util.h"
 #include "Pet.h"
 #include "Group.h"
+#include "Utilities/Random.h"
 
 void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
 {
@@ -113,7 +113,7 @@ void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
                 return;
             }
 
-            if (!pCharmedUnit->IsSpellReady(*spellInfo))
+            if (!pCharmedUnit->IsSpellReady(spellInfo))
             {
                 pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_NOT_READY);
                 return;
@@ -496,7 +496,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPackets::Pet::PetCastSpell cons
         return;
     }
 
-    if (!pet->IsSpellReady(*spellInfo))
+    if (!pet->IsSpellReady(spellInfo))
         return;
 
     // do not cast not learned spells
@@ -530,7 +530,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPackets::Pet::PetCastSpell cons
     else
     {
         pet->SendPetCastFail(packet.spellId, result);
-        if (pet->IsSpellReady(packet.spellId))
+        if (pet->IsSpellReady(spellInfo))
             GetPlayer()->SendClearCooldown(packet.spellId, pet);
 
         spell->finish(false);

@@ -296,11 +296,11 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     return action;
 }
 
-void MovementAnticheat::AddMessageToPacketLog(std::string message)
+void MovementAnticheat::AddMessageToPacketLog(std::string const& message)
 {
-    WorldPacket data(SMSG_NOTIFICATION, message.size() + 1);
-    data << message;
-    LogMovementPacket(false, data);
+    WorldPackets::Misc::Notification notificationPacket;
+    notificationPacket.message = message;
+    LogMovementPacket(notificationPacket);
 }
 
 bool MovementAnticheat::IsLoggedOpcode(uint16 opcode)
@@ -396,6 +396,17 @@ bool MovementAnticheat::IsLoggedOpcode(uint16 opcode)
             return true;
     }
     return false;
+}
+
+void MovementAnticheat::LogMovementPacket(ServerPacket const& packet)
+{
+    if (sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE) != 0)
+    {
+        // TODO: Wait for all packets to be converted, so we can store the ServerPacket directly
+        WorldPacket binaryPacket(packet.GetOpcode());
+        packet.AppendBodyTo(binaryPacket);
+        LogMovementPacket(false, binaryPacket);
+    }
 }
 
 void MovementAnticheat::LogMovementPacket(bool isClientPacket, WorldPacket const& packet)

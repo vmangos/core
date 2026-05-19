@@ -25,6 +25,7 @@
 #include "Common.h"
 
 class SpellEntry;
+class Unit;
 
 struct ItemSetEffect
 {

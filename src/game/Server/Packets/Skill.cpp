@@ -21,3 +21,9 @@ void WorldPackets::Skill::TalentWipeConfirmResponse::AppendBodyTo(ByteBuffer& bu
     buffer << trainerGuid;
     buffer << cost;
 }
+
+void WorldPackets::Skill::SetProficiency::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << itemClass;
+    buffer << itemSubclassMask;
+}

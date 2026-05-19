@@ -78,6 +78,41 @@ namespace WorldPackets { namespace Combat
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class AttackStart final : public ServerPacket
+    {
+    public:
+        ObjectGuid attackerGuid;
+        ObjectGuid victimGuid;
+
+        explicit AttackStart() : ServerPacket(SMSG_ATTACKSTART) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class PartyKillLog final : public ServerPacket
+    {
+    public:
+        ObjectGuid killerGuid; // player with the killing blow
+        ObjectGuid victimGuid;
+
+        explicit PartyKillLog() : ServerPacket(SMSG_PARTYKILLLOG) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class EnvironmentalDamageLog final : public ServerPacket
+    {
+    public:
+        ObjectGuid victimGuid;
+        uint8 damageType = 0; // type of environmental damage
+        uint32 damage = 0;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+        uint32 absorb = 0;
+        int32 resist = 0;
+#endif
+
+        explicit EnvironmentalDamageLog() : ServerPacket(SMSG_ENVIRONMENTALDAMAGELOG) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Combat
 
 #endif // MANGOS_PACKETS_COMBAT_H

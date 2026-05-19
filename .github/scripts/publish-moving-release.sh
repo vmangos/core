@@ -18,24 +18,35 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 3 ]; then
-  echo "Usage: $0 <release-tag> <release-title-prefix> <asset-dir>" >&2
+if [ "$#" -lt 3 ] || [ "$#" -gt 4 ]; then
+  echo "Usage: $0 <release-tag> <release-title-prefix> <asset-dir> [notes-preamble-file]" >&2
   exit 1
 fi
 
 release_tag="$1"
 release_title_prefix="$2"
 asset_dir="$3"
+notes_preamble_file="${4:-}"
 repo_url="https://github.com/$GITHUB_REPOSITORY"
 release_title="$release_title_prefix ($(date -u +%F))"
 notes_file="$(mktemp)"
 
 trap 'rm -f "$notes_file"' EXIT
 
+if [ -n "$notes_preamble_file" ] && [ ! -f "$notes_preamble_file" ]; then
+  echo "Could not find notes preamble file at $notes_preamble_file." >&2
+  exit 1
+fi
+
 git fetch --force --tags origin
 previous_sha="$(git rev-parse -q --verify "refs/tags/$release_tag^{commit}" 2>/dev/null || true)"
 
-echo "## Commits" >"$notes_file"
+if [ -n "$notes_preamble_file" ]; then
+  cat "$notes_preamble_file" >"$notes_file"
+  printf '\n' >>"$notes_file"
+fi
+
+echo "## Commits" >>"$notes_file"
 
 if [ -n "$previous_sha" ] && [ "$previous_sha" != "$GITHUB_SHA" ]; then
   git_log_args=(--reverse --format='%H%x09%s' "$previous_sha..$GITHUB_SHA")

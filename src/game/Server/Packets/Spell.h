@@ -4,6 +4,7 @@
 #include "Packet.h"
 #include "SpellCastTargetsInfo.h"
 #include "ObjectGuid.h"
+#include "nonstd/optional.hpp"
 
 class SpellEntry;
 
@@ -69,19 +70,41 @@ namespace WorldPackets { namespace Spell
     };
     // --- Server Packets ---
 
-    // Simplified SMSG_CAST_RESULT for a basic spell failure (status=2) with no extra data.
-    // For complex failures with additional payload (e.g. cooldown time, required area),
-    // use the full Spell::SendCastResult() path in Spell.cpp instead.
-    class CastResultSimpleFailure final : public ServerPacket
+    class CastResult final : public ServerPacket
     {
     public:
-        ::SpellEntry const* spellEntry; // SpellEntry pointers are always valid even when `.reload`
-        uint8 reason;
+        ::SpellEntry const* spellEntry;
+        uint8 result = 0;
+        uint8 failureReason = 0;
+        nonstd::optional<uint32> failureArg1; // optional argument 1
+        nonstd::optional<uint32> failureArg2; // optional argument 2
 
-        explicit CastResultSimpleFailure(::SpellEntry const* spellEntry, uint8 reason)
-            : ServerPacket(SMSG_CAST_RESULT), spellEntry(spellEntry), reason(reason) {}
+        explicit CastResult() : ServerPacket(SMSG_CAST_RESULT) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
+
+    class PlaySpellVisual final : public ServerPacket
+    {
+    public:
+        ObjectGuid casterGuid;
+        uint32 spellVisualId = 0; // SpellVisualKit.dbc index
+
+        explicit PlaySpellVisual() : ServerPacket(SMSG_PLAY_SPELL_VISUAL) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    class PlaySpellImpact final : public ServerPacket
+    {
+    public:
+        ObjectGuid targetGuid;
+        uint32 spellVisualId = 0; // spell visual id
+
+        explicit PlaySpellImpact() : ServerPacket(SMSG_PLAY_SPELL_IMPACT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+#endif
+
 }} // namespace WorldPackets::Spell
 
 #endif // MANGOS_PACKETS_SPELL_H

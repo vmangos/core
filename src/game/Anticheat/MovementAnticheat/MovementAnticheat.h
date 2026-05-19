@@ -63,6 +63,7 @@ class MovementInfo;
 class ChatHandler;
 class WorldSession;
 class WorldPacket;
+class ServerPacket;
 
 class MovementAnticheat
 {
@@ -86,6 +87,7 @@ class MovementAnticheat
         uint32 HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         uint32 HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         bool HandleSplineDone(Player* pPlayer, MovementInfo const& movementInfo, uint32 splineId);
+        void LogMovementPacket(ServerPacket const& packet);
         void LogMovementPacket(bool isClientPacket, WorldPacket const& packet);
         static bool IsLoggedOpcode(uint16 opcode);
 
@@ -117,7 +119,7 @@ class MovementAnticheat
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
         uint32 CheckTimeDesync(MovementInfo const& movementInfo);
 
-        void AddMessageToPacketLog(std::string message);
+        void AddMessageToPacketLog(std::string const& message);
 
         MovementInfo& GetLastMovementInfo();
         MovementInfo const& GetLastMovementInfo() const;

@@ -113,7 +113,7 @@ char const* WorldSession::GetPlayerName() const
 }
 
 // Sends a packet to the client.
-void WorldSession::SendPacket(std::unique_ptr<ServerPacket> packet)
+void WorldSession::SendPacket(std::unique_ptr<ServerPacket const> packet)
 {
     WorldPacket buffer;
     { // TODO: This part will be offloaded to an IO thread soon. Only the IO thread will allocate a buffer.

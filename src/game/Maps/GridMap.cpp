@@ -26,6 +26,7 @@
 #include "GridMap.h"
 #include "VMapFactory.h"
 #include "MoveMap.h"
+#include "Utilities/Random.h"
 #include "World.h"
 #include "Policies/SingletonImp.h"
 #include "Util.h"

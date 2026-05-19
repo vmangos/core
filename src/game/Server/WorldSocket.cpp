@@ -37,6 +37,7 @@
 #include "Config/Config.h"
 #include "Util.h"
 #include "Errors.h"
+#include "Utilities/Random.h"
 
 #include "IO/Networking/DNS.h"
 #include "IO/Timer/AsyncSystemTimer.h"
@@ -74,7 +75,7 @@ WorldSocket::WorldSocket(IO::Networking::AsyncSocket socket)
       m_lastPingTime(std::chrono::system_clock::time_point::min()),
       m_overSpeedPings(0),
       m_Session(nullptr),
-      m_authSeed(static_cast<uint32>(rand32())),
+      m_authSeed(randu32()),
       m_remoteIpAddressStringAfterProxy(m_socket.GetRemoteIpString())
 {
     m_sendQueueIsRunning.clear(); // there is no atomic_flag::constructor on windows to initialize it with false by default (and if left out, linux is uninitialized and will fail randomly)

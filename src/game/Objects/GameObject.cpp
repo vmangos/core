@@ -48,6 +48,7 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 #include "Geometry.h"
+#include "Utilities/Random.h"
 
 bool QuaternionData::isUnit() const
 {
@@ -703,6 +704,11 @@ uint32 GameObjectData::ComputeRespawnDelay(uint32 respawnDelay) const
     return respawnDelay;
 }
 
+uint32 GameObjectData::GetRandomRespawnTime() const
+{
+    return urand(static_cast<uint32>(spawntimesecsmin), static_cast<uint32>(spawntimesecsmax));
+}
+
 void GameObject::JustDespawnedWaitingRespawn()
 {
     if (uint16 poolid = sPoolMgr.IsPartOfAPool<GameObject>(GetGUIDLow()))
@@ -803,7 +809,7 @@ void GameObject::FinishRitual()
         // take spell cooldown
         if (Player* pOwner = ::ToPlayer(GetOwner()))
             if (SpellEntry const* createBySpell = sSpellMgr.GetSpellEntry(GetSpellId()))
-                pOwner->AddCooldown(*createBySpell);
+                pOwner->AddCooldown(createBySpell);
         if (!info->summoningRitual.ritualPersistent)
             SetLootState(GO_JUST_DEACTIVATED);
         // Only ritual of doom deals a second spell

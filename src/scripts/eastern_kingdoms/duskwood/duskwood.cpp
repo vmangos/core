@@ -50,7 +50,7 @@ void Handle_NightmareCorruption(/*const*/ Player* player)
     }
 
     char message[200];
-    sprintf(message, "Come, %s. See what the Nightmare brings...", player->GetName());
+    snprintf(message, sizeof(message), "Come, %s. See what the Nightmare brings...", player->GetName());
 
     corrupter->MonsterWhisper(message, player);
 }
@@ -174,7 +174,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
                     if (player->IsDead())
                     {
                         char eMessage[200];
-                        sprintf(eMessage, "Twilight Corrupter squeezes the last bit of life out of %s and swallows their soul.", player->GetName());
+                        snprintf(eMessage, sizeof(eMessage), "Twilight Corrupter squeezes the last bit of life out of %s and swallows their soul.", player->GetName());
                         m_creature->MonsterTextEmote(eMessage, nullptr, false);
                         m_creature->CastSpell(m_creature, SPELL_SWELL_OF_SOULS, true);
                         guid = 0;

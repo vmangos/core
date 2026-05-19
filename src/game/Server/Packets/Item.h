@@ -265,6 +265,84 @@ namespace WorldPackets { namespace Item
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class OpenContainer final : public ServerPacket
+    {
+    public:
+        ObjectGuid itemGuid; // guid of the container to open in the UI
+
+        explicit OpenContainer() : ServerPacket(SMSG_OPEN_CONTAINER) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class BuyFailed final : public ServerPacket
+    {
+    public:
+        ObjectGuid vendorGuid;
+        uint32 itemEntry = 0;
+        uint8 reason = 0; // BuyResult enum value
+
+        explicit BuyFailed() : ServerPacket(SMSG_BUY_FAILED) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SellItemResponse final : public ServerPacket
+    {
+    public:
+        ObjectGuid vendorGuid;
+        ObjectGuid itemGuid;
+        uint8 reason = 0; // SellResult enum value
+
+        explicit SellItemResponse() : ServerPacket(SMSG_SELL_ITEM) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class BuyItemResponse final : public ServerPacket
+    {
+    public:
+        ObjectGuid vendorGuid;
+        uint32 vendorSlot = 0;      // vendor slot, numbered from 1 at client
+        uint32 newCount = 0;        // new stock count (0xFFFFFFFF if unlimited)
+        uint32 purchaseCount = 0;   // number of items purchased
+
+        explicit BuyItemResponse() : ServerPacket(SMSG_BUY_ITEM) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class InventoryChangeFailure final : public ServerPacket
+    {
+    public:
+        uint8 reason = 0;          // InventoryResult enum value
+        uint32 requiredLevel = 0;  // only used for EQUIP_ERR_CANT_EQUIP_LEVEL_I
+        ObjectGuid item1Guid;      // first involved item guid (empty if no item)
+        ObjectGuid item2Guid;      // second involved item guid (empty if no second item)
+        uint8 bagSlot = 0;         // slot of target bag that has storing condition (can be InventorySlots or BankBagSlots)
+
+        explicit InventoryChangeFailure() : ServerPacket(SMSG_INVENTORY_CHANGE_FAILURE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class ItemPushResult final : public ServerPacket
+    {
+    public:
+        ObjectGuid playerGuid;
+        uint32 received = 0;         // 0=looted, 1=from npc
+        uint32 created = 0;          // 0=received, 1=created
+        uint32 showInChat = 0;       // whether to show in chat
+        uint8 bagSlot = 0;           // which bag slot the item went to
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        uint32 itemSlot = 0;         // item slot (0xFFFFFFFF if stacked on existing)
+#endif
+        uint32 itemEntry = 0;        // item entry id
+        uint32 suffixFactor = 0;     // item suffix factor
+        uint32 randomPropertyId = 0; // item random property id
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        uint32 count = 0;            // count of items added
+#endif
+
+        explicit ItemPushResult() : ServerPacket(SMSG_ITEM_PUSH_RESULT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Item
 
 #endif // MANGOS_PACKETS_ITEM_H

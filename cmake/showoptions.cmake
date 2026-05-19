@@ -26,6 +26,12 @@ else()
   message(STATUS "Build for host CPU    : No")
 endif()
 
+if(BUILD_WARNINGS_AS_ERROR)
+  message(STATUS "Warnings as errors    : Yes")
+else()
+  message(STATUS "Warnings as errors    : No (default)")
+endif()
+
 message(STATUS "Build type            : ${CMAKE_BUILD_TYPE}")
 
 if(USE_SCRIPTS)
