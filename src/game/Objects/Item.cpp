@@ -141,9 +141,14 @@ bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProt
     if (!pProto || !pBagProto)
         return false;
 
+    // Special bags have bag family assigned but you can't place them inside each other. Tested in Classic.
+    if (pBagProto->BagFamily != BAG_FAMILY_NONE && pProto->ContainerSlots != 0)
+        return false;
+
     switch (pBagProto->Class)
     {
         case ITEM_CLASS_CONTAINER:
+        {
             switch (pBagProto->SubClass)
             {
                 case ITEM_SUBCLASS_CONTAINER:
@@ -162,7 +167,9 @@ bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProt
                     return true;
             }
             return false;
+        }
         case ITEM_CLASS_QUIVER:
+        {
             switch (pBagProto->SubClass)
             {
                 case ITEM_SUBCLASS_QUIVER:
@@ -173,9 +180,9 @@ bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProt
                     if (pProto->BagFamily != BAG_FAMILY_BULLETS)
                         return false;
                     return true;
-                default:
-                    return false;
             }
+            return false;
+        }
     }
     return false;
 }
