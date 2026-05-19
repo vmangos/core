@@ -1892,6 +1892,18 @@ float WorldObject::GetAngle(float const x, float const y) const
     return ang;
 }
 
+// Return backwards angle in range 0..2*pi
+float WorldObject::GetBackAngle(float const x, float const y) const
+{
+    float dx = x - GetPositionX();
+    float dy = y - GetPositionY();
+
+    float ang = atan2(dy, dx);
+    ang + M_PI_F;
+    ang = (ang >= 0) ? ang : 2 * M_PI_F + ang;
+    return ang;
+}
+
 bool WorldObject::HasInArc(float const arcangle, float const x, float const y) const
 {
     // always have self in arc

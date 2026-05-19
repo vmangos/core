@@ -1109,12 +1109,15 @@ void PathInfo::CutPathWithDynamicLoS()
     Vector3 out;
     // We have always keep at least 2 points (else, there is no mvt !)
     for (uint32 i = 1; i <= maxIndex; ++i)
+    {
         if (m_sourceUnit->GetMap()->GetDynamicObjectHitPos(m_pathPoints[i - 1], m_pathPoints[i], out, -0.1f))
         {
+            m_sourceUnit->GetNearPointAroundPosition(m_sourceUnit, out.x, out.y, out.z, m_sourceUnit->GetObjectBoundingRadius(), 1.0f, m_sourceUnit->GetBackAngle(m_pathPoints[i].x, m_pathPoints[i].y));
             m_pathPoints[i] = out;
             m_pathPoints.resize(i + 1);
             break;
         }
+    }
 }
 
 float PathInfo::Length() const

@@ -130,6 +130,8 @@ namespace Movement
                 path.ExcludeSteepSlopes();
             path.setUseStrightPath(options & MOVE_STRAIGHT_PATH);
             path.calculate(dest.x, dest.y, dest.z, options & MOVE_FORCE_DESTINATION);
+            // prevent units from going through closed doors
+            path.CutPathWithDynamicLoS();
             Move(&path);
         }
         else

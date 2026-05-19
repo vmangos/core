@@ -189,15 +189,12 @@ void ChaseMovementGenerator<T>::_setTargetLocation(T &owner)
     if (pathType == PATHFIND_NOPATH)
         return;
 
-    if (owner.IsPet())
+    // prevent units from going through closed doors
+    path.CutPathWithDynamicLoS();
+    if (path.getPath().size() == 2 && path.Length() < 0.1f)
     {
-        // prevent pets from going through closed doors
-        path.CutPathWithDynamicLoS();
-        if (path.getPath().size() == 2 && path.Length() < 0.1f)
-        {
-            m_bReachable = false;
-            return;
-        }
+        m_bReachable = false;
+        return;
     }
 
     if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STATE_ALLOW_INCOMPLETE_PATH))
@@ -646,6 +643,14 @@ void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
 
     PathType pathType = path.getPathType();
     m_bReachable = pathType & (PATHFIND_NORMAL | PATHFIND_DEST_FORCED);
+
+    // prevent units from going through closed doors
+    path.CutPathWithDynamicLoS();
+    if (path.getPath().size() == 2 && path.Length() < 0.1f)
+    {
+        m_bReachable = false;
+        return;
+    }
 
     if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STATE_ALLOW_INCOMPLETE_PATH))
         m_bReachable = true;
