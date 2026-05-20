@@ -2480,20 +2480,22 @@ void Unit::SendMeleeAttackStart(Unit const* pVictim) const
 
 void Unit::SendMeleeAttackStop(Unit const* pVictim) const
 {
-    if (!pVictim)
-        return;
-
-    WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));         // guess size, max is 9+9+4
+    WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));      // guess size, max is 9+9+4
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GetPackGUID();
-    data << pVictim->GetPackGUID();                          // can be 0x00...
+    if (pVictim)
+        data << pVictim->GetPackGUID();
+    else
+        data << ObjectGuid().WriteAsPacked();
 #else
     data << GetGUID();
-    data << pVictim->GetGUID();                          // can be 0x00...
+    if (pVictim)
+        data << pVictim->GetGUID();
+    else
+        data << ObjectGuid();
 #endif
-    data << uint32(0);                                      // can be 0x1
+    data << uint32(GetHealth() == 0);                    // is dead
     SendObjectMessageToSet(&data, true);
-    DETAIL_FILTER_LOG(LOG_FILTER_COMBAT, "%s %u stopped attacking %s %u", (IsPlayer() ? "player" : "creature"), GetGUIDLow(), (pVictim->IsPlayer() ? "player" : "creature"), pVictim->GetGUIDLow());
 }
 
 bool Unit::IsSpellPartiallyBlocked(SpellCaster const* pCaster, SpellEntry const* spellEntry, WeaponAttackType attackType) const
