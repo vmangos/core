@@ -1899,7 +1899,7 @@ float WorldObject::GetBackAngle(float const x, float const y) const
     float dy = y - GetPositionY();
 
     float ang = atan2(dy, dx);
-    ang + M_PI_F;
+    ang += M_PI_F;
     ang = (ang >= 0) ? ang : 2 * M_PI_F + ang;
     return ang;
 }
