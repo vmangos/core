@@ -89,11 +89,11 @@ enum BagFamily
     BAG_FAMILY_ARROWS                           = 1,
     BAG_FAMILY_BULLETS                          = 2,
     BAG_FAMILY_SOUL_SHARDS                      = 3,
-    BAG_FAMILY_UNKNOWN1                         = 4,
-    BAG_FAMILY_UNKNOWN2                         = 5,
+  //BAG_FAMILY_LEATHERWORKING_SUPPLIES          = 4, // added in tbc
+  //BAG_FAMILY_INSCRIPTION_SUPPLIES             = 5, // added in wotlk
     BAG_FAMILY_HERBS                            = 6,
-    BAG_FAMILY_ENCHANTING_SUPP                  = 7,
-    BAG_FAMILY_ENGINEERING_SUPP                 = 8,
+    BAG_FAMILY_ENCHANTING_SUPPLIES              = 7,
+    BAG_FAMILY_ENGINEERING_SUPPLIES             = 8,
     BAG_FAMILY_KEYS                             = 9,
 };
 
