@@ -180,6 +180,7 @@ if(WIN32)
   target_include_directories(shared PUBLIC
     ${CMAKE_SOURCE_DIR}/dep/windows/include
   )
+  target_link_libraries(shared PUBLIC ${ACE_LIBRARIES} ws2_32 winmm)
 endif()
 
 if (REQUIRES_LIBCURL)
@@ -199,9 +200,5 @@ if(UNIX)
   find_package(Threads)
   target_link_libraries(shared PUBLIC ${ACE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 endif(UNIX)
-
-if(MINGW)
-  target_link_libraries(shared PUBLIC ${ACE_LIBRARIES} -lws2_32)
-endif()
 
 SET_TARGET_PROPERTIES (shared PROPERTIES FOLDER "Game Libs")
