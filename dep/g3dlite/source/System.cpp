@@ -50,7 +50,7 @@
 #   else
 #       include "malloc.h"
 #       include <x86intrin.h>
-extern int putenv(char *);
+extern int _putenv(char const*);
 #   endif
 #elif defined(G3D_LINUX) 
 
@@ -1580,7 +1580,7 @@ void System::alignedFree(void* _ptr) {
 
 void System::setEnv(const std::string& name, const std::string& value) {
     std::string cmd = name + "=" + value;
-#   ifdef _MSC_VER
+#   ifdef G3D_WINDOWS
         _putenv(cmd.c_str());
 #   else
         // Many linux implementations of putenv expect char*
