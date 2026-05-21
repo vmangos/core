@@ -112,7 +112,11 @@ else()
 endif()
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# allow extension on windows cause mingw cant build without
+if(NOT WIN32)
 set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
 
 if(NOT USE_STD_MALLOC)
   unset(TBB_INCLUDE_DIRS            CACHE)

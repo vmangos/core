@@ -31,6 +31,7 @@
 #include "Util.h"
 #include "World.h"
 #include "GridMap.h"
+#include "Map.h"
 
 pAuraProcHandler AuraProcHandler[TOTAL_AURAS] =
 {
