@@ -1900,6 +1900,7 @@ float WorldObject::GetBackAngle(float const x, float const y) const
 
     float ang = atan2(dy, dx);
     ang += M_PI_F;
+    ang += frand(-0.785398163f, 0.785398163f);
     ang = (ang >= 0) ? ang : 2 * M_PI_F + ang;
     return ang;
 }
