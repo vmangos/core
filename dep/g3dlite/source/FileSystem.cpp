@@ -27,6 +27,9 @@
 #   include <io.h>
 #  ifdef __MINGW32__
 #    define stat64 stat
+#    define stricmp strcasecmp 
+#    define strnicmp strncasecmp 
+#    include <strings.h>
 #  else
 #    define stat64 _stat64
 #  endif

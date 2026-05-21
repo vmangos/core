@@ -40,14 +40,18 @@
 #include <cstdlib>
 
 #ifdef G3D_WINDOWS
-
 #   include <conio.h>
-#   include <crtdbg.h>
 #   include <sys/timeb.h>
 #   include "G3D/RegistryUtil.h"
-#include <Ole2.h>
-#include <intrin.h>
-
+#   include <Ole2.h>
+#   ifdef _MSC_VER
+#       include <crtdbg.h>
+#       include <intrin.h>
+#   else
+#       include "malloc.h"
+#       include <x86intrin.h>
+extern int putenv(char *);
+#   endif
 #elif defined(G3D_LINUX) 
 
 #   include <stdlib.h>
@@ -211,11 +215,11 @@ void System::init() {
 		case PROCESSOR_ARCHITECTURE_ARM:
 			arch = "ARM";
 			break;
-
+#ifdef PROCESSOR_ARCHITECTURE_ARM64
 		case PROCESSOR_ARCHITECTURE_ARM64:
 			arch = "ARM64";
 			break;
-
+#endif
         default:
             arch = "Unknown";
 			break;
@@ -1293,7 +1297,11 @@ public:
         if (ptr == NULL) {
 #           ifdef G3D_WINDOWS
                 // Check for memory corruption
+#               ifdef _MSC_VER
                 alwaysAssertM(_CrtCheckMemory() == TRUE, "Heap corruption detected.");
+#               else
+                alwaysAssertM(_heapchk() == _HEAPOK, "Heap corruption detected.")
+#               endif
 #           endif
 
             // Flush memory pools to try and recover space
@@ -1572,7 +1580,7 @@ void System::alignedFree(void* _ptr) {
 
 void System::setEnv(const std::string& name, const std::string& value) {
     std::string cmd = name + "=" + value;
-#   ifdef G3D_WINDOWS
+#   ifdef _MSC_VER
         _putenv(cmd.c_str());
 #   else
         // Many linux implementations of putenv expect char*

@@ -63,23 +63,12 @@ target_sources(g3dlite
     source/Vector3.cpp
     source/Vector4.cpp)
 
-target_sources(g3dlite
-  PUBLIC
-    FILE_SET HEADERS
-    BASE_DIRS include
-    FILES
-      include/G3D/AABox.h
-      include/G3D/BoundsTrait.h
-      include/G3D/Box.h
-      include/G3D/CoordinateFrame.h
-      include/G3D/g3dmath.h
-      include/G3D/Matrix3.h
-      include/G3D/Matrix4.h
-      include/G3D/Plane.h
-      include/G3D/Quat.h
-      include/G3D/Ray.h
-      include/G3D/Vector3.h
-      include/G3D/Vector4.h)
+target_include_directories(g3dlite
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source
+  PRIVATE ${CMAKE_SOURCE_DIR}/dep/include
+  PRIVATE ${CMAKE_SOURCE_DIR}/dep/src/libseh
+  PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 if((CMAKE_SYSTEM_NAME MATCHES "Linux" AND NOT NOJEM) OR TSAN)
   target_compile_definitions(g3dlite

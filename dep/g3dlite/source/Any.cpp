@@ -22,6 +22,10 @@
 #include <deque>
 #include <iostream>
 
+#ifdef __MINGW32__
+#include <strings.h>
+#endif
+
 namespace G3D {
 const char* Any::PAREN   = "()";
 const char* Any::BRACKET = "[]";
@@ -142,7 +146,7 @@ bool Any::nameBeginsWith(const char* s) const {
 
 bool Any::nameEquals(const char* s) const {
     verifyType(Any::ARRAY, Any::TABLE);
-#ifdef G3D_WINDOWS
+#ifdef _MSC_VER
     return stricmp(name().c_str(), s) == 0;
 #else
     return strcasecmp(name().c_str(), s) == 0;
