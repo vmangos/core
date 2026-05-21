@@ -162,7 +162,7 @@ bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProt
                         return false;
                     return true;
                 case ITEM_SUBCLASS_ENCHANTING_CONTAINER:
-                    if (pProto->BagFamily != BAG_FAMILY_ENCHANTING_SUPP)
+                    if (pProto->BagFamily != BAG_FAMILY_ENCHANTING_SUPPLIES)
                         return false;
                     return true;
             }
