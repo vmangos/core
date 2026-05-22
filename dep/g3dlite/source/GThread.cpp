@@ -91,29 +91,21 @@ typedef struct tagTHREADNAME_INFO {
 } THREADNAME_INFO;
 #pragma pack(pop)
 
-#ifdef __MINGW32__
-#include <seh.h>
-#endif
+static LONG WINAPI ExceptionIgnorer(PEXCEPTION_POINTERS ex)
+{
+   return ex->ExceptionRecord->ExceptionCode == MS_VC_EXCEPTION ? EXCEPTION_CONTINUE_EXECUTION : EXCEPTION_CONTINUE_SEARCH;
+}
 
 static void SetThreadName(DWORD dwThreadID, const char* threadName) {
-    THREADNAME_INFO info;
-    info.dwType = 0x1000;
-    info.szName = threadName;
-    info.dwThreadID = dwThreadID;
-    info.dwFlags = 0;
+   THREADNAME_INFO info;
+   info.dwType = 0x1000;
+   info.szName = threadName;
+   info.dwThreadID = dwThreadID;
+   info.dwFlags = 0;
 
-#ifdef __MINGW32__
-    __seh_try {
-        RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
-    }   
-    __seh_except(EXCEPTION_EXECUTE_HANDLER) {}
-    __seh_end_except
-#else
-    __try {
-        RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
-    }
-    __except(EXCEPTION_EXECUTE_HANDLER) {}
-#endif
+   PVOID handler = AddVectoredExceptionHandler(1, &ExceptionIgnorer);
+   RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
+   RemoveVectoredExceptionHandler(handler);
 }
 #endif
 

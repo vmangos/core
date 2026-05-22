@@ -1,0 +1,13 @@
+diff --git a/dep/g3dlite/include/G3D/UprightFrame.h b/dep/g3dlite/include/G3D/UprightFrame.h
+index 696ab94df..559e0d93f 100644
+--- a/dep/g3dlite/include/G3D/UprightFrame.h
++++ b/dep/g3dlite/include/G3D/UprightFrame.h
+@@ -82,7 +82,7 @@ public:
+ class UprightSpline : public Spline<UprightFrame> {
+ protected:
+ 
+-    virtual void ensureShortestPath(UprightFrame* A, int N) const {
++    void ensureShortestPath(UprightFrame* A, int N) const override {
+         UprightFrame::unwrapYaw(A, N);
+     }
+ 

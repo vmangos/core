@@ -1,0 +1,46 @@
+diff --git a/dep/g3dlite/include/G3D/AtomicInt32.h b/dep/g3dlite/include/G3D/AtomicInt32.h
+index 51561e3dc..95f842f48 100644
+--- a/dep/g3dlite/include/G3D/AtomicInt32.h
++++ b/dep/g3dlite/include/G3D/AtomicInt32.h
+@@ -13,6 +13,9 @@
+ #include "G3D/g3dmath.h"
+ 
+ #if defined(G3D_WINDOWS)
++#   ifndef NOMINMAX
++#       define NOMINMAX 1
++#   endif
+ #   include <Windows.h>
+ #elif defined(G3D_OSX)
+ #   include <libkern/OSAtomic.h>
+diff --git a/dep/g3dlite/include/G3D/System.h b/dep/g3dlite/include/G3D/System.h
+index 81c83527c..c9275c402 100644
+--- a/dep/g3dlite/include/G3D/System.h
++++ b/dep/g3dlite/include/G3D/System.h
+@@ -22,7 +22,10 @@
+ #include <string>
+ 
+ #ifdef G3D_WINDOWS
+-#include <Windows.h>
++#   ifndef NOMINMAX
++#       define NOMINMAX 1
++#   endif
++#   include <Windows.h>
+ #endif
+ 
+ #if defined(__aarch64__)
+diff --git a/dep/g3dlite/source/debugAssert.cpp b/dep/g3dlite/source/debugAssert.cpp
+index ff843fb7e..329aaf5b4 100644
+--- a/dep/g3dlite/source/debugAssert.cpp
++++ b/dep/g3dlite/source/debugAssert.cpp
+@@ -23,7 +23,10 @@
+ #include <cstdlib>
+ 
+ #ifdef _MSC_VER
+-#include <Windows.h>
++#   ifndef NOMINMAX
++#       define NOMINMAX 1
++#   endif
++#   include <Windows.h>
+     // disable: "C++ exception handler used"
+ #   pragma warning (push)
+ #   pragma warning (disable : 4530)

@@ -276,9 +276,9 @@ namespace VMAP
         float height = G3D::inf();
         Vector3 dir;
         if (maxSearchDist >= 0.f)
-            dir = Vector3::down();
+            dir = -Vector3::unitZ(); // down
         else
-            dir = Vector3::up();
+            dir = Vector3::unitZ();  // up
         G3D::Ray ray(pPos, dir); // direction with length of 1
         float maxDist = std::abs(maxSearchDist);
         if (getIntersectionTime(ray, maxDist, false, false))
