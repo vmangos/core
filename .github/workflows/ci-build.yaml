@@ -98,8 +98,12 @@ jobs:
         run: sudo apt install -y --no-install-recommends clang
 
       - name: Install macOS build dependencies
+        # Pinned to match the macOS release build's dependencies so this job
+        # actually validates the configuration we ship; see the
+        # `Install macOS build dependencies` step in
+        # `.github/workflows/development-release.yaml` for the reasoning.
         if: matrix.config.os == 'macos-26'
-        run: brew install mysql-client
+        run: brew install openssl@3 mysql-client@8.4
 
       - name: Set up MSYS2 (MINGW64)
         if: matrix.config.use_mingw
@@ -140,6 +144,7 @@ jobs:
           cd build
           cmake ../ \
             -DCMAKE_INSTALL_PREFIX="../_install" \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix openssl@3);$(brew --prefix mysql-client@8.4)" \
             -DBUILD_EXTRACTORS=1 \
             -DENABLE_MAILSENDER=1 \
             -DBUILD_WARNINGS_AS_ERROR=1 \
