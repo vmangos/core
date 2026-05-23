@@ -1523,7 +1523,6 @@ uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemLevel) const
 void Pet::_LoadSpellCooldowns()
 {
     //std::unique_ptr<QueryResult> result = CharacterDatabase.PQuery("SELECT spell,time FROM pet_spell_cooldown WHERE guid = '%u'",m_charmInfo->GetPetNumber());
-
     if (m_pTmpCache)
     {
         ByteBuffer cdData;
@@ -1575,7 +1574,12 @@ void Pet::_LoadSpellCooldowns()
                 data << GetObjectGuid();
                 //data << uint8(0x0);                                     // flags (0x1, 0x2)
                 data.append(cdData);
-                owner->GetSession()->SendPacket(&data);
+
+                // cooldown packet is ignored if create object is not received yet
+                owner->m_Events.AddLambdaEventAtOffset([owner, pkt = std::move(data)]()
+                {
+                    owner->GetSession()->SendPacket(&pkt);
+                }, 1);
             }
         }
     }
@@ -1599,20 +1603,26 @@ void Pet::_SaveSpellCooldowns()
         auto& cdData = cdItr.second;
         if (!cdData->IsPermanent())
         {
-            TimePoint sTime = currTime;
-            cdData->GetSpellCDExpireTime(sTime);
-            uint64 spellExpireTime = uint64(Clock::to_time_t(sTime));
+            TimePoint spellExpireTime = currTime;
+            cdData->GetSpellCDExpireTime(spellExpireTime);
+
+            if (spellExpireTime.time_since_epoch().count() == 0)
+            {
+                cdData->GetCatCDExpireTime(spellExpireTime);
+                if (spellExpireTime.time_since_epoch().count() == 0)
+                    continue;
+            }
 
             if (m_pTmpCache)
             {
                 PetSpellCoodown cd;
                 cd.spell = cdItr.first;
-                cd.time = spellExpireTime;
+                cd.time = uint64(Clock::to_time_t(spellExpireTime));
                 m_pTmpCache->spellCooldowns.push_back(cd);
             }
 
             stmt = CharacterDatabase.CreateStatement(insSpellCD, "INSERT INTO `pet_spell_cooldown` (`guid`, `spell`, `time`) VALUES (?, ?, ?)");
-            stmt.PExecute(m_charmInfo->GetPetNumber(), cdItr.first, spellExpireTime);
+            stmt.PExecute(m_charmInfo->GetPetNumber(), cdItr.first, uint64(Clock::to_time_t(spellExpireTime)));
         }
     }
 }
