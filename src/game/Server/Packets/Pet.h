@@ -207,6 +207,17 @@ namespace WorldPackets { namespace Pet
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class PetCastFailed final : public ServerPacket
+    {
+    public:
+        uint32 spellId = 0;
+        uint8 status = 0;  // SPELL_RESULT_STATUS_FAIL
+        uint8 reason = 0;  // SpellCastResult enum value
+
+        explicit PetCastFailed() : ServerPacket(SMSG_PET_CAST_FAILED) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Pet
 
 #endif // MANGOS_PACKETS_PET_H

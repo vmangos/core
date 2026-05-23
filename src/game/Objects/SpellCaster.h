@@ -54,14 +54,14 @@ enum MeleeHitOutcome
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
 struct SpellNonMeleeDamage {
-    SpellNonMeleeDamage(SpellCaster* _attacker, Unit* _target, uint32 _SpellID, SpellSchools _school)
-        : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), school(_school),
+    SpellNonMeleeDamage(SpellCaster* _attacker, Unit* _target, uint32 spellId_, SpellSchools _school)
+        : target(_target), attacker(_attacker), spellId(spellId_), damage(0), school(_school),
         absorb(0), resist(0), periodicLog(false), reflected(false), blocked(0), HitInfo(0), spell(nullptr)
     {}
 
     Unit* target;
     SpellCaster* attacker;
-    uint32 SpellID;
+    uint32 spellId;
     uint32 damage;
     SpellSchools school;
     uint32 absorb;
@@ -398,9 +398,9 @@ public:
     void SendSpellDamageResist(Unit const* target, uint32 spellId) const;
     void SendSpellOrDamageImmune(Unit const* target, uint32 spellId) const;
     int32 DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* spellProto, bool critical = false);
-    void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
-    void EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
-    void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
+    void SendHealSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, bool critical = false) const;
+    void EnergizeBySpell(Unit* pTarget, uint32 spellId, uint32 amount, Powers powertype);
+    void SendEnergizeSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, Powers powertype) const;
 
     void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut) const;
     DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex) const;

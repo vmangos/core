@@ -1231,7 +1231,7 @@ class Unit : public SpellCaster
         bool UnsummonOldPetBeforeNewSummon(uint32 newPetEntry, bool canUnsummon);
 
         // Pet responses methods
-        void SendPetCastFail(uint32 spellid, SpellCastResult msg);
+        void SendPetCastFail(uint32 spellId, SpellCastResult msg);
         void SendPetActionFeedback(uint8 msg);
         void SendPetTalk(uint32 pettalk);
         void SendPetAIReaction();

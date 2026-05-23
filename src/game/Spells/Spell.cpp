@@ -4289,9 +4289,8 @@ void Spell::finish(bool ok)
             // Fix a client problem with ritual of doom, by itself it disables
             // the spell during cast and then the spell stays disabled
             // Ignore the spell when it's triggered (ritual helper)
-            if (m_spellInfo->Id == 18540 && !m_IsTriggeredSpell
-                && pPlayer->IsSpellReady(m_spellInfo))
-                pPlayer->ToPlayer()->SendClearCooldown(18540, pPlayer);
+            if (m_spellInfo->Id == 18540 && !m_IsTriggeredSpell && pPlayer->IsSpellReady(m_spellInfo))
+                pPlayer->ToPlayer()->SendClearCooldown(m_spellInfo->Id, pPlayer);
         }
 
         if (ok && pPlayer->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
@@ -4398,7 +4397,7 @@ void Spell::SendCastResult(SpellCastResult result)
 void Spell::SendCastResult(Player const* caster, SpellEntry const* spellInfo, SpellCastResult result)
 {
     auto packet = std::make_unique<WorldPackets::Spell::CastResult>();
-    packet->spellEntry = spellInfo;
+    packet->spellId = spellInfo->Id;
     packet->failureReason = result;
 
     if (result != SPELL_CAST_OK && !spellInfo->HasAttribute(SPELL_ATTR_EX2_DO_NOT_REPORT_SPELL_FAILURE))
@@ -4793,18 +4792,17 @@ void Spell::SendAllTargetsMiss()
             return;
     }
 
-    WorldPacket data(SMSG_SPELLLOGMISS, (4 + 8 + 1 + 4 + m_UniqueTargetInfo.size() * (8 + 1)));
-    data << uint32(m_spellInfo->Id);
-    data << m_caster->GetObjectGuid();
-    data << uint8(0);                                       // nothing shown in combat log if != 0 (calls nullsub instead)
-    data << uint32(m_UniqueTargetInfo.size());
+    auto packet = std::make_unique<WorldPackets::Spell::SpellLogMiss>();
+    packet->spellId = m_spellInfo->Id;
+    packet->casterGuid = m_caster->GetObjectGuid();
     for (auto const& target : m_UniqueTargetInfo)
     {
-        data << target.targetGUID;
-        data << uint8(target.missCondition);
-        // 2 more floats if the uint8 before targets is != 0
+        WorldPackets::Spell::SpellLogMissEntry entry;
+        entry.targetGuid = target.targetGUID;
+        entry.missInfo = target.missCondition;
+        packet->missEntries.push_back(entry);
     }
-    m_caster->SendObjectMessageToSet(&data, true);
+    m_caster->SendObjectMessageToSet(std::move(packet), true);
 }
 
 void Spell::SendChannelUpdate(uint32 time, bool interrupted)

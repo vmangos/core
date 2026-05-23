@@ -1663,7 +1663,7 @@ SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit* pVictim, uint32 
     }
 #endif
 
-    SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
+    SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, static_cast<SpellSchools>(spellInfo->School));
     float fdamage = CalculateSpellEffectValue(pVictim, spellInfo, triggeredByAura->GetEffIndex());
     fdamage = SpellDamageBonusDone(pVictim, spellInfo, triggeredByAura->GetEffIndex(), fdamage, SPELL_DIRECT_DAMAGE);
     fdamage = pVictim->SpellDamageBonusTaken(this, spellInfo, triggeredByAura->GetEffIndex(), fdamage, SPELL_DIRECT_DAMAGE);

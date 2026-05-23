@@ -56,7 +56,7 @@ struct MageIgniteScript : public AuraScript
         SPELL_TALENT_RANK_1 = 11119,
         SPELL_TALENT_RANK_2 = 11120,
         SPELL_TALENT_RANK_3 = 12846,
-        SPELL_TALENT_RANK_4 = 12847, 
+        SPELL_TALENT_RANK_4 = 12847,
         SPELL_TALENT_RANK_5 = 12848,
     };
 
@@ -149,7 +149,7 @@ struct MageCombustionProcScript : public AuraScript
         // does not proc if no target is affected (aoe like flamestrike)
         if (!pVictim)
             return SPELL_AURA_PROC_FAILED;
-        
+
         // combustion counter was dispelled or clicked off
         if (!pOwner->HasAura(SPELL_COMBUSTION_CRIT_BUFF))
         {
@@ -163,7 +163,7 @@ struct MageCombustionProcScript : public AuraScript
             pOwner->RemoveAurasDueToSpell(SPELL_COMBUSTION_CRIT_BUFF); // remove Combustion auras
             return SPELL_AURA_PROC_OK; // charge counting (will be removed)
         }
-        
+
         pOwner->CastSpell(pOwner, SPELL_COMBUSTION_CRIT_BUFF, true, nullptr, triggeredByAura);
         return (procEx & PROC_EX_CRITICAL_HIT) ? SPELL_AURA_PROC_OK : SPELL_AURA_PROC_FAILED; // charge update only at crit hits, no hidden cooldowns
     }
