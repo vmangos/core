@@ -1530,9 +1530,14 @@ void Pet::_LoadSpellCooldowns()
     auto curTime = sWorld.GetCurrentClockTime();
     for (const auto& it : m_pTmpCache->spellCooldowns)
     {
-        SpellEntry const* spellEntry = it.spell;
+        SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(it.spell);
+        if (!spellEntry)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has unknown spell %u in `character_spell_cooldown`, skipping.", GetGuidStr().c_str(), it.spell);
+            continue;
+        }
+        
         TimePoint whenReadyAgain = it.whenReadyAgainTime;
-
         std::chrono::milliseconds spellRecTime = std::chrono::milliseconds::zero();
         if (whenReadyAgain > curTime)
             spellRecTime = std::chrono::duration_cast<std::chrono::milliseconds>(whenReadyAgain - curTime);
@@ -1596,7 +1601,7 @@ void Pet::_SaveSpellCooldowns()
             }
 
             stmt = CharacterDatabase.CreateStatement(insSpellCD, "INSERT INTO `pet_spell_cooldown` (`guid`, `spell`, `time`) VALUES (?, ?, ?)");
-            stmt.PExecute(m_charmInfo->GetPetNumber(), cdItr.first->Id, static_cast<uint64>(Clock::to_time_t(spellExpireTime)));
+            stmt.PExecute(m_charmInfo->GetPetNumber(), cdItr.first, static_cast<uint64>(Clock::to_time_t(spellExpireTime)));
         }
     }
 }

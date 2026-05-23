@@ -1333,7 +1333,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     else if (m_damage && unitTarget->IsAlive())
     {
         // Fill base damage struct (unitTarget - is real spell target)
-        SpellNonMeleeDamage damageInfo(pCaster, unitTarget, m_spellInfo, GetFirstSchoolInMask(m_spellSchoolMask));
+        SpellNonMeleeDamage damageInfo(pCaster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
         damageInfo.spell = this;
         damageInfo.reflected = isReflected;
 
@@ -1434,7 +1434,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         }
 
         // Fill base damage struct (unitTarget - is real spell target)
-        SpellNonMeleeDamage damageInfo(pCaster, unitTarget, m_spellInfo, GetFirstSchoolInMask(m_spellSchoolMask));
+        SpellNonMeleeDamage damageInfo(pCaster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
         procEx = CreateProcExtendMask(&damageInfo, missInfo);
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         uint32 dmg = 0;
@@ -1558,7 +1558,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
         unit->IsImmuneToSpell(m_spellInfo, unit == pRealUnitCaster)))
     {
         if (pRealCaster)
-            pRealCaster->SendSpellMiss(unit, m_spellInfo, SPELL_MISS_IMMUNE);
+            pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
 
         ResetEffectDamageAndHeal();
         return;
@@ -1587,7 +1587,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                 // dead creatures don't see alive players, but spells should still hit
                 !(unit->IsPlayer() && unit->IsAlive() && m_caster->IsCreature() && m_casterUnit->IsDead()))
             {
-                pRealCaster->SendSpellMiss(unit, m_spellInfo, SPELL_MISS_EVADE);
+                pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 ResetEffectDamageAndHeal();
                 return;
             }
@@ -1644,7 +1644,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
             // for delayed spells ignore negative spells (after duel end) for friendly targets
             if (m_delayed && !m_spellInfo->IsPositiveSpell())
             {
-                pRealCaster->SendSpellMiss(unit, m_spellInfo, SPELL_MISS_EVADE);
+                pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 ResetEffectDamageAndHeal();
                 return;
             }
@@ -1837,7 +1837,7 @@ void Spell::HandleDelayedSpellLaunch(TargetInfo *target)
     ResetEffectDamageAndHeal();
 
     // Fill base damage struct (unitTarget - is real spell target)
-    SpellNonMeleeDamage damageInfo(pCaster, unitTarget, m_spellInfo, GetFirstSchoolInMask(m_spellSchoolMask));
+    SpellNonMeleeDamage damageInfo(pCaster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
 
     if (unit && !pCaster->IsFriendlyTo(unit))
         unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_HOSTILE_ACTION_RECEIVED_CANCELS);
@@ -4290,11 +4290,11 @@ void Spell::finish(bool ok)
             // the spell during cast and then the spell stays disabled
             // Ignore the spell when it's triggered (ritual helper)
             if (m_spellInfo->Id == 18540 && !m_IsTriggeredSpell && pPlayer->IsSpellReady(m_spellInfo))
-                pPlayer->ToPlayer()->SendClearCooldown(m_spellInfo, pPlayer);
+                pPlayer->ToPlayer()->SendClearCooldown(m_spellInfo->Id, pPlayer);
         }
 
         if (ok && pPlayer->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
-            pPlayer->SendClearCooldown(m_spellInfo, pPlayer);
+            pPlayer->SendClearCooldown(m_spellInfo->Id, pPlayer);
     }
 
     // Restore pet movement after spell (succubus after seduce)

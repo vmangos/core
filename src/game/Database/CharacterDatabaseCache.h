@@ -10,7 +10,7 @@ class SpellEntry;
 // pet_spell_cooldown
 struct PetSpellCooldown
 {
-    SpellEntry const* spell = nullptr;
+    uint32 spell = 0;
     TimePoint whenReadyAgainTime{};
 };
 

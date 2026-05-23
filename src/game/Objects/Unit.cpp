@@ -1716,14 +1716,14 @@ void Unit::TriggerDamageShields(Unit* pVictim)
             // Damage shield can be resisted...
             if (SpellMissInfo missInfo = pVictim->SpellHitResult(this, pSpellProto, (*i)->GetEffIndex()))
             {
-                pVictim->SendSpellMiss(this, pSpellProto, missInfo);
+                pVictim->SendSpellMiss(this, pSpellProto->Id, missInfo);
                 continue;
             }
 
             // ...or immuned
             if (IsImmuneToDamage(pSpellProto->GetSpellSchoolMask()))
             {
-                pVictim->SendSpellOrDamageImmune(this, pSpellProto);
+                pVictim->SendSpellOrDamageImmune(this, pSpellProto->Id);
                 continue;
             }
 
@@ -2057,7 +2057,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
                 reflectTo->CalculateDamageAbsorbAndResist(pCaster, schoolMask, DOT, splitted, &reflectAbsorb, &reflectResist, spellProto);
             splitted -= (reflectAbsorb + reflectResist);
             pCaster->DealDamageMods(reflectTo, splitted, &splitted_absorb);
-            pCaster->SendSpellNonMeleeDamageLog(reflectTo, (*i)->GetSpellProto(), splitted, schoolMask, splitted_absorb, 0, (damagetype == DOT), 0, false, true);
+            pCaster->SendSpellNonMeleeDamageLog(reflectTo, (*i)->GetId(), splitted, schoolMask, splitted_absorb, 0, (damagetype == DOT), 0, false, true);
             CleanDamage cleanDamage = CleanDamage(splitted, BASE_ATTACK, MELEE_HIT_NORMAL, reflectAbsorb, reflectResist);
             pCaster->DealDamage(reflectTo, splitted, &cleanDamage, DOT, schoolMask, (*i)->GetSpellProto(), false);
         }
@@ -2095,7 +2095,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
             }
 #endif
 
-            pCaster->SendSpellNonMeleeDamageLog(caster, (*i)->GetSpellProto(), splitted, schoolMask, split_absorb, 0, (damagetype == DOT), 0, false, true);
+            pCaster->SendSpellNonMeleeDamageLog(caster, (*i)->GetId(), splitted, schoolMask, split_absorb, 0, (damagetype == DOT), 0, false, true);
 
             CleanDamage cleanDamage = CleanDamage(splitted, BASE_ATTACK, MELEE_HIT_NORMAL, 0, 0);
             pCaster->DealDamage(caster, splitted, &cleanDamage, DOT, schoolMask, (*i)->GetSpellProto(), false);
@@ -9254,7 +9254,7 @@ Player* Unit::GetSpellModOwner() const
 }
 
 // ----------Pet responses methods-----------------
-void Unit::SendPetCastFail(SpellEntry const* spellEntry, SpellCastResult msg)
+void Unit::SendPetCastFail(uint32 spellId, SpellCastResult msg)
 {
     if (msg == SPELL_CAST_OK)
         return;
@@ -9262,7 +9262,7 @@ void Unit::SendPetCastFail(SpellEntry const* spellEntry, SpellCastResult msg)
     if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
     {
         auto packet = std::make_unique<WorldPackets::Pet::PetCastFailed>();
-        packet->spellId = spellEntry ? spellEntry->Id : 0;
+        packet->spellId = spellId;
         packet->status = static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
         packet->reason = static_cast<uint8>(msg);
         pOwner->GetSession()->SendPacket(std::move(packet));

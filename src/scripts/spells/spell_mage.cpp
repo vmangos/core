@@ -28,11 +28,11 @@ struct MageColdSnapScript : SpellScript
                 return false;
 
             // immediately finishes the cooldown on Frost spells
-            auto cdCheck = [](SpellEntry const* spellEntry) -> bool
+            auto cdCheck = [](SpellEntry const & spellEntry) -> bool
             {
-                if (spellEntry->SpellFamilyName != SPELLFAMILY_MAGE)
+                if (spellEntry.SpellFamilyName != SPELLFAMILY_MAGE)
                     return false;
-                if ((spellEntry->GetSpellSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellEntry->GetRecoveryTime() > 0)
+                if ((spellEntry.GetSpellSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellEntry.GetRecoveryTime() > 0)
                     return true;
                 return false;
             };

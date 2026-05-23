@@ -651,10 +651,10 @@ float SpellCaster::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
     return resistModHitChance;
 }
 
-void SpellCaster::SendSpellMiss(Unit const* target, SpellEntry const* spellEntry, SpellMissInfo missInfo) const
+void SpellCaster::SendSpellMiss(Unit const* target, uint32 spellId, SpellMissInfo missInfo) const
 {
     auto packet = std::make_unique<WorldPackets::Spell::SpellLogMiss>();
-    packet->spellId = spellEntry->Id;
+    packet->spellId = spellId;
     packet->casterGuid = GetObjectGuid();
     WorldPackets::Spell::SpellLogMissEntry entry;
     entry.targetGuid = target->GetObjectGuid();
@@ -663,22 +663,22 @@ void SpellCaster::SendSpellMiss(Unit const* target, SpellEntry const* spellEntry
     SendObjectMessageToSet(std::move(packet), true);
 }
 
-void SpellCaster::SendSpellDamageResist(Unit const* target, SpellEntry const* spellEntry) const
+void SpellCaster::SendSpellDamageResist(Unit const* target, uint32 spellId) const
 {
     auto packet = std::make_unique<WorldPackets::Spell::ProcResist>();
     packet->casterGuid = GetObjectGuid();
     packet->targetGuid = target->GetObjectGuid();
-    packet->spellId = spellEntry->Id;
+    packet->spellId = spellId;
     packet->logFormat = 0; // 0=default, 1=debug
     SendMessageToSet(std::move(packet), true);
 }
 
-void SpellCaster::SendSpellOrDamageImmune(Unit const* target, SpellEntry const* spellEntry) const
+void SpellCaster::SendSpellOrDamageImmune(Unit const* target, uint32 spellId) const
 {
     auto packet = std::make_unique<WorldPackets::Spell::SpellOrDamageImmune>();
     packet->casterGuid = GetObjectGuid();
     packet->targetGuid = target->GetObjectGuid();
-    packet->spellId = spellEntry->Id;
+    packet->spellId = spellId;
     SendMessageToSet(std::move(packet), true);
 }
 
@@ -809,7 +809,7 @@ void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log) con
     auto packet = std::make_unique<WorldPackets::Spell::SpellNonMeleeDamageLog>();
     packet->targetGuid = log->target->GetObjectGuid();
     packet->attackerGuid = log->attacker->GetObjectGuid();
-    packet->spellId = log->spellEntry->Id;
+    packet->spellId = log->spellId;
     packet->damage = log->damage;
     packet->school = log->school;
     packet->absorbedDamage = log->absorb;
@@ -822,9 +822,9 @@ void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log) con
     SendMessageToSet(std::move(packet), true);
 }
 
-void SpellCaster::SendSpellNonMeleeDamageLog(Unit const* target, SpellEntry const* spellEntry, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit, bool split) const
+void SpellCaster::SendSpellNonMeleeDamageLog(Unit const* target, uint32 spellId, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit, bool split) const
 {
-    SpellNonMeleeDamage log(const_cast<SpellCaster*>(this), const_cast<Unit*>(target), spellEntry, GetFirstSchoolInMask(damageSchoolMask));
+    SpellNonMeleeDamage log(const_cast<SpellCaster*>(this), const_cast<Unit*>(target), spellId, GetFirstSchoolInMask(damageSchoolMask));
     log.damage = damage;
     log.damage += (resist < 0 ? uint32(std::abs(resist)) : 0);
     log.damage -= (absorbedDamage + (resist > 0 ? uint32(resist) : 0) + blocked);
@@ -1592,9 +1592,16 @@ void SpellCaster::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabili
     if (!pVictim->IsAlive() || pVictim->IsTaxiFlying() || (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode()))
         return;
 
+    SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(damageInfo->spellId);
+    if (spellProto == nullptr)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SpellCaster::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->spellId);
+        return;
+    }
+
     // Call default DealDamage (send critical in hit info for threat calculation)
     CleanDamage cleanDamage(0, BASE_ATTACK, damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT ? MELEE_HIT_CRIT : MELEE_HIT_NORMAL, damageInfo->absorb, damageInfo->resist);
-    DealDamage(pVictim, damageInfo->damage, &cleanDamage, damageInfo->spellEntry->HasAttribute(SPELL_ATTR_EX3_TREAT_AS_PERIODIC) ? DOT : SPELL_DIRECT_DAMAGE, GetSchoolMask(damageInfo->school), damageInfo->spellEntry, durabilityLoss, damageInfo->spell, damageInfo->reflected);
+    DealDamage(pVictim, damageInfo->damage, &cleanDamage, spellProto->HasAttribute(SPELL_ATTR_EX3_TREAT_AS_PERIODIC) ? DOT : SPELL_DIRECT_DAMAGE, GetSchoolMask(damageInfo->school), spellProto, durabilityLoss, damageInfo->spell, damageInfo->reflected);
 }
 
 uint32 SpellCaster::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell, bool reflected)
@@ -2181,7 +2188,7 @@ bool SpellCaster::CheckLockout(SpellSchoolMask schoolMask) const
 
 bool SpellCaster::GetExpireTime(SpellEntry const* spellEntry, TimePoint& expireTime, bool& isPermanent) const
 {
-    auto spellItr = m_cooldownMap.FindBySpellEntry(spellEntry);
+    auto spellItr = m_cooldownMap.FindBySpellId(spellEntry->Id);
     if (spellItr != m_cooldownMap.end())
     {
         auto& cdData = spellItr->second;
@@ -2221,7 +2228,7 @@ bool SpellCaster::IsSpellReady(SpellEntry const* spellEntry, ItemPrototype const
         }
     }
 
-    if (m_cooldownMap.FindBySpellEntry(spellEntry) != m_cooldownMap.end())
+    if (m_cooldownMap.FindBySpellId(spellEntry->Id) != m_cooldownMap.end())
         return false;
 
     if (spellCategory && m_cooldownMap.FindByCategory(spellCategory) != m_cooldownMap.end())
@@ -2237,8 +2244,8 @@ bool SpellCaster::IsSpellOnPermanentCooldown(SpellEntry const* spellEntry) const
 {
     TimePoint now = World::GetCurrentClockTime();
 
-    auto itr = m_cooldownMap.FindBySpellEntry(spellEntry);
-    if (itr != m_cooldownMap.end() && !itr->second->IsSpellCDExpired(now))
+    auto itr = m_cooldownMap.FindBySpellId(spellEntry->Id);
+    if (itr != m_cooldownMap.end() && !(*itr).second->IsSpellCDExpired(now))
         return itr->second->IsPermanent();
 
     return false;
@@ -2255,7 +2262,7 @@ void SpellCaster::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
 
 void SpellCaster::RemoveSpellCooldown(SpellEntry const* spellEntry, bool /*updateClient = true*/)
 {
-    m_cooldownMap.RemoveBySpellEntry(spellEntry);
+    m_cooldownMap.RemoveBySpellId(spellEntry->Id);
 }
 
 void SpellCaster::RemoveSpellCategoryCooldown(uint32 category, bool /*updateClient = true*/)

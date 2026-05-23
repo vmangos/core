@@ -242,11 +242,11 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
     SendPacket(&data);
 }
 
-void WorldSession::SendTrainingSuccess(ObjectGuid guid, SpellEntry const* spellEntry)
+void WorldSession::SendTrainingSuccess(ObjectGuid guid, uint32 spellId)
 {
     auto packet = std::make_unique<WorldPackets::Npc::TrainerBuySucceeded>();
     packet->trainerGuid = guid;
-    packet->spellId = spellEntry ? spellEntry->Id : 0; // should be same as in packet from client
+    packet->spellId = spellId; // should be same as in packet from client
     SendPacket(std::move(packet));
 }
 
@@ -336,7 +336,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPackets::Npc::TrainerBuySpel
     if (cast_result == SPELL_CAST_OK)
     {
         _player->ModifyMoney(-int32(nSpellCost));
-        SendTrainingSuccess(packet.guid, proto);
+        SendTrainingSuccess(packet.guid, packet.spellId);
     }
     else
         SendTrainingFailure(packet.guid, packet.spellId, TRAIN_FAIL_UNAVAILABLE);

@@ -386,7 +386,7 @@ class WorldSession
         // Trainer
         void SendTrainerList(ObjectGuid guid);
         void SendTrainerList(ObjectGuid guid, std::string const& strTitle);
-        void SendTrainingSuccess(ObjectGuid guid, SpellEntry const* spellEntry);
+        void SendTrainingSuccess(ObjectGuid guid, uint32 spellId);
         void SendTrainingFailure(ObjectGuid guid, uint32 serviceId, uint32 errorCode);
 
         // NPC

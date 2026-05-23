@@ -1725,7 +1725,7 @@ bool Map::ScriptCommand_AddSpellCooldown(ScriptInfo const& script, WorldObject* 
         pSource->AddCooldown(pSpellEntry, nullptr, false, script.addCooldown.cooldown * IN_MILLISECONDS);
 
         if (Player* pPlayer = pSource->ToPlayer())
-            pPlayer->SendSpellCooldown(pSpellEntry, Milliseconds(script.addCooldown.cooldown * IN_MILLISECONDS), pPlayer->GetObjectGuid());
+            pPlayer->SendSpellCooldown(pSpellEntry->Id, Milliseconds(script.addCooldown.cooldown * IN_MILLISECONDS), pPlayer->GetObjectGuid());
     }
 
 

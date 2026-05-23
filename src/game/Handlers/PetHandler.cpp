@@ -115,14 +115,14 @@ void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
 
             if (!pCharmedUnit->IsSpellReady(spellInfo))
             {
-                pCharmedUnit->SendPetCastFail(spellInfo, SPELL_FAILED_NOT_READY);
+                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_NOT_READY);
                 return;
             }
 
             // do not cast not learned spells
             if (!pCharmedUnit->HasSpell(spellid) || spellInfo->IsPassiveSpell())
             {
-                pCharmedUnit->SendPetCastFail(spellInfo, SPELL_FAILED_NOT_KNOWN);
+                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_NOT_KNOWN);
                 return;
             }
 
@@ -130,7 +130,7 @@ void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
 
             if (!pUnitTarget && explicitlySelectedTarget)
             {
-                pCharmedUnit->SendPetCastFail(spellInfo, SPELL_FAILED_BAD_IMPLICIT_TARGETS);
+                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_BAD_IMPLICIT_TARGETS);
                 return;
             }
 
@@ -141,7 +141,7 @@ void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
                 // spells not castable on self like Fire Shield
                 spellInfo->HasAttribute(SPELL_ATTR_EX_EXCLUDE_CASTER)))
             {
-                pCharmedUnit->SendPetCastFail(spellInfo, SPELL_FAILED_BAD_TARGETS);
+                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_BAD_TARGETS);
                 return;
             }
 
@@ -170,7 +170,7 @@ void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
                     pCharmedUnit->StopMoving();
             }
             else
-                pCharmedUnit->SendPetCastFail(spellInfo, result);
+                pCharmedUnit->SendPetCastFail(spellid, result);
 
 
             break;
@@ -529,9 +529,9 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPackets::Pet::PetCastSpell cons
     }
     else
     {
-        pet->SendPetCastFail(spellInfo, result);
+        pet->SendPetCastFail(packet.spellId, result);
         if (pet->IsSpellReady(spellInfo))
-            GetPlayer()->SendClearCooldown(spellInfo, pet);
+            GetPlayer()->SendClearCooldown(packet.spellId, pet);
 
         spell->finish(false);
         spell->Delete();

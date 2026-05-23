@@ -323,7 +323,7 @@ bool EffectDummyCreature_npc_snufflenose_gopher(WorldObject* pCaster, uint32 uiS
             if (pUnit->GetTargetGuid() != pCreatureTarget->GetObjectGuid())
             {
                 // Send Spell_FAILED_BAD_TARGETS
-                pCreatureTarget->SendPetCastFail(sSpellMgr.GetSpellEntry(SPELL_SNUFFLENOSE_COMMAND), SPELL_FAILED_BAD_TARGETS);
+                pCreatureTarget->SendPetCastFail(SPELL_SNUFFLENOSE_COMMAND, SPELL_FAILED_BAD_TARGETS);
                 return false;
             }
 

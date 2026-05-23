@@ -183,7 +183,7 @@ void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
         }
 
         PetSpellCooldown cooldownEntry;
-        cooldownEntry.spell = spellEntry;
+        cooldownEntry.spell = spellId;
         cooldownEntry.whenReadyAgainTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::from_time_t(time));
         lastPetCache->spellCooldowns.push_back(cooldownEntry);
         ++count;
