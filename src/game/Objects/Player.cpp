@@ -3608,7 +3608,7 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
                 {
                     // update spell ranks in spellbook and action bar
                     auto supercededPacket = std::make_unique<WorldPackets::Spell::SupercededSpell>();
-                    supercededPacket->oldSpellId = spellInfo->Id;
+                    supercededPacket->oldSpellId = spellId;
                     supercededPacket->newSpellId = next_active_spell_id;
                     GetSession()->SendPacket(std::move(supercededPacket));
                 }
@@ -3931,7 +3931,6 @@ void Player::RemoveSpell(uint32 spellId, bool disabled, bool learnLowRank)
     // activate lesser rank in spellbook/action bar, and cast it if need
     bool previousActivated = false;
 
-    auto spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (uint32 previousId = sSpellMgr.GetPrevSpellInChain(spellId))
     {
         uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(previousId);
@@ -3964,7 +3963,7 @@ void Player::RemoveSpell(uint32 spellId, bool disabled, bool learnLowRank)
                     {
                         // downgrade spell ranks in spellbook and action bar
                         auto supercededPacket = std::make_unique<WorldPackets::Spell::SupercededSpell>();
-                        supercededPacket->oldSpellId = spellInfo->Id;
+                        supercededPacket->oldSpellId = spellId;
                         supercededPacket->newSpellId = previousId;
                         GetSession()->SendPacket(std::move(supercededPacket));
                         previousActivated = true;
@@ -3976,7 +3975,7 @@ void Player::RemoveSpell(uint32 spellId, bool disabled, bool learnLowRank)
 
     // remove from spell book if not replaced by lesser rank
     if (!previousActivated)
-        SendSpellRemoved(spellInfo->Id);
+        SendSpellRemoved(spellId);
 }
 
 void Player::_LoadSpellCooldowns(std::unique_ptr<QueryResult> result)

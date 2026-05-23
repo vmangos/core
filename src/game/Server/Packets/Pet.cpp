@@ -1,7 +1,5 @@
 #include "Pet.h"
 
-#include "SpellEntry.h"
-
 void WorldPackets::Pet::QueryPetName::ReadFromWorldPacket(WorldPacket& recv_data)
 {
     recv_data >> petNumber;
