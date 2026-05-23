@@ -5,8 +5,6 @@
 #include "ObjectGuid.h"
 #include "DBCEnums.h"
 
-class SpellEntry;
-
 // pet_spell_cooldown
 struct PetSpellCooldown
 {

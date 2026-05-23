@@ -766,40 +766,40 @@ int32 SpellCaster::DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* s
         pHealer = pUnit->GetOwner();
 
     if (IsPlayer() || pVictim->IsPlayer())
-        pHealer->SendHealSpellLog(pVictim, spellProto, addhealth, critical);
+        pHealer->SendHealSpellLog(pVictim, spellProto->Id, addhealth, critical);
 
     return gain;
 }
 
-void SpellCaster::SendHealSpellLog(Unit const* pVictim, SpellEntry const* spellEntry, uint32 Damage, bool critical) const
+void SpellCaster::SendHealSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, bool critical) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     auto packet = std::make_unique<WorldPackets::Spell::SpellHealLog>();
-    packet->targetGuid = pVictim->GetObjectGuid();
+    packet->targetGuid = pTarget->GetObjectGuid();
     packet->healerGuid = GetObjectGuid();
-    packet->spellId = spellEntry->Id;
-    packet->healAmount = Damage;
+    packet->spellId = spellId;
+    packet->healAmount = amount;
     packet->isCritical = critical;
     SendMessageToSet(std::move(packet), true);
 #endif
 }
 
-void SpellCaster::EnergizeBySpell(Unit* pVictim, SpellEntry const* spellEntry, uint32 Damage, Powers powertype)
+void SpellCaster::EnergizeBySpell(Unit* pTarget, uint32 spellId, uint32 amount, Powers powertype)
 {
-    SendEnergizeSpellLog(pVictim, spellEntry, Damage, powertype);
+    SendEnergizeSpellLog(pTarget, spellId, amount, powertype);
     // needs to be called after sending spell log
-    pVictim->ModifyPower(powertype, Damage);
+    pTarget->ModifyPower(powertype, amount);
 }
 
-void SpellCaster::SendEnergizeSpellLog(Unit const* pVictim, SpellEntry const* spellEntry, uint32 Damage, Powers powertype) const
+void SpellCaster::SendEnergizeSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, Powers powertype) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     auto packet = std::make_unique<WorldPackets::Spell::SpellEnergizeLog>();
-    packet->targetGuid = pVictim->GetObjectGuid();
+    packet->targetGuid = pTarget->GetObjectGuid();
     packet->casterGuid = GetObjectGuid();
-    packet->spellId = spellEntry->Id;
+    packet->spellId = spellId;
     packet->powerType = static_cast<uint32>(powertype);
-    packet->amount = Damage;
+    packet->amount = amount;
     SendMessageToSet(std::move(packet), true);
 #endif
 }

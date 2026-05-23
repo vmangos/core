@@ -398,9 +398,9 @@ public:
     void SendSpellDamageResist(Unit const* target, uint32 spellId) const;
     void SendSpellOrDamageImmune(Unit const* target, uint32 spellId) const;
     int32 DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* spellProto, bool critical = false);
-    void SendHealSpellLog(Unit const* pVictim, SpellEntry const* spellEntry, uint32 Damage, bool critical = false) const;
-    void EnergizeBySpell(Unit* pVictim, SpellEntry const* spellEntry, uint32 Damage, Powers powertype);
-    void SendEnergizeSpellLog(Unit const* pVictim, SpellEntry const* spellEntry, uint32 Damage, Powers powertype) const;
+    void SendHealSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, bool critical = false) const;
+    void EnergizeBySpell(Unit* pTarget, uint32 spellId, uint32 amount, Powers powertype);
+    void SendEnergizeSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, Powers powertype) const;
 
     void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut) const;
     DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex) const;

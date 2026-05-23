@@ -3613,7 +3613,7 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
                     GetSession()->SendPacket(std::move(supercededPacket));
                 }
                 else
-                    SendSpellRemoved(spellInfo->Id);
+                    SendSpellRemoved(spellId);
             }
 
             return active;                                  // learn (show in spell book if active now)

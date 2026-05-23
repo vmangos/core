@@ -1227,7 +1227,7 @@ void Aura::TriggerSpell()
                         if (int32 mana = triggerTarget->GetMaxPower(POWER_MANA))
                         {
                             mana /= 10;
-                            triggerTarget->EnergizeBySpell(triggerTarget, sSpellMgr.GetSpellEntry(23493), mana, POWER_MANA);
+                            triggerTarget->EnergizeBySpell(triggerTarget, 23493, mana, POWER_MANA);
                         }
                         return;
                     }
@@ -1295,7 +1295,7 @@ void Aura::TriggerSpell()
                         if (target->GetPower(POWER_MANA) >= 10)
                         {
                             target->ModifyPower(POWER_MANA, -10);
-                            target->SendEnergizeSpellLog(target, sSpellMgr.GetSpellEntry(27746), -10, POWER_MANA);
+                            target->SendEnergizeSpellLog(target, 27746, -10, POWER_MANA);
                         }
                         else
                             target->RemoveAurasDueToSpell(27746);
@@ -5772,7 +5772,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 SpellMissInfo result = pCaster->SpellHitResult(target, spellProto, GetEffIndex(), false);
                 if (result != SPELL_MISS_NONE)
                 {
-                    pCaster->SendSpellMiss(target, spellProto->Id, result);
+                    pCaster->SendSpellMiss(target, GetId(), result);
                     return;
                 }
             }
@@ -5885,7 +5885,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 SpellMissInfo result = pCaster->SpellHitResult(target, spellProto, GetEffIndex(), false);
                 if (result != SPELL_MISS_NONE)
                 {
-                    pCaster->SendSpellMiss(target, spellProto->Id, result);
+                    pCaster->SendSpellMiss(target, GetId(), result);
                     return;
                 }
             }
@@ -6082,7 +6082,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 SpellMissInfo result = pCaster->SpellHitResult(target, spellProto, GetEffIndex(), false);
                 if (result != SPELL_MISS_NONE)
                 {
-                    pCaster->SendSpellMiss(target, spellProto->Id, result);
+                    pCaster->SendSpellMiss(target, GetId(), result);
                     return;
                 }
             }

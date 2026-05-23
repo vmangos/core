@@ -1992,7 +1992,7 @@ void Spell::EffectEnergize(SpellEffectIndex effIdx)
     AddExecuteLogInfo(effIdx, info);
 #endif
 
-    m_caster->EnergizeBySpell(unitTarget, m_spellInfo, damage, power);
+    m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, damage, power);
 }
 
 void Spell::SendLoot(ObjectGuid guid, LootType loottype, LockType lockType)

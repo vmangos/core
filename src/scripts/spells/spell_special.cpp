@@ -398,7 +398,7 @@ struct DarkmoonFaireManaConsumptionAuraScript : public AuraScript
         if (target->GetPower(POWER_MANA) >= MANA_COST_PER_TICK)
         {
             target->ModifyPower(POWER_MANA, -MANA_COST_PER_TICK);
-            target->SendEnergizeSpellLog(target, aura->GetSpellProto(), -MANA_COST_PER_TICK, POWER_MANA);
+            target->SendEnergizeSpellLog(target, aura->GetId(), -MANA_COST_PER_TICK, POWER_MANA);
         }
         else
         {
