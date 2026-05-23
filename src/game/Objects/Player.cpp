@@ -19378,7 +19378,7 @@ void Player::ApplyEquipCooldown(Item const* pItem)
 
         auto itemCooldownPacket = std::make_unique<WorldPackets::Item::ItemCooldown>();
         itemCooldownPacket->itemGuid = pItem->GetObjectGuid();
-        itemCooldownPacket->spellId = spellentry->Id;
+        itemCooldownPacket->spellId = spellData.SpellId;
         GetSession()->SendPacket(std::move(itemCooldownPacket));
     }
 }
