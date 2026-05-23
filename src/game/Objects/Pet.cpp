@@ -1525,7 +1525,7 @@ void Pet::_LoadSpellCooldowns()
 {
     if (!m_pTmpCache)
         return;
-
+    
     std::vector<WorldPackets::Spell::SpellCooldownEntry> cooldownEntries;
     auto curTime = sWorld.GetCurrentClockTime();
     for (const auto& it : m_pTmpCache->spellCooldowns)
@@ -1566,7 +1566,14 @@ void Pet::_LoadSpellCooldowns()
         auto packet = std::make_unique<WorldPackets::Spell::SpellCooldown>();
         packet->casterGuid = GetObjectGuid();
         packet->cooldownEntries = std::move(cooldownEntries);
-        owner->GetSession()->SendPacket(std::move(packet));
+
+        // cooldown packet is ignored if create object is not received yet
+        owner->m_Events.AddLambdaEventAtOffset([owner, pkt = std::move(packet)]()
+        {
+            WorldPacket packet(pkt->GetOpcode());
+            pkt->AppendBodyTo(packet);
+            owner->GetSession()->SendPacket(&packet);
+        }, 1);
     }
 }
 
@@ -1581,16 +1588,20 @@ void Pet::_SaveSpellCooldowns()
     SqlStatement stmt = CharacterDatabase.CreateStatement(delSpellCD, "DELETE FROM `pet_spell_cooldown` WHERE `guid` = ?");
     stmt.PExecute(m_charmInfo->GetPetNumber());
 
-    TimePoint currTime = sWorld.GetCurrentClockTime();
-
     for (auto& cdItr : m_cooldownMap)
     {
         auto& cdData = cdItr.second;
         if (!cdData->IsPermanent())
         {
-            TimePoint sTime = currTime;
-            cdData->GetSpellCDExpireTime(sTime);
-            TimePoint spellExpireTime = std::chrono::time_point_cast<std::chrono::milliseconds>(sTime);
+            TimePoint spellExpireTime;
+            cdData->GetSpellCDExpireTime(spellExpireTime);
+
+            if (spellExpireTime.time_since_epoch().count() == 0)
+            {
+                cdData->GetCatCDExpireTime(spellExpireTime);
+                if (spellExpireTime.time_since_epoch().count() == 0)
+                    continue;
+            }
 
             if (m_pTmpCache)
             {
