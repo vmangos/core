@@ -229,7 +229,7 @@ void WorldPackets::Item::ItemPushResult::AppendBodyTo(ByteBuffer& buffer) const
 void WorldPackets::Item::ItemCooldown::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << itemGuid;
-    buffer << spellEntry->Id;
+    buffer << spellId;
 }
 
 void WorldPackets::Item::EnchantmentLog::AppendBodyTo(ByteBuffer& buffer) const

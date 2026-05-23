@@ -9,8 +9,6 @@
 #include <vector>
 #include <array>
 
-class SpellEntry;
-
 namespace WorldPackets { namespace Misc
 {
     class WorldTeleport final : public ClientPacket
@@ -725,7 +723,7 @@ namespace WorldPackets { namespace Misc
         uint32 duration = 0;    // full timer duration in ms
         int32 scale = 0;        // rate of change (-1 = decreasing, 10 = increasing)
         bool paused = false;
-        ::SpellEntry const* maybeSpellEntry = nullptr; // spell causing the timer (nullptr if no spell)
+        uint32 spellId = 0;     // spell causing the timer (nullptr if no spell)
 
         explicit StartMirrorTimer() : ServerPacket(SMSG_START_MIRROR_TIMER) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
@@ -754,6 +752,7 @@ namespace WorldPackets { namespace Misc
 
     struct TransferPendingTransportInfo
     {
+        TransferPendingTransportInfo(uint32 transport, uint32 map) : transportEntry(transport), oldMapId(map) {};
         uint32 transportEntry = 0;
         uint32 oldMapId = 0;
     };

@@ -654,7 +654,7 @@ float SpellCaster::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
 void SpellCaster::SendSpellMiss(Unit const* target, SpellEntry const* spellEntry, SpellMissInfo missInfo) const
 {
     auto packet = std::make_unique<WorldPackets::Spell::SpellLogMiss>();
-    packet->spellEntry = spellEntry;
+    packet->spellId = spellEntry->Id;
     packet->casterGuid = GetObjectGuid();
     WorldPackets::Spell::SpellLogMissEntry entry;
     entry.targetGuid = target->GetObjectGuid();
@@ -668,7 +668,7 @@ void SpellCaster::SendSpellDamageResist(Unit const* target, SpellEntry const* sp
     auto packet = std::make_unique<WorldPackets::Spell::ProcResist>();
     packet->casterGuid = GetObjectGuid();
     packet->targetGuid = target->GetObjectGuid();
-    packet->spellEntry = spellEntry;
+    packet->spellId = spellEntry->Id;
     packet->logFormat = 0; // 0=default, 1=debug
     SendMessageToSet(std::move(packet), true);
 }
@@ -678,7 +678,7 @@ void SpellCaster::SendSpellOrDamageImmune(Unit const* target, SpellEntry const* 
     auto packet = std::make_unique<WorldPackets::Spell::SpellOrDamageImmune>();
     packet->casterGuid = GetObjectGuid();
     packet->targetGuid = target->GetObjectGuid();
-    packet->spellEntry = spellEntry;
+    packet->spellId = spellEntry->Id;
     SendMessageToSet(std::move(packet), true);
 }
 
@@ -777,7 +777,7 @@ void SpellCaster::SendHealSpellLog(Unit const* pVictim, SpellEntry const* spellE
     auto packet = std::make_unique<WorldPackets::Spell::SpellHealLog>();
     packet->targetGuid = pVictim->GetObjectGuid();
     packet->healerGuid = GetObjectGuid();
-    packet->spellEntry = spellEntry;
+    packet->spellId = spellEntry->Id;
     packet->healAmount = Damage;
     packet->isCritical = critical;
     SendMessageToSet(std::move(packet), true);
@@ -797,7 +797,7 @@ void SpellCaster::SendEnergizeSpellLog(Unit const* pVictim, SpellEntry const* sp
     auto packet = std::make_unique<WorldPackets::Spell::SpellEnergizeLog>();
     packet->targetGuid = pVictim->GetObjectGuid();
     packet->casterGuid = GetObjectGuid();
-    packet->spellEntry = spellEntry;
+    packet->spellId = spellEntry->Id;
     packet->powerType = static_cast<uint32>(powertype);
     packet->amount = Damage;
     SendMessageToSet(std::move(packet), true);
@@ -809,7 +809,7 @@ void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log) con
     auto packet = std::make_unique<WorldPackets::Spell::SpellNonMeleeDamageLog>();
     packet->targetGuid = log->target->GetObjectGuid();
     packet->attackerGuid = log->attacker->GetObjectGuid();
-    packet->spellEntry = log->spellEntry;
+    packet->spellId = log->spellEntry->Id;
     packet->damage = log->damage;
     packet->school = log->school;
     packet->absorbedDamage = log->absorb;

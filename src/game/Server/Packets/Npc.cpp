@@ -106,7 +106,7 @@ void WorldPackets::Npc::StableResult::AppendBodyTo(ByteBuffer& buffer) const
 void WorldPackets::Npc::TrainerBuySucceeded::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << trainerGuid;
-    buffer << spellEntry->Id;
+    buffer << spellId;
 }
 
 void WorldPackets::Npc::TrainerBuyFailed::AppendBodyTo(ByteBuffer& buffer) const

@@ -1542,7 +1542,7 @@ void Pet::_LoadSpellCooldowns()
             continue;
 
         WorldPackets::Spell::SpellCooldownEntry entry;
-        entry.spellEntry = spellEntry;
+        entry.spellId = spellEntry->Id;
         entry.cooldown = spellRecTime;
         cooldownEntries.emplace_back(entry);
 

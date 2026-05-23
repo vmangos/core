@@ -128,7 +128,7 @@ void WorldPackets::Pet::PetTameFailure::AppendBodyTo(ByteBuffer& buffer) const
 
 void WorldPackets::Pet::PetCastFailed::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << status;
     buffer << reason;
 }

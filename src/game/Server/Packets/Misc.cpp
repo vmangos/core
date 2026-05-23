@@ -476,7 +476,7 @@ void WorldPackets::Misc::StartMirrorTimer::AppendBodyTo(ByteBuffer& buffer) cons
     buffer << duration;
     buffer << scale;
     buffer << paused;
-    buffer << (maybeSpellEntry ? maybeSpellEntry->Id : 0u);
+    buffer << spellId;
 }
 
 void WorldPackets::Misc::StopMirrorTimer::AppendBodyTo(ByteBuffer& buffer) const

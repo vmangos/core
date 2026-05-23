@@ -246,7 +246,7 @@ void WorldSession::SendTrainingSuccess(ObjectGuid guid, SpellEntry const* spellE
 {
     auto packet = std::make_unique<WorldPackets::Npc::TrainerBuySucceeded>();
     packet->trainerGuid = guid;
-    packet->spellEntry = spellEntry; // should be same as in packet from client
+    packet->spellId = spellEntry ? spellEntry->Id : 0; // should be same as in packet from client
     SendPacket(std::move(packet));
 }
 

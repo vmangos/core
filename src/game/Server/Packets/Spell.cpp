@@ -39,7 +39,7 @@ void WorldPackets::Spell::CancelChanneling::ReadFromWorldPacket(WorldPacket& rec
 
 void WorldPackets::Spell::CastResult::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << result;
     if (result == static_cast<uint8>(SPELL_RESULT_STATUS_FAIL))
     {
@@ -69,7 +69,7 @@ void WorldPackets::Spell::SpellLogMiss::AppendBodyTo(ByteBuffer& buffer) const
 {
     bool constexpr useExtendedInfo = false; // Seems unused in client
 
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << casterGuid;
     buffer << useExtendedInfo;
     buffer << static_cast<uint32>(missEntries.size());
@@ -89,7 +89,7 @@ void WorldPackets::Spell::ProcResist::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << casterGuid;
     buffer << targetGuid;
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << logFormat;
 }
 
@@ -97,7 +97,7 @@ void WorldPackets::Spell::SpellOrDamageImmune::AppendBodyTo(ByteBuffer& buffer) 
 {
     buffer << casterGuid;
     buffer << targetGuid;
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << logFormat;
 }
 
@@ -106,7 +106,7 @@ void WorldPackets::Spell::SpellHealLog::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << targetGuid.WriteAsPacked();
     buffer << healerGuid.WriteAsPacked();
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << healAmount;
     buffer << isCritical;
 }
@@ -115,7 +115,7 @@ void WorldPackets::Spell::SpellEnergizeLog::AppendBodyTo(ByteBuffer& buffer) con
 {
     buffer << targetGuid.WriteAsPacked();
     buffer << casterGuid.WriteAsPacked();
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << powerType;
     buffer << amount;
 }
@@ -125,7 +125,7 @@ void WorldPackets::Spell::SpellNonMeleeDamageLog::AppendBodyTo(ByteBuffer& buffe
 {
     buffer << targetGuid.WriteAsPackedClientBuildAware();
     buffer << attackerGuid.WriteAsPackedClientBuildAware();
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << damage;
     buffer << school;
     buffer << absorbedDamage;
@@ -144,14 +144,14 @@ void WorldPackets::Spell::SpellCooldown::AppendBodyTo(ByteBuffer& buffer) const
     buffer << casterGuid;
     for (auto const& cooldownEntry : cooldownEntries)
     {
-        buffer << cooldownEntry.spellEntry->Id;
+        buffer << cooldownEntry.spellId;
         buffer << static_cast<uint32>(cooldownEntry.cooldown.count());
     }
 }
 
 void WorldPackets::Spell::ClearCooldown::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << targetGuid;
 }
 
@@ -162,25 +162,25 @@ void WorldPackets::Spell::CooldownCheat::AppendBodyTo(ByteBuffer& buffer) const
 
 void WorldPackets::Spell::CooldownEvent::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << spellEntry->Id;
+    buffer << spellId;
     buffer << casterGuid;
 }
 
 void WorldPackets::Spell::SupercededSpell::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << static_cast<uint16>(oldSpellEntry->Id);
-    buffer << static_cast<uint16>(newSpellEntry->Id);
+    buffer << static_cast<uint16>(oldSpellId);
+    buffer << static_cast<uint16>(newSpellId);
 }
 
 void WorldPackets::Spell::LearnedSpell::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << static_cast<uint16>(spellEntry->Id);
-    buffer << static_cast<int16>(0); // not used
+    buffer << static_cast<uint16>(spellId);
+    buffer << static_cast<int16>(actionBarSlot); // not used
 }
 
 void WorldPackets::Spell::RemovedSpell::AppendBodyTo(ByteBuffer& buffer) const
 {
-    buffer << static_cast<uint16>(spellEntry->Id);
+    buffer << static_cast<uint16>(spellId);
 }
 
 void WorldPackets::Spell::SetSpellModifier::AppendBodyTo(ByteBuffer& buffer) const

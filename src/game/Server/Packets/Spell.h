@@ -9,8 +9,6 @@
 #include "nonstd/optional.hpp"
 #include <vector>
 
-class SpellEntry;
-
 namespace WorldPackets { namespace Spell
 {
     class CastSpell final : public ClientPacket
@@ -76,7 +74,7 @@ namespace WorldPackets { namespace Spell
     class CastResult final : public ServerPacket
     {
     public:
-        ::SpellEntry const* spellEntry;
+        uint32 spellId = 0;
         uint8 result = 0;
         uint8 failureReason = 0;
         nonstd::optional<uint32> failureArg1; // optional argument 1
@@ -117,7 +115,7 @@ namespace WorldPackets { namespace Spell
     class SpellLogMiss final : public ServerPacket
     {
     public:
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
         ObjectGuid casterGuid;
         std::vector<SpellLogMissEntry> missEntries;
 
@@ -130,7 +128,7 @@ namespace WorldPackets { namespace Spell
     public:
         ObjectGuid casterGuid;
         ObjectGuid targetGuid;
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
         uint8 logFormat = 0; // 0=default, 1=debug
 
         explicit ProcResist() : ServerPacket(SMSG_PROCRESIST) {}
@@ -142,7 +140,7 @@ namespace WorldPackets { namespace Spell
     public:
         ObjectGuid casterGuid;
         ObjectGuid targetGuid;
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
         uint8 logFormat = 0; // 0=default, 1=debug
 
         explicit SpellOrDamageImmune() : ServerPacket(SMSG_SPELLORDAMAGE_IMMUNE) {}
@@ -155,7 +153,7 @@ namespace WorldPackets { namespace Spell
     public:
         ObjectGuid targetGuid;
         ObjectGuid healerGuid;
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
         uint32 healAmount = 0;
         bool isCritical = false;
 
@@ -168,7 +166,7 @@ namespace WorldPackets { namespace Spell
     public:
         ObjectGuid targetGuid;
         ObjectGuid casterGuid;
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
         uint32 powerType = 0; // Powers enum value
         uint32 amount = 0;
 
@@ -182,7 +180,7 @@ namespace WorldPackets { namespace Spell
     public:
         ObjectGuid targetGuid;
         ObjectGuid attackerGuid;
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
         uint32 damage = 0;
         uint8 school = 0;       // damage school
         uint32 absorbedDamage = 0;
@@ -201,7 +199,7 @@ namespace WorldPackets { namespace Spell
 
     struct SpellCooldownEntry
     {
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
         Milliseconds cooldown{};
     };
 
@@ -218,7 +216,7 @@ namespace WorldPackets { namespace Spell
     class ClearCooldown final : public ServerPacket
     {
     public:
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
         ObjectGuid targetGuid;
 
         explicit ClearCooldown() : ServerPacket(SMSG_CLEAR_COOLDOWN) {}
@@ -237,7 +235,7 @@ namespace WorldPackets { namespace Spell
     class CooldownEvent final : public ServerPacket
     {
     public:
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
         ObjectGuid casterGuid;
 
         explicit CooldownEvent() : ServerPacket(SMSG_COOLDOWN_EVENT) {}
@@ -247,8 +245,8 @@ namespace WorldPackets { namespace Spell
     class SupercededSpell final : public ServerPacket
     {
     public:
-        ::SpellEntry const* oldSpellEntry = nullptr; // spell being replaced/superseded
-        ::SpellEntry const* newSpellEntry = nullptr; // new spell that supersedes it
+        uint32 oldSpellId = 0; // spell being replaced/superseded
+        uint32 newSpellId = 0; // new spell that supersedes it
 
         explicit SupercededSpell() : ServerPacket(SMSG_SUPERCEDED_SPELL) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
@@ -257,7 +255,8 @@ namespace WorldPackets { namespace Spell
     class LearnedSpell final : public ServerPacket
     {
     public:
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;       // sent as uint16
+        uint16 actionBarSlot = 0; // unused on client
 
         explicit LearnedSpell() : ServerPacket(SMSG_LEARNED_SPELL) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
@@ -266,7 +265,7 @@ namespace WorldPackets { namespace Spell
     class RemovedSpell final : public ServerPacket
     {
     public:
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;    // sent as uint16
 
         explicit RemovedSpell() : ServerPacket(SMSG_REMOVED_SPELL) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;

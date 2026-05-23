@@ -9262,7 +9262,7 @@ void Unit::SendPetCastFail(SpellEntry const* spellEntry, SpellCastResult msg)
     if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
     {
         auto packet = std::make_unique<WorldPackets::Pet::PetCastFailed>();
-        packet->spellEntry = spellEntry;
+        packet->spellId = spellEntry ? spellEntry->Id : 0;
         packet->status = static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
         packet->reason = static_cast<uint8>(msg);
         pOwner->GetSession()->SendPacket(std::move(packet));

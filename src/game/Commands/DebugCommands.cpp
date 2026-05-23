@@ -203,7 +203,7 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
     MANGOS_ASSERT(spellEntry);
 
     auto packet = std::make_unique<WorldPackets::Spell::CastResult>();
-    packet->spellEntry = spellEntry;
+    packet->spellId = spellEntry->Id;
     packet->result = static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
     packet->failureReason = static_cast<uint8>(failnum);
     packet->failureArg1 = failarg1;

@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 
-class SpellEntry;
-
 namespace WorldPackets { namespace Npc
 {
     class GossipHello final : public ClientPacket
@@ -182,7 +180,7 @@ namespace WorldPackets { namespace Npc
     {
     public:
         ObjectGuid trainerGuid;
-        ::SpellEntry const* spellEntry = nullptr;
+        uint32 spellId = 0;
 
         explicit TrainerBuySucceeded() : ServerPacket(SMSG_TRAINER_BUY_SUCCEEDED) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
