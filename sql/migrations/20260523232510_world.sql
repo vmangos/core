@@ -37,6 +37,7 @@ UPDATE `creature` SET `position_x` = -2714.4, `position_y` = -4999.92, `position
 UPDATE `creature` SET `id` = 12348 WHERE `guid` = 6405;
 -- Correct enytry for Mottled Raptor in Sen'jin is 12345, from wowemu
 UPDATE `creature` SET `id` = 12345 WHERE `guid` = 6404;
+
 -- The old Dun morogh rams have wrong entries and wrong positions:
 -- From wowemu, matches image from vanilla:
 UPDATE `creature` SET `id` = 12370, `position_x` = -5531.01, `position_y` = -1358.63, `position_z` = 398.819, `orientation` = 1.7709, `wander_distance` = 2.0, `movement_type` = 1 WHERE `guid` = 4156;
@@ -44,6 +45,41 @@ UPDATE `creature` SET `id` = 12371, `position_x` = -5535.82, `position_y` = -133
 -- The rams should be max level 2 according to Allakhazam
 UPDATE `creature_template` SET `level_max` = 2 WHERE `entry` = 12370;
 UPDATE `creature_template` SET `level_max` = 2 WHERE `entry` = 12371;
+-- Riding Tiger (White) should be Riding Nightsaber
+UPDATE `creature` SET `id` = 12361 WHERE `guid` = 49183;
+-- For some reason had display_scale1 = 1 in DB while all others had 0
+UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 12361;
+-- Should have max level 2 according to Allakhazam
+UPDATE `creature_template` SET `display_scale1` = 0, `level_max` = 2 WHERE `entry` = 12361;
+
+-- Riding Tiger (Black) should be Riding Frostsaber
+UPDATE `creature` SET `id` = 12362 WHERE `guid` = 48577;
+-- Should have max level 2 according to Allakhazam
+UPDATE `creature_template` SET `display_scale1` = 0, `level_max` = 2 WHERE `entry` = 12362;
+
+-- Riding Stripped Nightsaber had diffrent spawn in pre 1.4
+-- Used to have the same location Riding Striped Frostsaber uses post 1.4
+UPDATE `creature` SET `patch_min` = 2 WHERE `guid` = 46332;
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (217037, 12360, 0, 0, 0, 0, 1, 10132.7, 2526.33, 1325.56, 3.63028, 300, 300, 0.0, 100.0, 100.0, 0, 0, 0.0, 0, 1);
+INSERT INTO creature_addon
+(guid, patch, display_id, mount_display_id, equipment_id, stand_state, sheath_state, emote_state, auras)
+VALUES(217037, 0, 0, -1, -1, 3, 1, 0, NULL);
+
+-- Riding Spotted Frostsaber had diffrent spawn in pre 1.4
+-- Used to have the same location that Swift Stormsaber uses post 1.4:
+UPDATE `creature` SET `patch_min` = 2 WHERE `guid` = 46327;
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (217038, 12359, 0, 0, 0, 0, 1, 10132.9, 2527.95, 1325.16, 4.01426, 300, 300, 0.0, 100.0, 0.0, 0, 0, 0.0, 0, 1);
+INSERT INTO creature_addon
+(guid, patch, display_id, mount_display_id, equipment_id, stand_state, sheath_state, emote_state, auras)
+VALUES(217038, 0, 0, -1, -1, 3, 1, 0, NULL);
+
+-- Riding Striped Frostsaber had diffrent spawn in pre 1.4
+-- Used to have the same location that Riding Spotted Frostsaber uses post 1.4:
+UPDATE `creature` SET `patch_min` = 2 WHERE `guid` = 46321;
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `id5`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (217039, 12358, 0, 0, 0, 0, 1, 10127.7, 2521.29, 1326.04, 1.8675, 300, 300, 0.0, 100.0, 100.0, 0, 0, 0.0, 0, 1);
+INSERT INTO creature_addon
+(guid, patch, display_id, mount_display_id, equipment_id, stand_state, sheath_state, emote_state, auras)
+VALUES(217039, 0, 0, -1, -1, 3, 1, 0, NULL);
 
 -- Sniffed old AQ gong:
 -- Ahn'Qiraj Gong
