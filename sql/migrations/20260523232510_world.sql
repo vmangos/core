@@ -37,10 +37,13 @@ UPDATE `creature` SET `position_x` = -2714.4, `position_y` = -4999.92, `position
 UPDATE `creature` SET `id` = 12348 WHERE `guid` = 6405;
 -- Correct enytry for Mottled Raptor in Sen'jin is 12345, from wowemu
 UPDATE `creature` SET `id` = 12345 WHERE `guid` = 6404;
--- Dun morogh has wrong entries and wrong positions:
+-- The old Dun morogh rams have wrong entries and wrong positions:
 -- From wowemu, matches image from vanilla:
 UPDATE `creature` SET `id` = 12370, `position_x` = -5531.01, `position_y` = -1358.63, `position_z` = 398.819, `orientation` = 1.7709, `wander_distance` = 2.0, `movement_type` = 1 WHERE `guid` = 4156;
 UPDATE `creature` SET `id` = 12371, `position_x` = -5535.82, `position_y` = -1337.64, `position_z` = 398.894, `orientation` = 5.48232, `wander_distance` = 2.0, `movement_type` = 1 WHERE `guid` = 4155;
+-- The rams should be max level 2 according to Allakhazam
+UPDATE `creature_template` SET `level_max` = 2 WHERE `entry` = 12370;
+UPDATE `creature_template` SET `level_max` = 2 WHERE `entry` = 12371;
 
 -- Sniffed old AQ gong:
 -- Ahn'Qiraj Gong
