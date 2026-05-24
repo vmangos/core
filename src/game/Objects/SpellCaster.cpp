@@ -26,6 +26,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
+#include "Utilities/Random.h"
 
 Unit* SpellCaster::SelectMagnetTarget(Unit* victim, Spell* spell, SpellEffectIndex eff)
 {
@@ -351,7 +352,7 @@ float SpellCaster::MeleeSpellMissChance(Unit const* pVictim, WeaponAttackType at
 
         // Bonuses from attacker aura and ratings
         hitChance += pUnit->GetWeaponBasedAuraModifier(attType, SPELL_AURA_MOD_HIT_CHANCE);
-    } 
+    }
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from
     // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking players Weapon Skill.
@@ -433,7 +434,7 @@ SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit const* pVictim, SpellEntry c
     }
     // Check creatures flags_extra for disable parry
     if (Creature const* pCreatureVictim = pVictim->ToCreature())
-    { 
+    {
         if (pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_PARRY))
             canParry = false;
         if (pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_BLOCK))
@@ -567,10 +568,10 @@ int32 SpellCaster::MagicSpellHitChance(Unit const* pVictim, SpellEntry const* sp
             modOwner->ApplySpellMod(spell->Id, SPELLMOD_RESIST_MISS_CHANCE, modHitChance, spellPtr);
         }
     }
-    
+
     // Chance hit from victim SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE auras
     modHitChance += pVictim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE, schoolMask);
-    
+
     // Reduce spell hit chance for Area of effect spells from victim SPELL_AURA_MOD_AOE_AVOIDANCE aura
     if (spell->IsAreaOfEffectSpell())
     {
@@ -583,14 +584,14 @@ int32 SpellCaster::MagicSpellHitChance(Unit const* pVictim, SpellEntry const* sp
         resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->Mechanic);
     // Apply mod
     modHitChance -= resist_mech;
-    
+
     // Chance resist debuff
     modHitChance -= pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DEBUFF_RESISTANCE, int32(spell->Dispel));
-    
+
     // Increase hit chance from attacker SPELL_AURA_MOD_SPELL_HIT_CHANCE and attacker ratings
     if (Unit* pUnit = ToUnit())
         modHitChance += int32(pUnit->m_modSpellHitChance);
-    
+
     // Nostalrius: sorts binaires.
     if (spell->IsBinary())
     {
@@ -652,37 +653,33 @@ float SpellCaster::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
 
 void SpellCaster::SendSpellMiss(Unit const* target, uint32 spellId, SpellMissInfo missInfo) const
 {
-    WorldPacket data(SMSG_SPELLLOGMISS, (4 + 8 + 1 + 4 + 8 + 1));
-    data << uint32(spellId);
-    data << GetObjectGuid();
-    data << uint8(0);                                       // unk8
-    data << uint32(1);                                      // target count
-    // for(i = 0; i < target count; ++i)
-    data << target->GetObjectGuid();                        // target GUID
-    data << uint8(missInfo);
-    // Nostalrius: + 2 * float if unk8=1
-    // end loop
-    SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::SpellLogMiss>();
+    packet->spellId = spellId;
+    packet->casterGuid = GetObjectGuid();
+    WorldPackets::Spell::SpellLogMissEntry entry;
+    entry.targetGuid = target->GetObjectGuid();
+    entry.missInfo = missInfo;
+    packet->missEntries.push_back(entry);
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
 void SpellCaster::SendSpellDamageResist(Unit const* target, uint32 spellId) const
 {
-    WorldPacket data(SMSG_PROCRESIST, 8 + 8 + 4 + 1);
-    data << GetObjectGuid();
-    data << target->GetObjectGuid();
-    data << uint32(spellId);
-    data << uint8(0); // bool - log format: 0-default, 1-debug
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::ProcResist>();
+    packet->casterGuid = GetObjectGuid();
+    packet->targetGuid = target->GetObjectGuid();
+    packet->spellId = spellId;
+    packet->logFormat = 0; // 0=default, 1=debug
+    SendMessageToSet(std::move(packet), true);
 }
 
 void SpellCaster::SendSpellOrDamageImmune(Unit const* target, uint32 spellId) const
 {
-    WorldPacket data(SMSG_SPELLORDAMAGE_IMMUNE, (8 + 8 + 4 + 1));
-    data << GetObjectGuid();
-    data << target->GetObjectGuid();
-    data << uint32(spellId);
-    data << uint8(0);
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::SpellOrDamageImmune>();
+    packet->casterGuid = GetObjectGuid();
+    packet->targetGuid = target->GetObjectGuid();
+    packet->spellId = spellId;
+    SendMessageToSet(std::move(packet), true);
 }
 
 uint32 SpellCaster::SpellCriticalDamageBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim, Spell* spell)
@@ -708,7 +705,7 @@ uint32 SpellCaster::SpellCriticalDamageBonus(SpellEntry const* spellProto, uint3
         if (Player* modOwner = pUnit->GetSpellModOwner())
             modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CRIT_DAMAGE_BONUS, crit_bonus, spell);
     }
-    
+
 
     if (!pVictim)
         return damage += crit_bonus;
@@ -774,62 +771,55 @@ int32 SpellCaster::DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* s
     return gain;
 }
 
-void SpellCaster::SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical) const
+void SpellCaster::SendHealSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, bool critical) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    // we guess size
-    WorldPacket data(SMSG_SPELLHEALLOG, (8 + 8 + 4 + 4 + 1));
-    data << pVictim->GetPackGUID();
-    data << GetPackGUID();
-    data << uint32(SpellID);
-    data << uint32(Damage);
-    data << uint8(critical ? 1 : 0);
-    // data << uint8(0);                                    // [-ZERO]
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::SpellHealLog>();
+    packet->targetGuid = pTarget->GetObjectGuid();
+    packet->healerGuid = GetObjectGuid();
+    packet->spellId = spellId;
+    packet->healAmount = amount;
+    packet->isCritical = critical;
+    SendMessageToSet(std::move(packet), true);
 #endif
 }
 
-void SpellCaster::EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
+void SpellCaster::EnergizeBySpell(Unit* pTarget, uint32 spellId, uint32 amount, Powers powertype)
 {
-    SendEnergizeSpellLog(pVictim, SpellID, Damage, powertype);
+    SendEnergizeSpellLog(pTarget, spellId, amount, powertype);
     // needs to be called after sending spell log
-    pVictim->ModifyPower(powertype, Damage);
+    pTarget->ModifyPower(powertype, amount);
 }
 
-void SpellCaster::SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const
+void SpellCaster::SendEnergizeSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, Powers powertype) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    WorldPacket data(SMSG_SPELLENERGIZELOG, (8 + 8 + 4 + 4 + 4 + 1));
-    data << pVictim->GetPackGUID();
-    data << GetPackGUID();
-    data << uint32(SpellID);
-    data << uint32(powertype);
-    data << uint32(Damage);
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::SpellEnergizeLog>();
+    packet->targetGuid = pTarget->GetObjectGuid();
+    packet->casterGuid = GetObjectGuid();
+    packet->spellId = spellId;
+    packet->powerType = static_cast<uint32>(powertype);
+    packet->amount = amount;
+    SendMessageToSet(std::move(packet), true);
 #endif
 }
 
 void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log) const
 {
-    WorldPacket data(SMSG_SPELLNONMELEEDAMAGELOG, (16 + 4 + 4 + 1 + 4 + 4 + 1 + 1 + 4 + 4 + 1)); // we guess size
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << log->target->GetPackGUID();
-    data << log->attacker->GetPackGUID();
-#else
-    data << log->target->GetGUID();
-    data << log->attacker->GetGUID();
+    auto packet = std::make_unique<WorldPackets::Spell::SpellNonMeleeDamageLog>();
+    packet->targetGuid = log->target->GetObjectGuid();
+    packet->attackerGuid = log->attacker->GetObjectGuid();
+    packet->spellId = log->spellId;
+    packet->damage = log->damage;
+    packet->school = log->school;
+    packet->absorbedDamage = log->absorb;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+    packet->resist = log->resist;
 #endif
-    data << uint32(log->SpellID);
-    data << uint32(log->damage);                            // damage amount
-    data << uint8(log->school);                             // damage school
-    data << uint32(log->absorb);                            // AbsorbedDamage
-    data << int32(log->resist);                             // resist
-    data << uint8(log->periodicLog);                        // if 1, then client show spell name (example: %s's ranged shot hit %s for %u school or %s suffers %u school damage from %s's spell_name
-    data << uint8(false);                                   // unused
-    data << uint32(log->blocked);                           // blocked
-    data << uint32(log->HitInfo);
-    data << uint8(0);                                       // flag to use extend data
-    SendMessageToSet(&data, true);
+    packet->periodicLog = log->periodicLog;
+    packet->blocked = log->blocked;
+    packet->hitInfo = log->HitInfo;
+    SendMessageToSet(std::move(packet), true);
 }
 
 void SpellCaster::SendSpellNonMeleeDamageLog(Unit const* target, uint32 spellId, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit, bool split) const
@@ -1022,7 +1012,7 @@ void SpellCaster::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float da
     }
     else
         damage = 0;
-    damageInfo->damage = ditheru(damage);
+    damageInfo->damage = rand_ditheru(damage);
 }
 
 /**
@@ -1042,7 +1032,7 @@ float SpellCaster::MeleeDamageBonusDone(Unit const* pVictim, float pdamage, Weap
     bool isWeaponDamageBasedSpell = !(spellProto && (damagetype == DOT || spellProto->HasEffect(SPELL_EFFECT_SCHOOL_DAMAGE)));
     Item* pWeapon          = GetTypeId() == TYPEID_PLAYER ? ((Player*)this)->GetWeaponForAttack(attType, true, false) : nullptr;
     uint32 creatureTypeMask = pVictim->GetCreatureTypeMask();
-    uint32 schoolMask       = spellProto ? spellProto->GetSpellSchoolMask() : GetMeleeDamageSchoolMask();
+    uint32 schoolMask = spell ? spell->m_spellSchoolMask : (spellProto ? spellProto->GetSpellSchoolMask() : GetMeleeDamageSchoolMask());
 
     // FLAT damage bonus auras
     // =======================
@@ -1258,7 +1248,7 @@ float SpellCaster::SpellHealingBonusDone(Unit const* pVictim, SpellEntry const* 
         if (Player* modOwner = pUnit->GetSpellModOwner())
             modOwner->ApplySpellMod(spellProto->Id, damagetype == DOT ? SPELLMOD_DOT : SPELLMOD_DAMAGE, heal, spell);
     }
-    
+
     return heal < 0 ? 0 : heal;
 }
 
@@ -1286,7 +1276,7 @@ float SpellCaster:: SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
             }
         }
     }
-    
+
     return AdvertisedBenefit;
 }
 
@@ -1467,7 +1457,7 @@ int32 SpellCaster::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
             }
         }
     }
-    
+
     return DoneAdvertisedBenefit;
 }
 
@@ -1602,10 +1592,10 @@ void SpellCaster::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabili
     if (!pVictim->IsAlive() || pVictim->IsTaxiFlying() || (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode()))
         return;
 
-    SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(damageInfo->SpellID);
+    SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(damageInfo->spellId);
     if (spellProto == nullptr)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SpellCaster::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->SpellID);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SpellCaster::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->spellId);
         return;
     }
 
@@ -2130,13 +2120,13 @@ SpellCastResult SpellCaster::CastSpell(float x, float y, float z, SpellEntry con
     return spell->prepare(std::move(targets), triggeredByAura);
 }
 
-void SpellCaster::AddGCD(SpellEntry const& spellEntry, uint32 forcedDuration /*= 0*/, bool /*updateClient = false*/)
+void SpellCaster::AddGCD(SpellEntry const* spellEntry, uint32 forcedDuration /*= 0*/, bool /*updateClient = false*/)
 {
-    uint32 gcdRecTime = forcedDuration ? forcedDuration : spellEntry.StartRecoveryTime;
+    uint32 gcdRecTime = forcedDuration ? forcedDuration : spellEntry->StartRecoveryTime;
     if (!gcdRecTime)
         return;
 
-    m_GCDCatMap.emplace(spellEntry.StartRecoveryCategory, std::chrono::milliseconds(gcdRecTime) + sWorld.GetCurrentClockTime());
+    m_GCDCatMap.emplace(spellEntry->StartRecoveryCategory, std::chrono::milliseconds(gcdRecTime) + sWorld.GetCurrentClockTime());
 }
 
 bool SpellCaster::HasGCD(SpellEntry const* spellEntry) const
@@ -2150,11 +2140,11 @@ bool SpellCaster::HasGCD(SpellEntry const* spellEntry) const
     return !m_GCDCatMap.empty();
 }
 
-void SpellCaster::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* /*itemProto = nullptr*/, bool /*permanent = false*/, uint32 forcedDuration /*= 0*/)
+void SpellCaster::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* /*itemProto = nullptr*/, bool /*permanent = false*/, uint32 forcedDuration /*= 0*/)
 {
-    uint32 recTimeDuration = forcedDuration ? forcedDuration : spellEntry.RecoveryTime;
-    if (recTimeDuration || spellEntry.CategoryRecoveryTime)
-        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTimeDuration, spellEntry.Category, spellEntry.CategoryRecoveryTime);
+    uint32 recTimeDuration = forcedDuration ? forcedDuration : spellEntry->RecoveryTime;
+    if (recTimeDuration || spellEntry->CategoryRecoveryTime)
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTimeDuration, spellEntry->Category, spellEntry->CategoryRecoveryTime);
 }
 
 void SpellCaster::UpdateCooldowns(TimePoint const& now)
@@ -2196,9 +2186,9 @@ bool SpellCaster::CheckLockout(SpellSchoolMask schoolMask) const
     return false;
 }
 
-bool SpellCaster::GetExpireTime(SpellEntry const& spellEntry, TimePoint& expireTime, bool& isPermanent) const
+bool SpellCaster::GetExpireTime(SpellEntry const* spellEntry, TimePoint& expireTime, bool& isPermanent) const
 {
-    auto spellItr = m_cooldownMap.FindBySpellId(spellEntry.Id);
+    auto spellItr = m_cooldownMap.FindBySpellId(spellEntry->Id);
     if (spellItr != m_cooldownMap.end())
     {
         auto& cdData = spellItr->second;
@@ -2221,16 +2211,16 @@ bool SpellCaster::GetExpireTime(SpellEntry const& spellEntry, TimePoint& expireT
     return false;
 }
 
-bool SpellCaster::IsSpellReady(SpellEntry const& spellEntry, ItemPrototype const* itemProto /*= nullptr*/) const
+bool SpellCaster::IsSpellReady(SpellEntry const* spellEntry, ItemPrototype const* itemProto /*= nullptr*/) const
 {
-    uint32 spellCategory = spellEntry.Category;
+    uint32 spellCategory = spellEntry->Category;
 
     // overwrite category by provided category in item prototype during item cast if need
     if (itemProto)
     {
         for (const auto& Spell : itemProto->Spells)
         {
-            if (Spell.SpellId == spellEntry.Id)
+            if (Spell.SpellId == spellEntry->Id)
             {
                 spellCategory = Spell.SpellCategory;
                 break;
@@ -2238,32 +2228,23 @@ bool SpellCaster::IsSpellReady(SpellEntry const& spellEntry, ItemPrototype const
         }
     }
 
-    if (m_cooldownMap.FindBySpellId(spellEntry.Id) != m_cooldownMap.end())
+    if (m_cooldownMap.FindBySpellId(spellEntry->Id) != m_cooldownMap.end())
         return false;
 
     if (spellCategory && m_cooldownMap.FindByCategory(spellCategory) != m_cooldownMap.end())
         return false;
 
-    if (spellEntry.PreventionType == SPELL_PREVENTION_TYPE_SILENCE && CheckLockout(spellEntry.GetSpellSchoolMask()))
+    if (spellEntry->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && CheckLockout(spellEntry->GetSpellSchoolMask()))
         return false;
 
     return true;
 }
 
-bool SpellCaster::IsSpellReady(uint32 spellId, ItemPrototype const* itemProto /*= nullptr*/) const
-{
-    SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
-    if (!spellEntry)
-        return false;
-
-    return IsSpellReady(*spellEntry, itemProto);
-}
-
-bool SpellCaster::IsSpellOnPermanentCooldown(SpellEntry const& spellEntry) const
+bool SpellCaster::IsSpellOnPermanentCooldown(SpellEntry const* spellEntry) const
 {
     TimePoint now = World::GetCurrentClockTime();
 
-    auto itr = m_cooldownMap.FindBySpellId(spellEntry.Id);
+    auto itr = m_cooldownMap.FindBySpellId(spellEntry->Id);
     if (itr != m_cooldownMap.end() && !(*itr).second->IsSpellCDExpired(now))
         return itr->second->IsPermanent();
 
@@ -2279,18 +2260,9 @@ void SpellCaster::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
     }
 }
 
-void SpellCaster::RemoveSpellCooldown(uint32 spellId, bool updateClient /*= true*/)
+void SpellCaster::RemoveSpellCooldown(SpellEntry const* spellEntry, bool /*updateClient = true*/)
 {
-    SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
-    if (!spellEntry)
-        return;
-
-    RemoveSpellCooldown(*spellEntry, updateClient);
-}
-
-void SpellCaster::RemoveSpellCooldown(SpellEntry const& spellEntry, bool /*updateClient = true*/)
-{
-    m_cooldownMap.RemoveBySpellId(spellEntry.Id);
+    m_cooldownMap.RemoveBySpellId(spellEntry->Id);
 }
 
 void SpellCaster::RemoveSpellCategoryCooldown(uint32 category, bool /*updateClient = true*/)

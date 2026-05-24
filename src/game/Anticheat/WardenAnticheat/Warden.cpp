@@ -30,6 +30,7 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "Log.h"
+#include "Errors.h"
 #include "Opcodes.h"
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"
@@ -41,6 +42,7 @@
 #include "WardenWin.hpp"
 #include "WardenMac.hpp"
 #include "WardenScanMgr.hpp"
+#include "Utilities/Random.h"
 
 #include <zlib.h>
 #include <algorithm>
@@ -229,7 +231,7 @@ void Warden::SendModuleToClient()
 
 std::vector<std::shared_ptr<Scan const>> Warden::SelectScans(ScanFlags flags) const
 {
-    return std::move(sWardenScanMgr.GetRandomScans(static_cast<ScanFlags>(flags | GetScanFlags()), m_clientBuild));
+    return sWardenScanMgr.GetRandomScans(static_cast<ScanFlags>(flags | GetScanFlags()), m_clientBuild);
 }
 
 void Warden::EnqueueScans(std::vector<std::shared_ptr<Scan const>>&& scans)
@@ -266,7 +268,7 @@ void Warden::RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans)
         if (request + (*i)->requestSize > MaxRequest || reply + (*i)->replySize > MaxReply ||
             m_pendingScans.size() >= sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_NUM_SCANS))
         {
-            m_enqueuedScans = std::move(std::vector<std::shared_ptr<Scan const>>(i, m_enqueuedScans.end()));
+            m_enqueuedScans = std::vector<std::shared_ptr<Scan const>>(i, m_enqueuedScans.end());
             queueUpdated = true;
             break;
         }
@@ -358,33 +360,33 @@ void Warden::ReadScanResults(ByteBuffer& buff)
 
 void Warden::SendPacket(ByteBuffer const& buff)
 {
-    WorldPacket pkt(SMSG_WARDEN_DATA, buff.wpos());
-    pkt.append(buff);
+    auto packet = std::make_unique<WorldPackets::Warden::WardenDataServer>();
+    packet->encryptedData.append(buff);
 
-    // we specifically append the packet copy, rather than the input copy, to avoid
+    // we specifically encrypt the packet copy, rather than the input copy, to avoid
     // creating side-effects for this function
-    EncryptData(const_cast<uint8*>(pkt.contents()), pkt.wpos());
+    EncryptData(const_cast<uint8*>(packet->encryptedData.contents()), packet->encryptedData.wpos());
 
-    sWorld.GetMessager().AddMessage([packet = std::move(pkt), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world)
+    sWorld.GetMessager().AddMessage([packet = std::move(packet), accountId = m_accountId, sessionGuid = m_sessionGuid](World* world) mutable
     {
         if (WorldSession* session = world->FindSession(accountId))
         {
             if (session->GetGUID() == sessionGuid)
-                session->SendPacket(&packet);
+                session->SendPacket(std::move(packet));
         }
     });
 }
 
 void Warden::SendPacketDirect(ByteBuffer const& buff, WorldSession* session)
 {
-    WorldPacket pkt(SMSG_WARDEN_DATA, buff.wpos());
-    pkt.append(buff);
+    auto packet = std::make_unique<WorldPackets::Warden::WardenDataServer>();
+    packet->encryptedData.append(buff);
 
-    // we specifically append the packet copy, rather than the input copy, to avoid
+    // we specifically encrypt the packet copy, rather than the input copy, to avoid
     // creating side-effects for this function
-    EncryptData(const_cast<uint8*>(pkt.contents()), pkt.wpos());
+    EncryptData(const_cast<uint8*>(packet->encryptedData.contents()), packet->encryptedData.wpos());
 
-    session->SendPacket(&pkt);
+    session->SendPacket(std::move(packet));
 }
 
 void Warden::KickSession() const
@@ -501,7 +503,7 @@ void Warden::ApplyPenalty(std::string message, WardenActions penalty, std::share
     });
 }
 
-void Warden::HandlePacket(WorldPacket& recvData)
+void Warden::HandlePacket(ByteBuffer recvData)
 {
     // initialize decrypt packet
     DecryptData(const_cast<uint8*>(recvData.contents()), recvData.size());
@@ -657,18 +659,20 @@ void Warden::HandlePacket(WorldPacket& recvData)
 void Warden::Update()
 {
     {
-        std::vector<WorldPacket> packetQueue;
+        std::queue<std::vector<uint8>> packetQueue;
 
         {
-            std::lock_guard<std::mutex> lock(m_packetQueueMutex);
-            std::swap(packetQueue, m_packetQueue);
+            std::lock_guard<std::mutex> lock(m_packetDataQueueMutex);
+            std::swap(packetQueue, m_packetDataQueue);
         }
 
-        for (auto& packet : packetQueue)
+        while (packetQueue.size())
         {
+            std::vector<uint8> packetData = std::move(packetQueue.front());
+            packetQueue.pop();
             try
             {
-                HandlePacket(packet);
+                HandlePacket(ByteBuffer::from(std::move(packetData)));
             }
             catch (ByteBufferException &)
             {

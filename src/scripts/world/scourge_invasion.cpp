@@ -124,6 +124,8 @@ void ChangeZoneEventStatus(Creature* pMouth, bool on)
             else
                 sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES, true);
             break;
+        default:
+            break;
     }
 }
 
@@ -138,7 +140,7 @@ void DespawnEventDoodads(Creature* pShard)
         pDoodad->RemoveFromWorld();
 
     std::list<Creature*> finderList;
-    GetCreatureListWithEntryInGrid(finderList, pShard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
+    GetCreatureListWithEntryInGrid(finderList, pShard, NPC_SCOURGE_INVASION_MINION_FINDER, 60.0f);
     for (const auto pFinder : finderList)
         pFinder->RemoveFromWorld();
 }
@@ -160,7 +162,7 @@ void SummonCultists(Unit* pShard)
         return;
 
     std::list<GameObject*> summonerShieldList;
-    GetGameObjectListWithEntryInGrid(summonerShieldList, pShard, { GOBJ_SUMMONER_SHIELD }, INSPECT_DISTANCE);
+    GetGameObjectListWithEntryInGrid(summonerShieldList, pShard, GOBJ_SUMMONER_SHIELD, INSPECT_DISTANCE);
     for (const auto pSummonerShield : summonerShieldList)
         pSummonerShield->Despawn();
 
@@ -186,7 +188,7 @@ void DespawnCultists(Unit* pDespawner)
         return;
 
     std::list<Creature*> cultistList;
-    GetCreatureListWithEntryInGrid(cultistList, pDespawner, { NPC_CULTIST_ENGINEER }, INSPECT_DISTANCE);
+    GetCreatureListWithEntryInGrid(cultistList, pDespawner, NPC_CULTIST_ENGINEER, INSPECT_DISTANCE);
     for (const auto pCultist : cultistList)
         if (pCultist)
             pCultist->ForcedDespawn();
@@ -198,7 +200,7 @@ void DespawnShadowsOfDoom(Unit* pDespawner)
         return;
 
     std::list<Creature*> shadowList;
-    GetCreatureListWithEntryInGrid(shadowList, pDespawner, { NPC_SHADOW_OF_DOOM }, 200.0f);
+    GetCreatureListWithEntryInGrid(shadowList, pDespawner, NPC_SHADOW_OF_DOOM, 200.0f);
     for (const auto pShadow : shadowList)
         if (pShadow && pShadow->IsAlive() && !pShadow->IsInCombat())
             pShadow->ForcedDespawn();
@@ -245,7 +247,7 @@ uint32 GetFindersAmount(Creature* pShard)
 {
     uint32 finderCounter = 0;
     std::list<Creature*> finderList;
-    GetCreatureListWithEntryInGrid(finderList, pShard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
+    GetCreatureListWithEntryInGrid(finderList, pShard, NPC_SCOURGE_INVASION_MINION_FINDER, 60.0f);
     for (const auto pFinder : finderList)
         if (pFinder)
             finderCounter++;
@@ -322,6 +324,8 @@ struct MouthAI : public ScriptedAI
                 m_creature->RemoveFromWorld();
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -336,6 +340,8 @@ struct MouthAI : public ScriptedAI
                 case EVENT_MOUTH_OF_KELTHUZAD_YELL:
                     DoScriptText(PickRandomValue(BCT_MOUTH_OF_KELTHUZAD_RANDOM_1, BCT_MOUTH_OF_KELTHUZAD_RANDOM_2, BCT_MOUTH_OF_KELTHUZAD_RANDOM_3, BCT_MOUTH_OF_KELTHUZAD_RANDOM_4), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
                     m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, urand((IN_MILLISECONDS * 150), (IN_MILLISECONDS * HOUR)));
+                    break;
+                default:
                     break;
             }
         }
@@ -431,6 +437,8 @@ struct NecropolisHealthAI : public ScriptedAI
             case ZONEID_AZSHARA:
                 TEMP_SI_ATTACK_ZONE = VARIABLE_SI_AZSHARA_REMAINING;
                 break;
+            default:
+                break;
         }
 
         int numb = sObjectMgr.GetSavedVariable(TEMP_SI_ATTACK_ZONE);
@@ -485,6 +493,8 @@ struct NecropolisProxyAI : public ScriptedAI
                 if (Creature* pHealth = m_creature->FindNearestCreature(NPC_NECROPOLIS_HEALTH, 200.0f))
                     m_creature->CastSpell(pHealth, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
                 break;
+            default:
+                break;
         }
     }
 
@@ -530,6 +540,8 @@ struct NecropolisRelayAI : public ScriptedAI
             case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
                 if (Creature* pProxy = m_creature->FindNearestCreature(NPC_NECROPOLIS_PROXY, 200.0f))
                     m_creature->CastSpell(pProxy, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+                break;
+            default:
                 break;
         }
     }
@@ -626,6 +638,8 @@ struct NecroticShard : public ScriptedAI
                     pCaster->CastSpell(pCaster, SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON, true);
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -678,6 +692,8 @@ struct NecroticShard : public ScriptedAI
                 // Remove Objects from the event around the Shard (Yes this is Blizzlike).
                 DespawnEventDoodads(m_creature);
                 break;
+            default:
+                break;
         }
     }
 
@@ -700,7 +716,7 @@ struct NecroticShard : public ScriptedAI
                     int finderAmount = urand(1, 3); // Up to 3 spawns.
 
                     std::list<Creature*> finderList;
-                    GetCreatureListWithEntryInGrid(finderList, m_creature, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
+                    GetCreatureListWithEntryInGrid(finderList, m_creature, NPC_SCOURGE_INVASION_MINION_FINDER, 60.0f);
                     if (finderList.empty())
                         return;
 
@@ -751,6 +767,8 @@ struct NecroticShard : public ScriptedAI
                     m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_BUTTRESS, IN_MILLISECONDS * HOUR);
                     break;
                 }
+                default:
+                    break;
             }
         }
     }
@@ -775,7 +793,7 @@ struct MinionspawnerAI : public ScriptedAI
 
     EventMap m_events;
 
-    void Reset() {}
+    void Reset() override {}
 
     void UpdateAI(uint32 const diff) override
     {
@@ -808,6 +826,8 @@ struct MinionspawnerAI : public ScriptedAI
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
     }
@@ -864,6 +884,8 @@ struct npc_cultist_engineer : public ScriptedAI
                         pShard->AddAura(SPELL_BUTTRESS_CHANNEL);
                     }
                 }
+                default:
+                    break;
             }
         }
     }
@@ -915,7 +937,7 @@ struct ScourgeMinion : public ScriptedAI
 
     EventMap m_events;
 
-    void Reset()
+    void Reset() override
     {
         switch (m_creature->GetEntry())
         {
@@ -925,6 +947,8 @@ struct ScourgeMinion : public ScriptedAI
                 break;
             case NPC_FLAMESHOCKER:
                 m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, 2000);
+                break;
+            default:
                 break;
         }
     }
@@ -955,6 +979,8 @@ struct ScourgeMinion : public ScriptedAI
             case NPC_FLAMESHOCKER:
                 m_creature->CastSpell(m_creature, SPELL_FLAMESHOCKERS_REVENGE, true);
                 break;
+            default:
+                break;
         }
     }
 
@@ -964,6 +990,8 @@ struct ScourgeMinion : public ScriptedAI
         {
             case SPELL_SPIRIT_SPAWN_OUT:
                 m_creature->DespawnOrUnsummon(3000);
+                break;
+            default:
                 break;
         }
     }
@@ -1002,7 +1030,7 @@ struct ScourgeMinion : public ScriptedAI
                             }
                         }
                     }
-                    
+
                     break;
                 }
                 case EVENT_DOOM_MINDFLAY:
@@ -1030,6 +1058,8 @@ struct ScourgeMinion : public ScriptedAI
                     m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
                     break;
                 }
+                default:
+                    break;
             }
         }
 
@@ -1161,6 +1191,8 @@ bool GossipSelect_npc_argent_emissary(Player* pPlayer, Creature* pCreature, uint
                 pPlayer->SEND_GOSSIP_MENU(BCT_ARGENT_EMISSARY_FREE_OF_SCOURGE, pCreature->GetGUID());
             break;
         }
+        default:
+            break;
     }
     //pPlayer->CLOSE_GOSSIP_MENU();
     return true;
@@ -1218,7 +1250,7 @@ struct PallidHorrorAI : public ScriptedAI
                     pFlameshocker->CastSpell(pFlameshocker, SPELL_MINION_SPAWN_IN, true);
                     m_flameshockers.insert(pFlameshocker->GetObjectGuid());
                 }
-            }   
+            }
         }
         m_events.Reset();
         m_creature->SetCorpseDelay(10); // Corpse despawns 10 seconds after a crystal spawns.
@@ -1330,6 +1362,8 @@ struct PallidHorrorAI : public ScriptedAI
                     m_events.ScheduleEvent(EVENT_PALLID_SUMMON_FLAMESHOCKER, 2000);
                     break;
                 }
+                default:
+                    break;
             }
         }
 

@@ -60,9 +60,9 @@ bool ChatHandler::HandleNotifyCommand(char* args)
     std::string str = GetMangosString(LANG_GLOBAL_NOTIFY);
     str += args;
 
-    WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
-    data << str;
-    sWorld.SendGlobalMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::Notification>();
+    packet->message = str;
+    sWorld.SendGlobalMessage(std::move(packet));
 
     return true;
 }

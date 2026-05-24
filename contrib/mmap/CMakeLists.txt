@@ -31,9 +31,7 @@ include_directories(
     ../../src/game/vmap
     ../../src/game/Maps
     ../../src/game/Commands
-    ../../dep/include/g3dlite
     ../../src/framework
-    ${ACE_INCLUDE_DIR}
     ../../dep/recastnavigation/
     ../../dep/recastnavigation/Detour/Include
     ../../dep/recastnavigation/Recast/Include
@@ -50,13 +48,13 @@ set(SOURCES
 )
 
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
+mangos_target_flags(${EXECUTABLE_NAME})
 SET_TARGET_PROPERTIES (${EXECUTABLE_NAME} PROPERTIES FOLDER Extractors)
 
 target_link_libraries(${EXECUTABLE_NAME}
-                        vmap 
+                        vmap
                         Detour
                         Recast
-                        ${ACE_LIBRARIES}
                         shared
                         framework
                         )

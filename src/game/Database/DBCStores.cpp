@@ -506,6 +506,16 @@ CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType
     return nullptr;
 }
 
+void GetAllValidCharSectionVariationAndColorPairs(uint8 race, CharSectionType genType, uint8 gender, std::vector<std::pair<uint8, uint8>>& validVariations)
+{
+    auto eqr = sCharSectionMap.equal_range(uint32(genType) | uint32(gender << 8) | uint32(race << 16));
+    for (auto itr = eqr.first; itr != eqr.second; ++itr)
+    {
+        if (!itr->second->HasFlag(SECTION_FLAG_UNAVAILABLE))
+            validVariations.push_back({ itr->second->VariationIndex, itr->second->ColorIndex });
+    }
+}
+
 ChatChannelsEntry const* GetChannelEntryFor(uint32 channel_id)
 {
     // not sorted, numbering index from 0

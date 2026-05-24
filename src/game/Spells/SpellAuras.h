@@ -76,6 +76,7 @@ struct HeartBeatData
 };
 
 class Unit;
+class Player;
 class Item;
 class WorldObject;
 class DynamicObject;
@@ -160,6 +161,7 @@ class SpellAuraHolder
         bool IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) const;
         bool IsNeedVisibleSlot(Unit const* caster) const;
         bool IsRemovedOnShapeLost() const { return m_isRemovedOnShapeLost; }
+        void SetRemovedOnShapeLost(bool removed) { m_isRemovedOnShapeLost = removed; }
         bool IsInUse() const { return m_in_use;}
         bool IsDeleted() const { return m_deleted;}
         bool IsEmptyHolder() const;
@@ -511,8 +513,8 @@ class Aura
         bool IsApplied() const { return m_applied; }
         // Results :
         // - 0 : Not in the same category.
-        // - 1 : I am more important. I apply myself. 
-        // - 2 : Other aura is more important. It applies. 
+        // - 1 : I am more important. I apply myself.
+        // - 2 : Other aura is more important. It applies.
         int CheckExclusiveWith(Aura const* other) const;
         bool ExclusiveAuraCanApply();
         void ExclusiveAuraUnapply();

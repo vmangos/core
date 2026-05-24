@@ -164,7 +164,7 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
     float startPoint[VERTEX_SIZE] = {startPos.y, startPos.z, startPos.x};
     float endPoint[VERTEX_SIZE] = {endPos.y, endPos.z, endPos.x};
 
-    bool const canSwimToDestination = m_sourceUnit->CanSwim() &&
+    bool const canSwimToDestination = m_sourceUnit->CanSwim() && (!m_sourceUnit->IsCreature() || m_sourceUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_USE_SWIM_ANIMATION)) &&
                                       m_sourceUnit->CanSwimAtPosition(startPos) &&
                                       m_sourceUnit->CanSwimAtPosition(endPos);
 
@@ -305,11 +305,20 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
         {
             // we can hit offmesh connection as last poly - closestPointOnPoly() don't like that
             // try to recover by using prev polyref
-            --prefixPolyLength;
-            suffixStartPoly = m_pathPolyRefs[prefixPolyLength - 1];
-            if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint, &PosOverBody)))
+            if (prefixPolyLength > 1) // Prevent out-of-bounds access
             {
-                // suffixStartPoly is still invalid, error state
+                --prefixPolyLength;
+                suffixStartPoly = m_pathPolyRefs[prefixPolyLength - 1];
+                if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint, &PosOverBody)))
+                {
+                    // suffixStartPoly is still invalid, error state
+                    BuildShortcut();
+                    m_type = PATHFIND_NOPATH;
+                    return;
+                }
+            }
+            else
+            {
                 BuildShortcut();
                 m_type = PATHFIND_NOPATH;
                 return;

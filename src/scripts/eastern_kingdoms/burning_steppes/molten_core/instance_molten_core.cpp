@@ -708,7 +708,7 @@ struct instance_molten_core : ScriptedInstance
             SetData(i, m_auiEncounter[i]);
         }
 
-        for (uint32 const& i : m_RuneSates)
+        for (uint64 const& i : m_RuneSates)
         {
             SetData((DATA_RUNE_ACTIVE_0 + 16), i);
         }

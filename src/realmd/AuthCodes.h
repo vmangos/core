@@ -26,7 +26,7 @@
 #ifndef _AUTHCODES_H
 #define _AUTHCODES_H
 
-enum eAuthCmd
+enum eAuthCmd : uint8
 {
     CMD_AUTH_LOGON_CHALLENGE        = 0x00,
     CMD_AUTH_LOGON_PROOF            = 0x01,
@@ -37,7 +37,7 @@ enum eAuthCmd
     CMD_XFER_DATA                   = 0x31,
     CMD_XFER_ACCEPT                 = 0x32,
     CMD_XFER_RESUME                 = 0x33,
-    CMD_XFER_CANCEL                 = 0x34
+    CMD_XFER_CANCEL                 = 0x34,
 };
 
 // not used by us currently
@@ -56,7 +56,7 @@ enum eAuthSrvCmd
     CMD_GRUNT_SUNKEN_ONLINE         = 0x46
 };
 
-enum AuthResult
+enum AuthResult : uint8
 {
     WOW_SUCCESS                     = 0x00,
     WOW_FAIL_UNKNOWN0               = 0x01,                 // Unknown0 - Unable to connect

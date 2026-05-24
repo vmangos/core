@@ -28,16 +28,13 @@
 #include "Group.h"
 #include "LFGMgr.h"
 
-void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
+void WorldSession::HandleMeetingStoneJoinOpcode(WorldPackets::Misc::MeetingStoneJoin const& packet)
 {
-    ObjectGuid guid;
-    recv_data >> guid;
-
     // ignore for remote control state
     if (!_player->IsSelfMover())
         return;
 
-    GameObject* obj = _player->GetGameObjectIfCanInteractWith(guid);
+    GameObject* obj = _player->GetGameObjectIfCanInteractWith(packet.guid);
 
     if (!obj)
         return;
@@ -77,7 +74,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
    sLFGMgr.AddToQueue(_player, gInfo->meetingstone.areaID);
 }
 
-void WorldSession::HandleMeetingStoneLeaveOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleMeetingStoneLeaveOpcode(NullClientPacket const& /*packet*/)
 {
     if (Group* grp = _player->GetGroup())
     {
@@ -102,7 +99,7 @@ void WorldSession::HandleMeetingStoneLeaveOpcode(WorldPacket& /*recv_data*/)
     }
 }
 
-void WorldSession::HandleMeetingStoneInfoOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleMeetingStoneInfoOpcode(NullClientPacket const& /*packet*/)
 {
     if (Group* grp = _player->GetGroup())
     {
@@ -129,15 +126,21 @@ void WorldSession::HandleMeetingStoneInfoOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::SendMeetingstoneFailed(uint8 status)
 {
-    WorldPacket data(SMSG_MEETINGSTONE_JOINFAILED, 1);
-    data << uint8(status);
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::MeetingstoneJoinFailed>();
+    packet->reason = status;
+    SendPacket(std::move(packet));
 }
 
 void WorldSession::SendMeetingstoneSetqueue(uint32 areaid, uint8 status)
 {
-    WorldPacket data(SMSG_MEETINGSTONE_SETQUEUE, 5);
-    data << uint32(areaid);
-    data << uint8(status);
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::MeetingstoneSetQueue>();
+
+    packet->areaId = areaid;
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+    packet->idempotencyToken = 0; // TODO: Must forward this but there are soo many callsites of `SendMeetingstoneSetqueue`
+#else
+    packet->status = status;
+#endif
+
+    SendPacket(std::move(packet));
 }

@@ -10,6 +10,8 @@
 #include "SpellAuras.h"
 #include "Chat.h"
 #include "CharacterDatabaseCache.h"
+#include "Utilities/Random.h"
+
 #include <random>
 
 enum CombatBotSpells
@@ -1065,7 +1067,7 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (IsHigherRankSpell(m_spells.warrior.pDefensiveStance))
                         m_spells.warrior.pDefensiveStance = pSpellEntry;
                 }
-                else if (pSpellEntry->SpellName[0].find("Charge") != std::string::npos)
+                else if (pSpellEntry->SpellName[0] == "Charge")
                 {
                     if (IsHigherRankSpell(m_spells.warrior.pCharge))
                         m_spells.warrior.pCharge = pSpellEntry;
@@ -1797,7 +1799,7 @@ void CombatBotBaseAI::PopulateSpellData()
                 }
                 return pHighestRank;
             };
-            
+
             SpellEntry const* pPoisonSpell = nullptr;
             std::vector<SpellEntry const*> vPoisons;
             if (hasDeadlyPoison && (pPoisonSpell = GetHighestRankOfPoisonByName("Deadly Poison", me->GetLevel())))
@@ -2225,7 +2227,7 @@ bool CombatBotBaseAI::IsValidBuffTarget(Unit const* pTarget, SpellEntry const* p
             if (it == i.first)
                 return false;
     }
-        
+
     return true;
 }
 
@@ -2249,6 +2251,61 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
     }
 
     return nullptr;
+}
+
+Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSingleSpellEntry, SpellEntry const* pGroupSpellEntry, SpellEntry const*& pSelectedSpellEntry) const
+{
+    pSelectedSpellEntry = nullptr;
+
+    if (!pSingleSpellEntry && !pGroupSpellEntry)
+        return nullptr;
+
+    if (!pSingleSpellEntry)
+    {
+        pSelectedSpellEntry = pGroupSpellEntry;
+        return SelectBuffTarget(pGroupSpellEntry);
+    }
+
+    if (!pGroupSpellEntry)
+    {
+        pSelectedSpellEntry = pSingleSpellEntry;
+        return SelectBuffTarget(pSingleSpellEntry);
+    }
+
+    Player* pFirstMissingMember = nullptr;
+    uint8 missingMemberCount = 0;
+    Group* pGroup = me->GetGroup();
+    if (pGroup)
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* pMember = itr->getSource())
+            {
+                if (!me->IsValidHelpfulTarget(pMember) ||
+                    pMember->IsGameMaster() ||
+                    !me->IsWithinLOSInMap(pMember) ||
+                    !me->IsWithinDist(pMember, 30.0f) ||
+                    !IsValidBuffTarget(pMember, pSingleSpellEntry) ||
+                    !IsValidBuffTarget(pMember, pGroupSpellEntry))
+                    continue;
+
+                if (!pFirstMissingMember)
+                    pFirstMissingMember = pMember;
+
+                ++missingMemberCount;
+                if (missingMemberCount > 1)
+                {
+                    pSelectedSpellEntry = pGroupSpellEntry;
+                    return pFirstMissingMember;
+                }
+            }
+        }
+    }
+
+    if (missingMemberCount == 1)
+        pSelectedSpellEntry = pSingleSpellEntry;
+
+    return pFirstMissingMember;
 }
 
 Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
@@ -2392,8 +2449,10 @@ void CombatBotBaseAI::LearnPremadeSpecForClass()
     {
         // Use gm command to learn spells on trainers and items.
         LearnRandomTalents();
-        ChatHandler(me).HandleLearnAllTrainerCommand("");
-        ChatHandler(me).HandleLearnAllItemsCommand("");
+        char trainerArgs[] = "";
+        char itemArgs[] = "";
+        ChatHandler(me).HandleLearnAllTrainerCommand(trainerArgs);
+        ChatHandler(me).HandleLearnAllItemsCommand(itemArgs);
     }
 }
 
@@ -2647,7 +2706,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
     for (auto& itr : itemsPerSlot)
     {
         bool hasPrimaryStatItem = false;
-        
+
         for (auto const& pItem : itr.second)
         {
             for (auto const& stat : pItem->ItemStat)
@@ -2747,7 +2806,10 @@ void CombatBotBaseAI::AutoEquipGear(uint32 option)
 
 bool CombatBotBaseAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const
 {
-    if (!me->IsSpellReady(pSpellEntry->Id))
+    if (m_preventCasting)
+        return false;
+
+    if (!me->IsSpellReady(pSpellEntry))
         return false;
 
     if (me->HasGCD(pSpellEntry))
@@ -2799,6 +2861,9 @@ bool CombatBotBaseAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* p
 
 SpellCastResult CombatBotBaseAI::DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry)
 {
+    if (m_preventCasting)
+        return SPELL_FAILED_DONT_REPORT;
+
     if (me != pTarget)
         me->SetFacingToObject(pTarget);
 
@@ -2885,8 +2950,8 @@ void CombatBotBaseAI::AddHunterAmmo()
                     AddItemToInventory(pAmmoProto->ItemId, pAmmoProto->GetMaxStackSize());
                     me->SetAmmo(pAmmoProto->ItemId);
                 }
-            }  
-        }  
+            }
+        }
     }
 }
 
@@ -2955,6 +3020,20 @@ void CombatBotBaseAI::UpdateVisualHonorRankBasedOnItems()
     me->SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_HIGHEST_HONOR_RANK, m_visualHonorRank);
 }
 
+void CombatBotBaseAI::BeginChasing(Unit* pVictim) const
+{
+    if ((m_role == ROLE_RANGE_DPS || m_role == ROLE_HEALER) &&
+        IsRangedDamageClass(me->GetClass()) &&
+       !IsAttackSpeedOverridenForm(me->GetShapeshiftForm()) &&
+       (me->GetPowerPercent(POWER_MANA) > 10.0f || me->GetWeaponForAttack(RANGED_ATTACK, true, true)))
+        me->SetCasterChaseDistance(25.0f);
+    else if (me->HasDistanceCasterMovement())
+        me->SetCasterChaseDistance(0.0f);
+
+    // we use dist = 1 always so we can specify angle, instead of spreading around target like mobs
+    me->GetMotionMaster()->MoveChase(pVictim, 1.0f, m_role == ROLE_MELEE_DPS ? M_PI_F : 0.0f);
+}
+
 bool CombatBotBaseAI::SummonShamanTotems()
 {
     if (m_spells.shaman.pAirTotem &&
@@ -3006,17 +3085,19 @@ SpellCastResult CombatBotBaseAI::CastWeaponBuff(SpellEntry const* pSpellEntry, E
     return spell->prepare(std::move(targets), nullptr);
 }
 
-void CombatBotBaseAI::UseTrinketEffects()
+bool CombatBotBaseAI::UseTrinketEffects(bool onlyToBreakCC)
 {
     if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET1))
-        if (UseItemEffect(pItem))
-            return;
+        if (UseItemEffect(pItem, onlyToBreakCC))
+            return true;
     if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2))
-        if (UseItemEffect(pItem))
-            return;
+        if (UseItemEffect(pItem, onlyToBreakCC))
+            return true;
+
+    return false;
 }
 
-bool CombatBotBaseAI::UseItemEffect(Item* pItem)
+bool CombatBotBaseAI::UseItemEffect(Item* pItem, bool onlyToBreakCC)
 {
     ItemPrototype const* pProto = pItem->GetProto();
     for (auto const& itr : pProto->Spells)
@@ -3025,8 +3106,11 @@ bool CombatBotBaseAI::UseItemEffect(Item* pItem)
         {
             if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(itr.SpellId))
             {
-                if (me->IsSpellReady(*pSpellEntry, pProto))
+                if (me->IsSpellReady(pSpellEntry, pProto))
                 {
+                    if (onlyToBreakCC && !pSpellEntry->HasAttribute(SPELL_ATTR_EX_IMMUNITY_PURGES_EFFECT))
+                        continue;
+
                     if (pSpellEntry->IsPositiveSpell())
                         return me->CastSpell(me, pSpellEntry, false, pItem) == SPELL_CAST_OK;
                     else if (me->GetVictim())
@@ -3036,6 +3120,108 @@ bool CombatBotBaseAI::UseItemEffect(Item* pItem)
         }
     }
     return false;
+}
+
+void CombatBotBaseAI::BreakCrowdControlEffects()
+{
+    if (UseTrinketEffects(true))
+        return;
+
+    switch (me->GetClass())
+    {
+        case CLASS_PALADIN:
+        {
+            if (m_spells.paladin.pDivineShield &&
+                CanTryToCastSpell(me, m_spells.paladin.pDivineShield))
+            {
+                if (DoCastSpell(me, m_spells.paladin.pDivineShield) == SPELL_CAST_OK)
+                {
+                    if (m_role != ROLE_HEALER)
+                    {
+                        me->m_Events.AddLambdaEventAtOffset([player = me, spellId = m_spells.paladin.pDivineShield->Id]()
+                        {
+                            if (player->GetHealthPercent() > 75.0f && player->GetAttackers().size() < 3)
+                                player->RemoveAurasDueToSpellByCancel(spellId);
+                        }, 1 * IN_MILLISECONDS);
+                    }
+                    return;
+                }
+            }
+            break;
+        }
+        case CLASS_MAGE:
+        {
+            if (me->HasUnitState(UNIT_STATE_STUNNED) && m_spells.mage.pBlink &&
+                CanTryToCastSpell(me, m_spells.mage.pBlink))
+            {
+                if (DoCastSpell(me, m_spells.mage.pBlink) == SPELL_CAST_OK)
+                    return;
+            }
+            if (m_spells.mage.pIceBlock &&
+                CanTryToCastSpell(me, m_spells.mage.pIceBlock))
+            {
+                if (DoCastSpell(me, m_spells.mage.pIceBlock) == SPELL_CAST_OK)
+                {
+                    me->m_Events.AddLambdaEventAtOffset([player = me, spellId = m_spells.mage.pIceBlock->Id]()
+                    {
+                        if (player->GetHealthPercent() > 75.0f && player->GetAttackers().size() < 3)
+                            player->RemoveAurasDueToSpellByCancel(spellId);
+                    }, 1 * IN_MILLISECONDS);
+                    return;
+                }
+            }
+            break;
+        }
+        case CLASS_DRUID:
+        {
+            bool polymorphed = false;
+            auto const& auraList = me->GetAurasByType(SPELL_AURA_MOD_CONFUSE);
+            for (auto const& pAura : auraList)
+            {
+                if (pAura->GetSpellProto()->Mechanic == MECHANIC_POLYMORPH)
+                {
+                    polymorphed = true;
+                    break;
+                }
+            }
+
+            if (polymorphed)
+            {
+                SpellEntry const* pShapeshift = nullptr;
+
+                if (m_role == ROLE_TANK && m_spells.druid.pBearForm && CanTryToCastSpell(me, m_spells.druid.pBearForm))
+                    pShapeshift = m_spells.druid.pBearForm;
+                else if (m_role == ROLE_MELEE_DPS && m_spells.druid.pCatForm && CanTryToCastSpell(me, m_spells.druid.pCatForm))
+                    pShapeshift = m_spells.druid.pCatForm;
+                else if (m_role == ROLE_RANGE_DPS && m_spells.druid.pMoonkinForm && CanTryToCastSpell(me, m_spells.druid.pMoonkinForm))
+                    pShapeshift = m_spells.druid.pMoonkinForm;
+                else
+                {
+                    for (auto const& pSpell : m_spells.raw.spells)
+                    {
+                        if (pSpell && pSpell->HasAura(SPELL_AURA_MOD_SHAPESHIFT) && CanTryToCastSpell(me, pSpell))
+                        {
+                            pShapeshift = pSpell;
+                            break;
+                        }
+                    }
+                }
+
+                if (pShapeshift && DoCastSpell(me, pShapeshift) == SPELL_CAST_OK)
+                {
+                    if (m_role == ROLE_HEALER)
+                    {
+                        me->m_Events.AddLambdaEventAtOffset([player = me, spellId = pShapeshift->Id]()
+                        {
+                            player->RemoveAurasDueToSpellByCancel(spellId);
+                        }, 1 * IN_MILLISECONDS);
+                    }
+                    return;
+                }
+            }
+            break;
+        }
+    }
 }
 
 bool CombatBotBaseAI::IsWearingShield(Player* pPlayer) const
@@ -3072,14 +3258,14 @@ void CombatBotBaseAI::SendBattlefieldPortPacket()
 {
     for (uint32 i = BATTLEGROUND_QUEUE_AV; i <= BATTLEGROUND_QUEUE_AB; i++)
     {
-        if (me->IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId(i)))
+        if (me->IsInvitedForBattleGroundQueueType(static_cast<BattleGroundQueueTypeId>(i)))
         {
-            WorldPacket data(CMSG_BATTLEFIELD_PORT);
+            WorldPackets::Battleground::BattleFieldPort packet;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-            data << uint32(GetBattleGrounMapIdByTypeId(BattleGroundTypeId(i)));
+            packet.mapId = GetBattleGrounMapIdByTypeId(static_cast<BattleGroundTypeId>(i));
 #endif
-            data << uint8(1);
-            me->GetSession()->HandleBattleFieldPortOpcode(data);
+            packet.action = 1;
+            me->GetSession()->HandleBattleFieldPortOpcode(packet);
             break;
         }
     }
@@ -3087,19 +3273,18 @@ void CombatBotBaseAI::SendBattlefieldPortPacket()
 
 void CombatBotBaseAI::SendBattlemasterJoinPacket(uint8 battlegroundId)
 {
-    WorldPacket data(CMSG_BATTLEFIELD_JOIN);
-    data << me->GetObjectGuid();                       // battlemaster guid, or player guid if joining queue from BG portal
-
+    uint32 instanceId = 0; // first available
+    uint32 mapId;
     switch (battlegroundId)
     {
         case BATTLEGROUND_QUEUE_AV:
-            data << uint32(MAP_ALTERAC_VALLEY);
+            mapId = MAP_ALTERAC_VALLEY;
             break;
         case BATTLEGROUND_QUEUE_WS:
-            data << uint32(MAP_WARSONG_GULCH);
+            mapId = MAP_WARSONG_GULCH;
             break;
         case BATTLEGROUND_QUEUE_AB:
-            data << uint32(MAP_ARATHI_BASIN);
+            mapId = MAP_ARATHI_BASIN;
             break;
         default:
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Invalid BG queue type!");
@@ -3107,16 +3292,14 @@ void CombatBotBaseAI::SendBattlemasterJoinPacket(uint8 battlegroundId)
             return;
     }
 
-    data << uint32(0);                                 // instance id, 0 if First Available selected
-    data << uint8(0);                                  // join as group
-    me->GetSession()->HandleBattlemasterJoinOpcode(data);
+    me->GetSession()->RequestBgJoinQueue(me->GetObjectGuid(), instanceId, mapId, false);
 }
 
 void CombatBotBaseAI::SendAreaTriggerPacket(uint32 areaTriggerId)
 {
-    WorldPacket data(CMSG_AREATRIGGER);
-    data << uint32(areaTriggerId);
-    me->GetSession()->HandleAreaTriggerOpcode(data);
+    WorldPackets::Misc::AreaTrigger packet;
+    packet.triggerId = areaTriggerId;
+    me->GetSession()->HandleAreaTriggerOpcode(packet);
 }
 
 void CombatBotBaseAI::ActivateNearbyAreaTrigger()
@@ -3146,7 +3329,7 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             if (!me)
                 return;
 
-            std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(MSG_MOVE_WORLDPORT_ACK);
+            auto data = std::make_unique<NullClientPacket>(MSG_MOVE_WORLDPORT_ACK);
             me->GetSession()->QueuePacket(std::move(data));
             break;
         }
@@ -3155,12 +3338,12 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             if (!me)
                 return;
 
-            std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(MSG_MOVE_TELEPORT_ACK);
-            *data << me->GetObjectGuid();
+            auto data = std::make_unique<WorldPackets::Movement::MoveTeleportAck>();
+            data->guid = me->GetObjectGuid();
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            *data << me->GetLastCounterForMovementChangeType(TELEPORT);
+            data->movementCounter = me->GetLastCounterForMovementChangeType(TELEPORT);
 #endif
-            *data << uint32(time(nullptr));
+            data->time = uint32(time(nullptr));
             me->GetSession()->QueuePacket(std::move(data));
             break;
         }
@@ -3180,13 +3363,12 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             uint32 status = *((uint32*)(*packet).contents());
             if (status == TRADE_STATUS_BEGIN_TRADE)
             {
-                std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_BEGIN_TRADE);
+                auto data = std::make_unique<NullClientPacket>(CMSG_BEGIN_TRADE);
                 me->GetSession()->QueuePacket(std::move(data));
             }
             else if (status == TRADE_STATUS_TRADE_ACCEPT)
             {
-                std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_ACCEPT_TRADE);
-                *data << uint32(1);
+                auto data = std::make_unique<WorldPackets::Trade::AcceptTrade>();
                 me->GetSession()->QueuePacket(std::move(data));
             }
             else if (status == TRADE_STATUS_TRADE_COMPLETE)
@@ -3201,9 +3383,9 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             if (!me)
                 return;
 
-            std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_RESURRECT_RESPONSE);
-            *data << me->GetResurrector();
-            *data << uint8(1);
+            auto data = std::make_unique<WorldPackets::Misc::ResurrectResponse>();
+            data->resurrectorGuid = me->GetResurrector();
+            data->accept = true;
             me->GetSession()->QueuePacket(std::move(data));
             break;
         }
@@ -3235,10 +3417,10 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             uint64 guid = *((uint64*)(*packet).contents());
             uint32 slot = *(((uint32*)(*packet).contents()) + 2);
 
-            std::unique_ptr<WorldPacket> data = std::make_unique<WorldPacket>(CMSG_LOOT_ROLL);
-            *data << uint64(guid);
-            *data << uint32(slot);
-            *data << uint8(0); // pass
+            auto data = std::make_unique<WorldPackets::Loot::LootRoll>();
+            data->lootedTarget = ObjectGuid(guid);
+            data->itemSlot = slot;
+            data->rollType = ROLL_PASS;
             me->GetSession()->QueuePacket(std::move(data));
             return;
         }

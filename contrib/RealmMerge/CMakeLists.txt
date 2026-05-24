@@ -21,7 +21,6 @@ endif()
 include_directories(../../src/shared)
 include_directories(../../src/framework/)
 include_directories(${MYSQL_INCLUDE_DIR})
-include_directories(${ACE_INCLUDE_DIR})
 
 if(WIN32)
   include_directories(
@@ -30,9 +29,9 @@ if(WIN32)
 endif()
 
 add_executable(RealmMerge RealmMerge.cpp)
+mangos_target_flags(RealmMerge)
 SET_TARGET_PROPERTIES (RealmMerge PROPERTIES FOLDER Tools)
-target_link_libraries(RealmMerge 
-                    ${ACE_LIBRARIES}
+target_link_libraries(RealmMerge
                     shared
                     framework
 )

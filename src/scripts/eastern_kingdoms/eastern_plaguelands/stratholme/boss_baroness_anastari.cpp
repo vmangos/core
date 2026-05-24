@@ -167,7 +167,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
         //Possess
         if (Possess_Timer < diff)
         {
-            if (m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1)) // au moins 2 joueurs présents
+            if (m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1)) // at least 2 players present
             {
                 if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {

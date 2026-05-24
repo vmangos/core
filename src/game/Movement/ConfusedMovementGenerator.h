@@ -40,7 +40,7 @@ class ConfusedMovementGenerator : public MovementGeneratorMedium< T, ConfusedMov
             i_z = z;
         }
 
-        MovementGeneratorType GetMovementGeneratorType() const { return CONFUSED_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return CONFUSED_MOTION_TYPE; }
     private:
         float i_x, i_y, i_z;
 };

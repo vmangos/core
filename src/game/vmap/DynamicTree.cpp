@@ -22,6 +22,7 @@
 #include "BIHWrap.h"
 #include "RegularGrid.h"
 #include "GameObjectModel.h"
+#include "Errors.h"
 
 template<> struct HashTrait< GameObjectModel>
 {
@@ -292,7 +293,7 @@ bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, flo
 float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist) const
 {
     Vector3 v(x, y, z);
-    G3D::Ray r(v, Vector3::down());
+    G3D::Ray r(v, -Vector3::unitZ()); // down
     DynamicTreeIntersectionCallback callback;
     impl.intersectZAllignedRay(r, callback, maxSearchDist);
 

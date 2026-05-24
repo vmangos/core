@@ -51,15 +51,15 @@
 #include "Chat.h"
 #include "MonsterChatBuilder.h"
 #include "Anticheat.h"
-
 #include "packet_builder.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
+#include "Utilities/Random.h"
 
 ////////////////////////////////////////////////////////////
 // Methods of class MovementInfo
 
-void MovementInfo::Read(ByteBuffer &data)
+void MovementInfo::Read(ByteBuffer& data)
 {
     stime = WorldTimer::getMSTime();
     data >> moveFlags;
@@ -103,6 +103,53 @@ void MovementInfo::Read(ByteBuffer &data)
     }
 }
 
+void MovementInfo::FillFrom(MovementInfo const& info)
+{
+    stime = WorldTimer::getMSTime();
+    moveFlags = info.moveFlags;
+    ctime = info.ctime;
+    pos.x = info.pos.x;
+    pos.y = info.pos.y;
+    pos.z = info.pos.z;
+    pos.o = info.pos.o;
+
+    if (HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    {
+        t_guid = info.t_guid;
+        t_pos.x = info.t_pos.x;
+        t_pos.y = info.t_pos.y;
+        t_pos.z = info.t_pos.z;
+        t_pos.o = info.t_pos.o;
+    }
+
+    if (HasMovementFlag(MOVEFLAG_SWIMMING))
+        s_pitch = info.s_pitch;
+
+    fallTime = info.fallTime;
+
+    if (HasMovementFlag(MOVEFLAG_JUMPING))
+    {
+        jump.zspeed = info.jump.zspeed;
+        jump.cosAngle = info.jump.cosAngle;
+        jump.sinAngle = info.jump.sinAngle;
+        jump.xyspeed = info.jump.xyspeed;
+        if (!jump.startClientTime)
+        {
+            jump.startClientTime = ctime;
+            jump.start = pos;
+        }
+    }
+    else
+    {
+        jump.startClientTime = 0;
+    }
+
+    if (HasMovementFlag(MOVEFLAG_SPLINE_ELEVATION))
+    {
+        splineElevation = info.splineElevation;                                     // unknown
+    }
+}
+
 void MovementInfo::CorrectData()
 {
     // Nostalrius: remove incompatible flags, causing client freezes for example
@@ -141,7 +188,7 @@ void MovementInfo::CorrectData()
 #undef REMOVE_VIOLATING_FLAGS
 }
 
-void MovementInfo::Write(ByteBuffer &data) const
+void MovementInfo::Write(ByteBuffer& data) const
 {
     data << moveFlags;
     data << stime;
@@ -213,7 +260,6 @@ Object::~Object()
     m_uint32Values = nullptr;
     delete[] m_uint32Values_mirror;
     m_uint32Values_mirror = nullptr;
-    m_deleted = true;
 }
 
 void Object::_InitValues()
@@ -299,7 +345,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     buf << GetGUID();
 #endif
     buf << uint8(m_objectTypeId);
-    
+
     BuildMovementUpdate(&buf, updateFlags);
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
@@ -452,9 +498,9 @@ void Object::DestroyForPlayer(Player const* target) const
 {
     MANGOS_ASSERT(target);
 
-    WorldPacket data(SMSG_DESTROY_OBJECT, 8);
-    data << GetObjectGuid();
-    target->GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+    packet->objectGuid = GetObjectGuid();
+    target->GetSession()->SendPacket(std::move(packet));
 }
 
 void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
@@ -567,7 +613,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
     if (IsCreature())
         m.moveFlags = m.moveFlags & ~MOVEFLAG_ROOT;
     *data << m;
-    
+
     if (Unit const* unit = ToUnit())
     {
         *data << float(unit->GetSpeed(MOVE_WALK));
@@ -590,7 +636,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
 {
     if (!target)
         return;
-    
+
     bool const ShowHealthValues = sWorld.getConfig(CONFIG_BOOL_OBJECT_HEALTH_VALUE_SHOW);
 
     bool IsActivateToQuest = false;
@@ -601,20 +647,20 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
     if (updatetype == UPDATETYPE_CREATE_OBJECT)
 #endif
     {
-        if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
+        if (IsType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {
             if (((GameObject*)this)->ActivateToQuest(target) || target->IsGameMaster())
                 IsActivateToQuest = true;
 
             updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
         }
-        else if (isType(TYPEMASK_UNIT) && target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
+        else if (IsType(TYPEMASK_UNIT) && target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
         {
             // Force include dynamic flags to make special info visible.
             updateMask->SetBit(UNIT_DYNAMIC_FLAGS);
         }
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
-        else if (isType(TYPEMASK_ITEM))
+        else if (IsType(TYPEMASK_ITEM))
         {
             // Force include flags field in create object packet,
             // because the static flags need to be sent in that field.
@@ -624,7 +670,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
     }
     else                                                    // case UPDATETYPE_VALUES
     {
-        if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
+        if (IsType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {
             if (((GameObject*)this)->ActivateToQuest(target) || target->IsGameMaster())
                 IsActivateToQuest = true;
@@ -635,7 +681,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
 #endif
         }
     }
-    if (isType(TYPEMASK_GAMEOBJECT))
+    if (IsType(TYPEMASK_GAMEOBJECT))
     {
         std::unique_lock<std::mutex> lock(target->m_visibleGobjsQuestAct_lock);
         target->m_visibleGobjQuestActivated[GetObjectGuid()] = IsActivateToQuest;
@@ -647,7 +693,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
     data->append(updateMask->GetMask(), updateMask->GetLength());
 
     // 2 specialized loops for speed optimization in non-unit case
-    if (isType(TYPEMASK_UNIT))                              // unit (creature/player) case
+    if (IsType(TYPEMASK_UNIT))                              // unit (creature/player) case
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
         {
@@ -778,7 +824,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
 
                     *data << uint32(faction);
                 }
-                // RAID ally-horde : pas de flag FFA
+                // RAID ally-horde : no FFA flag
                 else if (index == PLAYER_FLAGS && (m_uint32Values[index] & PLAYER_FLAGS_FFA_PVP))
                 {
                     Player* owner = ((Unit*)this)->GetCharmerOrOwnerPlayerOrPlayerItself();
@@ -828,7 +874,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                             continue;
                         }
                     }
-                    *data << m_uint32Values[index];     
+                    *data << m_uint32Values[index];
                 }
                 else if (index == UNIT_FIELD_TARGET+1)
                 {
@@ -859,7 +905,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
-    else if (isType(TYPEMASK_GAMEOBJECT))                   // gameobject case
+    else if (IsType(TYPEMASK_GAMEOBJECT))                   // gameobject case
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
         {
@@ -893,7 +939,8 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
-    else if (isType(TYPEMASK_CORPSE))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
+    else if (IsType(TYPEMASK_CORPSE))
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
         {
@@ -919,8 +966,9 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
+#endif
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
-    else if (isType(TYPEMASK_ITEM))
+    else if (IsType(TYPEMASK_ITEM))
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
         {
@@ -1022,7 +1070,7 @@ uint16 Object::GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*&
                     if (plr->IsInSameRaidWith(target))
                         visibleFlag |= UF_FLAG_GROUP_ONLY;
             }
-            
+
             break;
         }
         /*
@@ -1430,7 +1478,7 @@ bool WorldObject::IsWithinLootXPDist(WorldObject const* objToLoot) const
     if (objToLoot->IsCreature() && (static_cast<Creature const*>(objToLoot)->GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS))
         lootDistance += 150.0f;
 
-    return _IsWithinDist(objToLoot, lootDistance, false);
+    return IsWithinDist(objToLoot, lootDistance, false);
 }
 
 float WorldObject::GetVisibilityModifier() const
@@ -1642,7 +1690,7 @@ bool WorldObject::IsInMap(WorldObject const* obj) const
     return IsInWorld() && obj->IsInWorld() && (FindMap() == obj->FindMap());
 }
 
-bool WorldObject::_IsWithinDist(WorldObject const* obj, float const dist2compare, bool const is3D, SizeFactor distcalc) const
+bool WorldObject::IsWithinDist(WorldObject const* obj, float const dist2compare, bool const is3D, SizeFactor distcalc) const
 {
     ASSERT(obj);
     float const dx = GetPositionX() - obj->GetPositionX();
@@ -1783,7 +1831,7 @@ bool WorldObject::CanReachWithMeleeSpellAttack(WorldObject const* pVictim, float
     if (!pVictim || !pVictim->IsInWorld())
         return false;
 
-    float reach = IsUnit() && pVictim->IsUnit() ? 
+    float reach = IsUnit() && pVictim->IsUnit() ?
         static_cast<Unit const*>(this)->GetCombatReachToTarget(static_cast<Unit const*>(pVictim), true, flat_mod) : ATTACK_DISTANCE;
 
     // This check is not related to bounding radius
@@ -1822,7 +1870,7 @@ float WorldObject::GetLeewayBonusRadius() const
     {
         if ((pPlayer->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED) || pPlayer->m_movementInfo.HasMovementFlag(MOVEFLAG_JUMPING))
             return LEEWAY_BONUS_RANGE;
-    }  
+    }
 
     return 0.0f;
 }
@@ -1904,19 +1952,23 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         rand_z = z;
         return true;
     }
-    
+
     Map const* pMap = GetMap();
     Unit const* pUnit = ToUnit();
 
     // 1st case we can fly => Position in the air, easy.
     if (pUnit && pUnit->CanFly())
     {
-        float randAngle1 = rand_norm_f() * 2 * M_PI;
-        float randAngle2 = rand_norm_f() * 2 * M_PI;
+        float theta = rand_norm_f() * 2.0f * M_PI;
+        float u = rand_norm_f() * 2.0f - 1.0f;
         float randDist = rand_norm_f() * distance;
-        rand_x = x + randDist * cos(randAngle1) * sin(randAngle2);
-        rand_y = y + randDist * sin(randAngle2) * sin(randAngle2);
-        rand_z = z + randDist * sin(randAngle2);
+
+        float sinPhi = sqrtf(1.0f - u * u); // Radius of sphere at z
+
+        rand_x = x + randDist * sinPhi * cos(theta);
+        rand_y = y + randDist * sinPhi * sin(theta);
+        rand_z = z + randDist * u;
+
         // May happen in the border of the map
         if (!MaNGOS::IsValidMapCoord(x, y, z) || !MaNGOS::IsValidMapCoord(rand_x, rand_y, rand_z))
             return false;
@@ -1941,7 +1993,7 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
             }
         }
     }
-    
+
     {
         // Otherwise, we find a position on the ground, or in water, or in lava (not for players)
         uint32 moveAllowed = NAV_GROUND | NAV_WATER;
@@ -2125,6 +2177,15 @@ bool WorldObject::IsPositionValid() const
     return MaNGOS::IsValidMapCoord(m_position.x, m_position.y, m_position.z, m_position.o);
 }
 
+void WorldObject::SendMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self) const
+{
+    // TODO Use broadcaster which does the binary conversion automatically
+    WorldPacket binaryPacket;
+    binaryPacket.SetOpcode(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+    SendMessageToSet(&binaryPacket, self);
+}
+
 void WorldObject::SendMessageToSet(WorldPacket* data, bool /*bToSelf*/) const
 {
     //if object is in world, map for it already created!
@@ -2192,6 +2253,13 @@ void WorldObject::SendObjectMessageToSetImpl(WorldPacket* data, bool self, World
     cell.Visit(p, message, *GetMap(), *this, std::max(GetMap()->GetVisibilityDistance(), GetVisibilityModifier()));
 }
 
+void WorldObject::SendObjectMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except) const
+{
+    WorldPacket data(packet->GetOpcode());
+    packet->AppendBodyTo(data);
+    SendObjectMessageToSet(&data, self, except);
+}
+
 void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except) const
 {
     SendObjectMessageToSetImpl<ObjectViewersDeliverer>(data, self, except);
@@ -2232,19 +2300,19 @@ void WorldObject::SendMessageToSetExcept(WorldPacket* data, Player const* skippe
 
 void WorldObject::SendObjectSpawnAnim() const
 {
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
-    data << GetObjectGuid();
-    SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Misc::GameObjectSpawnAnim>();
+    packet->gameObjectGuid = GetObjectGuid();
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
 void WorldObject::SendObjectDeSpawnAnim() const
 {
-    WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-    data << GetObjectGuid();
-    SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Misc::GameObjectDespawnAnim>();
+    packet->gameObjectGuid = GetObjectGuid();
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
-bool WorldObject::isWithinVisibilityDistanceOf(Unit const* viewer, WorldObject const* viewPoint, bool inVisibleList) const
+bool WorldObject::IsWithinVisibilityDistanceOf(Unit const* viewer, WorldObject const* viewPoint, bool inVisibleList) const
 {
     if (viewer->IsTaxiFlying())
     {
@@ -2406,7 +2474,7 @@ Creature* Map::SummonCreature(uint32 entry, float x, float y, float z, float ang
     // Active state set before added to map
     pCreature->SetActiveObjectState(asActiveObject);
     pCreature->Summon(spwtype, despwtime);
-    
+
     // Creature Linking, Initial load is handled like respawn
     if (pCreature->IsLinkingEventTrigger())
         GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, pCreature);
@@ -2758,33 +2826,33 @@ void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float 
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player const* target /*= nullptr*/) const
 {
     // Nostalrius: ignored by client if unit is not loaded
-    WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4 + 8);
-    data << uint32(sound_id);
-    data << GetObjectGuid();
+    auto packet = std::make_unique<WorldPackets::Misc::PlayObjectSound>();
+    packet->soundId = sound_id;
+    packet->sourceGuid = GetObjectGuid();
     if (target)
-        target->SendDirectMessage(&data);
+        target->GetSession()->SendPacket(std::move(packet));
     else
-        SendObjectMessageToSet(&data, true);
+        SendObjectMessageToSet(std::move(packet), true);
 }
 
 void WorldObject::PlayDirectSound(uint32 sound_id, Player const* target /*= nullptr*/) const
 {
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(sound_id);
+    auto packet = std::make_unique<WorldPackets::Misc::PlaySound>();
+    packet->soundId = sound_id;
     if (target)
-        target->SendDirectMessage(&data);
+        target->GetSession()->SendPacket(std::move(packet));
     else
-        SendMessageToSet(&data, true);
+        SendMessageToSet(std::move(packet), true);
 }
 
 void WorldObject::PlayDirectMusic(uint32 music_id, Player const* target /*= nullptr*/) const
 {
-    WorldPacket data(SMSG_PLAY_MUSIC, 4);
-    data << uint32(music_id);
+    auto packet = std::make_unique<WorldPackets::Misc::PlayMusic>();
+    packet->musicId = music_id;
     if (target)
-        target->SendDirectMessage(&data);
+        target->GetSession()->SendPacket(std::move(packet));
     else
-        SendMessageToSet(&data, true);
+        SendMessageToSet(std::move(packet), true);
 }
 
 void WorldObject::UpdateVisibilityAndView()
@@ -2820,7 +2888,7 @@ struct WorldObjectChangeAccumulator
     {
         // send self fields changes in another way, otherwise
         // with new camera system when player's camera too far from player, camera wouldn't receive packets and changes from player
-        if (i_object.isType(TYPEMASK_PLAYER))
+        if (i_object.IsType(TYPEMASK_PLAYER))
             i_object.BuildUpdateDataForPlayer((Player*)&i_object, i_updateDatas);
     }
 
@@ -2920,7 +2988,7 @@ void WorldObject::DestroyForNearbyPlayers()
         if (!plr->IsInVisibleList_Unsafe(this))
             continue;
 
-        if (isType(TYPEMASK_UNIT) && ((Unit*)this)->GetCharmerGuid() == plr->GetObjectGuid()) // TODO: this is for puppet
+        if (IsType(TYPEMASK_UNIT) && ((Unit*)this)->GetCharmerGuid() == plr->GetObjectGuid()) // TODO: this is for puppet
             continue;
 
         DestroyForPlayer(plr);
@@ -3031,6 +3099,15 @@ GameObject* WorldObject::FindRandomGameObject(uint32 entry, float range) const
     return *tcIter;
 }
 
+GameObject* WorldObject::FindNearbyClosedDoor(float range) const
+{
+    GameObject* door = nullptr;
+    MaNGOS::AnyClosedDoorInRangeCheck go_check(this, range);
+    MaNGOS::GameObjectSearcher<MaNGOS::AnyClosedDoorInRangeCheck> checker(door, go_check);
+    Cell::VisitGridObjects(this, checker, range);
+    return door;
+}
+
 Player* WorldObject::FindNearestPlayer(float range) const
 {
     Player* target = nullptr;
@@ -3130,6 +3207,12 @@ uint32 WorldObject::RespawnNearCreaturesByEntry(uint32 entry, float range)
 
 void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z) const
 {
+    GetRelativePositions(fForwardBackward, fLeftRight, x, y);
+    z = GetPositionZ() + fUpDown;
+}
+
+void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float &x, float &y) const
+{
     float orientation = GetOrientation() + M_PI / 2.0f;
 
     float x_coef = cos(orientation);
@@ -3140,7 +3223,6 @@ void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight,
 
     x = GetPositionX() + x_coef * fLeftRight + x_range_add;
     y = GetPositionY() + y_coef * fLeftRight + y_range_add;
-    z = GetPositionZ() + fUpDown;
 }
 
 void WorldObject::GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o) const
@@ -3238,14 +3320,14 @@ void WorldObject::SetActiveObjectState(bool on)
 
     bool world = IsInWorld();
 
-    Map* map;
+    Map* map = nullptr;
     if (world)
     {
         map = GetMap();
         if (GetTypeId() == TYPEID_UNIT)
-            map->Remove((Creature*)this, false);
+            map->Remove(static_cast<Creature*>(this), false);
         else
-            map->Remove((GameObject*)this, false);
+            map->Remove(static_cast<GameObject*>(this), false);
     }
 
     m_isActiveObject = on;
@@ -3253,9 +3335,9 @@ void WorldObject::SetActiveObjectState(bool on)
     if (world)
     {
         if (GetTypeId() == TYPEID_UNIT)
-            map->Add((Creature*)this);
+            map->Add(static_cast<Creature*>(this));
         else
-            map->Add((GameObject*)this);
+            map->Add(static_cast<GameObject*>(this));
     }
 }
 
@@ -3452,11 +3534,6 @@ void WorldObject::LoadMapCellsAround(float dist) const
     Cell::VisitAllObjects(this, notifier, dist, false);
 }
 
-bool WorldObject::isVisibleFor(Player const* u, WorldObject const* viewPoint) const
-{
-    return IsVisibleForInState(u, viewPoint, false);
-}
-
 FactionTemplateEntry const* WorldObject::GetFactionTemplateEntry() const
 {
     FactionTemplateEntry const* entry = sObjectMgr.GetFactionTemplateEntry(GetFactionTemplateId());
@@ -3505,7 +3582,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
         return REP_FRIENDLY;
 
     // always friendly to charmer or owner
-    if (IsUnit() && target->IsUnit() && 
+    if (IsUnit() && target->IsUnit() &&
         static_cast<Unit const*>(this)->GetCharmerOrOwnerOrOwnGuid() == static_cast<Unit const*>(target)->GetCharmerOrOwnerOrOwnGuid())
         return REP_FRIENDLY;
 

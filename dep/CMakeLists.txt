@@ -15,9 +15,21 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+add_subdirectory(g3dlite)
 add_subdirectory(src)
 add_subdirectory(recastnavigation)
 add_subdirectory(gsoap)
-if (USE_EXTRACTORS)
-	add_subdirectory(libmpq)
+if (BUILD_EXTRACTORS)
+  add_subdirectory(libmpq)
+endif()
+
+if (ENABLE_CPPTRACE)
+  add_subdirectory(cpptrace)
+  set_target_properties(cpptrace-lib PROPERTIES FOLDER "3rd Party")
+  get_cmake_property(variables CACHE_VARIABLES) # hide "CPPTRACE_*" variables in default cmake config
+  foreach(variable ${variables})
+    if(variable MATCHES "^CPPTRACE_")
+      mark_as_advanced(${variable})
+    endif()
+  endforeach()
 endif()

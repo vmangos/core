@@ -19,8 +19,9 @@
 set (shared_SRCS
     ByteBuffer.h
     Common.h
-    DelayExecutor.h
+    EnumFlag.h
     Errors.h
+    Errors.cpp
     LockedQueue.h
     Log.h
     migrations_list.h
@@ -32,16 +33,23 @@ set (shared_SRCS
     ServiceWin32.h
     SystemConfig.h
     ThreadPool.h
+    ThreadSpecificPtr.h
+    ThreadSpecificPtr.cpp
     Timer.h
+    Utilities/Random.h
     Util.h
-    WheatyExceptionReport.h
-    WorldPacket.h
     Config/Config.h
     Config/ConfigEnv.h
     Crypto/BigNumber.h
     Crypto/BigNumber.cpp
+    Crypto/CryptoUtils.h
+    Crypto/CryptoUtils.cpp
+    Crypto/InitializeCrypto.h
+    Crypto/InitializeCrypto.cpp
     Crypto/Authentication/SRP6.h
     Crypto/Authentication/SRP6.cpp
+    Crypto/Encoding/Base32.h
+    Crypto/Encoding/Base32.cpp
     Crypto/Encryption/RC4.h
     Crypto/Encryption/RC4.cpp
     Crypto/Hash/HMACSHA1.h
@@ -50,56 +58,103 @@ set (shared_SRCS
     Crypto/Hash/MD5.cpp
     Crypto/Hash/SHA1.h
     Crypto/Hash/SHA1.cpp
+    Compression/ZLib.h
+    Compression/ZLib.cpp
     Database/Database.h
     Database/DatabaseCallback.h
     Database/DatabaseEnv.h
     Database/DatabaseImpl.h
     Database/DatabaseMysql.h
-    Database/DatabasePostgre.h
     Database/DBCFileLoader.h
     Database/DBCStore.h
     Database/Field.h
     Database/MySQLDelayThread.h
-    Database/PGSQLDelayThread.h
     Database/QueryResult.h
     Database/QueryResultMysql.h
-    Database/QueryResultPostgre.h
     Database/SqlDelayThread.h
     Database/SqlOperations.h
     Database/SqlPreparedStatement.h
     Database/SQLStorage.h
     Database/SQLStorageImpl.h
     Multithreading/Messager.h
-    TimePeriod.h
+    nonstd/expected.hpp
+    nonstd/nodiscard.hpp
     nonstd/optional.hpp
+    nonstd/saturating_cast.hpp
+    TimePeriod.h
     ByteBuffer.cpp
     Common.cpp
-    DelayExecutor.cpp
     Log.cpp
     PosixDaemon.cpp
     ProgressBar.cpp
     ServiceWin32.cpp
     ThreadPool.cpp
     Util.cpp
+    Utilities/Random.cpp
     Duration.h
-    WheatyExceptionReport.cpp
     Auth/AuthCrypt.h
-    Auth/base32.h
     Auth/AuthCrypt.cpp
-    Auth/base32.cpp
     Config/Config.cpp
     Database/Database.cpp
     Database/DatabaseMysql.cpp
-    Database/DatabasePostgre.cpp
     Database/DBCFileLoader.cpp
     Database/Field.cpp
     Database/QueryResultMysql.cpp
-    Database/QueryResultPostgre.cpp
     Database/SqlDelayThread.cpp
     Database/SqlOperations.cpp
     Database/SqlPreparedStatement.cpp
     Database/SQLStorage.cpp
     Multithreading/Messager.cpp
+    IO/Context/IoContext.h
+    IO/Utils.h
+    IO/Utils.cpp
+    IO/Utils_Unix.h
+    IO/ReadableBuffer.h
+    IO/Context/IoContext_bsd.cpp
+    IO/Context/IoContext_linux.cpp
+    IO/Context/IoContext_windows.cpp
+    IO/SystemErrorToString.h
+    IO/SystemErrorToString.cpp
+    IO/Networking/Internal.h
+    IO/Networking/Internal.cpp
+    IO/Networking/AsyncSocket.h
+    IO/Networking/AsyncSocket.cpp
+    IO/Networking/AsyncSocket_posix.cpp
+    IO/Networking/AsyncSocket_windows.cpp
+    IO/Networking/AsyncSocketAcceptor.h
+    IO/Networking/AsyncSocketAcceptor_posix.cpp
+    IO/Networking/AsyncSocketAcceptor_windows.cpp
+    IO/Networking/SocketConnector.h
+    IO/Networking/SocketConnector.cpp
+    IO/Networking/NetworkError.h
+    IO/Networking/NetworkError.cpp
+    IO/Networking/SocketDescriptor.h
+    IO/Networking/SocketDescriptor.cpp
+    IO/Networking/Utils.h
+    IO/Networking/Utils.cpp
+    IO/Networking/IpAddress.h
+    IO/Networking/IpAddress.cpp
+    IO/Networking/DNS.h
+    IO/Networking/DNS.cpp
+    IO/Multithreading/CreateThread.h
+    IO/Multithreading/CreateThread.cpp
+    IO/Timer/impl/windows/AsyncSystemTimer.cpp
+    IO/Timer/impl/windows/TimerHandle.cpp
+    IO/Timer/impl/unix/AsyncSystemTimer.cpp
+    IO/Timer/impl/unix/TimerHandle.cpp
+    IO/Timer/AsyncSystemTimer.h
+    IO/Filesystem/FileSystem.h
+    IO/Filesystem/FileHandle.h
+    IO/Filesystem/impl/windows/FileSystem.cpp
+    IO/Filesystem/impl/windows/FileHandle.cpp
+    IO/Filesystem/impl/unix/FileSystem.cpp
+    IO/Filesystem/impl/unix/FileHandle.cpp
+    ProxyProtocol/ProxyV2Reader.h
+    ProxyProtocol/ProxyV2Reader.cpp
+    ArgparserForServer.h
+    ArgparserForServer.cpp
+    Memory/ArrayDeleter.h
+    Memory/NoDeleter.h
     TimePeriod.cpp
 )
 
@@ -113,32 +168,48 @@ if (ENABLE_MAILSENDER)
   )
 endif()
 
-# Exclude Win32 files
-if(WIN32)
+
+if(WIN32) # For window build: Exclude Unix/MacOS files
   list(REMOVE_ITEM shared_SRCS
     PosixDaemon.h
     PosixDaemon.cpp
     revision.h
     migrations_list.h
+    IO/Utils_Unix.h
+    IO/Context/IoContext_linux.cpp
+    IO/Context/IoContext_bsd.cpp
+    IO/Networking/AsyncSocket_posix.cpp
+    IO/Networking/AsyncSocketAcceptor_posix.cpp
+    IO/Timer/impl/unix/AsyncSystemTimer.cpp
+    IO/Timer/impl/unix/TimerHandle.cpp
+    IO/Filesystem/impl/unix/FileSystem.cpp
+    IO/Filesystem/impl/unix/FileHandle.cpp
   )
-
-  if (NOT MSVC)
-    list(REMOVE_ITEM shared_SRCS
-      WheatyExceptionReport.cpp
-      WheatyExceptionReport.h
-    )
-  endif()
-
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
 else()
   list(REMOVE_ITEM shared_SRCS
-    WheatyExceptionReport.cpp
-    WheatyExceptionReport.h
     ServiceWin32.cpp
     ServiceWin32.h
     revision.h
     migrations_list.h
+    IO/Context/IoContext_windows.cpp
+    IO/Networking/AsyncSocket_windows.cpp
+    IO/Networking/AsyncSocketAcceptor_windows.cpp
+    IO/Timer/impl/windows/AsyncSystemTimer.cpp
+    IO/Timer/impl/windows/TimerHandle.cpp
+    IO/Filesystem/impl/windows/FileSystem.cpp
+    IO/Filesystem/impl/windows/FileHandle.cpp
   )
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Remove Linux specific stuff
+    list(REMOVE_ITEM shared_SRCS
+      IO/Context/IoContext_bsd.cpp
+    )
+  else()
+    # Remove macOS specific stuff
+    list(REMOVE_ITEM shared_SRCS
+      IO/Context/IoContext_linux.cpp
+    )
+  endif()
 endif()
 
 source_group("Util"
@@ -166,21 +237,29 @@ source_group("Log"
 add_library(shared STATIC
   ${shared_SRCS}
 )
+mangos_target_flags(shared)
 
 target_include_directories(shared PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/dep/include
   ${CMAKE_SOURCE_DIR}/src/framework
   ${CMAKE_BINARY_DIR}
-  ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
+  ${ZLIB_INCLUDE_DIRS}
 )
+target_compile_definitions(shared PUBLIC OPENSSL_NO_DEPRECATED) # Disable the usage of deprecated OpenSSL functions
 
 if(WIN32)
   target_include_directories(shared PUBLIC
     ${CMAKE_SOURCE_DIR}/dep/windows/include
   )
+
+  if(MINGW)
+    target_include_directories(shared PRIVATE
+      ${CMAKE_SOURCE_DIR}/dep/src/libseh
+    )
+  endif()
 endif()
 
 if (REQUIRES_LIBCURL)
@@ -198,11 +277,31 @@ endif()
 
 if(UNIX)
   find_package(Threads)
-  target_link_libraries(shared PUBLIC ${ACE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(shared PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 endif(UNIX)
 
-if(MINGW)
-  target_link_libraries(shared PUBLIC ${ACE_LIBRARIES} -lws2_32)
+if(WIN32)
+  target_link_libraries(shared PUBLIC ws2_32 mswsock winmm)
+
+  if(MINGW)
+    # MinGW needs libseh for the debugger thread-name SEH handler in
+    # CreateThread.cpp.
+    target_link_libraries(shared PRIVATE libseh)
+  endif()
 endif()
 
-SET_TARGET_PROPERTIES (shared PROPERTIES FOLDER "Game Libs")
+if (ENABLE_CPPTRACE)
+  target_link_libraries(shared PRIVATE cpptrace::cpptrace)
+endif()
+
+if(WIN32)
+  target_link_libraries(shared PUBLIC zlib)
+else()
+  target_link_libraries(shared PUBLIC ${ZLIB_LIBRARIES})
+endif()
+
+SET_TARGET_PROPERTIES(shared PROPERTIES FOLDER "Game Libs")
+
+if (ENABLE_CPPTRACE)
+  target_compile_definitions(shared PRIVATE ENABLE_CPPTRACE)
+endif()

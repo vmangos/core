@@ -30,6 +30,7 @@
 #include "GuardMgr.h"
 #include "Conditions.h"
 #include "Map.h"
+#include "Utilities/Random.h"
 
 bool CreatureEventAIHolder::UpdateRepeatTimer(Creature* creature, uint32 repeatMin, uint32 repeatMax)
 {
@@ -878,7 +879,7 @@ void CreatureEventAI::GroupMemberJustDied(Creature* pUnit, bool isLeader)
 
             if (((bool)i.Event.group_member_died.isLeader) == isLeader)
                 ProcessEvent(i, pUnit);
-        } 
+        }
     }
 }
 

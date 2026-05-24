@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: Boss_Maexxna
 SD%Complete:
-SDComment: 
+SDComment:
 SDCategory: Naxxramas
 EndScriptData */
 
@@ -31,7 +31,7 @@ enum MaexxnaData
 {
     EMOTE_BOSS_GENERIC_ENRAGE   = 2384,
 
-    SPELL_WEBWRAP               = 28622,    
+    SPELL_WEBWRAP               = 28622,
 
     SPELL_WEBSPRAY              = 29484,
     SPELL_POISONSHOCK           = 28741,
@@ -63,7 +63,7 @@ enum MaexxnaData
     SPELL_CLEAR_WEB_WRAP     = 28629,
     */
 
-    MAX_SPIDERLINGS         = 10, // 8 in cmangos, should be 10 
+    MAX_SPIDERLINGS         = 10, // 8 in cmangos, should be 10
     MAX_WEB_WRAP_POSITIONS  = 3
 };
 
@@ -71,13 +71,13 @@ static float WebWrapCooldown(bool initial = false)            { return initial ?
 static float SummonSpiderlingsCooldown(bool initial = false)  { return initial ? 30000 : 40000; }
 static float WebSprayCooldown(bool initial = false)           { return initial ? 40000 : 40000; }
 static float PoisonShockCooldown(bool initial = false)        { return urand(9000,11000); }
-static float NecroticPoisonCooldown(bool initial = false)     { return initial ? 15000 : urand(5000, 10000); } 
+static float NecroticPoisonCooldown(bool initial = false)     { return initial ? 15000 : urand(5000, 10000); }
 
 struct mob_webwrapAI : public ScriptedAI
 {
     mob_webwrapAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        Reset(); 
+        Reset();
     }
 
     ObjectGuid m_victimGuid;
@@ -201,7 +201,7 @@ struct boss_maexxnaAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MAEXXNA, DONE);
     }
 
-    void MoveInLineOfSight(Unit* pWho) override 
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (!m_creature->IsWithinDistInMap(pWho, 40.0f))
             return;
@@ -220,7 +220,7 @@ struct boss_maexxnaAI : public ScriptedAI
             }
         }
     }
-    
+
     void JustReachedHome() override
     {
         if (m_pInstance)
@@ -230,7 +230,7 @@ struct boss_maexxnaAI : public ScriptedAI
         for (Creature* pSpider : spiderlings)
             pSpider->DeleteLater();
     }
-    
+
     bool DoCastWebWrap()
     {
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
@@ -240,7 +240,7 @@ struct boss_maexxnaAI : public ScriptedAI
         std::list<Player*> candidates;
         ThreatList::const_iterator it = tList.begin();
         ++it;
-        for (it; it != tList.end(); ++it)
+        for (; it != tList.end(); ++it)
         {
             Player* pPlayer = (*it)->getTarget()->ToPlayer();
             if (!pPlayer) continue;
@@ -370,7 +370,7 @@ struct boss_maexxnaAI : public ScriptedAI
         }
         else
             m_uiWebWrapTimer -= uiDiff;
-        
+
         // Web Spray
         if (m_uiWebSprayTimer < uiDiff)
         {

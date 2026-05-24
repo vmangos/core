@@ -1,0 +1,13 @@
+diff --git a/dep/g3dlite/source/GThread.cpp b/dep/g3dlite/source/GThread.cpp
+index f6483a75d..9af707ff5 100644
+--- a/dep/g3dlite/source/GThread.cpp
++++ b/dep/g3dlite/source/GThread.cpp
+@@ -91,7 +91,7 @@ typedef struct tagTHREADNAME_INFO {
+ } THREADNAME_INFO;
+ #pragma pack(pop)
+ 
+-static LONG ExceptionIgnorer(PEXCEPTION_POINTERS ex)
++static LONG WINAPI ExceptionIgnorer(PEXCEPTION_POINTERS ex)
+ {
+    return ex->ExceptionRecord->ExceptionCode == MS_VC_EXCEPTION ? EXCEPTION_CONTINUE_EXECUTION : EXCEPTION_CONTINUE_SEARCH;
+ }

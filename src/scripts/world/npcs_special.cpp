@@ -396,7 +396,7 @@ void npc_doctorAI::EndEvent(bool success)
         if (Creature* pPatient = m_creature->GetMap()->GetCreature(guid))
             pPatient->DespawnOrUnsummon(1);
     }
-    
+
     Reset();
 }
 
@@ -558,7 +558,7 @@ struct npc_tonk_mineAI : public ScriptedAI
     void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bArmed)
-        { 
+        {
             if (m_uiArmTimer < uiDiff)
             {
                 m_bArmed = true;
@@ -811,8 +811,8 @@ struct npc_arcanite_dragonlingAI : ScriptedPetAI
     uint32 m_firebuffetTimer;
     uint32 m_flamebreathTimer;
 
-    void Reset() override 
-    { 
+    void Reset() override
+    {
         m_firebuffetTimer = 5000;
         m_flamebreathTimer = urand(10000, 60000);
     }
@@ -1235,7 +1235,7 @@ struct npc_summon_possessedAI : ScriptedAI
             {
                 if (uint32 spellId = m_creature->GetUInt32Value(UNIT_CREATED_BY_SPELL))
                     pPlayer->RemoveAurasDueToSpell(spellId);
-            } 
+            }
         }
 
         ScriptedAI::JustDied(pKiller);
@@ -1436,7 +1436,7 @@ struct npc_target_dummyAI : ScriptedAI
 
     void EnterEvadeMode() override
     {
-        
+
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1787,7 +1787,7 @@ struct npc_sickly_critterAI : CritterAI
                         m_creature->SetEntry(NPC_CURED_DEER);
                         m_creature->SetDisplayId(MODEL_CURED_DEER);
                         break;
-                    case HORDE:
+                    default: // HORDE
                         m_creature->SetEntry(NPC_CURED_GAZELLE);
                         m_creature->SetDisplayId(MODEL_CURED_GAZELLE);
                         break;
@@ -2070,7 +2070,7 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
 
         if (m_creature->GetZoneId() != winningZone && winningZone != 0)
             return;
-        
+
         // If Kwee Q. Peddlefeet is in the winner Zone, start the winner event here.
         switch (winningZone)
         {

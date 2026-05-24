@@ -28,12 +28,12 @@ class IdleMovementGenerator : public MovementGenerator
 {
     public:
 
-        void Initialize(Unit &) {}
-        void Finalize(Unit &) {}
-        void Interrupt(Unit &) {}
-        void Reset(Unit &);
-        bool Update(Unit &, uint32 const&) { return true; }
-        MovementGeneratorType GetMovementGeneratorType() const { return IDLE_MOTION_TYPE; }
+        void Initialize(Unit &) override {}
+        void Finalize(Unit &) override {}
+        void Interrupt(Unit &) override {}
+        void Reset(Unit &) override;
+        bool Update(Unit &, uint32 const&) override { return true; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return IDLE_MOTION_TYPE; }
 };
 
 extern IdleMovementGenerator si_idleMovement;
@@ -43,12 +43,12 @@ class DistractMovementGenerator : public MovementGenerator
     public:
         explicit DistractMovementGenerator(uint32 timer) : m_timer(timer) {}
 
-        void Initialize(Unit& owner);
-        void Finalize(Unit& owner);
-        void Interrupt(Unit&);
-        void Reset(Unit&);
-        bool Update(Unit& owner, uint32 const& time_diff);
-        MovementGeneratorType GetMovementGeneratorType() const { return DISTRACT_MOTION_TYPE; }
+        void Initialize(Unit& owner) override;
+        void Finalize(Unit& owner) override;
+        void Interrupt(Unit&) override;
+        void Reset(Unit&) override;
+        bool Update(Unit& owner, uint32 const& time_diff) override;
+        MovementGeneratorType GetMovementGeneratorType() const override { return DISTRACT_MOTION_TYPE; }
 
     private:
         uint32 m_timer;
@@ -60,8 +60,8 @@ class AssistanceDistractMovementGenerator : public DistractMovementGenerator
         AssistanceDistractMovementGenerator(uint32 timer) :
             DistractMovementGenerator(timer) {}
 
-        MovementGeneratorType GetMovementGeneratorType() const { return ASSISTANCE_DISTRACT_MOTION_TYPE; }
-        void Finalize(Unit& unit);
+        MovementGeneratorType GetMovementGeneratorType() const override { return ASSISTANCE_DISTRACT_MOTION_TYPE; }
+        void Finalize(Unit& unit) override;
 };
 
 #endif

@@ -55,6 +55,6 @@ bool ExtractSingleWmo(std::string& fname);
  */
 bool ExtractSingleModel(std::string& origPath, std::string& fixedName, StringSet& failedPaths);
 
-void ExtractGameobjectModels();
+bool ExtractGameobjectModels();
 
 #endif

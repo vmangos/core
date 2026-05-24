@@ -18,13 +18,18 @@ else()
   message(STATUS "PGO profile           : Disabled")
 endif()
 
-message(STATUS "Memory allocation     : ${ALLOC_LIB_INFO_STRING} ${TBB_LIBRARIES}")
 message(STATUS "Detected compiler     : ${CMAKE_CXX_COMPILER_ID}")
 
 if(BUILD_FOR_HOST_CPU)
   message(STATUS "Build for host CPU    : Yes (default)")
 else()
   message(STATUS "Build for host CPU    : No")
+endif()
+
+if(BUILD_WARNINGS_AS_ERROR)
+  message(STATUS "Warnings as errors    : Yes")
+else()
+  message(STATUS "Warnings as errors    : No (default)")
 endif()
 
 message(STATUS "Build type            : ${CMAKE_BUILD_TYPE}")
@@ -35,10 +40,28 @@ else()
   message(STATUS "Build scripts         : No")
 endif()
 
+if(BUILD_EXTRACTORS)
+  message(STATUS "Build extractors      : Yes")
+else()
+  message(STATUS "Build extractors      : No (default)")
+endif()
+
+if(BUILD_REALMMERGE)
+  message(STATUS "Build realm merge     : Yes")
+else()
+  message(STATUS "Build realm merge     : No (default)")
+endif()
+
 if(ENABLE_MAILSENDER)
   message(STATUS "Mailsender enabled    : Yes")
 else()
   message(STATUS "Mailsender enabled    : No (default)")
+endif()
+
+if(ENABLE_CPPTRACE)
+  message(STATUS "Cpptrace enabled      : Yes (default)")
+else()
+  message(STATUS "Cpptrace enabled      : No")
 endif()
 
 if(UNIX)

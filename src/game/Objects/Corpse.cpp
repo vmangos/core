@@ -292,7 +292,7 @@ bool Corpse::IsExpired(time_t t) const
         return m_time < t - 3 * DAY;
 }
 
-uint32 Corpse::GetFactionTemplateId() const 
+uint32 Corpse::GetFactionTemplateId() const
 {
     return m_faction->ID;
 }

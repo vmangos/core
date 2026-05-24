@@ -37,21 +37,21 @@ enum AtLoginFlags
 
 std::string MakeConnectionString()
 {
-    std::string mysql_host;
-    std::string mysql_port;
+    std::string mysql_server_host;
+    std::string mysql_server_port;
     std::string mysql_user;
     std::string mysql_pass;
     std::string mysql_db;
 
     printf("Host: ");
-    getline(std::cin, mysql_host);
-    if (mysql_host.empty())
-        mysql_host = "127.0.0.1";
+    getline(std::cin, mysql_server_host);
+    if (mysql_server_host.empty())
+        mysql_server_host = "127.0.0.1";
 
     printf("Port: ");
-    getline(std::cin, mysql_port);
-    if (mysql_port.empty())
-        mysql_port = "3306";
+    getline(std::cin, mysql_server_port);
+    if (mysql_server_port.empty())
+        mysql_server_port = "3306";
 
     printf("User: ");
     getline(std::cin, mysql_user);
@@ -63,7 +63,7 @@ std::string MakeConnectionString()
     if (mysql_pass.empty())
         mysql_pass = "root";
 
-    return mysql_host + ";" + mysql_port + ";" + mysql_user + ";" + mysql_pass + ";";
+    return mysql_server_host + ";" + mysql_server_port + ";" + mysql_user + ";" + mysql_pass + ";";
 }
 
 char GetChar()
@@ -311,7 +311,7 @@ bool UpdateCharacterGuids()
 
         CharacterDatabase2.PExecute("UPDATE `character_deleted_items` SET `id` = `id` + %u", maxId);
     }
-    
+
     return true;
 }
 
@@ -1182,7 +1182,7 @@ int main(int argc, char* argv[])
         GetChar();
         return 1;
     }
-    
+
     if (!UpdateItemGuids())
     {
         GetChar();

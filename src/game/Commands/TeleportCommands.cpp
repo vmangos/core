@@ -459,7 +459,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
         {
             std::string name = pParam1;
             WorldDatabase.escape_string(name);
-            std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT guid FROM creature, creature_template WHERE creature.id = creature_template.entry AND creature_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
+            std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT guid FROM creature, creature_template WHERE creature.id = creature_template.entry AND creature_template.name LIKE CONCAT('%%','%s','%%')", name.c_str());
             if (!result)
             {
                 SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
@@ -612,7 +612,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
         {
             std::string name = pParam1;
             WorldDatabase.escape_string(name);
-            std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT guid FROM gameobject, gameobject_template WHERE gameobject.id = gameobject_template.entry AND gameobject_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
+            std::unique_ptr<QueryResult> result = WorldDatabase.PQuery("SELECT guid FROM gameobject, gameobject_template WHERE gameobject.id = gameobject_template.entry AND gameobject_template.name LIKE CONCAT('%%','%s','%%')", name.c_str());
             if (!result)
             {
                 SendSysMessage(LANG_COMMAND_GOOBJNOTFOUND);
@@ -1059,6 +1059,12 @@ bool ChatHandler::HandleStartCommand(char* /*args*/)
     return true;
 }
 
+
+enum : uint32
+{
+    SPELL_UNDYING_SOUL = 20939, // Dummy aura used for Unstuck command
+};
+
 bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
 {
     Player* pPlayer = m_session->GetPlayer();
@@ -1066,7 +1072,8 @@ bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
     if (!pPlayer)
         return false;
 
-    if (pPlayer->IsInCombat() || pPlayer->InBattleGround() || pPlayer->IsTaxiFlying() || !pPlayer->IsSpellReady(20939) || (pPlayer->GetDeathState() == CORPSE) || (pPlayer->GetLevel() < 10))
+    SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(SPELL_UNDYING_SOUL);
+    if (pPlayer->IsInCombat() || pPlayer->InBattleGround() || pPlayer->IsTaxiFlying() || !pPlayer->IsSpellReady(pSpellEntry) || (pPlayer->GetDeathState() == CORPSE) || (pPlayer->GetLevel() < 10))
     {
         SendSysMessage(LANG_UNSTUCK_UNAVAILABLE);
         return false;
@@ -1074,14 +1081,14 @@ bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
 
     if (pPlayer->IsAlive())
     {
-        pPlayer->CastSpell(pPlayer, 20939, false);
+        pPlayer->CastSpell(pPlayer, SPELL_UNDYING_SOUL, false);
         SendSysMessage(LANG_UNSTUCK_ALIVE);
     }
     else
     {
         pPlayer->AddAura(SPELL_ID_PASSIVE_RESURRECTION_SICKNESS); // Add Resurrection Sickness
-        if (SpellEntry const* pSpellEntry= sSpellMgr.GetSpellEntry(20939))
-            pPlayer->AddCooldown(*pSpellEntry, nullptr, false, HOUR * IN_MILLISECONDS); // Trigger 1 Hour Cooldown
+        if (pSpellEntry)
+            pPlayer->AddCooldown(pSpellEntry, nullptr, false, HOUR * IN_MILLISECONDS); // Trigger 1 Hour Cooldown
         // Get nearest graveyard.
         WorldSafeLocsEntry const* pClosestGrave = sObjectMgr.GetClosestGraveYard(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetMapId(), pPlayer->GetTeam());
         if (!pClosestGrave) // No nearby graveyards (stuck in void?). Send ally to Westfall, Horde to Barrens.

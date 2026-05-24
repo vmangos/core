@@ -3,7 +3,7 @@
 ############################################
 
 [RealmdConf]
-ConfVersion=2020010501
+ConfVersion=2026042601
 
 ###################################################################################################################
 # REALMD SETTINGS
@@ -39,15 +39,30 @@ ConfVersion=2020010501
 #         on different IP addresses using default ports.
 #         DO NOT CHANGE THIS UNLESS YOU _REALLY_ KNOW WHAT YOU'RE DOING
 #
+#    TrustedProxyServers
+#        Description: Enables the parsing of Proxy Protocol v2 for specific IPs.
+#                     You can use this feature when your server is behind a proxy, load balancer, or similar component,
+#                     to retrieve the real IP address of players.
+#                     You need to enable Proxy Protocol v2 on both this server and the proxy/load balancer.
+#                     For example see HaProxy "send-proxy-v2" option.
+#                     Multiple servers can be separated with ','
+#        Default:     ""                      - (Disabled, no proxy)
+#        Example      "10.13.37.1,10.13.37.2" - (to allow multiple proxy servers)
+#
 #    PidFile
 #        Realmd daemon PID file
 #        Default: ""             - do not create PID file
 #                 "./realmd.pid" - create PID file (recommended name)
 #
-#    LogLevel
+#    LogLevel.Console
 #        Server console level of logging
-#        0 = Minimum; 1 = Error; 2 = Detail; 3 = Full/Debug
-#        Default: 0
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
+#
+#    LogLevel.File
+#        Server file level of logging
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
 #
 #    LogTime
 #        Include time in server console output [hh:mm:ss]
@@ -82,7 +97,8 @@ ConfVersion=2020010501
 #    WaitAtStartupError
 #        After startup error report wait <Enter> or some time before continue (and possible close console window)
 #                 -1 (wait until <Enter> press)
-#        Default:  0 (not wait)
+#                  0 (no wait)
+#         Default: 5 (wait 5 sec)
 #                  N (>0, wait N secs)
 #
 #    MinRealmListDelay
@@ -93,19 +109,6 @@ ConfVersion=2020010501
 #        Realm list Update up delay (updated at realm list request if delay expired).
 #        Default: 20
 #                 0  (Disabled)
-#
-#    WrongPass.MaxCount
-#        Number of login attemps with wrong password before the account or IP is banned
-#        Default: 0  (Never ban)
-#
-#    WrongPass.BanTime
-#        Duration of the ban in seconds (0 means permanent ban)
-#        Default: 600
-#
-#    WrongPass.BanType
-#        Ban the IP or account on which login is attempted
-#        Default: 0 (Ban IP)
-#                 1 (Ban Account)
 #
 #    ReqEmailVerification
 #        Required that the user has verified their email address before allowing logins
@@ -160,20 +163,19 @@ PatchesDir = "./patches"
 MaxPingTime = 30
 RealmServerPort = 3724
 BindIP = "0.0.0.0"
+TrustedProxyServers = ""
 PidFile = ""
-LogLevel = 0
+LogLevel.Console = 2
+LogLevel.File = 2
 LogTime = 0
 LogFile = "Realmd.log"
 LogTimestamp = 0
 LogFileLevel = 0
 UseProcessors = 0
 ProcessPriority = 1
-WaitAtStartupError = 0
+WaitAtStartupError = 5 # consider fixing your actual problem before changing this value!
 MinRealmListDelay = 1
 RealmsStateUpdateDelay = 20
-WrongPass.MaxCount = 0
-WrongPass.BanTime = 600
-WrongPass.BanType = 0
 ReqEmailVerification = 0
 ReqEmailSince = 0
 GeoLocking = 0
@@ -184,3 +186,24 @@ MailCertChecks = 1
 SendGridKey = ""
 GeolockGUID = ""
 MaxSessionDuration = 300
+
+###################################################################################################################
+#    LOGIN THROTTLE SETTINGS
+#
+#    In-memory brute-force guard on realmd. Locks out an IP after repeated
+#    wrong-password failures within a sliding window. A successful login
+#    clears the failure counter.
+#
+#    WrongPass.MaxAttempts
+#        Maximum wrong-password attempts per IP before further logon challenges are rejected outright.
+#        Set to 0 to disable the brute-force guard entirely.
+#        Default: 10
+#
+#    WrongPass.ThrottleWindowDurationSec
+#        Sliding window for the brute-force guard, in seconds.
+#        Default: 60
+#
+###################################################################################################################
+
+WrongPass.MaxAttempts = 10
+WrongPass.ThrottleWindowDurationSec = 60

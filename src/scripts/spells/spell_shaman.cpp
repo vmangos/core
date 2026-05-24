@@ -35,7 +35,7 @@ struct ShamanFlametongueProcDummyScript : SpellScript
             float weaponSpeed = (1.0f / float(IN_MILLISECONDS)) * spell->m_CastItem->GetProto()->Delay;
             float totalDamage = (spell->damage + 3.85f * spellDamage) * 0.01f * weaponSpeed;
 
-            spell->m_caster->CastCustomSpell(spell->GetUnitTarget(), 10444, dither(totalDamage), {}, {}, true, spell->m_CastItem);
+            spell->m_caster->CastCustomSpell(spell->GetUnitTarget(), 10444, rand_dither(totalDamage), {}, {}, true, spell->m_CastItem);
         }
         return true;
     }
@@ -46,6 +46,28 @@ SpellScript* GetScript_ShamanFlametongueProcDummy(SpellEntry const*)
     return new ShamanFlametongueProcDummyScript();
 }
 
+// 16191 - Mana Tide
+struct ShamanManaTideAuraScript : public AuraScript
+{
+    void OnPeriodicTrigger(Aura* aura, Unit* /*caster*/, Unit* target, WorldObject* /*targetObject*/, SpellEntry const*& spellInfo) final
+    {
+        // Cast custom spell with dithered amount instead of default trigger
+        uint32 triggerSpellId = aura->GetSpellProto()->EffectTriggerSpell[aura->GetEffIndex()];
+        if (triggerSpellId)
+        {
+            int32 ditheredAmount = rand_dither(aura->GetModifier()->m_amount);
+            target->CastCustomSpell(target, triggerSpellId, ditheredAmount, {}, {}, true, nullptr, aura);
+            // Prevent default cast
+            spellInfo = nullptr;
+        }
+    }
+};
+
+AuraScript* GetScript_ShamanManaTide(SpellEntry const*)
+{
+    return new ShamanManaTideAuraScript();
+}
+
 void AddSC_shaman_spell_scripts()
 {
     Script* newscript;
@@ -53,5 +75,10 @@ void AddSC_shaman_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_shaman_flametongue_proc_dummy";
     newscript->GetSpellScript = &GetScript_ShamanFlametongueProcDummy;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_shaman_mana_tide";
+    newscript->GetAuraScript = &GetScript_ShamanManaTide;
     newscript->RegisterSelf();
 }

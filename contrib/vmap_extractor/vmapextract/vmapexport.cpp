@@ -55,6 +55,11 @@
 
 //-----------------------------------------------------------------------------
 
+template<typename T>
+static void IgnoreResult(T const&)
+{
+}
+
 extern ArchiveSet gOpenArchives;
 
 typedef struct
@@ -132,12 +137,13 @@ bool ExtractWmo()
 bool ExtractSingleWmo(std::string& fname)
 {
     // Copy files from archive
+    // Note: This function does not have fallback logic for path variants (underscores vs spaces)
 
     char szLocalFile[1024];
     char* plain_name = GetPlainName(&fname[0]);
     FixNameCase(plain_name, strlen(plain_name));
     FixNameSpaces(plain_name, strlen(plain_name));
-    sprintf(szLocalFile, "%s/%s", szWorkDirWmo, plain_name);
+    snprintf(szLocalFile, sizeof(szLocalFile), "%s/%s", szWorkDirWmo, plain_name);
 
     if (FileExists(szLocalFile))
         return true;
@@ -147,8 +153,8 @@ bool ExtractSingleWmo(std::string& fname)
     const char* rchr = strrchr(plain_name, '_');
     if (rchr != NULL)
     {
-        char cpy[4];
-        strncpy((char*)cpy, rchr, 4);
+        char cpy[5] {};
+        strncpy(cpy, rchr, sizeof(cpy) - 1);
         for (int i = 0; i < 4; ++i)
         {
             int m = cpy[i];
@@ -185,10 +191,10 @@ bool ExtractSingleWmo(std::string& fname)
         for (uint32 i = 0; i < froot.nGroups; ++i)
         {
             char temp[1024];
-            strcpy(temp, fname.c_str());
+            snprintf(temp, sizeof(temp), "%s", fname.c_str());
             temp[fname.length() - 4] = 0;
             char groupFileName[1024];
-            sprintf(groupFileName, "%s_%03d.wmo", temp, i);
+            snprintf(groupFileName, sizeof(groupFileName), "%s_%03d.wmo", temp, i);
             //printf("Trying to open groupfile %s\n",groupFileName);
 
             string s = groupFileName;
@@ -234,16 +240,15 @@ bool ExtractSingleWmo(std::string& fname)
     return true;
 }
 
-void ParsMapFiles()
+bool ParsMapFiles()
 {
     char fn[512];
-    //char id_filename[64];
     char id[10];
     StringSet failedPaths;
     for (unsigned int i = 0; i < map_count; ++i)
     {
-        sprintf(id, "%03u", map_ids[i].id);
-        sprintf(fn, "World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
+        snprintf(id, sizeof(id), "%03u", map_ids[i].id);
+        snprintf(fn, sizeof(fn), "World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
         WDTFile WDT(fn, map_ids[i].name);
         if (WDT.init(id, map_ids[i].id))
         {
@@ -254,7 +259,6 @@ void ParsMapFiles()
                 {
                     if (ADTFile* ADT = WDT.GetMap(x, y))
                     {
-                        //sprintf(id_filename,"%02u %02u %03u",x,y,map_ids[i].id);//!!!!!!!!!
                         ADT->init(map_ids[i].id, x, y, failedPaths);
                         delete ADT;
                     }
@@ -271,16 +275,17 @@ void ParsMapFiles()
         printf("Warning: Some models could not be extracted, see below\n");
         for (StringSet::const_iterator itr = failedPaths.begin(); itr != failedPaths.end(); ++itr)
             printf("Could not find file of model %s\n", itr->c_str());
-        printf("A few not found models can be expected and are not alarming.\n");
+        return false;
     }
+    return true;
 }
 
 void getGamePath()
 {
 #ifdef _WIN32
-    strcpy(input_path, "Data\\");
+    snprintf(input_path, sizeof(input_path), "Data\\");
 #else
-    strcpy(input_path, "Data/");
+    snprintf(input_path, sizeof(input_path), "Data/");
 #endif
 }
 
@@ -293,11 +298,11 @@ bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
     {
         if (i != 1)
         {
-            sprintf(path, "%s-%d.MPQ", scanmatch, i);
+            snprintf(path, sizeof(path), "%s-%d.MPQ", scanmatch, i);
         }
         else
         {
-            sprintf(path, "%s.MPQ", scanmatch);
+            snprintf(path, sizeof(path), "%s.MPQ", scanmatch);
         }
         if (FILE* h = fopen(path, "rb"))
         {
@@ -321,21 +326,21 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
 
     // open expansion and common files
     printf("Opening data files from data directory.\n");
-    sprintf(path, "%sterrain.MPQ", input_path);
+    snprintf(path, sizeof(path), "%sterrain.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%smodel.MPQ", input_path);
+    snprintf(path, sizeof(path), "%smodel.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%stexture.MPQ", input_path);
+    snprintf(path, sizeof(path), "%stexture.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%swmo.MPQ", input_path);
+    snprintf(path, sizeof(path), "%swmo.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%sbase.MPQ", input_path);
+    snprintf(path, sizeof(path), "%sbase.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%smisc.MPQ", input_path);
+    snprintf(path, sizeof(path), "%smisc.MPQ", input_path);
 
     // now, scan for the patch levels in the core dir
     printf("Scanning patch levels from data directory.\n");
-    sprintf(path, "%spatch", input_path);
+    snprintf(path, sizeof(path), "%spatch", input_path);
     if (!scan_patches(path, pArchiveNames))
         return (false);
 
@@ -361,9 +366,12 @@ bool processArgv(int argc, char** argv)
             if ((i + 1) < argc)
             {
                 hasInputPathParam = true;
-                strcpy(input_path, argv[i + 1]);
+                snprintf(input_path, sizeof(input_path), "%s", argv[i + 1]);
                 if (input_path[strlen(input_path) - 1] != '\\' && input_path[strlen(input_path) - 1] != '/')
-                    strcat(input_path, "/");
+                {
+                    size_t inputPathLen = strlen(input_path);
+                    snprintf(input_path + inputPathLen, sizeof(input_path) - inputPathLen, "/");
+                }
                 ++i;
             }
             else
@@ -426,7 +434,7 @@ int main(int argc, char** argv)
             printf("Your output directory seems to be polluted, please use an empty directory!\n");
             printf("<press return to exit>");
             char garbage[2];
-            scanf("%c", garbage);
+            IgnoreResult(scanf("%c", garbage));
             return 1;
         }
     }
@@ -477,26 +485,30 @@ int main(int argc, char** argv)
         for (unsigned int x = 0; x < map_count; ++x)
         {
             map_ids[x].id = dbc->getRecord(x).getUInt(0);
-            strcpy(map_ids[x].name, dbc->getRecord(x).getString(1));
+            snprintf(map_ids[x].name, sizeof(map_ids[x].name), "%s", dbc->getRecord(x).getString(1));
             printf("Map - %s\n", map_ids[x].name);
         }
 
 
         delete dbc;
-        ParsMapFiles();
+        bool mapSuccess = ParsMapFiles();
         delete[] map_ids;
-        //nError = ERROR_SUCCESS;
-        // Extract models, listed in DameObjectDisplayInfo.dbc
-        ExtractGameobjectModels();
-    }
+        // Extract models, listed in GameObjectDisplayInfo.dbc
+        bool goSuccess = ExtractGameobjectModels();
 
-    printf("\n");
-    if (!success)
+        bool hasWarnings = !mapSuccess || !goSuccess;
+
+        printf("\n");
+        if (hasWarnings)
+            printf("Extract for %s. Work complete with warnings.\n", szRawVMAPMagic);
+        else
+            printf("Extract for %s. Work complete. No errors.\n", szRawVMAPMagic);
+    }
+    else
     {
-        printf("ERROR: Extract for %s. Work NOT complete.\n   Precise vector data=%d.\nPress any key.\n", szRawVMAPMagic, preciseVectorData);
-        getchar();
+        printf("\n");
+        printf("ERROR: Extract for %s. Work NOT complete.\n", szRawVMAPMagic);
     }
 
-    printf("Extract for %s. Work complete. No errors.\n", szRawVMAPMagic);
-    return 0;
+    return success ? 0 : 1;
 }

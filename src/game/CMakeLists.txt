@@ -46,7 +46,6 @@ set (game_SRCS
     UnitAuraProcHandler.cpp
     Weather.cpp
     World.cpp
-    WorldSession.cpp
     AI/BasicAI.cpp
     AI/CreatureAI.cpp
     AI/CreatureAIRegistry.cpp
@@ -196,11 +195,39 @@ set (game_SRCS
     PlayerBots/BattleBotWaypoints.cpp
     PlayerBots/PlayerBotAI.cpp
     PlayerBots/PlayerBotMgr.cpp
-    Protocol/Opcodes.cpp
-    Protocol/WorldSocket.cpp
-    Protocol/WorldSocketMgr.cpp
+    Server/Protocol/Opcodes.cpp
+    Server/Packets/Battleground.cpp
+    Server/Packets/AuctionHouse.cpp
+    Server/Packets/Channel.cpp
+    Server/Packets/Character.cpp
+    Server/Packets/Chat.cpp
+    Server/Packets/Combat.cpp
+    Server/Packets/Duel.cpp
+    Server/Packets/GmTicket.cpp
+    Server/Packets/Group.cpp
+    Server/Packets/Guild.cpp
+    Server/Packets/Item.cpp
+    Server/Packets/Loot.cpp
+    Server/Packets/Mail.cpp
+    Server/Packets/Misc.cpp
+    Server/Packets/Movement.cpp
+    Server/Packets/Npc.cpp
+    Server/Packets/Pet.cpp
+    Server/Packets/Petition.cpp
+    Server/Packets/Query.cpp
+    Server/Packets/Quest.cpp
+    Server/Packets/Skill.cpp
+    Server/Packets/Social.cpp
+    Server/Packets/Spell.cpp
+    Server/Packets/Taxi.cpp
+    Server/Packets/Trade.cpp
+    Server/Packets/Warden.cpp
+    Server/WorldSession.cpp
+    Server/WorldSocket.cpp
+    Server/WorldSocketMgr.cpp
     Spells/Spell.cpp
     Spells/SpellAuras.cpp
+    Spells/SpellCastTargetsInfo.cpp
     Spells/SpellEffects.cpp
     Spells/SpellEntry.cpp
     Spells/SpellMgr.cpp
@@ -257,7 +284,6 @@ set (game_SRCS
     UnitEvents.h
     Weather.h
     World.h
-    WorldSession.h
     WorldStates.h
     AI/BasicAI.h
     AI/CreatureAI.h
@@ -419,12 +445,43 @@ set (game_SRCS
     PlayerBots/BattleBotWaypoints.h
     PlayerBots/PlayerBotAI.h
     PlayerBots/PlayerBotMgr.h
-    Protocol/Opcodes.h
-    Protocol/WorldSocket.h
-    Protocol/WorldSocketMgr.h
+    Server/Protocol/Opcodes.h
+    Server/Protocol/Opcodes_active.h
+    Server/Packet.h
+    Server/Packets/Battleground.h
+    Server/Packets/AuctionHouse.h
+    Server/Packets/Channel.h
+    Server/Packets/Character.h
+    Server/Packets/Chat.h
+    Server/Packets/Combat.h
+    Server/Packets/Duel.h
+    Server/Packets/GmTicket.h
+    Server/Packets/Group.h
+    Server/Packets/Guild.h
+    Server/Packets/Item.h
+    Server/Packets/Loot.h
+    Server/Packets/Mail.h
+    Server/Packets/Misc.h
+    Server/Packets/Movement.h
+    Server/Packets/Npc.h
+    Server/Packets/Pet.h
+    Server/Packets/Petition.h
+    Server/Packets/Query.h
+    Server/Packets/Quest.h
+    Server/Packets/Skill.h
+    Server/Packets/Social.h
+    Server/Packets/Spell.h
+    Server/Packets/Taxi.h
+    Server/Packets/Trade.h
+    Server/Packets/Warden.h
+    Server/WorldPacket.h
+    Server/WorldSession.h
+    Server/WorldSocket.h
+    Server/WorldSocketMgr.h
     Spells/Spell.h
     Spells/SpellAuraDefines.h
     Spells/SpellAuras.h
+    Spells/SpellCastTargetsInfo.h
     Spells/SpellClassMask.h
     Spells/SpellDefines.h
     Spells/SpellEntry.h
@@ -463,10 +520,7 @@ endif()
 if(WIN32)
   #allow exceptions in destructors
   if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:implicitNoexcept-")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
-  elseif(MINGW)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+    set(GAME_EXTRA_CXX_FLAGS "/Zc:implicitNoexcept-")
   endif()
 endif()
 
@@ -505,14 +559,14 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/OutdoorPvP
   ${CMAKE_CURRENT_SOURCE_DIR}/PacketBroadcast
   ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBots
-  ${CMAKE_CURRENT_SOURCE_DIR}/Protocol
+  ${CMAKE_CURRENT_SOURCE_DIR}/Server
+  ${CMAKE_CURRENT_SOURCE_DIR}/Server/Protocol
   ${CMAKE_CURRENT_SOURCE_DIR}/Spells
   ${CMAKE_CURRENT_SOURCE_DIR}/Threat
   ${CMAKE_CURRENT_SOURCE_DIR}/Transports
   ${CMAKE_CURRENT_SOURCE_DIR}/vmap
   ${CMAKE_SOURCE_DIR}/src/scripts
   ${CMAKE_SOURCE_DIR}/src/scripts/PrecompiledHeaders
-  ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation
   ${CMAKE_SOURCE_DIR}/dep/include
@@ -522,8 +576,6 @@ include_directories(
   ${CMAKE_BINARY_DIR}
   ${CMAKE_BINARY_DIR}/src/shared
   ${MYSQL_INCLUDE_DIR}
-  ${TBB_INCLUDE_DIRS}
-  ${ACE_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
   ${ZLIB_INCLUDE_DIRS}
 )
@@ -573,12 +625,17 @@ source_group("Anticheat"
 add_library(game STATIC
   ${game_SRCS}
 )
+mangos_target_flags(game)
+if(GAME_EXTRA_CXX_FLAGS)
+  target_compile_options(game PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${GAME_EXTRA_CXX_FLAGS}>)
+endif()
 
 SET_TARGET_PROPERTIES (game PROPERTIES FOLDER "Game Libs")
 
 target_link_libraries(game
   shared
   Detour
+  g3dlite
 )
 
 #add_dependencies(game revision.h)
@@ -598,15 +655,14 @@ if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
 else()
   if(USE_PCH)
       target_precompile_headers(game PRIVATE
-      Protocol/WorldSocket.h
+      Server/WorldSocket.h
       ../shared/Common.h
-
       Maps/MapManager.h
       ../shared/Log.h
       ObjectAccessor.h
       ObjectGuid.h
       Database/SQLStorages.h
-      Protocol/Opcodes.h
+      Server/Protocol/Opcodes.h
       SharedDefines.h
       Guild/GuildMgr.h
       ObjectMgr.h

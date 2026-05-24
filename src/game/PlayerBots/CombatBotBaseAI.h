@@ -104,6 +104,7 @@ public:
     Unit* SelectHealTarget(float selfHealPercent = 100.0f, float groupHealPercent = 100.0f) const;
     Unit* SelectPeriodicHealTarget(float selfHealPercent = 100.0f, float groupHealPercent = 100.0f) const;
     Player* SelectBuffTarget(SpellEntry const* pSpellEntry) const;
+    Player* SelectBuffTarget(SpellEntry const* pSingleSpellEntry, SpellEntry const* pGroupSpellEntry, SpellEntry const*& pSelectedSpellEntry) const;
     Player* SelectDispelTarget(SpellEntry const* pSpellEntry) const;
     bool IsValidBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool IsValidHealTarget(Unit const* pTarget, float healthPercent = 100.0f) const;
@@ -132,11 +133,12 @@ public:
     void AddHunterAmmo();
     uint8 GetHighestHonorRankFromEquippedItems() const;
     void UpdateVisualHonorRankBasedOnItems();
-
+    void BeginChasing(Unit* pVictim) const;
     bool SummonShamanTotems();
     SpellCastResult CastWeaponBuff(SpellEntry const* pSpellEntry, EquipmentSlots slot);
-    void UseTrinketEffects();
-    bool UseItemEffect(Item* pItem);
+    bool UseTrinketEffects(bool onlyToBreakCC = false);
+    bool UseItemEffect(Item* pItem, bool onlyToBreakCC = false);
+    void BreakCrowdControlEffects();
 
     virtual void UpdateInCombatAI() = 0;
     virtual void UpdateOutOfCombatAI() = 0;
@@ -554,6 +556,7 @@ public:
 
     bool m_initialized = false;
     bool m_isBuffing = false;
+    bool m_preventCasting = false;
     bool m_receivedBgInvite = false;
     uint8 m_visualHonorRank = 0;
     CombatBotRoles m_role = ROLE_INVALID;

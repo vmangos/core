@@ -27,9 +27,16 @@
 
 #include "SHA1.h"
 
+#include <openssl/opensslv.h>
+
 class BigNumber;
 
 typedef struct hmac_ctx_st HMAC_CTX;
+
+#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+typedef struct evp_mac_st EVP_MAC;
+typedef struct evp_mac_ctx_st EVP_MAC_CTX;
+#endif
 
 namespace Crypto { namespace Hash { namespace HMACSHA1
 {
@@ -40,6 +47,7 @@ namespace Crypto { namespace Hash { namespace HMACSHA1
     class Generator
     {
     public:
+        Generator(std::vector<uint8> const& key);
         Generator(uint8 const* key, size_t len);
         ~Generator();
 
@@ -53,7 +61,12 @@ namespace Crypto { namespace Hash { namespace HMACSHA1
         Digest GetDigest();
 
     private:
+#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+        EVP_MAC* m_mac;
+        EVP_MAC_CTX* m_ctx;
+#else
         HMAC_CTX* m_ctx;
+#endif
     };
 
 }}} // namespace Crypto::Hash::HMACSHA1

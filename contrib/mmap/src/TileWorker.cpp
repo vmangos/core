@@ -239,7 +239,7 @@ namespace MMAP
                     return;
                 }
 
-                buildTile(tileInfo.m_mapId, tileInfo.m_tileX, tileInfo.m_tileY, navMesh, tileInfo.m_curTile, tileInfo.m_tileCount);
+                buildTile(tileInfo.m_mapId, tileInfo.m_tileX, tileInfo.m_tileY, navMesh, tileInfo.m_curTile, tileInfo.m_tileCount, tileInfo.m_forceRebuild);
                 dtFreeNavMesh(navMesh);
             }
             else
@@ -252,7 +252,7 @@ namespace MMAP
     bool TileWorker::duDumpPolyMeshToObj(rcPolyMesh& pmesh, uint32 mapID, uint32 tileY, uint32 tileX)
     {
         char fname[256];
-        sprintf(fname, "meshes/map%03u%02u%02unavmesh.obj", mapID, tileY, tileX);
+        snprintf(fname, sizeof(fname), "meshes/map%03u%02u%02unavmesh.obj", mapID, tileY, tileX);
         FILE* objFile = fopen(fname, "wb");
         if (!objFile)
         {
@@ -301,7 +301,7 @@ namespace MMAP
     {
 
         char fname[256];
-        sprintf(fname, "meshes/map%03u%02u%02unavmeshdetail.obj", mapID, tileY, tileX);
+        snprintf(fname, sizeof(fname), "meshes/map%03u%02u%02unavmeshdetail.obj", mapID, tileY, tileX);
         FILE* objFile = fopen(fname, "wb");
 
         if (!objFile)
@@ -346,7 +346,7 @@ namespace MMAP
     bool TileWorker::shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY)
     {
         char fileName[255];
-        sprintf(fileName, "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
+        snprintf(fileName, sizeof(fileName), "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
         FILE* file = fopen(fileName, "rb");
         if (!file)
         {
@@ -374,9 +374,9 @@ namespace MMAP
         return true;
     }
 
-    void TileWorker::buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh, uint32 curTile, uint32 tileCount)
+    void TileWorker::buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh, uint32 curTile, uint32 tileCount, bool forceRebuild)
     {
-        if (shouldSkipTile(mapID, tileX, tileY))
+        if (!forceRebuild && shouldSkipTile(mapID, tileX, tileY))
         {
             return;
         }
@@ -410,8 +410,8 @@ namespace MMAP
         float bmin[3], bmax[3];
         m_mapBuilder->getTileBounds(tileX, tileY, allVerts.getCArray(), allVerts.size() / 3, bmin, bmax);
 
-        // offmesh.txt
-        m_terrainBuilder->loadOffMeshConnections(mapID, tileX, tileY, meshData, m_mapBuilder->m_offMeshFilePath);
+        // offmesh.txt (verbose output only for single tile builds)
+        m_terrainBuilder->loadOffMeshConnections(mapID, tileX, tileY, meshData, m_mapBuilder->m_offMeshFilePath, tileCount == 1);
 
         // build navmesh tile
         buildMoveMapTile(mapID, tileX, tileY, meshData, bmin, bmax, navMesh);
@@ -422,7 +422,7 @@ namespace MMAP
     {
         // console output
         char tileString[20];
-        sprintf(tileString, "[Map %03i] [%02i,%02i]: ", mapID, tileX, tileY);
+        snprintf(tileString, sizeof(tileString), "[Map %03i] [%02i,%02i]: ", mapID, tileX, tileY);
         printf("%s Building movemap tiles...                          \r", tileString);
 
         IntermediateValues iv;
@@ -868,12 +868,12 @@ namespace MMAP
 
             // file output
             char fileName[255];
-            sprintf(fileName, "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
+            snprintf(fileName, sizeof(fileName), "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
             FILE* file = fopen(fileName, "wb");
             if (!file)
             {
                 char message[1024];
-                sprintf(message, "[Map %03i] Failed to open %s for writing!             \n", mapID, fileName);
+                snprintf(message, sizeof(message), "[Map %03i] Failed to open %s for writing!             \n", mapID, fileName);
                 perror(message);
                 navMesh->removeTile(tileRef, nullptr, nullptr);
                 continue;
@@ -904,7 +904,7 @@ namespace MMAP
                 //iv.writeIV(mapID, tileX, tileY);
                 // Write navmesh data
                 char fname[256];
-                sprintf(fname, "meshes/map%03u%02u%02u.nav", mapID, tileY, tileX);
+                snprintf(fname, sizeof(fname), "meshes/map%03u%02u%02u.nav", mapID, tileY, tileX);
                 FILE* file = fopen(fname, "wb");
                 if (file)
                 {

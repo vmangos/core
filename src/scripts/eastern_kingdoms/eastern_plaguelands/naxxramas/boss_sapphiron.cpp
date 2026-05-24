@@ -50,13 +50,13 @@ enum SapphironData
     SPELL_WING_BUFFET       = 29328, // is it the spell he does on takeoff, or another one?
 
     SPELL_SAPPHIRON_DIES = 29357, // adds camera-shake.
-    
+
     GO_ICEBLOCK = 181247,
 
     MOVE_POINT_LIFTOFF = 1,
     MOVE_POINT_FLYPOINT = 2,
 
-    NPC_WING_BUFFET = 17025, 
+    NPC_WING_BUFFET = 17025,
     NPC_BLIZZARD = 16474
 };
 
@@ -82,16 +82,10 @@ enum Phase
     PHASE_LIFT_OFF   = 2,
     PHASE_AIR_BOLTS  = 3,
     PHASE_AIR_BREATH = 4,
-    PHASE_LANDING    = 5,
-
-    PHASE_SKELETON,
-    PHASE_SUMMONING,
-    PHASE_DEAD
+    PHASE_LANDING    = 5
 };
 
 static float const aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
-uint32 SPAWN_ANIM_TIMER = 21500;
-static constexpr float AGGRO_RADIUS = 70.0f;
 
 struct boss_sapphironAI : public ScriptedAI
 {
@@ -99,28 +93,8 @@ struct boss_sapphironAI : public ScriptedAI
     {
         m_forceTargetUpdateTimer = 1000;
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
-        Reset();
-
-        if (m_pInstance)
-        {
-            if (m_pInstance->GetData(TYPE_SAPPHIRON) != DONE)
-            {
-                phase = PHASE_SKELETON;
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                m_creature->SetVisibility(VISIBILITY_OFF);
-            }
-            else
-            {
-                if (GameObject* skeleton = m_pInstance->GetSingleGameObjectFromStorage(GO_SAPPHIRON_SPAWN))
-                    skeleton->Despawn();
-                phase = PHASE_DEAD;
-            }
-        }
-        else
-        {
-            phase = PHASE_GROUND;
-        }
         m_TargetNotReachableTimer = 0;
+        Reset();
     }
 
     instance_naxxramas* m_pInstance;
@@ -136,18 +110,15 @@ struct boss_sapphironAI : public ScriptedAI
 
     EventMap events;
     Phase phase;
-    uint32 spawnTimer;
     uint32 berserkTimer;
     std::vector<ObjectGuid> iceboltTargets;
     ObjectGuid wingBuffetCreature;
-    uint32 pullCheckTimer;
 
     uint32 m_forceTargetUpdateTimer;
     uint32 m_TargetNotReachableTimer;
 
     void Reset() override
     {
-        pullCheckTimer = 0;
         phase = PHASE_GROUND;
         events.Reset();
         berserkTimer = 900000; // 15 min
@@ -186,7 +157,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32&) override 
+    void DamageTaken(Unit* pDoneBy, uint32&) override
     {
         if (m_creature->GetMeleeZLimit() < 1.0f)
         {
@@ -197,115 +168,12 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
 
-    void MakeVisible()
-    {
-        phase = PHASE_GROUND;
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-        m_creature->SetVisibility(VISIBILITY_ON);
-        m_creature->SetInCombatWithZone();
-        if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST,0))
-        {
-            AttackStart(pUnit);
-        }
-        if (GameObject* pGO1 = GetClosestGameObjectWithEntry(m_creature, GO_SAPPHIRON_SPAWN, 200.0f))
-        {
-            pGO1->Delete();
-            if (GameObject* pGO2 = GetClosestGameObjectWithEntry(m_creature, GO_SAPPHIRON_SPAWN, 200.0f))
-                pGO2->Delete();
-        }
-    }
-
     void AttackStart(Unit* who) override
     {
         if (phase != PHASE_GROUND)
             return;
 
         ScriptedAI::AttackStart(who);
-    }
-
-    void StartSkeletonSummon()
-    {
-        phase = PHASE_SUMMONING;
-        spawnTimer = SPAWN_ANIM_TIMER;
-        // atm can only get the animation to play when summoning the gameobject. Thus, as a hack,
-        // we remove the old skeleton and summon a new one temporarily.
-        if (GameObject* skeleton = m_pInstance->GetSingleGameObjectFromStorage(GO_SAPPHIRON_SPAWN))
-        {
-            skeleton->Despawn();
-            m_creature->SummonGameObject(GO_SAPPHIRON_SPAWN, skeleton->GetPositionX(), skeleton->GetPositionY(), skeleton->GetPositionZ(),
-                skeleton->GetOrientation(), 0, 0, 0, 0, SPAWN_ANIM_TIMER);
-        }
-        else
-        {
-            MakeVisible();
-        }
-    }
-
-    void AggroRadius(uint32 diff)
-    {
-        if (m_creature->IsInCombat() || m_creature->IsInEvadeMode())
-            return;
-
-        if (phase != PHASE_GROUND && phase != PHASE_SKELETON)
-            return;
-
-        if (pullCheckTimer < diff)
-        {
-            pullCheckTimer = 1000;
-        }
-        else
-        {
-            pullCheckTimer -= diff;
-            return;
-        }
-
-        float x, y, z, o;
-        m_creature->GetHomePosition(x, y, z, o);
-
-        // Large aggro radius
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (const auto& itr : PlayerList)
-        {
-            Player* pPlayer = itr.getSource();
-
-            float dx = pPlayer->GetPositionX() - x;
-            float dy = pPlayer->GetPositionY() - y;
-            float dz = pPlayer->GetPositionZ() - z;
-            float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
-            dist = (dist > 0 ? dist : 0);
-            if (dist > AGGRO_RADIUS)
-                continue;
-
-            bool alert;
-            if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
-                continue;
-
-            if (!pPlayer->IsTargetableBy(m_creature) || !m_creature->IsHostileTo(pPlayer))
-                continue;
-
-            if (phase == PHASE_SKELETON)
-            {
-                StartSkeletonSummon();
-                return;
-            }
-            if (m_creature->CanInitiateAttack())
-            {
-                if (pPlayer->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
-                {
-                    if (!m_creature->GetVictim())
-                    {
-                        AttackStart(pPlayer);
-                        return;
-                    }
-                    else if (m_creature->GetMap()->IsDungeon())
-                    {
-                        pPlayer->SetInCombatWith(m_creature);
-                        m_creature->AddThreat(pPlayer);
-                        return;
-                    }
-                }
-            }
-        }
     }
 
     void Aggro(Unit* pWho) override
@@ -432,7 +300,7 @@ struct boss_sapphironAI : public ScriptedAI
 
     void UpdateReachable(uint32 update_diff)
     {
-        bool unreachableTarget = 
+        bool unreachableTarget =
             !m_creature->GetMotionMaster()->empty() &&
              m_creature->GetVictim() &&
              m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
@@ -450,27 +318,8 @@ struct boss_sapphironAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (phase == PHASE_SKELETON)
-        {
-            AggroRadius(uiDiff);
-            return;
-        }
-        else if (phase == PHASE_SUMMONING)
-        {
-            if (spawnTimer < uiDiff)
-            {
-                MakeVisible();
-            }
-            else
-            {
-                spawnTimer -= uiDiff;
-                return;
-            }
-        }
-
         if (phase == PHASE_GROUND)
         {
-            AggroRadius(uiDiff);
             if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
 
@@ -493,7 +342,7 @@ struct boss_sapphironAI : public ScriptedAI
                     m_forceTargetUpdateTimer -= uiDiff;
             }
         }
-        else 
+        else
         {
             if (m_creature->GetThreatManager().isThreatListEmpty())
             {
@@ -542,7 +391,7 @@ struct boss_sapphironAI : public ScriptedAI
                 case EVENT_LAND:
                 {
                     iceboltTargets.clear();
-                    // in case something is delayed, and we're not finished 
+                    // in case something is delayed, and we're not finished
                     // casting the frost breath
                     if (m_creature->IsNonMeleeSpellCasted())
                     {
@@ -712,7 +561,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         std::vector<Unit*> suitableUnits;
         auto it = threatlist.begin();
         ++it; // skip tank
-        for (it; it != threatlist.end(); ++it)
+        for (; it != threatlist.end(); ++it)
         {
             if (Player* pTarget = (*it)->getTarget()->ToPlayer())
             {
@@ -773,6 +622,46 @@ SpellScript* GetScript_SapphironLifeDrain(SpellEntry const*)
     return new SapphironLifeDrainScript();
 }
 
+struct sapphiron_birthAI : public GameObjectAI
+{
+    instance_naxxramas* m_pInstance;
+
+    explicit sapphiron_birthAI(GameObject* pGo) : GameObjectAI(pGo)
+    {
+        m_pInstance = (instance_naxxramas*)me->GetInstanceData();
+    }
+
+    bool OnUse(Unit* user) override
+    {
+        if (!user || !user->IsPlayer() || !user->IsAlive() || ((Player*)user)->IsGameMaster())
+            return false;
+
+        if (!m_pInstance)
+            return false;
+
+        // Only trigger if encounter hasn't started yet
+        if (m_pInstance->GetData(TYPE_SAPPHIRON) != NOT_STARTED)
+            return false;
+
+        // Don't trigger if Sapphiron already exists
+        if (m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON))
+            return false;
+
+        m_pInstance->SetData(TYPE_SAPPHIRON, SPECIAL);
+
+        // Play bones animation that construct Sapphiron
+        // It appears, when you assign a cpp script, need to call this manually
+        me->SendObjectDeSpawnAnim();
+
+        return true;
+    }
+};
+
+GameObjectAI* GetAI_sapphiron_birth(GameObject* pGo)
+{
+    return new sapphiron_birthAI(pGo);
+}
+
 void AddSC_boss_sapphiron()
 {
     Script* pNewScript;
@@ -790,5 +679,10 @@ void AddSC_boss_sapphiron()
     pNewScript = new Script;
     pNewScript->Name = "spell_sapphiron_life_drain";
     pNewScript->GetSpellScript = &GetScript_SapphironLifeDrain;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "go_sapphiron_birth";
+    pNewScript->GOGetAI = &GetAI_sapphiron_birth;
     pNewScript->RegisterSelf();
 }

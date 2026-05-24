@@ -16,6 +16,7 @@
 #include "BattleGroundMgr.h"
 #include "MapManager.h"
 #include "Language.h"
+#include "Utilities/Random.h"
 #include "Spell.h"
 
 INSTANTIATE_SINGLETON_1(PlayerBotMgr);
@@ -235,7 +236,15 @@ void PlayerBotMgr::Update(uint32 diff)
             if (iter->second->requestRemoval)
             {
                 if (iter->second->ai && iter->second->ai->me)
+                {
+                    if (!iter->second->ai->me->IsAlive())
+                    {
+                        // don't leave permanent corpse
+                        iter->second->ai->me->ResurrectPlayer(1.0f);
+                        iter->second->ai->me->SpawnCorpseBones();
+                    }
                     iter->second->ai->me->RemoveFromGroup();
+                }
 
                 DeleteBot(iter);
 
@@ -1230,6 +1239,87 @@ bool ChatHandler::HandlePartyBotAoECommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandlePartyBotStartCastingCommand(char * args)
+{
+    return HandlePartyBotToggleCastingCommand(true);
+}
+
+bool ChatHandler::HandlePartyBotStopCastingCommand(char * args)
+{
+    return HandlePartyBotToggleCastingCommand(false);
+}
+
+bool ChatHandler::HandlePartyBotToggleCastingCommand(bool allowCasting)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (pTarget && (pTarget != pPlayer))
+    {
+        if (pTarget->AI())
+        {
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                if (allowCasting)
+                {
+                    pAI->m_preventCasting = false;
+                    PSendSysMessage("%s will be allowed to cast spells.", pTarget->GetName());
+                }
+                else
+                {
+                    pAI->m_preventCasting = true;
+                    pTarget->InterruptNonMeleeSpells(false);
+                    PSendSysMessage("%s will no longer cast spells.", pTarget->GetName());
+                }
+                return true;
+            }
+        }
+        SendSysMessage("Target is not a party bot.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    if (allowCasting)
+                    {
+                        pAI->m_preventCasting = false;
+                    }
+                    else
+                    {
+                        pAI->m_preventCasting = true;
+                        pTarget->InterruptNonMeleeSpells(false);
+                    }
+                }
+            }
+        }
+    }
+
+    if (allowCasting)
+        SendSysMessage("All bots are now allowed to cast spells again.");
+    else
+        SendSysMessage("All bots are now forbidden from casting spells.");
+
+    return true;
+}
+
 static std::map<std::string, RaidTargetIcon> raidTargetIcons =
 {
     { "star",     RAID_TARGET_ICON_STAR     },
@@ -1814,10 +1904,10 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
             return false;
         }
 
-        
+
         ExtractUInt32(&args, botLevel);
 
-        
+
         if (char* tempStr = ExtractArg(&args))
         {
             if (strcmp(tempStr, "temp") == 0)
@@ -1936,7 +2026,7 @@ bool ChatHandler::HandleBattleBotShowAllPathsCommand(char* args)
             break;
         }
         default:
-            break;
+            return false;
     }
 
     uint32 id = 1;

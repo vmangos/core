@@ -199,7 +199,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         if ((who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && !m_cleanerSpawn && m_questStarted)
         {
             if (who->GetGUID() != m_playerGUID || who->IsPet())
-            {   
+            {
                 if (Creature* pCleaner = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
                 {
                     pCleaner->SetInCombatWith(who);
@@ -217,23 +217,12 @@ struct npc_eris_havenfireAI : public ScriptedAI
         if (!summoned)
             return;
 
-        std::vector<uint32> mobsEntries;
-        std::vector<uint32>::iterator entriesIt;
-        mobsEntries.push_back(NPC_PEASANT_0);
-        mobsEntries.push_back(NPC_PEASANT_1);
-
-        for (entriesIt = mobsEntries.begin(); entriesIt != mobsEntries.end(); ++entriesIt)
+        std::list<Creature*> tmpMobsList;
+        GetCreatureListWithEntryInGrid(tmpMobsList, m_creature, { NPC_PEASANT_0 , NPC_PEASANT_1 }, 100.0f);
+        for (auto const& curr : tmpMobsList)
         {
-            std::list<Creature*> tmpMobsList;
-            GetCreatureListWithEntryInGrid(tmpMobsList, m_creature, (*entriesIt), 100.0f);
-            while (!tmpMobsList.empty())
-            {
-                Creature* curr = tmpMobsList.front();
-                tmpMobsList.pop_front();
-
-                if (curr->IsAlive())
-                    summoned->AddThreat(curr, float(urand(100, 200)));
-            }
+            if (curr->IsAlive())
+                summoned->AddThreat(curr, float(urand(100, 200)));
         }
 
         if (Player* player = GetPlayer())
@@ -253,32 +242,17 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 }
             }
         }
-        mobsEntries.clear();
     }
 
     void DespawnAll()
     {
-        std::vector<uint32> mobsEntries;
-        std::vector<uint32>::iterator entriesIt;
-        mobsEntries.push_back(NPC_PEASANT_0);
-        mobsEntries.push_back(NPC_PEASANT_1);
-        mobsEntries.push_back(NPC_WARRIOR);
-        mobsEntries.push_back(NPC_ARCHER);
-
-        for (entriesIt = mobsEntries.begin(); entriesIt != mobsEntries.end(); ++entriesIt)
+        std::list<Creature*> tmpMobsList;
+        GetCreatureListWithEntryInGrid(tmpMobsList, m_creature, { NPC_PEASANT_0 , NPC_PEASANT_1 , NPC_WARRIOR , NPC_ARCHER }, 150.0f);
+        for (auto const& curr : tmpMobsList)
         {
-            std::list<Creature*> tmpMobsList;
-            GetCreatureListWithEntryInGrid(tmpMobsList, m_creature, (*entriesIt), 150.0f);
-            while (!tmpMobsList.empty())
-            {
-                Creature* curr = tmpMobsList.front();
-                tmpMobsList.pop_front();
-
-                if (curr->IsAlive())
-                    curr->ForcedDespawn();
-            }
+            if (curr->IsAlive())
+                curr->ForcedDespawn();
         }
-        mobsEntries.clear();
 
         for (auto& guid : m_deathPostGUIDs)
         {
@@ -300,9 +274,6 @@ struct npc_eris_havenfireAI : public ScriptedAI
                     ++j;
 
                 m_archerGUIDs[j] = summoned->GetGUID();
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summoned->AddUnitState(UNIT_STATE_ROOT);
                 break;
             case NPC_WARRIOR:
                 SetAttackOnPeasantOrPlayer(summoned);
@@ -317,8 +288,6 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 if (j < 50)
                     m_villagerGUIDs[j] = summoned->GetGUID();
 
-                if (Player* player = GetPlayer())
-                    summoned->SetFactionTemplateId(player->GetFactionTemplateId());
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 break;
         }
@@ -671,9 +640,9 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
     void KilledUnit(Unit* victim) override { }
 
-    void DamageTaken(Unit *done_by, uint32 &damage) override
+    void DamageTaken(Unit* pAttacker, uint32 &damage) override
     {
-        if (done_by->GetEntry() == NPC_ARCHER)
+        if (pAttacker->GetEntry() == NPC_ARCHER)
             damage = urand(80, 105);
     }
 
@@ -1059,7 +1028,7 @@ struct go_darrowshire_triggerAI : public GameObjectAI
 
     void Reset()
     {
-        // Faction change needed to allow aggro on sight 
+        // Faction change needed to allow aggro on sight
         m_defenderFaction = 0;
         Map::PlayerList const &pl = me->GetMap()->GetPlayers();
         uint32 myArea = me->GetAreaId();
@@ -1159,7 +1128,7 @@ struct go_darrowshire_triggerAI : public GameObjectAI
                 summoned->GetMotionMaster()->MovePoint(2, DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, MOVE_PATHFINDING, 5.0f);
                 break;
             case NPC_MARDUK_THE_BLACK:
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_SPAWNING);
+                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                 summoned->ForcedDespawn(12000);
                 break;
             default:
@@ -1511,7 +1480,7 @@ struct go_darrowshire_triggerAI : public GameObjectAI
                     }
                     break;
                 }
-                case 3: // Horgus the Ravager is slain, Davil despawns, and Redpath spawns 
+                case 3: // Horgus the Ravager is slain, Davil despawns, and Redpath spawns
                 {
                     if (Creature* davil = me->GetMap()->GetCreature(m_davilGuid))
                     {
@@ -1532,7 +1501,7 @@ struct go_darrowshire_triggerAI : public GameObjectAI
                     }
                     break;
                 }
-                case 4: // Marduk spawns, normal Redpath is killed and corrupted Redpath spawns 
+                case 4: // Marduk spawns, normal Redpath is killed and corrupted Redpath spawns
                 {
                     Creature* marduk = me->GetMap()->GetCreature(m_mardukGuid);
                     if (marduk)
@@ -1624,7 +1593,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
-        
+
         switch(uiPointId)
         {
             case 0:
@@ -1676,7 +1645,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
                 case 0:
                 {
                     m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    
+
                     m_creature->GetMotionMaster()->MovePoint(0, 1431.501f, -3684.229f, 75.726f, MOVE_PATHFINDING, 1.5f);
                     ++EventStep;
                     EventTimer = 0;
@@ -1685,7 +1654,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
                 case 1:
                 {
                     if (Creature* pamela = m_creature->FindNearestCreature(NPC_PAMELA_REDPATH, 150.0f, true))
-                    { 
+                    {
                         DoScriptText(SAY_PAMELA_1, pamela);
                         pamela->GetMotionMaster()->MovePoint(0, 1450.733f, -3599.974f, 85.621f, MOVE_PATHFINDING, 4.0f);
                     }
@@ -1913,7 +1882,7 @@ struct npc_guard_didierAI : public ScriptedAI
         }
     }
 
-    void AttackStart(Unit* pVictim)
+    void AttackStart(Unit* pVictim) override
     {
         if (m_creature->HasReactState(REACT_PASSIVE))
         {
@@ -1926,7 +1895,7 @@ struct npc_guard_didierAI : public ScriptedAI
                 return;
             }
         }
-        
+
         ScriptedAI::AttackStart(pVictim);
     }
 };
@@ -1948,7 +1917,7 @@ struct npc_caravan_muleAI : public ScriptedAI
     }
 
     void Reset() override
-    { 
+    {
         m_creature->SetReactState(REACT_PASSIVE);
     }
 
@@ -1976,7 +1945,7 @@ struct npc_caravan_muleAI : public ScriptedAI
         }
     }
 
-    void AttackStart(Unit* pVictim)
+    void AttackStart(Unit* pVictim) override
     {
         if (m_creature->HasReactState(REACT_PASSIVE))
         {

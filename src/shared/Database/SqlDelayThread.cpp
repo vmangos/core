@@ -48,9 +48,7 @@ bool SqlDelayThread::HasAsyncQuery()
 
 void SqlDelayThread::run()
 {
-    #ifndef DO_POSTGRESQL
     mysql_thread_init();
-    #endif
 
     auto loopSleepDelay = std::chrono::milliseconds(10);
 
@@ -74,9 +72,7 @@ void SqlDelayThread::run()
         }
     }
 
-    #ifndef DO_POSTGRESQL
     mysql_thread_end();
-    #endif
 }
 
 void SqlDelayThread::Stop()

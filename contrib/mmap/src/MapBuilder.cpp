@@ -24,6 +24,7 @@
 #include "Maps/GridMapDefines.h"
 #include "DetourNavMeshBuilder.h"
 #include "DetourCommon.h"
+#include <climits>
 
 using namespace VMAP;
 
@@ -103,7 +104,7 @@ namespace MMAP
             std::set<uint32>& tiles = (*itr).second;
             mapID = (*itr).first;
 
-            sprintf(filter, "%03u*.vmtile", mapID);
+            snprintf(filter, sizeof(filter), "%03u*.vmtile", mapID);
             files.clear();
             getDirContents(files, "vmaps", filter);
             for (uint32 i = 0; i < files.size(); ++i)
@@ -116,7 +117,7 @@ namespace MMAP
                 count++;
             }
 
-            sprintf(filter, "%03u*", mapID);
+            snprintf(filter, sizeof(filter), "%03u*", mapID);
             files.clear();
             getDirContents(files, "maps", filter);
             for (uint32 i = 0; i < files.size(); ++i)
@@ -147,7 +148,9 @@ namespace MMAP
         m_cancel.store(false);
         buildMap(mapID);
         processQueuedTiles();
-        printf("Done.");
+
+        printf("[Map %03i] Updated map file: mmaps/%03u.mmap\n", mapID, mapID);
+        printf("Done.\n");
     }
 
     void MapBuilder::buildAllMaps()
@@ -161,7 +164,7 @@ namespace MMAP
         }
 
         processQueuedTiles();
-        printf("Done.");
+        printf("Done.\n");
     }
 
     void MapBuilder::processQueuedTiles()
@@ -242,15 +245,17 @@ namespace MMAP
             uint32 minX, minY, maxX, maxY;
             getGridBounds(mapID, minX, minY, maxX, maxY);
 
-            // add all tiles within bounds to tile list.
-            for (uint32 i = minX; i <= maxX; ++i)
-                for (uint32 j = minY; j <= maxY; ++j)
-                    if (i == tileX && j == tileY)
-                        tiles.insert(StaticMapTree::packTileID(i, j));
+            // Only add the requested tile to avoid allocating NavMesh for entire map
+            // when building a single tile (which would cause massive memory overhead).
+            if (tileX >= minX && tileX <= maxX && tileY >= minY && tileY <= maxY)
+                tiles.insert(StaticMapTree::packTileID(tileX, tileY));
         }
 
         if (!tiles.size())
+        {
+            printf("[Map %03i] Tile [%02u,%02u] not found in valid tile range!\n", mapID, tileX, tileY);
             return;
+        }
 
         dtNavMesh* navMesh = nullptr;
         buildNavMesh(mapID, navMesh);
@@ -260,32 +265,23 @@ namespace MMAP
             return;
         }
 
-        printf("Adding %i, %i, %i", mapID, tileX, tileY);
+        printf("[Map %03i] Building single tile [%02u,%02u]\n", mapID, tileX, tileY);
 
         TileInfo tileInfo;
         tileInfo.m_mapId = mapID;
         tileInfo.m_tileX = tileX;
         tileInfo.m_tileY = tileY;
-        tileInfo.m_curTile = 0;
-        tileInfo.m_tileCount = uint32(tiles.size());
+        tileInfo.m_curTile = 1;
+        tileInfo.m_tileCount = 1;
+        tileInfo.m_forceRebuild = true;  // Always rebuild when building a single tile
         memcpy(&tileInfo.m_navMeshParams, navMesh->getParams(), sizeof(dtNavMeshParams));
         m_tileQueue.Push(tileInfo);
 
-        auto worker = std::make_unique<TileWorker>(this, false, m_quick, m_debug, m_config);
-
-        while (!m_tileQueue.Empty() && !m_cancel.load())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        }
-
-        m_cancel.store(true);
-        m_tileQueue.Cancel();
-
-        worker->WaitCompletion();
-
         dtFreeNavMesh(navMesh);
 
-        printf("Building single tile finished.");
+        processQueuedTiles();
+
+        printf("[Map %03i] Generated file: mmaps/%03u%02u%02u.mmtile\n", mapID, mapID, tileY, tileX);
     }
 
     void MapBuilder::buildMap(uint32 mapID)
@@ -390,14 +386,14 @@ namespace MMAP
         }
 
         char fileName[25];
-        sprintf(fileName, "mmaps/%03u.mmap", mapID);
+        snprintf(fileName, sizeof(fileName), "mmaps/%03u.mmap", mapID);
 
         FILE* file = fopen(fileName, "wb");
         if (!file)
         {
             dtFreeNavMesh(navMesh);
             char message[1024];
-            sprintf(message, "[Map %03i] Failed to open %s for writing!             \n", mapID, fileName);
+            snprintf(message, sizeof(message), "[Map %03i] Failed to open %s for writing!             \n", mapID, fileName);
             perror(message);
             return;
         }
@@ -542,10 +538,10 @@ namespace MMAP
         float agentHeight = 1.0f;
         float agentRadius = 0.5f;
         float agentMaxClimb = 2.0f;
-        const static float BASE_UNIT_DIM = 0.13f;
+        const static float BASE_UNIT_DIM_MAP_BUILDER = 0.13f; // Differs from BASE_UNIT_DIM which is `0.2666666`. Dont ask me why.
 
-        config.cs = BASE_UNIT_DIM;
-        config.ch = BASE_UNIT_DIM;
+        config.cs = BASE_UNIT_DIM_MAP_BUILDER;
+        config.ch = BASE_UNIT_DIM_MAP_BUILDER;
         config.walkableSlopeAngle = 50.0f;
         config.walkableHeight = (int)ceilf(agentHeight / config.ch);
         config.walkableClimb = (int)floorf(agentMaxClimb / config.ch);
@@ -707,12 +703,12 @@ namespace MMAP
             return;
         }
         char fileName[255];
-        sprintf(fileName, "mmaps/go%04u.mmtile", displayId);
+        snprintf(fileName, sizeof(fileName), "mmaps/go%04u.mmtile", displayId);
         FILE* file = fopen(fileName, "wb");
         if (!file)
         {
             char message[1024];
-            sprintf(message, "Failed to open %s for writing!\n", fileName);
+            snprintf(message, sizeof(message), "Failed to open %s for writing!\n", fileName);
             perror(message);
             dtFree(navData);
             return;

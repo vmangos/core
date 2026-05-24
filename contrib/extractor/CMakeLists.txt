@@ -27,10 +27,11 @@ include_directories (
 add_executable (${EXECUTABLE_NAME}
     dbcfile.cpp
     System.cpp
-    loadlib/loadlib.cpp 
+    loadlib/loadlib.cpp
     loadlib/adt.cpp
     loadlib/wdt.cpp
     )
+mangos_target_flags(${EXECUTABLE_NAME})
 
 SET_TARGET_PROPERTIES (${EXECUTABLE_NAME} PROPERTIES FOLDER Extractors)
 

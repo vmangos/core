@@ -283,25 +283,3 @@ void LFGMgr::UpdateGroup(Group* group, bool join, ObjectGuid playerGuid)
     });
 }
 
-void LFGMgr::BuildSetQueuePacket(WorldPacket& data, uint32 areaId, uint8 status)
-{
-    data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
-    data << uint32(areaId);
-    data << uint8(status);
-}
-
-void LFGMgr::BuildMemberAddedPacket(WorldPacket& data, ObjectGuid plrGuid)
-{
-    data.Initialize(SMSG_MEETINGSTONE_MEMBER_ADDED, 8);
-    data << uint64(plrGuid);
-}
-
-void LFGMgr::BuildInProgressPacket(WorldPacket& data)
-{
-    data.Initialize(SMSG_MEETINGSTONE_IN_PROGRESS, 0);
-}
-
-void LFGMgr::BuildCompletePacket(WorldPacket& data)
-{
-    data.Initialize(SMSG_MEETINGSTONE_COMPLETE, 0);
-}

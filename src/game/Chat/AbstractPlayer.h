@@ -61,10 +61,10 @@ public:
 template <typename T>
 class PlayerWrapper final: public AbstractPlayer
 {
+    PlayerWrapper() = delete;
 public:
     PlayerWrapper(T& pl);
     PlayerWrapper(T* pl);
-    PlayerWrapper();
     PlayerWrapper(PlayerWrapper<T> const& other);
 
     ObjectGuid GetObjectGuid() const override;

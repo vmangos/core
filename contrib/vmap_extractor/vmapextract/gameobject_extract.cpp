@@ -2,9 +2,19 @@
 #include "dbcfile.h"
 #include "wmo.h"
 #include "vmapexport.h"
+#include "libmpq/mpq_libmpq.h"
 
 #include <algorithm>
 #include <stdio.h>
+
+// Check if file exists in MPQ without adding to failedPaths
+static bool MPQFileExists(const std::string& path)
+{
+    MPQFile f(path.c_str());
+    bool exists = !f.isEof();
+    f.close();
+    return exists;
+}
 
 bool ExtractSingleModel(std::string& origPath, std::string& fixedName, StringSet& failedPaths)
 {
@@ -23,25 +33,50 @@ bool ExtractSingleModel(std::string& origPath, std::string& fixedName, StringSet
     // >= 3.1.0 ADT MMDX section store filename.m2 filenames for corresponded .m2 file
     // nothing do
 
+    std::string originalPath = origPath;
+
     char* name = GetPlainName((char*)origPath.c_str());
     FixNameCase(name, strlen(name));
-    FixNameSpaces(name, strlen(name)); // Fix a few models with spaces instead of underscores in their filenames (razorfen leanto03)
+    FixNameSpaces(name, strlen(name));
+    fixedName = name;
 
-    std::string output(szWorkDirWmo); // Stores output filename (possible changed)
-    output += "/";
-    output += name;
-
+    std::string output = std::string(szWorkDirWmo) + "/" + name;
     if (FileExists(output.c_str()))
         return true;
 
+    // Try 1: Path with underscores
     Model mdl(origPath);
-    if (!mdl.open(failedPaths)) // Possible changed fname
-        return false;
+    if (mdl.open(failedPaths))
+        return mdl.ConvertToVMAPModel(output.c_str());
 
-    return mdl.ConvertToVMAPModel(output.c_str());
+    // Try 2: Original path (with spaces if it had them)
+    if (originalPath != origPath && MPQFileExists(originalPath))
+    {
+        failedPaths.erase(origPath);
+        Model mdl2(originalPath);
+        if (mdl2.open(failedPaths))
+            return mdl2.ConvertToVMAPModel(output.c_str());
+    }
+
+    // Try 3: Filename with underscores converted to spaces
+    size_t lastSlash = origPath.find_last_of("\\/");
+    if (lastSlash != std::string::npos)
+    {
+        std::string altPath = origPath;
+        std::replace(altPath.begin() + lastSlash + 1, altPath.end(), '_', ' ');
+        if (altPath != origPath && altPath != originalPath && MPQFileExists(altPath))
+        {
+            failedPaths.erase(origPath);
+            Model mdl3(altPath);
+            if (mdl3.open(failedPaths))
+                return mdl3.ConvertToVMAPModel(output.c_str());
+        }
+    }
+
+    return false;
 }
 
-void ExtractGameobjectModels()
+bool ExtractGameobjectModels()
 {
     printf("\n");
     printf("Extracting GameObject models...\n");
@@ -68,28 +103,29 @@ void ExtractGameobjectModels()
 
         FixNameCase((char*)path.c_str(), path.size());
         char* name = GetPlainName((char*)path.c_str());
-        FixNameSpaces(name, strlen(name));
 
         char const* ch_ext = GetExtension(name);
         if (!ch_ext)
             continue;
 
-        //strToLower(ch_ext);
-
         bool result = false;
+        std::string fixedName;
+
         if (!strcmp(ch_ext, ".wmo"))
         {
             result = ExtractSingleWmo(path);
+            if (result)
+                FixNameSpaces(name, strlen(name));
         }
         else if (!strcmp(ch_ext, ".mdl"))
         {
-            // TODO: extract .mdl files, if needed
             continue;
         }
-        else //if (!strcmp(ch_ext, ".mdx") || !strcmp(ch_ext, ".m2"))
+        else
         {
-            std::string fixedName;
             result = ExtractSingleModel(path, fixedName, failedPaths);
+            if (result)
+                name = (char*)fixedName.c_str();
         }
 
         if (result)
@@ -109,8 +145,10 @@ void ExtractGameobjectModels()
         printf("Warning: Some models could not be extracted, see below\n");
         for (StringSet::const_iterator itr = failedPaths.begin(); itr != failedPaths.end(); ++itr)
             printf("Could not find file of model %s\n", itr->c_str());
-        printf("A few of these warnings are expected to happen, so be not alarmed!\n");
+        printf("Done!\n");
+        return false;
     }
 
     printf("Done!\n");
+    return true;
 }

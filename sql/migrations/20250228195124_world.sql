@@ -184,8 +184,8 @@ DELETE FROM `pool_template` WHERE `entry` = 1217;
 -- Fire Plume Ridge
 SET @PTEMPLATE = 1140;
 DELETE FROM `pool_pool` WHERE `pool_id` IN (1488, 1491, 1487, 1489, 14441);
-UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Fire Plume Ridge' WHERE `entry` IN (1488, 1218, 1487, 1489, 14441);
-UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Fire Plume Ridge' WHERE `pool_entry` IN (1488, 1218, 1487, 1489, 14441);
+UPDATE `pool_template` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Fire Plume Ridge' WHERE `entry` IN (1488, 1491, 1487, 1489, 14441);
+UPDATE `pool_gameobject` SET `description` = 'Truesilver Deposit / Rich Thorium Vein - Un\'Goro Crater - Fire Plume Ridge' WHERE `pool_entry` IN (1488, 1491, 1487, 1489, 14441);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE+1, 1, 'Un\'Goro Crater - Fire Plume Ridge - Truesilver Deposit / Rich Thorium Vein (Master Pool)', 0, 0, 0, 10);
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES

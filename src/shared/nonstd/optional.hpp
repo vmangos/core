@@ -366,7 +366,7 @@ struct optional_storage_base {
   TL_OPTIONAL_11_CONSTEXPR optional_storage_base(in_place_t, U &&... u)
       : m_value(std::forward<U>(u)...), m_has_value(true) {}
 
-  ~optional_storage_base() {
+  ~optional_storage_base() noexcept(::std::is_nothrow_destructible<T>::value) {
     if (m_has_value) {
       m_value.~T();
       m_has_value = false;

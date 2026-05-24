@@ -19,13 +19,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __BATTLEGROUNDMGR_H
-#define __BATTLEGROUNDMGR_H
+#ifndef MANGOS_BATTLEGROUNDMGR_H
+#define MANGOS_BATTLEGROUNDMGR_H
 
+#include <memory>
 #include <vector>
 
 #include "Common.h"
-#include "Policies/Singleton.h"
+#include "Packet.h"
 #include "BattleGround.h"
 
 typedef std::map<uint32, BattleGround*> BattleGroundSet;
@@ -36,6 +37,9 @@ typedef std::list<BattleGround*> BgFreeSlotQueueType;
 typedef std::unordered_map<uint32, BattleGroundTypeId> BattleMastersMap;
 typedef std::unordered_map<uint32, std::vector<BattleGroundEventIdx> > CreatureBattleEventIndexesMap;
 typedef std::unordered_map<uint32, std::vector<BattleGroundEventIdx> > GameObjectBattleEventIndexesMap;
+
+// Sentinel key used for the default (unregistered) event entry in the battle event index maps.
+constexpr uint32 BG_UNREGISTERED_GUID = static_cast<uint32>(-1);
 
 #define COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME 10
 #define OFFLINE_BG_QUEUE_TIME                 60*1000 // in ms
@@ -70,11 +74,11 @@ enum BattleGroundQueueGroupTypes
 };
 #define BG_QUEUE_GROUP_TYPES_COUNT 4
 
-enum BattleGroundGroupJoinStatus
+enum BattleGroundGroupJoinStatus : uint32
 {
-    BG_GROUPJOIN_DESERTERS = -2,
-    BG_GROUPJOIN_FAILED = -1    // actually, any negative except 2
-                                // any other value is a MapID meaning successful join
+    BG_GROUPJOIN_DESERTERS = 0xFFFFFFFE,
+    BG_GROUPJOIN_FAILED = 0xFFFFFFFF,
+    // any other value is a MapID (meaning successful join)
 };
 
 class BattleGround;
@@ -205,15 +209,17 @@ class BattleGroundMgr
 
         /* Packet Building */
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-        void BuildPlayerJoinedBattleGroundPacket(WorldPacket* data, Player* player);
-        void BuildPlayerLeftBattleGroundPacket(WorldPacket* data, ObjectGuid guid);
+        std::unique_ptr<ServerPacket> BuildPlayerJoinedBattleGroundPacket(Player* player);
+        std::unique_ptr<ServerPacket> BuildPlayerLeftBattleGroundPacket(ObjectGuid guid);
 #endif
-        void BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattleGroundTypeId bgTypeId);
-        void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, int32 status);
-        void BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value);
-        void BuildPvpLogDataPacket(WorldPacket* data, BattleGround* bg);
-        void BuildBattleGroundStatusPacket(WorldPacket* data, BattleGround* bg, uint8 queueSlot, uint8 statusID, uint32 time1, uint32 time2);
-        void BuildPlaySoundPacket(WorldPacket* data, uint32 soundid);
+        std::unique_ptr<ServerPacket> BuildBattleGroundListPacket(ObjectGuid guid, Player* player, BattleGroundTypeId bgTypeId);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
+        std::unique_ptr<ServerPacket> BuildGroupJoinedBattlegroundPacket(int32 status);
+        std::unique_ptr<ServerPacket> BuildPvpLogDataPacket(BattleGround const* bg);
+#endif
+        std::unique_ptr<ServerPacket> BuildUpdateWorldStatePacket(uint32 field, uint32 value);
+        std::unique_ptr<ServerPacket> BuildBattleGroundStatusPacket(BattleGround* bg, uint8 queueSlot, uint8 statusID, uint32 time1, uint32 time2);
+        std::unique_ptr<ServerPacket> BuildPlaySoundPacket(uint32 soundId);
 
         /* Battlegrounds */
         BattleGroundSet::iterator GetBattleGroundsBegin(BattleGroundTypeId bgTypeId) { return m_battleGrounds[bgTypeId].begin(); };
@@ -266,14 +272,14 @@ class BattleGroundMgr
             CreatureBattleEventIndexesMap::const_iterator itr = m_creatureBattleEventIndexMap.find(dbGuid);
             if (itr != m_creatureBattleEventIndexMap.end())
                 return itr->second[0];
-            return m_creatureBattleEventIndexMap.find(-1)->second[0];
+            return m_creatureBattleEventIndexMap.find(BG_UNREGISTERED_GUID)->second[0];
         }
         BattleGroundEventIdx GetGameObjectEventIndex(uint32 dbGuid) const
         {
             GameObjectBattleEventIndexesMap::const_iterator itr = m_gameObjectBattleEventIndexMap.find(dbGuid);
             if (itr != m_gameObjectBattleEventIndexMap.end())
                 return itr->second[0];
-            return m_gameObjectBattleEventIndexMap.find(-1)->second[0];
+            return m_gameObjectBattleEventIndexMap.find(BG_UNREGISTERED_GUID)->second[0];
         }
         // Nostalrius: allow multiple events per creature ... Avoid when possible.
         std::vector<BattleGroundEventIdx> const& GetCreatureEventsVector(uint32 dbGuid) const
@@ -281,14 +287,14 @@ class BattleGroundMgr
             CreatureBattleEventIndexesMap::const_iterator itr = m_creatureBattleEventIndexMap.find(dbGuid);
             if (itr != m_creatureBattleEventIndexMap.end())
                 return itr->second;
-            return m_creatureBattleEventIndexMap.find(-1)->second;
+            return m_creatureBattleEventIndexMap.find(BG_UNREGISTERED_GUID)->second;
         }
         std::vector<BattleGroundEventIdx> const& GetGameObjectEventsVector(uint32 dbGuid) const
         {
             GameObjectBattleEventIndexesMap::const_iterator itr = m_gameObjectBattleEventIndexMap.find(dbGuid);
             if (itr != m_gameObjectBattleEventIndexMap.end())
                 return itr->second;
-            return m_gameObjectBattleEventIndexMap.find(-1)->second;
+            return m_gameObjectBattleEventIndexMap.find(BG_UNREGISTERED_GUID)->second;
         }
 
         bool isTesting() const { return m_testing; }
@@ -318,4 +324,6 @@ class BattleGroundMgr
 };
 
 #define sBattleGroundMgr MaNGOS::Singleton<BattleGroundMgr>::Instance()
-#endif
+
+#endif // MANGOS_BATTLEGROUNDMGR_H
+

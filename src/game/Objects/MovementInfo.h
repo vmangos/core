@@ -20,6 +20,7 @@
 #include "Common.h"
 #include "ByteBuffer.h"
 #include "ObjectGuid.h"
+#include "SharedDefines.h"
 #include "Timer.h"
 
 // [-ZERO] Need check and update
@@ -164,8 +165,9 @@ class MovementInfo
             s_pitch(0.0f), fallTime(0), splineElevation(0.0f), sourceSessionGuid(0) {}
 
         // Read/Write methods
-        void Read(ByteBuffer &data);
-        void Write(ByteBuffer &data) const;
+        void Read(ByteBuffer& data);
+        void FillFrom(MovementInfo const& info);
+        void Write(ByteBuffer& data) const;
         void CorrectData();
 
         // Movement flags manipulations
@@ -201,7 +203,7 @@ class MovementInfo
         void ChangePosition(float x, float y, float z, float o) { pos.x = x; pos.y = y; pos.z = z; pos.o = o; }
         void UpdateTime(uint32 _time) { stime = _time; }
         void SetAsServerSide()
-        { 
+        {
             uint32 const oldTime = stime;
             stime = WorldTimer::getMSTime();
 

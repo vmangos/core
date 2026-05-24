@@ -211,7 +211,7 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     uint32 action = CHEAT_ACTION_NONE;
 
     auto AddPenaltyForCheat = [&action, &reason, this](bool total, CheatType cheatType, eConfigBoolValues enabledConfig, eConfigUInt32Values thresholdConfig, eConfigUInt32Values penaltyConfig)
-    { 
+    {
         if (sWorld.getConfig(enabledConfig))
         {
             ASSERT(cheatType < CHEATS_COUNT);
@@ -296,11 +296,11 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     return action;
 }
 
-void MovementAnticheat::AddMessageToPacketLog(std::string message)
+void MovementAnticheat::AddMessageToPacketLog(std::string const& message)
 {
-    WorldPacket data(SMSG_NOTIFICATION, message.size() + 1);
-    data << message;
-    LogMovementPacket(false, data);
+    WorldPackets::Misc::Notification notificationPacket;
+    notificationPacket.message = message;
+    LogMovementPacket(notificationPacket);
 }
 
 bool MovementAnticheat::IsLoggedOpcode(uint16 opcode)
@@ -383,17 +383,30 @@ bool MovementAnticheat::IsLoggedOpcode(uint16 opcode)
         case CMSG_MOVE_WATER_WALK_ACK:
         case CMSG_SET_ACTIVE_MOVER:
         case CMSG_MOVE_NOT_ACTIVE_MOVER:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         case CMSG_MOVE_START_SWIM_CHEAT:
         case CMSG_MOVE_STOP_SWIM_CHEAT:
         case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
         case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
         case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         case MSG_MOVE_TIME_SKIPPED:
 #endif
             return true;
     }
     return false;
+}
+
+void MovementAnticheat::LogMovementPacket(ServerPacket const& packet)
+{
+    if (sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE) != 0)
+    {
+        // TODO: Wait for all packets to be converted, so we can store the ServerPacket directly
+        WorldPacket binaryPacket(packet.GetOpcode());
+        packet.AppendBodyTo(binaryPacket);
+        LogMovementPacket(false, binaryPacket);
+    }
 }
 
 void MovementAnticheat::LogMovementPacket(bool isClientPacket, WorldPacket const& packet)
@@ -610,7 +623,7 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)) ||
         !pPlayer->movespline->Finalized())
         return 0;
-    
+
     if (pPlayer != me)
         InitNewPlayer(pPlayer);
 
@@ -682,7 +695,7 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
             cheatFlags |= flags;
     }
 
-    if (IsFallEndOpcode(opcode) || 
+    if (IsFallEndOpcode(opcode) ||
         movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
         m_knockBack = false;
 
@@ -697,8 +710,8 @@ uint32 MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& mov
         {
             me->m_movementInfo.moveFlags = movementInfo.moveFlags;
             me->m_movementInfo.CorrectData();
-        }     
-        
+        }
+
         if (HAS_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP) &&
             sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
         {
@@ -733,7 +746,7 @@ uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movemen
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
         return 0;
-    
+
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
 
@@ -941,7 +954,7 @@ bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
         if (!GetLastMovementInfo().HasMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
             return true;
     }
-    
+
     return movementInfo.fallTime != 0 || movementInfo.jump.zspeed != 0.0f;
 }
 
@@ -997,7 +1010,7 @@ bool MovementAnticheat::CheckMoveStart(MovementInfo const& movementInfo, uint16 
            !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_FORWARD))
             return true;
     }
-    
+
     if (opcode == MSG_MOVE_START_BACKWARD)
     {
         if (!movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD))
@@ -1065,7 +1078,7 @@ bool MovementAnticheat::CheckMoveStart(MovementInfo const& movementInfo, uint16 
     }
     else
     {
-        
+
         if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) &&
            !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_SWIMMING) &&
            !me->HasCheatOption(PLAYER_CHEAT_FLY))
@@ -1260,7 +1273,7 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
         (opcode == CMSG_MOVE_SPLINE_DONE) ||
         IsInKnockBack() ||
         !GetLastMovementInfo().ctime ||
-        me->IsTaxiFlying() || 
+        me->IsTaxiFlying() ||
         me->IsBeingTeleported())
         return 0;
 
@@ -1477,7 +1490,7 @@ void MovementAnticheat::CheckBotting(uint16 opcode, MovementInfo const& movement
         // we store turns count here
         m_cheatOccuranceTotal[CHEAT_TYPE_BOTTING]++;
     }
-    
+
     m_movementPacketsCount++;
 }
 
@@ -1500,7 +1513,7 @@ bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
         float const distance2d = movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) ?
             GetDistance2D(GetLastMovementInfo().t_pos, movementInfo.t_pos) :
             GetDistance2D(GetLastMovementInfo().pos, movementInfo.pos);
-        
+
         if (distance2d > 1.0f)
             return true;
 
@@ -1512,7 +1525,7 @@ bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
             float const distanceZ = movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) ?
                 std::abs(GetLastMovementInfo().t_pos.z - movementInfo.t_pos.z) :
                 std::abs(GetLastMovementInfo().pos.z - movementInfo.pos.z);
-            
+
             if (distanceZ > 2.0f)
                 return true;
         }

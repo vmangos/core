@@ -44,21 +44,21 @@ class TargetedMovementGeneratorMedium
             m_bReachable(true), m_fTargetLastX(0), m_fTargetLastY(0), m_fTargetLastZ(0), m_bTargetOnTransport(false)
         {
         }
-        ~TargetedMovementGeneratorMedium() {}
+        ~TargetedMovementGeneratorMedium() override {}
 
     public:
-        
+
         void UpdateAsync(T&, uint32 diff);
 
-        bool IsReachable() const
+        bool IsReachable() const override
         {
             return m_bReachable;
         }
 
         Unit* GetTarget() const { return i_target.getTarget(); }
 
-        void UnitSpeedChanged() { m_bRecalculateTravel=true; }
-        void UpdateFinalDistance(float fDistance);
+        void UnitSpeedChanged() override { m_bRecalculateTravel=true; }
+        void UpdateFinalDistance(float fDistance) override;
         bool IsFarEnoughToMoveStationaryFollower(T&) const;
 
     protected:
@@ -86,9 +86,9 @@ class ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMo
             : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >(target) {}
         ChaseMovementGenerator(Unit &target, float offset, float angle)
             : TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >(target, offset, angle) {}
-        ~ChaseMovementGenerator() {}
+        ~ChaseMovementGenerator() override {}
 
-        MovementGeneratorType GetMovementGeneratorType() const { return CHASE_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return CHASE_MOTION_TYPE; }
 
         bool Update(T &, uint32 const&);
         void Initialize(T &);

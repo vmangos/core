@@ -22,27 +22,39 @@
 #ifndef MANGOS_DEFINE_H
 #define MANGOS_DEFINE_H
 
-#include <sys/types.h>
-
-#include <ace/Basic_Types.h>
-#include <ace/Default_Constants.h>
-#include <ace/OS_NS_dlfcn.h>
-#include <ace/ACE_export.h>
-
 #include "Platform/CompilerDefs.h"
+#include <cstdint>
+
+#if PLATFORM == PLATFORM_WINDOWS
+// Unfortunately, every library (e.g. MySQL, G3D) includes <Windows.h> in their **HEADER**
+// and will break parts of the code, since Windows adds so many marcos and stuff.
+// So if we can't beat them, join them!
+// We include Windows.h first and remove all the conflicting definitions after.
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <WinSock2.h>
+// Now we need to remove all the stuff that comes included with Windows headers and will most probably cause errors...
+#undef WIN32_LEAN_AND_MEAN
+#undef NOMINMAX
+#undef ERROR
+#undef IGNORE
+#endif // WINDOWS
 
 #define MANGOS_LITTLEENDIAN 0
 #define MANGOS_BIGENDIAN    1
 
 #if !defined(MANGOS_ENDIAN)
-#  if defined (ACE_BIG_ENDIAN)
+#  if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #    define MANGOS_ENDIAN MANGOS_BIGENDIAN
-#  else //ACE_BYTE_ORDER != ACE_BIG_ENDIAN
+#  else //__BYTE_ORDER__ != __ORDER_BIG_ENDIAN__
 #    define MANGOS_ENDIAN MANGOS_LITTLEENDIAN
-#  endif //ACE_BYTE_ORDER
+#  endif //__BYTE_ORDER__
 #endif //MANGOS_ENDIAN
-
-#define MANGOS_PATH_MAX PATH_MAX                            // ace/os_include/os_limits.h -> ace/Basic_Types.h
 
 #if PLATFORM == PLATFORM_WINDOWS
 #  ifndef DECLSPEC_NORETURN
@@ -60,14 +72,14 @@
 #  define ATTR_PRINTF(F,V)
 #endif //COMPILER == COMPILER_GNU
 
-typedef ACE_INT64 int64;
-typedef ACE_INT32 int32;
-typedef ACE_INT16 int16;
-typedef ACE_INT8 int8;
-typedef ACE_UINT64 uint64;
-typedef ACE_UINT32 uint32;
-typedef ACE_UINT16 uint16;
-typedef ACE_UINT8 uint8;
+typedef std::int64_t  int64;
+typedef std::int32_t  int32;
+typedef std::int16_t  int16;
+typedef std::int8_t   int8;
+typedef std::uint64_t uint64;
+typedef std::uint32_t uint32;
+typedef std::uint16_t uint16;
+typedef std::uint8_t  uint8;
 
 #ifndef _WIN32
 typedef uint16      WORD;

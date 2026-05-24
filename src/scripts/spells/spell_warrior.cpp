@@ -19,11 +19,11 @@
 // 5246 - Intimidating Shout
 struct WarriorIntimidatingShoutScript : SpellScript
 {
-    bool OnCheckTarget(Spell const* spell, Unit* target, SpellEffectIndex /*eff*/) const final
+    bool OnCheckTarget(Spell const* spell, Unit* target, SpellEffectIndex eff) const final
     {
         // Exception: Intimidating Shout
         // The AoE fear does not apply to spell main target (that is stunned by another aura)
-        if (target == spell->m_targets.getUnitTarget())
+        if (target == spell->m_targets.getUnitTarget() && eff != EFFECT_INDEX_0)
             return false;
         return true;
     }
@@ -99,7 +99,7 @@ struct WarriorExecuteDummyScript : SpellScript
         if (!spell->GetUnitTarget() || !spell->m_casterUnit)
             return;
         
-        int32 basePoints0 = spell->m_currentBasePoints[0] + dither(spell->m_casterUnit->GetPower(POWER_RAGE) * spell->m_spellInfo->DmgMultiplier[0]);
+        int32 basePoints0 = spell->m_currentBasePoints[0] + rand_dither(spell->m_casterUnit->GetPower(POWER_RAGE) * spell->m_spellInfo->DmgMultiplier[0]);
         // m_casterUnit->SetPower(POWER_RAGE, 0); // Done in spell 20647
         spell->m_casterUnit->CastCustomSpell(spell->GetUnitTarget(), 20647, basePoints0, {}, {}, true, nullptr);
     }
@@ -146,6 +146,56 @@ SpellScript* GetScript_WarriorBloodrage(SpellEntry const*)
     return new WarriorBloodrageScript();
 }
 
+// 12292 - Sweeping Strikes
+struct WarriorSweepingStrikesAuraScript : public AuraScript
+{
+    void OnHolderInit(SpellAuraHolder* holder, WorldObject* /*caster*/) final
+    {
+        // Sweeping Strikes should not be removed on shapeshift
+        holder->SetRemovedOnShapeLost(false);
+    }
+};
+
+AuraScript* GetScript_WarriorSweepingStrikes(SpellEntry const*)
+{
+    return new WarriorSweepingStrikesAuraScript();
+}
+
+// 23234 - Blood Fury
+struct WarriorBloodFuryAuraScript : public AuraScript
+{
+    enum
+    {
+        SPELL_BLOOD_FURY_DEBUFF = 23230,
+    };
+
+    void OnBeforeApply(Aura* aura, bool apply) final
+    {
+#if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1) && (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4)
+        if (aura->GetEffIndex() != EFFECT_INDEX_0)
+            return;
+
+        // Blood Fury - Add aura to decrease attack power on remove
+        if (!apply && (aura->GetHolder()->GetRemoveMode() == AURA_REMOVE_BY_CANCEL || aura->GetHolder()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE))
+        {
+            Unit* target = aura->GetTarget();
+            // using delayed event because of an error in ExclusiveAuraUnapply
+            target->m_Events.AddLambdaEventAtOffset([target]
+            {
+                int32 attackPower = -25 * (target->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100;
+                if (attackPower < 0)
+                    target->CastCustomSpell(target, SPELL_BLOOD_FURY_DEBUFF, attackPower, {}, {}, true, nullptr);
+            }, 1);
+        }
+#endif
+    }
+};
+
+AuraScript* GetScript_WarriorBloodFury(SpellEntry const*)
+{
+    return new WarriorBloodFuryAuraScript();
+}
+
 void AddSC_warrior_spell_scripts()
 {
     Script* newscript;
@@ -183,5 +233,15 @@ void AddSC_warrior_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_warrior_bloodrage";
     newscript->GetSpellScript = &GetScript_WarriorBloodrage;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warrior_sweeping_strikes";
+    newscript->GetAuraScript = &GetScript_WarriorSweepingStrikes;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_warrior_blood_fury";
+    newscript->GetAuraScript = &GetScript_WarriorBloodFury;
     newscript->RegisterSelf();
 }

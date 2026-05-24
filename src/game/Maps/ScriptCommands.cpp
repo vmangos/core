@@ -27,6 +27,7 @@
 #include "ObjectMgr.h"
 #include "Group.h"
 #include "CreatureGroups.h"
+#include "Utilities/Random.h"
 
 // Script commands should return false by default.
 // If they return true the rest of the script is aborted.
@@ -374,7 +375,8 @@ bool Map::ScriptCommand_RespawnGameObject(ScriptInfo const& script, WorldObject*
 
     if (!pGo)
     {
-        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
+        if (!(script.raw.data[4] & SF_GENERAL_SKIP_MISSING_TARGETS))
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
         return ShouldAbortScript(script);
     }
 
@@ -493,7 +495,8 @@ bool Map::ScriptCommand_OpenDoor(ScriptInfo const& script, WorldObject* source, 
 
     if (!pDoor)
     {
-        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_OPEN_DOOR (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
+        if (!(script.raw.data[4] & SF_GENERAL_SKIP_MISSING_TARGETS))
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_OPEN_DOOR (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
         return ShouldAbortScript(script);
     }
 
@@ -510,7 +513,7 @@ bool Map::ScriptCommand_OpenDoor(ScriptInfo const& script, WorldObject* source, 
 
     pDoor->UseDoorOrButton(time_to_close);
 
-    if (target && target->isType(TYPEMASK_GAMEOBJECT) && (static_cast<GameObject*>(target))->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
+    if (target && target->IsType(TYPEMASK_GAMEOBJECT) && (static_cast<GameObject*>(target))->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
         (static_cast<GameObject*>(target))->UseDoorOrButton(time_to_close);
 
     return false;
@@ -537,7 +540,8 @@ bool Map::ScriptCommand_CloseDoor(ScriptInfo const& script, WorldObject* source,
 
     if (!pDoor)
     {
-        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_CLOSE_DOOR (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
+        if (!(script.raw.data[4] & SF_GENERAL_SKIP_MISSING_TARGETS))
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_CLOSE_DOOR (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
         return ShouldAbortScript(script);
     }
     if (pDoor->GetGoType() != GAMEOBJECT_TYPE_DOOR)
@@ -553,7 +557,7 @@ bool Map::ScriptCommand_CloseDoor(ScriptInfo const& script, WorldObject* source,
 
     pDoor->UseDoorOrButton(time_to_open);
 
-    if (target && target->isType(TYPEMASK_GAMEOBJECT) && (static_cast<GameObject*>(target))->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
+    if (target && target->IsType(TYPEMASK_GAMEOBJECT) && (static_cast<GameObject*>(target))->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
         (static_cast<GameObject*>(target))->UseDoorOrButton(time_to_open);
 
     return false;
@@ -1096,7 +1100,7 @@ bool Map::ScriptCommand_TerminateCondition(ScriptInfo const& script, WorldObject
     WorldObject* pTarget = target;
 
     bool terminateResult = IsConditionSatisfied(script.terminateCond.conditionId, pTarget, this, pSource, CONDITION_FROM_DBSCRIPTS);
-    
+
     if (script.terminateCond.flags & SF_TERMINATECONDITION_WHEN_FALSE)
         terminateResult = !terminateResult;
 
@@ -1220,7 +1224,7 @@ bool Map::ScriptCommand_MeetingStone(ScriptInfo const& script, WorldObject* sour
 bool Map::ScriptCommand_SetData(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
     InstanceData* pInst = GetInstanceData();
-    
+
     if (!pInst)
     {
         sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_SET_INST_DATA (script id %u) call for map without an instance script, skipping.", script.id);
@@ -1251,7 +1255,7 @@ bool Map::ScriptCommand_SetData(ScriptInfo const& script, WorldObject* source, W
 bool Map::ScriptCommand_SetData64(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
     InstanceData* pInst = GetInstanceData();
-    
+
     if (!pInst)
     {
         sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_SET_INST_DATA64 (script id %u) call for map without an instance script, skipping.", script.id);
@@ -1694,7 +1698,7 @@ bool Map::ScriptCommand_RemoveGuardians(ScriptInfo const& script, WorldObject* s
         sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_REMOVE_GUARDIANS (script id %u) call for a nullptr or non-unit source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
         return ShouldAbortScript(script);
     }
-    
+
     if (script.removeGuardian.creatureId)
     {
         pSource->RemoveGuardiansWithEntry(script.removeGuardian.creatureId);
@@ -1717,9 +1721,13 @@ bool Map::ScriptCommand_AddSpellCooldown(ScriptInfo const& script, WorldObject* 
     }
 
     if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(script.addCooldown.spellId))
-    pSource->AddCooldown(*pSpellEntry, nullptr, false, script.addCooldown.cooldown * IN_MILLISECONDS);
-    if (Player* pPlayer = pSource->ToPlayer())
-        pPlayer->SendSpellCooldown(script.addCooldown.spellId, script.addCooldown.cooldown * IN_MILLISECONDS, pPlayer->GetObjectGuid());
+    {
+        pSource->AddCooldown(pSpellEntry, nullptr, false, script.addCooldown.cooldown * IN_MILLISECONDS);
+
+        if (Player* pPlayer = pSource->ToPlayer())
+            pPlayer->SendSpellCooldown(pSpellEntry->Id, Milliseconds(script.addCooldown.cooldown * IN_MILLISECONDS), pPlayer->GetObjectGuid());
+    }
+
 
     return false;
 }
@@ -1736,7 +1744,10 @@ bool Map::ScriptCommand_RemoveSpellCooldown(ScriptInfo const& script, WorldObjec
     }
 
     if (script.removeCooldown.spellId)
-        pSource->RemoveSpellCooldown(script.removeCooldown.spellId, true);
+    {
+        if (SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(script.removeCooldown.spellId))
+            pSource->RemoveSpellCooldown(spellEntry, true);
+    }
     else
         pSource->RemoveAllCooldowns();
 
@@ -1875,7 +1886,7 @@ bool Map::ScriptCommand_RemoveMapEventTarget(ScriptInfo const& script, WorldObje
                         continue;
                     }
                 }
-                
+
                 ++itr;
             }
             break;
@@ -2030,7 +2041,7 @@ bool Map::ScriptCommand_StartScriptForAll(ScriptInfo const& script, WorldObject*
         if (!script.startScriptForAll.objectEntry || (pWorldObject->GetEntry() == script.startScriptForAll.objectEntry))
             ScriptsStart(sGenericScripts, script.startScriptForAll.scriptId, pWorldObject->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
     }
-    
+
     return false;
 }
 
@@ -2146,7 +2157,7 @@ bool Map::ScriptCommand_CombatStop(ScriptInfo const& script, WorldObject* source
     {
         pSource->CombatStop(true);
         pSource->DeleteThreatList();
-    }  
+    }
 
     return false;
 }
@@ -2306,7 +2317,8 @@ bool Map::ScriptCommand_DespawnGameObject(ScriptInfo const& script, WorldObject*
 
     if (!pGo)
     {
-        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_DESPAWN_GAMEOBJECT (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
+        if (!(script.raw.data[4] & SF_GENERAL_SKIP_MISSING_TARGETS))
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_DESPAWN_GAMEOBJECT (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
         return ShouldAbortScript(script);
     }
 
@@ -2511,7 +2523,7 @@ bool Map::ScriptCommand_LoadCreatureSpawn(ScriptInfo const& script, WorldObject*
         if (!LoadCreatureSpawn(script.loadCreature.dbGuid))
             return ShouldAbortScript(script);
     }
-       
+
     return false;
 }
 

@@ -126,7 +126,7 @@ class GameEventMgr
         template<typename T>
         int16 GetGameEventId(uint32 guid_or_poolid);
 
-        GameEventCreatureData const* GetCreatureUpdateDataForActiveEvent(uint32 lowguid) const;       
+        GameEventCreatureData const* GetCreatureUpdateDataForActiveEvent(uint32 lowguid) const;
         HardcodedEventList mGameEventHardcodedList;
         void LoadHardcodedEvents(HardcodedEventList& eventList);
     private:
@@ -146,7 +146,7 @@ class GameEventMgr
         typedef std::vector<GameEventCreatureDataPair> GameEventCreatureDataList;
         typedef std::vector<GameEventCreatureDataList> GameEventCreatureDataMap;
         typedef std::multimap<uint32, uint32> GameEventCreatureDataPerGuidMap;
-        typedef std::pair<GameEventCreatureDataPerGuidMap::const_iterator,GameEventCreatureDataPerGuidMap::const_iterator> GameEventCreatureDataPerGuidBounds;        
+        typedef std::pair<GameEventCreatureDataPerGuidMap::const_iterator,GameEventCreatureDataPerGuidMap::const_iterator> GameEventCreatureDataPerGuidBounds;
 
         typedef std::vector<uint32> QuestList;
         typedef std::vector<QuestList> GameEventQuestMap;
@@ -158,7 +158,7 @@ class GameEventMgr
         typedef std::vector<GameEventMail> MailList;
         typedef std::vector<MailList> GameEventMailMap;
         GameEventMailMap  mGameEventMails;                  // events*2-1
-        
+
         GameEventGuidMap  mGameEventCreatureGuids;          // events*2-1
         GameEventGuidMap  mGameEventGameobjectGuids;        // events*2-1
         GameEventIdMap    mGameEventSpawnPoolIds;           // events size, only positive event case

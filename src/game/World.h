@@ -35,7 +35,9 @@
 #include "WorldPacket.h"
 #include "Multithreading/Messager.h"
 #include "LFGQueue.h"
+#include "LockedQueue.h"
 
+#include <atomic>
 #include <map>
 #include <set>
 #include <list>
@@ -44,6 +46,7 @@
 #include <unordered_map>
 #include <thread>
 
+class ServerPacket;
 class Object;
 class WorldSession;
 class Player;
@@ -411,7 +414,6 @@ enum eConfigFloatValues
     CONFIG_FLOAT_RATE_XP_EXPLORE,
     CONFIG_FLOAT_RATE_REPUTATION_GAIN,
     CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL,
-    CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_QUEST,
     CONFIG_FLOAT_RATE_CREATURE_NORMAL_HP,
     CONFIG_FLOAT_RATE_CREATURE_ELITE_ELITE_HP,
     CONFIG_FLOAT_RATE_CREATURE_ELITE_RAREELITE_HP,
@@ -632,17 +634,6 @@ enum RealmType
                                                             // replaced by REALM_PVP in realm list
 };
 
-class SessionPacketSendTask
-{
-public:
-    SessionPacketSendTask(SessionPacketSendTask const&) = delete;
-    SessionPacketSendTask(uint32 accountId, WorldPacket& data) : m_accountId(accountId), m_data(data) {}
-    void operator ()();
-private:
-    uint32 m_accountId;
-    WorldPacket m_data;
-};
-
 // Storage class for commands issued for delayed execution
 struct CliCommandHolder
 {
@@ -652,7 +643,7 @@ struct CliCommandHolder
     uint32 m_cliAccountId;                                  // 0 for console and real account id for RA/soap
     AccountTypes m_cliAccessLevel;
     void* m_callbackArg;
-    char *m_command;
+    char* m_command;
     Print* m_print;
     CommandFinished* m_commandFinished;
 
@@ -679,7 +670,7 @@ class ThreadPool;
 class World
 {
     public:
-        static volatile uint32 m_worldLoopCounter;
+        static std::atomic<uint32> m_worldLoopCounter;
 
         World();
         ~World();
@@ -687,9 +678,9 @@ class World
         typedef std::unordered_map<uint32, WorldSession*> SessionMap;
         typedef std::set<WorldSession*> SessionSet;
         SessionMap GetAllSessions() { return m_sessions; }
-        WorldSession* FindSession(uint32 id) const;
-        void AddSession(WorldSession* s);
-        bool RemoveSession(uint32 id);
+        WorldSession* FindSession(uint32 accountId) const;
+        void AddSession(WorldSession* session);
+        bool RemoveSession(uint32 accountId);
         // Get the number of current active sessions
         void UpdateMaxSessionCounters();
         uint32 GetActiveAndQueuedSessionCount() const { return m_sessions.size(); }
@@ -767,9 +758,10 @@ class World
         void SendGMTicketText(char const* text);
         void SendGMText(int32 string_id, ...);
         void SendGlobalText(char const* text, WorldSession* self);
-        void SendGlobalMessage(WorldPacket* packet, WorldSession* self = 0, uint32 team = 0);
-        void SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, uint32 team = 0);
-        void SendZoneText(uint32 zone, char const* text, WorldSession* self = 0, uint32 team = 0);
+        void SendGlobalMessage(WorldPacket const* binaryPacket, WorldSession const* self = nullptr, uint32 team = 0);
+        void SendGlobalMessage(std::unique_ptr<ServerPacket const> packet, WorldSession const* self = nullptr, uint32 team = 0);
+        void SendZoneMessage(uint32 zone, WorldPacket const* binaryPacket, WorldSession const* self = nullptr, uint32 team = 0);
+        void SendZoneText(uint32 zone, char const* text, WorldSession const* self = nullptr, uint32 team = 0);
         void SendServerMessage(ServerMessageType type, char const* text = "", Player* player = nullptr);
 
         // Are we in the middle of a shutdown?
@@ -897,6 +889,8 @@ class World
         time_t GetWorldUpdateTimer(WorldTimers timer);
         time_t GetWorldUpdateTimerInterval(WorldTimers timer);
 
+        uint32 GetDelayUntilNextSpellBatchingInterval();
+
         Messager<World>& GetMessager() { return m_messager; }
 
         LFGQueue& GetLFGQueue() { return m_lfgQueue; }
@@ -936,7 +930,7 @@ class World
         int32  m_timeZoneOffset;
         IntervalTimer m_timers[WUPDATE_COUNT];
 
-        SessionMap m_sessions;
+        SessionMap m_sessions; // Sessions by accountId
         SessionSet m_disconnectedSessions;
         std::map<uint32 /*accountId*/, AccountPlayHistory> m_accountsPlayHistory;
         bool CanSkipQueue(WorldSession const* session);

@@ -19,6 +19,7 @@
 #ifndef INSTANCE_STATISTICS_H
 #define INSTANCE_STATISTICS_H
 
+#include <mutex>
 #include "Common.h"
 
 enum eInstanceCustomCounter : int

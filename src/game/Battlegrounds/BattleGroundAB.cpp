@@ -26,7 +26,7 @@
 #include "GameObject.h"
 #include "BattleGroundMgr.h"
 #include "Language.h"
-#include "Util.h"
+#include "Utilities/Random.h"
 #include "WorldPacket.h"
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1

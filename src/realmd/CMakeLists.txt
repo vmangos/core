@@ -17,16 +17,17 @@
 
 set(EXECUTABLE_NAME realmd)
 set(EXECUTABLE_SRCS
+  AuthPackets.h
   AuthCodes.h
   AuthSocket.h
-  BufferedSocket.h
-  PatchHandler.h
+  LoginThrottle.h
+  LoginThrottle.cpp
   RealmList.h
   AuthSocket.cpp
-  BufferedSocket.cpp
-  Main.cpp
-  PatchHandler.cpp
   RealmList.cpp
+  ClientPatchCache.h
+  ClientPatchCache.cpp
+  Main.cpp
 )
 
 
@@ -34,18 +35,31 @@ if(WIN32)
   list(APPEND EXECUTABLE_SRCS
     realmd.rc
   )
+endif()
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
+include_directories(
+  ${CMAKE_SOURCE_DIR}/src/shared
+  ${CMAKE_SOURCE_DIR}/src/framework
+  ${CMAKE_BINARY_DIR}
+  ${CMAKE_BINARY_DIR}/src/shared
+  ${MYSQL_INCLUDE_DIR}
+  ${OPENSSL_INCLUDE_DIR}
+)
+
+if(WIN32)
+  include_directories(
+    ${CMAKE_SOURCE_DIR}/dep/windows/include
+  )
 endif()
 
 add_executable(${EXECUTABLE_NAME}
   ${EXECUTABLE_SRCS}
 )
+mangos_target_flags(${EXECUTABLE_NAME})
 
 target_link_libraries(${EXECUTABLE_NAME}
   shared
   framework
-  ${ACE_LIBRARIES}
 )
 
 if(WIN32)

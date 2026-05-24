@@ -48,6 +48,7 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 #include "Geometry.h"
+#include "Utilities/Random.h"
 
 bool QuaternionData::isUnit() const
 {
@@ -347,7 +348,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                 case GAMEOBJECT_TYPE_TRAP:
                 {
                     // Arming Time for GAMEOBJECT_TYPE_TRAP (6)
-                    /* Ivina < Nostalrius > : toujours appliquer le startDelay. Retirer le delai de la DB si jamais un piege n'en a pas. */
+                    /* Ivina < Nostalrius > : always apply the startDelay. Remove the delay from the DB if a trap doesn't have one. */
                     // Unit* owner = GetOwner();
                     // if (owner && ((Player*)owner)->IsInCombat())
                     if (GetGOInfo()->trap.startDelay)
@@ -703,6 +704,11 @@ uint32 GameObjectData::ComputeRespawnDelay(uint32 respawnDelay) const
     return respawnDelay;
 }
 
+uint32 GameObjectData::GetRandomRespawnTime() const
+{
+    return urand(static_cast<uint32>(spawntimesecsmin), static_cast<uint32>(spawntimesecsmax));
+}
+
 void GameObject::JustDespawnedWaitingRespawn()
 {
     if (uint16 poolid = sPoolMgr.IsPartOfAPool<GameObject>(GetGUIDLow()))
@@ -803,7 +809,7 @@ void GameObject::FinishRitual()
         // take spell cooldown
         if (Player* pOwner = ::ToPlayer(GetOwner()))
             if (SpellEntry const* createBySpell = sSpellMgr.GetSpellEntry(GetSpellId()))
-                pOwner->AddCooldown(*createBySpell);
+                pOwner->AddCooldown(createBySpell);
         if (!info->summoningRitual.ritualPersistent)
             SetLootState(GO_JUST_DEACTIVATED);
         // Only ritual of doom deals a second spell
@@ -1154,7 +1160,7 @@ bool GameObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject c
                     return false;
             }
         }
-        
+
     }
 
     // check distance
@@ -1514,7 +1520,7 @@ void GameObject::Use(Unit* user)
 
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
-            
+
             if (!user->IsWithinLOSInMap(this, false))
                 return;
 
@@ -1892,7 +1898,7 @@ void GameObject::Use(Unit* user)
                     if (!sScriptMgr.OnProcessEvent(info->flagdrop.eventID, player, this, true))
                         GetMap()->ScriptsStart(sEventScripts, info->flagdrop.eventID, player->GetObjectGuid(), GetObjectGuid());
                 }
-                
+
                 spellId = info->flagdrop.pickupSpell;
             }
             break;
@@ -2184,7 +2190,7 @@ bool GameObject::PlayerCanUse(Player* pPlayer)
 {
     if (pPlayer->IsGameMaster())
         return true;
-    
+
     if (!IsVisible())
         return false;
 
@@ -2412,7 +2418,7 @@ void GameObject::GetLosCheckPosition(float& x, float& y, float& z) const
         z = pos.z;
         return;
     }
-    
+
     GetPosition(x, y, z);
     z += 1.0f;
 }
@@ -2505,10 +2511,13 @@ uint32 GameObject::GetLevel() const
 
 bool GameObject::IsAtInteractDistance(Player const* player, uint32 maxRange) const
 {
-    SpellEntry const* spellInfo;
-    if (maxRange || (spellInfo = GetSpellForLock(player)))
+    SpellEntry const* spellInfo = nullptr;
+    if (maxRange == 0)
+        spellInfo = GetSpellForLock(player);
+
+    if (maxRange || spellInfo)
     {
-        if (maxRange == 0.f)
+        if (maxRange == 0)
         {
             SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
             maxRange = srange ? srange->maxRange : 0;

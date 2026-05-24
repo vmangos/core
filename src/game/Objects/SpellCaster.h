@@ -24,6 +24,8 @@
 #include <array>
 #include <memory>
 
+#include "SpellEntry.h"
+
 using nonstd::optional;
 
 class Aura;
@@ -52,14 +54,14 @@ enum MeleeHitOutcome
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
 struct SpellNonMeleeDamage {
-    SpellNonMeleeDamage(SpellCaster* _attacker, Unit* _target, uint32 _SpellID, SpellSchools _school)
-        : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), school(_school),
+    SpellNonMeleeDamage(SpellCaster* _attacker, Unit* _target, uint32 spellId_, SpellSchools _school)
+        : target(_target), attacker(_attacker), spellId(spellId_), damage(0), school(_school),
         absorb(0), resist(0), periodicLog(false), reflected(false), blocked(0), HitInfo(0), spell(nullptr)
     {}
 
     Unit* target;
     SpellCaster* attacker;
-    uint32 SpellID;
+    uint32 spellId;
     uint32 damage;
     SpellSchools school;
     uint32 absorb;
@@ -98,8 +100,8 @@ class CooldownData
 {
         friend class CooldownContainer;
     public:
-        CooldownData(TimePoint clockNow, uint32 spellId, uint32 duration, uint32 spellCategory, uint32 categoryDuration, uint32 itemId = 0, bool isPermanent = false) :
-            m_spellId(spellId),
+        CooldownData(TimePoint clockNow, SpellEntry const* spellEntry, uint32 duration, uint32 spellCategory, uint32 categoryDuration, uint32 itemId = 0, bool isPermanent = false) :
+            m_spellEntry(spellEntry),
             m_category(spellCategory),
             m_expireTime(duration ? std::chrono::milliseconds(duration) + clockNow : TimePoint()),
             m_catExpireTime(spellCategory && categoryDuration ? std::chrono::milliseconds(categoryDuration) + clockNow : TimePoint()),
@@ -156,11 +158,11 @@ class CooldownData
 
         bool IsPermanent() const { return m_typePermanent; }
         uint32 GetItemId() const { return m_itemId; }
-        uint32 GetSpellId() const { return m_spellId; }
+        SpellEntry const* GetSpellEntry() const { return m_spellEntry; }
         uint32 GetCategory() const { return m_category; }
 
     private:
-        uint32            m_spellId;
+        SpellEntry const* m_spellEntry;
         uint32            m_category;
         TimePoint         m_expireTime;
         TimePoint         m_catExpireTime;
@@ -200,10 +202,10 @@ class CooldownContainer
             }
         }
 
-        bool AddCooldown(TimePoint clockNow, uint32 spellId, uint32 duration, uint32 spellCategory = 0, uint32 categoryDuration = 0, uint32 itemId = 0, bool onHold = false)
+        bool AddCooldown(TimePoint clockNow, SpellEntry const* spellEntry, uint32 duration, uint32 spellCategory = 0, uint32 categoryDuration = 0, uint32 itemId = 0, bool onHold = false)
         {
-            RemoveBySpellId(spellId);
-            auto resultItr = m_spellIdMap.emplace(spellId, std::move(std::unique_ptr<CooldownData>(new CooldownData(clockNow, spellId, duration, spellCategory, categoryDuration, itemId, onHold))));
+            RemoveBySpellId(spellEntry->Id);
+            auto resultItr = m_spellIdMap.emplace(spellEntry->Id, std::make_unique<CooldownData>(clockNow, spellEntry, duration, spellCategory, categoryDuration, itemId, onHold));
             // do not overwrite one permanent category cooldown with another permanent category cooldown
             if (resultItr.second && spellCategory && categoryDuration)
             {
@@ -396,9 +398,9 @@ public:
     void SendSpellDamageResist(Unit const* target, uint32 spellId) const;
     void SendSpellOrDamageImmune(Unit const* target, uint32 spellId) const;
     int32 DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* spellProto, bool critical = false);
-    void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
-    void EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
-    void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
+    void SendHealSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, bool critical = false) const;
+    void EnergizeBySpell(Unit* pTarget, uint32 spellId, uint32 amount, Powers powertype);
+    void SendEnergizeSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, Powers powertype) const;
 
     void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut) const;
     DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex) const;
@@ -409,17 +411,15 @@ public:
     void RemoveAllDynObjects();
 
     // cooldown system
-    virtual void AddGCD(SpellEntry const& spellEntry, uint32 forcedDuration = 0, bool updateClient = false);
+    virtual void AddGCD(SpellEntry const* spellEntry, uint32 forcedDuration = 0, bool updateClient = false);
     virtual bool HasGCD(SpellEntry const* spellEntry) const;
     void ResetGCD(SpellEntry const* spellEntry = nullptr);
-    virtual void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0);
-    virtual void RemoveSpellCooldown(SpellEntry const& spellEntry, bool updateClient = true);
-    void RemoveSpellCooldown(uint32 spellId, bool updateClient = true);
+    virtual void AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0);
+    virtual void RemoveSpellCooldown(SpellEntry const* spellEntry, bool updateClient = true);
     virtual void RemoveSpellCategoryCooldown(uint32 category, bool updateClient = true);
     virtual void RemoveAllCooldowns(bool /*sendOnly*/ = false) { m_GCDCatMap.clear(); m_cooldownMap.clear(); m_lockoutMap.clear(); }
-    bool IsSpellReady(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr) const;
-    bool IsSpellReady(uint32 spellId, ItemPrototype const* itemProto = nullptr) const;
-    bool IsSpellOnPermanentCooldown(SpellEntry const& spellEntry) const;
+    bool IsSpellReady(SpellEntry const* spellEntry, ItemPrototype const* itemProto = nullptr) const;
+    bool IsSpellOnPermanentCooldown(SpellEntry const* spellEntry) const;
     virtual void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration);
     void PrintCooldownList(ChatHandler& chat) const;
     bool CheckLockout(SpellSchoolMask schoolMask) const;
@@ -431,7 +431,7 @@ protected:
     explicit SpellCaster() = default;
 
     // cooldown system
-    bool GetExpireTime(SpellEntry const& spellEntry, TimePoint& expireTime, bool& isPermanent) const;
+    bool GetExpireTime(SpellEntry const* spellEntry, TimePoint& expireTime, bool& isPermanent) const;
 
     GCDMap            m_GCDCatMap;
     LockoutMap        m_lockoutMap;

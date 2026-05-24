@@ -18,6 +18,7 @@
 
 #include "DatabaseEnv.h"
 #include "Log.h"
+#include "Errors.h"
 
 bool SqlStmtFieldData::toBool() const { MANGOS_ASSERT(m_type == FIELD_BOOL); return m_binaryData.boolean; }
 uint8 SqlStmtFieldData::toUint8() const { MANGOS_ASSERT(m_type == FIELD_UI8); return m_binaryData.ui8; }
@@ -105,7 +106,7 @@ SqlPlainPreparedStatement::SqlPlainPreparedStatement(std::string const& fmt, Sql
 {
     m_bPrepared = true;
     m_nParams = std::count(m_szFmt.begin(), m_szFmt.end(), '?');
-    m_bIsQuery = strnicmp(m_szFmt.c_str(), "select", 6) == 0;
+    m_bIsQuery = StringStartsWithCaseInsensitive(m_szFmt, "select");
 }
 
 void SqlPlainPreparedStatement::bind(SqlStmtParameters const& holder)
@@ -154,6 +155,7 @@ void SqlPlainPreparedStatement::DataToString(SqlStmtFieldData const& data, std::
 {
     switch (data.type())
     {
+        case FIELD_NONE:    MANGOS_ASSERT(false);                           break;
         case FIELD_BOOL:    fmt << "'" << uint32(data.toBool()) << "'";     break;
         case FIELD_UI8:     fmt << "'" << uint32(data.toUint8()) << "'";    break;
         case FIELD_UI16:    fmt << "'" << uint32(data.toUint16()) << "'";   break;

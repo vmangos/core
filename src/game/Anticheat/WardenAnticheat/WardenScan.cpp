@@ -29,6 +29,9 @@
 #include "Crypto/Hash/HMACSHA1.h"
 #include "Crypto/Hash/SHA1.h"
 #include "World.h"
+#include "Errors.h"
+#include "Platform/CompilerDefs.h"
+#include "Utilities/Random.h"
 
 #include <string>
 #include <algorithm>
@@ -121,6 +124,11 @@ Scan::CheckT StringHashScan::GetChecker()
     };
 }
 
+#if COMPILER == COMPILER_GNU
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+
 WindowsStringHashScan::WindowsStringHashScan()
     : StringHashScan(), WindowsScan(
     // builder
@@ -130,7 +138,7 @@ WindowsStringHashScan::WindowsStringHashScan()
     128, sizeof(uint8) + Crypto::Hash::SHA1::Digest::size() + Crypto::Hash::MD5::Digest::size(), "Maiev string hash",
     ScanFlags::Maiev, 0, UINT16_MAX)
 {
-    
+
 }
 
 MacStringHashScan::MacStringHashScan(bool moduleLoaded)
@@ -145,6 +153,10 @@ MacStringHashScan::MacStringHashScan(bool moduleLoaded)
 
 }
 
+#if COMPILER == COMPILER_GNU
+#pragma GCC diagnostic pop
+#endif
+
 WindowsModuleScan::WindowsModuleScan(std::string const& module, bool wanted, std::string const& comment, ScanFlags flags, uint32 minBuild, uint32 maxBuild)
     : m_module(module), m_wanted(wanted),
     WindowsScan(
@@ -152,7 +164,7 @@ WindowsModuleScan::WindowsModuleScan(std::string const& module, bool wanted, std
     [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
         auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
-        auto const seed = static_cast<uint32>(rand32());
+        uint32 const seed = randu32();
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_MODULE_BY_NAME] ^ winWarden->GetXor()) << seed;
 
@@ -180,7 +192,7 @@ WindowsModuleScan::WindowsModuleScan(std::string const& module, CheckT checker, 
     [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
         auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
-        auto const seed = static_cast<uint32>(rand32());
+        uint32 const seed = randu32();
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_MODULE_BY_NAME] ^ winWarden->GetXor()) << seed;
 
@@ -308,7 +320,7 @@ WindowsCodeScan::WindowsCodeScan(uint32 offset, std::vector<uint8> const& patter
     [this](Warden const* warden, std::vector<std::string>&, ByteBuffer& scan)
     {
         auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
-        auto const seed = static_cast<uint32>(rand32());
+        uint32 const seed = randu32();
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[this->m_memImageOnly ? FIND_MEM_IMAGE_CODE_BY_HASH : FIND_CODE_BY_HASH] ^ winWarden->GetXor())
              << seed;
@@ -463,7 +475,7 @@ WindowsHookScan::WindowsHookScan(std::string const& module, std::string const& p
         strings.emplace_back(this->m_proc);
 
         auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
-        auto const seed = static_cast<uint32>(rand32());
+        uint32 const seed = randu32();
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[API_CHECK] ^ winWarden->GetXor()) << seed;
 
@@ -495,7 +507,7 @@ WindowsDriverScan::WindowsDriverScan(std::string const& name, std::string const&
         strings.emplace_back(this->m_name);
 
         auto const winWarden = reinterpret_cast<WardenWin const*>(warden);
-        auto const seed = static_cast<uint32>(rand32());
+        uint32 const seed = randu32();
 
         scan << static_cast<uint8>(winWarden->GetModule()->opcodes[FIND_DRIVER_BY_NAME] ^ winWarden->GetXor()) << seed;
 

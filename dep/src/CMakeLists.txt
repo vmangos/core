@@ -19,7 +19,6 @@
 if (MINGW)
 add_subdirectory(libseh)
 endif()
-add_subdirectory(g3dlite)
 if(WIN32)
     add_subdirectory(zlib)
 endif()

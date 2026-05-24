@@ -32,9 +32,8 @@ class CyclicMovementGenerator<Creature>
 : public MovementGeneratorMedium< Creature, CyclicMovementGenerator<Creature> >
 {
     public:
-
-        CyclicMovementGenerator(Creature &) : i_path(nullptr), m_PathOrigin(PATH_NO_PATH) { }
-        ~CyclicMovementGenerator() { i_path = nullptr; }
+        explicit CyclicMovementGenerator(Creature &) : i_path(nullptr), m_PathOrigin(PATH_NO_PATH) { }
+        ~CyclicMovementGenerator() override { i_path = nullptr; }
 
         void InitializeWaypointPath(Creature& creature, WaypointPathOrigin wpSource, uint32 overwriteGuid, uint32 overwriteEntry);
         void Initialize(Creature &);
@@ -42,7 +41,7 @@ class CyclicMovementGenerator<Creature>
         void Interrupt(Creature &);
         void Reset(Creature &);
         bool Update(Creature &, uint32 const&);
-        MovementGeneratorType GetMovementGeneratorType() const { return CYCLIC_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return CYCLIC_MOTION_TYPE; }
 
     private:
         void LoadPath(uint32 guid, uint32 entry, WaypointPathOrigin wpOrigin);

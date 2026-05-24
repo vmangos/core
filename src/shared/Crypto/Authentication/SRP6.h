@@ -51,7 +51,7 @@ class SRP6
           \param l the length of client public ephemeral (A)
           \return true on valid safeguard conditions otherwise false
         */
-        bool CalculateSessionKey(uint8* lp_A, int l);
+        bool CalculateSessionKey(uint8 const* lp_A, int l);
 
         //! calculates the password verifier (v)
         /*!
@@ -77,7 +77,7 @@ class SRP6
           \param l the length of client proof (M)
           \return true if client and server proof matches otherwise false
         */
-        bool Proof(uint8* lp_M, int l);
+        bool Proof(uint8 const* lp_M, int l);
 
         //! compare password verifier (v)
         /*!

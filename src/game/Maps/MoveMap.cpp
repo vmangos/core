@@ -21,6 +21,8 @@
 #include "VMapFactory.h"
 #include "MoveMap.h"
 #include "MoveMapSharedDefines.h"
+#include "Errors.h"
+#include "Util.h"
 
 namespace MMAP
 {
@@ -82,7 +84,7 @@ bool MMapManager::loadMapData(uint32 mapId)
     }
 
     dtNavMeshParams params;
-    fread(&params, sizeof(dtNavMeshParams), 1, file);
+    IgnoreResult(fread(&params, sizeof(dtNavMeshParams), 1, file));
     fclose(file);
 
     dtNavMesh* mesh = dtAllocNavMesh();
@@ -156,7 +158,7 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
 
     // read header
     MmapTileHeader fileHeader;
-    fread(&fileHeader, sizeof(MmapTileHeader), 1, file);
+    IgnoreResult(fread(&fileHeader, sizeof(MmapTileHeader), 1, file));
 
     if (fileHeader.mmapMagic != MMAP_MAGIC)
     {
@@ -389,7 +391,7 @@ bool MMapManager::loadGameObject(uint32 displayId)
     }
 
     MmapTileHeader fileHeader;
-    fread(&fileHeader, sizeof(MmapTileHeader), 1, file);
+    IgnoreResult(fread(&fileHeader, sizeof(MmapTileHeader), 1, file));
 
     if (fileHeader.mmapMagic != MMAP_MAGIC)
     {

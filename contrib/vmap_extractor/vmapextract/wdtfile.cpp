@@ -82,7 +82,7 @@ bool WDTFile::init(char* map_id, unsigned int mapID)
                     std::string path(p);
                     char* s = wdtGetPlainName(p);
                     FixNameCase(s, strlen(s));
-                    // FixNameSpaces(s, strlen(s)); not needed here?
+                    // FixNameSpaces(s, strlen(s)); // Not needed for WMO names in WDT files
                     p = p + strlen(p) + 1;
                     m_wmoNames.push_back(s);
                 }
@@ -129,6 +129,6 @@ ADTFile* WDTFile::GetMap(int x, int z)
 
     char name[512];
 
-    sprintf(name, "World\\Maps\\%s\\%s_%d_%d.adt", filename.c_str(), filename.c_str(), x, z);
+    snprintf(name, sizeof(name), "World\\Maps\\%s\\%s_%d_%d.adt", filename.c_str(), filename.c_str(), x, z);
     return new ADTFile(name);
 }

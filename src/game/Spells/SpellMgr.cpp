@@ -561,7 +561,7 @@ void SpellMgr::LoadSpellGroups()
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_group` does not exist", itr->second);
                 mSpellGroupSpell.erase(itr++);
             }
-            // Necessaire pour le fix "Un sort plus puissant est deja actif".
+            // Needed for the fix "A more powerful spell is already active".
             /*else if (GetSpellRank(itr->second) > 1)
             {
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_group` is not first rank of spell", itr->second);
@@ -647,9 +647,9 @@ bool SpellMgr::ListMorePowerfulSpells(uint32 spellId, std::vector<uint32>& list)
     {
         if (itr.second == spellId)
         {
-            // Un sort peut etre dans plusieurs groupes. On s'interesse au groupe 'SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN'
+            // A spell can be in multiple groups. We care about the 'SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN' group
             SpellGroupStackMap::const_iterator found = mSpellGroupStack.find(itr.first);
-            // Ce groupe n'a pas de regle ... Pas d'entree dans 'spell_group_stack_rule' ?
+            // This group has no rule... No entry in 'spell_group_stack_rule'?
             if (found == mSpellGroupStack.end())
                 continue;
             SpellGroupStackRule stackRule = found->second;
@@ -690,9 +690,9 @@ bool SpellMgr::ListLessPowerfulSpells(uint32 spellId, std::vector<uint32>& list)
     {
         if (itr.second == spellId)
         {
-            // Un sort peut etre dans plusieurs groupes. On s'interesse au groupe 'SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN'
+            // A spell can be in multiple groups. We care about the 'SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN' group
             SpellGroupStackMap::const_iterator found = mSpellGroupStack.find(itr.first);
-            // Ce groupe n'a pas de regle ... Pas d'entree dans 'spell_group_stack_rule' ?
+            // This group has no rule... No entry in 'spell_group_stack_rule'?
             if (found == mSpellGroupStack.end())
                 continue;
             SpellGroupStackRule stackRule = found->second;
@@ -782,7 +782,7 @@ struct DoSpellThreat
         else
         {
             SpellThreatEntry const& r_ste = spellItr->second;
-            if (ste.threat == r_ste.threat && ste.multiplier == r_ste.multiplier && ste.ap_bonus == r_ste.ap_bonus)
+            if (ste.threat == r_ste.threat && ste.multiplier == r_ste.multiplier && ste.inverseEffectMask == r_ste.inverseEffectMask)
                 sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_threat` as custom rank has same data as Rank 1, so redundant", spell_id);
         }
     }
@@ -806,12 +806,14 @@ struct DoSpellThreat
 
         // flat threat bonus and attack power bonus currently only work properly when all
         // effects have same targets, otherwise, we'd need to seperate it by effect index
-        if (ste.threat || ste.ap_bonus != 0.f)
+        if (ste.inverseEffectMask == 0 && ste.threat != 0)
         {
+            uint32 const* effect = spell->Effect;
             uint32 const* targetA = spell->EffectImplicitTargetA;
-            if ((targetA[EFFECT_INDEX_1] && targetA[EFFECT_INDEX_1] != targetA[EFFECT_INDEX_0]) ||
-                    (targetA[EFFECT_INDEX_2] && targetA[EFFECT_INDEX_2] != targetA[EFFECT_INDEX_0]))
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_threat` has effects with different targets, threat may be assigned incorrectly", spell->Id);
+            if ((effect[EFFECT_INDEX_0] && effect[EFFECT_INDEX_1] && targetA[EFFECT_INDEX_0] != targetA[EFFECT_INDEX_1]) ||
+                (effect[EFFECT_INDEX_0] && effect[EFFECT_INDEX_2] && targetA[EFFECT_INDEX_0] != targetA[EFFECT_INDEX_2]) ||
+                (effect[EFFECT_INDEX_1] && effect[EFFECT_INDEX_2] && targetA[EFFECT_INDEX_1] != targetA[EFFECT_INDEX_2]))
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_threat` has effects with different targets, threat may be assigned incorrectly. Consider using inverse effect mask.", spell->Id);
         }
         ++count;
     }
@@ -834,7 +836,7 @@ void SpellMgr::LoadSpellThreats()
     mSpellThreatMap.clear();                                // need for reload case
 
     //                                                                0        1         2             3
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `Threat`, `multiplier`, `ap_bonus` FROM `spell_threat` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `threat`, `multiplier`, `inverse_effect_mask` FROM `spell_threat` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -859,7 +861,7 @@ void SpellMgr::LoadSpellThreats()
         SpellThreatEntry ste;
         ste.threat = fields[1].GetUInt16();
         ste.multiplier = fields[2].GetFloat();
-        ste.ap_bonus = fields[3].GetFloat();
+        ste.inverseEffectMask = fields[3].GetUInt8();
 
         rankHelper.RecordRank(ste, entry);
 
@@ -997,7 +999,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         return false;
 
                     // Improved Hamstring -> Hamstring (multi-family check)
-                    if ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x2)) && spellInfo_1->Id == 23694)
+                    if ((spellInfo_2->SpellFamilyFlags & uint64(0x2)) && spellInfo_1->Id == 23694)
                         return false;
                     break;
                 }
@@ -1023,7 +1025,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         return false;
 
                     // Improved Wing Clip -> Wing Clip (multi-family check)
-                    if ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x40)) && spellInfo_1->Id == 19229)
+                    if ((spellInfo_2->SpellFamilyFlags & uint64(0x40)) && spellInfo_1->Id == 19229)
                         return false;
                     break;
                 }
@@ -1045,18 +1047,18 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     return false;
 
                 // Blizzard & Chilled (and some other stacked with blizzard spells
-                if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x80)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x100000))) ||
-                        ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x80)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x100000))))
+                if (((spellInfo_1->SpellFamilyFlags & uint64(0x80)) && (spellInfo_2->SpellFamilyFlags & uint64(0x100000))) ||
+                        ((spellInfo_2->SpellFamilyFlags & uint64(0x80)) && (spellInfo_1->SpellFamilyFlags & uint64(0x100000))))
                     return false;
 
                 // Blink & Improved Blink
-                if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x0000000000010000)) && (spellInfo_2->SpellVisual == 72 && spellInfo_2->SpellIconID == 1499)) ||
-                        ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x0000000000010000)) && (spellInfo_1->SpellVisual == 72 && spellInfo_1->SpellIconID == 1499)))
+                if (((spellInfo_1->SpellFamilyFlags & uint64(0x0000000000010000)) && (spellInfo_2->SpellVisual == 72 && spellInfo_2->SpellIconID == 1499)) ||
+                        ((spellInfo_2->SpellFamilyFlags & uint64(0x0000000000010000)) && (spellInfo_1->SpellVisual == 72 && spellInfo_1->SpellIconID == 1499)))
                     return false;
 
                 // Fireball & Pyroblast (Dots)
-                if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x1)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x400000))) ||
-                        ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x1)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x400000))))
+                if (((spellInfo_1->SpellFamilyFlags & uint64(0x1)) && (spellInfo_2->SpellFamilyFlags & uint64(0x400000))) ||
+                        ((spellInfo_2->SpellFamilyFlags & uint64(0x1)) && (spellInfo_1->SpellFamilyFlags & uint64(0x400000))))
                     return false;
 
                 // Arcane Missiles
@@ -1097,8 +1099,8 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             if (spellInfo_2->SpellFamilyName == SPELLFAMILY_WARRIOR)
             {
                 // Rend and Deep Wound
-                if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x20)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x1000000000))) ||
-                        ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x20)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x1000000000))))
+                if (((spellInfo_1->SpellFamilyFlags & uint64(0x20)) && (spellInfo_2->SpellFamilyFlags & uint64(0x1000000000))) ||
+                        ((spellInfo_2->SpellFamilyFlags & uint64(0x20)) && (spellInfo_1->SpellFamilyFlags & uint64(0x1000000000))))
                     return false;
 
                 // Battle Shout and Rampage
@@ -1112,7 +1114,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             }
 
             // Hamstring -> Improved Hamstring (multi-family check)
-            if ((spellInfo_1->SpellFamilyFlags & UI64LIT(0x2)) && spellInfo_2->Id == 23694)
+            if ((spellInfo_1->SpellFamilyFlags & uint64(0x2)) && spellInfo_2->Id == 23694)
                 return false;
 
             // Defensive Stance and Scroll of Protection (multi-family check)
@@ -1138,13 +1140,13 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     return false;
 
                 //Devouring Plague and Shadow Vulnerability
-                if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x2000000)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x800000000))) ||
-                        ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x2000000)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x800000000))))
+                if (((spellInfo_1->SpellFamilyFlags & uint64(0x2000000)) && (spellInfo_2->SpellFamilyFlags & uint64(0x800000000))) ||
+                        ((spellInfo_2->SpellFamilyFlags & uint64(0x2000000)) && (spellInfo_1->SpellFamilyFlags & uint64(0x800000000))))
                     return false;
 
                 //StarShards and Shadow Word: Pain
-                if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x200000)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x8000))) ||
-                        ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x200000)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x8000))))
+                if (((spellInfo_1->SpellFamilyFlags & uint64(0x200000)) && (spellInfo_2->SpellFamilyFlags & uint64(0x8000))) ||
+                        ((spellInfo_2->SpellFamilyFlags & uint64(0x200000)) && (spellInfo_1->SpellFamilyFlags & uint64(0x8000))))
                     return false;
             }
             break;
@@ -1156,8 +1158,8 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     return false;
 
                 //Omen of Clarity and Blood Frenzy
-                if (((spellInfo_1->SpellFamilyFlags == UI64LIT(0x0) && spellInfo_1->SpellIconID == 108) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x20000000000000))) ||
-                        ((spellInfo_2->SpellFamilyFlags == UI64LIT(0x0) && spellInfo_2->SpellIconID == 108) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x20000000000000))))
+                if (((spellInfo_1->SpellFamilyFlags == uint64(0x0) && spellInfo_1->SpellIconID == 108) && (spellInfo_2->SpellFamilyFlags & uint64(0x20000000000000))) ||
+                        ((spellInfo_2->SpellFamilyFlags == uint64(0x0) && spellInfo_2->SpellIconID == 108) && (spellInfo_1->SpellFamilyFlags & uint64(0x20000000000000))))
                     return false;
             }
 
@@ -1175,18 +1177,18 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             if (spellInfo_2->SpellFamilyName == SPELLFAMILY_HUNTER)
             {
                 // Rapid Fire & Quick Shots
-                if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x20)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x20000000000))) ||
-                        ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x20)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x20000000000))))
+                if (((spellInfo_1->SpellFamilyFlags & uint64(0x20)) && (spellInfo_2->SpellFamilyFlags & uint64(0x20000000000))) ||
+                        ((spellInfo_2->SpellFamilyFlags & uint64(0x20)) && (spellInfo_1->SpellFamilyFlags & uint64(0x20000000000))))
                     return false;
 
                 // Serpent Sting & (Immolation/Explosive Trap Effect)
-                if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x4)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x00000004000))) ||
-                        ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x4)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x00000004000))))
+                if (((spellInfo_1->SpellFamilyFlags & uint64(0x4)) && (spellInfo_2->SpellFamilyFlags & uint64(0x00000004000))) ||
+                        ((spellInfo_2->SpellFamilyFlags & uint64(0x4)) && (spellInfo_1->SpellFamilyFlags & uint64(0x00000004000))))
                     return false;
 
                 // Wyvern Sting DoT & Immolation Trap Effect - using family flags
-                if (((spellInfo_1->SpellFamilyFlags & UI64LIT(0x10000)) && (spellInfo_2->SpellFamilyFlags & UI64LIT(0x4))) ||
-                        ((spellInfo_2->SpellFamilyFlags & UI64LIT(0x10000)) && (spellInfo_1->SpellFamilyFlags & UI64LIT(0x4))))
+                if (((spellInfo_1->SpellFamilyFlags & uint64(0x10000)) && (spellInfo_2->SpellFamilyFlags & uint64(0x4))) ||
+                        ((spellInfo_2->SpellFamilyFlags & uint64(0x10000)) && (spellInfo_1->SpellFamilyFlags & uint64(0x4))))
                     return false;
 
                 // Bestial Wrath
@@ -1195,7 +1197,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             }
 
             // Wing Clip -> Improved Wing Clip (multi-family check)
-            if ((spellInfo_1->SpellFamilyFlags & UI64LIT(0x40)) && spellInfo_2->Id == 19229)
+            if ((spellInfo_1->SpellFamilyFlags & uint64(0x40)) && spellInfo_2->Id == 19229)
                 return false;
 
             // Concussive Shot and Imp. Concussive Shot (multi-family check)
@@ -2358,6 +2360,61 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
     return true;
 }
 
+void SpellMgr::LoadSpellCones()
+{
+    mSpellCones.clear();                              // need for reload case
+
+    uint32 count = 0;
+
+    //                                                               0        1
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `cone_degrees` FROM `spell_cone`"));
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spell cones", count);
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+        int16 degrees = fields[1].GetInt16();
+
+        SpellEntry const* pSpellInfo = GetSpellEntry(entry);
+
+        if (!pSpellInfo)
+        {
+            if (!IsExistingSpellId(entry))
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_cone` does not exist", entry);
+            continue;
+        }
+
+        if (degrees < -360 || degrees > 360)
+        {
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u listed in `spell_cone` has incorrect angle %i outside of valid range", entry, degrees);
+            continue;
+        }
+
+        float angle = degrees * M_PI_F / 180.0f;
+
+        mSpellCones[entry] = angle;
+
+        ++count;
+    } while (result->NextRow());
+
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u spell cones", count);
+}
+
 void SpellMgr::LoadSpellAreas()
 {
     mSpellAreaMap.clear();                                  // need for reload case
@@ -2661,12 +2718,6 @@ uint32 SpellMgr::GetRequiredAreaForSpell(uint32 spellId)
     // Not defined in database.
     switch (spellId)
     {
-        // Alterac Valley
-        case 22564: // Recall (Alliance)
-        case 22563: // Recall (Horde)
-        case 23538: // Battle Standard (Horde)
-        case 23539: // Battle Standard (Alliance)
-            return 2597;
         // Warsong Gulch
         case 23333: // Warsong Flag
         case 23335: // Silverwing Flag
@@ -2848,9 +2899,9 @@ void SpellMgr::CheckUsedSpells(char const* table)
                 continue;
             }
 
-            if (familyMask != UI64LIT(0xFFFFFFFFFFFFFFFF))
+            if (familyMask != uint64(0xFFFFFFFFFFFFFFFF))
             {
-                if (familyMask == UI64LIT(0x0000000000000000))
+                if (familyMask == uint64(0x0000000000000000))
                 {
                     if (spellEntry->SpellFamilyFlags)
                     {
@@ -2933,9 +2984,9 @@ void SpellMgr::CheckUsedSpells(char const* table)
                 if (family >= 0 && spellEntry->SpellFamilyName != uint32(family))
                     continue;
 
-                if (familyMask != UI64LIT(0xFFFFFFFFFFFFFFFF))
+                if (familyMask != uint64(0xFFFFFFFFFFFFFFFF))
                 {
-                    if (familyMask == UI64LIT(0x0000000000000000))
+                    if (familyMask == uint64(0x0000000000000000))
                     {
                         if (spellEntry->SpellFamilyFlags)
                             continue;
@@ -3376,6 +3427,35 @@ namespace SpellInternal
         }
         return true;
     }
+
+    uint32 GetAllowedTargetMask(SpellEntry const* spellInfo)
+    {
+        uint32 targetMask = spellInfo->Targets;
+
+        for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if (spellInfo->Effect[i])
+            {
+                targetMask |= GetAllowedTargetMaskForTargetType((SpellTarget)spellInfo->EffectImplicitTargetA[i]);
+                targetMask |= GetAllowedTargetMaskForTargetType((SpellTarget)spellInfo->EffectImplicitTargetB[i]);
+            }
+        }
+
+        if (targetMask & (TARGET_FLAG_UNIT_RAID | TARGET_FLAG_UNIT_PARTY | TARGET_FLAG_UNIT_ENEMY | TARGET_FLAG_UNIT_ALLY | TARGET_FLAG_UNIT_DEAD | TARGET_FLAG_UNIT_MINIPET))
+            targetMask |= TARGET_FLAG_UNIT;
+
+        if (targetMask & (TARGET_FLAG_LOCKED))
+            targetMask |= TARGET_FLAG_ITEM | TARGET_FLAG_GAMEOBJECT;
+
+        if (targetMask & (TARGET_FLAG_ITEM))
+            targetMask |= TARGET_FLAG_TRADE_ITEM;
+
+        // unreleased player corpse is still a unit
+        if (targetMask & (TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_CORPSE_ALLY))
+            targetMask |= TARGET_FLAG_UNIT;
+
+        return targetMask;
+    }
 }
 
 void SpellMgr::AssignInternalSpellFlags()
@@ -3434,6 +3514,8 @@ void SpellMgr::AssignInternalSpellFlags()
 
             if (SpellInternal::IsCCSpell(pSpellEntry.get()))
                 pSpellEntry->Internal |= SPELL_INTERNAL_CROWD_CONTROL;
+
+            pSpellEntry->AllowedTargetMask = SpellInternal::GetAllowedTargetMask(pSpellEntry.get());
         }
     }
 }

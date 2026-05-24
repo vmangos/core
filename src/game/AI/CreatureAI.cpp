@@ -26,7 +26,14 @@
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "Group.h"
+#include "Utilities/Random.h"
+
 #include <unordered_set>
+
+CreatureAISpellsEntry::CreatureAISpellsEntry(CreatureSpellsEntry const& EntryStruct):
+    CreatureSpellsEntry(EntryStruct),
+    cooldown(urand(EntryStruct.delayInitialMin, EntryStruct.delayInitialMax))
+{}
 
 CreatureAI::CreatureAI(Creature* creature) :
     m_creature(creature), m_bUseAiAtControl(false),
@@ -130,7 +137,7 @@ void CreatureAI::DoSpellsListCasts(uint32 const uiDiff)
             {
                 if (bDontCast || m_creature->IsNonMeleeSpellCasted(false))
                     continue;
-            } 
+            }
 
             // Checked on startup.
             SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(spell.spellId);
@@ -138,7 +145,7 @@ void CreatureAI::DoSpellsListCasts(uint32 const uiDiff)
             Unit* pTarget = ToUnit(GetTargetByType(m_creature, m_creature, m_creature->GetMap(), spell.castTarget, spell.targetParam1, spell.targetParam2, pSpellInfo));
 
             SpellCastResult result = m_creature->TryToCast(pTarget, pSpellInfo, spell.castFlags, spell.probability);
-            
+
             switch (result)
             {
                 case SPELL_CAST_OK:
@@ -248,12 +255,12 @@ void CreatureAI::SetMeleeAttack(bool enabled)
     m_bMeleeAttack = enabled;
 
     if (Unit* pVictim = m_creature->GetVictim())
-    { 
+    {
         if (enabled)
         {
             m_creature->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
             m_creature->SendMeleeAttackStart(pVictim);
-        } 
+        }
         else
         {
             m_creature->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
@@ -280,7 +287,7 @@ void CreatureAI::SetCombatMovement(bool enabled)
         {
             m_creature->GetMotionMaster()->MovementExpired(false);
             m_creature->GetMotionMaster()->MoveChase(pVictim);
-        }  
+        }
     }
 }
 

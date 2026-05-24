@@ -141,9 +141,14 @@ bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProt
     if (!pProto || !pBagProto)
         return false;
 
+    // Special bags have bag family assigned but you can't place them inside each other. Tested in Classic.
+    if (pBagProto->BagFamily != BAG_FAMILY_NONE && pProto->ContainerSlots != 0)
+        return false;
+
     switch (pBagProto->Class)
     {
         case ITEM_CLASS_CONTAINER:
+        {
             switch (pBagProto->SubClass)
             {
                 case ITEM_SUBCLASS_CONTAINER:
@@ -157,12 +162,14 @@ bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProt
                         return false;
                     return true;
                 case ITEM_SUBCLASS_ENCHANTING_CONTAINER:
-                    if (pProto->BagFamily != BAG_FAMILY_ENCHANTING_SUPP)
+                    if (pProto->BagFamily != BAG_FAMILY_ENCHANTING_SUPPLIES)
                         return false;
                     return true;
             }
             return false;
+        }
         case ITEM_CLASS_QUIVER:
+        {
             switch (pBagProto->SubClass)
             {
                 case ITEM_SUBCLASS_QUIVER:
@@ -173,9 +180,9 @@ bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProt
                     if (pProto->BagFamily != BAG_FAMILY_BULLETS)
                         return false;
                     return true;
-                default:
-                    return false;
             }
+            return false;
+        }
     }
     return false;
 }
@@ -969,8 +976,8 @@ bool Item::IsFitToSpellRequirements(SpellEntry const* spellInfo, uint32 itemClas
 {
     if (spellInfo->EquippedItemClass != -1)                 // -1 == any item class
     {
-        // Ustaag <Nostalrius> : ajout exception pour le spell Enchant Cloak - Minor Agility
-        // prob de DB : spellInfo->EquippedItemClass == 2 alors qu'il devrait etre == 4
+        // Ustaag <Nostalrius> : added exception for spell Enchant Cloak - Minor Agility
+        // DB issue: spellInfo->EquippedItemClass == 2 when it should be == 4
         if (spellInfo->Id == 13419 && itemInventoryType == INVTYPE_CLOAK)
             return true;
         if ((spellInfo->EquippedItemClass != int32(itemClass)) && spellInfo->Id != 13419)

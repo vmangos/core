@@ -134,6 +134,25 @@ SpellScript* GetScript_HunterCounterAttack(SpellEntry const*)
     return new HunterCounterAttackScript();
 }
 
+// 13810 - Frost Trap Aura
+struct HunterFrostTrapAuraScript : public AuraScript
+{
+    void OnPeriodicTrigger(Aura* aura, Unit* /*caster*/, Unit* target, WorldObject* /*targetObject*/, SpellEntry const*& /*spellInfo*/) final
+    {
+        Unit* caster = aura->GetCaster();
+        if (!caster)
+            return;
+
+        // Talent 'Entrapment' for example (chance to root)
+        caster->ProcDamageAndSpell(ProcSystemArguments(target, PROC_FLAG_ON_TRAP_ACTIVATION, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, 1, BASE_ATTACK, aura->GetSpellProto()));
+    }
+};
+
+AuraScript* GetScript_HunterFrostTrapAura(SpellEntry const*)
+{
+    return new HunterFrostTrapAuraScript();
+}
+
 void AddSC_hunter_spell_scripts()
 {
     Script* newscript;
@@ -161,5 +180,10 @@ void AddSC_hunter_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_hunter_counterattack";
     newscript->GetSpellScript = &GetScript_HunterCounterAttack;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_hunter_frost_trap_aura";
+    newscript->GetAuraScript = &GetScript_HunterFrostTrapAura;
     newscript->RegisterSelf();
 }

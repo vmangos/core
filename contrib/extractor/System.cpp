@@ -155,13 +155,13 @@ void HandleArgs(int argc, char* arg[])
         {
             case 'i':
                 if (c + 1 < argc)                           // all ok
-                    strcpy(input_path, arg[(c++) + 1]);
+                    snprintf(input_path, sizeof(input_path), "%s", arg[(c++) + 1]);
                 else
                     Usage(arg[0]);
                 break;
             case 'o':
                 if (c + 1 < argc)                           // all ok
-                    strcpy(output_path, arg[(c++) + 1]);
+                    snprintf(output_path, sizeof(output_path), "%s", arg[(c++) + 1]);
                 else
                     Usage(arg[0]);
                 break;
@@ -201,7 +201,7 @@ uint32 ReadMapDBC()
     for (uint32 x = 0; x < map_count; ++x)
     {
         map_ids[x].id = dbc.getRecord(x).getUInt(0);
-        strcpy(map_ids[x].name, dbc.getRecord(x).getString(1));
+        snprintf(map_ids[x].name, sizeof(map_ids[x].name), "%s", dbc.getRecord(x).getString(1));
     }
     printf("Done! (%u maps loaded)\n", uint32(map_count));
     return map_count;
@@ -473,7 +473,7 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
     // Try store as packed in uint16 or uint8 values
     if (!(heightHeader.flags & MAP_HEIGHT_NO_HEIGHT))
     {
-        float step;
+        float step = 0.0f;
         // Try Store as uint values
         if (CONF_allow_float_to_int)
         {
@@ -767,7 +767,7 @@ void ExtractMapsFromMpq()
     {
         printf("Extract %s (%d/%d)                  \n", map_ids[z].name, z + 1, map_count);
         // Loadup map grid data
-        sprintf(mpq_map_name, "World\\Maps\\%s\\%s.wdt", map_ids[z].name, map_ids[z].name);
+        snprintf(mpq_map_name, sizeof(mpq_map_name), "World\\Maps\\%s\\%s.wdt", map_ids[z].name, map_ids[z].name);
         WDT_file wdt;
         if (!wdt.loadFile(mpq_map_name, false))
         {
@@ -781,8 +781,8 @@ void ExtractMapsFromMpq()
             {
                 if (!wdt.main->adt_list[y][x].exist)
                     continue;
-                sprintf(mpq_filename, "World\\Maps\\%s\\%s_%u_%u.adt", map_ids[z].name, map_ids[z].name, x, y);
-                sprintf(output_filename, "%s/maps/%03u%02u%02u.map", output_path, map_ids[z].id, y, x);
+                snprintf(mpq_filename, sizeof(mpq_filename), "World\\Maps\\%s\\%s_%u_%u.adt", map_ids[z].name, map_ids[z].name, x, y);
+                snprintf(output_filename, sizeof(output_filename), "%s/maps/%03u%02u%02u.map", output_path, map_ids[z].id, y, x);
                 ConvertADT(mpq_filename, output_filename, y, x);
             }
             // draw progress bar
@@ -892,7 +892,7 @@ void LoadCommonMPQFiles()
     int count = sizeof(CONF_mpq_list) / sizeof(char*);
     for (int i = 0; i < count; ++i)
     {
-        sprintf(filename, "%s/Data/%s", input_path, CONF_mpq_list[i]);
+        snprintf(filename, sizeof(filename), "%s/Data/%s", input_path, CONF_mpq_list[i]);
         if (FileExists(filename))
             new MPQArchive(filename);
     }

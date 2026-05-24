@@ -22,6 +22,8 @@
 #ifndef _BYTEBUFFER_H
 #define _BYTEBUFFER_H
 
+#include <array>
+
 #include "Common.h"
 #include "Utilities/ByteConverter.h"
 
@@ -42,12 +44,6 @@ class ByteBufferException
         size_t size;
 };
 
-template<class T>
-struct Unused
-{
-    Unused() {}
-};
-
 class ByteBuffer
 {
     public:
@@ -60,7 +56,7 @@ class ByteBuffer
         }
 
         // constructor
-        ByteBuffer(size_t res): _rpos(0), _wpos(0)
+        explicit ByteBuffer(size_t res): _rpos(0), _wpos(0)
         {
             _storage.reserve(res);
         }
@@ -78,6 +74,25 @@ class ByteBuffer
             _wpos = rhs._wpos;
             _storage = std::move(rhs._storage);
             return *this;
+        }
+
+        static ByteBuffer from(std::vector<uint8> const& v)
+        {
+            ByteBuffer buf;
+            buf._storage = v;
+            buf._rpos = 0;
+            buf._wpos = buf._storage.size();
+            return buf;
+        }
+
+        // `std::move` v into the buffer
+        static ByteBuffer from(std::vector<uint8>&& v)
+        {
+            ByteBuffer buf;
+            buf._storage = std::move(v);
+            buf._rpos = 0;
+            buf._wpos = buf._storage.size();
+            return buf;
         }
 
         void clear()
@@ -116,7 +131,7 @@ class ByteBuffer
             return *this;
         }
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(__MINGW64__)
         ByteBuffer& operator<<(time_t value)
         {
             append<time_t>(value);
@@ -184,7 +199,7 @@ class ByteBuffer
 
         ByteBuffer& operator>>(bool& value)
         {
-            value = read<char>() > 0 ? true : false;
+            value = read<char>() != 0;
             return *this;
         }
 
@@ -212,7 +227,7 @@ class ByteBuffer
             return *this;
         }
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(__MINGW64__)
         ByteBuffer& operator >> (time_t& value)
         {
             value = read<time_t>();
@@ -274,17 +289,9 @@ class ByteBuffer
                 value.assign((char*)(&_storage[startPos]), _rpos - startPos);
                 _rpos++;
             }
-            
+
             return *this;
         }
-
-        template<class T>
-        ByteBuffer& operator>>(Unused<T> const&)
-        {
-            read_skip<T>();
-            return *this;
-        }
-
 
         uint8 operator[](size_t pos) const
         {
@@ -423,7 +430,13 @@ class ByteBuffer
             append((uint8 const*)str.c_str(), str.size() + 1);
         }
 
-        void append(std::vector<uint8> const& src) 
+        void append(std::vector<uint8> const& src)
+        {
+            return append(src.data(), src.size());
+        }
+
+        template<size_t Size>
+        void append(std::array<uint8, Size> const& src)
         {
             return append(src.data(), src.size());
         }
@@ -469,9 +482,9 @@ class ByteBuffer
         void appendPackXYZ(float x, float y, float z)
         {
             uint32 packed = 0;
-            packed |= ((int)(x / 0.25f) & 0x7FF);
-            packed |= ((int)(y / 0.25f) & 0x7FF) << 11;
-            packed |= ((int)(z / 0.25f) & 0x3FF) << 22;
+            packed |= ((int)lroundf(x * 4.0f) & 0x7FF);
+            packed |= ((int)lroundf(y * 4.0f) & 0x7FF) << 11;
+            packed |= ((int)lroundf(z * 4.0f) & 0x3FF) << 22;
             *this << packed;
         }
 
@@ -482,7 +495,7 @@ class ByteBuffer
             memcpy(&_storage[pos], src, cnt);
         }
 
-        void hexlike() const;
+        void PrintAsHex() const;
 
     private:
         // limited for internal use because can "append" any unexpected type (like pointer and etc) with hard detection problem

@@ -23,8 +23,12 @@
 #include "World.h"
 #include "Database/Field.h"
 
-Quest::Quest(Field* questRecord)
+void Quest::LoadFromDB(Field* questRecord)
 {
+    prevQuests.clear();
+    prevChainQuests.clear();
+    DependentBreadcrumbQuests.clear();
+
     QuestId = questRecord[0].GetUInt32();
     QuestMethod = questRecord[1].GetUInt32();
     ZoneOrSort = questRecord[2].GetInt32();

@@ -24,6 +24,11 @@
 #include "ModelInstance.h"
 #include "Maps/GridMapDefines.h"
 
+template<typename T>
+static void IgnoreResult(T const&)
+{
+}
+
 namespace MMAP
 {
     TerrainBuilder::TerrainBuilder(bool skipLiquid, bool quick) : m_skipLiquid(skipLiquid), m_V9(nullptr), m_V8(nullptr), m_quick(quick), m_mapId(0) { }
@@ -90,14 +95,14 @@ namespace MMAP
     bool TerrainBuilder::loadMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, Spot portion)
     {
         char mapFileName[255];
-        sprintf(mapFileName, "maps/%03u%02u%02u.map", mapID, tileY, tileX);
+        snprintf(mapFileName, sizeof(mapFileName), "maps/%03u%02u%02u.map", mapID, tileY, tileX);
 
         FILE* mapFile = fopen(mapFileName, "rb");
         if (!mapFile)
             return false;
 
         GridMapFileHeader fheader;
-        fread(&fheader, sizeof(GridMapFileHeader), 1, mapFile);
+        IgnoreResult(fread(&fheader, sizeof(GridMapFileHeader), 1, mapFile));
 
         if (fheader.versionMagic != *((uint32 const*)(MAP_VERSION_MAGIC)))
         {
@@ -109,7 +114,7 @@ namespace MMAP
 
         GridMapHeightHeader hheader;
         fseek(mapFile, fheader.heightMapOffset, SEEK_SET);
-        fread(&hheader, sizeof(GridMapHeightHeader), 1, mapFile);
+        IgnoreResult(fread(&hheader, sizeof(GridMapHeightHeader), 1, mapFile));
 
         bool haveTerrain = !(hheader.flags & MAP_HEIGHT_NO_HEIGHT);
         bool haveLiquid = fheader.liquidMapOffset && !m_skipLiquid;
@@ -143,8 +148,8 @@ namespace MMAP
             {
                 uint8 v9[V9_SIZE_SQ];
                 uint8 v8[V8_SIZE_SQ];
-                fread(v9, sizeof(uint8), V9_SIZE_SQ, mapFile);
-                fread(v8, sizeof(uint8), V8_SIZE_SQ, mapFile);
+                IgnoreResult(fread(v9, sizeof(uint8), V9_SIZE_SQ, mapFile));
+                IgnoreResult(fread(v8, sizeof(uint8), V8_SIZE_SQ, mapFile));
                 heightMultiplier = (hheader.gridMaxHeight - hheader.gridHeight) / 255;
 
                 for (i = 0; i < V9_SIZE_SQ; ++i)
@@ -157,8 +162,8 @@ namespace MMAP
             {
                 uint16 v9[V9_SIZE_SQ];
                 uint16 v8[V8_SIZE_SQ];
-                fread(v9, sizeof(uint16), V9_SIZE_SQ, mapFile);
-                fread(v8, sizeof(uint16), V8_SIZE_SQ, mapFile);
+                IgnoreResult(fread(v9, sizeof(uint16), V9_SIZE_SQ, mapFile));
+                IgnoreResult(fread(v8, sizeof(uint16), V8_SIZE_SQ, mapFile));
                 heightMultiplier = (hheader.gridMaxHeight - hheader.gridHeight) / 65535;
 
                 for (i = 0; i < V9_SIZE_SQ; ++i)
@@ -169,14 +174,14 @@ namespace MMAP
             }
             else
             {
-                fread(V9, sizeof(float), V9_SIZE_SQ, mapFile);
-                fread(V8, sizeof(float), V8_SIZE_SQ, mapFile);
+                IgnoreResult(fread(V9, sizeof(float), V9_SIZE_SQ, mapFile));
+                IgnoreResult(fread(V8, sizeof(float), V8_SIZE_SQ, mapFile));
             }
 
             // hole data
             memset(holes, 0, fheader.holesSize);
             fseek(mapFile, fheader.holesOffset, SEEK_SET);
-            fread(holes, fheader.holesSize, 1, mapFile);
+            IgnoreResult(fread(holes, fheader.holesSize, 1, mapFile));
 
             if (portion == ENTIRE)
             {
@@ -210,7 +215,11 @@ namespace MMAP
                 meshData.solidVerts.append(coord[1]);
             }
 
-            int j, indices[3], loopStart, loopEnd, loopInc;
+            int j;
+            int indices[3];
+            int loopStart = 0;
+            int loopEnd = 0;
+            int loopInc = 1;
             getLoopVars(portion, loopStart, loopEnd, loopInc);
             for (i = loopStart; i < loopEnd; i += loopInc)
                 for (j = TOP; j <= BOTTOM; j += 1)
@@ -302,9 +311,12 @@ namespace MMAP
                 }
             }
 
-            int indices[3], loopStart, loopEnd, loopInc, triInc;
+            int indices[3];
+            int loopStart = 0;
+            int loopEnd = 0;
+            int loopInc = 1;
+            int triInc = BOTTOM - TOP;
             getLoopVars(portion, loopStart, loopEnd, loopInc);
-            triInc = BOTTOM - TOP;
 
             // generate triangles
             for (int i = loopStart; i < loopEnd; i += loopInc)
@@ -322,8 +334,12 @@ namespace MMAP
 
         // now that we have gathered the data, we can figure out which parts to keep:
         // liquid above ground, ground above liquid
-        int loopStart, loopEnd, loopInc, tTriCount = 4;
-        bool useTerrain, useLiquid;
+        int loopStart = 0;
+        int loopEnd = 0;
+        int loopInc = 1;
+        int tTriCount = 4;
+        bool useTerrain = false;
+        bool useLiquid = false;
 
         float* lverts = meshData.liquidVerts.getCArray();
         int* ltris = ltriangles.getCArray();
@@ -762,7 +778,7 @@ namespace MMAP
 
             /// Check every map vertice
             // x, y * -1
-            
+
             for (vector<GroupModel>::iterator it = groupModels.begin(); it != groupModels.end(); ++it)
                 for (int t = 0; t < mapVertsCount / 3; ++t)
                 {
@@ -775,7 +791,7 @@ namespace MMAP
 
                     float outDist = -1.0f;
                     float inDist  = -1.0f;
-                    if (it->IsUnderObject(v, Vector3::up(), isM2, &outDist, &inDist)) // inDist < outDist
+                    if (it->IsUnderObject(v, Vector3::unitZ(), isM2, &outDist, &inDist)) // up // inDist < outDist
                     {
                         //if there are less than 5.0y between terrain and model then mark the terrain as unwalkable
                         if (inDist < 5.0f)
@@ -1006,7 +1022,7 @@ namespace MMAP
     }
 
     /**************************************************************************/
-    void TerrainBuilder::loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, char const* offMeshFilePath)
+    void TerrainBuilder::loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, char const* offMeshFilePath, bool printOffmeshData)
     {
         // no meshfile input given?
         if (offMeshFilePath == nullptr)
@@ -1033,6 +1049,12 @@ namespace MMAP
 
             if (mapID == mid && tileX == tx && tileY == ty)
             {
+                if (printOffmeshData)
+                {
+                    printf(" loadOffMeshConnections:: Found offmesh connection for map %u tile [%u,%u]: (%.2f %.2f %.2f) -> (%.2f %.2f %.2f) size %.2f\n",
+                           mapID, tileX, tileY, p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], size);
+                }
+
                 meshData.offMeshConnections.append(p0[1]);
                 meshData.offMeshConnections.append(p0[2]);
                 meshData.offMeshConnections.append(p0[0]);

@@ -387,7 +387,7 @@ struct instance_sunken_temple : public ScriptedInstance
                     if (bAllDead)
                     {
                         if (GameObject* pGob = instance->GetGameObject(m_uiJammalanBarrierGUID))
-                            if (pGob->GetGoState() != GO_STATE_ACTIVE) // Fermée
+                            if (pGob->GetGoState() != GO_STATE_ACTIVE) // Closed
                                 DoUseDoorOrButton(m_uiJammalanBarrierGUID);
 
                         // Intro yell

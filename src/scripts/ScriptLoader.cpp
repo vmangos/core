@@ -4,9 +4,6 @@
 
 #include "scriptPCH.h"
 
-// AI system
-void AddSC_npc_escort();
-
 //battlegrounds
 void AddSC_battleground();
 void AddSC_bg_alterac();
@@ -78,7 +75,6 @@ void AddSC_boss_thermaplugg();
 void AddSC_instance_gnomeregan();
 
 void AddSC_boss_lucifron();                          //molten_core
-void AddSC_boss_magmadar();
 void AddSC_boss_gehennas();
 void AddSC_boss_garr();
 void AddSC_boss_baron_geddon();
@@ -169,7 +165,7 @@ void AddSC_elwynn_forest();
 void AddSC_hillsbrad_foothills();
 void AddSC_hinterlands();
 void AddSC_loch_modan();
-void AddSC_redridge_mountains();
+//void AddSC_redridge_mountains();
 void AddSC_searing_gorge();
 void AddSC_silverpine_forest();
 void AddSC_stormwind_city();
@@ -253,9 +249,6 @@ void AddSC_warrior_spell_scripts();
 
 void AddScripts()
 {
-    //Nostalrius
-    AddSC_npc_escort();
-
     //battlegrounds
     AddSC_battleground();
     AddSC_bg_alterac();
@@ -326,7 +319,6 @@ void AddScripts()
     AddSC_boss_thermaplugg();
     AddSC_instance_gnomeregan();
     AddSC_boss_lucifron();                                  //molten_core
-    AddSC_boss_magmadar();
     AddSC_boss_gehennas();
     AddSC_boss_garr();
     AddSC_boss_baron_geddon();
@@ -417,7 +409,7 @@ void AddScripts()
     AddSC_hillsbrad_foothills();
     AddSC_hinterlands();
     AddSC_loch_modan();
-    AddSC_redridge_mountains();
+    //AddSC_redridge_mountains();
     AddSC_searing_gorge();
     AddSC_silverpine_forest();
     AddSC_stormwind_city();

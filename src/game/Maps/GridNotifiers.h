@@ -714,6 +714,22 @@ namespace MaNGOS
             GameObjectEntryInPosRangeCheck(GameObjectEntryInPosRangeCheck const&);
     };
 
+    class AnyClosedDoorInRangeCheck
+    {
+        public:
+            AnyClosedDoorInRangeCheck(WorldObject const* pObject, float fMaxRange) : m_pObject(pObject), m_fRange(fMaxRange) {}
+            bool operator() (GameObject* pGo)
+            {
+                return pGo->GetGoType() == GAMEOBJECT_TYPE_DOOR &&
+                       pGo->GetGoState() == GO_STATE_READY &&
+                       m_pObject->IsWithinDist(pGo, m_fRange);
+            }
+
+        private:
+            const WorldObject* m_pObject;
+            float m_fRange;
+    };
+
     // Unit checks
 
     class MostHPMissingInRangeCheck

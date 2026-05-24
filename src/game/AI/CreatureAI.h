@@ -44,7 +44,7 @@ struct Loot;
 struct CreatureAISpellsEntry : CreatureSpellsEntry
 {
     uint32 cooldown;
-    CreatureAISpellsEntry(CreatureSpellsEntry const& EntryStruct) : CreatureSpellsEntry(EntryStruct), cooldown(urand(EntryStruct.delayInitialMin, EntryStruct.delayInitialMax)) {}
+    CreatureAISpellsEntry(CreatureSpellsEntry const& EntryStruct);
 };
 
 class CreatureAI
@@ -163,7 +163,7 @@ class CreatureAI
 
         // Will auto attack if the swing timer is ready.
         bool DoMeleeAttackIfReady();
-        
+
         // == State checks =================================
 
         // Is corpse looting allowed ?
@@ -203,7 +203,7 @@ class CreatureAI
 
         // Enables or disables combat movement.
         void SetCombatMovement(bool enabled);
-        
+
         // Pointer to controlled by AI creature
         Creature* const m_creature;
         bool SwitchAiAtControl() const { return !m_bUseAiAtControl; }

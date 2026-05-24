@@ -105,7 +105,7 @@ struct DruidSwiftmendScript : SpellScript
     {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         if (Unit* target = spell->m_targets.getUnitTarget())
-            if (!target->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, UI64LIT(0x50)))
+            if (!target->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, uint64(0x50)))
                 return SPELL_FAILED_TARGET_AURASTATE;
 #endif
         return SPELL_CAST_OK;

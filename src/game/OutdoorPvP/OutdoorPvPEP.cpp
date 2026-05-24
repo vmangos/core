@@ -246,11 +246,11 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
         ct = EP_EWT_Summons_A;
     else
         ct = EP_EWT_Summons_H;
-    
+
     for (uint8 i = 0; i < EP_SummonsNum; ++i)
     {
         DelCreature(i);
-    
+
         bool asActiveObject = false;
         switch (ct[i].entry)
         {
@@ -260,9 +260,9 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
             case NPC_LORDAERON_FIGHTER:
                 asActiveObject = true;
         }
-    
+
         AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 0, asActiveObject);
-    
+
         if (ct[i].entry == NPC_LORDAERON_SOLDIER || ct[i].entry == NPC_LORDAERON_FIGHTER)
         {
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
@@ -724,7 +724,7 @@ void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
 {
     DelCreature(CROWN_GUARD_TOWER_SPIRITOFVICTORY); // The only Creature to delete here.
     AddCreature(CROWN_GUARD_TOWER_SPIRITOFVICTORY, EP_CGT_SpiritOfVictory.entry, team, EP_CGT_SpiritOfVictory.map, EP_CGT_SpiritOfVictory.x, EP_CGT_SpiritOfVictory.y, EP_CGT_SpiritOfVictory.z, EP_CGT_SpiritOfVictory.o, 0, true);
-    
+
     if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[CROWN_GUARD_TOWER_SPIRITOFVICTORY]))
     {
         pCreature->RemoveAllAuras();
@@ -941,7 +941,7 @@ void OPvPCapturePointEP_PWT::HandlePlayerLeave(Player* pPlayer)
 void OPvPCapturePointEP_PWT::SummonFlightMaster(uint32 team)
 {
     AddCreature(PLAGUEWOOD_TOWER_FLIGHTMASTER, EP_PWT_FlightMaster.entry, team, EP_PWT_FlightMaster.map, EP_PWT_FlightMaster.x, EP_PWT_FlightMaster.y, EP_PWT_FlightMaster.z, EP_PWT_FlightMaster.o);
-    
+
     if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[PLAGUEWOOD_TOWER_FLIGHTMASTER]))
     {
         pCreature->SetFactionTemplateId(team == ALLIANCE ? 774 : 775);
@@ -1115,7 +1115,7 @@ public:
         : ZoneScript_Script()
     {
     }
-    uint32 GetMapId() const
+    uint32 GetMapId() const override
     {
         return 0;
     }

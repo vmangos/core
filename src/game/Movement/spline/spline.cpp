@@ -55,8 +55,7 @@ SplineBase::InitMethtod SplineBase::initializers[] =
     (InitMethtod)& SplineBase::UninitializedSpline,
 };
 
-///////////
-#pragma region evaluation methtods
+/////////// evaluation methtods
 
 using G3D::Matrix4;
 static Matrix4 const s_catmullRomCoeffs(
@@ -199,7 +198,6 @@ float SplineBase::SegLengthBezier3(index_type index) const
     }
     return length;
 }
-#pragma endregion
 
 void SplineBase::init_spline(Vector3 const* controls, index_type count, EvaluationMode m)
 {
@@ -224,7 +222,7 @@ void SplineBase::InitLinear(Vector3 const* controls, index_type count, bool cycl
 
     points.resize(real_size);
 
-    memcpy(&points[0], controls, sizeof(Vector3) * count);
+    memcpy(static_cast<void*>(&points[0]), controls, sizeof(Vector3) * count);
 
     // first and last two indexes are space for special 'virtual points'
     // these points are required for proper C_Evaluate and C_Evaluate_Derivative methtod work
@@ -246,7 +244,7 @@ void SplineBase::InitCatmullRom(Vector3 const* controls, index_type count, bool 
     int lo_index = 1;
     int high_index = lo_index + count - 1;
 
-    memcpy(&points[lo_index], controls, sizeof(Vector3) * count);
+    memcpy(static_cast<void*>(&points[lo_index]), controls, sizeof(Vector3) * count);
 
     // first and last two indexes are space for special 'virtual points'
     // these points are required for proper C_Evaluate and C_Evaluate_Derivative methtod work
@@ -276,7 +274,7 @@ void SplineBase::InitBezier3(Vector3 const* controls, index_type count, bool /*c
     index_type t = c / 3u;
 
     points.resize(c);
-    memcpy(&points[0], controls, sizeof(Vector3) * c);
+    memcpy(static_cast<void*>(&points[0]), controls, sizeof(Vector3) * c);
 
     index_lo = 0;
     index_hi = t - 1;

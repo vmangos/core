@@ -27,11 +27,8 @@
 #include "UpdateData.h"
 #include "Player.h"
 
-void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
+void WorldSession::HandleDuelAcceptedOpcode(WorldPackets::Duel::DuelAccepted const& /*packet*/)
 {
-    ObjectGuid guid;
-    recvPacket >> guid;
-
     if (!GetPlayer()->m_duel)                                 // ignore accept from duel-sender
         return;
 
@@ -49,7 +46,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     plTarget->SendDuelCountdown(3000);
 }
 
-void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
+void WorldSession::HandleDuelCancelledOpcode(WorldPackets::Duel::DuelCancelled const& /*packet*/)
 {
     auto pPlayer = GetPlayer();
     // no duel requested
@@ -70,8 +67,5 @@ void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 
     // player either discarded the duel using the "discard button"
     // or used "/forfeit" before countdown reached 0
-    ObjectGuid guid;
-    recvPacket >> guid;
-
     pPlayer->DuelComplete(DUEL_INTERRUPTED);
 }

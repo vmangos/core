@@ -28,6 +28,7 @@
 #include "Conditions.h"
 #include "Group.h"
 #include "BattleGroundMgr.h"
+#include "Utilities/Random.h"
 
 static eConfigFloatValues const qualityToRate[MAX_ITEM_QUALITY] =
 {
@@ -558,7 +559,7 @@ void Loot::FillNotNormalLootFor(Player* pl)
 {
     if (pl->IsInWorld())
         m_allowedLooters.push_back(pl->GetObjectGuid());
-    
+
     uint32 plguid = pl->GetGUIDLow();
 
     QuestItemMap::const_iterator qmapitr = m_playerQuestItems.find(plguid);
@@ -674,30 +675,34 @@ void Loot::NotifyItemRemoved(uint8 lootIndex)
 {
     // notify all players that are looting this that the item was removed
     // convert the index to the slot the player sees
-    PlayersLooting::iterator i_next;
-    for (PlayersLooting::iterator i = m_playersLooting.begin(); i != m_playersLooting.end(); i = i_next)
+    for (PlayersLooting::iterator i = m_playersLooting.begin(); i != m_playersLooting.end(); )
     {
-        i_next = i;
-        ++i_next;
         if (Player* pl = ObjectAccessor::FindPlayer(*i))
+        {
             pl->SendNotifyLootItemRemoved(lootIndex);
+            ++i;
+        }
         else
-            m_playersLooting.erase(i);
+        {
+            i = m_playersLooting.erase(i);
+        }
     }
 }
 
 void Loot::NotifyMoneyRemoved()
 {
     // notify all players that are looting this that the money was removed
-    PlayersLooting::iterator i_next;
-    for (PlayersLooting::iterator i = m_playersLooting.begin(); i != m_playersLooting.end(); i = i_next)
+    for (PlayersLooting::iterator i = m_playersLooting.begin(); i != m_playersLooting.end(); )
     {
-        i_next = i;
-        ++i_next;
         if (Player* pl = ObjectAccessor::FindPlayer(*i))
+        {
             pl->SendNotifyLootMoneyRemoved();
+            ++i;
+        }
         else
-            m_playersLooting.erase(i);
+        {
+            i = m_playersLooting.erase(i);
+        }
     }
 }
 
@@ -708,11 +713,8 @@ void Loot::NotifyQuestItemRemoved(uint8 questIndex)
     // (other questitems can be looted by each group member)
     // bit inefficient but isnt called often
 
-    PlayersLooting::iterator i_next;
-    for (PlayersLooting::iterator i = m_playersLooting.begin(); i != m_playersLooting.end(); i = i_next)
+    for (PlayersLooting::iterator i = m_playersLooting.begin(); i != m_playersLooting.end(); )
     {
-        i_next = i;
-        ++i_next;
         if (Player* pl = ObjectAccessor::FindPlayer(*i))
         {
             QuestItemMap::const_iterator pq = m_playerQuestItems.find(pl->GetGUIDLow());
@@ -729,9 +731,12 @@ void Loot::NotifyQuestItemRemoved(uint8 questIndex)
                 if (j < pql.size())
                     pl->SendNotifyLootItemRemoved(items.size() + j);
             }
+            ++i;
         }
         else
-            m_playersLooting.erase(i);
+        {
+            i = m_playersLooting.erase(i);
+        }
     }
 }
 
@@ -825,7 +830,7 @@ WorldObject const* Loot::GetLootTarget() const
             if (Player const* pPlayer = sObjectAccessor.FindPlayer(pCorpse->GetOwnerGuid()))
                 return pPlayer;
     }
-    
+
     return m_lootTarget;
 }
 
@@ -920,7 +925,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                     break;
                 case OWNER_PERMISSION:
                     //slot_type = LOOT_SLOT_TYPE_OWNER;
-                    slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT; // Sinon pas de loot auto ...
+                    slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT; // Otherwise no auto-loot ...
                     break;
                 default:
                     break;

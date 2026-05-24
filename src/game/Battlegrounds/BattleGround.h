@@ -23,6 +23,7 @@
 #define __BATTLEGROUND_H
 
 #include "Common.h"
+#include "Packet.h"
 #include "SharedDefines.h"
 #include "Map.h"
 #include "ByteBuffer.h"
@@ -30,6 +31,8 @@
 #include "WorldStates.h"
 #include "SpellDefines.h"
 #include "BattleGroundDefines.h"
+
+#include <memory>
 
 class Creature;
 class GameObject;
@@ -192,7 +195,9 @@ class BattleGround
         // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
         virtual void FillInitialWorldStates(WorldPacket& /*data*/, uint32& /*count*/) {}
         void SendPacketToTeam(Team team, WorldPacket* packet, Player* sender = nullptr, bool self = true);
+        void SendPacketToTeam(Team team, std::unique_ptr<ServerPacket> packet, Player* sender = nullptr, bool self = true);
         void SendPacketToAll(WorldPacket* packet);
+        void SendPacketToAll(std::unique_ptr<ServerPacket> packet);
 
         template<class Do>
         void BroadcastWorker(Do& _do);
@@ -359,7 +364,7 @@ class BattleGround
         /* Battleground */
         BattleGroundTypeId m_typeId;
         BattleGroundStatus m_status;
-        BattleGroundWinner  m_winner;
+        BattleGroundWinner m_winner;
         WorldPacket m_finalScore;
 
         uint32 m_clientInstanceId;                          //the instance-id which is sent to the client and without any other internal use

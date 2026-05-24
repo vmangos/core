@@ -1677,9 +1677,6 @@ inline uint32 GetBattleGrounMapIdByTypeId(BattleGroundTypeId bgTypeId)
         case BATTLEGROUND_AB:   return MAP_ARATHI_BASIN;
         default:                return 0;   //none
     }
-
-    // impossible, just make compiler happy
-    return 0;
 }
 
 enum MailResponseType
@@ -1792,6 +1789,8 @@ enum TicketType
 // Used for some dynamic scaling systems, depending on total population
 #define BLIZZLIKE_REALM_POPULATION 2500
 
+struct WorldLocation;
+
 struct Position
 {
     Position() = default;
@@ -1805,24 +1804,27 @@ struct Position
     {
         return !x && !y && !z && !o;
     }
+
+    WorldLocation WithMapId(uint32 mapId) const;
 };
 
-struct WorldLocation
+struct WorldLocation : public Position
 {
-    uint16 mapId = 0;
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    float o = 0.0f;
-    explicit WorldLocation(uint16 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
-        : mapId(_mapid), x(_x), y(_y), z(_z), o(_o) {}
+    uint32 mapId = 0;
+    explicit WorldLocation(uint32 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
+        : Position(_x, _y, _z, _o), mapId(_mapid) {}
     WorldLocation(WorldLocation const& loc)
-        : mapId(loc.mapId), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
+        : Position(loc.x, loc.y, loc.z, loc.o), mapId(loc.mapId) {}
 
     bool IsEmpty() const
     {
-        return !mapId && !x && !y && !z && !o;
+        return !mapId && Position::IsEmpty();
     }
 };
+
+inline WorldLocation Position::WithMapId(uint32 mapId) const
+{
+    return WorldLocation(mapId, x, y, z, o);
+}
 
 #endif

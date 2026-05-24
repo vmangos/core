@@ -29,6 +29,11 @@
 #undef max
 #include "libmpq/mpq_libmpq.h"
 
+template<typename T>
+static void IgnoreResult(T const&)
+{
+}
+
 using namespace std;
 
 WMORoot::WMORoot(std::string& filename)
@@ -90,10 +95,6 @@ bool WMORoot::open()
             while (ptr < end)
             {
                 std::string path = ptr;
-
-                char* s = GetPlainName(ptr);
-                FixNameCase(s, strlen(s));
-                FixNameSpaces(s, strlen(s));
 
                 uint32 doodadNameIndex = ptr - f.getPointer();
                 ptr += path.length() + 1;
@@ -478,7 +479,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
                     liquidEntry = 3;        // magma
                     break;
                 case 3:
-                    if (filename.find("Stratholme_raid") != string::npos)
+                    if (rootWMO->RootWMOID == 4489) // Stratholme_raid.wmo WMOID == 4489
                     {
                         liquidEntry = 21;   // Naxxramas slime
                     }
@@ -564,7 +565,7 @@ WMOInstance::WMOInstance(MPQFile& f, const char* WmoInstName, uint32 mapID, uint
     //-----------add_in _dir_file----------------
 
     char tempname[512];
-    sprintf(tempname, "%s/%s", szWorkDirWmo, WmoInstName);
+    snprintf(tempname, sizeof(tempname), "%s/%s", szWorkDirWmo, WmoInstName);
     FILE* input;
     input = fopen(tempname, "r+b");
 
@@ -576,7 +577,7 @@ WMOInstance::WMOInstance(MPQFile& f, const char* WmoInstName, uint32 mapID, uint
 
     fseek(input, 8, SEEK_SET); // get the correct no of vertices
     int nVertices;
-    fread(&nVertices, sizeof(int), 1, input);
+    IgnoreResult(fread(&nVertices, sizeof(int), 1, input));
     fclose(input);
 
     if (nVertices == 0)

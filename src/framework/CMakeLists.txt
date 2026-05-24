@@ -15,9 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# include(${CMAKE_SOURCE_DIR}/dep/tbb/tbbinclude.cmake)
-
-set(framework_SRCS 
+set(framework_SRCS
   Dynamic/FactoryHolder.h
   Dynamic/ObjectRegistry.h
   GameSystem/Grid.h
@@ -29,10 +27,6 @@ set(framework_SRCS
   GameSystem/TypeContainerFunctions.h
   GameSystem/TypeContainerFunctionsPtr.h
   GameSystem/TypeContainerVisitor.h
-  Network/MangosSocket.h
-  Network/MangosSocketImpl.h
-  Network/MangosSocketMgr.h
-  Network/MangosSocketMgrImpl.h
   Platform/CompilerDefs.h
   Platform/Define.h
   Policies/CreationPolicy.h
@@ -40,6 +34,7 @@ set(framework_SRCS
   Policies/Singleton.h
   Policies/SingletonImp.h
   Policies/ThreadingModel.h
+  Policies/ObjectConstructorTraits.h
   Utilities/ByteConverter.h
   Utilities/EventProcessor.h
   Utilities/EventMap.h
@@ -47,7 +42,6 @@ set(framework_SRCS
   Utilities/TypeList.h
   Utilities/LinkedReference/Reference.h
   Utilities/LinkedReference/RefManager.h
-  Policies/MemoryManagement.cpp
   Policies/ObjectLifeTime.cpp
   Utilities/EventProcessor.cpp
   Utilities/EventMap.cpp
@@ -85,17 +79,13 @@ source_group("Dynamic"
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${TBB_INCLUDE_DIRS}
-  ${ACE_INCLUDE_DIR}
   ${CMAKE_SOURCE_DIR}/src/shared
 )
 
 add_library(framework STATIC
   ${framework_SRCS}
 )
+mangos_target_flags(framework)
 
 SET_TARGET_PROPERTIES (framework PROPERTIES FOLDER "Game Libs")
 
-target_link_libraries(framework
-  ${TBB_LIBRARIES}
-)
