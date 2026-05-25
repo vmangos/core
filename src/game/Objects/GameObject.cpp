@@ -2380,7 +2380,7 @@ void GameObject::GetLosCheckPosition(float& x, float& y, float& z) const
 {
     if (GameObjectDisplayInfoAddon const* displayInfo = sGameObjectDisplayInfoAddonStorage.LookupEntry<GameObjectDisplayInfoAddon>(GetDisplayId()))
     {
-        if (displayInfo->min_x || displayInfo->min_y || displayInfo->min_z || displayInfo->max_x || displayInfo->max_y || displayInfo->max_z)
+        if (displayInfo->HasBounds())
         {
             float scale = GetObjectScale();
 
@@ -2576,21 +2576,24 @@ bool GameObject::IsAtInteractDistance(Position const& pos, float radius) const
 {
     if (GameObjectDisplayInfoAddon const* displayInfo = sGameObjectDisplayInfoAddonStorage.LookupEntry<GameObjectDisplayInfoAddon>(GetDisplayId()))
     {
-        float scale = GetObjectScale();
+        if (displayInfo->HasBounds())
+        {
+            float scale = GetObjectScale();
 
-        float minX = displayInfo->min_x * scale - radius;
-        float minY = displayInfo->min_y * scale - radius;
-        float minZ = displayInfo->min_z * scale - radius;
-        float maxX = displayInfo->max_x * scale + radius;
-        float maxY = displayInfo->max_y * scale + radius;
-        float maxZ = displayInfo->max_z * scale + radius;
+            float minX = displayInfo->min_x * scale - radius;
+            float minY = displayInfo->min_y * scale - radius;
+            float minZ = displayInfo->min_z * scale - radius;
+            float maxX = displayInfo->max_x * scale + radius;
+            float maxY = displayInfo->max_y * scale + radius;
+            float maxZ = displayInfo->max_z * scale + radius;
 
-        QuaternionData worldRotation = GetLocalRotation();
-        G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
+            QuaternionData worldRotation = GetLocalRotation();
+            G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
 
-        return G3D::CoordinateFrame{ { worldRotationQuat },{ GetPositionX(), GetPositionY(), GetPositionZ() } }
+            return G3D::CoordinateFrame{ { worldRotationQuat },{ GetPositionX(), GetPositionY(), GetPositionZ() } }
             .toWorldSpace(G3D::Box{ { minX, minY, minZ },{ maxX, maxY, maxZ } })
             .contains({ pos.x, pos.y, pos.z });
+        }
     }
 
     return GetDistance3dToCenter(pos) <= radius;
