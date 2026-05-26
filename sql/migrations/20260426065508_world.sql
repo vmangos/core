@@ -12,7 +12,6 @@ SET @CGUID := 8127;
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 11684, 1, 1616.5979, -2522.462, 97.884094, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x20566000200B6900000113000077F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 11684 (Warsong Shredder) Low: 7861405
@@ -41,7 +40,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 11684, 1, 2444.4524, -3357.64, 103.01454, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x20566000200B6900000113000077F4A0 Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 11684 (Warsong Shredder) Low: 7861408
@@ -113,7 +111,6 @@ DELETE FROM creature_movement WHERE id IN(33069,33079,33068,33078,33071,33077);
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 11683, 1, 2634.562, -3456.797, 108.45066, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x20566000200B68C0000113000177F4A0 Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 11683 (Warsong Shaman) Low: 24638624
@@ -154,7 +151,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 11683, 1, 2472.2043, -3491.7686, 92.33869, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x20516000200B68C00000190000C344F0 Creature/0 R5208/S25 Map: 1 (Kalimdor) Entry: 11683 (Warsong Shaman) Low: 12797168
@@ -473,7 +469,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 (@MOVID, 26, 3143.4958, -1910.5104, 204.38576, 100, 0, 0, 0);
 
 SET @MOVID=35055;
-SET @CGUID=@CGUID+1;
 DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3825, 1, 2897.1243, -1780.3457, 200.73242, 0.64330601692199710000, 300, 300, 0, 2);
@@ -505,7 +500,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID; 
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3825, 1, 3187.6594, -1471.982, 206.12036, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BC40000113000377F49B Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3825 (Ghostpaw Alpha) Low: 58193051
@@ -532,7 +526,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3825, 1, 3551.4868, -1545.1895, 168.57285, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BC40000113000377F49E Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3825 (Ghostpaw Alpha) Low: 58193054
@@ -555,7 +548,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3825, 1, 3353.446, -1558.328, 167.41385, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BC40000113000277F49C Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3825 (Ghostpaw Alpha) Low: 41415836
@@ -590,7 +582,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3825, 1, 3324.8271, -1726.1813, 185.3376, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BC400001130001F7F49C Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3825 (Ghostpaw Alpha) Low: 33027228
@@ -621,7 +612,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID; -- 156079
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 3360.4849, 46.575306, 7.333963, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC0000113000277F4A0 Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 41415840
@@ -653,7 +643,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 3636.6946, 65.89692, 2.521203, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC0000113000577F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 91747485
@@ -682,7 +671,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 4058.7014, 40.355686, 14.889296, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC00000680001FC1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 33300365
@@ -711,7 +699,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 4036.0088, 187.99762, 4.0975933, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC00000680002FC1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 50077581
@@ -745,7 +732,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 3312.6177, 343.49728, 5.4585733, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC000006800017C1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 24911757
@@ -775,7 +761,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 3266.8313, 527.351, 0.2742809, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC00000680001FC1F89 Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 33300361
@@ -801,7 +786,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 3249.4414, 553.6018, -1.4838974, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC00000680005FC1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 100409229
@@ -831,7 +815,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 3526.0317, 742.38666, 5.608039, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC000006800047C1F8C Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 75243404
@@ -860,7 +843,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2973.6304, 355.51694, 102.17226, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC000006800037C1F8B Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 58466187
@@ -889,7 +871,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2812.7834, 440.09012, 94.86547, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC00000680013FC1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 335290253
@@ -924,7 +905,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2840.626, 508.43408, 101.72179, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC000006800007C1F87 Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 8134535
@@ -953,7 +933,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2667.675, 562.68353, 92.915245, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC00000680008FC1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 150740877
@@ -990,7 +969,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2473.958, 635.0509, 126.77722, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC0000068000A7C1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 175906701
@@ -1019,7 +997,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2325.3784, 421.2066, 128.59358, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC000006800017C1F8B Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 24911755
@@ -1046,7 +1023,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2707.1213, 156.05122, 92.740005, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC00000680009FC1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 167518093
@@ -1073,7 +1049,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2653.1025, 4.134874, 105.94609, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC000006800067C1F8C Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 108797836
@@ -1114,7 +1089,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2622.966, -247.07677, 109.49042, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC00000680005FC1F8C Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 100409228
@@ -1147,7 +1121,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2630.336, -104.03993, 99.95373, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC0000068000F7C1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 259792781
@@ -1180,7 +1153,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2431.6082, -330.6561, 100.96674, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC000006800057C1F8C Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 92020620
@@ -1211,7 +1183,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3823, 1, 2387.5647, -381.45074, 101.21952, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003BBC000006800117C1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3823 (Ghostpaw Runner) Low: 293347213
@@ -1292,7 +1263,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID; -- 156099
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3811, 1, 2985.0356, -3166.29, 187.76047, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8C0000113000077F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3811 (Giant Ashenvale Bear) Low: 7861405
@@ -1317,7 +1287,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3811, 1, 2881.2986, -3055.6472, 200.18604, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8C0000113000177F49C Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3811 (Giant Ashenvale Bear) Low: 24638620
@@ -1349,7 +1318,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3811, 1, 2745.7158, -3123.533, 167.69876, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8C00001130000F7F49C Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3811 (Giant Ashenvale Bear) Low: 16250012
@@ -1374,7 +1342,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3811, 1, 2858.898, -3094.251, 196.85649, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8C0000113000077F49C Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3811 (Giant Ashenvale Bear) Low: 7861404
@@ -1399,7 +1366,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2606.2288, -1400.3759, 168.13614, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8400001130007F7F49F Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 133690527
@@ -1426,7 +1392,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2728.904, -1534.1578, 202.36404, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B840000113000477F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 74970269
@@ -1449,7 +1414,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2622.4927, -1190.9452, 154.195, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8400001130004F7F49E Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 83358878
@@ -1480,7 +1444,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2676.328, -1245.8959, 161.78313, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8400001130004F7F4A0 Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 83358880
@@ -1507,7 +1470,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2599.1309, -1344.8922, 156.77393, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B840000113000077F49A Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 7861402
@@ -1538,7 +1500,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2583.3572, -1032.8915, 122.9966, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B840000113000977F4A0 Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 158856352
@@ -1561,7 +1522,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2929.5317, -742.7804, 166.35733, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8400001130000F7F49E Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 16250014
@@ -1585,7 +1545,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2710.2026, -1259.2174, 176.18108, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B840000113000077F49B Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 7861403
@@ -1618,7 +1577,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2958.73, -1222.0642, 189.3869, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B840000113000777F4A0 Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 125301920
@@ -1647,7 +1605,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2912.3926, -1311.737, 204.04884, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B840000113000477F4A0 Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 74970272
@@ -1686,7 +1643,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2573.539, -944.69586, 137.3547, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8400001130005F7F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 100136093
@@ -1713,7 +1669,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2658.724, -895.36896, 159.05098, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8400001130001F7F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 33027229
@@ -1752,7 +1707,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2875.4336, -779.5879, 159.38158, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B840000113000177F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 24638621
@@ -1777,7 +1731,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 3039.2095, -619.5213, 172.53503, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B840000113000677F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 108524701
@@ -1810,7 +1763,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 3076.4192, -862.5241, 199.45108, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B840000113000077F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 7861405
@@ -1843,7 +1795,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2083.6953, -804.0004, 106.84119, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8400000680000FC1F8E Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 16523150
@@ -1872,7 +1823,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2247.4211, -910.60266, 89.7098, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B84000006800117C1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 293347213
@@ -1897,7 +1847,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2190.9219, -732.2624, 105.223625, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8400000680009FC1F8E Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 167518094
@@ -1932,7 +1881,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3809, 1, 2372.7957, -932.06934, 97.83822, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B8400000680004FC1F8D Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3809 (Ashenvale Bear) Low: 83632013
@@ -1998,7 +1946,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3815, 1, 1918.7743, -1577.9518, 63.197205, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003B9C000006800007C1F89 Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3815 (Blink Dragon) Low: 8134537
@@ -2034,7 +1981,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3926, 1, 3350.0854, -452.17676, 153.03552, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003D580000113000077F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3926 (Thistlefur Pathfinder) Low: 7861405
@@ -2051,7 +1997,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3926, 1, 3274.504, -374.04037, 152.86844, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003D580000113000077F49E Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3926 (Thistlefur Pathfinder) Low: 7861406
@@ -2068,7 +2013,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 (@MOVID, 9, 3273.624, -381.11523, 152.28201, 100, 0, 0, 0);
 
 SET @MOVID=32882;
-SET @CGUID=@CGUID+1;
 DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3987, 1, 3278.1917, -577.94165, 156.303, 0.64330601692199710000, 300, 300, 0, 2);
@@ -2113,7 +2057,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3926, 1, 3245.9556, -554.0596, 156.08455, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003D5800001130000F7F49F Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3926 (Thistlefur Pathfinder) Low: 16250015
@@ -2142,7 +2085,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3926, 1, 3255.6692, -580.75714, 156.32866, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003D580000113000177F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3926 (Thistlefur Pathfinder) Low: 24638621
@@ -2169,7 +2111,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3926, 1, 3506.533, -496.408, 186.6573, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003D5800001130000F7F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3926 (Thistlefur Pathfinder) Low: 16250013
@@ -2218,7 +2159,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3926, 1, 3445.8484, -350.73206, 134.24686, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003D580000113000077F49B Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3926 (Thistlefur Pathfinder) Low: 7861403
@@ -2239,7 +2179,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3926, 1, 3401.9714, -460.43854, 159.67883, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003D5800001130001F7F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3926 (Thistlefur Pathfinder) Low: 33027229
@@ -2278,7 +2217,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3745, 1, 2378.5073, -1221.1986, 91.00992, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003A8400000680000FC1F8C Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3745 (Foulweald Pathfinder) Low: 16523148
@@ -2303,7 +2241,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3745, 1, 2195.5156, -1399.2715, 88.86077, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003A84000006800007C1F8C Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3745 (Foulweald Pathfinder) Low: 8134540
@@ -2330,7 +2267,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3745, 1, 2338.0747, -1178.1737, 88.12819, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003A84000006800007C1F88 Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3745 (Foulweald Pathfinder) Low: 8134536
@@ -2374,7 +2310,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 -- forsaken
 
 SET @MOVID=156134;
-SET @CGUID=@CGUID+1;
 DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3734, 1, 3884.9214, -99.50825, 5.1864324, 0.64330601692199710000, 300, 300, 0, 2);
@@ -2405,7 +2340,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 (@MOVID, 22, 3866.139, -107.37066, 4.205177, 100, 0, 0, 0);
 
 SET @MOVID=156135;
-SET @CGUID=@CGUID+1;
 DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type, wander_distance) VALUES
 (@MOVID, 3734, 1, 3884.9214, -99.50825, 5.1864324, 0.64330601692199710000, 300, 300, 0, 0, 0);
@@ -2417,7 +2351,6 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3734, 1, 3795.2551, -153.92616, 0.48319542, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003A5800001130001F7F49D Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3734 (Forsaken Thug) Low: 33027229
@@ -2443,7 +2376,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
-DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
 (@MOVID, 3734, 1, 3862.711, -189.00581, 2.4535205, 0.64330601692199710000, 300, 300, 0, 2);
 -- GUID: Full: 0x205660002003A580000113000177F49C Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3734 (Forsaken Thug) Low: 24638620
@@ -2513,7 +2445,6 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 (@MOVID, 35, 3030.7688, 472.97238, 5.562662, 100, 0, 0, 0);
 
 SET @MOVID=156139; -- formation
-SET @CGUID=@CGUID+1;
 DELETE FROM creature WHERE guid IN(@MOVID);
 INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type, wander_distance) VALUES
 (@MOVID, 3737, 1, 7815.905, -4443.398, 667.3878, 0.64330601692199710000, 300, 300, 0, 0, 0);
