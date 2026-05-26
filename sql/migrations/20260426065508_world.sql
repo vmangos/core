@@ -8,7 +8,7 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES (20260426065508);
 -- Add your query below.
 
-SET @CGUID := 8127;
+SET @CGUID := 18809;
 
 SET @MOVID=@CGUID;
 SET @CGUID=@CGUID+1;
