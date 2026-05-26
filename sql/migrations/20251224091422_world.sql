@@ -161,6 +161,12 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = '3' WHERE (`entry` =
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = '3' WHERE (`entry` = '1522') and (`item` = '2839');
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = '3' WHERE (`entry` = '1523') and (`item` = '2839');
 
+-- Add Missing Gossip Script to Meridith the Mermaiden (thanks Bluntzilla/Tonythetiger)
+DELETE FROM `gossip_scripts` WHERE `id`=10;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(10, 0, 0, 15, 25678, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Meridith the Mermaiden - Cast Siren Song'),
+(10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11089, 0, 0, 0, 0, 0, 0, 0, 0, 'Meridith the Mermaiden - Talk');
+
 
 -- End of migration.
 END IF;
