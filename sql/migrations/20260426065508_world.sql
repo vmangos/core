@@ -2431,8 +2431,8 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 SET @MOVID=156135;
 SET @CGUID=@CGUID+1;
 DELETE FROM creature WHERE guid IN(@MOVID);
-INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
-(@MOVID, '3734', '1', '3884.9214', '-99.50825', '5.1864324', '0.64330601692199710000', '300', '300', '0', '0');
+INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type, wander_distance) VALUES
+(@MOVID, '3734', '1', '3884.9214', '-99.50825', '5.1864324', '0.64330601692199710000', '300', '300', '0', '0', '0');
 -- GUID: Full: 0x205660002003A5800001130000F7F49C Creature/0 R5528/S275 Map: 1 (Kalimdor) Entry: 3734 (Forsaken Thug) Low: 16250012
 
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
@@ -2539,8 +2539,8 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 SET @MOVID=156139; -- formation
 SET @CGUID=@CGUID+1;
 DELETE FROM creature WHERE guid IN(@MOVID);
-INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type) VALUES
-(@MOVID, '3737', '1', '7815.905', '-4443.398', '667.3878', '0.64330601692199710000', '300', '300', '0', '0');
+INSERT INTO creature(guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, patch_min, movement_type, wander_distance) VALUES
+(@MOVID, '3737', '1', '7815.905', '-4443.398', '667.3878', '0.64330601692199710000', '300', '300', '0', '0', '0');
 -- GUID: Full: 0x205660002003A64000006800017C1F88 Creature/0 R5528/S104 Map: 1 (Kalimdor) Entry: 3737 (Saltspittle Puddlejumper) Low: 24911752
 
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
