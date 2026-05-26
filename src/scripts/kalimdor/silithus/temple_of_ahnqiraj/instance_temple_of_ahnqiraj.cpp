@@ -244,6 +244,8 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
         if (m_auiEncounter[TYPE_HUHURAN] == DONE)
             pCreature->AddObjectToRemoveList();
         break;
+    case NPC_VEKLOR:
+    case NPC_VEKNILASH:
     case NPC_ANUBISATH_DEFENDER:
     case NPC_QIRAJI_SCARAB:
     case NPC_QIRAJI_SCORPION:
