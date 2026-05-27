@@ -757,7 +757,7 @@ class World
         // Get the maximum skill level a player can reach
         uint16 GetConfigMaxSkillValue() const
         {
-            uint32 lvl = getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+            uint32 lvl = std::max(60u, getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
             return lvl > 60 ? 300 + ((lvl - 60) * 75) / 10 : lvl*5;
         }
 
