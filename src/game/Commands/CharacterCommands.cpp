@@ -2426,8 +2426,21 @@ bool ChatHandler::HandleHonorShow(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HonorSystemDisabled()
+{
+    if (sWorld.IsHonorEnabled())
+        return false;
+
+    SendSysMessage(LANG_COMMAND_HONOR_DISABLED);
+    SetSentErrorMessage(true);
+    return true;
+}
+
 bool ChatHandler::HandleHonorAddCommand(char* args)
 {
+    if (HonorSystemDisabled())
+        return false;
+
     if (!*args)
         return false;
 
@@ -2450,6 +2463,9 @@ bool ChatHandler::HandleHonorAddCommand(char* args)
 
 bool ChatHandler::HandleHonorAddKillCommand(char* /*args*/)
 {
+    if (HonorSystemDisabled())
+        return false;
+
     Unit* target = GetSelectedUnit();
     if (!target)
     {
@@ -2467,6 +2483,9 @@ bool ChatHandler::HandleHonorAddKillCommand(char* /*args*/)
 
 bool ChatHandler::HandleModifyHonorCommand(char* args)
 {
+    if (HonorSystemDisabled())
+        return false;
+
     if (!*args)
         return false;
 
@@ -2537,6 +2556,9 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
 
 bool ChatHandler::HandleHonorResetCommand(char* /*args*/)
 {
+    if (HonorSystemDisabled())
+        return false;
+
     Player* target = GetSelectedPlayer();
     if (!target)
     {
@@ -2551,6 +2573,9 @@ bool ChatHandler::HandleHonorResetCommand(char* /*args*/)
 
 bool ChatHandler::HandleHonorSetRPCommand(char *args)
 {
+    if (HonorSystemDisabled())
+        return false;
+
     Player* target = GetSelectedPlayer();
     if (!target)
     {
@@ -3779,6 +3804,9 @@ bool ChatHandler::HandleListTalentsCommand(char* /*args*/)
 
 bool ChatHandler::HandleResetHonorCommand(char* args)
 {
+    if (HonorSystemDisabled())
+        return false;
+
     Player* target;
     if (!ExtractPlayerTarget(&args, &target))
         return false;
