@@ -217,6 +217,13 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
         case SPELL_DAMAGE_CLASS_NONE:
             return SPELL_MISS_NONE;
         case SPELL_DAMAGE_CLASS_MAGIC:
+            // Wands deal spell school damage but are ranged weapon attacks, so
+            // their hit roll uses the ranged hit table, which is keyed on the
+            // Wands skill, rather than the spell hit table, which is keyed on
+            // level difference. This mirrors the wand crit handling in
+            // Unit::IsSpellCrit.
+            if (spell->HasAttribute(SPELL_ATTR_EX3_NORMAL_RANGED_ATTACK))
+                return MeleeSpellHitResult(pVictim, spell, spellPtr);
             return MagicSpellHitResult(pVictim, spell, spellPtr);
         case SPELL_DAMAGE_CLASS_MELEE:
         case SPELL_DAMAGE_CLASS_RANGED:
@@ -379,7 +386,9 @@ float SpellCaster::MeleeSpellMissChance(Unit const* pVictim, WeaponAttackType at
 // Melee based spells hit result calculations
 SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit const* pVictim, SpellEntry const* spell, Spell* spellPtr)
 {
-    WeaponAttackType attType = spell->DmgClass == SPELL_DAMAGE_CLASS_RANGED ? RANGED_ATTACK : BASE_ATTACK;
+    // Wands use the ranged attack type.
+    WeaponAttackType attType = (spell->DmgClass == SPELL_DAMAGE_CLASS_RANGED ||
+        spell->HasAttribute(SPELL_ATTR_EX3_NORMAL_RANGED_ATTACK)) ? RANGED_ATTACK : BASE_ATTACK;
 
     // Hammer of Wrath should not use weapon skill, but Bloodthirst should.
     // bonus from skills is 0.04% per skill Diff
