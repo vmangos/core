@@ -10447,7 +10447,9 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
             trainerSpell.reqLevel = spellinfo->spellLevel;
 
         if (SpellMgr::IsProfessionSpell(spellinfo->EffectTriggerSpell[0]))
-            data.trainerType = 2;
+            data.trainerType = TRAINER_TYPE_TRADESKILLS;
+        else if (SpellMgr::IsRidingSpell(spellinfo->EffectTriggerSpell[0]))
+            data.trainerType = TRAINER_TYPE_MOUNTS;
 
         ++count;
 

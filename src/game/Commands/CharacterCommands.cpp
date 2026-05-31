@@ -2852,16 +2852,24 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
             if (!validTrainer)
                 continue;
 
-            if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
+            TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first);
+            TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId);
+
+            uint32 trainerType = cSpells ? cSpells->trainerType : (tSpells ? tSpells->trainerType : 0);
+
+            if (trainerType == TRAINER_TYPE_TRADESKILLS || trainerType == TRAINER_TYPE_MOUNTS)
+                continue;
+
+            if (cSpells)
                 HandleLearnTrainerHelper(pPlayer, cSpells);
 
-            if (trainerId = cInfo->trainer_id) // assignment
+            if (trainerId = cInfo->trainer_id)
             {
                 if (checkedTrainerTemplates.find(trainerId) != checkedTrainerTemplates.end())
                     continue;
 
                 checkedTrainerTemplates.insert(trainerId);
-                if (TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId))
+                if (tSpells)
                     HandleLearnTrainerHelper(pPlayer, tSpells);
             }
         }

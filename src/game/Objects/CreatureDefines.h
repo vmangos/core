@@ -26,6 +26,15 @@
 #include <array>
 #include <vector>
 
+enum TrainerType
+{
+    TRAINER_TYPE_CLASS = 0,
+    TRAINER_TYPE_MOUNTS = 1,            // on blizz it's 2
+    TRAINER_TYPE_TRADESKILLS = 2,
+    TRAINER_TYPE_PETS = 3
+};
+
+#define MAX_TRAINER_TYPE 4
 
 // CreatureType.dbc
 enum CreatureType
@@ -592,8 +601,8 @@ struct TrainerSpellData
     TrainerSpellData() : trainerType(0) {}
 
     TrainerSpellMap spellList;
-    uint32 trainerType;                                     // trainer type based at trainer spells, can be different from creature_template value.
-                                                            // req. for correct show non-prof. trainers like weaponmaster, allowed values 0 and 2.
+    uint32 trainerType;                                     // trainer type based on trainer spells
+                                                            // used for displaying profession/mount training menus correctly
     TrainerSpell const* Find(uint32 spell_id) const;
     void Clear() { spellList.clear(); }
 };
