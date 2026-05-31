@@ -21,6 +21,7 @@
 
 #include "Path.h"
 #include "MoveMapSharedDefines.h"
+#include "../recastnavigation/Detour/Include/DetourCommon.h"
 #include "../recastnavigation/Detour/Include/DetourNavMesh.h"
 #include "../recastnavigation/Detour/Include/DetourNavMeshQuery.h"
 #include "MoveSplineInitArgs.h"
@@ -83,13 +84,14 @@ class PathInfo
         // Nostalrius
         bool UpdateForCaster(Unit* pTarget, float castRange);
         bool UpdateForMelee(Unit* pTarget, float meleeReach);
-        void CutPathWithDynamicLoS();
         float Length() const;
         void ExcludeSteepSlopes() { m_filter.setExcludeFlags(NAV_STEEP_SLOPES); }
         static dtPolyRef FindWalkPoly(dtNavMeshQuery const* query, float const* pointYZX, dtQueryFilter const& filter, float* closestPointYZX, float zSearchDist = 10.0f);
         void SetTransport(GenericTransport* t) { m_transport = t; }
         GenericTransport* GetTransport() const { return m_transport; }
         void FillTargetAllowedFlags(Unit* target);
+        static bool IntersectVolumeBox(const float* pa, const float* pb, const G3D::AABox& box);
+
     private:
 
         dtPolyRef       m_pathPolyRefs[MAX_PATH_LENGTH];   // array of detour polygon references
@@ -126,14 +128,14 @@ class PathInfo
         static float dist3DSqr(Vector3 const& p1, Vector3 const& p2);
         static bool inRangeYZX(float const* v1, float const* v2, float r, float h);
 
-        dtPolyRef getPolyByLocation(float const* point, float *distance, uint32 flags = 0);
+        dtPolyRef getPolyByLocation(float const* point, float *distance, dtQueryFilter* filter, uint32 flags = 0);
         bool HaveTiles(Vector3 const& p) const;
 
-        void BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos);
-        void BuildPointPath(float const* startPoint, float const* endPoint, float distToStartPoly, float distToEndPoly);
-        void BuildShortcut();
-        void BuildUnderwaterPath();
-        void BuildPathWithoutMMaps(Vector3 const& start, Vector3 const& dest); // build path using only maps following terrain (no vmap or mmap)
+        void BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos, dtQueryFilter* filter);
+        void BuildPointPath(float const* startPoint, float const* endPoint, float distToStartPoly, float distToEndPoly, dtQueryFilter* filter);
+        void BuildShortcut(dtQueryFilter* filter);
+        void BuildUnderwaterPath(dtQueryFilter* filter);
+        void BuildPathWithoutMMaps(Vector3 const& start, Vector3 const& dest, dtQueryFilter* filter); // build path using only maps following terrain (no vmap or mmap)
 
         void createFilter();
         void updateFilter();
@@ -146,7 +148,50 @@ class PathInfo
                             unsigned char& steerPosFlag, dtPolyRef& steerPosRef) const;
         dtStatus findSmoothPath(float const* startPos, float const* endPos,
                                 dtPolyRef const* polyPath, uint32 polyPathSize,
-                                float* smoothPath, int* smoothPathSize, uint32 maxSmoothPathSize);
+                                float* smoothPath, int* smoothPathSize, uint32 maxSmoothPathSize, dtQueryFilter* filter);
+};
+
+class VolumeBoxFilter : public dtQueryFilter
+{
+public:
+    const Map* m_map;
+
+    VolumeBoxFilter(const Map* map) : m_map(map) {}
+
+    virtual bool passFilter(dtPolyRef ref, const dtMeshTile* tile, const dtPoly* poly) const override
+    {
+        if ((poly->flags & getIncludeFlags()) == 0)
+            return false;
+
+        if (poly->flags & getExcludeFlags())
+            return false;
+
+        float polyMin[3] = {FLT_MAX, FLT_MAX, FLT_MAX};
+        float polyMax[3] = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
+
+        for (int i = 0; i < poly->vertCount; ++i)
+        {
+            const float* vertex = &tile->verts[poly->verts[i] * 3];
+            for (int axis = 0; axis < 3; ++axis)
+            {
+                if (vertex[axis] < polyMin[axis])
+                    polyMin[axis] = vertex[axis];
+                if (vertex[axis] > polyMax[axis])
+                    polyMax[axis] = vertex[axis];
+            }
+        }
+
+        for (const auto& obj : m_map->GetVolumeCache())
+        {
+            if (!obj.enabled)
+                continue;
+
+            if (PathInfo::IntersectVolumeBox(polyMin, polyMax, obj.worldBounds))
+                return false;
+        }
+
+        return true;
+    }
 };
 
 typedef PathInfo PathFinder;
