@@ -166,18 +166,18 @@ public:
         if (poly->flags & getExcludeFlags())
             return false;
 
-        float polyMin[3] = {FLT_MAX, FLT_MAX, FLT_MAX};
-        float polyMax[3] = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
+        float boxMin[3] = {FLT_MAX, FLT_MAX, FLT_MAX};
+        float boxMax[3] = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
 
         for (int i = 0; i < poly->vertCount; ++i)
         {
             const float* vertex = &tile->verts[poly->verts[i] * 3];
             for (int axis = 0; axis < 3; ++axis)
             {
-                if (vertex[axis] < polyMin[axis])
-                    polyMin[axis] = vertex[axis];
-                if (vertex[axis] > polyMax[axis])
-                    polyMax[axis] = vertex[axis];
+                if (vertex[axis] < boxMin[axis])
+                    boxMin[axis] = vertex[axis];
+                if (vertex[axis] > boxMax[axis])
+                    boxMax[axis] = vertex[axis];
             }
         }
 
@@ -186,7 +186,7 @@ public:
             if (!obj.enabled)
                 continue;
 
-            if (PathInfo::IntersectVolumeBox(polyMin, polyMax, obj.worldBounds))
+            if (PathInfo::IntersectVolumeBox(boxMin, boxMax, obj.worldBounds))
                 return false;
         }
 

@@ -368,11 +368,14 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             {
                 if (!creature->HasExtraFlag(CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING) && !creature->IsPet() && !i_target.getTarget()->IsMoving())
                 {
-                    if (owner.IsWithinLOSInMap(i_target.getTarget()))
+                    if (m_bRecalculateTravel && TargetDeepInBounds(owner, i_target.getTarget()))
                     {
-                        if (m_bRecalculateTravel && TargetDeepInBounds(owner, i_target.getTarget()))
+                        if (owner.IsWithinLOSInMap(i_target.getTarget()))
                             DoBackMovement(owner, i_target.getTarget());
-                        else if (m_bCanSpread)
+                    }
+                    else if (m_bCanSpread)
+                    {
+                        if (owner.IsWithinLOSInMap(i_target.getTarget()))
                             DoSpreadIfNeeded(owner, i_target.getTarget());
                     }
                 }
