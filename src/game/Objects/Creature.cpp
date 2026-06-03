@@ -3279,7 +3279,7 @@ void Creature::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* /*
         recTime = 10 * IN_MILLISECONDS;
         m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTime, 0, 0);
         if (Player const* player = ::ToPlayer(GetCharmer()))
-            player->SendSpellCooldown(spellEntry->Id, recTime, GetObjectGuid());
+            player->SendSpellCooldown(spellEntry->Id, Milliseconds(recTime), GetObjectGuid());
     }
 }
 

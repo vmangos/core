@@ -125,7 +125,7 @@ static std::string gettablename(std::string &str)
     if (endIndex == std::string::npos)
         return "";
 
-    return str.substr(startIndex, endIndex - startIndex);
+    return str.substr(startIndex - 1, endIndex - startIndex + 1);
 }
 
 static bool changenth(std::string &str, int n, char const* with, bool insert = false, bool nonzero = false)

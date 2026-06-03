@@ -1,5 +1,7 @@
 #include "Misc.h"
 
+#include "SpellEntry.h"
+
 void WorldPackets::Misc::WorldTeleport::ReadFromWorldPacket(WorldPacket& recv_data)
 {
     recv_data >> timeMs;
@@ -465,6 +467,16 @@ void WorldPackets::Misc::GameObjectSpawnAnim::AppendBodyTo(ByteBuffer& buffer) c
 void WorldPackets::Misc::GameObjectDespawnAnim::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << gameObjectGuid;
+}
+
+void WorldPackets::Misc::StartMirrorTimer::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << timerType;
+    buffer << remaining;
+    buffer << duration;
+    buffer << scale;
+    buffer << paused;
+    buffer << spellId;
 }
 
 void WorldPackets::Misc::StopMirrorTimer::AppendBodyTo(ByteBuffer& buffer) const

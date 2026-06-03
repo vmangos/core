@@ -715,6 +715,20 @@ namespace WorldPackets { namespace Misc
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class StartMirrorTimer final : public ServerPacket
+    {
+    public:
+        uint32 timerType = 0;   // mirror timer type (breath, fatigue, environmental)
+        uint32 remaining = 0;   // remaining time in ms
+        uint32 duration = 0;    // full timer duration in ms
+        int32 scale = 0;        // rate of change (-1 = decreasing, 10 = increasing)
+        bool paused = false;
+        uint32 spellId = 0;     // spell causing the timer (nullptr if no spell)
+
+        explicit StartMirrorTimer() : ServerPacket(SMSG_START_MIRROR_TIMER) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
     class StopMirrorTimer final : public ServerPacket
     {
     public:
@@ -738,6 +752,7 @@ namespace WorldPackets { namespace Misc
 
     struct TransferPendingTransportInfo
     {
+        TransferPendingTransportInfo(uint32 transport, uint32 map) : transportEntry(transport), oldMapId(map) {};
         uint32 transportEntry = 0;
         uint32 oldMapId = 0;
     };

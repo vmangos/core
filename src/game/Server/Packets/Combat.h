@@ -113,6 +113,26 @@ namespace WorldPackets { namespace Combat
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    // SMSG_FEIGN_DEATH_RESISTED: empty body; sent when feign death is resisted
+    class FeignDeathResisted final : public ServerPacket
+    {
+    public:
+        explicit FeignDeathResisted() : ServerPacket(SMSG_FEIGN_DEATH_RESISTED) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SpellDamageShield final : public ServerPacket
+    {
+    public:
+        ObjectGuid victimGuid;  // unit that has the shield aura
+        ObjectGuid attackerGuid; // unit that attacked the shield bearer
+        uint32 damage = 0;
+        uint32 school = 0;  // spell school of the shield damage
+
+        explicit SpellDamageShield() : ServerPacket(SMSG_SPELLDAMAGESHIELD) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Combat
 
 #endif // MANGOS_PACKETS_COMBAT_H

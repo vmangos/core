@@ -217,6 +217,13 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
         case SPELL_DAMAGE_CLASS_NONE:
             return SPELL_MISS_NONE;
         case SPELL_DAMAGE_CLASS_MAGIC:
+            // Wands deal spell school damage but are ranged weapon attacks, so
+            // their hit roll uses the ranged hit table, which is keyed on the
+            // Wands skill, rather than the spell hit table, which is keyed on
+            // level difference. This mirrors the wand crit handling in
+            // Unit::IsSpellCrit.
+            if (spell->HasAttribute(SPELL_ATTR_EX3_NORMAL_RANGED_ATTACK))
+                return MeleeSpellHitResult(pVictim, spell, spellPtr);
             return MagicSpellHitResult(pVictim, spell, spellPtr);
         case SPELL_DAMAGE_CLASS_MELEE:
         case SPELL_DAMAGE_CLASS_RANGED:
@@ -379,7 +386,9 @@ float SpellCaster::MeleeSpellMissChance(Unit const* pVictim, WeaponAttackType at
 // Melee based spells hit result calculations
 SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit const* pVictim, SpellEntry const* spell, Spell* spellPtr)
 {
-    WeaponAttackType attType = spell->DmgClass == SPELL_DAMAGE_CLASS_RANGED ? RANGED_ATTACK : BASE_ATTACK;
+    // Wands use the ranged attack type.
+    WeaponAttackType attType = (spell->DmgClass == SPELL_DAMAGE_CLASS_RANGED ||
+        spell->HasAttribute(SPELL_ATTR_EX3_NORMAL_RANGED_ATTACK)) ? RANGED_ATTACK : BASE_ATTACK;
 
     // Hammer of Wrath should not use weapon skill, but Bloodthirst should.
     // bonus from skills is 0.04% per skill Diff
@@ -653,37 +662,33 @@ float SpellCaster::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
 
 void SpellCaster::SendSpellMiss(Unit const* target, uint32 spellId, SpellMissInfo missInfo) const
 {
-    WorldPacket data(SMSG_SPELLLOGMISS, (4 + 8 + 1 + 4 + 8 + 1));
-    data << uint32(spellId);
-    data << GetObjectGuid();
-    data << uint8(0);                                       // unk8
-    data << uint32(1);                                      // target count
-    // for(i = 0; i < target count; ++i)
-    data << target->GetObjectGuid();                        // target GUID
-    data << uint8(missInfo);
-    // Nostalrius: + 2 * float if unk8=1
-    // end loop
-    SendObjectMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::SpellLogMiss>();
+    packet->spellId = spellId;
+    packet->casterGuid = GetObjectGuid();
+    WorldPackets::Spell::SpellLogMissEntry entry;
+    entry.targetGuid = target->GetObjectGuid();
+    entry.missInfo = missInfo;
+    packet->missEntries.push_back(entry);
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
 void SpellCaster::SendSpellDamageResist(Unit const* target, uint32 spellId) const
 {
-    WorldPacket data(SMSG_PROCRESIST, 8 + 8 + 4 + 1);
-    data << GetObjectGuid();
-    data << target->GetObjectGuid();
-    data << uint32(spellId);
-    data << uint8(0); // bool - log format: 0-default, 1-debug
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::ProcResist>();
+    packet->casterGuid = GetObjectGuid();
+    packet->targetGuid = target->GetObjectGuid();
+    packet->spellId = spellId;
+    packet->logFormat = 0; // 0=default, 1=debug
+    SendMessageToSet(std::move(packet), true);
 }
 
 void SpellCaster::SendSpellOrDamageImmune(Unit const* target, uint32 spellId) const
 {
-    WorldPacket data(SMSG_SPELLORDAMAGE_IMMUNE, (8 + 8 + 4 + 1));
-    data << GetObjectGuid();
-    data << target->GetObjectGuid();
-    data << uint32(spellId);
-    data << uint8(0);
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::SpellOrDamageImmune>();
+    packet->casterGuid = GetObjectGuid();
+    packet->targetGuid = target->GetObjectGuid();
+    packet->spellId = spellId;
+    SendMessageToSet(std::move(packet), true);
 }
 
 uint32 SpellCaster::SpellCriticalDamageBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim, Spell* spell)
@@ -775,64 +780,55 @@ int32 SpellCaster::DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* s
     return gain;
 }
 
-void SpellCaster::SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical) const
+void SpellCaster::SendHealSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, bool critical) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    // we guess size
-    WorldPacket data(SMSG_SPELLHEALLOG, (8 + 8 + 4 + 4 + 1));
-    data << pVictim->GetPackGUID();
-    data << GetPackGUID();
-    data << uint32(SpellID);
-    data << uint32(Damage);
-    data << uint8(critical ? 1 : 0);
-    // data << uint8(0);                                    // [-ZERO]
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::SpellHealLog>();
+    packet->targetGuid = pTarget->GetObjectGuid();
+    packet->healerGuid = GetObjectGuid();
+    packet->spellId = spellId;
+    packet->healAmount = amount;
+    packet->isCritical = critical;
+    SendMessageToSet(std::move(packet), true);
 #endif
 }
 
-void SpellCaster::EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
+void SpellCaster::EnergizeBySpell(Unit* pTarget, uint32 spellId, uint32 amount, Powers powertype)
 {
-    SendEnergizeSpellLog(pVictim, SpellID, Damage, powertype);
+    SendEnergizeSpellLog(pTarget, spellId, amount, powertype);
     // needs to be called after sending spell log
-    pVictim->ModifyPower(powertype, Damage);
+    pTarget->ModifyPower(powertype, amount);
 }
 
-void SpellCaster::SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const
+void SpellCaster::SendEnergizeSpellLog(Unit const* pTarget, uint32 spellId, uint32 amount, Powers powertype) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    WorldPacket data(SMSG_SPELLENERGIZELOG, (8 + 8 + 4 + 4 + 4 + 1));
-    data << pVictim->GetPackGUID();
-    data << GetPackGUID();
-    data << uint32(SpellID);
-    data << uint32(powertype);
-    data << uint32(Damage);
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Spell::SpellEnergizeLog>();
+    packet->targetGuid = pTarget->GetObjectGuid();
+    packet->casterGuid = GetObjectGuid();
+    packet->spellId = spellId;
+    packet->powerType = static_cast<uint32>(powertype);
+    packet->amount = amount;
+    SendMessageToSet(std::move(packet), true);
 #endif
 }
 
 void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log) const
 {
-    WorldPacket data(SMSG_SPELLNONMELEEDAMAGELOG, (16 + 4 + 4 + 1 + 4 + 4 + 1 + 1 + 4 + 4 + 1)); // we guess size
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << log->target->GetPackGUID();
-    data << log->attacker->GetPackGUID();
-#else
-    data << log->target->GetGUID();
-    data << log->attacker->GetGUID();
-#endif
-    data << uint32(log->SpellID);
-    data << uint32(log->damage);                            // damage amount
-    data << uint8(log->school);                             // damage school
-    data << uint32(log->absorb);                            // AbsorbedDamage
+    auto packet = std::make_unique<WorldPackets::Spell::SpellNonMeleeDamageLog>();
+    packet->targetGuid = log->target->GetObjectGuid();
+    packet->attackerGuid = log->attacker->GetObjectGuid();
+    packet->spellId = log->spellId;
+    packet->damage = log->damage;
+    packet->school = log->school;
+    packet->absorbedDamage = log->absorb;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
-    data << int32(log->resist);                             // resist
+    packet->resist = log->resist;
 #endif
-    data << uint8(log->periodicLog);                        // if 1, then client show spell name (example: %s's ranged shot hit %s for %u school or %s suffers %u school damage from %s's spell_name
-    data << uint8(false);                                   // unused
-    data << uint32(log->blocked);                           // blocked
-    data << uint32(log->HitInfo);
-    data << uint8(0);                                       // flag to use extend data
-    SendMessageToSet(&data, true);
+    packet->periodicLog = log->periodicLog;
+    packet->blocked = log->blocked;
+    packet->hitInfo = log->HitInfo;
+    SendMessageToSet(std::move(packet), true);
 }
 
 void SpellCaster::SendSpellNonMeleeDamageLog(Unit const* target, uint32 spellId, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit, bool split) const
@@ -1605,10 +1601,10 @@ void SpellCaster::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabili
     if (!pVictim->IsAlive() || pVictim->IsTaxiFlying() || (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode()))
         return;
 
-    SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(damageInfo->SpellID);
+    SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(damageInfo->spellId);
     if (spellProto == nullptr)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SpellCaster::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->SpellID);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SpellCaster::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->spellId);
         return;
     }
 

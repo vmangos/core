@@ -105,6 +105,101 @@ jobs:
           name: linux-development-build
           path: "${{ github.workspace }}/bin/${{ env.ARCHIVE_FILENAME }}"
 
+  build-macos:
+    name: Build macOS development release
+    runs-on: macos-26
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install macOS build dependencies
+        # `openssl@3` is preinstalled on `macos-26` today, but pin it
+        # explicitly so the build doesn't silently break if a future runner
+        # image stops shipping it.
+        #
+        # `mysql-client@8.4` is pinned (MySQL LTS through 2032) because the
+        # current `mysql-client` formula tracks MySQL 9, which removed the
+        # `mysql_native_password` authentication plugin that MariaDB still
+        # uses by default. MySQL 8.4 keeps the plugin built into the client
+        # library, so MariaDB users can connect out of the box. Matches the
+        # MySQL 8.0 ABI used by the Linux build's `libmysqlclient`.
+        run: brew install openssl@3 mysql-client@8.4
+
+      - name: Build release binaries
+        run: |
+          set -euo pipefail
+          mkdir -p build _install
+          cd build
+          cmake ../ \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=26.0 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/_install" \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix openssl@3);$(brew --prefix mysql-client@8.4)" \
+            -DBUILD_EXTRACTORS=1 \
+            -DBUILD_FOR_HOST_CPU=0 \
+            -DCONF_DIR:STRING=./etc \
+            -DDEBUG_SYMBOLS=0
+          make -j"$(sysctl -n hw.ncpu)"
+          make install
+
+      - name: Set release archive filename
+        run: |
+          echo "ARCHIVE_FILENAME=dev-macos-arm64-$(git rev-parse --short HEAD).tar.gz" >>"$GITHUB_ENV"
+
+      - name: Create release archive
+        run: |
+          set -euo pipefail
+          ./.github/scripts/package-macos-release.sh _install "$ARCHIVE_FILENAME"
+
+      - name: Smoke test release
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/vmangos-release
+          tar -xzf "$GITHUB_WORKSPACE/bin/$ARCHIVE_FILENAME" -C /tmp/vmangos-release
+
+          /tmp/vmangos-release/vmangos-macos-arm64/bin/realmd --version
+          /tmp/vmangos-release/vmangos-macos-arm64/bin/mangosd --version
+
+          missing=0
+          while IFS= read -r -d '' file; do
+            magic="$(head -c 4 "$file" 2>/dev/null || true)"
+            case "$magic" in
+            $'\xcf\xfa\xed\xfe' | $'\xfe\xed\xfa\xcf' | $'\xca\xfe\xba\xbe' | $'\xbe\xba\xfe\xca')
+              ;;
+            *)
+              continue
+              ;;
+            esac
+
+            while IFS= read -r dep; do
+              dep="${dep#"${dep%%[![:space:]]*}"}"
+              dep="${dep% (compatibility *}"
+              case "$dep" in
+              "" | /usr/lib/* | /System/* | @rpath/* | @loader_path/* | @executable_path/*)
+                ;;
+              *)
+                if [ "$(basename "$dep")" != "$(basename "$file")" ]; then
+                  echo "Unexpected dependency in $file: $dep" >&2
+                  missing=1
+                fi
+                ;;
+              esac
+            done < <(otool -L "$file" 2>/dev/null | tail -n +2)
+          done < <(find /tmp/vmangos-release/vmangos-macos-arm64 -type f -print0)
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-development-build
+          path: "${{ github.workspace }}/bin/${{ env.ARCHIVE_FILENAME }}"
+
   build-windows:
     name: Build Windows development release
     runs-on: windows-2022
@@ -146,7 +241,7 @@ jobs:
 
   publish:
     name: Publish development release
-    needs: [build-linux, build-windows]
+    needs: [build-linux, build-macos, build-windows]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -163,6 +258,12 @@ jobs:
           name: linux-development-build
           path: release-assets
 
+      - name: Download macOS release artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: macos-development-build
+          path: release-assets
+
       - name: Download Windows release artifact
         uses: actions/download-artifact@v8
         with:
@@ -177,6 +278,15 @@ jobs:
           The Linux build is for `amd64` systems using `glibc` 2.39 or newer.
           It is built on Ubuntu 24.04 and bundles non-`glibc` runtime libraries.
           It is not expected to run on Alpine/`musl` or older `glibc` systems.
+
+          ## macOS compatibility
+
+          The macOS build is for Apple silicon (`arm64`) systems running macOS 26 or
+          newer.
+          If macOS refuses to launch the binaries with a Gatekeeper warning (typically
+          only when the archive was downloaded via a browser and the binaries are
+          launched from Finder), clear the quarantine flag with
+          `xattr -d -r com.apple.quarantine vmangos-macos-arm64/`.
 
           RELEASE_NOTES
 

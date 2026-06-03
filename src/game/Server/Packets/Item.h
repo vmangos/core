@@ -343,6 +343,29 @@ namespace WorldPackets { namespace Item
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class ItemCooldown final : public ServerPacket
+    {
+    public:
+        ObjectGuid itemGuid;
+        uint32 spellId = 0;
+
+        explicit ItemCooldown() : ServerPacket(SMSG_ITEM_COOLDOWN) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class EnchantmentLog final : public ServerPacket
+    {
+    public:
+        ObjectGuid casterGuid; // enchanter; empty means enchant has faded
+        ObjectGuid ownerGuid;  // item owner
+        uint32 itemEntry = 0;
+        uint32 spellId = 0;
+        bool showAffiliation = false; // only used if casterGuid is not empty
+
+        explicit EnchantmentLog() : ServerPacket(SMSG_ENCHANTMENTLOG) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Item
 
 #endif // MANGOS_PACKETS_ITEM_H

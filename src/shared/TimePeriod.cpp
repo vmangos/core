@@ -19,9 +19,6 @@
 
 #ifdef _WIN32
     #include <Windows.h>
-#if COMPILER == COMPILER_MICROSOFT
-    #pragma comment(lib, "Winmm.lib")
-#endif
 #endif
 
 // That's right, this only does something on Windows

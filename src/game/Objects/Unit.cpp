@@ -1751,12 +1751,12 @@ void Unit::TriggerDamageShields(Unit* pVictim)
             uint32 damage = rand_ditheru(fdamage);
             pVictim->DealDamageMods(this, damage, nullptr);
 
-            WorldPacket data(SMSG_SPELLDAMAGESHIELD, (8 + 8 + 4 + 4));
-            data << pVictim->GetObjectGuid();
-            data << GetObjectGuid();
-            data << uint32(damage);
-            data << uint32(pSpellProto->School);
-            pVictim->SendObjectMessageToSet(&data, true);
+            auto spellDamageShieldPacket = std::make_unique<WorldPackets::Combat::SpellDamageShield>();
+            spellDamageShieldPacket->victimGuid = pVictim->GetObjectGuid();
+            spellDamageShieldPacket->attackerGuid = GetObjectGuid();
+            spellDamageShieldPacket->damage = damage;
+            spellDamageShieldPacket->school = pSpellProto->School;
+            pVictim->SendObjectMessageToSet(std::move(spellDamageShieldPacket), true);
 
             pVictim->DealDamage(this, damage, nullptr, SPELL_DIRECT_DAMAGE, pSpellProto->GetSpellSchoolMask(), pSpellProto, true);
 
@@ -2057,7 +2057,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
                 reflectTo->CalculateDamageAbsorbAndResist(pCaster, schoolMask, DOT, splitted, &reflectAbsorb, &reflectResist, spellProto);
             splitted -= (reflectAbsorb + reflectResist);
             pCaster->DealDamageMods(reflectTo, splitted, &splitted_absorb);
-            pCaster->SendSpellNonMeleeDamageLog(reflectTo, (*i)->GetSpellProto()->Id, splitted, schoolMask, splitted_absorb, 0, (damagetype == DOT), 0, false, true);
+            pCaster->SendSpellNonMeleeDamageLog(reflectTo, (*i)->GetId(), splitted, schoolMask, splitted_absorb, 0, (damagetype == DOT), 0, false, true);
             CleanDamage cleanDamage = CleanDamage(splitted, BASE_ATTACK, MELEE_HIT_NORMAL, reflectAbsorb, reflectResist);
             pCaster->DealDamage(reflectTo, splitted, &cleanDamage, DOT, schoolMask, (*i)->GetSpellProto(), false);
         }
@@ -2095,7 +2095,7 @@ void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask 
             }
 #endif
 
-            pCaster->SendSpellNonMeleeDamageLog(caster, (*i)->GetSpellProto()->Id, splitted, schoolMask, split_absorb, 0, (damagetype == DOT), 0, false, true);
+            pCaster->SendSpellNonMeleeDamageLog(caster, (*i)->GetId(), splitted, schoolMask, split_absorb, 0, (damagetype == DOT), 0, false, true);
 
             CleanDamage cleanDamage = CleanDamage(splitted, BASE_ATTACK, MELEE_HIT_NORMAL, 0, 0);
             pCaster->DealDamage(caster, splitted, &cleanDamage, DOT, schoolMask, (*i)->GetSpellProto(), false);
@@ -2485,15 +2485,12 @@ void Unit::SendMeleeAttackStart(Unit const* pVictim) const
 
 void Unit::SendMeleeAttackStop(Unit const* pVictim) const
 {
-    if (!pVictim)
-        return;
-
     auto packet = std::make_unique<WorldPackets::Combat::AttackStop>();
     packet->attackerGuid = GetObjectGuid();
-    packet->victimGuid = pVictim->GetObjectGuid();
-    packet->isDead = pVictim->IsDead();
+    if (pVictim)
+        packet->victimGuid = pVictim->GetObjectGuid();
+    packet->isDead = GetHealth() == 0;
     SendObjectMessageToSet(std::move(packet), true);
-    DETAIL_FILTER_LOG(LOG_FILTER_COMBAT, "%s %u stopped attacking %s %u", (IsPlayer() ? "player" : "creature"), GetGUIDLow(), (pVictim->IsPlayer() ? "player" : "creature"), pVictim->GetGUIDLow());
 }
 
 bool Unit::IsSpellPartiallyBlocked(SpellCaster const* pCaster, SpellEntry const* spellEntry, WeaponAttackType attackType) const
@@ -9254,18 +9251,18 @@ Player* Unit::GetSpellModOwner() const
 }
 
 // ----------Pet responses methods-----------------
-void Unit::SendPetCastFail(uint32 spellid, SpellCastResult msg)
+void Unit::SendPetCastFail(uint32 spellId, SpellCastResult msg)
 {
     if (msg == SPELL_CAST_OK)
         return;
 
     if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
     {
-        WorldPacket data(SMSG_PET_CAST_FAILED, 4 + 1 + 1);
-        data << uint32(spellid);
-        data << static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
-        data << uint8(msg);
-        pOwner->GetSession()->SendPacket(&data);
+        auto packet = std::make_unique<WorldPackets::Pet::PetCastFailed>();
+        packet->spellId = spellId;
+        packet->status = static_cast<uint8>(SPELL_RESULT_STATUS_FAIL);
+        packet->reason = static_cast<uint8>(msg);
+        pOwner->GetSession()->SendPacket(std::move(packet));
     }
 }
 

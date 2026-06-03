@@ -2,7 +2,7 @@
 #include "Log.h"
 #include "Database/DatabaseEnv.h"
 #include "Pet.h"
-
+#include "SpellMgr.h"
 
 CharacterDatabaseCache::~CharacterDatabaseCache()
 {
@@ -80,7 +80,7 @@ void CharacterDatabaseCache::LoadCharacterPet(uint32 singlePetId)
         InsertCharacterPet(pCache);
     }
     while (result->NextRow());
-    
+
     if (!singlePetId)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "-> %u rows loaded.", count);
 }
@@ -130,7 +130,7 @@ void CharacterDatabaseCache::LoadPetSpell(uint32 singlePetId)
         ++count;
     }
     while (result->NextRow());
-    
+
     if (!singlePetId)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "-> %u rows loaded.", count);
 }
@@ -174,10 +174,18 @@ void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
             lastPetCache = GetCharacterPetById(lowGuid);
         if (!lastPetCache)
             continue;
-        PetSpellCoodown _spellStruct;
-        _spellStruct.spell = spellId;
-        _spellStruct.time  = time;
-        lastPetCache->spellCooldowns.push_back(_spellStruct);
+
+        SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
+        if (!spellEntry)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has unknown spell %u in `pet_spell_cooldown`, skipping.", ObjectGuid(HIGHGUID_PET, lowGuid).GetString().c_str(), spellId);
+            continue;
+        }
+
+        PetSpellCooldown cooldownEntry;
+        cooldownEntry.spell = spellId;
+        cooldownEntry.whenReadyAgainTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::from_time_t(time));
+        lastPetCache->spellCooldowns.push_back(cooldownEntry);
         ++count;
     }
     while (result->NextRow());
@@ -252,7 +260,7 @@ void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
         ++count;
     }
     while (result->NextRow());
-    
+
     if (!singlePetId)
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "-> %u rows loaded.", count);
 }
@@ -348,7 +356,7 @@ void CharacterDatabaseCache::DeleteCharacterPetById(uint32 id)
                 break;
             }
     }
-    
+
     delete petStruct->second;
     m_petsByGuid.erase(petStruct);
 }

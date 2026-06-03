@@ -1151,7 +1151,7 @@ extern "C" {
 # endif
 #endif
 
-#ifdef WIN32
+#ifdef _MSC_VER
 # ifdef UNDER_CE
 #  define soap_errno GetLastError()
 #  define soap_socket_errno GetLastError()

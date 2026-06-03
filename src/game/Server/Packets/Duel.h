@@ -68,7 +68,6 @@ namespace WorldPackets { namespace Duel
         explicit DuelCountdown() : ServerPacket(SMSG_DUEL_COUNTDOWN) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
-
 }} // namespace WorldPackets::Duel
 
 #endif // MANGOS_PACKETS_DUEL_H

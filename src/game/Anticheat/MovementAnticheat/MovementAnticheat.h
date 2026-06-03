@@ -1,5 +1,5 @@
-#ifndef _HEADER_CHEATS
-#define _HEADER_CHEATS
+#ifndef MANGOS_MOVEMENT_ANTICHEAT_H
+#define MANGOS_MOVEMENT_ANTICHEAT_H
 
 #include "Common.h"
 #include "UnitDefines.h"
@@ -7,7 +7,6 @@
 #include "SniffFile.h"
 
 #include <array>
-#include <sstream>
 #include <deque>
 #include <mutex>
 
@@ -87,6 +86,8 @@ class MovementAnticheat
         uint32 HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         uint32 HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         bool HandleSplineDone(Player* pPlayer, MovementInfo const& movementInfo, uint32 splineId);
+
+        // Will save a copy of the ServerPacket
         void LogMovementPacket(ServerPacket const& packet);
         void LogMovementPacket(bool isClientPacket, WorldPacket const& packet);
         static bool IsLoggedOpcode(uint16 opcode);
@@ -161,4 +162,4 @@ class MovementAnticheat
         std::mutex m_packetLogMutex;
 };
 
-#endif
+#endif // MANGOS_MOVEMENT_ANTICHEAT_H

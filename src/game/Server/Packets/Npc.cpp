@@ -133,4 +133,3 @@ void WorldPackets::Npc::BinderConfirm::AppendBodyTo(ByteBuffer& buffer) const
     buffer << binderGuid;
 }
 #endif
-

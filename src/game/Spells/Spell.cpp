@@ -3203,6 +3203,18 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 }
             }
+            // Falling blink case
+            else if (m_casterUnit && m_casterUnit->HasUnitMovementFlag(MOVEFLAG_FALLINGFAR))
+            {
+                // optimization: instead of calling Map::GetHeight use static height we already have from checking water level
+                // calling it with DEFAULT_WATER_SEARCH cause thats what GetHeightStatic gets called with above in GetWaterLevel
+                float groundWithVmap = std::max(ground, m_casterUnit->GetMap()->GetDynamicTreeHeight(src.x, src.y, src.z, DEFAULT_WATER_SEARCH));
+                if (groundWithVmap > INVALID_HEIGHT && std::abs(groundWithVmap - src.z) <= 40.0f)
+                {
+                    src.z = groundWithVmap;
+                    dest.z = groundWithVmap;
+                }
+            }
 
             GameObject const* const pDoor = m_caster->FindNearbyClosedDoor(dist);
             bool const directionThroughDoor = pDoor ? pDoor->HasInArc(M_PI_F, src.x, src.y) != pDoor->HasInArc(M_PI_F, dest.x, dest.y) : false;
@@ -4289,9 +4301,8 @@ void Spell::finish(bool ok)
             // Fix a client problem with ritual of doom, by itself it disables
             // the spell during cast and then the spell stays disabled
             // Ignore the spell when it's triggered (ritual helper)
-            if (m_spellInfo->Id == 18540 && !m_IsTriggeredSpell
-                && pPlayer->IsSpellReady(m_spellInfo))
-                pPlayer->ToPlayer()->SendClearCooldown(18540, pPlayer);
+            if (m_spellInfo->Id == 18540 && !m_IsTriggeredSpell && pPlayer->IsSpellReady(m_spellInfo))
+                pPlayer->ToPlayer()->SendClearCooldown(m_spellInfo->Id, pPlayer);
         }
 
         if (ok && pPlayer->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
@@ -4398,7 +4409,7 @@ void Spell::SendCastResult(SpellCastResult result)
 void Spell::SendCastResult(Player const* caster, SpellEntry const* spellInfo, SpellCastResult result)
 {
     auto packet = std::make_unique<WorldPackets::Spell::CastResult>();
-    packet->spellEntry = spellInfo;
+    packet->spellId = spellInfo->Id;
     packet->failureReason = result;
 
     if (result != SPELL_CAST_OK && !spellInfo->HasAttribute(SPELL_ATTR_EX2_DO_NOT_REPORT_SPELL_FAILURE))
@@ -4793,18 +4804,17 @@ void Spell::SendAllTargetsMiss()
             return;
     }
 
-    WorldPacket data(SMSG_SPELLLOGMISS, (4 + 8 + 1 + 4 + m_UniqueTargetInfo.size() * (8 + 1)));
-    data << uint32(m_spellInfo->Id);
-    data << m_caster->GetObjectGuid();
-    data << uint8(0);                                       // nothing shown in combat log if != 0 (calls nullsub instead)
-    data << uint32(m_UniqueTargetInfo.size());
+    auto packet = std::make_unique<WorldPackets::Spell::SpellLogMiss>();
+    packet->spellId = m_spellInfo->Id;
+    packet->casterGuid = m_caster->GetObjectGuid();
     for (auto const& target : m_UniqueTargetInfo)
     {
-        data << target.targetGUID;
-        data << uint8(target.missCondition);
-        // 2 more floats if the uint8 before targets is != 0
+        WorldPackets::Spell::SpellLogMissEntry entry;
+        entry.targetGuid = target.targetGUID;
+        entry.missInfo = target.missCondition;
+        packet->missEntries.push_back(entry);
     }
-    m_caster->SendObjectMessageToSet(&data, true);
+    m_caster->SendObjectMessageToSet(std::move(packet), true);
 }
 
 void Spell::SendChannelUpdate(uint32 time, bool interrupted)
@@ -6605,9 +6615,11 @@ SpellCastResult Spell::CheckCasterAuras() const
         prevented_reason = SPELL_FAILED_CONFUSED;
     else if ((unitflag & UNIT_FLAG_FLEEING) && !(mechanic_immune & (1 << (MECHANIC_FEAR - 1u))))
         prevented_reason = SPELL_FAILED_FLEEING;
-    else if (m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE &&
-            ((unitflag & UNIT_FLAG_SILENCED) ||
-                m_casterUnit->CheckLockout(m_spellInfo->GetSpellSchoolMask()))) // Nostalrius : fix counterspell for mobs.
+    // Silence check seems to only be performed if not stunned.
+    // Mages can blink out of stun even when silenced.
+    // https://www.youtube.com/watch?v=NiWibn2GdbA
+    else if (m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && !(unitflag & UNIT_FLAG_STUNNED) &&
+            ((unitflag & UNIT_FLAG_SILENCED) || m_casterUnit->CheckLockout(m_spellInfo->GetSpellSchoolMask()))) // Nostalrius : fix counterspell for mobs.
         prevented_reason = SPELL_FAILED_SILENCED;
     else if ((unitflag & UNIT_FLAG_PACIFIED) && m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY)
         prevented_reason = SPELL_FAILED_PACIFIED;
@@ -6641,7 +6653,6 @@ SpellCastResult Spell::CheckCasterAuras() const
                     // That is needed when your casting is prevented by multiple states and you are only immune to some of them.
                     switch (aura->GetModifier()->m_auraname)
                     {
-
                         case SPELL_AURA_MOD_STUN:
                             if (!(mechanic_immune & (1 << (MECHANIC_STUN - 1u))))
                                 return SPELL_FAILED_STUNNED;

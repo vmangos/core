@@ -62,11 +62,11 @@ public:
     typedef shared_ptr<class AlignedMemoryManager> Ref;
 
     
-    void* alloc(size_t s) override;
+    virtual void* alloc(size_t s);
 
-    void free(void* ptr) override;
+    virtual void free(void* ptr);
 
-    bool isThreadsafe() const override;
+    virtual bool isThreadsafe() const;
 
     static AlignedMemoryManager::Ref create();
 };
@@ -80,9 +80,9 @@ protected:
 
 public:
     typedef shared_ptr<class MemoryManager> Ref;
-    void* alloc(size_t s) override;
-    void free(void* ptr) override;
-    bool isThreadsafe() const override;
+    virtual void* alloc(size_t s);
+    virtual void free(void* ptr);
+    virtual bool isThreadsafe() const;
 
     /** There's only one instance of this memory manager; it is 
         cached after the first creation. */

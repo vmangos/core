@@ -17,7 +17,7 @@
 
 /**
  \def G3D_VER
- The version number of G3D in the form: MmmBB ->
+ The version number of G3D in the form: MmmBB -> 
  version M.mm [beta BB]
  */
 #define G3D_VER 90000
@@ -41,7 +41,7 @@
 #   define G3D_DEBUG
 #endif
 
-/**
+/** 
 \def G3D_WINSOCK_MAJOR_VERSION
 These control the version of Winsock used by G3D.
     Version 2.0 is standard for G3D 6.09 and later.
@@ -51,8 +51,8 @@ These control the version of Winsock used by G3D.
 #define G3D_WINSOCK_MINOR_VERSION 0
 
 #ifndef _MSC_VER
-#ifndef __fastcall
 /// Fast call is a register-based optimized calling convention supported only by Visual C++
+#ifndef __fastcall
 #define __fastcall
 #endif
 #endif
@@ -62,12 +62,14 @@ These control the version of Winsock used by G3D.
 /** \def G3D_LINUX*/
 /** \def G3D_OSX */
 
-#ifdef _MSC_VER
+#ifdef _MSC_VER 
 #   define G3D_WINDOWS
 #elif defined(__MINGW32__)
     #define G3D_WINDOWS
-    #undef __MSVCRT_VERSION__
-    #define __MSVCRT_VERSION__ 0x0601
+    #if !defined(__MSVCRT_VERSION__) || __MSVCRT_VERSION__ < 0x0601
+        #undef __MSVCRT_VERSION__
+        #define __MSVCRT_VERSION__ 0x0601
+    #endif
     #include <windows.h>
 #elif  defined(__FreeBSD__) || defined(__OpenBSD__)
     #define G3D_FREEBSD
@@ -81,7 +83,7 @@ These control the version of Winsock used by G3D.
    // pi as a constant, which creates a conflict with G3D
 #define __FP__
 #else
-    #error Unknown platform
+    #error Unknown platform 
 #endif
 
 /** \def G3D_64BIT */
@@ -115,7 +117,7 @@ These control the version of Winsock used by G3D.
 #    ifndef __GNUC__
 #        error G3D only supports the gcc compiler on OS X.
 #    endif
-
+    
 #    if defined(__i386__)
 #        define G3D_OSX_INTEL
 #    elif defined(__PPC__)
@@ -144,7 +146,7 @@ These control the version of Winsock used by G3D.
 #  pragma warning (disable : 4127)
 
 /** \def G3D_DEPRECATED()
-    Creates deprecated warning at compile time when used.
+    Creates deprecated warning at compile time when used. 
 
     Example:
     \code
@@ -168,7 +170,7 @@ These control the version of Winsock used by G3D.
 
 /** @def G3D_CHECK_PRINTF_METHOD_ARGS()
     Enables printf parameter validation on gcc. */
-#   define G3D_CHECK_PRINTF_ARGS
+#   define G3D_CHECK_PRINTF_ARGS 
 
 /** @def G3D_CHECK_PRINTF_METHOD_ARGS()
     Enables printf parameter validation on gcc. */
@@ -176,7 +178,7 @@ These control the version of Winsock used by G3D.
 
 /** @def G3D_CHECK_PRINTF_METHOD_ARGS()
     Enables printf parameter validation on gcc. */
-#   define G3D_CHECK_PRINTF_METHOD_ARGS
+#   define G3D_CHECK_PRINTF_METHOD_ARGS 
 
 /** @def G3D_CHECK_PRINTF_METHOD_ARGS()
     Enables printf parameter validation on gcc. */
@@ -185,13 +187,14 @@ These control the version of Winsock used by G3D.
     // On MSVC, we need to link against the multithreaded DLL version of
     // the C++ runtime because that is what SDL and ZLIB are compiled
     // against.  This is not the default for MSVC, so we set the following
-    // defines to force correct linking.
+    // defines to force correct linking.  
     //
     // For documentation on compiler options, see:
     //  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vccore/html/_core_.2f.md.2c_2f.ml.2c_2f.mt.2c_2f.ld.asp
     //  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vccore98/HTML/_core_Compiler_Reference.asp
     //
 
+#if 0
     // DLL runtime
     #ifndef _DLL
         #define _DLL
@@ -228,6 +231,8 @@ These control the version of Winsock used by G3D.
 #   include <windows.h>
 #   undef WIN32_LEAN_AND_MEAN
 #   undef NOMINMAX
+
+#endif // 0
 
 #   ifdef _G3D_INTERNAL_HIDE_WINSOCK_
 #      undef _G3D_INTERNAL_HIDE_WINSOCK_
@@ -275,7 +280,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw) {\
 #           define __stdcall __attribute__((stdcall))
 #       endif
 
-#   else
+#   elif defined(__x86_64__) || defined(__arm) || defined(__aarch64__)
 
 #       ifndef __cdecl
 #           define __cdecl
@@ -304,18 +309,18 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw) {\
 #endif
 
 
-/**
+/** 
   \def STR(expression)
 
   Creates a string from the expression.  Frequently used with G3D::Shader
-  to express shading programs inline.
+  to express shading programs inline.  
 
   <CODE>STR(this becomes a string)\verbatim<PRE>\endverbatim evaluates the same as \verbatim<CODE>\endverbatim"this becomes a string"</CODE>
  */
 #define STR(x) #x
 
 /** @def PRAGMA(expression)
-    \#pragma may not appear inside a macro, so this uses the pragma operator
+    \#pragma may not appear inside a macro, so this uses the pragma operator 
     to create an equivalent statement.*/
 #ifdef _MSC_VER
 // Microsoft's version http://msdn.microsoft.com/en-us/library/d9x1s805.aspx
@@ -327,7 +332,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw) {\
 
 /** \def G3D_BEGIN_PACKED_CLASS(byteAlign)
     Switch to tight alignment.
-
+    
     \code
     G3D_BEGIN_PACKED_CLASS(1)
     ThreeBytes {
@@ -349,49 +354,34 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw) {\
 
 /** \def G3D_END_PACKED_CLASS(byteAlign)
     End switch to tight alignment
-
+ 
     See G3D::Color3uint8 for an example.*/
 #ifdef __GNUC__
 #    define G3D_END_PACKED_CLASS(byteAlign)  __attribute((aligned(byteAlign))) ;
 #elif defined(_MSC_VER)
 #    define G3D_END_PACKED_CLASS(byteAlign)  ; PRAGMA( pack(pop) )
-#else
+#else 
 #    define G3D_END_PACKED_CLASS(byteAlign)  ;
 #endif
 
 
 // Bring in shared_ptr and weak_ptr
-#if (defined(__GNUC__) && defined(__APPLE__)) || defined(__linux__)
-#include <ciso646> // Defines _LIBCC_VERSION if linking against libc++ or does nothing
-#endif
-#if (!defined(_LIBCPP_VERSION) && defined(__APPLE__)) || (!defined(_LIBCPP_VERSION) && defined(__linux__))
-#   include <tr1/memory>
-#else
-#   include <memory>
-#endif
+#include <memory>
 
 namespace G3D {
-#if (!defined(_LIBCPP_VERSION) && defined(__APPLE__)) || (!defined(_LIBCPP_VERSION) && defined(__linux__))
-    using std::tr1::shared_ptr;
-    using std::tr1::weak_ptr;
-    using std::tr1::dynamic_pointer_cast;
-    using std::tr1::static_pointer_cast;
-    using std::tr1::enable_shared_from_this;
-#else
     using std::shared_ptr;
     using std::weak_ptr;
     using std::dynamic_pointer_cast;
     using std::static_pointer_cast;
     using std::enable_shared_from_this;
-#endif
 
     /** Options for initG3D and initGLG3D. */
     class G3DSpecification {
     public:
-        /**
+        /** 
           \brief Should G3D spawn its own network thread?
 
-          If true, G3D will spawn a thread for network management on the first invocation of G3D::NetServer::create or
+          If true, G3D will spawn a thread for network management on the first invocation of G3D::NetServer::create or 
           G3D::NetConnection::connectToServer.
 
           If false and networking is used, the application must explicitly invoke G3D::serviceNetwork() regularly to allow the network

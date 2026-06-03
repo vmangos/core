@@ -25,7 +25,7 @@
 
 #include "Platform/Define.h"
 #include "Crypto/Hash/MD5.h"
-
+#include "Progression.h"
 #include <zlib.h>
 
 #include <string>

@@ -281,14 +281,12 @@ if(UNIX)
 endif(UNIX)
 
 if(WIN32)
-  target_link_libraries(shared PUBLIC ws2_32 mswsock)
+  target_link_libraries(shared PUBLIC ws2_32 mswsock winmm)
 
   if(MINGW)
     # MinGW needs libseh for the debugger thread-name SEH handler in
     # CreateThread.cpp.
-    # MinGW also needs an explicit winmm link because it does not honor
-    # TimePeriod.cpp's Winmm.lib pragma.
-    target_link_libraries(shared PRIVATE libseh winmm)
+    target_link_libraries(shared PRIVATE libseh)
   endif()
 endif()
 
