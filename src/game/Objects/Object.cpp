@@ -2255,14 +2255,21 @@ void WorldObject::SendObjectMessageToSetImpl(WorldPacket* data, bool self, World
 
 void WorldObject::SendObjectMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except) const
 {
-    WorldPacket data(packet->GetOpcode());
-    packet->AppendBodyTo(data);
-    SendObjectMessageToSet(&data, self, except);
+    WorldPacket binaryPacket(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+    SendObjectMessageToSet(&binaryPacket, self, except);
 }
 
 void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except) const
 {
     SendObjectMessageToSetImpl<ObjectViewersDeliverer>(data, self, except);
+}
+
+void WorldObject::SendMovementMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except)
+{
+    WorldPacket binaryPacket(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+    SendMovementMessageToSet(std::move(binaryPacket), self, except);
 }
 
 void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except)

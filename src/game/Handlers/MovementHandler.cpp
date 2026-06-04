@@ -966,10 +966,9 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPackets::Movement::MoveNo
 
 void WorldSession::HandleMountSpecialAnimOpcode(NullClientPacket const& /*packet*/)
 {
-    WorldPacket data(SMSG_MOUNTSPECIAL_ANIM, 8);
-    data << GetPlayer()->GetObjectGuid();
-
-    GetPlayer()->SendMovementMessageToSet(std::move(data), false);
+    auto packet = std::make_unique<WorldPackets::Movement::MountSpecialAnim>();
+    packet->mountedUnitGuid = GetPlayer()->GetObjectGuid();
+    GetPlayer()->SendMovementMessageToSet(std::move(packet), false);
 }
 
 void WorldSession::HandleSummonResponseOpcode(WorldPackets::Misc::SummonResponse const& packet)
@@ -1158,4 +1157,3 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
         pMover->GetMap()->CreatureRelocation((Creature*)pMover, pMover->m_movementInfo.GetPos().x, pMover->m_movementInfo.GetPos().y, pMover->m_movementInfo.GetPos().z, pMover->m_movementInfo.GetPos().o);
     }
 }
-

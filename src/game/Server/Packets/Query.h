@@ -3,6 +3,10 @@
 
 #include "Packet.h"
 #include "ObjectGuid.h"
+#include "nonstd/expected.hpp"
+
+struct CreatureInfo;
+struct GameObjectInfo;
 
 namespace WorldPackets { namespace Query
 {
@@ -95,6 +99,53 @@ namespace WorldPackets { namespace Query
         uint32 nextPageId = 0;
 
         explicit PageTextQueryResponse() : ServerPacket(SMSG_PAGE_TEXT_QUERY_RESPONSE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class CreatureQueryResponse final : public ServerPacket
+    {
+    public:
+        int sessionDbLocaleIndex = -1;
+        nonstd::expected<CreatureInfo const*, uint32> maybeCreatureInfo = nonstd::make_unexpected(uint32(0)); // creature info OR if not found, the queried entry id
+
+        CreatureQueryResponse() : ServerPacket(SMSG_CREATURE_QUERY_RESPONSE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class GameObjectQueryResponse final : public ServerPacket
+    {
+    public:
+        static constexpr uint32 RawDataSize_1_12_1 = 24 * sizeof(int32);
+        static constexpr uint32 RawDataSize_Legacy = 16 * sizeof(int32);
+
+        int sessionDbLocaleIndex = -1;
+        nonstd::expected<GameObjectInfo const*, uint32> maybeGameObjectInfo = nonstd::make_unexpected(uint32(0)); // gameobject info OR if not found, the queried entry id
+
+        GameObjectQueryResponse() : ServerPacket(SMSG_GAMEOBJECT_QUERY_RESPONSE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    struct NpcTextOption
+    {
+        float probability = 0.0f;
+        std::string maleText;
+        std::string femaleText;
+        uint32 language = 0;
+        uint32 emoteDelay1 = 0;
+        uint32 emote1 = 0;
+        uint32 emoteDelay2 = 0;
+        uint32 emote2 = 0;
+        uint32 emoteDelay3 = 0;
+        uint32 emote3 = 0;
+    };
+
+    class NpcTextUpdate final : public ServerPacket
+    {
+    public:
+        uint32 textId = 0;
+        NpcTextOption options[8];
+
+        NpcTextUpdate() : ServerPacket(SMSG_NPC_TEXT_UPDATE) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

@@ -82,4 +82,18 @@ void WorldPackets::Mail::QueryNextMailTimeResponse::AppendBodyTo(ByteBuffer& buf
     buffer << nextMailTime;
 }
 
-
+void WorldPackets::Mail::SendMailResult::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << mailId;
+    buffer << mailAction;
+    buffer << mailError;
+    if (mailError == MAIL_ERR_EQUIP_ERROR)
+    {
+        buffer << equipError;
+    }
+    else if (mailAction == MAIL_ITEM_TAKEN)
+    {
+        buffer << itemGuidLow;
+        buffer << itemCount;
+    }
+}
