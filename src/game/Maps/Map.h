@@ -41,6 +41,7 @@
 #include "SQLStorages.h"
 #include "ScriptCommands.h"
 #include "CreatureLinkingMgr.h"
+#include <G3D/AABox.h>
 
 #include <bitset>
 #include <list>
@@ -174,6 +175,13 @@ struct AreaEntry
 struct AreaLocale
 {
     std::vector<std::string> Name;
+};
+
+struct VolumeCache
+{
+    ObjectGuid guid;
+    G3D::AABox worldBounds;
+    bool enabled;
 };
 
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
@@ -515,6 +523,34 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
         WorldObject* GetWorldObject(ObjectGuid guid);         // only use if sure that need objects at current map, specially for player case
         WorldObject* GetWorldObjectOrPlayer(ObjectGuid guid); // Returns a world object from current map, or player anywhere.
 
+        // Volume caching for movement generators
+        const std::vector<VolumeCache>& GetVolumeCache() const { return m_volumeCache; }
+        void ClearVolumeCache() { m_volumeCache.clear(); }
+        void AddVolumeCacheEntry(ObjectGuid objGuid, G3D::AABox bounds, bool enabled)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Volume Box Created - GUID: %u", objGuid);
+            m_volumeCache.push_back( { objGuid, bounds, enabled } );
+        }
+        void RemoveVolumeCacheEntry(ObjectGuid guid)
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Volume Box Deleted - GUID: %u", guid);
+            m_volumeCache.erase(std::remove_if(m_volumeCache.begin(), m_volumeCache.end(), [guid](const VolumeCache& obj) { return obj.guid == guid; }), m_volumeCache.end());
+        }
+        void SetVolumeCollisionState(ObjectGuid guid, bool active) // Enabled/disabled local volumes
+        {
+            for (auto& obj : m_volumeCache)
+            {
+                if (obj.guid == guid)
+                {
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Volume Box %s - GUID: %u - Low: %.2f %.2f %.2f | High: %.2f %.2f %.2f", active ? "Enabled" : "Disabled", obj.guid,
+                    obj.worldBounds.low().x, obj.worldBounds.low().y, obj.worldBounds.low().z, obj.worldBounds.high().x, obj.worldBounds.high().y, obj.worldBounds.high().z);
+
+                    obj.enabled = active;
+                    break;
+                }
+            }
+        }
+
         template <typename T> void InsertObject(ObjectGuid const& guid, T* ptr)
         {
             m_objectsStore_lock.acquire_write();
@@ -727,6 +763,9 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
 
         InstanceData* m_data;
         uint32 m_scriptId;
+
+        // Volume caching for movement generators
+        std::vector<VolumeCache> m_volumeCache;
 
         // Map local low guid counters
         mutable MapMutexType    m_guidGenerators_lock;

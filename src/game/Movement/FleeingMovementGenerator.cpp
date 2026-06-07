@@ -55,7 +55,6 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T &owner)
     path.ExcludeSteepSlopes();
     path.setPathLengthLimit(30.0f);
     path.calculate(x, y, z);
-    path.CutPathWithDynamicLoS();
     if (path.getPathType() & PATHFIND_NOPATH)
     {
         i_nextCheckTime.Reset(urand(1000, 1500));

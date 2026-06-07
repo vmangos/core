@@ -37,7 +37,6 @@ void FearMovementGenerator<T>::_setTargetLocation(T &owner)
     path.ExcludeSteepSlopes();
     path.setPathLengthLimit(PATH_LENGTH_LIMIT);
     path.calculate(x, y, z);
-    path.CutPathWithDynamicLoS();
 
     if (path.getPathType() & PATHFIND_NOPATH)
     {
