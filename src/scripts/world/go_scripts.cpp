@@ -33,21 +33,6 @@ EndContentData */
 #include "scriptPCH.h"
 #include "Utilities/EventMap.h"
 
-/*######
-## go_cat_figurine
-######*/
-
-enum
-{
-    SPELL_SUMMON_GHOST_SABER    = 5968,
-};
-
-bool GOHello_go_cat_figurine(Player* pPlayer, GameObject* pGo)
-{
-    pPlayer->CastSpell(pPlayer, SPELL_SUMMON_GHOST_SABER, true);
-    return false;
-}
-
 
 /*######
 ## go_field_repair_bot_74A
@@ -472,11 +457,6 @@ GameObjectAI* GetAI_go_containment_coffer(GameObject* gameobject)
 void AddSC_go_scripts()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "go_cat_figurine";
-    newscript->pGOHello = &GOHello_go_cat_figurine;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_field_repair_bot_74A";
