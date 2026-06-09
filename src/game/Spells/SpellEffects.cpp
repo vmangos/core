@@ -3918,10 +3918,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                     if (Creature* pTonk = m_caster->FindNearestCreature(15328, 5, true))
                     {
                         pTonk->SetWalk(false);
-                        pTonk->m_spells[0] = 24933;
-                        pTonk->m_spells[1] = 25003;
-                        pTonk->m_spells[2] = 27746;
-                        pTonk->m_spells[3] = PickRandomValue(25024, 25026, 25027, 27759);
                         m_caster->CastSpell(pTonk, 24937, true);
                     }
                     return;

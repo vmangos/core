@@ -1539,6 +1539,9 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Points Of Interest Data...");
     sObjectMgr.LoadPointsOfInterest();
 
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Creature Charm Spells...");
+    sObjectMgr.LoadCreatureCharmSpells();
+
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Pet Create Spells...");
     sObjectMgr.LoadPetCreateSpells();
 

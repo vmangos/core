@@ -8614,11 +8614,14 @@ void CharmInfo::InitPossessCreateSpells()
     if (!pCreature)
         return;
 
-    for (uint32 spell : pCreature->m_spells)
+    for (auto const& spellSlot : pCreature->m_spells)
     {
-        if (Spells::IsPassiveSpell(spell))
-            m_unit->CastSpell(m_unit, spell, true);
-        else if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(spell))
+        if (!spellSlot.has_value())
+            continue;
+
+        if (Spells::IsPassiveSpell(spellSlot->spellId))
+            m_unit->CastSpell(m_unit, spellSlot->spellId, true);
+        else if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(spellSlot->spellId))
 
             // World of Warcraft Client Patch 1.10.0 (2006-03-28)
             // - Charm spells on charmed creatures are no longer available to the
@@ -8627,7 +8630,7 @@ void CharmInfo::InitPossessCreateSpells()
             if (!pSpellEntry->IsCharmSpell())
 #endif
 
-                AddSpellToActionBar(spell, ACT_PASSIVE);
+                AddSpellToActionBar(spellSlot->spellId, ACT_PASSIVE);
     }
 }
 
@@ -8644,13 +8647,15 @@ void CharmInfo::InitCharmCreateSpells()
 
     for (uint32 x = 0; x < CREATURE_MAX_SPELLS; ++x)
     {
-        uint32 spellId = ((Creature*)m_unit)->m_spells[x];
+        auto const& spellSlot = ((Creature*)m_unit)->m_spells[x];
 
-        if (!spellId)
+        if (!spellSlot.has_value())
         {
-            m_charmSpells[x].SetActionAndType(spellId, ACT_DISABLED);
+            m_charmSpells[x].SetActionAndType(0, ACT_DISABLED);
             continue;
         }
+
+        uint32 spellId = spellSlot->spellId;
 
         if (Spells::IsPassiveSpell(spellId))
         {
