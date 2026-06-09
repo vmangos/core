@@ -39,7 +39,7 @@ class Totem : public Creature
         void Update(uint32 update_diff, uint32 time) override;
         void Summon(Unit* owner);
         void UnSummon();
-        uint32 GetSpell() const { return m_spells[0]; }
+        uint32 GetSpell() const;
         uint32 GetTotemDuration() const { return m_duration; }
         Unit* GetOwner();
         TotemType GetTotemType() const { return m_type; }

@@ -263,9 +263,6 @@ Creature::Creature(CreatureSubtype subtype) :
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
-
-    for (uint32 & spell : m_spells)
-        spell = 0;
 }
 
 Creature::~Creature()
@@ -655,7 +652,29 @@ bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData 
     InitializeReactState();
 
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
-        m_spells[i] = GetCreatureInfo()->spells[i];
+        m_spells[i].reset();
+
+    if (CreatureCharmSpellSlotsArray const* pSpellSlots = sObjectMgr.GetCreatureCharmSpellSlotsArray(entry))
+    {
+        for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
+        {
+            float roll = frand(0, 100);
+            float sum = 0.0f;
+
+            for (auto const& itr : (*pSpellSlots)[i])
+            {
+                float const currentChance = itr.availability;
+
+                if ((roll > sum) && (roll <= (sum + currentChance)))
+                {
+                    m_spells[i] = itr;
+                    break;
+                }
+
+                sum += currentChance;
+            }
+        }
+    }
 
     SetCallForHelpDist(GetCreatureInfo()->call_for_help_range);
     SetLeashDistance(GetCreatureInfo()->leash_range);
@@ -3244,7 +3263,7 @@ bool Creature::IsInEvadeMode() const
 bool Creature::HasSpell(uint32 spellId) const
 {
     for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
-        if (spellId == m_spells[i])
+        if (m_spells[i].has_value() && spellId == m_spells[i]->spellId)
             return true;
     return false;
 }
@@ -3259,7 +3278,12 @@ void Creature::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
 
 void Creature::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* /*itemProto*/, bool /*permanent*/, uint32 forcedDuration)
 {
-    uint32 recTime = forcedDuration ? forcedDuration : spellEntry->RecoveryTime;
+    uint32 recTime;
+    if (forcedDuration)
+        recTime = forcedDuration;
+    else if (!GetCharmSpellCooldown(spellEntry->Id, recTime))
+        recTime = spellEntry->RecoveryTime;
+
     if (recTime || spellEntry->CategoryRecoveryTime)
     {
         uint32 categoryRecTime = spellEntry->CategoryRecoveryTime;
@@ -3272,14 +3296,8 @@ void Creature::AddCooldown(SpellEntry const* spellEntry, ItemPrototype const* /*
         }
 
         m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTime, spellEntry->Category, categoryRecTime);
-    }
-    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry->GetCastTime(this))
-    {
-        // Forced cooldown on using instant spells during mind control to prevent abuse.
-        recTime = 10 * IN_MILLISECONDS;
-        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry, recTime, 0, 0);
         if (Player const* player = ::ToPlayer(GetCharmer()))
-            player->SendSpellCooldown(spellEntry->Id, Milliseconds(recTime), GetObjectGuid());
+            player->SendSpellCooldown(spellEntry->Id, Milliseconds(recTime ? recTime : categoryRecTime), GetObjectGuid());
     }
 }
 
@@ -4285,4 +4303,20 @@ void Creature::CancelSummonPossessedCharm()
             }
         }
     }
+}
+
+bool Creature::GetCharmSpellCooldown(uint32 spellId, uint32& cooldown)
+{
+    for (auto const& itr : m_spells)
+    {
+        if (!itr.has_value())
+            continue;
+
+        if (spellId == itr->spellId)
+        {
+            cooldown = urand(itr->cooldownMin * IN_MILLISECONDS, itr->cooldownMax * IN_MILLISECONDS);
+            return true;
+        }
+    }
+    return false;
 }
