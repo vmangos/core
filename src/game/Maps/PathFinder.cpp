@@ -1191,3 +1191,38 @@ bool WorldObject::HasMMapsForCurrentMap() const
     dtNavMeshQuery const* m_navMeshQuery = GetTransport() ? mmap->GetModelNavMeshQuery(GetTransport()->GetDisplayId()) : mmap->GetNavMeshQuery(GetMapId());
     return m_navMeshQuery != nullptr;
 }
+
+bool VolumeBoxFilter::passFilter(dtPolyRef ref, const dtMeshTile* tile, const dtPoly* poly) const
+{
+    if ((poly->flags & getIncludeFlags()) == 0)
+        return false;
+
+    if (poly->flags & getExcludeFlags())
+        return false;
+
+    float boxMin[3] = {FLT_MAX, FLT_MAX, FLT_MAX};
+    float boxMax[3] = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
+
+    for (int i = 0; i < poly->vertCount; ++i)
+    {
+        const float* vertex = &tile->verts[poly->verts[i] * 3];
+        for (int axis = 0; axis < 3; ++axis)
+        {
+            if (vertex[axis] < boxMin[axis])
+                boxMin[axis] = vertex[axis];
+            if (vertex[axis] > boxMax[axis])
+                boxMax[axis] = vertex[axis];
+        }
+    }
+
+    for (const auto& obj : m_map->GetVolumeCache())
+    {
+        if (!obj.enabled)
+            continue;
+
+        if (PathInfo::IntersectVolumeBox(boxMin, boxMax, obj.worldBounds))
+            return false;
+    }
+
+    return true;
+}
