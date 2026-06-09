@@ -25,11 +25,12 @@
 #include "../recastnavigation/Detour/Include/DetourNavMesh.h"
 #include "../recastnavigation/Detour/Include/DetourNavMeshQuery.h"
 #include "MoveSplineInitArgs.h"
-
+#include <G3D/AABox.h>
 
 using Movement::Vector3;
 using Movement::PointsArray;
 
+class Map;
 class Unit;
 class GenericTransport;
 struct GridMapLiquidData;
@@ -158,40 +159,7 @@ public:
 
     VolumeBoxFilter(const Map* map) : m_map(map) {}
 
-    virtual bool passFilter(dtPolyRef ref, const dtMeshTile* tile, const dtPoly* poly) const override
-    {
-        if ((poly->flags & getIncludeFlags()) == 0)
-            return false;
-
-        if (poly->flags & getExcludeFlags())
-            return false;
-
-        float boxMin[3] = {FLT_MAX, FLT_MAX, FLT_MAX};
-        float boxMax[3] = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
-
-        for (int i = 0; i < poly->vertCount; ++i)
-        {
-            const float* vertex = &tile->verts[poly->verts[i] * 3];
-            for (int axis = 0; axis < 3; ++axis)
-            {
-                if (vertex[axis] < boxMin[axis])
-                    boxMin[axis] = vertex[axis];
-                if (vertex[axis] > boxMax[axis])
-                    boxMax[axis] = vertex[axis];
-            }
-        }
-
-        for (const auto& obj : m_map->GetVolumeCache())
-        {
-            if (!obj.enabled)
-                continue;
-
-            if (PathInfo::IntersectVolumeBox(boxMin, boxMax, obj.worldBounds))
-                return false;
-        }
-
-        return true;
-    }
+    virtual bool passFilter(dtPolyRef ref, const dtMeshTile* tile, const dtPoly* poly) const override;
 };
 
 typedef PathInfo PathFinder;
