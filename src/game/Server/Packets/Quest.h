@@ -273,7 +273,7 @@ namespace WorldPackets { namespace Quest
     class QuestGiverQuestList final : public ServerPacket
     {
     public:
-        int sessionDbLocaleIndex = 0;
+        int sessionDbLocaleIndex = -1;
         ObjectGuid npcGuid;
         std::string fallbackTitle;
         uint32 fallbackEmoteDelay = 0;
@@ -294,7 +294,7 @@ namespace WorldPackets { namespace Quest
     class QuestGiverQuestDetails final : public ServerPacket
     {
     public:
-        int sessionDbLocaleIndex = 0;
+        int sessionDbLocaleIndex = -1;
         ObjectGuid npcGuid;
         ::Quest const* quest = nullptr;
         bool autoFinish = false;
@@ -306,7 +306,7 @@ namespace WorldPackets { namespace Quest
     class QuestGiverOfferReward final : public ServerPacket
     {
     public:
-        int sessionDbLocaleIndex = 0;
+        int sessionDbLocaleIndex = -1;
         ObjectGuid npcGuid;
         ::Quest const* quest = nullptr;
         bool autoFinish = false;
@@ -318,7 +318,7 @@ namespace WorldPackets { namespace Quest
     class QuestGiverRequestItems final : public ServerPacket
     {
     public:
-        int sessionDbLocaleIndex = 0;
+        int sessionDbLocaleIndex = -1;
         ObjectGuid npcGuid;
         ::Quest const* quest = nullptr;
         bool isComplete = false;
@@ -331,7 +331,7 @@ namespace WorldPackets { namespace Quest
     class QuestQueryResponse final : public ServerPacket
     {
     public:
-        int sessionDbLocaleIndex = 0;
+        int sessionDbLocaleIndex = -1;
         ::Quest const* quest = nullptr;
 
         explicit QuestQueryResponse() : ServerPacket(SMSG_QUEST_QUERY_RESPONSE) {}

@@ -120,6 +120,15 @@ namespace WorldPackets { namespace Movement
         MoveNotActiveMover() : ClientPacket(CMSG_MOVE_NOT_ACTIVE_MOVER) {}
         void ReadFromWorldPacket(WorldPacket& recv_data) override;
     };
+
+    class MountSpecialAnim final : public ServerPacket
+    {
+    public:
+        ObjectGuid mountedUnitGuid;
+
+        MountSpecialAnim() : ServerPacket(SMSG_MOUNTSPECIAL_ANIM) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
 }} // namespace WorldPackets::Movement
 
 #endif // MANGOS_PACKETS_MOVEMENT_H
