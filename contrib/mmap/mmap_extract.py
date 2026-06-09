@@ -112,10 +112,10 @@ def get_subprocess_config() -> SubprocessConfig:
     return SubprocessConfig(executable, startup_info, creation_flags)
 
 
-def run_move_map_gen(map_id: int) -> None:
+def run_move_map_gen(*leading_args: str) -> None:
     config = get_subprocess_config()
     subprocess.check_call(
-        (config.executable, str(map_id), "--silent", "--threads", "1", *sys.argv[1:]),
+        (config.executable, *leading_args, "--silent", "--threads", "1", *sys.argv[1:]),
         startupinfo=config.startupinfo,
         creationflags=config.creation_flags,
         stdout=subprocess.DEVNULL,
@@ -142,12 +142,12 @@ def main() -> None:
     print(f"Using {max_workers} worker(s) for map processing")
     pool = concurrent.futures.ThreadPoolExecutor(max_workers)
 
-    # Create mmaps directory beforehand to avoid a race condition in MoveMapGen
+    # Create mmaps directory beforehand to avoid a race condition in MoveMapGenerator
     mmaps_directory = current_working_directory / "mmaps"
     mmaps_directory.mkdir(exist_ok=True)
 
     # Process maps
-    future_to_map_id = {pool.submit(run_move_map_gen, map_id): map_id for map_id in sorted(map_ids)}
+    future_to_map_id = {pool.submit(run_move_map_gen, str(map_id)): map_id for map_id in sorted(map_ids)}
     total = len(future_to_map_id)
     num_errors = 0
     for number, future in enumerate(concurrent.futures.as_completed(future_to_map_id), start=1):
@@ -159,6 +159,17 @@ def main() -> None:
 
     pool.shutdown()
     print(f"Finished processing all maps ({total}) with {num_errors} error(s)")
+
+    # The per-map runs above only build each map's tiles. The transport gameobject models
+    # (go####.mmtile) are produced by a separate --onlyGO pass, the same step a no-argument
+    # MoveMapGenerator run performs after building the maps.
+    print("Building transport gameobject models")
+    try:
+        run_move_map_gen("--onlyGO")
+    except subprocess.CalledProcessError as exception:
+        print("Failed to build the transport gameobject models:", exception)
+    else:
+        print("Successfully built the transport gameobject models")
 
 
 if __name__ == "__main__":
