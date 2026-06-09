@@ -160,7 +160,7 @@ struct npc_etendardAI : NullCreatureAI
     explicit npc_etendardAI(Creature* pCreature) : NullCreatureAI(pCreature)
     {
         m_bSpawned = false;
-        m_bAutoRepeatSpell = pCreature->GetCreatureInfo()->spells[0];
+        m_bAutoRepeatSpell = pCreature->GetCreatureInfo()->totem_spell_id;
     }
 
     bool m_bSpawned;

@@ -278,7 +278,7 @@ struct CreatureInfo
     uint32  skinning_loot_id = 0;
     uint32  gold_min = 0;
     uint32  gold_max = 0;
-    uint32  spells[CREATURE_MAX_SPELLS] = {};
+    uint32  totem_spell_id = 0;
     uint32  spell_list_id = 0;
     uint32  pet_spell_list_id = 0;
     uint32  spawn_spell_id = 0;
@@ -432,6 +432,13 @@ struct EquipmentTemplate
     EquipmentEntry const* ChooseEquipmentEntry() const;
 };
 
+struct CreatureCharmSpellEntry
+{
+    uint32 spellId = 0;
+    float availability = 100.0f;
+    uint32 cooldownMin = 0;
+    uint32 cooldownMax = 0;
+};
 
 struct CreatureLocale
 {

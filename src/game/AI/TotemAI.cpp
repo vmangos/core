@@ -48,7 +48,7 @@ TotemAI::TotemAI(Creature* pCreature) : CreatureAI(pCreature)
     }  
     else
     {
-        m_spellId = m_creature->GetCreatureInfo()->spells[0];
+        m_spellId = m_creature->GetCreatureInfo()->totem_spell_id;
         SpellEntry const* totemSpell = sSpellMgr.GetSpellEntry(m_spellId);
         if (totemSpell && totemSpell->GetCastTime(m_creature))
             m_totemType = TOTEM_ACTIVE;
