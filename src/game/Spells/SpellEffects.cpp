@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
+#include "CharacterDatabaseCache.h"
 #include "Opcodes.h"
 #include "Log.h"
 #include "World.h"
@@ -3145,6 +3146,27 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLeve
         return ObjectGuid();
     }
 
+    // Check database for current pet before attempting to load
+    if (GetTypeId() == TYPEID_PLAYER && !petEntry)
+    {
+        Player* player = (Player*)this;
+        CharacterPetCache* currentPet = sCharacterDatabaseCache.GetCharacterPetByOwner(player->GetGUIDLow());
+
+        if (!currentPet)
+        {
+            // No pet at all
+            player->SendPetTameFailure(PETTAME_NOPETAVAILABLE);
+            return ObjectGuid();
+        }
+
+        if (currentPet->currentHealth == 0)
+        {
+            // Pet is dead
+            player->SendPetTameFailure(PETTAME_DEAD);
+            return ObjectGuid();
+        }
+    }
+
     Pet* newSummon = new Pet;
 
     // petEntry==0 for hunter "call pet" (current pet summoned if any)
@@ -5466,27 +5488,31 @@ void Spell::EffectSummonDeadPet(SpellEffectIndex /*effIdx*/)
     if (!player)
         return;
 
-    Pet* pet = player->GetPet();
-    if (!pet)
+    // Load pet from database (corpse already despawned in CheckCast)
+    CharacterPetCache* currentPet = sCharacterDatabaseCache.GetCharacterPetByOwner(player->GetGUIDLow());
+    if (!currentPet)
         return;
-    if (pet->IsAlive())
+
+    Pet* newPet = new Pet;
+    if (!newPet->LoadPetFromDB(player, currentPet->entry, currentPet->id))
+    {
+        delete newPet;
         return;
+    }
 
     if (damage < 0)
         return;
 
-    // Chakor : Teleport the pet to the player's location
-    pet->NearTeleportTo(player->GetPosition(), false);
-    pet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
-    pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-    pet->SetDeathState(ALIVE);
-    pet->ClearUnitState(UNIT_STATE_ALL_DYN_STATES);
-    pet->SetHealth(uint32(pet->GetMaxHealth() * (damage / 100)));
+    // Transition pet from dead to alive state
+    newPet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
+    newPet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+    newPet->SetDeathState(ALIVE);
+    newPet->ClearUnitState(UNIT_STATE_ALL_DYN_STATES);
+    newPet->SetHealth(uint32(newPet->GetMaxHealth() * damage / 100));
 
-    pet->AIM_Initialize();
+    newPet->AIM_Initialize();
 
-    // player->PetSpellInitialize(); -- action bar not removed at death and not required send at revive
-    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+    newPet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
 void Spell::EffectDestroyAllTotems(SpellEffectIndex /*effIdx*/)
