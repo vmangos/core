@@ -22,6 +22,7 @@
 #include "Spell.h"
 #include "Log.h"
 #include "Opcodes.h"
+#include "CharacterDatabaseCache.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "World.h"
@@ -6336,11 +6337,45 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_EFFECT_SUMMON_DEAD_PET:
             {
                 Creature* pet = m_casterUnit ? m_casterUnit->GetPet() : nullptr;
-                if (!pet)
-                    return SPELL_FAILED_NO_PET;
+                Player* player = m_caster->ToPlayer();
 
-                if (pet->IsAlive())
-                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                if (pet)
+                {
+                    if (pet->IsAlive())
+                    {
+                        if (player)
+                            player->SendPetTameFailure(PETTAME_ANOTHERSUMMONACTIVE);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+
+                    // Remove dead pet corpse before revive
+                    if (Pet* petObj = pet->ToPet())
+                        petObj->Unsummon(PET_SAVE_AS_CURRENT, player);
+
+                    break;
+                }
+
+                // No active pet - check database
+                if (player)
+                {
+                    CharacterPetCache* currentPet = sCharacterDatabaseCache.GetCharacterPetByOwner(player->GetGUIDLow());
+                    if (!currentPet)
+                    {
+                        player->SendPetTameFailure(PETTAME_NOPETAVAILABLE);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+
+                    if (currentPet->currentHealth > 0)
+                    {
+                        player->SendPetTameFailure(PETTAME_NOTDEAD);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+                    // Pet is dead in DB - allow revive
+                }
+                else
+                {
+                    return SPELL_FAILED_NO_PET;
+                }
 
                 break;
             }
