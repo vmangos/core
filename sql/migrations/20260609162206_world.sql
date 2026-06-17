@@ -18,9 +18,6 @@ UPDATE `gameobject_template` SET `data0` = 1 WHERE `entry`=181124;
 -- Doodad_Nox_door_slime02
 UPDATE `gameobject_template` SET `data2` = 196608 WHERE `entry`=181199;
 
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=180913;
-
 -- Campfire
 UPDATE `gameobject_template` SET `data2` = 2 WHERE `entry`=2061;
 
@@ -30,33 +27,6 @@ UPDATE `gameobject_template` SET `data8` = 0 WHERE `entry`=180448;
 -- Bonfire Damage
 UPDATE `gameobject_template` SET `data2` = 5 WHERE `entry`=2066;
 
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=141838;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=61919;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=61920;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=61921;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=61922;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=61923;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=61924;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=61925;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=138614;
-
 -- Ironforge Auction house
 UPDATE `gameobject_template` SET `type` = 20 WHERE `entry`=176924;
 
@@ -65,9 +35,6 @@ UPDATE `gameobject_template` SET `data1` = 1 WHERE `entry`=180745;
 
 -- Summoning Portal
 UPDATE `gameobject_template` SET `data5` = 0, `data7` = 0 WHERE `entry`=36727;
-
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=181130;
 
 -- Icebellow Furnace
 UPDATE `gameobject_template` SET `data3` = 196608 WHERE `entry`=181168;
@@ -102,38 +69,11 @@ UPDATE `gameobject_template` SET `data11` = 1, `data12` = 129 WHERE `entry`=1815
 -- Naxx Teleporter trap
 INSERT INTO `gameobject_template` (`entry`, `type`, `displayid`, `name`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`) VALUES (129, 6, 0, 'Naxx Teleporter trap', 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=144133;
-
 -- Glyphed Crystal Prism
 UPDATE `gameobject_template` SET `data2` = 196608 WHERE `entry`=180514;
 
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=2575;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=60439;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=60440;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=60395;
-
--- Boucher's Cauldron
-UPDATE `gameobject_template` SET `displayid` = 751 WHERE `entry`=59850;
-
--- Wooden Chair
-UPDATE `gameobject_template` SET `displayid` = 380 WHERE `entry`=60438;
-
 -- Zandalar Cage
 UPDATE `gameobject_template` SET `data2` = 0 WHERE `entry`=180104;
-
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=179844;
-
--- Fire
-UPDATE `gameobject_template` SET `displayid` = 349 WHERE `entry`=176460;
 
 -- Hakkari Thorium Vein
 UPDATE `gameobject_template` SET `data4` = 2, `data5` = 4 WHERE `entry`=180215;
@@ -169,78 +109,6 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (6448, 766
 -- Purple Lotus
 UPDATE `gameobject_template` SET `data9` = 0 WHERE `entry`=180165;
 
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 351 WHERE `entry`=3936;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 351 WHERE `entry`=3938;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 351 WHERE `entry`=3941;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 351 WHERE `entry`=3942;
-
--- Mighty Blaze
-UPDATE `gameobject_template` SET `displayid` = 350 WHERE `entry`=3943;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 351 WHERE `entry`=3939;
-
--- Mighty Blaze
-UPDATE `gameobject_template` SET `displayid` = 350 WHERE `entry`=3937;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 351 WHERE `entry`=3940;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147443;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147444;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147448;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147442;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147450;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147440;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147445;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147436;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147438;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147447;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147435;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147439;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147441;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147446;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147437;
-
--- Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=147449;
-
 -- Naxxramas Portal
 UPDATE `gameobject_template` SET `data11` = 1, `data12` = 129 WHERE `entry`=181576;
 
@@ -250,126 +118,12 @@ DELETE FROM `gameobject_template` WHERE `entry`=180369 && `patch`=7;
 -- School of Tastyfish
 DELETE FROM `gameobject_template` WHERE `entry`=180248 && `patch`=7;
 
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 349 WHERE `entry`=3851;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 349 WHERE `entry`=3850;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 349 WHERE `entry`=3849;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 349 WHERE `entry`=3847;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 349 WHERE `entry`=3848;
-
--- Fierce Blaze
-UPDATE `gameobject_template` SET `displayid` = 349 WHERE `entry`=174859;
-
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=175144;
-
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=2728;
-
 -- Cat Figurine
 UPDATE `gameobject_template` SET `type` = 3, `data1` = 2768, `data3` = 1, `data5` = 0, `data7` = 12653, `script_name`='' WHERE `entry`=13873;
 INSERT INTO `gameobject_template` (`entry`, `type`, `displayid`, `name`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`) VALUES (12653, 6, 327, 'Ghost Saber Trap', 1, 0, 20, 0, 5968, 0, 0, -1);
 
--- Champions' Hall
-UPDATE `gameobject_template` SET `displayid` = 173 WHERE `entry`=179736;
-
--- Thane's Boots
-UPDATE `gameobject_template` SET `displayid` = 179 WHERE `entry`=164908;
-
--- The Silver Shield
-UPDATE `gameobject_template` SET `displayid` = 171 WHERE `entry`=2150;
-
--- Lionheart Armory
-UPDATE `gameobject_template` SET `displayid` = 171 WHERE `entry`=66780;
-
--- Stormwind Visitor's Center
-UPDATE `gameobject_template` SET `displayid` = 177 WHERE `entry`=63195;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24530;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24531;
-
--- Everyday Merchandise
-UPDATE `gameobject_template` SET `displayid` = 176 WHERE `entry`=2146;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24496;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24528;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24529;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24388;
-
--- Weller's Arsenal
-UPDATE `gameobject_template` SET `displayid` = 173 WHERE `entry`=2139;
-
--- The Gilded Rose
-UPDATE `gameobject_template` SET `displayid` = 180 WHERE `entry`=112898;
-
--- The Empty Quiver
-UPDATE `gameobject_template` SET `displayid` = 172 WHERE `entry`=2138;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24532;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24498;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24533;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24534;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24536;
-
--- Stone Bench
-UPDATE `gameobject_template` SET `displayid` = 622 WHERE `entry`=24537;
-
--- Canal Tailor and Fit Shop
-UPDATE `gameobject_template` SET `displayid` = 179 WHERE `entry`=23295;
-
--- Stormwind Staves
-UPDATE `gameobject_template` SET `displayid` = 173 WHERE `entry`=2162;
-
--- Duncan's Textiles
-UPDATE `gameobject_template` SET `displayid` = 179 WHERE `entry`=2161;
-
--- Larson Clothiers
-UPDATE `gameobject_template` SET `displayid` = 179 WHERE `entry`=23296;
-
--- The Blue Recluse
-UPDATE `gameobject_template` SET `displayid` = 180 WHERE `entry`=2169;
-
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=142078;
-
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=153459;
-
--- SI:7
-UPDATE `gameobject_template` SET `displayid` = 173 WHERE `entry`=179737;
-
 -- Suppression Device
 UPDATE `gameobject_template` SET `type` = 6, `data0` = 55, `data3` = 22247, `data4` = 0, `data6` = 235929600, `script_name`='go_suppression' WHERE `entry`=179784;
-
--- Forge
-UPDATE `gameobject_template` SET `displayid` = 233 WHERE `entry`=179863;
 
 
 -- End of migration.
