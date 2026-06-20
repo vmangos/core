@@ -34,6 +34,12 @@ UPDATE `creature` SET `id` = 1806, `id2` = 1812, `id3` = 0 WHERE `guid` IN (4675
 -- Frenzied Plaguehound (8598) should share spawn with Monstrous Plaguebat (8602)
 UPDATE `creature` SET `id` = 8598, `id2` = 8602 WHERE `id` IN (8598, 8602);
 
+-- Plague Ravager (8520) should share spawn with Blighted Surge (8519)
+UPDATE `creature` SET `id` = 8519, `id2` = 8520 WHERE `id` IN (8519, 8520);
+
+-- Plague Monstrosity (8522) should share spawn with Blighted Horror (8521)
+UPDATE `creature` SET `id` = 8521, `id2` = 8522 WHERE `id` IN (8521, 8522);
+
 -- Plaguehound (8597) should share spawn with Noxious Plaguebat (8601)
 UPDATE `creature` SET `id` = 8597, `id2` = 8601 WHERE `id` IN (8597, 8601);
 
