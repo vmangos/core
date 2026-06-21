@@ -158,7 +158,7 @@ class RegularGrid2D
         }
 
         template<typename RayCallback>
-        void intersectRay(Ray const& ray, RayCallback& intersectCallback, float& max_dist, Vector3 const& end, bool stopAtfirst, bool ignoreM2Model)
+        void intersectRay(Ray const& ray, RayCallback& intersectCallback, float& max_dist, Vector3 const& end, bool stopAtFirst, bool ignoreM2Model)
         {
             Cell cell = Cell::ComputeCell(ray.origin().x, ray.origin().y);
             if (!cell.isValid())
@@ -169,7 +169,7 @@ class RegularGrid2D
             if (cell == last_cell)
             {
                 if (Node* node = nodes[cell.x][cell.y])
-                    node->intersectRay(ray, intersectCallback, max_dist, stopAtfirst, ignoreM2Model);
+                    node->intersectRay(ray, intersectCallback, max_dist, stopAtFirst, ignoreM2Model);
                 return;
             }
 
@@ -214,8 +214,10 @@ class RegularGrid2D
             {
                 if (Node* node = nodes[cell.x][cell.y])
                 {
-                    //float enterdist = max_dist;
-                    node->intersectRay(ray, intersectCallback, max_dist, stopAtfirst, ignoreM2Model);
+                    float const enter_dist = max_dist;
+                    node->intersectRay(ray, intersectCallback, max_dist, stopAtFirst, ignoreM2Model);
+                    if (stopAtFirst && max_dist < enter_dist)
+                        return;
                 }
                 if (cell == last_cell)
                     break;
