@@ -152,13 +152,13 @@ class RegularGrid2D
         }
 
         template<typename RayCallback>
-        void intersectRay(Ray const& ray, RayCallback& intersectCallback, float max_dist, bool ignoreM2Model)
+        void intersectRay(Ray const& ray, RayCallback& intersectCallback, float max_dist, bool stopAtfirst, bool ignoreM2Model)
         {
-            intersectRay(ray, intersectCallback, max_dist, ray.origin() + ray.direction() * max_dist, ignoreM2Model);
+            intersectRay(ray, intersectCallback, max_dist, ray.origin() + ray.direction() * max_dist, stopAtfirst, ignoreM2Model);
         }
 
         template<typename RayCallback>
-        void intersectRay(Ray const& ray, RayCallback& intersectCallback, float& max_dist, Vector3 const& end, bool ignoreM2Model)
+        void intersectRay(Ray const& ray, RayCallback& intersectCallback, float& max_dist, Vector3 const& end, bool stopAtfirst, bool ignoreM2Model)
         {
             Cell cell = Cell::ComputeCell(ray.origin().x, ray.origin().y);
             if (!cell.isValid())
@@ -169,7 +169,7 @@ class RegularGrid2D
             if (cell == last_cell)
             {
                 if (Node* node = nodes[cell.x][cell.y])
-                    node->intersectRay(ray, intersectCallback, max_dist, ignoreM2Model);
+                    node->intersectRay(ray, intersectCallback, max_dist, stopAtfirst, ignoreM2Model);
                 return;
             }
 
@@ -215,7 +215,7 @@ class RegularGrid2D
                 if (Node* node = nodes[cell.x][cell.y])
                 {
                     //float enterdist = max_dist;
-                    node->intersectRay(ray, intersectCallback, max_dist, ignoreM2Model);
+                    node->intersectRay(ray, intersectCallback, max_dist, stopAtfirst, ignoreM2Model);
                 }
                 if (cell == last_cell)
                     break;
@@ -246,13 +246,13 @@ class RegularGrid2D
 
         // Optimized verson of intersectRay function for rays with vertical directions
         template<typename RayCallback>
-        void intersectZAllignedRay(Ray const& ray, RayCallback& intersectCallback, float& max_dist)
+        void intersectZAllignedRay(Ray const& ray, RayCallback& intersectCallback, float& max_dist, bool stopAtfirst)
         {
             Cell cell = Cell::ComputeCell(ray.origin().x, ray.origin().y);
             if (!cell.isValid())
                 return;
             if (Node* node = nodes[cell.x][cell.y])
-                node->intersectRay(ray, intersectCallback, max_dist, false);
+                node->intersectRay(ray, intersectCallback, max_dist, stopAtfirst, false);
         }
 };
 

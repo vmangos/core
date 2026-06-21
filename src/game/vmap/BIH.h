@@ -141,7 +141,7 @@ class BIH
                         intervalMax = t2;
                     // intervalMax can only become smaller for other axis,
                     //  and intervalMin only larger respectively, so stop early
-                    if (intervalMax <= 0 || intervalMin >= maxDist)
+                    if (intervalMax < 0 || intervalMin >= maxDist)
                         return;
                 }
             }
