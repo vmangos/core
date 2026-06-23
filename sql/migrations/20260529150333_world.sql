@@ -11,7 +11,7 @@ INSERT INTO `migrations` VALUES ('20260529150333');
 -- Blasted Lands - Wretched Lost One | Black Slayer
 
 DELETE FROM `creature` WHERE `id` IN (5979, 5982);
-DELETE FROM `creature_movement` WHERE `id` IN (3861, 3933);
+DELETE FROM `creature_movement` WHERE `id` IN (3861, 3933, 1449, 3905, 3860);
 
 SET @CGUID := 8638;
 
