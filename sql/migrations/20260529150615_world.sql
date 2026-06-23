@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20260529150615');
 -- Add your query below.
 
 DELETE FROM `creature` WHERE `id` IN (4095, 4097, 4099, 4093, 4094, 4096, 7404);
-SELECT * FROM `creature_addon` WHERE `guid` IN (21761, 21768);
+DELETE FROM `creature_addon` WHERE `guid` IN (21761, 21768);
 DELETE FROM `creature_movement` WHERE `id` IN (21021);
 
 SET @CGUID := 12426;
