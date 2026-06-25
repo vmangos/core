@@ -3106,15 +3106,6 @@ GameObject* WorldObject::FindRandomGameObject(uint32 entry, float range) const
     return *tcIter;
 }
 
-GameObject* WorldObject::FindNearbyClosedDoor(float range) const
-{
-    GameObject* door = nullptr;
-    MaNGOS::AnyClosedDoorInRangeCheck go_check(this, range);
-    MaNGOS::GameObjectSearcher<MaNGOS::AnyClosedDoorInRangeCheck> checker(door, go_check);
-    Cell::VisitGridObjects(this, checker, range);
-    return door;
-}
-
 Player* WorldObject::FindNearestPlayer(float range) const
 {
     Player* target = nullptr;
