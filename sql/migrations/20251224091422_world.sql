@@ -173,6 +173,10 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (10, 0, 0, 15, 25678, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Meridith the Mermaiden - Cast Siren Song'),
 (10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11089, 0, 0, 0, 0, 0, 0, 0, 0, 'Meridith the Mermaiden - Talk');
 
+--Correct Condition 805
+-- 805: Target Has Quest 5247 In Log
+UPDATE `conditions` SET `type`=9, `value1`=5247 WHERE `condition_entry`=805;
+
 
 -- End of migration.
 END IF;
