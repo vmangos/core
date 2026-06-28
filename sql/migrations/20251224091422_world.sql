@@ -177,6 +177,22 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 -- 805: Target Has Quest 5247 In Log
 UPDATE `conditions` SET `type`=9, `value1`=5247 WHERE `condition_entry`=805;
 
+-- Events list for Shy-Rotam
+DELETE FROM `creature_ai_scripts` WHERE `id`=1073704;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1073704, 0, 0, 10, 10741, 180000, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 8074.84, -3840, 690.061, 4.6, 0, 'Shy-Rotam - Summon Creature Sian-Rotam'),
+(1073704, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6039, 0, 0, 0, 0, 0, 0, 0, 0, 'Shy-Rotam - Talk');
+
+-- Events list for Sian-Rotam
+DELETE FROM `creature_ai_events` WHERE `creature_id`=10741;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(1074101, 10741, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1074101, 0, 0, 'Sian-Rotam - Talk on Spawn');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1074101;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1074101, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6040, 0, 0, 0, 0, 0, 0, 0, 0, 'Sian-Rotam - Talk on Spawn');
+
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry`=10741 AND `patch`=0;
+
 
 -- End of migration.
 END IF;
