@@ -283,6 +283,7 @@ UPDATE `gameobject_template` SET `data0` = 93 /*lockId*/ WHERE `entry`=142696;
 
 -- Fel Reaver Energy Matrix
 DELETE FROM `gameobject_template` WHERE `entry`=184862;
+DELETE FROM `locales_gameobject` WHERE `entry`=184862;
 
 -- Witch Doctor's Chest
 DELETE FROM `gameobject_template` WHERE `entry`=141596;
