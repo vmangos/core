@@ -1862,7 +1862,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
         Loot l(nullptr);
         if (lootOwner)
             l.SetTeam(lootOwner->GetTeam());
-        tab->Process(l, *store, store->IsRatesAllowed());
+        tab->Process(l, *store, lootOwner, store->IsRatesAllowed());
         for (const auto& item : l.items)
             if (!lootOwner || !item.conditionId)
                 lootChances[item.itemid]++;
