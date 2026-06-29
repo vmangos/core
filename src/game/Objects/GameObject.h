@@ -226,7 +226,7 @@ class GameObject : public SpellCaster
         void AIM_Initialize();
         GameObjectAI* AI() { return m_AI; }
 
-        void UpdateCollisionState(bool polyCull = false);
+        void UpdateCollisionState();
         void UpdateModel();                                 // updates model in case displayId were changed
         GameObjectModel* m_model;
         void UpdateModelPosition();
@@ -260,7 +260,6 @@ class GameObject : public SpellCaster
         bool IsAtInteractDistance(Player const* player, uint32 maxRange = 0) const;
 
         SpellEntry const* GetSpellForLock(Player const* player) const;
-
     protected:
         bool        m_visible;
         uint32      m_spellId;

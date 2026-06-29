@@ -188,6 +188,17 @@ void ChaseMovementGenerator<T>::_setTargetLocation(T &owner)
     if (pathType == PATHFIND_NOPATH)
         return;
 
+    if (owner.IsPet())
+    {
+        // prevent pets from going through closed doors
+        path.CutPathWithDynamicLoS();
+        if (path.getPath().size() == 2 && path.Length() < 0.1f)
+        {
+            m_bReachable = false;
+            return;
+        }
+    }
+
     if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STATE_ALLOW_INCOMPLETE_PATH))
         m_bReachable = true;
 
@@ -368,15 +379,9 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
                 if (!creature->HasExtraFlag(CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING) && !creature->IsPet() && !i_target.getTarget()->IsMoving())
                 {
                     if (m_bRecalculateTravel && TargetDeepInBounds(owner, i_target.getTarget()))
-                    {
-                        if (owner.IsWithinLOSInMap(i_target.getTarget()))
-                            DoBackMovement(owner, i_target.getTarget());
-                    }
+                        DoBackMovement(owner, i_target.getTarget());
                     else if (m_bCanSpread)
-                    {
-                        if (owner.IsWithinLOSInMap(i_target.getTarget()))
-                            DoSpreadIfNeeded(owner, i_target.getTarget());
-                    }
+                        DoSpreadIfNeeded(owner, i_target.getTarget());
                 }
             }
         }
