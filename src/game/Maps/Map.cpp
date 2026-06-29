@@ -1606,9 +1606,6 @@ void Map::UnloadAll(bool pForce)
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Non empty bones list, probably leaking. Please report.");
         m_bones.clear();
     }
-
-    // Clear collision volume cache
-    ClearVolumeCache();
 }
 
 bool Map::CheckGridIntegrity(Creature* c, bool moved)
