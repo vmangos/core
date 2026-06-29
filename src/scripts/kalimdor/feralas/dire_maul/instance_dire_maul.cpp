@@ -30,6 +30,7 @@ instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
 
     // North
     m_uiGuardAliveCount(6),
+    m_uiFinalGuardAliveCount(6),
     m_uiTendrisGUID(0),
     m_uiOldIronbarkGUID(0),
     m_uiSlipKikGUID(0),
@@ -37,15 +38,7 @@ instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     m_uiKingGordokGUID(0),
     m_uiChoRushTheObserverGUID(0),
     m_uiChoRushEquipment(0),
-
-    m_uiGordokTribute0GUID(0),
-    m_uiGordokTribute1GUID(0),
-    m_uiGordokTribute2GUID(0),
-    m_uiGordokTribute3GUID(0),
-    m_uiGordokTribute4GUID(0),
-    m_uiGordokTribute5GUID(0),
-    m_uiGordokTribute6GUID(0),
-
+    m_uiGordokTributeGUID(0),
     m_uiBrokenTrapGUID(0),
     m_bIsGordokTributeRespawned(false),
     m_bIsTanninLooted(false)
@@ -139,26 +132,8 @@ void instance_dire_maul::OnObjectCreate(GameObject* pGo)
             m_uiMagicVortexGUID    = pGo->GetGUID();
             break;
         // DM North
-        case GO_GORDOK_TRIBUTE_0:
-            m_uiGordokTribute0GUID = pGo->GetGUID();
-            break;
-        case GO_GORDOK_TRIBUTE_1:
-            m_uiGordokTribute1GUID = pGo->GetGUID();
-            break;
-        case GO_GORDOK_TRIBUTE_2:
-            m_uiGordokTribute2GUID = pGo->GetGUID();
-            break;
-        case GO_GORDOK_TRIBUTE_3:
-            m_uiGordokTribute3GUID = pGo->GetGUID();
-            break;
-        case GO_GORDOK_TRIBUTE_4:
-            m_uiGordokTribute4GUID = pGo->GetGUID();
-            break;
-        case GO_GORDOK_TRIBUTE_5:
-            m_uiGordokTribute5GUID = pGo->GetGUID();
-            break;
-        case GO_GORDOK_TRIBUTE_6:
-            m_uiGordokTribute6GUID = pGo->GetGUID();
+        case GO_GORDOK_TRIBUTE:
+            m_uiGordokTributeGUID = pGo->GetGUID();
             break;
         case GO_BROKEN_TRAP:
             m_uiBrokenTrapGUID = pGo->GetGUID();
@@ -367,32 +342,8 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
                 if (m_bIsGordokTributeRespawned)
                     return;
 
-                uint32 finalGuardStatus = m_uiGuardAliveCount;
-
-                switch (finalGuardStatus)
-                {
-                    case 0:
-                        DoRespawnGameObject(m_uiGordokTribute6GUID);
-                        break;
-                    case 1:
-                        DoRespawnGameObject(m_uiGordokTribute5GUID);
-                        break;
-                    case 2:
-                        DoRespawnGameObject(m_uiGordokTribute4GUID);
-                        break;
-                    case 3:
-                        DoRespawnGameObject(m_uiGordokTribute3GUID);
-                        break;
-                    case 4:
-                        DoRespawnGameObject(m_uiGordokTribute2GUID);
-                        break;
-                    case 5:
-                        DoRespawnGameObject(m_uiGordokTribute1GUID);
-                        break;
-                    case 6:
-                        DoRespawnGameObject(m_uiGordokTribute0GUID);
-                        break;
-                }
+                m_uiFinalGuardAliveCount = m_uiGuardAliveCount;
+                DoRespawnGameObject(m_uiGordokTributeGUID);
                 m_bIsGordokTributeRespawned = true;
             }
             m_auiEncounter[TYPE_GORDOK_TRIBUTE] = uiData;
@@ -514,6 +465,9 @@ uint32 instance_dire_maul::GetData(uint32 uiType)
 {
     if (uiType == DATA_TANNIN_LOOTED)
         return m_bIsTanninLooted;
+
+    if (uiType == DATA_FINAL_GUARD_ALIVE_COUNT)
+        return m_uiFinalGuardAliveCount;
 
     ASSERT(uiType < INSTANCE_DIRE_MAUL_MAX_ENCOUNTER);
     return m_auiEncounter[uiType];
