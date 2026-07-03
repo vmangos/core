@@ -164,7 +164,14 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     if (mEntry->IsRaid())
     {
-        if (time_t timeReset = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(mEntry->id))
+        time_t timeReset = 0;
+        if (DungeonResetScheduler::IsRaidResetSchedulingGlobal())
+            timeReset = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(mEntry->id);
+        // before 1.9 each raid instance has its own reset timer
+        else if (DungeonPersistentState* state = dynamic_cast<DungeonPersistentState*>(GetPlayer()->GetMap()->GetPersistentState()))
+            timeReset = state->GetResetTime();
+
+        if (timeReset)
         {
             uint32 timeleft = uint32(timeReset - time(nullptr));
             GetPlayer()->SendInstanceResetWarning(mEntry->id, timeleft);
