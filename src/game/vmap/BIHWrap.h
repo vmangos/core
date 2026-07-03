@@ -98,11 +98,11 @@ public:
     }
 
     template<typename RayCallback>
-    void intersectRay(const Ray& r, RayCallback& intersectCallback, float& maxDist, bool ignoreM2Model)
+    void intersectRay(const Ray& r, RayCallback& intersectCallback, float& maxDist, bool stopAtFirst, bool ignoreM2Model)
     {
         balance();
         MDLCallback<RayCallback> temp_cb(intersectCallback, m_objects.getCArray(), m_objects.size());
-        m_tree.intersectRay(r, temp_cb, maxDist, true, ignoreM2Model);
+        m_tree.intersectRay(r, temp_cb, maxDist, stopAtFirst, ignoreM2Model);
     }
 
     template<typename IsectCallback>
