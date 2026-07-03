@@ -3437,22 +3437,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 }
             }
 
-            GameObject const* const pDoor = m_caster->FindNearbyClosedDoor(dist);
-            bool const directionThroughDoor = pDoor ? pDoor->HasInArc(M_PI_F, src.x, src.y) != pDoor->HasInArc(M_PI_F, dest.x, dest.y) : false;
-
             if (m_caster->GetMap()->GetWalkHitPosition(m_caster->GetTransport(), src.x, src.y, src.z, dest.x, dest.y, dest.z, NAV_GROUND | NAV_WATER, 20.0f, false))
             {
-                // move back so we dont clip into a door
-                if (pDoor)
-                {
-                    if (directionThroughDoor)
-                        Geometry::Move2dPointTowards(src, dest, 3.0f);
-
-                    if (pDoor->HasInArc(M_PI_F, src.x, src.y) != pDoor->HasInArc(M_PI_F, dest.x, dest.y) ||
-                       !m_caster->IsWithinLOS(dest.x, dest.y, dest.z, true, 0.1f))
-                        dest = src;
-                }
-
                 // should never go backwards or sideways
                 if (!m_caster->HasInArc(M_PI_F / 2.0f, dest.x, dest.y))
                     dest = src;
@@ -3464,6 +3450,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             }
 
             m_targets.setDestination(dest.x, dest.y, dest.z);
+            break;
         }
         default:
             //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SPELL: Unknown implicit target (%u) for spell ID %u", targetMode, m_spellInfo->Id);

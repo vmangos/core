@@ -3305,11 +3305,16 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
         return false;
     }
 
+    if (t == 0)
+    {
+        return false;
+    }
+
     // We hit a wall - calculate new endposition
     if ((t < 1) && (t > 0))
     {
         for (int i = 0; i < 3; ++i)
-            endPosition[i] = point[i] + (endPosition[i] - point[i]) * hitNormal[i];
+            endPosition[i] = point[i] + (endPosition[i] - point[i]) * t;
     }
 
     if (dtStatusFailed(navMeshQuery->closestPointOnPoly(visited[visitedCount - 1], endPosition, endPosition, nullptr)))
