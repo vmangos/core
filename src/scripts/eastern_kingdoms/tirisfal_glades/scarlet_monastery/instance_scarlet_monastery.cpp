@@ -563,7 +563,7 @@ SpellScript* GetScript_ForgivenessDummy(SpellEntry const*)
     return new Spell_Forgiveness_DummyScript();
 }
 
-// SPELL_FORGIVENESS 28443
+// SPELL_TRANSFORM_GHOST 28443
 class spell_transform_ghost_visual : public SpellScript
 {
     void OnAfterHit(Spell* spell) const final
