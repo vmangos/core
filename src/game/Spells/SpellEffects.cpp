@@ -1289,14 +1289,6 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 {
                     return;
                 }
-                case 28697:                                 // Forgiveness (SM Ashbringer event)
-                {
-                    if (unitTarget && m_casterUnit)
-                    {
-                        m_casterUnit->Kill(unitTarget, nullptr);
-                    }
-                    return;
-                }
                 case 21343:                                 // Snowball Knockdown
                 {
                     if (unitTarget && m_caster && unitTarget->IsPlayer() && m_caster->IsPlayer())
