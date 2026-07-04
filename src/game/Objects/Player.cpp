@@ -5231,45 +5231,7 @@ uint32 Player::GetShieldBlockValue() const
 
 float Player::GetMeleeCritFromAgility() const
 {
-    float valLevel1 = 0.0f;
-    float valLevel60 = 0.0f;
-    // critical
-    switch (GetClass())
-    {
-        case CLASS_PALADIN:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            valLevel1 = 4.6f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_MAGE:
-            valLevel1 = 12.9f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_ROGUE:
-            valLevel1 = 2.2f;
-            valLevel60 = 29.0f;
-            break;
-        case CLASS_HUNTER:
-            valLevel1 = 3.5f;
-            valLevel60 = 53.0f;
-            break;
-        case CLASS_PRIEST:
-            valLevel1 = 11.0f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARLOCK:
-            valLevel1 = 8.4f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARRIOR:
-            valLevel1 = 3.9f;
-            valLevel60 = 20.0f;
-            break;
-        default:
-            return 0.0f;
-    }
-    float classRate = valLevel1 * float(60.0f - GetLevel()) / 59.0f + valLevel60 * float(GetLevel() - 1.0f) / 59.0f;
+    float classRate = sObjectMgr.GetPlayerCritPerAgility(GetClass(), GetLevel());
     return GetStat(STAT_AGILITY) / classRate;
 }
 

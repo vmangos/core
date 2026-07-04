@@ -5033,6 +5033,84 @@ void ObjectMgr::LoadPlayerInfo()
             m_PlayerXPperLevel[level] = m_PlayerXPperLevel[level - 1] + 100;
         }
     }
+
+    // Loading crit per agility rates
+    {
+        std::unique_ptr<QueryResult> result;
+
+        for (uint32 classId = 1; classId < MAX_CLASSES; ++classId)
+        {
+            // skip nonexistent classes
+            if (!((1 << (classId - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(classId))
+                continue;
+
+            std::vector<float>& ratePerLevelVector = m_playerCritPerAgility[classId];
+
+            ratePerLevelVector.resize(PLAYER_MAX_LEVEL);
+
+            //                                     0        1
+            result = WorldDatabase.PQuery("SELECT `level`, `rate` FROM `player_crit_per_agility` WHERE `class`=%u ORDER BY `level`", classId);
+
+            if (result)
+            {
+                do
+                {
+                    Field* fields = result->Fetch();
+                    uint32 level = fields[0].GetUInt32();
+
+                    if (!level)
+                    {
+                        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `player_crit_per_agility` contains data for invalid `level` = %u!", level);
+                        continue;
+                    }
+
+                    if (level > ratePerLevelVector.size())
+                        ratePerLevelVector.resize(level);
+
+                    uint32 i = level - 1;
+                    float& rate = ratePerLevelVector[i];
+                    rate = fields[1].GetFloat();
+
+                    if (rate <= 0.0f)
+                        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `rate` = %g in `player_crit_per_agility` for `class` = %u and `level` = %u!", rate, classId, level);
+
+                } while (result->NextRow());
+            }
+
+            // it's mandatory for first and max level to be defined in the table, rest can be interpolated
+
+            if (!ratePerLevelVector.front())
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Missing crit per agility rate for `class` = %u and `level` = 1!", classId);
+                Log::WaitBeforeContinueIfNeed();
+                exit(1);
+            }
+
+            if (!ratePerLevelVector.back())
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Missing crit per agility rate for `class` = %u and `level` = %u!", classId, (uint32)ratePerLevelVector.size());
+                Log::WaitBeforeContinueIfNeed();
+                exit(1);
+            }
+
+            for (uint32 i = 1; i < ratePerLevelVector.size(); ++i)
+            {
+                // If level is not defined, use linear interpolation from last defined level and next defined level.
+                // There are gaps in the table because we haven't sniffed every single class-level combination.
+                if (!ratePerLevelVector[i])
+                {
+                    for (uint32 j = i + 1; j < ratePerLevelVector.size(); ++j)
+                    {
+                        if (ratePerLevelVector[j])
+                        {
+                            ratePerLevelVector[i] = InterpolateValueAtIndex(i - 1, ratePerLevelVector[i - 1], j, ratePerLevelVector[j], i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void ObjectMgr::GetPlayerClassLevelInfo(uint32 class_, uint32 level, PlayerClassLevelInfo* info) const
@@ -5136,6 +5214,20 @@ void ObjectMgr::BuildPlayerLevelInfo(uint8 race, uint8 _class, uint8 level, Play
                 info->stats[STAT_SPIRIT]    += (lvl > 38 ? 3 : (lvl > 5 ? 1 : 0));
         }
     }
+}
+
+float ObjectMgr::GetPlayerCritPerAgility(uint32 classId, uint32 level) const
+{
+    if (classId >= m_playerCritPerAgility.size())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to get crit per agility rate for undefined player class %u!", classId);
+        return 1;
+    }
+
+    if (level > m_playerCritPerAgility[classId].size())
+        return m_playerCritPerAgility[classId].back();
+
+    return m_playerCritPerAgility[classId][level - 1];
 }
 
 void ObjectMgr::LoadGroups()
