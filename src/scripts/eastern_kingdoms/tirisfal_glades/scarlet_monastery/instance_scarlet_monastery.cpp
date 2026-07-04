@@ -526,6 +526,67 @@ bool AreaTrigger_at_cathedral_entrance(Player* player, AreaTriggerEntry const* a
     return false;
 }
 
+//SPELL_FORGIVENESS 28697
+struct Spell_Forgiveness_DummyScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0)
+        {
+            auto target = spell->GetUnitTarget();
+            auto caster = spell->GetAffectiveCaster();
+
+            if (!target || !caster)
+                return false;
+
+            if (!spell || !spell->m_spellInfo)
+                return false;
+
+            uint32 impactKit = 0;
+
+            if (SpellVisualEntry const* visual = sSpellVisualStore.LookupEntry(spell->m_spellInfo->SpellVisual))
+                impactKit = visual->impactKit;
+
+            target->SendPlaySpellVisualKit(impactKit); // FORGIVENESS IMPACTKIT 317
+
+            // Will delay death to let the client play the visual effects
+            caster->m_Events.AddLambdaEventAtOffset([target, caster]() -> void
+                {
+                    caster->Kill(target, nullptr);
+                }, 500);
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_ForgivenessDummy(SpellEntry const*)
+{
+    return new Spell_Forgiveness_DummyScript();
+}
+
+// SPELL_FORGIVENESS 28443
+class spell_transform_ghost_visual : public SpellScript
+{
+    void OnAfterHit(Spell* spell) const final
+    {
+        if (!spell || !spell->m_spellInfo)
+            return;
+
+        uint32 impactKit = 0;
+
+        if (SpellVisualEntry const* visual = sSpellVisualStore.LookupEntry(spell->m_spellInfo->SpellVisual))
+            impactKit = visual->impactKit;
+
+        if (Unit* target = spell->GetUnitTarget())
+            target->SendPlaySpellVisualKit(impactKit); // TRANSFORM_GHOST IMPACTKIT 500
+    }
+};
+
+SpellScript* GetScript_TransformGhostVisual(SpellEntry const*)
+{
+    return new spell_transform_ghost_visual();
+}
+
 void AddSC_instance_scarlet_monastery()
 {
     Script* newscript;
@@ -538,4 +599,15 @@ void AddSC_instance_scarlet_monastery()
     newscript->Name = "at_cathedral_entrance";
     newscript->pAreaTrigger = &AreaTrigger_at_cathedral_entrance;
     newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_forgiveness_dummy";
+    newscript->GetSpellScript = &GetScript_ForgivenessDummy;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_transform_ghost_visual";
+    newscript->GetSpellScript = &GetScript_TransformGhostVisual;
+    newscript->RegisterSelf();
+
 }
