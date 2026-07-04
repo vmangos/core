@@ -479,7 +479,6 @@ struct instance_scarlet_monastery : ScriptedInstance
                         break;
                     case EVENT_SPELL:
                         if (pHighlord)
-                            //TODO:This spell hits the target and the target has no lightning effect
                             pHighlord->CastSpell(pMograine, SPELL_FORGIVENESS, false);
                         m_events.ScheduleEvent(EVENT_FORGIVEN, Seconds(4));
                         break;
