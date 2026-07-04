@@ -1,14 +1,15 @@
 {
-	"_example_map_ID_override":
+	"_Info": "Map overrides: top-level key = numeric map ID (e.g. \"0\" = Eastern Kingdoms). Rename '_map_override_template' to a map ID to activate it.",
+	"_Info2": "Tile overrides: key inside a map object = zero-padded tileX+tileY, e.g. tile (3,7) -> \"0307\". Omitted parameters use the compiled-in defaults.",
+	"_Info3": "walkableClimbModelTransition: max step height (voxels) at terrain<->model transitions; 0 = same as walkableClimb.",
+	"_map_override_template":
 	{
-		"_Info": "Map-level override: replace the key name with a numeric map ID (e.g. \"0\" for Eastern Kingdoms).",
-		"_Info2": "Any parameter listed below can be set here; omitted parameters use the compiled-in defaults.",
 		"walkableSlopeAngle":      75.0,
 		"walkableSlopeAngleVMaps": 61.0,
 		"walkableRadius":          2,
 		"walkableClimb":           0,
-		"walkableHeight":          0,
 		"walkableClimbModelTransition": 0,
+		"walkableHeight":          0,
 		"borderSize":              5,
 		"maxEdgeLen":              45,
 		"maxSimplificationError":  1.8,
@@ -18,14 +19,10 @@
 		"detailSampleMaxError":    0.5,
 		"quick":                   -1,
 
-		"_example_tile_override":
+		"0307":
 		{
-			"_Info": "Tile-level override: key is zero-padded tileX+tileY, e.g. tile (3,7) -> \"0307\".",
-			"_Info2": "Overrides the map-level values for that specific tile only.",
-			"0307":
-			{
-				"walkableSlopeAngle": 50.0
-			}
+			"_Info": "Tile-level override for tile (3,7): sits directly inside the map object and replaces its values for that tile only.",
+			"walkableSlopeAngle": 50.0
 		}
 	}
 }

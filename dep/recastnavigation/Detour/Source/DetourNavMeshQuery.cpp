@@ -2517,14 +2517,7 @@ dtStatus dtNavMeshQuery::raycast(dtPolyRef startRef, const float* startPos, cons
 		if (n < hit->maxPath)
 			hit->path[n++] = curRef;
 		else
-		{
 			status |= DT_BUFFER_TOO_SMALL;
-
-			// Fix: Return early when path buffer is full to prevent continuing with invalid state.
-			// Set pathCount to the number of items we successfully stored before hitting the limit.
-			hit->pathCount = n;
-			return status;
-		}
 
 		// Ray end is completely inside the polygon.
 		if (segMax == -1)
