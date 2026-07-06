@@ -563,29 +563,6 @@ SpellScript* GetScript_ForgivenessDummy(SpellEntry const*)
     return new Spell_Forgiveness_DummyScript();
 }
 
-// SPELL_TRANSFORM_GHOST 28443
-class spell_transform_ghost_visual : public SpellScript
-{
-    void OnAfterHit(Spell* spell) const final
-    {
-        if (!spell || !spell->m_spellInfo)
-            return;
-
-        uint32 impactKit = 0;
-
-        if (SpellVisualEntry const* visual = sSpellVisualStore.LookupEntry(spell->m_spellInfo->SpellVisual))
-            impactKit = visual->impactKit;
-
-        if (Unit* target = spell->GetUnitTarget())
-            target->SendPlaySpellVisualKit(impactKit); // TRANSFORM_GHOST IMPACTKIT 500
-    }
-};
-
-SpellScript* GetScript_TransformGhostVisual(SpellEntry const*)
-{
-    return new spell_transform_ghost_visual();
-}
-
 void AddSC_instance_scarlet_monastery()
 {
     Script* newscript;
@@ -603,10 +580,4 @@ void AddSC_instance_scarlet_monastery()
     newscript->Name = "spell_forgiveness_dummy";
     newscript->GetSpellScript = &GetScript_ForgivenessDummy;
     newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "spell_transform_ghost_visual";
-    newscript->GetSpellScript = &GetScript_TransformGhostVisual;
-    newscript->RegisterSelf();
-
 }
