@@ -9,7 +9,6 @@ INSERT INTO `migrations` VALUES ('20260704150526');
 -- Add your query below.
 
 UPDATE `spell_template` SET `script_name`='spell_forgiveness_dummy' WHERE `entry`=28697;
-UPDATE `spell_template` SET `script_name`='spell_transform_ghost_visual' WHERE `entry`=28443;
 
 -- End of migration.
 END IF;
