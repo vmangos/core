@@ -983,9 +983,11 @@ dtStatus PathInfo::findSmoothPath(float const* startPos, float const* endPos,
                 }
                 // Move position at the other side of the off-mesh link.
                 dtVcopy(iterPos, endPos);
-                if (dtStatusFailed(m_navMeshQuery->getPolyHeight(polys[0], iterPos, &iterPos[1])))
-                    return DT_FAILURE;
-                iterPos[1] += 0.2f;
+                // getPolyHeight can fail when the link's end point was clamped onto the
+                // landing poly's boundary edge at link time; the stored height is already
+                // the landing poly's height there, so keep it instead of failing the path.
+                if (dtStatusSucceed(m_navMeshQuery->getPolyHeight(polys[0], iterPos, &iterPos[1])))
+                    iterPos[1] += 0.2f;
             }
         }
 

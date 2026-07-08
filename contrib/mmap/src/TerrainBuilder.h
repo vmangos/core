@@ -145,6 +145,11 @@ namespace MMAP
             TerrainBuilder(const TerrainBuilder& tb);
             float* m_V9;
             float* m_V8;
+            /// m_V9/m_V8 hold data of exactly one tile - getHeight() must know which
+            /// one, and must not serve stale data from a previously built tile
+            bool m_heightDataValid;
+            uint32 m_heightDataTileX;
+            uint32 m_heightDataTileY;
             bool m_quick;
             uint32 m_mapId;
             VMAP::VMapManager2 vmapManager;

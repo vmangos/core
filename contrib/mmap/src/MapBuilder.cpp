@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <cctype>
+#include <cstdlib>
 #include <fstream>
 #include "MMapCommon.h"
 #include "MapBuilder.h"
@@ -41,16 +43,30 @@ namespace MMAP
         m_terrainBuilder(nullptr),
         m_debug(debug),
         m_offMeshFilePath(offMeshFilePath),
+        m_skipLiquid(skipLiquid),
         m_skipContinents(skipContinents),
         m_skipJunkMaps(skipJunkMaps),
         m_skipBattlegrounds(skipBattlegrounds),
         m_quick(quick),
         m_rcContext(nullptr),
+        m_cancel(false),
+        m_anyError(false),
         m_threads(threads)
     {
         std::ifstream jsonConfig(configInputPath);
         if (jsonConfig)
-            m_config = json::parse(jsonConfig);
+        {
+            try
+            {
+                m_config = json::parse(jsonConfig);
+            }
+            catch (json::parse_error const& e)
+            {
+                printf("Failed to parse %s: %s\n", configInputPath, e.what());
+                exit(EXIT_FAILURE);
+            }
+            validateConfig(configInputPath);
+        }
 
         m_terrainBuilder = new TerrainBuilder(skipLiquid, quick);
 
@@ -63,6 +79,68 @@ namespace MMAP
     {
         delete m_terrainBuilder;
         delete m_rcContext;
+    }
+
+    void MapBuilder::validateConfig(char const* configInputPath)
+    {
+        json const defaults = TileWorker::getDefaultConfig();
+
+        // keys starting with '_' are comments ("_Info"); nested objects are tile
+        // overrides and are checked separately by the caller
+        auto checkParams = [&](json const& section, std::string const& where)
+        {
+            for (json::const_iterator it = section.begin(); it != section.end(); ++it)
+            {
+                if (!it.key().empty() && it.key()[0] == '_')
+                    continue;
+                if (it.value().is_object())
+                    continue;
+                if (defaults.find(it.key()) == defaults.end())
+                {
+                    printf("%s: unknown parameter '%s' in %s will be ignored!\n", configInputPath, it.key().c_str(), where.c_str());
+                    continue;
+                }
+                if (!it.value().is_number() && !it.value().is_boolean())
+                {
+                    // a non-numeric value would throw inside a worker thread later,
+                    // which terminates the process without any context
+                    printf("%s: parameter '%s' in %s must be a number!\n", configInputPath, it.key().c_str(), where.c_str());
+                    exit(EXIT_FAILURE);
+                }
+            }
+        };
+
+        for (json::const_iterator mapIt = m_config.begin(); mapIt != m_config.end(); ++mapIt)
+        {
+            if (!mapIt.value().is_object())
+            {
+                printf("%s: entry '%s' is not a map config object!\n", configInputPath, mapIt.key().c_str());
+                exit(EXIT_FAILURE);
+            }
+
+            std::string const mapWhere = "map " + mapIt.key();
+            checkParams(mapIt.value(), mapWhere);
+
+            for (json::const_iterator it = mapIt.value().begin(); it != mapIt.value().end(); ++it)
+            {
+                if (!it.value().is_object() || (!it.key().empty() && it.key()[0] == '_'))
+                    continue;
+
+                // tile override keys must match the zero-padded "XXYY" format built
+                // by TileWorker::getTileConfig, otherwise they never apply
+                std::string const& key = it.key();
+                bool validKey = key.size() == 4;
+                for (uint32 c = 0; c < key.size() && validKey; ++c)
+                {
+                    if (!isdigit(static_cast<unsigned char>(key[c])))
+                        validKey = false;
+                }
+                if (!validKey)
+                    printf("%s: tile key '%s' in %s is not in zero-padded XXYY format and will never match a tile!\n", configInputPath, key.c_str(), mapWhere.c_str());
+
+                checkParams(it.value(), mapWhere + " tile " + key);
+            }
+        }
     }
 
     void MapBuilder::discoverTiles()
@@ -171,7 +249,7 @@ namespace MMAP
         std::vector<std::unique_ptr<TileWorker>> workers;
         for (uint8 i = 0; i < m_threads; ++i)
         {
-            workers.emplace_back(std::make_unique<TileWorker>(this, false, m_quick, m_debug, m_config));
+            workers.emplace_back(std::make_unique<TileWorker>(this, m_skipLiquid, m_quick, m_debug, m_config));
         }
 
         while (!m_tileQueue.Empty() && !m_cancel.load())
@@ -244,16 +322,18 @@ namespace MMAP
             uint32 minX, minY, maxX, maxY;
             getGridBounds(mapID, minX, minY, maxX, maxY);
 
-            // Only add the requested tile to avoid allocating NavMesh for entire map
-            // when building a single tile (which would cause massive memory overhead).
-            if (tileX >= minX && tileX <= maxX && tileY >= minY && tileY <= maxY)
-                tiles.insert(StaticMapTree::packTileID(tileX, tileY));
-        }
+            // Add all tiles within bounds - buildNavMesh derives the .mmap header
+            // (orig, maxTiles) from this list, and a header derived from a single
+            // tile would not match .mmtile files written by an earlier full build.
+            for (uint32 i = minX; i <= maxX; ++i)
+                for (uint32 j = minY; j <= maxY; ++j)
+                    tiles.insert(StaticMapTree::packTileID(i, j));
 
-        if (!tiles.size())
-        {
-            printf("[Map %03i] Tile [%02u,%02u] not found in valid tile range!\n", mapID, tileX, tileY);
-            return;
+            if (!tiles.count(StaticMapTree::packTileID(tileX, tileY)))
+            {
+                printf("[Map %03i] Tile [%02u,%02u] not found in valid tile range!\n", mapID, tileX, tileY);
+                return;
+            }
         }
 
         dtNavMesh* navMesh = nullptr;
