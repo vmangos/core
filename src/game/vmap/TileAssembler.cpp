@@ -89,9 +89,15 @@ namespace VMAP
                 }
                 else if (entry->second.flags & MOD_WORLDSPAWN) // WMO maps and terrain maps use different origin, so we need to adapt :/
                 {
-                    // TODO: remove extractor hack and uncomment below line:
-                    // entry->second.iPos += Vector3(533.33333f*32, 533.33333f*32, 0.f);
-                    entry->second.iBound = entry->second.iBound + Vector3(533.33333f * 32, 533.33333f * 32, 0.f);
+                    // WMO world spawns (instances) use a different coordinate system than terrain maps.
+                    // The extractor applies the offset only to iPos, and only when the raw position is (0,0,z)
+                    // (see WMOInstance::WMOInstance in wmo.cpp) - in practice that matches the WDT global-map
+                    // WMOs which get the MOD_WORLDSPAWN flag. Bounds never get the offset, so we apply it here.
+                    //
+                    // NOTE: If there are worldspawns with non-zero initial positions, their iPos may be incorrect.
+                    // The original TODO comment suggested this is an "extractor hack" that should be resolved properly.
+                    Vector3 offset(533.33333f * 32, 533.33333f * 32, 0.f);
+                    entry->second.iBound = entry->second.iBound + offset;
                 }
                 mapSpawns.push_back(&(entry->second));
                 spawnedModelFiles.insert(entry->second.name);

@@ -262,7 +262,7 @@ void MotionMaster::DelayedClean(bool reset, bool all)
 
     if (!m_expList)
         m_expList = new ExpireList();
-;
+
     std::vector<MovementGenerator*> mvtGensToFinalize;
     while (all ? !empty() : size() > 1)
     {
@@ -890,6 +890,17 @@ bool MotionMaster::MoveDistance(Unit const* pTarget, float distance)
         return false;
 
     if (m_owner->GetDistanceSqr(x, y, z) == 0.0f)
+        return false;
+
+    // LOS alone does not catch navmesh borders (fences, cliffs), and without
+    // a valid path the spline shortcuts straight through geometry, so verify
+    // reachability first. A shortcut flagged PATHFIND_NORMAL is a legitimate
+    // direct move (swimming to shore, maps without mmaps) and stays allowed.
+    PathFinder path(m_owner);
+    path.calculate(x, y, z);
+    PathType const pathType = path.getPathType();
+    if ((pathType & PATHFIND_NOPATH) ||
+        ((pathType & PATHFIND_SHORTCUT) && !(pathType & PATHFIND_NORMAL)))
         return false;
 
     if (m_owner->IsPlayer())

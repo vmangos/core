@@ -96,9 +96,16 @@ namespace MMAP
 
             bool IsBusy();
 
+            // true if any tile failed to build - lets the process exit non-zero
+            // instead of pretending the run succeeded
+            bool HasErrors() const { return m_anyError.load(); }
+
         private:
             // detect maps and tiles
             void discoverTiles();
+            // warn about unknown config.json keys and reject non-numeric values that
+            // would otherwise throw (and std::terminate) inside a worker thread
+            void validateConfig(char const* configInputPath);
             std::set<uint32>& getTileList(uint32 mapID);
 
             void buildMap(uint32 mapID);
@@ -116,6 +123,7 @@ namespace MMAP
             bool m_debug;
 
             const char* m_offMeshFilePath;
+            bool m_skipLiquid;
             bool m_skipContinents;
             bool m_skipJunkMaps;
             bool m_skipBattlegrounds;
@@ -128,6 +136,7 @@ namespace MMAP
             mutable std::mutex m_tilesMutex;
             ProducerConsumerQueue<TileInfo> m_tileQueue;
             std::atomic<bool> m_cancel;
+            std::atomic<bool> m_anyError;
             uint8 m_threads;
     };
 }
