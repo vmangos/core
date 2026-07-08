@@ -112,6 +112,11 @@ namespace MMAP
 
         for (json::const_iterator mapIt = m_config.begin(); mapIt != m_config.end(); ++mapIt)
         {
+            // keys starting with '_' are comments ("_Info") or inert templates
+            // ("_map_override_template") and are not active map configs
+            if (!mapIt.key().empty() && mapIt.key()[0] == '_')
+                continue;
+
             if (!mapIt.value().is_object())
             {
                 printf("%s: entry '%s' is not a map config object!\n", configInputPath, mapIt.key().c_str());
