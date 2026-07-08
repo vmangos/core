@@ -261,8 +261,11 @@ struct OpeningBattlegroundBannerScript : public SpellScript
             LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
             if (lockInfo && lockInfo->Index[1] == LOCKTYPE_SLOW_OPEN)
             {
-                Spell* visual = new Spell(spell->m_casterUnit, sSpellMgr.GetSpellEntry(24390), true);
-                visual->prepare();
+                if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(24390))
+                {
+                    Spell* visual = new Spell(spell->m_casterUnit, pSpellEntry, true);
+                    visual->prepare();
+                }
             }
         }
     }
