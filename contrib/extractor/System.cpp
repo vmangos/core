@@ -138,6 +138,7 @@ void Usage(char* prg)
         "-o set output path\n"\
         "-e extract only MAP(1)/DBC(2)/Camera(4) - standard: all(7)\n"\
         "-f height stored as int (less map size but lost some accuracy) 1 by default\n"\
+        "-h allow to limit minimum height (less map size) 1 by default\n"\
         "--silent skip all interactive prompts (for scripted runs)\n"\
         "Example: %s -f 0 -i \"c:\\games\\game\"", prg, prg);
     exit(1);
@@ -178,6 +179,12 @@ void HandleArgs(int argc, char* arg[])
             case 'f':
                 if (c + 1 < argc)                           // all ok
                     CONF_allow_float_to_int = atoi(arg[(c++) + 1]) != 0;
+                else
+                    Usage(arg[0]);
+                break;
+            case 'h':
+                if (c + 1 < argc)                           // all ok
+                    CONF_allow_height_limit = atoi(arg[(c++) + 1]) != 0;
                 else
                     Usage(arg[0]);
                 break;
