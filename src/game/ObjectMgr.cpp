@@ -10602,7 +10602,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         else
             trainerSpell.reqLevel = spellinfo->spellLevel;
 
-        if (SpellMgr::IsProfessionSpell(spellinfo->EffectTriggerSpell[0]))
+        if (SpellMgr::IsProfessionSpell(spellinfo->EffectTriggerSpell[0]) || SpellMgr::IsTradeskillSpell(spellinfo->EffectTriggerSpell[0]))
             data.trainerType = 2;
 
         ++count;
