@@ -4601,11 +4601,16 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo const* damageInfo) const
         data << float(subDamage->damage);
         data << uint32(subDamage->damage);
         data << uint32(subDamage->absorb);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
         data << int32(subDamage->resist);
+#endif
     }
     data << uint32(damageInfo->TargetState);
     data << uint32(0);
-    data << uint32(0);                                      // spell id, seen with heroic strike and disarm as examples.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_5_1
+    data << uint32(0);                                      // spell damage, same value as the total damage
+#endif
+    data << uint32(0);                                      // spell id, seen with heroic strike and disarm as examples
     // HITINFO_NOACTION normally set if spell
     data << uint32(damageInfo->blocked_amount);
 
