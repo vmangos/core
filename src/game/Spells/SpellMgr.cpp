@@ -1344,6 +1344,15 @@ bool SpellMgr::IsProfessionSpell(uint32 spellId)
     return IsProfessionSkill(skill);
 }
 
+bool SpellMgr::IsTradeskillSpell(uint32 spellId)
+{
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    if (!spellInfo)
+        return false;
+
+    return spellInfo->Attributes & SPELL_ATTR_IS_TRADESKILL;
+}
+
 bool SpellMgr::IsPrimaryProfessionSpell(uint32 spellId)
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
