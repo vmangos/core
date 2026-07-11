@@ -716,6 +716,7 @@ class ObjectMgr
         void GetPlayerLevelInfo(uint32 race, uint32 class_,uint32 level, PlayerLevelInfo* info) const;
 
         float GetPlayerCritPerAgility(uint32 classId, uint32 level) const;
+        float GetPlayerDodgePerAgility(uint32 classId, uint32 level) const;
 
         ObjectGuid GetPlayerGuidByName(std::string const& name) const;
         bool GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const;
@@ -1580,6 +1581,7 @@ class ObjectMgr
 
                                                             // [class][level]
         std::array<std::vector<float>, MAX_CLASSES> m_playerCritPerAgility;
+        std::array<std::vector<float>, MAX_CLASSES> m_playerDodgePerAgility;
 
         typedef std::vector<uint32> PlayerXPperLevel;       // [level]
         PlayerXPperLevel m_PlayerXPperLevel;
