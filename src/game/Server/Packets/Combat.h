@@ -4,6 +4,7 @@
 #include "Packet.h"
 #include "ObjectGuid.h"
 #include "DamageStructs.h"
+#include "nonstd/optional.hpp"
 
 namespace WorldPackets { namespace Combat
 {
