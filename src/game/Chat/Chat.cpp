@@ -1305,6 +1305,9 @@ ChatCommand * ChatHandler::getCommandTable()
         { "groupspell",     SEC_ADMINISTRATOR,  true, nullptr,                                         "", groupSpellCommandTable},
         { "pet",            SEC_GAMEMASTER,     true, nullptr,                                         "", petCommandTable},
         { "channel",        SEC_MODERATOR,      false, nullptr,                                        "", channelCommandTable},
+#ifdef USE_AUTO_TESTS
+        { "runtest",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleRunTestCommand,             "", nullptr },
+#endif
         { "log",            SEC_GAMEMASTER,     true,  &ChatHandler::HandleViewLogCommand,             "", nullptr },
         { "sniff",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleSniffCommand,               "", nullptr },
         { "spamer",         SEC_MODERATOR,      true, nullptr,                                         "", spamerCommandTable },

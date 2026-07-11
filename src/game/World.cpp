@@ -88,6 +88,10 @@
 
 #include <chrono>
 
+#ifdef USE_AUTO_TESTS
+#include "AutoTesting/AutoTestingMgr.h"
+#endif
+
 INSTANTIATE_SINGLETON_1(World);
 
 volatile bool World::m_stopEvent = false;
@@ -1885,6 +1889,10 @@ void World::SetInitialWorldSettings()
 
     sAnticheatMgr->StartWardenUpdateThread();
 
+#ifdef USE_AUTO_TESTS
+    sAutoTestingMgr->Load();
+#endif
+
     m_broadcaster =
         std::make_unique<MovementBroadcaster>(getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
@@ -2058,6 +2066,9 @@ void World::Update(uint32 diff)
     sBattleGroundMgr.Update(diff);
     sGuardMgr.Update(diff);
     sZoneScriptMgr.Update(diff);
+#ifdef USE_AUTO_TESTS
+    sAutoTestingMgr->Update(diff);
+#endif
 
     // Update groups with offline leaders
     if (m_timers[WUPDATE_GROUPS].Passed())
