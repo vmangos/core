@@ -4571,61 +4571,36 @@ void Unit::HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, uint32
 
 void Unit::SendAttackStateUpdate(CalcDamageInfo const* damageInfo) const
 {
-    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "WORLD: Sending SMSG_ATTACKERSTATEUPDATE");
-
-    WorldPacket data(SMSG_ATTACKERSTATEUPDATE, (16 + 45));  // we guess size
-
-    data << uint32(damageInfo->HitInfo);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << GetPackGUID();
-    data << damageInfo->target->GetPackGUID();
-#else
-    data << GetGUID();
-    data << damageInfo->target->GetGUID();
-#endif
-    data << uint32(damageInfo->totalDamage);    // Total damage
-
-    data << uint8(m_weaponDamageCount[damageInfo->attackType]);         // Sub damage count
-
-    // Sub damage description
-    for (uint8 i = 0; i < m_weaponDamageCount[damageInfo->attackType]; i++)
-    {
-        SubDamageInfo const* subDamage = &damageInfo->subDamage[i];
-
-        data << uint32(GetFirstSchoolInMask(subDamage->damageSchoolMask));
-        data << float(subDamage->damage);
-        data << uint32(subDamage->damage);
-        data << uint32(subDamage->absorb);
-        data << int32(subDamage->resist);
-    }
-    data << uint32(damageInfo->TargetState);
-    data << uint32(0);
-    data << uint32(0);                                      // spell id, seen with heroic strike and disarm as examples.
-    // HITINFO_NOACTION normally set if spell
-    data << uint32(damageInfo->blocked_amount);
-
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Combat::MeleeAttackingStateUpdate>();
+    packet->hitInfo = damageInfo->HitInfo;
+    packet->attackerGuid = GetObjectGuid();
+    packet->victimGuid = damageInfo->target->GetObjectGuid();
+    packet->totalDamage = damageInfo->totalDamage;
+    packet->subDamage.resize(m_weaponDamageCount[damageInfo->attackType]);
+    for (uint32 i = 0; i < packet->subDamage.size(); ++i)
+        packet->subDamage[i] = damageInfo->subDamage[i];
+    packet->victimState = damageInfo->TargetState;
+    packet->blockedAmount = damageInfo->blocked_amount;
+    SendMessageToSet(std::move(packet), true);
 }
 
-void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const
+void Unit::SendAttackStateUpdate(uint32 hitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 damage, uint32 absorbDamage, int32 resist, VictimState targetState, uint32 blockedAmount) const
 {
-    CalcDamageInfo dmgInfo;
-    dmgInfo.HitInfo = HitInfo;
-    dmgInfo.attacker = const_cast<Unit*>(this);
-    dmgInfo.target = const_cast<Unit*>(target);
-    dmgInfo.attackType = BASE_ATTACK;
-    dmgInfo.totalDamage = Damage;
-    dmgInfo.totalDamage += (Resist < 0 ? uint32(std::abs(Resist)) : 0);
-    dmgInfo.totalDamage -= (AbsorbDamage + (Resist > 0 ? uint32(Resist) : 0) + BlockedAmount);
-    dmgInfo.totalAbsorb = AbsorbDamage;
-    dmgInfo.totalResist = Resist;
-    dmgInfo.subDamage[0].damage = dmgInfo.totalDamage;
-    dmgInfo.subDamage[0].damageSchoolMask = damageSchoolMask;
-    dmgInfo.subDamage[0].absorb = AbsorbDamage;
-    dmgInfo.subDamage[0].resist = Resist;
-    dmgInfo.TargetState = TargetState;
-    dmgInfo.blocked_amount = BlockedAmount;
-    SendAttackStateUpdate(&dmgInfo);
+    auto packet = std::make_unique<WorldPackets::Combat::MeleeAttackingStateUpdate>();
+    packet->hitInfo = hitInfo;
+    packet->attackerGuid = GetObjectGuid();
+    packet->victimGuid = target->GetObjectGuid();
+    packet->totalDamage = damage;
+    packet->totalDamage += (resist < 0 ? uint32(std::abs(resist)) : 0);
+    packet->totalDamage -= (absorbDamage + (resist > 0 ? uint32(resist) : 0) + blockedAmount);
+    packet->subDamage.resize(1);
+    packet->subDamage[0].damage = packet->totalDamage;
+    packet->subDamage[0].damageSchoolMask = damageSchoolMask;
+    packet->subDamage[0].absorb = absorbDamage;
+    packet->subDamage[0].resist = resist;
+    packet->victimState = targetState;
+    packet->blockedAmount = blockedAmount;
+    SendMessageToSet(std::move(packet), true);
 }
 
 void Unit::SetPowerType(Powers new_powertype)
@@ -8608,11 +8583,14 @@ void CharmInfo::InitPossessCreateSpells()
     if (!pCreature)
         return;
 
-    for (uint32 spell : pCreature->m_spells)
+    for (auto const& spellSlot : pCreature->m_spells)
     {
-        if (Spells::IsPassiveSpell(spell))
-            m_unit->CastSpell(m_unit, spell, true);
-        else if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(spell))
+        if (!spellSlot.has_value())
+            continue;
+
+        if (Spells::IsPassiveSpell(spellSlot->spellId))
+            m_unit->CastSpell(m_unit, spellSlot->spellId, true);
+        else if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(spellSlot->spellId))
 
             // World of Warcraft Client Patch 1.10.0 (2006-03-28)
             // - Charm spells on charmed creatures are no longer available to the
@@ -8621,7 +8599,7 @@ void CharmInfo::InitPossessCreateSpells()
             if (!pSpellEntry->IsCharmSpell())
 #endif
 
-                AddSpellToActionBar(spell, ACT_PASSIVE);
+                AddSpellToActionBar(spellSlot->spellId, ACT_PASSIVE);
     }
 }
 
@@ -8638,13 +8616,15 @@ void CharmInfo::InitCharmCreateSpells()
 
     for (uint32 x = 0; x < CREATURE_MAX_SPELLS; ++x)
     {
-        uint32 spellId = ((Creature*)m_unit)->m_spells[x];
+        auto const& spellSlot = ((Creature*)m_unit)->m_spells[x];
 
-        if (!spellId)
+        if (!spellSlot.has_value())
         {
-            m_charmSpells[x].SetActionAndType(spellId, ACT_DISABLED);
+            m_charmSpells[x].SetActionAndType(0, ACT_DISABLED);
             continue;
         }
+
+        uint32 spellId = spellSlot->spellId;
 
         if (Spells::IsPassiveSpell(spellId))
         {

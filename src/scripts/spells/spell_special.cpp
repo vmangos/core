@@ -261,8 +261,11 @@ struct OpeningBattlegroundBannerScript : public SpellScript
             LockEntry const* lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
             if (lockInfo && lockInfo->Index[1] == LOCKTYPE_SLOW_OPEN)
             {
-                Spell* visual = new Spell(spell->m_casterUnit, sSpellMgr.GetSpellEntry(24390), true);
-                visual->prepare();
+                if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(24390))
+                {
+                    Spell* visual = new Spell(spell->m_casterUnit, pSpellEntry, true);
+                    visual->prepare();
+                }
             }
         }
     }
@@ -542,6 +545,20 @@ AuraScript* GetScript_Stoneform(SpellEntry const*)
     return new StoneformAuraScript();
 }
 
+// 29421 - Holiday Breath of Fire, Conditional (NPC)
+struct HolidayBreathOfFireConditionalScript : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        return roll_chance_u(10);
+    }
+};
+
+SpellScript* GetScript_HolidayBreathOfFireConditional(SpellEntry const*)
+{
+    return new HolidayBreathOfFireConditionalScript();
+}
+
 void AddSC_special_spell_scripts()
 {
     Script* newscript;
@@ -649,5 +666,10 @@ void AddSC_special_spell_scripts()
     newscript = new Script;
     newscript->Name = "spell_flamethrower";
     newscript->GetAuraScript = &GetScript_Flamethrower;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_holiday_breath_of_fire_conditional";
+    newscript->GetSpellScript = &GetScript_HolidayBreathOfFireConditional;
     newscript->RegisterSelf();
 }

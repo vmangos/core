@@ -983,9 +983,11 @@ dtStatus PathInfo::findSmoothPath(float const* startPos, float const* endPos,
                 }
                 // Move position at the other side of the off-mesh link.
                 dtVcopy(iterPos, endPos);
-                if (dtStatusFailed(m_navMeshQuery->getPolyHeight(polys[0], iterPos, &iterPos[1])))
-                    return DT_FAILURE;
-                iterPos[1] += 0.2f;
+                // getPolyHeight can fail when the link's end point was clamped onto the
+                // landing poly's boundary edge at link time; the stored height is already
+                // the landing poly's height there, so keep it instead of failing the path.
+                if (dtStatusSucceed(m_navMeshQuery->getPolyHeight(polys[0], iterPos, &iterPos[1])))
+                    iterPos[1] += 0.2f;
             }
         }
 
@@ -1109,12 +1111,20 @@ void PathInfo::CutPathWithDynamicLoS()
     Vector3 out;
     // We have always keep at least 2 points (else, there is no mvt !)
     for (uint32 i = 1; i <= maxIndex; ++i)
-        if (m_sourceUnit->GetMap()->GetDynamicObjectHitPos(m_pathPoints[i - 1], m_pathPoints[i], out, -0.1f))
+    {
+        Vector3 start = m_pathPoints[i - 1];
+        Vector3 end = m_pathPoints[i];
+        start.z += 1.0f;
+        end.z += 1.0f;
+
+        if (m_sourceUnit->GetMap()->GetDynamicObjectHitPos(start, end, out, -0.1f))
         {
+            out.z -= 1.0f;
             m_pathPoints[i] = out;
             m_pathPoints.resize(i + 1);
             break;
         }
+    }
 }
 
 float PathInfo::Length() const

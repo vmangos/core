@@ -1,4 +1,6 @@
 #include "AuctionHouse.h"
+#include "AuctionHouseMgr.h"
+#include "SharedDefines.h"
 
 void WorldPackets::AuctionHouse::AuctionHello::ReadFromWorldPacket(WorldPacket& recv_data)
 {
@@ -94,4 +96,29 @@ void WorldPackets::AuctionHouse::AuctionOwnerNotification::AppendBodyTo(ByteBuff
     buffer << bidderGuid;
     buffer << itemTemplate;
     buffer << randomPropertyId;
+}
+
+void WorldPackets::AuctionHouse::AuctionCommandResult::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << auctionId;
+    buffer << action;
+    buffer << errorCode;
+
+    switch (errorCode)
+    {
+        case AUCTION_OK:
+            if (action == AUCTION_BID_PLACED)
+                buffer << auctionOutBid;
+            break;
+        case AUCTION_ERR_INVENTORY:
+            buffer << inventoryError;
+            break;
+        case AUCTION_ERR_HIGHER_BID:
+            buffer << newBidderGuid;
+            buffer << newBid;
+            buffer << auctionOutBid;
+            break;
+        default:
+            break;
+    }
 }

@@ -5208,89 +5208,13 @@ uint32 Player::GetShieldBlockValue() const
 
 float Player::GetMeleeCritFromAgility() const
 {
-    float valLevel1 = 0.0f;
-    float valLevel60 = 0.0f;
-    // critical
-    switch (GetClass())
-    {
-        case CLASS_PALADIN:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            valLevel1 = 4.6f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_MAGE:
-            valLevel1 = 12.9f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_ROGUE:
-            valLevel1 = 2.2f;
-            valLevel60 = 29.0f;
-            break;
-        case CLASS_HUNTER:
-            valLevel1 = 3.5f;
-            valLevel60 = 53.0f;
-            break;
-        case CLASS_PRIEST:
-            valLevel1 = 11.0f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARLOCK:
-            valLevel1 = 8.4f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARRIOR:
-            valLevel1 = 3.9f;
-            valLevel60 = 20.0f;
-            break;
-        default:
-            return 0.0f;
-    }
-    float classRate = valLevel1 * float(60.0f - GetLevel()) / 59.0f + valLevel60 * float(GetLevel() - 1.0f) / 59.0f;
+    float classRate = sObjectMgr.GetPlayerCritPerAgility(GetClass(), GetLevel());
     return GetStat(STAT_AGILITY) / classRate;
 }
 
 float Player::GetDodgeFromAgility() const
 {
-    float valLevel1 = 0.0f;
-    float valLevel60 = 0.0f;
-    // critical
-    switch (GetClass())
-    {
-        case CLASS_PALADIN:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            valLevel1 = 4.6f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_MAGE:
-            valLevel1 = 12.9f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_ROGUE:
-            valLevel1 = 1.1f;
-            valLevel60 = 14.5f;
-            break;
-        case CLASS_HUNTER:
-            valLevel1 = 1.8f;
-            valLevel60 = 26.5f;
-            break;
-        case CLASS_PRIEST:
-            valLevel1 = 11.0f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARLOCK:
-            valLevel1 = 8.4f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARRIOR:
-            valLevel1 = 3.9f;
-            valLevel60 = 20.0f;
-            break;
-        default:
-            return 0.0f;
-    }
-    float classRate = valLevel1 * float(60.0f - GetLevel()) / 59.0f + valLevel60 * float(GetLevel() - 1.0f) / 59.0f;
+    float classRate = sObjectMgr.GetPlayerDodgePerAgility(GetClass(), GetLevel());
     return GetStat(STAT_AGILITY) / classRate;
 }
 
@@ -16148,8 +16072,11 @@ void Player::SendRaidInfo() const
             data << uint32(state->GetMapId());              // map id
 
             // Permanent dungeons (raids) don't have a valid reset timer since it's
-            // on a schedule. Send the scheduled time instead of state reset time
-            time_t resetTime = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(state->GetMapId());
+            // on a schedule. Send the scheduled time instead of state reset time.
+            // Before 1.9 each raid instance has its own reset timer instead.
+            time_t resetTime = DungeonResetScheduler::IsRaidResetSchedulingGlobal()
+                ? sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(state->GetMapId())
+                : state->GetResetTime();
             data << uint32(resetTime - time(nullptr));
             data << uint32(state->GetInstanceId());         // instance id
 

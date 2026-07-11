@@ -29,6 +29,7 @@
 #include "Player.h"
 #include "Path.h"
 #include "WaypointMovementGenerator.h"
+#include "Database/DBCStores.h"
 
 void WorldSession::HandleTaxiNodeStatusQueryOpcode(WorldPackets::Taxi::TaxiNodeStatusQuery const& packet)
 {
@@ -87,12 +88,23 @@ void WorldSession::SendTaxiMenu(Creature* unit)
     if (curloc == 0)
         return;
 
-    WorldPacket data(SMSG_SHOWTAXINODES, (4 + 8 + 4 + 8 * 4));
-    data << uint32(1);
-    data << unit->GetObjectGuid();
-    data << uint32(curloc);
-    GetPlayer()->m_taxi.AppendTaximaskTo(data, GetPlayer()->IsTaxiCheater());
-    SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Taxi::ShowTaxiNodes>();
+    packet->flightmasterGuid = unit->GetObjectGuid();
+    packet->currentNode = curloc;
+
+    if (GetPlayer()->IsTaxiCheater())
+    { // player is able to use all taxi nodes
+        for (uint32 i = 0; i < 8; ++i)
+            packet->knownNodesMask[i] = sTaxiNodesMask[i];
+    }
+    else
+    {
+        TaxiMask const& taxiMask = GetPlayer()->m_taxi.GetTaxiMask();
+        for (uint32 i = 0; i < 8; ++i)
+            packet->knownNodesMask[i] = taxiMask[i];
+    }
+
+    SendPacket(std::move(packet));
 }
 
 void WorldSession::SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathNode)

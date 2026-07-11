@@ -2255,14 +2255,21 @@ void WorldObject::SendObjectMessageToSetImpl(WorldPacket* data, bool self, World
 
 void WorldObject::SendObjectMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except) const
 {
-    WorldPacket data(packet->GetOpcode());
-    packet->AppendBodyTo(data);
-    SendObjectMessageToSet(&data, self, except);
+    WorldPacket binaryPacket(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+    SendObjectMessageToSet(&binaryPacket, self, except);
 }
 
 void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except) const
 {
     SendObjectMessageToSetImpl<ObjectViewersDeliverer>(data, self, except);
+}
+
+void WorldObject::SendMovementMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except)
+{
+    WorldPacket binaryPacket(packet->GetOpcode());
+    packet->AppendBodyTo(binaryPacket);
+    SendMovementMessageToSet(std::move(binaryPacket), self, except);
 }
 
 void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except)
@@ -3097,15 +3104,6 @@ GameObject* WorldObject::FindRandomGameObject(uint32 entry, float range) const
         ++tcIter;
 
     return *tcIter;
-}
-
-GameObject* WorldObject::FindNearbyClosedDoor(float range) const
-{
-    GameObject* door = nullptr;
-    MaNGOS::AnyClosedDoorInRangeCheck go_check(this, range);
-    MaNGOS::GameObjectSearcher<MaNGOS::AnyClosedDoorInRangeCheck> checker(door, go_check);
-    Cell::VisitGridObjects(this, checker, range);
-    return door;
 }
 
 Player* WorldObject::FindNearestPlayer(float range) const

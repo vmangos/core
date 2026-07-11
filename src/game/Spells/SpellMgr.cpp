@@ -1344,6 +1344,15 @@ bool SpellMgr::IsProfessionSpell(uint32 spellId)
     return IsProfessionSkill(skill);
 }
 
+bool SpellMgr::IsTradeskillSpell(uint32 spellId)
+{
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    if (!spellInfo)
+        return false;
+
+    return spellInfo->Attributes & SPELL_ATTR_IS_TRADESKILL;
+}
+
 bool SpellMgr::IsPrimaryProfessionSpell(uint32 spellId)
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
@@ -3964,20 +3973,21 @@ void SpellMgr::LoadSpell(Field* fields)
     if (spell->HasAttribute(SPELL_ATTR_EX2_ENABLE_AFTER_PARRY))
         spell->CasterAuraState = spell->SpellFamilyName == SPELLFAMILY_HUNTER ? AURA_STATE_HUNTER_PARRY : AURA_STATE_DEFENSE;
 
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
     for (int i = EFFECT_INDEX_0; i <= EFFECT_INDEX_2; ++i)
     {
         if (IsEffectAppliesAura(spell->Effect[i]))
         {
             switch (spell->EffectApplyAuraName[i])
             {
-                // Before 1.11, the spell data specifies TO what percent the speed is reduced, not BY what percent.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+            // Before 1.11, the spell data specifies TO what percent the speed is reduced, not BY what percent.
             case SPELL_AURA_MOD_DECREASE_SPEED:
             {
                 spell->EffectBasePoints[i] = -(100 - spell->EffectBasePoints[i]);
                 break;
             }
-
+#endif
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
             // Before 1.9, the creature family is not a mask.
             case SPELL_AURA_MOD_DAMAGE_DONE_CREATURE:
@@ -4016,6 +4026,10 @@ void SpellMgr::LoadSpell(Field* fields)
             case SPELL_AURA_MOD_BASE_RESISTANCE_PCT:
             case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
             case SPELL_AURA_SPLIT_DAMAGE_FLAT:
+#endif
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
+            // School in this effect updated way later for some reason.
+            case SPELL_AURA_MANA_SHIELD:
             {
                 if (spell->EffectMiscValue[i] == -2)
                     spell->EffectMiscValue[i] = 127; // all schools

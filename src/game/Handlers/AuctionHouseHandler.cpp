@@ -69,30 +69,30 @@ void WorldSession::SendAuctionHello(Unit* unit)
 // call this method when player bids, creates, or deletes auction
 void WorldSession::SendAuctionCommandResult(AuctionEntry* auc, AuctionAction Action, AuctionError ErrorCode, InventoryResult invError)
 {
-    WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 16);
-    data << uint32(auc ? auc->Id : 0);
-    data << uint32(Action);
-    data << uint32(ErrorCode);
+    auto packet = std::make_unique<WorldPackets::AuctionHouse::AuctionCommandResult>();
+    packet->auctionId = auc ? auc->Id : 0;
+    packet->action = Action;
+    packet->errorCode = ErrorCode;
 
     switch (ErrorCode)
     {
         case AUCTION_OK:
             if (Action == AUCTION_BID_PLACED)
-                data << uint32(auc->GetAuctionOutBid());    // new AuctionOutBid?
+                packet->auctionOutBid = auc->GetAuctionOutBid();    // new AuctionOutBid?
             break;
         case AUCTION_ERR_INVENTORY:
-            data << uint32(invError);
+            packet->inventoryError = invError;
             break;
         case AUCTION_ERR_HIGHER_BID:
-            data << ObjectGuid(HIGHGUID_PLAYER, auc->bidder); // new bidder guid
-            data << uint32(auc->bid);                       // new bid
-            data << uint32(auc->GetAuctionOutBid());        // new AuctionOutBid?
+            packet->newBidderGuid = ObjectGuid(HIGHGUID_PLAYER, auc->bidder); // new bidder guid
+            packet->newBid = auc->bid;                       // new bid
+            packet->auctionOutBid = auc->GetAuctionOutBid(); // new AuctionOutBid?
             break;
         default:
             break;
     }
 
-    SendPacket(&data);
+    SendPacket(std::move(packet));
 }
 
 // this function sends notification, if bidder is online

@@ -1,12 +1,28 @@
 {
-	"0": {
-		"3147": {
-			"maxSimplificationError": 1.0,
-			"detailSampleDist": 0.5,
-			"_Info": "stomrwind keep - pathing guard"
-		},
-		"3050": {
-			"_Info": "TODO:westbrook garrison"
+	"_Info": "Map overrides: top-level key = numeric map ID (e.g. \"0\" = Eastern Kingdoms). Rename '_map_override_template' to a map ID to activate it.",
+	"_Info2": "Tile overrides: key inside a map object = zero-padded tileX+tileY, e.g. tile (3,7) -> \"0307\". Omitted parameters use the compiled-in defaults.",
+	"_Info3": "walkableClimbModelTransition: max step height (voxels) at terrain<->model transitions; 0 = same as walkableClimb.",
+	"_map_override_template":
+	{
+		"walkableSlopeAngle":      75.0,
+		"walkableSlopeAngleVMaps": 61.0,
+		"walkableRadius":          2,
+		"walkableClimb":           0,
+		"walkableClimbModelTransition": 0,
+		"walkableHeight":          0,
+		"borderSize":              5,
+		"maxEdgeLen":              45,
+		"maxSimplificationError":  1.8,
+		"mergeRegionArea":         10,
+		"minRegionArea":           30,
+		"detailSampleDist":        2.0,
+		"detailSampleMaxError":    0.5,
+		"quick":                   -1,
+
+		"0307":
+		{
+			"_Info": "Tile-level override for tile (3,7): sits directly inside the map object and replaces its values for that tile only.",
+			"walkableSlopeAngle": 50.0
 		}
 	}
 }

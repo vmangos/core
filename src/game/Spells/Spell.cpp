@@ -22,6 +22,7 @@
 #include "Spell.h"
 #include "Log.h"
 #include "Opcodes.h"
+#include "CharacterDatabaseCache.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "World.h"
@@ -3216,22 +3217,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 }
             }
 
-            GameObject const* const pDoor = m_caster->FindNearbyClosedDoor(dist);
-            bool const directionThroughDoor = pDoor ? pDoor->HasInArc(M_PI_F, src.x, src.y) != pDoor->HasInArc(M_PI_F, dest.x, dest.y) : false;
-
             if (m_caster->GetMap()->GetWalkHitPosition(m_caster->GetTransport(), src.x, src.y, src.z, dest.x, dest.y, dest.z, NAV_GROUND | NAV_WATER, 20.0f, false))
             {
-                // move back so we dont clip into a door
-                if (pDoor)
-                {
-                    if (directionThroughDoor)
-                        Geometry::Move2dPointTowards(src, dest, 3.0f);
-
-                    if (pDoor->HasInArc(M_PI_F, src.x, src.y) != pDoor->HasInArc(M_PI_F, dest.x, dest.y) ||
-                       !m_caster->IsWithinLOS(dest.x, dest.y, dest.z, true, 0.1f))
-                        dest = src;
-                }
-
                 // should never go backwards or sideways
                 if (!m_caster->HasInArc(M_PI_F / 2.0f, dest.x, dest.y))
                     dest = src;
@@ -3243,6 +3230,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             }
 
             m_targets.setDestination(dest.x, dest.y, dest.z);
+            break;
         }
         default:
             //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SPELL: Unknown implicit target (%u) for spell ID %u", targetMode, m_spellInfo->Id);
@@ -4969,30 +4957,38 @@ void Spell::SendChannelStart(uint32 duration)
     m_timer = duration;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+    // TODO: Investigate when exactly this packet should be sent.
+    // It breaks Eyes of the Beast visual on pet if sent for it.
     if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_CHANNELED))
     {
-        WorldPacket data(SMSG_SPELL_UPDATE_CHAIN_TARGETS);
-        data << m_caster->GetObjectGuid();
-        data << uint32(m_spellInfo->Id);
-        size_t count_pos = data.wpos();
-        data << uint32(0);
-        uint32 hit = 0;
-        for (TargetList::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); ++itr)
+        if (SpellVisualEntry const* pVisual = sSpellVisualStore.LookupEntry(m_spellInfo->SpellVisual))
         {
-            if (((itr->effectMask & (1 << EFFECT_INDEX_0)) && itr->reflectResult == SPELL_MISS_NONE &&
-                m_CastItem) || itr->targetGUID != m_caster->GetObjectGuid())
+            if (pVisual->channelKit)
             {
-                if (Unit* target = ObjectAccessor::GetUnit(*m_caster, itr->targetGUID))
+                WorldPacket data(SMSG_SPELL_UPDATE_CHAIN_TARGETS);
+                data << m_caster->GetObjectGuid();
+                data << uint32(m_spellInfo->Id);
+                size_t count_pos = data.wpos();
+                data << uint32(0);
+                uint32 hit = 0;
+                for (TargetList::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); ++itr)
                 {
-                    ++hit;
-                    data << target->GetObjectGuid();
+                    if (((itr->effectMask & (1 << EFFECT_INDEX_0)) && itr->reflectResult == SPELL_MISS_NONE &&
+                        m_CastItem) || itr->targetGUID != m_caster->GetObjectGuid())
+                    {
+                        if (Unit* target = ObjectAccessor::GetUnit(*m_caster, itr->targetGUID))
+                        {
+                            ++hit;
+                            data << target->GetObjectGuid();
+                        }
+                    }
+                }
+                if (hit)
+                {
+                    data.put<uint32>(count_pos, hit);
+                    m_caster->SendMessageToSet(&data, true);
                 }
             }
-        }
-        if (hit)
-        {
-            data.put<uint32>(count_pos, hit);
-            m_caster->SendMessageToSet(&data, true);
         }
     }
 #endif
@@ -6108,11 +6104,45 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_EFFECT_SUMMON_DEAD_PET:
             {
                 Creature* pet = m_casterUnit ? m_casterUnit->GetPet() : nullptr;
-                if (!pet)
-                    return SPELL_FAILED_NO_PET;
+                Player* player = m_caster->ToPlayer();
 
-                if (pet->IsAlive())
-                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                if (pet)
+                {
+                    if (pet->IsAlive())
+                    {
+                        if (player)
+                            player->SendPetTameFailure(PETTAME_ANOTHERSUMMONACTIVE);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+
+                    // Remove dead pet corpse before revive
+                    if (Pet* petObj = pet->ToPet())
+                        petObj->Unsummon(PET_SAVE_AS_CURRENT, player);
+
+                    break;
+                }
+
+                // No active pet - check database
+                if (player)
+                {
+                    CharacterPetCache* currentPet = sCharacterDatabaseCache.GetCharacterPetByOwner(player->GetGUIDLow());
+                    if (!currentPet)
+                    {
+                        player->SendPetTameFailure(PETTAME_NOPETAVAILABLE);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+
+                    if (currentPet->currentHealth > 0)
+                    {
+                        player->SendPetTameFailure(PETTAME_NOTDEAD);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+                    // Pet is dead in DB - allow revive
+                }
+                else
+                {
+                    return SPELL_FAILED_NO_PET;
+                }
 
                 break;
             }

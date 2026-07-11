@@ -227,60 +227,6 @@ static char const* UnitBytes2FlagsToString(uint32 flag)
 
 #define CREATURE_MAX_SPELLS     4
 
-enum Swing
-{
-    NOSWING                    = 0,
-    SINGLEHANDEDSWING          = 1,
-    TWOHANDEDSWING             = 2
-};
-
-enum VictimState
-{
-    VICTIMSTATE_UNAFFECTED     = 0,                         // seen in relation with HITINFO_MISS
-    VICTIMSTATE_NORMAL         = 1,
-    VICTIMSTATE_DODGE          = 2,
-    VICTIMSTATE_PARRY          = 3,
-    VICTIMSTATE_INTERRUPT      = 4,
-    VICTIMSTATE_BLOCKS         = 5,
-    VICTIMSTATE_EVADES         = 6,
-    VICTIMSTATE_IS_IMMUNE      = 7,
-    VICTIMSTATE_DEFLECTS       = 8
-};
-
-enum HitInfo
-{
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    HITINFO_NORMALSWING         = 0x00000000,
-    HITINFO_DEBUG               = 0x00000001,               // req correct packet structure
-    HITINFO_AFFECTS_VICTIM      = 0x00000002,               // no being hit animation on victim without it
-    HITINFO_LEFTSWING           = 0x00000004,
-    HITINFO_UNK3                = 0x00000008,
-    HITINFO_MISS                = 0x00000010,
-    HITINFO_ABSORB              = 0x00000020,               // plays absorb sound
-    HITINFO_RESIST              = 0x00000040,               // resisted atleast some damage
-    HITINFO_CRITICALHIT         = 0x00000080,
-    HITINFO_UNK8                = 0x00000100,               // wotlk?
-    HITINFO_UNK9                = 0x00002000,               // wotlk?
-    HITINFO_GLANCING            = 0x00004000,
-    HITINFO_CRUSHING            = 0x00008000,
-    HITINFO_NOACTION            = 0x00010000,
-    HITINFO_SWINGNOHITSOUND     = 0x00080000
-#else
-    HITINFO_NORMALSWING         = 0x00000000,
-    HITINFO_MISS                = 0x00000001,
-    HITINFO_AFFECTS_VICTIM      = 0x00000002,               // no being hit animation on victim without it
-    HITINFO_CRITICALHIT         = 0x00000008,
-    HITINFO_DEBUG               = 0x00000020,               // req correct packet structure
-    HITINFO_LEFTSWING           = 0x00000200,
-    HITINFO_NOACTION            = 0x00001000,
-    HITINFO_ABSORB              = 0x00010000,               // plays absorb sound
-    HITINFO_RESIST              = 0x00020000,               // resisted atleast some damage
-    HITINFO_GLANCING            = 0x00100000,
-    HITINFO_CRUSHING            = 0x00200000,
-    HITINFO_SWINGNOHITSOUND     = 0x00800000
-#endif
-};
-
 //i would like to remove this: (it is defined in item.h
 enum InventorySlot
 {

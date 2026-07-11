@@ -354,8 +354,12 @@ typedef std::pair<GossipMenuItemsMap::const_iterator, GossipMenuItemsMap::const_
 
 struct PetCreateSpellEntry
 {
-    uint32 spellId[4];
+    uint32 spellId[CREATURE_MAX_SPELLS];
 };
+
+
+typedef std::array<std::vector<CreatureCharmSpellEntry>, CREATURE_MAX_SPELLS> CreatureCharmSpellSlotsArray;
+typedef std::unordered_map<uint32, CreatureCharmSpellSlotsArray> CreatureCharmSpellsMap;
 
 struct GraveYardData
 {
@@ -711,6 +715,9 @@ class ObjectMgr
         }
         void GetPlayerLevelInfo(uint32 race, uint32 class_,uint32 level, PlayerLevelInfo* info) const;
 
+        float GetPlayerCritPerAgility(uint32 classId, uint32 level) const;
+        float GetPlayerDodgePerAgility(uint32 classId, uint32 level) const;
+
         ObjectGuid GetPlayerGuidByName(std::string const& name) const;
         bool GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const;
         Team GetPlayerTeamByGUID(ObjectGuid guid) const;
@@ -840,6 +847,14 @@ class ObjectMgr
             return nullptr;
         }
 
+        CreatureCharmSpellSlotsArray const* GetCreatureCharmSpellSlotsArray(uint32 id) const
+        {
+            auto itr = m_creatureCharmSpellsMap.find(id);
+            if (itr != m_creatureCharmSpellsMap.end())
+                return &itr->second;
+            return nullptr;
+        }
+
         PetCreateSpellEntry const* GetPetCreateSpellEntry(uint32 id) const
         {
             auto itr = m_PetCreateSpellMap.find(id);
@@ -868,6 +883,7 @@ class ObjectMgr
         void LoadBroadcastTextLocales();
         bool LoadQuestGreetings();
         bool LoadTrainerGreetings();
+        void LoadCreatureCharmSpells();
         void LoadPetCreateSpells();
         void LoadPetSpellData();
         void LoadCreatureLocales();
@@ -1502,6 +1518,7 @@ class ObjectMgr
         GossipMenuItemsMap  m_GossipMenuItemsMap;
         PointOfInterestMap  m_PointsOfInterestMap;
 
+        CreatureCharmSpellsMap m_creatureCharmSpellsMap;
         PetCreateSpellMap   m_PetCreateSpellMap;
 
         //character reserved names
@@ -1555,13 +1572,16 @@ class ObjectMgr
         std::set<uint32> m_ConditionIdSet;
 
         typedef std::map<uint32,PetLevelInfo*> PetLevelInfoMap;
-        // PetLevelInfoMap[creature_id][level]
-        PetLevelInfoMap m_PetInfoMap;                            // [creature_id][level]
+        PetLevelInfoMap m_PetInfoMap;                       // [creature_id][level]
 
         PlayerClassInfo m_PlayerClassInfo[MAX_CLASSES];
 
         void BuildPlayerLevelInfo(uint8 race, uint8 class_, uint8 level, PlayerLevelInfo* plinfo) const;
         PlayerInfo m_PlayerInfo[MAX_RACES][MAX_CLASSES];
+
+                                                            // [class][level]
+        std::array<std::vector<float>, MAX_CLASSES> m_playerCritPerAgility;
+        std::array<std::vector<float>, MAX_CLASSES> m_playerDodgePerAgility;
 
         typedef std::vector<uint32> PlayerXPperLevel;       // [level]
         PlayerXPperLevel m_PlayerXPperLevel;

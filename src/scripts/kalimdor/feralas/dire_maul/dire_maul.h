@@ -25,6 +25,7 @@ enum
 
     DATA_TANNIN_LOOTED            = 13,
     DATA_DREADSTEED_RITUAL_PLAYER = 14,
+    DATA_FINAL_GUARD_ALIVE_COUNT  = 15,
 
     // DM East
     NPC_OLD_IRONBARK       = 11491,
@@ -75,13 +76,7 @@ enum
 
     SPELL_KING_OF_GORDOK   = 22799,
 
-    GO_GORDOK_TRIBUTE_0    = 179564,
-    GO_GORDOK_TRIBUTE_1    = 300400,
-    GO_GORDOK_TRIBUTE_2    = 300401,
-    GO_GORDOK_TRIBUTE_3    = 300402,
-    GO_GORDOK_TRIBUTE_4    = 300403,
-    GO_GORDOK_TRIBUTE_5    = 300404,
-    GO_GORDOK_TRIBUTE_6    = 300405,
+    GO_GORDOK_TRIBUTE    = 179564,
 
     ITEM_GORDOK_INNER_DOOR_KEY = 18268,
     ITEM_GORDOK_COURTYARD_KEY  = 18266,
@@ -160,6 +155,7 @@ class instance_dire_maul : public ScriptedInstance
 
         // North
         uint32 m_uiGuardAliveCount;
+        uint32 m_uiFinalGuardAliveCount;
         uint64 m_uiTendrisGUID;
         uint64 m_uiOldIronbarkGUID;
         uint64 m_uiSlipKikGUID;
@@ -167,15 +163,7 @@ class instance_dire_maul : public ScriptedInstance
         uint64 m_uiKingGordokGUID;
         uint64 m_uiChoRushTheObserverGUID;
         uint8 m_uiChoRushEquipment;
-
-        uint64 m_uiGordokTribute0GUID;
-        uint64 m_uiGordokTribute1GUID;
-        uint64 m_uiGordokTribute2GUID;
-        uint64 m_uiGordokTribute3GUID;
-        uint64 m_uiGordokTribute4GUID;
-        uint64 m_uiGordokTribute5GUID;
-        uint64 m_uiGordokTribute6GUID;
-
+        uint64 m_uiGordokTributeGUID;
         uint64 m_uiBrokenTrapGUID;
         bool m_bIsGordokTributeRespawned;
         bool m_bIsTanninLooted;

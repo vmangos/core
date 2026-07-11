@@ -58,4 +58,13 @@ void WorldPackets::Character::LoginVerifyWorld::AppendBodyTo(ByteBuffer& buffer)
     buffer << location.o;
 }
 
+void WorldPackets::Character::CharRenameResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << result;
+    if (result == RESPONSE_SUCCESS)
+    {
+        buffer << renamedCharacterGuid;
+        buffer << newName;
+    }
+}
 

@@ -218,7 +218,7 @@ class LootTemplate
         // Adds an entry to the group (at loading stage)
         void AddEntry(LootStoreItem& item);
         // Rolls for every item in the template and adds the rolled items to the loot
-        void Process(Loot& loot, LootStore const& store, bool rate, uint8 GroupId = 0) const;
+        void Process(Loot& loot, LootStore const& store, Player* player, bool rate, uint8 GroupId = 0) const;
 
         // True if template includes at least 1 quest drop entry
         bool HasQuestDrop(uint8 groupId = 0) const;
@@ -350,8 +350,8 @@ struct Loot
     bool HasPlayersLooting() const { return !m_playersLooting.empty(); }
 
     void GenerateMoneyLoot(uint32 minAmount, uint32 maxAmount);
-    bool FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError = false, WorldObject const* looted = nullptr);
-    void FillPlayerDependentLoot(Player* loot_owner, bool personal, WorldObject const* looted = nullptr);
+    bool FillLoot(uint32 loot_id, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, WorldObject const* looted = nullptr);
+    void FillPlayerDependentLoot(Player* lootOwner, bool personal, WorldObject const* looted = nullptr);
 
     // Inserts the item into the loot (called by LootTemplate processors)
     void AddItem(LootStoreItem const& item);

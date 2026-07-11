@@ -81,3 +81,8 @@ void WorldPackets::Movement::MoveNotActiveMover::ReadFromWorldPacket(WorldPacket
 #endif
     recv_data >> movementInfo;
 }
+
+void WorldPackets::Movement::MountSpecialAnim::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << mountedUnitGuid;
+}

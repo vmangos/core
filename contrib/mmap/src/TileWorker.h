@@ -156,8 +156,9 @@ namespace MMAP
         bool shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY);
         void buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh, uint32 curTile, uint32 tileCount, bool forceRebuild = false);
         void buildMoveMapTile(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, float bmin[3], float bmax[3], dtNavMesh* navMesh);
+        void validateOffMeshConnections(MeshData const& meshData, dtNavMesh const* navMesh, dtNavMeshCreateParams const& params, char const* tileString);
 
-        json getDefaultConfig();
+        static json getDefaultConfig();
         json getMapIdConfig(uint32 mapId);
         json getTileConfig(uint32 mapId, uint32 tileX, uint32 tileY);
 
