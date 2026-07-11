@@ -345,6 +345,17 @@ static std::vector<PathfindingTestCase> GetCases_EasternKingdoms()
             Vector3(-14422.698242f, 442.271454f, 11.481449f),
             Vector3(-14428.955078f, 451.584686f, 15.414349f),
             "Booty Bay - Dock", 1.109f),
+
+        // Straight line under an archway - the arch must not block the path
+        PathfindingTestCase(MAP_EASTERN_KINGDOMS,
+            Vector3(1718.490234f, -802.188354f, 57.533108f),
+            Vector3(1715.224854f, -773.817810f, 56.574677f),
+            "The Bulwark - Path under archway", 1.001f),
+
+        PathfindingTestCase(MAP_EASTERN_KINGDOMS,
+            Vector3(-8568.852539f, -2561.991699f, 133.149109f),
+            Vector3(-8530.038086f, -2558.897217f, 133.373856f),
+            "Blackrock Pass - Path under archway", 1.000f),
     };
 }
 
