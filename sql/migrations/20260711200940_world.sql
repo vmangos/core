@@ -8,6 +8,7 @@ IF v = 0 THEN
 INSERT INTO `migrations` VALUES ('20260711200940');
 -- Add your query below.
 
+-- Fadeleaf
 -- Add Missing
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (21, 2042, 1, -4201.8, -3419, 33.998, 1.0821, 0, 0, 0.515038, 0.857167, 300, 300, 100, 1, 0, 0, 0, 10),
@@ -143,7 +144,74 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (7666, @PTEMPLATE+3, 'Fadeleaf - Badlands - Group 3'),
 (11466, @PTEMPLATE+3, 'Fadeleaf - Badlands - Group 3');
 
--- Grave Moss Arathi
+-- Grave Moss
+-- Add Missing
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1150, 1628, 0, -10971.9, -1321.31, 52.3461, 2.51327, 0, 0, 0.951056, 0.309017, 300, 300, 100, 1, 0, 0, 0, 10),
+(1153, 1628, 0, -11005.3, -1334.97, 52.1094, 1.62316, 0, 0, 0.725374, 0.688355, 300, 300, 100, 1, 0, 0, 0, 10),
+(1159, 1628, 1, -2020.59, 1333.22, 63.6953, -2.54818, 0, 0, -0.956305, 0.292372, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
+(1159,  107, 0, 'Grave Moss', 0, 0, 10);
+
+-- Barrens
+SET @PTEMPLATE = 1082;
+DELETE FROM `pool_template` WHERE `entry` = 1083;
+DELETE FROM `pool_gameobject` WHERE `pool_entry` = 1083;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Grave Moss - Barrens - Group 1 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
+(13383, @PTEMPLATE+1, 'Grave Moss - Barrens - Group 1'),
+(29150, @PTEMPLATE+1, 'Grave Moss - Barrens - Group 1'),
+(29151, @PTEMPLATE+1, 'Grave Moss - Barrens - Group 1'),
+(68705, @PTEMPLATE+1, 'Grave Moss - Barrens - Group 1');
+
+-- Alterac Mountains
+SET @PTEMPLATE = 1059;
+DELETE FROM `pool_template` WHERE `entry` = 1060;
+DELETE FROM `pool_gameobject` WHERE `pool_entry` = 1060;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Grave Moss - Alterac Mountains - Group 1 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
+(4445, @PTEMPLATE+1, 'Grave Moss - Alterac Mountains - Group 1'),
+(32644, @PTEMPLATE+1, 'Grave Moss - Alterac Mountains - Group 1'),
+(29129, @PTEMPLATE+1, 'Grave Moss - Alterac Mountains - Group 1');
+
+-- Duskwood
+SET @PTEMPLATE = 4976;
+DELETE FROM `pool_template` WHERE `entry` = 105;
+DELETE FROM `pool_gameobject` WHERE `pool_entry` = 105;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Grave Moss - Duskwood - Group 1 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
+(4452, @PTEMPLATE+1, 'Grave Moss - Duskwood - Group 1'),
+(14026, @PTEMPLATE+1, 'Grave Moss - Duskwood - Group 1'),
+(29117, @PTEMPLATE+1, 'Grave Moss - Duskwood - Group 1'),
+(29118, @PTEMPLATE+1, 'Grave Moss - Duskwood - Group 1'),
+(29123, @PTEMPLATE+1, 'Grave Moss - Duskwood - Group 1'),
+(68702, @PTEMPLATE+1, 'Grave Moss - Duskwood - Group 1');
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+2, 1, 'Grave Moss - Duskwood - Group 2 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
+(4465, @PTEMPLATE+2, 'Grave Moss - Duskwood - Group 2'),
+(4502, @PTEMPLATE+2, 'Grave Moss - Duskwood - Group 2'),
+(17892, @PTEMPLATE+2, 'Grave Moss - Duskwood - Group 2'),
+(29120, @PTEMPLATE+2, 'Grave Moss - Duskwood - Group 2'),
+(33483, @PTEMPLATE+2, 'Grave Moss - Duskwood - Group 2'),
+(68703, @PTEMPLATE+2, 'Grave Moss - Duskwood - Group 2');
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(@PTEMPLATE+3, 1, 'Grave Moss - Duskwood - Group 3 - Master', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
+(4473, @PTEMPLATE+3, 'Grave Moss - Duskwood - Group 3'),
+(1150, @PTEMPLATE+3, 'Grave Moss - Duskwood - Group 3'),
+(1153, @PTEMPLATE+3, 'Grave Moss - Duskwood - Group 3'),
+(29119, @PTEMPLATE+3, 'Grave Moss - Duskwood - Group 3'),
+(29121, @PTEMPLATE+3, 'Grave Moss - Duskwood - Group 3'),
+(29122, @PTEMPLATE+3, 'Grave Moss - Duskwood - Group 3');
+
+-- Arathi
 SET @PTEMPLATE = 103;
 DELETE FROM `pool_template` WHERE `entry` = 104;
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 104;
