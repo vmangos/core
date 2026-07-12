@@ -533,7 +533,7 @@ void WorldSession::SendStablePet(ObjectGuid guid)
 
     uint8 num = 0;                                          // counter for place holder
 
-    // not let move dead pet in slot
+    // Send current summoned pet if alive
     if (pet && pet->IsAlive() && pet->GetPetType() == HUNTER_PET)
     {
         data << uint32(pet->GetCharmInfo()->GetPetNumber());
@@ -544,7 +544,7 @@ void WorldSession::SendStablePet(ObjectGuid guid)
         data << uint8(0x01);                                // client slot 1 == current pet (0)
         ++num;
     }
-    // Pet may be despawned if owner went far away from pet for example.
+    // Send current pet from DB if dismissed or dead
     else if (CharacterPetCache const* currentPetData = sCharacterDatabaseCache.GetCharacterPetByOwner(_player->GetGUIDLow()))
     {
         data << uint32(currentPetData->id);
