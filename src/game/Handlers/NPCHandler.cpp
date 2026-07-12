@@ -783,7 +783,7 @@ void WorldSession::HandleUnstablePet(WorldPackets::Npc::UnstablePet const& packe
         return;
     }
 
-    // No current pet - simple unstable
+    // No current pet and the pet being unstabled is dead — move to NOT_IN_SLOT
     if (petData->currentHealth == 0)
     {
         CharacterDatabase.BeginTransaction();
