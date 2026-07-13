@@ -60,11 +60,39 @@ static std::array<uint16, SIZE> SetupUpdateFieldFlagsArray(uint8 objectTypeMask)
     return flagsArray;
 }
 
+template<std::size_t SIZE>
+static std::array<bool, SIZE> SetupGuidFieldStartArray(uint8 objectTypeMask)
+{
+    std::array<bool, SIZE> guidStartArray;
+    guidStartArray.fill(false);
+    for (auto const& itr : g_updateFieldsData)
+    {
+        if ((itr.objectTypeMask & objectTypeMask) == 0)
+            continue;
+
+        if (itr.valueType != UF_TYPE_GUID)
+            continue;
+
+        // Guid fields and guid arrays are consecutive uint32 pairs.
+        for (uint16 i = itr.offset; i + 1 < itr.offset + itr.size; i += 2)
+        {
+            guidStartArray.at(i) = true;
+        }
+    }
+    return guidStartArray;
+}
+
 static std::array<uint16, CONTAINER_END> const g_containerUpdateFieldFlags = SetupUpdateFieldFlagsArray<CONTAINER_END>(TYPEMASK_OBJECT | TYPEMASK_ITEM | TYPEMASK_CONTAINER);
 static std::array<uint16, PLAYER_END> const g_playerUpdateFieldFlags = SetupUpdateFieldFlagsArray<PLAYER_END>(TYPEMASK_OBJECT | TYPEMASK_UNIT | TYPEMASK_PLAYER);
 static std::array<uint16, GAMEOBJECT_END> const g_gameObjectUpdateFieldFlags = SetupUpdateFieldFlagsArray<GAMEOBJECT_END>(TYPEMASK_OBJECT | TYPEMASK_GAMEOBJECT);
 static std::array<uint16, DYNAMICOBJECT_END> const g_dynamicObjectUpdateFieldFlags = SetupUpdateFieldFlagsArray<DYNAMICOBJECT_END>(TYPEMASK_OBJECT | TYPEMASK_DYNAMICOBJECT);
 static std::array<uint16, CORPSE_END> const g_corpseUpdateFieldFlags = SetupUpdateFieldFlagsArray<CORPSE_END>(TYPEMASK_OBJECT | TYPEMASK_CORPSE);
+
+static std::array<bool, CONTAINER_END> const g_containerGuidFieldStart = SetupGuidFieldStartArray<CONTAINER_END>(TYPEMASK_OBJECT | TYPEMASK_ITEM | TYPEMASK_CONTAINER);
+static std::array<bool, PLAYER_END> const g_playerGuidFieldStart = SetupGuidFieldStartArray<PLAYER_END>(TYPEMASK_OBJECT | TYPEMASK_UNIT | TYPEMASK_PLAYER);
+static std::array<bool, GAMEOBJECT_END> const g_gameObjectGuidFieldStart = SetupGuidFieldStartArray<GAMEOBJECT_END>(TYPEMASK_OBJECT | TYPEMASK_GAMEOBJECT);
+static std::array<bool, DYNAMICOBJECT_END> const g_dynamicObjectGuidFieldStart = SetupGuidFieldStartArray<DYNAMICOBJECT_END>(TYPEMASK_OBJECT | TYPEMASK_DYNAMICOBJECT);
+static std::array<bool, CORPSE_END> const g_corpseGuidFieldStart = SetupGuidFieldStartArray<CORPSE_END>(TYPEMASK_OBJECT | TYPEMASK_CORPSE);
 
 uint16 const* UpdateFields::GetUpdateFieldFlagsArray(uint8 objectTypeId)
 {
@@ -95,6 +123,37 @@ uint16 const* UpdateFields::GetUpdateFieldFlagsArray(uint8 objectTypeId)
     }
     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unhandled object type id (%hhu) in GetUpdateFieldFlagsArray!", objectTypeId);
     return 0;
+}
+
+bool const* UpdateFields::GetGuidFieldStartArray(uint8 objectTypeId)
+{
+    switch (objectTypeId)
+    {
+        case TYPEID_ITEM:
+        case TYPEID_CONTAINER:
+        {
+            return g_containerGuidFieldStart.data();
+        }
+        case TYPEID_UNIT:
+        case TYPEID_PLAYER:
+        {
+            return g_playerGuidFieldStart.data();
+        }
+        case TYPEID_GAMEOBJECT:
+        {
+            return g_gameObjectGuidFieldStart.data();
+        }
+        case TYPEID_DYNAMICOBJECT:
+        {
+            return g_dynamicObjectGuidFieldStart.data();
+        }
+        case TYPEID_CORPSE:
+        {
+            return g_corpseGuidFieldStart.data();
+        }
+    }
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unhandled object type id (%hhu) in GetGuidFieldStartArray!", objectTypeId);
+    return nullptr;
 }
 
 UpdateFieldData const* UpdateFields::GetUpdateFieldDataByName(char const* name)
