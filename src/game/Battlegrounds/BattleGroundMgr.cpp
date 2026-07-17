@@ -673,7 +673,10 @@ void BattleGroundQueue::RemoveOfflinePlayer()
 
         if (remove)
         {
-            itr = m_queuedPlayers.erase(itr);
+            ObjectGuid playerGuid = itr->first;
+            ++itr; 
+
+            RemovePlayer(playerGuid, true); 
         }
         else
         {
