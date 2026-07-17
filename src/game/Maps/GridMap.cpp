@@ -859,7 +859,7 @@ float TerrainInfo::GetHeightStatic(float x, float y, float z, bool useVmaps/*=tr
             // we have mapheight and vmapheight and must select more appropriate
 
             // we are already under the surface or vmap height above map heigt
-            if (z < mapHeight || vmapHeight > mapHeight)
+            if (z + 1.0f  < mapHeight || vmapHeight > mapHeight)
                 return vmapHeight;
             return mapHeight;                               // better use .map surface height
         }
