@@ -51,7 +51,7 @@ public:
     void WriteToFile(Container<LoggedPacket, Args...> const& container)
     {
         WriteHeader();
-        for (auto const &itr : container)
+        for (auto const& itr : container)
             WritePacket(itr);
     }
 private:
