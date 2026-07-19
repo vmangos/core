@@ -63,7 +63,8 @@ jobs:
               c_compiler: clang
               cxx_compiler: clang++
               install_clang: true
-              job_name: Ubuntu Clang
+              job_name: Ubuntu Clang & PCH OFF
+              pch_off: "-DUSE_PCH=OFF"
           - client_build: 5875
             config:
               os: macos-26
@@ -77,13 +78,6 @@ jobs:
               os: windows-2022
               job_name: Windows MinGW
               use_mingw: true
-          - client_build: 5875
-            config:
-              os: ubuntu-24.04
-              c_compiler: gcc
-              cxx_compiler: g++
-              job_name: Ubuntu GCC (PCH OFF)
-              pch_off: "-DUSE_PCH=OFF"
 
     steps:
       - name: Check out repository
