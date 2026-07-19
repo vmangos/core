@@ -130,8 +130,8 @@ void InstanceStatisticsMgr::LoadFromDB()
             Field* fields = result->Fetch();
 
             uint32 index = fields[0].GetUInt32();
-            uint32 count = fields[1].GetUInt32();
-            m_instanceCustomCounters[index] = count;
+            uint32 customcount = fields[1].GetUInt32();
+            m_instanceCustomCounters[index] = customcount;
             ++count;
         } while (result->NextRow());
 
