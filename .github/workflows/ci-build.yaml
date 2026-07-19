@@ -55,6 +55,7 @@ jobs:
             c_compiler: gcc
             cxx_compiler: g++
             job_name: Ubuntu GCC
+            pch_off: ""
         include:
           - client_build: 5875
             config:
@@ -62,7 +63,8 @@ jobs:
               c_compiler: clang
               cxx_compiler: clang++
               install_clang: true
-              job_name: Ubuntu Clang
+              job_name: Ubuntu Clang & PCH OFF
+              pch_off: "-DUSE_PCH=OFF"
           - client_build: 5875
             config:
               os: macos-26
@@ -132,7 +134,8 @@ jobs:
             -DBUILD_EXTRACTORS=1 \
             -DENABLE_MAILSENDER=1 \
             -DBUILD_WARNINGS_AS_ERROR=1 \
-            -DSUPPORTED_CLIENT_BUILD="${{ matrix.client_build }}"
+            -DSUPPORTED_CLIENT_BUILD="${{ matrix.client_build }}" \
+            ${{ matrix.config.pch_off }}
           make -j"$(nproc)"
           make install
 
