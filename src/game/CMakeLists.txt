@@ -519,7 +519,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation
   ${CMAKE_SOURCE_DIR}/dep/include
   ${CMAKE_SOURCE_DIR}/src/framework
-  ${CMAKE_SOURCE_DIR}/src/framework/Network
   ${CMAKE_SOURCE_DIR}/src/shared
   ${CMAKE_BINARY_DIR}
   ${CMAKE_BINARY_DIR}/src/shared
@@ -557,12 +556,6 @@ source_group("Server"
   REGULAR_EXPRESSION Socket|Session|Opcodes|DBC
   FILES
     SharedDefines.h
-)
-
-source_group("Chat Commands"
-  REGULAR_EXPRESSION Level[0-9]
-  FILES
-    debugcmds.cpp
 )
 
 source_group("Tool"
