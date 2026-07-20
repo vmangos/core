@@ -346,11 +346,20 @@ void WorldSession::HandleLootMethodOpcode(WorldPackets::Group::LootMethod const&
     if (!group)
         return;
 
-    /** error handling **/
     if (!group->IsLeader(GetPlayer()->GetObjectGuid()))
         return;
-    /********************/
 
+    if (packet.lootMethod == MASTER_LOOT)
+    {
+        if (!group->IsMember(packet.lootMaster))
+            return;
+    }
+    else
+    {
+        // cannot have loot master in other loot methods
+        const_cast<ObjectGuid&>(packet.lootMaster).Clear();
+    }
+    
     // everything is fine, do it
     group->SetLootMethod((LootMethod)packet.lootMethod);
     group->SetLooterGuid(packet.lootMaster);
