@@ -835,9 +835,8 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     data << uint32(startbid);                               // Auction->startbid (not sure if useful)
     data << uint32(bid ? GetAuctionOutBid() : 0);           // minimal outbid
     data << uint32(buyout);                                 // auction->buyout
-    int64 const timeLeftMs = std::max<int64>(
-        0, int64(expireTime - time(nullptr)) * IN_MILLISECONDS);
-    data << uint32(std::min<int64>(timeLeftMs, INT32_MAX)); // time left
+    int64 const timeLeftMs = std::min<int64>(std::max<int64>(0, int64(expireTime - time(nullptr)) * IN_MILLISECONDS), INT32_MAX);
+    data << uint32(timeLeftMs);                             // time left
     data << ObjectGuid(HIGHGUID_PLAYER, bidder);            // auction->bidder current
     data << uint32(bid);                                    // current bid
     return true;
