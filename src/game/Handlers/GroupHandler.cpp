@@ -351,9 +351,16 @@ void WorldSession::HandleLootMethodOpcode(WorldPackets::Group::LootMethod const&
         return;
     /********************/
 
+    if (packet.lootMethod == MASTER_LOOT && !group->IsMember(packet.lootMaster))
+        return;
+
+    ObjectGuid const lootMaster = packet.lootMethod == MASTER_LOOT
+        ? packet.lootMaster
+        : ObjectGuid();
+
     // everything is fine, do it
     group->SetLootMethod((LootMethod)packet.lootMethod);
-    group->SetLooterGuid(packet.lootMaster);
+    group->SetLooterGuid(lootMaster);
     group->SetLootThreshold((ItemQualities)packet.lootThreshold);
     group->SendUpdate();
 }
