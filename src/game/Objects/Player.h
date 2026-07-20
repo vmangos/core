@@ -997,6 +997,7 @@ class Player final: public Unit
         void SendBuyError(BuyResult msg, Creature const* pCreature, uint32 item, uint32 param) const;
         void SendSellError(SellResult msg, Creature const* pCreature, ObjectGuid itemGuid, uint32 param) const;
         void SendOpenContainer(ObjectGuid itemGuid) const;
+        bool IsVendorItemVisible(Creature* vendor, VendorItem const* vendorItem, ItemPrototype const* itemProto);
         void AddWeaponProficiency(uint32 newflag) { m_weaponProficiency |= newflag; }
         void AddArmorProficiency(uint32 newflag) { m_armorProficiency |= newflag; }
         uint32 GetWeaponProficiency() const { return m_weaponProficiency; }
