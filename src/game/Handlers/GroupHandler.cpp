@@ -440,7 +440,7 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
     recv_data >> maximum;
 
     /** error handling **/
-    if (minimum > maximum || maximum > 10000)               // < 32768 for urand call
+    if (minimum > maximum || maximum > 1000000)
         return;
     /********************/
 
