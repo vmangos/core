@@ -1293,7 +1293,16 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 {
                     if (unitTarget && m_casterUnit)
                     {
-                        m_casterUnit->Kill(unitTarget, nullptr);
+                        ObjectGuid const targetGuid = unitTarget->GetObjectGuid();
+                        m_casterUnit->m_Events.AddLambdaEventAtOffset(
+                            [caster = m_casterUnit, targetGuid]
+                            {
+                                if (!caster->IsInWorld())
+                                    return;
+                                if (Unit* target = caster->GetMap()->GetUnit(targetGuid))
+                                    if (target->IsAlive())
+                                        caster->Kill(target, nullptr);
+                            }, 500);
                     }
                     return;
                 }
