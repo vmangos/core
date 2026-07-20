@@ -394,7 +394,7 @@ void WorldSession::HandleMinimapPingOpcode(WorldPackets::Group::MinimapPing cons
 void WorldSession::HandleRandomRollOpcode(WorldPackets::Group::RandomRoll const& packet)
 {
     /** error handling **/
-    if (packet.minimum > packet.maximum || packet.maximum > 10000) // < 32768 for urand call
+    if (packet.minimum > packet.maximum || packet.maximum > 1000000)
         return;
     /********************/
 
