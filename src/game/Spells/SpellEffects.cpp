@@ -1293,16 +1293,16 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                 {
                     if (unitTarget && m_casterUnit)
                     {
-                        ObjectGuid const targetGuid = unitTarget->GetObjectGuid();
+                        // kill is delayed so that spell visual can display properly
                         m_casterUnit->m_Events.AddLambdaEventAtOffset(
-                            [caster = m_casterUnit, targetGuid]
+                            [caster = m_casterUnit, targetGuid = unitTarget->GetObjectGuid()]
                             {
                                 if (!caster->IsInWorld())
                                     return;
                                 if (Unit* target = caster->GetMap()->GetUnit(targetGuid))
                                     if (target->IsAlive())
                                         caster->Kill(target, nullptr);
-                            }, 500);
+                            }, BATCHING_INTERVAL);
                     }
                     return;
                 }
