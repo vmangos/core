@@ -1474,6 +1474,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         }
     }
 
+    if (m_spellInfo->IsNextMeleeSwingSpell() && m_casterUnit && m_casterUnit->GetVictim() == unitTarget && !(m_damage && unitTarget->IsAlive()))
+        SendMeleeAttackingStateUpdate(target, nullptr);
+
     // All calculated do it!
     // Do healing and triggers
     if (m_healing && unitTarget->IsAlive())
@@ -1592,6 +1595,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         m_damage = damageInfo.damage; // update value so that script handler has access
         if (m_spellScript)
             m_spellScript->OnHit(this, missInfo);
+
+        // Should be sent before spell damage log
+        if (m_spellInfo->IsNextMeleeSwingSpell() && m_casterUnit && m_casterUnit->GetVictim() == unitTarget)
+            SendMeleeAttackingStateUpdate(target, &damageInfo);
 
         // Send log damage message to client
         pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
@@ -5257,6 +5264,45 @@ void Spell::SendResurrectRequest(Player* target, bool sickness)
     // override delay sent with SMSG_CORPSE_RECLAIM_DELAY, set instant resurrection for spells with this attribute
     data << uint8(!m_spellInfo->HasAttribute(SPELL_ATTR_EX3_NO_RES_TIMER));
     target->GetSession()->SendPacket(&data);
+}
+
+void Spell::SendMeleeAttackingStateUpdate(TargetInfo const* target, SpellNonMeleeDamage const* damageInfo)
+{
+    auto packet = std::make_unique<WorldPackets::Combat::MeleeAttackingStateUpdate>();
+
+    packet->hitInfo = HITINFO_NOACTION | HITINFO_NO_FLOATING_TEXT;
+    if (target->missCondition == SPELL_MISS_MISS)
+        packet->hitInfo |= HITINFO_MISS;
+    else if (target->missCondition == SPELL_MISS_ABSORB)
+        packet->hitInfo |= HITINFO_ABSORB;
+    else if (target->missCondition != SPELL_MISS_IMMUNE && target->missCondition != SPELL_MISS_IMMUNE2)
+        packet->hitInfo |= HITINFO_AFFECTS_VICTIM;
+    if (target->missCondition == SPELL_MISS_RESIST)
+        packet->hitInfo |= HITINFO_RESIST;
+    if (target->isCrit)
+        packet->hitInfo |= HITINFO_CRITICALHIT;
+
+    packet->attackerGuid = m_casterUnit->GetObjectGuid();
+    packet->victimGuid = m_casterUnit->GetVictim()->GetObjectGuid();
+    packet->subDamage.resize(1);
+
+    if (damageInfo && !m_spellInfo->HasAttribute(SPELL_ATTR_ON_NEXT_SWING_NO_DAMAGE))
+    {
+        packet->totalDamage = packet->meleeSpellDamage = damageInfo->damage;
+        for (uint32 i = 0; i < packet->subDamage.size(); ++i)
+        {
+            packet->subDamage[i].damage = damageInfo->damage;
+            packet->subDamage[i].absorb = damageInfo->absorb;
+            packet->subDamage[i].resist = damageInfo->resist;
+            packet->subDamage[i].damageSchoolMask = GetSchoolMask(damageInfo->school);
+        }
+        packet->blockedAmount = damageInfo->blocked;
+    }
+
+    packet->victimState = SpellMissInfoToVictimState(target->missCondition);
+    packet->attackerState = packet->victimState == VICTIMSTATE_NORMAL ? 1000 : 0;
+    packet->meleeSpellId = m_spellInfo->Id;
+    m_casterUnit->SendMessageToSet(std::move(packet), true);
 }
 
 void Spell::TakeCastItem()
