@@ -54,6 +54,31 @@ enum VictimState
     VICTIMSTATE_DEFLECTS       = 8
 };
 
+inline VictimState SpellMissInfoToVictimState(SpellMissInfo missInfo)
+{
+    switch (missInfo)
+    {
+        case SPELL_MISS_NONE:
+            return VICTIMSTATE_NORMAL;
+        case SPELL_MISS_MISS:
+            return VICTIMSTATE_UNAFFECTED;
+        case SPELL_MISS_DODGE:
+            return VICTIMSTATE_DODGE;
+        case SPELL_MISS_PARRY:
+            return VICTIMSTATE_PARRY;
+        case SPELL_MISS_BLOCK:
+            return VICTIMSTATE_BLOCKS;
+        case SPELL_MISS_EVADE:
+            return VICTIMSTATE_EVADES;
+        case SPELL_MISS_IMMUNE:
+        case SPELL_MISS_IMMUNE2:
+            return VICTIMSTATE_IS_IMMUNE;
+        case SPELL_MISS_DEFLECT:
+            return VICTIMSTATE_DEFLECTS;
+    }
+    return VICTIMSTATE_UNAFFECTED;
+}
+
 enum HitInfo
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
@@ -67,6 +92,7 @@ enum HitInfo
     HITINFO_RESIST              = 0x00000040,               // resisted atleast some damage
     HITINFO_CRITICALHIT         = 0x00000080,
     HITINFO_UNK8                = 0x00000100,               // wotlk?
+    HITINFO_NO_FLOATING_TEXT    = 0x00001000,               // used with melee spells
     HITINFO_UNK9                = 0x00002000,               // wotlk?
     HITINFO_GLANCING            = 0x00004000,
     HITINFO_CRUSHING            = 0x00008000,
@@ -82,6 +108,7 @@ enum HitInfo
     HITINFO_NOACTION            = 0x00001000,
     HITINFO_ABSORB              = 0x00010000,               // plays absorb sound
     HITINFO_RESIST              = 0x00020000,               // resisted atleast some damage
+    HITINFO_NO_FLOATING_TEXT    = 0x00040000,               // used with melee spells
     HITINFO_GLANCING            = 0x00100000,
     HITINFO_CRUSHING            = 0x00200000,
     HITINFO_SWINGNOHITSOUND     = 0x00800000
