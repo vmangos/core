@@ -1319,9 +1319,18 @@ void ObjectMgr::CorrectCreatureDisplayIds(uint32 entry, uint32& displayId)
         // Rhahk'Zor
         if (entry == 644 && displayId == 1124)
             displayId = 14403;
+        // Mo'grosh Ogre
+        if (entry == 1178 && displayId == 740)
+            displayId = 1122;
+        //  Mo'grosh Enforcer
+        if (entry == 1179 && displayId == 645)
+            displayId = 6692;
         // Mo'grosh Brute
         if (entry == 1180 && displayId == 1124)
             displayId = 14403;
+        // Chok'sul
+        if (entry == 1210 && displayId == 8431)
+            displayId = 1054;
         // Crushridge Brute
         if (entry == 2253 && displayId == 10711)
             displayId = 610;
@@ -1340,9 +1349,21 @@ void ObjectMgr::CorrectCreatureDisplayIds(uint32 entry, uint32& displayId)
         // Dreadmaul Ogre
         if (entry == 5974 && displayId == 11541)
             displayId = 14402;
+        // Dreadmaul Brute
+        if (entry == 5976 && displayId == 11535)
+            displayId = 11584;
         // Dreadmaul Mauler
         if (entry == 5977 && displayId == 11540)
             displayId = 14401;
+        // Spirestone Battle Mage
+        if (entry == 9197 && displayId == 11575)
+            displayId = 11543;
+        // Spirestone Ogre Magus
+        if (entry == 9201 && displayId == 11580)
+            displayId = 11562;
+        // Brackenwall Enforcer
+        if (entry == 10036 && displayId == 8432)
+            displayId = 10704;
     }
 #endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
