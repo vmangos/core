@@ -3664,6 +3664,7 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
         ResetCombatTime();
         UpdateCombatState(true);
 
+        HandleEmoteState(0);
         SetStandState(UNIT_STAND_STATE_STAND);
         m_pacifiedTimer = 0;
 
