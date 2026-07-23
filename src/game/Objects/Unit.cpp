@@ -2196,12 +2196,12 @@ void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool ext
 
     ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.totalDamage + damageInfo.totalAbsorb + damageInfo.totalResist, damageInfo.attackType));
 
-    // In sniffs SMSG_ATTACKERSTATEUPDATE follows chance-on-hit spell casts.
+    // In sniffs SMSG_ATTACKERSTATEUPDATE is sent after chance on hit spell casts from CastItemCombatSpell. This fixes animation for Frostbrand Attack.
     // Send it before lethal damage so the client can still resolve the victim
     // for swing animation, combat feedback, and victim-anchored world text.
     SendAttackStateUpdate(&damageInfo);
 
-    // Damage remains after procs so victim auras can affect the caster on a killing blow.
+    // Damage is done after procs so it can trigger auras on the victim that affect the caster in case of killing blow.
     DealMeleeDamage(&damageInfo, true);
 
     if (IsPlayer())
