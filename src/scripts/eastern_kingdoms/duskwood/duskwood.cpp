@@ -202,7 +202,9 @@ CreatureAI* GetAI_npc_twilight_corrupter(Creature* pCreature)
 enum WatcherBlombergData
 {
     NPC_WATCHER_DODDS   = 888,
-    NPC_WATCHER_PAIGE   = 499
+    NPC_WATCHER_PAIGE   = 499,
+    SAY_LOOK_ALIVE      = 16,
+    FACTION_COMBAT      = 56
 };
 
 struct npc_watcher_blombergAI : ScriptedAI
@@ -215,8 +217,7 @@ struct npc_watcher_blombergAI : ScriptedAI
 
     bool m_bIsEngaged;
     uint32 m_uiSayTimer;
-    ObjectGuid m_DoddsGuid;
-    ObjectGuid m_PaigeGuid;
+    ObjectGuid m_doddsGuid;
 
     void Reset() override
     {
@@ -229,27 +230,36 @@ struct npc_watcher_blombergAI : ScriptedAI
         m_uiSayTimer = 3000;
     }
 
+    void OnRemoveFromWorld() override
+    {
+        if (auto pDodds = m_creature->GetMap()->GetCreature(m_doddsGuid))
+        {
+            pDodds->SetUInt32Value(UNIT_NPC_FLAGS, pDodds->GetCreatureInfo()->npc_flags);
+            pDodds->ClearTemporaryFaction();
+            pDodds->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        }
+    }
+
     void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bIsEngaged)
         {
             if (m_uiSayTimer < uiDiff)
             {
-                m_creature->MonsterSay("The abomination is coming! Dodds! Paige! Come here and help us!");
+                DoScriptText(SAY_LOOK_ALIVE, m_creature);
                 m_bIsEngaged = true;
 
                 if (auto pDodds = m_creature->FindNearestCreature(NPC_WATCHER_DODDS, 200.0f))
                 {
-                    m_DoddsGuid = pDodds->GetObjectGuid();
-                    pDodds->GetMotionMaster()->MovePoint(0, -10903.043945f, -377.539124f, 40.065773f, MOVE_PATHFINDING, 0, 1.19f);                    
+                    pDodds->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                    pDodds->SetFactionTemporary(FACTION_COMBAT, TEMPFACTION_ALL);
+                    pDodds->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    pDodds->GetMotionMaster()->MovePoint(0, -10903.043945f, -377.539124f, 40.065773f, MOVE_PATHFINDING, 0, 1.19f);
+                    m_doddsGuid = pDodds->GetObjectGuid();
                 }
-
 
                 if (auto pPaige = m_creature->FindNearestCreature(NPC_WATCHER_PAIGE, 200.0f))
-                {
-                    m_PaigeGuid = pPaige->GetObjectGuid();
-                    pPaige->GetMotionMaster()->MovePoint(0, -10906.221680f, -375.957214f, 39.960278f, MOVE_PATHFINDING, 0, 1.19f);                    
-                }
+                    pPaige->GetMotionMaster()->MovePoint(0, -10906.221680f, -375.957214f, 39.960278f, MOVE_PATHFINDING, 0, 1.19f);
             }
             else
                 m_uiSayTimer -= uiDiff;
@@ -453,7 +463,7 @@ struct npc_stitchesAI : npc_escortAI
     }
 
     std::list<ObjectGuid> m_lWatchman;
-    ObjectGuid m_townCrierGuid, m_DoddsGuid, m_PaigeGuid, m_sirraVonIndiGuide;
+    ObjectGuid m_townCrierGuid, m_sirraVonIndiGuide;
     uint32 m_uiAuraOfRotTimer;
     uint32 m_uiLaunchTimer;
     bool m_bLaunchChecked;
@@ -472,12 +482,6 @@ struct npc_stitchesAI : npc_escortAI
             pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_5);
 
         DespawnWatcher();
-
-        if (auto pDodds = m_creature->GetMap()->GetCreature(m_DoddsGuid))
-            pDodds->GetMotionMaster()->MoveTargetedHome();
-
-        if (auto pPaige = m_creature->GetMap()->GetCreature(m_PaigeGuid))
-            pPaige->GetMotionMaster()->MoveTargetedHome();
 
         if (auto pSirra = m_creature->GetMap()->GetCreature(m_sirraVonIndiGuide))
         {
@@ -543,11 +547,6 @@ struct npc_stitchesAI : npc_escortAI
                 pSummoned->GetMotionMaster()->MovePoint(0, -10902.211914f, -375.488495f, 40.000954f, MOVE_PATHFINDING);
                 pSummoned->SetCombatStartPosition(-10902.211914f, -375.488495f, 40.000954f);
                 pSummoned->SetHomePosition(-10902.211914f, -375.488495f, 40.000954f, 0.0f);
-                if (auto pSummonedAI = static_cast<npc_watcher_blombergAI*>(pSummoned->AI()))
-                {
-                    m_DoddsGuid = pSummonedAI->m_DoddsGuid;
-                    m_PaigeGuid = pSummonedAI->m_PaigeGuid;
-                }
                 break;
             case NPC_WATCHER_SELKIN:
                 if (auto pSummonedAI = static_cast<npc_watcher_selkinAI*>(pSummoned->AI()))

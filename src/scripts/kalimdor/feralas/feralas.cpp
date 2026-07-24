@@ -849,6 +849,7 @@ void npc_kindal_moonweaverAI::BeginEvent()
                 pSpriteAI->m_uiKindalGUID = m_creature->GetObjectGuid();
                 pSpriteAI->m_uiGateGUID = pGoGate->GetObjectGuid();
                 pSpriteAI->m_bEventStart = true;
+                pSprite->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             }
         }
     }
