@@ -162,11 +162,19 @@ enum SpellMissInfo
     SPELL_MISS_NONE                    = 0,
     SPELL_MISS_MISS                    = 1,
     SPELL_MISS_RESIST                  = 2,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
     SPELL_MISS_DODGE                   = 3,
     SPELL_MISS_PARRY                   = 4,
     SPELL_MISS_BLOCK                   = 5,
     SPELL_MISS_EVADE                   = 6,
     SPELL_MISS_IMMUNE                  = 7,
+#else
+    SPELL_MISS_IMMUNE                  = 3,
+    SPELL_MISS_EVADE                   = 4,
+    SPELL_MISS_DODGE                   = 5,
+    SPELL_MISS_PARRY                   = 6,
+    SPELL_MISS_BLOCK                   = 7,
+#endif
     SPELL_MISS_IMMUNE2                 = 8,
     SPELL_MISS_DEFLECT                 = 9,
     SPELL_MISS_ABSORB                  = 10,
