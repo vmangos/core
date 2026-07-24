@@ -176,8 +176,10 @@ enum SpellMissInfo
     SPELL_MISS_BLOCK                   = 7,
 #endif
     SPELL_MISS_IMMUNE2                 = 8,
+    // below added in 1.5
     SPELL_MISS_DEFLECT                 = 9,
     SPELL_MISS_ABSORB                  = 10,
+    // below added in 1.6
     SPELL_MISS_REFLECT                 = 11
 };
 
