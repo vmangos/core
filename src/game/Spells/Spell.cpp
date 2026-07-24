@@ -1185,6 +1185,13 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     {
         if (m_casterUnit)
         {
+            // World of Warcraft Client Patch 1.6.0 (2005-07-12)
+            // - Spell reflection effects have greatly improved visuals and functionality.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_5_1
+            // client doesn't support SPELL_MISS_REFLECT so we need target to cast on caster
+            unitTarget->SendSpellGo(m_casterUnit, m_spellInfo->Id);
+#endif
+
             isReflected = true;
             DoSpellHitOnUnit(m_casterUnit, effectMask);
             unitTarget = m_casterUnit;
@@ -4644,9 +4651,18 @@ void Spell::WriteSpellGoTargets(WorldPacket* data)
             if (ihit.missCondition == SPELL_MISS_REFLECT)
                 *data << uint8(ihit.reflectResult);
 #else
-            *data << uint8(ihit.missCondition);
+            // some types not supported by earlier clients
+            uint8 missInfo = ihit.missCondition;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_1
             if (ihit.missCondition == SPELL_MISS_REFLECT)
-                *data << uint8(ihit.reflectResult);
+                missInfo = SPELL_MISS_DEFLECT;
+#else
+            if (ihit.missCondition > SPELL_MISS_IMMUNE2)
+                missInfo = SPELL_MISS_RESIST;
+#endif
+            
+            *data << uint8(missInfo);
             *data << (ihit.targetGUID);
 #endif
             ++miss;
