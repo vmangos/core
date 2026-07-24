@@ -4857,10 +4857,17 @@ void Spell::WriteSpellGoTargets(WorldPacket* data)
     {
         if (ihit.missCondition != SPELL_MISS_NONE)        // Add only miss
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
             *data << (ihit.targetGUID);
             *data << uint8(ihit.missCondition);
             if (ihit.missCondition == SPELL_MISS_REFLECT)
                 *data << uint8(ihit.reflectResult);
+#else
+            *data << uint8(ihit.missCondition);
+            if (ihit.missCondition == SPELL_MISS_REFLECT)
+                *data << uint8(ihit.reflectResult);
+            *data << (ihit.targetGUID);
+#endif
             ++miss;
         }
     }
