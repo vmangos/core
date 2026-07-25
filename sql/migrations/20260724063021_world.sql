@@ -784,6 +784,14 @@ UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 134217728 /*C
 -- Dwarven Farmer
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 64 /*ImmuneNPC*/ WHERE `entry`=12998; -- DB2 Matches
 
+-- Mechanical Chicken (minipet)
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 32 /*ImmunePC*/ WHERE `entry`=8376; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 64 /*ImmuneNPC*/ WHERE `entry`=8376; -- DB2 Matches
+
+-- Black Tabby (minipet)
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 32 /*ImmunePC*/ WHERE `entry`=7383; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 64 /*ImmuneNPC*/ WHERE `entry`=7383; -- DB2 Matches
+
 
 -- End of migration.
 END IF;
