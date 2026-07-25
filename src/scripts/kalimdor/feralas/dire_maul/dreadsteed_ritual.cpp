@@ -578,15 +578,21 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
             {
                 case 0:
                     //pop horse
-                    if (crea = me->SummonCreature(NPC_XOROTHIAN_DREADSTEED, x, y, z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
+                    if (crea = me->SummonCreature(NPC_XOROTHIAN_DREADSTEED, -39.0447f, 812.591f, -29.4525f, 1.39626f, TEMPSUMMON_DEAD_DESPAWN, 0))
                     {
                     }
                     waveTimer = 10000;
                     waveStep++;
                     break;
                 case 1:
-                    if (crea = me->SummonCreature(NPC_LORD_HEL_NURATH, x, y, z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
+                    if (crea = me->SummonCreature(NPC_LORD_HEL_NURATH, -39.5763f, 812.786f, -29.4525f, 2.26893f, TEMPSUMMON_DEAD_DESPAWN, 0))
+                    {
                         DoScriptText(SAY_HEL_NURATH, crea);
+                        crea->m_Events.AddLambdaEventAtOffset([crea]()
+                        {
+                            crea->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                        }, 5000);
+                    }
                     waveTimer = 210000;
                     waveStep++;
                     break;
