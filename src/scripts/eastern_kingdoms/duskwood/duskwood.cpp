@@ -218,6 +218,7 @@ struct npc_watcher_blombergAI : ScriptedAI
     bool m_bIsEngaged;
     uint32 m_uiSayTimer;
     ObjectGuid m_doddsGuid;
+    ObjectGuid m_paigeGuid;
 
     void Reset() override
     {
@@ -234,9 +235,22 @@ struct npc_watcher_blombergAI : ScriptedAI
     {
         if (auto pDodds = m_creature->GetMap()->GetCreature(m_doddsGuid))
         {
-            pDodds->SetUInt32Value(UNIT_NPC_FLAGS, pDodds->GetCreatureInfo()->npc_flags);
-            pDodds->ClearTemporaryFaction();
-            pDodds->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            if (pDodds->IsAlive())
+            {
+                pDodds->SetUInt32Value(UNIT_NPC_FLAGS, pDodds->GetCreatureInfo()->npc_flags);
+                pDodds->ClearTemporaryFaction();
+                pDodds->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                if (pDodds->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
+                    pDodds->GetMotionMaster()->MoveTargetedHome();
+            }
+        }
+        if (auto pPaige = m_creature->GetMap()->GetCreature(m_paigeGuid))
+        {
+            if (pPaige->IsAlive())
+            {
+                if (pPaige->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
+                    pPaige->GetMotionMaster()->MoveTargetedHome();
+            }
         }
     }
 
@@ -259,7 +273,10 @@ struct npc_watcher_blombergAI : ScriptedAI
                 }
 
                 if (auto pPaige = m_creature->FindNearestCreature(NPC_WATCHER_PAIGE, 200.0f))
+                {
                     pPaige->GetMotionMaster()->MovePoint(0, -10906.221680f, -375.957214f, 39.960278f, MOVE_PATHFINDING, 0, 1.19f);
+                    m_paigeGuid = pPaige->GetObjectGuid();
+                }
             }
             else
                 m_uiSayTimer -= uiDiff;
