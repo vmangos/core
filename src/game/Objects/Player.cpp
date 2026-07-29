@@ -3570,9 +3570,18 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
     }
 
     PlayerSpellState state = learning ? PLAYERSPELL_NEW : PLAYERSPELL_UNCHANGED;
-
+    TalentSpellPos const* talentPos = GetTalentSpellPos(spellId);
     bool disabledCase = false;
     bool supercededOld = false;
+    bool cannotSupercede = false;
+
+    // fixes Nature's Grasp displaying as not learned on talent interface after learning next rank
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+    if (uint32 firstRank = sSpellMgr.GetFirstSpellInChain(spellId))
+        if (uint32 nextRank = sSpellMgr.GetSpellBookSuccessorSpellId(firstRank))
+            if (GetTalentSpellPos(firstRank) && !GetTalentSpellPos(nextRank))
+                cannotSupercede = true;
+#endif
 
     PlayerSpellMap::iterator itr = m_spells.find(spellId);
     if (itr != m_spells.end())
@@ -3581,9 +3590,9 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
         bool dependent_set = false;
 
         // fix activate state for non-stackable low rank (and find next spell for !active case)
-        if (uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(spellInfo->Id))
+        if (uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(spellId))
         {
-            if (HasSpell(nextId))
+            if (!cannotSupercede && HasSpell(nextId))
             {
                 // high rank already known so this must !active
                 active = false;
@@ -3674,8 +3683,6 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
             }
     }
 
-    TalentSpellPos const* talentPos = GetTalentSpellPos(spellId);
-
     if (!disabledCase) // skip new spell adding if spell already known (disabled spells case)
     {
         // talent: unlearn all other talent ranks (high and low)
@@ -3709,7 +3716,7 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
         newspell.disabled  = disabled;
 
         // replace spells in action bars and spellbook to bigger rank if only one spell rank must be accessible
-        if (newspell.active && !newspell.disabled)
+        if (!cannotSupercede && newspell.active && !newspell.disabled)
         {
             for (auto& m_spell : m_spells)
             {
