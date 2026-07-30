@@ -1143,10 +1143,27 @@ void Object::_SetCreateBits(UpdateMask& updateMask, Player const* target) const
     uint16 const* flags = nullptr;
     uint16 visibleFlag = GetUpdateFieldFlagsForTarget(target, flags);
     ASSERT(flags);
+    bool const* guidFieldStart = UpdateFields::GetGuidFieldStartArray(GetTypeId());
 
     for (uint16 index = 0; index < m_valuesCount; ++index)
     {
-        if ((m_uint32Values[index] != 0) && (flags[index] & visibleFlag))
+        if (!(flags[index] & visibleFlag))
+            continue;
+
+        // Guid fields must be networked with both halves or not at all. The client
+        // ignores 64 bit values that are only partially present in the create stage,
+        // so sending just the non-zero half (player guids have a zero high half)
+        // makes it display no target for example. See comment in SetUInt64Value.
+        if (guidFieldStart && guidFieldStart[index])
+        {
+            if ((m_uint32Values[index] != 0) || (m_uint32Values[index + 1] != 0))
+            {
+                updateMask.SetBit(index);
+                updateMask.SetBit(index + 1);
+            }
+            ++index; // high half handled together with the low half
+        }
+        else if (m_uint32Values[index] != 0)
             updateMask.SetBit(index);
     }
 }

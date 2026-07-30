@@ -3547,9 +3547,18 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
     }
 
     PlayerSpellState state = learning ? PLAYERSPELL_NEW : PLAYERSPELL_UNCHANGED;
-
+    TalentSpellPos const* talentPos = GetTalentSpellPos(spellId);
     bool disabledCase = false;
     bool supercededOld = false;
+    bool cannotSupercede = false;
+
+    // fixes Nature's Grasp displaying as not learned on talent interface after learning next rank
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+    if (uint32 firstRank = sSpellMgr.GetFirstSpellInChain(spellId))
+        if (uint32 nextRank = sSpellMgr.GetSpellBookSuccessorSpellId(firstRank))
+            if (GetTalentSpellPos(firstRank) && !GetTalentSpellPos(nextRank))
+                cannotSupercede = true;
+#endif
 
     PlayerSpellMap::iterator itr = m_spells.find(spellId);
     if (itr != m_spells.end())
@@ -3558,9 +3567,9 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
         bool dependent_set = false;
 
         // fix activate state for non-stackable low rank (and find next spell for !active case)
-        if (uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(spellInfo->Id))
+        if (uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(spellId))
         {
-            if (HasSpell(nextId))
+            if (!cannotSupercede && HasSpell(nextId))
             {
                 // high rank already known so this must !active
                 active = false;
@@ -3651,8 +3660,6 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
             }
     }
 
-    TalentSpellPos const* talentPos = GetTalentSpellPos(spellId);
-
     if (!disabledCase) // skip new spell adding if spell already known (disabled spells case)
     {
         // talent: unlearn all other talent ranks (high and low)
@@ -3686,7 +3693,7 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
         newspell.disabled  = disabled;
 
         // replace spells in action bars and spellbook to bigger rank if only one spell rank must be accessible
-        if (newspell.active && !newspell.disabled)
+        if (!cannotSupercede && newspell.active && !newspell.disabled)
         {
             for (auto& m_spell : m_spells)
             {
@@ -18405,6 +18412,42 @@ void Player::InitDataForForm(bool reapplyMods)
     UpdateAttackPowerAndDamage(true);
 }
 
+bool Player::IsVendorItemVisible(Creature* vendor, VendorItem const* vendorItem, ItemPrototype const* itemProto)
+{
+    if (!vendor || !vendorItem || !itemProto)
+        return false;
+
+    if (IsGameMaster())
+        return true;
+
+    // class wrong item skip only for bindable case
+    if ((itemProto->AllowableClass & GetClassMask()) == 0 && itemProto->Bonding == BIND_WHEN_PICKED_UP)
+        return false;
+
+    // race wrong item skip always
+    if ((itemProto->AllowableRace & GetRaceMask()) == 0)
+        return false;
+
+    // when no faction required but rank > 0 will be used faction id from the vendor faction template to compare the rank
+    if (!itemProto->RequiredReputationFaction && itemProto->RequiredReputationRank > 0 &&
+        ReputationRank(itemProto->RequiredReputationRank) > GetReputationRank(vendor->GetFactionId()))
+        return false;
+
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Argent Dawn, Timbermaw, Zandalar and Arathi Basin vendors now show
+    //   you their entire inventory regardless of current reputation, allowing
+    //   players to peruse their full range of wares.The items in question
+    //   now require the appropriate reputation level to make use of them.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+    if (itemProto->RequiredReputationFaction && itemProto->RequiredReputationRank > 0 &&
+        ReputationRank(itemProto->RequiredReputationRank) > GetReputationRank(itemProto->RequiredReputationFaction))
+        return false;
+#endif
+
+    return !vendorItem->conditionId ||
+        IsConditionSatisfied(vendorItem->conditionId, this, vendor->GetMap(), vendor, CONDITION_FROM_VENDOR);
+}
+
 // Return true is the bought item has a max count to force refresh of window by caller
 bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, uint8 bag, uint8 slot)
 {
@@ -18456,7 +18499,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
     }
 
     VendorItem const* crItem = vendorslot < vCount ? vItems->GetItem(vendorslot) : tItems->GetItem(vendorslot - vCount);
-    if (!crItem || crItem->item != item)                    // store diff item (cheating)
+    if (!crItem || crItem->item != item || !IsVendorItemVisible(pCreature, crItem, pProto))
     {
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
         return false;
@@ -18494,12 +18537,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         return false;
     }
 
-    if (crItem->conditionId && !IsGameMaster() && !IsConditionSatisfied(crItem->conditionId, this, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
-    {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
-        return false;
-    }
-
+    // Visibility, including vendor conditions, was validated above.
     uint32 price  = pProto->BuyPrice * count;
 
     // reputation discount
@@ -18561,9 +18599,20 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
     uint32 new_count = pCreature->UpdateVendorItemCurrentCount(crItem, totalCount);
 
+    // SMSG_LIST_INVENTORY numbers only visible rows. Report that same
+    // compact slot so the client updates the item it just purchased.
+    uint32 clientVendorSlot = 0;
+    for (size_t i = 0; i <= vendorslot; ++i)
+    {
+        VendorItem const* listedItem = i < vCount ? vItems->GetItem(i) : tItems->GetItem(i - vCount);
+        ItemPrototype const* listedProto = listedItem ? sObjectMgr.GetItemPrototype(listedItem->item) : nullptr;
+        if (IsVendorItemVisible(pCreature, listedItem, listedProto))
+            ++clientVendorSlot;
+    }
+
     auto packet = std::make_unique<WorldPackets::Item::BuyItemResponse>();
     packet->vendorGuid = pCreature->GetObjectGuid();
-    packet->vendorSlot = vendorslot + 1;
+    packet->vendorSlot = clientVendorSlot;
     packet->newCount = crItem->maxcount > 0 ? new_count : 0xFFFFFFFF;
     packet->purchaseCount = count;
     GetSession()->SendPacket(std::move(packet));

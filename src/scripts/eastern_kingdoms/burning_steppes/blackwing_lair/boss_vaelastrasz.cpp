@@ -477,15 +477,19 @@ bool QuestAccept_vaelastrasz(Player* pPlayer, Creature* pCreature, Quest const* 
 
     if (pQuest->GetQuestId() == QUEST_NEFARIUS_CORRUPTION)
     {
-        // Only one may accept
-        if (m_pInstance->GetData(TYPE_SCEPTER_RUN) != NOT_STARTED)
+        uint32 const scepterRunState = m_pInstance->GetData(TYPE_SCEPTER_RUN);
+        if (scepterRunState == NOT_STARTED)
+        {
+            // The first accepter starts the timed run and owns its one
+            // conditioned shard; later accepters must not replace it.
+            m_pInstance->SetData(TYPE_SCEPTER_RUN, SPECIAL);
+            m_pInstance->SetData(DATA_SCEPTER_CHAMPION, pPlayer->GetObjectGuid());
+        }
+        else if (scepterRunState != SPECIAL)
         {
             pPlayer->FailQuest(QUEST_NEFARIUS_CORRUPTION);
             return false;
         }
-
-        m_pInstance->SetData(TYPE_SCEPTER_RUN, SPECIAL);
-        m_pInstance->SetData(DATA_SCEPTER_CHAMPION, pPlayer->GetObjectGuid());
 
         // Permanently bind player to instance
         pCreature->GetMap()->BindToInstanceOrRaid(pPlayer, pCreature->GetRespawnTimeEx(), true);
