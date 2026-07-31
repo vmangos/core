@@ -6021,7 +6021,7 @@ void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply)
                     return;
         }
 
-        m_spellImmune[op].push_back({spellId, type});
+        m_spellImmune[op].push_back({type, spellId});
     }
     else
     {
