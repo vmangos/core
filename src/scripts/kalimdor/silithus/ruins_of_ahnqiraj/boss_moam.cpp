@@ -67,6 +67,7 @@ struct boss_moamAI : public ScriptedAI
 
         m_bIsInCombat = false;
         m_uiArmorValue = m_creature->GetDefaultArmor();
+        m_creature->SetPower(POWER_MANA, 0);
 
         m_OGvictim.Clear();
 
