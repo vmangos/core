@@ -33,13 +33,20 @@ OpcodesList const moveTypeToOpcode[MAX_MOVE_TYPE][3] =
     { SMSG_SPLINE_SET_SWIM_SPEED,        SMSG_FORCE_SWIM_SPEED_CHANGE,           MSG_MOVE_SET_SWIM_SPEED },
     { SMSG_SPLINE_SET_SWIM_BACK_SPEED,   SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,      MSG_MOVE_SET_SWIM_BACK_SPEED },
     { SMSG_SPLINE_SET_TURN_RATE,         SMSG_FORCE_TURN_RATE_CHANGE,            MSG_MOVE_SET_TURN_RATE },
-#else
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     { MSG_MOVE_SET_WALK_SPEED,           SMSG_FORCE_WALK_SPEED_CHANGE,           MSG_MOVE_SET_WALK_SPEED },
     { MSG_MOVE_SET_RUN_SPEED,            SMSG_FORCE_RUN_SPEED_CHANGE,            MSG_MOVE_SET_RUN_SPEED },
     { MSG_MOVE_SET_RUN_BACK_SPEED,       SMSG_FORCE_RUN_BACK_SPEED_CHANGE,       MSG_MOVE_SET_RUN_BACK_SPEED },
     { MSG_MOVE_SET_SWIM_SPEED,           SMSG_FORCE_SWIM_SPEED_CHANGE,           MSG_MOVE_SET_SWIM_SPEED },
     { MSG_MOVE_SET_SWIM_BACK_SPEED,      SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,      MSG_MOVE_SET_SWIM_BACK_SPEED },
     { MSG_MOVE_SET_TURN_RATE,            SMSG_FORCE_TURN_RATE_CHANGE,            MSG_MOVE_SET_TURN_RATE },
+#else
+    { MSG_MOVE_SET_WALK_SPEED,           MSG_NULL_ACTION,                        MSG_MOVE_SET_WALK_SPEED },
+    { MSG_MOVE_SET_RUN_SPEED,            SMSG_FORCE_RUN_SPEED_CHANGE,            MSG_MOVE_SET_RUN_SPEED },
+    { MSG_MOVE_SET_RUN_BACK_SPEED,       SMSG_FORCE_RUN_BACK_SPEED_CHANGE,       MSG_MOVE_SET_RUN_BACK_SPEED },
+    { MSG_MOVE_SET_SWIM_SPEED,           SMSG_FORCE_SWIM_SPEED_CHANGE,           MSG_MOVE_SET_SWIM_SPEED },
+    { MSG_MOVE_SET_SWIM_BACK_SPEED,      MSG_NULL_ACTION,                        MSG_MOVE_SET_SWIM_BACK_SPEED },
+    { MSG_MOVE_SET_TURN_RATE,            MSG_NULL_ACTION,                        MSG_MOVE_SET_TURN_RATE },
 #endif
 };
 
@@ -52,7 +59,17 @@ void MovementPacketSender::AddSpeedChangeToController(Unit* unit, UnitMoveType m
         return;
     }
 
-    float newSpeedFlat = newRate * baseMoveSpeed[mtype]; 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_4_2
+    // some opcodes dont exist in old versions
+    if (moveTypeToOpcode[mtype][1] == MSG_NULL_ACTION)
+    {
+        unit->SetSpeedRateReal(mtype, newRate);
+        SendSpeedChangeToAll(unit, mtype, newRate);
+        return;
+    }
+#endif
+
+    float newSpeedFlat = newRate * baseMoveSpeed[mtype];
     uint32 mCounter = unit->GetMovementCounterAndInc();
     PlayerMovementPendingChange pendingChange;
     pendingChange.movementCounter = mCounter;

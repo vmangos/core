@@ -839,6 +839,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 }
 
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
 void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
@@ -872,6 +873,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     BuildPartyMemberStatsPacket(player, &data, GROUP_UPDATE_FULL, true);
     SendPacket(&data);
 }
+#endif
 
 void WorldSession::HandleRequestRaidInfoOpcode(WorldPacket& /*recv_data*/)
 {

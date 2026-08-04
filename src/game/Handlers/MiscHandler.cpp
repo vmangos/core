@@ -463,6 +463,10 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
     }
 }
 
+void WorldSession::HandleSetMouseOverTargetOpcode(WorldPacket& recv_data)
+{
+}
+
 void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recv_data)
 {
     uint32 animState;

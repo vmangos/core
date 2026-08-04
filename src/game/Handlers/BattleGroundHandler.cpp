@@ -188,9 +188,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
         // check Deserter debuff
         if (!_player->CanJoinToBattleground())
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
             WorldPacket data(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
             data << uint32(0xFFFFFFFE);
             _player->GetSession()->SendPacket(&data);
+#endif
             return;
         }
         // check if already in queue
@@ -232,9 +234,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
 
         if (err == BG_JOIN_ERR_GROUP_DESERTER)
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
             WorldPacket data;
             sBattleGroundMgr.BuildGroupJoinedBattlegroundPacket(&data, BG_GROUPJOIN_DESERTERS);
             _player->GetSession()->SendPacket(&data);
+#endif
             SendBattleGroundJoinError(err);
             return;
         }
@@ -258,9 +262,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
             
             if (std::find(excludedMembers.begin(), excludedMembers.end(), member->GetGUIDLow()) != excludedMembers.end())
             {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
                 WorldPacket data;
                 sBattleGroundMgr.BuildGroupJoinedBattlegroundPacket(&data, BG_GROUPJOIN_FAILED);
                 member->GetSession()->SendPacket(&data);
+#endif
                 SendBattleGroundJoinError(err);
                 continue;
             }
@@ -284,6 +290,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_data*/)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     // empty opcode
     BattleGround *bg = _player->GetBattleGround();
     if (!bg)                                                // can't be received if player not in battleground
@@ -340,6 +347,7 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_d
     }
 
     SendPacket(&data);
+#endif
 }
 
 void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recv_data*/)
@@ -441,10 +449,12 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
         //if player is trying to enter battleground and he has deserter debuff, we must just remove him from queue
         if (!_player->CanJoinToBattleground())
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
             //send bg command result to show nice message
             WorldPacket data2(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
             data2 << uint32(0xFFFFFFFE);
             _player->GetSession()->SendPacket(&data2);
+#endif
             action = 0;
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Battleground: player %s (%u) has a deserter debuff, do not port him to battleground!", _player->GetName(), _player->GetGUIDLow());
         }
@@ -535,6 +545,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
     }
 }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
 void WorldSession::HandleLeaveBattlefieldOpcode(WorldPacket& recv_data)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -552,6 +563,7 @@ void WorldSession::HandleLeaveBattlefieldOpcode(WorldPacket& recv_data)
 
     _player->LeaveBattleground();
 }
+#endif
 
 void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recv_data*/)
 {
@@ -608,6 +620,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recv_data*/)
     }
 }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
 void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
 {
     BattleGround *bg = _player->GetBattleGround();
@@ -626,7 +639,9 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
 
     unit->SendAreaSpiritHealerQueryOpcode(GetPlayer());
 }
+#endif
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
 void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data)
 {
     BattleGround *bg = _player->GetBattleGround();
@@ -645,6 +660,7 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data)
 
     sScriptMgr.OnGossipHello(GetPlayer(), unit);
 }
+#endif
 
 void WorldSession::SendBattleGroundJoinError(uint8 err)
 {

@@ -893,6 +893,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     else if (IsType(TYPEMASK_CORPSE))
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
@@ -919,6 +920,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
+#endif
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
     else if (IsType(TYPEMASK_ITEM))
     {

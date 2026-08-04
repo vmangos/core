@@ -285,9 +285,15 @@ void LFGMgr::UpdateGroup(Group* group, bool join, ObjectGuid playerGuid)
 
 void LFGMgr::BuildSetQueuePacket(WorldPacket& data, uint32 areaId, uint8 status)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
     data << uint32(areaId);
     data << uint8(status);
+#else
+    data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 12);
+    data << uint64(status);
+    data << uint32(areaId);
+#endif
 }
 
 void LFGMgr::BuildMemberAddedPacket(WorldPacket& data, ObjectGuid plrGuid)

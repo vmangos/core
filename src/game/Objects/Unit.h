@@ -1370,7 +1370,11 @@ class Unit : public SpellCaster
         bool FindPendingMovementRootChange(uint32 movementCounter, bool applyReceived);
         bool FindPendingMovementTeleportChange(uint32 movementCounter);
         bool FindPendingMovementKnockbackChange(MovementInfo& movementInfo, uint32 movementCounter);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         bool FindPendingMovementSpeedChange(float speedReceived, uint32 movementCounter, UnitMoveType moveType);
+#else
+        bool FindPendingMovementSpeedChange(float& newSpeed, UnitMoveType moveType);
+#endif
         void CheckPendingMovementChanges();
         bool HasPendingSplineDone() const { return m_hasPendingSplineDone; }
         void SetSplineDonePending(bool state) { m_hasPendingSplineDone = state; }

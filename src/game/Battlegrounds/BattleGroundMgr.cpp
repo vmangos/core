@@ -1079,6 +1079,7 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
 
 void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround *bg)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     data->Initialize(MSG_PVP_LOG_DATA, (1 + 4 + 40 * bg->GetPlayerScoresSize()));
 
     if (bg->GetStatus() != STATUS_WAIT_LEAVE)
@@ -1144,13 +1145,16 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround *bg)
                 break;
         }
     }
+#endif
 }
 
 void BattleGroundMgr::BuildGroupJoinedBattlegroundPacket(WorldPacket* data, int32 status)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
     data->Initialize(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
     // for status, see enum BattleGroundGroupJoinStatus
     *data << int32(status);
+#endif
 }
 
 void BattleGroundMgr::BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value)

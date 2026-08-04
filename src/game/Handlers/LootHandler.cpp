@@ -521,6 +521,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             }
             break;
         }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         case HIGHGUID_CORPSE:                               // ONLY remove insignia at BG
         {
             Corpse* corpse = _player->GetMap()->GetCorpse(lguid);
@@ -538,6 +539,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             corpse->ExecuteDelayedActions();
             break;
         }
+#endif
         case HIGHGUID_ITEM:
         {
             Item *pItem = player->GetItemByGuid(lguid);

@@ -175,7 +175,30 @@ void PacketBuilder::WriteCreate(MoveSpline const& move_spline, ByteBuffer& data)
 
         uint32 nodes = move_spline.getPath().size();
         data << nodes;
-        data.append<Vector3>(&move_spline.getPath()[0], nodes);
+
+        if (!move_spline.isCyclic())
+        {
+            for (uint32 i = 0; i < move_spline.getPath().size(); ++i)
+            {
+                float offset = 0.0f;
+
+                // 1.4 client crashes with assert when it gets a zero offset.
+                if (i > 0 && (move_spline.getPath()[i - 1] - move_spline.getPath()[i]).isZero())
+                {
+                    if (i & 1)
+                        offset = 0.01f;
+                    else
+                        offset = 0.02f;
+                }
+                
+                data << float(move_spline.getPath()[i].x);
+                data << float(move_spline.getPath()[i].y);
+                data << float(move_spline.getPath()[i].z + offset);
+            }
+        }
+        else
+            data.append<Vector3>(&move_spline.getPath()[0], nodes);
+
         data << (move_spline.isCyclic() ? Vector3::zero() : move_spline.FinalDestination());
     }
 }

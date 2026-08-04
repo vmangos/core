@@ -3719,6 +3719,7 @@ void Map::RemoveCorpses(bool unload)
             // add bones in grid store if grid loaded where corpse placed
             Add(bones);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
             if (looterGuid)
             {
                 // Now we must make bones lootable, and send player loot
@@ -3730,6 +3731,7 @@ void Map::RemoveCorpses(bool unload)
                     looter->SendLoot(bones->GetObjectGuid(), LOOT_INSIGNIA, owner);
                 }
             }
+#endif
 
             // Only take the lock for a second
             {

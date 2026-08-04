@@ -501,6 +501,7 @@ class WorldSession
         void HandleTogglePvP(WorldPacket& recvPacket);
         void HandleZoneUpdateOpcode(WorldPacket& recvPacket);
         void HandleSetSelectionOpcode(WorldPacket& recvPacket);
+        void HandleSetMouseOverTargetOpcode(WorldPacket& recvPacket);
         void HandleStandStateChangeOpcode(WorldPacket& recvPacket);
         void HandleEmoteOpcode(WorldPacket& recvPacket);
         void HandleFriendListOpcode(WorldPacket& recvPacket);
@@ -541,7 +542,9 @@ class WorldSession
         void HandleGroupDisbandOpcode(WorldPacket& recvPacket);
         void HandleLootMethodOpcode(WorldPacket& recvPacket);
         void HandleLootRoll(WorldPacket& recv_data);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         void HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data);
+#endif
         void HandleRaidTargetUpdateOpcode(WorldPacket& recv_data);
         void HandleRaidReadyCheckOpcode(WorldPacket& recv_data);
         void HandleGroupRaidConvertOpcode(WorldPacket& recv_data);
@@ -759,7 +762,9 @@ class WorldSession
         void HandleBattlefieldStatusOpcode(WorldPacket& recv_data);
         void HandleBattleFieldPortOpcode(WorldPacket& recv_data);
         void HandleBattlefieldListOpcode(WorldPacket& recv_data);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         void HandleLeaveBattlefieldOpcode(WorldPacket& recv_data);
+#endif
 
         void HandleWardenDataOpcode(WorldPacket& recv_data);
         void HandleMinimapPingOpcode(WorldPacket& recv_data);
@@ -767,9 +772,10 @@ class WorldSession
         void HandleFarSightOpcode(WorldPacket& recv_data);
         void HandleWhoisOpcode(WorldPacket& recv_data);
         void HandleResetInstancesOpcode(WorldPacket& recv_data);
-
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         void HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data);
         void HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data);
+#endif
         void HandleSelfResOpcode(WorldPacket& recv_data);
 
     private:

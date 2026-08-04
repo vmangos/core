@@ -471,6 +471,7 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
     switch (packet->GetOpcode())
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         case MSG_PVP_LOG_DATA:
         {
             if (!me)
@@ -493,6 +494,7 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
             }
             return;
         }
+#endif
     }
 
     CombatBotBaseAI::OnPacketReceived(packet);
