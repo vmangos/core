@@ -291,7 +291,7 @@ void LFGMgr::BuildSetQueuePacket(WorldPacket& data, uint32 areaId, uint8 status)
     data << uint8(status);
 #else
     data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 12);
-    data << uint64(status);
+    data << uint64(areaId != 0);
     data << uint32(areaId);
 #endif
 }
