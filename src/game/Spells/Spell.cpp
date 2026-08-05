@@ -5268,41 +5268,39 @@ void Spell::SendResurrectRequest(Player* target, bool sickness)
 
 void Spell::SendMeleeAttackingStateUpdate(TargetInfo const* target, SpellNonMeleeDamage const* damageInfo)
 {
-    auto packet = std::make_unique<WorldPackets::Combat::MeleeAttackingStateUpdate>();
+    CalcDamageInfo meleeDamageInfo;
 
-    packet->hitInfo = HITINFO_NOACTION | HITINFO_NO_FLOATING_TEXT;
+    meleeDamageInfo.HitInfo = HITINFO_NOACTION | HITINFO_NO_FLOATING_TEXT;
     if (target->missCondition == SPELL_MISS_MISS)
-        packet->hitInfo |= HITINFO_MISS;
+        meleeDamageInfo.HitInfo |= HITINFO_MISS;
     else if (target->missCondition == SPELL_MISS_ABSORB)
-        packet->hitInfo |= HITINFO_ABSORB;
+        meleeDamageInfo.HitInfo |= HITINFO_ABSORB;
     else if (target->missCondition != SPELL_MISS_IMMUNE && target->missCondition != SPELL_MISS_IMMUNE2)
-        packet->hitInfo |= HITINFO_AFFECTS_VICTIM;
+        meleeDamageInfo.HitInfo |= HITINFO_AFFECTS_VICTIM;
     if (target->missCondition == SPELL_MISS_RESIST)
-        packet->hitInfo |= HITINFO_RESIST;
+        meleeDamageInfo.HitInfo |= HITINFO_RESIST;
     if (target->isCrit)
-        packet->hitInfo |= HITINFO_CRITICALHIT;
+        meleeDamageInfo.HitInfo |= HITINFO_CRITICALHIT;
 
-    packet->attackerGuid = m_casterUnit->GetObjectGuid();
-    packet->victimGuid = m_casterUnit->GetVictim()->GetObjectGuid();
-    packet->subDamage.resize(1);
+    meleeDamageInfo.attacker = m_casterUnit;
+    meleeDamageInfo.target = m_casterUnit->GetVictim();
 
     if (damageInfo && !m_spellInfo->HasAttribute(SPELL_ATTR_ON_NEXT_SWING_NO_DAMAGE))
     {
-        packet->totalDamage = packet->meleeSpellDamage = damageInfo->damage;
-        for (uint32 i = 0; i < packet->subDamage.size(); ++i)
+        meleeDamageInfo.totalDamage = damageInfo->damage;
+        for (uint32 i = 0; i < 1; ++i)
         {
-            packet->subDamage[i].damage = damageInfo->damage;
-            packet->subDamage[i].absorb = damageInfo->absorb;
-            packet->subDamage[i].resist = damageInfo->resist;
-            packet->subDamage[i].damageSchoolMask = GetSchoolMask(damageInfo->school);
+            meleeDamageInfo.subDamage[i].damage = damageInfo->damage;
+            meleeDamageInfo.subDamage[i].absorb = damageInfo->absorb;
+            meleeDamageInfo.subDamage[i].resist = damageInfo->resist;
+            meleeDamageInfo.subDamage[i].damageSchoolMask = GetSchoolMask(damageInfo->school);
         }
-        packet->blockedAmount = damageInfo->blocked;
+        meleeDamageInfo.blocked_amount = damageInfo->blocked;
     }
 
-    packet->victimState = SpellMissInfoToVictimState(target->missCondition);
-    packet->attackerState = packet->victimState == VICTIMSTATE_NORMAL ? 1000 : 0;
-    packet->meleeSpellId = m_spellInfo->Id;
-    m_casterUnit->SendMessageToSet(std::move(packet), true);
+    meleeDamageInfo.TargetState = SpellMissInfoToVictimState(target->missCondition);
+    meleeDamageInfo.meleeSpellId = m_spellInfo->Id;
+    m_casterUnit->SendAttackStateUpdate(&meleeDamageInfo);
 }
 
 void Spell::TakeCastItem()

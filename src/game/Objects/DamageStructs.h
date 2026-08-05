@@ -136,6 +136,7 @@ struct CalcDamageInfo
     uint32 blocked_amount = 0;
     uint32 HitInfo = HITINFO_NORMALSWING;
     uint32 TargetState = VICTIMSTATE_UNAFFECTED;
+    uint32 meleeSpellId = 0;
 
     // Helper
     WeaponAttackType attackType = BASE_ATTACK;
