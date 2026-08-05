@@ -828,7 +828,7 @@ void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log) con
     data << log->target->GetGUID();
     data << log->attacker->GetGUID();
 #endif
-    data << uint32(log->SpellID);
+    data << uint32(log->spellId);
     data << uint32(log->damage);                            // damage amount
     data << uint8(log->school);                             // damage school
     data << uint32(log->absorb);                            // AbsorbedDamage
@@ -1613,10 +1613,10 @@ void SpellCaster::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabili
     if (!pVictim->IsAlive() || pVictim->IsTaxiFlying() || (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode()))
         return;
 
-    SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(damageInfo->SpellID);
+    SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(damageInfo->spellId);
     if (spellProto == nullptr)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SpellCaster::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->SpellID);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SpellCaster::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->spellId);
         return;
     }
 

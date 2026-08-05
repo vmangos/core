@@ -385,6 +385,7 @@ set (game_SRCS
     Objects/Corpse.h
     Objects/Creature.h
     Objects/CreatureDefines.h
+    Objects/DamageStructs.h
     Objects/DynamicObject.h
     Objects/GameObject.h
     Objects/GameObjectDefines.h

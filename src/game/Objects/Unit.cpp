@@ -4617,24 +4617,24 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo const* damageInfo) const
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const
+void Unit::SendAttackStateUpdate(uint32 hitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 damage, uint32 absorbDamage, int32 resist, VictimState targetState, uint32 blockedAmount) const
 {
     CalcDamageInfo dmgInfo;
-    dmgInfo.HitInfo = HitInfo;
+    dmgInfo.HitInfo = hitInfo;
     dmgInfo.attacker = const_cast<Unit*>(this);
     dmgInfo.target = const_cast<Unit*>(target);
     dmgInfo.attackType = BASE_ATTACK;
-    dmgInfo.totalDamage = Damage;
-    dmgInfo.totalDamage += (Resist < 0 ? uint32(std::abs(Resist)) : 0);
-    dmgInfo.totalDamage -= (AbsorbDamage + (Resist > 0 ? uint32(Resist) : 0) + BlockedAmount);
-    dmgInfo.totalAbsorb = AbsorbDamage;
-    dmgInfo.totalResist = Resist;
+    dmgInfo.totalDamage = damage;
+    dmgInfo.totalDamage += (resist < 0 ? uint32(std::abs(resist)) : 0);
+    dmgInfo.totalDamage -= (absorbDamage + (resist > 0 ? uint32(resist) : 0) + blockedAmount);
+    dmgInfo.totalAbsorb = absorbDamage;
+    dmgInfo.totalResist = resist;
     dmgInfo.subDamage[0].damage = dmgInfo.totalDamage;
     dmgInfo.subDamage[0].damageSchoolMask = damageSchoolMask;
-    dmgInfo.subDamage[0].absorb = AbsorbDamage;
-    dmgInfo.subDamage[0].resist = Resist;
-    dmgInfo.TargetState = TargetState;
-    dmgInfo.blocked_amount = BlockedAmount;
+    dmgInfo.subDamage[0].absorb = absorbDamage;
+    dmgInfo.subDamage[0].resist = resist;
+    dmgInfo.TargetState = targetState;
+    dmgInfo.blocked_amount = blockedAmount;
     SendAttackStateUpdate(&dmgInfo);
 }
 
