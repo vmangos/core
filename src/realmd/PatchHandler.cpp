@@ -186,7 +186,7 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
 bool PatchCache::GetHash(const char * pat, ACE_UINT8 mymd5[Crypto::Hash::MD5::Digest::size()])
 {
     for (Patches::iterator i = patches_.begin (); i != patches_.end (); i++)
-        if (!stricmp(pat, i->first.c_str ()))
+        if (StringStartsWithCaseInsensitive(pat, i->first.c_str ()))
         {
             memcpy(mymd5, i->second->md5.data(), i->second->md5.size());
             return true;
