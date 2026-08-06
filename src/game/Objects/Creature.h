@@ -39,7 +39,6 @@ class Quest;
 class Player;
 class WorldSession;
 class CreatureGroup;
-
 struct GameEventCreatureData;
 
 struct CreatureCreatePos
@@ -307,7 +306,8 @@ class Creature : public Unit
         bool IsTappedBy(Player const* player) const;
         bool IsSkinnableBy(Player const* player) const { return !skinningForOthersTimer || IsTappedBy(player); }
 
-        uint32 m_spells[CREATURE_MAX_SPELLS];
+        bool GetCharmSpellCooldown(uint32 spellId, uint32& cooldown);
+        nonstd::optional<CreatureCharmSpellEntry> m_spells[CREATURE_MAX_SPELLS];
 
         float GetAttackDistance(Unit const* pl) const;
         float GetDetectionRange() const { return m_detectionDistance; }

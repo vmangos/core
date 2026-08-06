@@ -122,6 +122,17 @@ namespace WorldPackets { namespace Character
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class CharRenameResponse final : public ServerPacket
+    {
+    public:
+        uint8 result = 0;
+        ObjectGuid renamedCharacterGuid;
+        std::string newName;
+
+        CharRenameResponse() : ServerPacket(SMSG_CHAR_RENAME) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Character
 
 #endif // MANGOS_PACKETS_CHARACTER_H

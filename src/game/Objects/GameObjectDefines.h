@@ -840,6 +840,10 @@ struct GameObjectDisplayInfoAddon
     float max_x;
     float max_y;
     float max_z;
+    bool HasBounds() const
+    {
+        return min_x != 0.0f || min_y != 0.0f || min_z != 0.0f || max_x != 0.0f || max_y != 0.0f || max_z != 0.0f;
+    }
 };
 
 struct QuaternionData

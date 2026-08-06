@@ -216,3 +216,8 @@ bool Totem::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex 
     }
     return Creature::IsImmuneToSpellEffect(spellInfo, index, castOnSelf);
 }
+
+uint32 Totem::GetSpell() const
+{
+    return GetCreatureInfo()->totem_spell_id;
+}

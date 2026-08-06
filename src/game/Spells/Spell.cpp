@@ -22,6 +22,7 @@
 #include "Spell.h"
 #include "Log.h"
 #include "Opcodes.h"
+#include "CharacterDatabaseCache.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "World.h"
@@ -3203,6 +3204,18 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 }
             }
+            // Falling blink case
+            else if (m_casterUnit && m_casterUnit->HasUnitMovementFlag(MOVEFLAG_FALLINGFAR))
+            {
+                // optimization: instead of calling Map::GetHeight use static height we already have from checking water level
+                // calling it with DEFAULT_WATER_SEARCH cause thats what GetHeightStatic gets called with above in GetWaterLevel
+                float groundWithVmap = std::max(ground, m_casterUnit->GetMap()->GetDynamicTreeHeight(src.x, src.y, src.z, DEFAULT_WATER_SEARCH));
+                if (groundWithVmap > INVALID_HEIGHT && std::abs(groundWithVmap - src.z) <= 40.0f)
+                {
+                    src.z = groundWithVmap;
+                    dest.z = groundWithVmap;
+                }
+            }
 
             GameObject const* const pDoor = m_caster->FindNearbyClosedDoor(dist);
             bool const directionThroughDoor = pDoor ? pDoor->HasInArc(M_PI_F, src.x, src.y) != pDoor->HasInArc(M_PI_F, dest.x, dest.y) : false;
@@ -4957,30 +4970,38 @@ void Spell::SendChannelStart(uint32 duration)
     m_timer = duration;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+    // TODO: Investigate when exactly this packet should be sent.
+    // It breaks Eyes of the Beast visual on pet if sent for it.
     if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_CHANNELED))
     {
-        WorldPacket data(SMSG_SPELL_UPDATE_CHAIN_TARGETS);
-        data << m_caster->GetObjectGuid();
-        data << uint32(m_spellInfo->Id);
-        size_t count_pos = data.wpos();
-        data << uint32(0);
-        uint32 hit = 0;
-        for (TargetList::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); ++itr)
+        if (SpellVisualEntry const* pVisual = sSpellVisualStore.LookupEntry(m_spellInfo->SpellVisual))
         {
-            if (((itr->effectMask & (1 << EFFECT_INDEX_0)) && itr->reflectResult == SPELL_MISS_NONE &&
-                m_CastItem) || itr->targetGUID != m_caster->GetObjectGuid())
+            if (pVisual->channelKit)
             {
-                if (Unit* target = ObjectAccessor::GetUnit(*m_caster, itr->targetGUID))
+                WorldPacket data(SMSG_SPELL_UPDATE_CHAIN_TARGETS);
+                data << m_caster->GetObjectGuid();
+                data << uint32(m_spellInfo->Id);
+                size_t count_pos = data.wpos();
+                data << uint32(0);
+                uint32 hit = 0;
+                for (TargetList::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); ++itr)
                 {
-                    ++hit;
-                    data << target->GetObjectGuid();
+                    if (((itr->effectMask & (1 << EFFECT_INDEX_0)) && itr->reflectResult == SPELL_MISS_NONE &&
+                        m_CastItem) || itr->targetGUID != m_caster->GetObjectGuid())
+                    {
+                        if (Unit* target = ObjectAccessor::GetUnit(*m_caster, itr->targetGUID))
+                        {
+                            ++hit;
+                            data << target->GetObjectGuid();
+                        }
+                    }
+                }
+                if (hit)
+                {
+                    data.put<uint32>(count_pos, hit);
+                    m_caster->SendMessageToSet(&data, true);
                 }
             }
-        }
-        if (hit)
-        {
-            data.put<uint32>(count_pos, hit);
-            m_caster->SendMessageToSet(&data, true);
         }
     }
 #endif
@@ -6096,11 +6117,45 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_EFFECT_SUMMON_DEAD_PET:
             {
                 Creature* pet = m_casterUnit ? m_casterUnit->GetPet() : nullptr;
-                if (!pet)
-                    return SPELL_FAILED_NO_PET;
+                Player* player = m_caster->ToPlayer();
 
-                if (pet->IsAlive())
-                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                if (pet)
+                {
+                    if (pet->IsAlive())
+                    {
+                        if (player)
+                            player->SendPetTameFailure(PETTAME_ANOTHERSUMMONACTIVE);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+
+                    // Remove dead pet corpse before revive
+                    if (Pet* petObj = pet->ToPet())
+                        petObj->Unsummon(PET_SAVE_AS_CURRENT, player);
+
+                    break;
+                }
+
+                // No active pet - check database
+                if (player)
+                {
+                    CharacterPetCache* currentPet = sCharacterDatabaseCache.GetCharacterPetByOwner(player->GetGUIDLow());
+                    if (!currentPet)
+                    {
+                        player->SendPetTameFailure(PETTAME_NOPETAVAILABLE);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+
+                    if (currentPet->currentHealth > 0)
+                    {
+                        player->SendPetTameFailure(PETTAME_NOTDEAD);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+                    // Pet is dead in DB - allow revive
+                }
+                else
+                {
+                    return SPELL_FAILED_NO_PET;
+                }
 
                 break;
             }
@@ -6603,9 +6658,11 @@ SpellCastResult Spell::CheckCasterAuras() const
         prevented_reason = SPELL_FAILED_CONFUSED;
     else if ((unitflag & UNIT_FLAG_FLEEING) && !(mechanic_immune & (1 << (MECHANIC_FEAR - 1u))))
         prevented_reason = SPELL_FAILED_FLEEING;
-    else if (m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE &&
-            ((unitflag & UNIT_FLAG_SILENCED) ||
-                m_casterUnit->CheckLockout(m_spellInfo->GetSpellSchoolMask()))) // Nostalrius : fix counterspell for mobs.
+    // Silence check seems to only be performed if not stunned.
+    // Mages can blink out of stun even when silenced.
+    // https://www.youtube.com/watch?v=NiWibn2GdbA
+    else if (m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && !(unitflag & UNIT_FLAG_STUNNED) &&
+            ((unitflag & UNIT_FLAG_SILENCED) || m_casterUnit->CheckLockout(m_spellInfo->GetSpellSchoolMask()))) // Nostalrius : fix counterspell for mobs.
         prevented_reason = SPELL_FAILED_SILENCED;
     else if ((unitflag & UNIT_FLAG_PACIFIED) && m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY)
         prevented_reason = SPELL_FAILED_PACIFIED;
@@ -6639,7 +6696,6 @@ SpellCastResult Spell::CheckCasterAuras() const
                     // That is needed when your casting is prevented by multiple states and you are only immune to some of them.
                     switch (aura->GetModifier()->m_auraname)
                     {
-
                         case SPELL_AURA_MOD_STUN:
                             if (!(mechanic_immune & (1 << (MECHANIC_STUN - 1u))))
                                 return SPELL_FAILED_STUNNED;

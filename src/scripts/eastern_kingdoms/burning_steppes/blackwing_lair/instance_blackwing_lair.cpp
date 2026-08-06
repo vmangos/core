@@ -1033,73 +1033,59 @@ GameObjectAI* GetAIgo_egg_raz(GameObject* pGo)
     return new go_egg_razAI(pGo);
 }
 
-struct go_engin_suppressionAI: public GameObjectAI
+/*###############
+## go_suppression
+################*/
+
+struct go_ai_suppression : public GameObjectAI
 {
-    go_engin_suppressionAI(GameObject* pGo) : GameObjectAI(pGo), m_uiCheckTimer(urand(6000, 12000)), m_bActive(true) {}
+    go_ai_suppression(GameObject* go) : GameObjectAI(go), m_uiFumeTimer(urand(0, 5 * IN_MILLISECONDS)) {}
 
-    uint32 m_uiCheckTimer;
-    bool m_bActive;
+    uint32 m_uiFumeTimer;
 
-    bool OnUse(Unit* pUser) override
+    void OnLootStateChange() override
     {
-        if (pUser->IsWithinDistInMap(me, 5.0f))
-        {
-            me->SetGoState(GO_STATE_ACTIVE);
-            m_bActive = false;
-            m_uiCheckTimer = urand(4000, 6000);
-            return true;
-        }
-        else
-            return false;
-    }
-
-    void ApplyAura()
-    {
-        me->SendGameObjectCustomAnim();
-        Map::PlayerList const& liste = me->GetMap()->GetPlayers();
-
-        for (const auto& i : liste)
-        {
-            if (me->GetDistance(i.getSource()) <= 15.0f)
-                if (!i.getSource()->HasStealthAura() && i.getSource()->IsAlive() && !i.getSource()->IsGameMaster())
-                    i.getSource()->AddAura(SPELL_SUPPRESSION_AURA);
-        }
-    }
-
-    void RestoreGo()
-    {
-        if (me->GetInstanceData()->GetData(TYPE_LASHLAYER) == DONE)
+        ScriptedInstance* pInstance = (ScriptedInstance*)me->GetMap()->GetInstanceData();
+        if (!pInstance)
             return;
 
-        me->SetGoState(GO_STATE_READY);
-        m_bActive = true;
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (m_uiCheckTimer <= uiDiff)
+        // As long as Broodlord Lashlayer is alive, the GO will rearm on a random timer from 30 sec to 2 min
+        // It will not rearm for the instance lifetime after Broodlord Lashlayer death
+        if (me->getLootState() == GO_ACTIVATED)
         {
-            if (m_bActive)
-                ApplyAura();
+            if (pInstance->GetData(TYPE_LASHLAYER) != DONE)
+                me->SetRespawnTime(urand(30, 2 * MINUTE));
             else
-            {
-                if (!urand(0, 4))
-                {
-                    RestoreGo();
-                    m_uiCheckTimer = urand(3000, 4000);
-                    return;
-                }
-            }
-            m_uiCheckTimer = 6000;
-            return;
+                me->SetRespawnTime(7 * 24 * HOUR);
         }
-        m_uiCheckTimer -= uiDiff;
+    }
+
+    // Visual effects for each GO is played on a 5 seconds timer. Sniff show that the GO should also be used (trap spell is cast)
+    // but we need core support for GO casting for that
+    void UpdateAI(const uint32 uiDiff) override
+    {
+        if (m_uiFumeTimer)
+        {
+            if (m_uiFumeTimer <= uiDiff)
+            {
+                // The loot state check may be removed in that case because it should probably be handled in the Gameobject::Use() code
+                if (me->getLootState() == GO_READY)
+                {
+                    me->SendGameObjectCustomAnim(me->GetObjectGuid());
+                    me->CastSpell(nullptr, me->GetGOInfo()->trap.spellId, true);
+                }
+                m_uiFumeTimer = 5 * IN_MILLISECONDS;
+            }
+            else
+                m_uiFumeTimer -= uiDiff;
+        }
     }
 };
 
-GameObjectAI* GetAIgo_engin_suppression(GameObject *pGo)
+
+GameObjectAI* GetAI_go_suppression(GameObject* go)
 {
-    return new go_engin_suppressionAI(pGo);
+    return new go_ai_suppression(go);
 }
 
 bool AreaTrigger_at_orb_of_command(Player* pPlayer, AreaTriggerEntry const* pAt)
@@ -1455,8 +1441,8 @@ void AddSC_instance_blackwing_lair()
     pNewscript->RegisterSelf();
 
     pNewscript = new Script;
-    pNewscript->Name = "go_engin_suppression";
-    pNewscript->GOGetAI = &GetAIgo_engin_suppression;
+    pNewscript->Name = "go_suppression";
+    pNewscript->GOGetAI = &GetAI_go_suppression;
     pNewscript->RegisterSelf();
 
     pNewscript = new Script;

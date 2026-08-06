@@ -439,70 +439,6 @@ InstanceData* GetInstanceData_instance_zulgurub(Map* pMap)
     return new instance_zulgurub(pMap);
 }
 
-enum
-{
-    TABLET_GRILEK = 180358,
-    TABLET_HAZZARAH = 180364,
-    TABLET_RENATAKI = 180365,
-    TABLET_WUSHOOLAY = 180393,
-};
-
-
-bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
-{
-
-    ScriptedInstance* m_pInstance = (ScriptedInstance*)pGo->GetInstanceData();
-    if(!m_pInstance)
-        return false;
-
-    uint32 randomBoss = m_pInstance->GetData(TYPE_RANDOM_BOSS);
-                if (sGameEventMgr.IsActiveEvent(29))
-                    randomBoss = BOSS_GRILEK;
-                else if (sGameEventMgr.IsActiveEvent(30))
-                    randomBoss = BOSS_HAZZARAH;
-                else if (sGameEventMgr.IsActiveEvent(31))
-                    randomBoss = BOSS_RENATAKI;
-                else if (sGameEventMgr.IsActiveEvent(32))
-                    randomBoss = BOSS_WUSHOOLAY;
-
-
-    if (randomBoss > 16000)
-        return false;
-
-    //DEBUG
-    //char sMessage[200];
-    //sprintf(sMessage, "boss ID=%d",randomBoss);
-    //pPlayer->Say(sMessage,0);
-    switch(pGo->GetEntry())
-    {
-        case TABLET_GRILEK:
-            if (randomBoss == BOSS_GRILEK)
-                pPlayer->SEND_GOSSIP_MENU(7669, pGo->GetGUID());
-            else
-                pPlayer->SEND_GOSSIP_MENU(7643, pGo->GetGUID());
-            break;
-    case TABLET_HAZZARAH:
-            if (randomBoss == BOSS_HAZZARAH)
-                pPlayer->SEND_GOSSIP_MENU(7671, pGo->GetGUID());
-            else
-                pPlayer->SEND_GOSSIP_MENU(7670, pGo->GetGUID());
-            break;
-    case TABLET_RENATAKI:
-            if (randomBoss == BOSS_RENATAKI)
-                pPlayer->SEND_GOSSIP_MENU(7673, pGo->GetGUID());
-            else
-                pPlayer->SEND_GOSSIP_MENU(7672, pGo->GetGUID());
-            break;
-    case TABLET_WUSHOOLAY:
-            if (randomBoss == BOSS_WUSHOOLAY)
-                pPlayer->SEND_GOSSIP_MENU(7675, pGo->GetGUID());
-            else
-                pPlayer->SEND_GOSSIP_MENU(7674, pGo->GetGUID());
-            break;
-    }
-    return true;
-}
-
 bool ProcessEventId_event_summon_gahzranka(uint32 uiEventId, Object* pSource, Object* pTarget, bool bIsStart)
 {
     // No target or source, block event
@@ -537,11 +473,6 @@ void AddSC_instance_zulgurub()
     newscript = new Script;
     newscript->Name = "instance_zulgurub";
     newscript->GetInstanceData = &GetInstanceData_instance_zulgurub;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_table_madness";
-    newscript->pGOHello = &OnGossipHello_go_table_madness;
     newscript->RegisterSelf();
 
     newscript = new Script;

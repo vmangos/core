@@ -140,6 +140,22 @@ namespace WorldPackets { namespace AuctionHouse
         explicit AuctionOwnerNotification() : ServerPacket(SMSG_AUCTION_OWNER_NOTIFICATION) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
+
+    class AuctionCommandResult final : public ServerPacket
+    {
+    public:
+        uint32 auctionId = 0;
+        uint32 action = 0;
+        uint32 errorCode = 0;
+
+        uint32 auctionOutBid = 0;      // used by AUCTION_OK + AUCTION_BID_PLACED, and AUCTION_ERR_HIGHER_BID
+        uint32 inventoryError = 0;     // used by AUCTION_ERR_INVENTORY
+        ObjectGuid newBidderGuid;      // used by AUCTION_ERR_HIGHER_BID
+        uint32 newBid = 0;             // used by AUCTION_ERR_HIGHER_BID
+
+        AuctionCommandResult() : ServerPacket(SMSG_AUCTION_COMMAND_RESULT) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
 }} // namespace WorldPackets::AuctionHouse
 
 #endif // MANGOS_PACKETS_AUCTIONHOUSE_H

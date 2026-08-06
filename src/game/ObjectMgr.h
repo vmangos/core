@@ -354,8 +354,12 @@ typedef std::pair<GossipMenuItemsMap::const_iterator, GossipMenuItemsMap::const_
 
 struct PetCreateSpellEntry
 {
-    uint32 spellId[4];
+    uint32 spellId[CREATURE_MAX_SPELLS];
 };
+
+
+typedef std::array<std::vector<CreatureCharmSpellEntry>, CREATURE_MAX_SPELLS> CreatureCharmSpellSlotsArray;
+typedef std::unordered_map<uint32, CreatureCharmSpellSlotsArray> CreatureCharmSpellsMap;
 
 struct GraveYardData
 {
@@ -840,6 +844,14 @@ class ObjectMgr
             return nullptr;
         }
 
+        CreatureCharmSpellSlotsArray const* GetCreatureCharmSpellSlotsArray(uint32 id) const
+        {
+            auto itr = m_creatureCharmSpellsMap.find(id);
+            if (itr != m_creatureCharmSpellsMap.end())
+                return &itr->second;
+            return nullptr;
+        }
+
         PetCreateSpellEntry const* GetPetCreateSpellEntry(uint32 id) const
         {
             auto itr = m_PetCreateSpellMap.find(id);
@@ -868,6 +880,7 @@ class ObjectMgr
         void LoadBroadcastTextLocales();
         bool LoadQuestGreetings();
         bool LoadTrainerGreetings();
+        void LoadCreatureCharmSpells();
         void LoadPetCreateSpells();
         void LoadPetSpellData();
         void LoadCreatureLocales();
@@ -1502,6 +1515,7 @@ class ObjectMgr
         GossipMenuItemsMap  m_GossipMenuItemsMap;
         PointOfInterestMap  m_PointsOfInterestMap;
 
+        CreatureCharmSpellsMap m_creatureCharmSpellsMap;
         PetCreateSpellMap   m_PetCreateSpellMap;
 
         //character reserved names
