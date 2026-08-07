@@ -14551,7 +14551,10 @@ void Player::SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32
         // Update player field and fire UNIT_QUEST_LOG_CHANGED for self for the current batch
         uint16 slot = FindQuestSlot(pQuest->GetQuestId());
         if (slot < MAX_QUEST_LOG_SIZE) {
-            SetQuestSlotCounter(slot + pQuest->GetReqCreatureOrGOcount(), uint8(item_idx), uint8(current + batchCount));
+            // item counters are stored after the creature or GO counters within the same quest slot
+            uint8 counterIdx = uint8(item_idx + pQuest->GetReqCreatureOrGOcount());
+            if (counterIdx < QUEST_OBJECTIVES_COUNT)
+                SetQuestSlotCounter(slot, counterIdx, uint8(current + batchCount));
         }
 
         count -= batchCount;
