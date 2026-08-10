@@ -650,6 +650,7 @@ void World::LoadConfigSettings(bool reload)
 
     setConfigMinMax(CONFIG_FLOAT_RP_DECAY, "RpDecay", 0.2f, 0.0f, 1.0f);
     setConfigMinMax(CONFIG_UINT32_MAINTENANCE_DAY, "MaintenanceDay", 4, 0, 6);
+    setConfig(CONFIG_UINT32_CHARDB_CLEANUP_FLAGS, "CharacterDatabaseCleanupFlags", CharacterDatabaseCleaner::CLEANING_FLAG_CHARACTERS | CharacterDatabaseCleaner::CLEANING_FLAG_PETS | CharacterDatabaseCleaner::CLEANING_FLAG_ITEMS);
     setConfig(CONFIG_BOOL_AUTO_HONOR_RESTART, "AutoHonorRestart", true);
     setConfig(CONFIG_BOOL_ALL_TAXI_PATHS, "AllFlightPaths", false);
     setConfig(CONFIG_BOOL_CAST_UNSTUCK, "CastUnstuck", true);

@@ -26,19 +26,23 @@ namespace CharacterDatabaseCleaner
 {
     enum CleaningFlags
     {
-        // reserved for next version          0x1
-        CLEANING_FLAG_SKILLS                = 0x2,
-        CLEANING_FLAG_SPELLS                = 0x4,
-        // reserved for next version          0x8
+        CLEANING_FLAG_CHARACTERS            = 0x1,
+        CLEANING_FLAG_PETS                  = 0x2,
+        CLEANING_FLAG_ITEMS                 = 0x4,
+        CLEANING_FLAG_SKILLS                = 0x8,
+        CLEANING_FLAG_SPELLS                = 0x10,
     };
 
-
     void CleanDatabase();
-
+    void RemoveOrphanedRows(char const* tableName1, char const* columnName1, char const* tableName2, char const* columnName2);
     void CheckUnique(char const* column, char const* table, bool (*check)(uint32));
 
     bool SkillCheck(uint32 skill);
     bool SpellCheck(uint32 spell_id);
+
+    void CleanOrphanedCharacterData();
+    void CleanOrphanedPetData();
+    void CleanOrphanedItemData();
 
     void CleanCharacterSkills();
     void CleanCharacterSpell();

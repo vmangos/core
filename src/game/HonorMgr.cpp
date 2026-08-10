@@ -625,6 +625,10 @@ void HonorMaintenancer::CheckMaintenanceDay()
             sWorld.ShutdownServ(900, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
 
         ToggleMaintenanceMarker();
+
+        // Schedule character database cleanup too.
+        if (sWorld.getConfig(CONFIG_UINT32_CHARDB_CLEANUP_FLAGS))
+            CharacterDatabase.DirectPExecute("UPDATE `saved_variables` SET `cleaning_flags` = (`cleaning_flags` | %u)", sWorld.getConfig(CONFIG_UINT32_CHARDB_CLEANUP_FLAGS));
     }
 }
 
