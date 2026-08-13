@@ -1543,6 +1543,10 @@ void Aura::TriggerSpell()
     // All ok cast by default case
     if (triggeredSpellInfo)
     {
+        // Fixes Phasing Stealth (6718) triggering in combat.
+        if (triggeredSpellInfo->HasAttribute(SPELL_ATTR_NOT_IN_COMBAT_ONLY_PEACEFUL) && triggerCaster->IsInCombat())
+            return;
+
         Item* pItem = nullptr;
         if (auraSpellInfo->HasAttribute(SPELL_ATTR_EX2_RETAIN_ITEM_CAST) && !GetCastItemGuid().IsEmpty())
         {
