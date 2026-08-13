@@ -1538,7 +1538,7 @@ bool Map::ScriptCommand_DealDamage(ScriptInfo const& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
-    Unit* pTarget = ToUnit(source);
+    Unit* pTarget = ToUnit(target);
 
     if (!pTarget)
     {
@@ -2541,6 +2541,59 @@ bool Map::ScriptCommand_StartScriptOnZone(ScriptInfo const& script, WorldObject*
                     ScriptsStart(sGenericScripts, script.startScriptOnZone.scriptId, pPet->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
         }
     }
+
+    return false;
+}
+
+// SCRIPT_COMMAND_FOLLOW_ESCORT (93)
+bool Map::ScriptCommand_FollowEscort(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_FOLLOW_ESCORT (script id %u) call for a nullptr or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    if (!pSource->GetCharmerOrOwnerGuid().IsEmpty())
+    {
+        sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_FOLLOW_ESCORT (script id %u) wrongly used for pet. The command is intended for regular npcs. Consider using SCRIPT_COMMAND_SET_COMMAND_STATE instead.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    if (script.followEscort.doFollow)
+    {
+        if (!pSource->IsAlive())
+            return ShouldAbortScript(script);
+
+        Unit* pTarget = ToUnit(target);
+        if (!pTarget)
+        {
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_FOLLOW_ESCORT (script id %u) call for a nullptr or non-unit target (TypeId: %u), skipping.", script.id, target ? target->GetTypeId() : 0);
+            return ShouldAbortScript(script);
+        }
+        if (pTarget == pSource)
+        {
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_FOLLOW_ESCORT (script id %u) call for identical source and target, skipping.", script.id);
+            return ShouldAbortScript(script);
+        }
+        if (pSource->IsHostileTo(pTarget))
+        {
+            sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "SCRIPT_COMMAND_FOLLOW_ESCORT (script id %u) call for hostile target, skipping.", script.id);
+            return ShouldAbortScript(script);
+        }
+
+        if (!pTarget->IsAlive())
+            return ShouldAbortScript(script);
+
+        pSource->SetFollowTargetGuid(pTarget->GetObjectGuid());
+
+        if (!pSource->GetVictim())
+            pSource->GetMotionMaster()->MoveFollow(pTarget, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+    }
+    else
+        pSource->SetFollowTargetGuid(ObjectGuid());
 
     return false;
 }

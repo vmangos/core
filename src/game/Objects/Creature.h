@@ -586,6 +586,18 @@ class Creature : public Unit
         // (msecs)timer used for group loot
         uint32 GetGroupLootTimer() const { return m_groupLootTimer; }
 
+        void SetFollowTargetGuid(ObjectGuid guid)
+        {
+            m_followTarget = guid;
+        }
+        ObjectGuid GetFollowTargetGuid() const
+        {
+            if (!m_followTarget.IsEmpty())
+                return m_followTarget;
+            return GetCharmerOrOwnerGuid();
+        }
+        Unit* GetFollowTarget() const;
+
         void SetEscortable(bool escortable)
         {
             if (escortable)
@@ -642,6 +654,7 @@ class Creature : public Unit
         uint32 m_originalEntry;
 
         CreatureGroup* m_creatureGroup;
+        ObjectGuid m_followTarget;                          // To be used for follower quests. Guid of player creature follows out of combat.
 
         float m_combatStartX;
         float m_combatStartY;

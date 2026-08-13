@@ -2268,6 +2268,7 @@ void Creature::SetDeathState(DeathState s)
     if (s == JUST_DIED)
     {
         SetTargetGuid(ObjectGuid());                        // remove target selection in any cases (can be set at aura remove in Unit::SetDeathState)
+        SetFollowTargetGuid(ObjectGuid());
         SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
         if (!IsPet() && GetCreatureInfo()->skinning_loot_id)
@@ -4320,4 +4321,11 @@ bool Creature::GetCharmSpellCooldown(uint32 spellId, uint32& cooldown)
         }
     }
     return false;
+}
+
+Unit* Creature::GetFollowTarget() const
+{
+    if (!m_followTarget.IsEmpty())
+        return GetMap()->GetUnit(m_followTarget);
+    return GetCharmerOrOwner();
 }

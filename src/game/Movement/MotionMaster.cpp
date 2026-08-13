@@ -376,10 +376,17 @@ void MotionMaster::MoveTargetedHome()
 
     Clear(false);
 
-    if (m_owner->IsCreature() && (!((Creature*)m_owner)->GetCharmerOrOwnerGuid() || ((Creature*)m_owner)->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE)))
+    Creature* pCreature = m_owner->ToCreature();
+    if (!pCreature)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt targeted home", m_owner->GetGuidStr().c_str());
+        return;
+    }
+
+    if (!pCreature->GetFollowTargetGuid() || pCreature->HasStaticFlag(CREATURE_STATIC_FLAG_SESSILE))
     {
         // Manual exception for linked mobs
-        if (m_owner->IsLinkingEventTrigger() && m_owner->GetMap()->GetCreatureLinkingHolder()->TryFollowMaster((Creature*)m_owner))
+        if (m_owner->IsLinkingEventTrigger() && m_owner->GetMap()->GetCreatureLinkingHolder()->TryFollowMaster(pCreature))
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s refollowed linked master", m_owner->GetGuidStr().c_str());
         else
         {
@@ -390,14 +397,14 @@ void MotionMaster::MoveTargetedHome()
             Mutate(new HomeMovementGenerator<Creature>());
         }
     }
-    else if (m_owner->IsCreature() && ((Creature*)m_owner)->GetCharmerOrOwnerGuid())
+    else
     {
         if (m_owner->GetCharmInfo() && m_owner->GetCharmInfo()->IsAtStay())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s is at stay", m_owner->GetGuidStr().c_str());
             MoveIdle();
         }
-        else if (Unit* target = ((Creature*)m_owner)->GetCharmerOrOwner())
+        else if (Unit* target = pCreature->GetFollowTarget())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
             Mutate(new FollowMovementGenerator<Creature>(*target, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE));
@@ -405,8 +412,6 @@ void MotionMaster::MoveTargetedHome()
         else
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s attempt but fail to follow owner", m_owner->GetGuidStr().c_str());
     }
-    else
-        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempt targeted home", m_owner->GetGuidStr().c_str());
 }
 
 void MotionMaster::MoveConfused()
