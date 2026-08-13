@@ -131,13 +131,13 @@ void CharacterDatabaseCleaner::CleanOrphanedCharacterData()
     RemoveOrphanedRows("gm_tickets", "guid", "characters", "guid");
     //RemoveOrphanedRows("gm_tickets", "closed_by", "characters", "guid");
     //RemoveOrphanedRows("gm_tickets", "assigned_to", "characters", "guid");
-    RemoveOrphanedRows("groups", "leader_guid", "characters", "guid");
+    //RemoveOrphanedRows("groups", "leader_guid", "characters", "guid");
     //RemoveOrphanedRows("groups", "main_tank_guid", "characters", "guid");
     //RemoveOrphanedRows("groups", "main_assistant_guid", "characters", "guid");
     //RemoveOrphanedRows("groups", "looter_guid", "characters", "guid");
     RemoveOrphanedRows("group_instance", "leader_guid", "characters", "guid");
     RemoveOrphanedRows("group_member", "member_guid", "characters", "guid");
-    RemoveOrphanedRows("guild", "leader_guid", "characters", "guid");
+    //RemoveOrphanedRows("guild", "leader_guid", "characters", "guid");
     //RemoveOrphanedRows("guild_eventlog", "player_guid1", "characters", "guid");
     //RemoveOrphanedRows("guild_eventlog", "player_guid2", "characters", "guid");
     RemoveOrphanedRows("guild_member", "guid", "characters", "guid");
