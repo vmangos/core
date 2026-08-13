@@ -79,45 +79,30 @@ bool FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float 
     if (!&owner)
         return false;
 
-    float dist_from_caster, angle_to_caster;
+    float dist_from_caster;
     if (Unit* fright = ObjectAccessor::GetUnit(owner, i_frightGuid))
-    {
         dist_from_caster = fright->GetDistance(&owner);
-        if (dist_from_caster > 0.2f)
-            angle_to_caster = fright->GetAngle(&owner);
-        else
-            angle_to_caster = frand(0, 2 * M_PI_F);
-    }
     else
-    {
         dist_from_caster = 0.0f;
-        angle_to_caster = frand(0, 2 * M_PI_F);
-    }
 
-    float dist, angle;
+    float angle = frand(0, 2 * M_PI_F);
+    float dist;
     if (dist_from_caster < MIN_QUIET_DISTANCE)
-    {
         dist = frand(0.4f, 1.3f) * (MIN_QUIET_DISTANCE - dist_from_caster);
-        angle = angle_to_caster + frand(-M_PI_F / 8, M_PI_F / 8);
-    }
     else if (dist_from_caster > MAX_QUIET_DISTANCE)
-    {
         dist = frand(0.4f, 1.0f) * (MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE);
-        angle = -angle_to_caster + frand(-M_PI_F / 4, M_PI_F / 4);
-    }
     else    // we are inside quiet range
-    {
         dist = frand(0.6f, 1.2f) * (MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE);
-        angle = frand(0, 2 * M_PI_F);
-    }
 
-    // Nostalrius: pathfinding pour trouver la position de fear (seulement si disponible)
+    // Nostalrius: Pathfinding to find Fear's location (only if available)
     owner.GetSafePosition(x, y, z);
     x += dist * cos(angle);
     y += dist * sin(angle);
+
     // If walking on the border of the map ... Fix crash.
     if (!MaNGOS::IsValidMapCoord(x, y, z))
         return false;
+
     float srcX, srcY, srcZ;
     owner.GetSafePosition(srcX, srcY, srcZ, owner.GetTransport());
     if (!owner.GetMap()->GetWalkHitPosition(owner.GetTransport(), srcX, srcY, srcZ, x, y, z, NAV_WATER | NAV_GROUND))
