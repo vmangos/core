@@ -91,12 +91,19 @@ void Log::OutWarden(Warden const* warden, LogLevel logLevel, char const* format,
     }
 }
 
+bool Warden::m_scriptedScansLoaded = false;
+
 void Warden::LoadScriptedScans()
 {
+    // Prevent duplicating the scripted scans on reload.
+    if (m_scriptedScansLoaded)
+        return;
+
     auto const start = sWardenScanMgr.Count();
 
     WardenWin::LoadScriptedScans();
     WardenMac::LoadScriptedScans();
+    m_scriptedScansLoaded = true;
 
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, ">> %u scripted Warden scans loaded from anticheat module", sWardenScanMgr.Count() - start);
 }
