@@ -291,7 +291,11 @@ void Warden::RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans)
         // if the scan did not change the buffer size or the string size, consider
         // it a NOP and don't bother marking it as pending
         if (scan.wpos() != startSize || strings.size() != startStringSize)
+        {
             m_pendingScans.push_back(*i);
+            request += (*i)->requestSize;
+            reply += (*i)->replySize;
+        }
     }
 
     // if there are still no pending scans, it means that there is a single scan which is too big.
