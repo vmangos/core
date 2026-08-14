@@ -228,9 +228,12 @@ WindowsMemoryScan::WindowsMemoryScan(uint32 offset, void const* expected, size_t
         if (!!buff.read<uint8>())
             return true;
 
-        auto const result = !!memcmp(buff.contents() + buff.rpos(), &this->m_expected[0], this->m_expected.size());
-        buff.rpos(buff.rpos() + this->m_expected.size());
-        return result;
+        // the client may reply with fewer bytes than we asked for.  read_skip() bounds checks
+        // and throws, which the caller turns into a kick, rather than reading past the packet
+        auto const pos = buff.rpos();
+        buff.read_skip(this->m_expected.size());
+
+        return !!memcmp(buff.contents() + pos, this->m_expected.data(), this->m_expected.size());
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags, minBuild, maxBuild)
 {
     // must fit within uint8
@@ -263,9 +266,12 @@ WindowsMemoryScan::WindowsMemoryScan(std::string const& module, uint32 offset, v
         if (!!buff.read<uint8>())
             return true;
 
-        auto const result = !!memcmp(buff.contents() + buff.rpos(), &this->m_expected[0], this->m_expected.size());
-        buff.rpos(buff.rpos() + this->m_expected.size());
-        return result;
+        // the client may reply with fewer bytes than we asked for.  read_skip() bounds checks
+        // and throws, which the caller turns into a kick, rather than reading past the packet
+        auto const pos = buff.rpos();
+        buff.read_skip(this->m_expected.size());
+
+        return !!memcmp(buff.contents() + pos, this->m_expected.data(), this->m_expected.size());
     }, module.length() + sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + length, comment, flags, minBuild, maxBuild)
 {
     // must fit within uint8
@@ -403,7 +409,7 @@ WindowsLuaScan::WindowsLuaScan(std::string const& lua, bool wanted, std::string 
         if (found)
         {
             auto const length = buff.read<uint8>();
-            buff.rpos(buff.rpos() + length);
+            buff.read_skip(length);
         }
 
         return found != this->m_wanted;
@@ -434,11 +440,15 @@ WindowsLuaScan::WindowsLuaScan(std::string const& lua, std::string const& expect
 
         const size_t len = buff.read<uint8>();
 
-        const std::string str(reinterpret_cast<char const*>(buff.contents() + buff.rpos()), len);
+        // bounds checked, so a truncated reply throws instead of reading past the packet
+        auto const pos = buff.rpos();
+        buff.read_skip(len);
 
-        buff.rpos(buff.rpos() + len);
+        const std::string str(reinterpret_cast<char const*>(buff.contents() + pos), len);
 
-        return str == this->m_expectedValue;
+        // like every other check, we report a hack when the client deviates from what a clean
+        // client must report.  the expected value is the good one, not the cheat's value.
+        return str != this->m_expectedValue;
     }, sizeof(uint8) + sizeof(uint8) + lua.length(), sizeof(uint8) + 0xFF, comment, flags | ScanFlags::OffsetsInitialized, minBuild, maxBuild)
 {
     MANGOS_ASSERT(expectedValue.length() <= 0xFF);
