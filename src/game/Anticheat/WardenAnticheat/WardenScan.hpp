@@ -25,6 +25,7 @@
 #define __WARDENSCAN_HPP_
 
 #include "ByteBuffer.h"
+#include "Crypto/Hash/MD5.h"
 #include "Crypto/Hash/SHA1.h"
 
 #include <functional>
@@ -120,6 +121,8 @@ class StringHashScan
 public:
     Scan::BuildT GetBuilder();
     Scan::CheckT GetChecker();
+    static constexpr size_t MaxRequestSize = 128;
+    static constexpr size_t MaxReplySize = sizeof(uint8) + Crypto::Hash::SHA1::Digest::size() + Crypto::Hash::MD5::Digest::size();
 };
 
 // only supported by maiev

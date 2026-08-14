@@ -80,7 +80,7 @@ Scan::BuildT StringHashScan::GetBuilder()
         std::string& string = warden->m_hashString;
 
         string.clear();
-        uint8 size = urand(1, 255);
+        uint8 size = urand(1, StringHashScan::MaxRequestSize - sizeof(uint8) /*null terminator*/ - sizeof(uint8) /*count*/);
         string.reserve(size);
         for (uint8 i = 0; i < size; i++)
             string += (char)urand('a', 'z');
@@ -135,7 +135,7 @@ WindowsStringHashScan::WindowsStringHashScan()
     GetBuilder(),
     // checker
     GetChecker(),
-    128, sizeof(uint8) + Crypto::Hash::SHA1::Digest::size() + Crypto::Hash::MD5::Digest::size(), "Maiev string hash",
+    StringHashScan::MaxRequestSize, StringHashScan::MaxReplySize, "Maiev string hash",
     ScanFlags::Maiev, 0, UINT16_MAX)
 {
 
@@ -147,7 +147,7 @@ MacStringHashScan::MacStringHashScan(bool moduleLoaded)
         GetBuilder(),
         // checker
         GetChecker(),
-        128, sizeof(uint8) + Crypto::Hash::SHA1::Digest::size() + Crypto::Hash::MD5::Digest::size(), moduleLoaded ? "Mac string hash" : "Maiev string hash",
+        StringHashScan::MaxRequestSize, StringHashScan::MaxReplySize, moduleLoaded ? "Mac string hash" : "Maiev string hash",
         (moduleLoaded ? ScanFlags::None : ScanFlags::Maiev), 0, UINT16_MAX)
 {
 
