@@ -38,6 +38,7 @@
 #include "SQLStorages.h"
 #include "ScriptCommands.h"
 #include "CreatureLinkingMgr.h"
+#include "CreatureGroups.h"
 
 #include <bitset>
 #include <list>
@@ -53,7 +54,6 @@ class Creature;
 class Unit;
 class WorldPacket;
 class InstanceData;
-class CreatureGroup;
 class MapPersistentState;
 class WorldPersistentState;
 class DungeonPersistentState;
@@ -178,7 +178,6 @@ struct AreaLocale
 
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
 
-typedef std::map<uint32, CreatureGroup*> CreatureGroupHolderType;
 using MapMutexType = std::mutex; // can be replaced with a null mutex
 
 // Instance IDs reserved for internal use (instanced continent parts, ...)
@@ -598,6 +597,7 @@ class Map : public GridRefManager<NGridType>
 
         // Get Holder for Creature Linking
         CreatureLinkingHolder* GetCreatureLinkingHolder() { return &m_creatureLinkingHolder; }
+        CreatureGroupsManager* GetCreatureGroupsManager() { return &m_creatureGroupManager; }
 
         // Teleport all players in that map to choosed location
         void TeleportAllPlayersTo(TeleportLocation loc);
@@ -758,6 +758,7 @@ class Map : public GridRefManager<NGridType>
 
         // Holder for information about linked mobs
         CreatureLinkingHolder m_creatureLinkingHolder;
+        CreatureGroupsManager m_creatureGroupManager;
 
         // WeatherSystem
         WeatherSystem* m_weatherSystem;
@@ -967,7 +968,6 @@ class Map : public GridRefManager<NGridType>
         };
 
     public:
-        CreatureGroupHolderType CreatureGroupHolder;
         uint32 GetLastPlayerLeftTime() const { return m_lastPlayerLeftTime; }
 };
 

@@ -21,7 +21,6 @@
 
 #include "Common.h"
 #include "ObjectGuid.h"
-
 #include <map>
 
 class Map;
@@ -52,11 +51,11 @@ struct CreatureGroupMember
     uint32 memberFlags = 0;
 };
 
-class CreatureGroupsManager;
+class CreatureGroupsLoadingManager;
 
 class CreatureGroup
 {
-    friend class CreatureGroupsManager;
+    friend class CreatureGroupsLoadingManager;
     public:
         CreatureGroup(ObjectGuid leader) : m_leaderGuid(leader), m_originalLeaderGuid(leader), m_options(0), m_assistGuard(false), m_respawnGuard(false), m_deleted(false), m_lastReachedWaypoint(0)
         {
@@ -99,21 +98,51 @@ class CreatureGroup
 
 class CreatureGroupsManager
 {
+    friend class CreatureGroupsLoadingManager;
     public:
-        static CreatureGroupsManager* instance()
+        CreatureGroupsManager() = default;
+        CreatureGroupsManager(CreatureGroupsManager const& other)
         {
-            static CreatureGroupsManager* i = new CreatureGroupsManager();
-            return i;
+            for (auto const& itr : other.m_groups)
+            {
+                m_groups[itr.first] = new CreatureGroup(*itr.second);
+            }
+        }
+        ~CreatureGroupsManager()
+        {
+            for (auto& itr : m_groups)
+                delete itr.second;
         }
         void LoadCreatureGroup(ObjectGuid guid, CreatureGroup*& group);
         void RegisterNewGroup(CreatureGroup* group) { m_groups[group->GetOriginalLeaderGuid()] = group; }
-        void Load();
         void EraseCreatureGroup(ObjectGuid leaderGuid) { m_groups.erase(leaderGuid); }
         static ObjectGuid ConvertDBGuid(uint32 guidlow);
     protected:
         std::map<ObjectGuid, CreatureGroup*> m_groups;
 };
 
-#define sCreatureGroupsManager (CreatureGroupsManager::instance())
+class CreatureGroupsLoadingManager
+{
+    public:
+        static CreatureGroupsLoadingManager* instance()
+        {
+            static CreatureGroupsLoadingManager* i = new CreatureGroupsLoadingManager();
+            return i;
+        }
+        void LoadFromDB();
+        void InitializeGroupManagerForMap(uint32 mapId, CreatureGroupsManager& manager) const
+        {
+            auto itr = m_groupManagers.find(mapId);
+            if (itr == m_groupManagers.end())
+                return;
+
+            for (auto const& itr : itr->second.m_groups)
+                manager.m_groups[itr.first] = new CreatureGroup(*itr.second);
+        }
+    protected:
+        std::map<uint32 /*mapId*/, CreatureGroupsManager> m_groupManagers;
+};
+
+#define sCreatureGroupsManager (CreatureGroupsLoadingManager::instance())
 
 #endif

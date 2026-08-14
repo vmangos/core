@@ -155,6 +155,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_persistentState = sMapPersistentStateMgr.AddPersistentState(m_mapEntry, GetInstanceId(), 0, IsDungeon());
     m_persistentState->SetUsedByMapState(this);
     m_weatherSystem = new WeatherSystem(this);
+    sCreatureGroupsManager->InitializeGroupManagerForMap(id, m_creatureGroupManager);
 
     if (IsContinent())
     {

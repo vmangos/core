@@ -1535,7 +1535,7 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Creature Groups ...");
-    sCreatureGroupsManager->Load();
+    sCreatureGroupsManager->LoadFromDB();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Gameobject Data...");
     sObjectMgr.LoadGameobjects();

@@ -284,7 +284,7 @@ void Creature::AddToWorld()
         GetMap()->InsertObject<Creature>(GetObjectGuid(), this);
 
     if (!m_creatureGroup && HasStaticDBSpawnData())
-        sCreatureGroupsManager->LoadCreatureGroup(GetObjectGuid(), m_creatureGroup);
+        GetMap()->GetCreatureGroupsManager()->LoadCreatureGroup(GetObjectGuid(), m_creatureGroup);
 
     if (m_creatureGroup)
     {
@@ -1936,7 +1936,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
     ObjectGuid fullGuid = ObjectGuid(HIGHGUID_UNIT, data->creature_id[0], guidlow);
     m_creatureData = data;
     m_creatureDataAddon = sObjectMgr.GetCreatureAddon(guidlow);
-    sCreatureGroupsManager->LoadCreatureGroup(fullGuid, m_creatureGroup);
+    map->GetCreatureGroupsManager()->LoadCreatureGroup(fullGuid, m_creatureGroup);
 
     uint32 const creatureId = m_creatureGroup ? m_creatureGroup->ChooseCreatureId(fullGuid, data, map) : data->ChooseCreatureId();
     CreatureInfo const* cinfo = sObjectMgr.GetCreatureTemplate(creatureId);
@@ -4234,6 +4234,7 @@ void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint
     {
         group = new CreatureGroup(leader->GetObjectGuid());
         leader->SetCreatureGroup(group);
+        GetMap()->GetCreatureGroupsManager()->RegisterNewGroup(group);
     }
     group->AddMember(GetObjectGuid(), dist, angle, options);
     SetCreatureGroup(group);
@@ -4247,6 +4248,7 @@ void Creature::LeaveCreatureGroup()
     {
         if (pGroup->GetOriginalLeaderGuid() == GetObjectGuid())
         {
+            GetMap()->GetCreatureGroupsManager()->EraseCreatureGroup(pGroup->GetOriginalLeaderGuid());
             pGroup->DisbandGroup(this);
             delete pGroup;
         }
