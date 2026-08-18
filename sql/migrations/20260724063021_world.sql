@@ -93,7 +93,7 @@ UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~4194304 /*Pv
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~536870912 /*Floating <Don't Use>*/ WHERE `entry`=10541; -- DB2 Matches
 
 -- Gadgetzan Bruiser
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=9460; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=9460 && `patch` > 0; -- DB2 Matches
 
 -- Chief Engineer Bilgewhizzle
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 134217728 /*Calls Guards*/ WHERE `entry`=7407; -- No Match
@@ -267,13 +267,13 @@ UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 32 /*ImmunePC
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 64 /*ImmuneNPC*/ WHERE `entry`=3509; -- DB2 Matches
 
 -- Stormwind Royal Guard
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1756; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1756 && `patch` > 0; -- DB2 Matches
 
 -- Aedis Brom
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1478; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1478 && `patch` > 0; -- DB2 Matches
 
 -- Christoph Faral
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1477; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1477 && `patch` > 0; -- DB2 Matches
 
 -- Cleo
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 32 /*ImmunePC*/ WHERE `entry`=15066; -- DB2 Matches
@@ -320,10 +320,10 @@ UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 32 /*ImmunePC
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 64 /*ImmuneNPC*/ WHERE `entry`=7394; -- DB2 Matches
 
 -- Mountaineer Droken
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1280; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1280 && `patch` > 0; -- DB2 Matches
 
 -- Mountaineer Stenn
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1278; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1278 && `patch` > 0; -- DB2 Matches
 
 -- Shadowmage Vivian Lagrave
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 524288 /*Amphibious*/, `inhabit_type` = `inhabit_type` | 2 WHERE `entry`=9078; -- DB2 Matches
@@ -678,7 +678,7 @@ UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~4194304 /*Pv
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 134217728 /*Calls Guards*/ WHERE `entry`=14961; -- DB2 Matches
 
 -- Mountaineer Brokk
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1276; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1276 && `patch` > 0; -- DB2 Matches
 
 -- Deeprun Diver
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 64 /*ImmuneNPC*/ WHERE `entry`=14121; -- DB2 Matches
@@ -761,7 +761,7 @@ UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~64 /*ImmuneN
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 32 /*ImmunePC*/ WHERE `entry`=7997; -- DB2 Matches
 
 -- Feathermoon Sentinel
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=7939; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=7939 && `patch` > 0; -- DB2 Matches
 
 -- Unliving Resident
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~524288 /*Amphibious*/, `inhabit_type` = `inhabit_type` & ~2 WHERE `entry`=12380; -- No Match
