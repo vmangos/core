@@ -668,6 +668,7 @@ float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEf
             {
                 return donePart ? 0.20f : 0.29f;
             }
+            break;
         }
         case SPELLFAMILY_SHAMAN:
         {
@@ -695,6 +696,7 @@ float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEf
                     coeff *= multiplier;
                 return coeff;
             }
+            break;
         }
         default:
             break;

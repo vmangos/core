@@ -678,6 +678,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         default:
                             return;
                     };
+                    return;
                 }
                 case 8593:                                  // Symbol of life (restore creature to life)
                 {
