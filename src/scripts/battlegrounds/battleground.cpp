@@ -49,6 +49,8 @@ struct npc_spirit_guideAI : ScriptedAI
     explicit npc_spirit_guideAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         uiTimerRez = 0;
+        uiInterruptTimer = 0;
+        uiDelayCast = 0;
 
         npc_spirit_guideAI::Reset();
     }
@@ -57,7 +59,9 @@ struct npc_spirit_guideAI : ScriptedAI
     {
     }
 
-    uint32 uiTimerRez;
+    uint32 uiTimerRez;          // main cycle timer
+    uint32 uiInterruptTimer;    // when to interrupt the channel
+    uint32 uiDelayCast;         // delay before casting 22012 (after interrupt)
 
     uint32 GetData(uint32 /*type*/) override
     {
@@ -66,14 +70,68 @@ struct npc_spirit_guideAI : ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (uiTimerRez < uiDiff)
+        // Delayed cast after interrupt
+        if (uiDelayCast)
+        {
+            if (uiDelayCast <= uiDiff)
+            {
+                // Find a dead player with aura 2584 in range (to cast on)
+                Player* target = nullptr;
+                Map* map = m_creature->GetMap();
+                if (map)
+                {
+                    Map::PlayerList const& players = map->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        Player* player = itr->getSource();
+                        if (player && player->IsInWorld() && player->GetDistance(m_creature) < 20.0f)
+                        {
+                            if (!player->IsAlive() && player->HasAura(2584))
+                            {
+                                target = player;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (target)
+                {
+                    // Cast on the player, this triggers the NPC's cast animation
+                    m_creature->CastSpell(target, SPELL_SPIRIT_HEAL, false);
+                }
+                // no eligible target, skip casting
+                uiDelayCast = 0;
+            }
+            else
+                uiDelayCast -= uiDiff;
+        }
+
+        // Interrupt the channel and prepare to cast 22012
+        if (uiInterruptTimer)
+        {
+            if (uiInterruptTimer <= uiDiff)
+            {
+                // Stop channeling and remove the aura
+                m_creature->InterruptNonMeleeSpells(true);
+                m_creature->RemoveAurasDueToSpell(SPELL_SPIRIT_HEAL_CHANNEL);
+                // Wait 50ms to let the NPC fully exit the channeling state
+                uiDelayCast = 50;
+                uiInterruptTimer = 0;
+            }
+            else
+                uiInterruptTimer -= uiDiff;
+        }
+
+        // Start a new channel cycle (only if no cast is pending)
+        if (uiTimerRez < uiDiff && uiDelayCast == 0)
         {
             m_creature->InterruptNonMeleeSpells(true);
-            m_creature->CastSpell(m_creature, SPELL_SPIRIT_HEAL, true);
             m_creature->CastSpell(m_creature, SPELL_SPIRIT_HEAL_CHANNEL, false);
-            uiTimerRez = 30000;
+            uiInterruptTimer = 30000;   // interrupt after 30s
+            uiTimerRez = 31000;         // next cycle at 31s
         }
-        else
+        else if (uiTimerRez >= uiDiff)
             uiTimerRez -= uiDiff;
     }
 

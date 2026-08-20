@@ -5783,7 +5783,6 @@ void Spell::EffectSummonDemon(SpellEffectIndex effIdx)
 
 void Spell::EffectSpiritHeal(SpellEffectIndex /*effIdx*/)
 {
-    // TODO player can't see the heal-animation - he should respawn some ticks later
     if (!unitTarget || unitTarget->IsAlive())
         return;
     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
@@ -5803,9 +5802,28 @@ void Spell::EffectSpiritHeal(SpellEffectIndex /*effIdx*/)
         player->RepopAtGraveyard();
 
     player->RemoveAurasDueToSpell(2584);
-    player->ResurrectPlayer(1.0f);
-    player->SpawnCorpseBones();
-    player->AutoReSummonPet();
+
+    // Delayed resurrection – gives Holy Nova time to render
+    struct ResurrectEvent : public BasicEvent
+    {
+        Player* m_player;
+        ResurrectEvent(Player* p) : m_player(p) {}
+
+        bool Execute(uint64 /*time*/, uint32 /*diff*/) override
+        {
+            if (m_player && !m_player->IsAlive())
+            {
+                m_player->ResurrectPlayer(1.0f);
+                m_player->SpawnCorpseBones();
+                m_player->AutoReSummonPet();
+            }
+            return true;
+        }
+
+        bool IsDeletable() const override { return true; }
+    };
+
+    player->m_Events.AddEvent(new ResurrectEvent(player), player->m_Events.CalculateTime(500));
 }
 
 // remove insignia spell effect
