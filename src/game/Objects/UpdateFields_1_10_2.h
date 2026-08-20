@@ -248,7 +248,7 @@ enum EPlayerFields
     PLAYER_FIELD_BANKBAG_SLOT_1                      = UNIT_END + 0x1AA,   // 0x266 - Size: 12 - Type: GUID - Flags: PRIVATE
     PLAYER_FIELD_VENDORBUYBACK_SLOT_1                = UNIT_END + 0x1B6,   // 0x272 - Size: 24 - Type: GUID - Flags: PRIVATE
     PLAYER_FARSIGHT                                  = UNIT_END + 0x1CE,   // 0x28A - Size: 2 - Type: GUID - Flags: PRIVATE
-    PLAYER__FIELD_COMBO_TARGET                       = UNIT_END + 0x1D0,   // 0x28C - Size: 2 - Type: GUID - Flags: PRIVATE
+    PLAYER_FIELD_COMBO_TARGET                        = UNIT_END + 0x1D0,   // 0x28C - Size: 2 - Type: GUID - Flags: PRIVATE
     PLAYER_XP                                        = UNIT_END + 0x1D2,   // 0x28E - Size: 1 - Type: INT - Flags: PRIVATE
     PLAYER_NEXT_LEVEL_XP                             = UNIT_END + 0x1D3,   // 0x28F - Size: 1 - Type: INT - Flags: PRIVATE
     PLAYER_SKILL_INFO_1_1                            = UNIT_END + 0x1D4,   // 0x290 - Size: 384 - Type: TWO_SHORT - Flags: PRIVATE

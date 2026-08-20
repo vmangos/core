@@ -98,11 +98,11 @@ enum EUnitFields
     UNIT_FIELD_STAT3                                 = OBJECT_END + 0x98,  // 0x09E - Size: 1 - Type: INT - Flags: PRIVATE + OWNER_ONLY
     UNIT_FIELD_STAT4                                 = OBJECT_END + 0x99,  // 0x09F - Size: 1 - Type: INT - Flags: PRIVATE + OWNER_ONLY
     UNIT_FIELD_RESISTANCES                           = OBJECT_END + 0x9A,  // 0x0A0 - Size: 7 - Type: INT - Flags: PRIVATE + OWNER_ONLY + SPECIAL_INFO
-    UNIT_FIELD_ATTACKPOWER                           = OBJECT_END + 0xA1,  // 0x0A7 - Size: 1 - Type: INT - Flags: PRIVATE + OWNER_ONLY
+    UNIT_FIELD_ATTACK_POWER                          = OBJECT_END + 0xA1,  // 0x0A7 - Size: 1 - Type: INT - Flags: PRIVATE + OWNER_ONLY
     UNIT_FIELD_BASE_MANA                             = OBJECT_END + 0xA2,  // 0x0A8 - Size: 1 - Type: INT - Flags: PRIVATE + OWNER_ONLY
     UNIT_FIELD_ATTACK_POWER_MODS                     = OBJECT_END + 0xA3,  // 0x0A9 - Size: 1 - Type: TWO_SHORT - Flags: PRIVATE + OWNER_ONLY
     UNIT_FIELD_BYTES_2                               = OBJECT_END + 0xA4,  // 0x0AA - Size: 1 - Type: BYTES - Flags: PUBLIC
-    UNIT_FIELD_RANGEDATTACKPOWER                     = OBJECT_END + 0xA5,  // 0x0AB - Size: 1 - Type: INT - Flags: PRIVATE + OWNER_ONLY
+    UNIT_FIELD_RANGED_ATTACK_POWER                   = OBJECT_END + 0xA5,  // 0x0AB - Size: 1 - Type: INT - Flags: PRIVATE + OWNER_ONLY
     UNIT_FIELD_RANGED_ATTACK_POWER_MODS              = OBJECT_END + 0xA6,  // 0x0AC - Size: 1 - Type: TWO_SHORT - Flags: PRIVATE + OWNER_ONLY
     UNIT_FIELD_MINRANGEDDAMAGE                       = OBJECT_END + 0xA7,  // 0x0AD - Size: 1 - Type: FLOAT - Flags: PRIVATE + OWNER_ONLY
     UNIT_FIELD_MAXRANGEDDAMAGE                       = OBJECT_END + 0xA8,  // 0x0AE - Size: 1 - Type: FLOAT - Flags: PRIVATE + OWNER_ONLY
@@ -225,7 +225,7 @@ enum EPlayerFields
     PLAYER_FIELD_BANKBAG_SLOT_1                      = UNIT_END + 0x198,   // 0x248 - Size: 12 - Type: GUID - Flags: PRIVATE
     PLAYER_FIELD_VENDORBUYBACK_SLOT                  = UNIT_END + 0x1A4,   // 0x254 - Size: 2 - Type: GUID - Flags: PRIVATE
     PLAYER_FARSIGHT                                  = UNIT_END + 0x1A6,   // 0x256 - Size: 2 - Type: GUID - Flags: PRIVATE
-    PLAYER__FIELD_COMBO_TARGET                       = UNIT_END + 0x1A8,   // 0x258 - Size: 2 - Type: GUID - Flags: PRIVATE
+    PLAYER_FIELD_COMBO_TARGET                        = UNIT_END + 0x1A8,   // 0x258 - Size: 2 - Type: GUID - Flags: PRIVATE
     PLAYER_FIELD_BUYBACK_NPC                         = UNIT_END + 0x1AA,   // 0x25A - Size: 2 - Type: GUID - Flags: PRIVATE
     PLAYER_XP                                        = UNIT_END + 0x1AC,   // 0x25C - Size: 1 - Type: INT - Flags: PRIVATE
     PLAYER_NEXT_LEVEL_XP                             = UNIT_END + 0x1AD,   // 0x25D - Size: 1 - Type: INT - Flags: PRIVATE

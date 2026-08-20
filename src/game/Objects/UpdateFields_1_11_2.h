@@ -249,7 +249,7 @@ enum EPlayerFields
     PLAYER_FIELD_VENDORBUYBACK_SLOT_1                = UNIT_END + 0x1B6,   // 0x272 - Size: 24 - Type: GUID - Flags: PRIVATE
     PLAYER_FIELD_KEYRING_SLOT_1                      = UNIT_END + 0x1CE,   // 0x28A - Size: 64 - Type: GUID - Flags: PRIVATE
     PLAYER_FARSIGHT                                  = UNIT_END + 0x20E,   // 0x2CA - Size: 2 - Type: GUID - Flags: PRIVATE
-    PLAYER__FIELD_COMBO_TARGET                       = UNIT_END + 0x210,   // 0x2CC - Size: 2 - Type: GUID - Flags: PRIVATE
+    PLAYER_FIELD_COMBO_TARGET                        = UNIT_END + 0x210,   // 0x2CC - Size: 2 - Type: GUID - Flags: PRIVATE
     PLAYER_XP                                        = UNIT_END + 0x212,   // 0x2CE - Size: 1 - Type: INT - Flags: PRIVATE
     PLAYER_NEXT_LEVEL_XP                             = UNIT_END + 0x213,   // 0x2CF - Size: 1 - Type: INT - Flags: PRIVATE
     PLAYER_SKILL_INFO_1_1                            = UNIT_END + 0x214,   // 0x2D0 - Size: 384 - Type: TWO_SHORT - Flags: PRIVATE
