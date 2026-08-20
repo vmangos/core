@@ -469,6 +469,7 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
                         if (pMaster->IsControlledByPlayer())
                             return;
                         pMaster->EnterCombatWithTarget(pEnemy);
+                        break;
                     case LINKING_EVENT_EVADE:
                         if (!pMaster->IsAlive())
                             pMaster->Respawn();
