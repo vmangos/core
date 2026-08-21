@@ -17,6 +17,9 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 (856701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6185, 0, 0, 0, 0, 0, 0, 0, 0, 'Glutton - Yell on Aggro'),
 (856704, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6186, 0, 0, 0, 0, 0, 0, 0, 0, 'Glutton - Yell on Kill');
 
+UPDATE `broadcast_text` SET `sound_id` = 5823 WHERE `entry` = 6185;
+UPDATE `broadcast_text` SET `chat_type` = 6, `sound_id` = 5824 WHERE `entry` = 6186;
+
 -- End of migration.
 END IF;
 END??
