@@ -2604,7 +2604,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                                 display_id = gender == GENDER_MALE ?
                                             10136 :
                                             10147 ;
-                                mod_x = DEFAULT_GNOME_SCALE / target->GetScaleForDisplayId(target->GetNativeDisplayId());
+                                mod_x = DEFAULT_GNOME_SCALE / Unit::GetScaleForDisplayId(target->GetNativeDisplayId());
                                 break;
                             case RACE_HUMAN:
                                 display_id = gender == GENDER_MALE ?
@@ -2635,12 +2635,12 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                                 if (gender == GENDER_MALE)
                                 {
                                     display_id = 10148;
-                                    mod_x = DEFAULT_TAUREN_MALE_SCALE / target->GetScaleForDisplayId(target->GetNativeDisplayId());
+                                    mod_x = DEFAULT_TAUREN_MALE_SCALE / Unit::GetScaleForDisplayId(target->GetNativeDisplayId());
                                 }
                                 else
                                 {
                                     display_id = 10149;
-                                    mod_x = DEFAULT_TAUREN_FEMALE_SCALE / target->GetScaleForDisplayId(target->GetNativeDisplayId());
+                                    mod_x = DEFAULT_TAUREN_FEMALE_SCALE / Unit::GetScaleForDisplayId(target->GetNativeDisplayId());
                                 }
                                 break;
                             default:
@@ -2655,7 +2655,6 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             }
             else
             {
-                float displayScale = mod_x;
                 CreatureInfo const* ci = sObjectMgr.GetCreatureTemplate(m_modifier.m_miscvalue);
                 if (!ci)
                 {
@@ -2663,14 +2662,11 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                     sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Aura::HandleAuraTransform - Unknown creature id (%d) (only need its display_id) for spell %d.", m_modifier.m_miscvalue, GetId());
                 }
                 else
-                    display_id = Creature::ChooseDisplayId(ci, nullptr, nullptr, nullptr, &displayScale);   // Will use the default display id here
+                    display_id = Creature::ChooseDisplayId(ci, nullptr, nullptr, nullptr, &mod_x);   // Will use the default display id here
 
                 // creature case, need to update equipment
                 if (ci && target->IsCreature())
-                {
                     ((Creature*)target)->LoadEquipment(ci->equipment_id, true);
-                    mod_x = displayScale;
-                }
             }
 
             if (display_id)
