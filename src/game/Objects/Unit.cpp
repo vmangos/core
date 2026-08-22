@@ -3064,16 +3064,6 @@ bool Unit::CanSwimAtPosition(float x, float y, float z) const
     return GetTerrain()->IsSwimmable(x, y, z, GetMinSwimDepth());
 }
 
-bool Unit::IsInWater() const
-{
-    return GetTerrain()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ());
-}
-
-bool Unit::IsUnderwater() const
-{
-    return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
-}
-
 float Unit::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
 {
     float speed = 0.0f;

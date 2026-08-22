@@ -1360,8 +1360,6 @@ class Unit : public SpellCaster
         float GetJumpInitialSpeed() const { return m_jumpInitialSpeed; }
 
         // Terrain checks
-        virtual bool IsInWater() const;
-        virtual bool IsUnderwater() const;
         template<class T>
         bool CanSwimAtPosition(T const& pos) const
         {

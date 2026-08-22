@@ -745,6 +745,8 @@ class WorldObject : public Object
         //obtain terrain data for map where this object belong...
         TerrainInfo const* GetTerrain() const;
         bool HasMMapsForCurrentMap() const;
+        virtual bool IsInWater() const;
+        virtual bool IsUnderwater() const;
 
         void SetZoneScript();
         virtual ZoneScript* GetZoneScript() const { return m_zoneScript; }

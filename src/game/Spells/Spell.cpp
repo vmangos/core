@@ -5467,9 +5467,9 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_CASTER_DEAD;
     }
 
-    // check global cooldown
     if (!m_IsTriggeredSpell)
     {
+        // check global cooldown
         // Activated spells will get stuck if we return SPELL_FAILED_NOT_READY during GCD
         if (strict && m_caster->HasGCD(m_spellInfo))
             return m_spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT) ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_NOT_READY;
@@ -5494,6 +5494,26 @@ SpellCastResult Spell::CheckCast(bool strict)
 
             if ((m_spellInfo->Attributes & SPELL_ATTR_ONLY_STEALTHED) && !(m_casterUnit->HasStealthAura()))
                 return SPELL_FAILED_ONLY_STEALTHED;
+        }
+        
+        if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_UNDER_WATER_CANCELS))
+        {
+            // Client checks only swimming flag.
+            if (m_caster->IsSwimming())
+                return SPELL_FAILED_ONLY_ABOVEWATER;
+
+            if (m_caster->IsInWater() && (!m_caster->IsPlayer() || static_cast<Player*>(m_caster)->IsInHighLiquid()))
+                return SPELL_FAILED_ONLY_ABOVEWATER;
+        }
+
+        if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_ABOVE_WATER_CANCELS))
+        {
+            // Client checks only swimming flag.
+            if (!m_caster->IsSwimming())
+                return SPELL_FAILED_ONLY_UNDERWATER;
+
+            if (!m_caster->IsInWater() || (m_caster->IsPlayer() && !static_cast<Player*>(m_caster)->IsInHighLiquid()))
+                return SPELL_FAILED_ONLY_UNDERWATER;
         }
     }
 
@@ -6496,9 +6516,6 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 if (!m_casterUnit)
                     return SPELL_FAILED_BAD_TARGETS;
-
-                if (m_casterUnit->IsInWater() && (!m_casterUnit->IsPlayer() || static_cast<Player*>(m_casterUnit)->IsInHighLiquid()))
-                    return SPELL_FAILED_ONLY_ABOVEWATER;
 
                 if (m_casterUnit->IsPlayer() && m_casterUnit->GetTransport() && !static_cast<Player*>(m_casterUnit)->IsOutdoorOnTransport())
                     return SPELL_FAILED_NO_MOUNTS_ALLOWED;

@@ -2387,6 +2387,16 @@ TerrainInfo const* WorldObject::GetTerrain() const
     return m_currMap->GetTerrain();
 }
 
+bool WorldObject::IsInWater() const
+{
+    return GetTerrain()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ());
+}
+
+bool WorldObject::IsUnderwater() const
+{
+    return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
+}
+
 void WorldObject::AddObjectToRemoveList()
 {
     if (m_deleted) // Already in the remove list
