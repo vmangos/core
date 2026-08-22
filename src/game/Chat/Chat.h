@@ -716,6 +716,8 @@ class ChatHandler
         bool HandleNpcSpawnSetEmoteStateCommand(char* args);
         bool HandleNpcSpawnSetStandStateCommand(char* args);
         bool HandleNpcSpawnSetSheathStateCommand(char* args);
+        bool HandleNpcSpawnLoadCommand(char* args);
+        bool HandleNpcSpawnUnloadCommand(char* args);
         bool HandleNpcSetMoveTypeCommand(char* args);
         bool HandleNpcSpawnSetMoveTypeCommand(char* args);
         bool HandleNpcSpawnWanderDistCommand(char* args);
