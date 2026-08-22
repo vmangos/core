@@ -1008,6 +1008,7 @@ enum SpellAttributesInternal
     SPELL_INTERNAL_NON_PERIODIC_DISPEL      = 0x08000,
     SPELL_INTERNAL_PVE_HEARTBEAT            = 0x10000,
     SPELL_INTERNAL_CROWD_CONTROL            = 0x20000,
+    SPELL_INTERNAL_MUST_DELAY_EFFECTS       = 0x40000,
 };
 
 // Spell proc event related declarations

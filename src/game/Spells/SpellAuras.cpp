@@ -1535,6 +1535,15 @@ void Aura::TriggerSpell()
                 triggerTarget = target;
             }
         }
+
+        // If spell is supposed to trigger another only at end of channel,
+        // clear channel instantly before casting to fix cast animations.
+        // This fixes the casting animation of Spirit Heal in battlegrounds.
+        if (m_modifier.periodictime == GetAuraMaxDuration() &&
+            triggerCaster->GetUInt32Value(UNIT_CHANNEL_SPELL) == GetId())
+        {
+            triggerCaster->CancelSpellChannelingAnimationInstantly();
+        }
     }
 
     if (GetAuraScript())
