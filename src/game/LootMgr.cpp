@@ -909,24 +909,25 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         case MASTER_PERMISSION:
         case OWNER_PERMISSION:
         {
-            uint8 slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
-            switch (lv.permission)
-            {
-                case MASTER_PERMISSION:
-                    slot_type = LOOT_SLOT_TYPE_MASTER;
-                    break;
-                case OWNER_PERMISSION:
-                    //slot_type = LOOT_SLOT_TYPE_OWNER;
-                    slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT; // Otherwise no auto-loot ...
-                    break;
-                default:
-                    break;
-            }
-
             for (uint8 i = 0; i < l.items.size(); ++i)
             {
                 if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].AllowedForPlayer(lv.viewer, l.GetLootTarget()))
                 {
+                    uint8 slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
+                    switch (lv.permission)
+                    {
+                        case MASTER_PERMISSION:
+                            // Items under threshold are directly lootable, items at/above threshold require master looter assignment
+                            slot_type = l.items[i].is_underthreshold ? LOOT_SLOT_TYPE_ALLOW_LOOT : LOOT_SLOT_TYPE_MASTER;
+                            break;
+                        case OWNER_PERMISSION:
+                            // Use ALLOW_LOOT instead of OWNER to enable auto-loot functionality
+                            slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
+                            break;
+                        default:
+                            break;
+                    }
+
                     b << uint8(i) << l.items[i];
                     b << uint8(slot_type);
                     ++itemsShown;
