@@ -34,6 +34,7 @@
 #include "ObjectGuid.h"
 #include "AsyncCommandHandlers.h"
 #include "Anticheat.h"
+#include "Player.h"
 
 void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, ObjectGuid& target_guid, std::string& name)
 {
@@ -498,7 +499,19 @@ void AccountSearchHandler::ShowAccountListHelper(std::unique_ptr<QueryResult> re
 }
 
 // Not thread-safe. Executed inside thread-unsafe callback
-void PlayerGoldRemovalHandler::HandleGoldLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 removeAmount)
+void PlayerGoldModificationHandler::HandleGoldRemovalLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 removeAmount)
+{
+    HandleGoldLookupResult(std::move(result), accountId, removeAmount, false);
+}
+
+// Not thread-safe. Executed inside thread-unsafe callback
+void PlayerGoldModificationHandler::HandleGoldAdditionLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 addAmount)
+{
+    HandleGoldLookupResult(std::move(result), accountId, addAmount, true);
+}
+
+// Not thread-safe. Executed inside thread-unsafe callback
+void PlayerGoldModificationHandler::HandleGoldLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 amount, bool add)
 {
     WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
@@ -521,10 +534,12 @@ void PlayerGoldRemovalHandler::HandleGoldLookupResult(std::unique_ptr<QueryResul
     guidLow = fields[1].GetUInt32();
     std::string name(fields[2].GetString());
 
-    if (removeAmount > prevMoney)
+    if (add)
+        newMoney = uint32(std::min<uint64>(uint64(prevMoney) + uint64(amount), MAX_MONEY_AMOUNT));
+    else if (amount > prevMoney)
         newMoney = 0;
     else
-        newMoney = prevMoney - removeAmount;
+        newMoney = prevMoney - amount;
     // Wrap inside user serial or they might login while the query is in progress and all the gold is back
     CharacterDatabase.BeginTransaction(guidLow);
     auto res = CharacterDatabase.PExecute("UPDATE characters SET money = %u WHERE guid = '%u'", newMoney, guidLow);
@@ -532,11 +547,14 @@ void PlayerGoldRemovalHandler::HandleGoldLookupResult(std::unique_ptr<QueryResul
 
     if (!res)
     {
-        chatHandler.PSendSysMessage("Encountered a database error during gold removal - see log for details");
+        chatHandler.PSendSysMessage("Encountered a database error during gold %s - see log for details", add ? "addition" : "removal");
         return;
     }
 
-    chatHandler.PSendSysMessage("Removed %ug %us %uc from %s", removeAmount / GOLD, (removeAmount % GOLD) / SILVER, (removeAmount % GOLD) % SILVER, name.c_str());
+    if (add)
+        chatHandler.PSendSysMessage("Added %ug %us %uc to %s", amount / GOLD, (amount % GOLD) / SILVER, (amount % GOLD) % SILVER, name.c_str());
+    else
+        chatHandler.PSendSysMessage("Removed %ug %us %uc from %s", amount / GOLD, (amount % GOLD) / SILVER, (amount % GOLD) % SILVER, name.c_str());
     chatHandler.PSendSysMessage("%s previously had %ug %us %uc", name.c_str(), prevMoney / GOLD, (prevMoney % GOLD) / SILVER, (prevMoney % GOLD) % SILVER);
     chatHandler.PSendSysMessage("%s now has %ug %us %uc", name.c_str(), newMoney / GOLD, (newMoney % GOLD) / SILVER, (newMoney % GOLD) % SILVER);
 }

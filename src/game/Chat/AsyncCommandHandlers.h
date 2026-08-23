@@ -109,12 +109,18 @@ public:
     static void ShowAccountListHelper(std::unique_ptr<QueryResult> result, ChatHandler& chatHandler, uint32& count, uint32 limit, bool title);
 };
 
-class PlayerGoldRemovalHandler
+class PlayerGoldModificationHandler
 {
 public:
     // Handle the initial gold lookup for offline player, and perform the removal
     // @not thread safe, must be called from an async unsafe DB callback
-    static void HandleGoldLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 removeAmount);
+    static void HandleGoldRemovalLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 removeAmount);
+    // Handle the initial gold lookup for offline player, and perform the addition
+    // @not thread safe, must be called from an async unsafe DB callback
+    static void HandleGoldAdditionLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 addAmount);
+
+private:
+    static void HandleGoldLookupResult(std::unique_ptr<QueryResult> result, uint32 accountId, uint32 amount, bool add);
 };
 
 typedef std::map<uint32, std::pair<uint32, std::string>> PlayerSearchAccountMap;

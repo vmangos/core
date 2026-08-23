@@ -5575,27 +5575,22 @@ bool ChatHandler::HandleServiceDeleteCharacters(char* args)
     return true;
 }
 
-bool ChatHandler::HandleGoldRemoval(char* args)
+// Parses the arguments of the gold commands. Format is: name #g #s #c
+static bool ParseGoldCommandArgs(char* args, std::string& name, uint32& amount)
 {
-    std::string error("Illformed gold removal command. Format is: name #g #s #c"); // move?
-
-    std::string input(args);
+    std::string input(args ? args : "");
     // I'm bad at regex - feel free to improve this
     std::regex pattern(R"(([a-zA-Z]{3,}) (\d{1,5})(g|s|c)\s?(\d{1,2})(g|s|c)\s?(\d{1,2})(g|s|c)\s?)");
     std::smatch matches;
 
     if (!std::regex_match(input, matches, pattern))
-    {
-        PSendSysMessage(error.c_str());
-        SetSentErrorMessage(true);
         return false;
-    }
 
     unsigned long gold = 0;
     unsigned long silver = 0;
     unsigned long copper = 0;
 
-    std::string name = matches[1];
+    name = matches[1];
 
     for (auto i = matches.begin() + 2; i != matches.end(); i += 2)
     {
@@ -5617,41 +5612,83 @@ bool ChatHandler::HandleGoldRemoval(char* args)
             }
             else
             {
-                PSendSysMessage(error.c_str());
-                SetSentErrorMessage(true);
                 return false;
             }
         }
         catch (std::runtime_error&)
         {
-            PSendSysMessage(error.c_str());
-            SetSentErrorMessage(true);
             return false;
         }
     }
 
-    uint32_t prevMoney = 0;
-    uint32_t newMoney = 0;
+    amount = uint32(std::min<uint64>((uint64(gold) * GOLD) + (uint64(silver) * SILVER) + uint64(copper), MAX_MONEY_AMOUNT));
+    return true;
+}
+
+bool ChatHandler::HandleGoldRemoval(char* args)
+{
+    std::string name;
+    uint32 removalAmount = 0;
+
+    if (!ParseGoldCommandArgs(args, name, removalAmount))
+    {
+        SendSysMessage("Illformed gold removal command. Format is: name #g #s #c"); // move?
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     Player* player = sObjectMgr.GetPlayer(name.c_str());
 
-    uint32 removalAmount = (gold * GOLD) + (silver * SILVER) + copper;
-
     if (player)
     {
-        prevMoney = player->GetMoney();
+        uint32 prevMoney = player->GetMoney();
         player->ModifyMoney(-static_cast<int32>(removalAmount));
-        newMoney = player->GetMoney();
+        uint32 newMoney = player->GetMoney();
 
-        PSendSysMessage("Removed %ug %us %uc from %s", gold, silver, copper, name.c_str());
+        PSendSysMessage("Removed %ug %us %uc from %s", removalAmount / GOLD, (removalAmount % GOLD) / SILVER, (removalAmount % GOLD) % SILVER, name.c_str());
         PSendSysMessage("%s previously had %ug %us %uc", name.c_str(), prevMoney / GOLD, (prevMoney % GOLD) / SILVER, (prevMoney % GOLD) % SILVER);
         PSendSysMessage("%s now has %ug %us %uc", name.c_str(), newMoney / GOLD, (newMoney % GOLD) / SILVER, (newMoney % GOLD) % SILVER);
     }
     else
     {
         CharacterDatabase.escape_string(name);
-        CharacterDatabase.AsyncPQueryUnsafe(&PlayerGoldRemovalHandler::HandleGoldLookupResult,
+        CharacterDatabase.AsyncPQueryUnsafe(&PlayerGoldModificationHandler::HandleGoldRemovalLookupResult,
             GetAccountId(), removalAmount,
+            "SELECT money, guid, name FROM characters WHERE name = '%s'",
+            name.c_str());
+    }
+    return true;
+}
+
+bool ChatHandler::HandleGoldAddition(char* args)
+{
+    std::string name;
+    uint32 additionAmount = 0;
+
+    if (!ParseGoldCommandArgs(args, name, additionAmount))
+    {
+        SendSysMessage("Illformed gold addition command. Format is: name #g #s #c");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* player = sObjectMgr.GetPlayer(name.c_str());
+
+    if (player)
+    {
+        uint32 prevMoney = player->GetMoney();
+        player->ModifyMoney(static_cast<int32>(additionAmount));
+        uint32 newMoney = player->GetMoney();
+
+        PSendSysMessage("Added %ug %us %uc to %s", additionAmount / GOLD, (additionAmount % GOLD) / SILVER, (additionAmount % GOLD) % SILVER, name.c_str());
+        PSendSysMessage("%s previously had %ug %us %uc", name.c_str(), prevMoney / GOLD, (prevMoney % GOLD) / SILVER, (prevMoney % GOLD) % SILVER);
+        PSendSysMessage("%s now has %ug %us %uc", name.c_str(), newMoney / GOLD, (newMoney % GOLD) / SILVER, (newMoney % GOLD) % SILVER);
+    }
+    else
+    {
+        CharacterDatabase.escape_string(name);
+        CharacterDatabase.AsyncPQueryUnsafe(&PlayerGoldModificationHandler::HandleGoldAdditionLookupResult,
+            GetAccountId(), additionAmount,
             "SELECT money, guid, name FROM characters WHERE name = '%s'",
             name.c_str());
     }

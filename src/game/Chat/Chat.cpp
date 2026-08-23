@@ -1168,6 +1168,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand goldCommandTable[] =
     {
+        { "add",                SEC_BASIC_ADMIN,    false, &ChatHandler::HandleGoldAddition,              "", nullptr },
         { "remove",             SEC_BASIC_ADMIN,    false, &ChatHandler::HandleGoldRemoval,               "", nullptr },
         { nullptr,              0,                  false, nullptr,                                       "", nullptr }
     };
