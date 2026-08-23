@@ -96,9 +96,7 @@ cmake_install.cmake
 .DS_Store
 
 # CLion / JetBrain Tools
-# But allow premade code style
-.idea/*
-!.idea/codeStyles/
+.idea/
 
 # VSCode
 .vscode
