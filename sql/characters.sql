@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `auction` (
   `deposit` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `key_item_guid` (`item_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   KEY `idx_account` (`account`),
   KEY `idx_online` (`online`),
   KEY `idx_name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
 CREATE TABLE IF NOT EXISTS `characters_guid_delete` (
   `guid` int(11) DEFAULT NULL,
   UNIQUE KEY `key_guid` (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
 
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `characters_guid_delete` (
 CREATE TABLE IF NOT EXISTS `characters_item_delete` (
   `entry` int(11) DEFAULT NULL,
   UNIQUE KEY `key_entry` (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
 
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `character_action` (
   `action` int(11) unsigned NOT NULL DEFAULT '0',
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`button`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -170,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `character_battleground_data` (
   `join_o` float NOT NULL DEFAULT '0',
   `join_map` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS `character_deleted_items` (
 -- Dumping structure for table characters.character_duplicate_account
 CREATE TABLE IF NOT EXISTS `character_duplicate_account` (
   `account` int(11) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
 
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `character_forgotten_skills` (
   `skill` mediumint(9) unsigned NOT NULL,
   `value` mediumint(9) unsigned NOT NULL,
   PRIMARY KEY (`guid`,`skill`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -214,7 +214,7 @@ CREATE TABLE IF NOT EXISTS `character_gifts` (
   `flags` int(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`item_guid`),
   KEY `idx_guid` (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS `character_homebind` (
   `position_y` float NOT NULL DEFAULT '0',
   `position_z` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -242,7 +242,7 @@ CREATE TABLE IF NOT EXISTS `character_honor_cp` (
   `date` int(11) unsigned NOT NULL DEFAULT '0',
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   KEY `idx_guid` (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS `character_instance` (
   `permanent` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`instance`),
   KEY `idx_instance` (`instance`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -268,7 +268,7 @@ CREATE TABLE IF NOT EXISTS `character_inventory` (
   `item_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
   PRIMARY KEY (`item_guid`),
   KEY `idx_guid` (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS `character_pet` (
   `teach_spell_data` longtext,
   PRIMARY KEY (`id`),
   KEY `idx_owner` (`owner_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet System';
 
 -- Data exporting was unselected.
 
@@ -323,7 +323,7 @@ CREATE TABLE IF NOT EXISTS `character_queststatus` (
   `item_count4` int(11) unsigned NOT NULL DEFAULT '0',
   `reward_choice` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -335,7 +335,7 @@ CREATE TABLE IF NOT EXISTS `character_reputation` (
   `standing` int(11) NOT NULL DEFAULT '0',
   `flags` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`faction`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -347,7 +347,7 @@ CREATE TABLE IF NOT EXISTS `character_skills` (
   `value` mediumint(9) unsigned NOT NULL,
   `max` mediumint(9) unsigned NOT NULL,
   PRIMARY KEY (`guid`,`skill`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -362,7 +362,7 @@ CREATE TABLE IF NOT EXISTS `character_social` (
   KEY `idx_friend` (`friend`),
   KEY `idx_guid_flags` (`guid`,`flags`),
   KEY `idx_friend_flags` (`friend`,`flags`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -375,7 +375,7 @@ CREATE TABLE IF NOT EXISTS `character_spell` (
   `disabled` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`spell`),
   KEY `idx_spell` (`spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -389,7 +389,7 @@ CREATE TABLE IF NOT EXISTS `character_spell_cooldown` (
   `category_expire_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell category cooldown expire time',
   `item_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -425,7 +425,7 @@ CREATE TABLE IF NOT EXISTS `character_stats` (
   `attack_power` int(10) unsigned NOT NULL DEFAULT '0',
   `ranged_attack_power` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -442,7 +442,7 @@ CREATE TABLE IF NOT EXISTS `character_tutorial` (
   `tut6` int(11) unsigned NOT NULL DEFAULT '0',
   `tut7` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`account`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -464,7 +464,7 @@ CREATE TABLE IF NOT EXISTS `corpse` (
   KEY `idx_instance` (`instance`),
   KEY `idx_player` (`player_guid`),
   KEY `idx_time` (`time`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Death System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Death System';
 
 -- Data exporting was unselected.
 
@@ -499,7 +499,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_respawn` (
 CREATE TABLE IF NOT EXISTS `game_event_status` (
   `event` smallint(6) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`event`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Game event system';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Game event system';
 
 -- Data exporting was unselected.
 
@@ -511,7 +511,7 @@ CREATE TABLE IF NOT EXISTS `gm_subsurveys` (
   `rank` int(10) unsigned NOT NULL DEFAULT '0',
   `comment` text NOT NULL,
   PRIMARY KEY (`survey_id`,`subsurvey_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -524,7 +524,7 @@ CREATE TABLE IF NOT EXISTS `gm_surveys` (
   `overall_comment` longtext NOT NULL,
   `create_time` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`survey_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -552,7 +552,7 @@ CREATE TABLE IF NOT EXISTS `gm_tickets` (
   `ticket_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `security_needed` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ticket_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -577,7 +577,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `is_raid` tinyint(1) unsigned NOT NULL,
   PRIMARY KEY (`group_id`),
   UNIQUE KEY `key_leaderGuid` (`leader_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Groups';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Groups';
 
 -- Data exporting was unselected.
 
@@ -589,7 +589,7 @@ CREATE TABLE IF NOT EXISTS `group_instance` (
   `permanent` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`leader_guid`,`instance`),
   KEY `idx_instance` (`instance`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -602,7 +602,7 @@ CREATE TABLE IF NOT EXISTS `group_member` (
   `subgroup` smallint(6) unsigned NOT NULL,
   PRIMARY KEY (`group_id`,`member_guid`),
   KEY `idx_memberGuid` (`member_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Groups';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Groups';
 
 -- Data exporting was unselected.
 
@@ -621,7 +621,7 @@ CREATE TABLE IF NOT EXISTS `guild` (
   `motd` varchar(255) NOT NULL DEFAULT '',
   `create_date` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`guild_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 -- Data exporting was unselected.
 
@@ -639,7 +639,7 @@ CREATE TABLE IF NOT EXISTS `guild_eventlog` (
   KEY `idx_PlayerGuid1` (`player_guid1`),
   KEY `idx_PlayerGuid2` (`player_guid2`),
   KEY `idx_LogGuid` (`log_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Guild Eventlog';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guild Eventlog';
 
 -- Data exporting was unselected.
 
@@ -654,7 +654,7 @@ CREATE TABLE IF NOT EXISTS `guild_member` (
   UNIQUE KEY `key_guid` (`guid`),
   KEY `idx_guildid` (`guild_id`),
   KEY `idx_guildid_rank` (`guild_id`,`rank`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 -- Data exporting was unselected.
 
@@ -667,7 +667,7 @@ CREATE TABLE IF NOT EXISTS `guild_rank` (
   `rights` int(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guild_id`,`id`),
   KEY `idx_rid` (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 -- Data exporting was unselected.
 
@@ -681,7 +681,7 @@ CREATE TABLE IF NOT EXISTS `instance` (
   PRIMARY KEY (`id`),
   KEY `idx_map` (`map`),
   KEY `idx_resettime` (`reset_time`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -691,7 +691,7 @@ CREATE TABLE IF NOT EXISTS `instance_reset` (
   `map` int(11) unsigned NOT NULL DEFAULT '0',
   `reset_time` bigint(40) NOT NULL DEFAULT '0',
   PRIMARY KEY (`map`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -729,7 +729,7 @@ CREATE TABLE IF NOT EXISTS `item_loot` (
   `property` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`item_id`),
   KEY `idx_owner_guid` (`owner_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Item System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Item System';
 
 -- Data exporting was unselected.
 
@@ -739,7 +739,7 @@ CREATE TABLE IF NOT EXISTS `item_text` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
   `text` longtext,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Item System';
 
 -- Data exporting was unselected.
 
@@ -776,7 +776,7 @@ CREATE TABLE IF NOT EXISTS `mail_items` (
   PRIMARY KEY (`mail_id`,`item_guid`),
   KEY `idx_receiver` (`receiver_guid`),
   KEY `idx_item_guid` (`item_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- Data exporting was unselected.
 
@@ -785,7 +785,7 @@ CREATE TABLE IF NOT EXISTS `mail_items` (
 CREATE TABLE IF NOT EXISTS `migrations` (
   `id` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -799,7 +799,7 @@ CREATE TABLE IF NOT EXISTS `petition` (
   PRIMARY KEY (`owner_guid`),
   UNIQUE KEY `key_ownerguid_petitionguid` (`owner_guid`,`petition_guid`),
   UNIQUE KEY `charterguid` (`charter_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 -- Data exporting was unselected.
 
@@ -813,7 +813,7 @@ CREATE TABLE IF NOT EXISTS `petition_sign` (
   PRIMARY KEY (`petition_guid`,`player_guid`),
   KEY `idx_playerguid` (`player_guid`),
   KEY `idx_ownerguid` (`owner_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 -- Data exporting was unselected.
 
@@ -847,7 +847,7 @@ CREATE TABLE IF NOT EXISTS `pet_spell` (
   `spell` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
   `active` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet System';
 
 -- Data exporting was unselected.
 
@@ -858,7 +858,7 @@ CREATE TABLE IF NOT EXISTS `pet_spell_cooldown` (
   `spell` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
   `time` bigint(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -870,7 +870,7 @@ CREATE TABLE IF NOT EXISTS `playerbot` (
   `comment` varchar(255) DEFAULT NULL,
   `ai` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`char_guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
 
@@ -883,7 +883,7 @@ CREATE TABLE IF NOT EXISTS `saved_variables` (
   `honor_next_maintenance_day` int(11) unsigned NOT NULL DEFAULT '0',
   `honor_maintenance_marker` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`key`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Variable Saves';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Variable Saves';
 
 -- Data exporting was unselected.
 
@@ -893,7 +893,7 @@ CREATE TABLE IF NOT EXISTS `world` (
   `map` int(11) unsigned NOT NULL DEFAULT '0',
   `data` longtext,
   PRIMARY KEY (`map`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -904,7 +904,7 @@ CREATE TABLE IF NOT EXISTS `worldstates` (
   `value` int(11) DEFAULT NULL,
   `comment` varchar(255) DEFAULT NULL,
   UNIQUE KEY `key_entry` (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

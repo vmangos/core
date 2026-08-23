@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `account_banned` (
   `gmlevel` tinyint(4) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`bandate`),
   UNIQUE KEY `banid` (`banid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Ban List';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Ban List';
 
 -- Data exporting was unselected.
 
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS `ip_banned` (
   `bannedby` varchar(50) NOT NULL DEFAULT '[Console]',
   `banreason` varchar(50) NOT NULL DEFAULT 'no reason',
   PRIMARY KEY (`ip`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Banned IPs';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Banned IPs';
 
 -- Data exporting was unselected.
 
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `ip_banned` (
 CREATE TABLE IF NOT EXISTS `migrations` (
   `id` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `realmcharacters` (
   `numchars` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`realmid`,`acctid`),
   KEY `acctid` (`acctid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Realm Character Tracker';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Realm Character Tracker';
 
 -- Data exporting was unselected.
 
@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `realmlist` (
   `realmbuilds` varchar(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_name` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Realm System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Realm System';
 
 -- Data exporting was unselected.
 
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `uptime` (
   `maxplayers` smallint(5) unsigned NOT NULL DEFAULT '0',
   `revision` varchar(255) NOT NULL DEFAULT 'VMangos',
   PRIMARY KEY (`realmid`,`starttime`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Uptime system';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Uptime system';
 
 -- Data exporting was unselected.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -92,6 +92,15 @@ time.
   (`account.last_login`, `account.last_pwd_reset`, ...). Under `NO_ZERO_DATE`/`NO_ZERO_IN_DATE`,
   *any* `ALTER TABLE` on such a table fails with `Invalid default value`, even when it does not
   touch that column. Run modern MySQL servers with `sql-mode="NO_ENGINE_SUBSTITUTION"`.
+- Every table must be InnoDB. The core wraps multi-table writes in transactions that span tables
+  the upstream schema used to split across engines — `Player::_SaveInventory` writes
+  `character_inventory` and `item_instance` in one transaction. A transaction mixing a
+  non-transactional (MyISAM) table with a transactional one is rejected outright once
+  `enforce_gtid_consistency` is on, which is the default from MySQL 8.4 onwards, and the failed
+  statement is dropped without stopping the save: `Statement violates GTID consistency`. Even
+  without GTID enforcement the mix is unsafe, because a rollback leaves the MyISAM half applied.
+  The baselines here are all InnoDB; a world DB imported from a released dump is not, so convert
+  it after import.
 - The `add_migration` stored procedure inserts the migration id **before** running the change, and
   DDL cannot roll back. A migration whose DDL fails therefore leaves its id recorded as applied and
   `CheckRequiredMigrations` will pass on a schema that was never updated — check the actual schema

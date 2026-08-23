@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `instance_creature_kills` (
   `spellEntry` int(10) NOT NULL COMMENT 'entry of spell which did the kill. 0 for melee or unknown',
   `count` int(10) unsigned NOT NULL COMMENT 'number of kills',
   PRIMARY KEY (`mapId`,`creatureEntry`,`spellEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='creatures killing players statistics';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='creatures killing players statistics';
 
 -- Data exporting was unselected.
 
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `instance_custom_counters` (
   `index` int(10) unsigned NOT NULL COMMENT 'index as defined in InstanceStatistics.h',
   `count` int(10) unsigned NOT NULL COMMENT 'counter',
   PRIMARY KEY (`index`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='custom counters for instance statistics';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='custom counters for instance statistics';
 
 -- Data exporting was unselected.
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `instance_wipes` (
   `creatureEntry` int(10) unsigned NOT NULL COMMENT 'creature which the wipe occured against',
   `count` int(10) unsigned NOT NULL COMMENT 'number of wipes',
   PRIMARY KEY (`mapId`,`creatureEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='players wiping against creatures statistics';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='players wiping against creatures statistics';
 
 -- Data exporting was unselected.
 
@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `logs_trashcharacters` (
   `data` varchar(255) NOT NULL,
   `cluster` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS `logs_warden` (
   `position_z` float DEFAULT NULL COMMENT 'Player position Z',
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Date of the log entry',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Warden log of failed checks';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Warden log of failed checks';
 
 -- Data exporting was unselected.
 
@@ -217,7 +217,7 @@ DROP TABLE IF EXISTS `migrations`;
 CREATE TABLE IF NOT EXISTS `migrations` (
   `id` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
