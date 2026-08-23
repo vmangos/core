@@ -1,6 +1,3 @@
-[![CI Build](https://github.com/vmangos/core/actions/workflows/ci-build.yaml/badge.svg)](https://github.com/vmangos/core/actions/workflows/ci-build.yaml)
-
-
 # Progressive Vanilla
 This project is an independent continuation of the Elysium / LightsHope codebases, focused on delivering the most complete and accurate content progression system possible, including support for the patch appropriate game clients.
 
@@ -24,11 +21,42 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 - Tools are great: Content creation should not require programming knowledge. We hope to eventually provide tools that allow for user-friendly editing of database scripts and content, with all data presented in human-readable form.
 
 ### Downloads
-- [![Development Release](https://github.com/vmangos/core/actions/workflows/development-release.yaml/badge.svg)](https://github.com/vmangos/core/releases/tag/latest) Latest development build (Linux, macOS, and Windows)
-- [![Development Database Dump](https://github.com/vmangos/core/actions/workflows/development-db-dump.yaml/badge.svg)](https://github.com/vmangos/core/releases/tag/db_latest) Latest MySQL 5.6 development database snapshot; no updates required
+- [Latest development build](https://github.com/vmangos/core/releases/tag/latest) (Linux, macOS, and Windows)
+- [Latest MySQL 5.6 development database snapshot](https://github.com/vmangos/core/releases/tag/db_latest); no updates required
 
 ### Useful Links
 - [Wiki](https://github.com/vmangos/wiki)
 - [Discord](https://discord.gg/x9a2jt7)
 - [Script Editor](https://github.com/brotalnia/scripteditor)
 - [Script Converter](https://github.com/vmangos/ScriptConverter)
+
+### Changes
+
+How this fork differs from upstream VMaNGOS.
+
+**New commands**
+- `.gold add <name> #g #s #c` — grants money, mirroring the existing `.gold remove`. Works on
+  online and offline characters, at the same security level. Both commands now share their
+  argument parsing and saturate at the money cap instead of overflowing.
+
+**Updated libraries**
+
+The Windows dependencies vendored under `dep/windows` were badly out of date:
+
+| Library | Was | Now |
+| --- | --- | --- |
+| MySQL client | 5.5.62 | 26.7.0 |
+| OpenSSL | 1.0.2k (Jan 2017) | 3.5.7 |
+
+The old MySQL client could only speak `mysql_native_password`, which newer MySQL servers no
+longer offer, so connecting failed outright. OpenSSL 1.0.2 has been unsupported upstream since
+the end of 2019.
+
+Because the vendored headers are shared between architectures and cannot match two client
+versions at once, the 32-bit Windows libraries were dropped rather than left stale. A 32-bit
+build now fails at configure time with an explanation. `MYSQL_ROOT_DIR` was added for pointing
+the build at an external MySQL client.
+
+**Other**
+- `doc/BUILDING_WINDOWS.md` — a full Windows build and setup guide.
+- The GitHub workflows and JetBrains project files were removed; this fork runs no CI.
