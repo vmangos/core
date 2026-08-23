@@ -95,12 +95,45 @@ endif()
 
 # Using the prepackages Windows dependencies from the repo
 if(WIN32)
-  set(MYSQL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/windows/include/mysql)
-  set(MYSQL_LIBRARY ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libmySQL.lib)
-  set(MYSQL_DEBUG_LIBRARY ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libmySQL.lib)
+  # The dependencies bundled under dep/windows are 64-bit only.
+  if(PLATFORM MATCHES X86)
+    message(FATAL_ERROR
+            "The Windows dependencies bundled with this repository are 64-bit only.\n"
+            "Build for 64-bit instead."
+    )
+  endif()
+
+  if(MYSQL_ROOT_DIR)
+    # An external MySQL client library was provided, expected to be laid out like a
+    # Connector/C package: headers in `include`, import library and dll in `lib`.
+    if(NOT EXISTS ${MYSQL_ROOT_DIR}/include/mysql.h)
+      message(FATAL_ERROR "MYSQL_ROOT_DIR is set to ${MYSQL_ROOT_DIR}, but ${MYSQL_ROOT_DIR}/include/mysql.h does not exist.")
+    endif()
+    if(NOT EXISTS ${MYSQL_ROOT_DIR}/lib/libmysql.lib)
+      message(FATAL_ERROR "MYSQL_ROOT_DIR is set to ${MYSQL_ROOT_DIR}, but ${MYSQL_ROOT_DIR}/lib/libmysql.lib does not exist.")
+    endif()
+    set(MYSQL_INCLUDE_DIR ${MYSQL_ROOT_DIR}/include)
+    # Connector/C only ships a release build of the import library and the dll.
+    set(MYSQL_LIBRARY ${MYSQL_ROOT_DIR}/lib/libmysql.lib)
+    set(MYSQL_DEBUG_LIBRARY ${MYSQL_ROOT_DIR}/lib/libmysql.lib)
+    set(MYSQL_RELEASE_DLL ${MYSQL_ROOT_DIR}/lib/libmysql.dll)
+    set(MYSQL_DEBUG_DLL ${MYSQL_ROOT_DIR}/lib/libmysql.dll)
+  else()
+    set(MYSQL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/windows/include/mysql)
+    file(STRINGS ${MYSQL_INCLUDE_DIR}/mysql_version.h MYSQL_BUNDLED_VERSION REGEX "MYSQL_SERVER_VERSION")
+    string(REGEX REPLACE "^[^\"]*\"([^\"]*)\".*$" "\\1" MYSQL_BUNDLED_VERSION "${MYSQL_BUNDLED_VERSION}")
+    # Only a release build of the client is bundled; it is used for both configurations.
+    set(MYSQL_LIBRARY ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libmysql.lib)
+    set(MYSQL_DEBUG_LIBRARY ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libmysql.lib)
+    set(MYSQL_RELEASE_DLL ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libmysql.dll)
+    set(MYSQL_DEBUG_DLL ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libmysql.dll)
+  endif()
   set(OPENSSL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/windows/include/openssl)
-  set(OPENSSL_LIBRARIES ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libeay32.lib)
-  set(OPENSSL_DEBUG_LIBRARIES ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libeay32.lib)
+  file(STRINGS ${OPENSSL_INCLUDE_DIR}/opensslv.h OPENSSL_BUNDLED_VERSION REGEX "define OPENSSL_VERSION_STR")
+  string(REGEX REPLACE "^[^\"]*\"([^\"]*)\".*$" "\\1" OPENSSL_BUNDLED_VERSION "${OPENSSL_BUNDLED_VERSION}")
+  # Only libcrypto is bundled; gsoap is built without WITH_OPENSSL, so libssl is unused.
+  set(OPENSSL_LIBRARIES ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libcrypto.lib)
+  set(OPENSSL_DEBUG_LIBRARIES ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libcrypto.lib)
   set(ZLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/dep/windows/include/zlib)
   if (REQUIRES_LIBCURL AND MSVC)
     # MinGW falls through to find_package(CURL) below, which picks up
@@ -213,17 +246,25 @@ set(CMAKE_INSTALL_RPATH ${LIBS_DIR})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if(WIN32)
+  # `legacy.dll` is the OpenSSL 3 provider holding RC4, which the game protocol needs.
+  # It is installed next to the binaries, where Crypto::InitializeCrypto looks for it.
+  # `libssl` is not linked by us, but the bundled MySQL client imports it, and it has
+  # to come from the same OpenSSL build as `libcrypto` or the client fails to load.
   install(
     FILES
-      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libeay32.dll
-      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libmySQL.dll
+      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libcrypto-3-x64.dll
+      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/libssl-3-x64.dll
+      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_release/legacy.dll
+      ${MYSQL_RELEASE_DLL}
     DESTINATION ${LIBS_DIR}
     CONFIGURATIONS Release
   )
   install(
     FILES
-      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libeay32.dll
-      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libmySQL.dll
+      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libcrypto-3-x64.dll
+      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/libssl-3-x64.dll
+      ${CMAKE_SOURCE_DIR}/dep/windows/lib/${DEP_ARCH}_debug/legacy.dll
+      ${MYSQL_DEBUG_DLL}
     DESTINATION ${LIBS_DIR}
     CONFIGURATIONS Debug
   )

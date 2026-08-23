@@ -34,6 +34,15 @@ endif()
 
 message(STATUS "Build type            : ${CMAKE_BUILD_TYPE}")
 
+if(WIN32)
+  if(MYSQL_ROOT_DIR)
+    message(STATUS "MySQL client library  : ${MYSQL_ROOT_DIR}")
+  else()
+    message(STATUS "MySQL client library  : Bundled ${MYSQL_BUNDLED_VERSION} (default)")
+  endif()
+  message(STATUS "OpenSSL library       : Bundled ${OPENSSL_BUNDLED_VERSION}")
+endif()
+
 if(USE_SCRIPTS)
   message(STATUS "Build scripts         : Yes (default)")
 else()

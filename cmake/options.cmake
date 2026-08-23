@@ -21,6 +21,12 @@ endif()
 # Other options
 set(SUPPORTED_CLIENT_BUILD "CLIENT_BUILD_1_12_1" CACHE STRING "Client version the core will support")
 
+if(WIN32)
+  # Path to an external MySQL client library, expected to contain `include/mysql.h`
+  # and `lib/libmysql.lib`. When empty, the client bundled in dep/windows is used.
+  set(MYSQL_ROOT_DIR "" CACHE PATH "Path to an external MySQL client library (leave empty to use the bundled one)")
+endif()
+
 if(UNIX)
   option(DEBUG_SYMBOLS "Include Debug Symbols" ON)
 endif()
@@ -73,6 +79,7 @@ message(STATUS
     BUILD_REALMMERGE          Build helper tool for merging character databases
     ENABLE_MAILSENDER         Enables support for sending emails via sendgrid.com (requires libcurl)
     SUPPORTED_CLIENT_BUILD    Client version the core will support
+    MYSQL_ROOT_DIR            Windows only: path to an external MySQL client library
     ENABLE_CPPTRACE           Enables cpptrace stack tracing; can be disabled if using other tools like GDB
 
 
