@@ -344,6 +344,7 @@ class Spell
         }
         bool ShouldRemoveStealthAuras();
 
+        WorldObject* GetChannelTarget() const;
         void AddChanneledAuraHolder(SpellAuraHolder* holder);
         void RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode);
         void UpdateCastStartPosition();

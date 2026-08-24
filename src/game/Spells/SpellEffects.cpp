@@ -774,7 +774,11 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     if (!m_originalCaster || m_originalCaster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    Creature* channelTarget = m_originalCaster->GetMap()->GetCreature(m_originalCaster->GetChannelObjectGuid());
+                    Spell* pChannel = m_originalCaster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+                    if (!pChannel)
+                        return;
+
+                    Creature* channelTarget = ToCreature(pChannel->GetChannelTarget());
 
                     if (!channelTarget)
                         return;
