@@ -121,37 +121,6 @@ struct WeaponDamageInfo
     SpellSchools school;
 };
 
-struct SubDamageInfo
-{
-    SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL;
-    uint32 damage = 0;
-    uint32 absorb = 0;
-    int32 resist = 0;
-};
-
-// Struct for use in Unit::CalculateMeleeDamage
-// Need create structure like in SMSG_ATTACKERSTATEUPDATE opcode
-struct CalcDamageInfo
-{
-    Unit* attacker = nullptr;             // Attacker
-    Unit* target = nullptr;               // Target for damage
-    uint32 totalDamage = 0;
-    uint32 totalAbsorb = 0;
-    int32 totalResist = 0;
-    SubDamageInfo subDamage[MAX_ITEM_PROTO_DAMAGES] = {};
-    uint32 blocked_amount = 0;
-    uint32 HitInfo = HITINFO_NORMALSWING;
-    uint32 TargetState = VICTIMSTATE_UNAFFECTED;
-
-    // Helper
-    WeaponAttackType attackType = BASE_ATTACK;
-    uint32 procAttacker = 0;
-    uint32 procVictim = 0;
-    uint32 procEx = 0;
-    uint32 cleanDamage = 0;                        // Used only for rage calculation
-    MeleeHitOutcome hitOutCome = MELEE_HIT_EVADE;  // TODO: remove this field (need use TargetState)
-};
-
 struct SpellPeriodicAuraLogInfo
 {
     SpellPeriodicAuraLogInfo(Aura* _aura, uint32 _damage, uint32 _absorb, int32 _resist, float _multiplier)
@@ -1007,7 +976,7 @@ class Unit : public SpellCaster
 
         void AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType = BASE_ATTACK, bool extra = false);
         void SendAttackStateUpdate(CalcDamageInfo const* damageInfo) const;
-        void SendAttackStateUpdate(uint32 HitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const;
+        void SendAttackStateUpdate(uint32 hitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 damage, uint32 absorbDamage, int32 resist, VictimState targetState, uint32 blockedAmount) const;
         void SendMeleeAttackStop(Unit const* victim) const;
         void SendMeleeAttackStart(Unit const* pVictim) const;
 
@@ -1391,8 +1360,6 @@ class Unit : public SpellCaster
         float GetJumpInitialSpeed() const { return m_jumpInitialSpeed; }
 
         // Terrain checks
-        virtual bool IsInWater() const;
-        virtual bool IsUnderwater() const;
         template<class T>
         bool CanSwimAtPosition(T const& pos) const
         {

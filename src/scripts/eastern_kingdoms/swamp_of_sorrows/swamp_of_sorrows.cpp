@@ -74,6 +74,7 @@ struct npc_galen_goodwardAI : public npc_escortAI
         {
             case 0:
             {
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                 GameObject* pCage = nullptr;
                 if (m_uiGalensCageGUID)
                     pCage = m_creature->GetMap()->GetGameObject(m_uiGalensCageGUID);
@@ -87,6 +88,7 @@ struct npc_galen_goodwardAI : public npc_escortAI
                 break;
             }
             case 21:
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                 DoScriptText(EMOTE_DISAPPEAR, m_creature);
                 break;
         }

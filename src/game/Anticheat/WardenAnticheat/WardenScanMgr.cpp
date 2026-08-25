@@ -204,6 +204,8 @@ void WardenScanMgr::LoadFromDB()
                 auto const variable = fields[2].GetCppString();
                 auto const expected = fields[3].GetCppString();
 
+                // `data` holds the value a clean client must report for this variable.  leave it
+                // empty to only check whether the variable exists, using `result` as the wanted flag
                 if (expected.empty())
                     scan = new WindowsLuaScan(variable, fields[6].GetBool(), comment, flags, buildMin, buildMax);
                 else

@@ -303,6 +303,12 @@ class DungeonResetScheduler
     public:                                                 // accessors
         time_t GetResetTimeFor(uint32 mapId) { return m_resetTimeByMapId[mapId]; }
 
+        // World of Warcraft Client Patch 1.9.0 (2006-01-03)
+        // - All instances of a raid dungeon now reset at the same time on a fixed
+        //   schedule. Before this patch each raid instance instead expired a fixed
+        //   number of days after that particular instance was created.
+        static bool IsRaidResetSchedulingGlobal();
+
         static uint32 GetMaxResetTimeFor(MapEntry const* temp);
         static time_t CalculateNextResetTime(MapEntry const* temp, time_t prevResetTime);
     public:                                                 // modifiers

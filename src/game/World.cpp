@@ -576,7 +576,8 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_COMPRESSION_UPDATE_SIZE, "Compression.Update.Size", 128);
     setConfig(CONFIG_UINT32_COMPRESSION_MOVEMENT_COUNT, "Compression.Movement.Count", 300);
     setConfig(CONFIG_BOOL_ADDON_CHANNEL, "AddonChannel", true);
-    setConfig(CONFIG_BOOL_CLEAN_CHARACTER_DB, "CleanCharacterDB", true);
+    setConfig(CONFIG_BOOL_CLEAN_CHARACTER_DB, "CharacterDatabaseCleanup.Enable", true);
+    setConfig(CONFIG_UINT32_CHARDB_CLEANUP_FLAGS, "CharacterDatabaseCleanup.Flags", CharacterDatabaseCleaner::CLEANING_FLAG_CHARACTERS | CharacterDatabaseCleaner::CLEANING_FLAG_PETS | CharacterDatabaseCleaner::CLEANING_FLAG_ITEMS);
     setConfig(CONFIG_UINT32_REUSABLE_GUID_POOL_SIZE, "ReusableGuidPoolSize", 100000);
     setConfig(CONFIG_BOOL_GRID_UNLOAD, "GridUnload", true);
     setConfig(CONFIG_BOOL_CLEANUP_TERRAIN, "CleanupTerrain", true);
@@ -1018,7 +1019,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS, "PerformanceLog.SlowMapPackets", 60);
     setConfig(CONFIG_UINT32_PERFLOG_SLOW_SESSIONS_UPDATE, "PerformanceLog.SlowSessionsUpdate", 0);
     setConfig(CONFIG_UINT32_PERFLOG_SLOW_PACKET_BCAST, "PerformanceLog.SlowPacketBroadcast", 0);
-    setConfig(CONFIG_UINT32_LOG_MONEY_TRADES_TRESHOLD, "LogMoneyTreshold", 10000);
+    setConfig(CONFIG_UINT32_LOG_MONEY_TRADES_TRESHOLD, "LogMoneyThreshold", 10000);
 
     setConfig(CONFIG_FLOAT_DYN_RESPAWN_CHECK_RANGE, "DynamicRespawn.Range", -1.0f);
     setConfig(CONFIG_FLOAT_DYN_RESPAWN_MAX_REDUCTION_RATE, "DynamicRespawn.MaxReductionRate", 0.0f);
@@ -1534,7 +1535,7 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Creature Groups ...");
-    sCreatureGroupsManager->Load();
+    sCreatureGroupsManager->LoadFromDB();
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading Gameobject Data...");
     sObjectMgr.LoadGameobjects();

@@ -578,7 +578,8 @@ public:
         if (GameObject* cleansed = me->SummonGameObject(cleansedEntry, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0, 0.0, 0.0, 0.0, 0.0, CLEANSED_PLANT_RESPAWN_TIMER))
         {
             cleansedGuid = cleansed->GetObjectGuid();
-            cleansed->SetSpawnedByDefault(true);
+            if (sWorld.GetWowPatch() >= WOW_PATCH_109)
+                cleansed->SetSpawnedByDefault(true);
         }
 
         if (GameObjectData const* data = me->GetGOData())

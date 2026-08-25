@@ -591,6 +591,56 @@ bool ChatHandler::HandleNpcTameCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleNpcSpawnLoadCommand(char* args)
+{
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hcreature", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    if (m_session->GetPlayer()->GetMap()->LoadCreatureSpawn(lowguid))
+        PSendSysMessage("Loaded creature spawn with guid %u.", lowguid);
+    else
+        PSendSysMessage("Unable to load creature spawn with guid %u.", lowguid);
+
+    return true;
+}
+
+bool ChatHandler::HandleNpcSpawnUnloadCommand(char* args)
+{
+    Creature* pCreature = nullptr;
+
+    if (*args)
+    {
+        // number or [name] Shift-click form |color|Hcreature:creature_guid|h[name]|h|r
+        uint32 lowguid;
+        if (!ExtractUint32KeyFromLink(&args, "Hcreature", lowguid))
+            return false;
+
+        if (!lowguid)
+            return false;
+
+        if (CreatureData const* data = sObjectMgr.GetCreatureData(lowguid))
+            pCreature = m_session->GetPlayer()->GetMap()->GetCreature(data->GetObjectGuid(lowguid));
+    }
+    else
+        pCreature = GetSelectedCreature();
+
+    if (!pCreature)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pCreature->AddObjectToRemoveList();
+    PSendSysMessage("Unloaded creature spawn with guid %u.", pCreature->GetGUIDLow());
+
+    return true;
+}
+
 bool ChatHandler::HandleNpcSpawnSetDeathStateCommand(char* args)
 {
     bool value;

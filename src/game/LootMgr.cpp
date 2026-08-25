@@ -128,14 +128,6 @@ void LootStore::LoadLootTable()
                 continue;                                   // error already printed to log/console.
             }
 
-            if (mincountOrRef < 0 && conditionId)
-            {
-                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table '%s' entry %u mincountOrRef %i < 0 and not allowed has condition, skipped",
-                                GetName(), entry, mincountOrRef);
-                sLog.Out(LOG_DBERRFIX, LOG_LVL_ERROR, "DELETE FROM %s WHERE entry=%u AND condition_id=%u AND mincountOrRef=%i;", GetName(), entry, conditionId, mincountOrRef);
-                continue;
-            }
-
             if (conditionId)
             {
                 ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId);
@@ -494,7 +486,7 @@ void Loot::AddItem(LootStoreItem const& item)
 }
 
 // Calls processor of corresponding LootTemplate (which handles everything including references)
-bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError, WorldObject const* looted)
+bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, WorldObject const* looted)
 {
     LootTemplate const* tab = store.GetLootFor(loot_id);
 
@@ -509,21 +501,21 @@ bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, 
     items.reserve(MAX_NR_LOOT_ITEMS);
     m_questItems.reserve(MAX_NR_QUEST_ITEMS);
 
-    tab->Process(*this, store, store.IsRatesAllowed());     // Processing is done there, callback via Loot::AddItem()
+    tab->Process(*this, store, lootOwner, store.IsRatesAllowed());     // Processing is done there, callback via Loot::AddItem()
 
-    if (loot_owner)
-        FillPlayerDependentLoot(loot_owner, personal, looted);
+    if (lootOwner)
+        FillPlayerDependentLoot(lootOwner, personal, looted);
 
     return true;
 }
 
-void Loot::FillPlayerDependentLoot(Player* loot_owner, bool personal, WorldObject const* looted)
+void Loot::FillPlayerDependentLoot(Player* lootOwner, bool personal, WorldObject const* looted)
 {
     // Setting access rights for group loot case
-    Group* group = loot_owner->GetGroup();
+    Group* group = lootOwner->GetGroup();
     if (!personal && group)
     {
-        roundRobinPlayer = loot_owner->GetGUID();
+        roundRobinPlayer = lootOwner->GetGUID();
         m_personal = false;
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             if (Player* pl = itr->getSource())
@@ -541,7 +533,7 @@ void Loot::FillPlayerDependentLoot(Player* loot_owner, bool personal, WorldObjec
     }
     // ... for personal loot
     else
-        FillNotNormalLootFor(loot_owner);
+        FillNotNormalLootFor(lootOwner);
 }
 
 bool Loot::IsAllowedLooter(ObjectGuid guid, bool doPersonalCheck) const
@@ -917,24 +909,25 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         case MASTER_PERMISSION:
         case OWNER_PERMISSION:
         {
-            uint8 slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
-            switch (lv.permission)
-            {
-                case MASTER_PERMISSION:
-                    slot_type = LOOT_SLOT_TYPE_MASTER;
-                    break;
-                case OWNER_PERMISSION:
-                    //slot_type = LOOT_SLOT_TYPE_OWNER;
-                    slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT; // Otherwise no auto-loot ...
-                    break;
-                default:
-                    break;
-            }
-
             for (uint8 i = 0; i < l.items.size(); ++i)
             {
                 if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].AllowedForPlayer(lv.viewer, l.GetLootTarget()))
                 {
+                    uint8 slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
+                    switch (lv.permission)
+                    {
+                        case MASTER_PERMISSION:
+                            // Items under threshold are directly lootable, items at/above threshold require master looter assignment
+                            slot_type = l.items[i].is_underthreshold ? LOOT_SLOT_TYPE_ALLOW_LOOT : LOOT_SLOT_TYPE_MASTER;
+                            break;
+                        case OWNER_PERMISSION:
+                            // Use ALLOW_LOOT instead of OWNER to enable auto-loot functionality
+                            slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
+                            break;
+                        default:
+                            break;
+                    }
+
                     b << uint8(i) << l.items[i];
                     b << uint8(slot_type);
                     ++itemsShown;
@@ -1246,7 +1239,7 @@ void LootTemplate::AddEntry(LootStoreItem& item)
 }
 
 // Rolls for every item in the template and adds the rolled items the the loot
-void LootTemplate::Process(Loot& loot, LootStore const& store, bool rate, uint8 groupId) const
+void LootTemplate::Process(Loot& loot, LootStore const& store, Player* lootOwner, bool rate, uint8 groupId) const
 {
     if (groupId)                                            // Group reference uses own processing of the group
     {
@@ -1265,16 +1258,20 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, bool rate, uint8 
 
         if (itr.mincountOrRef < 0)                          // References processing
         {
+            // In case of reference condition isn't checked before
+            if (itr.conditionId && !IsConditionSatisfied(itr.conditionId, lootOwner, loot.GetLootTarget()->GetMap(), loot.GetLootTarget(), CONDITION_FROM_LOOT))
+                continue;
+
             LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(-itr.mincountOrRef);
 
             if (!Referenced)
                 continue;                                   // Error message already printed at loading stage
 
             for (uint32 loop = 0; loop < itr.maxcount; ++loop) // Ref multiplicator
-                Referenced->Process(loot, store, rate, itr.group);
+                Referenced->Process(loot, store, lootOwner, rate, itr.group);
         }
         else                                                // Plain entries (not a reference, not grouped)
-            loot.AddItem(itr);                               // Chance is already checked, just add
+            loot.AddItem(itr);                              // Chance is already checked, just add
     }
 
     // Now processing groups

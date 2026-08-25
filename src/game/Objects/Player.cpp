@@ -3547,9 +3547,18 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
     }
 
     PlayerSpellState state = learning ? PLAYERSPELL_NEW : PLAYERSPELL_UNCHANGED;
-
+    TalentSpellPos const* talentPos = GetTalentSpellPos(spellId);
     bool disabledCase = false;
     bool supercededOld = false;
+    bool cannotSupercede = false;
+
+    // fixes Nature's Grasp displaying as not learned on talent interface after learning next rank
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+    if (uint32 firstRank = sSpellMgr.GetFirstSpellInChain(spellId))
+        if (uint32 nextRank = sSpellMgr.GetSpellBookSuccessorSpellId(firstRank))
+            if (GetTalentSpellPos(firstRank) && !GetTalentSpellPos(nextRank))
+                cannotSupercede = true;
+#endif
 
     PlayerSpellMap::iterator itr = m_spells.find(spellId);
     if (itr != m_spells.end())
@@ -3558,9 +3567,9 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
         bool dependent_set = false;
 
         // fix activate state for non-stackable low rank (and find next spell for !active case)
-        if (uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(spellInfo->Id))
+        if (uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(spellId))
         {
-            if (HasSpell(nextId))
+            if (!cannotSupercede && HasSpell(nextId))
             {
                 // high rank already known so this must !active
                 active = false;
@@ -3651,8 +3660,6 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
             }
     }
 
-    TalentSpellPos const* talentPos = GetTalentSpellPos(spellId);
-
     if (!disabledCase) // skip new spell adding if spell already known (disabled spells case)
     {
         // talent: unlearn all other talent ranks (high and low)
@@ -3686,7 +3693,7 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
         newspell.disabled  = disabled;
 
         // replace spells in action bars and spellbook to bigger rank if only one spell rank must be accessible
-        if (newspell.active && !newspell.disabled)
+        if (!cannotSupercede && newspell.active && !newspell.disabled)
         {
             for (auto& m_spell : m_spells)
             {
@@ -5057,41 +5064,30 @@ void Player::RepopAtGraveyard()
     else
         pClosestGrave = sObjectMgr.GetClosestGraveYard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
 
-    float orientation = GetOrientation();
-
-    // World of Warcraft Client Patch 1.8.0 (2005-10-11)
-    // - All graveyards that needed adjustment were changed so that a
-    //   character's spirit comes into the world facing toward the Spirit Healer.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     if (pClosestGrave)
-        if (float facing = sObjectMgr.GetWorldSafeLocFacing(pClosestGrave->ID))
-            orientation = facing;
-#endif
-
-    if (IsAlive())
     {
-        if (pClosestGrave)
-            TeleportTo(pClosestGrave->map_id, pClosestGrave->x, pClosestGrave->y, pClosestGrave->z, orientation, TELE_TO_NOT_UNSUMMON_PET, std::move(recover));
-    }
-    else
-    {
-        // if no grave found, stay at the current location
-        // and don't show spirit healer location
-        if (pClosestGrave)
+        // Release spirit from transport => Teleport alive at nearest graveyard.
+        if (!IsAlive() && GetTransport())
         {
-            // Release spirit from transport => Teleport alive at nearest graveyard.
-            if (GetTransport())
-            {
-                GetTransport()->RemovePassenger(this);
-                ResurrectPlayer(1.0f);
-            }
-            TeleportTo(pClosestGrave->map_id, pClosestGrave->x, pClosestGrave->y, pClosestGrave->z, orientation, TELE_TO_NOT_UNSUMMON_PET, std::move(recover));
+            GetTransport()->RemovePassenger(this);
+            ResurrectPlayer(1.0f);
         }
 
-        // Fix invisible spirit healer if you die close to graveyard.
-        if (IsInWorld())
-            UpdateVisibilityAndView();
+        // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+        // - All graveyards that needed adjustment were changed so that a
+        //   character's spirit comes into the world facing toward the Spirit Healer.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        float orientation = sObjectMgr.GetWorldSafeLocFacing(pClosestGrave->ID);
+#else
+        float orientation = GetOrientation();
+#endif
+
+        TeleportTo(pClosestGrave->map_id, pClosestGrave->x, pClosestGrave->y, pClosestGrave->z, orientation, TELE_TO_NOT_UNSUMMON_PET, std::move(recover)); 
     }
+
+    // Fix invisible spirit healer if you die close to graveyard.
+    if (!IsAlive() && IsInWorld())
+        UpdateVisibilityAndView();
 }
 
 void Player::JoinedChannel(Channel* c)
@@ -5208,89 +5204,13 @@ uint32 Player::GetShieldBlockValue() const
 
 float Player::GetMeleeCritFromAgility() const
 {
-    float valLevel1 = 0.0f;
-    float valLevel60 = 0.0f;
-    // critical
-    switch (GetClass())
-    {
-        case CLASS_PALADIN:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            valLevel1 = 4.6f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_MAGE:
-            valLevel1 = 12.9f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_ROGUE:
-            valLevel1 = 2.2f;
-            valLevel60 = 29.0f;
-            break;
-        case CLASS_HUNTER:
-            valLevel1 = 3.5f;
-            valLevel60 = 53.0f;
-            break;
-        case CLASS_PRIEST:
-            valLevel1 = 11.0f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARLOCK:
-            valLevel1 = 8.4f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARRIOR:
-            valLevel1 = 3.9f;
-            valLevel60 = 20.0f;
-            break;
-        default:
-            return 0.0f;
-    }
-    float classRate = valLevel1 * float(60.0f - GetLevel()) / 59.0f + valLevel60 * float(GetLevel() - 1.0f) / 59.0f;
+    float classRate = sObjectMgr.GetPlayerCritPerAgility(GetClass(), GetLevel());
     return GetStat(STAT_AGILITY) / classRate;
 }
 
 float Player::GetDodgeFromAgility() const
 {
-    float valLevel1 = 0.0f;
-    float valLevel60 = 0.0f;
-    // critical
-    switch (GetClass())
-    {
-        case CLASS_PALADIN:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            valLevel1 = 4.6f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_MAGE:
-            valLevel1 = 12.9f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_ROGUE:
-            valLevel1 = 1.1f;
-            valLevel60 = 14.5f;
-            break;
-        case CLASS_HUNTER:
-            valLevel1 = 1.8f;
-            valLevel60 = 26.5f;
-            break;
-        case CLASS_PRIEST:
-            valLevel1 = 11.0f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARLOCK:
-            valLevel1 = 8.4f;
-            valLevel60 = 20.0f;
-            break;
-        case CLASS_WARRIOR:
-            valLevel1 = 3.9f;
-            valLevel60 = 20.0f;
-            break;
-        default:
-            return 0.0f;
-    }
-    float classRate = valLevel1 * float(60.0f - GetLevel()) / 59.0f + valLevel60 * float(GetLevel() - 1.0f) / 59.0f;
+    float classRate = sObjectMgr.GetPlayerDodgePerAgility(GetClass(), GetLevel());
     return GetStat(STAT_AGILITY) / classRate;
 }
 
@@ -14620,7 +14540,10 @@ void Player::SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32
         // Update player field and fire UNIT_QUEST_LOG_CHANGED for self for the current batch
         uint16 slot = FindQuestSlot(pQuest->GetQuestId());
         if (slot < MAX_QUEST_LOG_SIZE) {
-            SetQuestSlotCounter(slot + pQuest->GetReqCreatureOrGOcount(), uint8(item_idx), uint8(current + batchCount));
+            // item counters are stored after the creature or GO counters within the same quest slot
+            uint8 counterIdx = uint8(item_idx + pQuest->GetReqCreatureOrGOcount());
+            if (counterIdx < QUEST_OBJECTIVES_COUNT)
+                SetQuestSlotCounter(slot, counterIdx, uint8(current + batchCount));
         }
 
         count -= batchCount;
@@ -15443,9 +15366,10 @@ bool Player::IsAllowedToLoot(Creature const* creature)
         case FREE_FOR_ALL:
             return true;
         case MASTER_LOOT:
-            // On peut toujours voir ces items.
-            if (loot->hasOverThresholdItem())
-                return true;
+            // All group members may open the loot. With Master Loot, items below the
+            // threshold are directly lootable; items at/above threshold are protected
+            // at take-time in LootHandler (master-looter assignment only).
+            return true;
         case ROUND_ROBIN:
             // may only loot if the player is the loot roundrobin player
             // or if there are free/quest/conditional item for the player
@@ -16148,8 +16072,11 @@ void Player::SendRaidInfo() const
             data << uint32(state->GetMapId());              // map id
 
             // Permanent dungeons (raids) don't have a valid reset timer since it's
-            // on a schedule. Send the scheduled time instead of state reset time
-            time_t resetTime = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(state->GetMapId());
+            // on a schedule. Send the scheduled time instead of state reset time.
+            // Before 1.9 each raid instance has its own reset timer instead.
+            time_t resetTime = DungeonResetScheduler::IsRaidResetSchedulingGlobal()
+                ? sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(state->GetMapId())
+                : state->GetResetTime();
             data << uint32(resetTime - time(nullptr));
             data << uint32(state->GetInstanceId());         // instance id
 
@@ -18478,6 +18405,42 @@ void Player::InitDataForForm(bool reapplyMods)
     UpdateAttackPowerAndDamage(true);
 }
 
+bool Player::IsVendorItemVisible(Creature* vendor, VendorItem const* vendorItem, ItemPrototype const* itemProto)
+{
+    if (!vendor || !vendorItem || !itemProto)
+        return false;
+
+    if (IsGameMaster())
+        return true;
+
+    // class wrong item skip only for bindable case
+    if ((itemProto->AllowableClass & GetClassMask()) == 0 && itemProto->Bonding == BIND_WHEN_PICKED_UP)
+        return false;
+
+    // race wrong item skip always
+    if ((itemProto->AllowableRace & GetRaceMask()) == 0)
+        return false;
+
+    // when no faction required but rank > 0 will be used faction id from the vendor faction template to compare the rank
+    if (!itemProto->RequiredReputationFaction && itemProto->RequiredReputationRank > 0 &&
+        ReputationRank(itemProto->RequiredReputationRank) > GetReputationRank(vendor->GetFactionId()))
+        return false;
+
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Argent Dawn, Timbermaw, Zandalar and Arathi Basin vendors now show
+    //   you their entire inventory regardless of current reputation, allowing
+    //   players to peruse their full range of wares.The items in question
+    //   now require the appropriate reputation level to make use of them.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+    if (itemProto->RequiredReputationFaction && itemProto->RequiredReputationRank > 0 &&
+        ReputationRank(itemProto->RequiredReputationRank) > GetReputationRank(itemProto->RequiredReputationFaction))
+        return false;
+#endif
+
+    return !vendorItem->conditionId ||
+        IsConditionSatisfied(vendorItem->conditionId, this, vendor->GetMap(), vendor, CONDITION_FROM_VENDOR);
+}
+
 // Return true is the bought item has a max count to force refresh of window by caller
 bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, uint8 bag, uint8 slot)
 {
@@ -18529,7 +18492,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
     }
 
     VendorItem const* crItem = vendorslot < vCount ? vItems->GetItem(vendorslot) : tItems->GetItem(vendorslot - vCount);
-    if (!crItem || crItem->item != item)                    // store diff item (cheating)
+    if (!crItem || crItem->item != item || !IsVendorItemVisible(pCreature, crItem, pProto))
     {
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
         return false;
@@ -18567,12 +18530,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         return false;
     }
 
-    if (crItem->conditionId && !IsGameMaster() && !IsConditionSatisfied(crItem->conditionId, this, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
-    {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
-        return false;
-    }
-
+    // Visibility, including vendor conditions, was validated above.
     uint32 price  = pProto->BuyPrice * count;
 
     // reputation discount
@@ -18634,9 +18592,20 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
     uint32 new_count = pCreature->UpdateVendorItemCurrentCount(crItem, totalCount);
 
+    // SMSG_LIST_INVENTORY numbers only visible rows. Report that same
+    // compact slot so the client updates the item it just purchased.
+    uint32 clientVendorSlot = 0;
+    for (size_t i = 0; i <= vendorslot; ++i)
+    {
+        VendorItem const* listedItem = i < vCount ? vItems->GetItem(i) : tItems->GetItem(i - vCount);
+        ItemPrototype const* listedProto = listedItem ? sObjectMgr.GetItemPrototype(listedItem->item) : nullptr;
+        if (IsVendorItemVisible(pCreature, listedItem, listedProto))
+            ++clientVendorSlot;
+    }
+
     auto packet = std::make_unique<WorldPackets::Item::BuyItemResponse>();
     packet->vendorGuid = pCreature->GetObjectGuid();
-    packet->vendorSlot = vendorslot + 1;
+    packet->vendorSlot = clientVendorSlot;
     packet->newCount = crItem->maxcount > 0 ? new_count : 0xFFFFFFFF;
     packet->purchaseCount = count;
     GetSession()->SendPacket(std::move(packet));

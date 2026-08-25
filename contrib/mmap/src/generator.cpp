@@ -126,6 +126,12 @@ bool handleArgs(int argc, char** argv,
 
             char* stileX = strtok(param, ",");
             char* stileY = strtok(nullptr, ",");
+            if (!stileX || !stileY)
+            {
+                printf("invalid tile coords.\n");
+                return false;
+            }
+
             int tilex = atoi(stileX);
             int tiley = atoi(stileY);
 
@@ -307,6 +313,12 @@ int main(int argc, char** argv)
     while (builder.IsBusy())
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+
+    if (builder.HasErrors())
+    {
+        printf("MoveMapGenerator finished with errors! Some tiles were not built.\n");
+        return silent ? EXIT_FAILURE : finish("Press any key to close...", EXIT_FAILURE);
     }
 
     if (silent)

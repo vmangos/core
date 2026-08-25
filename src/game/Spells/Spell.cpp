@@ -827,11 +827,25 @@ void Spell::CleanupTargetList()
     m_delayMoment = 0;
 }
 
+bool Spell::CanDelaySpellDueToBatching() const
+{
+    if (!m_spellInfo->IsSpellWithDelayableEffects())
+        return false;
+
+    // Always!
+    if (m_spellInfo->IsEffectDelayMandatory())
+        return true;
+
+    // Delay is turned off so don't even set spell as delayed.
+    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY))
+        return false;
+
+    return !m_IsTriggeredSpell && m_caster->IsPlayer();
+}
+
 uint32 Spell::GetSpellBatchingEffectDelay(SpellCaster const* pTarget, SpellEffectIndex effIndex) const
 {
-    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY))
-        return 0;
-
+    // No delay on self.
     if (pTarget == m_casterUnit && !m_spellInfo->EffectChainTarget[effIndex])
         return 0;
 
@@ -841,7 +855,13 @@ uint32 Spell::GetSpellBatchingEffectDelay(SpellCaster const* pTarget, SpellEffec
 
     // This tries to recreate the feeling of spell effect execution being done in batches,
     // by syncing the delay of effects to the world timer so they happen simultaneously.
-    return sWorld.GetDelayUntilNextSpellBatchingInterval();
+    uint32 const delay = sWorld.GetDelayUntilNextSpellBatchingInterval();
+
+    // These spells need to be delayed to work as intended, so force the delay.
+    if (!delay && m_spellInfo->IsEffectDelayMandatory())
+        return sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) ? sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) : BATCHING_INTERVAL;
+    
+    return delay;
 }
 
 void Spell::AddUnitTarget(Unit* pTarget, SpellEffectIndex effIndex)
@@ -1185,6 +1205,13 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     {
         if (m_casterUnit)
         {
+            // World of Warcraft Client Patch 1.6.0 (2005-07-12)
+            // - Spell reflection effects have greatly improved visuals and functionality.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_5_1
+            // client doesn't support SPELL_MISS_REFLECT so we need target to cast on caster
+            unitTarget->SendSpellGo(m_casterUnit, m_spellInfo->Id);
+#endif
+
             isReflected = true;
             DoSpellHitOnUnit(m_casterUnit, effectMask);
             unitTarget = m_casterUnit;
@@ -1253,6 +1280,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             }
         }
     }
+
+    if (m_spellInfo->IsNextMeleeSwingSpell() && m_casterUnit && m_casterUnit->GetVictim() == unitTarget && !(m_damage && unitTarget->IsAlive()))
+        SendMeleeAttackingStateUpdate(target, nullptr);
 
     // All calculated do it!
     // Do healing and triggers
@@ -1372,6 +1402,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         m_damage = damageInfo.damage; // update value so that script handler has access
         if (m_spellScript)
             m_spellScript->OnHit(this, missInfo);
+
+        // Should be sent before spell damage log
+        if (m_spellInfo->IsNextMeleeSwingSpell() && m_casterUnit && m_casterUnit->GetVictim() == unitTarget)
+            SendMeleeAttackingStateUpdate(target, &damageInfo);
 
         // Send log damage message to client
         pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
@@ -3217,22 +3251,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 }
             }
 
-            GameObject const* const pDoor = m_caster->FindNearbyClosedDoor(dist);
-            bool const directionThroughDoor = pDoor ? pDoor->HasInArc(M_PI_F, src.x, src.y) != pDoor->HasInArc(M_PI_F, dest.x, dest.y) : false;
-
             if (m_caster->GetMap()->GetWalkHitPosition(m_caster->GetTransport(), src.x, src.y, src.z, dest.x, dest.y, dest.z, NAV_GROUND | NAV_WATER, 20.0f, false))
             {
-                // move back so we dont clip into a door
-                if (pDoor)
-                {
-                    if (directionThroughDoor)
-                        Geometry::Move2dPointTowards(src, dest, 3.0f);
-
-                    if (pDoor->HasInArc(M_PI_F, src.x, src.y) != pDoor->HasInArc(M_PI_F, dest.x, dest.y) ||
-                       !m_caster->IsWithinLOS(dest.x, dest.y, dest.z, true, 0.1f))
-                        dest = src;
-                }
-
                 // should never go backwards or sideways
                 if (!m_caster->HasInArc(M_PI_F / 2.0f, dest.x, dest.y))
                     dest = src;
@@ -3244,6 +3264,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             }
 
             m_targets.setDestination(dest.x, dest.y, dest.z);
+            break;
         }
         default:
             //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SPELL: Unknown implicit target (%u) for spell ID %u", targetMode, m_spellInfo->Id);
@@ -3319,8 +3340,7 @@ SpellCastResult Spell::prepare(SpellCastTargets targets, Aura* triggeredByAura, 
 SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
 {
     m_spellState = SPELL_STATE_PREPARING;
-    m_delayed = m_spellInfo->speed > 0.0f
-        || (!m_IsTriggeredSpell && m_caster->IsPlayer() && m_spellInfo->IsSpellWithDelayableEffects());
+    m_delayed = m_spellInfo->speed > 0.0f || CanDelaySpellDueToBatching();
 
     UpdateCastStartPosition();
 
@@ -4644,10 +4664,26 @@ void Spell::WriteSpellGoTargets(WorldPacket* data)
     {
         if (ihit.missCondition != SPELL_MISS_NONE)        // Add only miss
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
             *data << (ihit.targetGUID);
             *data << uint8(ihit.missCondition);
             if (ihit.missCondition == SPELL_MISS_REFLECT)
                 *data << uint8(ihit.reflectResult);
+#else
+            // some types not supported by earlier clients
+            uint8 missInfo = ihit.missCondition;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_1
+            if (ihit.missCondition == SPELL_MISS_REFLECT)
+                missInfo = SPELL_MISS_DEFLECT;
+#else
+            if (ihit.missCondition > SPELL_MISS_IMMUNE2)
+                missInfo = SPELL_MISS_RESIST;
+#endif
+            
+            *data << uint8(missInfo);
+            *data << (ihit.targetGUID);
+#endif
             ++miss;
         }
     }
@@ -4904,24 +4940,27 @@ void Spell::SendChannelUpdate(uint32 time, bool interrupted)
 
     if (!time)
     {
-        if (interrupted)
+        if (m_casterUnit->GetUInt32Value(UNIT_CHANNEL_SPELL) || m_casterUnit->GetChannelObjectGuid())
         {
-            // Send update directly on interrupt to fix animation if recasting channeled spell
-            m_casterUnit->CancelSpellChannelingAnimationInstantly();
-        }
-        else
-        {
-            // Reset of channel values has to be done after a few delay.
-            // Else, we have some visual bugs (arcane projectile, last tick)
-            ChannelResetEvent* event = new ChannelResetEvent(m_casterUnit);
-            m_casterUnit->m_Events.AddEventAtOffset(event, 1000);
+            if (interrupted)
+            {
+                // Send update directly on interrupt to fix animation if recasting channeled spell
+                m_casterUnit->CancelSpellChannelingAnimationInstantly();
+            }
+            else
+            {
+                // Reset of channel values has to be done after a few delay.
+                // Else, we have some visual bugs (arcane projectile, last tick)
+                ChannelResetEvent* event = new ChannelResetEvent(m_casterUnit);
+                m_casterUnit->m_Events.AddEventAtOffset(event, 1000);
+            }
         }
     }
     else if (Player* pPlayer = m_casterUnit->ToPlayer())
         pPlayer->SendChannelUpdate(time);
 }
 
-void Spell::SendChannelStart(uint32 duration)
+WorldObject* Spell::GetChannelTarget() const
 {
     WorldObject* target = nullptr;
 
@@ -4937,7 +4976,7 @@ void Spell::SendChannelStart(uint32 duration)
                 continue;
 
             if ((itr.effectMask & (1 << EFFECT_INDEX_0)) && itr.reflectResult == SPELL_MISS_NONE &&
-                    itr.targetGUID != m_caster->GetObjectGuid())
+                itr.targetGUID != m_caster->GetObjectGuid())
             {
                 target = ObjectAccessor::GetUnit(*m_caster, itr.targetGUID);
                 break;
@@ -4959,6 +4998,11 @@ void Spell::SendChannelStart(uint32 duration)
         }
     }
 
+    return target;
+}
+
+void Spell::SendChannelStart(uint32 duration)
+{
     if (m_caster->IsPlayer())
     {
         WorldPacket data(MSG_CHANNEL_START, (4 + 4));
@@ -5008,7 +5052,7 @@ void Spell::SendChannelStart(uint32 duration)
 
     if (m_casterUnit)
     {
-        if (target)
+        if (WorldObject* target = GetChannelTarget())
             m_casterUnit->SetChannelObjectGuid(target->GetObjectGuid());
         m_casterUnit->SetUInt32Value(UNIT_CHANNEL_SPELL, m_spellInfo->Id);
     }
@@ -5050,6 +5094,45 @@ void Spell::SendResurrectRequest(Player* target, bool sickness)
     // override delay sent with SMSG_CORPSE_RECLAIM_DELAY, set instant resurrection for spells with this attribute
     data << uint8(!m_spellInfo->HasAttribute(SPELL_ATTR_EX3_NO_RES_TIMER));
     target->GetSession()->SendPacket(&data);
+}
+
+void Spell::SendMeleeAttackingStateUpdate(TargetInfo const* target, SpellNonMeleeDamage const* damageInfo)
+{
+    auto packet = std::make_unique<WorldPackets::Combat::MeleeAttackingStateUpdate>();
+
+    packet->hitInfo = HITINFO_NOACTION | HITINFO_NO_FLOATING_TEXT;
+    if (target->missCondition == SPELL_MISS_MISS)
+        packet->hitInfo |= HITINFO_MISS;
+    else if (target->missCondition == SPELL_MISS_ABSORB)
+        packet->hitInfo |= HITINFO_ABSORB;
+    else if (target->missCondition != SPELL_MISS_IMMUNE && target->missCondition != SPELL_MISS_IMMUNE2)
+        packet->hitInfo |= HITINFO_AFFECTS_VICTIM;
+    if (target->missCondition == SPELL_MISS_RESIST)
+        packet->hitInfo |= HITINFO_RESIST;
+    if (target->isCrit)
+        packet->hitInfo |= HITINFO_CRITICALHIT;
+
+    packet->attackerGuid = m_casterUnit->GetObjectGuid();
+    packet->victimGuid = m_casterUnit->GetVictim()->GetObjectGuid();
+    packet->subDamage.resize(1);
+
+    if (damageInfo && !m_spellInfo->HasAttribute(SPELL_ATTR_ON_NEXT_SWING_NO_DAMAGE))
+    {
+        packet->totalDamage = packet->meleeSpellDamage = damageInfo->damage;
+        for (uint32 i = 0; i < packet->subDamage.size(); ++i)
+        {
+            packet->subDamage[i].damage = damageInfo->damage;
+            packet->subDamage[i].absorb = damageInfo->absorb;
+            packet->subDamage[i].resist = damageInfo->resist;
+            packet->subDamage[i].damageSchoolMask = GetSchoolMask(damageInfo->school);
+        }
+        packet->blockedAmount = damageInfo->blocked;
+    }
+
+    packet->victimState = SpellMissInfoToVictimState(target->missCondition);
+    packet->attackerState = packet->victimState == VICTIMSTATE_NORMAL ? 1000 : 0;
+    packet->meleeSpellId = m_spellInfo->Id;
+    m_casterUnit->SendMessageToSet(std::move(packet), true);
 }
 
 void Spell::TakeCastItem()
@@ -5389,9 +5472,9 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_CASTER_DEAD;
     }
 
-    // check global cooldown
     if (!m_IsTriggeredSpell)
     {
+        // check global cooldown
         // Activated spells will get stuck if we return SPELL_FAILED_NOT_READY during GCD
         if (strict && m_caster->HasGCD(m_spellInfo))
             return m_spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT) ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_NOT_READY;
@@ -5416,6 +5499,26 @@ SpellCastResult Spell::CheckCast(bool strict)
 
             if ((m_spellInfo->Attributes & SPELL_ATTR_ONLY_STEALTHED) && !(m_casterUnit->HasStealthAura()))
                 return SPELL_FAILED_ONLY_STEALTHED;
+        }
+        
+        if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_UNDER_WATER_CANCELS))
+        {
+            // Client checks only swimming flag.
+            if (m_caster->IsSwimming())
+                return SPELL_FAILED_ONLY_ABOVEWATER;
+
+            if (m_caster->IsInWater() && (!m_caster->IsPlayer() || static_cast<Player*>(m_caster)->IsInHighLiquid()))
+                return SPELL_FAILED_ONLY_ABOVEWATER;
+        }
+
+        if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_ABOVE_WATER_CANCELS))
+        {
+            // Client checks only swimming flag.
+            if (!m_caster->IsSwimming())
+                return SPELL_FAILED_ONLY_UNDERWATER;
+
+            if (!m_caster->IsInWater() || (m_caster->IsPlayer() && !static_cast<Player*>(m_caster)->IsInHighLiquid()))
+                return SPELL_FAILED_ONLY_UNDERWATER;
         }
     }
 
@@ -5495,7 +5598,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_BAD_TARGETS;
         }
 
-        if (!m_IsTriggeredSpell && m_spellInfo->IsDeathOnlySpell() && target->IsAlive())
+        if (!m_IsTriggeredSpell && m_spellInfo->IsDeathOnlySpell() && target->IsAlive() &&
+            IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0]))
             return SPELL_FAILED_TARGET_NOT_DEAD;
 
         // Check spell min target level
@@ -6108,8 +6212,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!target || target->GetOwnerGuid().IsPlayer())
                     return SPELL_FAILED_BAD_TARGETS;
 
-                if (!target->GetCreatureInfo()->pickpocket_loot_id &&
-                    !(target->GetCreatureTypeMask() & CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD))
+                if (!target->GetCreatureInfo()->pickpocket_loot_id)
                     return SPELL_FAILED_TARGET_NO_POCKETS;
 
                 break;
@@ -6418,9 +6521,6 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 if (!m_casterUnit)
                     return SPELL_FAILED_BAD_TARGETS;
-
-                if (m_casterUnit->IsInWater() && (!m_casterUnit->IsPlayer() || static_cast<Player*>(m_casterUnit)->IsInHighLiquid()))
-                    return SPELL_FAILED_ONLY_ABOVEWATER;
 
                 if (m_casterUnit->IsPlayer() && m_casterUnit->GetTransport() && !static_cast<Player*>(m_casterUnit)->IsOutdoorOnTransport())
                     return SPELL_FAILED_NO_MOUNTS_ALLOWED;

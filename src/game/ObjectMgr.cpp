@@ -1310,24 +1310,60 @@ void ObjectMgr::LoadCreatureInfo(Field* fields)
 void ObjectMgr::CorrectCreatureDisplayIds(uint32 entry, uint32& displayId)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_2_4
-    if (sWorld.GetWowPatch() == WOW_PATCH_102)
+    if (sWorld.GetWowPatch() <= WOW_PATCH_102)
     {
         // Rhahk'Zor
         if (entry == 644 && displayId == 1124)
             displayId = 14403;
+        // Mo'grosh Ogre
+        if (entry == 1178 && displayId == 740)
+            displayId = 1122;
+        //  Mo'grosh Enforcer
+        if (entry == 1179 && displayId == 645)
+            displayId = 6692;
         // Mo'grosh Brute
         if (entry == 1180 && displayId == 1124)
             displayId = 14403;
+        // Chok'sul
+        if (entry == 1210 && displayId == 8431)
+            displayId = 1054;
+        // Crushridge Brute
+        if (entry == 2253 && displayId == 10711)
+            displayId = 610;
+        // Crushridge Mauler
+        if (entry == 2254 && displayId == 11530)
+            displayId = 655;
+        // Crushridge Enforcer
+        if (entry == 2256 && displayId == 11529)
+            displayId = 416;
+        // Crushridge Warmonger
+        if (entry == 2287 && displayId == 11531)
+            displayId = 536;
+        // Crushridge Plunderer
+        if (entry == 2416 && displayId == 154)
+            displayId = 415;
         // Dreadmaul Ogre
         if (entry == 5974 && displayId == 11541)
             displayId = 14402;
+        // Dreadmaul Brute
+        if (entry == 5976 && displayId == 11535)
+            displayId = 11584;
         // Dreadmaul Mauler
         if (entry == 5977 && displayId == 11540)
             displayId = 14401;
+        // Spirestone Battle Mage
+        if (entry == 9197 && displayId == 11575)
+            displayId = 11543;
+        // Spirestone Ogre Magus
+        if (entry == 9201 && displayId == 11580)
+            displayId = 11562;
+        // Brackenwall Enforcer
+        if (entry == 10036 && displayId == 8432)
+            displayId = 10704;
     }
 #endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-    if (sWorld.GetWowPatch() == WOW_PATCH_106)
+    if (sWorld.GetWowPatch() <= WOW_PATCH_106)
     {
         // Grizzle Halfmane
         if (entry == 347 && displayId == 15092)
@@ -1341,7 +1377,7 @@ void ObjectMgr::CorrectCreatureDisplayIds(uint32 entry, uint32& displayId)
     }
 #endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-    if (sWorld.GetWowPatch() == WOW_PATCH_107)
+    if (sWorld.GetWowPatch() <= WOW_PATCH_107)
     {
         // Stormpike Emissary
         if (entry == 15103 && displayId == 15261)
@@ -1972,7 +2008,7 @@ void ObjectMgr::LoadCreatureSpells()
                 if (!sSpellMgr.GetSpellEntry(spellId))
                 {
                     if (!sSpellMgr.IsExistingSpellId(spellId))
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has non-existent spell %u used as spellId_%u, skipping spell.", entry, spellId, i);
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has non-existent spell %u used as spellId_%u, skipping spell.", entry, spellId, i+1);
                     continue;
                 }
 
@@ -1980,7 +2016,8 @@ void ObjectMgr::LoadCreatureSpells()
 
                 if ((probability == 0) || (probability > 100))
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid probability_%u value %u, setting it to 100 instead.", entry, i, probability);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid probability_%u value %u, setting it to 100 instead.", entry, i+1, probability);
+                    sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_spells` SET `probability_%u`=100 WHERE `entry`=%u;", i+1, entry);
                     probability = 100;
                 }
 
@@ -2000,7 +2037,7 @@ void ObjectMgr::LoadCreatureSpells()
 
                 if (delayInitialMin > delayInitialMax)
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid initial timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i, delayInitialMin, i, delayInitialMax);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid initial timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i+1, delayInitialMin, i+1, delayInitialMax);
                     continue;
                 }
 
@@ -2009,7 +2046,7 @@ void ObjectMgr::LoadCreatureSpells()
 
                 if (delayRepeatMin > delayRepeatMax)
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid repeat timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i, delayRepeatMin, i, delayRepeatMax);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid repeat timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i+1, delayRepeatMin, i+1, delayRepeatMax);
                     continue;
                 }
 
@@ -2019,7 +2056,7 @@ void ObjectMgr::LoadCreatureSpells()
                 {
                     if (spellScriptSetFull.find(scriptId) == spellScriptSetFull.end())
                     {
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has non-existent scriptId_%u = %u, setting it to 0 instead.", entry, i, scriptId);
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has non-existent scriptId_%u = %u, setting it to 0 instead.", entry, i+1, scriptId);
                         scriptId = 0;
                     }
                     else
@@ -5024,6 +5061,162 @@ void ObjectMgr::LoadPlayerInfo()
             m_PlayerXPperLevel[level] = m_PlayerXPperLevel[level - 1] + 100;
         }
     }
+
+    // Loading crit per agility rates
+    {
+        std::unique_ptr<QueryResult> result;
+
+        for (uint32 classId = 1; classId < MAX_CLASSES; ++classId)
+        {
+            // skip nonexistent classes
+            if (!((1 << (classId - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(classId))
+                continue;
+
+            std::vector<float>& ratePerLevelVector = m_playerCritPerAgility[classId];
+
+            ratePerLevelVector.resize(PLAYER_MAX_LEVEL);
+
+            //                                     0        1
+            result = WorldDatabase.PQuery("SELECT `level`, `rate` FROM `player_crit_per_agility` WHERE `class`=%u ORDER BY `level`", classId);
+
+            if (result)
+            {
+                do
+                {
+                    Field* fields = result->Fetch();
+                    uint32 level = fields[0].GetUInt32();
+
+                    if (!level)
+                    {
+                        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `player_crit_per_agility` contains data for invalid `level` = %u!", level);
+                        continue;
+                    }
+
+                    if (level > ratePerLevelVector.size())
+                        ratePerLevelVector.resize(level);
+
+                    uint32 i = level - 1;
+                    float& rate = ratePerLevelVector[i];
+                    rate = fields[1].GetFloat();
+
+                    if (rate <= 0.0f)
+                        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `rate` = %g in `player_crit_per_agility` for `class` = %u and `level` = %u!", rate, classId, level);
+
+                } while (result->NextRow());
+            }
+
+            // it's mandatory for first and max level to be defined in the table, rest can be interpolated
+
+            if (!ratePerLevelVector.front())
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Missing crit per agility rate for `class` = %u and `level` = 1!", classId);
+                Log::WaitBeforeContinueIfNeed();
+                exit(1);
+            }
+
+            if (!ratePerLevelVector.back())
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Missing crit per agility rate for `class` = %u and `level` = %u!", classId, (uint32)ratePerLevelVector.size());
+                Log::WaitBeforeContinueIfNeed();
+                exit(1);
+            }
+
+            for (uint32 i = 1; i < ratePerLevelVector.size(); ++i)
+            {
+                // If level is not defined, use linear interpolation from last defined level and next defined level.
+                // There are gaps in the table because we haven't sniffed every single class-level combination.
+                if (!ratePerLevelVector[i])
+                {
+                    for (uint32 j = i + 1; j < ratePerLevelVector.size(); ++j)
+                    {
+                        if (ratePerLevelVector[j])
+                        {
+                            ratePerLevelVector[i] = InterpolateValueAtIndex(i - 1, ratePerLevelVector[i - 1], j, ratePerLevelVector[j], i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Loading dodge per agility rates
+    {
+        std::unique_ptr<QueryResult> result;
+
+        for (uint32 classId = 1; classId < MAX_CLASSES; ++classId)
+        {
+            // skip nonexistent classes
+            if (!((1 << (classId - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(classId))
+                continue;
+
+            std::vector<float>& ratePerLevelVector = m_playerDodgePerAgility[classId];
+
+            ratePerLevelVector.resize(PLAYER_MAX_LEVEL);
+
+            //                                     0        1
+            result = WorldDatabase.PQuery("SELECT `level`, `rate` FROM `player_dodge_per_agility` WHERE `class`=%u ORDER BY `level`", classId);
+
+            if (result)
+            {
+                do
+                {
+                    Field* fields = result->Fetch();
+                    uint32 level = fields[0].GetUInt32();
+
+                    if (!level)
+                    {
+                        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `player_dodge_per_agility` contains data for invalid `level` = %u!", level);
+                        continue;
+                    }
+
+                    if (level > ratePerLevelVector.size())
+                        ratePerLevelVector.resize(level);
+
+                    uint32 i = level - 1;
+                    float& rate = ratePerLevelVector[i];
+                    rate = fields[1].GetFloat();
+
+                    if (rate <= 0.0f)
+                        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `rate` = %g in `player_dodge_per_agility` for `class` = %u and `level` = %u!", rate, classId, level);
+
+                } while (result->NextRow());
+            }
+
+            // it's mandatory for first and max level to be defined in the table, rest can be interpolated
+
+            if (!ratePerLevelVector.front())
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Missing dodge per agility rate for `class` = %u and `level` = 1!", classId);
+                Log::WaitBeforeContinueIfNeed();
+                exit(1);
+            }
+
+            if (!ratePerLevelVector.back())
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Missing dodge per agility rate for `class` = %u and `level` = %u!", classId, (uint32)ratePerLevelVector.size());
+                Log::WaitBeforeContinueIfNeed();
+                exit(1);
+            }
+
+            for (uint32 i = 1; i < ratePerLevelVector.size(); ++i)
+            {
+                // If level is not defined, use linear interpolation from last defined level and next defined level.
+                // There are gaps in the table because we haven't sniffed every single class-level combination.
+                if (!ratePerLevelVector[i])
+                {
+                    for (uint32 j = i + 1; j < ratePerLevelVector.size(); ++j)
+                    {
+                        if (ratePerLevelVector[j])
+                        {
+                            ratePerLevelVector[i] = InterpolateValueAtIndex(i - 1, ratePerLevelVector[i - 1], j, ratePerLevelVector[j], i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void ObjectMgr::GetPlayerClassLevelInfo(uint32 class_, uint32 level, PlayerClassLevelInfo* info) const
@@ -5127,6 +5320,34 @@ void ObjectMgr::BuildPlayerLevelInfo(uint8 race, uint8 _class, uint8 level, Play
                 info->stats[STAT_SPIRIT]    += (lvl > 38 ? 3 : (lvl > 5 ? 1 : 0));
         }
     }
+}
+
+float ObjectMgr::GetPlayerCritPerAgility(uint32 classId, uint32 level) const
+{
+    if (classId >= m_playerCritPerAgility.size())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to get crit per agility rate for undefined player class %u!", classId);
+        return 1;
+    }
+
+    if (level > m_playerCritPerAgility[classId].size())
+        return m_playerCritPerAgility[classId].back();
+
+    return m_playerCritPerAgility[classId][level - 1];
+}
+
+float ObjectMgr::GetPlayerDodgePerAgility(uint32 classId, uint32 level) const
+{
+    if (classId >= m_playerDodgePerAgility.size())
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to get dodge per agility rate for undefined player class %u!", classId);
+        return 1;
+    }
+
+    if (level > m_playerDodgePerAgility[classId].size())
+        return m_playerDodgePerAgility[classId].back();
+
+    return m_playerDodgePerAgility[classId][level - 1];
 }
 
 void ObjectMgr::LoadGroups()
@@ -10511,7 +10732,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         }
         else
             trainerSpell.reqLevel = spellinfo->spellLevel;
-
+            
         ++count;
 
     }

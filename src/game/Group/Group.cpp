@@ -1123,6 +1123,8 @@ void Group::CountSingleLooterRoll(Roll* roll)
                 player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
             if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
                 player->OnReceivedItem(newItem);
+            if (roll->getLoot()->isLooted())
+                player->GetSession()->DoLootRelease(roll->getLoot()->GetLootTarget()->GetObjectGuid());
         }
         else
         {
@@ -1184,6 +1186,8 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                              player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
                     if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
                         player->OnReceivedItem(newItem);
+                    if (roll->getLoot()->isLooted())
+                        player->GetSession()->DoLootRelease(roll->getLoot()->GetLootTarget()->GetObjectGuid());
                 }
                 else
                 {
@@ -1235,6 +1239,8 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
                              player->GetShortDescription().c_str(), item->count, item->itemid, roll->lootedTargetGUID.GetString().c_str());
                     if (Item* newItem = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId))
                         player->OnReceivedItem(newItem);
+                    if (roll->getLoot()->isLooted())
+                        player->GetSession()->DoLootRelease(roll->getLoot()->GetLootTarget()->GetObjectGuid());
                 }
                 else
                 {

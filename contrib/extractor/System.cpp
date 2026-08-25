@@ -19,6 +19,7 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
+#include <cstring>
 #include <deque>
 #include <set>
 #include <cstdlib>
@@ -83,6 +84,8 @@ enum Extract
 
 // Select data for extract
 int   CONF_extract = EXTRACT_MAP | EXTRACT_DBC | EXTRACT_CAMERA;
+// Skip all interactive prompts (for scripted runs)
+bool  CONF_silent = false;
 // This option allow limit minimum height to some value (Allow save some memory)
 // see contrib/mmap/src/TerrainBuilder.h, INVALID_MAP_LIQ_HEIGHT
 bool  CONF_allow_height_limit = true;
@@ -135,6 +138,8 @@ void Usage(char* prg)
         "-o set output path\n"\
         "-e extract only MAP(1)/DBC(2)/Camera(4) - standard: all(7)\n"\
         "-f height stored as int (less map size but lost some accuracy) 1 by default\n"\
+        "-h allow to limit minimum height (less map size) 1 by default\n"\
+        "--silent skip all interactive prompts (for scripted runs)\n"\
         "Example: %s -f 0 -i \"c:\\games\\game\"", prg, prg);
     exit(1);
 }
@@ -148,6 +153,12 @@ void HandleArgs(int argc, char* arg[])
         // e - extract only MAP(1)/DBC(2) - standard both(3)
         // f - use float to int conversion
         // h - limit minimum height
+        if (strcmp(arg[c], "--silent") == 0)
+        {
+            CONF_silent = true;
+            continue;
+        }
+
         if (arg[c][0] != '-')
             Usage(arg[0]);
 
@@ -168,6 +179,12 @@ void HandleArgs(int argc, char* arg[])
             case 'f':
                 if (c + 1 < argc)                           // all ok
                     CONF_allow_float_to_int = atoi(arg[(c++) + 1]) != 0;
+                else
+                    Usage(arg[0]);
+                break;
+            case 'h':
+                if (c + 1 < argc)                           // all ok
+                    CONF_allow_height_limit = atoi(arg[(c++) + 1]) != 0;
                 else
                     Usage(arg[0]);
                 break;
@@ -911,6 +928,39 @@ int main(int argc, char* arg[])
 
     HandleArgs(argc, arg);
 
+    // Prompt user for map resolution (skipped with --silent, keeping the command line settings)
+    bool highRes = !CONF_allow_float_to_int;
+    bool fullHeight = !CONF_allow_height_limit;
+
+    if (!CONF_silent)
+    {
+        std::string userInput;
+        std::cout << "Extract maps with high resolution (default = " << (highRes ? "y" : "n") << ")? [y/n]" << std::endl;
+        std::getline(std::cin, userInput);
+        if (!userInput.empty())
+            highRes = userInput.compare("y") == 0;
+
+        userInput.clear();
+        std::cout << "Extract maps with full height (default = " << (fullHeight ? "y" : "n") << ")? [y/n]" << std::endl;
+        std::getline(std::cin, userInput);
+        if (!userInput.empty())
+            fullHeight = userInput.compare("y") == 0;
+    }
+
+    std::cout << "High resolution = " << highRes << std::endl;
+    std::cout << "Full height     = " << fullHeight << std::endl;
+
+    if (!CONF_silent)
+    {
+        std::cout << "Press enter to start extracting maps." << std::endl;
+        std::cout << "=====================================" << std::endl;
+        std::cin.get();
+    }
+
+    // Overwrite due to user input or explicit setting
+    CONF_allow_float_to_int = highRes ? false : true;
+    CONF_allow_height_limit = fullHeight ? false : true;
+
     // Open MPQs
     LoadCommonMPQFiles();
 
@@ -927,6 +977,12 @@ int main(int argc, char* arg[])
 
     // Close MPQs
     CloseMPQFiles();
+
+    if (!CONF_silent)
+    {
+        std::cout << "Extraction complete. Press enter to close..." << std::endl;
+        std::cin.get();
+    }
 
     return 0;
 }

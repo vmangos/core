@@ -59,7 +59,8 @@
 #include "MovementPacketSender.h"
 #include "Errors.h"
 #include "Utilities/Random.h"
-#include "ScriptMgr.h"
+
+#include <limits>
 
 //#define DEBUG_DEBUFF_LIMIT
 
@@ -481,11 +482,9 @@ bool Unit::HaveOffhandWeapon() const
 
     if (IsPlayer())
         return ((Player*)this)->GetWeaponForAttack(OFF_ATTACK, true, true);
-    else
-    {
-        uint8 itemClass = GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (1 * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
-        return itemClass == ITEM_CLASS_WEAPON;
-    }
+
+    uint8 itemClass = GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (1 * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
+    return itemClass == ITEM_CLASS_WEAPON;
 }
 
 void Unit::SendHeartBeat(bool includingSelf)
@@ -2196,11 +2195,13 @@ void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool ext
 
     ProcDamageAndSpell(ProcSystemArguments(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.totalDamage, damageInfo.totalDamage + damageInfo.totalAbsorb + damageInfo.totalResist, damageInfo.attackType));
 
+    // In sniffs SMSG_ATTACKERSTATEUPDATE is sent after chance on hit spell casts from CastItemCombatSpell. This fixes animation for Frostbrand Attack.
+    // Send it before lethal damage so the client can still resolve the victim
+    // for swing animation, combat feedback, and victim-anchored world text.
+    SendAttackStateUpdate(&damageInfo);
+
     // Damage is done after procs so it can trigger auras on the victim that affect the caster in case of killing blow.
     DealMeleeDamage(&damageInfo, true);
-
-    // In sniffs SMSG_ATTACKERSTATEUPDATE is sent after chance on hit spell casts from CastItemCombatSpell. This fixes animation for Frostbrand Attack.
-    SendAttackStateUpdate(&damageInfo);
 
     if (IsPlayer())
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
@@ -2402,28 +2403,24 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
         {
             return MELEE_HIT_CRUSHING;
         }
-        else
+        // mobs can score crushing blows if they're 3 or more levels above victim
+        // or when their weapon skill is 15 or more above victim's defense skill
+        tmp = victimDefenseSkill;
+        int32 tmpmax = victimMaxSkillValueForLevel;
+        // having defense above your maximum (from items, talents etc.) has no effect
+        tmp = tmp > tmpmax ? tmpmax : tmp;
+        // tmp = mob's level * 5 - player's current defense skill
+        tmp = attackerMaxSkillValueForLevel - tmp;
+        if (tmp >= 15)
         {
-            // mobs can score crushing blows if they're 3 or more levels above victim
-            // or when their weapon skill is 15 or more above victim's defense skill
-            tmp = victimDefenseSkill;
-            int32 tmpmax = victimMaxSkillValueForLevel;
-            // having defense above your maximum (from items, talents etc.) has no effect
-            tmp = tmp > tmpmax ? tmpmax : tmp;
-            // tmp = mob's level * 5 - player's current defense skill
-            tmp = attackerMaxSkillValueForLevel - tmp;
-            if (tmp >= 15)
+            // add 2% chance per lacking skill point, min. is 15%
+            tmp = tmp * 200 - 1500;
+            if (roll < (sum += tmp))
             {
-                // add 2% chance per lacking skill point, min. is 15%
-                tmp = tmp * 200 - 1500;
-                if (roll < (sum += tmp))
-                {
-                    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRUSHING <%d, %d)", sum - tmp, sum);
-                    return MELEE_HIT_CRUSHING;
-                }
+                DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRUSHING <%d, %d)", sum - tmp, sum);
+                return MELEE_HIT_CRUSHING;
             }
         }
-
     }
 
     DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: NORMAL");
@@ -2700,17 +2697,13 @@ float Unit::GetUnitDodgeChance() const
         return 0.0f;
     if (IsPlayer())
         return GetFloatValue(PLAYER_DODGE_PERCENTAGE);
-    else
-    {
-        if (((Creature const*)this)->IsTotem())
-            return 0.0f;
-        else
-        {
-            float dodge = 5.0f;
-            dodge += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
-            return dodge > 0.0f ? dodge : 0.0f;
-        }
-    }
+
+    if (((Creature const*)this)->IsTotem())
+        return 0.0f;
+
+    float dodge = 5.0f;
+    dodge += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
+    return dodge > 0.0f ? dodge : 0.0f;
 }
 
 float Unit::GetUnitParryChance() const
@@ -2767,17 +2760,13 @@ float Unit::GetUnitBlockChance() const
         // is player but has no block ability or no not broken shield equipped
         return 0.0f;
     }
-    else
-    {
-        if (((Creature const*)this)->IsTotem())
-            return 0.0f;
-        else
-        {
-            float block = 5.0f;
-            block += GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_PERCENT);
-            return block > 0.0f ? block : 0.0f;
-        }
-    }
+
+    if (((Creature const*)this)->IsTotem())
+        return 0.0f;
+
+    float block = 5.0f;
+    block += GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_PERCENT);
+    return block > 0.0f ? block : 0.0f;
 }
 
 float Unit::GetUnitCriticalChance(WeaponAttackType attackType, Unit const* pVictim) const
@@ -3066,23 +3055,13 @@ bool Unit::IsInAccessablePlaceFor(Creature const* c) const
 {
     if (IsInWater())
         return c->CanSwim();
-    else
-        return c->CanWalk() || c->CanFly();
+
+    return c->CanWalk() || c->CanFly();
 }
 
 bool Unit::CanSwimAtPosition(float x, float y, float z) const
 {
     return GetTerrain()->IsSwimmable(x, y, z, GetMinSwimDepth());
-}
-
-bool Unit::IsInWater() const
-{
-    return GetTerrain()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ());
-}
-
-bool Unit::IsUnderwater() const
-{
-    return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
 }
 
 float Unit::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
@@ -4209,6 +4188,27 @@ void Unit::RemoveAuraTypeOnDeath(AuraType auraType)
 
 void Unit::RemoveAllAurasOnDeath()
 {
+    // Auras that track their target for the caster (SPELL_AURA_MOD_STALKED,
+    // i.e. Hunter's Mark) end when the tracking caster dies. Other
+    // caster-owned single-target auras retain their existing death behavior.
+    SingleCastSpellTargetMap& singleTargets = GetSingleCastSpellTargets();
+    for (SingleCastSpellTargetMap::iterator itr = singleTargets.begin(); itr != singleTargets.end();)
+    {
+        SpellEntry const* spellInfo = itr->first;
+        if (!spellInfo->HasAura(SPELL_AURA_MOD_STALKED))
+        {
+            ++itr;
+            continue;
+        }
+
+        ObjectGuid const targetGuid = itr->second;
+        singleTargets.erase(itr);
+        if (IsInWorld())
+            if (Unit* target = GetMap()->GetUnit(targetGuid))
+                target->RemoveAurasByCasterSpell(spellInfo->Id, GetObjectGuid(), AURA_REMOVE_BY_DEATH);
+        itr = singleTargets.begin();
+    }
+
     // used just after dieing to remove all visible auras
     // and disable the mods for the passive ones
     for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end();)
@@ -4571,61 +4571,36 @@ void Unit::HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, uint32
 
 void Unit::SendAttackStateUpdate(CalcDamageInfo const* damageInfo) const
 {
-    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "WORLD: Sending SMSG_ATTACKERSTATEUPDATE");
-
-    WorldPacket data(SMSG_ATTACKERSTATEUPDATE, (16 + 45));  // we guess size
-
-    data << uint32(damageInfo->HitInfo);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << GetPackGUID();
-    data << damageInfo->target->GetPackGUID();
-#else
-    data << GetGUID();
-    data << damageInfo->target->GetGUID();
-#endif
-    data << uint32(damageInfo->totalDamage);    // Total damage
-
-    data << uint8(m_weaponDamageCount[damageInfo->attackType]);         // Sub damage count
-
-    // Sub damage description
-    for (uint8 i = 0; i < m_weaponDamageCount[damageInfo->attackType]; i++)
-    {
-        SubDamageInfo const* subDamage = &damageInfo->subDamage[i];
-
-        data << uint32(GetFirstSchoolInMask(subDamage->damageSchoolMask));
-        data << float(subDamage->damage);
-        data << uint32(subDamage->damage);
-        data << uint32(subDamage->absorb);
-        data << int32(subDamage->resist);
-    }
-    data << uint32(damageInfo->TargetState);
-    data << uint32(0);
-    data << uint32(0);                                      // spell id, seen with heroic strike and disarm as examples.
-    // HITINFO_NOACTION normally set if spell
-    data << uint32(damageInfo->blocked_amount);
-
-    SendMessageToSet(&data, true);
+    auto packet = std::make_unique<WorldPackets::Combat::MeleeAttackingStateUpdate>();
+    packet->hitInfo = damageInfo->HitInfo;
+    packet->attackerGuid = GetObjectGuid();
+    packet->victimGuid = damageInfo->target->GetObjectGuid();
+    packet->totalDamage = damageInfo->totalDamage;
+    packet->subDamage.resize(m_weaponDamageCount[damageInfo->attackType]);
+    for (uint32 i = 0; i < packet->subDamage.size(); ++i)
+        packet->subDamage[i] = damageInfo->subDamage[i];
+    packet->victimState = damageInfo->TargetState;
+    packet->blockedAmount = damageInfo->blocked_amount;
+    SendMessageToSet(std::move(packet), true);
 }
 
-void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const
+void Unit::SendAttackStateUpdate(uint32 hitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 damage, uint32 absorbDamage, int32 resist, VictimState targetState, uint32 blockedAmount) const
 {
-    CalcDamageInfo dmgInfo;
-    dmgInfo.HitInfo = HitInfo;
-    dmgInfo.attacker = const_cast<Unit*>(this);
-    dmgInfo.target = const_cast<Unit*>(target);
-    dmgInfo.attackType = BASE_ATTACK;
-    dmgInfo.totalDamage = Damage;
-    dmgInfo.totalDamage += (Resist < 0 ? uint32(std::abs(Resist)) : 0);
-    dmgInfo.totalDamage -= (AbsorbDamage + (Resist > 0 ? uint32(Resist) : 0) + BlockedAmount);
-    dmgInfo.totalAbsorb = AbsorbDamage;
-    dmgInfo.totalResist = Resist;
-    dmgInfo.subDamage[0].damage = dmgInfo.totalDamage;
-    dmgInfo.subDamage[0].damageSchoolMask = damageSchoolMask;
-    dmgInfo.subDamage[0].absorb = AbsorbDamage;
-    dmgInfo.subDamage[0].resist = Resist;
-    dmgInfo.TargetState = TargetState;
-    dmgInfo.blocked_amount = BlockedAmount;
-    SendAttackStateUpdate(&dmgInfo);
+    auto packet = std::make_unique<WorldPackets::Combat::MeleeAttackingStateUpdate>();
+    packet->hitInfo = hitInfo;
+    packet->attackerGuid = GetObjectGuid();
+    packet->victimGuid = target->GetObjectGuid();
+    packet->totalDamage = damage;
+    packet->totalDamage += (resist < 0 ? uint32(std::abs(resist)) : 0);
+    packet->totalDamage -= (absorbDamage + (resist > 0 ? uint32(resist) : 0) + blockedAmount);
+    packet->subDamage.resize(1);
+    packet->subDamage[0].damage = packet->totalDamage;
+    packet->subDamage[0].damageSchoolMask = damageSchoolMask;
+    packet->subDamage[0].absorb = absorbDamage;
+    packet->subDamage[0].resist = resist;
+    packet->victimState = targetState;
+    packet->blockedAmount = blockedAmount;
+    SendMessageToSet(std::move(packet), true);
 }
 
 void Unit::SetPowerType(Powers new_powertype)
@@ -5998,10 +5973,7 @@ void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply)
                     return;
         }
 
-        SpellImmune Immune;
-        Immune.spellId = spellId;
-        Immune.type = type;
-        m_spellImmune[op].push_back(Immune);
+        m_spellImmune[op].push_back({type, spellId});
     }
     else
     {
@@ -7443,6 +7415,14 @@ void Unit::SetRooted(bool apply)
     {
         SetRootedReal(apply);
         MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEFLAG_ROOT, apply);
+
+        // Hackfix: Old clients teleport unit to last point if new spline begins right after unroot.
+        // In 1.8 sniffs it appears that the creature only begins chasing on the next world update,
+        // but motion is updated right away in our core, so send a sacrificial STOP spline after unroot.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+        if (!apply)
+            StopMoving(true);
+#endif
     }
 }
 
@@ -8946,7 +8926,7 @@ void Unit::HandlePetCommand(CommandStates command, Unit* pTarget)
 
             ClearUnitState(UNIT_STATE_FOLLOW);
             // This is true if pet has no target or has target but targets differs.
-            if (GetVictim() != pTarget || (GetVictim() == pTarget && !GetCharmInfo()->IsCommandAttack()) || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            if (GetVictim() != pTarget || !GetCharmInfo()->IsCommandAttack() || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
             {
                 if (GetVictim())
                     AttackStop();
@@ -9725,7 +9705,11 @@ uint8 Unit::GetEnemyCountInRadiusAround(Unit const* pTarget, float radius) const
     MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(pTarget, this, radius);
     MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
     Cell::VisitAllObjects(pTarget, searcher, radius);
-    return targets.size();
+
+    if (targets.size() > std::numeric_limits<uint8>::max())
+        return std::numeric_limits<uint8>::max();
+
+    return static_cast<uint8>(targets.size());
 }
 
 void Unit::GetEnemyListInRadiusAround(Unit const* pTarget, float radius, std::list<Unit*>& targets) const
@@ -9754,11 +9738,7 @@ Unit* Unit::SelectRandomUnfriendlyTarget(Unit const* except /*= nullptr*/, float
            (inFront && !this->HasInArc(*tIter, M_PI_F / 2)) ||
            (isValidAttackTarget && !IsValidAttackTarget(*tIter)) ||
            (notPvpEnabling && !CanAttackWithoutEnablingPvP(*tIter)))
-        {
-            std::list<Unit*>::iterator tIter2 = tIter;
-            ++tIter;
-            targets.erase(tIter2);
-        }
+            tIter = targets.erase(tIter);
         else
             ++tIter;
     }
@@ -9767,13 +9747,7 @@ Unit* Unit::SelectRandomUnfriendlyTarget(Unit const* except /*= nullptr*/, float
     if (targets.empty())
         return nullptr;
 
-    // select random
-    uint32 rIdx = urand(0, targets.size() - 1);
-    std::list<Unit*>::const_iterator tcIter = targets.begin();
-    for (uint32 i = 0; i < rIdx; ++i)
-        ++tcIter;
-
-    return *tcIter;
+    return SelectRandomContainerElement(targets);
 }
 
 Unit* Unit::SelectRandomFriendlyTarget(Unit const* except /*= nullptr*/, float radius /*= ATTACK_DISTANCE*/, bool inCombat) const
@@ -9793,11 +9767,7 @@ Unit* Unit::SelectRandomFriendlyTarget(Unit const* except /*= nullptr*/, float r
     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
         if (!IsWithinLOSInMap(*tIter) || (inCombat && !(*tIter)->IsInCombat()) || (*tIter)->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
-        {
-            std::list<Unit*>::iterator tIter2 = tIter;
-            ++tIter;
-            targets.erase(tIter2);
-        }
+            tIter = targets.erase(tIter);
         else
             ++tIter;
     }
@@ -9806,13 +9776,7 @@ Unit* Unit::SelectRandomFriendlyTarget(Unit const* except /*= nullptr*/, float r
     if (targets.empty())
         return nullptr;
 
-    // select random
-    uint32 rIdx = urand(0, targets.size() - 1);
-    std::list<Unit*>::const_iterator tcIter = targets.begin();
-    for (uint32 i = 0; i < rIdx; ++i)
-        ++tcIter;
-
-    return *tcIter;
+    return SelectRandomContainerElement(targets);
 }
 
 // Returns friendly unit with the most amount of hp missing from max hp
@@ -10267,17 +10231,10 @@ void Unit::StopAttackFaction(uint32 factionId)
         }
     }
 
-    AttackerSet const& attackers = GetAttackers();
-    for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
-    {
+    AttackerSet attackers = GetAttackers();
+    for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
         if ((*itr)->GetFactionId() == factionId)
-        {
             (*itr)->AttackStop();
-            itr = attackers.begin();
-        }
-        else
-            ++itr;
-    }
 
     GetHostileRefManager().deleteReferencesForFaction(factionId);
 
@@ -10520,14 +10477,14 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
         sizeFactor = DEFAULT_WORLD_OBJECT_SIZE;
 
     bool const canOnlySwim = attacker->CanSwim() && !attacker->CanWalk() && !attacker->CanFly();
-    bool const reachableBySwiming = attacker->CanSwimAtPosition(GetPosition());
+    bool const reachableBySwimming = attacker->CanSwimAtPosition(GetPosition());
 
     uint32 attackerCount = GetAttackers().size();
     if (attackerCount > 0)
         --attackerCount;
 
     // Don't compute a random position for a moving player or when swimming to player near shore
-    if ((IsPlayer() && IsMoving()) || (canOnlySwim && !reachableBySwiming))
+    if ((IsPlayer() && IsMoving()) || (canOnlySwim && !reachableBySwimming))
         attackerCount = 0;
 
     angle += (attackerCount ? ((float(M_PI / 2) - float(M_PI) * rand_norm_f()) * attackerCount / sizeFactor) * 0.3f : 0);
@@ -10562,10 +10519,10 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
     y = initialPos.y + dist * sin(angle) * normalizedVectXY;
     z = initialPos.z + dist * normalizedVectZ;
 
-    if (attacker->CanFly() || (attacker->CanSwim() && reachableBySwiming) || !HasMMapsForCurrentMap())
+    if (attacker->CanFly() || (attacker->CanSwim() && reachableBySwimming) || !HasMMapsForCurrentMap())
     {
         GetMap()->GetLosHitPosition(initialPos.x, initialPos.y, initialPos.z, x, y, z, -0.2f);
-        if (attacker->CanSwim() && reachableBySwiming)
+        if (attacker->CanSwim() && reachableBySwimming)
         {
             float ground = 0.0f;
             float waterSurface = GetTerrain()->GetWaterLevel(x, y, z, &ground);
@@ -10578,7 +10535,7 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
         }
         return true;
     }
-    else if (canOnlySwim && !reachableBySwiming)
+    else if (canOnlySwim && !reachableBySwimming)
     {
         z = GetTerrain()->GetWaterLevel(attacker->GetPositionX(), attacker->GetPositionY(), attacker->GetPositionZ());
         if (z != VMAP_INVALID_HEIGHT_VALUE)

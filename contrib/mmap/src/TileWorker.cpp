@@ -1,6 +1,7 @@
 #include "TileWorker.h"
 #include "MapBuilder.h"
 #include "Maps/GridMapDefines.h"
+#include "DetourNavMeshQuery.h"
 
 inline static void calcTriNormal(const float* v0, const float* v1, const float* v2, float* norm)
 {
@@ -66,10 +67,11 @@ static void filterWalkableLowHeightSpansWith(rcHeightfield& filter, rcHeightfiel
         {
             for (rcSpan* spanOut = out.spans[x + y * w]; spanOut; spanOut = spanOut->next)
                 for (rcSpan* spanFilter = filter.spans[x + y * w]; spanFilter; spanFilter = spanFilter->next)
-                    if (spanOut->area == AREA_GROUND) // No steep slopes here.
+                {
+                    const int bot = (int)(spanOut->smax);
+                    const int top = (int)(spanFilter->smin);
+                    if (spanOut->area == AREA_GROUND)
                     {
-                        const int bot = (int)(spanOut->smax);
-                        const int top = (int)(spanFilter->smin);
                         if ((top - bot) <= max && (top - bot) >= 0)
                         {
                             if ((top - bot) >= min)
@@ -78,6 +80,16 @@ static void filterWalkableLowHeightSpansWith(rcHeightfield& filter, rcHeightfiel
                                 spanOut->area = AREA_WATER_TRANSITION;
                         }
                     }
+                    else if (spanOut->area == AREA_STEEP_SLOPE)
+                    {
+                        // fully submerged steep slopes are swimmable - the slope only
+                        // matters for ground movement. Shallow water over steep slopes is
+                        // deliberately left alone: a transition area would grant NAV_GROUND
+                        // and change ground pathing.
+                        if ((top - bot) >= min && (top - bot) <= max)
+                            spanOut->area = spanFilter->area;
+                    }
+                }
         }
     }
 }
@@ -224,28 +236,25 @@ namespace MMAP
             }
 
             TileInfo tileInfo;
-            if (m_mapBuilder->m_tileQueue.WaitAndPop(tileInfo))
-            {
-                if (m_mapBuilder->m_cancel.load())
-                {
-                    return;
-                }
-
-                dtNavMesh* navMesh = dtAllocNavMesh();
-                if (!navMesh->init(&tileInfo.m_navMeshParams))
-                {
-                    printf("[Map %03i] Failed creating navmesh for tile %i,%i !\n", tileInfo.m_mapId, tileInfo.m_tileX, tileInfo.m_tileY);
-                    dtFreeNavMesh(navMesh);
-                    return;
-                }
-
-                buildTile(tileInfo.m_mapId, tileInfo.m_tileX, tileInfo.m_tileY, navMesh, tileInfo.m_curTile, tileInfo.m_tileCount, tileInfo.m_forceRebuild);
-                dtFreeNavMesh(navMesh);
-            }
-            else
+            if (!m_mapBuilder->m_tileQueue.WaitAndPop(tileInfo))
             {
                 return;
             }
+
+            // once a tile has been popped it must be built - checking m_cancel here
+            // would silently drop the tile when the main thread sees the empty queue
+            // and cancels while we sit between the pop and the check
+            dtNavMesh* navMesh = dtAllocNavMesh();
+            if (!navMesh || !navMesh->init(&tileInfo.m_navMeshParams))
+            {
+                printf("[Map %03i] Failed creating navmesh for tile %i,%i !\n", tileInfo.m_mapId, tileInfo.m_tileX, tileInfo.m_tileY);
+                m_mapBuilder->m_anyError.store(true);
+                dtFreeNavMesh(navMesh);
+                continue;
+            }
+
+            buildTile(tileInfo.m_mapId, tileInfo.m_tileX, tileInfo.m_tileY, navMesh, tileInfo.m_curTile, tileInfo.m_tileCount, tileInfo.m_forceRebuild);
+            dtFreeNavMesh(navMesh);
         }
     }
 
@@ -442,8 +451,10 @@ namespace MMAP
         memset(&config, 0, sizeof(rcConfig));
         json jsonTileConfig = getTileConfig(mapID, tileX, tileY);
         int const quickFromConfig = jsonTileConfig["quick"].get<int>();
+        // -1 = use the global (command line) value; must not leak into later tiles on this worker
+        bool quick = m_quick;
         if (quickFromConfig >= 0)
-            m_quick = quickFromConfig == 0 ? false : true;
+            quick = quickFromConfig != 0;
         config = jsonTileConfig;
 
         rcVcopy(config.bmin, bmin);
@@ -471,18 +482,14 @@ namespace MMAP
         if (config.walkableClimb == 0)
             config.walkableClimb = (int)floorf(agentMaxClimbModelTerrainTransition / config.ch); // For models
         uint32 walkableClimbTerrain = (int)floorf(agentMaxClimbTerrain / config.ch);
-        uint32 walkableClimbModelTransition = (int)floorf(agentMaxClimbModelTerrainTransition / config.ch);
-        if (config.walkableRadius == 0)
-            config.walkableRadius = (int)ceilf(agentRadius / config.cs);
-        if (config.maxEdgeLen == 0)
-            config.maxEdgeLen = (int)(12 / config.cs);
-        if (config.borderSize == 0)
-            config.borderSize = config.walkableRadius + 3;
+        uint32 walkableClimbModelTransition = config.walkableClimb; // follows walkableClimb unless overridden below
+        if (int const climbOverride = jsonTileConfig["walkableClimbModelTransition"].get<int>())
+            walkableClimbModelTransition = climbOverride;
 
         config.width = config.tileSize + config.borderSize * 2;
         config.height = config.tileSize + config.borderSize * 2;
 
-        int inWaterGround = config.walkableHeight;
+        int inWaterGround = config.walkableHeight / 2; // AREA_WATER_TRANSITION up to half agent height (~0.75yd), deeper becomes AREA_WATER (non-swimmers stop here)
         int stepForGroundInheriteWater = (int)ceilf(30.0f / config.ch);
 
         // allocate subregions : tiles
@@ -579,7 +586,7 @@ namespace MMAP
                     }
                     // Now we remove underterrain triangles (actually set flags to 0)
                     // This prevents selecting wrong poly for a player in the server later.
-                    if (!terrain && areas[i] && !m_quick)
+                    if (!terrain && areas[i] && !quick)
                     {
                         // Get triangle corners (as usual, yzx positions)
                         // (actually we push these corners towards the center a bit to prevent collision with border models etc...)
@@ -717,6 +724,7 @@ namespace MMAP
             delete[] pmmerge;
             delete[] dmmerge;
             printf("%s alloc iv.polyMesh FAILED!                          \r", tileString);
+            m_mapBuilder->m_anyError.store(true);
             return;
         }
         rcMergePolyMeshes(m_rcContext, pmmerge, nmerge, *iv.polyMesh);
@@ -728,6 +736,7 @@ namespace MMAP
             delete[] tiles;
             delete[] pmmerge;
             delete[] dmmerge;
+            m_mapBuilder->m_anyError.store(true);
             return;
         }
         rcMergePolyMeshDetails(m_rcContext, dmmerge, nmerge, *iv.polyMeshDetail);
@@ -821,8 +830,10 @@ namespace MMAP
             }
             if (params.vertCount >= 0xffff)
             {
+                // skip only this tile - killing the whole build here (and with exit
+                // code 0 on top) makes scripted pipelines believe the run succeeded
                 printf("%s Too many vertices! (0x%8x)                         \n", tileString, params.vertCount);
-                exit(0);
+                m_mapBuilder->m_anyError.store(true);
                 continue;
             }
             if (!params.vertCount || !params.verts)
@@ -852,6 +863,7 @@ namespace MMAP
             if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
             {
                 printf("%s Failed building navmesh tile!                      \n", tileString);
+                m_mapBuilder->m_anyError.store(true);
                 continue;
             }
 
@@ -863,8 +875,11 @@ namespace MMAP
             if (!tileRef || dtStatusFailed(dtResult))
             {
                 printf("%s Failed adding tile to navmesh (0x%x)               \n", tileString, dtResult);
+                m_mapBuilder->m_anyError.store(true);
                 continue;
             }
+
+            validateOffMeshConnections(meshData, navMesh, params, tileString);
 
             // file output
             char fileName[255];
@@ -875,6 +890,7 @@ namespace MMAP
                 char message[1024];
                 snprintf(message, sizeof(message), "[Map %03i] Failed to open %s for writing!             \n", mapID, fileName);
                 perror(message);
+                m_mapBuilder->m_anyError.store(true);
                 navMesh->removeTile(tileRef, nullptr, nullptr);
                 continue;
             }
@@ -918,23 +934,75 @@ namespace MMAP
         } while (0);
     }
 
+    /**
+     * Off-mesh connections whose endpoints do not land on a navmesh polygon are
+     * silently dropped by Detour - warn about them so broken offmesh.txt entries
+     * are visible at build time instead of failing quietly at runtime.
+     */
+    void TileWorker::validateOffMeshConnections(MeshData const& meshData, dtNavMesh const* navMesh, dtNavMeshCreateParams const& params, char const* tileString)
+    {
+        int const conCount = meshData.offMeshConnections.size() / 6;
+        if (!conCount)
+            return;
+
+        dtNavMeshQuery* query = dtAllocNavMeshQuery();
+        if (!query || dtStatusFailed(query->init(navMesh, 2048)))
+        {
+            dtFreeNavMeshQuery(query);
+            return;
+        }
+
+        dtQueryFilter filter;
+        float const* verts = meshData.offMeshConnections.getCArray();
+        for (int i = 0; i < conCount; ++i)
+        {
+            float const rad = meshData.offMeshConnectionRads[i];
+            // same search box Detour uses when linking the connection at runtime
+            float const halfExtents[3] = { rad, params.walkableClimb, rad };
+            for (int p = 0; p < 2; ++p)
+            {
+                float const* point = &verts[i * 6 + p * 3];
+
+                // the end point may legitimately lie in a neighboring tile (linked via
+                // connectExtOffMeshLinks once that tile is loaded) - only points inside
+                // this tile can be validated against its polygons
+                if (p == 1 && (point[0] < params.bmin[0] || point[0] > params.bmax[0] ||
+                               point[2] < params.bmin[2] || point[2] > params.bmax[2]))
+                {
+                    continue;
+                }
+
+                dtPolyRef nearestRef = 0;
+                float nearestPt[3];
+                if (dtStatusFailed(query->findNearestPoly(point, halfExtents, &filter, &nearestRef, nearestPt)) || !nearestRef)
+                {
+                    // print in offmesh.txt coordinate order (x y z) for easy lookup
+                    printf("%s Off-mesh connection %s point (%.2f %.2f %.2f) is not on any polygon - connection will not work!\n",
+                           tileString, p == 0 ? "start" : "end", point[2], point[0], point[1]);
+                }
+            }
+        }
+        dtFreeNavMeshQuery(query);
+    }
+
     json TileWorker::getDefaultConfig()
     {
         return
         {
-            { "borderSize",              0     }, // placeholder
-            { "detailSampleDist",        2.0f  },
-            { "detailSampleMaxError",    0.5f  },
-            { "maxEdgeLen",              0     }, // placeholder
-            { "maxSimplificationError",  1.8f  },
-            { "mergeRegionArea",         10    },
-            { "minRegionArea",           30    },
-            { "walkableClimb",           0     }, // placeholder
-            { "walkableHeight",          0     }, // placeholder
-            { "walkableRadius",          0     }, // placeholder
-            { "walkableSlopeAngle",      75.0f }, // slope terrain
-            { "walkableSlopeAngleVMaps", 61.0f }, // slope model (WMO...)
-            { "quick",                   -1    }, // skip 'undermesh removal'
+            { "borderSize",                   5     }, // Non-navigable border around heightfield (voxels) - if overriding walkableRadius per tile, also override this (= walkableRadius + 3)
+            { "detailSampleDist",             2.0f  }, // Sampling distance for detail mesh height data (world units)
+            { "detailSampleMaxError",         0.5f  }, // Max deviation of detail mesh from heightfield data (world units)
+            { "maxEdgeLen",                   45    }, // Max length for contour edges along mesh border (voxels - 12 world units / BASE_UNIT_DIM)
+            { "maxSimplificationError",       1.8f  }, // Max distance simplified contour can deviate from raw contour (voxels)
+            { "mergeRegionArea",              10    }, // Regions with span count < this will merge with larger regions (voxels)
+            { "minRegionArea",                30    }, // Min voxels allowed to form isolated island areas (voxels)
+            { "walkableClimb",                0     }, // Max ledge height that is traversable (voxels) - calculated at runtime
+            { "walkableClimbModelTransition", 0     }, // Max ledge height at terrain<->model transitions (voxels) - 0 = same as walkableClimb
+            { "walkableHeight",               0     }, // Min floor to ceiling height for walkable area (voxels) - calculated at runtime
+            { "walkableRadius",               2     }, // Distance to erode walkable area away from obstructions (voxels, ~0.53yd)
+            { "walkableSlopeAngle",           75.0f }, // Max slope angle for terrain that is considered walkable (degrees)
+            { "walkableSlopeAngleVMaps",      61.0f }, // Max slope angle for WMO/M2 models that is considered walkable (degrees)
+            { "quick",                        -1    }, // -1=use global, 0=thorough build, 1=skip undermesh removal for faster build
         };
     }
 
@@ -951,7 +1019,9 @@ namespace MMAP
 
     json TileWorker::getTileConfig(uint32 mapId, uint32 tileX, uint32 tileY)
     {
-        std::string key = std::to_string(tileX) + std::to_string(tileY);
+        // zero-padded so keys are unambiguous: tile (1,23) -> "0123", tile (12,3) -> "1203"
+        char key[8];
+        snprintf(key, sizeof(key), "%02u%02u", tileX, tileY);
 
         json config = getMapIdConfig(mapId);
         if (config.find(key) != config.end())

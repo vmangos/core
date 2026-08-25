@@ -127,17 +127,12 @@ void GameObject::AddToWorld()
             m_zoneScript->OnGameObjectCreate(this);
 
         if (m_model)
-        {
             GetMap()->InsertGameObjectModel(*m_model);
-
-            if (GetGoType() == GAMEOBJECT_TYPE_DOOR)
-                GetMap()->AddVolumeCacheEntry(GetObjectGuid(), m_model->getBounds(), m_model->collisionEnabled());
-        }
     }
     Object::AddToWorld();
 
     // After Object::AddToWorld so that for initial state the GO is added to the world (and hence handled correctly)
-    UpdateCollisionState(true);
+    UpdateCollisionState();
 
     if (!m_AI)
         AIM_Initialize();
@@ -162,9 +157,6 @@ void GameObject::RemoveFromWorld()
 
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
-
-        if (GetGoType() == GAMEOBJECT_TYPE_DOOR)
-            GetMap()->RemoveVolumeCacheEntry(GetObjectGuid());
 
         RemoveAllDynObjects();
 
@@ -2257,18 +2249,14 @@ void GameObject::SetLootState(LootState state)
     }
 
     m_lootState = state;
-    UpdateCollisionState(false);
-
-    // Call for GameObjectAI script
-    if (m_AI)
-        m_AI->OnLootStateChange();
+    UpdateCollisionState();
 }
 
 void GameObject::SetGoState(GOState state)
 {
     //SetByteValue(GAMEOBJECT_BYTES_1, 0, state); // 3.3.5
     SetUInt32Value(GAMEOBJECT_STATE, state);
-    UpdateCollisionState(true);
+    UpdateCollisionState();
 }
 
 void GameObject::SetDisplayId(uint32 modelId)
@@ -2359,24 +2347,13 @@ bool GameObject::HasStaticDBSpawnData() const
     return sObjectMgr.GetGOData(GetGUIDLow()) != nullptr;
 }
 
-void GameObject::UpdateCollisionState(bool polyCull)
+void GameObject::UpdateCollisionState()
 {
     if (!m_model || !IsInWorld())
         return;
 
     bool enabled = GetGoType() == GAMEOBJECT_TYPE_CHEST ? getLootState() == GO_READY : GetGoState() == GO_STATE_READY;
     m_model->enable(enabled);
-
-    if (polyCull)
-    {
-        if (GetGoType() == GAMEOBJECT_TYPE_DOOR && GetMap()) // Currently we only use this system for doors
-        {
-            if (GetGoState() == GO_STATE_READY)
-                GetMap()->SetVolumeCollisionState(GetObjectGuid(), true);
-            else
-                GetMap()->SetVolumeCollisionState(GetObjectGuid(), false);
-        }
-    }
 }
 
 void GameObject::UpdateModel()

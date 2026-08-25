@@ -284,7 +284,7 @@ void Creature::AddToWorld()
         GetMap()->InsertObject<Creature>(GetObjectGuid(), this);
 
     if (!m_creatureGroup && HasStaticDBSpawnData())
-        sCreatureGroupsManager->LoadCreatureGroup(GetObjectGuid(), m_creatureGroup);
+        GetMap()->GetCreatureGroupsManager()->LoadCreatureGroup(GetObjectGuid(), m_creatureGroup);
 
     if (m_creatureGroup)
     {
@@ -1679,7 +1679,7 @@ void Creature::SelectLevel(float percentHealth, float percentMana)
     uint32 const level = minLevel == maxLevel ? minLevel : urand(minLevel, maxLevel);
 
     SetLevel(level);
-    InitStatsForLevel();
+    InitStatsForLevel(percentHealth, percentMana);
 }
 
 void Creature::InitStatsForLevel(float percentHealth, float percentMana)
@@ -1828,7 +1828,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map, bool force)
     ObjectGuid fullGuid = ObjectGuid(HIGHGUID_UNIT, data->creature_id[0], guidlow);
     m_creatureData = data;
     m_creatureDataAddon = sObjectMgr.GetCreatureAddon(guidlow);
-    sCreatureGroupsManager->LoadCreatureGroup(fullGuid, m_creatureGroup);
+    map->GetCreatureGroupsManager()->LoadCreatureGroup(fullGuid, m_creatureGroup);
 
     uint32 const creatureId = m_creatureGroup ? m_creatureGroup->ChooseCreatureId(fullGuid, data, map) : data->ChooseCreatureId();
     CreatureInfo const* cinfo = sObjectMgr.GetCreatureTemplate(creatureId);
@@ -2160,6 +2160,7 @@ void Creature::SetDeathState(DeathState s)
     if (s == JUST_DIED)
     {
         SetTargetGuid(ObjectGuid());                        // remove target selection in any cases (can be set at aura remove in Unit::SetDeathState)
+        SetFollowTargetGuid(ObjectGuid());
         SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
         if (!IsPet() && GetCreatureInfo()->skinning_loot_id)
@@ -3551,6 +3552,7 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
         ResetCombatTime();
         UpdateCombatState(true);
 
+        HandleEmoteState(0);
         SetStandState(UNIT_STAND_STATE_STAND);
         m_pacifiedTimer = 0;
 
@@ -4124,6 +4126,7 @@ void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint
     {
         group = new CreatureGroup(leader->GetObjectGuid());
         leader->SetCreatureGroup(group);
+        GetMap()->GetCreatureGroupsManager()->RegisterNewGroup(group);
     }
     group->AddMember(GetObjectGuid(), dist, angle, options);
     SetCreatureGroup(group);
@@ -4137,6 +4140,7 @@ void Creature::LeaveCreatureGroup()
     {
         if (pGroup->GetOriginalLeaderGuid() == GetObjectGuid())
         {
+            GetMap()->GetCreatureGroupsManager()->EraseCreatureGroup(pGroup->GetOriginalLeaderGuid());
             pGroup->DisbandGroup(this);
             delete pGroup;
         }
@@ -4211,4 +4215,11 @@ bool Creature::GetCharmSpellCooldown(uint32 spellId, uint32& cooldown)
         }
     }
     return false;
+}
+
+Unit* Creature::GetFollowTarget() const
+{
+    if (!m_followTarget.IsEmpty())
+        return GetMap()->GetUnit(m_followTarget);
+    return GetCharmerOrOwner();
 }

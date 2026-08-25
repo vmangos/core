@@ -149,6 +149,8 @@ struct UpdateFieldData
 namespace UpdateFields
 {
     uint16 const* GetUpdateFieldFlagsArray(uint8 objectTypeId);
+    // True at every index that is the low half of a guid (pair of uint32); guid arrays are marked pairwise.
+    bool const* GetGuidFieldStartArray(uint8 objectTypeId);
     UpdateFieldData const* GetUpdateFieldDataByName(char const* name);
     UpdateFieldData const* GetUpdateFieldDataByTypeMaskAndOffset(uint8 objectTypeMask, uint16 offset);
 };

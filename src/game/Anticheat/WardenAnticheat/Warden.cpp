@@ -91,12 +91,19 @@ void Log::OutWarden(Warden const* warden, LogLevel logLevel, char const* format,
     }
 }
 
+bool Warden::m_scriptedScansLoaded = false;
+
 void Warden::LoadScriptedScans()
 {
+    // Prevent duplicating the scripted scans on reload.
+    if (m_scriptedScansLoaded)
+        return;
+
     auto const start = sWardenScanMgr.Count();
 
     WardenWin::LoadScriptedScans();
     WardenMac::LoadScriptedScans();
+    m_scriptedScansLoaded = true;
 
     sLog.Out(LOG_ANTICHEAT, LOG_LVL_MINIMAL, ">> %u scripted Warden scans loaded from anticheat module", sWardenScanMgr.Count() - start);
 }
@@ -284,7 +291,11 @@ void Warden::RequestScans(std::vector<std::shared_ptr<Scan const>>&& scans)
         // if the scan did not change the buffer size or the string size, consider
         // it a NOP and don't bother marking it as pending
         if (scan.wpos() != startSize || strings.size() != startStringSize)
+        {
             m_pendingScans.push_back(*i);
+            request += (*i)->requestSize;
+            reply += (*i)->replySize;
+        }
     }
 
     // if there are still no pending scans, it means that there is a single scan which is too big.

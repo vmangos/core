@@ -245,9 +245,11 @@ void instance_ruins_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
             m_uiOssirianGUID = pCreature->GetGUID();
             break;
         case NPC_GENERAL_ANDOROV:
+            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             m_uiAndorovGUID = pCreature->GetGUID();
             break;
         case NPC_KALDOREI_ELITE:
+            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             m_lKaldoreiElites.push_back(pCreature->GetGUID());
             break;
         default:

@@ -346,11 +346,20 @@ void WorldSession::HandleLootMethodOpcode(WorldPackets::Group::LootMethod const&
     if (!group)
         return;
 
-    /** error handling **/
     if (!group->IsLeader(GetPlayer()->GetObjectGuid()))
         return;
-    /********************/
 
+    if (packet.lootMethod == MASTER_LOOT)
+    {
+        if (!group->IsMember(packet.lootMaster))
+            return;
+    }
+    else
+    {
+        // cannot have loot master in other loot methods
+        const_cast<ObjectGuid&>(packet.lootMaster).Clear();
+    }
+    
     // everything is fine, do it
     group->SetLootMethod((LootMethod)packet.lootMethod);
     group->SetLooterGuid(packet.lootMaster);
@@ -394,7 +403,7 @@ void WorldSession::HandleMinimapPingOpcode(WorldPackets::Group::MinimapPing cons
 void WorldSession::HandleRandomRollOpcode(WorldPackets::Group::RandomRoll const& packet)
 {
     /** error handling **/
-    if (packet.minimum > packet.maximum || packet.maximum > 10000) // < 32768 for urand call
+    if (packet.minimum > packet.maximum || packet.maximum > 1000000)
         return;
     /********************/
 

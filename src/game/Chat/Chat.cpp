@@ -667,6 +667,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { "info",           SEC_MODERATOR,      false, &ChatHandler::HandleNpcSpawnInfoCommand,        "", nullptr },
         { "set",            SEC_DEVELOPER,      false, nullptr,                                        "", creatureSpawnsSetCommandTable },
         { "move",           SEC_DEVELOPER,      false, &ChatHandler::HandleNpcSpawnMoveCommand,        "", nullptr },
+        { "load",           SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcSpawnLoadCommand,        "", nullptr },
+        { "unload",         SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcSpawnUnloadCommand,      "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 

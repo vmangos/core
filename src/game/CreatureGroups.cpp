@@ -274,9 +274,6 @@ void CreatureGroup::DisbandGroup(Creature* pLeader)
     MANGOS_ASSERT(pLeader->GetObjectGuid() == GetOriginalLeaderGuid());
 
     m_deleted = true;
-
-    if (pLeader->HasStaticDBSpawnData())
-        sCreatureGroupsManager->EraseCreatureGroup(GetOriginalLeaderGuid());
     pLeader->SetCreatureGroup(nullptr);
 
     for (auto const& it : m_members)
@@ -415,12 +412,11 @@ ObjectGuid CreatureGroupsManager::ConvertDBGuid(uint32 guidlow)
     return ObjectGuid();
 }
 
-void CreatureGroupsManager::Load()
+void CreatureGroupsLoadingManager::LoadFromDB()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
-    // Memory leak, but we cannot delete the loaded groups, since pointer may be present at loaded creatures
-    m_groups.clear();
+    m_groupManagers.clear();
 
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `leader_guid`, `member_guid`, `dist`, `angle`, `flags` FROM `creature_groups` ORDER BY `leader_guid`"));
 
@@ -445,28 +441,43 @@ void CreatureGroupsManager::Load()
         fields = result->Fetch();
 
         //Load group member data
-        ObjectGuid leaderGuid = ConvertDBGuid(fields[0].GetUInt32());
-        ObjectGuid memberGuid = ConvertDBGuid(fields[1].GetUInt32());
-        if (leaderGuid.IsEmpty())
+        uint32 leaderGuidLow = fields[0].GetUInt32();
+        uint32 memberGuidLow = fields[1].GetUInt32();
+
+        CreatureData const* pLeaderData = sObjectMgr.GetCreatureData(leaderGuidLow);
+        if (!pLeaderData)
         {
-            if (!sObjectMgr.IsExistingCreatureGuid(fields[0].GetUInt32()))
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
+            if (!sObjectMgr.IsExistingCreatureGuid(leaderGuidLow))
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad leader guid %u", leaderGuidLow);
+            continue;
         }
-        else if (memberGuid.IsEmpty())
+
+        CreatureData const* pMemberData = sObjectMgr.GetCreatureData(memberGuidLow);
+        if (!pMemberData)
         {
-            if (!sObjectMgr.IsExistingCreatureGuid(fields[1].GetUInt32()))
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad member guid %u", fields[1].GetUInt32());
+            if (!sObjectMgr.IsExistingCreatureGuid(memberGuidLow))
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad member guid %u", memberGuidLow);
+            continue;
         }
-        else
+
+        if (pLeaderData->position.mapId != pMemberData->position.mapId)
         {
-            if (!currentGroup || leaderGuid != currentGroup->GetOriginalLeaderGuid())
-            {
-                currentGroup = new CreatureGroup(leaderGuid);
-                RegisterNewGroup(currentGroup);
-            }
-            currentGroup->AddMember(memberGuid, fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetUInt32());
-            ++count;
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Group with leader (guid %u) has member (guid %u) on different map!", leaderGuidLow, memberGuidLow);
+            continue;
         }
+
+        CreatureGroupsManager& manager = m_groupManagers[pLeaderData->position.mapId];
+
+        ObjectGuid leaderGuid = pLeaderData->GetObjectGuid(leaderGuidLow);
+        ObjectGuid memberGuid = pMemberData->GetObjectGuid(memberGuidLow);
+
+        if (!currentGroup || leaderGuid != currentGroup->GetOriginalLeaderGuid())
+        {
+            currentGroup = new CreatureGroup(leaderGuid);
+            manager.RegisterNewGroup(currentGroup);
+        }
+        currentGroup->AddMember(memberGuid, fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetUInt32());
+        ++count;
     }
     while (result->NextRow());
 
@@ -482,7 +493,7 @@ void CreatureGroupsManager::Load()
             fields = result->Fetch();
 
             //Load group member data
-            ObjectGuid leaderGuid = ConvertDBGuid(fields[0].GetUInt32());
+            uint32 leaderGuidLow = fields[0].GetUInt32();
             uint32 creatureId = fields[1].GetUInt32();
             int32 minCount = fields[2].GetInt32();
             int32 maxCount = fields[3].GetInt32();
@@ -502,34 +513,37 @@ void CreatureGroupsManager::Load()
                 continue;
             }
 
-            if (leaderGuid.IsEmpty())
+            CreatureData const* pLeaderData = sObjectMgr.GetCreatureData(leaderGuidLow);
+            if (!pLeaderData)
             {
-                if (!sObjectMgr.IsExistingCreatureGuid(fields[0].GetUInt32()))
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
+                if (!sObjectMgr.IsExistingCreatureGuid(leaderGuidLow))
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad leader guid %u", leaderGuidLow);
+                continue;
             }
-            else
+
+            ObjectGuid leaderGuid = pLeaderData->GetObjectGuid(leaderGuidLow);
+
+            if (!currentGroup || leaderGuid != currentGroup->GetOriginalLeaderGuid())
             {
-                if (!currentGroup || leaderGuid != currentGroup->GetOriginalLeaderGuid())
+                CreatureGroupsManager& manager = m_groupManagers[pLeaderData->position.mapId];
+                currentGroup = nullptr;
+                for (const auto& itr : manager.m_groups)
                 {
-                    currentGroup = nullptr;
-                    for (const auto& itr : m_groups)
+                    if (itr.first == leaderGuid)
                     {
-                        if (itr.first == leaderGuid)
-                        {
-                            currentGroup = itr.second;
-                            break;
-                        }
+                        currentGroup = itr.second;
+                        break;
                     }
                 }
-
-                if (!currentGroup)
-                {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
-                    continue;
-                }
-
-                currentGroup->m_entryLimits[creatureId] = std::make_pair(minCount, maxCount);
             }
+
+            if (!currentGroup)
+            {
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
+                continue;
+            }
+
+            currentGroup->m_entryLimits[creatureId] = std::make_pair(minCount, maxCount);
         } while (result->NextRow());
     }
 

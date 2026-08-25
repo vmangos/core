@@ -239,14 +239,148 @@ BindIP = "0.0.0.0"
 #        Default: 1 (permit addon channel)
 #                 0 (do not permit addon channel)
 #
-#    CleanCharacterDB
+#    CharacterDatabaseCleanup.Enable
 #        Perform character db cleanups on start up
 #        Default: 1 (Enable)
 #                 0 (Disabled)
 #
+#    CharacterDatabaseCleanup.Flags
+#        What to be scheduled for cleanup automatically on maintenance day.
+#        Flags:  1 - delete orphaned character data (rows without a row in `characters`)
+#                2 - delete orphaned pet data (rows without a row in `character_pet`)
+#                4 - delete orphaned item data (rows without a row in `item_instance`)
+#                8 - delete unknown skills from `character_skills`
+#               16 - delete unknown spells from `character_spell`
+#        Default: 7 (Characters, Pets, Items)
+#
 #    ReusableGuidPoolSize
 #        Preload unused guids in db to reuse for new characters, items, texts and corpses.
 #        Default: 100000
+#
+#    Continents.Instanciate
+#        Run continents as instanced maps split along zone boundaries to reduce update times.
+#        Default:     0 (Disabled)
+#                     1 (Enabled)
+#
+#    Continents.InactivePlayers.SkipUpdates
+#        Skip N map updates for inactive players on continents (load mitigation).
+#                     Range: 0..100
+#        Default:     0
+#
+#    MapUpdate.ReduceGridActivationDist.Tick
+#        Every N map ticks, reduce grid activation distance under load.
+#        Default:     0
+#
+#    MapUpdate.IncreaseGridActivationDist.Tick
+#        Every N map ticks, restore/increase grid activation distance.
+#        Default:     0
+#
+#    MapUpdate.MinGridActivationDistance
+#        Floor for adaptive grid activation distance (yards).
+#        Default:     0
+#
+#    MapUpdate.ReduceVisDist.Tick
+#        Every N map ticks, reduce visibility distance under load.
+#        Default:     0
+#
+#    MapUpdate.IncreaseVisDist.Tick
+#        Every N map ticks, restore/increase visibility distance.
+#        Default:     0
+#
+#    MapUpdate.MinVisibilityDistance
+#        Floor for adaptive visibility distance (yards).
+#        Default:     0
+#
+#    MapUpdate.Empty.UpdateTime
+#        Stop updating maps with no players after this idle time (milliseconds).
+#        Default:     0
+#
+#    MapUpdate.Instanced.UpdateThreads
+#        Worker threads for updating instanced maps.
+#                     Range: 0..20
+#        Default:     2
+#
+#    MapUpdate.ObjectsUpdate.MaxThreads
+#        Per-map object-update worker threads (non-instanced).
+#                     Range: 1..20
+#        Default:     4
+#
+#    MapUpdate.ObjectsUpdate.Timeout
+#        Timeout (ms) waiting for object-update workers.
+#                     Range: 10..2000
+#        Default:     100
+#
+#    MapUpdate.VisibilityUpdate.MaxThreads
+#        Per-map visibility-update worker threads (non-instanced).
+#                     Range: 1..20
+#        Default:     4
+#
+#    MapUpdate.VisibilityUpdate.Timeout
+#        Timeout (ms) waiting for visibility-update workers.
+#                     Range: 10..2000
+#        Default:     100
+#
+#    MapUpdate.UpdatePacketsDiff
+#        Time budget hint (ms) for packet processing within a map update.
+#                     Range: 1..10000
+#        Default:     100
+#
+#    MapUpdate.UpdatePlayersDiff
+#        Time budget hint (ms) for player updates within a map update.
+#                     Range: 1..10000
+#        Default:     100
+#
+#    MapUpdate.UpdateCellsDiff
+#        Time budget hint (ms) for cell updates within a map update.
+#                     Range: 1..10000
+#        Default:     100
+#
+#    MapUpdate.Continents.MTCells.Threads
+#        Parallel cell updates on the same continent map.
+#                     Range: 0..20
+#        Default:     0 (Disabled)
+#
+#    MapUpdate.Continents.MTCells.SafeDistance
+#        Minimum distance between cells updated in parallel (avoids race conditions).
+#                     Range: 0..34112
+#        Default:     1066
+#
+#    Continents.MotionUpdate.Threads
+#        Threads for continent motion/spline updates. If disabled motion is updated in the unit update.
+#        Default:     0
+#
+#    AsyncTasks.Threads
+#        Threads for async world tasks (/who, auction listings, etc.).
+#                     Range: 1..20
+#        Default:     1
+#
+#    AsyncQueriesTickTimeout
+#        Max time (ms) spent processing async query results per tick.
+#        Default:     0 (Unlimited)
+#
+#    Movement.ExtrapolateChargePosition
+#        Extrapolate target position for charge movement.
+#        Default:     1 (Enabled)
+#                     0 (Disabled)
+#
+#    Movement.ExtrapolatePetPosition
+#        Extrapolate target position in targeted movement generator.
+#        Default:     1 (Enabled)
+#                     0 (Disabled)
+#
+#    Movement.RelocationVmapsCheckDelay
+#        Delay (ms) between deferred relocation VMap checks (mounts indoors, swimming, etc.).
+#                     Range: 0..2000
+#        Default:     0 (Disabled)
+#
+#    Movement.MaxPointsPerPacket
+#        Maximum spline/movement points packed into one movement packet.
+#                     Range: 5..10000
+#        Default:     80
+#
+#    Movement.PendingAckResponseTime
+#        Time to wait (ms) for a client movement-change ACK before treating it as delayed/missing.
+#        Default:     4000
 #
 ###################################################################################################################
 
@@ -283,7 +417,8 @@ UpdateUptimeInterval = 10
 MaxCoreStuckTime = 0
 BanListReloadTimer = 120
 AddonChannel = 1
-CleanCharacterDB = 1
+CharacterDatabaseCleanup.Enable = 1
+CharacterDatabaseCleanup.Flags = 7
 ReusableGuidPoolSize = 100000
 
 # Optimization / load mitigation settings
@@ -295,14 +430,8 @@ MapUpdate.MinGridActivationDistance = 0
 MapUpdate.ReduceVisDist.Tick = 0
 MapUpdate.IncreaseVisDist.Tick = 0
 MapUpdate.MinVisibilityDistance = 0
-
-# Maps with no player for more than $UpdateTime (ms) will no longer be updated (0 to disable)
 MapUpdate.Empty.UpdateTime = 0
-
-# Per-map threading
 MapUpdate.Instanced.UpdateThreads = 2
-
-# Per-map subthreads (not for instanced maps)
 MapUpdate.ObjectsUpdate.MaxThreads = 4
 MapUpdate.ObjectsUpdate.Timeout = 100
 MapUpdate.VisibilityUpdate.MaxThreads = 4
@@ -314,21 +443,15 @@ MapUpdate.UpdatePlayersDiff = 100
 MapUpdate.UpdateCellsDiff = 100
 
 # Parallelized execution of cells from same map
-#   MTCells.Threads       Number of different cells to update at the sametime
-#   MTCells.SafeDistance  2 cells wont be updated at the same time if they are at an inferior distance from each other (thread race issues)
 MapUpdate.Continents.MTCells.Threads = 0
 MapUpdate.Continents.MTCells.SafeDistance = 1066
 Continents.MotionUpdate.Threads = 0
 
-# Number of threads for async tasks (/who, list AH items ...)
 AsyncTasks.Threads = 1
 AsyncQueriesTickTimeout = 0
 
-# Movement extrapolation system - not stable now
 Movement.ExtrapolateChargePosition = 1
 Movement.ExtrapolatePetPosition = 1
-
-# Delayed repositionning checks (mounts inside / swimming ...). 0 to disable.
 Movement.RelocationVmapsCheckDelay = 0
 Movement.MaxPointsPerPacket = 80
 
@@ -650,6 +773,67 @@ DebuffLimit = 0
 #        Enable or disable database battleground logs.
 #        Default: 0
 #
+#    Smartlog.Death
+#        Emit smartlog entries on player deaths of interest.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+#    Smartlog.LongCombat
+#        Emit smartlog entries for unusually long combats.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+#    Smartlog.LongCombatDuration
+#        Combat duration in seconds that counts as "long" for Smartlog.LongCombat.
+#        Default:     1800 - (30 minutes)
+#
+#    Smartlog.ExtraEntries
+#        Extra creature/spell entries (comma-separated) always included in smartlog.
+#        Default:     ""
+#        Example:     "12345,67890"
+#
+#    Smartlog.ExtraGuids
+#        Extra object GUIDs (comma-separated) always included in smartlog.
+#        Default:     ""
+#        Example:     "100001,100002"
+#
+#    PerformanceLog.SlowWorldUpdate
+#        Log world update if it exceeds this many milliseconds.
+#        Default:     100
+#
+#    PerformanceLog.SlowMapSystemUpdate
+#        Log map-system update if it exceeds this many milliseconds.
+#        Default:     100
+#
+#    PerformanceLog.SlowMapUpdate
+#        Log a single map update if it exceeds this many milliseconds.
+#        Default:     100
+#
+#    PerformanceLog.SlowAsynQueries
+#        Log async DB query processing if it exceeds this many milliseconds.
+#                     Note: key spelling is SlowAsynQueries (matches core).
+#        Default:     100
+#
+#    PerformanceLog.SlowUniqueSessionUpdate
+#        Log a single session update if it exceeds this many milliseconds.
+#        Default:     20
+#
+#    PerformanceLog.SlowPackets
+#        Log packet handling if it exceeds this many milliseconds.
+#        Default:     20
+#
+#    PerformanceLog.SlowMapPackets
+#        Log map packet processing if it exceeds this many milliseconds.
+#        Default:     60
+#
+#    PerformanceLog.SlowSessionsUpdate
+#        Log the full sessions update if it exceeds this many milliseconds.
+#        Default:     0
+#
+#    PerformanceLog.SlowPacketBroadcast
+#        Log packet broadcast if it exceeds this many milliseconds.
+#        Default:     0
+#
 ###################################################################################################################
 
 LogSQL = 1
@@ -694,7 +878,7 @@ LogFile.GmCriticalCommands = "gm_critical.log"
 LogFile.Trades = "Trades.log"
 LogFile.Network = "Network.log"
 
-LogMoneyTreshold = 10000
+LogMoneyThreshold = 10000
 CharLogDump = 0
 
 GmLogPerAccount = 0
@@ -772,6 +956,11 @@ PerformanceLog.SlowPacketBroadcast = 0
 #        DBC Language Settings
 #        0 = English; 1 = Korean; 2 = French; 3 = German; 4 = Chinese; 5 = Taiwanese; 6 = Spanish;
 #        255 = Auto Detect (Default)
+#
+#    DeclinedNames
+#        Enable Russian declined character names support.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
 #
 #    StrictPlayerNames
 #        Limit player name to language specific symbols set, don't allow creating characters, and flag existing characters for rename and disconnect
@@ -1187,6 +1376,11 @@ Motd = "Welcome to World of Warcraft!"
 #        Default: 0 (Not allowed)
 #                 1 (Allowed)
 #
+#    GM.JoinOppositeFactionChannels
+#        Allow GMs to join opposite-faction chat channels.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
 #    AllowTwoSide.WhoList
 #        Allow showing players from both teams in who list.
 #        Default: 0 (Not allowed)
@@ -1263,7 +1457,7 @@ AllowTwoSide.AddFriend = 0
 #        Default: 7000 (7s)
 #
 #    WorldBossLevelDiff
-#        Difference for boss dynamic level with target
+#        Level difference used for world-boss dynamic leveling versus target.
 #        Default: 3
 #
 #    SendLootRollUponReconnect
@@ -1288,7 +1482,7 @@ AllowTwoSide.AddFriend = 0
 #    Rate.Creature.Elite.RAREELITE.Damage
 #    Rate.Creature.Elite.WORLDBOSS.Damage
 #    Rate.Creature.Elite.RARE.Damage
-#        Creature Damage Rates.
+#        Melee damage multipliers by creature rank.
 #        Examples: 2 - creatures will deal double damage with melee attacks
 #
 #    Rate.Creature.Normal.SpellDamage
@@ -1296,7 +1490,7 @@ AllowTwoSide.AddFriend = 0
 #    Rate.Creature.Elite.RAREELITE.SpellDamage
 #    Rate.Creature.Elite.WORLDBOSS.SpellDamag
 #    Rate.Creature.Elite.RARE.SpellDamage
-#        Creature Spell Damage Rates.
+#        Spell damage multipliers by creature rank.
 #        Examples: 2 - creatures will deal double damage with spells
 #
 #    Rate.Creature.Normal.HP
@@ -1304,7 +1498,7 @@ AllowTwoSide.AddFriend = 0
 #    Rate.Creature.Elite.RAREELITE.HP
 #    Rate.Creature.Elite.WORLDBOSS.HP
 #    Rate.Creature.Elite.RARE.HP
-#        Creature Health Ammount Modifier.
+#        Health multipliers by creature rank.
 #        Examples: 2 - creatures will have double health
 #
 #    ListenRange.Say
@@ -1479,67 +1673,67 @@ WorldChan.Cooldown = 0
 WorldChan.CooldownMaxLevel = 0
 WorldChan.CooldownScaling = 0
 WhisperDiffZone.MinLevel = 1
-YellMinLevel = 0;
+YellMinLevel = 0
 YellRange.LinearScale.MaxLevel = 0
 YellRange.QuadraticScale.MaxLevel = 0
 ChannelInvite.MinLevel = 10
 PublicChansMute.BypassLevel = 61
 WhisperRestriction = 0
-SayMinLevel = 0;
-SayEmoteMinLevel = 0;
+SayMinLevel = 0
+SayEmoteMinLevel = 0
 Antiflood.Sanction = 8
 
 ###################################################################################################
 # WARDEN SETTINGS
 #
 #    Warden.WinEnabled
-#        Description: Enables Warden checks for Windows clients.
+#        Enables Warden checks for Windows clients.
 #                     1 - (Enabled)
 #        Default:     0 - (Disabled)
 #
 #    Warden.OSXEnabled
-#        Description: Enables Warden checks for OSX clients.
+#        Enables Warden checks for OSX clients.
 #                     1 - (Enabled)
 #        Default:     0 - (Disabled)
 #
 #    Warden.PlayersOnly
-#        Description: Ignore game master accounts.
+#        Ignore game master accounts.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 #
 #    Warden.NumScans
-#        Description: Number of Warden memory checks that are sent to the client each cycle.
+#        Number of Warden memory checks that are sent to the client each cycle.
 #        Default:     10
 #
 #    Warden.ClientResponseDelay
-#        Description: Time (in seconds) before client gets disconnected for not responding.
+#        Time (in seconds) before client gets disconnected for not responding.
 #        Default:     30 - (30 Seconds)
 #                     0 - (Disabled, client won't be kicked)
 #
 #    Warden.ScanFrequency
-#        Description: Time (in seconds) to wait before sending the next scan request to the client.
+#        Time (in seconds) to wait before sending the next scan request to the client.
 #                     A low number increases traffic and load on client and server side.
 #        Default:     15 - (15 Seconds)
 #
 #    Warden.DefaultPenalty
-#        Description: Default action being taken if a client check failed. Penalties can be
+#        Default action being taken if a client check failed. Penalties can be
 #                     customized per check id in the warden_checks table.
 #        Default:     0 - (Disabled, Logging only)
 #                     1 - (Kick)
 #                     2 - (Ban)
 #
 #    Warden.BanDuration
-#        Description: Time (in seconds) an account will be banned for if Penalty is set to ban.
+#        Time (in seconds) an account will be banned for if Penalty is set to ban.
 #        Default:     86400 - (24 hours)
 #                     0     - (Permanent ban)
 #
 #    Warden.DebugLog
-#        Description: Prints additional information about performed checks.
+#        Prints additional information about performed checks.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 #
 #    Warden.ModuleDir
-#        Description: Directory where warden modules are stored.
+#        Directory where warden modules are stored.
 #        Default: "warden_modules"
 #
 ###################################################################################################
@@ -1559,552 +1753,552 @@ Warden.ModuleDir = "warden_modules"
 # MOVEMENT ANTICHEAT SETTINGS
 #
 #    Anticheat.Enable
-#        Description: Enables player movement checks.
+#        Enables player movement checks.
 #                     1 - (Enabled)
 #        Default:     0 - (Disabled)
 #
 #    Anticheat.PlayersOnly
-#        Description: Ignore game master accounts.
+#        Ignore game master accounts.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.NotifyCheaters
-#        Description: Informs players if they fail a movement check.
+#        Informs players if they fail a movement check.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 #
 #    Anticheat.BanDuration
-#        Description: Time (in seconds) an account will be banned if Penalty is set to ban.
+#        Time (in seconds) an account will be banned if Penalty is set to ban.
 #        Default:     86400 - (24 hours)
 #                     0     - (Permanent ban)
 #
 #    Anticheat.LogData
-#        Description: Save the result of every anticheat tick in the database.
+#        Save the result of every anticheat tick in the database.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 #
 #    Anticheat.PacketLogSize
-#        Description: How many previous movement packets to dump to file upon detection resulting in kick or ban.
+#        How many previous movement packets to dump to file upon detection resulting in kick or ban.
 #                     File is saved in pkt format that can be parsed with WowPacketParser.
 #        Default:     100
 #                     0 - (Disabled)
 #
 #    Anticheat.MaxAllowedDesync
-#        Description: Client time desynchronization allowed when doing movement extrapolation.
+#        Client time desynchronization allowed when doing movement extrapolation.
 #        Default:     0
 #
 #    Anticheat.ReverseTime.Enable
-#        Description: Check for players whose clock went back in time.
+#        Check for players whose clock went back in time.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.ReverseTime.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     1
 #
 #    Anticheat.ReverseTime.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.NullTime.Enable
-#        Description: Check for players sending a null timestamp.
+#        Check for players sending a null timestamp.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.NullTime.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     2
 #
 #    Anticheat.NullTime.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.SkippedHeartbeats.Enable
-#        Description: Check for players missing a heartbeat packet.
+#        Check for players missing a heartbeat packet.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.SkippedHeartbeats.Threshold.Tick
-#        Description: Detections needed to trigger a penalty in one tick.
+#        Detections needed to trigger a penalty in one tick.
 #        Default:     2
 #
 #    Anticheat.SkippedHeartbeats.Threshold.Total
-#        Description: Detections needed to trigger a penalty total.
+#        Detections needed to trigger a penalty total.
 #        Default:     10
 #
 #    Anticheat.SkippedHeartbeats.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.TimeDesync.Enable
-#        Description: Check for players that claim more time has passed for them than for the server since last time they moved.
+#        Check for players that claim more time has passed for them than for the server since last time they moved.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.TimeDesync.Threshold
-#        Description: Milliseconds of time difference tolerated.
+#        Milliseconds of time difference tolerated.
 #        Default:     5000
 #
 #    Anticheat.TimeDesync.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.NumDesyncs.Enable
-#        Description: Check how many times the above described time desync has occurred.
+#        Check how many times the above described time desync has occurred.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.NumDesyncs.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     5
 #
 #    Anticheat.NumDesyncs.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.SpeedHack.Enable
-#        Description: Check for players moving too fast using extrapolation.
+#        Check for players moving too fast using extrapolation.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.OverpspeedDistance.Enable
-#        Description: Check for players that claim to have traveled further than possible.
+#        Check for players that claim to have traveled further than possible.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.OverpspeedDistance.Threshold
-#        Description: Yards traveled beyond what we think is possible.
+#        Yards traveled beyond what we think is possible.
 #        Default:     30
 #
 #    Anticheat.OverpspeedDistance.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.OverspeedJump.Enable
-#        Description: Check for players that are moving too fast while jumping.
+#        Check for players that are moving too fast while jumping.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.OverspeedJump.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.OverspeedJump.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     3
 #
 #    Anticheat.OverspeedJump.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.JumpSpeedChange.Enable
-#        Description: Check for players that change speed while in the middle of a jump.
+#        Check for players that change speed while in the middle of a jump.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.JumpSpeedChange.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.JumpSpeedChange.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     3
 #
 #    Anticheat.JumpSpeedChange.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.MultiJump.Enable
-#        Description: Check for players jumping while still in the air.
+#        Check for players jumping while still in the air.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.MultiJump.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.MultiJump.Threshold.Tick
-#        Description: Detections needed to trigger a penalty in one tick.
+#        Detections needed to trigger a penalty in one tick.
 #        Default:     2
 #
 #    Anticheat.MultiJump.Threshold.Total
-#        Description: Detections needed to trigger a penalty total.
+#        Detections needed to trigger a penalty total.
 #        Default:     10
 #
 #    Anticheat.MultiJump.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.WallClimb.Enable
-#        Description: Check for players climbing a surface that is too steep.
+#        Check for players climbing a surface that is too steep.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.WallClimb.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.WallClimb.Angle
-#        Description: Vertical angle in radians between two points that players are able to climb.
+#        Vertical angle in radians between two points that players are able to climb.
 #        Default:     1.0
 #
 #    Anticheat.WallClimb.Threshold.Tick
-#        Description: Detections needed to trigger a penalty in one tick.
+#        Detections needed to trigger a penalty in one tick.
 #        Default:     3
 #
 #    Anticheat.WallClimb.Threshold.Total
-#        Description: Detections needed to trigger a penalty total.
+#        Detections needed to trigger a penalty total.
 #        Default:     30
 #
 #    Anticheat.WallClimb.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.Unreachable.Enable
-#        Description: Check for players that are in combat with a creature which can't reach them.
+#        Check for players that are in combat with a creature which can't reach them.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.Unreachable.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     40
 #
 #    Anticheat.Unreachable.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     3 - Log, Report to GM
 #
 #    Anticheat.FlyHack.Enable
-#        Description: Check for players that are flying.
+#        Check for players that are flying.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.FlyHack.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.FlyHack.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     3
 #
 #    Anticheat.FlyHack.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.NoFallTime.Enable
-#        Description: Check for consecutive movements with falling flag but no fall time.
+#        Check for consecutive movements with falling flag but no fall time.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.NoFallTime.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     1
 #
 #    Anticheat.NoFallTime.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.BadFallReset.Enable
-#        Description: Check for wrong data in fall reset opcode.
+#        Check for wrong data in fall reset opcode.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.BadFallReset.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     1
 #
 #    Anticheat.BadFallReset.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.BadFallStop.Enable
-#        Description: Check for falling flag being removed without sending land opcode.
+#        Check for falling flag being removed without sending land opcode.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.BadFallStop.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     1
 #
 #    Anticheat.BadFallStop.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.BadMoveStart.Enable
-#        Description: Check for starting movement with wrong opcode.
+#        Check for starting movement with wrong opcode.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.BadMoveStart.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     1
 #
 #    Anticheat.BadMoveStart.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.Teleport.Enable
-#        Description: Check for players teleporting far away from their current position.
+#        Check for players teleporting far away from their current position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.Teleport.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.Teleport.Distance
-#        Description: Yards that we allow players to travel in one packet.
+#        Yards that we allow players to travel in one packet.
 #                     Setting this too low can cause false positives at high speeds.
 #        Default:     40.0
 #
 #    Anticheat.Teleport.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     3
 #
 #    Anticheat.Teleport.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     19 - Log, Report to GM, Ban
 #
 #    Anticheat.TeleportToTransport.Enable
-#        Description: Check for players teleporting on a transport.
+#        Check for players teleporting on a transport.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.TeleportToTransport.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.TeleportToTransport.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     2
 #
 #    Anticheat.TeleportToTransport.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.FakeTransport.Enable
-#        Description: Check for players claiming they have boarded a non-existent transport.
+#        Check for players claiming they have boarded a non-existent transport.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.FakeTransport.Reject
-#        Description: Do not accept movement info and logout player to sync transports.
+#        Do not accept movement info and logout player to sync transports.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.FakeTransport.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     1
 #
 #    Anticheat.FakeTransport.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     3 - Log, Report to GM
 #
 #    Anticheat.WaterWalk.Enable
-#        Description: Check for players walking on water without a water walking buff.
+#        Check for players walking on water without a water walking buff.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.WaterWalk.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.WaterWalk.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     5
 #
 #    Anticheat.WaterWalk.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #
 #    Anticheat.SlowFall.Enable
-#        Description: Check for players slow falling without a slow fall buff.
+#        Check for players slow falling without a slow fall buff.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.SlowFall.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.SlowFall.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     5
 #
 #    Anticheat.SlowFall.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.Hover.Enable
-#        Description: Check for players hovering without a hover buff.
+#        Check for players hovering without a hover buff.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.Hover.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.Hover.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     5
 #
 #    Anticheat.Hover.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.FixedZ.Enable
-#        Description: Check for players that have a fixed Z axis.
+#        Check for players that have a fixed Z axis.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.FixedZ.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.FixedZ.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     5
 #
 #    Anticheat.FixedZ.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.RootMove.Enable
-#        Description: Check for players that are moving while rooted.
+#        Check for players that are moving while rooted.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.RootMove.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.RootMove.Threshold.Tick
-#        Description: Detections needed to trigger a penalty in one tick.
+#        Detections needed to trigger a penalty in one tick.
 #        Default:     5
 #
 #    Anticheat.RootMove.Threshold.Total
-#        Description: Detections needed to trigger a penalty in one tick.
+#        Detections needed to trigger a penalty in one tick.
 #        Default:     30
 #
 #    Anticheat.RootMove.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.SelfRoot.Enable
-#        Description: Check for players that have root flag but should not.
+#        Check for players that have root flag but should not.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.SelfRoot.Reject
-#        Description: Do not accept movement info and teleport to old position.
+#        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.SelfRoot.Threshold
-#        Description: Detections needed to trigger a penalty in one tick.
+#        Detections needed to trigger a penalty in one tick.
 #        Default:     1
 #
 #    Anticheat.SelfRoot.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     3 - Log, Report to GM
 #
 #    Anticheat.WrongAckData.Enable
-#        Description: Check for players sending wrong data in an ACK packet.
+#        Check for players sending wrong data in an ACK packet.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.WrongAckData.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     3
 #
 #    Anticheat.WrongAckData.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.PendingAckDelay.Enable
-#        Description: Check for players failing to acknowledge a forced movement change.
+#        Check for players failing to acknowledge a forced movement change.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.PendingAckDelay.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     3
 #
 #    Anticheat.PendingAckDelay.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.ExploreArea.Enable
-#        Description: Check for players that are exploring low level zones too quickly.
+#        Check for players that are exploring low level zones too quickly.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.ExploreArea.Threshold
-#        Description: Count of areas explored this session.
+#        Count of areas explored this session.
 #        Default:     100
 #
 #    Anticheat.ExploreArea.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.ExploreHighLevelArea.Enable
-#        Description: Check for players that are exploring high level zones too quickly.
+#        Check for players that are exploring high level zones too quickly.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.ExploreHighLevelArea.Threshold
-#        Description: Count of areas explored this session.
+#        Count of areas explored this session.
 #        Default:     50
 #
 #    Anticheat.ExploreHighLevelArea.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.ForbiddenArea.Enable
-#        Description: Check for players entering a forbidden area.
+#        Check for players entering a forbidden area.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.ForbiddenArea.Threshold
-#        Description: Detections needed to trigger a penalty.
+#        Detections needed to trigger a penalty.
 #        Default:     1
 #
 #    Anticheat.ForbiddenArea.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     3 - Log, Report to GM
 #
 #    Anticheat.Botting.Enable
-#        Description: Check for bot-like movement.
+#        Check for bot-like movement.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 #    Anticheat.Botting.MinPeriod
-#        Description: For how long client must exibit bot-like movement to trigger penalty.
+#        For how long client must exibit bot-like movement to trigger penalty.
 #        Default:     300000 (5 minutes)
 #
 #    Anticheat.Botting.MinPackets
-#        Description: Minimum number of movement packets that need to have been sent.
+#        Minimum number of movement packets that need to have been sent.
 #        Default:     160
 #
 #    Anticheat.Botting.MinTurnsMouse
 #    Anticheat.Botting.MinTurnsKeyboard
 #    Anticheat.Botting.MinTurnsAbnormal
-#        Description: Minimum number of turns that need to happen in the given period.
+#        Minimum number of turns that need to happen in the given period.
 #        Default:     20, 80, 5
 #
 #    Anticheat.Botting.Penalty
-#        Description: Action to take upon failing this check.
+#        Action to take upon failing this check.
 #        Default:     3 - Log, Report to GM
 #
 ###################################################################################################
@@ -2539,7 +2733,7 @@ Visibility.ForceActiveObjects = 1
 #                  0 (disabled)
 #
 #    DurabilityLoss.Enable
-#         Description: Enable durability loss
+#         Enable durability loss
 #         Default: 1 (enabled)
 #                  0 (disabled)
 #
@@ -2566,10 +2760,26 @@ Visibility.ForceActiveObjects = 1
 #         Default: 1 (enabled)
 #                  0 (disabled)
 #
+#    Corpses.UpdateMinutes
+#        Interval (minutes) for corpse cleanup/update processing.
+#        Default:     20
+#
+#    Bones.ExpireMinutes
+#        Minutes before bones expire and are removed.
+#        Default:     60
+#
 #    Death.Ghost.RunSpeed.World
 #    Death.Ghost.RunSpeed.Battleground
 #         Modifies the speed of player ghosts, removed upon reviving, not permanent/saved, in non-BG and BG maps
 #         Default: 1.0 (normal speed)
+#
+#    Rate.WarEffortResourceComplete
+#        Auto-complete rate for Ahn'Qiraj War Effort resource turn-ins.
+#        Default:     0.0
+#
+#    WarEffortResourceCompletePeriod
+#        Period (seconds) used with Rate.WarEffortResourceComplete auto-completion.
+#        Default:     86400 - (24 hours)
 #
 #    PvP.PoolSizePerFaction
 #         Defines the size of the active PvP pools of players per faction that's used to calculate standing on each
@@ -2687,6 +2897,15 @@ PvP.PoolSizePerFaction = 0
 #                 1800000 (30 minutes)
 #        Default: 0 - disable premade group matches (group always added to bg team in normal way)
 #
+#    BattleGround.PremadeQueue.MinGroupSize
+#        Minimum group size to be treated as a premade in the BG queue.
+#        Default:     6
+#
+#    BattleGround.TagInBattleGrounds
+#        Allow players to be tagged for PvP while inside battlegrounds.
+#        Default:     1 (Enabled)
+#                     0 (Disabled)
+#
 #    BattleGround.RandomizeQueues
 #        Randomize the queue positions
 #        Default: 0 - first players to queue will be invited first
@@ -2788,22 +3007,22 @@ LFG.MatchmakingTimer = 600
 #         Default: 50
 #
 #    Network.PacketBroadcast.ReduceVisDistance.DiffAbove
-#        Description: TODO
+#        If map packet broadcast lag (ms) exceeds this value, temporarily reduce
+#        visibility distance. 0 disables the mitigation.
 #        Default: 0
 #
 #    Network.TrustedProxyServers
-#        Description: Enables the parsing of Proxy Protocol v2 for specific IPs.
-#                     You can use this feature when your server is behind a proxy, load balancer, or similar component,
-#                     to retrieve the real IP address of players.
-#                     You need to enable Proxy Protocol v2 on both this server and the proxy/load balancer.
-#                     For example see HaProxy "send-proxy-v2" option.
-#                     Multiple servers can be separated with ','
+#        Enables the parsing of Proxy Protocol v2 for specific IPs.
+#        You can use this feature when your server is behind a proxy, load balancer, or similar component,
+#        to retrieve the real IP address of players.
+#        You need to enable Proxy Protocol v2 on both this server and the proxy/load balancer.
+#        For example see HaProxy "send-proxy-v2" option.
+#        Multiple servers can be separated with ','
 #        Default:     ""                      - (Disabled, no proxy)
 #        Example      "10.13.37.1,10.13.37.2" - (to allow multiple proxy servers)
 #
 #    Network.TimeoutSecsIfNoAuth
-#        Description: Kicks a player if they dont auth within a certain amount of time.
-#                     (in seconds)
+#        Kicks a player if they dont auth within a certain amount of time. (in seconds)
 #        Default: 10
 #                 0  - to disable
 #
@@ -2811,7 +3030,7 @@ LFG.MatchmakingTimer = 600
 
 Network.Threads = 1
 Network.SystemSendBuffer = -1
-Network.TcpNodelay = 1
+Network.TcpNoDelay = 1
 Network.KickOnBadPacket = 0
 Network.PacketBroadcast.Threads = 0
 Network.PacketBroadcast.Frequency = 50
@@ -2926,6 +3145,7 @@ CharDelete.KeepDays = 30
 #        Default: 50
 #
 ###################################################################################################################
+
 AHBot.Enable = 0
 AHBot.ah.fid = 120
 AHBot.itemcount = 50
@@ -3001,6 +3221,7 @@ AHBot.itemcount = 50
 #                 1 - on
 #
 ###################################################################################################################
+
 RandomBot.Enable = 0
 RandomBot.MinBots = 0
 RandomBot.MaxBots = 0
@@ -3020,8 +3241,37 @@ BattleBot.AutoEquip = 1
 BattleBot.AutoJoin = 0
 
 ###################################################################################################################
-#    Mail flooding mitigation
+# MAIL FLOODING MITIGATION
+#
+#    MailSpam.ExpireSecs
+#        Sliding window (seconds) for counting distinct destination accounts mailed.
+#                     Re-mailing an account already contacted in the window always succeeds.
+#        Default:     0 (makes prior contacts expire immediately, rate window effectivelly off)
+#
+#    MailSpam.MaxMails
+#        Max distinct destination accounts that may be mailed within ExpireSecs.
+#                     Further first-time recipients are blocked (ChatSpam log path).
+#        Default:     2
+#
+#    MailSpam.Level
+#        Character level threshold for the empty-mail content filter.
+#                     Used only when MailSpam.Item = 1.
+#        Default:     1
+#
+#    MailSpam.Money
+#        Minimum attached copper that bypasses the empty-mail filter.
+#                     Used only when MailSpam.Item = 1: senders below MailSpam.Level with
+#                     less attached money and no item are rejected.
+#        Default:     0
+#
+#    MailSpam.Item
+#        Enable the low-level empty-mail content filter (Level/Money/item checks).
+#                     When disabled, MailSpam.Level and MailSpam.Money are unused for that check.
+#        Default:     0 (Disabled)
+#                     1 (Enabled)
+#
 ###################################################################################################################
+
 MailSpam.ExpireSecs = 0
 MailSpam.MaxMails = 2
 MailSpam.Level = 1
@@ -3029,8 +3279,53 @@ MailSpam.Money = 0
 MailSpam.Item = 0
 
 ###################################################################################################################
-#    Dynamic respawn rates - Disabled by default
+# DYNAMIC RESPAWN RATES
+#
+#    NOTE: Disabled while DynamicRespawn.Range <= 0. Affects continent generic creature spawns.
+#          Elites need SPAWN_FLAG_FORCE_DYNAMIC_ELITE on the spawn to participate.
+#
+#    DynamicRespawn.Range
+#        Yards around the creature used to count nearby players.
+#        Default:     -1 (Disabled)
+#
+#    DynamicRespawn.PercentPerPlayer
+#        Percent of original respawn delay removed per counted player above PlayersThreshold.
+#        Default:     0.0
+#
+#    DynamicRespawn.MaxReductionRate
+#        Cap on total fractional reduction (e.g. 0.5 = at most 50% shorter).
+#        Default:     0.0
+#
+#    DynamicRespawn.MinRespawnTime
+#        Floor (seconds) for reduced respawn delay. Also skips reduction if current delay is already below this.
+#        Default:     0
+#
+#    DynamicRespawn.MinEliteRespawnTime
+#        Extra floor (seconds) for elite (and above) dynamic respawns.
+#        Default:     0
+#
+#    DynamicRespawn.MinIndoorRespawnTime
+#        Floor (seconds) for indoor non-elite dynamic respawns when > 0.
+#        Default:     0
+#
+#    DynamicRespawn.AffectRespawnTimeBelow
+#        Only creatures whose base respawn delay (seconds) is at/below this value are reduced.
+#        Default:     0
+#
+#    DynamicRespawn.AffectLevelBelow
+#        Only creatures at or below this level are affected.
+#        Default:     0
+#
+#    DynamicRespawn.PlayersThreshold
+#        Nearby player count that must be exceeded before reduction starts.
+#        Default:     0
+#
+#    DynamicRespawn.PlayersMaxLevelDiff
+#        Max level difference between nearby player and creature to count that player.
+#        Default:     0
+#
 ###################################################################################################################
+
 DynamicRespawn.Range = -1
 DynamicRespawn.PercentPerPlayer = 0
 DynamicRespawn.MaxReductionRate = 0

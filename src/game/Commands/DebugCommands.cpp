@@ -1864,7 +1864,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
         Loot l(nullptr);
         if (lootOwner)
             l.SetTeam(lootOwner->GetTeam());
-        tab->Process(l, *store, store->IsRatesAllowed());
+        tab->Process(l, *store, lootOwner, store->IsRatesAllowed());
         for (const auto& item : l.items)
             if (!lootOwner || !item.conditionId)
                 lootChances[item.itemid]++;
@@ -2494,65 +2494,101 @@ bool ChatHandler::HandleMmap(char* args)
     return true;
 }
 
-bool ChatHandler::HandleMmapConnection(char* /*args*/)
+bool ChatHandler::HandleMmapConnection(char* args)
 {
-    static bool hasStartPoint = false;
-    static float startX = 0.0f, startY = 0.0f, startZ = 0.0f;
-    static uint32 startMapId = 0;
+    struct OffMeshStartPoint
+    {
+        uint32 mapId;
+        float x, y, z;
+    };
 
+    static std::map<ObjectGuid, OffMeshStartPoint> startPoints;
     Player* pPlayer = m_session->GetPlayer();
+    ObjectGuid const playerGuid = pPlayer->GetObjectGuid();
 
-    if (!hasStartPoint)
+    if (ExtractLiteralArg(&args, "cancel"))
+    {
+        if (startPoints.erase(playerGuid))
+            SendSysMessage("Offmesh start point discarded.");
+        else
+            SendSysMessage("No offmesh start point recorded.");
+        return true;
+    }
+
+    std::map<ObjectGuid, OffMeshStartPoint>::iterator itr = startPoints.find(playerGuid);
+    if (itr == startPoints.end())
     {
         // First call: record start position
-        pPlayer->GetPosition(startX, startY, startZ);
-        startMapId = pPlayer->GetMapId();
-        hasStartPoint = true;
-        PSendSysMessage("Start point recorded at (%.2f, %.2f, %.2f). Move to end point and run command again.", startX, startY, startZ);
+        OffMeshStartPoint start;
+        start.mapId = pPlayer->GetMapId();
+        pPlayer->GetPosition(start.x, start.y, start.z);
+        startPoints[playerGuid] = start;
+        PSendSysMessage("Start point recorded at (%.2f, %.2f, %.2f).", start.x, start.y, start.z);
+        SendSysMessage("Move to the end point and run the command again (optional argument: agent radius, default 2.5).");
+        SendSysMessage("Use '.mmap connect cancel' to discard the start point.");
+        return true;
+    }
+
+    // Second call: record end position and write connection
+    if (pPlayer->GetMapId() != itr->second.mapId)
+    {
+        SendSysMessage("Error: You changed maps! Connection cancelled. Start again.");
+        startPoints.erase(itr);
+        return true;
+    }
+
+    // parse the radius before consuming the start point, so a bad argument does not discard it
+    float radius;
+    if (!ExtractOptFloat(&args, radius, 2.5f) || radius <= 0.0f)
+    {
+        SendSysMessage("Invalid radius argument. Start point kept - run the command again.");
+        return true;
+    }
+
+    OffMeshStartPoint const start = itr->second;
+    startPoints.erase(itr);
+
+    float endX, endY, endZ;
+    pPlayer->GetPosition(endX, endY, endZ);
+
+    // Detour only stores a connection whose START point lies inside the tile, so
+    // the tile must be derived from the start position. Axes are switched: the
+    // offmesh.txt tile convention is tileX from world Y, tileY from world X.
+    int32 tileX = int32(32 - start.y / SIZE_OF_GRIDS);
+    int32 tileY = int32(32 - start.x / SIZE_OF_GRIDS);
+
+    float const dist = sqrt(pow(endX - start.x, 2) + pow(endY - start.y, 2) + pow(endZ - start.z, 2));
+    if (dist > 100.0f)
+        PSendSysMessage("Warning: connection is %.0f yd long - did you forget an earlier start point? Check the output before using it.", dist);
+
+    int32 endTileX = int32(32 - endY / SIZE_OF_GRIDS);
+    int32 endTileY = int32(32 - endX / SIZE_OF_GRIDS);
+    if (endTileX != tileX || endTileY != tileY)
+        PSendSysMessage("Note: end point lies in neighboring tile [%d,%d] - this works, the connection is stored in the start point's tile.", endTileX, endTileY);
+
+    // Format: mapID tileX,tileY (start_x start_y start_z) (end_x end_y end_z) size
+    PSendSysMessage("Offmesh connection recorded:");
+    PSendSysMessage("%u %d,%d (%.6f %.6f %.6f) (%.6f %.6f %.6f) %.2f",
+                    start.mapId, tileX, tileY,
+                    start.x, start.y, start.z,
+                    endX, endY, endZ, radius);
+    PSendSysMessage("Copy the line into offmesh.txt, then rebuild: MoveMapGenerator %u --tile %d,%d --threads 1 --silent", start.mapId, tileX, tileY);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Copy the line into offmesh.txt, then rebuild: MoveMapGenerator %u --tile %d,%d --threads 1 --silent", start.mapId, tileX, tileY);
+
+    // Write to file
+    FILE* file = fopen("offmesh_connections.txt", "a");
+    if (file)
+    {
+        fprintf(file, "%u %d,%d (%.6f %.6f %.6f) (%.6f %.6f %.6f) %.2f\n",
+                start.mapId, tileX, tileY,
+                start.x, start.y, start.z,
+                endX, endY, endZ, radius);
+        fclose(file);
+        SendSysMessage("Written to offmesh_connections.txt");
     }
     else
     {
-        // Second call: record end position and write connection
-        if (pPlayer->GetMapId() != startMapId)
-        {
-            SendSysMessage("Error: You changed maps! Connection cancelled. Start again.");
-            hasStartPoint = false;
-            startX = startY = startZ = 0.0f;
-            return true;
-        }
-
-        // Switched x/y
-        int32 tileY = 32 - pPlayer->GetPositionX() / SIZE_OF_GRIDS;
-        int32 tileX = 32 - pPlayer->GetPositionY() / SIZE_OF_GRIDS;
-
-        // Format: mapID tileX,tileY (start_x start_y start_z) (end_x end_y end_z) size
-        PSendSysMessage("Offmesh connection recorded:");
-        PSendSysMessage("%u %d,%d (%.6f %.6f %.6f) (%.6f %.6f %.6f) 2.5",
-                        pPlayer->GetMapId(), tileX, tileY,
-                        startX, startY, startZ,
-                        pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
-        PSendSysMessage("Rebuild with: MoveMapGenerator %u --tile %d,%d", pPlayer->GetMapId(), tileX, tileY);
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Rebuild with: MoveMapGenerator %u --tile %d,%d", pPlayer->GetMapId(), tileX, tileY);
-
-        // Write to file
-        FILE* file = fopen("offmesh_connections.txt", "a");
-        if (file)
-        {
-            fprintf(file, "%u %d,%d (%.6f %.6f %.6f) (%.6f %.6f %.6f) 2.5\n",
-                    pPlayer->GetMapId(), tileX, tileY,
-                    startX, startY, startZ,
-                    pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
-            fclose(file);
-            SendSysMessage("Written to offmesh_connections.txt");
-        }
-        else
-        {
-            SendSysMessage("Warning: Could not write to offmesh_connections.txt");
-        }
-
-        // Reset state
-        hasStartPoint = false;
-        startX = startY = startZ = 0.0f;
+        SendSysMessage("Warning: Could not write to offmesh_connections.txt");
     }
 
     return true;

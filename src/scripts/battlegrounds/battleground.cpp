@@ -38,9 +38,7 @@ EndScriptData */
 enum
 {
     SPELL_SPIRIT_HEAL_CHANNEL       = 22011,                // Spirit Heal Channel
-
-    SPELL_SPIRIT_HEAL               = 22012,                // Spirit Heal
-
+    SPELL_SPIRIT_HEAL               = 22012,                // Spirit Heal (triggered by 22011)
     SPELL_WAITING_TO_RESURRECT      = 2584                  // players who cancel this aura don't want a resurrection
 };
 
@@ -48,7 +46,7 @@ struct npc_spirit_guideAI : ScriptedAI
 {
     explicit npc_spirit_guideAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        uiTimerRez = 0;
+        m_rezTimer = 0;
 
         npc_spirit_guideAI::Reset();
     }
@@ -57,24 +55,20 @@ struct npc_spirit_guideAI : ScriptedAI
     {
     }
 
-    uint32 uiTimerRez;
-
-    uint32 GetData(uint32 /*type*/) override
-    {
-        return uiTimerRez;
-    }
+    uint32 m_rezTimer;
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (uiTimerRez < uiDiff)
+        if (m_creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            return;
+
+        if (m_rezTimer < uiDiff)
         {
-            m_creature->InterruptNonMeleeSpells(true);
-            m_creature->CastSpell(m_creature, SPELL_SPIRIT_HEAL, true);
             m_creature->CastSpell(m_creature, SPELL_SPIRIT_HEAL_CHANNEL, false);
-            uiTimerRez = 30000;
+            m_rezTimer = std::max<uint32>(BATCHING_INTERVAL, sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY));
         }
         else
-            uiTimerRez -= uiDiff;
+            m_rezTimer -= uiDiff;
     }
 
     void CorpseRemoved(uint32 &) override

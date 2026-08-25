@@ -1227,6 +1227,16 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_FOLLOW_ESCORT:
+            {
+                if (tmp.followEscort.doFollow > 1)
+                {
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` using non-boolean value in datalong (%u) in SCRIPT_COMMAND_FOLLOW_ESCORT for script id %u",
+                        tablename, tmp.followEscort.doFollow, tmp.id);
+                    continue;
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())

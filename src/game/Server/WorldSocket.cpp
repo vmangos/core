@@ -539,10 +539,15 @@ void WorldSocket::SendPacket(WorldPacket packet)
         return;
     }
     m_sendQueue.push(std::move(packet));
+    // The flag must be set under the same lock that guards the queue: HandleResultOfAsyncWrite
+    // only clears it while holding the lock with an empty queue, so our push is either seen by
+    // the running loop or we observe the cleared flag and start a new one. Otherwise a packet
+    // pushed between its empty-check and clear would strand in the queue until the next send.
+    bool const alreadyRunning = m_sendQueueIsRunning.test_and_set();
     m_sendQueueLock.unlock();
 
     // Start AsyncProcessingSendQueue which take things from the queue
-    if (m_sendQueueIsRunning.test_and_set())
+    if (alreadyRunning)
         return; // already running
 
     m_socket.EnterIoContext([self = shared_from_this()](IO::NetworkError error)
@@ -565,11 +570,15 @@ void WorldSocket::HandleResultOfAsyncWrite(IO::NetworkError const& error, std::s
         return;
     }
 
+    m_sendQueueLock.lock();
     if (m_sendQueue.empty())
     {
+        // Must be cleared while holding the queue lock, see comment in SendPacket().
         m_sendQueueIsRunning.clear();
+        m_sendQueueLock.unlock();
         return;
     }
+    m_sendQueueLock.unlock();
 
     // Combine all packets into `alreadyAllocatedBuffer`
     alreadyAllocatedBuffer->clear();

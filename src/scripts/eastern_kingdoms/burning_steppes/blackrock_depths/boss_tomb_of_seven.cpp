@@ -26,7 +26,7 @@ EndScriptData */
 
 enum
 {
-    FACTION_NEUTRAL                     = 734,
+    FACTION_FRIENDLY                    = 35,
     FACTION_HOSTILE                     = 54,
 
     SPELL_SHADOWBOLTVOLLEY              = 15245,
@@ -43,6 +43,7 @@ struct boss_doomrelAI : public ScriptedAI
     boss_doomrelAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_bInitalized = false;
         Reset();
     }
 
@@ -56,6 +57,7 @@ struct boss_doomrelAI : public ScriptedAI
     uint32 m_uiWipeCheck_Timer;
     uint8 m_uiDwarfRound;
     bool m_bHasSummoned;
+    bool m_bInitalized;
 
     void Reset() override
     {
@@ -126,7 +128,8 @@ struct boss_doomrelAI : public ScriptedAI
                 if (!pDwarf->IsAlive() || pDwarf->IsDead())
                     pDwarf->Respawn();
 
-                pDwarf->SetFactionTemplateId(FACTION_NEUTRAL);
+                pDwarf->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                pDwarf->SetFactionTemplateId(FACTION_FRIENDLY);
             }
         }
     }
@@ -157,8 +160,7 @@ struct boss_doomrelAI : public ScriptedAI
                             {
                                 if (!pDwarf->SelectHostileTarget() || !pDwarf->GetVictim())
                                 {
-                                    if (m_pInstance)
-                                        m_pInstance->SetData(TYPE_TOMB_OF_SEVEN, FAIL);
+                                    m_pInstance->SetData(TYPE_TOMB_OF_SEVEN, FAIL);
                                 }
                             }
                         }
@@ -168,15 +170,17 @@ struct boss_doomrelAI : public ScriptedAI
                         m_uiWipeCheck_Timer -= diff;
                 }
             }
-            else if (m_pInstance->GetData(TYPE_TOMB_OF_SEVEN) == FAIL)
+            else if (m_pInstance->GetData(TYPE_TOMB_OF_SEVEN) == FAIL ||
+                     m_pInstance->GetData(TYPE_TOMB_OF_SEVEN) == NOT_STARTED && !m_bInitalized)
             {
                 for (m_uiDwarfRound = 0; m_uiDwarfRound < MAX_DWARF; ++m_uiDwarfRound)
                     CallToFight(false);
 
                 m_uiDwarfRound = 0;
                 m_uiCallToFight_Timer = 0;
+                m_bInitalized = true;
 
-                if (m_pInstance)
+                if (m_pInstance->GetData(TYPE_TOMB_OF_SEVEN) == FAIL)
                     m_pInstance->SetData(TYPE_TOMB_OF_SEVEN, NOT_STARTED);
             }
         }

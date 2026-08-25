@@ -610,8 +610,9 @@ class SpellMgr
             return false;
         }
         
-        static bool IsProfessionSpell(uint32 spellId);
         static bool IsProfessionOrRidingSpell(uint32 spellId);
+        static bool IsProfessionSpell(uint32 spellId);
+        static bool IsTradeskillSpell(uint32 spellId);
         static bool IsPrimaryProfessionSpell(uint32 spellId);
         bool IsPrimaryProfessionFirstRankSpell(uint32 spellId) const;
 

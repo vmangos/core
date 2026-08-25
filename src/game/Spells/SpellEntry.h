@@ -811,6 +811,7 @@ class SpellEntry
                 case SPELL_EFFECT_HEAL_MECHANICAL:
                 case SPELL_EFFECT_ATTACK_ME:
                 case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                case SPELL_EFFECT_SPIRIT_HEAL:
                     return true;
                 case SPELL_EFFECT_APPLY_AURA:
                 {
@@ -876,6 +877,11 @@ class SpellEntry
         bool IsSpellWithDelayableEffects() const
         {
             return Internal & SPELL_INTERNAL_DELAYABLE_EFFECTS;
+        }
+
+        bool IsEffectDelayMandatory() const
+        {
+            return Internal & SPELL_INTERNAL_MUST_DELAY_EFFECTS;
         }
 
         bool IsNextMeleeSwingSpell() const
