@@ -44,7 +44,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPackets::Petition::PetitionBuy c
     Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(packet.guidNPC, UNIT_NPC_FLAG_PETITIONER);
     if (!pCreature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandlePetitionBuyOpcode - %s not found or you can't interact with him.", packet.guidNPC.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandlePetitionBuyOpcode - %s not found or you can't interact with it.", packet.guidNPC.GetString().c_str());
         return;
     }
 
@@ -484,7 +484,7 @@ void WorldSession::SendPetitionShowList(ObjectGuid guid)
     Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_PETITIONER);
     if (!pCreature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandlePetitionShowListOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandlePetitionShowListOpcode - %s not found or you can't interact with it.", guid.GetString().c_str());
         return;
     }
 

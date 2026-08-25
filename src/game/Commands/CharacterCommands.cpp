@@ -2854,10 +2854,27 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
 
             TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first);
             TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId);
+            TrainerSpellData const* trainerSpellList = cSpells ? cSpells : (tSpells ? tSpells : nullptr);
 
-            uint32 trainerType = cSpells ? cSpells->trainerType : (tSpells ? tSpells->trainerType : 0);
+            if (!trainerSpellList)
+                continue;
+            
+            if (trainerSpellList->spellList.empty())
+                continue;
 
-            if (trainerType == TRAINER_TYPE_TRADESKILLS || trainerType == TRAINER_TYPE_MOUNTS)
+            // Skip unwanted valid trainers:
+            // Check whether a given spell is a profession or riding spell. If it is we skip the trainer
+            auto itr = trainerSpellList->spellList.begin();
+
+            if (IsProfessionOrRidingSkill(itr->second.reqSkill))
+                continue;
+
+            SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr->first);
+
+            if (!spellInfo)
+                continue;
+
+            if (SpellMgr::IsProfessionOrRidingSpell(spellInfo->EffectTriggerSpell[EFFECT_INDEX_0]))
                 continue;
 
             if (cSpells)

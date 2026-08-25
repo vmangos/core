@@ -10049,7 +10049,7 @@ bool ObjectMgr::LoadQuestGreetings()
                 if (!GetCreatureTemplate(entry))
                 {
                     if (!IsExistingCreatureId(entry))
-                        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `quest_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
+                        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `quest_greeting` have entry for nonexistent creature template (Entry: %u), ignored", entry);
                     continue;
                 }
                 break;
@@ -10058,14 +10058,14 @@ bool ObjectMgr::LoadQuestGreetings()
             {
                 if (!sObjectMgr.GetGameObjectTemplate(entry))
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `quest_greeting` have entry for nonexistent gameobject template (Entry: %u), ignore", entry);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `quest_greeting` have entry for nonexistent gameobject template (Entry: %u), ignored", entry);
                     continue;
                 }
                 break;
             }
             default:
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `quest_greeting` have entry with invalid type (Type: %u), ignore", type);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `quest_greeting` have entry with invalid type (Type: %u), ignored", type);
                 continue;
             }
         }
@@ -10113,9 +10113,9 @@ bool ObjectMgr::LoadQuestGreetings()
 
 bool ObjectMgr::LoadTrainerGreetings()
 {
-    m_TrainerGreetingLocaleMap.clear();
+    m_TrainerGreetingMap.clear();
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` FROM `npc_trainer_greeting`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `trainerType`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` FROM `npc_trainer_greeting`"));
 
     if (!result)
     {
@@ -10139,21 +10139,30 @@ bool ObjectMgr::LoadTrainerGreetings()
         if (!GetCreatureTemplate(entry))
         {
             if (!IsExistingCreatureId(entry))
-                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `npc_trainer_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `npc_trainer_greeting` have entry for nonexistent creature template (Entry: %u), ignored", entry);
             continue;
         }
 
-        TrainerGreetingLocale& data = m_TrainerGreetingLocaleMap[entry];
+        uint8 trainerType = fields[1].GetUInt8();
 
+        if (trainerType != GREETING_TYPE_SMALL && trainerType != GREETING_TYPE_LARGE)
+        {
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `npc_trainer_greeting` has entry with invalid trainerType %u (Entry: %u), ignored", trainerType, entry);
+            continue;
+        }
+
+        TrainerGreeting& data = m_TrainerGreetingMap[entry];
+        
+        data.trainerType = trainerType;
         data.Content.resize(1);
         ++count;
 
-        // 0 -> default, idx in to idx+1
-        data.Content[0] = fields[1].GetCppString();
+        // 0 -> default, idx in to idx+2
+        data.Content[0] = fields[2].GetCppString();
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
-            std::string str = fields[i + 1].GetCppString();
+            std::string str = fields[i + 2].GetCppString();
             if (!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -10418,13 +10427,13 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         SpellEntry const* spellinfo = sSpellMgr.GetSpellEntry(spell);
         if (!spellinfo)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` (Entry: %u ) has non existing spell %u, ignore", tableName, entry, spell);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` (Entry: %u ) has non existing spell %u, ignored", tableName, entry, spell);
             continue;
         }
 
         if (spellinfo->Effect[0] != SPELL_EFFECT_LEARN_SPELL)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` for trainer (Entry: %u) has non-learning spell %u, ignore", tableName, entry, spell);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` for trainer (Entry: %u) has non-learning spell %u, ignored", tableName, entry, spell);
             for (uint32 spell2 = 1; spell2 < sSpellMgr.GetMaxSpellId(); ++spell2)
             {
                 if (SpellEntry const* spellEntry2 = sSpellMgr.GetSpellEntry(spell2))
@@ -10441,7 +10450,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
 
         if (!SpellMgr::IsSpellValid(spellinfo))
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` (Entry: %u) has broken learning spell %u, ignore", tableName, entry, spell);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` (Entry: %u) has broken learning spell %u, ignored", tableName, entry, spell);
             continue;
         }
 
@@ -10449,7 +10458,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         {
             if (talentIds.find(spell) == talentIds.end())
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has talent as learning spell %u, ignore", tableName, spell);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` has talent as learning spell %u, ignored", tableName, spell);
                 talentIds.insert(spell);
             }
             continue;
@@ -10462,7 +10471,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
             if (!cInfo)
             {
                 if (!IsExistingCreatureId(entry))
-                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have entry for nonexistent creature template (Entry: %u), ignore", tableName, entry);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have entry for nonexistent creature template (Entry: %u), ignored", tableName, entry);
                 continue;
             }
 
@@ -10470,7 +10479,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
             {
                 if (skip_trainers.find(entry) == skip_trainers.end())
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have data for creature (Entry: %u) without trainer flag, ignore", tableName, entry);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` have data for creature (Entry: %u) without trainer flag, ignored", tableName, entry);
                     skip_trainers.insert(entry);
                 }
                 continue;
@@ -10480,7 +10489,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
             {
                 if (tSpells->spellList.find(spell) != tSpells->spellList.end())
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` (Entry: %u) has spell %u listed in trainer template %u, ignore", tableName, entry, spell, cInfo->trainer_id);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` (Entry: %u) has spell %u listed in trainer template %u, ignored", tableName, entry, spell, cInfo->trainer_id);
                     continue;
                 }
             }
@@ -10502,11 +10511,6 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         }
         else
             trainerSpell.reqLevel = spellinfo->spellLevel;
-
-        if (SpellMgr::IsProfessionSpell(spellinfo->EffectTriggerSpell[0]))
-            data.trainerType = TRAINER_TYPE_TRADESKILLS;
-        else if (SpellMgr::IsRidingSpell(spellinfo->EffectTriggerSpell[0]))
-            data.trainerType = TRAINER_TYPE_MOUNTS;
 
         ++count;
 

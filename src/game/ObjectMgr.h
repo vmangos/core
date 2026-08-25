@@ -189,9 +189,18 @@ enum
     QUESTGIVER_TYPE_MAX = 2,
 };
 
-struct TrainerGreetingLocale
+// trainer greeting type from sniffs (valid values are 0 and 2)
+// required to correctly display training UI on SMSG_TRAINER_LIST
+enum TrainerType
 {
-    TrainerGreetingLocale() { }
+    GREETING_TYPE_SMALL = 0,
+    GREETING_TYPE_LARGE = 2,
+};
+
+struct TrainerGreeting
+{
+    TrainerGreeting() : trainerType(GREETING_TYPE_SMALL) {}
+    uint8 trainerType;                                      
     std::vector<std::string> Content;                       // 0 -> default, i -> i-1 locale index
 };
 
@@ -263,7 +272,7 @@ typedef std::unordered_map<uint32,QuestGreetingLocale> QuestGreetingLocaleMap;
 typedef std::unordered_map<uint32,GossipMenuItemsLocale> GossipMenuItemsLocaleMap;
 typedef std::unordered_map<uint32,PointOfInterestLocale> PointOfInterestLocaleMap;
 typedef std::unordered_map<uint32,AreaLocale> AreaLocaleMap;
-typedef std::unordered_map<uint32, TrainerGreetingLocale> TrainerGreetingLocaleMap;
+typedef std::unordered_map<uint32, TrainerGreeting> TrainerGreetingMap;
 
 typedef std::multimap<int32, uint32> ExclusiveQuestGroupsMap;
 typedef std::multimap<uint32, ItemRequiredTarget> ItemRequiredTargetMap;
@@ -1181,10 +1190,10 @@ class ObjectMgr
             return &itr->second;
         }
 
-        TrainerGreetingLocale const* GetTrainerGreetingLocale(uint32 entry) const
+        TrainerGreeting const* GetTrainerGreeting(uint32 entry) const
         {
-            auto itr = m_TrainerGreetingLocaleMap.find(entry);
-            if (itr == m_TrainerGreetingLocaleMap.end()) return nullptr;
+            auto itr = m_TrainerGreetingMap.find(entry);
+            if (itr == m_TrainerGreetingMap.end()) return nullptr;
             return &itr->second;
         }
 
@@ -1609,7 +1618,7 @@ class ObjectMgr
         MangosStringLocaleMap m_MangosStringLocaleMap;
         BroadcastTextLocaleMap m_BroadcastTextLocaleMap;
         QuestGreetingLocaleMap m_QuestGreetingLocaleMap[QUESTGIVER_TYPE_MAX];
-        TrainerGreetingLocaleMap m_TrainerGreetingLocaleMap;
+        TrainerGreetingMap m_TrainerGreetingMap;
         GossipMenuItemsLocaleMap m_GossipMenuItemsLocaleMap;
         PointOfInterestLocaleMap m_PointOfInterestLocaleMap;
         AreaLocaleMap m_AreaLocaleMap;

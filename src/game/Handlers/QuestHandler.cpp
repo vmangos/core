@@ -82,7 +82,7 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPackets::Quest::QuestgiverHe
 
     if (!pCreature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleQuestgiverHelloOpcode - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleQuestgiverHelloOpcode - %s not found or you can't interact with it.", packet.guid.GetString().c_str());
         return;
     }
 

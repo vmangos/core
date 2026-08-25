@@ -43,7 +43,7 @@ void WorldSession::HandleAuctionHelloOpcode(WorldPackets::AuctionHouse::AuctionH
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.auctioneerGuid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleAuctionHelloOpcode - %s not found or you can't interact with him.", packet.auctioneerGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleAuctionHelloOpcode - %s not found or you can't interact with it.", packet.auctioneerGuid.GetString().c_str());
         return;
     }
 

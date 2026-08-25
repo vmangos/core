@@ -39,7 +39,7 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPackets::Skill::TalentWipe
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.trainerGuid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTalentWipeConfirmOpcode - %s not found or you can't interact with him.", packet.trainerGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTalentWipeConfirmOpcode - %s not found or you can't interact with it.", packet.trainerGuid.GetString().c_str());
         return;
     }
 

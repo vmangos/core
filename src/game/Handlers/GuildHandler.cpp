@@ -688,7 +688,7 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPackets::Guild::SaveGuildEmb
     {
         //[-ZERO] fails silently, not "That's not an emblem vendor!"
         SendSaveGuildEmblem(ERR_GUILDEMBLEM_FAIL_NO_MESSAGE);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleSaveGuildEmblemOpcode - %s not found or you can't interact with him.", packet.vendorGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleSaveGuildEmblemOpcode - %s not found or you can't interact with it.", packet.vendorGuid.GetString().c_str());
         return;
     }
 
