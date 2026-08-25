@@ -270,11 +270,6 @@ inline bool IsProfessionSkill(uint32 skill)
     return  IsPrimaryProfessionSkill(skill) || skill == SKILL_FISHING || skill == SKILL_COOKING || skill == SKILL_FIRST_AID;
 }
 
-inline bool IsRidingSkill(uint32 skill)
-{
-    return skill == SKILL_RIDING;
-}
-
 inline bool IsProfessionOrRidingSkill(uint32 skill)
 {
     return  IsProfessionSkill(skill) || skill == SKILL_RIDING;
