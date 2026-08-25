@@ -595,11 +595,9 @@ typedef std::unordered_map<uint32 /*spellid*/, TrainerSpell> TrainerSpellMap;
 
 struct TrainerSpellData
 {
-    TrainerSpellData() : trainerType(0) {}
-
+    TrainerSpellData() {}
+    
     TrainerSpellMap spellList;
-    uint32 trainerType;                                     // trainer greeting type from sniffs (valid values only 0 and 2)
-                                                            // required to correctly display training UI
     TrainerSpell const* Find(uint32 spell_id) const;
     void Clear() { spellList.clear(); }
 };
