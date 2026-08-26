@@ -62,9 +62,9 @@ enum
     SPELL_ARCHAEDAS_AWAKEN        = 10347,
     SPELL_AWAKEN_EARTHEN_GUARDIAN = 10252,
     SPELL_AWAKEN_VAULT_WARDER     = 10258,
-    /* spells cast from summoning ritual altars, send scripted_event_id events
-    SPELL_ULDMAN_SUB_BOSS_AGGRO  = 11568, event 2228 event_awaken_stone_keeper
-    SPELL_ULDMAN_BOSS_AGGRO      = 10340, event 2268 event_awaken_archaedas*/
+    /* spells cast from summoning ritual altars, start event scripts
+    SPELL_ULDMAN_SUB_BOSS_AGGRO  = 11568, event 2228
+    SPELL_ULDMAN_BOSS_AGGRO      = 10340, event 2268*/
     // Earthen Custodians
     SPELL_RECONSTRUCT             = 10260,
     // Ironaya

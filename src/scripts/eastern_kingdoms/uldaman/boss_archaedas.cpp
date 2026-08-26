@@ -41,22 +41,6 @@ enum Texts
     SAY_SLAY            = 6215
 };
 
-// Return true to avoid db script attempt
-bool ProcessEventId_event_awaken_archaedas(uint32 eventId, Object* source, Object* target, bool isStart)
-{
-    if (!source || source->GetTypeId() != TYPEID_PLAYER)
-        return true;
-
-    // Couldn't get Altar, block event
-    if (!target)
-        return true;
-
-    if (ScriptedInstance* instance = dynamic_cast<ScriptedInstance*>(((Player*)source)->GetInstanceData()))
-        instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, IN_PROGRESS);
-
-    return true;
-}
-
 struct boss_archaedasAI : public ScriptedAI
 {
     boss_archaedasAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -423,10 +407,5 @@ void AddSC_boss_archaedas()
     newscript = new Script;
     newscript->Name = "mob_archaedas_minions";
     newscript->GetAI = &GetAI_mob_archaedas_minions;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "event_awaken_archaedas";
-    newscript->pProcessEventId = &ProcessEventId_event_awaken_archaedas;
     newscript->RegisterSelf();
 }

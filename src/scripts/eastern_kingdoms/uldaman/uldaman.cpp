@@ -51,21 +51,6 @@ bool GOHello_go_keystone_chamber(Player* pPlayer, GameObject* pGo)
     return false;
 }
 
-// Return true to avoid db script attempt
-bool ProcessEventId_event_awaken_stone_keeper(uint32 eventId, Object* source, Object* target, bool isStart)
-{
-    if (!source || source->GetTypeId() != TYPEID_PLAYER)
-        return true;
-
-    if (!target)
-        return true;
-
-    if (ScriptedInstance* instance = dynamic_cast<ScriptedInstance*>(((Player*)source)->GetInstanceData()))
-        instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, IN_PROGRESS);
-
-    return true;
-}
-
 struct mob_stone_keeperAI : public ScriptedAI
 {
     mob_stone_keeperAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -279,11 +264,6 @@ void AddSC_uldaman()
     newscript = new Script;
     newscript->Name = "go_keystone_chamber";
     newscript->pGOHello = &GOHello_go_keystone_chamber;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "event_awaken_stone_keeper";
-    newscript->pProcessEventId = &ProcessEventId_event_awaken_stone_keeper;
     newscript->RegisterSelf();
 
     newscript = new Script;
