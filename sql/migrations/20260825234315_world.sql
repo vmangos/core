@@ -25,7 +25,6 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3068, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, 0, NULL, 0, 10656),     -- Trainer gossip menu option for Thorkaf Dragoneye (Dragonscale Leatherworking - Horde)
 (3069, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, 0, NULL, 0, 10658);     -- Trainer gossip menu option for Brumn Winterhoof (Elemental Leatherworking - Horde)
 
-
 -- Update condition for existing trainer gossip menu options
 UPDATE `gossip_menu_option` SET `condition_id` = 1354 WHERE `option_id` = 5 AND `menu_id` IN (
 597,       -- Grumnus Steelshaper (Armorsmithing - Alliance)
@@ -541,6 +540,9 @@ UPDATE `npc_trainer_greeting` SET `trainer_type` = 0 WHERE `entry` = 12042;
 UPDATE `npc_trainer_greeting` SET `trainer_type` = 0 WHERE `entry` = 13084;
 UPDATE `npc_trainer_greeting` SET `trainer_type` = 0 WHERE `entry` = 13283;
 UPDATE `npc_trainer_greeting` SET `trainer_type` = 0 WHERE `entry` = 13417;
+
+-- LANG_NPC_TAINER_HELLO is no longer used
+DELETE FROM `mangos_string` WHERE `entry` = 51;
 
 -- End of migration.
 END IF;
