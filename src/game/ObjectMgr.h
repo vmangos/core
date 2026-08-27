@@ -199,7 +199,7 @@ enum TrainerType
 
 struct TrainerGreeting
 {
-    TrainerGreeting() : trainerType(GREETING_TYPE_SMALL) {}
+    TrainerGreeting() : trainerType(GREETING_TYPE_LARGE) {}
     uint8 trainerType;                                      
     std::vector<std::string> Content;                       // 0 -> default, i -> i-1 locale index
 };
