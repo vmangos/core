@@ -283,6 +283,47 @@ namespace WorldPackets { namespace Spell
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class SpellStart final : public ServerPacket
+    {
+    public:
+        ObjectGuid casterGuid;
+        ObjectGuid unitCasterGuid;
+        uint32 spellId = 0;
+        uint16 castFlags = 0;
+        uint32 castTimer = 0;
+        SpellCastTargets targets;
+        uint32 ammoDisplayId = 0;
+        uint32 ammoInventoryType = 0;
+
+        explicit SpellStart() : ServerPacket(SMSG_SPELL_START) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SpellGo final : public ServerPacket
+    {
+    public:
+        struct SpellGoMissTarget
+        {
+            SpellGoMissTarget(ObjectGuid target, uint8 miss, uint8 reflect) : targetGuid(target), missCondition(miss), reflectResult(reflect) {};
+            ObjectGuid targetGuid;
+            uint8 missCondition = 0;
+            uint8 reflectResult = 0;
+        };
+
+        ObjectGuid casterGuid;
+        ObjectGuid unitCasterGuid;
+        uint32 spellId = 0;
+        uint16 castFlags = 0;
+        std::vector<ObjectGuid> hitTargets;
+        std::vector<SpellGoMissTarget> missTargets;
+        SpellCastTargets targets;
+        uint32 ammoDisplayId = 0;
+        uint32 ammoInventoryType = 0;
+
+        explicit SpellGo() : ServerPacket(SMSG_SPELL_GO) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Spell
 
 #endif // MANGOS_PACKETS_SPELL_H

@@ -4471,21 +4471,6 @@ void Spell::SendCastResult(Player const* caster, SpellEntry const* spellInfo, Sp
     caster->GetSession()->SendPacket(std::move(packet));
 }
 
-static void WriteGuidHelper(WorldPacket& data, Object* pCaster)
-{
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    if (pCaster)
-        data << pCaster->GetPackGUID();
-    else
-        data << ObjectGuid().WriteAsPacked();
-#else
-    if (pCaster)
-        data << pCaster->GetGUID();
-    else
-        data << uint64(0);
-#endif
-}
-
 void Spell::SendSpellStart()
 {
     if (!IsNeedSendToClient())
@@ -4493,7 +4478,7 @@ void Spell::SendSpellStart()
 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
-    uint32 castFlags = CAST_FLAG_UNKNOWN2;
+    uint16 castFlags = CAST_FLAG_UNKNOWN2;
     if (m_spellInfo->IsRangedSpell())
         castFlags |= CAST_FLAG_AMMO;
 
@@ -4502,25 +4487,25 @@ void Spell::SendSpellStart()
     if (m_spellInfo->Id == 25648)
         castFlags = CAST_FLAG_HIDDEN_COMBATLOG;
 
-    WorldPacket data(SMSG_SPELL_START, (8 + 8 + 4 + 2 + 4));
-
+    auto packet = std::make_unique<WorldPackets::Spell::SpellStart>();
+    
     if (m_CastItem)
-        WriteGuidHelper(data, m_CastItem);
+        packet->casterGuid = m_CastItem->GetObjectGuid();
     else
-        WriteGuidHelper(data, m_caster);
+        packet->casterGuid = m_caster->GetObjectGuid();
 
-    WriteGuidHelper(data, m_casterUnit);
+    if (m_casterUnit)
+        packet->unitCasterGuid = m_casterUnit->GetObjectGuid();
 
-    data << uint32(m_spellInfo->Id);                        // spellId
-    data << uint16(castFlags);                              // cast flags
-    data << uint32(m_timer);                                // delay?
+    packet->spellId = m_spellInfo->Id;
+    packet->castFlags = castFlags;
+    packet->castTimer = m_timer;
+    packet->targets = m_targets;
 
-    data << m_targets;
+    if (castFlags & CAST_FLAG_AMMO) // projectile info
+        WriteAmmoToPacket(packet->ammoDisplayId, packet->ammoInventoryType);
 
-    if (castFlags & CAST_FLAG_AMMO)                         // projectile info
-        WriteAmmoToPacket(&data);
-
-    m_caster->SendObjectMessageToSet(&data, true);
+    m_caster->SendObjectMessageToSet(std::move(packet), true);
 }
 
 void Spell::SendSpellGo()
@@ -4532,37 +4517,33 @@ void Spell::SendSpellGo()
         return;
     }
 
-    uint32 castFlags = CAST_FLAG_UNKNOWN9;
+    uint16 castFlags = CAST_FLAG_UNKNOWN9;
     if (m_spellInfo->IsRangedSpell())
         castFlags |= CAST_FLAG_AMMO;                        // arrows/bullets visual
 
-    WorldPacket data(SMSG_SPELL_GO, 53);                    // guess size
+    auto packet = std::make_unique<WorldPackets::Spell::SpellGo>();
 
     if (m_CastItem)
-        WriteGuidHelper(data, m_CastItem);
+        packet->casterGuid = m_CastItem->GetObjectGuid();
     else
-        WriteGuidHelper(data, m_caster);
+        packet->casterGuid = m_caster->GetObjectGuid();
 
-    WriteGuidHelper(data, m_casterUnit);
+    if (m_casterUnit)
+        packet->unitCasterGuid = m_casterUnit->GetObjectGuid();
 
-    data << uint32(m_spellInfo->Id);                        // spellId
-    data << uint16(castFlags);                              // cast flags
+    packet->spellId = m_spellInfo->Id;
+    packet->castFlags = castFlags;
+    WriteSpellGoTargets(*packet);
+    packet->targets = m_targets;
 
-    WriteSpellGoTargets(&data);
+    if (castFlags & CAST_FLAG_AMMO) // projectile info
+        WriteAmmoToPacket(packet->ammoDisplayId, packet->ammoInventoryType);
 
-    data << m_targets;
-
-    if (castFlags & CAST_FLAG_AMMO)                         // projectile info
-        WriteAmmoToPacket(&data);
-
-    m_caster->SendObjectMessageToSet(&data, true);
+    m_caster->SendObjectMessageToSet(std::move(packet), true);
 }
 
-void Spell::WriteAmmoToPacket(WorldPacket* data)
+void Spell::WriteAmmoToPacket(uint32& ammoDisplayId, uint32& ammoInventoryType)
 {
-    uint32 ammoInventoryType = 0;
-    uint32 ammoDisplayID = 0;
-
     if (m_caster->IsPlayer())
     {
         Item *pItem = ((Player*)m_caster)->GetWeaponForAttack(RANGED_ATTACK);
@@ -4570,7 +4551,7 @@ void Spell::WriteAmmoToPacket(WorldPacket* data)
         {
             ammoInventoryType = pItem->GetProto()->InventoryType;
             if (ammoInventoryType == INVTYPE_THROWN)
-                ammoDisplayID = pItem->GetProto()->DisplayInfoID;
+                ammoDisplayId = pItem->GetProto()->DisplayInfoID;
             else
             {
                 uint32 ammoID = ((Player*)m_caster)->GetUInt32Value(PLAYER_AMMO_ID);
@@ -4579,7 +4560,7 @@ void Spell::WriteAmmoToPacket(WorldPacket* data)
                     ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(ammoID);
                     if (pProto)
                     {
-                        ammoDisplayID = pProto->DisplayInfoID;
+                        ammoDisplayId = pProto->DisplayInfoID;
                         ammoInventoryType = pProto->InventoryType;
                     }
                 }
@@ -4600,99 +4581,57 @@ void Spell::WriteAmmoToPacket(WorldPacket* data)
                         case ITEM_SUBCLASS_WEAPON_THROWN:
                             if (m_casterUnit)
                             {
-                                ammoDisplayID = m_casterUnit->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + i);
+                                ammoDisplayId = m_casterUnit->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + i);
                                 ammoInventoryType = m_casterUnit->GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (i * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_INVENTORYTYPE);
                             }
                             break;
                         case ITEM_SUBCLASS_WEAPON_BOW:
                         case ITEM_SUBCLASS_WEAPON_CROSSBOW:
-                            ammoDisplayID = 5996;           // is this need fixing?
+                            ammoDisplayId = 5996;           // is this need fixing?
                             ammoInventoryType = INVTYPE_AMMO;
                             break;
                         case ITEM_SUBCLASS_WEAPON_GUN:
-                            ammoDisplayID = 5998;           // is this need fixing?
+                            ammoDisplayId = 5998;           // is this need fixing?
                             ammoInventoryType = INVTYPE_AMMO;
                             break;
                     }
 
-                    if (ammoDisplayID)
+                    if (ammoDisplayId)
                         break;
                 }
             }
         }
     }
-
-    *data << uint32(ammoDisplayID);
-    *data << uint32(ammoInventoryType);
 }
 
-void Spell::WriteSpellGoTargets(WorldPacket* data)
+void Spell::WriteSpellGoTargets(WorldPackets::Spell::SpellGo& packet)
 {
     // This function also fill data for channeled spells:
     // m_needAliveTargetMask req for stop channelig if one target die
     for (auto& ihit : m_UniqueTargetInfo)
     {
-        if (ihit.effectMask == 0)                  // No effect apply - all immuned add state
-            // possibly SPELL_MISS_IMMUNE2 for this??
+        // No effect apply - all immuned
+        if (ihit.effectMask == 0)
             ihit.missCondition = SPELL_MISS_IMMUNE2;
     }
-
-    uint32 hit = 0;
-    size_t hitPos = data->wpos();
-    *data << (uint8)0; // placeholder
 
     for (auto& ihit : m_UniqueTargetInfo)
     {
         if (ihit.missCondition == SPELL_MISS_NONE)
         {
-            *data << ihit.targetGUID;                          // in 1.12.1 expected all targets
+            packet.hitTargets.push_back(ihit.targetGUID);
             m_needAliveTargetMask |= ihit.effectMask;
-            ++hit;
         }
+        else
+            packet.missTargets.emplace_back(ihit.targetGUID, (uint8)ihit.missCondition, (uint8)ihit.reflectResult);
     }
 
     for (const auto& ighit : m_UniqueGOTargetInfo)
-    {
-        *data << ighit.targetGUID;                         // Always hits
-        ++hit;
-    }
+        packet.hitTargets.push_back(ighit.targetGUID); // Always hits
 
-    uint32 miss = 0;
-    size_t missPos = data->wpos();
-    *data << (uint8)0; // placeholder
-    for (const auto& ihit : m_UniqueTargetInfo)
-    {
-        if (ihit.missCondition != SPELL_MISS_NONE)        // Add only miss
-        {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
-            *data << (ihit.targetGUID);
-            *data << uint8(ihit.missCondition);
-            if (ihit.missCondition == SPELL_MISS_REFLECT)
-                *data << uint8(ihit.reflectResult);
-#else
-            // some types not supported by earlier clients
-            uint8 missInfo = ihit.missCondition;
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_1
-            if (ihit.missCondition == SPELL_MISS_REFLECT)
-                missInfo = SPELL_MISS_DEFLECT;
-#else
-            if (ihit.missCondition > SPELL_MISS_IMMUNE2)
-                missInfo = SPELL_MISS_RESIST;
-#endif
-            
-            *data << uint8(missInfo);
-            *data << (ihit.targetGUID);
-#endif
-            ++miss;
-        }
-    }
     // Reset m_needAliveTargetMask for non channeled spell
     if (!m_channeled)
         m_needAliveTargetMask = 0;
-
-    data->put<uint8>(hitPos, (uint8)hit);
-    data->put<uint8>(missPos, (uint8)miss);
 }
 
 void Spell::SendLogExecute()

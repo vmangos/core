@@ -30,6 +30,7 @@
 #include "Object.h"
 #include "Player.h"
 #include "SpellCastTargetsInfo.h"
+#include "Packets/Spell.h"
 #include <vector>
 #include <memory>
 
@@ -251,8 +252,8 @@ class Spell
 
         void DoCreateItem(SpellEffectIndex effIdx, uint32 itemtype);
 
-        void WriteSpellGoTargets(WorldPacket* data);
-        void WriteAmmoToPacket(WorldPacket* data);
+        void WriteSpellGoTargets(WorldPackets::Spell::SpellGo& packet);
+        void WriteAmmoToPacket(uint32& ammoDisplayId, uint32& ammoInventoryType);
 
         typedef std::list<Unit*> UnitList;
         void FillTargetMap();

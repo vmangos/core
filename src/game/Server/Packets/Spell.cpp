@@ -189,3 +189,66 @@ void WorldPackets::Spell::SetSpellModifier::AppendBodyTo(ByteBuffer& buffer) con
     buffer << modOp;
     buffer << value;
 }
+
+void WorldPackets::Spell::SpellStart::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid.WriteAsPackedClientBuildAware();
+    buffer << unitCasterGuid.WriteAsPackedClientBuildAware();
+
+    buffer << spellId;
+    buffer << castFlags;
+    buffer << castTimer;
+    buffer << targets;
+
+    if (castFlags & CAST_FLAG_AMMO)
+    {
+        buffer << ammoDisplayId;
+        buffer << ammoInventoryType;
+    }
+}
+
+void WorldPackets::Spell::SpellGo::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid.WriteAsPackedClientBuildAware();
+    buffer << unitCasterGuid.WriteAsPackedClientBuildAware();
+
+    buffer << spellId;
+    buffer << castFlags;
+
+    uint8 const hitTargetCount = (uint8)std::min<size_t>(UINT8_MAX, hitTargets.size());
+    buffer << hitTargetCount;
+    for (uint8 i = 0; i < hitTargetCount; ++i)
+        buffer << hitTargets[0];
+
+    uint8 const missTargetsCount = (uint8)std::min<size_t>(UINT8_MAX, missTargets.size());
+    buffer << missTargetsCount;
+    for (uint8 i = 0; i < missTargetsCount; ++i)
+    {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+        buffer << missTargets[i].targetGuid;
+        buffer << missTargets[i].missCondition;
+        if (missTargets[i].missCondition == SPELL_MISS_REFLECT)
+            buffer << missTargets[i].reflectResult;
+#else
+        // some types not supported by earlier clients
+        uint8 missInfo = missTargets[i].missCondition;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_1
+        if (missInfo == SPELL_MISS_REFLECT)
+            missInfo = SPELL_MISS_DEFLECT;
+#else
+        if (missInfo > SPELL_MISS_IMMUNE2)
+            missInfo = SPELL_MISS_RESIST;
+#endif
+        buffer << missInfo;
+        buffer << missTargets[i].targetGuid;
+#endif
+    }
+    
+    buffer << targets;
+
+    if (castFlags & CAST_FLAG_AMMO)
+    {
+        buffer << ammoDisplayId;
+        buffer << ammoInventoryType;
+    }
+}
