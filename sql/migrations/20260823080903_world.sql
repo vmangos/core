@@ -173,6 +173,15 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 
 DELETE FROM `pool_template` WHERE  `entry` IN (1288, 8109);
 
+-- Events list for Glutton
+DELETE FROM `creature_ai_events` WHERE `creature_id`=8567;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(856701, 8567, 0, 4, 0, 100, 0, 0, 0, 0, 0, 856701, 0, 0, 'Glutton - Yell on Aggro'),
+(856702, 8567, 0, 2, 0, 100, 0, 50, 0, 0, 0, 856702, 0, 0, 'Glutton - Cast Frenzy at 50% HP'),
+(856703, 8567, 0, 2, 0, 100, 0, 15, 0, 0, 0, 856703, 0, 0, 'Glutton - Cast Frenzy at 15% HP'),
+(856704, 8567, 0, 5, 0, 100, 1, 0, 0, 1, 0, 856704, 0, 0, 'Glutton - Yell on Kill');
+
+
 -- End of migration.
 END IF;
 END??
