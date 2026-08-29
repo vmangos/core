@@ -218,7 +218,7 @@ void WorldPackets::Spell::SpellGo::AppendBodyTo(ByteBuffer& buffer) const
     uint8 const hitTargetCount = (uint8)std::min<size_t>(UINT8_MAX, hitTargets.size());
     buffer << hitTargetCount;
     for (uint8 i = 0; i < hitTargetCount; ++i)
-        buffer << hitTargets[0];
+        buffer << hitTargets[i];
 
     uint8 const missTargetsCount = (uint8)std::min<size_t>(UINT8_MAX, missTargets.size());
     buffer << missTargetsCount;
