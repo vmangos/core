@@ -510,6 +510,18 @@ set (game_SRCS
 
 )
 
+if(USE_AUTO_TESTS)
+  list(APPEND game_SRCS
+    AutoTesting/AutoTestingMgr.cpp
+    AutoTesting/AutoTestingMgr.h
+    AutoTesting/TestLoader.cpp
+    AutoTesting/TestMapUtils.cpp
+    AutoTesting/TestMapUtils.h
+    AutoTesting/Tests/Pathfinding.cpp
+  )
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/AutoTesting)
+endif()
+
 if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   list(APPEND game_SRCS
       pchdef.cpp
