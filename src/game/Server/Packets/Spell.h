@@ -9,6 +9,8 @@
 #include "nonstd/optional.hpp"
 #include <vector>
 
+class SpellEntry;
+
 namespace WorldPackets { namespace Spell
 {
     class CastSpell final : public ClientPacket

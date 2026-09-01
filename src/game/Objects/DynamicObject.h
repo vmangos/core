@@ -23,7 +23,7 @@
 #define MANGOSSERVER_DYNAMICOBJECT_H
 
 #include "Object.h"
-#include "DBCEnums.h"
+#include "SpellDefines.h"
 
 enum DynamicObjectType
 {

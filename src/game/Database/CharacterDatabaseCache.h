@@ -3,7 +3,7 @@
 
 #include "Common.h"
 #include "ObjectGuid.h"
-#include "DBCEnums.h"
+#include "SpellDefines.h"
 
 // pet_spell_cooldown
 struct PetSpellCooldown
