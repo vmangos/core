@@ -3447,13 +3447,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
 void Player::SendInitialSpells() const
 {
-    uint16 spellCount = 0;
-
-    WorldPacket data(SMSG_INITIAL_SPELLS, (1 + 2 + 4 * m_spells.size() + 2 + m_cooldownMap.size() * (2 + 2 + 2 + 4 + 4)));
-    data << uint8(0);
-
-    size_t countPos = data.wpos();
-    data << uint16(spellCount);                             // spell count placeholder
+    auto packet = std::make_unique<WorldPackets::Spell::InitialSpells>();
 
     for (const auto& spell : m_spells)
     {
@@ -3463,20 +3457,11 @@ void Player::SendInitialSpells() const
         if (!spell.second.active || spell.second.disabled)
             continue;
 
-        data << uint16(spell.first);
-        data << uint16(0);                                  // it's not slot id
-
-        spellCount += 1;
+        packet->knownSpells.emplace_back(uint16(spell.first), int16(0));
     }
 
-    data.put<uint16>(countPos, spellCount);                 // write real count value
-
     // write cooldown data
-    uint32 cdCount = 0;
-    const size_t cdCountPos = data.wpos();
-    data << uint16(0);
     auto currTime = sWorld.GetCurrentClockTime();
-
     for (auto& cdItr : m_cooldownMap)
     {
         auto& cdData = cdItr.second;
@@ -3500,17 +3485,9 @@ void Player::SendInitialSpells() const
             catCDDuration |= 0x80000000;
         }
 
-        data << uint16(cdData->GetSpellEntry()->Id);
-        data << uint16(cdData->GetItemId());                // cast item id
-        data << uint16(cdData->GetCategory());              // spell category
-        data << uint32(spellCDDuration);                    // cooldown
-        data << uint32(catCDDuration);                      // category cooldown
-        ++cdCount;
+        packet->cooldowns.emplace_back(uint16(cdData->GetSpellEntry()->Id), uint16(cdData->GetItemId()), uint16(cdData->GetCategory()), int32(spellCDDuration), int32(catCDDuration));
     }
-
-    data.put<uint16>(cdCountPos, cdCount);
-
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "CHARACTER: Sent Initial Spells");
 }
@@ -21076,17 +21053,17 @@ void Player::_SaveBGData()
 
 void Player::SendClearCooldown(uint32 spellId, Unit const* target) const
 {
-    auto clearCooldownPacket = std::make_unique<WorldPackets::Spell::ClearCooldown>();
-    clearCooldownPacket->spellId = spellId;
-    clearCooldownPacket->targetGuid = target->GetObjectGuid();
-    GetSession()->SendPacket(std::move(clearCooldownPacket));
+    auto packet = std::make_unique<WorldPackets::Spell::ClearCooldown>();
+    packet->spellId = spellId;
+    packet->targetGuid = target->GetObjectGuid();
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendClearAllCooldowns(Unit const* target) const
 {
-    auto cooldownCheatPacket = std::make_unique<WorldPackets::Spell::CooldownCheat>();
-    cooldownCheatPacket->targetGuid = target->GetObjectGuid();
-    GetSession()->SendPacket(std::move(cooldownCheatPacket));
+    auto packet = std::make_unique<WorldPackets::Spell::CooldownCheat>();
+    packet->targetGuid = target->GetObjectGuid();
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendSpellCooldown(uint32 spellId, Milliseconds cooldown, ObjectGuid target) const
@@ -21102,16 +21079,16 @@ void Player::SendSpellCooldown(uint32 spellId, Milliseconds cooldown, ObjectGuid
 
 void Player::SendSpellRemoved(uint32 spellId) const
 {
-    auto removedSpellPacket = std::make_unique<WorldPackets::Spell::RemovedSpell>();
-    removedSpellPacket->spellId = spellId;
-    GetSession()->SendPacket(std::move(removedSpellPacket));
+    auto packet = std::make_unique<WorldPackets::Spell::RemovedSpell>();
+    packet->spellId = spellId;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendChannelUpdate(uint32 time) const
 {
-    WorldPacket data(MSG_CHANNEL_UPDATE, 4);
-    data << uint32(time);
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Spell::ChannelUpdate>();
+    packet->duration = time;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::UpdateChannelStartPosition()

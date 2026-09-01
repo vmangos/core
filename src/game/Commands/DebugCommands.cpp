@@ -240,10 +240,10 @@ bool ChatHandler::HandleDebugSendNextChannelSpellVisualCommand(char *args)
     }
     if (id && id <= sSpellMgr.GetMaxSpellId())
     {
-        WorldPacket data(MSG_CHANNEL_START, (4 + 4));
-        data << uint32(id);
-        data << uint32(60000);
-        m_session->GetPlayer()->SendDirectMessage(&data);
+        auto packet = std::make_unique<WorldPackets::Spell::ChannelStart>();
+        packet->spellId = id;
+        packet->duration = 60000;
+        m_session->SendPacket(std::move(packet));
         m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, id);
         PSendSysMessage("Playing channel visual of spell %u %s %s", id, spellInfo->SpellName[0].c_str(), spellInfo->Rank[0].c_str());
         return true;
@@ -261,10 +261,10 @@ bool ChatHandler::HandleSendSpellChannelVisualCommand(char *args)
 
     if (uiPlayId && uiPlayId <= sSpellMgr.GetMaxSpellId())
     {
-        WorldPacket data(MSG_CHANNEL_START, (4 + 4));
-        data << uint32(uiPlayId);
-        data << uint32(60000);
-        m_session->GetPlayer()->SendDirectMessage(&data);
+        auto packet = std::make_unique<WorldPackets::Spell::ChannelStart>();
+        packet->spellId = uiPlayId;
+        packet->duration = 60000;
+        m_session->SendPacket(std::move(packet));
         m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, uiPlayId);
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(uiPlayId);
         PSendSysMessage("Playing channel visual of spell %u %s %s", uiPlayId, spellInfo->SpellName[0].c_str(), spellInfo->Rank[0].c_str());
@@ -601,12 +601,11 @@ bool ChatHandler::HandleDebugSendChannelNotifyCommand(char* args)
     if (!ExtractUInt32(&args, code) || code > 255)
         return false;
 
-    WorldPacket data(SMSG_CHANNEL_NOTIFY, (1 + 10));
-    data << uint8(code);                                    // notify type
-    data << name;                                           // channel name
-    data << uint32(0);
-    data << uint32(0);
-    m_session->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Channel::ChannelNotify>();
+    packet->type = code;
+    packet->channelName = name;
+    m_session->SendPacket(std::move(packet));
+
     return true;
 }
 
@@ -1626,11 +1625,11 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
         chr->PSendSysMessage(LANG_YOURS_SPELLMODS_CHANGED, GetNameLink().c_str(),
                                          opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct", spellmodop, value, effidx);
 
-    WorldPacket data(opcode, (1 + 1 + 2 + 2));
-    data << uint8(effidx);
-    data << uint8(spellmodop);
-    data << int32(value);
-    chr->GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Spell::SetSpellModifier>(opcode);
+    packet->effectIndex = effidx;
+    packet->modOp = spellmodop;
+    packet->value = value;
+    chr->GetSession()->SendPacket(std::move(packet));
 
     return true;
 }

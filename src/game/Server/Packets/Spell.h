@@ -324,6 +324,162 @@ namespace WorldPackets { namespace Spell
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class SpellLogExecute final : public ServerPacket
+    {
+    public:
+        struct ExecuteLogInfo
+        {
+            ExecuteLogInfo() {}
+            ExecuteLogInfo(ObjectGuid _targetGuid) : targetGuid(_targetGuid) {}
+
+            ObjectGuid targetGuid;
+
+            union
+            {
+                struct
+                {
+                    uint32 power;
+                    uint32 amount;
+                    float multiplier;
+                } powerDrain;
+
+                struct
+                {
+                    uint32 count;
+                } extraAttacks;
+
+                struct
+                {
+                    uint32 itemEntry;
+                } createItem;
+
+                struct
+                {
+                    uint32 spellId;
+                } interruptCast;
+
+                struct
+                {
+                    uint32 itemEntry;
+                } feedPet;
+
+                struct
+                {
+                    int32 itemEntry;
+                    int32 unk;
+                } durabilityDamage;
+
+                struct
+                {
+                    uint32 amount;
+                    uint8 critical;
+                } heal;
+
+                struct
+                {
+                    uint32 amount;
+                    uint32 powerType;
+                } energize;
+            };
+        };
+
+        ObjectGuid casterGuid;
+        SpellEntry const* pSpellEntry = nullptr;
+        std::vector<WorldPackets::Spell::SpellLogExecute::ExecuteLogInfo> executeLogInfos[MAX_EFFECT_INDEX];
+
+        explicit SpellLogExecute() : ServerPacket(SMSG_SPELLLOGEXECUTE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SpellFailedOther final : public ServerPacket
+    {
+    public:
+        ObjectGuid casterGuid;
+        uint32 spellId = 0;
+
+        explicit SpellFailedOther() : ServerPacket(SMSG_SPELL_FAILED_OTHER) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class ChannelStart final : public ServerPacket
+    {
+    public:
+        uint32 spellId = 0;
+        uint32 duration = 0;
+
+        explicit ChannelStart() : ServerPacket(MSG_CHANNEL_START) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class ChannelUpdate final : public ServerPacket
+    {
+    public:
+        uint32 duration = 0;
+
+        explicit ChannelUpdate() : ServerPacket(MSG_CHANNEL_UPDATE) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SpellUpdateChainTargets final : public ServerPacket
+    {
+    public:
+        ObjectGuid casterGuid;
+        uint32 spellId = 0;
+        std::vector<ObjectGuid> targets;
+
+        explicit SpellUpdateChainTargets() : ServerPacket(SMSG_SPELL_UPDATE_CHAIN_TARGETS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class ResurrectRequest final : public ServerPacket
+    {
+    public:
+        ObjectGuid casterGuid;
+        std::string casterName;
+        bool sickness = false; // warns it will cause ressurrection sickness
+        bool delayed = false; // if false ignore delay sent with SMSG_CORPSE_RECLAIM_DELAY
+
+        explicit ResurrectRequest() : ServerPacket(SMSG_RESURRECT_REQUEST) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class SpellDelayed final : public ServerPacket
+    {
+    public:
+        ObjectGuid casterGuid;
+        uint32 delayTime = 0;
+
+        explicit SpellDelayed() : ServerPacket(SMSG_SPELL_DELAYED) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class InitialSpells final : public ServerPacket
+    {
+    public:
+        struct KnownSpell
+        {
+            KnownSpell(uint16 spellId_, int16 unk_) : spellId(spellId_), unk(unk) {};
+            uint16 spellId = 0;
+            int16 unk = 0;
+        };
+        struct CurrentCooldown
+        {
+            CurrentCooldown(uint16 spellId_, uint16 itemId_, uint16 category_, int32 recoveryTime_, int32 categoryRecoveryTime_) :
+                spellId(spellId_), itemId(itemId_), category(category_), recoveryTime(recoveryTime_), categoryRecoveryTime(categoryRecoveryTime_) {};
+            uint16 spellId = 0;
+            uint16 itemId = 0;
+            uint16 category = 0;
+            int32 recoveryTime = 0;
+            int32 categoryRecoveryTime = 0;
+        };
+        uint8 talentSpec = 0; // always 0
+        std::vector<KnownSpell> knownSpells;
+        std::vector<CurrentCooldown> cooldowns;
+
+        explicit InitialSpells() : ServerPacket(SMSG_INITIAL_SPELLS) {}
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Spell
 
 #endif // MANGOS_PACKETS_SPELL_H

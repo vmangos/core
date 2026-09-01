@@ -252,3 +252,174 @@ void WorldPackets::Spell::SpellGo::AppendBodyTo(ByteBuffer& buffer) const
         buffer << ammoInventoryType;
     }
 }
+
+void WorldPackets::Spell::SpellLogExecute::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid.WriteAsPackedClientBuildAware();
+    buffer << uint32(pSpellEntry->Id);
+    
+    uint32 effectCount = 0;
+
+    for (const auto& i : executeLogInfos)
+    {
+        if (!i.empty())
+            effectCount++;
+    }
+
+    if (!effectCount)
+        return;
+
+    buffer << uint32(effectCount);
+
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if (executeLogInfos[i].empty())
+            continue;
+
+        buffer << uint32(pSpellEntry->Effect[i]);
+        buffer << uint32(executeLogInfos[i].size());
+
+        for (uint32 j = 0; j < executeLogInfos[i].size(); ++j)
+        {
+            auto info = executeLogInfos[i][j];
+            switch (pSpellEntry->Effect[i])
+            {
+                case SPELL_EFFECT_POWER_DRAIN:
+                    buffer << info.targetGuid;
+                    buffer << info.powerDrain.amount;
+                    buffer << info.powerDrain.power;
+                    buffer << info.powerDrain.multiplier;
+                    break;
+                case SPELL_EFFECT_HEAL:
+                case SPELL_EFFECT_HEAL_MAX_HEALTH:
+                    buffer << info.targetGuid;
+                    buffer << info.heal.amount;
+                    buffer << info.heal.critical;
+                    break;
+                case SPELL_EFFECT_ENERGIZE:
+                    buffer << info.targetGuid;
+                    buffer << info.energize.amount;
+                    buffer << info.energize.powerType;
+                    break;
+                case SPELL_EFFECT_ADD_EXTRA_ATTACKS:
+                    buffer << info.targetGuid;
+                    buffer << info.extraAttacks.count;
+                    break;
+                case SPELL_EFFECT_CREATE_ITEM:
+                    buffer << info.createItem.itemEntry;
+                    break;
+                case SPELL_EFFECT_INTERRUPT_CAST:
+                    buffer << info.targetGuid;
+                    buffer << info.interruptCast.spellId;
+                    break;
+                case SPELL_EFFECT_FEED_PET:
+                    buffer << info.feedPet.itemEntry;
+                    break;
+                case SPELL_EFFECT_DURABILITY_DAMAGE:
+                    buffer << info.targetGuid;
+                    buffer << info.durabilityDamage.itemEntry;
+                    buffer << info.durabilityDamage.unk;
+                    break;
+                case SPELL_EFFECT_INSTAKILL:
+                case SPELL_EFFECT_RESURRECT:
+                case SPELL_EFFECT_DISPEL:
+                case SPELL_EFFECT_THREAT:
+                case SPELL_EFFECT_DISTRACT:
+                case SPELL_EFFECT_SANCTUARY:
+                case SPELL_EFFECT_THREAT_ALL:
+                case SPELL_EFFECT_DISPEL_MECHANIC:
+                case SPELL_EFFECT_RESURRECT_NEW:
+                case SPELL_EFFECT_ATTACK_ME:
+                case SPELL_EFFECT_SKIN_PLAYER_CORPSE:
+                case SPELL_EFFECT_MODIFY_THREAT_PERCENT:
+                case SPELL_EFFECT_126:
+                case SPELL_EFFECT_OPEN_LOCK:
+                case SPELL_EFFECT_OPEN_LOCK_ITEM:
+                case SPELL_EFFECT_DISMISS_PET:
+                case SPELL_EFFECT_TRANS_DOOR:
+                case SPELL_EFFECT_SUMMON:
+                case SPELL_EFFECT_SUMMON_PET:
+                case SPELL_EFFECT_SUMMON_WILD:
+                case SPELL_EFFECT_SUMMON_GUARDIAN:
+                case SPELL_EFFECT_SUMMON_TOTEM_SLOT1:
+                case SPELL_EFFECT_SUMMON_TOTEM_SLOT2:
+                case SPELL_EFFECT_SUMMON_TOTEM_SLOT3:
+                case SPELL_EFFECT_SUMMON_TOTEM_SLOT4:
+                case SPELL_EFFECT_SUMMON_POSSESSED:
+                case SPELL_EFFECT_SUMMON_TOTEM:
+                case SPELL_EFFECT_SUMMON_CRITTER:
+                case SPELL_EFFECT_SUMMON_OBJECT_WILD:
+                case SPELL_EFFECT_SUMMON_OBJECT_SLOT1:
+                case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:
+                case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:
+                case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:
+                case SPELL_EFFECT_SUMMON_DEMON:
+                    buffer << info.targetGuid;
+                    break;
+                default:
+                    return;
+            }
+        }
+    }
+}
+
+void WorldPackets::Spell::SpellFailedOther::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid;
+    buffer << spellId;
+}
+
+void WorldPackets::Spell::ChannelStart::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << spellId;
+    buffer << duration;
+}
+
+void WorldPackets::Spell::ChannelUpdate::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << duration;
+}
+
+void WorldPackets::Spell::SpellUpdateChainTargets::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid;
+    buffer << spellId;
+    buffer << uint32(targets.size());
+    for (auto const& target : targets)
+        buffer << target;
+}
+
+void WorldPackets::Spell::ResurrectRequest::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid;
+    buffer << uint32(casterName.length() + 1);
+    buffer << casterName;
+    buffer << uint8(sickness);
+    buffer << uint8(delayed);
+}
+
+void WorldPackets::Spell::SpellDelayed::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << casterGuid;
+    buffer << delayTime;
+}
+
+void WorldPackets::Spell::InitialSpells::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << talentSpec;
+    buffer << uint16(knownSpells.size());
+    for (auto const& itr : knownSpells)
+    {
+        buffer << itr.spellId;
+        buffer << itr.unk;
+    }
+    buffer << uint16(cooldowns.size());
+    for (auto const& itr : cooldowns)
+    {
+        buffer << itr.spellId;
+        buffer << itr.itemId;
+        buffer << itr.category;
+        buffer << itr.recoveryTime;
+        buffer << itr.categoryRecoveryTime;
+    }
+}

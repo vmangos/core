@@ -53,6 +53,7 @@
 #include "SocialMgr.h"
 
 using namespace Spells;
+using ExecuteLogInfo = WorldPackets::Spell::SpellLogExecute::ExecuteLogInfo;
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 {
@@ -1722,6 +1723,8 @@ void Spell::EffectPowerDrain(SpellEffectIndex effIdx)
 
         info.powerDrain.multiplier = manaMultiplier;
     }
+
+    AddExecuteLogInfo(effIdx, info);
 }
 
 void Spell::EffectSendEvent(SpellEffectIndex effIdx)
