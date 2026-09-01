@@ -4891,6 +4891,28 @@ SpellScript* GetScript_AVCreateShredder(SpellEntry const*)
     return new AVCreateShredderScript();
 }
 
+// 24677 - GY Mid Trigger
+struct BattlegroundBannerTriggerScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterGo)
+        {
+            if (Player* player = ToPlayer(spell->GetUnitTarget()))
+            {
+                if (BattleGround* bg = player->GetBattleGround())
+                    bg->EventPlayerClickedOnFlag(player, spell->m_casterGo);
+            }
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_BattlegroundBannerTrigger(SpellEntry const*)
+{
+    return new BattlegroundBannerTriggerScript();
+}
+
 void AddSC_bg_alterac()
 {
     Script* newscript;
@@ -5007,5 +5029,10 @@ void AddSC_bg_alterac()
     newscript = new Script;
     newscript->Name = "spell_av_create_shredder";
     newscript->GetSpellScript = &GetScript_AVCreateShredder;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_battleground_banner_trigger";
+    newscript->GetSpellScript = &GetScript_BattlegroundBannerTrigger;
     newscript->RegisterSelf();
 }
