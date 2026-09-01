@@ -173,6 +173,34 @@ struct npc_etendardAI : NullCreatureAI
     }
 };
 
+// Used by neutral banners in battlegrounds.
+// Faction specific banners are go type 1 not 10.
+// 23932 - A-Mid Trigger (Arathi Basin)
+// 23935 - H-Mid Trigger (Arathi Basin)
+// 23936 - Mid Trigger (Arathi Basin)
+// 23937 - ALT -N Trigger (Arathi Basin)
+// 23938 - ALT -S Trigger (Arathi Basin)
+// 24677 - GY Mid Trigger (Alterac Valley)
+struct BattlegroundBannerTriggerScript : SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx == EFFECT_INDEX_0 && spell->m_casterGo)
+        {
+            if (Player* player = ToPlayer(spell->GetUnitTarget()))
+            {
+                if (BattleGround* bg = player->GetBattleGround())
+                    bg->EventPlayerClickedOnFlag(player, spell->m_casterGo);
+            }
+        }
+        return true;
+    }
+};
+
+SpellScript* GetScript_BattlegroundBannerTrigger(SpellEntry const*)
+{
+    return new BattlegroundBannerTriggerScript();
+}
 
 CreatureAI* GetAI_npc_etendard(Creature* pCreature)
 {
@@ -192,5 +220,10 @@ void AddSC_battleground()
     newscript = new Script;
     newscript->Name = "npc_etendard";
     newscript->GetAI = &GetAI_npc_etendard;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "spell_battleground_banner_trigger";
+    newscript->GetSpellScript = &GetScript_BattlegroundBannerTrigger;
     newscript->RegisterSelf();
 }
