@@ -4635,6 +4635,21 @@ void Spell::WriteSpellGoTargets(WorldPackets::Spell::SpellGo& packet)
 
 void Spell::SendLogExecute()
 {
+    // Nothing to log means no packet at all. AppendBodyTo can no longer
+    // abort the send once the packet has been handed to the session.
+    bool hasLogInfo = false;
+    for (const auto& i : m_executeLogInfo)
+    {
+        if (!i.empty())
+        {
+            hasLogInfo = true;
+            break;
+        }
+    }
+
+    if (!hasLogInfo)
+        return;
+
     auto packet = std::make_unique<WorldPackets::Spell::SpellLogExecute>();
     packet->casterGuid = m_caster->GetObjectGuid();
     packet->pSpellEntry = m_spellInfo;

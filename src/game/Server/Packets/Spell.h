@@ -420,6 +420,7 @@ namespace WorldPackets { namespace Spell
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     class SpellUpdateChainTargets final : public ServerPacket
     {
     public:
@@ -430,6 +431,7 @@ namespace WorldPackets { namespace Spell
         explicit SpellUpdateChainTargets() : ServerPacket(SMSG_SPELL_UPDATE_CHAIN_TARGETS) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
+#endif
 
     class ResurrectRequest final : public ServerPacket
     {
@@ -458,7 +460,7 @@ namespace WorldPackets { namespace Spell
     public:
         struct KnownSpell
         {
-            KnownSpell(uint16 spellId_, int16 unk_) : spellId(spellId_), unk(unk) {};
+            KnownSpell(uint16 spellId_, int16 unk_) : spellId(spellId_), unk(unk_) {};
             uint16 spellId = 0;
             int16 unk = 0;
         };

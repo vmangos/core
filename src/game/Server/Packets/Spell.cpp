@@ -257,7 +257,7 @@ void WorldPackets::Spell::SpellLogExecute::AppendBodyTo(ByteBuffer& buffer) cons
 {
     buffer << casterGuid.WriteAsPackedClientBuildAware();
     buffer << uint32(pSpellEntry->Id);
-    
+
     uint32 effectCount = 0;
 
     for (const auto& i : executeLogInfos)
@@ -265,9 +265,6 @@ void WorldPackets::Spell::SpellLogExecute::AppendBodyTo(ByteBuffer& buffer) cons
         if (!i.empty())
             effectCount++;
     }
-
-    if (!effectCount)
-        return;
 
     buffer << uint32(effectCount);
 
@@ -356,8 +353,10 @@ void WorldPackets::Spell::SpellLogExecute::AppendBodyTo(ByteBuffer& buffer) cons
                 case SPELL_EFFECT_SUMMON_DEMON:
                     buffer << info.targetGuid;
                     break;
+                // Every effect that can add execute log info is handled above.
+                // Bailing out here would send a half written effect block.
                 default:
-                    return;
+                    break;
             }
         }
     }
@@ -380,6 +379,7 @@ void WorldPackets::Spell::ChannelUpdate::AppendBodyTo(ByteBuffer& buffer) const
     buffer << duration;
 }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 void WorldPackets::Spell::SpellUpdateChainTargets::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << casterGuid;
@@ -388,6 +388,7 @@ void WorldPackets::Spell::SpellUpdateChainTargets::AppendBodyTo(ByteBuffer& buff
     for (auto const& target : targets)
         buffer << target;
 }
+#endif
 
 void WorldPackets::Spell::ResurrectRequest::AppendBodyTo(ByteBuffer& buffer) const
 {
