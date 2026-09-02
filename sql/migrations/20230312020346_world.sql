@@ -138,13 +138,6 @@ Seen in TBC on map:
 DELETE FROM `gameobject_template` WHERE `entry`=181851;
 
 /*
-Firework Rocket, Promotion
-Seen in TBC on map:
--- Outland (530)
-*/
-DELETE FROM `gameobject_template` WHERE `entry`=181886;
-
-/*
 Campfire
 Seen in TBC on map:
 -- Outland (530)
@@ -1331,7 +1324,6 @@ DELETE FROM `locales_gameobject` WHERE `entry` = 181738;
 DELETE FROM `locales_gameobject` WHERE `entry` = 181757;
 DELETE FROM `locales_gameobject` WHERE `entry` = 181787;
 DELETE FROM `locales_gameobject` WHERE `entry` = 181851;
-DELETE FROM `locales_gameobject` WHERE `entry` = 181886;
 DELETE FROM `locales_gameobject` WHERE `entry` = 181888;
 DELETE FROM `locales_gameobject` WHERE `entry` = 182059;
 DELETE FROM `locales_gameobject` WHERE `entry` = 182114;
