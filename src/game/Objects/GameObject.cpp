@@ -2651,7 +2651,7 @@ bool GameObject::CanAggroWhenOpening() const
         return false;
 
     if (!GetFactionTemplateId())
-        return;
+        return false;
 
     // only faction Treasure
     if (GetFactionId() != 77)

@@ -177,8 +177,10 @@ void DragonsOfNightmare::Update()
     {
         // Event is active, dragons exist in the world
         uint32 alive = 0;
+
         // Update respawn time to max time value if the dragon is dead, get current alive count
-        GetAliveCountAndUpdateRespawnTime(dragonGUIDs, alive, std::numeric_limits<time_t>::max());
+        if (!GetAliveCountAndUpdateRespawnTime(dragonGUIDs, alive, std::numeric_limits<time_t>::max()))
+            return;
 
         // If any dragons are still alive, do not pass go. We'll update once they are all dead
         if (alive)
@@ -251,8 +253,9 @@ void DragonsOfNightmare::CheckSingleVariable(uint32 idx, uint32& value)
     }
 }
 
-void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> const& dragons, uint32& alive, time_t respawnTime)
+bool DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> const& dragons, uint32& alive, time_t respawnTime)
 {
+    bool allFound = true;
     for (auto const& guid : dragons)
     {
         auto cData = sObjectMgr.GetCreatureData(guid.GetCounter());
@@ -260,6 +263,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
         if (!cData)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] creature data %u not found!", guid.GetCounter());
+            allFound = false;
             continue;
         }
 
@@ -271,6 +275,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
         if (!map)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] instance %u of map %u not found!", instanceId, cData->position.mapId);
+            allFound = false;
             continue;
         }
 
@@ -279,6 +284,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
         if (!pCreature)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] creature %u not found!", guid.GetCounter());
+            allFound = false;
             continue;
         }
 
@@ -287,10 +293,12 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
         else
             ++alive;
     }
+    return allFound;
 }
 
 bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid>& dragonGUIDs)
 {
+    bool allFound = true;
     for (uint32 entry : NightmareDragons)
     {
         // lookup the dragon
@@ -299,13 +307,14 @@ bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid>& dragonGUIDs)
         if (dCreatureGuid.IsEmpty())
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] creature %u not found in world!", entry);
-            return false;
+            allFound = false;
+            continue;
         }
 
         dragonGUIDs.push_back(dCreatureGuid);
     }
 
-    return true;
+    return allFound;
 }
 
 //void DragonsOfNightmare::GetAliveCount(std::vector<ObjectGuid> dragonGUIDs, uint32& alive)
