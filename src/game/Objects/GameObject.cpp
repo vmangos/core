@@ -2650,6 +2650,9 @@ bool GameObject::CanAggroWhenOpening() const
     if (GetGoType() != GAMEOBJECT_TYPE_CHEST)
         return false;
 
+    if (!GetFactionTemplateId())
+        return;
+
     // only faction Treasure
     if (GetFactionId() != 77)
         return false;
