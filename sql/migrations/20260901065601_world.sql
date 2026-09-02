@@ -10,12 +10,6 @@ INSERT INTO `migrations` VALUES ('20260901065601');
 
 
 -- Removing unused script actions.
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (294101);
-
--- Events list for Lanie Reed
-DELETE FROM `creature_ai_events` WHERE `creature_id`=2941;
-
--- Removing unused script actions.
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (604701);
 
 -- Events list for Aqua Guardian
@@ -26,12 +20,6 @@ DELETE FROM `creature_ai_scripts` WHERE `id` IN (854501);
 
 -- Events list for Abomination
 DELETE FROM `creature_ai_events` WHERE `creature_id`=8545;
-
--- Removing unused script actions.
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (1037801);
-
--- Events list for Omusa Thunderhorn
-DELETE FROM `creature_ai_events` WHERE `creature_id`=10378;
 
 -- Auras and spawn spell for Darrowshire Spirit.
 UPDATE `creature_template` SET `spawn_spell_id`=17321, `auras`='17327' WHERE `entry`=11064;
