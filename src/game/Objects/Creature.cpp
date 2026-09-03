@@ -4325,6 +4325,12 @@ bool Creature::GetCharmSpellCooldown(uint32 spellId, uint32& cooldown)
     return false;
 }
 
+float Creature::GetFollowAngle() const
+{
+    // Follower escorts seem to follow behind player.
+    return GetCharmerOrOwnerGuid().IsEmpty() ? M_PI_F : PET_FOLLOW_ANGLE;
+}
+
 Unit* Creature::GetFollowTarget() const
 {
     if (!m_followTarget.IsEmpty())

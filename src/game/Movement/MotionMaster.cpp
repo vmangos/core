@@ -407,7 +407,7 @@ void MotionMaster::MoveTargetedHome()
         else if (Unit* target = pCreature->GetFollowTarget())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
-            Mutate(new FollowMovementGenerator<Creature>(*target, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE));
+            Mutate(new FollowMovementGenerator<Creature>(*target, PET_FOLLOW_DIST, pCreature->GetFollowAngle()));
         }
         else
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s attempt but fail to follow owner", m_owner->GetGuidStr().c_str());

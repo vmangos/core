@@ -586,6 +586,8 @@ class Creature : public Unit
         // (msecs)timer used for group loot
         uint32 GetGroupLootTimer() const { return m_groupLootTimer; }
 
+        virtual float GetFollowAngle() const;
+
         void SetFollowTargetGuid(ObjectGuid guid)
         {
             m_followTarget = guid;

@@ -2590,7 +2590,7 @@ bool Map::ScriptCommand_FollowEscort(ScriptInfo const& script, WorldObject* sour
         pSource->SetFollowTargetGuid(pTarget->GetObjectGuid());
 
         if (!pSource->GetVictim())
-            pSource->GetMotionMaster()->MoveFollow(pTarget, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+            pSource->GetMotionMaster()->MoveFollow(pTarget, PET_FOLLOW_DIST, M_PI_F);
     }
     else
         pSource->SetFollowTargetGuid(ObjectGuid());
