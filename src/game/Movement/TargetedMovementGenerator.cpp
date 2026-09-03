@@ -666,29 +666,26 @@ void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
 
     _addUnitStateMove(owner);
     m_bTargetReached = false;
-
     init.Move(&path);
 
-    float dist = path.Length();
-    float speed = i_target->GetSpeedForMovementInfo(i_target->m_movementInfo);
-    if (!speed)
-        speed = owner.GetSpeedForMovementInfo(owner.m_movementInfo);
-
-    init.SetWalk(false);
-    init.SetVelocity(speed);
-    if (dist > speed)
+    float const dist = path.Length();
+    if (owner.GetCharmerOrOwnerGuid() == i_target->GetObjectGuid() && dist > owner.GetSpeed(MOVE_RUN) &&
+       (!i_target->IsInCombat() && !owner.IsInCombat() || i_target->IsPlayer() && i_target->IsMounted()))
     {
-        Unit* pOwner = owner.GetCharmerOrOwner();
-        if (pOwner && (!pOwner->IsInCombat() && !owner.IsInCombat() || pOwner->IsPlayer() && pOwner->IsMounted()))
-        {
-            float distFactor = 1.0f + 0.04f * (dist - speed);
-            if (distFactor < 1.0f) distFactor = 1.0f;
-            if (distFactor > 2.1f) distFactor = 2.1f;
-            init.SetVelocity(distFactor * speed);
-        }
+        float speed = i_target->GetSpeedForMovementInfo(i_target->m_movementInfo);
+        if (!speed || dist > 10.0f)
+            speed = std::max(speed, owner.GetSpeedForMovementInfo(owner.m_movementInfo));
+
+        float distFactor = 1.0f + 0.04f * (dist - speed);
+        if (distFactor < 1.0f) distFactor = 1.0f;
+        if (distFactor > 2.1f) distFactor = 2.1f;
+        speed *= distFactor;
+
+        init.SetVelocity(speed);
     }
-    else if (dist < 2.0f)
-        init.SetWalk(true);
+    else
+        init.SetWalk(dist < 2.0f);
+
     init.SetFacing(i_target->GetOrientation());
     init.Launch();
     m_checkDistanceTimer.Reset(500);
