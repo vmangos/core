@@ -868,14 +868,6 @@ DELETE FROM `gameobject_template` WHERE `entry`=186465;
 DELETE FROM `gameobject` WHERE `id`=186465;
 
 /*
-Firework Rocket, Type 1 Purple BIG
-Seen in TBC on map:
--- Kalimdor (1)
--- Zul\'Aman (568)
-*/
-DELETE FROM `gameobject_template` WHERE `entry`=180863;
-
-/*
 Torche en sorbier
 Seen in TBC on map:
 -- Kalimdor (1)
