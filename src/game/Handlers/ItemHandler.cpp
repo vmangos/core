@@ -447,7 +447,7 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem const& pack
     Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(packet.vendorGuid, UNIT_NPC_FLAG_VENDOR);
     if (!pCreature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleSellItemOpcode - %s not found or you can't interact with it.", packet.vendorGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleSellItemOpcode - %s not found or you can't interact with him.", packet.vendorGuid.GetString().c_str());
         _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, packet.itemGuid, 0);
         return;
     }
@@ -618,7 +618,7 @@ void WorldSession::HandleBuybackItem(WorldPackets::Item::BuybackItem const& pack
     Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(packet.vendorGuid, UNIT_NPC_FLAG_VENDOR);
     if (!pCreature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleBuybackItem - %s not found or you can't interact with it.", packet.vendorGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleBuybackItem - %s not found or you can't interact with him.", packet.vendorGuid.GetString().c_str());
         _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid(), 0);
         return;
     }
@@ -704,7 +704,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
 
     if (!pCreature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: SendListInventory - %s not found or you can't interact with it.", vendorguid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: SendListInventory - %s not found or you can't interact with him.", vendorguid.GetString().c_str());
         _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid(), 0);
         return;
     }
@@ -861,7 +861,7 @@ bool WorldSession::CheckBanker(ObjectGuid guid)
     {
         if (!GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_BANKER))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Banker %s not found or you can't interact with it.", guid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Banker %s not found or you can't interact with him.", guid.GetString().c_str());
             return false;
         }
     }

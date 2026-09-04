@@ -51,7 +51,7 @@ void WorldSession::HandleTabardVendorActivateOpcode(WorldPackets::Npc::TabardVen
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.guid, UNIT_NPC_FLAG_TABARDDESIGNER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTabardVendorActivateOpcode - %s not found or you can't interact with it.", packet.guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTabardVendorActivateOpcode - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
         return;
     }
 
@@ -143,7 +143,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: SendTrainerList - %s not found or you can't interact with it.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: SendTrainerList - %s not found or you can't interact with him.", guid.GetString().c_str());
         return;
     }
 
@@ -160,7 +160,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
 
     if (!cSpells && !tSpells)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: SendTrainerList - Trainer spells not found for %s", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: SendTrainerList - Training spells not found for %s", guid.GetString().c_str());
         return;
     }
 
@@ -263,14 +263,14 @@ void WorldSession::SendTrainingFailure(ObjectGuid guid, uint32 serviceId, uint32
 
 void WorldSession::HandleTrainerBuySpellOpcode(WorldPackets::Npc::TrainerBuySpell const& packet)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_TRAINER_BUY_SPELL Trainer: %s, spell id: %u", packet.guid.GetString().c_str(), packet.spellId);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_TRAINER_BUY_SPELL Trainer: %s, learn spell id is: %u", packet.guid.GetString().c_str(), packet.spellId);
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.guid, UNIT_NPC_FLAG_TRAINER);
 
     if (!unit || !unit->IsTrainerOf(_player) || !unit->IsWithinLOSInMap(_player))
     {
         SendTrainingFailure(packet.guid, packet.spellId, TRAIN_FAIL_UNAVAILABLE);
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTrainerBuySpellOpcode - %s not found or you can't interact with it.", packet.guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTrainerBuySpellOpcode - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
         return;
     }
 
@@ -349,7 +349,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPackets::Npc::GossipHello const&
     Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(packet.npcGuid, UNIT_NPC_FLAG_NONE);
     if (!pCreature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleGossipHelloOpcode - %s not found or you can't interact with it.", packet.npcGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleGossipHelloOpcode - %s not found or you can't interact with him.", packet.npcGuid.GetString().c_str());
         return;
     }
 
@@ -420,7 +420,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPackets::Npc::SpiritHea
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.guid, UNIT_NPC_FLAG_SPIRITHEALER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleSpiritHealerActivateOpcode - %s not found or you can't interact with it.", packet.guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleSpiritHealerActivateOpcode - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
         return;
     }
 
@@ -486,7 +486,7 @@ void WorldSession::HandleBinderActivateOpcode(WorldPackets::Npc::BinderActivate 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.npcGuid, UNIT_NPC_FLAG_INNKEEPER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleBinderActivateOpcode - %s not found or you can't interact with it.", packet.npcGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleBinderActivateOpcode - %s not found or you can't interact with him.", packet.npcGuid.GetString().c_str());
         return;
     }
 
@@ -512,7 +512,7 @@ void WorldSession::HandleListStabledPetsOpcode(WorldPackets::Npc::ListStabledPet
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.npcGuid, UNIT_NPC_FLAG_STABLEMASTER);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleListStabledPetsOpcode - %s not found or you can't interact with it.", packet.npcGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleListStabledPetsOpcode - %s not found or you can't interact with him.", packet.npcGuid.GetString().c_str());
         return;
     }
 
@@ -600,7 +600,7 @@ bool WorldSession::CheckStableMaster(ObjectGuid guid)
     {
         if (!GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_STABLEMASTER))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Stablemaster %s not found or you can't interact with it.", guid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Stablemaster %s not found or you can't interact with him.", guid.GetString().c_str());
             return false;
         }
     }
@@ -1007,7 +1007,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPackets::Npc::RepairItem const& p
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.npcGuid, UNIT_NPC_FLAG_REPAIR);
     if (!unit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleRepairItemOpcode - %s not found or you can't interact with it.", packet.npcGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleRepairItemOpcode - %s not found or you can't interact with him.", packet.npcGuid.GetString().c_str());
         return;
     }
 
