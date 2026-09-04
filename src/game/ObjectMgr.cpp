@@ -1189,8 +1189,8 @@ struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader, SQLSto
 
 void ObjectMgr::LoadCreatureTemplates()
 {
-    //                                                                0        1       2          3            4            5          6            7                 8              9              10             11             12                13                14                15                16                      17                       18                     19                      20                           21                  22            23           24                 25                     26             27      28            29      30            31               32                   33                 34                  35                   36                 37               38                  39                    40          41          42            43           44            45            46              47               48               49               50         51                    52                  53          54          55               56                   57                58                59       60         61               62              63          64               65              66            67           68                      69                    70                71               72               73             74
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `name`, `subname`, `level_min`, `level_max`, `faction`, `npc_flags`, `gossip_menu_id`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `type`, `pet_family`, `rank`, `unit_class`, `xp_multiplier`, `health_multiplier`, `mana_multiplier`, `armor_multiplier`, `damage_multiplier`, `damage_variance`, `damage_school`, `base_attack_time`, `ranged_attack_time`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`,  `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `gold_min`, `gold_max`, `spell_list_id`, `pet_spell_list_id`, `spawn_spell_id`, `totem_spell_id`, `auras`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `immunity_flags`, `static_flags1`, `static_flags2`, `flags_extra`, `script_name` FROM `creature_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `creature_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
+    //                                                                0        1       2          3            4            5          6            7                 8              9              10             11             12                13                14                15                16                      17                       18                     19                      20                           21                  22            23           24                 25                     26             27      28            29      30            31               32                   33                 34                  35                   36                 37               38                  39                    40          41          42            43           44            45             46         47                    48                  49          50          51               52                   53                54                55       56         57               58              59          60               61              62            63           64                      65                    66                67               68               69             70
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `name`, `subname`, `level_min`, `level_max`, `faction`, `npc_flags`, `gossip_menu_id`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `type`, `pet_family`, `rank`, `unit_class`, `xp_multiplier`, `health_multiplier`, `mana_multiplier`, `armor_multiplier`, `damage_multiplier`, `damage_variance`, `damage_school`, `base_attack_time`, `ranged_attack_time`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`,  `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `gold_min`, `gold_max`, `spell_list_id`, `pet_spell_list_id`, `spawn_spell_id`, `totem_spell_id`, `auras`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `immunity_flags`, `static_flags1`, `static_flags2`, `flags_extra`, `script_name` FROM `creature_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `creature_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
 
     if (!result)
         return;
@@ -1208,8 +1208,8 @@ void ObjectMgr::LoadCreatureTemplates()
 
 void ObjectMgr::LoadCreatureTemplate(uint32 entry)
 {
-    //                                                                0        1       2          3            4            5          6            7                 8              9              10             11             12                13                14                15                16                      17                       18                     19                      20                           21                  22            23           24                 25                     26             27      28            29      30            31               32                   33                 34                  35                   36                 37               38                  39                    40          41          42            43           44            45            46              47               48               49               50         51                    52                  53          54          55               56                   57                58                59       60         61               62              63          64               65              66            67           68                      69                    70                71               72               73             74
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `name`, `subname`, `level_min`, `level_max`, `faction`, `npc_flags`, `gossip_menu_id`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `type`, `pet_family`, `rank`, `unit_class`, `xp_multiplier`, `health_multiplier`, `mana_multiplier`, `armor_multiplier`, `damage_multiplier`, `damage_variance`, `damage_school`, `base_attack_time`, `ranged_attack_time`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`,  `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `gold_min`, `gold_max`, `spell_list_id`, `pet_spell_list_id`, `spawn_spell_id`, `totem_spell_id`, `auras`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `immunity_flags`, `static_flags1`, `static_flags2`, `flags_extra`, `script_name` FROM `creature_template` t1 WHERE `entry`=%u && `patch`=(SELECT max(`patch`) FROM `creature_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", entry, sWorld.GetWowPatch()));
+    //                                                                0        1       2          3            4            5          6            7                 8              9              10             11             12                13                14                15                16                      17                       18                     19                      20                           21                  22            23           24                 25                     26             27      28            29      30            31               32                   33                 34                  35                   36                 37               38                  39                    40          41          42            43           44            45             46         47                    48                  49          50          51               52                   53                54                55       56         57               58              59          60               61              62            63           64                      65                    66                67               68               69             70
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `name`, `subname`, `level_min`, `level_max`, `faction`, `npc_flags`, `gossip_menu_id`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `type`, `pet_family`, `rank`, `unit_class`, `xp_multiplier`, `health_multiplier`, `mana_multiplier`, `armor_multiplier`, `damage_multiplier`, `damage_variance`, `damage_school`, `base_attack_time`, `ranged_attack_time`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`,  `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `gold_min`, `gold_max`, `spell_list_id`, `pet_spell_list_id`, `spawn_spell_id`, `totem_spell_id`, `auras`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `immunity_flags`, `static_flags1`, `static_flags2`, `flags_extra`, `script_name` FROM `creature_template` t1 WHERE `entry`=%u && `patch`=(SELECT max(`patch`) FROM `creature_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", entry, sWorld.GetWowPatch()));
 
     if (!result)
         return;
@@ -1278,36 +1278,32 @@ void ObjectMgr::LoadCreatureInfo(Field* fields)
     pInfo->frost_res = fields[43].GetInt32();
     pInfo->shadow_res = fields[44].GetInt32();
     pInfo->arcane_res = fields[45].GetInt32();
-    pInfo->trainer_type = fields[46].GetUInt32();
-    pInfo->trainer_spell = fields[47].GetUInt32();
-    pInfo->trainer_class = fields[48].GetUInt32();
-    pInfo->trainer_race = fields[49].GetUInt32();
-    pInfo->loot_id = fields[50].GetUInt32();
-    pInfo->pickpocket_loot_id = fields[51].GetUInt32();
-    pInfo->skinning_loot_id = fields[52].GetUInt32();
-    pInfo->gold_min = fields[53].GetUInt32();
-    pInfo->gold_max = fields[54].GetUInt32();
-    pInfo->spell_list_id = fields[55].GetUInt32();
-    pInfo->pet_spell_list_id = fields[56].GetUInt32();
-    pInfo->spawn_spell_id = fields[57].GetUInt32();
-    pInfo->totem_spell_id = fields[58].GetUInt32();
+    pInfo->loot_id = fields[46].GetUInt32();
+    pInfo->pickpocket_loot_id = fields[47].GetUInt32();
+    pInfo->skinning_loot_id = fields[48].GetUInt32();
+    pInfo->gold_min = fields[49].GetUInt32();
+    pInfo->gold_max = fields[50].GetUInt32();
+    pInfo->spell_list_id = fields[51].GetUInt32();
+    pInfo->pet_spell_list_id = fields[52].GetUInt32();
+    pInfo->spawn_spell_id = fields[53].GetUInt32();
+    pInfo->totem_spell_id = fields[54].GetUInt32();
     delete[] pInfo->auras;
-    pInfo->auras = (uint32*)(fields[59].GetString() ? mangos_strdup(fields[59].GetString()) : nullptr);
-    pInfo->ai_name = fields[60].GetCppString();
-    pInfo->movement_type = fields[61].GetUInt32();
-    pInfo->inhabit_type = fields[62].GetUInt32();
-    pInfo->civilian = fields[63].GetBool();
-    pInfo->racial_leader = fields[64].GetBool();
-    pInfo->equipment_id = fields[65].GetUInt32();
-    pInfo->trainer_id = fields[66].GetUInt32();
-    pInfo->vendor_id = fields[67].GetUInt32();
-    pInfo->mechanic_immune_mask = fields[68].GetUInt32();
-    pInfo->school_immune_mask = fields[69].GetUInt32();
-    pInfo->immunity_flags = fields[70].GetUInt32();
-    pInfo->static_flags1 = fields[71].GetUInt32();
-    pInfo->static_flags2 = fields[72].GetUInt32();
-    pInfo->flags_extra = fields[73].GetUInt32();
-    pInfo->script_id = sScriptMgr.GetScriptId(fields[74].GetString());
+    pInfo->auras = (uint32*)(fields[55].GetString() ? mangos_strdup(fields[55].GetString()) : nullptr);
+    pInfo->ai_name = fields[56].GetCppString();
+    pInfo->movement_type = fields[57].GetUInt32();
+    pInfo->inhabit_type = fields[58].GetUInt32();
+    pInfo->civilian = fields[59].GetBool();
+    pInfo->racial_leader = fields[60].GetBool();
+    pInfo->equipment_id = fields[61].GetUInt32();
+    pInfo->trainer_id = fields[62].GetUInt32();
+    pInfo->vendor_id = fields[63].GetUInt32();
+    pInfo->mechanic_immune_mask = fields[64].GetUInt32();
+    pInfo->school_immune_mask = fields[65].GetUInt32();
+    pInfo->immunity_flags = fields[66].GetUInt32();
+    pInfo->static_flags1 = fields[67].GetUInt32();
+    pInfo->static_flags2 = fields[68].GetUInt32();
+    pInfo->flags_extra = fields[69].GetUInt32();
+    pInfo->script_id = sScriptMgr.GetScriptId(fields[70].GetString());
     CheckCreatureTemplate(pInfo.get());
 }
 
@@ -1522,9 +1518,6 @@ void ObjectMgr::CheckCreatureTemplate(CreatureInfo* cInfo)
         sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_template` SET `ranged_attack_time`=%u WHERE `entry`=%u;", BASE_ATTACK_TIME, cInfo->entry);
         cInfo->ranged_attack_time = BASE_ATTACK_TIME;
     }
-
-    if ((cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER) && cInfo->trainer_type >= MAX_TRAINER_TYPE)
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has wrong trainer type %u", cInfo->entry, cInfo->trainer_type);
 
     if (cInfo->type && !sCreatureTypeStore.LookupEntry(cInfo->type))
     {
@@ -10341,9 +10334,9 @@ bool ObjectMgr::LoadQuestGreetings()
 
 bool ObjectMgr::LoadTrainerGreetings()
 {
-    m_TrainerGreetingLocaleMap.clear();
+    m_TrainerGreetingMap.clear();
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` FROM `npc_trainer_greeting`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `trainerType`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` FROM `npc_trainer_greeting`"));
 
     if (!result)
     {
@@ -10371,17 +10364,26 @@ bool ObjectMgr::LoadTrainerGreetings()
             continue;
         }
 
-        TrainerGreetingLocale& data = m_TrainerGreetingLocaleMap[entry];
+        uint8 trainerType = fields[1].GetUInt8();
 
+        if (trainerType != GREETING_TYPE_SMALL && trainerType != GREETING_TYPE_LARGE)
+        {
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `npc_trainer_greeting` has entry with invalid trainerType %u (Entry: %u), ignored", trainerType, entry);
+            continue;
+        }
+
+        TrainerGreeting& data = m_TrainerGreetingMap[entry];
+        
+        data.trainerType = trainerType;
         data.Content.resize(1);
         ++count;
 
-        // 0 -> default, idx in to idx+1
-        data.Content[0] = fields[1].GetCppString();
+        // 0 -> default, idx in to idx+2
+        data.Content[0] = fields[2].GetCppString();
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
-            std::string str = fields[i + 1].GetCppString();
+            std::string str = fields[i + 2].GetCppString();
             if (!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -10730,10 +10732,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         }
         else
             trainerSpell.reqLevel = spellinfo->spellLevel;
-
-        if (SpellMgr::IsProfessionSpell(spellinfo->EffectTriggerSpell[0]) || SpellMgr::IsTradeskillSpell(spellinfo->EffectTriggerSpell[0]))
-            data.trainerType = 2;
-
+        
         ++count;
 
     }

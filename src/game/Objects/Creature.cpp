@@ -1356,7 +1356,7 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
     return true;
 }
 
-bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
+bool Creature::IsTrainerOf(Player* pPlayer) const
 {
     if (!IsTrainer())
         return false;
@@ -1364,7 +1364,7 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
     TrainerSpellData const* cSpells = GetTrainerSpells();
     TrainerSpellData const* tSpells = GetTrainerTemplateSpells();
 
-    // for not pet trainer expected not empty trainer list always
+    // all trainers should have a non-empty trainer list
     if ((!cSpells || cSpells->spellList.empty()) && (!tSpells || tSpells->spellList.empty()))
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature %u (Entry: %u) have UNIT_NPC_FLAG_TRAINER but have empty trainer spell list.",
@@ -1372,121 +1372,42 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
         return false;
     }
 
-    switch (GetCreatureInfo()->trainer_type)
+    uint32 gossipMenuId = GetCreatureInfo()->gossip_menu_id;
+    if (!gossipMenuId)
     {
-        case TRAINER_TYPE_CLASS:
-            if (pPlayer->GetClass() != GetCreatureInfo()->trainer_class)
-            {
-                if (msg)
-                {
-                    pPlayer->PlayerTalkClass->ClearMenus();
-                    switch (GetCreatureInfo()->trainer_class)
-                    {
-                        case CLASS_DRUID:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(4913, GetObjectGuid());
-                            break;
-                        case CLASS_HUNTER:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(10090, GetObjectGuid());
-                            break;
-                        case CLASS_MAGE:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(328, GetObjectGuid());
-                            break;
-                        case CLASS_PALADIN:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(1635, GetObjectGuid());
-                            break;
-                        case CLASS_PRIEST:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(4436, GetObjectGuid());
-                            break;
-                        case CLASS_ROGUE:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(4797, GetObjectGuid());
-                            break;
-                        case CLASS_SHAMAN:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(5003, GetObjectGuid());
-                            break;
-                        case CLASS_WARLOCK:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(5836, GetObjectGuid());
-                            break;
-                        case CLASS_WARRIOR:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(4985, GetObjectGuid());
-                            break;
-                    }
-                }
-                return false;
-            }
-            break;
-        case TRAINER_TYPE_PETS:
-            if (pPlayer->GetClass() != CLASS_HUNTER)
-            {
-                if (msg)
-                {
-                    pPlayer->PlayerTalkClass->ClearMenus();
-                    pPlayer->PlayerTalkClass->SendGossipMenu(3620, GetObjectGuid());
-                }
-                return false;
-            }
-            break;
-        case TRAINER_TYPE_MOUNTS:
-            if (GetCreatureInfo()->trainer_race && pPlayer->GetRace() != GetCreatureInfo()->trainer_race)
-            {
-                // Allowed to train if exalted
-                if (FactionTemplateEntry const* faction_template = GetFactionTemplateEntry())
-                {
-                    if (pPlayer->GetReputationRank(faction_template->faction) == REP_EXALTED)
-                        return true;
-                }
-
-                if (msg)
-                {
-                    pPlayer->PlayerTalkClass->ClearMenus();
-                    switch (GetCreatureInfo()->trainer_class)
-                    {
-                        case RACE_DWARF:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(5865, GetObjectGuid());
-                            break;
-                        case RACE_GNOME:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(4881, GetObjectGuid());
-                            break;
-                        case RACE_HUMAN:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(5861, GetObjectGuid());
-                            break;
-                        case RACE_NIGHTELF:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(5862, GetObjectGuid());
-                            break;
-                        case RACE_ORC:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(5863, GetObjectGuid());
-                            break;
-                        case RACE_TAUREN:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(5864, GetObjectGuid());
-                            break;
-                        case RACE_TROLL:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(5816, GetObjectGuid());
-                            break;
-                        case RACE_UNDEAD:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(624, GetObjectGuid());
-                            break;
-                    }
-                }
-                return false;
-            }
-            break;
-        case TRAINER_TYPE_TRADESKILLS:
-            if (GetCreatureInfo()->trainer_spell && !pPlayer->HasSpell(GetCreatureInfo()->trainer_spell))
-            {
-                if (msg)
-                {
-                    pPlayer->PlayerTalkClass->ClearMenus();
-                    pPlayer->PlayerTalkClass->SendGossipMenu(11031, GetObjectGuid());
-                }
-                return false;
-            }
-            break;
-        default:
-            return false;                                   // checked and error output at creature_template loading
+        // no requirement to access training menu
+        return true;
     }
-    return true;
+
+    bool found = false;
+
+    GossipMenuItemsMapBounds bounds = sObjectMgr.GetGossipMenuItemsMapBounds(gossipMenuId);
+    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+    {
+        GossipMenuItems const& gMenuItem = itr->second;
+        if (gMenuItem.option_id == GOSSIP_OPTION_TRAINER)
+        {
+            found = true;
+            uint32 conditionId = gMenuItem.condition_id;
+            if (!conditionId)
+            {
+                return true;
+            }
+            else
+            {
+                return IsConditionSatisfied(conditionId, pPlayer, pPlayer->GetMap(), this, CONDITION_FROM_GOSSIP_OPTION);
+            }
+        }
+    }
+
+    if (!found)
+        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature %u (Entry: %u) has npc_flag UNIT_NPC_FLAG_TRAINER but does not have a GOSSIP_OPTION_TRAINER entry assigend to its gossip_menu (Entry: %u) in gossip_menu_option.",
+                        GetGUIDLow(), GetEntry(), gossipMenuId);
+
+    return false;
 }
 
-bool Creature::CanInteractWithBattleMaster(Player* pPlayer, bool msg) const
+bool Creature::CanInteractWithBattleMaster(Player* pPlayer) const
 {
     if (!IsBattleMaster())
         return false;
@@ -1495,36 +1416,7 @@ bool Creature::CanInteractWithBattleMaster(Player* pPlayer, bool msg) const
     if (bgTypeId == BATTLEGROUND_TYPE_NONE)
         return false;
 
-    if (!msg)
-        return pPlayer->GetBGAccessByLevel(bgTypeId);
-
-    if (!pPlayer->GetBGAccessByLevel(bgTypeId))
-    {
-        pPlayer->PlayerTalkClass->ClearMenus();
-        switch (bgTypeId)
-        {
-            case BATTLEGROUND_AV:
-                pPlayer->PlayerTalkClass->SendGossipMenu(7616, GetObjectGuid());
-                break;
-            case BATTLEGROUND_WS:
-                pPlayer->PlayerTalkClass->SendGossipMenu(7599, GetObjectGuid());
-                break;
-            case BATTLEGROUND_AB:
-                pPlayer->PlayerTalkClass->SendGossipMenu(7642, GetObjectGuid());
-                break;
-            default:
-                break;
-        }
-        return false;
-    }
-    return true;
-}
-
-bool Creature::CanTrainAndResetTalentsOf(Player const* pPlayer) const
-{
-    return pPlayer->GetLevel() >= 10
-           && GetCreatureInfo()->trainer_type == TRAINER_TYPE_CLASS
-           && pPlayer->GetClass() == GetCreatureInfo()->trainer_class;
+    return pPlayer->GetBGAccessByLevel(bgTypeId);
 }
 
 /**
