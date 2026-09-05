@@ -10501,7 +10501,7 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
             GetPosition(initialPos.x, initialPos.y, initialPos.z);
     }
     else
-        dist = GetCombatReachToTarget(attacker, false, 0.0f, true) - 0.5f;
+        dist = GetCombatReachToTarget(attacker, false, 0.0f, true) - 2.8f;
 
     float attackerTargetDistance = sqrt(pow(initialPos.x - attacker->GetPositionX(), 2) +
         pow(initialPos.y - attacker->GetPositionY(), 2) +
