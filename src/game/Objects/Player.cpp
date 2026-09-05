@@ -11491,7 +11491,7 @@ void Player::AddItemToBuyBackSlot(Item* pItem, uint32 money, ObjectGuid vendorGu
             // found empty
             if (!m_items[i])
             {
-                slot = i;
+                oldest_slot = i;
                 break;
             }
 
