@@ -11283,7 +11283,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     }
 
     VendorItemData const* vItems = isTemplate ? GetNpcVendorTemplateItemList(vendor_entry) : GetNpcVendorItemList(vendor_entry);
-    VendorItemData const* tItems = isTemplate ? nullptr : GetNpcVendorTemplateItemList(vendor_entry);
+    VendorItemData const* tItems = (!isTemplate && cInfo->vendor_id) ? GetNpcVendorTemplateItemList(cInfo->vendor_id) : nullptr;
 
     if (!vItems && !tItems)
         return true;                                        // later checks for non-empty lists
@@ -11302,7 +11302,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
 
     if (!isTemplate)
     {
-        if (tItems && tItems->GetItem(item_id))
+        if (tItems && tItems->FindItem(item_id))
         {
             if (pl)
                 pl->PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id);
