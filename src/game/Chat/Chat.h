@@ -182,6 +182,7 @@ class ChatHandler
 
         bool HasLowerSecurity(Player* target, ObjectGuid guid = ObjectGuid(), bool strong = false);
         bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
+        bool HonorSystemDisabled();
 
         void SendGlobalSysMessage(char const* str);
 

@@ -677,7 +677,7 @@ void Player::SatisfyItemRequirements(ItemPrototype const* pItem)
 
     // Set required honor rank
     auto playerRank = (sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_EQUIP_REQUIREMENTS) && sWorld.GetWowPatch() < WOW_PATCH_106) ? m_honorMgr.GetRank().rank : m_honorMgr.GetHighestRank().rank;
-    if (playerRank < (uint8)pItem->RequiredHonorRank)
+    if (sWorld.IsHonorEnabled() && playerRank < (uint8)pItem->RequiredHonorRank)
     {
         HonorRankInfo rank;
         rank.rank = pItem->RequiredHonorRank;
@@ -21869,10 +21869,6 @@ void Player::LootMoney(int32 money, Loot* loot)
 
 void Player::RewardHonor(Unit const* pVictim, uint32 groupSize)
 {
-    // Honor System was added in 1.4.
-    if (sWorld.GetWowPatch() < WOW_PATCH_104 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_TIMELINE))
-        return;
-
     if (!pVictim)
         return;
 
@@ -21902,15 +21898,10 @@ void Player::RewardHonor(Unit const* pVictim, uint32 groupSize)
             return;
         }
     }
-    // for PvP see ::HonorRewardInPvP
 }
 
 void Player::RewardHonorOnDeath()
 {
-    // Honor System was added in 1.4.
-    if (sWorld.GetWowPatch() < WOW_PATCH_104 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_TIMELINE))
-        return;
-
     if (HasAuraType(SPELL_AURA_NO_PVP_CREDIT)) // Honorless Target
         return;
 
