@@ -145,9 +145,16 @@ bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
 bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
 {
     Creature* pTarget = GetSelectedCreature();
-    auto* targetAi = pTarget->AI();
 
-    if (!pTarget || !targetAi)
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    auto* targetAi = pTarget->AI();
+    if (!targetAi)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
