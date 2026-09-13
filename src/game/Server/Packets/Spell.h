@@ -180,6 +180,15 @@ namespace WorldPackets { namespace Spell
     class SpellNonMeleeDamageLog final : public ServerPacket
     {
     public:
+        struct ExtendedData
+        {
+            // Only if SPELL_HIT_TYPE_CRIT_DEBUG set
+            float critRoll = 0.0f;
+            float critNeeded = 0.0f;
+            // Only if SPELL_HIT_TYPE_HIT_DEBUG set
+            float hitRoll = 0.0f;
+            float hitNeeded = 0.0f;
+        };
         ObjectGuid targetGuid;
         ObjectGuid attackerGuid;
         uint32 spellId = 0;
@@ -192,8 +201,8 @@ namespace WorldPackets { namespace Spell
         bool periodicLog = false; // if true, client shows spell name in log
         bool unused = false;
         uint32 blocked = 0;
-        uint32 hitInfo = 0;
-        uint8 extendedData = 0; // flag to use extended data (always 0)
+        uint32 hitTypeFlags = 0; // enum SpellHitType
+        nonstd::optional<ExtendedData> extendedData;
 
         explicit SpellNonMeleeDamageLog() : ServerPacket(SMSG_SPELLNONMELEEDAMAGELOG) {}
         void AppendBodyTo(ByteBuffer& buffer) const override;

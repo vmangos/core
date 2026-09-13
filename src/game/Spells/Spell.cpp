@@ -902,7 +902,7 @@ void Spell::AddUnitTarget(Unit* pTarget, SpellEffectIndex effIndex)
     targetInfo.effectMask = immuned ? 0 : 1 << effIndex;        // Store index of effect if not immuned
     targetInfo.processed  = false;                              // Effects not apply on target
     targetInfo.deleted = false;
-    targetInfo.HitInfo = 0x0;
+    targetInfo.hitTypeFlags = 0x0;
     targetInfo.damage = 0;
 
     // spell fly from visual cast object
@@ -1370,7 +1370,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         if (m_delayed)
         {
             damageInfo.damage = m_damage;
-            damageInfo.HitInfo = target->HitInfo;
+            damageInfo.hitTypeFlags = target->hitTypeFlags;
         }
         // Add bonuses and fill damageInfo struct
         else
@@ -1910,7 +1910,7 @@ void Spell::HandleDelayedSpellLaunch(TargetInfo *target)
     }
 
     target->damage = damageInfo.damage;
-    target->HitInfo = damageInfo.HitInfo;
+    target->hitTypeFlags = damageInfo.hitTypeFlags;
 }
 
 void Spell::InitializeDamageMultipliers()

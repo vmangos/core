@@ -827,7 +827,7 @@ void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log) con
 #endif
     packet->periodicLog = log->periodicLog;
     packet->blocked = log->blocked;
-    packet->hitInfo = log->HitInfo;
+    packet->hitTypeFlags = log->hitTypeFlags;
     SendMessageToSet(std::move(packet), true);
 }
 
@@ -841,11 +841,11 @@ void SpellCaster::SendSpellNonMeleeDamageLog(Unit const* target, uint32 spellId,
     log.resist = resist;
     log.periodicLog = isPeriodic;
     log.blocked = blocked;
-    log.HitInfo = 0;
+    log.hitTypeFlags = 0;
     if (criticalHit)
-        log.HitInfo |= SPELL_HIT_TYPE_CRIT;
+        log.hitTypeFlags |= SPELL_HIT_TYPE_CRIT;
     if (split)
-        log.HitInfo |= SPELL_HIT_TYPE_SPLIT;
+        log.hitTypeFlags |= SPELL_HIT_TYPE_SPLIT;
     SendSpellNonMeleeDamageLog(&log);
 }
 
@@ -989,7 +989,7 @@ void SpellCaster::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float da
             // if crit add critical bonus
             if (crit && !spellInfo->HasAttribute(SPELL_ATTR_EX3_IGNORE_CASTER_MODIFIERS))
             {
-                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+                damageInfo->hitTypeFlags |= SPELL_HIT_TYPE_CRIT;
                 damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
             }
             break;
@@ -1005,7 +1005,7 @@ void SpellCaster::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float da
             // If crit add critical bonus
             if (crit && !spellInfo->HasAttribute(SPELL_ATTR_EX3_IGNORE_CASTER_MODIFIERS))
             {
-                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+                damageInfo->hitTypeFlags |= SPELL_HIT_TYPE_CRIT;
                 damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
             }
             break;
@@ -1609,7 +1609,7 @@ void SpellCaster::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabili
     }
 
     // Call default DealDamage (send critical in hit info for threat calculation)
-    CleanDamage cleanDamage(0, BASE_ATTACK, damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT ? MELEE_HIT_CRIT : MELEE_HIT_NORMAL, damageInfo->absorb, damageInfo->resist);
+    CleanDamage cleanDamage(0, BASE_ATTACK, damageInfo->hitTypeFlags & SPELL_HIT_TYPE_CRIT ? MELEE_HIT_CRIT : MELEE_HIT_NORMAL, damageInfo->absorb, damageInfo->resist);
     DealDamage(pVictim, damageInfo->damage, &cleanDamage, spellProto->HasAttribute(SPELL_ATTR_EX3_TREAT_AS_PERIODIC) ? DOT : SPELL_DIRECT_DAMAGE, GetSchoolMask(damageInfo->school), spellProto, durabilityLoss, damageInfo->spell, damageInfo->reflected);
 }
 

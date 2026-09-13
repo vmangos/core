@@ -135,8 +135,22 @@ void WorldPackets::Spell::SpellNonMeleeDamageLog::AppendBodyTo(ByteBuffer& buffe
     buffer << periodicLog;
     buffer << unused;
     buffer << blocked;
-    buffer << hitInfo;
-    buffer << extendedData;
+    buffer << hitTypeFlags;
+    buffer << uint8(extendedData.has_value());
+
+    if (extendedData.has_value())
+    {
+        if (hitTypeFlags & SPELL_HIT_TYPE_CRIT_DEBUG)
+        {
+            buffer << extendedData->critRoll;
+            buffer << extendedData->critNeeded;
+        }
+        if (hitTypeFlags & SPELL_HIT_TYPE_HIT_DEBUG)
+        {
+            buffer << extendedData->hitRoll;
+            buffer << extendedData->hitNeeded;
+        }
+    }
 }
 
 void WorldPackets::Spell::SpellCooldown::AppendBodyTo(ByteBuffer& buffer) const

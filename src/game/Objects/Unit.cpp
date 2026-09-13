@@ -9091,7 +9091,7 @@ uint32 CreateProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
                 if (damageInfo->absorb)
                     procEx |= PROC_EX_ABSORB;
                 // On crit
-                if (damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT)
+                if (damageInfo->hitTypeFlags & SPELL_HIT_TYPE_CRIT)
                     procEx |= PROC_EX_CRITICAL_HIT;
                 else
                     procEx |= PROC_EX_NORMAL_HIT;

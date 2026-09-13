@@ -219,8 +219,6 @@ enum SpellHitType
     SPELL_HIT_TYPE_CRIT                 = 0x02,
     SPELL_HIT_TYPE_HIT_DEBUG            = 0x04,
     SPELL_HIT_TYPE_SPLIT                = 0x08,
-    SPELL_HIT_TYPE_VICTIM_IS_ATTACKER   = 0x10,
-    SPELL_HIT_TYPE_ATTACK_TABLE_DEBUG   = 0x20
 };
 
 enum SpellDmgClass

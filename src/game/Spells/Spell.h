@@ -467,7 +467,7 @@ class Spell
         {
             ObjectGuid targetGUID;
             uint64 timeDelay;
-            uint32 HitInfo;
+            uint32 hitTypeFlags; // enum SpellHitType
             uint32 damage;
             SpellMissInfo missCondition:8;
             SpellMissInfo reflectResult:8;

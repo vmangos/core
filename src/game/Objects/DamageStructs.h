@@ -166,7 +166,7 @@ struct CalcDamageInfo
 struct SpellNonMeleeDamage {
     SpellNonMeleeDamage(SpellCaster* _attacker, Unit* _target, uint32 spellId_, SpellSchools _school)
         : target(_target), attacker(_attacker), spellId(spellId_), damage(0), school(_school),
-        absorb(0), resist(0), periodicLog(false), reflected(false), blocked(0), HitInfo(0), spell(nullptr)
+        absorb(0), resist(0), periodicLog(false), reflected(false), blocked(0), hitTypeFlags(0), spell(nullptr)
     {}
 
     Unit* target;
@@ -179,7 +179,7 @@ struct SpellNonMeleeDamage {
     bool   periodicLog;
     bool   reflected;
     uint32 blocked;
-    uint32 HitInfo;
+    uint32 hitTypeFlags; // enum SpellHitType
     Spell* spell;
 };
 
