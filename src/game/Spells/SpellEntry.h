@@ -1109,6 +1109,9 @@ class SpellEntry
 
         bool CanCrit() const
         {
+            if (HasAttribute(SPELL_ATTR_EX2_CANT_CRIT))
+                return false;
+
             for (uint32 i : Effect)
             {
                 if (Spells::IsEffectThatCanCrit(i))

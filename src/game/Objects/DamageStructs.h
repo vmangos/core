@@ -26,24 +26,52 @@ class Spell;
 class SpellCaster;
 class Unit;
 
-// At least some values expected fixed and used in auras field, other custom
+// Server side enum.
+// Returned by SpellCaster::RollMeleeOutcomeAgainst to determine outcome of melee attacks.
 enum MeleeHitOutcome
 {
     MELEE_HIT_EVADE = 0,
     MELEE_HIT_MISS = 1,
-    MELEE_HIT_DODGE = 2,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
-    MELEE_HIT_BLOCK = 3,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
-    MELEE_HIT_PARRY = 4,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_DODGE = 2,
+    MELEE_HIT_BLOCK = 3,
+    MELEE_HIT_PARRY = 4,
     MELEE_HIT_GLANCING = 5,
     MELEE_HIT_CRIT = 6,
     MELEE_HIT_CRUSHING = 7,
     MELEE_HIT_NORMAL = 8,
-    MELEE_HIT_BLOCK_CRIT = 9,
+    MELEE_HIT_RESIST = 9
 };
 
+inline SpellMissInfo MeleeHitOutcomeToSpellMissInfo(MeleeHitOutcome hitOutcome)
+{
+    switch (hitOutcome)
+    {
+        case MELEE_HIT_EVADE:
+            return SPELL_MISS_EVADE;
+        case MELEE_HIT_MISS:
+            return SPELL_MISS_MISS;
+        case MELEE_HIT_DODGE:
+            return SPELL_MISS_DODGE;
+        case MELEE_HIT_BLOCK:
+            return SPELL_MISS_BLOCK;
+        case MELEE_HIT_PARRY:
+            return SPELL_MISS_PARRY;
+        case MELEE_HIT_RESIST:
+            return SPELL_MISS_RESIST;
+        case MELEE_HIT_GLANCING:
+        case MELEE_HIT_CRIT:
+        case MELEE_HIT_CRUSHING:
+        case MELEE_HIT_NORMAL:
+            return SPELL_MISS_NONE;
+    }
+    return SPELL_MISS_NONE;
+};
+
+// Client side enum.
+// Sent in SMSG_ATTACKERSTATEUPDATE.
 enum VictimState
 {
-    VICTIMSTATE_UNAFFECTED     = 0,                         // seen in relation with HITINFO_MISS
+    VICTIMSTATE_UNAFFECTED     = 0,
     VICTIMSTATE_NORMAL         = 1,
     VICTIMSTATE_DODGE          = 2,
     VICTIMSTATE_PARRY          = 3,
@@ -79,14 +107,15 @@ inline VictimState SpellMissInfoToVictimState(SpellMissInfo missInfo)
     return VICTIMSTATE_UNAFFECTED;
 }
 
+// Client side enum.
+// Sent in SMSG_ATTACKERSTATEUPDATE.
 enum HitInfo
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    HITINFO_NORMALSWING         = 0x00000000,
     HITINFO_DEBUG               = 0x00000001,               // 0
     HITINFO_AFFECTS_VICTIM      = 0x00000002,               // 1 no being hit animation on victim without it
     HITINFO_LEFTSWING           = 0x00000004,               // 2
-    HITINFO_KILLING_BLOW        = 0x00000008,               // 3 guessed, not seen in sniffs, but they contain no killing blows either
+    HITINFO_UNK3                = 0x00000008,               // 3 seemingly an unused flag after 1.9, still unused even in wotlk
     HITINFO_MISS                = 0x00000010,               // 4
     HITINFO_ABSORB              = 0x00000020,               // 5 plays absorb sound
     HITINFO_RESIST              = 0x00000040,               // 6 resisted atleast some damage
@@ -95,16 +124,15 @@ enum HitInfo
     HITINFO_ROLLED_PARRY        = 0x00000200,               // 9 guessed, parry check was made, never set when attacking from behind, implies HITINFO_ROLLED_DODGE
     HITINFO_ROLLED_BLOCK        = 0x00000400,               // 10 guessed, block check was made, never set on glancing blows, implies HITINFO_ROLLED_PARRY
     HITINFO_BLOCK               = 0x00000800,               // 11 used instead of VICTIMSTATE_BLOCKS in sniffs, implies HITINFO_ROLLED_BLOCK
-    HITINFO_NO_FLOATING_TEXT    = 0x00001000,               // 12 used with melee spells
-    HITINFO_BLOOD_SPURT         = 0x00002000,               // 13 sprays extra blood
+    HITINFO_SUPPRESS_MISS_TEXT  = 0x00001000,               // 12 used with melee spells, but only if damage is 0 and not miss
+    HITINFO_BLOOD_SPURT         = 0x00002000,               // 13 sprays extra blood, only when damage is between 20% and 100% of victim max health, victim is always a player
     HITINFO_GLANCING            = 0x00004000,               // 14
     HITINFO_CRUSHING            = 0x00008000,               // 15
     HITINFO_NOACTION            = 0x00010000,               // 16
     HITINFO_UNK17               = 0x00020000,               // 17 seen in sniffs, only sent by players, always set on melee spell casts
-    HITINFO_PVP                 = 0x00040000,               // 18 guessed, always set when both attacker and victim are players in sniff, but never with creatures
+    HITINFO_PVP                 = 0x00040000,               // 18 guessed, set when both attacker and victim are player controlled
     HITINFO_SWINGNOHITSOUND     = 0x00080000                // 19
 #else
-    HITINFO_NORMALSWING         = 0x00000000,
     HITINFO_MISS                = 0x00000001,               // 0
     HITINFO_AFFECTS_VICTIM      = 0x00000002,               // 1 no being hit animation on victim without it
     HITINFO_KILLING_BLOW        = 0x00000004,               // 2 victim died, confirmed by 0.5.3 client and sniffs
@@ -115,19 +143,30 @@ enum HitInfo
     HITINFO_ROLLED_BLOCK        = 0x00000080,               // 7 guessed, block check was made, set on every block, implies HITINFO_ROLLED_DODGE
     HITINFO_UNK8                = 0x00000100,               // 8
     HITINFO_LEFTSWING           = 0x00000200,               // 9
-    HITINFO_BLOOD_SPURT         = 0x00000400,               // 10 sprays extra blood, only when damage is between 20% and 100% of victim max health
-    HITINFO_DAZE                = 0x00000800,               // 11 guessed, only seen together with 0x00000010
+    HITINFO_BLOOD_SPURT         = 0x00000400,               // 10 sprays extra blood, only when damage is between 20% and 100% of victim max health, victim is always a player
+    HITINFO_DAZE                = 0x00000800,               // 11 guessed, daze spell cast preceeds it, only seen together with 0x00000010
     HITINFO_NOACTION            = 0x00001000,               // 12
     HITINFO_DEBUG               = 0x00002000,               // 13
     HITINFO_UNK14               = 0x00004000,               // 14
     HITINFO_UNK15               = 0x00008000,               // 15
     HITINFO_ABSORB              = 0x00010000,               // 16 plays absorb sound
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
     HITINFO_RESIST              = 0x00020000,               // 17 resisted atleast some damage
-    HITINFO_NO_FLOATING_TEXT    = 0x00040000,               // 18 used with melee spells
+    HITINFO_SUPPRESS_MISS_TEXT  = 0x00040000,               // 18 used with melee spells, but only if damage is 0 and not miss
     HITINFO_BLOCK               = 0x00080000,               // 19 used instead of VICTIMSTATE_BLOCKS in sniffs, implies HITINFO_ROLLED_BLOCK
     HITINFO_GLANCING            = 0x00100000,               // 20
     HITINFO_CRUSHING            = 0x00200000,               // 21
-    HITINFO_SWINGNOHITSOUND     = 0x00400000                // 22
+    HITINFO_PVP                 = 0x00400000,               // 22 guessed, all the cases are player vs player or pet/totem
+    HITINFO_SWINGNOHITSOUND     = 0x00800000,               // 23
+#else
+    HITINFO_RESIST              = 0x00000000,               // does not exists before 1.6
+    HITINFO_SUPPRESS_MISS_TEXT  = 0x00020000,               // 17 used with melee spells, but only if damage is 0 and not miss
+    HITINFO_BLOCK               = 0x00040000,               // 18 used instead of VICTIMSTATE_BLOCKS in sniffs, implies HITINFO_ROLLED_BLOCK
+    HITINFO_GLANCING            = 0x00080000,               // 19
+    HITINFO_CRUSHING            = 0x00100000,               // 20
+    HITINFO_PVP                 = 0x00200000,               // 21 guessed, all the cases are player vs player or pet/totem
+    HITINFO_SWINGNOHITSOUND     = 0x00400000,               // 22
+#endif
 #endif
 };
 
@@ -150,7 +189,7 @@ struct CalcDamageInfo
     int32 totalResist = 0;
     SubDamageInfo subDamage[MAX_ITEM_PROTO_DAMAGES] = {};
     uint32 blocked_amount = 0;
-    uint32 HitInfo = HITINFO_NORMALSWING;
+    uint32 HitInfo = 0;
     uint32 TargetState = VICTIMSTATE_UNAFFECTED;
 
     // Helper

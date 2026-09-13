@@ -903,18 +903,24 @@ void Spell::AddUnitTarget(Unit* pTarget, SpellEffectIndex effIndex)
     targetInfo.processed  = false;                              // Effects not apply on target
     targetInfo.deleted = false;
     targetInfo.hitTypeFlags = 0x0;
+    targetInfo.meleeHitInfo = 0x0;
     targetInfo.damage = 0;
+    targetInfo.isCrit = false;
+
+    // For melee spells crit outcome is part of the attack table, so MeleeSpellHitResult will set it.
+    nonstd::optional<bool> isCrit;
+
+    // Calculate hit result and crit
+    targetInfo.missCondition = m_caster->SpellHitResult(pTarget, m_spellInfo, effIndex, m_canReflect, this, &isCrit, &targetInfo.meleeHitInfo);
 
     // spell fly from visual cast object
     SpellCaster* affectiveObject = GetAffectiveCasterObject();
 
-    if (affectiveObject && m_spellInfo->CanCrit())
+    // If crit chance wasn't rolled, roll it here.
+    if (isCrit.has_value())
+        targetInfo.isCrit = isCrit.value();
+    else if (affectiveObject)
         targetInfo.isCrit = affectiveObject->IsSpellCrit(pTarget, m_spellInfo, m_spellSchoolMask, m_attackType, this);
-    else
-        targetInfo.isCrit = false;
-
-    // Calculate hit result
-    targetInfo.missCondition = m_caster->SpellHitResult(pTarget, m_spellInfo, effIndex, m_canReflect, this);
 
     // Spell have speed - need calculate incoming time
     if (m_spellInfo->speed > 0.0f && affectiveObject && pTarget != affectiveObject)
@@ -1369,6 +1375,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
         if (m_delayed)
         {
+            // Copy damage calculated from HandleDelayedSpellLaunch
             damageInfo.damage = m_damage;
             damageInfo.hitTypeFlags = target->hitTypeFlags;
         }
@@ -1389,6 +1396,18 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             }
 
             pCaster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, damageEffectIndex, m_attackType, this, target->isCrit);
+        }
+
+        // Next Melee spells roll on the melee hit table, so they can glance or crush.
+        // Only they can produce these outcomes, no extra spell check is needed here.
+        // It is unknown if damage should actually be affected, because damage is hidden
+        // in SMSG_ATTACKERSTATEUPDATE, need to check SMSG_SPELLNONMELEEDAMAGELOG.
+        if (m_casterUnit && damageInfo.damage > 0)
+        {
+            if (target->meleeHitInfo & HITINFO_GLANCING)
+                damageInfo.damage = std::max<uint32>(1, damageInfo.damage * m_casterUnit->GetGlancingBlowDamageMultiplier(unitTarget, m_attackType));
+            else if (target->meleeHitInfo & HITINFO_CRUSHING)
+                damageInfo.damage += damageInfo.damage / 2; // 150% of normal damage
         }
 
         uint32 const originalDamage = damageInfo.damage;
@@ -4929,18 +4948,6 @@ void Spell::SendMeleeAttackingStateUpdate(TargetInfo const* target, SpellNonMele
 {
     auto packet = std::make_unique<WorldPackets::Combat::MeleeAttackingStateUpdate>();
 
-    packet->hitInfo = HITINFO_NOACTION | HITINFO_NO_FLOATING_TEXT;
-    if (target->missCondition == SPELL_MISS_MISS)
-        packet->hitInfo |= HITINFO_MISS;
-    else if (target->missCondition == SPELL_MISS_ABSORB)
-        packet->hitInfo |= HITINFO_ABSORB;
-    else if (target->missCondition != SPELL_MISS_IMMUNE && target->missCondition != SPELL_MISS_IMMUNE2)
-        packet->hitInfo |= HITINFO_AFFECTS_VICTIM;
-    if (target->missCondition == SPELL_MISS_RESIST)
-        packet->hitInfo |= HITINFO_RESIST;
-    if (target->isCrit)
-        packet->hitInfo |= HITINFO_CRITICALHIT;
-
     packet->attackerGuid = m_casterUnit->GetObjectGuid();
     packet->victimGuid = m_casterUnit->GetVictim()->GetObjectGuid();
     packet->subDamage.resize(1);
@@ -4961,6 +4968,23 @@ void Spell::SendMeleeAttackingStateUpdate(TargetInfo const* target, SpellNonMele
     packet->victimState = SpellMissInfoToVictimState(target->missCondition);
     packet->attackerState = packet->victimState == VICTIMSTATE_NORMAL ? 1000 : 0;
     packet->meleeSpellId = m_spellInfo->Id;
+    packet->hitInfo = target->meleeHitInfo | HITINFO_NOACTION;
+    m_casterUnit->SetDamageIndependentHitInfoFlags(packet->hitInfo, m_casterUnit->GetVictim(), m_attackType);
+
+    // On a dodge or parry there is no damage info at all,
+    // so unlike auto attacks we cannot tell how hard the
+    // swing would have been, and never set HITINFO_BLOOD_SPURT.
+    // That is actually blizzlike because in the sniff data,
+    // blood spurt is never present for dodge or parry with spells.
+    // Which means we don't need to supply total damage as param.
+    if (damageInfo)
+        m_casterUnit->SetDamageDependentHitInfoFlags(packet->hitInfo, m_casterUnit->GetVictim(), packet->victimState, 0, damageInfo->damage, damageInfo->blocked, damageInfo->absorb, damageInfo->resist);
+
+    if (!packet->totalDamage && !packet->blockedAmount &&
+        !packet->subDamage[0].absorb && !packet->subDamage[0].resist &&
+        packet->victimState != VICTIMSTATE_UNAFFECTED)
+        packet->hitInfo |= HITINFO_SUPPRESS_MISS_TEXT;
+
     m_casterUnit->SendMessageToSet(std::move(packet), true);
 }
 

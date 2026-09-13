@@ -468,12 +468,13 @@ class Spell
             ObjectGuid targetGUID;
             uint64 timeDelay;
             uint32 hitTypeFlags; // enum SpellHitType
+            uint32 meleeHitInfo; // enum HitInfo
             uint32 damage;
             SpellMissInfo missCondition:8;
             SpellMissInfo reflectResult:8;
             uint8  effectMask:8;
             bool   processed:1;
-            bool   isCrit:1;
+            bool   isCrit : 1;
             bool   deleted:1;
         };
 
