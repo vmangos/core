@@ -6011,8 +6011,8 @@ void Player::SaveRecallPosition()
 
 void Player::SendMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self) const
 {
-    WorldPacket binaryPacket(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    WorldPacket binaryPacket;
+    packet->WritePacket(binaryPacket);
     SendMessageToSet(&binaryPacket, self);
 }
 

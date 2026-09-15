@@ -406,8 +406,8 @@ void MovementAnticheat::LogMovementPacket(ServerPacket const& packet)
     if (sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE) != 0)
     {
         // TODO: Wait for all packets to be converted, so we can store the ServerPacket directly
-        WorldPacket binaryPacket(packet.GetOpcode());
-        packet.AppendBodyTo(binaryPacket);
+        WorldPacket binaryPacket;
+        packet.WritePacket(binaryPacket);
         LogMovementPacket(false, binaryPacket);
     }
 }

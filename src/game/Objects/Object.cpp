@@ -2226,8 +2226,7 @@ void WorldObject::SendMessageToSet(std::unique_ptr<ServerPacket const> packet, b
 {
     // TODO Use broadcaster which does the binary conversion automatically
     WorldPacket binaryPacket;
-    binaryPacket.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    packet->WritePacket(binaryPacket);
     SendMessageToSet(&binaryPacket, self);
 }
 
@@ -2300,8 +2299,8 @@ void WorldObject::SendObjectMessageToSetImpl(WorldPacket* data, bool self, World
 
 void WorldObject::SendObjectMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except) const
 {
-    WorldPacket binaryPacket(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    WorldPacket binaryPacket;
+    packet->WritePacket(binaryPacket);
     SendObjectMessageToSet(&binaryPacket, self, except);
 }
 
@@ -2312,8 +2311,8 @@ void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObje
 
 void WorldObject::SendMovementMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except)
 {
-    WorldPacket binaryPacket(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    WorldPacket binaryPacket;
+    packet->WritePacket(binaryPacket);
     SendMovementMessageToSet(std::move(binaryPacket), self, except);
 }
 

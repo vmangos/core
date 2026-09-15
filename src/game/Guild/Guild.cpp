@@ -645,8 +645,8 @@ void Guild::BroadcastChatMsgToOfficers(WorldSession const* senderSession, char c
 void Guild::BroadcastPacket(std::unique_ptr<ServerPacket> packet) const
 {
     // TODO Use broadcaster which does the binary conversion automatically
-    WorldPacket binaryPacket = WorldPacket(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    WorldPacket binaryPacket;
+    packet->WritePacket(binaryPacket);
 
     for (const auto& member : members)
     {
@@ -659,8 +659,8 @@ void Guild::BroadcastPacket(std::unique_ptr<ServerPacket> packet) const
 void Guild::BroadcastPacketToRank(std::unique_ptr<ServerPacket> packet, uint32 rankId) const
 {
     // TODO Use broadcaster which does the binary conversion automatically
-    WorldPacket binaryPacket = WorldPacket(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    WorldPacket binaryPacket;
+    packet->WritePacket(binaryPacket);
 
     for (const auto& member : members)
     {

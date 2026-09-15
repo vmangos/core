@@ -117,9 +117,8 @@ void WorldSession::SendPacket(std::unique_ptr<ServerPacket const> packet)
 {
     WorldPacket buffer;
     { // TODO: This part will be offloaded to an IO thread soon. Only the IO thread will allocate a buffer.
-        buffer.SetOpcode(packet->GetOpcode());
+        packet->WritePacket(buffer);
         buffer.FillPacketTime(WorldTimer::getMSTime());
-        packet->AppendBodyTo(buffer);
     }
 
     // There is a maximum size packet.

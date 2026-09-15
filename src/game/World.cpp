@@ -2170,8 +2170,7 @@ void World::SendGlobalMessage(std::unique_ptr<ServerPacket const> packet, WorldS
 {
     // TODO Use broadcaster which does the binary conversion automatically
     WorldPacket binaryPacket;
-    binaryPacket.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    packet->WritePacket(binaryPacket);
     SendGlobalMessage(&binaryPacket, self, team);
 }
 

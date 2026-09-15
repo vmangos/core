@@ -768,8 +768,7 @@ void Group::SendLootStartRoll(uint32 CountDown, Roll const& r)
 
     // TODO Use broadcaster which does the binary conversion automatically
     WorldPacket data;
-    data.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(data);
+    packet->WritePacket(data);
 
     for (const auto& itr : r.playerVote)
     {
@@ -798,8 +797,7 @@ void Group::SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 r
 
     // TODO Use broadcaster which does the binary conversion automatically
     WorldPacket data;
-    data.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(data);
+    packet->WritePacket(data);
 
     for (const auto& itr : r.playerVote)
     {
@@ -826,8 +824,7 @@ void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, Roll
 
     // TODO Use broadcaster which does the binary conversion automatically
     WorldPacket data;
-    data.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(data);
+    packet->WritePacket(data);
 
     for (const auto& itr : r.playerVote)
     {
@@ -851,8 +848,7 @@ void Group::SendLootAllPassed(Roll const& r)
 
     // TODO Use broadcaster which does the binary conversion automatically
     WorldPacket data;
-    data.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(data);
+    packet->WritePacket(data);
 
     for (const auto& itr : r.playerVote)
     {
@@ -1491,8 +1487,7 @@ void Group::BroadcastPacket(std::unique_ptr<ServerPacket> packet, bool ignorePla
 {
     // TODO Use broadcaster/scheduler which does the binary conversion automatically
     WorldPacket data;
-    data.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(data);
+    packet->WritePacket(data);
     BroadcastPacket(&data, ignorePlayersInBGRaid, raidSubGroup, ignore);
 }
 

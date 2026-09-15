@@ -26,6 +26,12 @@ class ServerPacket : public Packet
 public:
     explicit ServerPacket(uint16 opcode) : Packet(opcode) {}
     virtual void AppendBodyTo(ByteBuffer& buffer) const = 0;
+
+    void WritePacket(WorldPacket& packet) const
+    {
+        AppendBodyTo(packet);
+        packet.SetOpcode(GetOpcode());
+    }
 };
 
 class ClientPacket : public Packet
