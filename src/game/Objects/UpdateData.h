@@ -22,6 +22,7 @@
 #ifndef __UPDATEDATA_H
 #define __UPDATEDATA_H
 
+#include <memory>
 #include "ByteBuffer.h"
 #include "ObjectGuid.h"
 #include "Packets/ObjectUpdate.h"
