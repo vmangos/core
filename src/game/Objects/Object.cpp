@@ -442,9 +442,9 @@ void WorldObject::DirectSendPublicValueUpdate(UpdateMask& updateMask)
         }
     }
 
-    WorldPacket packet;
-    data.BuildPacket(&packet);
-    SendObjectMessageToSet(&packet, true);
+    auto packet = std::make_unique<WorldPackets::ObjectUpdate::UpdateObject>();
+    data.BuildPacket(packet);
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
 void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) const
@@ -489,9 +489,9 @@ void Object::SendOutOfRangeUpdateToPlayer(Player const* player)
 {
     UpdateData data;
     BuildOutOfRangeUpdateBlock(data);
-    WorldPacket packet;
-    data.BuildPacket(&packet);
-    player->SendDirectMessage(&packet);
+    auto packet = std::make_unique<WorldPackets::ObjectUpdate::UpdateObject>();
+    data.BuildPacket(packet);
+    player->GetSession()->SendPacket(std::move(packet));
 }
 
 void Object::DestroyForPlayer(Player const* target) const

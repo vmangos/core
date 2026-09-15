@@ -541,11 +541,14 @@ void GenericTransport::SendOutOfRangeUpdateToMap()
     {
         UpdateData data;
         BuildOutOfRangeUpdateBlock(data);
-        WorldPacket packet;
-        data.BuildPacket(&packet);
+        auto packet = std::make_unique<WorldPackets::ObjectUpdate::UpdateObject>();
+        data.BuildPacket(packet);
+        WorldPacket binaryPacket;
+        packet->WritePacket(binaryPacket);
+
         for (const auto& player : players)
             if (player.getSource()->GetTransport() != this)
-                player.getSource()->SendDirectMessage(&packet);
+                player.getSource()->GetSession()->SendPacket(&binaryPacket);
     }
 }
 

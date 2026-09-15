@@ -2896,11 +2896,7 @@ void Player::SetCheatDebugTargetInfo(bool on, bool notify)
             UpdateData newData;
             pUnit->BuildValuesUpdateBlockForPlayerWithFlags(newData, this, UpdateFieldFlags(updateFlags), true);
             if (newData.HasData())
-            {
-                WorldPacket newDataPacket;
-                newData.BuildPacket(&newDataPacket);
-                SendDirectMessage(&newDataPacket);
-            }
+                newData.Send(GetSession());
         }
     }
 }

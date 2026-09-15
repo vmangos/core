@@ -212,6 +212,7 @@ set (game_SRCS
     Server/Packets/Misc.cpp
     Server/Packets/Movement.cpp
     Server/Packets/Npc.cpp
+    Server/Packets/ObjectUpdate.cpp
     Server/Packets/Pet.cpp
     Server/Packets/Petition.cpp
     Server/Packets/Query.cpp
@@ -465,6 +466,7 @@ set (game_SRCS
     Server/Packets/Misc.h
     Server/Packets/Movement.h
     Server/Packets/Npc.h
+    Server/Packets/ObjectUpdate.h
     Server/Packets/Pet.h
     Server/Packets/Petition.h
     Server/Packets/Query.h

@@ -377,7 +377,6 @@ bool Group::AddMember(ObjectGuid guid, char const* name, uint8 joinMethod)
         {
             // Broadcast new player group member fields to rest of the group
             UpdateData groupData;
-            WorldPacket groupDataPacket;
 
             // Broadcast group members' fields to player
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -405,23 +404,15 @@ bool Group::AddMember(ObjectGuid guid, char const* name, uint8 joinMethod)
                         {
                             UpdateData newData;
                             player->BuildValuesUpdateBlockForPlayer(newData, updateMask, member);
-
                             if (newData.HasData())
-                            {
-                                WorldPacket newDataPacket;
-                                newData.BuildPacket(&newDataPacket);
-                                member->SendDirectMessage(&newDataPacket);
-                            }
+                                newData.Send(member->GetSession());
                         }
                     }
                 }
             }
 
             if (groupData.HasData())
-            {
-                groupData.BuildPacket(&groupDataPacket);
-                player->SendDirectMessage(&groupDataPacket);
-            }
+                groupData.Send(player->GetSession());
         }
 
         if (IsInLFG())
@@ -582,11 +573,8 @@ void Group::Disband(bool hideDestroy, ObjectGuid initiator)
             }, 1);
         }
 
-        WorldPacket data;
         if (!hideDestroy)
-        {
             player->GetSession()->SendPacket(std::make_unique<WorldPackets::Group::GroupDestroyed>());
-        }
 
         //we already removed player from group and in player->GetGroup() is his original group, send update
         if (Group* group = player->GetGroup())
