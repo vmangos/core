@@ -57,6 +57,47 @@ class adt_MCVT
         bool  prepareLoadedData();
 };
 
+// MCNK flags selecting the liquid layers stored in its MCLQ chunk. The client
+// writes one layer per set flag, in this bit order.
+#define ADT_MCNK_LIQUID_RIVER  0x004
+#define ADT_MCNK_LIQUID_OCEAN  0x008
+#define ADT_MCNK_LIQUID_MAGMA  0x010
+#define ADT_MCNK_LIQUID_SLIME  0x020
+#define ADT_MCNK_LIQUID_MASK   (ADT_MCNK_LIQUID_RIVER | ADT_MCNK_LIQUID_OCEAN | ADT_MCNK_LIQUID_MAGMA | ADT_MCNK_LIQUID_SLIME)
+
+// Sub cell render flags of a liquid layer
+#define ADT_LIQUID_HIDDEN      0x0F
+#define ADT_LIQUID_DARK_WATER  0x80
+
+// Bytes one liquid layer occupies inside MCLQ: the layer itself plus the flow
+// data appended to it (uint32 count and two SWFlowv of 40 bytes each).
+#define ADT_LIQUID_LAYER_SIZE  804
+
+//
+// Adt file liquid map layer (old)
+//
+struct adt_MCLQ_layer
+{
+    float height1;
+    float height2;
+    struct liquid_data
+    {
+        uint32 light;
+        float  height;
+    } liquid[ADT_CELL_SIZE + 1][ADT_CELL_SIZE + 1];
+
+    // 1<<0 - ochen
+    // 1<<1 - lava/slime
+    // 1<<2 - water
+    // 1<<6 - all water
+    // 1<<7 - dark water
+    // == 0x0F - not show liquid
+    uint8 flags[ADT_CELL_SIZE][ADT_CELL_SIZE];
+    uint8 data[84];
+};
+
+static_assert(sizeof(adt_MCLQ_layer) == ADT_LIQUID_LAYER_SIZE, "MCLQ layers are stored back to back and must not be padded");
+
 //
 // Adt file liquid map chunk (old)
 //
@@ -69,22 +110,8 @@ class adt_MCLQ
         };
         uint32 size;
     public:
-        float height1;
-        float height2;
-        struct liquid_data
-        {
-            uint32 light;
-            float  height;
-        } liquid[ADT_CELL_SIZE + 1][ADT_CELL_SIZE + 1];
-
-        // 1<<0 - ochen
-        // 1<<1 - lava/slime
-        // 1<<2 - water
-        // 1<<6 - all water
-        // 1<<7 - dark water
-        // == 0x0F - not show liquid
-        uint8 flags[ADT_CELL_SIZE][ADT_CELL_SIZE];
-        uint8 data[84];
+        // Layer count is not stored here, it follows from sizeMCLQ in the parent MCNK.
+        adt_MCLQ_layer layers[1];
         bool  prepareLoadedData();
 };
 
@@ -146,6 +173,20 @@ class adt_MCNK
             if (offsMCLQ)
                 return (adt_MCLQ*)((uint8*)this + offsMCLQ);
             return 0;
+        }
+        // A chunk holding liquid stores one layer per set liquid flag. Deriving the
+        // count from the chunk size keeps it consistent with what is really there.
+        uint32 getLiquidLayerCount() const
+        {
+            if (!offsMCLQ || sizeMCLQ <= 8)
+                return 0;
+            return (sizeMCLQ - 8) / ADT_LIQUID_LAYER_SIZE;
+        }
+        adt_MCLQ_layer* getLiquidLayer(uint32 layer)
+        {
+            if (layer >= getLiquidLayerCount())
+                return 0;
+            return getMCLQ()->layers + layer;
         }
 };
 
