@@ -14629,7 +14629,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     // prevent login to locked character
     m_characterFlags = fields[15].GetUInt32();
-    if (m_characterFlags & (CHARACTER_FLAG_LOCKED_FOR_TRANSFER | CHARACTER_FLAG_DELETED_BY_TRANSFER))
+    if (m_characterFlags & (CHARACTER_FLAG_RENAME | CHARACTER_FLAG_LOCKED_FOR_TRANSFER | CHARACTER_FLAG_DELETED_BY_TRANSFER))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempts to login but character is locked!", guid.GetString().c_str());
         return false;
