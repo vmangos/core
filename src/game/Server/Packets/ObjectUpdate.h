@@ -7,6 +7,16 @@
 
 namespace WorldPackets { namespace ObjectUpdate
 {
+    class DestroyObject final : public ServerPacket
+    {
+    public:
+        ObjectGuid objectGuid; // guid of the object to destroy
+
+        explicit DestroyObject() : ServerPacket(SMSG_DESTROY_OBJECT) {}
+        size_t EstimateFinalSize() const override;
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
     class UpdateObject final : public ServerPacket
     {
     public:

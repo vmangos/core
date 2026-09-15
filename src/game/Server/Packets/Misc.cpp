@@ -612,16 +612,6 @@ void WorldPackets::Misc::InvalidatePlayer::AppendBodyTo(ByteBuffer& buffer) cons
 }
 #endif
 
-size_t WorldPackets::Misc::DestroyObject::EstimateFinalSize() const
-{
-    return sizeof(objectGuid);
-}
-
-void WorldPackets::Misc::DestroyObject::AppendBodyTo(ByteBuffer& buffer) const
-{
-    buffer << objectGuid;
-}
-
 size_t WorldPackets::Misc::AiReaction::EstimateFinalSize() const
 {
     return sizeof(unitGuid) +

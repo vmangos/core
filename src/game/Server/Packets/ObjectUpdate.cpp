@@ -5,6 +5,16 @@
 #include "World.h"
 #include <zlib.h>
 
+size_t WorldPackets::ObjectUpdate::DestroyObject::EstimateFinalSize() const
+{
+    return sizeof(objectGuid);
+}
+
+void WorldPackets::ObjectUpdate::DestroyObject::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << objectGuid;
+}
+
 size_t WorldPackets::ObjectUpdate::UpdateObject::EstimateFinalSize() const
 {
     // The size depends on whether the packet ends up compressed, so

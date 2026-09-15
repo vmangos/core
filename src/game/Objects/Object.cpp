@@ -498,7 +498,7 @@ void Object::DestroyForPlayer(Player const* target) const
 {
     MANGOS_ASSERT(target);
 
-    auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+    auto packet = std::make_unique<WorldPackets::ObjectUpdate::DestroyObject>();
     packet->objectGuid = GetObjectGuid();
     target->GetSession()->SendPacket(std::move(packet));
 }

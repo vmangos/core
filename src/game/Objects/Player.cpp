@@ -1836,7 +1836,7 @@ bool Player::SwitchInstance(uint32 newInstanceId)
 
     for (const auto& guid : m_visibleGUIDs)
     {
-        auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+        auto packet = std::make_unique<WorldPackets::ObjectUpdate::DestroyObject>();
         packet->objectGuid = guid;
         GetSession()->SendPacket(std::move(packet));
     }
@@ -21740,7 +21740,7 @@ void Player::SendDestroyGroupMembers(bool includingSelf)
         {
             if (!includingSelf && itr.guid == GetObjectGuid())
                 continue;
-            auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+            auto packet = std::make_unique<WorldPackets::ObjectUpdate::DestroyObject>();
             packet->objectGuid = itr.guid;
             GetSession()->SendPacket(std::move(packet));
             m_visibleGUIDs.erase(itr.guid);

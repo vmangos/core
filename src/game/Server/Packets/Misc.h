@@ -685,16 +685,6 @@ namespace WorldPackets { namespace Misc
     };
 #endif
 
-    class DestroyObject final : public ServerPacket
-    {
-    public:
-        ObjectGuid objectGuid; // guid of the object to destroy
-
-        explicit DestroyObject() : ServerPacket(SMSG_DESTROY_OBJECT) {}
-        size_t EstimateFinalSize() const override;
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
-
     class AiReaction final : public ServerPacket
     {
     public:
