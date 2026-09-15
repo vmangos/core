@@ -192,7 +192,7 @@ void LFGQueue::Update()
                     packet.playerGuid = member->GetObjectGuid();
 
                     // TODO Use broadcaster which does the binary conversion automatically
-                    WorldPacket data(MSG_NULL_ACTION, 8);
+                    WorldPacket data;
                     packet.WritePacket(data);
                     leader->GetSession()->SendPacket(&data);
 

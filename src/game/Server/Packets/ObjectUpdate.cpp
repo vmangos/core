@@ -34,7 +34,7 @@ void WorldPackets::ObjectUpdate::UpdateObject::AppendBodyTo(ByteBuffer& buffer) 
 
     auto WriteContentsToBuffer = [&](ByteBuffer& buf)
     {
-        buf.resize(size);
+        buf.reserve(size);
         uint32 blockCount = updatePacket ? updatePacket->blockCount : 0;
         buf << (uint32)(!outOfRangeGUIDs.empty() ? blockCount + 1 : blockCount);
         buf << (uint8)(hasTransport ? 1 : 0);
