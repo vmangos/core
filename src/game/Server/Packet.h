@@ -16,7 +16,7 @@ protected:
     mutable uint16 opcode {};
 public:
     explicit Packet(uint16 opcode) : opcode(opcode) {}
-    virtual ~Packet() = default;
+    virtual ~Packet() {}
 
     void SetOpcode(uint16 op) const { opcode = op; }
     uint16 GetOpcode() const { return opcode; }
