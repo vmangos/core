@@ -874,6 +874,17 @@ void MotionMaster::MoveJump(float x, float y, float z, float horizontalSpeed, fl
 void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack, bool useCombatReach)
 {
     float meleeReach = useCombatReach ? (m_owner->GetCombatReachToTarget(target, false, 0.0f, true) - 0.5f) : 0.0f;
+
+    // Make player Warrior charges finish close to the target
+    // instead of stopping near maximum melee range.
+    if (useCombatReach && m_owner->IsPlayer() && m_owner->GetClass() == CLASS_WARRIOR)
+    {
+        float closeReach = m_owner->GetObjectBoundingRadius() + target->GetObjectBoundingRadius() + 0.50f;
+
+        if (closeReach < meleeReach)
+            meleeReach = closeReach;
+    }
+
     if (m_owner->IsPlayer())
         Mutate(new ChargeMovementGenerator<Player>(*(m_owner->ToPlayer()), *target, delay, triggerAutoAttack, 0.0f, meleeReach));
     else
