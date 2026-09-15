@@ -67,6 +67,7 @@ namespace WorldPackets { namespace Trade
         uint8 slot = 0;
 
         explicit TradeStatus() : ServerPacket(SMSG_TRADE_STATUS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

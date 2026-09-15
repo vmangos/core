@@ -63,6 +63,7 @@ namespace WorldPackets { namespace Loot
     {
     public:
         explicit LootClearMoney() : ServerPacket(SMSG_LOOT_CLEAR_MONEY) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -72,6 +73,7 @@ namespace WorldPackets { namespace Loot
         uint32 amount = 0;
 
         explicit LootMoneyNotify() : ServerPacket(SMSG_LOOT_MONEY_NOTIFY) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -86,6 +88,7 @@ namespace WorldPackets { namespace Loot
         uint32 countdownTime = 0;            // the countdown time to choose "need" or "greed"
 
         explicit LootStartRoll() : ServerPacket(SMSG_LOOT_START_ROLL) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -102,6 +105,7 @@ namespace WorldPackets { namespace Loot
         uint8 rollType = 0;                  // 0: need, 1: need roll, 2: greed roll
 
         explicit LootRollResponse() : ServerPacket(SMSG_LOOT_ROLL) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -118,6 +122,7 @@ namespace WorldPackets { namespace Loot
         uint8 rollType = 0;                  // Rolltype related to SMSG_LOOT_ROLL
 
         explicit LootRollWon() : ServerPacket(SMSG_LOOT_ROLL_WON) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -131,6 +136,7 @@ namespace WorldPackets { namespace Loot
         uint32 randomSuffixId = 0;           // Item random suffix ID - not used
 
         explicit LootAllPassed() : ServerPacket(SMSG_LOOT_ALL_PASSED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -141,6 +147,7 @@ namespace WorldPackets { namespace Loot
         uint8 result = 1;      // always 1
 
         explicit LootReleaseResponse() : ServerPacket(SMSG_LOOT_RELEASE_RESPONSE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -150,6 +157,7 @@ namespace WorldPackets { namespace Loot
         uint8 lootSlot = 0; // slot of the removed loot item
 
         explicit LootRemoved() : ServerPacket(SMSG_LOOT_REMOVED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

@@ -160,6 +160,7 @@ namespace WorldPackets { namespace Group
         uint32 result = 0;
 
         explicit PartyCommandResult() : ServerPacket(SMSG_PARTY_COMMAND_RESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -169,6 +170,7 @@ namespace WorldPackets { namespace Group
         std::string inviterName;
 
         explicit GroupInviteNotification() : ServerPacket(SMSG_GROUP_INVITE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -178,6 +180,7 @@ namespace WorldPackets { namespace Group
         std::string playerName;
 
         explicit GroupDeclineNotification() : ServerPacket(SMSG_GROUP_DECLINE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -185,6 +188,7 @@ namespace WorldPackets { namespace Group
     {
     public:
         explicit GroupUninviteNotification() : ServerPacket(SMSG_GROUP_UNINVITE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -192,6 +196,7 @@ namespace WorldPackets { namespace Group
     {
     public:
         explicit GroupDestroyed() : ServerPacket(SMSG_GROUP_DESTROYED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -201,6 +206,7 @@ namespace WorldPackets { namespace Group
     {
     public:
         explicit RaidReadyCheckFromServer_Request() : ServerPacket(MSG_RAID_READY_CHECK) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -212,6 +218,7 @@ namespace WorldPackets { namespace Group
         uint8 state = 0;        // ready state
 
         explicit RaidReadyCheckFromServer_Response() : ServerPacket(MSG_RAID_READY_CHECK) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -223,6 +230,7 @@ namespace WorldPackets { namespace Group
         ObjectGuid targetGuid;
 
         explicit RaidTargetUpdateDelta() : ServerPacket(MSG_RAID_TARGET_UPDATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -239,6 +247,7 @@ namespace WorldPackets { namespace Group
         std::vector<IconEntry> icons;
 
         explicit RaidTargetUpdateAll() : ServerPacket(MSG_RAID_TARGET_UPDATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -250,6 +259,7 @@ namespace WorldPackets { namespace Group
         std::string leaderName;
 
         explicit GroupSetLeaderNotification() : ServerPacket(SMSG_GROUP_SET_LEADER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -282,6 +292,7 @@ namespace WorldPackets { namespace Group
 #endif
 
         explicit GroupList() : ServerPacket(SMSG_GROUP_LIST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -292,6 +303,7 @@ namespace WorldPackets { namespace Group
         std::vector<ObjectGuid> eligibleLooters; // guids of players that may receive the loot
 
         explicit LootMasterList() : ServerPacket(SMSG_LOOT_MASTER_LIST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

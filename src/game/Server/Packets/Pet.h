@@ -128,6 +128,7 @@ namespace WorldPackets { namespace Pet
     {
     public:
         explicit PetNameInvalid() : ServerPacket(SMSG_PET_NAME_INVALID) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -139,6 +140,7 @@ namespace WorldPackets { namespace Pet
         uint32 nameTimestamp = 0;
 
         explicit PetNameQueryResponse() : ServerPacket(SMSG_PET_NAME_QUERY_RESPONSE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -147,6 +149,7 @@ namespace WorldPackets { namespace Pet
     {
     public:
         explicit PetBroken() : ServerPacket(SMSG_PET_BROKEN) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -156,6 +159,7 @@ namespace WorldPackets { namespace Pet
         uint8 message = 0; // pet action feedback message code
 
         explicit PetActionFeedback() : ServerPacket(SMSG_PET_ACTION_FEEDBACK) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -167,6 +171,7 @@ namespace WorldPackets { namespace Pet
         uint32 soundId = 0; // pet talk sound ID
 
         explicit PetActionSound() : ServerPacket(SMSG_PET_ACTION_SOUND) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -182,6 +187,7 @@ namespace WorldPackets { namespace Pet
         uint8 enabledFlags = 0; // 0x0 = enabled, 0x8 = disabled
 
         explicit PetMode() : ServerPacket(SMSG_PET_MODE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -194,6 +200,7 @@ namespace WorldPackets { namespace Pet
         uint32 cost = 0; // cost in copper to reset pet skills
 
         explicit PetUnlearnConfirm() : ServerPacket(SMSG_PET_UNLEARN_CONFIRM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -204,6 +211,7 @@ namespace WorldPackets { namespace Pet
         uint8 reason = 0; // PetTameFailureReason enum value
 
         explicit PetTameFailure() : ServerPacket(SMSG_PET_TAME_FAILURE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -215,6 +223,7 @@ namespace WorldPackets { namespace Pet
         uint8 reason = 0;  // SpellCastResult enum value
 
         explicit PetCastFailed() : ServerPacket(SMSG_PET_CAST_FAILED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

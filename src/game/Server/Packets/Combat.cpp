@@ -12,28 +12,65 @@ void WorldPackets::Combat::SetSheathed::ReadFromWorldPacket(WorldPacket& recv_da
 
 // --- Server Packets ---
 
+size_t WorldPackets::Combat::AttackSwingNotInRange::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Combat::AttackSwingNotInRange::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Combat::AttackSwingNotStanding::EstimateFinalSize() const
+{
+    return 0;
 }
 
 void WorldPackets::Combat::AttackSwingNotStanding::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
 }
 
+size_t WorldPackets::Combat::AttackSwingDeadTarget::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Combat::AttackSwingDeadTarget::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Combat::AttackSwingCantAttack::EstimateFinalSize() const
+{
+    return 0;
 }
 
 void WorldPackets::Combat::AttackSwingCantAttack::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
 }
 
+size_t WorldPackets::Combat::CancelCombat::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Combat::CancelCombat::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
 }
 
+size_t WorldPackets::Combat::AttackSwingBadFacing::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Combat::AttackSwingBadFacing::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Combat::AttackStop::EstimateFinalSize() const
+{
+    return sizeof(uint8) + sizeof(attackerGuid) + /*packed*/
+           sizeof(uint8) + sizeof(victimGuid) + /*packed*/
+           sizeof(uint32) /*isDead, is 32bit on client*/;
 }
 
 void WorldPackets::Combat::AttackStop::AppendBodyTo(ByteBuffer& buffer) const
@@ -43,16 +80,40 @@ void WorldPackets::Combat::AttackStop::AppendBodyTo(ByteBuffer& buffer) const
     buffer << static_cast<uint32>(isDead); // is 32bit on client
 }
 
+size_t WorldPackets::Combat::AttackStart::EstimateFinalSize() const
+{
+    return sizeof(attackerGuid) +
+           sizeof(victimGuid);
+}
+
 void WorldPackets::Combat::AttackStart::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << attackerGuid;
     buffer << victimGuid;
 }
 
+size_t WorldPackets::Combat::PartyKillLog::EstimateFinalSize() const
+{
+    return sizeof(killerGuid) +
+           sizeof(victimGuid);
+}
+
 void WorldPackets::Combat::PartyKillLog::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << killerGuid;
     buffer << victimGuid;
+}
+
+size_t WorldPackets::Combat::EnvironmentalDamageLog::EstimateFinalSize() const
+{
+    return sizeof(victimGuid) +
+           sizeof(damageType) +
+           sizeof(damage)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+           + sizeof(absorb)
+           + sizeof(resist)
+#endif
+           ;
 }
 
 void WorldPackets::Combat::EnvironmentalDamageLog::AppendBodyTo(ByteBuffer& buffer) const
@@ -66,8 +127,21 @@ void WorldPackets::Combat::EnvironmentalDamageLog::AppendBodyTo(ByteBuffer& buff
 #endif
 }
 
+size_t WorldPackets::Combat::FeignDeathResisted::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Combat::FeignDeathResisted::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Combat::SpellDamageShield::EstimateFinalSize() const
+{
+    return sizeof(victimGuid) +
+           sizeof(attackerGuid) +
+           sizeof(damage) +
+           sizeof(school);
 }
 
 void WorldPackets::Combat::SpellDamageShield::AppendBodyTo(ByteBuffer& buffer) const
@@ -76,6 +150,45 @@ void WorldPackets::Combat::SpellDamageShield::AppendBodyTo(ByteBuffer& buffer) c
     buffer << attackerGuid;
     buffer << damage;
     buffer << school;
+}
+
+size_t WorldPackets::Combat::MeleeAttackingStateUpdate::EstimateFinalSize() const
+{
+    size_t size = sizeof(hitInfo) +
+                  sizeof(uint8) + sizeof(attackerGuid) + /*packed*/
+                  sizeof(uint8) + sizeof(victimGuid) + /*packed*/
+                  sizeof(totalDamage) +
+                  sizeof(uint8) + /*sub damage count*/
+                  subDamage.size() * (sizeof(int32) + /*damage school*/
+                                      sizeof(float) + /*damage as float*/
+                                      sizeof(int32) + /*damage*/
+                                      sizeof(int32)   /*absorb*/
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+                                      + sizeof(int32) /*resist*/
+#endif
+                                     ) +
+                  sizeof(victimState) +
+                  sizeof(attackerState) +
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_5_1
+                  sizeof(meleeSpellDamage) +
+#endif
+                  sizeof(meleeSpellId) +
+                  sizeof(blockedAmount);
+
+    if ((hitInfo & HITINFO_DEBUG) && debugInfo.has_value())
+        size += sizeof(DebugMeleeAttackingStateInfo::armor) +
+                sizeof(DebugMeleeAttackingStateInfo::critChance) +
+                sizeof(DebugMeleeAttackingStateInfo::combatRoll) +
+                sizeof(DebugMeleeAttackingStateInfo::missChance) +
+                sizeof(DebugMeleeAttackingStateInfo::dodgeChance) +
+                sizeof(DebugMeleeAttackingStateInfo::parryChance) +
+                sizeof(DebugMeleeAttackingStateInfo::blockChance) +
+                sizeof(DebugMeleeAttackingStateInfo::glanceChance) +
+                sizeof(DebugMeleeAttackingStateInfo::crushChance) +
+                sizeof(DebugMeleeAttackingStateInfo::damage) +
+                sizeof(DebugMeleeAttackingStateInfo::debugField10);
+
+    return size;
 }
 
 void WorldPackets::Combat::MeleeAttackingStateUpdate::AppendBodyTo(ByteBuffer& buffer) const

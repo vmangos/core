@@ -24,6 +24,7 @@ namespace WorldPackets { namespace Social
         std::vector<Entry> friends;
 
         explicit FriendList() : ServerPacket(SMSG_FRIEND_LIST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -33,6 +34,7 @@ namespace WorldPackets { namespace Social
         std::vector<ObjectGuid> ignoredPlayers; // player guids of ignored players
 
         explicit IgnoreList() : ServerPacket(SMSG_IGNORE_LIST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -52,6 +54,7 @@ namespace WorldPackets { namespace Social
         uint32 class_ = 0;        // player class
 
         explicit FriendStatus() : ServerPacket(SMSG_FRIEND_STATUS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

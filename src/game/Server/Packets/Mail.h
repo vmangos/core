@@ -106,6 +106,7 @@ namespace WorldPackets { namespace Mail
         uint32 notifyDelay = 0;
 
         explicit ReceivedMail() : ServerPacket(SMSG_RECEIVED_MAIL) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -116,6 +117,7 @@ namespace WorldPackets { namespace Mail
         std::string text;
 
         explicit ItemTextQueryResponse() : ServerPacket(SMSG_ITEM_TEXT_QUERY_RESPONSE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -125,6 +127,7 @@ namespace WorldPackets { namespace Mail
         float nextMailTime = 0.0f;
 
         explicit QueryNextMailTimeResponse() : ServerPacket(MSG_QUERY_NEXT_MAIL_TIME) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -139,6 +142,7 @@ namespace WorldPackets { namespace Mail
         uint32 itemCount = 0;
 
         SendMailResult() : ServerPacket(SMSG_SEND_MAIL_RESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

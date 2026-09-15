@@ -25,10 +25,16 @@ class ServerPacket : public Packet
 {
 public:
     explicit ServerPacket(uint16 opcode) : Packet(opcode) {}
+
+    // Attempts to calculate how much buffer space will be needed.
+    // This is only a hint for `reserve`, it does not need to be exact.
+    virtual size_t EstimateFinalSize() const = 0;
+
     virtual void AppendBodyTo(ByteBuffer& buffer) const = 0;
 
     void WritePacket(WorldPacket& packet) const
     {
+        packet.reserve(EstimateFinalSize());
         AppendBodyTo(packet);
         packet.SetOpcode(GetOpcode());
     }

@@ -102,6 +102,7 @@ namespace WorldPackets { namespace Petition
         uint32 result = 0;
 
         explicit PetitionSignResults() : ServerPacket(SMSG_PETITION_SIGN_RESULTS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -111,6 +112,7 @@ namespace WorldPackets { namespace Petition
         uint32 result = 0;
 
         explicit TurnInPetitionResults() : ServerPacket(SMSG_TURN_IN_PETITION_RESULTS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -138,6 +140,7 @@ namespace WorldPackets { namespace Petition
         uint32 defaultChoice = 0;
 
         explicit PetitionQueryResponse() : ServerPacket(SMSG_PETITION_QUERY_RESPONSE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -148,6 +151,7 @@ namespace WorldPackets { namespace Petition
         std::string newName;
 
         explicit PetitionRenameResult() : ServerPacket(MSG_PETITION_RENAME) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -157,6 +161,7 @@ namespace WorldPackets { namespace Petition
         ObjectGuid playerGuid;
 
         explicit PetitionDeclineResult() : ServerPacket(MSG_PETITION_DECLINE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -176,6 +181,7 @@ namespace WorldPackets { namespace Petition
         std::vector<PetitionShowListEntry> entries; // only 1 element is supported in the client
 
         explicit PetitionShowList() : ServerPacket(SMSG_PETITION_SHOWLIST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

@@ -9,6 +9,11 @@ void WorldPackets::Warden::WardenData::ReadFromWorldPacket(WorldPacket& recv_dat
         recv_data.read(data.data(), data.size());
 }
 
+size_t WorldPackets::Warden::WardenDataServer::EstimateFinalSize() const
+{
+    return encryptedData.size();
+}
+
 void WorldPackets::Warden::WardenDataServer::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer.append(encryptedData);

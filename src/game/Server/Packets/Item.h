@@ -219,6 +219,7 @@ namespace WorldPackets { namespace Item
         uint32 result = 0;
 
         explicit BuyBankSlotResult() : ServerPacket(SMSG_BUY_BANK_SLOT_RESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -229,6 +230,7 @@ namespace WorldPackets { namespace Item
         std::string name;
 
         explicit ItemNameQueryResponse() : ServerPacket(SMSG_ITEM_NAME_QUERY_RESPONSE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -238,6 +240,7 @@ namespace WorldPackets { namespace Item
         ObjectGuid itemGuid;
 
         explicit ReadItemOk() : ServerPacket(SMSG_READ_ITEM_OK) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -248,6 +251,7 @@ namespace WorldPackets { namespace Item
         uint8 reason = 0;
 
         explicit ReadItemFailed() : ServerPacket(SMSG_READ_ITEM_FAILED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -262,6 +266,7 @@ namespace WorldPackets { namespace Item
 #endif
 
         explicit ItemEnchantTimeUpdate() : ServerPacket(SMSG_ITEM_ENCHANT_TIME_UPDATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -271,6 +276,7 @@ namespace WorldPackets { namespace Item
         ObjectGuid itemGuid; // guid of the container to open in the UI
 
         explicit OpenContainer() : ServerPacket(SMSG_OPEN_CONTAINER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -282,6 +288,7 @@ namespace WorldPackets { namespace Item
         uint8 reason = 0; // BuyResult enum value
 
         explicit BuyFailed() : ServerPacket(SMSG_BUY_FAILED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -293,6 +300,7 @@ namespace WorldPackets { namespace Item
         uint8 reason = 0; // SellResult enum value
 
         explicit SellItemResponse() : ServerPacket(SMSG_SELL_ITEM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -305,6 +313,7 @@ namespace WorldPackets { namespace Item
         uint32 purchaseCount = 0;   // number of items purchased
 
         explicit BuyItemResponse() : ServerPacket(SMSG_BUY_ITEM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -318,6 +327,7 @@ namespace WorldPackets { namespace Item
         uint8 bagSlot = 0;         // slot of target bag that has storing condition (can be InventorySlots or BankBagSlots)
 
         explicit InventoryChangeFailure() : ServerPacket(SMSG_INVENTORY_CHANGE_FAILURE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -340,6 +350,7 @@ namespace WorldPackets { namespace Item
 #endif
 
         explicit ItemPushResult() : ServerPacket(SMSG_ITEM_PUSH_RESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -350,6 +361,7 @@ namespace WorldPackets { namespace Item
         uint32 spellId = 0;
 
         explicit ItemCooldown() : ServerPacket(SMSG_ITEM_COOLDOWN) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -363,6 +375,7 @@ namespace WorldPackets { namespace Item
         bool showAffiliation = false; // only used if casterGuid is not empty
 
         explicit EnchantmentLog() : ServerPacket(SMSG_ENCHANTMENTLOG) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

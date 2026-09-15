@@ -34,9 +34,19 @@ void WorldPackets::Character::CharRename::ReadFromWorldPacket(WorldPacket& recv_
     recv_data >> newname;
 }
 
+size_t WorldPackets::Character::CharCreateResponse::EstimateFinalSize() const
+{
+    return sizeof(result);
+}
+
 void WorldPackets::Character::CharCreateResponse::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << result;
+}
+
+size_t WorldPackets::Character::CharDeleteResponse::EstimateFinalSize() const
+{
+    return sizeof(result);
 }
 
 void WorldPackets::Character::CharDeleteResponse::AppendBodyTo(ByteBuffer& buffer) const
@@ -44,9 +54,23 @@ void WorldPackets::Character::CharDeleteResponse::AppendBodyTo(ByteBuffer& buffe
     buffer << result;
 }
 
+size_t WorldPackets::Character::CharacterLoginFailed::EstimateFinalSize() const
+{
+    return sizeof(result);
+}
+
 void WorldPackets::Character::CharacterLoginFailed::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << result;
+}
+
+size_t WorldPackets::Character::LoginVerifyWorld::EstimateFinalSize() const
+{
+    return sizeof(location.mapId) +
+           sizeof(location.x) +
+           sizeof(location.y) +
+           sizeof(location.z) +
+           sizeof(location.o);
 }
 
 void WorldPackets::Character::LoginVerifyWorld::AppendBodyTo(ByteBuffer& buffer) const
@@ -56,6 +80,16 @@ void WorldPackets::Character::LoginVerifyWorld::AppendBodyTo(ByteBuffer& buffer)
     buffer << location.y;
     buffer << location.z;
     buffer << location.o;
+}
+
+size_t WorldPackets::Character::CharRenameResponse::EstimateFinalSize() const
+{
+    if (result != RESPONSE_SUCCESS)
+        return sizeof(result);
+
+    return sizeof(result) +
+           sizeof(renamedCharacterGuid) +
+           newName.size() + sizeof(char) /*null terminator*/;
 }
 
 void WorldPackets::Character::CharRenameResponse::AppendBodyTo(ByteBuffer& buffer) const

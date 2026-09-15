@@ -30,6 +30,26 @@ void WorldPackets::Trade::AcceptTrade::ReadFromWorldPacket(WorldPacket& recv_dat
     recv_data.read_skip<uint32>();
 }
 
+size_t WorldPackets::Trade::TradeStatus::EstimateFinalSize() const
+{
+    switch (status)
+    {
+        case TRADE_STATUS_BEGIN_TRADE:
+            return sizeof(status) +
+                   sizeof(playerGuid);
+        case TRADE_STATUS_CLOSE_WINDOW:
+            return sizeof(status) +
+                   sizeof(closeResult) +
+                   sizeof(closeUnk) +
+                   sizeof(closeItemLimitCategory);
+        case TRADE_STATUS_ONLY_CONJURED:
+            return sizeof(status) +
+                   sizeof(slot);
+        default:
+            return sizeof(status);
+    }
+}
+
 void WorldPackets::Trade::TradeStatus::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << status;

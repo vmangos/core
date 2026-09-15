@@ -155,6 +155,7 @@ namespace WorldPackets { namespace Npc
     {
     public:
         explicit GossipComplete() : ServerPacket(SMSG_GOSSIP_COMPLETE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -164,6 +165,7 @@ namespace WorldPackets { namespace Npc
         ObjectGuid bankerGuid;
 
         explicit ShowBank() : ServerPacket(SMSG_SHOW_BANK) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -173,6 +175,7 @@ namespace WorldPackets { namespace Npc
         uint8 result = 0;
 
         explicit StableResult() : ServerPacket(SMSG_STABLE_RESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -183,6 +186,7 @@ namespace WorldPackets { namespace Npc
         uint32 spellId = 0;
 
         explicit TrainerBuySucceeded() : ServerPacket(SMSG_TRAINER_BUY_SUCCEEDED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -194,6 +198,7 @@ namespace WorldPackets { namespace Npc
         uint32 errorCode = 0;
 
         explicit TrainerBuyFailed() : ServerPacket(SMSG_TRAINER_BUY_FAILED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -203,6 +208,7 @@ namespace WorldPackets { namespace Npc
         ObjectGuid tabardVendorNpcGuid;
 
         explicit TabardVendorActivateResponse() : ServerPacket(MSG_TABARDVENDOR_ACTIVATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -214,6 +220,7 @@ namespace WorldPackets { namespace Npc
         uint32 nextResurrectTime = 0; // time in ms until next resurrection
 
         explicit AreaSpiritHealerTime() : ServerPacket(SMSG_AREA_SPIRIT_HEALER_TIME) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -225,6 +232,7 @@ namespace WorldPackets { namespace Npc
         ObjectGuid binderGuid; // guid of the innkeeper or binder
 
         explicit BinderConfirm() : ServerPacket(SMSG_BINDER_CONFIRM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif

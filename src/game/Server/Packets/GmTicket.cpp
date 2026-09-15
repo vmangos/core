@@ -43,9 +43,19 @@ void WorldPackets::GmTicket::GMSurveySubmit::ReadFromWorldPacket(WorldPacket& re
 }
 #endif
 
+size_t WorldPackets::GmTicket::GmTicketUpdateTextResponse::EstimateFinalSize() const
+{
+    return sizeof(response);
+}
+
 void WorldPackets::GmTicket::GmTicketUpdateTextResponse::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << response;
+}
+
+size_t WorldPackets::GmTicket::GmTicketDeleteTicketResponse::EstimateFinalSize() const
+{
+    return sizeof(response);
 }
 
 void WorldPackets::GmTicket::GmTicketDeleteTicketResponse::AppendBodyTo(ByteBuffer& buffer) const
@@ -53,14 +63,39 @@ void WorldPackets::GmTicket::GmTicketDeleteTicketResponse::AppendBodyTo(ByteBuff
     buffer << response;
 }
 
+size_t WorldPackets::GmTicket::GmTicketCreateResponse::EstimateFinalSize() const
+{
+    return sizeof(response);
+}
+
 void WorldPackets::GmTicket::GmTicketCreateResponse::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << response;
 }
 
+size_t WorldPackets::GmTicket::GmTicketSystemStatus::EstimateFinalSize() const
+{
+    return sizeof(status);
+}
+
 void WorldPackets::GmTicket::GmTicketSystemStatus::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << status;
+}
+
+size_t WorldPackets::GmTicket::GmTicketGetTicket::EstimateFinalSize() const
+{
+    if (status != GMTICKET_STATUS_HASTEXT)
+        return sizeof(status);
+
+    return sizeof(status) +
+           message.size() + sizeof(char) + /*null terminator*/
+           sizeof(ticketType) +
+           sizeof(lastModifiedAge) +
+           sizeof(oldestTicketAge) +
+           sizeof(estimatedWaitTime) +
+           sizeof(escalationStatus) +
+           sizeof(openedByGMStatus);
 }
 
 void WorldPackets::GmTicket::GmTicketGetTicket::AppendBodyTo(ByteBuffer& buffer) const

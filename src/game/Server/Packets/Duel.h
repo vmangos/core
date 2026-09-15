@@ -30,6 +30,7 @@ namespace WorldPackets { namespace Duel
     {
     public:
         explicit DuelOutOfBounds() : ServerPacket(SMSG_DUEL_OUTOFBOUNDS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -37,6 +38,7 @@ namespace WorldPackets { namespace Duel
     {
     public:
         explicit DuelInBounds() : ServerPacket(SMSG_DUEL_INBOUNDS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -46,6 +48,7 @@ namespace WorldPackets { namespace Duel
         bool started = false; // false if interrupted, true if actually completed
 
         explicit DuelComplete() : ServerPacket(SMSG_DUEL_COMPLETE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -57,6 +60,7 @@ namespace WorldPackets { namespace Duel
         std::string loserName;
 
         explicit DuelWinner() : ServerPacket(SMSG_DUEL_WINNER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -66,6 +70,7 @@ namespace WorldPackets { namespace Duel
         uint32 countdown = 0; // countdown in seconds
 
         explicit DuelCountdown() : ServerPacket(SMSG_DUEL_COUNTDOWN) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 }} // namespace WorldPackets::Duel

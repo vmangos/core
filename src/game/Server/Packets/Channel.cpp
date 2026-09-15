@@ -91,6 +91,12 @@ void WorldPackets::Channel::ChannelModerate::ReadFromWorldPacket(WorldPacket& re
     recv_data >> channelName;
 }
 
+size_t WorldPackets::Channel::ChannelNotify::EstimateFinalSize() const
+{
+    return sizeof(type) +
+           channelName.size() + sizeof(char) /*null terminator*/;
+}
+
 void WorldPackets::Channel::ChannelNotify::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << type;

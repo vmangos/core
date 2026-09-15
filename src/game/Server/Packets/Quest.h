@@ -144,6 +144,7 @@ namespace WorldPackets { namespace Quest
         uint8 msg = 0;          // enum QuestShareMessages
 
         explicit QuestPushResultResponse() : ServerPacket(MSG_QUEST_PUSH_RESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -151,6 +152,7 @@ namespace WorldPackets { namespace Quest
     {
     public:
         explicit QuestLogFull() : ServerPacket(SMSG_QUESTLOG_FULL) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -160,6 +162,7 @@ namespace WorldPackets { namespace Quest
         uint32 questId = 0;
 
         explicit QuestUpdateComplete() : ServerPacket(SMSG_QUESTUPDATE_COMPLETE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -179,6 +182,7 @@ namespace WorldPackets { namespace Quest
         std::vector<QuestRewardItem> rewardItems; // max is 5
 
         explicit QuestGiverQuestComplete() : ServerPacket(SMSG_QUESTGIVER_QUEST_COMPLETE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -189,6 +193,7 @@ namespace WorldPackets { namespace Quest
         uint32 reason = 0;
 
         explicit QuestGiverQuestFailed() : ServerPacket(SMSG_QUESTGIVER_QUEST_FAILED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -198,6 +203,7 @@ namespace WorldPackets { namespace Quest
         uint32 questId = 0;
 
         explicit QuestUpdateFailed() : ServerPacket(SMSG_QUESTUPDATE_FAILED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -207,6 +213,7 @@ namespace WorldPackets { namespace Quest
         uint32 questId = 0;
 
         explicit QuestUpdateFailedTimer() : ServerPacket(SMSG_QUESTUPDATE_FAILEDTIMER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -216,6 +223,7 @@ namespace WorldPackets { namespace Quest
         uint32 msg = 0;
 
         explicit QuestGiverQuestInvalid() : ServerPacket(SMSG_QUESTGIVER_QUEST_INVALID) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -227,6 +235,7 @@ namespace WorldPackets { namespace Quest
         ObjectGuid senderGuid;
 
         explicit QuestConfirmAcceptResponse() : ServerPacket(SMSG_QUEST_CONFIRM_ACCEPT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -237,6 +246,7 @@ namespace WorldPackets { namespace Quest
         uint32 count = 0;
 
         explicit QuestUpdateAddItem() : ServerPacket(SMSG_QUESTUPDATE_ADD_ITEM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -250,6 +260,7 @@ namespace WorldPackets { namespace Quest
         ObjectGuid guid;
 
         explicit QuestUpdateAddKill() : ServerPacket(SMSG_QUESTUPDATE_ADD_KILL) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -260,6 +271,7 @@ namespace WorldPackets { namespace Quest
         uint32 status = 0;
 
         explicit QuestGiverStatus() : ServerPacket(SMSG_QUESTGIVER_STATUS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -281,6 +293,7 @@ namespace WorldPackets { namespace Quest
         std::vector<QuestListEntry> quests;
 
         explicit QuestGiverQuestList() : ServerPacket(SMSG_QUESTGIVER_QUEST_LIST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -300,6 +313,7 @@ namespace WorldPackets { namespace Quest
         bool autoFinish = false;
 
         explicit QuestGiverQuestDetails() : ServerPacket(SMSG_QUESTGIVER_QUEST_DETAILS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -312,6 +326,7 @@ namespace WorldPackets { namespace Quest
         bool autoFinish = false;
 
         explicit QuestGiverOfferReward() : ServerPacket(SMSG_QUESTGIVER_OFFER_REWARD) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -325,6 +340,7 @@ namespace WorldPackets { namespace Quest
         bool closeOnCancel = false; // Is `false` when quest was opened by a submenu
 
         explicit QuestGiverRequestItems() : ServerPacket(SMSG_QUESTGIVER_REQUEST_ITEMS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -335,6 +351,7 @@ namespace WorldPackets { namespace Quest
         ::Quest const* quest = nullptr;
 
         explicit QuestQueryResponse() : ServerPacket(SMSG_QUEST_QUERY_RESPONSE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

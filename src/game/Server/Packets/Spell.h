@@ -83,6 +83,7 @@ namespace WorldPackets { namespace Spell
         nonstd::optional<uint32> failureArg2; // optional argument 2
 
         explicit CastResult() : ServerPacket(SMSG_CAST_RESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -93,6 +94,7 @@ namespace WorldPackets { namespace Spell
         uint32 spellVisualId = 0; // SpellVisualKit.dbc index
 
         explicit PlaySpellVisual() : ServerPacket(SMSG_PLAY_SPELL_VISUAL) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -104,6 +106,7 @@ namespace WorldPackets { namespace Spell
         uint32 spellVisualId = 0; // spell visual id
 
         explicit PlaySpellImpact() : ServerPacket(SMSG_PLAY_SPELL_IMPACT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -122,6 +125,7 @@ namespace WorldPackets { namespace Spell
         std::vector<SpellLogMissEntry> missEntries;
 
         explicit SpellLogMiss() : ServerPacket(SMSG_SPELLLOGMISS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -134,6 +138,7 @@ namespace WorldPackets { namespace Spell
         uint8 logFormat = 0; // 0=default, 1=debug
 
         explicit ProcResist() : ServerPacket(SMSG_PROCRESIST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -146,6 +151,7 @@ namespace WorldPackets { namespace Spell
         uint8 logFormat = 0; // 0=default, 1=debug
 
         explicit SpellOrDamageImmune() : ServerPacket(SMSG_SPELLORDAMAGE_IMMUNE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -160,6 +166,7 @@ namespace WorldPackets { namespace Spell
         bool isCritical = false;
 
         explicit SpellHealLog() : ServerPacket(SMSG_SPELLHEALLOG) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -173,6 +180,7 @@ namespace WorldPackets { namespace Spell
         uint32 amount = 0;
 
         explicit SpellEnergizeLog() : ServerPacket(SMSG_SPELLENERGIZELOG) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -205,6 +213,7 @@ namespace WorldPackets { namespace Spell
         nonstd::optional<ExtendedData> extendedData;
 
         explicit SpellNonMeleeDamageLog() : ServerPacket(SMSG_SPELLNONMELEEDAMAGELOG) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -221,6 +230,7 @@ namespace WorldPackets { namespace Spell
         std::vector<SpellCooldownEntry> cooldownEntries;
 
         explicit SpellCooldown() : ServerPacket(SMSG_SPELL_COOLDOWN) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -231,6 +241,7 @@ namespace WorldPackets { namespace Spell
         ObjectGuid targetGuid;
 
         explicit ClearCooldown() : ServerPacket(SMSG_CLEAR_COOLDOWN) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -240,6 +251,7 @@ namespace WorldPackets { namespace Spell
         ObjectGuid targetGuid;
 
         explicit CooldownCheat() : ServerPacket(SMSG_COOLDOWN_CHEAT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -250,6 +262,7 @@ namespace WorldPackets { namespace Spell
         ObjectGuid casterGuid;
 
         explicit CooldownEvent() : ServerPacket(SMSG_COOLDOWN_EVENT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -260,6 +273,7 @@ namespace WorldPackets { namespace Spell
         uint32 newSpellId = 0; // new spell that supersedes it
 
         explicit SupercededSpell() : ServerPacket(SMSG_SUPERCEDED_SPELL) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -270,6 +284,7 @@ namespace WorldPackets { namespace Spell
         uint16 actionBarSlot = 0; // unused on client
 
         explicit LearnedSpell() : ServerPacket(SMSG_LEARNED_SPELL) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -279,6 +294,7 @@ namespace WorldPackets { namespace Spell
         uint32 spellId = 0;    // sent as uint16
 
         explicit RemovedSpell() : ServerPacket(SMSG_REMOVED_SPELL) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -291,6 +307,7 @@ namespace WorldPackets { namespace Spell
         int32 value = 0;       // flat or percent modifier value
 
         explicit SetSpellModifier(uint16 opcode) : ServerPacket(opcode) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -307,6 +324,7 @@ namespace WorldPackets { namespace Spell
         uint32 ammoInventoryType = 0;
 
         explicit SpellStart() : ServerPacket(SMSG_SPELL_START) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -332,6 +350,7 @@ namespace WorldPackets { namespace Spell
         uint32 ammoInventoryType = 0;
 
         explicit SpellGo() : ServerPacket(SMSG_SPELL_GO) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -399,6 +418,7 @@ namespace WorldPackets { namespace Spell
         std::vector<WorldPackets::Spell::SpellLogExecute::ExecuteLogInfo> executeLogInfos[MAX_EFFECT_INDEX];
 
         explicit SpellLogExecute() : ServerPacket(SMSG_SPELLLOGEXECUTE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -409,6 +429,7 @@ namespace WorldPackets { namespace Spell
         uint32 spellId = 0;
 
         explicit SpellFailedOther() : ServerPacket(SMSG_SPELL_FAILED_OTHER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -419,6 +440,7 @@ namespace WorldPackets { namespace Spell
         uint32 duration = 0;
 
         explicit ChannelStart() : ServerPacket(MSG_CHANNEL_START) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -428,6 +450,7 @@ namespace WorldPackets { namespace Spell
         uint32 duration = 0;
 
         explicit ChannelUpdate() : ServerPacket(MSG_CHANNEL_UPDATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -440,6 +463,7 @@ namespace WorldPackets { namespace Spell
         std::vector<ObjectGuid> targets;
 
         explicit SpellUpdateChainTargets() : ServerPacket(SMSG_SPELL_UPDATE_CHAIN_TARGETS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -453,6 +477,7 @@ namespace WorldPackets { namespace Spell
         bool delayed = false; // if false ignore delay sent with SMSG_CORPSE_RECLAIM_DELAY
 
         explicit ResurrectRequest() : ServerPacket(SMSG_RESURRECT_REQUEST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -463,6 +488,7 @@ namespace WorldPackets { namespace Spell
         uint32 delayTime = 0;
 
         explicit SpellDelayed() : ServerPacket(SMSG_SPELL_DELAYED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -490,6 +516,7 @@ namespace WorldPackets { namespace Spell
         std::vector<CurrentCooldown> cooldowns;
 
         explicit InitialSpells() : ServerPacket(SMSG_INITIAL_SPELLS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

@@ -37,6 +37,19 @@ void WorldPackets::Spell::CancelChanneling::ReadFromWorldPacket(WorldPacket& rec
     recv_data >> spellId;
 }
 
+size_t WorldPackets::Spell::CastResult::EstimateFinalSize() const
+{
+    if (result != static_cast<uint8>(SPELL_RESULT_STATUS_FAIL))
+        return sizeof(spellId) +
+               sizeof(result);
+
+    return sizeof(spellId) +
+           sizeof(result) +
+           sizeof(failureReason) +
+           ((failureArg1 || failureArg2) ? sizeof(uint32) : 0) +
+           (failureArg2 ? sizeof(uint32) : 0);
+}
+
 void WorldPackets::Spell::CastResult::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << spellId;
@@ -51,6 +64,12 @@ void WorldPackets::Spell::CastResult::AppendBodyTo(ByteBuffer& buffer) const
     }
 }
 
+size_t WorldPackets::Spell::PlaySpellVisual::EstimateFinalSize() const
+{
+    return sizeof(casterGuid) +
+           sizeof(spellVisualId);
+}
+
 void WorldPackets::Spell::PlaySpellVisual::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << casterGuid;
@@ -58,12 +77,28 @@ void WorldPackets::Spell::PlaySpellVisual::AppendBodyTo(ByteBuffer& buffer) cons
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+size_t WorldPackets::Spell::PlaySpellImpact::EstimateFinalSize() const
+{
+    return sizeof(targetGuid) +
+           sizeof(spellVisualId);
+}
+
 void WorldPackets::Spell::PlaySpellImpact::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << targetGuid;
     buffer << spellVisualId;
 }
 #endif
+
+size_t WorldPackets::Spell::SpellLogMiss::EstimateFinalSize() const
+{
+    return sizeof(spellId) +
+           sizeof(casterGuid) +
+           sizeof(uint8) + /*useExtendedInfo*/
+           sizeof(uint32) + /*miss entries count*/
+           missEntries.size() * (sizeof(SpellLogMissEntry::targetGuid) +
+                                 sizeof(uint8) /*miss info*/);
+}
 
 void WorldPackets::Spell::SpellLogMiss::AppendBodyTo(ByteBuffer& buffer) const
 {
@@ -85,12 +120,28 @@ void WorldPackets::Spell::SpellLogMiss::AppendBodyTo(ByteBuffer& buffer) const
     }
 }
 
+size_t WorldPackets::Spell::ProcResist::EstimateFinalSize() const
+{
+    return sizeof(casterGuid) +
+           sizeof(targetGuid) +
+           sizeof(spellId) +
+           sizeof(logFormat);
+}
+
 void WorldPackets::Spell::ProcResist::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << casterGuid;
     buffer << targetGuid;
     buffer << spellId;
     buffer << logFormat;
+}
+
+size_t WorldPackets::Spell::SpellOrDamageImmune::EstimateFinalSize() const
+{
+    return sizeof(casterGuid) +
+           sizeof(targetGuid) +
+           sizeof(spellId) +
+           sizeof(logFormat);
 }
 
 void WorldPackets::Spell::SpellOrDamageImmune::AppendBodyTo(ByteBuffer& buffer) const
@@ -102,6 +153,15 @@ void WorldPackets::Spell::SpellOrDamageImmune::AppendBodyTo(ByteBuffer& buffer) 
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+size_t WorldPackets::Spell::SpellHealLog::EstimateFinalSize() const
+{
+    return sizeof(uint8) + sizeof(targetGuid) + /*packed*/
+           sizeof(uint8) + sizeof(healerGuid) + /*packed*/
+           sizeof(spellId) +
+           sizeof(healAmount) +
+           sizeof(uint8) /*isCritical*/;
+}
+
 void WorldPackets::Spell::SpellHealLog::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << targetGuid.WriteAsPacked();
@@ -109,6 +169,15 @@ void WorldPackets::Spell::SpellHealLog::AppendBodyTo(ByteBuffer& buffer) const
     buffer << spellId;
     buffer << healAmount;
     buffer << isCritical;
+}
+
+size_t WorldPackets::Spell::SpellEnergizeLog::EstimateFinalSize() const
+{
+    return sizeof(uint8) + sizeof(targetGuid) + /*packed*/
+           sizeof(uint8) + sizeof(casterGuid) + /*packed*/
+           sizeof(spellId) +
+           sizeof(powerType) +
+           sizeof(amount);
 }
 
 void WorldPackets::Spell::SpellEnergizeLog::AppendBodyTo(ByteBuffer& buffer) const
@@ -120,6 +189,36 @@ void WorldPackets::Spell::SpellEnergizeLog::AppendBodyTo(ByteBuffer& buffer) con
     buffer << amount;
 }
 #endif
+
+size_t WorldPackets::Spell::SpellNonMeleeDamageLog::EstimateFinalSize() const
+{
+    size_t size = sizeof(uint8) + sizeof(targetGuid) + /*packed*/
+                  sizeof(uint8) + sizeof(attackerGuid) + /*packed*/
+                  sizeof(spellId) +
+                  sizeof(damage) +
+                  sizeof(school) +
+                  sizeof(absorbedDamage) +
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+                  sizeof(resist) +
+#endif
+                  sizeof(uint8) + /*periodicLog*/
+                  sizeof(uint8) + /*unused*/
+                  sizeof(blocked) +
+                  sizeof(hitTypeFlags) +
+                  sizeof(uint8) /*extended data present*/;
+
+    if (extendedData.has_value())
+    {
+        if (hitTypeFlags & SPELL_HIT_TYPE_CRIT_DEBUG)
+            size += sizeof(ExtendedData::critRoll) +
+                    sizeof(ExtendedData::critNeeded);
+        if (hitTypeFlags & SPELL_HIT_TYPE_HIT_DEBUG)
+            size += sizeof(ExtendedData::hitRoll) +
+                    sizeof(ExtendedData::hitNeeded);
+    }
+
+    return size;
+}
 
 void WorldPackets::Spell::SpellNonMeleeDamageLog::AppendBodyTo(ByteBuffer& buffer) const
 {
@@ -153,6 +252,13 @@ void WorldPackets::Spell::SpellNonMeleeDamageLog::AppendBodyTo(ByteBuffer& buffe
     }
 }
 
+size_t WorldPackets::Spell::SpellCooldown::EstimateFinalSize() const
+{
+    return sizeof(casterGuid) +
+           cooldownEntries.size() * (sizeof(SpellCooldownEntry::spellId) +
+                                     sizeof(uint32) /*cooldown*/);
+}
+
 void WorldPackets::Spell::SpellCooldown::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << casterGuid;
@@ -163,15 +269,32 @@ void WorldPackets::Spell::SpellCooldown::AppendBodyTo(ByteBuffer& buffer) const
     }
 }
 
+size_t WorldPackets::Spell::ClearCooldown::EstimateFinalSize() const
+{
+    return sizeof(spellId) +
+           sizeof(targetGuid);
+}
+
 void WorldPackets::Spell::ClearCooldown::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << spellId;
     buffer << targetGuid;
 }
 
+size_t WorldPackets::Spell::CooldownCheat::EstimateFinalSize() const
+{
+    return sizeof(targetGuid);
+}
+
 void WorldPackets::Spell::CooldownCheat::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << targetGuid;
+}
+
+size_t WorldPackets::Spell::CooldownEvent::EstimateFinalSize() const
+{
+    return sizeof(spellId) +
+           sizeof(casterGuid);
 }
 
 void WorldPackets::Spell::CooldownEvent::AppendBodyTo(ByteBuffer& buffer) const
@@ -180,10 +303,22 @@ void WorldPackets::Spell::CooldownEvent::AppendBodyTo(ByteBuffer& buffer) const
     buffer << casterGuid;
 }
 
+size_t WorldPackets::Spell::SupercededSpell::EstimateFinalSize() const
+{
+    return sizeof(uint16) + /*oldSpellId*/
+           sizeof(uint16) /*newSpellId*/;
+}
+
 void WorldPackets::Spell::SupercededSpell::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << static_cast<uint16>(oldSpellId);
     buffer << static_cast<uint16>(newSpellId);
+}
+
+size_t WorldPackets::Spell::LearnedSpell::EstimateFinalSize() const
+{
+    return sizeof(uint16) + /*spellId*/
+           sizeof(int16) /*actionBarSlot*/;
 }
 
 void WorldPackets::Spell::LearnedSpell::AppendBodyTo(ByteBuffer& buffer) const
@@ -192,9 +327,21 @@ void WorldPackets::Spell::LearnedSpell::AppendBodyTo(ByteBuffer& buffer) const
     buffer << static_cast<int16>(actionBarSlot); // not used
 }
 
+size_t WorldPackets::Spell::RemovedSpell::EstimateFinalSize() const
+{
+    return sizeof(uint16) /*spellId*/;
+}
+
 void WorldPackets::Spell::RemovedSpell::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << static_cast<uint16>(spellId);
+}
+
+size_t WorldPackets::Spell::SetSpellModifier::EstimateFinalSize() const
+{
+    return sizeof(effectIndex) +
+           sizeof(modOp) +
+           sizeof(value);
 }
 
 void WorldPackets::Spell::SetSpellModifier::AppendBodyTo(ByteBuffer& buffer) const
@@ -202,6 +349,20 @@ void WorldPackets::Spell::SetSpellModifier::AppendBodyTo(ByteBuffer& buffer) con
     buffer << effectIndex;
     buffer << modOp;
     buffer << value;
+}
+
+size_t WorldPackets::Spell::SpellStart::EstimateFinalSize() const
+{
+    return sizeof(uint8) + sizeof(casterGuid) + /*packed*/
+           sizeof(uint8) + sizeof(unitCasterGuid) + /*packed*/
+           sizeof(spellId) +
+           sizeof(castFlags) +
+           sizeof(castTimer) +
+           // Cast targets: mask, up to two packed guids and a source and destination location.
+           sizeof(uint16) +
+           (sizeof(uint8) + sizeof(uint64)) * 2 +
+           sizeof(float) * 6 +
+           ((castFlags & CAST_FLAG_AMMO) ? (sizeof(ammoDisplayId) + sizeof(ammoInventoryType)) : 0);
 }
 
 void WorldPackets::Spell::SpellStart::AppendBodyTo(ByteBuffer& buffer) const
@@ -219,6 +380,25 @@ void WorldPackets::Spell::SpellStart::AppendBodyTo(ByteBuffer& buffer) const
         buffer << ammoDisplayId;
         buffer << ammoInventoryType;
     }
+}
+
+size_t WorldPackets::Spell::SpellGo::EstimateFinalSize() const
+{
+    return sizeof(uint8) + sizeof(casterGuid) + /*packed*/
+           sizeof(uint8) + sizeof(unitCasterGuid) + /*packed*/
+           sizeof(spellId) +
+           sizeof(castFlags) +
+           sizeof(uint8) + /*hit targets count*/
+           hitTargets.size() * sizeof(ObjectGuid) +
+           sizeof(uint8) + /*miss targets count*/
+           missTargets.size() * (sizeof(SpellGoMissTarget::targetGuid) +
+                                 sizeof(SpellGoMissTarget::missCondition) +
+                                 sizeof(SpellGoMissTarget::reflectResult)) +
+           // Cast targets: mask, up to two packed guids and a source and destination location.
+           sizeof(uint16) +
+           (sizeof(uint8) + sizeof(uint64)) * 2 +
+           sizeof(float) * 6 +
+           ((castFlags & CAST_FLAG_AMMO) ? (sizeof(ammoDisplayId) + sizeof(ammoInventoryType)) : 0);
 }
 
 void WorldPackets::Spell::SpellGo::AppendBodyTo(ByteBuffer& buffer) const
@@ -265,6 +445,26 @@ void WorldPackets::Spell::SpellGo::AppendBodyTo(ByteBuffer& buffer) const
         buffer << ammoDisplayId;
         buffer << ammoInventoryType;
     }
+}
+
+size_t WorldPackets::Spell::SpellLogExecute::EstimateFinalSize() const
+{
+    size_t size = sizeof(uint8) + sizeof(casterGuid) + /*packed*/
+                  sizeof(uint32) + /*spell id*/
+                  sizeof(uint32) /*effect count*/;
+
+    for (auto const& executeLogInfo : executeLogInfos)
+    {
+        if (executeLogInfo.empty())
+            continue;
+
+        // The largest effect block is a target guid followed by three values.
+        size += sizeof(uint32) + /*effect*/
+                sizeof(uint32) + /*info count*/
+                executeLogInfo.size() * (sizeof(ObjectGuid) + sizeof(uint32) * 3);
+    }
+
+    return size;
 }
 
 void WorldPackets::Spell::SpellLogExecute::AppendBodyTo(ByteBuffer& buffer) const
@@ -376,10 +576,22 @@ void WorldPackets::Spell::SpellLogExecute::AppendBodyTo(ByteBuffer& buffer) cons
     }
 }
 
+size_t WorldPackets::Spell::SpellFailedOther::EstimateFinalSize() const
+{
+    return sizeof(casterGuid) +
+           sizeof(spellId);
+}
+
 void WorldPackets::Spell::SpellFailedOther::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << casterGuid;
     buffer << spellId;
+}
+
+size_t WorldPackets::Spell::ChannelStart::EstimateFinalSize() const
+{
+    return sizeof(spellId) +
+           sizeof(duration);
 }
 
 void WorldPackets::Spell::ChannelStart::AppendBodyTo(ByteBuffer& buffer) const
@@ -388,12 +600,25 @@ void WorldPackets::Spell::ChannelStart::AppendBodyTo(ByteBuffer& buffer) const
     buffer << duration;
 }
 
+size_t WorldPackets::Spell::ChannelUpdate::EstimateFinalSize() const
+{
+    return sizeof(duration);
+}
+
 void WorldPackets::Spell::ChannelUpdate::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << duration;
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+size_t WorldPackets::Spell::SpellUpdateChainTargets::EstimateFinalSize() const
+{
+    return sizeof(casterGuid) +
+           sizeof(spellId) +
+           sizeof(uint32) + /*targets count*/
+           targets.size() * sizeof(ObjectGuid);
+}
+
 void WorldPackets::Spell::SpellUpdateChainTargets::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << casterGuid;
@@ -404,6 +629,15 @@ void WorldPackets::Spell::SpellUpdateChainTargets::AppendBodyTo(ByteBuffer& buff
 }
 #endif
 
+size_t WorldPackets::Spell::ResurrectRequest::EstimateFinalSize() const
+{
+    return sizeof(casterGuid) +
+           sizeof(uint32) + /*caster name length*/
+           casterName.size() + sizeof(char) + /*null terminator*/
+           sizeof(uint8) + /*sickness*/
+           sizeof(uint8) /*delayed*/;
+}
+
 void WorldPackets::Spell::ResurrectRequest::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << casterGuid;
@@ -413,10 +647,30 @@ void WorldPackets::Spell::ResurrectRequest::AppendBodyTo(ByteBuffer& buffer) con
     buffer << uint8(delayed);
 }
 
+size_t WorldPackets::Spell::SpellDelayed::EstimateFinalSize() const
+{
+    return sizeof(casterGuid) +
+           sizeof(delayTime);
+}
+
 void WorldPackets::Spell::SpellDelayed::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << casterGuid;
     buffer << delayTime;
+}
+
+size_t WorldPackets::Spell::InitialSpells::EstimateFinalSize() const
+{
+    return sizeof(talentSpec) +
+           sizeof(uint16) + /*known spells count*/
+           knownSpells.size() * (sizeof(KnownSpell::spellId) +
+                                 sizeof(KnownSpell::unk)) +
+           sizeof(uint16) + /*cooldowns count*/
+           cooldowns.size() * (sizeof(CurrentCooldown::spellId) +
+                               sizeof(CurrentCooldown::itemId) +
+                               sizeof(CurrentCooldown::category) +
+                               sizeof(CurrentCooldown::recoveryTime) +
+                               sizeof(CurrentCooldown::categoryRecoveryTime));
 }
 
 void WorldPackets::Spell::InitialSpells::AppendBodyTo(ByteBuffer& buffer) const

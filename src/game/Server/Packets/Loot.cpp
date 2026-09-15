@@ -31,13 +31,33 @@ void WorldPackets::Loot::LootMasterGive::ReadFromWorldPacket(WorldPacket& recv_d
 
 // --- Server Packets ---
 
+size_t WorldPackets::Loot::LootClearMoney::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Loot::LootClearMoney::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Loot::LootMoneyNotify::EstimateFinalSize() const
+{
+    return sizeof(amount);
 }
 
 void WorldPackets::Loot::LootMoneyNotify::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << amount;
+}
+
+size_t WorldPackets::Loot::LootStartRoll::EstimateFinalSize() const
+{
+    return sizeof(lootedTargetGuid) +
+           sizeof(itemSlot) +
+           sizeof(itemEntryId) +
+           sizeof(randomSuffix) +
+           sizeof(itemRandomPropId) +
+           sizeof(countdownTime);
 }
 
 void WorldPackets::Loot::LootStartRoll::AppendBodyTo(ByteBuffer& buffer) const
@@ -48,6 +68,18 @@ void WorldPackets::Loot::LootStartRoll::AppendBodyTo(ByteBuffer& buffer) const
     buffer << randomSuffix;
     buffer << itemRandomPropId;
     buffer << countdownTime;
+}
+
+size_t WorldPackets::Loot::LootRollResponse::EstimateFinalSize() const
+{
+    return sizeof(lootedTargetGuid) +
+           sizeof(itemSlot) +
+           sizeof(rollerGuid) +
+           sizeof(itemEntryId) +
+           sizeof(randomSuffix) +
+           sizeof(itemRandomPropId) +
+           sizeof(rollNumber) +
+           sizeof(rollType);
 }
 
 void WorldPackets::Loot::LootRollResponse::AppendBodyTo(ByteBuffer& buffer) const
@@ -62,6 +94,18 @@ void WorldPackets::Loot::LootRollResponse::AppendBodyTo(ByteBuffer& buffer) cons
     buffer << rollType;
 }
 
+size_t WorldPackets::Loot::LootRollWon::EstimateFinalSize() const
+{
+    return sizeof(lootedTargetGuid) +
+           sizeof(itemSlot) +
+           sizeof(itemEntryId) +
+           sizeof(randomSuffix) +
+           sizeof(itemRandomPropId) +
+           sizeof(winnerGuid) +
+           sizeof(rollNumber) +
+           sizeof(rollType);
+}
+
 void WorldPackets::Loot::LootRollWon::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << lootedTargetGuid;
@@ -74,6 +118,15 @@ void WorldPackets::Loot::LootRollWon::AppendBodyTo(ByteBuffer& buffer) const
     buffer << rollType;
 }
 
+size_t WorldPackets::Loot::LootAllPassed::EstimateFinalSize() const
+{
+    return sizeof(lootedTargetGuid) +
+           sizeof(itemSlot) +
+           sizeof(itemEntryId) +
+           sizeof(itemRandomPropId) +
+           sizeof(randomSuffixId);
+}
+
 void WorldPackets::Loot::LootAllPassed::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << lootedTargetGuid;
@@ -83,10 +136,21 @@ void WorldPackets::Loot::LootAllPassed::AppendBodyTo(ByteBuffer& buffer) const
     buffer << randomSuffixId;
 }
 
+size_t WorldPackets::Loot::LootReleaseResponse::EstimateFinalSize() const
+{
+    return sizeof(lootedGuid) +
+           sizeof(result);
+}
+
 void WorldPackets::Loot::LootReleaseResponse::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << lootedGuid;
     buffer << result;
+}
+
+size_t WorldPackets::Loot::LootRemoved::EstimateFinalSize() const
+{
+    return sizeof(lootSlot);
 }
 
 void WorldPackets::Loot::LootRemoved::AppendBodyTo(ByteBuffer& buffer) const

@@ -92,6 +92,7 @@ namespace WorldPackets { namespace Character
         uint8 result = 0;
 
         explicit CharCreateResponse() : ServerPacket(SMSG_CHAR_CREATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -101,6 +102,7 @@ namespace WorldPackets { namespace Character
         uint8 result = 0;
 
         explicit CharDeleteResponse() : ServerPacket(SMSG_CHAR_DELETE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -110,6 +112,7 @@ namespace WorldPackets { namespace Character
         uint8 result = 0;
 
         explicit CharacterLoginFailed() : ServerPacket(SMSG_CHARACTER_LOGIN_FAILED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -119,6 +122,7 @@ namespace WorldPackets { namespace Character
         WorldLocation location;
 
         explicit LoginVerifyWorld() : ServerPacket(SMSG_LOGIN_VERIFY_WORLD) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -130,6 +134,7 @@ namespace WorldPackets { namespace Character
         std::string newName;
 
         CharRenameResponse() : ServerPacket(SMSG_CHAR_RENAME) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

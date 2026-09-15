@@ -248,12 +248,27 @@ void WorldPackets::Misc::Bug::ReadFromWorldPacket(WorldPacket& recv_data)
 
 // --- Server Packets ---
 
+size_t WorldPackets::Misc::LogoutComplete::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Misc::LogoutComplete::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
 }
 
+size_t WorldPackets::Misc::LogoutCancelAck::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Misc::LogoutCancelAck::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Misc::StandStateUpdate::EstimateFinalSize() const
+{
+    return sizeof(standState);
 }
 
 void WorldPackets::Misc::StandStateUpdate::AppendBodyTo(ByteBuffer& buffer) const
@@ -262,6 +277,11 @@ void WorldPackets::Misc::StandStateUpdate::AppendBodyTo(ByteBuffer& buffer) cons
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+size_t WorldPackets::Misc::PlayTimeWarning::EstimateFinalSize() const
+{
+    return sizeof(flag) +
+           sizeof(timeLeftInSeconds);
+}
 void WorldPackets::Misc::PlayTimeWarning::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << flag;
@@ -269,10 +289,22 @@ void WorldPackets::Misc::PlayTimeWarning::AppendBodyTo(ByteBuffer& buffer) const
 }
 #endif
 
+size_t WorldPackets::Misc::LogoutResponse::EstimateFinalSize() const
+{
+    return sizeof(reason) +
+           sizeof(instant);
+}
+
 void WorldPackets::Misc::LogoutResponse::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << reason;
     buffer << instant;
+}
+
+size_t WorldPackets::Misc::PlayedTime::EstimateFinalSize() const
+{
+    return sizeof(totalPlayedTime) +
+           sizeof(levelPlayedTime);
 }
 
 void WorldPackets::Misc::PlayedTime::AppendBodyTo(ByteBuffer& buffer) const
@@ -281,9 +313,19 @@ void WorldPackets::Misc::PlayedTime::AppendBodyTo(ByteBuffer& buffer) const
     buffer << levelPlayedTime;
 }
 
+size_t WorldPackets::Misc::InspectResponse::EstimateFinalSize() const
+{
+    return sizeof(guid);
+}
+
 void WorldPackets::Misc::InspectResponse::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << guid;
+}
+
+size_t WorldPackets::Misc::WhoisResponse::EstimateFinalSize() const
+{
+    return message.size() + sizeof(char) /*null terminator*/;
 }
 
 void WorldPackets::Misc::WhoisResponse::AppendBodyTo(ByteBuffer& buffer) const
@@ -291,11 +333,45 @@ void WorldPackets::Misc::WhoisResponse::AppendBodyTo(ByteBuffer& buffer) const
     buffer << message;
 }
 
+size_t WorldPackets::Misc::UpdateAccountDataResponse::EstimateFinalSize() const
+{
+    return sizeof(type) +
+           sizeof(decompressedLength) +
+           compressedData.size();
+}
+
 void WorldPackets::Misc::UpdateAccountDataResponse::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << type;
     buffer << decompressedLength;
     buffer.append(compressedData.data(), compressedData.size());
+}
+
+size_t WorldPackets::Misc::InspectHonorStatsResponse::EstimateFinalSize() const
+{
+    return sizeof(playerGuid) +
+           sizeof(highestRank) +
+           sizeof(sessionKills) +
+           sizeof(yesterdayHK) +
+           sizeof(unknownOld1) +
+           sizeof(lastWeekHK) +
+           sizeof(unknownOld2) +
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+           sizeof(thisWeekHK) +
+           sizeof(unknownOld3) +
+#endif
+           sizeof(lifetimeHK) +
+           sizeof(lifetimeDHK) +
+           sizeof(yesterdayHonor) +
+           sizeof(lastWeekHonor) +
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+           sizeof(thisWeekHonor) +
+#endif
+           sizeof(lastWeekRank) +
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
+           sizeof(rankBar) +
+#endif
+           0;
 }
 
 void WorldPackets::Misc::InspectHonorStatsResponse::AppendBodyTo(ByteBuffer& buffer) const
@@ -325,6 +401,18 @@ void WorldPackets::Misc::InspectHonorStatsResponse::AppendBodyTo(ByteBuffer& buf
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+size_t WorldPackets::Misc::WeatherUpdate::EstimateFinalSize() const
+{
+    return sizeof(weatherType) +
+           sizeof(grade) +
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+           sizeof(soundId) +
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+           sizeof(instantChange) +
+#endif
+           0;
+}
 void WorldPackets::Misc::WeatherUpdate::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << weatherType;
@@ -338,15 +426,38 @@ void WorldPackets::Misc::WeatherUpdate::AppendBodyTo(ByteBuffer& buffer) const
 }
 #endif
 
+size_t WorldPackets::Misc::ServerMessage::EstimateFinalSize() const
+{
+    return sizeof(messageType) +
+           text.size() + sizeof(char) /*null terminator*/;
+}
+
 void WorldPackets::Misc::ServerMessage::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << messageType;
     buffer << text;
 }
 
+size_t WorldPackets::Misc::MeetingstoneJoinFailed::EstimateFinalSize() const
+{
+    return sizeof(reason);
+}
+
 void WorldPackets::Misc::MeetingstoneJoinFailed::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << reason;
+}
+
+size_t WorldPackets::Misc::MeetingstoneSetQueue::EstimateFinalSize() const
+{
+    return
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
+           sizeof(areaId) +
+           sizeof(status);
+#else
+           sizeof(idempotencyToken) +
+           sizeof(areaId);
+#endif
 }
 
 void WorldPackets::Misc::MeetingstoneSetQueue::AppendBodyTo(ByteBuffer& buffer) const
@@ -360,17 +471,39 @@ void WorldPackets::Misc::MeetingstoneSetQueue::AppendBodyTo(ByteBuffer& buffer) 
 #endif
 }
 
+size_t WorldPackets::Misc::MeetingstoneMemberAdded::EstimateFinalSize() const
+{
+    return sizeof(playerGuid);
+}
+
 void WorldPackets::Misc::MeetingstoneMemberAdded::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << playerGuid;
+}
+
+size_t WorldPackets::Misc::MeetingstoneInProgress::EstimateFinalSize() const
+{
+    return 0;
 }
 
 void WorldPackets::Misc::MeetingstoneInProgress::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
 }
 
+size_t WorldPackets::Misc::MeetingstoneComplete::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Misc::MeetingstoneComplete::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Misc::PvpCredit::EstimateFinalSize() const
+{
+    return sizeof(honor) +
+           sizeof(victimGuid) +
+           sizeof(victimRank);
 }
 
 void WorldPackets::Misc::PvpCredit::AppendBodyTo(ByteBuffer& buffer) const
@@ -378,6 +511,12 @@ void WorldPackets::Misc::PvpCredit::AppendBodyTo(ByteBuffer& buffer) const
     buffer << honor;
     buffer << victimGuid;
     buffer << victimRank;
+}
+
+size_t WorldPackets::Misc::SetForcedReactions::EstimateFinalSize() const
+{
+    return sizeof(uint32) /*size*/ +
+           forcedReactions.size() * sizeof(ForcedReactionEntry);
 }
 
 void WorldPackets::Misc::SetForcedReactions::AppendBodyTo(ByteBuffer& buffer) const
@@ -390,6 +529,12 @@ void WorldPackets::Misc::SetForcedReactions::AppendBodyTo(ByteBuffer& buffer) co
     }
 }
 
+size_t WorldPackets::Misc::SetFactionStanding::EstimateFinalSize() const
+{
+    return sizeof(uint32) /*size*/ +
+           factionStandings.size() * sizeof(FactionStandingEntry);
+}
+
 void WorldPackets::Misc::SetFactionStanding::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << static_cast<uint32>(factionStandings.size());
@@ -398,6 +543,12 @@ void WorldPackets::Misc::SetFactionStanding::AppendBodyTo(ByteBuffer& buffer) co
         buffer << entry.reputationListId;
         buffer << entry.standing;
     }
+}
+
+size_t WorldPackets::Misc::InitializeFactions::EstimateFinalSize() const
+{
+    return sizeof(uint32) /*size*/ +
+           factions.size() * (sizeof(FactionInitEntry::flags) + sizeof(FactionInitEntry::standing));
 }
 
 void WorldPackets::Misc::InitializeFactions::AppendBodyTo(ByteBuffer& buffer) const
@@ -410,9 +561,19 @@ void WorldPackets::Misc::InitializeFactions::AppendBodyTo(ByteBuffer& buffer) co
     }
 }
 
+size_t WorldPackets::Misc::SetFactionVisible::EstimateFinalSize() const
+{
+    return sizeof(reputationListId);
+}
+
 void WorldPackets::Misc::SetFactionVisible::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << reputationListId;
+}
+
+size_t WorldPackets::Misc::PlayMusic::EstimateFinalSize() const
+{
+    return sizeof(musicId);
 }
 
 void WorldPackets::Misc::PlayMusic::AppendBodyTo(ByteBuffer& buffer) const
@@ -420,9 +581,19 @@ void WorldPackets::Misc::PlayMusic::AppendBodyTo(ByteBuffer& buffer) const
     buffer << musicId;
 }
 
+size_t WorldPackets::Misc::PlaySound::EstimateFinalSize() const
+{
+    return sizeof(soundId);
+}
+
 void WorldPackets::Misc::PlaySound::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << soundId;
+}
+
+size_t WorldPackets::Misc::Notification::EstimateFinalSize() const
+{
+    return message.size() + sizeof(char) /*null terminator*/;
 }
 
 void WorldPackets::Misc::Notification::AppendBodyTo(ByteBuffer& buffer) const
@@ -431,15 +602,30 @@ void WorldPackets::Misc::Notification::AppendBodyTo(ByteBuffer& buffer) const
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+size_t WorldPackets::Misc::InvalidatePlayer::EstimateFinalSize() const
+{
+    return sizeof(playerGuid);
+}
 void WorldPackets::Misc::InvalidatePlayer::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << playerGuid;
 }
 #endif
 
+size_t WorldPackets::Misc::DestroyObject::EstimateFinalSize() const
+{
+    return sizeof(objectGuid);
+}
+
 void WorldPackets::Misc::DestroyObject::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << objectGuid;
+}
+
+size_t WorldPackets::Misc::AiReaction::EstimateFinalSize() const
+{
+    return sizeof(unitGuid) +
+           sizeof(reaction);
 }
 
 void WorldPackets::Misc::AiReaction::AppendBodyTo(ByteBuffer& buffer) const
@@ -448,9 +634,20 @@ void WorldPackets::Misc::AiReaction::AppendBodyTo(ByteBuffer& buffer) const
     buffer << reaction;
 }
 
+size_t WorldPackets::Misc::ZoneUnderAttack::EstimateFinalSize() const
+{
+    return sizeof(areaId);
+}
+
 void WorldPackets::Misc::ZoneUnderAttack::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << areaId;
+}
+
+size_t WorldPackets::Misc::PlayObjectSound::EstimateFinalSize() const
+{
+    return sizeof(soundId) +
+           sizeof(sourceGuid);
 }
 
 void WorldPackets::Misc::PlayObjectSound::AppendBodyTo(ByteBuffer& buffer) const
@@ -459,14 +656,34 @@ void WorldPackets::Misc::PlayObjectSound::AppendBodyTo(ByteBuffer& buffer) const
     buffer << sourceGuid;
 }
 
+size_t WorldPackets::Misc::GameObjectSpawnAnim::EstimateFinalSize() const
+{
+    return sizeof(gameObjectGuid);
+}
+
 void WorldPackets::Misc::GameObjectSpawnAnim::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << gameObjectGuid;
 }
 
+size_t WorldPackets::Misc::GameObjectDespawnAnim::EstimateFinalSize() const
+{
+    return sizeof(gameObjectGuid);
+}
+
 void WorldPackets::Misc::GameObjectDespawnAnim::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << gameObjectGuid;
+}
+
+size_t WorldPackets::Misc::StartMirrorTimer::EstimateFinalSize() const
+{
+    return sizeof(timerType) +
+           sizeof(remaining) +
+           sizeof(duration) +
+           sizeof(scale) +
+           sizeof(paused) +
+           sizeof(spellId);
 }
 
 void WorldPackets::Misc::StartMirrorTimer::AppendBodyTo(ByteBuffer& buffer) const
@@ -479,15 +696,37 @@ void WorldPackets::Misc::StartMirrorTimer::AppendBodyTo(ByteBuffer& buffer) cons
     buffer << spellId;
 }
 
+size_t WorldPackets::Misc::StopMirrorTimer::EstimateFinalSize() const
+{
+    return sizeof(timerType);
+}
+
 void WorldPackets::Misc::StopMirrorTimer::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << timerType;
+}
+
+size_t WorldPackets::Misc::PauseMirrorTimer::EstimateFinalSize() const
+{
+    return sizeof(timerType) +
+           sizeof(paused);
 }
 
 void WorldPackets::Misc::PauseMirrorTimer::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << timerType;
     buffer << paused;
+}
+
+size_t WorldPackets::Misc::TransferPending::EstimateFinalSize() const
+{
+    size_t result = sizeof(mapId);
+    if (transportInfo)
+    {
+        result += sizeof(TransferPendingTransportInfo::transportEntry) +
+                  sizeof(TransferPendingTransportInfo::oldMapId);
+    }
+    return result;
 }
 
 void WorldPackets::Misc::TransferPending::AppendBodyTo(ByteBuffer& buffer) const
@@ -500,6 +739,11 @@ void WorldPackets::Misc::TransferPending::AppendBodyTo(ByteBuffer& buffer) const
     }
 }
 
+size_t WorldPackets::Misc::NewWorld::EstimateFinalSize() const
+{
+    return sizeof(WorldLocation);
+}
+
 void WorldPackets::Misc::NewWorld::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << location.mapId;
@@ -507,6 +751,19 @@ void WorldPackets::Misc::NewWorld::AppendBodyTo(ByteBuffer& buffer) const
     buffer << location.y;
     buffer << location.z;
     buffer << location.o;
+}
+
+size_t WorldPackets::Misc::LogXpGain::EstimateFinalSize() const
+{
+    size_t result = sizeof(victimGuid) +
+                    sizeof(totalXp) +
+                    sizeof(xpType);
+    if (xpType == 0)
+    {
+        result += sizeof(baseXp) +
+                  sizeof(groupBonus);
+    }
+    return result;
 }
 
 void WorldPackets::Misc::LogXpGain::AppendBodyTo(ByteBuffer& buffer) const
@@ -521,6 +778,14 @@ void WorldPackets::Misc::LogXpGain::AppendBodyTo(ByteBuffer& buffer) const
     }
 }
 
+size_t WorldPackets::Misc::LevelUpInfo::EstimateFinalSize() const
+{
+    return sizeof(level) +
+           sizeof(healthGain) +
+           sizeof(powerGains) +
+           sizeof(statGains);
+}
+
 void WorldPackets::Misc::LevelUpInfo::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << level;
@@ -531,9 +796,19 @@ void WorldPackets::Misc::LevelUpInfo::AppendBodyTo(ByteBuffer& buffer) const
         buffer << statGains[i];
 }
 
+size_t WorldPackets::Misc::TriggerCinematic::EstimateFinalSize() const
+{
+    return sizeof(cinematicSequenceId);
+}
+
 void WorldPackets::Misc::TriggerCinematic::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << cinematicSequenceId;
+}
+
+size_t WorldPackets::Misc::PlayerSkinned::EstimateFinalSize() const
+{
+    return sizeof(freeRepop);
 }
 
 void WorldPackets::Misc::PlayerSkinned::AppendBodyTo(ByteBuffer& buffer) const
@@ -541,12 +816,28 @@ void WorldPackets::Misc::PlayerSkinned::AppendBodyTo(ByteBuffer& buffer) const
     buffer << freeRepop;
 }
 
+size_t WorldPackets::Misc::DurabilityDamageDeath::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Misc::DurabilityDamageDeath::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
 }
 
+size_t WorldPackets::Misc::CancelAutoRepeat::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Misc::CancelAutoRepeat::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Misc::ExplorationExperience::EstimateFinalSize() const
+{
+    return sizeof(areaId) +
+           sizeof(experience);
 }
 
 void WorldPackets::Misc::ExplorationExperience::AppendBodyTo(ByteBuffer& buffer) const
@@ -556,6 +847,11 @@ void WorldPackets::Misc::ExplorationExperience::AppendBodyTo(ByteBuffer& buffer)
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+size_t WorldPackets::Misc::FactionAtWarChange::EstimateFinalSize() const
+{
+    return sizeof(reputationId) +
+           sizeof(flags);
+}
 void WorldPackets::Misc::FactionAtWarChange::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << reputationId;
@@ -564,11 +860,20 @@ void WorldPackets::Misc::FactionAtWarChange::AppendBodyTo(ByteBuffer& buffer) co
 #endif
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+size_t WorldPackets::Misc::InstanceReset::EstimateFinalSize() const
+{
+    return sizeof(mapId);
+}
 void WorldPackets::Misc::InstanceReset::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << mapId;
 }
 
+size_t WorldPackets::Misc::InstanceResetFailed::EstimateFinalSize() const
+{
+    return sizeof(reason) +
+           sizeof(mapId);
+}
 void WorldPackets::Misc::InstanceResetFailed::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << reason;
@@ -576,14 +881,30 @@ void WorldPackets::Misc::InstanceResetFailed::AppendBodyTo(ByteBuffer& buffer) c
 }
 #endif
 
+size_t WorldPackets::Misc::MountResult::EstimateFinalSize() const
+{
+    return sizeof(result);
+}
+
 void WorldPackets::Misc::MountResult::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << result;
 }
 
+size_t WorldPackets::Misc::DismountResult::EstimateFinalSize() const
+{
+    return sizeof(result);
+}
+
 void WorldPackets::Misc::DismountResult::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << result;
+}
+
+size_t WorldPackets::Misc::RaidGroupOnly::EstimateFinalSize() const
+{
+    return sizeof(timer) +
+           sizeof(errorCode);
 }
 
 void WorldPackets::Misc::RaidGroupOnly::AppendBodyTo(ByteBuffer& buffer) const
@@ -592,9 +913,23 @@ void WorldPackets::Misc::RaidGroupOnly::AppendBodyTo(ByteBuffer& buffer) const
     buffer << errorCode;
 }
 
+size_t WorldPackets::Misc::SetRestStart::EstimateFinalSize() const
+{
+    return sizeof(restStateTime);
+}
+
 void WorldPackets::Misc::SetRestStart::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << restStateTime;
+}
+
+size_t WorldPackets::Misc::BindpointUpdate::EstimateFinalSize() const
+{
+    return sizeof(WorldLocation::x) +
+           sizeof(WorldLocation::y) +
+           sizeof(WorldLocation::z) +
+           sizeof(WorldLocation::mapId) +
+           sizeof(areaId);
 }
 
 void WorldPackets::Misc::BindpointUpdate::AppendBodyTo(ByteBuffer& buffer) const
@@ -604,6 +939,12 @@ void WorldPackets::Misc::BindpointUpdate::AppendBodyTo(ByteBuffer& buffer) const
     buffer << location.z;
     buffer << location.mapId;
     buffer << areaId;
+}
+
+size_t WorldPackets::Misc::PlayerBound::EstimateFinalSize() const
+{
+    return sizeof(binderGuid) +
+           sizeof(areaId);
 }
 
 void WorldPackets::Misc::PlayerBound::AppendBodyTo(ByteBuffer& buffer) const
@@ -623,10 +964,21 @@ static uint32 secsToTimeBitFields(time_t secs)
     return (localTime.tm_year - 100) << 24 | localTime.tm_mon  << 20 | (localTime.tm_mday - 1) << 14 | localTime.tm_wday << 11 | localTime.tm_hour << 6 | localTime.tm_min;
 }
 
+size_t WorldPackets::Misc::LoginSetTimeSpeed::EstimateFinalSize() const
+{
+    return sizeof(decltype(secsToTimeBitFields(0))) +
+           sizeof(gameSpeedMinutesPerSecond);
+}
+
 void WorldPackets::Misc::LoginSetTimeSpeed::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << secsToTimeBitFields(gameTime);
     buffer << gameSpeedMinutesPerSecond;
+}
+
+size_t WorldPackets::Misc::TransferAborted::EstimateFinalSize() const
+{
+    return sizeof(reason);
 }
 
 void WorldPackets::Misc::TransferAborted::AppendBodyTo(ByteBuffer& buffer) const
@@ -635,6 +987,12 @@ void WorldPackets::Misc::TransferAborted::AppendBodyTo(ByteBuffer& buffer) const
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+size_t WorldPackets::Misc::RaidInstanceMessage::EstimateFinalSize() const
+{
+    return sizeof(messageType) +
+           sizeof(mapId) +
+           sizeof(resetTime);
+}
 void WorldPackets::Misc::RaidInstanceMessage::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << messageType;
@@ -643,11 +1001,23 @@ void WorldPackets::Misc::RaidInstanceMessage::AppendBodyTo(ByteBuffer& buffer) c
 }
 #endif
 
+size_t WorldPackets::Misc::SummonRequest::EstimateFinalSize() const
+{
+    return sizeof(summonerGuid) +
+           sizeof(zoneId) +
+           sizeof(autoDeclineDelay);
+}
+
 void WorldPackets::Misc::SummonRequest::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << summonerGuid;
     buffer << zoneId;
     buffer << autoDeclineDelay;
+}
+
+size_t WorldPackets::Misc::CorpseReclaimDelay::EstimateFinalSize() const
+{
+    return sizeof(delayMs);
 }
 
 void WorldPackets::Misc::CorpseReclaimDelay::AppendBodyTo(ByteBuffer& buffer) const
@@ -656,16 +1026,30 @@ void WorldPackets::Misc::CorpseReclaimDelay::AppendBodyTo(ByteBuffer& buffer) co
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+size_t WorldPackets::Misc::UpdateInstanceOwnership::EstimateFinalSize() const
+{
+    return sizeof(hasBeenSaved);
+}
 void WorldPackets::Misc::UpdateInstanceOwnership::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << hasBeenSaved;
 }
 
+size_t WorldPackets::Misc::UpdateLastInstance::EstimateFinalSize() const
+{
+    return sizeof(mapId);
+}
 void WorldPackets::Misc::UpdateLastInstance::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << mapId;
 }
 #endif
+
+size_t WorldPackets::Misc::EmoteNotify::EstimateFinalSize() const
+{
+    return sizeof(emoteId) +
+           sizeof(unitGuid);
+}
 
 void WorldPackets::Misc::EmoteNotify::AppendBodyTo(ByteBuffer& buffer) const
 {
@@ -674,6 +1058,11 @@ void WorldPackets::Misc::EmoteNotify::AppendBodyTo(ByteBuffer& buffer) const
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+size_t WorldPackets::Misc::ClientControlUpdate::EstimateFinalSize() const
+{
+    return sizeof(uint8) + sizeof(uint64) + /*moverGuid, packed*/
+           sizeof(allowMove);
+}
 void WorldPackets::Misc::ClientControlUpdate::AppendBodyTo(ByteBuffer& buffer) const
 {
     // This packet uses the packed guid format; the old sender serialized target->GetPackGUID() directly.
@@ -681,6 +1070,17 @@ void WorldPackets::Misc::ClientControlUpdate::AppendBodyTo(ByteBuffer& buffer) c
     buffer << allowMove;
 }
 #endif
+
+size_t WorldPackets::Misc::UpdateWorldState::EstimateFinalSize() const
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    return sizeof(field) +
+           sizeof(value);
+#else
+    return sizeof(uint16) + /*field*/
+           sizeof(uint16); /*value*/
+#endif
+}
 
 void WorldPackets::Misc::UpdateWorldState::AppendBodyTo(ByteBuffer& buffer) const
 {

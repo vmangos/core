@@ -33,19 +33,43 @@ void WorldPackets::Taxi::ActivateTaxiExpress::ReadFromWorldPacket(WorldPacket& r
 }
 #endif
 
+size_t WorldPackets::Taxi::TaxiNodeStatus::EstimateFinalSize() const
+{
+    return sizeof(guid) +
+           sizeof(known);
+}
+
 void WorldPackets::Taxi::TaxiNodeStatus::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << guid;
     buffer << known;
 }
 
+size_t WorldPackets::Taxi::NewTaxiPath::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Taxi::NewTaxiPath::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Taxi::ActivateTaxiReply::EstimateFinalSize() const
+{
+    return sizeof(replyCode);
 }
 
 void WorldPackets::Taxi::ActivateTaxiReply::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << replyCode;
+}
+
+size_t WorldPackets::Taxi::ShowTaxiNodes::EstimateFinalSize() const
+{
+    return sizeof(uint32) + /*show ui*/
+           sizeof(flightmasterGuid) +
+           sizeof(currentNode) +
+           sizeof(knownNodesMask);
 }
 
 void WorldPackets::Taxi::ShowTaxiNodes::AppendBodyTo(ByteBuffer& buffer) const
