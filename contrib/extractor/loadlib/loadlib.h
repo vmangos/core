@@ -32,6 +32,13 @@ typedef std::uint8_t uint8;
 
 #define FILE_FORMAT_VERSION    18
 
+// Chunk magics are stored reversed, so the MVER chunk starts with the bytes "REVM".
+inline bool isChunk(char const* fcc_txt, char const* magic)
+{
+    return fcc_txt[0] == magic[3] && fcc_txt[1] == magic[2] &&
+           fcc_txt[2] == magic[1] && fcc_txt[3] == magic[0];
+}
+
 //
 // File version chunk
 //

@@ -54,7 +54,7 @@ bool ADT_file::prepareLoadedData()
 
 bool adt_MHDR::prepareLoadedData()
 {
-    if (!strncmp(fcc_txt, "MHDR", 4))
+    if (!isChunk(fcc_txt, "MHDR"))
         return false;
 
     if (size != sizeof(adt_MHDR) - 8)
@@ -73,7 +73,7 @@ bool adt_MHDR::prepareLoadedData()
 
 bool adt_MCIN::prepareLoadedData()
 {
-    if (!strncmp(fcc_txt, "MCIN", 4))
+    if (!isChunk(fcc_txt, "MCIN"))
         return false;
 
     // Check cells data
@@ -87,7 +87,7 @@ bool adt_MCIN::prepareLoadedData()
 
 bool adt_MH2O::prepareLoadedData()
 {
-    if (!strncmp(fcc_txt, "MH2O", 4))
+    if (!isChunk(fcc_txt, "MH2O"))
         return false;
 
     // Check liquid data
@@ -99,22 +99,28 @@ bool adt_MH2O::prepareLoadedData()
 
 bool adt_MCNK::prepareLoadedData()
 {
-    if (!strncmp(fcc_txt, "MCNK", 4))
+    if (!isChunk(fcc_txt, "MCNK"))
         return false;
 
     // Check height map
     if (offsMCVT && !getMCVT()->prepareLoadedData())
         return false;
-    // Check liquid data
-    if (offsMCLQ && !getMCLQ()->prepareLoadedData())
-        return false;
+    // Check liquid data. MCLQ stores no usable size of its own, so the layer
+    // count in the parent is the only thing that can be verified.
+    if (offsMCLQ)
+    {
+        if (sizeMCLQ > 8 && (sizeMCLQ - 8) % ADT_LIQUID_LAYER_SIZE)
+            return false;
+        if (!getMCLQ()->prepareLoadedData())
+            return false;
+    }
 
     return true;
 }
 
 bool adt_MCVT::prepareLoadedData()
 {
-    if (!strncmp(fcc_txt, "MCVT", 4))
+    if (!isChunk(fcc_txt, "MCVT"))
         return false;
 
     if (size != sizeof(adt_MCVT) - 8)
@@ -125,7 +131,7 @@ bool adt_MCVT::prepareLoadedData()
 
 bool adt_MCLQ::prepareLoadedData()
 {
-    if (!strncmp(fcc_txt, "MCLQ", 4))
+    if (!isChunk(fcc_txt, "MCLQ"))
         return false;
 
     return true;
