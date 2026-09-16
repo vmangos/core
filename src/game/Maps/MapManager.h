@@ -54,6 +54,41 @@ enum
     MAP1_LAST           = 20,
 };
 
+struct InstantiatedContinentBoundary
+{
+    float const* points; 
+    int count; 
+    float minY, maxY;
+    float minX, maxX;
+
+    InstantiatedContinentBoundary(float const* pts, int c, float minY_, float maxY_, float minX_, float maxX_) : points(pts), count(c), minY(minY_), maxY(maxY_), minX(minX_), maxX(maxX_) {}
+};
+
+inline InstantiatedContinentBoundary MakeBoundary(float const* pts, int count)
+{
+    assert(pts[1] < pts[count * 2 - 1] && "Boundary must be defined from west to east (first X < last X)");
+
+    float minX = pts[0], maxX = pts[0];
+    float minY = pts[1], maxY = pts[1];
+
+    for (int i = 1; i < count; ++i)
+    {
+        float x = pts[i * 2];
+        float y = pts[i * 2 + 1];
+
+        if (x < minX)
+            minX = x;
+        if (x > maxX)
+            maxX = x;
+        if (y < minY)
+            minY = y;
+        if (y > maxY)
+            maxY = y;
+    }
+
+    return InstantiatedContinentBoundary(pts, count, minY, maxY, minX, maxX);
+}
+
 struct MapID
 {
     explicit MapID(uint32 id) : nMapId(id), nInstanceId(0) {}
