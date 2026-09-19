@@ -711,6 +711,9 @@ class World
 
         // Get current server's WoW Patch
         uint8 GetWowPatch() const { return m_wowPatch; }
+        // The PvP Honor System was introduced in 1.4.0.
+        // https://warcraft.wiki.gg/wiki/Patch_1.4.0#PvP_Honor_System
+        bool IsHonorEnabled() const { return !(GetWowPatch() < WOW_PATCH_104 && getConfig(CONFIG_BOOL_ACCURATE_PVP_TIMELINE)); }
         char const* GetPatchName() const;
 
         LocaleConstant GetDefaultDbcLocale() const { return m_defaultDbcLocale; }
