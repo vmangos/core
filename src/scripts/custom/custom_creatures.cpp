@@ -18,6 +18,7 @@
 #include "custom.h"
 #include "ScriptedAI.h"
 #include <ctime>
+#include "Group.h"
 
 // TELEPORT NPC
 
@@ -1074,6 +1075,402 @@ bool GossipSelect_PremadeSpecNPC(Player* player, Creature* creature, uint32 send
     return true;
 }
 
+
+// Custom world buffs script
+
+// World Buffs NPC
+
+enum RoleCheckSpells
+{
+    SPELL_SHIELD_SLAM = 23922,
+    SPELL_BLOODTHIRST = 23881,
+    SPELL_LAST_STAND = 12975,
+    SPELL_HOLY_SHIELD = 20925,
+    SPELL_SANCTITY_AURA = 20218,
+    SPELL_SHADOWFORM = 15473,
+    SPELL_ELEMENTAL_MASTERY = 16166,
+    SPELL_STORMSTRIKE = 17364,
+    SPELL_MOONKIN_FORM = 24858,
+    SPELL_LEADER_OF_THE_PACK = 17007,
+};
+
+void AddAuraFromDummy(Player* player, Creature* caster, uint32 spellId, uint32 creatureEntry)
+{
+    Creature* dummy = caster->SummonCreature(creatureEntry, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 1000);
+    if (dummy)
+    {
+        player->AddAura(spellId, 0, dummy);   // or dummy->CastSpell(target, spellId, true);
+        // dummy->DespawnOrUnsummon();
+    }
+}
+
+void ApplyWorldBuffsToPlayer(Player* player, Creature* caster)
+{
+
+    // Core buffs for everyone
+    player->AddAura(22888, 0, nullptr);   // Rallying Cry of the Dragonslayer
+    player->AddAura(16609, 0, nullptr);   // Warchief's Blessing
+    player->AddAura(24425, 0, nullptr);   // Spirit of Zandalar
+    player->AddAura(22818, 0, nullptr);   // Mol'dar's Moxie
+    player->AddAura(15366, 0, nullptr);   // Songflower Serenade
+    player->AddAura(21850, 0, nullptr);   // Gift of the Wild
+    player->AddAura(21564, 0, nullptr);   // Prayer of Fortitude
+    // Add Aura Greater Blessing of Kings using a temporary creature to allow stacking
+    AddAuraFromDummy(player, caster, 25898, 90032); //Greater Blessing of Kings
+
+
+    // Class & role specific buffs
+    switch (player->GetClass())
+    {
+        case CLASS_WARRIOR:
+            player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+            player->AddAura(22817, 0, nullptr);   // Fengus' Ferocity
+            player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+            player->AddAura(17538, 0, nullptr);   // Elixir of the Mongoose
+            player->AddAura(16323, 0, nullptr);   // Juju Power
+            player->AddAura(17038, 0, nullptr);   // Winterfall Firewater
+            player->AddAura(17626, 0, nullptr);   // Flask of the Titans
+            player->AddAura(10667, 0, nullptr);   // Blasted Lands Strength
+            player->AddAura(24799, 0, nullptr);   // Smoked Desert Dumplings
+            AddAuraFromDummy(player, caster, 25916, 90032); //Greater Blessing of Might
+            
+            if (player->HasSpell(SPELL_SHIELD_SLAM)||player->HasSpell(SPELL_BLOODTHIRST) && player->HasSpell(SPELL_LAST_STAND)) //Tank
+            {
+                player->AddAura(17540, 0, nullptr);   // Greater Stoneshield Potion
+                AddAuraFromDummy(player, caster, 25890, 90032); //Greater Blessing of Light
+                AddAuraFromDummy(player, caster, 25899, 90032); //Greater Blessing of Sanctuary
+            }
+            else //DPS
+            {
+                AddAuraFromDummy(player, caster, 25895, 90032); //Greater Blessing of Salvation
+            }
+            // 19-21 buffs in total  
+            break;       
+
+        case CLASS_PALADIN:
+            player->AddAura(23028, 0, nullptr);   // Arcane Brilliance
+            player->AddAura(24363, 0, nullptr);   // Mageblood Potion
+            player->AddAura(22820, 0, nullptr);   // Slip'kik's Savvy
+            AddAuraFromDummy(player, caster, 25894, 90032); //Greater Blessing of Wisdom
+            if (player->HasSpell(SPELL_HOLY_SHIELD)) //Tank
+            {
+                player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+                player->AddAura(22817, 0, nullptr);   // Fengus' Ferocity
+                player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+                player->AddAura(17538, 0, nullptr);   // Elixir of the Mongoose
+                player->AddAura(16323, 0, nullptr);   // Juju Power
+                player->AddAura(17038, 0, nullptr);   // Winterfall Firewater
+                player->AddAura(17539, 0, nullptr);   // Greater Arcane Elixir
+                player->AddAura(17628, 0, nullptr);   // Flask of Supreme Power
+                player->AddAura(10667, 0, nullptr);   // Blasted Lands Strength
+                player->AddAura(24799, 0, nullptr);   // Smoked Desert Dumplings
+                player->AddAura(17540, 0, nullptr);   // Greater Stoneshield Potion
+                AddAuraFromDummy(player, caster, 25916, 90032); //Greater Blessing of Might
+                AddAuraFromDummy(player, caster, 25890, 90032); //Greater Blessing of Light
+                AddAuraFromDummy(player, caster, 25899, 90032); //Greater Blessing of Sanctuary
+            }
+
+            else if (player->HasSpell(SPELL_SANCTITY_AURA)) //DPS
+            {
+                player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+                player->AddAura(22817, 0, nullptr);   // Fengus' Ferocity
+                player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+                player->AddAura(17538, 0, nullptr);   // Elixir of the Mongoose
+                player->AddAura(16323, 0, nullptr);   // Juju Power
+                player->AddAura(17038, 0, nullptr);   // Winterfall Firewater
+                player->AddAura(17539, 0, nullptr);   // Greater Arcane Elixir
+                player->AddAura(17628, 0, nullptr);   // Flask of Supreme Power
+                player->AddAura(10667, 0, nullptr);   // Blasted Lands Strength
+                player->AddAura(24799, 0, nullptr);   // Smoked Desert Dumplings
+                AddAuraFromDummy(player, caster, 25916, 90032); //Greater Blessing of Might
+            }
+            else //Healer
+            {
+                player->AddAura(23766, 0, nullptr);   // Darkmoon Faire Intelligence
+                player->AddAura(17627, 0, nullptr);   // Flask of Distilled Wisdom
+                player->AddAura(10692, 0, nullptr);   // Blasted Lands Intelligence
+                player->AddAura(18194, 0, nullptr);   // Nightfin Soup
+            }
+            // 16-26 buffs in total
+            break;
+
+        case CLASS_SHAMAN:
+            player->AddAura(23028, 0, nullptr);   // Arcane Brilliance
+            player->AddAura(24363, 0, nullptr);   // Mageblood Potion
+            player->AddAura(22820, 0, nullptr);   // Slip'kik's Savvy
+            AddAuraFromDummy(player, caster, 25894, 90032); //Greater Blessing of Wisdom
+            if (player->HasSpell(SPELL_ELEMENTAL_MASTERY)) //Caster DPS
+            {
+                player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+                player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+                player->AddAura(17539, 0, nullptr);   // Greater Arcane Elixir
+                player->AddAura(17628, 0, nullptr);   // Flask of Supreme Power
+                player->AddAura(10692, 0, nullptr);   // Blasted Lands Intelligence
+                player->AddAura(18194, 0, nullptr);   // Nightfin Soup
+            }
+            else if (player->HasSpell(SPELL_STORMSTRIKE)) //Melee DPS
+            {
+                player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+                player->AddAura(22817, 0, nullptr);   // Fengus' Ferocity
+                player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+                player->AddAura(17538, 0, nullptr);   // Elixir of the Mongoose
+                player->AddAura(16323, 0, nullptr);   // Juju Power
+                player->AddAura(17038, 0, nullptr);   // Winterfall Firewater
+                player->AddAura(17539, 0, nullptr);   // Greater Arcane Elixir
+                player->AddAura(17628, 0, nullptr);   // Flask of Supreme Power
+                player->AddAura(10667, 0, nullptr);   // Blasted Lands Strength
+                player->AddAura(24799, 0, nullptr);   // Smoked Desert Dumplings
+                AddAuraFromDummy(player, caster, 25916, 90032); //Greater Blessing of Might
+            }
+            else //Healer
+            {
+                player->AddAura(23766, 0, nullptr);   // Darkmoon Faire Intelligence
+                player->AddAura(17627, 0, nullptr);   // Flask of Distilled Wisdom
+                player->AddAura(10692, 0, nullptr);   // Blasted Lands Intelligence
+                player->AddAura(18194, 0, nullptr);   // Nightfin Soup
+                // 16-21 buffs in total
+            }
+            break;
+
+        case CLASS_HUNTER:
+            player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+            player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+            player->AddAura(17538, 0, nullptr);   // Elixir of the Mongoose
+            player->AddAura(16329, 0, nullptr);   // Juju Might
+            player->AddAura(23028, 0, nullptr);   // Arcane Brilliance
+            player->AddAura(17626, 0, nullptr);   // Flask of the Titans
+            player->AddAura(10669, 0, nullptr);   // Blasted Lands Agility
+            player->AddAura(18192, 0, nullptr);   // Grilled Squid
+            AddAuraFromDummy(player, caster, 25894, 90032); //Greater Blessing of Wisdom
+            //15 buffs in total
+            break;
+        
+        case CLASS_DRUID:
+            player->AddAura(23028, 0, nullptr);   // Arcane Brilliance
+            player->AddAura(24363, 0, nullptr);   // Mageblood Potion
+            player->AddAura(22820, 0, nullptr);   // Slip'kik's Savvy
+            AddAuraFromDummy(player, caster, 25894, 90032); //Greater Blessing of Wisdom
+            if (player->HasSpell(SPELL_MOONKIN_FORM)) //Caster DPS
+            {
+                player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+                player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+                player->AddAura(17539, 0, nullptr);   // Greater Arcane Elixir
+                player->AddAura(17628, 0, nullptr);   // Flask of Supreme Power
+                player->AddAura(10692, 0, nullptr);   // Blasted Lands Intelligence
+                player->AddAura(18194, 0, nullptr);   // Nightfin Soup
+            }
+            else if (player->HasSpell(SPELL_LEADER_OF_THE_PACK)) //Melee DPS or Tank
+            {
+                player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+                player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+                player->AddAura(17538, 0, nullptr);   // Elixir of the Mongoose
+                player->AddAura(16329, 0, nullptr);   // Juju Might
+                player->AddAura(23028, 0, nullptr);   // Arcane Brilliance
+                player->AddAura(17626, 0, nullptr);   // Flask of the Titans
+                player->AddAura(10669, 0, nullptr);   // Blasted Lands Agility
+                player->AddAura(18192, 0, nullptr);   // Grilled Squid
+                AddAuraFromDummy(player, caster, 25916, 90032); //Greater Blessing of Might
+                AddAuraFromDummy(player, caster, 25890, 90032); //Greater Blessing of Light
+                AddAuraFromDummy(player, caster, 25899, 90032); //Greater Blessing of Sanctuary
+            }
+            else //Healer
+            {
+                player->AddAura(23766, 0, nullptr);   // Darkmoon Faire Intelligence
+                player->AddAura(17627, 0, nullptr);   // Flask of Distilled Wisdom
+                player->AddAura(10692, 0, nullptr);   // Blasted Lands Intelligence
+                player->AddAura(18194, 0, nullptr);   // Nightfin Soup
+            }
+                // 16 buffs in total
+            break;
+
+        case CLASS_ROGUE:
+            player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+            player->AddAura(22817, 0, nullptr);   // Fengus' Ferocity
+            player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+            player->AddAura(17538, 0, nullptr);   // Elixir of the Mongoose
+            player->AddAura(16323, 0, nullptr);   // Juju Power
+            player->AddAura(17038, 0, nullptr);   // Winterfall Firewater
+            player->AddAura(17626, 0, nullptr);   // Flask of the Titans
+            player->AddAura(10669, 0, nullptr);   // Blasted Lands Agility
+            player->AddAura(18192, 0, nullptr);   // Grilled Squid
+            
+            // Add Aura Greater Blessing of Kings using a temporary creature to allow stacking
+            AddAuraFromDummy(player, caster, 25916, 90032); //Greater Blessing of Might
+            AddAuraFromDummy(player, caster, 25895, 90032); //Greater Blessing of Salvation
+
+            // 19 buffs in total  
+            break;
+
+        case CLASS_MAGE:
+            player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+            player->AddAura(22820, 0, nullptr);   // Slip'kik's Savvy
+            player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+            player->AddAura(17628, 0, nullptr);   // Flask of Supreme Power
+            player->AddAura(17539, 0, nullptr);   // Greater Arcane Elixir
+            player->AddAura(21920, 0, nullptr);   // Elixir of Frost Power
+            player->AddAura(26276, 0, nullptr);   // Elixir of Greater Firepower
+            player->AddAura(23028, 0, nullptr);   // Arcane Brilliance
+            player->AddAura(10692, 0, nullptr);   // Blasted Lands Intelligence
+            player->AddAura(24363, 0, nullptr);   // Mageblood Potion
+            player->AddAura(18194, 0, nullptr);   // Nightfin Soup
+            AddAuraFromDummy(player, caster, 25894, 90032); //Greater Blessing of Wisdom
+            AddAuraFromDummy(player, caster, 25895, 90032); //Greater Blessing of Salvation
+
+            // 20 buffs in total
+            break;
+
+            case CLASS_WARLOCK:
+            player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+            player->AddAura(22820, 0, nullptr);   // Slip'kik's Savvy
+            player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+            player->AddAura(17628, 0, nullptr);   // Flask of Supreme Power
+            player->AddAura(17539, 0, nullptr);   // Greater Arcane Elixir
+            player->AddAura(11474, 0, nullptr);   // Elixir of Shadow Power
+            player->AddAura(26276, 0, nullptr);   // Elixir of Greater Firepower
+            player->AddAura(23028, 0, nullptr);   // Arcane Brilliance
+            player->AddAura(10692, 0, nullptr);   // Blasted Lands Intelligence
+            player->AddAura(24363, 0, nullptr);   // Mageblood Potion
+            player->AddAura(18194, 0, nullptr);   // Nightfin Soup
+            AddAuraFromDummy(player, caster, 25894, 90032); //Greater Blessing of Wisdom
+            AddAuraFromDummy(player, caster, 25895, 90032); //Greater Blessing of Salvation
+
+            // 19 buffs in total
+            break;
+        
+        case CLASS_PRIEST:
+            player->AddAura(23028, 0, nullptr);   // Arcane Brilliance
+            player->AddAura(24363, 0, nullptr);   // Mageblood Potion
+            player->AddAura(22820, 0, nullptr);   // Slip'kik's Savvy
+            player->AddAura(10692, 0, nullptr);   // Blasted Lands Intelligence
+            player->AddAura(18194, 0, nullptr);   // Nightfin Soup
+            AddAuraFromDummy(player, caster, 25894, 90032); //Greater Blessing of Wisdom
+            AddAuraFromDummy(player, caster, 25895, 90032); //Greater Blessing of Salvation
+            if (player->HasSpell(SPELL_SHADOWFORM)) //Caster DPS
+            {
+                player->AddAura(23768, 0, nullptr);   // Darkmoon Faire Damage
+                player->AddAura(29534, 0, nullptr);   // Traces of Silithyst
+                player->AddAura(17628, 0, nullptr);   // Flask of Supreme Power
+                player->AddAura(17539, 0, nullptr);   // Greater Arcane Elixir
+                player->AddAura(11474, 0, nullptr);   // Elixir of Shadow Power
+            }
+            else //Healer
+            {
+                player->AddAura(23766, 0, nullptr);   // Darkmoon Faire Intelligence
+                player->AddAura(17627, 0, nullptr);   // Flask of Distilled Wisdom
+            }
+            // 16 buffs in total
+            break;
+    }
+}
+
+bool GossipHello_WorldBuffsNPC(Player* player, Creature* creature)
+{
+    // Show action menu
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Buff my group",           GOSSIP_SENDER_MAIN, 1);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Buff myself",             GOSSIP_SENDER_MAIN, 2);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Fire Resistance (Group)", GOSSIP_SENDER_MAIN, 3);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Windfury (Only you)",     GOSSIP_SENDER_MAIN, 4);
+    player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_WorldBuffsNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
+{
+    if (sender != GOSSIP_SENDER_MAIN)
+        return true;
+
+    switch (action)
+    {
+
+        case 1: // Buff group
+        {
+            Group* group = player->GetGroup();
+            if (group)
+            {
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                {
+                    Player* member = itr->getSource();
+                    if (member && member->IsInWorld() && member->IsAlive())
+                    {
+                        ApplyWorldBuffsToPlayer(member, creature);
+                    }
+                }
+                player->GetSession()->SendNotification("Your group has been buffed.");
+            }
+            else
+            {
+                // No group, buff just the player
+                ApplyWorldBuffsToPlayer(player, creature);
+                player->GetSession()->SendNotification("You have been buffed.");
+            }
+            player->CLOSE_GOSSIP_MENU();
+            break;
+        }
+
+        case 2: // Buff myself
+        {
+            ApplyWorldBuffsToPlayer(player, creature);
+            player->GetSession()->SendNotification("You have been buffed.");
+            player->CLOSE_GOSSIP_MENU();
+            break;
+        }
+
+        case 3: // Fire Resistance 
+        {
+            Group* group = player->GetGroup();
+            if (group)
+            {
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                {
+                    Player* member = itr->getSource();
+                    if (member && member->IsInWorld() && member->IsAlive())
+                    {
+                        member->AddAura(15123, 0, nullptr); 
+                    }
+                }
+                player->GetSession()->SendNotification("Your group has been buffed.");
+            }
+            else
+            {
+                // No group, buff just the player
+                player->AddAura(15123, 0, nullptr); 
+                player->GetSession()->SendNotification("You have been buffed.");
+            }
+            player->CLOSE_GOSSIP_MENU();
+            break;
+        }
+
+        case 4: // Windfury (Only you)
+                // I know this may be a bit too custom, but I think if anyone is using the World Buffs NPC,
+                // They already are cheating. I wish to offer this option, because it's really a dream of
+                // Alliance Warriors to be able to use Windfury ^.^
+        {
+            // Get the player's main hand weapon
+            Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+
+            if (!pItem)
+            {
+                player->GetSession()->SendNotification("You need a weapon in your main hand to receive this enchantment!");
+                return false;
+            }
+            // Clear existing temporary enchantments first to prevent errors
+            player->ApplyEnchantment(pItem, TEMP_ENCHANTMENT_SLOT, false);
+
+            // 1669: Windfury Weapon (Rank 4)
+            // 1800000: Duration (30 minutes in milliseconds for Vanilla)
+            pItem->SetEnchantment(TEMP_ENCHANTMENT_SLOT, 1669, 1800000, 0);
+
+            // Refresh the item to the client so the visual/tooltip appears
+            player->ApplyEnchantment(pItem, TEMP_ENCHANTMENT_SLOT, true); 
+            player->GetSession()->SendNotification("I have a dream.");
+            player->CLOSE_GOSSIP_MENU();
+            break;
+        }
+
+    }
+    return true;
+}
+
 /*
 * Custom training dummy script
 */
@@ -1249,6 +1646,12 @@ void AddSC_custom_creatures()
     newscript->Name = "custom_premade_spec_npc";
     newscript->pGossipHello = &GossipHello_PremadeSpecNPC;
     newscript->pGossipSelect = &GossipSelect_PremadeSpecNPC;
+    newscript->RegisterSelf(false);
+
+    newscript = new Script;
+    newscript->Name = "custom_world_buffs_npc";
+    newscript->pGossipHello = &GossipHello_WorldBuffsNPC;
+    newscript->pGossipSelect = &GossipSelect_WorldBuffsNPC;
     newscript->RegisterSelf(false);
 
     newscript = new Script;
