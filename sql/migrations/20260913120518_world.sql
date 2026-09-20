@@ -217,7 +217,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
 (1526204, 15262, 0, 3, 0, 100, 0, 100, 100, 1000, 1000, 1526204, 0, 0, 'Obsidian Eradicator - Cast Shock Blast at Full Mana');
 
--- In combat timer: every ~6.5 sec cast SPELL_DRAINMANA (26457)
+-- In combat timer: every ~3.5 sec cast SPELL_DRAINMANA (26457)
 DELETE FROM `creature_spells` WHERE `entry`=152620;
 INSERT
     INTO
@@ -311,7 +311,7 @@ INSERT
     delayRepeatMin_8,
     delayRepeatMax_8,
     scriptId_8)
-VALUES(152620, 'Ahn''Qiraj Temple - Obsidian Eradicator', 26457, 100, 0, 0, 0, 0, 6, 7, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+VALUES(152620, 'Ahn''Qiraj Temple - Obsidian Eradicator', 26457, 100, 0, 0, 0, 0, 3, 4, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 
 -- End of migration.
