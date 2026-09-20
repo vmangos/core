@@ -109,17 +109,8 @@ struct boss_moamAI : public ScriptedAI
 
         m_manaFiendGuids.push_back(pSummoned->GetObjectGuid());
 
-        pSummoned->SetInCombatWithZone();
-
-        Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-        if (!target)
-            target = m_creature->GetVictim();
-
-        if (target)
-        {
-            pSummoned->AddThreat(target, 1000.0f);
+        if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             pSummoned->AI()->AttackStart(target);
-        }
     }
 
     void SummonedCreatureJustDied(Creature* pSummoned) override
@@ -151,7 +142,6 @@ struct boss_moamAI : public ScriptedAI
 
         m_creature->RemoveAurasDueToSpell(SPELL_ENERGIZE);
 
-        // Eruption and the mana-full emote are handled by the full-mana check in UpdateAI.
         m_uiStoneFormTimer = 90000;
     }
 
@@ -200,8 +190,6 @@ struct boss_moamAI : public ScriptedAI
 
                 m_uiStoneFormTimer = 90000;
             }
-            else
-                m_uiStoneFormTimer = 1000;  // retry shortly
         }
         else
             m_uiStoneFormTimer -= uiDiff;
