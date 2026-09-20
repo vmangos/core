@@ -383,68 +383,6 @@ struct mob_flesh_hunterAI : public ScriptedAI
 
 enum
 {
-    SPELL_PURGE             =  25756,
-    SPELL_DRAINMANA         =  25754,
-};
-
-
-struct ObsidianDestroyerAI : public ScriptedAI
-{
-    ObsidianDestroyerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    bool m_bIsInCombat;
-    uint32 m_uiDrainMana_Timer;
-
-    void Reset() override
-    {
-        m_uiDrainMana_Timer = 7000;
-        m_creature->SetPower(POWER_MANA, 0);
-
-        m_bIsInCombat = false;
-    }
-
-    void Aggro(Unit* pWho) override
-    {
-        m_creature->SetInCombatWithZone();
-        if (!m_bIsInCombat)
-        {
-            m_creature->SetPower(POWER_MANA, 0);
-            m_bIsInCombat = true;
-        }
-    }
-
-    void JustDied(Unit* pKiller) override
-    {
-        if (GameObject *pObsidian = m_creature->SummonGameObject(OBJ_SMALL_OBSIDIAN_CHUNK, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, 0, 0, 0, 0, -1, false))
-            pObsidian->SetRespawnTime(345600);
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (m_creature->GetPower(POWER_MANA) >= m_creature->GetMaxPower(POWER_MANA) && m_bIsInCombat)
-            DoCast(m_creature, SPELL_PURGE, true);
-
-        //m_uiDrainMana_Timer
-        if (m_uiDrainMana_Timer < uiDiff)
-        {
-            DoCast(m_creature, SPELL_DRAINMANA);
-            m_uiDrainMana_Timer = 7000;
-        }
-        else
-            m_uiDrainMana_Timer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-enum
-{
     SPELL_VENOM_SPIT    =   25497,
     SPELL_RETALIATION   =   22857,
 };
@@ -1045,11 +983,6 @@ CreatureAI* GetAI_HiveZaraSoldier(Creature* pCreature)
     return new HiveZaraSoldierAI(pCreature);
 }
 
-CreatureAI* GetAI_ObsidianDestroyer(Creature* pCreature)
-{
-    return new ObsidianDestroyerAI(pCreature);
-}
-
 CreatureAI* GetAI_SilicateFeeder(Creature* pCreature)
 {
     return new SilicateFeederAI(pCreature);
@@ -1151,11 +1084,6 @@ void AddSC_ruins_of_ahnqiraj()
     newscript = new Script;
     newscript->Name = "mob_hive_zara_soldier";
     newscript->GetAI = &GetAI_HiveZaraSoldier;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_obsidian_destroyer";
-    newscript->GetAI = &GetAI_ObsidianDestroyer;
     newscript->RegisterSelf();
 
     newscript = new Script;

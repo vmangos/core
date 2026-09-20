@@ -83,7 +83,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : BasicAI(c)
             m_CreatureEventAIList.emplace_back(i);
         }
     }
-    else
+    else if (!c->IsPet())
         sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "CreatureEventAI: EventMap for Creature %u is empty but creature is using CreatureEventAI.", m_creature->GetEntry());
 
     m_bEmptyList = m_CreatureEventAIList.empty();

@@ -14,13 +14,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Kurinnaxx
-SD%Complete: 100
-SDComment: Set in DB trap Despawn Time
-SDCategory: Ruins of Ahn'Qiraj
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "ruins_of_ahnqiraj.h"
 
@@ -58,50 +51,50 @@ struct boss_kurinnaxxAI : public ScriptedAI
 
     void Reset() override
     {
-        m_uiMortalWound_Timer = 7000;
-        m_uiSandTrap_Timer = 7000;
+        m_uiMortalWound_Timer = 8000;
+        m_uiSandTrap_Timer = 8000;
         m_uiCleanSandTrap_Timer = 0;
-        m_uiTrash_Timer = 10000;
-        m_uiWideSlash_Timer = 15000;
+        m_uiTrash_Timer = 16000;
+        m_uiWideSlash_Timer = 11000;
         m_bHasEnraged = false;
-    }
 
-    void JustRespawned() override
-    {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_KURINNAXX, NOT_STARTED);
     }
 
-    void Aggro(Unit* pPuller) override
+    void Aggro(Unit* /*pPuller*/) override
     {
         m_creature->SetInCombatWithZone();
+
         if (m_pInstance)
             m_pInstance->SetData(TYPE_KURINNAXX, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller) override
+    void JustDied(Unit* /*pKiller*/) override
     {
-        if (!m_pInstance)
-            return;
+        DoOrSimulateScriptTextForMap(SAY_BREACHED, NPC_OSSIRIAN, m_creature->GetMap());
 
-        DoOrSimulateScriptTextForMap(SAY_BREACHED, NPC_OSSIRIAN, m_creature->GetMap());  
-
-        m_pInstance->SetData(TYPE_KURINNAXX, DONE);
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_KURINNAXX, DONE);
     }
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        // if no one gets to the trap in 5 seconds delete the trap
-        if (m_uiCleanSandTrap_Timer < uiDiff)
+        // Despawn an untriggered sand trap after 5 seconds
+        if (m_uiCleanSandTrap_Timer)
         {
-            if (GameObject* pTrap = GetClosestGameObjectWithEntry(m_creature, GO_TRAP, DEFAULT_VISIBILITY_DISTANCE))
+            if (m_uiCleanSandTrap_Timer <= uiDiff)
             {
-                pTrap->SendObjectDeSpawnAnim();
-                pTrap->Delete();
+                if (GameObject* pTrap = GetClosestGameObjectWithEntry(m_creature, GO_TRAP, DEFAULT_VISIBILITY_DISTANCE))
+                {
+                    pTrap->SendObjectDeSpawnAnim();
+                    pTrap->Delete();
+                }
+                m_uiCleanSandTrap_Timer = 0;
             }
+            else
+                m_uiCleanSandTrap_Timer -= uiDiff;
         }
-        else
-            m_uiCleanSandTrap_Timer -= uiDiff;
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -111,7 +104,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
             {
-                DoScriptText(EMOTE_FRENZY, m_creature);
+                DoScriptText(EMOTE_FRENZY, m_creature, nullptr, CHAT_TYPE_ZONE_EMOTE);
                 m_bHasEnraged = true;
             }
         }
@@ -120,20 +113,17 @@ struct boss_kurinnaxxAI : public ScriptedAI
         if (m_uiMortalWound_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALWOUND) == CAST_OK)
-                m_uiMortalWound_Timer = 9000;
+                m_uiMortalWound_Timer = 8000;
         }
         else
             m_uiMortalWound_Timer -= uiDiff;
 
-        // TODO: Should use 26524 instead
-        /* Summon trap */
+        /* Sand trap */
         if (m_uiSandTrap_Timer < uiDiff)
         {
-            if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_SANDTRAP, CF_TRIGGERED) == CAST_OK)
             {
-                if (GameObject* trap = m_creature->SummonGameObject(GO_TRAP, pUnit->GetPositionX(), pUnit->GetPositionY(), pUnit->GetPositionZ(), 0, 0, 0, 0, 0, 0))
-                    trap->SetOwnerGuid(m_creature->GetObjectGuid());
-                m_uiSandTrap_Timer = urand(5100, 7000); /** Random timer for sandtrap between 1 and 7s */
+                m_uiSandTrap_Timer = 8000;
                 m_uiCleanSandTrap_Timer = 5000;
             }
         }
@@ -144,7 +134,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         if (m_uiWideSlash_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WIDE_SLASH) == CAST_OK)
-                m_uiWideSlash_Timer = 10000 + (rand() % 10000);
+                m_uiWideSlash_Timer = 11000;
         }
         else
             m_uiWideSlash_Timer -= uiDiff;
@@ -153,7 +143,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         if (m_uiTrash_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRASH) == CAST_OK)
-                m_uiTrash_Timer = 10000 + (rand() % 10000);
+                m_uiTrash_Timer = 16000;
         }
         else
             m_uiTrash_Timer -= uiDiff;
@@ -162,6 +152,33 @@ struct boss_kurinnaxxAI : public ScriptedAI
     }
 };
 
+// Spell script for 26524 - drops a sand trap under a random raid member
+struct KurinnaxxSandTrap : public SpellScript
+{
+    bool OnEffectExecute(Spell* spell, SpellEffectIndex effIdx) const final
+    {
+        if (effIdx != EFFECT_INDEX_0)
+            return true;
+
+        Creature* caster = spell->m_casterUnit ? spell->m_casterUnit->ToCreature() : nullptr;
+        if (!caster)
+            return true;
+
+        if (Unit* pTarget = caster->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+        {
+            if (GameObject* trap = caster->SummonGameObject(GO_TRAP, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0, 0, 0, 0, 0, 0))
+                trap->SetOwnerGuid(caster->GetObjectGuid());
+        }
+
+        return false;
+    }
+};
+
+SpellScript* GetScript_KurinnaxxSandTrap(SpellEntry const*)
+{
+    return new KurinnaxxSandTrap();
+}
+
 CreatureAI* GetAI_boss_kurinnaxx(Creature* pCreature)
 {
     return new boss_kurinnaxxAI(pCreature);
@@ -169,9 +186,13 @@ CreatureAI* GetAI_boss_kurinnaxx(Creature* pCreature)
 
 void AddSC_boss_kurinnaxx()
 {
-    Script* newscript;
-    newscript = new Script;
-    newscript->Name = "boss_kurinnaxx";
-    newscript->GetAI = &GetAI_boss_kurinnaxx;
-    newscript->RegisterSelf();
+    Script* pNewScript = new Script;
+    pNewScript->Name = "boss_kurinnaxx";
+    pNewScript->GetAI = &GetAI_boss_kurinnaxx;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spell_kurinnaxx_sand_trap";
+    pNewScript->GetSpellScript = &GetScript_KurinnaxxSandTrap;
+    pNewScript->RegisterSelf();
 }
