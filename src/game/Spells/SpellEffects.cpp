@@ -368,6 +368,15 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     }, 1);
                     return;
                 }
+                case 23777: // Zero Mana/Full Health DND
+                {
+                    if (!m_casterUnit)
+                        return;
+
+                    m_casterUnit->SetHealth(m_casterUnit->GetMaxHealth());
+                    m_casterUnit->SetPower(POWER_MANA, 0);
+                    return;
+                }
                 case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
                 {
                     if (!m_casterUnit->IsInCombat())
@@ -3970,13 +3979,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                         unitTarget->CastSpell(m_casterUnit, 26639, true);
                     return;
                 }
-                case 25676: // Moam                         // Drain Mana
+                case 25754: // Moam                         // Drain Mana
                 case 26559: // Obsidian Nullifier
                 {
                     m_caster->CastSpell(unitTarget, 25671, true);
                     return;
                 }
-                case 25754: // Obsidian Destroyer           // Drain Mana
+                case 25676: // Obsidian Destroyer           // Drain Mana
                 case 26457: // Obsidian Eradicator
                 {
                     m_caster->CastSpell(unitTarget, 25755, true);
