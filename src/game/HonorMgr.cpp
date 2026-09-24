@@ -791,6 +791,9 @@ void HonorMgr::Load(std::unique_ptr<QueryResult> result)
 
 bool HonorMgr::Add(float cp, uint8 type, Unit const* source)
 {
+    if (!sWorld.IsHonorEnabled())
+        return false;
+
     // Prevent give fake records to db with 0 honor
     if (!cp || !m_owner)
         return false;
