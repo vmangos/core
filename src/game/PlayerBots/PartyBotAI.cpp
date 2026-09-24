@@ -763,7 +763,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             else
                 UpdateInCombatAI_Hunter();
         }
-
+        else if (me->GetClass() == CLASS_MAGE ||
+                 me->GetClass() == CLASS_WARLOCK ||
+                 me->GetClass() == CLASS_PRIEST)
+        {
+            if (me->GetPowerPercent(POWER_MANA) >= 20.0f)
+                me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+        }
         return;
     }
 
