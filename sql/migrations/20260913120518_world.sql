@@ -186,7 +186,7 @@ UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entr
 DELETE FROM `creature_ai_events` WHERE `id` IN (1526200, 1526201, 1526202, 1526203, 1526204, 1526205, 1526206);
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (1526200, 1526201, 1526202, 1526203, 1526204, 1526205, 1526206);
 
--- Delete old broken aud custom scripts
+-- Delete old broken and custom scripts
 -- Spawn: cast SPELL_RESET_MANA (23777)
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`)
 VALUES (1526200, 0, 0, 15, 23777, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Obsidian Eradicator - Cast Zero Mana/Full Health DND (Spawn)');
