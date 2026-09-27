@@ -377,6 +377,31 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     m_casterUnit->SetPower(POWER_MANA, 0);
                     return;
                 }
+                case 22913: // Random Aggro
+                case 25680:
+                case 28388:
+                case 30215:
+                {
+                    Creature* caster = m_casterUnit ? m_casterUnit->ToCreature() : nullptr;
+                    if (!caster)
+                        return;
+
+                    // A guardian has no threat list of its own yet, so pull a random
+                    // target from its owner.
+                    Creature* pool = caster;
+                    if (Unit* owner = caster->GetCharmerOrOwner())
+                        if (Creature* ownerCreature = owner->ToCreature())
+                            pool = ownerCreature;
+
+                    if (Unit* target = pool->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    {
+                        // Keeps PetEventAI::FindTargetForAttack from falling back to
+                        // the owner's attacker on the next update.
+                        caster->AddThreat(target, 100.0f);
+                        caster->AI()->AttackStart(target);
+                    }
+                    return;
+                }
                 case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
                 {
                     if (!m_casterUnit->IsInCombat())

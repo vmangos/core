@@ -19,7 +19,7 @@
 
 enum
 {
-    EMOTE_FRENZY            = 10645,
+    EMOTE_FRENZY            = 2384,
 
     GO_TRAP                 =   180647,
 
@@ -133,7 +133,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         /* WideSlash */
         if (m_uiWideSlash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WIDE_SLASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_WIDE_SLASH) == CAST_OK)
                 m_uiWideSlash_Timer = 11000;
         }
         else
@@ -142,7 +142,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         /* Trash */
         if (m_uiTrash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_TRASH) == CAST_OK)
                 m_uiTrash_Timer = 16000;
         }
         else
@@ -166,8 +166,7 @@ struct KurinnaxxSandTrap : public SpellScript
 
         if (Unit* pTarget = caster->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
         {
-            if (GameObject* trap = caster->SummonGameObject(GO_TRAP, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0, 0, 0, 0, 0, 0))
-                trap->SetOwnerGuid(caster->GetObjectGuid());
+            caster->SummonGameObject(GO_TRAP, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0, 0, 0, 0, 0, 0);
         }
 
         return false;

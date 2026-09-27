@@ -31,6 +31,7 @@ enum
     SPELL_SUMMON_MANA_FIEND = 25684,
     SPELL_ENERGIZE          = 25685,
     SPELL_DROP_OBSIDIAN     = 27631,
+    SPELL_RANDOM_AGGRO      = 25680,
 
     NPC_MANA_FIEND          = 15527,
 };
@@ -109,8 +110,7 @@ struct boss_moamAI : public ScriptedAI
 
         m_manaFiendGuids.push_back(pSummoned->GetObjectGuid());
 
-        if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            pSummoned->AI()->AttackStart(target);
+        pSummoned->CastSpell(pSummoned, SPELL_RANDOM_AGGRO, true);
     }
 
     void SummonedCreatureJustDied(Creature* pSummoned) override
@@ -168,8 +168,9 @@ struct boss_moamAI : public ScriptedAI
             return;
         }
 
-        // Arcane Eruption at full mana
-        if (m_creature->GetPower(POWER_MANA) >= m_creature->GetMaxPower(POWER_MANA))
+        // Arcane Eruption. Sniff shows it fired at 25884 mana (not only at 100%),
+        // i.e. as soon as Moam can afford the spell's 25000 mana cost.
+        if (m_creature->GetPower(POWER_MANA) >= 25000)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEERUPTION) == CAST_OK)
                 DoScriptText(EMOTE_MANA_FULL, m_creature, nullptr, CHAT_TYPE_ZONE_EMOTE);
@@ -238,14 +239,14 @@ struct MoamSummonManaFiends : public SpellScript
         struct { uint32 spellId; float offset; } fiends[] =
         {
             { 25681, 0.0f },
-            { 25682, -M_PI_F / 2 },
-            { 25683,  M_PI_F / 2 }
+            { 25682,  M_PI_F / 2 },
+            { 25683, -M_PI_F / 2 }
         };
 
         for (auto const& f : fiends)
         {
             Position pos;
-            caster->GetFirstCollisionPosition(pos, 13.0f, baseAngle + f.offset);
+            caster->GetFirstCollisionPosition(pos, 10.0f, baseAngle + f.offset);
             caster->CastSpell(pos.x, pos.y, pos.z, f.spellId, true);
         }
         return true;
