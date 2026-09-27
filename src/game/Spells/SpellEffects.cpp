@@ -377,10 +377,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     m_casterUnit->SetPower(POWER_MANA, 0);
                     return;
                 }
-                case 22913: // Random Aggro
-                case 25680:
-                case 28388:
-                case 30215:
+                case 25680: // Random Aggro
                 {
                     Creature* caster = m_casterUnit ? m_casterUnit->ToCreature() : nullptr;
                     if (!caster)
