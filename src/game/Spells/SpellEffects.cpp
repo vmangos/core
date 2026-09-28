@@ -368,6 +368,37 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     }, 1);
                     return;
                 }
+                case 23777: // Zero Mana/Full Health DND
+                {
+                    if (!m_casterUnit)
+                        return;
+
+                    m_casterUnit->SetHealth(m_casterUnit->GetMaxHealth());
+                    m_casterUnit->SetPower(POWER_MANA, 0);
+                    return;
+                }
+                case 25680: // Random Aggro
+                {
+                    Creature* caster = m_casterUnit ? m_casterUnit->ToCreature() : nullptr;
+                    if (!caster)
+                        return;
+
+                    // A guardian has no threat list of its own yet, so pull a random
+                    // target from its owner.
+                    Creature* pool = caster;
+                    if (Unit* owner = caster->GetCharmerOrOwner())
+                        if (Creature* ownerCreature = owner->ToCreature())
+                            pool = ownerCreature;
+
+                    if (Unit* target = pool->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    {
+                        // Keeps PetEventAI::FindTargetForAttack from falling back to
+                        // the owner's attacker on the next update.
+                        caster->AddThreat(target, 100.0f);
+                        caster->AI()->AttackStart(target);
+                    }
+                    return;
+                }
                 case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
                 {
                     if (!m_casterUnit->IsInCombat())
@@ -3970,13 +4001,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                         unitTarget->CastSpell(m_casterUnit, 26639, true);
                     return;
                 }
-                case 25676: // Moam                         // Drain Mana
+                case 25754: // Moam                         // Drain Mana
                 case 26559: // Obsidian Nullifier
                 {
                     m_caster->CastSpell(unitTarget, 25671, true);
                     return;
                 }
-                case 25754: // Obsidian Destroyer           // Drain Mana
+                case 25676: // Obsidian Destroyer           // Drain Mana
                 case 26457: // Obsidian Eradicator
                 {
                     m_caster->CastSpell(unitTarget, 25755, true);
