@@ -155,14 +155,4 @@ enum WorldStates
     WS_UI_TOWER_COUNT_HORDE                     = 2328,
 };
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-inline void WriteInitialWorldStatePair(ByteBuffer& data, uint32 state, int32 value)
-#else
-inline void WriteInitialWorldStatePair(ByteBuffer& data, uint16 state, int16 value)
-#endif
-{
-    data << state;
-    data << value;
-}
-
 #endif

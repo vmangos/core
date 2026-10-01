@@ -1093,6 +1093,19 @@ namespace WorldPackets { namespace Misc
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class InitWorldStates final : public ServerPacket
+    {
+    public:
+        uint32 mapId = 0;
+        uint32 zoneId = 0;
+        std::vector<std::pair<uint32, int32>> states;
+        void AddWorldState(uint32 state, int32 value) { states.push_back({ state, value }); }
+
+        explicit InitWorldStates() : ServerPacket(SMSG_INIT_WORLD_STATES) {}
+        size_t EstimateFinalSize() const override;
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Misc
 
 #endif // MANGOS_PACKETS_MISC_H

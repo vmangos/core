@@ -61,7 +61,7 @@ class OutdoorPvPSI : public OutdoorPvP
 
         void Update(uint32 diff);
 
-        uint32 FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         void SendRemoveWorldStates(Player* plr);
 

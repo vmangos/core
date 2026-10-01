@@ -1082,3 +1082,36 @@ void WorldPackets::Misc::UpdateWorldState::AppendBodyTo(ByteBuffer& buffer) cons
     buffer << static_cast<uint16>(value);
 #endif
 }
+
+size_t WorldPackets::Misc::InitWorldStates::EstimateFinalSize() const
+{
+    return sizeof(mapId) + 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+           sizeof(zoneId) +
+#endif
+           sizeof(uint16) + /*count*/
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+           states.size() * (sizeof(uint32) + sizeof(uint32));
+#else
+           states.size() * (sizeof(uint16) + sizeof(uint16));
+#endif
+}
+
+void WorldPackets::Misc::InitWorldStates::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << mapId;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+    buffer << zoneId;
+#endif
+    buffer << uint16(states.size());
+    for (auto const& itr : states)
+    {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        buffer << uint32(itr.first);
+        buffer << int32(itr.second);
+#else
+        buffer << uint16(itr.first);
+        buffer << int16(itr.second);
+#endif
+    }
+}

@@ -100,7 +100,7 @@ class OPvPCapturePoint
         explicit OPvPCapturePoint(OutdoorPvP * pvp);
         virtual ~OPvPCapturePoint() {}
 
-        virtual uint32 FillInitialWorldStates(WorldPacket& /*data*/) { return 0; }
+        virtual void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& /*states*/) { }
 
         // send world state update to all players present
         void SendUpdateWorldState(uint32 field, uint32 value);
@@ -201,7 +201,7 @@ class ZoneScript
         virtual ~ZoneScript();
 
         // Renvoit le nombre de WS
-        virtual uint32 FillInitialWorldStates(WorldPacket& /*data*/) { return 0; }
+        virtual void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& /*states*/) { }
 
         // called when a player triggers an areatrigger
         virtual bool HandleAreaTrigger(Player* /*plr*/, uint32 /*trigger*/) { return false; }
@@ -282,7 +282,7 @@ class OutdoorPvP : public ZoneScript
         typedef std::map<uint32/*lowguid*/, OPvPCapturePoint*> OPvPCapturePointMap;
 
         // Renvoit le nombre de WS
-        uint32 FillInitialWorldStates(WorldPacket& /*data*/) override { return 0; }
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& /*states*/) override { }
 
         // called when a player triggers an areatrigger
         bool HandleAreaTrigger(Player* plr, uint32 trigger) override;

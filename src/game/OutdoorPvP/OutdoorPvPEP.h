@@ -307,7 +307,7 @@ class OPvPCapturePointEP_EWT : public OPvPCapturePoint
 
         void SendChangePhase();
 
-        uint32 FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         // used when player is activated/inactivated in the area
         bool HandlePlayerEnter(Player* plr);
@@ -341,7 +341,7 @@ class OPvPCapturePointEP_NPT : public OPvPCapturePoint
 
         void SendChangePhase();
 
-        uint32 FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         // used when player is activated/inactivated in the area
         bool HandlePlayerEnter(Player* plr);
@@ -374,7 +374,7 @@ class OPvPCapturePointEP_CGT : public OPvPCapturePoint
 
         void SendChangePhase();
 
-        uint32 FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         // used when player is activated/inactivated in the area
         bool HandlePlayerEnter(Player* plr);
@@ -413,7 +413,7 @@ class OPvPCapturePointEP_PWT : public OPvPCapturePoint
 
         void SendChangePhase();
 
-        uint32 FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         // used when player is activated/inactivated in the area
         bool HandlePlayerEnter(Player* plr);
@@ -452,7 +452,7 @@ class OutdoorPvPEP : public OutdoorPvP
 
         void Update(uint32 diff);
 
-        uint32 FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         void SendRemoveWorldStates(Player* plr);
 

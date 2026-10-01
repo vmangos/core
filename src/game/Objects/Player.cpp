@@ -8038,7 +8038,7 @@ void Player::SendUpdateWorldState(uint32 state, uint32 value) const
 }
 
 // TODO: Determine what these values mean, if anything.
-static WorldStatePair def_world_states[] =
+static std::pair<uint32, int32> def_world_states[] =
 {
     { 0x07AE, 0x01 },
     { 0x0532, 0x01 },
@@ -8159,16 +8159,9 @@ void Player::SendInitWorldStates(uint32 zoneid) const
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sending SMSG_INIT_WORLD_STATES to Map:%u, Zone: %u", mapId, zoneid);
 
-    uint32 count = 1; // count of world states in packet, 1 extra for the terminator
-
-    WorldPacket data(SMSG_INIT_WORLD_STATES, (4 + 4 + 2 + 6));
-    data << uint32(mapId);                              // map id
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-    data << uint32(zoneid);                             // zone id
-#endif
-
-    size_t countPos = data.wpos();
-    data << uint16(0);                                  // count of uint32 blocks, placeholder
+    auto packet = std::make_unique<WorldPackets::Misc::InitWorldStates>();
+    packet->mapId = mapId;
+    packet->zoneId = zoneid;
 
     // Scourge Invasion - Patch 1.11
     if (sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
@@ -8181,52 +8174,43 @@ void Player::SendInitWorldStates(uint32 zoneid) const
         int remainingTanaris = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
         int remainingWinterspring = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
-        WriteInitialWorldStatePair(data, WS_SI_AZSHARA_INVADED,             remainingAzshara > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_BLASTED_LANDS_INVADED,       remainingBlastedLands > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_BURNING_STEPPES_INVADED,     remainingBurningSteppes > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_EASTERN_PLAGUELANDS_INVADED, remainingEasternPlaguelands > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_TANARIS_INVADED,             remainingTanaris > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_WINTERSPRING_INVADED,        remainingWinterspring > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_AZSHARA_INVADED,             remainingAzshara > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_BLASTED_LANDS_INVADED,       remainingBlastedLands > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_BURNING_STEPPES_INVADED,     remainingBurningSteppes > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_EASTERN_PLAGUELANDS_INVADED, remainingEasternPlaguelands > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_TANARIS_INVADED,             remainingTanaris > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_WINTERSPRING_INVADED,        remainingWinterspring > 0 ? 1 : 0);
 
         // Battles & remaining necropolisses
-        WriteInitialWorldStatePair(data, WS_SI_BATTLES_WON,               victories);
-        WriteInitialWorldStatePair(data, WS_SI_AZSHARA_REMAINING,         remainingAzshara);
-        WriteInitialWorldStatePair(data, WS_SI_BLASTED_LANDS_REMAINING,   remainingBlastedLands);
-        WriteInitialWorldStatePair(data, WS_SI_BURNING_STEPPES_REMAINING, remainingBurningSteppes);
-        WriteInitialWorldStatePair(data, WS_SI_PLAGUELANDS_REMAINING,     remainingEasternPlaguelands);
-        WriteInitialWorldStatePair(data, WS_SI_TANARIS_REMAINING,         remainingTanaris);
-        WriteInitialWorldStatePair(data, WS_SI_WINTERSPRING_REMAINING,    remainingWinterspring);
-
-        count += 13;
+        packet->AddWorldState(WS_SI_BATTLES_WON,               victories);
+        packet->AddWorldState(WS_SI_AZSHARA_REMAINING,         remainingAzshara);
+        packet->AddWorldState(WS_SI_BLASTED_LANDS_REMAINING,   remainingBlastedLands);
+        packet->AddWorldState(WS_SI_BURNING_STEPPES_REMAINING, remainingBurningSteppes);
+        packet->AddWorldState(WS_SI_PLAGUELANDS_REMAINING,     remainingEasternPlaguelands);
+        packet->AddWorldState(WS_SI_TANARIS_REMAINING,         remainingTanaris);
+        packet->AddWorldState(WS_SI_WINTERSPRING_REMAINING,    remainingWinterspring);
     }
 
-    for (WorldStatePair const* itr = def_world_states; itr->state; ++itr)
-    {
-        WriteInitialWorldStatePair(data, itr->state, itr->value);
-        ++count;
-    }
+    for (auto const& itr : def_world_states)
+        packet->AddWorldState(itr.first, itr.second);
 
     if (ZoneScript* zoneScript = GetZoneScript())
-        count += zoneScript->FillInitialWorldStates(data);
+        zoneScript->FillInitialWorldStates(packet->states);
     switch (zoneid)
     {
         case 2597:                                      // AV
         case 3277:                                      // WS
         case 3358:                                      // AB
             if (BattleGround* bg = GetBattleGround())
-                bg->FillInitialWorldStates(data, count);
+                bg->FillInitialWorldStates(packet->states);
             break;
     }
 
     // Ahn'Qiraj War Effort
     if (sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT))
-    {
-        count += BuildWarEffortWorldStates(data);
-    }
+        BuildWarEffortWorldStates(packet->states);
 
-    data << uint32(0) << uint32(0);     // [-ZERO] Add terminator to prevent repeating audio bug.
-    data.put<uint16>(countPos, count);  // set actual world state amount
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 }
 
 uint32 Player::GetXPRestBonus(uint32 xp)

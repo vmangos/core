@@ -24,21 +24,18 @@
 #include "world_event_wareffort.h"
 #include <array>
 
-uint32 BuildWarEffortWorldStates(WorldPacket &data)
+void BuildWarEffortWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    uint32 count = 0;
     for (int i = 0; i < NUM_FACTION_OBJECTIVES; ++i)
     {
         uint32 amount = sObjectMgr.GetSavedVariable(AllianceObjectives[i].currentVar, 0);
 
-        WriteInitialWorldStatePair(data, AllianceObjectives[i].wsCurrent, amount);
-        WriteInitialWorldStatePair(data, AllianceObjectives[i].wsRequired, AllianceObjectives[i].required);
+        states.push_back(std::make_pair<uint32, int32>((uint32)AllianceObjectives[i].wsCurrent, (int32)amount));
+        states.push_back(std::make_pair<uint32, int32>((uint32)AllianceObjectives[i].wsRequired, (int32)AllianceObjectives[i].required));
 
         amount = sObjectMgr.GetSavedVariable(HordeObjectives[i].currentVar, 0);
-        WriteInitialWorldStatePair(data, HordeObjectives[i].wsCurrent, amount);
-        WriteInitialWorldStatePair(data, HordeObjectives[i].wsRequired, HordeObjectives[i].required);
-
-        count += 4;
+        states.push_back(std::make_pair<uint32, int32>((uint32)HordeObjectives[i].wsCurrent, (int32)amount));
+        states.push_back(std::make_pair<uint32, int32>((uint32)HordeObjectives[i].wsRequired, (int32)HordeObjectives[i].required));
     }
 
     for (int i = 0; i < NUM_SHARED_OBJECTIVES; ++i)
@@ -46,11 +43,9 @@ uint32 BuildWarEffortWorldStates(WorldPacket &data)
         uint32 allianceContrib = GetTeamStock(SharedObjectives[i].itemId, TEAM_ALLIANCE);
         uint32 hordeContrib = GetTeamStock(SharedObjectives[i].itemId, TEAM_HORDE);
 
-        WriteInitialWorldStatePair(data, SharedObjectives[i].wsAllianceCurrent, allianceContrib);
-        WriteInitialWorldStatePair(data, SharedObjectives[i].wsHordeCurrent, hordeContrib);
-        WriteInitialWorldStatePair(data, SharedObjectives[i].wsRequired, SharedObjectives[i].required);
-
-        count += 3;
+        states.push_back(std::make_pair<uint32, int32>((uint32)SharedObjectives[i].wsAllianceCurrent, (int32)allianceContrib));
+        states.push_back(std::make_pair<uint32, int32>((uint32)SharedObjectives[i].wsHordeCurrent, (int32)hordeContrib));
+        states.push_back(std::make_pair<uint32, int32>((uint32)SharedObjectives[i].wsRequired, (int32)SharedObjectives[i].required));
     }
     WarEffortGameEvents activeEvent;
     if ((activeEvent = GetActiveTransportEvent()) != EVENT_WAR_EFFORT_TERMINATOR)
@@ -74,11 +69,8 @@ uint32 BuildWarEffortWorldStates(WorldPacket &data)
                 daysRemaining = 1;
         }
 
-        WriteInitialWorldStatePair(data, WS_WE_TRANSITION_DAYS_REMAINING, daysRemaining);
-        ++count;
+        states.push_back(std::make_pair<uint32, int32>((uint32)WS_WE_TRANSITION_DAYS_REMAINING, (int32)daysRemaining));
     }
-
-    return count;
 }
 
 // Will automatically add resources to all pools at a rate of 10% per call,

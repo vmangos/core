@@ -161,7 +161,7 @@ class BattleGroundWS : public BattleGround
         void SetDroppedFlagGuid(ObjectGuid guid, Team team)  { m_droppedFlagGuid[GetTeamIndexByTeamId(team)] = guid;}
         void ClearDroppedFlagGuid(Team team)  { m_droppedFlagGuid[GetTeamIndexByTeamId(team)].Clear();}
         ObjectGuid const& GetDroppedFlagGuid(Team team) const { return m_droppedFlagGuid[GetTeamIndexByTeamId(team)];}
-        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         /* Scorekeeping */
         uint32 GetTeamScore(Team team) const            { return m_teamScores[GetTeamIndexByTeamId(team)]; }

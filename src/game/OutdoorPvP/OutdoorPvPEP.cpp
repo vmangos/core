@@ -155,16 +155,15 @@ void OPvPCapturePointEP_EWT::SendChangePhase()
     SendUpdateWorldState(WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
 }
 
-uint32 OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointEP_EWT::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
-    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
-    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
-    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
-    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
-    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
-    WriteInitialWorldStatePair(data, WS_EASTWALL_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
-    return 7;
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL)));
 }
 
 void OPvPCapturePointEP_EWT::UpdateTowerState()
@@ -402,16 +401,15 @@ void OPvPCapturePointEP_NPT::SendChangePhase()
     SendUpdateWorldState(WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
 }
 
-uint32 OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointEP_NPT::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
-    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
-    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
-    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
-    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
-    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
-    WriteInitialWorldStatePair(data, WS_NORTHPASS_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
-    return 7;
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL)));
 }
 
 void OPvPCapturePointEP_NPT::UpdateTowerState()
@@ -623,16 +621,15 @@ void OPvPCapturePointEP_CGT::SendChangePhase()
     SendUpdateWorldState(WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
 }
 
-uint32 OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointEP_CGT::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
-    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
-    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
-    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
-    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
-    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
-    WriteInitialWorldStatePair(data, WS_CROWN_GUARD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
-    return 7;
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL)));
 }
 
 void OPvPCapturePointEP_CGT::UpdateTowerState()
@@ -862,16 +859,15 @@ void OPvPCapturePointEP_PWT::SendChangePhase()
     SendUpdateWorldState(WS_UI_TOWER_SLIDER_POSITION, m_valuePct);
 }
 
-uint32 OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointEP_PWT::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
-    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
-    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
-    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
-    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
-    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
-    WriteInitialWorldStatePair(data, WS_PLAGUEWOOD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
-    return 7;
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED)));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL)));
 }
 
 void OPvPCapturePointEP_PWT::UpdateTowerState()
@@ -1053,17 +1049,16 @@ void OutdoorPvPEP::BuffTeams()
     }
 }
 
-uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPEP::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    WriteInitialWorldStatePair(data, WS_UI_TOWER_COUNT_ALLIANCE, m_AllianceTowersControlled);
-    WriteInitialWorldStatePair(data, WS_UI_TOWER_COUNT_HORDE, m_HordeTowersControlled);
-    WriteInitialWorldStatePair(data, WS_UI_TOWER_SLIDER_DISPLAY, 0);
-    WriteInitialWorldStatePair(data, WS_UI_TOWER_SLIDER_POSITION, 50);
-    WriteInitialWorldStatePair(data, WS_UI_TOWER_SLIDER_N, 100);
-    uint32 count = 5;
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_COUNT_ALLIANCE, (int32)m_AllianceTowersControlled));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_COUNT_HORDE, (int32)m_HordeTowersControlled));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_SLIDER_DISPLAY, 0));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_SLIDER_POSITION, 50));
+    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_SLIDER_N, 100));
+
     for (const auto& itr : m_capturePoints)
-        count += itr.second->FillInitialWorldStates(data);
-    return count;
+        itr.second->FillInitialWorldStates(states);
 }
 
 void OutdoorPvPEP::SendRemoveWorldStates(Player* pPlayer)

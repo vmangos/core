@@ -271,7 +271,7 @@ static const GOWarEffort GOBandages[10] =
 };
 
 
-uint32 BuildWarEffortWorldStates(WorldPacket &data);
+void BuildWarEffortWorldStates(std::vector<std::pair<uint32, int32>>& states);
 
 void AutoCompleteWarEffortProgress();
 void AutoCompleteWarEffortResource(uint32 resourceId, uint32 required, uint32 savedVar, float rate, TeamId team);
