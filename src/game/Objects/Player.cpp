@@ -8038,7 +8038,7 @@ void Player::SendUpdateWorldState(uint32 state, uint32 value) const
 }
 
 // TODO: Determine what these values mean, if anything.
-static std::pair<uint32, int32> def_world_states[] =
+static std::pair<uint32, int32> const def_world_states[] =
 {
     { 0x07AE, 0x01 },
     { 0x0532, 0x01 },

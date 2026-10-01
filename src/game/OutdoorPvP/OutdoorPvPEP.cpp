@@ -157,13 +157,13 @@ void OPvPCapturePointEP_EWT::SendChangePhase()
 
 void OPvPCapturePointEP_EWT::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_EASTWALL_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL)));
+    FillInitialWorldState(states, WS_EASTWALL_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    FillInitialWorldState(states, WS_EASTWALL_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    FillInitialWorldState(states, WS_EASTWALL_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    FillInitialWorldState(states, WS_EASTWALL_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    FillInitialWorldState(states, WS_EASTWALL_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    FillInitialWorldState(states, WS_EASTWALL_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    FillInitialWorldState(states, WS_EASTWALL_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
 }
 
 void OPvPCapturePointEP_EWT::UpdateTowerState()
@@ -403,13 +403,13 @@ void OPvPCapturePointEP_NPT::SendChangePhase()
 
 void OPvPCapturePointEP_NPT::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_NORTHPASS_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL)));
+    FillInitialWorldState(states, WS_NORTHPASS_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    FillInitialWorldState(states, WS_NORTHPASS_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    FillInitialWorldState(states, WS_NORTHPASS_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    FillInitialWorldState(states, WS_NORTHPASS_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    FillInitialWorldState(states, WS_NORTHPASS_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    FillInitialWorldState(states, WS_NORTHPASS_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    FillInitialWorldState(states, WS_NORTHPASS_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
 }
 
 void OPvPCapturePointEP_NPT::UpdateTowerState()
@@ -623,13 +623,13 @@ void OPvPCapturePointEP_CGT::SendChangePhase()
 
 void OPvPCapturePointEP_CGT::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_CROWN_GUARD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL)));
+    FillInitialWorldState(states, WS_CROWN_GUARD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    FillInitialWorldState(states, WS_CROWN_GUARD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    FillInitialWorldState(states, WS_CROWN_GUARD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    FillInitialWorldState(states, WS_CROWN_GUARD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    FillInitialWorldState(states, WS_CROWN_GUARD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    FillInitialWorldState(states, WS_CROWN_GUARD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    FillInitialWorldState(states, WS_CROWN_GUARD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
 }
 
 void OPvPCapturePointEP_CGT::UpdateTowerState()
@@ -861,13 +861,13 @@ void OPvPCapturePointEP_PWT::SendChangePhase()
 
 void OPvPCapturePointEP_PWT::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED)));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_PLAGUEWOOD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL)));
+    FillInitialWorldState(states, WS_PLAGUEWOOD_TOWER_ALLIANCE, bool(m_TowerState & TOWERSTATE_ALLIANCE));
+    FillInitialWorldState(states, WS_PLAGUEWOOD_TOWER_HORDE, bool(m_TowerState & TOWERSTATE_HORDE));
+    FillInitialWorldState(states, WS_PLAGUEWOOD_TOWER_ALLIANCE_PROGRESSING, bool(m_TowerState & TOWERSTATE_ALLIANCE_PROGRESSING));
+    FillInitialWorldState(states, WS_PLAGUEWOOD_TOWER_HORDE_PROGRESSING, bool(m_TowerState & TOWERSTATE_HORDE_PROGRESSING));
+    FillInitialWorldState(states, WS_PLAGUEWOOD_TOWER_ALLIANCE_CONTESTED, bool(m_TowerState & TOWERSTATE_ALLIANCE_CONTESTED));
+    FillInitialWorldState(states, WS_PLAGUEWOOD_TOWER_HORDE_CONTESTED, bool(m_TowerState & TOWERSTATE_HORDE_CONTESTED));
+    FillInitialWorldState(states, WS_PLAGUEWOOD_TOWER_NEUTRAL, bool(m_TowerState & TOWERSTATE_NEUTRAL));
 }
 
 void OPvPCapturePointEP_PWT::UpdateTowerState()
@@ -1051,11 +1051,11 @@ void OutdoorPvPEP::BuffTeams()
 
 void OutdoorPvPEP::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_COUNT_ALLIANCE, (int32)m_AllianceTowersControlled));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_COUNT_HORDE, (int32)m_HordeTowersControlled));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_SLIDER_DISPLAY, 0));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_SLIDER_POSITION, 50));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_UI_TOWER_SLIDER_N, 100));
+    FillInitialWorldState(states, WS_UI_TOWER_COUNT_ALLIANCE, m_AllianceTowersControlled);
+    FillInitialWorldState(states, WS_UI_TOWER_COUNT_HORDE, m_HordeTowersControlled);
+    FillInitialWorldState(states, WS_UI_TOWER_SLIDER_DISPLAY, 0);
+    FillInitialWorldState(states, WS_UI_TOWER_SLIDER_POSITION, 50);
+    FillInitialWorldState(states, WS_UI_TOWER_SLIDER_N, 100);
 
     for (const auto& itr : m_capturePoints)
         itr.second->FillInitialWorldStates(states);

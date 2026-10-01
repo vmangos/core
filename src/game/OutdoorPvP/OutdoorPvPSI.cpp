@@ -38,9 +38,9 @@ OutdoorPvPSI::OutdoorPvPSI()
 
 void OutdoorPvPSI::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_OPVP_SI_GATHERED_A, (int32)m_Gathered_A));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_OPVP_SI_GATHERED_H, (int32)m_Gathered_H));
-    states.push_back(std::make_pair<uint32, int32>((uint32)WS_OPVP_SI_SILITHYST_MAX, (int32)m_MaxRessources));
+    FillInitialWorldState(states, WS_OPVP_SI_GATHERED_A, m_Gathered_A);
+    FillInitialWorldState(states, WS_OPVP_SI_GATHERED_H, m_Gathered_H);
+    FillInitialWorldState(states, WS_OPVP_SI_SILITHYST_MAX, m_MaxRessources);
 }
 
 void OutdoorPvPSI::SendRemoveWorldStates(Player* plr)

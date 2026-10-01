@@ -30,12 +30,12 @@ void BuildWarEffortWorldStates(std::vector<std::pair<uint32, int32>>& states)
     {
         uint32 amount = sObjectMgr.GetSavedVariable(AllianceObjectives[i].currentVar, 0);
 
-        states.push_back(std::make_pair<uint32, int32>((uint32)AllianceObjectives[i].wsCurrent, (int32)amount));
-        states.push_back(std::make_pair<uint32, int32>((uint32)AllianceObjectives[i].wsRequired, (int32)AllianceObjectives[i].required));
+        FillInitialWorldState(states, AllianceObjectives[i].wsCurrent, amount);
+        FillInitialWorldState(states, AllianceObjectives[i].wsRequired, AllianceObjectives[i].required);
 
         amount = sObjectMgr.GetSavedVariable(HordeObjectives[i].currentVar, 0);
-        states.push_back(std::make_pair<uint32, int32>((uint32)HordeObjectives[i].wsCurrent, (int32)amount));
-        states.push_back(std::make_pair<uint32, int32>((uint32)HordeObjectives[i].wsRequired, (int32)HordeObjectives[i].required));
+        FillInitialWorldState(states, HordeObjectives[i].wsCurrent, amount);
+        FillInitialWorldState(states, HordeObjectives[i].wsRequired, HordeObjectives[i].required);
     }
 
     for (int i = 0; i < NUM_SHARED_OBJECTIVES; ++i)
@@ -43,9 +43,9 @@ void BuildWarEffortWorldStates(std::vector<std::pair<uint32, int32>>& states)
         uint32 allianceContrib = GetTeamStock(SharedObjectives[i].itemId, TEAM_ALLIANCE);
         uint32 hordeContrib = GetTeamStock(SharedObjectives[i].itemId, TEAM_HORDE);
 
-        states.push_back(std::make_pair<uint32, int32>((uint32)SharedObjectives[i].wsAllianceCurrent, (int32)allianceContrib));
-        states.push_back(std::make_pair<uint32, int32>((uint32)SharedObjectives[i].wsHordeCurrent, (int32)hordeContrib));
-        states.push_back(std::make_pair<uint32, int32>((uint32)SharedObjectives[i].wsRequired, (int32)SharedObjectives[i].required));
+        FillInitialWorldState(states, SharedObjectives[i].wsAllianceCurrent, allianceContrib);
+        FillInitialWorldState(states, SharedObjectives[i].wsHordeCurrent, hordeContrib);
+        FillInitialWorldState(states, SharedObjectives[i].wsRequired, SharedObjectives[i].required);
     }
     WarEffortGameEvents activeEvent;
     if ((activeEvent = GetActiveTransportEvent()) != EVENT_WAR_EFFORT_TERMINATOR)
@@ -69,7 +69,7 @@ void BuildWarEffortWorldStates(std::vector<std::pair<uint32, int32>>& states)
                 daysRemaining = 1;
         }
 
-        states.push_back(std::make_pair<uint32, int32>((uint32)WS_WE_TRANSITION_DAYS_REMAINING, (int32)daysRemaining));
+        FillInitialWorldState(states, WS_WE_TRANSITION_DAYS_REMAINING, daysRemaining);
     }
 }
 

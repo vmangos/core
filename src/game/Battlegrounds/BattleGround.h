@@ -416,20 +416,4 @@ class BattleGround
         uint32 m_playerSkinReflootId;
 };
 
-// helper functions for world state list fill
-inline void FillInitialWorldState(std::vector<std::pair<uint32, int32>>& states, uint32 state, uint32 value)
-{
-    states.push_back({ state, value });
-}
-
-inline void FillInitialWorldState(std::vector<std::pair<uint32, int32>>& states, uint32 state, int32 value)
-{
-    states.push_back({ state, value });
-}
-
-inline void FillInitialWorldState(std::vector<std::pair<uint32, int32>>& states, uint32 state, bool value)
-{
-    states.push_back({ state, value ? 1 : 0 });
-}
-
 #endif

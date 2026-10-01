@@ -1085,7 +1085,7 @@ void WorldPackets::Misc::UpdateWorldState::AppendBodyTo(ByteBuffer& buffer) cons
 
 size_t WorldPackets::Misc::InitWorldStates::EstimateFinalSize() const
 {
-    return sizeof(mapId) + 
+    return sizeof(mapId) +
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
            sizeof(zoneId) +
 #endif
