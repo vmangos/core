@@ -7,6 +7,8 @@
 
 #include <vector>
 
+struct LootItem;
+
 namespace WorldPackets { namespace Loot
 {
     class AutoStoreLootItem final : public ClientPacket
@@ -157,6 +159,32 @@ namespace WorldPackets { namespace Loot
         uint8 lootSlot = 0; // slot of the removed loot item
 
         explicit LootRemoved() : ServerPacket(SMSG_LOOT_REMOVED) {}
+        size_t EstimateFinalSize() const override;
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class LootResponse final : public ServerPacket
+    {
+    public:
+        struct LootSlotItem
+        {
+            uint8 idx = 0;
+            uint32 itemId = 0;
+            uint32 count = 0;
+            uint32 displayId = 0;
+            uint32 unk = 0;
+            uint32 randomPropertyId = 0;
+            uint8 slotType = 0;
+        };
+
+        ObjectGuid lootedGuid; // guid of the looted target
+        uint8 lootType = 0;
+        uint8 lootError = 0;
+        uint32 gold = 0;
+        std::vector<LootSlotItem> items;
+        void AddItem(uint8 idx, LootItem const& item, uint8 slotType);
+
+        explicit LootResponse() : ServerPacket(SMSG_LOOT_RESPONSE) {}
         size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };

@@ -7604,11 +7604,11 @@ void Player::SendLootRelease(ObjectGuid guid) const
 
 void Player::SendLootError(ObjectGuid guid, LootError error) const
 {
-    WorldPacket data(SMSG_LOOT_RESPONSE, 10);
-    data << uint64(guid);
-    data << uint8(0);
-    data << uint8(error);
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Loot::LootResponse>();
+    packet->lootedGuid = guid;
+    packet->lootType = 0;
+    packet->lootError = error;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendLoot(ObjectGuid guid, LootType lootType, Player const* pVictim)
@@ -7996,11 +7996,11 @@ void Player::SendLoot(ObjectGuid guid, LootType lootType, Player const* pVictim)
             break;
     }
 
-    WorldPacket data(SMSG_LOOT_RESPONSE, (9 + 50));         // we guess size
-    data << ObjectGuid(guid);
-    data << uint8(lootType);
-    data << LootView(*loot, this, permission);
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Loot::LootResponse>();
+    packet->lootedGuid = guid;
+    packet->lootType = lootType;
+    LootView(*loot, this, permission).WriteLoot(*packet);
+    GetSession()->SendPacket(std::move(packet));
 
     // add 'this' player as one of the players that are looting 'loot'
     if (permission != NONE_PERMISSION)

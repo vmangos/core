@@ -826,37 +826,17 @@ WorldObject const* Loot::GetLootTarget() const
     return m_lootTarget;
 }
 
-ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
+void LootView::WriteLoot(WorldPackets::Loot::LootResponse& packet)
 {
-    b << uint32(li.itemid);
-    b << uint32(li.count);                                  // nr of items of this type
-    b << uint32(sObjectMgr.GetItemPrototype(li.itemid)->DisplayInfoID);
-    b << uint32(0);
-    b << uint32(li.randomPropertyId);
-    //b << uint8(0);                                        // slot type - will send after this function call
-    return b;
-}
+    if (permission == NONE_PERMISSION)
+        return;
 
-ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
-{
-    if (lv.permission == NONE_PERMISSION)
-    {
-        b << uint32(0);                                     //gold
-        b << uint8(0);                                      // item count
-        return b;                                           // nothing output more
-    }
-
-    Loot &l = lv.loot;
-
-    uint8 itemsShown = 0;
+    Loot &l = loot;
 
     //gold
-    b << uint32(l.gold);
+    packet.gold = l.gold;
 
-    size_t count_pos = b.wpos();                            // pos of item count byte
-    b << uint8(0);                                          // item count placeholder
-
-    switch (lv.permission)
+    switch (permission)
     {
         case GROUP_PERMISSION:
         {
@@ -864,13 +844,13 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             // blocked rolled items and !ffa items
             for (uint8 i = 0; i < l.items.size(); ++i)
             {
-                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].AllowedForPlayer(lv.viewer, l.GetLootTarget()))
+                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].AllowedForPlayer(viewer, l.GetLootTarget()))
                 {
                     uint8 slot_type;
 
                     if (l.items[i].is_blocked)
                         slot_type = LOOT_SLOT_TYPE_ROLL_ONGOING;
-                    else if (l.roundRobinPlayer == 0 || !l.items[i].is_underthreshold || lv.viewer->GetGUID() == l.roundRobinPlayer)
+                    else if (l.roundRobinPlayer == 0 || !l.items[i].is_underthreshold || viewer->GetGUID() == l.roundRobinPlayer)
                     {
                         // no round robin owner or he has released the loot
                         // or it IS the round robin group owner
@@ -881,9 +861,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                         // item shall not be displayed.
                         continue;
 
-                    b << uint8(i) << l.items[i];
-                    b << uint8(slot_type);
-                    ++itemsShown;
+                    packet.AddItem(i, l.items[i], slot_type);
                 }
             }
             break;
@@ -892,15 +870,13 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         {
             for (uint8 i = 0; i < l.items.size(); ++i)
             {
-                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].AllowedForPlayer(lv.viewer, l.GetLootTarget()))
+                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].AllowedForPlayer(viewer, l.GetLootTarget()))
                 {
-                    if (l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer)
+                    if (l.roundRobinPlayer != 0 && viewer->GetGUID() != l.roundRobinPlayer)
                         // item shall not be displayed.
                         continue;
 
-                    b << uint8(i) << l.items[i];
-                    b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
-                    ++itemsShown;
+                    packet.AddItem(i, l.items[i], LOOT_SLOT_TYPE_ALLOW_LOOT);
                 }
             }
             break;
@@ -911,10 +887,10 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         {
             for (uint8 i = 0; i < l.items.size(); ++i)
             {
-                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].AllowedForPlayer(lv.viewer, l.GetLootTarget()))
+                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].AllowedForPlayer(viewer, l.GetLootTarget()))
                 {
                     uint8 slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
-                    switch (lv.permission)
+                    switch (permission)
                     {
                         case MASTER_PERMISSION:
                             // Items under threshold are directly lootable, items at/above threshold require master looter assignment
@@ -928,22 +904,20 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                             break;
                     }
 
-                    b << uint8(i) << l.items[i];
-                    b << uint8(slot_type);
-                    ++itemsShown;
+                    packet.AddItem(i, l.items[i], slot_type);
                 }
             }
             break;
         }
         default:
-            return b;                                       // nothing output more
+            return;                                       // nothing output more
     }
 
     // in next cases used same slot type for all items
     LootSlotType slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
 
     QuestItemMap const& lootPlayerQuestItems = l.GetPlayerQuestItems();
-    QuestItemMap::const_iterator q_itr = lootPlayerQuestItems.find(lv.viewer->GetGUIDLow());
+    QuestItemMap::const_iterator q_itr = lootPlayerQuestItems.find(viewer->GetGUIDLow());
     if (q_itr != lootPlayerQuestItems.end())
     {
         QuestItemList *q_list = q_itr->second;
@@ -955,20 +929,17 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                 continue;
 
             // Allow only the round robin player unless that player is not elligible for item
-            if (!item.freeforall && l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer
+            if (!item.freeforall && l.roundRobinPlayer != 0 && viewer->GetGUID() != l.roundRobinPlayer
                 && lootPlayerQuestItems.find(l.roundRobinPlayer) != lootPlayerQuestItems.end())
                 continue;
 
             // allow loot
-            b << uint8(l.items.size() + (qi - q_list->begin()));
-            b << item;
-            b << uint8(slot_type);
-            ++itemsShown;
+            packet.AddItem(uint8(l.items.size() + (qi - q_list->begin())), item, slot_type);
         }
     }
 
     QuestItemMap const& lootPlayerFFAItems = l.GetPlayerFFAItems();
-    QuestItemMap::const_iterator ffa_itr = lootPlayerFFAItems.find(lv.viewer->GetGUIDLow());
+    QuestItemMap::const_iterator ffa_itr = lootPlayerFFAItems.find(viewer->GetGUIDLow());
     if (ffa_itr != lootPlayerFFAItems.end())
     {
         QuestItemList *ffa_list = ffa_itr->second;
@@ -977,15 +948,14 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             LootItem &item = l.items[fi.index];
             if (!fi.is_looted && !item.is_looted)
             {
-                b << uint8(fi.index) << item;
-                b << uint8(slot_type);                      // allow loot
-                ++itemsShown;
+                // allow loot
+                packet.AddItem(fi.index, item, slot_type);
             }
         }
     }
 
     QuestItemMap const& lootPlayerNonQuestNonFFAConditionalItems = l.GetPlayerNonQuestNonFFAConditionalItems();
-    QuestItemMap::const_iterator nn_itr = lootPlayerNonQuestNonFFAConditionalItems.find(lv.viewer->GetGUIDLow());
+    QuestItemMap::const_iterator nn_itr = lootPlayerNonQuestNonFFAConditionalItems.find(viewer->GetGUIDLow());
     if (nn_itr != lootPlayerNonQuestNonFFAConditionalItems.end())
     {
         QuestItemList *conditional_list =  nn_itr->second;
@@ -993,25 +963,19 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         {
             LootItem &item = l.items[ci.index];
 
-            slot_type = item.GetSlotTypeForSharedLoot(lv.permission, lv.viewer, l.GetLootTarget(), !ci.is_looted);
+            slot_type = item.GetSlotTypeForSharedLoot(permission, viewer, l.GetLootTarget(), !ci.is_looted);
             if (slot_type >= MAX_LOOT_SLOT_TYPE)
                 continue;
 
             // Allow only the round robin player unless that player is not elligible for item
-            if (!item.freeforall && l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer
+            if (!item.freeforall && l.roundRobinPlayer != 0 && viewer->GetGUID() != l.roundRobinPlayer
                 && lootPlayerNonQuestNonFFAConditionalItems.find(l.roundRobinPlayer) != lootPlayerNonQuestNonFFAConditionalItems.end())
                 continue;
 
-            b << uint8(ci.index) << item;
-            b << uint8(slot_type);                          // allow loot
-            ++itemsShown;
+            // allow loot
+            packet.AddItem(ci.index, item, slot_type);
         }
     }
-
-    //update number of items shown
-    b.put<uint8>(count_pos, itemsShown);
-
-    return b;
 }
 
 // TrinityCore

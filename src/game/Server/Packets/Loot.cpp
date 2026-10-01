@@ -1,4 +1,6 @@
 #include "Loot.h"
+#include "LootMgr.h"
+#include "ObjectMgr.h"
 
 void WorldPackets::Loot::AutoStoreLootItem::ReadFromWorldPacket(WorldPacket& recv_data)
 {
@@ -156,4 +158,59 @@ size_t WorldPackets::Loot::LootRemoved::EstimateFinalSize() const
 void WorldPackets::Loot::LootRemoved::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << lootSlot;
+}
+
+size_t WorldPackets::Loot::LootResponse::EstimateFinalSize() const
+{
+    return sizeof(lootedGuid) +
+           sizeof(lootType) +
+           (lootType != 0 ? sizeof(gold) + sizeof(uint8) + items.size() *
+               (sizeof(LootSlotItem::idx) +
+                sizeof(LootSlotItem::itemId) +
+                sizeof(LootSlotItem::count) +
+                sizeof(LootSlotItem::displayId) +
+                sizeof(LootSlotItem::unk) +
+                sizeof(LootSlotItem::randomPropertyId) +
+                sizeof(LootSlotItem::slotType))
+               :
+               sizeof(lootError));
+}
+
+ByteBuffer& operator<<(ByteBuffer& b, WorldPackets::Loot::LootResponse::LootSlotItem const& li)
+{
+    b << li.idx;
+    b << li.itemId;
+    b << li.count;                                  // nr of items of this type
+    b << li.displayId;
+    b << li.unk;
+    b << li.randomPropertyId;
+    b << li.slotType;
+    return b;
+}
+
+void WorldPackets::Loot::LootResponse::AddItem(uint8 idx, LootItem const& item, uint8 slotType)
+{
+    LootSlotItem lootItem;
+    lootItem.idx = idx;
+    lootItem.itemId = item.itemid;
+    lootItem.count = item.count;
+    lootItem.displayId = sObjectMgr.GetItemPrototype(item.itemid)->DisplayInfoID;
+    lootItem.randomPropertyId = item.randomPropertyId;
+    lootItem.slotType = slotType;
+    items.emplace_back(std::move(lootItem));
+}
+
+void WorldPackets::Loot::LootResponse::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << lootedGuid;
+    buffer << lootType;
+    if (lootType)
+    {
+        buffer << gold;
+        buffer << uint8(items.size());
+        for (auto const& itr : items)
+            buffer << itr;
+    }
+    else
+        buffer << lootError;
 }
