@@ -164,12 +164,18 @@ def main() -> None:
     # (go####.mmtile) are produced by a separate --onlyGO pass, the same step a no-argument
     # MoveMapGenerator run performs after building the maps.
     print("Building transport gameobject models")
+    transports_built = False
     try:
         run_move_map_gen("--onlyGO")
     except subprocess.CalledProcessError as exception:
         print("Failed to build the transport gameobject models:", exception)
     else:
+        transports_built = True
         print("Successfully built the transport gameobject models")
+
+    # Exit with an error when any step failed, so the exit code reflects the result.
+    if num_errors or not transports_built:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
