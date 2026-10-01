@@ -198,17 +198,17 @@ class BattleGroundAB : public BattleGround
 
     public:
         BattleGroundAB();
-        ~BattleGroundAB();
+        ~BattleGroundAB() override;
 
-        void Update(uint32 diff);
-        void AddPlayer(Player* player);
+        void Update(uint32 diff) override;
+        void AddPlayer(Player* player) override;
         void StartingEventCloseDoors() override;
         void StartingEventOpenDoors() override;
-        void RemovePlayer(Player* player, ObjectGuid guid);
-        bool HandleAreaTrigger(Player* source, uint32 trigger);
+        void RemovePlayer(Player* player, ObjectGuid guid) override;
+        bool HandleAreaTrigger(Player* source, uint32 trigger) override;
         bool SetupBattleGround() override;
         void Reset() override;
-        void EndBattleGround(Team winner);
+        void EndBattleGround(Team winner) override;
         WorldSafeLocsEntry const* GetClosestGraveYard(Player* player) override;
 
         /* Scorekeeping */

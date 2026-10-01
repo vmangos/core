@@ -303,15 +303,15 @@ class OPvPCapturePointEP_EWT : public OPvPCapturePoint
 
         OPvPCapturePointEP_EWT(OutdoorPvP * pvp);
 
-        void ChangeState();
+        void ChangeState() override;
 
-        void SendChangePhase();
+        void SendChangePhase() override;
 
         void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* plr);
-        void HandlePlayerLeave(Player* plr);
+        bool HandlePlayerEnter(Player* plr) override;
+        void HandlePlayerLeave(Player* plr) override;
 
     protected:
 
@@ -337,15 +337,15 @@ class OPvPCapturePointEP_NPT : public OPvPCapturePoint
 
         OPvPCapturePointEP_NPT(OutdoorPvP * pvp);
 
-        void ChangeState();
+        void ChangeState() override;
 
-        void SendChangePhase();
+        void SendChangePhase() override;
 
         void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* plr);
-        void HandlePlayerLeave(Player* plr);
+        bool HandlePlayerEnter(Player* plr) override;
+        void HandlePlayerLeave(Player* plr) override;
 
     protected:
 
@@ -370,15 +370,15 @@ class OPvPCapturePointEP_CGT : public OPvPCapturePoint
 
         OPvPCapturePointEP_CGT(OutdoorPvP * pvp);
 
-        void ChangeState();
+        void ChangeState() override;
 
-        void SendChangePhase();
+        void SendChangePhase() override;
 
         void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* plr);
-        void HandlePlayerLeave(Player* plr);
+        bool HandlePlayerEnter(Player* plr) override;
+        void HandlePlayerLeave(Player* plr) override;
 
     protected:
 
@@ -409,15 +409,15 @@ class OPvPCapturePointEP_PWT : public OPvPCapturePoint
 
         OPvPCapturePointEP_PWT(OutdoorPvP * pvp);
 
-        void ChangeState();
+        void ChangeState() override;
 
-        void SendChangePhase();
+        void SendChangePhase() override;
 
         void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* plr);
-        void HandlePlayerLeave(Player* plr);
+        bool HandlePlayerEnter(Player* plr) override;
+        void HandlePlayerLeave(Player* plr) override;
 
     protected:
 
@@ -445,16 +445,16 @@ class OutdoorPvPEP : public OutdoorPvP
 
         OutdoorPvPEP();
 
-        bool SetupZoneScript();
+        bool SetupZoneScript() override;
 
-        void OnPlayerEnter(Player* plr);
-        void OnPlayerLeave(Player* plr);
+        void OnPlayerEnter(Player* plr) override;
+        void OnPlayerLeave(Player* plr) override;
 
-        void Update(uint32 diff);
+        void Update(uint32 diff) override;
 
         void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
-        void SendRemoveWorldStates(Player* plr);
+        void SendRemoveWorldStates(Player* plr) override;
 
         void BuffTeams();
 
