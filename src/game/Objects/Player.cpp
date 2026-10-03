@@ -16024,7 +16024,7 @@ void Player::SendSavedInstances() const
 
     //Send opcode 811. true or false means, whether you have current raid instances
     {
-        auto packet = std::make_unique<WorldPackets::Misc::UpdateInstanceOwnership>();
+        auto packet = std::make_unique<WorldPackets::Instance::UpdateInstanceOwnership>();
         packet->hasBeenSaved = hasBeenSaved;
         GetSession()->SendPacket(std::move(packet));
     }
@@ -16036,7 +16036,7 @@ void Player::SendSavedInstances() const
     {
         if (itr.second.perm)
         {
-            auto packet = std::make_unique<WorldPackets::Misc::UpdateLastInstance>();
+            auto packet = std::make_unique<WorldPackets::Instance::UpdateLastInstance>();
             packet->mapId = itr.second.state->GetMapId();
             GetSession()->SendPacket(std::move(packet));
         }
@@ -17172,7 +17172,7 @@ void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
 void Player::SendResetInstanceSuccess(uint32 mapId) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    auto packet = std::make_unique<WorldPackets::Misc::InstanceReset>();
+    auto packet = std::make_unique<WorldPackets::Instance::InstanceReset>();
     packet->mapId = mapId;
     GetSession()->SendPacket(std::move(packet));
 #endif
@@ -17182,7 +17182,7 @@ void Player::SendResetInstanceFailed(uint32 reason, uint32 mapId) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     // reason: see enum InstanceResetFailReason
-    auto packet = std::make_unique<WorldPackets::Misc::InstanceResetFailed>();
+    auto packet = std::make_unique<WorldPackets::Instance::InstanceResetFailed>();
     packet->reason = reason;
     packet->mapId = mapId;
     GetSession()->SendPacket(std::move(packet));
@@ -19232,7 +19232,7 @@ void Player::SendInstanceResetWarning(uint32 mapId, uint32 resetTime) const
         type = RAID_INSTANCE_WARNING_MIN;
     else
         type = RAID_INSTANCE_WARNING_MIN_SOON;
-    auto packet = std::make_unique<WorldPackets::Misc::RaidInstanceMessage>();
+    auto packet = std::make_unique<WorldPackets::Instance::RaidInstanceMessage>();
     packet->messageType = type;
     packet->mapId = mapId;
     packet->resetTime = resetTime;

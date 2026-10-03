@@ -849,28 +849,6 @@ void WorldPackets::Misc::FactionAtWarChange::AppendBodyTo(ByteBuffer& buffer) co
 }
 #endif
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-size_t WorldPackets::Misc::InstanceReset::EstimateFinalSize() const
-{
-    return sizeof(mapId);
-}
-void WorldPackets::Misc::InstanceReset::AppendBodyTo(ByteBuffer& buffer) const
-{
-    buffer << mapId;
-}
-
-size_t WorldPackets::Misc::InstanceResetFailed::EstimateFinalSize() const
-{
-    return sizeof(reason) +
-           sizeof(mapId);
-}
-void WorldPackets::Misc::InstanceResetFailed::AppendBodyTo(ByteBuffer& buffer) const
-{
-    buffer << reason;
-    buffer << mapId;
-}
-#endif
-
 size_t WorldPackets::Misc::MountResult::EstimateFinalSize() const
 {
     return sizeof(result);
@@ -976,21 +954,6 @@ void WorldPackets::Misc::TransferAborted::AppendBodyTo(ByteBuffer& buffer) const
     buffer << reason;
 }
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-size_t WorldPackets::Misc::RaidInstanceMessage::EstimateFinalSize() const
-{
-    return sizeof(messageType) +
-           sizeof(mapId) +
-           sizeof(resetTime);
-}
-void WorldPackets::Misc::RaidInstanceMessage::AppendBodyTo(ByteBuffer& buffer) const
-{
-    buffer << messageType;
-    buffer << mapId;
-    buffer << resetTime;
-}
-#endif
-
 size_t WorldPackets::Misc::SummonRequest::EstimateFinalSize() const
 {
     return sizeof(summonerGuid) +
@@ -1014,26 +977,6 @@ void WorldPackets::Misc::CorpseReclaimDelay::AppendBodyTo(ByteBuffer& buffer) co
 {
     buffer << delayMs;
 }
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-size_t WorldPackets::Misc::UpdateInstanceOwnership::EstimateFinalSize() const
-{
-    return sizeof(hasBeenSaved);
-}
-void WorldPackets::Misc::UpdateInstanceOwnership::AppendBodyTo(ByteBuffer& buffer) const
-{
-    buffer << hasBeenSaved;
-}
-
-size_t WorldPackets::Misc::UpdateLastInstance::EstimateFinalSize() const
-{
-    return sizeof(mapId);
-}
-void WorldPackets::Misc::UpdateLastInstance::AppendBodyTo(ByteBuffer& buffer) const
-{
-    buffer << mapId;
-}
-#endif
 
 size_t WorldPackets::Misc::EmoteNotify::EstimateFinalSize() const
 {
