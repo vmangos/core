@@ -15972,20 +15972,15 @@ DungeonPersistentState* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapId)
 
 void Player::SendRaidInfo() const
 {
-    uint32 counter = 0;
-
-    WorldPacket data(SMSG_RAID_INSTANCE_INFO, 4);
-
-    size_t p_counter = data.wpos();
-    data << uint32(counter);                                // placeholder
-
+    auto packet = std::make_unique<WorldPackets::Instance::RaidInstanceInfo>();
     std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)
         {
             DungeonPersistentState* state = itr.second.state;
-            data << uint32(state->GetMapId());              // map id
+            WorldPackets::Instance::RaidInstanceInfo::InstanceResetInfo info;
+            info.mapId = state->GetMapId();
 
             // Permanent dungeons (raids) don't have a valid reset timer since it's
             // on a schedule. Send the scheduled time instead of state reset time.
@@ -15993,15 +15988,12 @@ void Player::SendRaidInfo() const
             time_t resetTime = DungeonResetScheduler::IsRaidResetSchedulingGlobal()
                 ? sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(state->GetMapId())
                 : state->GetResetTime();
-            data << uint32(resetTime - time(nullptr));
-            data << uint32(state->GetInstanceId());         // instance id
-
-            counter++;
+            info.resetTime = uint32(resetTime - time(nullptr));
+            info.instanceId = state->GetInstanceId();
+            packet->resetInfos.push_back(info);
         }
     }
-
-    data.put<uint32>(p_counter, counter);
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 }
 
 /*

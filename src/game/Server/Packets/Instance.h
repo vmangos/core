@@ -64,6 +64,22 @@ namespace WorldPackets { namespace Instance
     };
 #endif
 
+    class RaidInstanceInfo final : public ServerPacket
+    {
+    public:
+        struct InstanceResetInfo
+        {
+            uint32 mapId = 0;
+            uint32 resetTime = 0;
+            uint32 instanceId = 0;
+        };
+        std::vector<InstanceResetInfo> resetInfos;
+
+        explicit RaidInstanceInfo() : ServerPacket(SMSG_RAID_INSTANCE_INFO) {}
+        size_t EstimateFinalSize() const override;
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Instance
 
 #endif // MANGOS_PACKETS_INSTANCE_H
