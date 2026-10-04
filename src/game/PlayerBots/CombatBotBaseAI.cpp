@@ -2596,7 +2596,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 {
     LearnArmorProficiencies();
 
-    bool const onlyPvE = urand(0, 1) != 0;
+    bool const onlyPvE = !sWorld.IsHonorEnabled() || urand(0, 1) != 0;
     uint8 const honorRank = onlyPvE ? 0 : urand(5, 18);
 
     std::map<uint32 /*slot*/, std::vector<ItemPrototype const*>> itemsPerSlot;
