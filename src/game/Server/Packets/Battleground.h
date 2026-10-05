@@ -103,6 +103,7 @@ namespace WorldPackets { namespace Battleground
         uint32 result = 0;
 
         explicit GroupJoinedBattleground() : ServerPacket(SMSG_GROUP_JOINED_BATTLEGROUND) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -126,6 +127,7 @@ namespace WorldPackets { namespace Battleground
         uint32 time2 = 0;
 
         explicit BattlefieldStatus() : ServerPacket(SMSG_BATTLEFIELD_STATUS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -138,6 +140,7 @@ namespace WorldPackets { namespace Battleground
 #endif
 
         explicit BattlefieldStatusEmpty() : ServerPacket(SMSG_BATTLEFIELD_STATUS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -163,6 +166,7 @@ namespace WorldPackets { namespace Battleground
         std::vector<PlayerScore> playerScores;
 
         explicit PvpLogData() : ServerPacket(MSG_PVP_LOG_DATA) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -174,6 +178,7 @@ namespace WorldPackets { namespace Battleground
         ObjectGuid playerGuid; // guid of the player that joined the battleground
 
         explicit BattlegroundPlayerJoined() : ServerPacket(SMSG_BATTLEGROUND_PLAYER_JOINED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -183,6 +188,7 @@ namespace WorldPackets { namespace Battleground
         ObjectGuid playerGuid; // guid of the player that left the battleground
 
         explicit BattlegroundPlayerLeft() : ServerPacket(SMSG_BATTLEGROUND_PLAYER_LEFT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -198,6 +204,7 @@ namespace WorldPackets { namespace Battleground
         std::vector<uint32> instanceIds; // list of available bg instance ids
 
         explicit BattlefieldList() : ServerPacket(SMSG_BATTLEFIELD_LIST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -206,6 +213,7 @@ namespace WorldPackets { namespace Battleground
     {
     public:
         explicit BattlefieldWin() : ServerPacket(SMSG_BATTLEFIELD_WIN) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -214,6 +222,7 @@ namespace WorldPackets { namespace Battleground
     {
     public:
         explicit BattlefieldLose() : ServerPacket(SMSG_BATTLEFIELD_LOSE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

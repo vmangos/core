@@ -198,26 +198,26 @@ class BattleGroundAB : public BattleGround
 
     public:
         BattleGroundAB();
-        ~BattleGroundAB();
+        ~BattleGroundAB() override;
 
-        void Update(uint32 diff);
-        void AddPlayer(Player* player);
-        virtual void StartingEventCloseDoors();
-        virtual void StartingEventOpenDoors();
-        void RemovePlayer(Player* player, ObjectGuid guid);
-        bool HandleAreaTrigger(Player* source, uint32 trigger);
-        virtual bool SetupBattleGround();
-        virtual void Reset();
-        void EndBattleGround(Team winner);
-        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
+        void Update(uint32 diff) override;
+        void AddPlayer(Player* player) override;
+        void StartingEventCloseDoors() override;
+        void StartingEventOpenDoors() override;
+        void RemovePlayer(Player* player, ObjectGuid guid) override;
+        bool HandleAreaTrigger(Player* source, uint32 trigger) override;
+        bool SetupBattleGround() override;
+        void Reset() override;
+        void EndBattleGround(Team winner) override;
+        WorldSafeLocsEntry const* GetClosestGraveYard(Player* player) override;
 
         /* Scorekeeping */
-        virtual void UpdatePlayerScore(Player* source, uint32 type, uint32 value);
+        void UpdatePlayerScore(Player* source, uint32 type, uint32 value) override;
 
-        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         /* Nodes occupying */
-        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* targetGo);
+        void EventPlayerClickedOnFlag(Player* source, GameObject* targetGo) override;
 
     private:
         /* Gameobject spawning/despawning */

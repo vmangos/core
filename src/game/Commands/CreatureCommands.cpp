@@ -145,9 +145,16 @@ bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
 bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
 {
     Creature* pTarget = GetSelectedCreature();
-    auto* targetAi = pTarget->AI();
 
-    if (!pTarget || !targetAi)
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    auto* targetAi = pTarget->AI();
+    if (!targetAi)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
@@ -588,6 +595,56 @@ bool ChatHandler::HandleNpcTameCommand(char* /*args*/)
     }
 
     player->CastSpell(creatureTarget, 13481, true);         // Tame Beast, triggered effect
+    return true;
+}
+
+bool ChatHandler::HandleNpcSpawnLoadCommand(char* args)
+{
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hcreature", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    if (m_session->GetPlayer()->GetMap()->LoadCreatureSpawn(lowguid))
+        PSendSysMessage("Loaded creature spawn with guid %u.", lowguid);
+    else
+        PSendSysMessage("Unable to load creature spawn with guid %u.", lowguid);
+
+    return true;
+}
+
+bool ChatHandler::HandleNpcSpawnUnloadCommand(char* args)
+{
+    Creature* pCreature = nullptr;
+
+    if (*args)
+    {
+        // number or [name] Shift-click form |color|Hcreature:creature_guid|h[name]|h|r
+        uint32 lowguid;
+        if (!ExtractUint32KeyFromLink(&args, "Hcreature", lowguid))
+            return false;
+
+        if (!lowguid)
+            return false;
+
+        if (CreatureData const* data = sObjectMgr.GetCreatureData(lowguid))
+            pCreature = m_session->GetPlayer()->GetMap()->GetCreature(data->GetObjectGuid(lowguid));
+    }
+    else
+        pCreature = GetSelectedCreature();
+
+    if (!pCreature)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pCreature->AddObjectToRemoveList();
+    PSendSysMessage("Unloaded creature spawn with guid %u.", pCreature->GetGUIDLow());
+
     return true;
 }
 

@@ -159,14 +159,14 @@ uint32 SpellCaster::GetDefenseSkillValue(SpellCaster const* target) const
 }
 
 // Calculate spell hit result can be:
-// Every spell can: Evade/Immune/Reflect/Sucesful hit
+// Every spell can: Evade/Immune/Reflect/Successful hit
 // For melee based spells:
 //   Miss
 //   Dodge
 //   Parry
 // For spells
 //   Resist
-SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell, SpellEffectIndex effIndex, bool CanReflect, Spell* spellPtr)
+SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* pSpellEntry, SpellEffectIndex effIndex, bool CanReflect, Spell* pSpell, nonstd::optional<bool>* pIsCrit, uint32* pMeleeHitInfo)
 {
     // Return evade for units in evade mode
     if (pVictim->IsCreature() && ((Creature*)pVictim)->IsInEvadeMode())
@@ -175,7 +175,7 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     // World of Warcraft Client Patch 1.7.0 (2005-09-13)
     // - Effects that make players immune to physical will no longer be immune
     //   to the "Recently Bandaged" effect from First Aid.
-    if (pVictim->IsImmuneToSpell(spell, pVictim == this))
+    if (pVictim->IsImmuneToSpell(pSpellEntry, pVictim == this))
         return SPELL_MISS_IMMUNE;
 
     if (pVictim == this)
@@ -183,17 +183,17 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
 
     // All positive spells can`t miss
     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
-    if (spell->IsPositiveSpell(this, pVictim) || spell->IsPositiveEffect(effIndex, this, pVictim))
+    if (pSpellEntry->IsPositiveSpell(this, pVictim) || pSpellEntry->IsPositiveEffect(effIndex, this, pVictim))
         return SPELL_MISS_NONE;
 
     // Check for immune (use charges)
     SpellSchoolMask schoolMask;
-    if (spellPtr)
-        schoolMask = spellPtr->m_spellSchoolMask;
+    if (pSpell)
+        schoolMask = pSpell->m_spellSchoolMask;
     else
-        schoolMask = spell->GetSpellSchoolMask();
+        schoolMask = pSpellEntry->GetSpellSchoolMask();
 
-    if (pVictim->IsImmuneToDamage(schoolMask, spell))
+    if (pVictim->IsImmuneToDamage(schoolMask, pSpellEntry))
         return SPELL_MISS_IMMUNE;
 
     // Try victim reflect spell
@@ -202,32 +202,35 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
         int32 reflectchance = pVictim->GetTotalAuraModifier(SPELL_AURA_REFLECT_SPELLS);
         Unit::AuraList const& mReflectSpellsSchool = pVictim->GetAurasByType(SPELL_AURA_REFLECT_SPELLS_SCHOOL);
         for (const auto i : mReflectSpellsSchool)
-            if (i->GetModifier()->m_miscvalue & spell->GetSpellSchoolMask())
+            if (i->GetModifier()->m_miscvalue & pSpellEntry->GetSpellSchoolMask())
                 reflectchance += i->GetModifier()->m_amount;
         if (reflectchance > 0 && roll_chance_i(reflectchance))
         {
             // Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
-            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKE_HARMFUL_SPELL, PROC_EX_REFLECT, 1, 1, BASE_ATTACK, spell));
+            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKE_HARMFUL_SPELL, PROC_EX_REFLECT, 1, 1, BASE_ATTACK, pSpellEntry));
             return SPELL_MISS_REFLECT;
         }
     }
 
-    switch (spell->DmgClass)
+    // Wands deal spell school damage but are ranged weapon attacks, so
+    // their hit roll uses the ranged hit table, which is keyed on the
+    // Wands skill, rather than the spell hit table, which is keyed on
+    // level difference. The attack type check mirrors the wand crit handling
+    // in Unit::IsSpellCrit, and excludes the few spells that carry the
+    // attribute without being weapon attacks at all.
+    uint32 const dmgClass = pSpellEntry->GetWeaponAttackType() == RANGED_ATTACK &&
+                            pSpellEntry->HasAttribute(SPELL_ATTR_EX3_NORMAL_RANGED_ATTACK) ?
+                            SPELL_DAMAGE_CLASS_RANGED : pSpellEntry->DmgClass;
+
+    switch (dmgClass)
     {
         case SPELL_DAMAGE_CLASS_NONE:
             return SPELL_MISS_NONE;
         case SPELL_DAMAGE_CLASS_MAGIC:
-            // Wands deal spell school damage but are ranged weapon attacks, so
-            // their hit roll uses the ranged hit table, which is keyed on the
-            // Wands skill, rather than the spell hit table, which is keyed on
-            // level difference. This mirrors the wand crit handling in
-            // Unit::IsSpellCrit.
-            if (spell->HasAttribute(SPELL_ATTR_EX3_NORMAL_RANGED_ATTACK))
-                return MeleeSpellHitResult(pVictim, spell, spellPtr);
-            return MagicSpellHitResult(pVictim, spell, spellPtr);
+            return MagicSpellHitResult(pVictim, pSpellEntry, pSpell);
         case SPELL_DAMAGE_CLASS_MELEE:
         case SPELL_DAMAGE_CLASS_RANGED:
-            return MeleeSpellHitResult(pVictim, spell, spellPtr);
+            return MeleeSpellHitResult(pVictim, pSpellEntry, pSpell, pIsCrit, pMeleeHitInfo);
     }
     return SPELL_MISS_NONE;
 }
@@ -328,34 +331,60 @@ void SpellCaster::ProcDamageAndSpell_real(ProcSystemArguments& data, ProcessProc
         pUnit->HandleTriggers(data.pVictim, data.procExtra, data.amount, data.originalAmount, data.procSpell, procTriggered);
 }
 
-// Melee based spells can be miss, parry or dodge on this step
+// Miss chance for both melee attacks and melee based spells.
 // Crit or block - determined on damage calculation phase! (and can be both in some time)
-float SpellCaster::MeleeSpellMissChance(Unit const* pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const* spell, Spell* spellPtr)
+float SpellCaster::GetMeleeMissChance(Unit const* pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const* pSpellEntry, Spell* pSpell) const
 {
     if (!pVictim || !pVictim->IsStandingUp())
         return 0.0f;
 
+    if (pSpellEntry && pSpellEntry->HasAttribute(SPELL_ATTR_EX3_ALWAYS_HIT))
+        return 0.0f;
+
+    Unit const* pUnit = ToUnit();
+
     // Calculate hit chance (more correct for chance mod)
     float hitChance = 0.0f;
-    float missChance = 0.0f;
+    float missChance = 5.0f;
+
+    // DualWield - white damage has an additional 19% miss penalty
+    if (!pSpellEntry && pUnit && pUnit->HaveOffhandWeapon() && attType != RANGED_ATTACK)
+    {
+        bool isNormal = false;
+        for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
+        {
+            if (m_currentSpells[i] && (m_currentSpells[i]->m_spellInfo->GetSpellSchoolMask() & SPELL_SCHOOL_MASK_NORMAL))
+            {
+                isNormal = true;
+                break;
+            }
+        }
+        if (!isNormal && !m_currentSpells[CURRENT_MELEE_SPELL])
+            missChance += 19.0f;
+    }
 
     // PvP - PvE melee chances
-    if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        missChance = 5.0f - skillDiff * 0.04f;
+    float skillDiffBonus = 0.0f;
+    if (pVictim->IsPlayer())
+        skillDiffBonus = skillDiff * 0.04f;
     else if (skillDiff < -10)
-        missChance = 5.0f - skillDiff * 0.2f;
+        skillDiffBonus = skillDiff * 0.2f;
     else
-        missChance = 5.0f - skillDiff * 0.1f;
+        skillDiffBonus = skillDiff * 0.1f;
+    missChance -= skillDiffBonus;
 
     // Low level reduction
-    if (!pVictim->IsPlayer() && pVictim->GetLevel() < 10)
-        missChance *= pVictim->GetLevel() / 10.0f;
+    float const levelDiffMultiplier = !pVictim->IsPlayer() && pVictim->GetLevel() < 10 ? pVictim->GetLevel() / 10.0f : 1.0f;
+    missChance *= levelDiffMultiplier;
 
-    if (Unit* pUnit = ToUnit())
+    if (pUnit)
     {
         // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
-        if (Player* modOwner = pUnit->GetSpellModOwner())
-            modOwner->ApplySpellMod(spell->Id, SPELLMOD_RESIST_MISS_CHANCE, hitChance, spellPtr);
+        if (pSpellEntry)
+        {
+            if (Player* modOwner = pUnit->GetSpellModOwner())
+                modOwner->ApplySpellMod(pSpellEntry->Id, SPELLMOD_RESIST_MISS_CHANCE, hitChance, pSpell);
+        }
 
         // Bonuses from attacker aura and ratings
         hitChance += pUnit->GetWeaponBasedAuraModifier(attType, SPELL_AURA_MOD_HIT_CHANCE);
@@ -367,13 +396,26 @@ float SpellCaster::MeleeSpellMissChance(Unit const* pVictim, WeaponAttackType at
     if (skillDiff < -10 && hitChance > 0)
         hitChance -= 1.0f;
 
-    // Hit chance depends from victim auras
-    if (attType == RANGED_ATTACK)
-        hitChance += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE);
-    else
-        hitChance += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE);
+    // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+    // - Items which provide +hit chance will now be allowed to counteract the
+    //   increased miss chance penalty of dual - wielding.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+    float const missChanceWithoutDualWieldPenalty = (5.0f - skillDiffBonus) * levelDiffMultiplier;
+    float const adjustedDualWieldPenalty = missChance - std::max(0.0f, missChanceWithoutDualWieldPenalty);
+#endif
 
     missChance -= hitChance;
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+    if ((hitChance > 0.0f) && (adjustedDualWieldPenalty > 0.0f) && IsPlayer())
+        missChance = std::max(missChance, adjustedDualWieldPenalty);
+#endif
+
+    // Hit chance depends from victim auras
+    if (attType == RANGED_ATTACK)
+        missChance -= pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE);
+    else
+        missChance -= pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE);
 
     // Limit miss chance from 0 to 60%
     if (missChance < 0.0f)
@@ -383,142 +425,364 @@ float SpellCaster::MeleeSpellMissChance(Unit const* pVictim, WeaponAttackType at
     return missChance;
 }
 
-// Melee based spells hit result calculations
-SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit const* pVictim, SpellEntry const* spell, Spell* spellPtr)
+void SpellCaster::RollMeleeOutcomeAgainst(MeleeHitOutcome& outHitOutcome, uint32& outHitInfo, Unit const* pVictim, WeaponAttackType attType, SpellEntry const* pSpellEntry, Spell* pSpell) const
 {
-    // Wands use the ranged attack type.
-    WeaponAttackType attType = (spell->DmgClass == SPELL_DAMAGE_CLASS_RANGED ||
-        spell->HasAttribute(SPELL_ATTR_EX3_NORMAL_RANGED_ATTACK)) ? RANGED_ATTACK : BASE_ATTACK;
+    if (pVictim->IsCreature() && ((Creature*)pVictim)->IsInEvadeMode())
+    {
+        outHitInfo |= HITINFO_MISS | HITINFO_SWINGNOHITSOUND;
+        outHitOutcome = MELEE_HIT_EVADE;
+        return;
+    }
+
+    bool const canCrit = !pSpellEntry || pSpellEntry->CanCrit();
+
+    if (canCrit && IsPlayer() && ToPlayer()->HasCheatOption(PLAYER_CHEAT_ALWAYS_CRIT))
+    {
+        outHitInfo |= HITINFO_CRITICALHIT;
+        outHitOutcome = MELEE_HIT_CRIT;
+        return;
+    }
+
+    int32 attackerMaxSkillValueForLevel = GetSkillMaxForLevel(pVictim);
+    int32 victimMaxSkillValueForLevel = pVictim->GetSkillMaxForLevel(this);
 
     // Hammer of Wrath should not use weapon skill, but Bloodthirst should.
     // bonus from skills is 0.04% per skill Diff
-    int32 attackerWeaponSkill = (spell->rangeIndex == SPELL_RANGE_IDX_COMBAT || spell->EquippedItemClass == ITEM_CLASS_WEAPON) ?
+    int32 attackerWeaponSkill = !pSpellEntry || (pSpellEntry->rangeIndex == SPELL_RANGE_IDX_COMBAT || pSpellEntry->EquippedItemClass == ITEM_CLASS_WEAPON) ?
                                 int32(GetWeaponSkillValue(attType, pVictim)) : GetSkillMaxForLevel();
-    int32 skillDiff = attackerWeaponSkill - int32(pVictim->GetSkillMaxForLevel(this));
-    int32 fullSkillDiff = attackerWeaponSkill - int32(pVictim->GetDefenseSkillValue(this));
-    int32 minWeaponSkill = GetSkillMaxForLevel(pVictim) < attackerWeaponSkill ? GetSkillMaxForLevel(pVictim) : attackerWeaponSkill;
-    int32 cappedSkillDiff = minWeaponSkill - pVictim->GetSkillMaxForLevel(this);
+    int32 victimDefenseSkill = pVictim->GetDefenseSkillValue(this);
 
-    uint32 roll = urand(0, 9999);
+    // bonus from skills is 0.04%
+    int32 skillDiff = attackerWeaponSkill - victimMaxSkillValueForLevel;
+    int32 fullSkillDiff = attackerWeaponSkill - victimDefenseSkill;
+    int32 cappedSkillDiff = std::min(attackerMaxSkillValueForLevel, attackerWeaponSkill) - victimMaxSkillValueForLevel;
+    int32 blockSkillBonus = pVictim->IsPlayer() ? 4 * skillDiff : 10 * skillDiff;
+    int32 dodgeSkillBonus = pVictim->IsPlayer() ? 4 * skillDiff : 10 * skillDiff;
+    int32 parrySkillBonus = pVictim->IsPlayer() ? 4 * skillDiff : cappedSkillDiff < -10 ? 60 * cappedSkillDiff : 20 * cappedSkillDiff;
+    int32 sum = 0, tmp = 0;
+    int32 roll = urand(0, 9999);
 
-    uint32 missChance = uint32(MeleeSpellMissChance(pVictim, attType, fullSkillDiff, spell, spellPtr) * 100.0f);
-    // Roll miss
-    uint32 tmp = spell->AttributesEx3 & SPELL_ATTR_EX3_ALWAYS_HIT ? 0 : missChance;
-    if (roll < tmp)
-        return SPELL_MISS_MISS;
+    int32 missChance = int32(GetMeleeMissChance(pVictim, attType, fullSkillDiff, pSpellEntry, pSpell) * 100);
+    int32 dodgeChance = int32(pVictim->GetUnitDodgeChance() * 100);
+    int32 blockChance = int32(pVictim->GetUnitBlockChance() * 100);
+    int32 parryChance = int32(pVictim->GetUnitParryChance() * 100);
 
-    // Chance resist mechanic for spell (effect resistance handled later)
-    int32 resist_mech = 0;
-    if (spell->Mechanic)
-        resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->Mechanic) * 100;
-    // Roll chance
-    tmp += resist_mech;
-    if (roll < tmp)
-        return SPELL_MISS_RESIST;
+    //DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: skill bonus of %d for attacker", skillBonus);
+    //DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: rolled %d, miss %d, dodge %d, parry %d, block %d, crit %d", roll, missChance, dodgeChance, parryChance, blockChance, critChance);
 
-    bool canDodge = true;
-    bool canParry = true;
-    bool canBlock = spell->HasAttribute(SPELL_ATTR_EX3_COMPLETELY_BLOCKED);
+    tmp = missChance;
 
-    // Same spells cannot be parry/dodge
-    if (spell->Attributes & SPELL_ATTR_NO_ACTIVE_DEFENSE)
-        return SPELL_MISS_NONE;
-
-    // Ranged attack cannot be parry/dodge
-    if (attType == RANGED_ATTACK)
-        return SPELL_MISS_NONE;
-
-    bool from_behind = !pVictim->HasInArc(this, M_PI_F);
-
-    // Check for attack from behind
-    if (from_behind)
+    if (tmp > 0 && roll < (sum += tmp))
     {
-        // Can`t dodge from behind in PvP (but its possible in PvE)
-        if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER)
-            canDodge = false;
+        DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: MISS");
+        outHitInfo |= HITINFO_MISS;
+        outHitOutcome = MELEE_HIT_MISS;
+        return;
+    }
 
-        // Can`t parry or block
+    if (pSpellEntry)
+    {
+        // Chance resist mechanic for spell (effect resistance handled later)
+        int32 resist_mech = 0;
+        if (pSpellEntry->Mechanic)
+            resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, pSpellEntry->Mechanic) * 100;
+        // Roll chance
+        tmp += resist_mech;
+        if (roll < tmp)
+        {
+            outHitInfo |= HITINFO_RESIST;
+            outHitOutcome = MELEE_HIT_RESIST;
+            return;
+        }
+    }
+
+    int32 critChance = 0;
+    if (pSpellEntry)
+    {
+        // Crit off the affective caster and its attack type, like the non melee paths in
+        // SpellHitResult, so pet or totem casts and off hand spells use the right chance.
+        if (Unit const* pCritCaster = ::ToUnit(pSpell ? pSpell->GetAffectiveCasterObject() : this))
+        {
+            critChance = int32(pCritCaster->GetSpellCritChance(pVictim, pSpellEntry,
+            pSpell ? pSpell->m_spellSchoolMask : pSpellEntry->GetSpellSchoolMask(), attType, pSpell) * 100);
+        }
+    }
+    else if (IsUnit())
+        critChance = int32(ToUnit()->GetUnitCriticalChance(attType, pVictim) * 100);
+
+
+    // always crit against a sitting target (except 0 crit chance)
+    if (canCrit && pVictim->IsPlayer() && !pVictim->IsStandingUp() && (critChance > 0 || IsCreature()))
+    {
+        DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRIT (sitting victim)");
+        outHitInfo |= HITINFO_CRITICALHIT;
+        outHitOutcome = MELEE_HIT_CRIT;
+        return;
+    }
+
+    bool canDodge;
+    bool canParry;
+    bool canBlock;
+    bool canGlancing;
+    bool canCrushing;
+
+    // The attacker is not necessarily a Unit, since GameObjects can cast spells too.
+    Creature const* pCreatureAttacker = ToCreature();
+
+    if (attType == RANGED_ATTACK)
+    {
+        // Intentional: ranged attacks only roll for miss and crit in our implementation.
+        // Dodge, parry, block, glancing and crushing blows are all disabled for them.
+        canDodge = false;
         canParry = false;
         canBlock = false;
+        canGlancing = false;
+        canCrushing = false;
     }
-    // Check creatures flags_extra for disable parry
-    if (Creature const* pCreatureVictim = pVictim->ToCreature())
-    {
-        if (pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_PARRY))
-            canParry = false;
-        if (pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_BLOCK))
-            canBlock = false;
-    }
-    // Check if the player can parry
     else
     {
-        if (!((Player const*)pVictim)->CanParry())
+        canDodge = true;
+        canParry = true;
+        canBlock = !(pCreatureAttacker && GetMeleeDamageSchoolMask() != SPELL_SCHOOL_MASK_NORMAL) &&
+                  (!pSpellEntry || pSpellEntry->HasAttribute(SPELL_ATTR_EX3_COMPLETELY_BLOCKED));
+        canGlancing = IsCharmerOrOwnerPlayerOrPlayerItself() && !pVictim->IsCharmerOrOwnerPlayerOrPlayerItself() &&
+                     (!pSpellEntry || pSpellEntry->IsNextMeleeSwingSpell());
+        canCrushing = pCreatureAttacker && !IsPet() && !pCreatureAttacker->HasStaticFlag(CREATURE_STATIC_FLAG_2_NO_CRUSHING_BLOWS) &&
+                     (!pSpellEntry || pSpellEntry->IsNextMeleeSwingSpell());
+
+        if (!pVictim->HasInArc(this))
+        {
+            DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: attack came from behind.");
+
+            // Can`t dodge from behind in PvP (but its possible in PvE)
+            if (pVictim->IsPlayer())
+                canDodge = false;
+
+            // Can`t parry or block
             canParry = false;
-        if (!((Player const*)pVictim)->CanBlock())
             canBlock = false;
+        }
+
+        // Check creatures flags_extra for disable parry or block.
+        // The player equivalent is already part of GetUnitParryChance and GetUnitBlockChance.
+        if (Creature const* pCreatureVictim = pVictim->ToCreature())
+        {
+            if (pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_PARRY))
+                canParry = false;
+            if (pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_BLOCK))
+                canBlock = false;
+        }
+
+        // Same spells cannot be parry/dodge
+        if (pSpellEntry && pSpellEntry->HasAttribute(SPELL_ATTR_NO_ACTIVE_DEFENSE))
+        {
+            canDodge = false;
+            canParry = false;
+            canBlock = false;
+        }
     }
 
+    // Dodge chance
     if (canDodge)
     {
-        // Roll dodge
-        int32 dodgeModifier = pVictim->IsPlayer() ? skillDiff * 4 : skillDiff * 10;
-        int32 dodgeChance = int32(pVictim->GetUnitDodgeChance() * 100.0f) - dodgeModifier;
-
-        if (dodgeChance < 0)
-            dodgeChance = 0;
+        dodgeChance -= dodgeSkillBonus;
 
         // Low level reduction
         if (!pVictim->IsPlayer() && pVictim->GetLevel() < 10)
             dodgeChance *= pVictim->GetLevel() / 10.0f;
 
-        tmp += dodgeChance;
-        if (roll < tmp)
-            return SPELL_MISS_DODGE;
+        if (dodgeChance > 0)
+        {
+            outHitInfo |= HITINFO_ROLLED_DODGE;
+            if (roll < (sum += dodgeChance))
+            {
+                DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: DODGE <%d, %d)", sum - dodgeChance, sum);
+                outHitOutcome = MELEE_HIT_DODGE;
+                return;
+            }
+        }
     }
 
-    if (canParry)
+    // Parry chance
+    if (canParry && (parryChance > 0))
     {
-        // Roll parry
-        int32 parryModifier = pVictim->IsPlayer() ? skillDiff * 4 : cappedSkillDiff < -10 ? 60 * cappedSkillDiff : 20 * cappedSkillDiff;
-        int32 parryChance = int32(pVictim->GetUnitParryChance() * 100.0f) - parryModifier;
-
-        // Can`t parry from behind
-        if (parryChance < 0)
-            parryChance = 0;
+        parryChance -= parrySkillBonus;
 
         // Low level reduction
         if (!pVictim->IsPlayer() && pVictim->GetLevel() < 10)
             parryChance *= pVictim->GetLevel() / 10.0f;
 
-        tmp += parryChance;
-        if (roll < tmp)
-            return SPELL_MISS_PARRY;
+        if (parryChance > 0)
+        {
+            outHitInfo |= HITINFO_ROLLED_PARRY;
+            if (roll < (sum += parryChance))
+            {
+                DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: PARRY <%d, %d)", sum - parryChance, sum);
+                outHitOutcome = MELEE_HIT_PARRY;
+                return;
+            }
+        }
     }
 
-    // There are 2 types of ability blocks: partial and full
-    // Fully blockable spells have a specific attribute, which generates a miss instead of a partial block
-    // Spells with an attribute must be rolled for block once on spell hit die
-    // Spells without an attribute must be rolled for partial block only inside damage calculation
-    if (canBlock && pVictim->RollSpellBlockChanceOutcome(this, attType))
-        return SPELL_MISS_BLOCK;
+    // Glancing Blow chance
+    // Max 40% chance to score a glancing blow against mobs that are higher level (can do only players and pets and not with ranged weapon)
+    if (canGlancing)
+    {
+        // cap possible value (with bonuses > max skill)
+        int32 skill = attackerWeaponSkill;
+        int32 maxskill = attackerMaxSkillValueForLevel;
+        skill = (skill > maxskill) ? maxskill : skill;
 
-    return SPELL_MISS_NONE;
+        // (Youfie) The +skill before BC does not reduce the frequency of glancing blows once it is equal to the player's level*5
+        if (attackerWeaponSkill > maxskill)
+            attackerWeaponSkill = maxskill;
+
+        // (Youfie) Chance of glance in Vanilla (unchanged by +skill beyond maxskill, see above):
+        tmp = (10 + ((victimDefenseSkill - attackerWeaponSkill) * 2)) * 100;
+        tmp = tmp > 4000 ? 4000 : tmp;
+        if (tmp < 0)
+            tmp = 0;
+        // sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "tmp = %i, Skill = %i, Max Skill = %i", tmp, attackerWeaponSkill, attackerMaxSkillValueForLevel); //For testing & debugging via the console
+
+        if (roll < (sum += tmp))
+        {
+            DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: GLANCING <%d, %d)", sum - tmp, sum);
+            outHitInfo |= HITINFO_GLANCING;
+            outHitOutcome = MELEE_HIT_GLANCING;
+            return;
+        }
+    }
+
+    // Block chance
+    if (canBlock && (blockChance > 0))
+    {
+        blockChance -= blockSkillBonus;
+
+        // mobs cannot block more than 5% of attacks regardless of rating difference
+        if (!pVictim->IsPlayer() && (blockChance > 500))
+            blockChance = 500;
+
+        // Low level reduction
+        if (!pVictim->IsPlayer() && pVictim->GetLevel() < 10)
+            blockChance *= pVictim->GetLevel() / 10.0f;
+
+        if (blockChance > 0)
+        {
+            outHitInfo |= HITINFO_ROLLED_BLOCK;
+            if (roll < (sum += blockChance))
+            {
+                DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: BLOCK <%d, %d)", sum - blockChance, sum);
+                outHitInfo |= HITINFO_BLOCK;
+                outHitOutcome = MELEE_HIT_BLOCK;
+                return;
+            }
+        }
+    }
+
+    // Critical chance - spells call IsSpellCrit from Spell::AddUnitTarget instead
+    if (canCrit && (critChance > 0))
+    {
+        tmp = critChance;
+        if (tmp > 0 && roll < (sum += tmp))
+        {
+            DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRIT <%d, %d)", sum - tmp, sum);
+            outHitInfo |= HITINFO_CRITICALHIT;
+            outHitOutcome = MELEE_HIT_CRIT;
+            return;
+        }
+    }
+
+    // Crushing Blow chance
+    if (canCrushing)
+    {
+        if (pCreatureAttacker->HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_CRUSH))
+        {
+            outHitInfo |= HITINFO_CRUSHING;
+            outHitOutcome = MELEE_HIT_CRUSHING;
+            return;
+        }
+
+        // mobs can score crushing blows if they're 3 or more levels above victim
+        // or when their weapon skill is 15 or more above victim's defense skill
+        tmp = victimDefenseSkill;
+        int32 tmpmax = victimMaxSkillValueForLevel;
+        // having defense above your maximum (from items, talents etc.) has no effect
+        tmp = tmp > tmpmax ? tmpmax : tmp;
+        // tmp = mob's level * 5 - player's current defense skill
+        tmp = attackerMaxSkillValueForLevel - tmp;
+        if (tmp >= 15)
+        {
+            // add 2% chance per lacking skill point, min. is 15%
+            tmp = tmp * 200 - 1500;
+            if (roll < (sum += tmp))
+            {
+                DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRUSHING <%d, %d)", sum - tmp, sum);
+                outHitInfo |= HITINFO_CRUSHING;
+                outHitOutcome = MELEE_HIT_CRUSHING;
+                return;
+            }
+        }
+    }
+
+    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: NORMAL");
+    outHitOutcome = MELEE_HIT_NORMAL;
 }
 
-SpellMissInfo SpellCaster::MagicSpellHitResult(Unit const* pVictim, SpellEntry const* spell, Spell* spellPtr)
+// Melee based spells hit result calculations
+SpellMissInfo SpellCaster::MeleeSpellHitResult(Unit const* pVictim, SpellEntry const* pSpellEntry, Spell* pSpell, nonstd::optional<bool>* pIsCrit, uint32* pMeleeHitInfo)
+{
+    // Wands use the ranged attack type.
+    WeaponAttackType attType = (pSpellEntry->DmgClass == SPELL_DAMAGE_CLASS_RANGED ||
+        pSpellEntry->HasAttribute(SPELL_ATTR_EX3_NORMAL_RANGED_ATTACK)) ? RANGED_ATTACK : BASE_ATTACK;
+
+    MeleeHitOutcome hitOutcome;
+    uint32 hitInfo = 0;
+    RollMeleeOutcomeAgainst(hitOutcome, hitInfo, pVictim, attType, pSpellEntry, pSpell);
+
+    if (pIsCrit)
+        *pIsCrit = (hitOutcome == MELEE_HIT_CRIT);
+
+    // Needed by Next Melee spells, to fill the hit info for SMSG_ATTACKERSTATEUPDATE.
+    if (pMeleeHitInfo)
+        *pMeleeHitInfo = hitInfo;
+
+    SpellMissInfo missInfo = MeleeHitOutcomeToSpellMissInfo(hitOutcome);
+
+    // Should magic spells get deflected instead of parried?
+    // cmangos has it this way but unsure if this is vanilla
+    /*
+    if (missInfo == SPELL_MISS_PARRY)
+    {
+        SpellSchoolMask schoolMask;
+        if (pSpell)
+            schoolMask = pSpell->m_spellSchoolMask;
+        else
+            schoolMask = pSpellEntry->GetSpellSchoolMask();
+
+        if ((schoolMask & SPELL_SCHOOL_MASK_MAGIC) &&
+            pSpellEntry->rangeIndex != SPELL_RANGE_IDX_COMBAT &&
+            pSpellEntry->rangeIndex != SPELL_RANGE_IDX_SELF_ONLY)
+            missInfo = SPELL_MISS_DEFLECT;
+    }
+    */
+
+    return missInfo;
+}
+
+SpellMissInfo SpellCaster::MagicSpellHitResult(Unit const* pVictim, SpellEntry const* pSpellEntry, Spell* pSpell)
 {
     // Can`t miss on dead target (on skinning for example)
     if (!pVictim->IsAlive())
         return SPELL_MISS_NONE;
 
     // Spell cannot be resisted (not exist on dbc, custom flag)
-    if (spell->AttributesEx4 & SPELL_ATTR_EX4_IGNORE_RESISTANCES)
+    if (pSpellEntry->AttributesEx4 & SPELL_ATTR_EX4_IGNORE_RESISTANCES)
         return SPELL_MISS_NONE;
 
     if (pVictim->IsCreature() && ((Creature*)pVictim)->HasStaticFlag(CREATURE_STATIC_FLAG_NO_SPELL_DEFENSE))
         return SPELL_MISS_NONE;
 
-    int32 hitChance = MagicSpellHitChance(pVictim, spell, spellPtr);
+    int32 hitChance = MagicSpellHitChance(pVictim, pSpellEntry, pSpell);
     int32 missChance = 10000 - hitChance;
     int32 rand = irand(0, 10000);
 
@@ -528,12 +792,12 @@ SpellMissInfo SpellCaster::MagicSpellHitResult(Unit const* pVictim, SpellEntry c
     return SPELL_MISS_NONE;
 }
 
-int32 SpellCaster::MagicSpellHitChance(Unit const* pVictim, SpellEntry const* spell, Spell* spellPtr)
+int32 SpellCaster::MagicSpellHitChance(Unit const* pVictim, SpellEntry const* pSpellEntry, Spell* pSpell)
 {
-     if (spell->AttributesEx3 & SPELL_ATTR_EX3_ALWAYS_HIT)
+     if (pSpellEntry->AttributesEx3 & SPELL_ATTR_EX3_ALWAYS_HIT)
         return 10000;
 
-    SpellSchoolMask schoolMask = spell->GetSpellSchoolMask();
+    SpellSchoolMask schoolMask = pSpellEntry->GetSpellSchoolMask();
 
     // PvP - PvE spell misschances per leveldif > 2
     int32 lchance = pVictim->GetTypeId() == TYPEID_PLAYER ? 7 : 11;
@@ -551,8 +815,8 @@ int32 SpellCaster::MagicSpellHitChance(Unit const* pVictim, SpellEntry const* sp
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     int32 leveldif = int32(pVictim->GetLevelForTarget(this)) - int32(GetLevelForTarget(pVictim));
 #else
-    int32 leveldif = (spellPtr ? spellPtr->GetOriginalCasterGuid().IsGameObject() : spell->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA)) ?
-        int32(pVictim->GetLevelForTarget(this)) - std::max<int32>(1, spell->spellLevel) :
+    int32 leveldif = (pSpell ? pSpell->GetOriginalCasterGuid().IsGameObject() : pSpellEntry->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA)) ?
+        int32(pVictim->GetLevelForTarget(this)) - std::max<int32>(1, pSpellEntry->spellLevel) :
         int32(pVictim->GetLevelForTarget(this)) - int32(GetLevelForTarget(pVictim));
 #endif
 
@@ -574,7 +838,7 @@ int32 SpellCaster::MagicSpellHitChance(Unit const* pVictim, SpellEntry const* sp
     {
         if (Player* modOwner = pUnit->GetSpellModOwner())
         {
-            modOwner->ApplySpellMod(spell->Id, SPELLMOD_RESIST_MISS_CHANCE, modHitChance, spellPtr);
+            modOwner->ApplySpellMod(pSpellEntry->Id, SPELLMOD_RESIST_MISS_CHANCE, modHitChance, pSpell);
         }
     }
 
@@ -582,27 +846,27 @@ int32 SpellCaster::MagicSpellHitChance(Unit const* pVictim, SpellEntry const* sp
     modHitChance += pVictim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE, schoolMask);
 
     // Reduce spell hit chance for Area of effect spells from victim SPELL_AURA_MOD_AOE_AVOIDANCE aura
-    if (spell->IsAreaOfEffectSpell())
+    if (pSpellEntry->IsAreaOfEffectSpell())
     {
         modHitChance -= pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_AOE_AVOIDANCE);
     }
 
     // Chance resist mechanic for spell (effect resistance handled later)
     int32 resist_mech = 0;
-    if (spell->Mechanic)
-        resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->Mechanic);
+    if (pSpellEntry->Mechanic)
+        resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, pSpellEntry->Mechanic);
     // Apply mod
     modHitChance -= resist_mech;
 
     // Chance resist debuff
-    modHitChance -= pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DEBUFF_RESISTANCE, int32(spell->Dispel));
+    modHitChance -= pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DEBUFF_RESISTANCE, int32(pSpellEntry->Dispel));
 
     // Increase hit chance from attacker SPELL_AURA_MOD_SPELL_HIT_CHANCE and attacker ratings
     if (Unit* pUnit = ToUnit())
         modHitChance += int32(pUnit->m_modSpellHitChance);
 
     // Nostalrius: sorts binaires.
-    if (spell->IsBinary())
+    if (pSpellEntry->IsBinary())
     {
         // Get base victim resistance for school
         float resistModHitChance = GetSpellResistChance(pVictim, schoolMask, false);
@@ -827,7 +1091,7 @@ void SpellCaster::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log) con
 #endif
     packet->periodicLog = log->periodicLog;
     packet->blocked = log->blocked;
-    packet->hitInfo = log->HitInfo;
+    packet->hitTypeFlags = log->hitTypeFlags;
     SendMessageToSet(std::move(packet), true);
 }
 
@@ -841,11 +1105,11 @@ void SpellCaster::SendSpellNonMeleeDamageLog(Unit const* target, uint32 spellId,
     log.resist = resist;
     log.periodicLog = isPeriodic;
     log.blocked = blocked;
-    log.HitInfo = 0;
+    log.hitTypeFlags = 0;
     if (criticalHit)
-        log.HitInfo |= SPELL_HIT_TYPE_CRIT;
+        log.hitTypeFlags |= SPELL_HIT_TYPE_CRIT;
     if (split)
-        log.HitInfo |= SPELL_HIT_TYPE_SPLIT;
+        log.hitTypeFlags |= SPELL_HIT_TYPE_SPLIT;
     SendSpellNonMeleeDamageLog(&log);
 }
 
@@ -989,7 +1253,7 @@ void SpellCaster::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float da
             // if crit add critical bonus
             if (crit && !spellInfo->HasAttribute(SPELL_ATTR_EX3_IGNORE_CASTER_MODIFIERS))
             {
-                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+                damageInfo->hitTypeFlags |= SPELL_HIT_TYPE_CRIT;
                 damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
             }
             break;
@@ -1005,7 +1269,7 @@ void SpellCaster::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float da
             // If crit add critical bonus
             if (crit && !spellInfo->HasAttribute(SPELL_ATTR_EX3_IGNORE_CASTER_MODIFIERS))
             {
-                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+                damageInfo->hitTypeFlags |= SPELL_HIT_TYPE_CRIT;
                 damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
             }
             break;
@@ -1609,7 +1873,7 @@ void SpellCaster::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabili
     }
 
     // Call default DealDamage (send critical in hit info for threat calculation)
-    CleanDamage cleanDamage(0, BASE_ATTACK, damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT ? MELEE_HIT_CRIT : MELEE_HIT_NORMAL, damageInfo->absorb, damageInfo->resist);
+    CleanDamage cleanDamage(0, BASE_ATTACK, damageInfo->hitTypeFlags & SPELL_HIT_TYPE_CRIT ? MELEE_HIT_CRIT : MELEE_HIT_NORMAL, damageInfo->absorb, damageInfo->resist);
     DealDamage(pVictim, damageInfo->damage, &cleanDamage, spellProto->HasAttribute(SPELL_ATTR_EX3_TREAT_AS_PERIODIC) ? DOT : SPELL_DIRECT_DAMAGE, GetSchoolMask(damageInfo->school), spellProto, durabilityLoss, damageInfo->spell, damageInfo->reflected);
 }
 

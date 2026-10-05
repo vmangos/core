@@ -200,7 +200,6 @@ set (SCRIPTS_SRCS
     kalimdor/silithus/ruins_of_ahnqiraj/boss_moam.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/boss_ossirian.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/instance_ruins_of_ahnqiraj.cpp
-    kalimdor/silithus/ruins_of_ahnqiraj/npc_sandstalker.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/ruins_of_ahnqiraj.cpp
     kalimdor/silithus/temple_of_ahnqiraj/boss_bug_trio.cpp
     kalimdor/silithus/temple_of_ahnqiraj/boss_cthun.cpp
@@ -217,7 +216,6 @@ set (SCRIPTS_SRCS
     kalimdor/tanaris/tanaris.cpp
     kalimdor/tanaris/zulfarrak/instance_zulfarrak.cpp
     kalimdor/tanaris/zulfarrak/zulfarrak.cpp
-    kalimdor/teldrassil/teldrassil.cpp
     kalimdor/the_barrens/the_barrens.cpp
     kalimdor/the_barrens/razorfen_downs/instance_razorfen_downs.cpp
     kalimdor/the_barrens/razorfen_downs/razorfen_downs.cpp

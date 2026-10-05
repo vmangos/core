@@ -22,8 +22,12 @@
 #ifndef __UPDATEDATA_H
 #define __UPDATEDATA_H
 
+#include <memory>
 #include "ByteBuffer.h"
 #include "ObjectGuid.h"
+#include "Packets/ObjectUpdate.h"
+
+using UpdatePacket = WorldPackets::ObjectUpdate::UpdateObject::UpdatePacket;
 
 class WorldPacket;
 class WorldSession;
@@ -56,14 +60,6 @@ enum ObjectUpdateFlags
 #endif
 };
 
-class UpdatePacket
-{
-    public:
-        UpdatePacket() : blockCount(0) {}
-        ByteBuffer data;
-        uint32 blockCount;
-};
-
 class PacketCompressor
 {
     public:
@@ -80,8 +76,8 @@ class UpdateData
         void AddOutOfRangeGUID(ObjectGuid const& guid);
         ByteBuffer& AddUpdateBlockAndGetBuffer();
         void Send(WorldSession* session, bool hasTransport = false);
-        bool BuildPacket(WorldPacket* packet, bool hasTransport = false);
-        bool BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket, bool hasTransport = false);
+        void BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, bool hasTransport = false);
+        void BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, UpdatePacket* updPacket, bool hasTransport = false);
         bool HasData() { return !m_datas.empty() || !m_outOfRangeGUIDs.empty(); }
         void Clear();
 

@@ -73,7 +73,7 @@ struct npc_obsidionAI : public ScriptedAI
         m_playerList.clear();
         m_IsEventRunning = false;
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
 
         if (Creature* cr = m_creature->GetMap()->GetCreature(m_Dorius))
             cr->DeleteLater();
@@ -83,7 +83,6 @@ struct npc_obsidionAI : public ScriptedAI
     void Aggro(Unit* pWho) override
     {
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         ScriptedAI::Aggro(pWho);
     }
 
@@ -148,7 +147,7 @@ struct npc_obsidionAI : public ScriptedAI
                     if (Player* player = m_creature->GetMap()->GetPlayer(guid))
                     {
                         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
 
                         AttackStart(player);
                         if (Creature* lathoric = m_creature->GetMap()->GetCreature(m_Dorius))

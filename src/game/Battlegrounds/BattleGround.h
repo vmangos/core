@@ -193,7 +193,7 @@ class BattleGround
 
         /* Packet Transfer */
         // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
-        virtual void FillInitialWorldStates(WorldPacket& /*data*/, uint32& /*count*/) {}
+        virtual void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& /*states*/) {}
         void SendPacketToTeam(Team team, WorldPacket* packet, Player* sender = nullptr, bool self = true);
         void SendPacketToTeam(Team team, std::unique_ptr<ServerPacket> packet, Player* sender = nullptr, bool self = true);
         void SendPacketToAll(WorldPacket* packet);
@@ -415,39 +415,5 @@ class BattleGround
 
         uint32 m_playerSkinReflootId;
 };
-
-// helper functions for world state list fill
-inline void FillInitialWorldState(ByteBuffer& data, uint32& count, uint32 state, uint32 value)
-{
-    WriteInitialWorldStatePair(data, state, value);
-    ++count;
-}
-
-inline void FillInitialWorldState(ByteBuffer& data, uint32& count, uint32 state, int32 value)
-{
-    WriteInitialWorldStatePair(data, state, value);
-    ++count;
-}
-
-inline void FillInitialWorldState(ByteBuffer& data, uint32& count, uint32 state, bool value)
-{
-    WriteInitialWorldStatePair(data, state, value ? 1 : 0);
-    ++count;
-}
-
-struct WorldStatePair
-{
-    uint32 state;
-    uint32 value;
-};
-
-inline void FillInitialWorldState(ByteBuffer& data, uint32& count, WorldStatePair const* array)
-{
-    for(WorldStatePair const* itr = array; itr->state; ++itr)
-    {
-        WriteInitialWorldStatePair(data, itr->state, itr->value);
-        ++count;
-    }
-}
 
 #endif

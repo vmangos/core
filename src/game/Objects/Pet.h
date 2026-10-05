@@ -196,7 +196,7 @@ class Pet : public Creature
         bool HaveInDiet(ItemPrototype const* item) const;
         uint32 GetCurrentFoodBenefitLevel(uint32 itemLevel) const;
         void SetDuration(int32 dur) { m_duration = dur; }
-        float GetFollowAngle() const { return m_followAngle; }
+        float GetFollowAngle() const final { return m_followAngle; }
         void SetFollowAngle(float angle) { m_followAngle = angle; }
 
         int32 GetBonusDamage() const { return m_bonusdamage; }

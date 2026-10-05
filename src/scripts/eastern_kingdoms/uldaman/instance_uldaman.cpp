@@ -208,6 +208,7 @@ struct instance_uldaman : public ScriptedInstance
             target->RemoveCorpse();
         }
         target->Respawn();
+        target->Update(0, 0); // respawn happens on next update and unit flags are reset then
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC);
     }
 

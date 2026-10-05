@@ -2015,7 +2015,7 @@ void ObjectMgr::LoadCreatureSpells()
                 if (!sSpellMgr.GetSpellEntry(spellId))
                 {
                     if (!sSpellMgr.IsExistingSpellId(spellId))
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has non-existent spell %u used as spellId_%u, skipping spell.", entry, spellId, i);
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has non-existent spell %u used as spellId_%u, skipping spell.", entry, spellId, i+1);
                     continue;
                 }
 
@@ -2023,7 +2023,8 @@ void ObjectMgr::LoadCreatureSpells()
 
                 if ((probability == 0) || (probability > 100))
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid probability_%u value %u, setting it to 100 instead.", entry, i, probability);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid probability_%u value %u, setting it to 100 instead.", entry, i+1, probability);
+                    sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE `creature_spells` SET `probability_%u`=100 WHERE `entry`=%u;", i+1, entry);
                     probability = 100;
                 }
 
@@ -2043,7 +2044,7 @@ void ObjectMgr::LoadCreatureSpells()
 
                 if (delayInitialMin > delayInitialMax)
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid initial timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i, delayInitialMin, i, delayInitialMax);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid initial timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i+1, delayInitialMin, i+1, delayInitialMax);
                     continue;
                 }
 
@@ -2052,7 +2053,7 @@ void ObjectMgr::LoadCreatureSpells()
 
                 if (delayRepeatMin > delayRepeatMax)
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid repeat timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i, delayRepeatMin, i, delayRepeatMax);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has invalid repeat timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i+1, delayRepeatMin, i+1, delayRepeatMax);
                     continue;
                 }
 
@@ -2062,7 +2063,7 @@ void ObjectMgr::LoadCreatureSpells()
                 {
                     if (spellScriptSetFull.find(scriptId) == spellScriptSetFull.end())
                     {
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has non-existent scriptId_%u = %u, setting it to 0 instead.", entry, i, scriptId);
+                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Entry %u in table `creature_spells` has non-existent scriptId_%u = %u, setting it to 0 instead.", entry, i+1, scriptId);
                         scriptId = 0;
                     }
                     else
@@ -11282,7 +11283,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     }
 
     VendorItemData const* vItems = isTemplate ? GetNpcVendorTemplateItemList(vendor_entry) : GetNpcVendorItemList(vendor_entry);
-    VendorItemData const* tItems = isTemplate ? nullptr : GetNpcVendorTemplateItemList(vendor_entry);
+    VendorItemData const* tItems = (!isTemplate && cInfo->vendor_id) ? GetNpcVendorTemplateItemList(cInfo->vendor_id) : nullptr;
 
     if (!vItems && !tItems)
         return true;                                        // later checks for non-empty lists
@@ -11301,7 +11302,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
 
     if (!isTemplate)
     {
-        if (tItems && tItems->GetItem(item_id))
+        if (tItems && tItems->FindItem(item_id))
         {
             if (pl)
                 pl->PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id);

@@ -1043,37 +1043,47 @@ struct go_ai_suppression : public GameObjectAI
 
     uint32 m_uiFumeTimer;
 
-    void OnLootStateChange() override
+    bool OnUse(Unit* /*user*/) override
     {
         ScriptedInstance* pInstance = (ScriptedInstance*)me->GetMap()->GetInstanceData();
         if (!pInstance)
-            return;
+            return false;
 
         // As long as Broodlord Lashlayer is alive, the GO will rearm on a random timer from 30 sec to 2 min
         // It will not rearm for the instance lifetime after Broodlord Lashlayer death
-        if (me->getLootState() == GO_ACTIVATED)
+        if (me->GetGoState() == GO_STATE_READY)
         {
             if (pInstance->GetData(TYPE_LASHLAYER) != DONE)
-                me->SetRespawnTime(urand(30, 2 * MINUTE));
+                m_uiFumeTimer = urand(30, 2 * MINUTE) * IN_MILLISECONDS;
             else
-                me->SetRespawnTime(7 * 24 * HOUR);
+                m_uiFumeTimer = WEEK * IN_MILLISECONDS;
+
+            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+            me->SetGoState(GO_STATE_ACTIVE);
+            me->SetLootState(GO_READY);
         }
+        
+        return true;
     }
 
-    // Visual effects for each GO is played on a 5 seconds timer. Sniff show that the GO should also be used (trap spell is cast)
-    // but we need core support for GO casting for that
+    // Visual effects for each GO is played on a 5 seconds timer. Sniff show that the GO should also be used (trap spell is cast).
     void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiFumeTimer)
         {
             if (m_uiFumeTimer <= uiDiff)
             {
-                // The loot state check may be removed in that case because it should probably be handled in the Gameobject::Use() code
-                if (me->getLootState() == GO_READY)
+                if (me->GetGoState() == GO_STATE_READY)
                 {
-                    me->SendGameObjectCustomAnim(me->GetObjectGuid());
+                    me->SendGameObjectCustomAnim();
                     me->CastSpell(nullptr, me->GetGOInfo()->trap.spellId, true);
                 }
+                else
+                {
+                    me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                    me->SetGoState(GO_STATE_READY);
+                }
+
                 m_uiFumeTimer = 5 * IN_MILLISECONDS;
             }
             else
@@ -1082,10 +1092,23 @@ struct go_ai_suppression : public GameObjectAI
     }
 };
 
-
 GameObjectAI* GetAI_go_suppression(GameObject* go)
 {
     return new go_ai_suppression(go);
+}
+
+// 22247 - Suppression Aura
+struct BWLSuppressionAuraScript : SpellScript
+{
+    bool OnCheckTarget(Spell const* /*spell*/, Unit* target, SpellEffectIndex /*eff*/) const final
+    {
+        return !target->HasStealthAura();
+    }
+};
+
+SpellScript* GetScript_BWLSuppressionAura(SpellEntry const*)
+{
+    return new BWLSuppressionAuraScript();
 }
 
 bool AreaTrigger_at_orb_of_command(Player* pPlayer, AreaTriggerEntry const* pAt)
@@ -1443,6 +1466,11 @@ void AddSC_instance_blackwing_lair()
     pNewscript = new Script;
     pNewscript->Name = "go_suppression";
     pNewscript->GOGetAI = &GetAI_go_suppression;
+    pNewscript->RegisterSelf();
+
+    pNewscript = new Script;
+    pNewscript->Name = "spell_bwl_suppression_aura";
+    pNewscript->GetSpellScript = &GetScript_BWLSuppressionAura;
     pNewscript->RegisterSelf();
 
     pNewscript = new Script;

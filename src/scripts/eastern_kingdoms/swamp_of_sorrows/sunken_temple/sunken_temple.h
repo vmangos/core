@@ -44,6 +44,7 @@ enum
     NPC_JAMMALAN          = 5710,
     NPC_AVATAR_OF_HAKKAR  = 8443,
     NPC_SHADE_OF_ERANIKUS = 5709,
+    NPC_OGOM              = 5711,
 
     // Jammalain mini-bosses
     NPC_ZOLO              = 5712,

@@ -78,19 +78,46 @@ void WorldPackets::Quest::QuestPushResult::ReadFromWorldPacket(WorldPacket& recv
 
 // --- Server Packets ---
 
+size_t WorldPackets::Quest::QuestPushResultResponse::EstimateFinalSize() const
+{
+    return sizeof(senderGuid) +
+           sizeof(msg);
+}
+
 void WorldPackets::Quest::QuestPushResultResponse::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << senderGuid;
     buffer << msg;
 }
 
+size_t WorldPackets::Quest::QuestLogFull::EstimateFinalSize() const
+{
+    return 0;
+}
+
 void WorldPackets::Quest::QuestLogFull::AppendBodyTo(ByteBuffer& /*buffer*/) const
 {
+}
+
+size_t WorldPackets::Quest::QuestUpdateComplete::EstimateFinalSize() const
+{
+    return sizeof(questId);
 }
 
 void WorldPackets::Quest::QuestUpdateComplete::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << questId;
+}
+
+size_t WorldPackets::Quest::QuestGiverQuestComplete::EstimateFinalSize() const
+{
+    return sizeof(questId) +
+           sizeof(unknown) +
+           sizeof(xp) +
+           sizeof(money) +
+           sizeof(uint32) + /*reward items count*/
+           rewardItems.size() * (sizeof(QuestRewardItem::itemId) +
+                                 sizeof(QuestRewardItem::itemCount));
 }
 
 void WorldPackets::Quest::QuestGiverQuestComplete::AppendBodyTo(ByteBuffer& buffer) const
@@ -107,10 +134,21 @@ void WorldPackets::Quest::QuestGiverQuestComplete::AppendBodyTo(ByteBuffer& buff
     }
 }
 
+size_t WorldPackets::Quest::QuestGiverQuestFailed::EstimateFinalSize() const
+{
+    return sizeof(questId) +
+           sizeof(reason);
+}
+
 void WorldPackets::Quest::QuestGiverQuestFailed::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << questId;
     buffer << reason;
+}
+
+size_t WorldPackets::Quest::QuestUpdateFailed::EstimateFinalSize() const
+{
+    return sizeof(questId);
 }
 
 void WorldPackets::Quest::QuestUpdateFailed::AppendBodyTo(ByteBuffer& buffer) const
@@ -118,14 +156,31 @@ void WorldPackets::Quest::QuestUpdateFailed::AppendBodyTo(ByteBuffer& buffer) co
     buffer << questId;
 }
 
+size_t WorldPackets::Quest::QuestUpdateFailedTimer::EstimateFinalSize() const
+{
+    return sizeof(questId);
+}
+
 void WorldPackets::Quest::QuestUpdateFailedTimer::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << questId;
 }
 
+size_t WorldPackets::Quest::QuestGiverQuestInvalid::EstimateFinalSize() const
+{
+    return sizeof(msg);
+}
+
 void WorldPackets::Quest::QuestGiverQuestInvalid::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << msg;
+}
+
+size_t WorldPackets::Quest::QuestConfirmAcceptResponse::EstimateFinalSize() const
+{
+    return sizeof(questId) +
+           questTitle.size() + sizeof(char) + /*null terminator*/
+           sizeof(senderGuid);
 }
 
 void WorldPackets::Quest::QuestConfirmAcceptResponse::AppendBodyTo(ByteBuffer& buffer) const
@@ -135,10 +190,25 @@ void WorldPackets::Quest::QuestConfirmAcceptResponse::AppendBodyTo(ByteBuffer& b
     buffer << senderGuid;
 }
 
+size_t WorldPackets::Quest::QuestUpdateAddItem::EstimateFinalSize() const
+{
+    return sizeof(itemId) +
+           sizeof(count);
+}
+
 void WorldPackets::Quest::QuestUpdateAddItem::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << itemId;
     buffer << count;
+}
+
+size_t WorldPackets::Quest::QuestUpdateAddKill::EstimateFinalSize() const
+{
+    return sizeof(questId) +
+           sizeof(entry) +
+           sizeof(count) +
+           sizeof(required) +
+           sizeof(guid);
 }
 
 void WorldPackets::Quest::QuestUpdateAddKill::AppendBodyTo(ByteBuffer& buffer) const
@@ -150,10 +220,35 @@ void WorldPackets::Quest::QuestUpdateAddKill::AppendBodyTo(ByteBuffer& buffer) c
     buffer << guid;
 }
 
+size_t WorldPackets::Quest::QuestGiverStatus::EstimateFinalSize() const
+{
+    return sizeof(npcGuid) +
+           sizeof(status);
+}
+
 void WorldPackets::Quest::QuestGiverStatus::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << npcGuid;
     buffer << status;
+}
+
+size_t WorldPackets::Quest::QuestGiverQuestList::EstimateFinalSize() const
+{
+    // Only an estimate, the greeting text and the localized quest titles may have a different length.
+    size_t size = sizeof(npcGuid) +
+                  fallbackTitle.size() + sizeof(char) + /*greeting text null terminator*/
+                  sizeof(fallbackEmoteDelay) +
+                  sizeof(fallbackEmote) +
+                  sizeof(uint8) + /*quests count*/
+                  quests.size() * (sizeof(uint32) + /*quest id*/
+                                   sizeof(QuestListEntry::icon) +
+                                   sizeof(uint32) + /*quest level*/
+                                   sizeof(char) /*title null terminator*/);
+
+    for (auto const& entry : quests)
+        size += entry.quest->GetTitle().size();
+
+    return size;
 }
 
 void WorldPackets::Quest::QuestGiverQuestList::AppendBodyTo(ByteBuffer& buffer) const
@@ -200,6 +295,26 @@ void WorldPackets::Quest::QuestGiverQuestList::AppendBodyTo(ByteBuffer& buffer) 
         buffer << quest->GetQuestLevel();
         buffer << title;
     }
+}
+
+size_t WorldPackets::Quest::QuestGiverQuestDetails::EstimateFinalSize() const
+{
+    // Only an estimate, the localized strings may have a different length.
+    // Assumes the rewards are not hidden, in which case only three zeroes are sent.
+    return sizeof(npcGuid) +
+           sizeof(uint32) + /*quest id*/
+           quest->GetTitle().size() + sizeof(char) + /*null terminator*/
+           quest->GetDetails().size() + sizeof(char) + /*null terminator*/
+           quest->GetObjectives().size() + sizeof(char) + /*null terminator*/
+           sizeof(uint32) + /*autoFinish*/
+           sizeof(uint32) + /*reward choice items count*/
+           sizeof(uint32) * 3 * QUEST_REWARD_CHOICES_COUNT + /*id, count, display id*/
+           sizeof(uint32) + /*reward items count*/
+           sizeof(uint32) * 3 * QUEST_REWARDS_COUNT + /*id, count, display id*/
+           sizeof(uint32) + /*reward money*/
+           sizeof(uint32) + /*reward spell*/
+           sizeof(uint32) + /*emote count*/
+           sizeof(uint32) * 2 * QUEST_EMOTE_COUNT /*emote, delay*/;
 }
 
 void WorldPackets::Quest::QuestGiverQuestDetails::AppendBodyTo(ByteBuffer& buffer) const
@@ -272,6 +387,28 @@ void WorldPackets::Quest::QuestGiverQuestDetails::AppendBodyTo(ByteBuffer& buffe
     }
 }
 
+size_t WorldPackets::Quest::QuestGiverOfferReward::EstimateFinalSize() const
+{
+    // Only an estimate, the localized strings may have a different length.
+    return sizeof(npcGuid) +
+           sizeof(uint32) + /*quest id*/
+           quest->GetTitle().size() + sizeof(char) + /*null terminator*/
+           quest->GetOfferRewardText().size() + sizeof(char) + /*null terminator*/
+           sizeof(uint32) + /*autoFinish*/
+           sizeof(uint32) + /*emote count*/
+           sizeof(uint32) * 2 * QUEST_EMOTE_COUNT + /*delay, emote*/
+           sizeof(uint32) + /*reward choice items count*/
+           sizeof(uint32) * 3 * QUEST_REWARD_CHOICES_COUNT + /*id, count, display id*/
+           sizeof(uint32) + /*reward items count*/
+           sizeof(uint32) * 3 * QUEST_REWARDS_COUNT + /*id, count, display id*/
+           sizeof(uint32) + /*reward money*/
+           sizeof(uint32) /*quest flags*/
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
+           + sizeof(uint32) /*reward spell*/
+#endif
+           ;
+}
+
 void WorldPackets::Quest::QuestGiverOfferReward::AppendBodyTo(ByteBuffer& buffer) const
 {
     std::string title = quest->GetTitle();
@@ -338,6 +475,22 @@ void WorldPackets::Quest::QuestGiverOfferReward::AppendBodyTo(ByteBuffer& buffer
 #endif
 }
 
+size_t WorldPackets::Quest::QuestGiverRequestItems::EstimateFinalSize() const
+{
+    // Only an estimate, the localized strings may have a different length.
+    return sizeof(npcGuid) +
+           sizeof(uint32) + /*quest id*/
+           quest->GetTitle().size() + sizeof(char) + /*null terminator*/
+           quest->GetRequestItemsText().size() + sizeof(char) + /*null terminator*/
+           sizeof(uint32) + /*emote delay*/
+           sizeof(uint32) + /*emote*/
+           sizeof(uint32) + /*close on cancel*/
+           sizeof(uint32) + /*required money*/
+           sizeof(uint32) + /*required items count*/
+           sizeof(uint32) * 3 * QUEST_ITEM_OBJECTIVES_COUNT + /*id, count, display id*/
+           sizeof(uint32) * 4 /*quest completion flags*/;
+}
+
 void WorldPackets::Quest::QuestGiverRequestItems::AppendBodyTo(ByteBuffer& buffer) const
 {
     std::string title = quest->GetTitle();
@@ -388,6 +541,44 @@ void WorldPackets::Quest::QuestGiverRequestItems::AppendBodyTo(ByteBuffer& buffe
     buffer << static_cast<uint32>(isComplete ? 0x03 : 0x00);
     buffer << static_cast<uint32>(0x04);
     buffer << static_cast<uint32>(0x08);
+}
+
+size_t WorldPackets::Quest::QuestQueryResponse::EstimateFinalSize() const
+{
+    // Only an estimate, the localized strings may have a different length.
+    return sizeof(uint32) + /*quest id*/
+           sizeof(uint32) + /*quest method*/
+           sizeof(uint32) + /*quest level*/
+           sizeof(uint32) + /*zone or sort*/
+           sizeof(uint32) + /*type*/
+           sizeof(uint32) + /*rep objective faction*/
+           sizeof(uint32) + /*rep objective value*/
+           sizeof(uint32) + /*required oposite rep faction*/
+           sizeof(uint32) + /*required oposite rep value*/
+           sizeof(uint32) + /*next quest in chain*/
+           sizeof(uint32) + /*reward money*/
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+           sizeof(uint32) + /*reward money max level*/
+#endif
+           sizeof(uint32) + /*reward spell*/
+           sizeof(uint32) + /*source item id*/
+           sizeof(uint32) + /*quest flags*/
+           sizeof(uint32) * 2 * QUEST_REWARDS_COUNT + /*id, count*/
+           sizeof(uint32) * 2 * QUEST_REWARD_CHOICES_COUNT + /*id, count*/
+           sizeof(uint32) + /*point map id*/
+           sizeof(float) + /*point x*/
+           sizeof(float) + /*point y*/
+           sizeof(uint32) + /*point opt*/
+           quest->GetTitle().size() + sizeof(char) + /*null terminator*/
+           quest->GetObjectives().size() + sizeof(char) + /*null terminator*/
+           quest->GetDetails().size() + sizeof(char) + /*null terminator*/
+           quest->GetEndText().size() + sizeof(char) + /*null terminator*/
+           sizeof(uint32) * 4 * QUEST_OBJECTIVES_COUNT + /*creature or go id, count, item id, count*/
+           sizeof(char) * QUEST_OBJECTIVES_COUNT + /*objective text null terminators*/
+           quest->ObjectiveText[0].size() +
+           quest->ObjectiveText[1].size() +
+           quest->ObjectiveText[2].size() +
+           quest->ObjectiveText[3].size();
 }
 
 void WorldPackets::Quest::QuestQueryResponse::AppendBodyTo(ByteBuffer& buffer) const

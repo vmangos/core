@@ -46,10 +46,6 @@ DELETE FROM `locales_gameobject` WHERE `entry`=15005;
 DELETE FROM `gameobject_template` WHERE `entry`=16431;
 DELETE FROM `locales_gameobject` WHERE `entry`=16431;
 
--- TEST House
-DELETE FROM `gameobject_template` WHERE `entry`=20668;
-DELETE FROM `locales_gameobject` WHERE `entry`=20668;
-
 -- Lashh'an Spell Circle
 DELETE FROM `gameobject_template` WHERE `entry`=21511;
 DELETE FROM `locales_gameobject` WHERE `entry`=21511;

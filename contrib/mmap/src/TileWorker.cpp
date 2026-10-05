@@ -485,6 +485,10 @@ namespace MMAP
         uint32 walkableClimbModelTransition = config.walkableClimb; // follows walkableClimb unless overridden below
         if (int const climbOverride = jsonTileConfig["walkableClimbModelTransition"].get<int>())
             walkableClimbModelTransition = climbOverride;
+        if (config.walkableRadius == 0)
+            config.walkableRadius = (int)ceilf(agentRadius / config.cs);
+        if (config.borderSize == 0)
+            config.borderSize = config.walkableRadius + 3;
 
         config.width = config.tileSize + config.borderSize * 2;
         config.height = config.tileSize + config.borderSize * 2;
@@ -989,7 +993,7 @@ namespace MMAP
     {
         return
         {
-            { "borderSize",                   5     }, // Non-navigable border around heightfield (voxels) - if overriding walkableRadius per tile, also override this (= walkableRadius + 3)
+            { "borderSize",                   0     }, // Non-navigable border around heightfield (voxels) - if overriding walkableRadius per tile, also override this (= walkableRadius + 3)
             { "detailSampleDist",             2.0f  }, // Sampling distance for detail mesh height data (world units)
             { "detailSampleMaxError",         0.5f  }, // Max deviation of detail mesh from heightfield data (world units)
             { "maxEdgeLen",                   45    }, // Max length for contour edges along mesh border (voxels - 12 world units / BASE_UNIT_DIM)
@@ -999,7 +1003,7 @@ namespace MMAP
             { "walkableClimb",                0     }, // Max ledge height that is traversable (voxels) - calculated at runtime
             { "walkableClimbModelTransition", 0     }, // Max ledge height at terrain<->model transitions (voxels) - 0 = same as walkableClimb
             { "walkableHeight",               0     }, // Min floor to ceiling height for walkable area (voxels) - calculated at runtime
-            { "walkableRadius",               2     }, // Distance to erode walkable area away from obstructions (voxels, ~0.53yd)
+            { "walkableRadius",               0     }, // Distance to erode walkable area away from obstructions(voxels) - 0 = ceil(agentRadius / cell size)
             { "walkableSlopeAngle",           75.0f }, // Max slope angle for terrain that is considered walkable (degrees)
             { "walkableSlopeAngleVMaps",      61.0f }, // Max slope angle for WMO/M2 models that is considered walkable (degrees)
             { "quick",                        -1    }, // -1=use global, 0=thorough build, 1=skip undermesh removal for faster build

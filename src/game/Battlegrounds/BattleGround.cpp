@@ -180,8 +180,8 @@ private:
 // TODO Use broadcaster which does the binary conversion automatically
 static WorldPacket BuildWorldPacket(std::unique_ptr<ServerPacket> packet)
 {
-    WorldPacket data(packet->GetOpcode());
-    packet->AppendBodyTo(data);
+    WorldPacket data;
+    packet->WritePacket(data);
     return data;
 }
 

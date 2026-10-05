@@ -479,7 +479,7 @@ class BattleGroundAV : public BattleGround
         void StartingEventCloseDoors() override;
         void StartingEventOpenDoors() override;
         // world states
-        void FillInitialWorldStates(WorldPacket& data, uint32& count) override;
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
         void RemovePlayer(Player* plr, ObjectGuid guid) override;
         bool HandleAreaTrigger(Player* source, uint32 trigger) override;

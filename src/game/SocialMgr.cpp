@@ -265,8 +265,7 @@ void SocialMgr::SendFriendStatus(MasterPlayer* player, FriendsResult result, Obj
     {
         // TODO Use broadcaster which does the binary conversion automatically
         WorldPacket data;
-        data.SetOpcode(packet->GetOpcode());
-        packet->AppendBodyTo(data);
+        packet->WritePacket(data);
         BroadcastToFriendListers(player, &data);
     }
     else

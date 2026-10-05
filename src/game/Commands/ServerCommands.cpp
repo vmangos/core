@@ -1896,7 +1896,7 @@ bool ChatHandler::HandleReloadVariablesCommand(char*)
 
 bool ChatHandler::HandleReloadCreatureGroupsCommand(char *args)
 {
-    sCreatureGroupsManager->Load();
+    sCreatureGroupsManager->LoadFromDB();
     SendSysMessage("DB table `creature_groups` reloaded.");
     return true;
 }

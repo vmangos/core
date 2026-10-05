@@ -36,12 +36,11 @@ OutdoorPvPSI::OutdoorPvPSI()
     m_LastController = 0;
 }
 
-uint32 OutdoorPvPSI::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPSI::FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states)
 {
-    WriteInitialWorldStatePair(data, WS_OPVP_SI_GATHERED_A, m_Gathered_A);
-    WriteInitialWorldStatePair(data, WS_OPVP_SI_GATHERED_H, m_Gathered_H);
-    WriteInitialWorldStatePair(data, WS_OPVP_SI_SILITHYST_MAX, m_MaxRessources);
-    return 3;
+    FillInitialWorldState(states, WS_OPVP_SI_GATHERED_A, m_Gathered_A);
+    FillInitialWorldState(states, WS_OPVP_SI_GATHERED_H, m_Gathered_H);
+    FillInitialWorldState(states, WS_OPVP_SI_SILITHYST_MAX, m_MaxRessources);
 }
 
 void OutdoorPvPSI::SendRemoveWorldStates(Player* plr)

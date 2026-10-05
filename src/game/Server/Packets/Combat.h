@@ -31,6 +31,7 @@ namespace WorldPackets { namespace Combat
     {
     public:
         explicit AttackSwingNotInRange() : ServerPacket(SMSG_ATTACKSWING_NOTINRANGE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -38,6 +39,7 @@ namespace WorldPackets { namespace Combat
     {
     public:
         explicit AttackSwingNotStanding() : ServerPacket(SMSG_ATTACKSWING_NOTSTANDING) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -45,6 +47,7 @@ namespace WorldPackets { namespace Combat
     {
     public:
         explicit AttackSwingDeadTarget() : ServerPacket(SMSG_ATTACKSWING_DEADTARGET) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -52,6 +55,7 @@ namespace WorldPackets { namespace Combat
     {
     public:
         explicit AttackSwingCantAttack() : ServerPacket(SMSG_ATTACKSWING_CANT_ATTACK) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -59,6 +63,7 @@ namespace WorldPackets { namespace Combat
     {
     public:
         explicit CancelCombat() : ServerPacket(SMSG_CANCEL_COMBAT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -66,6 +71,7 @@ namespace WorldPackets { namespace Combat
     {
     public:
         explicit AttackSwingBadFacing() : ServerPacket(SMSG_ATTACKSWING_BADFACING) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -77,6 +83,7 @@ namespace WorldPackets { namespace Combat
         bool isDead = false;
 
         explicit AttackStop() : ServerPacket(SMSG_ATTACKSTOP) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -87,6 +94,7 @@ namespace WorldPackets { namespace Combat
         ObjectGuid victimGuid;
 
         explicit AttackStart() : ServerPacket(SMSG_ATTACKSTART) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -97,6 +105,7 @@ namespace WorldPackets { namespace Combat
         ObjectGuid victimGuid;
 
         explicit PartyKillLog() : ServerPacket(SMSG_PARTYKILLLOG) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -112,6 +121,7 @@ namespace WorldPackets { namespace Combat
 #endif
 
         explicit EnvironmentalDamageLog() : ServerPacket(SMSG_ENVIRONMENTALDAMAGELOG) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -120,6 +130,7 @@ namespace WorldPackets { namespace Combat
     {
     public:
         explicit FeignDeathResisted() : ServerPacket(SMSG_FEIGN_DEATH_RESISTED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -132,6 +143,7 @@ namespace WorldPackets { namespace Combat
         uint32 school = 0;  // spell school of the shield damage
 
         explicit SpellDamageShield() : ServerPacket(SMSG_SPELLDAMAGESHIELD) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -151,21 +163,22 @@ namespace WorldPackets { namespace Combat
 
         struct DebugMeleeAttackingStateInfo
         {
-            uint32 debugField1 = 0;
-            float debugField2 = 0;
-            float debugField3 = 0;
-            float debugField4 = 0;
-            float debugField5 = 0;
-            float debugField6 = 0;
-            float debugField7 = 0;
-            float debugField8 = 0;
-            float debugField9 = 0;
-            std::pair<float, float> debugPairs[5] = {};
+            uint32 armor = 0;
+            float critChance = 0;
+            float combatRoll = 0;
+            float missChance = 0;
+            float dodgeChance = 0;
+            float parryChance = 0;
+            float blockChance = 0;
+            float glanceChance = 0;
+            float crushChance = 0;
+            std::pair<float /*min*/, float /*max*/> damage[5] = {};
             uint32 debugField10 = 0;
         };
         nonstd::optional<DebugMeleeAttackingStateInfo> debugInfo;
 
         explicit MeleeAttackingStateUpdate() : ServerPacket(SMSG_ATTACKERSTATEUPDATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

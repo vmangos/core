@@ -22,7 +22,8 @@ UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~524288 /*Amp
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~524288 /*Amphibious*/, `inhabit_type` = `inhabit_type` & ~2 WHERE `entry`=3941; -- No Match
 
 -- Booty Bay Bruiser
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=4624; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 2 /*No XP*/ WHERE `entry`=4624 && `patch` = 0;
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=4624 && `patch` > 0; -- DB2 Matches
 
 -- Auctioneer O'reely
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~524288 /*Amphibious*/, `inhabit_type` = `inhabit_type` & ~2 WHERE `entry`=15681; -- No Match
@@ -76,10 +77,10 @@ UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4194304 /*PvP
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1436 && `patch` > 0; -- DB2 Matches (progressive)
 
 -- Watcher Blomberg
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1000; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1000 && `patch` > 0; -- DB2 Matches
 
 -- Watcher Hutchins
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1001; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=1001 && `patch` > 0; -- DB2 Matches
 
 -- Zergling (minipet)
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 32 /*ImmunePC*/ WHERE `entry`=11327; -- DB2 Matches (sniff agree)
@@ -159,7 +160,7 @@ UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~134217728 /*
 INSERT INTO `creature_template` (`entry`, `patch`, `name`, `subname`, `level_min`, `level_max`, `faction`, `npc_flags`, `gossip_menu_id`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `type`, `pet_family`, `rank`, `unit_class`, `xp_multiplier`, `health_multiplier`, `mana_multiplier`, `armor_multiplier`, `damage_multiplier`, `damage_variance`, `damage_school`, `base_attack_time`, `ranged_attack_time`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `gold_min`, `gold_max`, `spell_list_id`, `pet_spell_list_id`, `spawn_spell_id`, `totem_spell_id`, `auras`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `immunity_flags`, `static_flags1`, `static_flags2`, `flags_extra`, `script_name`) VALUES (11118, 8, 'Innkeeper Vizzie', 'Innkeeper', 30, 30, 855, 135, 349, 10654, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1.14286, 18, 5, 0, 7, 0, 0, 1, 1, 1.05, 1, 1, 1, 0.14, 0, 2000, 2000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 3, 0, 0, 11118, 0, 0, 0, 0, 0, 138936326, 0, 2, '');
 
 -- Everlook Bruiser
-UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=11190; -- DB2 Matches
+UPDATE `creature_template` SET `static_flags1` = `static_flags1` | 4 /*No Loot*/ WHERE `entry`=11190 && `patch` > 0; -- DB2 Matches
 
 -- Legacki
 UPDATE `creature_template` SET `static_flags1` = `static_flags1` & ~4194304 /*PvP Enabling*/ WHERE `entry`=10978 && `patch` < 8; -- No Match (sniff disagree)

@@ -54,20 +54,20 @@ class OutdoorPvPSI : public OutdoorPvP
 
         OutdoorPvPSI();
 
-        bool SetupZoneScript();
+        bool SetupZoneScript() override;
 
-        void OnPlayerEnter(Player* plr);
-        void OnPlayerLeave(Player* plr);
+        void OnPlayerEnter(Player* plr) override;
+        void OnPlayerLeave(Player* plr) override;
 
-        void Update(uint32 diff);
+        void Update(uint32 diff) override;
 
-        uint32 FillInitialWorldStates(WorldPacket& data);
+        void FillInitialWorldStates(std::vector<std::pair<uint32, int32>>& states) override;
 
-        void SendRemoveWorldStates(Player* plr);
+        void SendRemoveWorldStates(Player* plr) override;
 
-        bool HandleAreaTrigger(Player* plr, uint32 trigger);
+        bool HandleAreaTrigger(Player* plr, uint32 trigger) override;
 
-        bool HandleDropFlag(Player* plr, uint32 spellId);
+        bool HandleDropFlag(Player* plr, uint32 spellId) override;
 
         void UpdateWorldState();
 

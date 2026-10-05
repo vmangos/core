@@ -46,6 +46,7 @@
 #include "Packets/GmTicket.h"
 #include "Packets/Group.h"
 #include "Packets/Guild.h"
+#include "Packets/Instance.h"
 #include "Packets/Item.h"
 #include "Packets/Loot.h"
 #include "Packets/Mail.h"

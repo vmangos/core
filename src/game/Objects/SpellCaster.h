@@ -320,12 +320,13 @@ public:
     virtual bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const { return false; }
     float SpellCriticalHealingBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim) const;
     uint32 SpellCriticalDamageBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim, Spell* spell = nullptr);
-    float  MeleeSpellMissChance(Unit const* pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const* spell, Spell* spellPtr = nullptr);
-    SpellMissInfo MeleeSpellHitResult(Unit const* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
-    SpellMissInfo MagicSpellHitResult(Unit const* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
-    int32 MagicSpellHitChance(Unit const* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
+    float GetMeleeMissChance(Unit const* pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const* pSpellEntry, Spell* pSpell = nullptr) const;
+    void RollMeleeOutcomeAgainst(MeleeHitOutcome& outHitOutcome, uint32& outHitInfo, Unit const* pVictim, WeaponAttackType attType, SpellEntry const* pSpellEntry = nullptr, Spell* pSpell = nullptr) const;
+    SpellMissInfo MeleeSpellHitResult(Unit const* pVictim, SpellEntry const* pSpellEntry, Spell* pSpell = nullptr, nonstd::optional<bool>* pIsCrit = nullptr, uint32* pMeleeHitInfo = nullptr);
+    SpellMissInfo MagicSpellHitResult(Unit const* pVictim, SpellEntry const* pSpellEntry, Spell* pSpell = nullptr);
+    int32 MagicSpellHitChance(Unit const* pVictim, SpellEntry const* pSpellEntry, Spell* pSpell = nullptr);
     float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
-    SpellMissInfo SpellHitResult(Unit* pVictim, SpellEntry const* spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
+    SpellMissInfo SpellHitResult(Unit* pVictim, SpellEntry const* pSpellEntry, SpellEffectIndex effIndex, bool canReflect = false, Spell* pSpell = nullptr, nonstd::optional<bool>* pIsCrit = nullptr, uint32* pMeleeHitInfo = nullptr);
     void UpdatePendingProcs(uint32 diff);
     void ProcDamageAndSpell(ProcSystemArguments&& data);
     void ProcDamageAndSpell_real(ProcSystemArguments& data, ProcessProcsAuraType processAurasType);

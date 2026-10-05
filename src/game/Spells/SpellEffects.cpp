@@ -53,6 +53,7 @@
 #include "SocialMgr.h"
 
 using namespace Spells;
+using ExecuteLogInfo = WorldPackets::Spell::SpellLogExecute::ExecuteLogInfo;
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 {
@@ -367,6 +368,37 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     }, 1);
                     return;
                 }
+                case 23777: // Zero Mana/Full Health DND
+                {
+                    if (!m_casterUnit)
+                        return;
+
+                    m_casterUnit->SetHealth(m_casterUnit->GetMaxHealth());
+                    m_casterUnit->SetPower(POWER_MANA, 0);
+                    return;
+                }
+                case 25680: // Random Aggro
+                {
+                    Creature* caster = m_casterUnit ? m_casterUnit->ToCreature() : nullptr;
+                    if (!caster)
+                        return;
+
+                    // A guardian has no threat list of its own yet, so pull a random
+                    // target from its owner.
+                    Creature* pool = caster;
+                    if (Unit* owner = caster->GetCharmerOrOwner())
+                        if (Creature* ownerCreature = owner->ToCreature())
+                            pool = ownerCreature;
+
+                    if (Unit* target = pool->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    {
+                        // Keeps PetEventAI::FindTargetForAttack from falling back to
+                        // the owner's attacker on the next update.
+                        caster->AddThreat(target, 100.0f);
+                        caster->AI()->AttackStart(target);
+                    }
+                    return;
+                }
                 case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
                 {
                     if (!m_casterUnit->IsInCombat())
@@ -678,6 +710,7 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                         default:
                             return;
                     };
+                    return;
                 }
                 case 8593:                                  // Symbol of life (restore creature to life)
                 {
@@ -773,7 +806,11 @@ void Spell::EffectDummy(SpellEffectIndex effIdx)
                     if (!m_originalCaster || m_originalCaster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    Creature* channelTarget = m_originalCaster->GetMap()->GetCreature(m_originalCaster->GetChannelObjectGuid());
+                    Spell* pChannel = m_originalCaster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+                    if (!pChannel)
+                        return;
+
+                    Creature* channelTarget = ToCreature(pChannel->GetChannelTarget());
 
                     if (!channelTarget)
                         return;
@@ -1717,6 +1754,8 @@ void Spell::EffectPowerDrain(SpellEffectIndex effIdx)
 
         info.powerDrain.multiplier = manaMultiplier;
     }
+
+    AddExecuteLogInfo(effIdx, info);
 }
 
 void Spell::EffectSendEvent(SpellEffectIndex effIdx)
@@ -1726,13 +1765,14 @@ void Spell::EffectSendEvent(SpellEffectIndex effIdx)
     */
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart %u for spellid %u in EffectSendEvent ", m_spellInfo->EffectMiscValue[effIdx], m_spellInfo->Id);
 
-    // In some cases, the spell does not require a focus but still uses a game object
-    // eg. using an Altar or similar GO.
-    // Therefore, pass the GO as the target if this is the case.
-    GameObject* gObject = focusObject ? focusObject : m_targets.getGOTarget();
-
-    if (!sScriptMgr.OnProcessEvent(m_spellInfo->EffectMiscValue[effIdx], m_caster, gObject, true))
-        m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[effIdx], m_caster->GetObjectGuid(), gObject ? gObject->GetObjectGuid() : ObjectGuid());
+    WorldObject* pTarget = focusObject;
+    if (!pTarget)
+        pTarget = gameObjTarget;
+    if (!pTarget)
+        pTarget = unitTarget;
+    
+    if (!sScriptMgr.OnProcessEvent(m_spellInfo->EffectMiscValue[effIdx], m_caster, pTarget, true))
+        m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[effIdx], m_caster->GetObjectGuid(), pTarget ? pTarget->GetObjectGuid() : ObjectGuid());
 }
 
 void Spell::EffectPowerBurn(SpellEffectIndex effIdx)
@@ -2078,8 +2118,7 @@ void Spell::EffectOpenLock(SpellEffectIndex effIdx)
             return;
 
         // Arathi Basin banner opening !
-        if ((goInfo->type == GAMEOBJECT_TYPE_BUTTON && goInfo->button.noDamageImmune) ||
-                (goInfo->type == GAMEOBJECT_TYPE_GOOBER && goInfo->goober.losOK))
+        if (goInfo->type == GAMEOBJECT_TYPE_BUTTON && goInfo->button.noDamageImmune)
         {
             //CanUseBattleGroundObject() already called in CheckCast()
             // in battleground check
@@ -3962,13 +4001,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex effIdx)
                         unitTarget->CastSpell(m_casterUnit, 26639, true);
                     return;
                 }
-                case 25676: // Moam                         // Drain Mana
+                case 25754: // Moam                         // Drain Mana
                 case 26559: // Obsidian Nullifier
                 {
                     m_caster->CastSpell(unitTarget, 25671, true);
                     return;
                 }
-                case 25754: // Obsidian Destroyer           // Drain Mana
+                case 25676: // Obsidian Destroyer           // Drain Mana
                 case 26457: // Obsidian Eradicator
                 {
                     m_caster->CastSpell(unitTarget, 25755, true);

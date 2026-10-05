@@ -59,6 +59,7 @@ namespace WorldPackets { namespace GmTicket
         uint32 response = 0;
 
         explicit GmTicketUpdateTextResponse() : ServerPacket(SMSG_GMTICKET_UPDATETEXT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -68,6 +69,7 @@ namespace WorldPackets { namespace GmTicket
         uint32 response = 0;
 
         explicit GmTicketDeleteTicketResponse() : ServerPacket(SMSG_GMTICKET_DELETETICKET) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -77,6 +79,7 @@ namespace WorldPackets { namespace GmTicket
         uint32 response = 0;
 
         explicit GmTicketCreateResponse() : ServerPacket(SMSG_GMTICKET_CREATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -86,6 +89,7 @@ namespace WorldPackets { namespace GmTicket
         uint32 status = 0;
 
         explicit GmTicketSystemStatus() : ServerPacket(SMSG_GMTICKET_SYSTEMSTATUS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -104,6 +108,7 @@ namespace WorldPackets { namespace GmTicket
         uint8 openedByGMStatus = 0;     // whether or not it has been viewed
 
         explicit GmTicketGetTicket() : ServerPacket(SMSG_GMTICKET_GETTICKET) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

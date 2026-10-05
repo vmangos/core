@@ -100,7 +100,7 @@ class GameEventMgr
 {
     public:
         GameEventMgr();
-        ~GameEventMgr() {}
+        ~GameEventMgr();
         typedef std::set<uint16> ActiveEvents;
         typedef std::vector<GameEventData> GameEventDataMap;
         ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; } // not thread-safe to use outside of world update

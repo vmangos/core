@@ -6,11 +6,11 @@
 	{
 		"walkableSlopeAngle":      75.0,
 		"walkableSlopeAngleVMaps": 61.0,
-		"walkableRadius":          2,
+		"walkableRadius":          0,
 		"walkableClimb":           0,
 		"walkableClimbModelTransition": 0,
 		"walkableHeight":          0,
-		"borderSize":              5,
+		"borderSize":              0,
 		"maxEdgeLen":              45,
 		"maxSimplificationError":  1.8,
 		"mergeRegionArea":         10,

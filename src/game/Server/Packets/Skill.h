@@ -44,6 +44,7 @@ namespace WorldPackets { namespace Skill
         uint32 cost = 0; // cost in copper to reset talents
 
         explicit TalentWipeConfirmResponse() : ServerPacket(MSG_TALENT_WIPE_CONFIRM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -54,6 +55,7 @@ namespace WorldPackets { namespace Skill
         uint32 itemSubclassMask = 0; // bitmask of allowed subclasses
 
         explicit SetProficiency() : ServerPacket(SMSG_SET_PROFICIENCY) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 }} // namespace WorldPackets::Skill

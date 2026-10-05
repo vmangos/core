@@ -49,7 +49,7 @@ bool FileLoader::prepareLoadedData()
 {
     // Check version
     version = (file_MVER*) data;
-    if (!strncmp(version->fcc_txt, "MVER", 4))
+    if (!isChunk(version->fcc_txt, "MVER"))
         return false;
     if (version->ver != FILE_FORMAT_VERSION)
         return false;

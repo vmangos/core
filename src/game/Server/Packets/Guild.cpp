@@ -82,10 +82,21 @@ void WorldPackets::Guild::GuildRank::ReadFromWorldPacket(WorldPacket& recv_data)
     recv_data >> rankName;
 }
 
+size_t WorldPackets::Guild::GuildInviteNotification::EstimateFinalSize() const
+{
+    return inviterName.size() + sizeof(char) + /*null terminator*/
+           guildName.size() + sizeof(char) /*null terminator*/;
+}
+
 void WorldPackets::Guild::GuildInviteNotification::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << inviterName;
     buffer << guildName;
+}
+
+size_t WorldPackets::Guild::GuildDeclineNotification::EstimateFinalSize() const
+{
+    return playerName.size() + sizeof(char) /*null terminator*/;
 }
 
 void WorldPackets::Guild::GuildDeclineNotification::AppendBodyTo(ByteBuffer& buffer) const
@@ -93,11 +104,28 @@ void WorldPackets::Guild::GuildDeclineNotification::AppendBodyTo(ByteBuffer& buf
     buffer << playerName;
 }
 
+size_t WorldPackets::Guild::GuildCommandResult::EstimateFinalSize() const
+{
+    return sizeof(command) +
+           str.size() + sizeof(char) + /*null terminator*/
+           sizeof(result);
+}
+
 void WorldPackets::Guild::GuildCommandResult::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << command;
     buffer << str;
     buffer << result;
+}
+
+size_t WorldPackets::Guild::GuildInfo::EstimateFinalSize() const
+{
+    return guildName.size() + sizeof(char) + /*null terminator*/
+           sizeof(createdDay) +
+           sizeof(createdMonth) +
+           sizeof(createdYear) +
+           sizeof(memberCount) +
+           sizeof(accountCount);
 }
 
 void WorldPackets::Guild::GuildInfo::AppendBodyTo(ByteBuffer& buffer) const
@@ -110,9 +138,36 @@ void WorldPackets::Guild::GuildInfo::AppendBodyTo(ByteBuffer& buffer) const
     buffer << accountCount;
 }
 
+size_t WorldPackets::Guild::SaveGuildEmblemResult::EstimateFinalSize() const
+{
+    return sizeof(error);
+}
+
 void WorldPackets::Guild::SaveGuildEmblemResult::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << error;
+}
+
+size_t WorldPackets::Guild::GuildQueryResponse::EstimateFinalSize() const
+{
+    return sizeof(guildId) +
+           guildName.size() + sizeof(char) + /*null terminator*/
+           sizeof(char) * 10 + /*rank name null terminators*/
+           rankNames[0].size() +
+           rankNames[1].size() +
+           rankNames[2].size() +
+           rankNames[3].size() +
+           rankNames[4].size() +
+           rankNames[5].size() +
+           rankNames[6].size() +
+           rankNames[7].size() +
+           rankNames[8].size() +
+           rankNames[9].size() +
+           sizeof(emblemStyle) +
+           sizeof(emblemColor) +
+           sizeof(borderStyle) +
+           sizeof(borderColor) +
+           sizeof(backgroundColor);
 }
 
 void WorldPackets::Guild::GuildQueryResponse::AppendBodyTo(ByteBuffer& buffer) const
@@ -130,6 +185,18 @@ void WorldPackets::Guild::GuildQueryResponse::AppendBodyTo(ByteBuffer& buffer) c
     buffer << backgroundColor;
 }
 
+size_t WorldPackets::Guild::GuildEvent::EstimateFinalSize() const
+{
+    size_t size = sizeof(event) +
+                  sizeof(uint8) + /*params count*/
+                  (affectedPlayerGuid.IsEmpty() ? 0 : sizeof(affectedPlayerGuid));
+
+    for (auto const& str : params)
+        size += str.size() + sizeof(char) /*null terminator*/;
+
+    return size;
+}
+
 void WorldPackets::Guild::GuildEvent::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << event;
@@ -138,6 +205,31 @@ void WorldPackets::Guild::GuildEvent::AppendBodyTo(ByteBuffer& buffer) const
         buffer << str;
     if (!affectedPlayerGuid.IsEmpty())
         buffer << affectedPlayerGuid;
+}
+
+size_t WorldPackets::Guild::GuildRoster::EstimateFinalSize() const
+{
+    size_t size = sizeof(uint32) + /*roster members count*/
+                  motd.size() + sizeof(char) + /*null terminator*/
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+                  guildInfo.size() + sizeof(char) + /*null terminator*/
+#endif
+                  sizeof(uint32) + /*rank rights count*/
+                  rankRights.size() * sizeof(uint32);
+
+    for (auto const& member : rosterMembers)
+        size += sizeof(GuildRosterMember::guid) +
+                sizeof(GuildRosterMember::presenceFlags) +
+                member.name.size() + sizeof(char) + /*null terminator*/
+                sizeof(GuildRosterMember::rankId) +
+                sizeof(GuildRosterMember::level) +
+                sizeof(GuildRosterMember::classId) +
+                sizeof(GuildRosterMember::zoneId) +
+                sizeof(GuildRosterMember::lastOnlineTime) +
+                member.publicNote.size() + sizeof(char) + /*null terminator*/
+                member.officerNote.size() + sizeof(char) /*null terminator*/;
+
+    return size;
 }
 
 void WorldPackets::Guild::GuildRoster::AppendBodyTo(ByteBuffer& buffer) const

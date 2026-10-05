@@ -168,6 +168,7 @@ class Warden
         void SetHasUsedClickToMove() const { m_hasUsedClickToMove = true; }
 
         static void LoadScriptedScans();
+        static bool m_scriptedScansLoaded;
 
         void HandlePacket(ByteBuffer recvData);
 

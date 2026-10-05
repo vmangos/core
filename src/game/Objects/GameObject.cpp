@@ -2250,10 +2250,6 @@ void GameObject::SetLootState(LootState state)
 
     m_lootState = state;
     UpdateCollisionState();
-
-    // Call for GameObjectAI script
-    if (m_AI)
-        m_AI->OnLootStateChange();
 }
 
 void GameObject::SetGoState(GOState state)
@@ -2652,6 +2648,9 @@ const QuaternionData GameObject::GetLocalRotation() const
 bool GameObject::CanAggroWhenOpening() const
 {
     if (GetGoType() != GAMEOBJECT_TYPE_CHEST)
+        return false;
+
+    if (!GetFactionTemplateId())
         return false;
 
     // only faction Treasure

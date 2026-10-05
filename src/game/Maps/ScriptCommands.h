@@ -336,6 +336,9 @@ enum eScriptCommand
                                                             // datalong = generic_script_id
                                                             // datalong2 = zone_id
                                                             // datalong3 = (bool) with_pets
+    SCRIPT_COMMAND_FOLLOW_ESCORT            = 93,           // source = Creature
+                                                            // target = Unit
+                                                            // datalong = (bool) doFollow
 
     SCRIPT_COMMAND_MAX,
 
@@ -1076,6 +1079,11 @@ struct ScriptInfo
             uint32 zoneId;                                  // datalong2
             uint32 withPets;                                // datalong3
         } startScriptOnZone;
+
+        struct                                              // SCRIPT_COMMAND_FOLLOW_ESCORT (93)
+        {
+            uint32 doFollow;                                // datalong
+        } followEscort;
 
         struct
         {

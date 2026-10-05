@@ -5,21 +5,21 @@
 
 bool wdt_MWMO::prepareLoadedData()
 {
-    if (!strncmp(fcc_txt, "MWMO", 4))
+    if (!isChunk(fcc_txt, "MWMO"))
         return false;
     return true;
 }
 
 bool wdt_MPHD::prepareLoadedData()
 {
-    if (!strncmp(fcc_txt, "MPHD", 4))
+    if (!isChunk(fcc_txt, "MPHD"))
         return false;
     return true;
 }
 
 bool wdt_MAIN::prepareLoadedData()
 {
-    if (!strncmp(fcc_txt, "MAIN", 4))
+    if (!isChunk(fcc_txt, "MAIN"))
         return false;
     return true;
 }

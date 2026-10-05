@@ -177,8 +177,10 @@ void DragonsOfNightmare::Update()
     {
         // Event is active, dragons exist in the world
         uint32 alive = 0;
+
         // Update respawn time to max time value if the dragon is dead, get current alive count
-        GetAliveCountAndUpdateRespawnTime(dragonGUIDs, alive, std::numeric_limits<time_t>::max());
+        if (!GetAliveCountAndUpdateRespawnTime(dragonGUIDs, alive, std::numeric_limits<time_t>::max()))
+            return;
 
         // If any dragons are still alive, do not pass go. We'll update once they are all dead
         if (alive)
@@ -251,8 +253,9 @@ void DragonsOfNightmare::CheckSingleVariable(uint32 idx, uint32& value)
     }
 }
 
-void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> const& dragons, uint32& alive, time_t respawnTime)
+bool DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> const& dragons, uint32& alive, time_t respawnTime)
 {
+    bool allFound = true;
     for (auto const& guid : dragons)
     {
         auto cData = sObjectMgr.GetCreatureData(guid.GetCounter());
@@ -260,6 +263,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
         if (!cData)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] creature data %u not found!", guid.GetCounter());
+            allFound = false;
             continue;
         }
 
@@ -271,6 +275,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
         if (!map)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] instance %u of map %u not found!", instanceId, cData->position.mapId);
+            allFound = false;
             continue;
         }
 
@@ -279,6 +284,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
         if (!pCreature)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] creature %u not found!", guid.GetCounter());
+            allFound = false;
             continue;
         }
 
@@ -287,10 +293,12 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
         else
             ++alive;
     }
+    return allFound;
 }
 
 bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid>& dragonGUIDs)
 {
+    bool allFound = true;
     for (uint32 entry : NightmareDragons)
     {
         // lookup the dragon
@@ -299,13 +307,14 @@ bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid>& dragonGUIDs)
         if (dCreatureGuid.IsEmpty())
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr: [Dragons of Nightmare] creature %u not found in world!", entry);
-            return false;
+            allFound = false;
+            continue;
         }
 
         dragonGUIDs.push_back(dCreatureGuid);
     }
 
-    return true;
+    return allFound;
 }
 
 //void DragonsOfNightmare::GetAliveCount(std::vector<ObjectGuid> dragonGUIDs, uint32& alive)
@@ -503,6 +512,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     invasion6Loaded(false)
 {
     memset(&previousRemainingCounts[0], -1, sizeof(int) * 6);
+    previousVictories = -1;
 
     // At start up VARIABLE_SI_LATEST_ATTACK_ZONE
     sObjectMgr.InitSavedVariable(VARIABLE_TANARIS_ATTACK_TIME, time(nullptr));
@@ -638,7 +648,12 @@ void ScourgeInvasionEvent::LogNextZoneTime()
         }
     }
 
-    time_t newtimeToNextAttack = timer - now;
+    // Every zone is either active or was the last one attacked, so there is nothing to announce.
+    // Without this the subtraction below would report a nonsense number of minutes.
+    if (!timer)
+        return;
+
+    time_t newtimeToNextAttack = timer > now ? timer - now : 0;
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[Scourge Invasion Event] Next invasion zone %d is in %d minutes.", zoneid, uint32(newtimeToNextAttack / 60));
 }
 
@@ -667,11 +682,13 @@ void ScourgeInvasionEvent::EnableAndStartEvent(uint16 event_id)
 
 void ScourgeInvasionEvent::DisableAndStopEvent(uint16 event_id)
 {
-    if (sGameEventMgr.IsActiveEvent(event_id))
-        sGameEventMgr.StopEvent(event_id);
-
+    // Disabling comes first: EnableEvent only reaches the hardcoded Disable() hook while the
+    // event is still active, and StopEvent on its own never calls it.
     if (sGameEventMgr.IsEnabled(event_id))
         sGameEventMgr.EnableEvent(event_id, false);
+
+    if (sGameEventMgr.IsActiveEvent(event_id))
+        sGameEventMgr.StopEvent(event_id);
 }
 
 void ScourgeInvasionEvent::HandleDefendedZones()
@@ -715,12 +732,6 @@ void ScourgeInvasionEvent::Update()
             HandleActiveCity(VARIABLE_SI_STORMWIND_TIME, now, zone.zoneId);
     }
 
-    // Waiting until all invasions have been loaded. OnEnable will return true
-    // if no invasions are supposed to be started, so this will only be the case if any of the
-    // maps required for a current invasionZone were not yet loaded
-    if (!invasion1Loaded || !invasion2Loaded || !invasion3Loaded || !invasion4Loaded || !invasion5Loaded || !invasion6Loaded)
-        return;
-
     if (!invasion1Loaded)
         invasion1Loaded = OnEnable(ZONEID_TANARIS, VARIABLE_TANARIS_ATTACK_TIME);
 
@@ -738,6 +749,12 @@ void ScourgeInvasionEvent::Update()
 
     if (!invasion6Loaded)
         invasion6Loaded = OnEnable(ZONEID_AZSHARA, VARIABLE_AZSHARA_ATTACK_TIME);
+
+    // Waiting until all invasions have been loaded. OnEnable will return true
+    // if no invasions are supposed to be started, so this will only be the case if any of the
+    // maps required for a current invasionZone were not yet loaded
+    if (!invasion1Loaded || !invasion2Loaded || !invasion3Loaded || !invasion4Loaded || !invasion5Loaded || !invasion6Loaded)
+        return;
 
     for (InvasionZone& zone : invasionPoints)
     {
@@ -816,7 +833,9 @@ void ScourgeInvasionEvent::Disable()
         if (!zone.pallidGuid)
             continue;
 
-        Map* mapPtr = GetMap(zone.map, zone.pallidPos[0]);
+        Map* mapPtr = GetMap(zone.map, zone.pallidPos[zone.spawnLocationId]);
+        if (!mapPtr)
+            continue;
 
         Creature* pPallid = mapPtr->GetCreature(zone.pallidGuid);
 
@@ -888,11 +907,10 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 zoneId,
     if (!pMouth)
     {
         // If more than one zones are alreay being attacked, set the timer again to ZONE_ATTACK_TIMER.
-        if (GetActiveZones() > 1)
-        {
-            time_t newtimeToNextAttack = t - now;
+        // Only once it has run out: ZONE_ATTACK_TIMER is rerolled on every update, so writing it
+        // unconditionally moves the next attack further away forever and dirties `worldstates` every tick.
+        if (t < now && GetActiveZones() > 1)
             sObjectMgr.SetSavedVariable(attackTimeVar, now + ZONE_ATTACK_TIMER, true);
-        }
 
         // Try to start the zone if attackTimeVar is 0.
         StartNewInvasionIfTime(attackTimeVar, zoneId);
@@ -1206,13 +1224,15 @@ void ScourgeInvasionEvent::UpdateWorldState()
     int REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
     int REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
-    if (previousRemainingCounts[0] != REMAINING_AZSHARA ||
+    if (previousVictories != VICTORIES ||
+        previousRemainingCounts[0] != REMAINING_AZSHARA ||
         previousRemainingCounts[1] != REMAINING_BLASTED_LANDS ||
         previousRemainingCounts[2] != REMAINING_BURNING_STEPPES ||
         previousRemainingCounts[3] != REMAINING_EASTERN_PLAGUELANDS ||
         previousRemainingCounts[4] != REMAINING_TANARIS ||
         previousRemainingCounts[5] != REMAINING_WINTERSPRING)
     {
+        previousVictories = VICTORIES;
         previousRemainingCounts[0] = REMAINING_AZSHARA;
         previousRemainingCounts[1] = REMAINING_BLASTED_LANDS;
         previousRemainingCounts[2] = REMAINING_BURNING_STEPPES;

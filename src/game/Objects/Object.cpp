@@ -442,9 +442,9 @@ void WorldObject::DirectSendPublicValueUpdate(UpdateMask& updateMask)
         }
     }
 
-    WorldPacket packet;
-    data.BuildPacket(&packet);
-    SendObjectMessageToSet(&packet, true);
+    auto packet = std::make_unique<WorldPackets::ObjectUpdate::UpdateObject>();
+    data.BuildPacket(packet);
+    SendObjectMessageToSet(std::move(packet), true);
 }
 
 void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) const
@@ -489,16 +489,16 @@ void Object::SendOutOfRangeUpdateToPlayer(Player const* player)
 {
     UpdateData data;
     BuildOutOfRangeUpdateBlock(data);
-    WorldPacket packet;
-    data.BuildPacket(&packet);
-    player->SendDirectMessage(&packet);
+    auto packet = std::make_unique<WorldPackets::ObjectUpdate::UpdateObject>();
+    data.BuildPacket(packet);
+    player->GetSession()->SendPacket(std::move(packet));
 }
 
 void Object::DestroyForPlayer(Player const* target) const
 {
     MANGOS_ASSERT(target);
 
-    auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+    auto packet = std::make_unique<WorldPackets::ObjectUpdate::DestroyObject>();
     packet->objectGuid = GetObjectGuid();
     target->GetSession()->SendPacket(std::move(packet));
 }
@@ -1517,7 +1517,7 @@ void WorldObject::SetVisibilityModifier(float f)
 WorldObject::WorldObject()
     :   m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
         m_mapId(0), m_instanceId(0), m_summonLimitAlert(0), m_worldMask(WORLD_DEFAULT_OBJECT), m_zoneScript(nullptr),
-        m_transport(nullptr)
+        m_transport(nullptr), m_heartbeatTimer(HEARTBEAT_INTERVAL)
 {
     m_movementInfo.stime = WorldTimer::getMSTime();
 }
@@ -1529,6 +1529,34 @@ void WorldObject::CleanupsBeforeDelete()
     if (Unit* pUnit = ToUnit())
         if (GenericTransport* transport = GetTransport())
             transport->RemovePassenger(pUnit);
+}
+
+void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
+{
+    m_heartbeatTimer -= Milliseconds(update_diff);
+    while (m_heartbeatTimer <= Milliseconds(0))
+    {
+        m_heartbeatTimer += HEARTBEAT_INTERVAL;
+        Heartbeat();
+    }
+
+    if (m_summonLimitAlert)
+    {
+        if (m_summonLimitAlert <= update_diff)
+        {
+            std::stringstream message;
+            message << "SummonCreature: " << GetGuidStr().c_str() << " in (map " << GetMapId() << ", instance " << GetInstanceId() << ")"
+                    << " has " << GetCreatureSummonCount() << " active summons,"
+                    << " and the limit is " << GetCreatureSummonLimit();
+            sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "SummonAlert", message.str().c_str());
+
+            m_summonLimitAlert = 5 * MINUTE * IN_MILLISECONDS;
+        }
+        else
+            m_summonLimitAlert -= update_diff;
+    }
+
+    ExecuteDelayedActions();
 }
 
 void WorldObject::_Create(uint32 guidlow, HighGuid guidhigh)
@@ -2198,8 +2226,7 @@ void WorldObject::SendMessageToSet(std::unique_ptr<ServerPacket const> packet, b
 {
     // TODO Use broadcaster which does the binary conversion automatically
     WorldPacket binaryPacket;
-    binaryPacket.SetOpcode(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    packet->WritePacket(binaryPacket);
     SendMessageToSet(&binaryPacket, self);
 }
 
@@ -2272,8 +2299,8 @@ void WorldObject::SendObjectMessageToSetImpl(WorldPacket* data, bool self, World
 
 void WorldObject::SendObjectMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except) const
 {
-    WorldPacket binaryPacket(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    WorldPacket binaryPacket;
+    packet->WritePacket(binaryPacket);
     SendObjectMessageToSet(&binaryPacket, self, except);
 }
 
@@ -2284,8 +2311,8 @@ void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObje
 
 void WorldObject::SendMovementMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self, WorldObject const* except)
 {
-    WorldPacket binaryPacket(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    WorldPacket binaryPacket;
+    packet->WritePacket(binaryPacket);
     SendMovementMessageToSet(std::move(binaryPacket), self, except);
 }
 
@@ -2385,6 +2412,16 @@ TerrainInfo const* WorldObject::GetTerrain() const
 {
     MANGOS_ASSERT(m_currMap);
     return m_currMap->GetTerrain();
+}
+
+bool WorldObject::IsInWater() const
+{
+    return GetTerrain()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ());
+}
+
+bool WorldObject::IsUnderwater() const
+{
+    return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
 }
 
 void WorldObject::AddObjectToRemoveList()
@@ -3518,28 +3555,6 @@ void WorldObject::GetPosition(float &x, float &y, float &z, GenericTransport con
     z = m_position.z;
     if (t)
         t->CalculatePassengerOffset(x, y, z);
-}
-
-void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
-{
-    if (m_summonLimitAlert)
-    {
-        if (m_summonLimitAlert <= update_diff)
-        {
-            std::stringstream message;
-            message << "SummonCreature: " << GetGuidStr().c_str()
-                    << " in (map " << GetMapId() << ", instance " << GetInstanceId() << ")"
-                    << " has " << GetCreatureSummonCount() << " active summons,"
-                    << " and the limit is " << GetCreatureSummonLimit();
-            sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "SummonAlert", message.str().c_str());
-
-            m_summonLimitAlert = 5 * MINUTE * IN_MILLISECONDS;
-        }
-        else
-            m_summonLimitAlert -= update_diff;
-    }
-
-    ExecuteDelayedActions();
 }
 
 void WorldObject::LoadMapCellsAround(float dist) const

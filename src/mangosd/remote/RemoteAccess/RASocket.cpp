@@ -159,7 +159,7 @@ void RASocket::HandleInput_FreshConnection(std::string const& line)
 
 void RASocket::HandleInput_GotUsername(std::string const& line)
 {
-    AccountTypes minRequiredAccLevel = static_cast<AccountTypes>(sConfig.GetIntDefault("Ra.MinLevel", AccountTypes::SEC_ADMINISTRATOR));
+    AccountTypes minRequiredAccLevel = static_cast<AccountTypes>(sConfig.GetIntDefault("Ra.MinAccountLevel", AccountTypes::SEC_ADMINISTRATOR));
 
     bool loginSuccessful = true;
 

@@ -1570,8 +1570,8 @@ void Pet::_LoadSpellCooldowns()
         // cooldown packet is ignored if create object is not received yet
         owner->m_Events.AddLambdaEventAtOffset([owner, pkt = std::move(packet)]()
         {
-            WorldPacket packet(pkt->GetOpcode());
-            pkt->AppendBodyTo(packet);
+            WorldPacket packet;
+            pkt->WritePacket(packet);
             owner->GetSession()->SendPacket(&packet);
         }, 1);
     }

@@ -62,6 +62,7 @@ struct instance_sunken_temple : public ScriptedInstance
     uint64 m_uiIdolHakkarGUID;
     uint64 m_uiShadeEranikusGUID;
     uint64 m_uiJammalanGUID;
+    uint64 m_uiOgomGUID;
     uint64 m_uiDreamscythGUID;
     uint64 m_uiWeaverGUID;
     uint64 m_uiAvatarHakkarGUID;
@@ -88,6 +89,7 @@ struct instance_sunken_temple : public ScriptedInstance
         m_uiIdolHakkarGUID = 0;
         m_uiShadeEranikusGUID = 0;
         m_uiJammalanGUID = 0;
+        m_uiOgomGUID = 0;
         m_uiDreamscythGUID = 0;
         m_uiWeaverGUID = 0;
         m_uiAvatarHakkarGUID = 0;
@@ -105,9 +107,7 @@ struct instance_sunken_temple : public ScriptedInstance
 
         DoScriptText(SAY_ATALALARION_SPAWN, pAtalarion);
         pAtalarion->SetVisibility(VISIBILITY_ON);
-        pAtalarion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        pAtalarion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-        pAtalarion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        pAtalarion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
     }
 
     void HandleStatueEventDone()
@@ -272,48 +272,55 @@ struct instance_sunken_temple : public ScriptedInstance
                 break;
             case NPC_JAMMALAN:
                 m_uiJammalanGUID = pCreature->GetGUID();
+                if (GetData(TYPE_PROTECTORS) == DONE)
+                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                break;
+            case NPC_OGOM:
+                m_uiOgomGUID = pCreature->GetGUID();
+                if (GetData(TYPE_PROTECTORS) == DONE)
+                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 break;
             case NPC_ATALARION:
                 m_uiAtalarionGUID = pCreature->GetGUID();
                 if (GetData(TYPE_SECRET_CIRCLE) != SPECIAL && GetData(TYPE_SECRET_CIRCLE) != DONE)
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 }
+                else
+                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 break;
             case NPC_SHADE_OF_ERANIKUS:
                 m_uiShadeEranikusGUID = pCreature->GetGUID();
                 if (GetData(TYPE_JAMMALAN) != DONE)
                 {
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pCreature->SetStandState(UNIT_STAND_STATE_SLEEP);
                 }
+                else
+                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 break;
             case NPC_DREAMSCYTH:
                 m_uiDreamscythGUID = pCreature->GetGUID();
                 if (GetData(TYPE_JAMMALAN) != DONE)
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pCreature->GetMotionMaster()->MoveIdle();
                 }
+                else
+                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 break;
             case NPC_WEAVER:
                 m_uiWeaverGUID = pCreature->GetGUID();
                 if (GetData(TYPE_JAMMALAN) != DONE)
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pCreature->GetMotionMaster()->MoveIdle();
                 }
+                else
+                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 break;
         }
     }
@@ -331,9 +338,7 @@ struct instance_sunken_temple : public ScriptedInstance
                 else
                 {
                     pCreature->AI()->EnterEvadeMode();
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 }
                 break;
             case NPC_SHADE_OF_ERANIKUS:
@@ -392,7 +397,12 @@ struct instance_sunken_temple : public ScriptedInstance
 
                         // Intro yell
                         if (Creature* pJam = instance->GetCreature(m_uiJammalanGUID))
+                        {
+                            pJam->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                             DoScriptText(SAY_JAMMALAN_INTRO, pJam);
+                        }
+                        if (Creature* pOgom = instance->GetCreature(m_uiOgomGUID))
+                            pOgom->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     }
                 }
                 break;
@@ -402,25 +412,19 @@ struct instance_sunken_temple : public ScriptedInstance
                 {
                     if (Creature* pEranikus = instance->GetCreature(m_uiShadeEranikusGUID))
                     {
-                        pEranikus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pEranikus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                        pEranikus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        pEranikus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     }
                     if (Creature* pDream = instance->GetCreature(m_uiDreamscythGUID))
                     {
                         pDream->SetVisibility(VISIBILITY_ON);
-                        pDream->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pDream->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                        pDream->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        pDream->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                         pDream->GetMotionMaster()->MoveWaypoint();
                         DoScriptText(SAY_DREAMSCYTHE_INTRO, pDream);
                     }
                     if (Creature* pWeav = instance->GetCreature(m_uiWeaverGUID))
                     {
                         pWeav->SetVisibility(VISIBILITY_ON);
-                        pWeav->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pWeav->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                        pWeav->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        pWeav->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                         pWeav->GetMotionMaster()->MoveWaypoint();
                     }
                 }

@@ -369,6 +369,7 @@ namespace WorldPackets { namespace Misc
         ObjectGuid playerGuid; // guid of the player that was added
 
         explicit MeetingstoneMemberAdded() : ServerPacket(SMSG_MEETINGSTONE_MEMBER_ADDED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -377,6 +378,7 @@ namespace WorldPackets { namespace Misc
     {
     public:
         explicit MeetingstoneInProgress() : ServerPacket(SMSG_MEETINGSTONE_IN_PROGRESS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -385,6 +387,7 @@ namespace WorldPackets { namespace Misc
     {
     public:
         explicit MeetingstoneComplete() : ServerPacket(SMSG_MEETINGSTONE_COMPLETE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -392,6 +395,7 @@ namespace WorldPackets { namespace Misc
     {
     public:
         explicit LogoutComplete() : ServerPacket(SMSG_LOGOUT_COMPLETE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -399,6 +403,7 @@ namespace WorldPackets { namespace Misc
     {
     public:
         explicit LogoutCancelAck() : ServerPacket(SMSG_LOGOUT_CANCEL_ACK) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -408,6 +413,7 @@ namespace WorldPackets { namespace Misc
         uint8 standState = 0;
 
         explicit StandStateUpdate() : ServerPacket(SMSG_STANDSTATE_UPDATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -419,6 +425,7 @@ namespace WorldPackets { namespace Misc
         int32 timeLeftInSeconds = 0;
 
         explicit PlayTimeWarning() : ServerPacket(SMSG_PLAY_TIME_WARNING) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -430,6 +437,7 @@ namespace WorldPackets { namespace Misc
         uint8 instant = 0;
 
         explicit LogoutResponse() : ServerPacket(SMSG_LOGOUT_RESPONSE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -440,6 +448,7 @@ namespace WorldPackets { namespace Misc
         uint32 levelPlayedTime = 0;
 
         explicit PlayedTime() : ServerPacket(SMSG_PLAYED_TIME) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -449,6 +458,7 @@ namespace WorldPackets { namespace Misc
         ObjectGuid guid;
 
         explicit InspectResponse() : ServerPacket(SMSG_INSPECT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -458,6 +468,7 @@ namespace WorldPackets { namespace Misc
         std::string message; // max CString length allowed: 256
 
         explicit WhoisResponse() : ServerPacket(SMSG_WHOIS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -469,6 +480,7 @@ namespace WorldPackets { namespace Misc
         std::vector<uint8> compressedData;
 
         explicit UpdateAccountDataResponse() : ServerPacket(SMSG_UPDATE_ACCOUNT_DATA) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -499,6 +511,7 @@ namespace WorldPackets { namespace Misc
 #endif
 
         explicit InspectHonorStatsResponse() : ServerPacket(MSG_INSPECT_HONOR_STATS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -516,6 +529,7 @@ namespace WorldPackets { namespace Misc
 #endif
 
         explicit WeatherUpdate() : ServerPacket(SMSG_WEATHER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -527,6 +541,7 @@ namespace WorldPackets { namespace Misc
         std::string text;
 
         explicit ServerMessage() : ServerPacket(SMSG_SERVER_MESSAGE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -536,6 +551,7 @@ namespace WorldPackets { namespace Misc
         uint8 reason = 0;
 
         explicit MeetingstoneJoinFailed() : ServerPacket(SMSG_MEETINGSTONE_JOINFAILED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -551,6 +567,7 @@ namespace WorldPackets { namespace Misc
 #endif
 
         explicit MeetingstoneSetQueue() : ServerPacket(SMSG_MEETINGSTONE_SETQUEUE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -562,6 +579,7 @@ namespace WorldPackets { namespace Misc
         int32 victimRank = 0;     // Rank of the victim (0 = no rank, 19 = racial leader)
 
         explicit PvpCredit() : ServerPacket(SMSG_PVP_CREDIT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -577,6 +595,7 @@ namespace WorldPackets { namespace Misc
         std::vector<ForcedReactionEntry> forcedReactions;
 
         explicit SetForcedReactions() : ServerPacket(SMSG_SET_FORCED_REACTIONS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -592,6 +611,7 @@ namespace WorldPackets { namespace Misc
         std::vector<FactionStandingEntry> factionStandings;
 
         explicit SetFactionStanding() : ServerPacket(SMSG_SET_FACTION_STANDING) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -608,6 +628,7 @@ namespace WorldPackets { namespace Misc
         std::array<FactionInitEntry, MAX_FACTION_COUNT> factions;
 
         explicit InitializeFactions() : ServerPacket(SMSG_INITIALIZE_FACTIONS) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -617,6 +638,7 @@ namespace WorldPackets { namespace Misc
         uint32 reputationListId = 0;
 
         explicit SetFactionVisible() : ServerPacket(SMSG_SET_FACTION_VISIBLE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -626,6 +648,7 @@ namespace WorldPackets { namespace Misc
         uint32 musicId = 0;
 
         explicit PlayMusic() : ServerPacket(SMSG_PLAY_MUSIC) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -635,6 +658,7 @@ namespace WorldPackets { namespace Misc
         uint32 soundId = 0;
 
         explicit PlaySound() : ServerPacket(SMSG_PLAY_SOUND) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -644,6 +668,7 @@ namespace WorldPackets { namespace Misc
         std::string message; // Notification message
 
         explicit Notification() : ServerPacket(SMSG_NOTIFICATION) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -655,18 +680,10 @@ namespace WorldPackets { namespace Misc
         ObjectGuid playerGuid;
 
         explicit InvalidatePlayer() : ServerPacket(SMSG_INVALIDATE_PLAYER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
-
-    class DestroyObject final : public ServerPacket
-    {
-    public:
-        ObjectGuid objectGuid; // guid of the object to destroy
-
-        explicit DestroyObject() : ServerPacket(SMSG_DESTROY_OBJECT) {}
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
 
     class AiReaction final : public ServerPacket
     {
@@ -675,6 +692,7 @@ namespace WorldPackets { namespace Misc
         uint32 reaction = 0; // AIReactionType enum value
 
         explicit AiReaction() : ServerPacket(SMSG_AI_REACTION) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -684,6 +702,7 @@ namespace WorldPackets { namespace Misc
         uint32 areaId = 0; // area id that is under attack
 
         explicit ZoneUnderAttack() : ServerPacket(SMSG_ZONE_UNDER_ATTACK) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -694,6 +713,7 @@ namespace WorldPackets { namespace Misc
         ObjectGuid sourceGuid; // object that is playing the sound
 
         explicit PlayObjectSound() : ServerPacket(SMSG_PLAY_OBJECT_SOUND) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -703,6 +723,7 @@ namespace WorldPackets { namespace Misc
         ObjectGuid gameObjectGuid;
 
         explicit GameObjectSpawnAnim() : ServerPacket(SMSG_GAMEOBJECT_SPAWN_ANIM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -712,6 +733,7 @@ namespace WorldPackets { namespace Misc
         ObjectGuid gameObjectGuid;
 
         explicit GameObjectDespawnAnim() : ServerPacket(SMSG_GAMEOBJECT_DESPAWN_ANIM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -726,6 +748,7 @@ namespace WorldPackets { namespace Misc
         uint32 spellId = 0;     // spell causing the timer (nullptr if no spell)
 
         explicit StartMirrorTimer() : ServerPacket(SMSG_START_MIRROR_TIMER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -735,6 +758,7 @@ namespace WorldPackets { namespace Misc
         uint32 timerType = 0; // mirror timer type to stop
 
         explicit StopMirrorTimer() : ServerPacket(SMSG_STOP_MIRROR_TIMER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -747,6 +771,7 @@ namespace WorldPackets { namespace Misc
         bool paused = false;
 
         explicit PauseMirrorTimer() : ServerPacket(SMSG_PAUSE_MIRROR_TIMER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -764,6 +789,7 @@ namespace WorldPackets { namespace Misc
         nonstd::optional<TransferPendingTransportInfo> transportInfo;
 
         explicit TransferPending() : ServerPacket(SMSG_TRANSFER_PENDING) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -773,6 +799,7 @@ namespace WorldPackets { namespace Misc
         WorldLocation location;
 
         explicit NewWorld() : ServerPacket(SMSG_NEW_WORLD) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -786,6 +813,7 @@ namespace WorldPackets { namespace Misc
         float groupBonus = 1.0f; // group bonus factor (1=none, 0=100% group bonus; only if kill xp)
 
         explicit LogXpGain() : ServerPacket(SMSG_LOG_XPGAIN) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -798,6 +826,7 @@ namespace WorldPackets { namespace Misc
         uint32 statGains[5] = {};  // stat gains for STRENGTH..SPIRIT
 
         explicit LevelUpInfo() : ServerPacket(SMSG_LEVELUP_INFO) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -807,6 +836,7 @@ namespace WorldPackets { namespace Misc
         uint32 cinematicSequenceId = 0;
 
         explicit TriggerCinematic() : ServerPacket(SMSG_TRIGGER_CINEMATIC) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -816,6 +846,7 @@ namespace WorldPackets { namespace Misc
         uint8 freeRepop = 0; // always 0 (whether player can repop for free)
 
         explicit PlayerSkinned() : ServerPacket(SMSG_PLAYER_SKINNED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -824,6 +855,7 @@ namespace WorldPackets { namespace Misc
     {
     public:
         explicit DurabilityDamageDeath() : ServerPacket(SMSG_DURABILITY_DAMAGE_DEATH) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -832,6 +864,7 @@ namespace WorldPackets { namespace Misc
     {
     public:
         explicit CancelAutoRepeat() : ServerPacket(SMSG_CANCEL_AUTO_REPEAT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -842,6 +875,7 @@ namespace WorldPackets { namespace Misc
         uint32 experience = 0;
 
         explicit ExplorationExperience() : ServerPacket(SMSG_EXPLORATION_EXPERIENCE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -853,27 +887,7 @@ namespace WorldPackets { namespace Misc
         uint8 flags = 0; // FACTION_FLAG_AT_WAR or 0 to clear
 
         explicit FactionAtWarChange() : ServerPacket(SMSG_SET_FACTION_ATWAR) {}
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
-#endif
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    class InstanceReset final : public ServerPacket
-    {
-    public:
-        uint32 mapId = 0;
-
-        explicit InstanceReset() : ServerPacket(SMSG_INSTANCE_RESET) {}
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
-
-    class InstanceResetFailed final : public ServerPacket
-    {
-    public:
-        uint32 reason = 0; // InstanceResetFailReason enum value
-        uint32 mapId = 0;
-
-        explicit InstanceResetFailed() : ServerPacket(SMSG_INSTANCE_RESET_FAILED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -884,6 +898,7 @@ namespace WorldPackets { namespace Misc
         uint32 result = 0; // UnitMountResult enum value
 
         explicit MountResult() : ServerPacket(SMSG_MOUNTRESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -893,6 +908,7 @@ namespace WorldPackets { namespace Misc
         uint32 result = 0; // UnitDismountResult enum value
 
         explicit DismountResult() : ServerPacket(SMSG_DISMOUNTRESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -903,6 +919,7 @@ namespace WorldPackets { namespace Misc
         uint32 errorCode = 0; // error used only when timer = 0
 
         explicit RaidGroupOnly() : ServerPacket(SMSG_RAID_GROUP_ONLY) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -912,6 +929,7 @@ namespace WorldPackets { namespace Misc
         uint32 restStateTime = 0; // rest state time (always 0 in original code)
 
         explicit SetRestStart() : ServerPacket(SMSG_SET_REST_START) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -922,6 +940,7 @@ namespace WorldPackets { namespace Misc
         uint32 areaId = 0;
 
         explicit BindpointUpdate() : ServerPacket(SMSG_BINDPOINTUPDATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -932,6 +951,7 @@ namespace WorldPackets { namespace Misc
         uint32 areaId = 0;
 
         explicit PlayerBound() : ServerPacket(SMSG_PLAYERBOUND) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -942,6 +962,7 @@ namespace WorldPackets { namespace Misc
         float gameSpeedMinutesPerSecond = 0.0f; // game speed
 
         explicit LoginSetTimeSpeed() : ServerPacket(SMSG_LOGIN_SETTIMESPEED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -951,21 +972,9 @@ namespace WorldPackets { namespace Misc
         uint8 reason = 0; // transfer abort reason
 
         explicit TransferAborted() : ServerPacket(SMSG_TRANSFER_ABORTED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-    class RaidInstanceMessage final : public ServerPacket
-    {
-    public:
-        uint32 messageType = 0; // type of warning (RAID_INSTANCE_WELCOME, etc.)
-        uint32 mapId = 0;
-        uint32 resetTime = 0;   // time in seconds until reset
-
-        explicit RaidInstanceMessage() : ServerPacket(SMSG_RAID_INSTANCE_MESSAGE) {}
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
-#endif
 
     class SummonRequest final : public ServerPacket
     {
@@ -975,6 +984,7 @@ namespace WorldPackets { namespace Misc
         uint32 autoDeclineDelay = 0; // time in ms before auto decline
 
         explicit SummonRequest() : ServerPacket(SMSG_SUMMON_REQUEST) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -984,28 +994,9 @@ namespace WorldPackets { namespace Misc
         uint32 delayMs = 0; // delay in milliseconds before corpse can be reclaimed
 
         explicit CorpseReclaimDelay() : ServerPacket(SMSG_CORPSE_RECLAIM_DELAY) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    class UpdateInstanceOwnership final : public ServerPacket
-    {
-    public:
-        uint32 hasBeenSaved = 0; // whether the player has any permanent instance binds
-
-        explicit UpdateInstanceOwnership() : ServerPacket(SMSG_UPDATE_INSTANCE_OWNERSHIP) {}
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
-
-    class UpdateLastInstance final : public ServerPacket
-    {
-    public:
-        uint32 mapId = 0; // map id of the last visited instance
-
-        explicit UpdateLastInstance() : ServerPacket(SMSG_UPDATE_LAST_INSTANCE) {}
-        void AppendBodyTo(ByteBuffer& buffer) const override;
-    };
-#endif
 
     // SMSG_EMOTE: sent to broadcast a unit's emote animation to nearby clients
     class EmoteNotify final : public ServerPacket
@@ -1015,6 +1006,7 @@ namespace WorldPackets { namespace Misc
         ObjectGuid unitGuid;
 
         explicit EmoteNotify() : ServerPacket(SMSG_EMOTE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -1026,6 +1018,7 @@ namespace WorldPackets { namespace Misc
         uint8 allowMove = 0;  // whether movement is allowed
 
         explicit ClientControlUpdate() : ServerPacket(SMSG_CLIENT_CONTROL_UPDATE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -1037,6 +1030,20 @@ namespace WorldPackets { namespace Misc
         uint32 value = 0;  // new value (will be uint16 on older clients)
 
         explicit UpdateWorldState() : ServerPacket(SMSG_UPDATE_WORLD_STATE) {}
+        size_t EstimateFinalSize() const override;
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
+    class InitWorldStates final : public ServerPacket
+    {
+    public:
+        uint32 mapId = 0;
+        uint32 zoneId = 0;
+        std::vector<std::pair<uint32, int32>> states;
+        void AddWorldState(uint32 state, int32 value) { states.push_back({ state, value }); }
+
+        explicit InitWorldStates() : ServerPacket(SMSG_INIT_WORLD_STATES) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

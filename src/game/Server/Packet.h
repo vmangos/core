@@ -13,11 +13,12 @@ uint16 constexpr OPCODE_WILL_BE_SET_IN_READ_FUNCTION = 0xFFFF;
 class Packet
 {
 protected:
-    uint16 opcode {};
+    mutable uint16 opcode {};
 public:
     explicit Packet(uint16 opcode) : opcode(opcode) {}
-    virtual ~Packet() = default;
+    virtual ~Packet() {}
 
+    void SetOpcode(uint16 op) const { opcode = op; }
     uint16 GetOpcode() const { return opcode; }
 };
 
@@ -25,7 +26,21 @@ class ServerPacket : public Packet
 {
 public:
     explicit ServerPacket(uint16 opcode) : Packet(opcode) {}
+
+    // Attempts to calculate how much buffer space will be needed.
+    // This is only a hint for `reserve`, it does not need to be exact.
+    virtual size_t EstimateFinalSize() const = 0;
+
+    // It's important that this be called before opcode is set to the binary
+    // packet because some packets (update object) can change opcode inside it.
     virtual void AppendBodyTo(ByteBuffer& buffer) const = 0;
+
+    void WritePacket(WorldPacket& packet) const
+    {
+        packet.reserve(EstimateFinalSize());
+        AppendBodyTo(packet);
+        packet.SetOpcode(GetOpcode());
+    }
 };
 
 class ClientPacket : public Packet

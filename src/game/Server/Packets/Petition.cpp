@@ -66,6 +66,13 @@ void WorldPackets::Petition::PetitionBuy::ReadFromWorldPacket(WorldPacket& recv_
     recv_data.read_skip<uint32>();                          // 0
 }
 
+size_t WorldPackets::Petition::PetitionSignResults::EstimateFinalSize() const
+{
+    return sizeof(itemGuid) +
+           sizeof(playerGuid) +
+           sizeof(result);
+}
+
 void WorldPackets::Petition::PetitionSignResults::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << itemGuid;
@@ -73,9 +80,40 @@ void WorldPackets::Petition::PetitionSignResults::AppendBodyTo(ByteBuffer& buffe
     buffer << result;
 }
 
+size_t WorldPackets::Petition::TurnInPetitionResults::EstimateFinalSize() const
+{
+    return sizeof(result);
+}
+
 void WorldPackets::Petition::TurnInPetitionResults::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << result;
+}
+
+size_t WorldPackets::Petition::PetitionQueryResponse::EstimateFinalSize() const
+{
+    size_t size = sizeof(petitionGuid) +
+                  sizeof(ownerGuid) +
+                  name.size() + sizeof(char) + /*null terminator*/
+                  bodyText.size() + sizeof(char) + /*null terminator*/
+                  sizeof(flags) +
+                  sizeof(minSignatures) +
+                  sizeof(maxSignatures) +
+                  sizeof(deadlineTimestamp) +
+                  sizeof(creationTimestamp) +
+                  sizeof(allowedGuildID) +
+                  sizeof(allowedClasses) +
+                  sizeof(allowedRaces) +
+                  sizeof(allowedGender) +
+                  sizeof(allowedMinLevel) +
+                  sizeof(allowedMaxLevel) +
+                  sizeof(uint32) + /*choices count*/
+                  sizeof(defaultChoice);
+
+    for (auto const& choice : choices)
+        size += choice.size() + sizeof(char) /*null terminator*/;
+
+    return size;
 }
 
 void WorldPackets::Petition::PetitionQueryResponse::AppendBodyTo(ByteBuffer& buffer) const
@@ -101,15 +139,37 @@ void WorldPackets::Petition::PetitionQueryResponse::AppendBodyTo(ByteBuffer& buf
     buffer << defaultChoice;
 }
 
+size_t WorldPackets::Petition::PetitionRenameResult::EstimateFinalSize() const
+{
+    return sizeof(itemGuid) +
+           newName.size() + sizeof(char) /*null terminator*/;
+}
+
 void WorldPackets::Petition::PetitionRenameResult::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << itemGuid;
     buffer << newName;
 }
 
+size_t WorldPackets::Petition::PetitionDeclineResult::EstimateFinalSize() const
+{
+    return sizeof(playerGuid);
+}
+
 void WorldPackets::Petition::PetitionDeclineResult::AppendBodyTo(ByteBuffer& buffer) const
 {
     buffer << playerGuid;
+}
+
+size_t WorldPackets::Petition::PetitionShowList::EstimateFinalSize() const
+{
+    return sizeof(npcGuid) +
+           sizeof(uint8) + /*entries count*/
+           entries.size() * (sizeof(PetitionShowListEntry::index) +
+                             sizeof(PetitionShowListEntry::charterEntry) +
+                             sizeof(PetitionShowListEntry::charterDisplayId) +
+                             sizeof(PetitionShowListEntry::charterCost) +
+                             sizeof(PetitionShowListEntry::entryFlags));
 }
 
 void WorldPackets::Petition::PetitionShowList::AppendBodyTo(ByteBuffer& buffer) const

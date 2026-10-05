@@ -24,6 +24,7 @@ namespace WorldPackets { namespace Warden
         ByteBuffer encryptedData; // already-encrypted warden payload
 
         explicit WardenDataServer() : ServerPacket(SMSG_WARDEN_DATA) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif

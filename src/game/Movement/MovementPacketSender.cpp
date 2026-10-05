@@ -398,7 +398,6 @@ void MovementPacketSender::SendMovementFlagChangeToObservers(Unit* unit, Movemen
 
 void MovementPacketSender::SendMovementFlagChangeToAll(Unit* unit, MovementFlags mFlag, bool apply)
 {
-
     uint16 opcode;
     switch (mFlag)
     {

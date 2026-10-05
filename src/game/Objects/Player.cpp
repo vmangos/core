@@ -110,7 +110,7 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 Player::Player(WorldSession* session) : Unit(),
     m_mover(this), m_camera(this), m_reputationMgr(this), m_saveDisabled(false), m_enableInstanceSwitch(true),
     m_currentTicketCounter(0), m_repopAtGraveyardPending(false), m_knownLanguagesMask(0),
-    m_honorMgr(this), m_personalXpRate(-1.0f), m_isStandUpScheduled(false), m_foodEmoteTimer(0)
+    m_honorMgr(this), m_personalXpRate(-1.0f), m_isStandUpScheduled(false)
 {
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
@@ -1240,7 +1240,6 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     if (IsAlive())
     {
         m_regenTimer -= update_diff;
-        HandleFoodEmotes(update_diff);
         RegenerateAll();
     }
     else
@@ -1307,9 +1306,6 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
     if (m_currentCinematicEntry)
         UpdateCinematic(p_time);
-
-    // group update
-    SendUpdateToOutOfRangeGroupMembers();
 
     if (IsHasDelayedTeleport())
         TeleportTo(m_teleportDest, m_teleportOptions, m_teleportRecoverDelayed);
@@ -1499,6 +1495,13 @@ void Player::CinematicEnd()
     // When you make a new character, current area gets
     // explored after you finish watching the cinematic.
     CheckAreaExploreAndOutdoor();
+}
+
+void Player::Heartbeat()
+{
+    Unit::Heartbeat();
+
+    SendUpdateToOutOfRangeGroupMembers();
 }
 
 void Player::SetDeathState(DeathState s)
@@ -1833,7 +1836,7 @@ bool Player::SwitchInstance(uint32 newInstanceId)
 
     for (const auto& guid : m_visibleGUIDs)
     {
-        auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+        auto packet = std::make_unique<WorldPackets::ObjectUpdate::DestroyObject>();
         packet->objectGuid = guid;
         GetSession()->SendPacket(std::move(packet));
     }
@@ -2261,41 +2264,6 @@ void Player::RewardRage(uint32 damage, bool attacker)
     addRage *= sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_RAGE_INCOME);
 
     ModifyPower(POWER_RAGE, uint32(addRage * 10));
-}
-
-void Player::HandleFoodEmotes(uint32 diff)
-{
-    // Handles the emotes for drinking and eating.
-    // According to sniffs there is a background timer going on that repeats independed from the time window where the aura applies.
-    // That's why we dont need to reset the timer on apply. In sniffs I have seen that the first call for the spell visual is totally random, then after
-    // 5 seconds over and over again which confirms my theory that we have a independed timer.
-    if (m_foodEmoteTimer <= diff)
-    {
-        AuraList const& lModRegenAuras = GetAurasByType(SPELL_AURA_MOD_REGEN);
-        AuraList const& lModPowerRegenAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
-
-        for (const auto pAura : lModRegenAuras)
-        {
-            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_REGEN) && pAura->GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
-            {
-                SendPlaySpellVisualKit(SPELL_VISUAL_KIT_FOOD);
-                break;
-            }
-        }
-
-        for (const auto pAura : lModPowerRegenAuras)
-        {
-            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && pAura->GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
-            {
-                SendPlaySpellVisualKit(SPELL_VISUAL_KIT_DRINK);
-                break;
-            }
-        }
-
-        m_foodEmoteTimer = 5000;
-    }
-    else
-        m_foodEmoteTimer -= diff;
 }
 
 void Player::RegenerateAll()
@@ -2928,11 +2896,7 @@ void Player::SetCheatDebugTargetInfo(bool on, bool notify)
             UpdateData newData;
             pUnit->BuildValuesUpdateBlockForPlayerWithFlags(newData, this, UpdateFieldFlags(updateFlags), true);
             if (newData.HasData())
-            {
-                WorldPacket newDataPacket;
-                newData.BuildPacket(&newDataPacket);
-                SendDirectMessage(&newDataPacket);
-            }
+                newData.Send(GetSession());
         }
     }
 }
@@ -3447,13 +3411,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
 void Player::SendInitialSpells() const
 {
-    uint16 spellCount = 0;
-
-    WorldPacket data(SMSG_INITIAL_SPELLS, (1 + 2 + 4 * m_spells.size() + 2 + m_cooldownMap.size() * (2 + 2 + 2 + 4 + 4)));
-    data << uint8(0);
-
-    size_t countPos = data.wpos();
-    data << uint16(spellCount);                             // spell count placeholder
+    auto packet = std::make_unique<WorldPackets::Spell::InitialSpells>();
 
     for (const auto& spell : m_spells)
     {
@@ -3463,20 +3421,11 @@ void Player::SendInitialSpells() const
         if (!spell.second.active || spell.second.disabled)
             continue;
 
-        data << uint16(spell.first);
-        data << uint16(0);                                  // it's not slot id
-
-        spellCount += 1;
+        packet->knownSpells.emplace_back(uint16(spell.first), int16(0));
     }
 
-    data.put<uint16>(countPos, spellCount);                 // write real count value
-
     // write cooldown data
-    uint32 cdCount = 0;
-    const size_t cdCountPos = data.wpos();
-    data << uint16(0);
     auto currTime = sWorld.GetCurrentClockTime();
-
     for (auto& cdItr : m_cooldownMap)
     {
         auto& cdData = cdItr.second;
@@ -3500,17 +3449,9 @@ void Player::SendInitialSpells() const
             catCDDuration |= 0x80000000;
         }
 
-        data << uint16(cdData->GetSpellEntry()->Id);
-        data << uint16(cdData->GetItemId());                // cast item id
-        data << uint16(cdData->GetCategory());              // spell category
-        data << uint32(spellCDDuration);                    // cooldown
-        data << uint32(catCDDuration);                      // category cooldown
-        ++cdCount;
+        packet->cooldowns.emplace_back(uint16(cdData->GetSpellEntry()->Id), uint16(cdData->GetItemId()), uint16(cdData->GetCategory()), int32(spellCDDuration), int32(catCDDuration));
     }
-
-    data.put<uint16>(cdCountPos, cdCount);
-
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 
     sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "CHARACTER: Sent Initial Spells");
 }
@@ -5064,41 +5005,30 @@ void Player::RepopAtGraveyard()
     else
         pClosestGrave = sObjectMgr.GetClosestGraveYard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
 
-    float orientation = GetOrientation();
-
-    // World of Warcraft Client Patch 1.8.0 (2005-10-11)
-    // - All graveyards that needed adjustment were changed so that a
-    //   character's spirit comes into the world facing toward the Spirit Healer.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     if (pClosestGrave)
-        if (float facing = sObjectMgr.GetWorldSafeLocFacing(pClosestGrave->ID))
-            orientation = facing;
-#endif
-
-    if (IsAlive())
     {
-        if (pClosestGrave)
-            TeleportTo(pClosestGrave->map_id, pClosestGrave->x, pClosestGrave->y, pClosestGrave->z, orientation, TELE_TO_NOT_UNSUMMON_PET, std::move(recover));
-    }
-    else
-    {
-        // if no grave found, stay at the current location
-        // and don't show spirit healer location
-        if (pClosestGrave)
+        // Release spirit from transport => Teleport alive at nearest graveyard.
+        if (!IsAlive() && GetTransport())
         {
-            // Release spirit from transport => Teleport alive at nearest graveyard.
-            if (GetTransport())
-            {
-                GetTransport()->RemovePassenger(this);
-                ResurrectPlayer(1.0f);
-            }
-            TeleportTo(pClosestGrave->map_id, pClosestGrave->x, pClosestGrave->y, pClosestGrave->z, orientation, TELE_TO_NOT_UNSUMMON_PET, std::move(recover));
+            GetTransport()->RemovePassenger(this);
+            ResurrectPlayer(1.0f);
         }
 
-        // Fix invisible spirit healer if you die close to graveyard.
-        if (IsInWorld())
-            UpdateVisibilityAndView();
+        // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+        // - All graveyards that needed adjustment were changed so that a
+        //   character's spirit comes into the world facing toward the Spirit Healer.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        float orientation = sObjectMgr.GetWorldSafeLocFacing(pClosestGrave->ID);
+#else
+        float orientation = GetOrientation();
+#endif
+
+        TeleportTo(pClosestGrave->map_id, pClosestGrave->x, pClosestGrave->y, pClosestGrave->z, orientation, TELE_TO_NOT_UNSUMMON_PET, std::move(recover)); 
     }
+
+    // Fix invisible spirit healer if you die close to graveyard.
+    if (!IsAlive() && IsInWorld())
+        UpdateVisibilityAndView();
 }
 
 void Player::JoinedChannel(Channel* c)
@@ -6077,8 +6007,8 @@ void Player::SaveRecallPosition()
 
 void Player::SendMessageToSet(std::unique_ptr<ServerPacket const> packet, bool self) const
 {
-    WorldPacket binaryPacket(packet->GetOpcode());
-    packet->AppendBodyTo(binaryPacket);
+    WorldPacket binaryPacket;
+    packet->WritePacket(binaryPacket);
     SendMessageToSet(&binaryPacket, self);
 }
 
@@ -7674,11 +7604,11 @@ void Player::SendLootRelease(ObjectGuid guid) const
 
 void Player::SendLootError(ObjectGuid guid, LootError error) const
 {
-    WorldPacket data(SMSG_LOOT_RESPONSE, 10);
-    data << uint64(guid);
-    data << uint8(0);
-    data << uint8(error);
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Loot::LootResponse>();
+    packet->lootedGuid = guid;
+    packet->lootType = 0;
+    packet->lootError = error;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendLoot(ObjectGuid guid, LootType lootType, Player const* pVictim)
@@ -8066,11 +7996,11 @@ void Player::SendLoot(ObjectGuid guid, LootType lootType, Player const* pVictim)
             break;
     }
 
-    WorldPacket data(SMSG_LOOT_RESPONSE, (9 + 50));         // we guess size
-    data << ObjectGuid(guid);
-    data << uint8(lootType);
-    data << LootView(*loot, this, permission);
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Loot::LootResponse>();
+    packet->lootedGuid = guid;
+    packet->lootType = lootType;
+    LootView(*loot, this, permission).WriteLoot(*packet);
+    GetSession()->SendPacket(std::move(packet));
 
     // add 'this' player as one of the players that are looting 'loot'
     if (permission != NONE_PERMISSION)
@@ -8108,7 +8038,7 @@ void Player::SendUpdateWorldState(uint32 state, uint32 value) const
 }
 
 // TODO: Determine what these values mean, if anything.
-static WorldStatePair def_world_states[] =
+static std::pair<uint32, int32> const def_world_states[] =
 {
     { 0x07AE, 0x01 },
     { 0x0532, 0x01 },
@@ -8229,16 +8159,9 @@ void Player::SendInitWorldStates(uint32 zoneid) const
 
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Sending SMSG_INIT_WORLD_STATES to Map:%u, Zone: %u", mapId, zoneid);
 
-    uint32 count = 1; // count of world states in packet, 1 extra for the terminator
-
-    WorldPacket data(SMSG_INIT_WORLD_STATES, (4 + 4 + 2 + 6));
-    data << uint32(mapId);                              // map id
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-    data << uint32(zoneid);                             // zone id
-#endif
-
-    size_t countPos = data.wpos();
-    data << uint16(0);                                  // count of uint32 blocks, placeholder
+    auto packet = std::make_unique<WorldPackets::Misc::InitWorldStates>();
+    packet->mapId = mapId;
+    packet->zoneId = zoneid;
 
     // Scourge Invasion - Patch 1.11
     if (sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
@@ -8251,52 +8174,43 @@ void Player::SendInitWorldStates(uint32 zoneid) const
         int remainingTanaris = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
         int remainingWinterspring = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
-        WriteInitialWorldStatePair(data, WS_SI_AZSHARA_INVADED,             remainingAzshara > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_BLASTED_LANDS_INVADED,       remainingBlastedLands > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_BURNING_STEPPES_INVADED,     remainingBurningSteppes > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_EASTERN_PLAGUELANDS_INVADED, remainingEasternPlaguelands > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_TANARIS_INVADED,             remainingTanaris > 0 ? 1 : 0);
-        WriteInitialWorldStatePair(data, WS_SI_WINTERSPRING_INVADED,        remainingWinterspring > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_AZSHARA_INVADED,             remainingAzshara > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_BLASTED_LANDS_INVADED,       remainingBlastedLands > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_BURNING_STEPPES_INVADED,     remainingBurningSteppes > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_EASTERN_PLAGUELANDS_INVADED, remainingEasternPlaguelands > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_TANARIS_INVADED,             remainingTanaris > 0 ? 1 : 0);
+        packet->AddWorldState(WS_SI_WINTERSPRING_INVADED,        remainingWinterspring > 0 ? 1 : 0);
 
         // Battles & remaining necropolisses
-        WriteInitialWorldStatePair(data, WS_SI_BATTLES_WON,               victories);
-        WriteInitialWorldStatePair(data, WS_SI_AZSHARA_REMAINING,         remainingAzshara);
-        WriteInitialWorldStatePair(data, WS_SI_BLASTED_LANDS_REMAINING,   remainingBlastedLands);
-        WriteInitialWorldStatePair(data, WS_SI_BURNING_STEPPES_REMAINING, remainingBurningSteppes);
-        WriteInitialWorldStatePair(data, WS_SI_PLAGUELANDS_REMAINING,     remainingEasternPlaguelands);
-        WriteInitialWorldStatePair(data, WS_SI_TANARIS_REMAINING,         remainingTanaris);
-        WriteInitialWorldStatePair(data, WS_SI_WINTERSPRING_REMAINING,    remainingWinterspring);
-
-        count += 13;
+        packet->AddWorldState(WS_SI_BATTLES_WON,               victories);
+        packet->AddWorldState(WS_SI_AZSHARA_REMAINING,         remainingAzshara);
+        packet->AddWorldState(WS_SI_BLASTED_LANDS_REMAINING,   remainingBlastedLands);
+        packet->AddWorldState(WS_SI_BURNING_STEPPES_REMAINING, remainingBurningSteppes);
+        packet->AddWorldState(WS_SI_PLAGUELANDS_REMAINING,     remainingEasternPlaguelands);
+        packet->AddWorldState(WS_SI_TANARIS_REMAINING,         remainingTanaris);
+        packet->AddWorldState(WS_SI_WINTERSPRING_REMAINING,    remainingWinterspring);
     }
 
-    for (WorldStatePair const* itr = def_world_states; itr->state; ++itr)
-    {
-        WriteInitialWorldStatePair(data, itr->state, itr->value);
-        ++count;
-    }
+    for (auto const& itr : def_world_states)
+        packet->AddWorldState(itr.first, itr.second);
 
     if (ZoneScript* zoneScript = GetZoneScript())
-        count += zoneScript->FillInitialWorldStates(data);
+        zoneScript->FillInitialWorldStates(packet->states);
     switch (zoneid)
     {
         case 2597:                                      // AV
         case 3277:                                      // WS
         case 3358:                                      // AB
             if (BattleGround* bg = GetBattleGround())
-                bg->FillInitialWorldStates(data, count);
+                bg->FillInitialWorldStates(packet->states);
             break;
     }
 
     // Ahn'Qiraj War Effort
     if (sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT))
-    {
-        count += BuildWarEffortWorldStates(data);
-    }
+        BuildWarEffortWorldStates(packet->states);
 
-    data << uint32(0) << uint32(0);     // [-ZERO] Add terminator to prevent repeating audio bug.
-    data.put<uint16>(countPos, count);  // set actual world state amount
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 }
 
 uint32 Player::GetXPRestBonus(uint32 xp)
@@ -11525,7 +11439,7 @@ void Player::AddItemToBuyBackSlot(Item* pItem, uint32 money, ObjectGuid vendorGu
             // found empty
             if (!m_items[i])
             {
-                slot = i;
+                oldest_slot = i;
                 break;
             }
 
@@ -11966,15 +11880,6 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
             AddEnchantmentDuration(item, slot, 0);
         }
     }
-}
-
-void Player::BuildEnchantmentLog(WorldPacket& data, ObjectGuid casterGuid, uint32 itemId, uint32 spellId, bool showAffiliation) const
-{
-    data << GetObjectGuid();
-    data << ObjectGuid(casterGuid); // message says enchant has faded if empty
-    data << uint32(itemId);
-    data << uint32(spellId);
-    data << uint8(showAffiliation); // only used if casterGuid is not empty
 }
 
 void Player::SendEnchantmentLog(ObjectGuid casterGuid, uint32 itemId, uint32 spellId) const
@@ -14551,7 +14456,10 @@ void Player::SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32
         // Update player field and fire UNIT_QUEST_LOG_CHANGED for self for the current batch
         uint16 slot = FindQuestSlot(pQuest->GetQuestId());
         if (slot < MAX_QUEST_LOG_SIZE) {
-            SetQuestSlotCounter(slot + pQuest->GetReqCreatureOrGOcount(), uint8(item_idx), uint8(current + batchCount));
+            // item counters are stored after the creature or GO counters within the same quest slot
+            uint8 counterIdx = uint8(item_idx + pQuest->GetReqCreatureOrGOcount());
+            if (counterIdx < QUEST_OBJECTIVES_COUNT)
+                SetQuestSlotCounter(slot, counterIdx, uint8(current + batchCount));
         }
 
         count -= batchCount;
@@ -14701,7 +14609,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     // prevent login to locked character
     m_characterFlags = fields[15].GetUInt32();
-    if (m_characterFlags & (CHARACTER_FLAG_LOCKED_FOR_TRANSFER | CHARACTER_FLAG_DELETED_BY_TRANSFER))
+    if (m_characterFlags & (CHARACTER_FLAG_RENAME | CHARACTER_FLAG_LOCKED_FOR_TRANSFER | CHARACTER_FLAG_DELETED_BY_TRANSFER))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempts to login but character is locked!", guid.GetString().c_str());
         return false;
@@ -15374,9 +15282,10 @@ bool Player::IsAllowedToLoot(Creature const* creature)
         case FREE_FOR_ALL:
             return true;
         case MASTER_LOOT:
-            // On peut toujours voir ces items.
-            if (loot->hasOverThresholdItem())
-                return true;
+            // All group members may open the loot. With Master Loot, items below the
+            // threshold are directly lootable; items at/above threshold are protected
+            // at take-time in LootHandler (master-looter assignment only).
+            return true;
         case ROUND_ROBIN:
             // may only loot if the player is the loot roundrobin player
             // or if there are free/quest/conditional item for the player
@@ -16063,20 +15972,15 @@ DungeonPersistentState* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapId)
 
 void Player::SendRaidInfo() const
 {
-    uint32 counter = 0;
-
-    WorldPacket data(SMSG_RAID_INSTANCE_INFO, 4);
-
-    size_t p_counter = data.wpos();
-    data << uint32(counter);                                // placeholder
-
+    auto packet = std::make_unique<WorldPackets::Instance::RaidInstanceInfo>();
     std::lock_guard<std::mutex> guard(m_boundInstancesMutex);
     for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)
         {
             DungeonPersistentState* state = itr.second.state;
-            data << uint32(state->GetMapId());              // map id
+            WorldPackets::Instance::RaidInstanceInfo::InstanceResetInfo info;
+            info.mapId = state->GetMapId();
 
             // Permanent dungeons (raids) don't have a valid reset timer since it's
             // on a schedule. Send the scheduled time instead of state reset time.
@@ -16084,15 +15988,12 @@ void Player::SendRaidInfo() const
             time_t resetTime = DungeonResetScheduler::IsRaidResetSchedulingGlobal()
                 ? sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(state->GetMapId())
                 : state->GetResetTime();
-            data << uint32(resetTime - time(nullptr));
-            data << uint32(state->GetInstanceId());         // instance id
-
-            counter++;
+            info.resetTime = uint32(resetTime - time(nullptr));
+            info.instanceId = state->GetInstanceId();
+            packet->resetInfos.push_back(info);
         }
     }
-
-    data.put<uint32>(p_counter, counter);
-    GetSession()->SendPacket(&data);
+    GetSession()->SendPacket(std::move(packet));
 }
 
 /*
@@ -16115,7 +16016,7 @@ void Player::SendSavedInstances() const
 
     //Send opcode 811. true or false means, whether you have current raid instances
     {
-        auto packet = std::make_unique<WorldPackets::Misc::UpdateInstanceOwnership>();
+        auto packet = std::make_unique<WorldPackets::Instance::UpdateInstanceOwnership>();
         packet->hasBeenSaved = hasBeenSaved;
         GetSession()->SendPacket(std::move(packet));
     }
@@ -16127,7 +16028,7 @@ void Player::SendSavedInstances() const
     {
         if (itr.second.perm)
         {
-            auto packet = std::make_unique<WorldPackets::Misc::UpdateLastInstance>();
+            auto packet = std::make_unique<WorldPackets::Instance::UpdateLastInstance>();
             packet->mapId = itr.second.state->GetMapId();
             GetSession()->SendPacket(std::move(packet));
         }
@@ -17263,7 +17164,7 @@ void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
 void Player::SendResetInstanceSuccess(uint32 mapId) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    auto packet = std::make_unique<WorldPackets::Misc::InstanceReset>();
+    auto packet = std::make_unique<WorldPackets::Instance::InstanceReset>();
     packet->mapId = mapId;
     GetSession()->SendPacket(std::move(packet));
 #endif
@@ -17273,7 +17174,7 @@ void Player::SendResetInstanceFailed(uint32 reason, uint32 mapId) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     // reason: see enum InstanceResetFailReason
-    auto packet = std::make_unique<WorldPackets::Misc::InstanceResetFailed>();
+    auto packet = std::make_unique<WorldPackets::Instance::InstanceResetFailed>();
     packet->reason = reason;
     packet->mapId = mapId;
     GetSession()->SendPacket(std::move(packet));
@@ -19323,7 +19224,7 @@ void Player::SendInstanceResetWarning(uint32 mapId, uint32 resetTime) const
         type = RAID_INSTANCE_WARNING_MIN;
     else
         type = RAID_INSTANCE_WARNING_MIN_SOON;
-    auto packet = std::make_unique<WorldPackets::Misc::RaidInstanceMessage>();
+    auto packet = std::make_unique<WorldPackets::Instance::RaidInstanceMessage>();
     packet->messageType = type;
     packet->mapId = mapId;
     packet->resetTime = resetTime;
@@ -21083,17 +20984,17 @@ void Player::_SaveBGData()
 
 void Player::SendClearCooldown(uint32 spellId, Unit const* target) const
 {
-    auto clearCooldownPacket = std::make_unique<WorldPackets::Spell::ClearCooldown>();
-    clearCooldownPacket->spellId = spellId;
-    clearCooldownPacket->targetGuid = target->GetObjectGuid();
-    GetSession()->SendPacket(std::move(clearCooldownPacket));
+    auto packet = std::make_unique<WorldPackets::Spell::ClearCooldown>();
+    packet->spellId = spellId;
+    packet->targetGuid = target->GetObjectGuid();
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendClearAllCooldowns(Unit const* target) const
 {
-    auto cooldownCheatPacket = std::make_unique<WorldPackets::Spell::CooldownCheat>();
-    cooldownCheatPacket->targetGuid = target->GetObjectGuid();
-    GetSession()->SendPacket(std::move(cooldownCheatPacket));
+    auto packet = std::make_unique<WorldPackets::Spell::CooldownCheat>();
+    packet->targetGuid = target->GetObjectGuid();
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendSpellCooldown(uint32 spellId, Milliseconds cooldown, ObjectGuid target) const
@@ -21109,16 +21010,16 @@ void Player::SendSpellCooldown(uint32 spellId, Milliseconds cooldown, ObjectGuid
 
 void Player::SendSpellRemoved(uint32 spellId) const
 {
-    auto removedSpellPacket = std::make_unique<WorldPackets::Spell::RemovedSpell>();
-    removedSpellPacket->spellId = spellId;
-    GetSession()->SendPacket(std::move(removedSpellPacket));
+    auto packet = std::make_unique<WorldPackets::Spell::RemovedSpell>();
+    packet->spellId = spellId;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::SendChannelUpdate(uint32 time) const
 {
-    WorldPacket data(MSG_CHANNEL_UPDATE, 4);
-    data << uint32(time);
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Spell::ChannelUpdate>();
+    packet->duration = time;
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::UpdateChannelStartPosition()
@@ -21815,7 +21716,7 @@ void Player::SendDestroyGroupMembers(bool includingSelf)
         {
             if (!includingSelf && itr.guid == GetObjectGuid())
                 continue;
-            auto packet = std::make_unique<WorldPackets::Misc::DestroyObject>();
+            auto packet = std::make_unique<WorldPackets::ObjectUpdate::DestroyObject>();
             packet->objectGuid = itr.guid;
             GetSession()->SendPacket(std::move(packet));
             m_visibleGUIDs.erase(itr.guid);

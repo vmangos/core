@@ -283,6 +283,22 @@ uint8 liquid_flags[ADT_CELLS_PER_GRID][ADT_CELLS_PER_GRID];
 bool  liquid_show[ADT_GRID_SIZE][ADT_GRID_SIZE];
 float liquid_height[ADT_GRID_SIZE + 1][ADT_GRID_SIZE + 1];
 
+// A MCNK holds one liquid layer per set liquid flag, in this order.
+struct LiquidLayerType
+{
+    uint32 mcnkFlag;
+    uint16 entry;                                           // LiquidType.dbc
+    uint8  mapFlag;
+};
+
+static LiquidLayerType const liquidLayerTypes[] =
+{
+    { ADT_MCNK_LIQUID_RIVER, 1, MAP_LIQUID_TYPE_WATER },
+    { ADT_MCNK_LIQUID_OCEAN, 2, MAP_LIQUID_TYPE_OCEAN },
+    { ADT_MCNK_LIQUID_MAGMA, 3, MAP_LIQUID_TYPE_MAGMA },
+    { ADT_MCNK_LIQUID_SLIME, 4, MAP_LIQUID_TYPE_SLIME },
+};
+
 bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
 {
     ADT_file adt;
@@ -300,6 +316,12 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
     memset(liquid_show, 0, sizeof(liquid_show));
     memset(liquid_flags, 0, sizeof(liquid_flags));
     memset(liquid_entry, 0, sizeof(liquid_entry));
+
+    // Only vertices belonging to a visible sub cell get a height below, the rest
+    // has to start out empty or stale data of the previous grid leaks in.
+    for (int y = 0; y <= ADT_GRID_SIZE; y++)
+        for (int x = 0; x <= ADT_GRID_SIZE; x++)
+            liquid_height[y][x] = CONF_use_minHeight;
 
     // Prepare map header
     GridMapFileHeader map;
@@ -541,46 +563,81 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
             if (!cell)
                 continue;
 
-            adt_MCLQ* liquid = cell->getMCLQ();
             int count = 0;
-            if (!liquid || cell->sizeMCLQ <= 8)
-                continue;
 
-            for (int y = 0; y < ADT_CELL_SIZE; y++)
+            // A chunk can hold several stacked liquid surfaces, the map format only
+            // one. Merge them: a sub cell is flooded if any layer shows it, a vertex
+            // takes the topmost surface reaching it, and the cell type is the one
+            // covering the largest part of the chunk.
+            float cellHeight[ADT_CELL_SIZE + 1][ADT_CELL_SIZE + 1];
+            bool  cellHeightSet[ADT_CELL_SIZE + 1][ADT_CELL_SIZE + 1];
+            memset(cellHeightSet, 0, sizeof(cellHeightSet));
+
+            int bestCells = 0;
+            float bestHeight = 0.0f;
+            uint32 layer = 0;
+
+            for (uint32 t = 0; t < sizeof(liquidLayerTypes) / sizeof(liquidLayerTypes[0]); ++t)
             {
-                int cy = i * ADT_CELL_SIZE + y;
-                for (int x = 0; x < ADT_CELL_SIZE; x++)
+                if (!(cell->flags & liquidLayerTypes[t].mcnkFlag))
+                    continue;
+
+                adt_MCLQ_layer* liquid = cell->getLiquidLayer(layer++);
+                if (!liquid)
+                    break;
+
+                int layerCells = 0;
+                float layerHeight = -20000.0f;
+
+                for (int y = 0; y < ADT_CELL_SIZE; y++)
                 {
-                    int cx = j * ADT_CELL_SIZE + x;
-                    if (liquid->flags[y][x] != 0x0F)
+                    int cy = i * ADT_CELL_SIZE + y;
+                    for (int x = 0; x < ADT_CELL_SIZE; x++)
                     {
+                        int cx = j * ADT_CELL_SIZE + x;
+                        if (liquid->flags[y][x] == ADT_LIQUID_HIDDEN)
+                            continue;
+
                         liquid_show[cy][cx] = true;
-                        if (liquid->flags[y][x] & (1 << 7))
+                        if (liquid->flags[y][x] & ADT_LIQUID_DARK_WATER)
                             liquid_flags[i][j] |= MAP_LIQUID_TYPE_DEEP_WATER;
+                        ++layerCells;
                         ++count;
+
+                        // Vertices of a hidden sub cell are left uninitialized by the
+                        // client, so only the corners of a visible one may be read.
+                        for (int vy = y; vy <= y + 1; vy++)
+                        {
+                            for (int vx = x; vx <= x + 1; vx++)
+                            {
+                                float h = liquid->liquid[vy][vx].height;
+                                if (!cellHeightSet[vy][vx] || cellHeight[vy][vx] < h)
+                                {
+                                    cellHeight[vy][vx] = h;
+                                    cellHeightSet[vy][vx] = true;
+                                }
+                                if (layerHeight < h)
+                                    layerHeight = h;
+                            }
+                        }
                     }
+                }
+
+                if (layerCells > bestCells || (layerCells == bestCells && layerHeight > bestHeight))
+                {
+                    bestCells = layerCells;
+                    bestHeight = layerHeight;
+                    liquid_entry[i][j] = liquidLayerTypes[t].entry;
+                    liquid_flags[i][j] = (liquid_flags[i][j] & MAP_LIQUID_TYPE_DEEP_WATER) | liquidLayerTypes[t].mapFlag;
                 }
             }
 
-            uint32 c_flag = cell->flags;
-            if (c_flag & (1 << 2))
+            if (!count)
             {
-                liquid_entry[i][j] = 1;
-                liquid_flags[i][j] |= MAP_LIQUID_TYPE_WATER;            // water
+                if (cell->flags & ADT_MCNK_LIQUID_MASK)
+                    fprintf(stderr, "Wrong liquid detect in MCLQ chunk");
+                continue;
             }
-            if (c_flag & (1 << 3))
-            {
-                liquid_entry[i][j] = 2;
-                liquid_flags[i][j] |= MAP_LIQUID_TYPE_OCEAN;            // ocean
-            }
-            if (c_flag & (1 << 4))
-            {
-                liquid_entry[i][j] = 3;
-                liquid_flags[i][j] |= MAP_LIQUID_TYPE_MAGMA;            // magma/slime
-            }
-
-            if (!count && liquid_flags[i][j])
-                fprintf(stderr, "Wrong liquid detect in MCLQ chunk");
 
             for (int y = 0; y <= ADT_CELL_SIZE; y++)
             {
@@ -588,7 +645,8 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
                 for (int x = 0; x <= ADT_CELL_SIZE; x++)
                 {
                     int cx = j * ADT_CELL_SIZE + x;
-                    liquid_height[cy][cx] = liquid->liquid[y][x].height;
+                    if (cellHeightSet[y][x])
+                        liquid_height[cy][cx] = cellHeight[y][x];
                 }
             }
         }

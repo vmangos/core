@@ -260,15 +260,8 @@ class LootValidatorRefManager : public RefManager<Loot, LootValidatorRef>
 };
 
 //=====================================================
-struct LootView;
-
-ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li);
-ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
-
 struct Loot
 {
-    friend ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
-
     QuestItemMap const& GetPlayerQuestItems() const { return m_playerQuestItems; }
     QuestItemMap const& GetPlayerFFAItems() const { return m_playerFFAItems; }
     QuestItemMap const& GetPlayerNonQuestNonFFAConditionalItems() const { return m_playerNonQuestNonFFAConditionalItems; }
@@ -394,6 +387,14 @@ struct Loot
         bool m_hasFFAQuestItems;
 };
 
+namespace WorldPackets
+{
+    namespace Loot
+    {
+        class LootResponse;
+    }
+}
+
 struct LootView
 {
     Loot &loot;
@@ -401,6 +402,7 @@ struct LootView
     PermissionTypes permission;
     LootView(Loot &_loot, Player* _viewer,PermissionTypes _permission = ALL_PERMISSION)
         : loot(_loot), viewer(_viewer), permission(_permission) {}
+    void WriteLoot(WorldPackets::Loot::LootResponse& packet);
 };
 
 extern LootStore LootTemplates_Creature;

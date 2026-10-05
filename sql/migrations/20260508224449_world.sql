@@ -15,7 +15,7 @@ UPDATE `quest_template` SET `StartScript`=219 WHERE `entry`=219;
 -- Start script for quest Missing In Action.
 DELETE FROM `quest_start_scripts` WHERE `id`=219;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(219, 0, 0, 61, 219, 900, 0, 0, 0, 0, 0, 8, 0, 21901, 1014, 21902, 0, 0, 0, 0, 0, 'Missing In Action: Corporal Keeshan - Start Scripted Map Event'),
+(219, 0, 0, 61, 219, 1200, 0, 0, 0, 0, 0, 8, 0, 21901, 1014, 21902, 0, 0, 0, 0, 0, 'Missing In Action: Corporal Keeshan - Start Scripted Map Event'),
 (219, 1, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Missing In Action: Corporal Keeshan - Remove Quest Giver Flag'),
 (219, 1, 0, 22, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Missing In Action: Corporal Keeshan - Set Faction to Escortee'),
 (219, 1, 0, 20, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Missing In Action: Corporal Keeshan - Start Waypoints');

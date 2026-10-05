@@ -153,6 +153,7 @@ namespace WorldPackets { namespace Guild
         std::string guildName;
 
         explicit GuildInviteNotification() : ServerPacket(SMSG_GUILD_INVITE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -162,6 +163,7 @@ namespace WorldPackets { namespace Guild
         std::string playerName;
 
         explicit GuildDeclineNotification() : ServerPacket(SMSG_GUILD_DECLINE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -173,6 +175,7 @@ namespace WorldPackets { namespace Guild
         uint32 result = 0;
 
         explicit GuildCommandResult() : ServerPacket(SMSG_GUILD_COMMAND_RESULT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -187,6 +190,7 @@ namespace WorldPackets { namespace Guild
         uint32 accountCount = 0;
 
         explicit GuildInfo() : ServerPacket(SMSG_GUILD_INFO) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -196,6 +200,7 @@ namespace WorldPackets { namespace Guild
         uint32 error = 0;
 
         explicit SaveGuildEmblemResult() : ServerPacket(MSG_SAVE_GUILD_EMBLEM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -212,6 +217,7 @@ namespace WorldPackets { namespace Guild
         int32 backgroundColor = 0;
 
         explicit GuildQueryResponse() : ServerPacket(SMSG_GUILD_QUERY_RESPONSE) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -223,6 +229,7 @@ namespace WorldPackets { namespace Guild
         ObjectGuid affectedPlayerGuid;
 
         explicit GuildEvent() : ServerPacket(SMSG_GUILD_EVENT) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -251,6 +258,7 @@ namespace WorldPackets { namespace Guild
         std::vector<GuildRosterMember> rosterMembers;
 
         explicit GuildRoster() : ServerPacket(SMSG_GUILD_ROSTER) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 

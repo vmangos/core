@@ -127,6 +127,7 @@ namespace WorldPackets { namespace Movement
         ObjectGuid mountedUnitGuid;
 
         MountSpecialAnim() : ServerPacket(SMSG_MOUNTSPECIAL_ANIM) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 }} // namespace WorldPackets::Movement

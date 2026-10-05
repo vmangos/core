@@ -168,6 +168,7 @@ namespace WorldPackets { namespace Channel
         std::string channelName;
 
         explicit ChannelNotify() : ServerPacket(SMSG_CHANNEL_NOTIFY) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 }} // namespace WorldPackets::Channel

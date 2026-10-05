@@ -123,83 +123,45 @@ void PacketCompressor::Compress(void* dst, uint32* dst_size, void* src, int src_
     *dst_size = c_stream.total_out;
 }
 
-bool UpdateData::BuildPacket(WorldPacket* packet, bool hasTransport)
+void UpdateData::BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, bool hasTransport)
 {
     if (m_datas.empty())
         return BuildPacket(packet, nullptr, hasTransport);
+
+    // Only the first update block ends up in the packet. Callers that fill more
+    // than one block must use `Send` instead, or the rest is silently dropped.
+    MANGOS_ASSERT(m_datas.size() == 1);
+
     return BuildPacket(packet, &(m_datas.front()), hasTransport);
 }
 
-bool UpdateData::BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket, bool hasTransport)
+void UpdateData::BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, UpdatePacket* updPacket, bool hasTransport)
 {
-    MANGOS_ASSERT(packet->empty());                         // shouldn't happen
+    // shouldn't happen
+    MANGOS_ASSERT(packet->outOfRangeGUIDs.empty() && !packet->updatePacket.has_value());
 
-    ByteBuffer buf(4 + 1 + (m_outOfRangeGUIDs.empty() ? 0 : 1 + 4 + 9 * m_outOfRangeGUIDs.size()) + (updPacket ? updPacket->data.wpos() : 0));
-
-    uint32 blockCount = updPacket ? updPacket->blockCount : 0;
-    buf << (uint32)(!m_outOfRangeGUIDs.empty() ? blockCount + 1 : blockCount);
-    buf << (uint8)(hasTransport ? 1 : 0);
-
+    packet->hasTransport = hasTransport;
     if (!m_outOfRangeGUIDs.empty())
-    {
-        buf << (uint8) UPDATETYPE_OUT_OF_RANGE_OBJECTS;
-        buf << (uint32) m_outOfRangeGUIDs.size();
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        for (const auto& guid : m_outOfRangeGUIDs)
-            buf << guid.WriteAsPacked();
-#else
-        for (const auto& guid : m_outOfRangeGUIDs)
-            buf << guid;
-#endif
-    }
-
+        packet->outOfRangeGUIDs = std::move(m_outOfRangeGUIDs);
     if (updPacket)
-        buf.append(updPacket->data);
-
-    size_t pSize = buf.wpos();                              // use real used data size
-
-    // compress large packets
-    if (pSize > sWorld.getConfig(CONFIG_UINT32_COMPRESSION_UPDATE_SIZE))
-    {
-        if (pSize >= 900000)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "[CRASH-CLIENT] Too large packet: %u", pSize);
-
-        uint32 destsize = compressBound(pSize);
-        packet->resize(destsize + sizeof(uint32));
-
-        packet->put<uint32>(0, pSize);
-        PacketCompressor::Compress(const_cast<uint8*>(packet->contents()) + sizeof(uint32), &destsize, (void*)buf.contents(), pSize);
-        if (destsize == 0)
-            return false;
-
-        packet->resize(destsize + sizeof(uint32));
-        packet->SetOpcode(SMSG_COMPRESSED_UPDATE_OBJECT);
-    }
-    else                                                    // send small packets without compression
-    {
-        packet->append(buf);
-        packet->SetOpcode(SMSG_UPDATE_OBJECT);
-    }
-
-    return true;
+        packet->updatePacket = std::move(*updPacket);
 }
 
 void UpdateData::Send(WorldSession* session, bool hasTransport)
 {
-    WorldPacket data;
     if (m_datas.empty() && !m_outOfRangeGUIDs.empty())
     {
-        BuildPacket(&data, nullptr, hasTransport);
-        session->SendPacket(&data);
+        auto data = std::make_unique<WorldPackets::ObjectUpdate::UpdateObject>();
+        BuildPacket(data, nullptr, hasTransport);
+        session->SendPacket(std::move(data));
         m_outOfRangeGUIDs.clear();
         return;
     }
-    for (const auto& itr : m_datas)
+    for (auto& itr : m_datas)
     {
-        BuildPacket(&data, &itr, hasTransport);
-        session->SendPacket(&data);
-        data.clear();
+        auto data = std::make_unique<WorldPackets::ObjectUpdate::UpdateObject>();
+        BuildPacket(data, &itr, hasTransport);
+        session->SendPacket(std::move(data));
         m_outOfRangeGUIDs.clear();
     }
 }

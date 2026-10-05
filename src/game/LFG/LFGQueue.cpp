@@ -192,8 +192,8 @@ void LFGQueue::Update()
                     packet.playerGuid = member->GetObjectGuid();
 
                     // TODO Use broadcaster which does the binary conversion automatically
-                    WorldPacket data(packet.GetOpcode(), 8);
-                    packet.AppendBodyTo(data);
+                    WorldPacket data;
+                    packet.WritePacket(data);
                     leader->GetSession()->SendPacket(&data);
 
                     Group* newQueueGroup = new Group;
@@ -414,8 +414,8 @@ void LFGQueue::RemovePlayerFromQueue(ObjectGuid playerGuid, PlayerLeaveMethod le
 #endif
 
                             // TODO Use broadcaster which does the binary conversion automatically
-                            WorldPacket data(packet.GetOpcode());
-                            packet.AppendBodyTo(data);
+                            WorldPacket data;
+                            packet.WritePacket(data);
                             player->GetSession()->SendPacket(&data);
                         }
 

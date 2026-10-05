@@ -23,6 +23,7 @@ namespace WorldPackets { namespace Chat
     {
     public:
         explicit ChatWrongFaction() : ServerPacket(SMSG_CHAT_WRONG_FACTION) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
@@ -31,6 +32,7 @@ namespace WorldPackets { namespace Chat
     {
     public:
         explicit ChatRestricted() : ServerPacket(SMSG_CHAT_RESTRICTED) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 #endif
@@ -41,6 +43,7 @@ namespace WorldPackets { namespace Chat
         std::string name;
 
         explicit ChatPlayerNotFound() : ServerPacket(SMSG_CHAT_PLAYER_NOT_FOUND) {}
+        size_t EstimateFinalSize() const override;
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
