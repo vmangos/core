@@ -14,6 +14,16 @@ IO::IoContext::~IoContext()
     ::close(m_kqueueDescriptor);
 }
 
+// The batch of events that RunUntilShutdown() is currently dispatching on this thread.
+// Only the events after `next` are still pending.
+struct DispatchBatch
+{
+    struct kevent* events;
+    int next;
+    int count;
+};
+static thread_local DispatchBatch* g_currentDispatchBatch = nullptr;
+
 std::unique_ptr<IO::IoContext> IO::IoContext::CreateIoContext()
 {
     // Initialize our main kqueue
@@ -47,11 +57,30 @@ void IO::IoContext::RunUntilShutdown()
             continue;
         }
 
-        for (int i = 0; i < numEvents; i++)
+        DispatchBatch batch{events, 0, numEvents};
+        g_currentDispatchBatch = &batch;
+        while (batch.next < batch.count)
         {
-            struct kevent const& event = events[i];
+            struct kevent const& event = events[batch.next++];
+            if (event.udata == nullptr)
+                continue; // The receiver was destroyed by an earlier event of this batch
+
             ((SystemIoEventReceiver*)(event.udata))->OnIoEvent(event.filter);
         }
+        g_currentDispatchBatch = nullptr;
+    }
+}
+
+void IO::IoContext::ForgetReceiverInCurrentBatch(IO::SystemIoEventReceiver const* eventReceiver)
+{
+    DispatchBatch* batch = g_currentDispatchBatch;
+    if (batch == nullptr)
+        return;
+
+    for (int i = batch->next; i < batch->count; i++)
+    {
+        if (batch->events[i].udata == eventReceiver)
+            batch->events[i].udata = nullptr;
     }
 }
 

@@ -64,6 +64,13 @@ namespace IO
         void PostForImmediateInvocation(IO::SystemIoEventReceiver* eventReceiver);
 #endif
 
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+        /// kqueue reports read and write as separate events, so one batch can hold two events for the same receiver.
+        /// Must be called when a receiver is destroyed, so the rest of the batch that is being dispatched
+        /// on this thread does not invoke it anymore. Has no effect outside of an IO thread.
+        static void ForgetReceiverInCurrentBatch(IO::SystemIoEventReceiver const* eventReceiver);
+#endif
+
     private:
         volatile bool m_isRunning;
 
