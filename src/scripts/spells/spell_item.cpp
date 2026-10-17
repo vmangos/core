@@ -415,8 +415,7 @@ struct GoblinJumperCablesScript : public SpellScript
             // Defibrillate (Goblin Jumper Cables) have 33% chance on success
             if (roll_chance_i(67))
             {
-                if (spell->m_casterUnit)
-                    spell->m_casterUnit->CastSpell(spell->m_casterUnit, 8338, true, spell->m_CastItem);
+                spell->m_casterUnit->CastSpell(spell->m_casterUnit, 8338, true, spell->m_CastItem);
                 return false;
             }
         }
@@ -439,8 +438,7 @@ struct GoblinJumperCablesXLScript : public SpellScript
             // Defibrillate (Goblin Jumper Cables XL) have 50% chance on success
             if (roll_chance_i(50))
             {
-                if (spell->m_casterUnit)
-                    spell->m_casterUnit->CastSpell(spell->m_casterUnit, 23055, true, spell->m_CastItem);
+                spell->m_casterUnit->CastSpell(spell->m_casterUnit, 23055, true, spell->m_CastItem);
                 return false;
             }
         }
