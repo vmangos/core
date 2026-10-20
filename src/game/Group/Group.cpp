@@ -947,6 +947,9 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     if (itr == roll->playerVote.end())
         return true;                                        // result used for need iterator ++, so avoid for end of list
 
+    if (itr->second != ROLL_NOT_EMITED_YET)
+        return false;   // player already rolled for this loot!
+
     if (Loot* pLoot = roll->getLoot())
         if (pLoot->items.empty())
             return false;
