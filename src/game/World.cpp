@@ -1819,8 +1819,11 @@ void World::SetInitialWorldSettings()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Deleting expired bans...");
     LoginDatabase.Execute("DELETE FROM `ip_banned` WHERE `unbandate`<=UNIX_TIMESTAMP() AND `unbandate`<>`bandate`");
 
-    sHonorMaintenancer.Initialize();
-    sHonorMaintenancer.DoMaintenance();
+    if (IsHonorEnabled())
+    {
+        sHonorMaintenancer.Initialize();
+        sHonorMaintenancer.DoMaintenance();
+    }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Starting Game Event system...");
     uint32 nextGameEvent = sGameEventMgr.Initialize();
@@ -2119,13 +2122,16 @@ void World::Update(uint32 diff)
     sMapPersistentStateMgr.Update();
 
     // Maintenance checker
-    if (m_MaintenanceTimeChecker < diff)
+    if (IsHonorEnabled())
     {
-        sHonorMaintenancer.CheckMaintenanceDay();
-        m_MaintenanceTimeChecker = 60000;
+        if (m_MaintenanceTimeChecker < diff)
+        {
+            sHonorMaintenancer.CheckMaintenanceDay();
+            m_MaintenanceTimeChecker = 60000;
+        }
+        else
+            m_MaintenanceTimeChecker -= diff;
     }
-    else
-        m_MaintenanceTimeChecker -= diff;
 
     // Update PlayerBotMgr
     sPlayerBotMgr.Update(diff);
