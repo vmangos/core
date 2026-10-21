@@ -22,11 +22,14 @@
 #include "MoveSplineInitArgs.h"
 #include "PathFinder.h"
 #include "MotionMaster.h"
+#include "UnitDefines.h"
 
 class Unit;
 
 namespace Movement
 {
+    UnitMoveType SelectSpeedType(uint32 moveFlags);
+
     /*  Initializes and launches spline movement
      */
     class MoveSplineInit
