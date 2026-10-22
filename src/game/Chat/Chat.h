@@ -198,6 +198,9 @@ class ChatHandler
 
         bool HandleAnticheatCommand(char*);
         bool HandleReloadAnticheatCommand(char*);
+#ifdef USE_AUTO_TESTS
+        bool HandleRunTestCommand(char*);
+#endif
         bool HandleViewLogCommand(char*);
         bool HandleSniffCommand(char*);
 
