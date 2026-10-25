@@ -708,7 +708,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
                     pinResult = VerifyPinData(std::stoi(m_securityInfo), *pinData);
                 }
             }
-            catch (const std::exception& e)
+            catch (std::exception const& e)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[AuthChallenge] Account '%s' failed to parse FIXED_PIN from security info: %s", m_login.c_str(), e.what());
                 pinResult = false;
@@ -717,15 +717,31 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         }
         else if ((m_lockFlags & TOTP) == TOTP)
         {
-            for (int i = -2; i != 2; ++i)
+            try
             {
-                auto pin = GenerateTotpPin(m_securityInfo, i);
+                if (m_securityInfo.empty())
+                {
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "[AuthChallenge] Account '%s' has empty security info for TOTP", m_login.c_str());
+                    pinResult = false;
+                }
+                else
+                {
+                    for (int i = -2; i != 2; ++i)
+                    {
+                        auto pin = GenerateTotpPin(m_securityInfo, i);
 
-                if (pin == uint32(-1))
-                    break;
+                        if (pin == uint32(-1))
+                            break;
 
-                if ((pinResult = VerifyPinData(pin, *pinData)))
-                    break;
+                        if ((pinResult = VerifyPinData(pin, *pinData)))
+                            break;
+                    }
+                }
+            }
+            catch (std::exception const& e)
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[AuthChallenge] Account '%s' failed to parse TOTP from security info: %s", m_login.c_str(), e.what());
+                pinResult = false;
             }
         }
         else if (m_geoUnlockPIN)
@@ -740,7 +756,8 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
     }
 
     // Check if SRP6 results match (password is correct), else send an error
-    if (!srp.Proof(lp->M1, 20) && pinResult)
+    bool const passwordResult = !srp.Proof(lp->M1, 20);
+    if (passwordResult && pinResult)
     {
         if (!VerifyVersion(lp->A, sizeof(lp->A), lp->crc_hash, false))
         {
@@ -850,7 +867,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
     else
     {
         // We are here because the password was incorrect
-        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong password!", m_login.c_str (), GetRemoteIpString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong %s!", m_login.c_str (), GetRemoteIpString().c_str(), (passwordResult ? "pin" : "password"));
 
         // Record the failure for the in-memory brute-force guard.
         RecordWrongPasswordAttempt(GetRemoteIpString());
