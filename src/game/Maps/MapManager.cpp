@@ -701,7 +701,8 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
                 -10670.61f, -1692.51f,
                 -10908.48f, -1563.87f,
                 -13006.40f, -1622.80f,
-                -12863.23f, -4798.42f
+                -12863.23f, -4798.42f,
+                -12863.23f, -5855.58f
             };
             static float const stormwindAreaSouthLimit[] = {
                  -8725.337891f,  3535.624023f,
