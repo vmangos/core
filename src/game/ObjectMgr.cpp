@@ -9590,6 +9590,12 @@ uint8 ObjectMgr::CheckPlayerName(std::string const& name, bool create)
     if (wname.size() < minName)
         return CHAR_NAME_TOO_SHORT;
 
+    for (size_t i = 2; i < wname.size(); ++i)
+    {
+        if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
+            return CHAR_NAME_THREE_CONSECUTIVE;
+    }
+
     uint32 strictMask = sWorld.getConfig(CONFIG_UINT32_STRICT_PLAYER_NAMES);
     if (!isValidString(wname, strictMask, false, create))
         return CHAR_NAME_MIXED_LANGUAGES;
