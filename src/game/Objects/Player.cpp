@@ -22709,7 +22709,7 @@ void Log::Player(WorldSession const* session, LogType logType, char const* subTy
     // Player logs should never go to the console
 }
 
-void Log:: Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...)
+void Log::Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...)
 {
     if (logType >= LOG_TYPE_MAX || logType < 0)
         return;
