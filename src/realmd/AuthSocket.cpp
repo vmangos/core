@@ -171,7 +171,7 @@ void AuthSocket::DoRecvIncomingData()
 
 std::shared_ptr<ByteBuffer> AuthSocket::GenerateLogonProofResponse(Crypto::Hash::SHA1::Digest const& shaDigest)
 {
-    std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+    auto pkt = std::make_shared<ByteBuffer>();
 
     if (m_build < 6299)  // before version 2.0.3 (exclusive)
     {
@@ -581,7 +581,7 @@ void AuthSocket::_HandleLogonProof()
                 return;
             }
 
-            std::shared_ptr<PINData> pinData(new PINData());
+            auto pinData = std::make_shared<PINData>();
             self->m_socket.Read((char*) pinData.get(), sizeof(PINData), [self, lp, pinData](IO::NetworkError const& error, size_t)
             {
                 self->_HandleLogonProof__PostRecv(lp, pinData);
@@ -614,7 +614,7 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
     if (m_pendingPatchFile == nullptr)
     {
         // no patch found
-        std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+        auto pkt = std::make_shared<ByteBuffer>();
         *pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
         *pkt << (uint8) 0x00;
         *pkt << (uint8) WOW_FAIL_VERSION_INVALID;
@@ -637,7 +637,7 @@ void AuthSocket::_HandleLogonProof__PostRecv_HandleInvalidVersion(std::shared_pt
         std::string wowClientPathType = "Patch"; // Must be patch "Patch"
         MANGOS_ASSERT(wowClientPathType.size() <= 255); // Filename must fit inside a byte
 
-        std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+        auto pkt = std::make_shared<ByteBuffer>();
 
         // packet 1
         *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
@@ -763,7 +763,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         {
             sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account %s tried to login with modified client!", m_login.c_str());
 
-            std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+            auto pkt = std::make_shared<ByteBuffer>();
             *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
             *pkt << (uint8) WOW_FAIL_VERSION_INVALID;
             m_socket.Write(std::move(pkt), [self = shared_from_this()](IO::NetworkError const& error)
@@ -792,7 +792,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to write geolock PIN for %s - account has not been locked", m_safelogin.c_str());
 
-                std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+                auto pkt = std::make_shared<ByteBuffer>();
                 *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
                 *pkt << (uint8) WOW_FAIL_DB_BUSY;
                 m_socket.Write(std::move(pkt), [self = shared_from_this()](IO::NetworkError const& error)
@@ -826,7 +826,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
             }
 #endif
 
-            std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+            auto pkt = std::make_shared<ByteBuffer>();
             *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
             *pkt << (uint8) WOW_FAIL_PARENTCONTROL;
             m_socket.Write(std::move(pkt), [self = shared_from_this()](IO::NetworkError const& error)
@@ -872,7 +872,7 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
         // Record the failure for the in-memory brute-force guard.
         RecordWrongPasswordAttempt(GetRemoteIpString());
 
-        std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+        auto pkt = std::make_shared<ByteBuffer>();
         *pkt << (uint8) CMD_AUTH_LOGON_PROOF;
         *pkt << (uint8) WOW_FAIL_UNKNOWN_ACCOUNT;
         if (m_build > 6005) // > 1.12.2
@@ -932,7 +932,7 @@ void AuthSocket::_HandleReconnectProof()
     m_status = STATUS_INVALID;
 
     // Read the packet
-    std::shared_ptr<AUTH_RECONNECT_PROOF_C> lp(new AUTH_RECONNECT_PROOF_C());
+    auto lp = std::make_shared<AUTH_RECONNECT_PROOF_C>();
     m_socket.Read((char*) lp.get(), sizeof(AUTH_RECONNECT_PROOF_C), [self = shared_from_this(), lp](IO::NetworkError const& error, size_t)
     {
         if (error)
@@ -1035,7 +1035,7 @@ void AuthSocket::_HandleRealmList()
         ByteBuffer realmlistBuffer;
         self->LoadRealmlistAndWriteIntoBuffer(realmlistBuffer);
 
-        std::shared_ptr<ByteBuffer> pkt(new ByteBuffer());
+        auto pkt = std::make_shared<ByteBuffer>();
         *pkt << (uint8) CMD_REALM_LIST;
         *pkt << (uint16)realmlistBuffer.size();
         pkt->append(realmlistBuffer);
@@ -1349,7 +1349,7 @@ void AuthSocket::InitAndHandOverControlToPatchHandler()
 {
     MANGOS_ASSERT(m_pendingPatchFile);
 
-    std::shared_ptr<XFER_DATA_CHUNK> rawChunk(new XFER_DATA_CHUNK());
+    auto rawChunk = std::make_shared<XFER_DATA_CHUNK>();
     rawChunk->cmd = CMD_XFER_DATA;
 
     RepeatInternalXferLoop(rawChunk);
