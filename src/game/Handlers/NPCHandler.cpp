@@ -499,6 +499,25 @@ void WorldSession::SendBindPoint(Creature* npc)
     if (GetPlayer()->GetMap()->Instanceable())
         return;
 
+    // Spell 3286 applies the bind before creating a Hearthstone. Its
+    // create-item effect is in slot 1, while CheckCast only protects
+    // a non-triggered create-item effect in slot 0.
+    // Preflight the authoritative operation so a missing Hearthstone
+    // and full inventory cannot still change the player's home.
+    static uint32 const HearthstoneItemId = 6948;
+    if (!GetPlayer()->HasItemCount(HearthstoneItemId, 1, true))
+    {
+        ItemPosCountVec destinations;
+        InventoryResult const result = GetPlayer()->CanStoreNewItem(
+            NULL_BAG, NULL_SLOT, destinations, HearthstoneItemId, 1);
+        if (result != EQUIP_ERR_OK)
+        {
+            GetPlayer()->SendEquipError(
+                result, nullptr, nullptr, 0, HearthstoneItemId);
+            return;
+        }
+    }
+
     // send spell for bind 3286 bind magic
     npc->CastSpell(_player, 3286, true);                    // Bind
 
