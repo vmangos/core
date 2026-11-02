@@ -17351,6 +17351,35 @@ void Player::PSendSysMessage(char const* format, ...) const
     SendSysMessage(str);
 }
 
+void WritePetSpellsCooldown(std::vector<WorldPackets::Pet::PetSpells::PetSpellCooldown>& packetCDs, CooldownContainer const& cooldownMap)
+{
+    // write cooldown data
+    auto currTime = sWorld.GetCurrentClockTime();
+
+    for (auto& cdItr : cooldownMap)
+    {
+        auto& cdData = cdItr.second;
+        TimePoint spellRecTime = currTime;
+        TimePoint catRecTime = currTime;
+        cdData->GetSpellCDExpireTime(spellRecTime);
+        cdData->GetCatCDExpireTime(catRecTime);
+        uint32 spellCDDuration = 0;
+        uint32 catCDDuration = 0;
+        if (spellRecTime > currTime)
+            spellCDDuration = std::chrono::duration_cast<std::chrono::milliseconds>(spellRecTime - currTime).count();
+        if (catRecTime > currTime)
+            catCDDuration = std::chrono::duration_cast<std::chrono::milliseconds>(catRecTime - currTime).count();
+
+        if (!spellCDDuration && !catCDDuration && !cdData->IsPermanent())
+            continue;
+
+        if (cdData->IsPermanent())
+            catCDDuration |= 0x8000000;
+
+        packetCDs.emplace_back(uint16(cdData->GetSpellEntry()->Id), uint16(cdData->GetCategory()), int32(spellCDDuration), int32(catCDDuration));
+    }
+}
+
 void Player::PetSpellInitialize()
 {
     Pet* pet = GetPet();
@@ -17362,39 +17391,24 @@ void Player::PetSpellInitialize()
 
     CharmInfo* charmInfo = pet->GetCharmInfo();
 
-    WorldPacket data(SMSG_PET_SPELLS, 8 + 4 + 1 + 1 + 2 + 4 * MAX_UNIT_ACTION_BAR_INDEX + 1 + 1);
-    data << pet->GetObjectGuid();
-    data << uint32(0);
-    data << uint8(charmInfo->GetReactState());
-    data << uint8(charmInfo->GetCommandState());
-    data << uint8(0);
-    data << uint8(pet->IsEnabled() ? 0x0 : 0x8);
-
-    // action bar loop
-    charmInfo->BuildActionBar(&data);
-
-    size_t spellsCountPos = data.wpos();
-
-    // spells count
-    uint8 addlist = 0;
-    data << uint8(addlist);                                 // placeholder
-
+    auto packet = std::make_unique<WorldPackets::Pet::PetSpells>();
+    packet->petGuid = pet->GetObjectGuid();
+    packet->reactState = charmInfo->GetReactState();
+    packet->commandState = charmInfo->GetCommandState();
+    packet->enabledFlags = pet->IsEnabled() ? 0x0 : 0x8;
+    charmInfo->BuildActionBar(packet->actionButtons);
     if (pet->IsPermanentPetFor(this))
     {
-        // spells loop
         for (PetSpellMap::const_iterator itr = pet->m_petSpells.begin(); itr != pet->m_petSpells.end(); ++itr)
         {
             if (itr->second.state == PETSPELL_REMOVED)
                 continue;
 
-            data << uint32(MAKE_UNIT_ACTION_BUTTON(itr->first, itr->second.active));
-            ++addlist;
+            packet->actions.push_back(uint32(MAKE_UNIT_ACTION_BUTTON(itr->first, itr->second.active)));
         }
     }
-
-    data.put<uint8>(spellsCountPos, addlist);
-    pet->WritePetSpellsCooldown(data);
-    GetSession()->SendPacket(&data);
+    WritePetSpellsCooldown(packet->cooldowns, pet->GetCooldownMap());
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::PossessSpellInitialize()
@@ -17423,17 +17437,12 @@ void Player::PossessSpellInitialize()
         }
     }
 
-    WorldPacket data(SMSG_PET_SPELLS, 8 + 4 + 4 + 4 * MAX_UNIT_ACTION_BAR_INDEX + 1 + 1);
-    data << charm->GetObjectGuid();
-    data << int32(duration);
-    data << uint32(0);
-
-    charmInfo->BuildActionBar(&data);
-
-    data << uint8(0);                                       // spells count
-    charm->WritePetSpellsCooldown(data);
-
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Pet::PetSpells>();
+    packet->petGuid = charm->GetObjectGuid();
+    packet->timeLimit = duration;
+    charmInfo->BuildActionBar(packet->actionButtons);
+    WritePetSpellsCooldown(packet->cooldowns, charm->GetCooldownMap());
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::CharmSpellInitialize() const
@@ -17477,38 +17486,29 @@ void Player::CharmSpellInitialize() const
         }
     }
 
-    WorldPacket data(SMSG_PET_SPELLS, 8 + 4 + 1 + 1 + 2 + 4 * MAX_UNIT_ACTION_BAR_INDEX + 1 + 4 * addlist + 1);
-    data << charm->GetObjectGuid();
-    data << int32(duration);
-    data << uint8(charmInfo->GetReactState());
-    data << uint8(charmInfo->GetCommandState());
-    data << uint8(0);
-    data << uint8(0);
-
-    charmInfo->BuildActionBar(&data);
-
-    data << uint8(addlist);
-
+    auto packet = std::make_unique<WorldPackets::Pet::PetSpells>();
+    packet->petGuid = charm->GetObjectGuid();
+    packet->timeLimit = duration;
+    packet->reactState = charmInfo->GetReactState();
+    packet->commandState = charmInfo->GetCommandState();
+    charmInfo->BuildActionBar(packet->actionButtons);
     if (addlist)
     {
         for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
         {
             CharmSpellEntry* cspell = charmInfo->GetCharmSpell(i);
             if (cspell->GetAction())
-                data << uint32(cspell->packedData);
+                packet->actions.push_back(cspell->packedData);
         }
     }
-
-    charm->WritePetSpellsCooldown(data);
-
-    GetSession()->SendPacket(&data);
+    WritePetSpellsCooldown(packet->cooldowns, charm->GetCooldownMap());
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::RemovePetActionBar() const
 {
-    WorldPacket data(SMSG_PET_SPELLS, 8);
-    data << ObjectGuid();
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Pet::PetSpells>();
+    GetSession()->SendPacket(std::move(packet));
 }
 
 // This will create a new creature and set the current unit as the controller of that new creature

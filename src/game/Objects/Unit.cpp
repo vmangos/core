@@ -8551,10 +8551,10 @@ void CharmInfo::LoadPetActionBar(std::string const& data)
     }
 }
 
-void CharmInfo::BuildActionBar(WorldPacket* data)
+void CharmInfo::BuildActionBar(std::array<uint32, 10>& data)
 {
-    for (const auto& i : m_petActionBar)
-        *data << uint32(i.packedData);
+    for (size_t i = 0; i < data.size(); ++i)
+        data[i] = m_petActionBar[i].packedData;
 }
 
 void CharmInfo::SetSpellAutocast(uint32 spellId, bool state)
@@ -10989,41 +10989,4 @@ void Unit::SetNativeScale(float scale)
 {
     SetTransformScale(scale);
     m_nativeScale = scale;
-}
-
-void Unit::WritePetSpellsCooldown(WorldPacket& data) const
-{
-    // write cooldown data
-    uint32 cdCount = 0;
-    const size_t cdCountPos = data.wpos();
-    data << uint16(0);
-    auto currTime = sWorld.GetCurrentClockTime();
-
-    for (auto& cdItr : m_cooldownMap)
-    {
-        auto& cdData = cdItr.second;
-        TimePoint spellRecTime = currTime;
-        TimePoint catRecTime = currTime;
-        cdData->GetSpellCDExpireTime(spellRecTime);
-        cdData->GetCatCDExpireTime(catRecTime);
-        uint32 spellCDDuration = 0;
-        uint32 catCDDuration = 0;
-        if (spellRecTime > currTime)
-            spellCDDuration = std::chrono::duration_cast<std::chrono::milliseconds>(spellRecTime - currTime).count();
-        if (catRecTime > currTime)
-            catCDDuration = std::chrono::duration_cast<std::chrono::milliseconds>(catRecTime - currTime).count();
-
-        if (!spellCDDuration && !catCDDuration && !cdData->IsPermanent())
-            continue;
-
-        if (cdData->IsPermanent())
-            catCDDuration |= 0x8000000;
-
-        data << uint32(cdData->GetSpellEntry()->Id);
-        data << uint16(cdData->GetCategory());              // spell category
-        data << uint32(spellCDDuration);                    // cooldown
-        data << uint32(catCDDuration);                      // category cooldown
-        ++cdCount;
-    }
-    data.put<uint16>(cdCountPos, cdCount);
 }
