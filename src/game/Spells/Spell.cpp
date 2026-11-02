@@ -3488,18 +3488,14 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         {
             // will show cast bar
             SendSpellStart();
+
             // add gcd server side (client side is handled by client itself)
             if (!m_caster->IsPlayer() || !static_cast<Player*>(m_caster)->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
                 m_caster->AddGCD(m_spellInfo);
         }
+
         // execute triggered without cast time explicitly in call point
-        else if ((m_timer == 0) &&
-            // Prevent scenario where pet has a periodic aura that
-            // triggers another spell to deal damage to owner,
-            // causing owner to die and pet gets despawned, leading to
-            // deletion of auras on pet and crash when stack unwinds.
-            // An example of this is spell 3584 Volatile Infection.
-            !(triggeredByAura && m_spellInfo->IsDirectDamageSpell() && m_caster->IsCreature()))
+        if (ShouldExecuteCastInstantly())
             cast(true);
 
         // else triggered with cast time will execute at next tick or later
@@ -8298,7 +8294,7 @@ bool Spell::IsTriggeredByProc() const
     return false;
 }
 
-bool Spell::ShouldRemoveStealthAuras()
+bool Spell::ShouldRemoveStealthAuras() const
 {
     if (!m_casterUnit)
         return false;
@@ -8330,6 +8326,24 @@ bool Spell::ShouldRemoveStealthAuras()
 
     return false;
 }
+
+bool Spell::ShouldExecuteCastInstantly() const
+{
+    if (m_timer != 0)
+        return false;
+
+    // Prevent scenario where pet has a periodic aura that
+    // triggers another spell to deal damage to owner,
+    // causing owner to die and pet gets despawned, leading to
+    // deletion of auras on pet and crash when stack unwinds.
+    // An example of this is spell 3584 Volatile Infection.
+    if (m_IsTriggeredSpell)
+        return !(m_triggeredByAuraSpell && m_spellInfo->IsDirectDamageSpell() && m_caster->IsCreature());
+
+    // Client started spells are executed instantly so that SpellStopCasting macros can chain multiple instant spells.
+    return m_isClientStarted && !m_channeled;
+}
+
 void Spell::Delete() const
 {
     if (IsDeletable())

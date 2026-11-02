@@ -343,7 +343,6 @@ class Spell
         {
             m_CastItem = item;
         }
-        bool ShouldRemoveStealthAuras();
 
         WorldObject* GetChannelTarget() const;
         void AddChanneledAuraHolder(SpellAuraHolder* holder);
@@ -373,6 +372,8 @@ class Spell
         void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
+        bool ShouldRemoveStealthAuras() const;
+        bool ShouldExecuteCastInstantly() const;
 
         ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
                                                             // e.g. damage around area spell trigered by victim aura and damage enemies of aura caster
