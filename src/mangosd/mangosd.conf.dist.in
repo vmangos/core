@@ -1033,7 +1033,6 @@ PerformanceLog.SlowPacketBroadcast = 0
 #
 #    RestrictUnverifiedAccounts
 #        Treat accounts with an unverified email as trial accounts, which are not allowed to do the following:
-#        - Join a guild
 #        - Whisper someone who has not added you to their friends list
 #        - Trade
 #        - Talk in General, Trade or LocalDefense channels
