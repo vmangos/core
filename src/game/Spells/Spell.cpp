@@ -8341,7 +8341,7 @@ bool Spell::ShouldExecuteCastInstantly() const
         return !(m_triggeredByAuraSpell && m_spellInfo->IsDirectDamageSpell() && m_caster->IsCreature());
 
     // Client started spells are executed instantly so that SpellStopCasting macros can chain multiple instant spells.
-    return m_isClientStarted && !m_channeled;
+    return m_isClientStarted && !IsChanneled() && !IsAutoRepeat();
 }
 
 void Spell::Delete() const
