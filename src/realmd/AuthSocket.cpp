@@ -895,16 +895,38 @@ void AuthSocket::_HandleReconnectChallenge()
 
     ReadChallengeRequest("ReconnectChallenge", [self = shared_from_this()](std::shared_ptr<sAuthLogonChallengeBody> const& body) -> void
     {
-        std::unique_ptr<QueryResult> queryResult = LoginDatabase.PQuery("SELECT `sessionkey`, `id` FROM `account` WHERE `username` = '%s'", self->m_safelogin.c_str());
+        // One query for everything: same checks as a full logon challenge (ip ban, account ban, IP lock).
+        // The remote address comes from the socket, the login is escaped: no SQL injection.
+        std::unique_ptr<QueryResult> queryResult = LoginDatabase.PQuery(
+            "SELECT a.`sessionkey`, a.`id`, a.`locked`, a.`last_ip`, "
+            "(SELECT COUNT(*) FROM `ip_banned` WHERE `ip` = '%s' AND (`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP())), "
+            "(SELECT COUNT(*) FROM `account_banned` WHERE `id` = a.`id` AND `active` = 1 AND (`unbandate` > UNIX_TIMESTAMP() OR `unbandate` = `bandate`)) "
+            "FROM `account` a WHERE a.`username` = '%s'", self->GetRemoteIpString().c_str(), self->m_safelogin.c_str());
 
         // Stop if the account is not found
         if (!queryResult)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "user %s tried to login and we cannot find his session key in the database.", self->m_login.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ReconnectChallenge] Account %s tried to login and we cannot find his session key in the database.", self->m_login.c_str());
             return; // implicit close
         }
 
         Field* fields = queryResult->Fetch();
+
+        // The client cannot display an error at this step (it drops the link on a non-zero result byte),
+        // so just close: the player then falls back to a full logon, which reports the reason.
+        if (fields[4].GetUInt32() || fields[5].GetUInt32())
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[ReconnectChallenge] Banned %s %s tries to reconnect!", fields[4].GetUInt32() ? "ip" : "account",
+                fields[4].GetUInt32() ? self->GetRemoteIpString().c_str() : self->m_login.c_str());
+            return; // implicit close
+        }
+
+        if ((fields[2].GetUInt8() & IP_LOCK) && fields[3].GetCppString() != self->GetRemoteIpString())
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[ReconnectChallenge] Account %s is locked to another ip, reconnect from %s refused!", self->m_login.c_str(), self->GetRemoteIpString().c_str());
+            return; // implicit close
+        }
+
         self->srp.SetStrongSessionKey(fields[0].GetString());
         self->m_accountId = fields[1].GetUInt32();
 
@@ -937,7 +959,7 @@ void AuthSocket::_HandleReconnectProof()
     {
         if (error)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleReconnectProof self->m_socket.Read(): ERROR");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ReconnectProof] self->m_socket.Read(): ERROR");
             self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
             return;
         }
@@ -986,7 +1008,7 @@ void AuthSocket::_HandleReconnectProof()
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "user %s tried to login, but session invalid.", self->m_login.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ReconnectProof] Account %s tried to login, but session invalid.", self->m_login.c_str());
             self->CloseSocket(); // TODO: Remove me. Closing the socket will be done implicitly if all references to this socket are deleted (when there is no IO anymore)
             return;
         }
