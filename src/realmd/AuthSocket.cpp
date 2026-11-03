@@ -427,8 +427,15 @@ void AuthSocket::_HandleLogonChallenge()
 
                     // account is IP locked and the player does not have 2FA enabled
                     if (((self->m_lockFlags & TOTP) != TOTP && (self->m_lockFlags & FIXED_PIN) != FIXED_PIN))
-                        *pkt << (uint8) WOW_FAIL_SUSPENDED;
-
+                    {
+                        *pkt << (uint8)WOW_FAIL_SUSPENDED;
+                        self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
+                        {
+                            if (error)
+                                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "_HandleLogonChallenge self->Write() Error: %s", error.ToString().c_str());
+                        });
+                        return;
+                    }
                     locked = true;
                 }
                 else
