@@ -988,9 +988,10 @@ void AuthSocket::_HandleReconnectProof()
 
         Crypto::Hash::SHA1::Generator sha;
         sha.UpdateData(self->m_login);
-        sha.UpdateData(t1);
-        sha.UpdateData(self->m_reconnectProof);
-        sha.UpdateData(K);
+        // Fixed widths, as the client: R1 and the challenge on 16 bytes, K on 40
+        sha.UpdateData(t1.AsByteArray(16));
+        sha.UpdateData(self->m_reconnectProof.AsByteArray(16));
+        sha.UpdateData(K.AsByteArray(40));
         Crypto::Hash::SHA1::Digest digest = sha.GetDigest();
 
         if (Crypto::ConstantTimeEquals(digest.data(), lp->R2, digest.size()))
