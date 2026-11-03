@@ -54,13 +54,15 @@ void SRP6::CalculateProof(std::string username)
     BigNumber t3;
     t3.SetBinary(hashN.data(), hashN.size());
 
+    // The client hashes s, A and B on 32 bytes and K on 40 bytes, whatever their value: a number with leading zero
+    // bytes must not be hashed shorter (it made the proof fail one time out of a few dozen)
     SHA1::Generator generator;
     generator.UpdateData(t3);
     generator.UpdateData(SHA1::ComputeFrom(username));
-    generator.UpdateData(s);
-    generator.UpdateData(A);
-    generator.UpdateData(B);
-    generator.UpdateData(K);
+    generator.UpdateData(s.AsByteArray(32));
+    generator.UpdateData(A.AsByteArray(32));
+    generator.UpdateData(B.AsByteArray(32));
+    generator.UpdateData(K.AsByteArray(40));
     SHA1::Digest hashM = generator.GetDigest();
 
     M.SetBinary(hashM.data(), hashM.size());
@@ -78,8 +80,8 @@ bool SRP6::CalculateSessionKey(uint8 const* lp_A, int l)
         return false;
 
     Crypto::Hash::SHA1::Generator generator;
-    generator.UpdateData(A);
-    generator.UpdateData(B);
+    generator.UpdateData(A.AsByteArray(32));
+    generator.UpdateData(B.AsByteArray(32));
     u.SetBinary(generator.GetDigest().data(), 20);
 
     S = (A * (v.ModExp(u, N))).ModExp(b, N);
@@ -126,30 +128,32 @@ bool SRP6::CalculateVerifier(const std::string& rI, const char* salt)
 
 void SRP6::HashSessionKey(void)
 {
-    uint8 t[32];
-    uint8 t1[16];
+    // Same interleave as the client: S as 32 little-endian bytes, without its leading zero bytes, and without one more
+    // byte if the remaining length is odd. The even and odd bytes are hashed apart and interleaved back into K (40 bytes).
+    std::vector<uint8> const t = S.AsByteArray(32);
+    size_t skip = 0;
+    while (skip < t.size() && t[skip] == 0)
+        ++skip;
+    if ((t.size() - skip) % 2)
+        ++skip;
+
+    size_t const half = (t.size() - skip) / 2;
+    std::vector<uint8> even(half), odd(half);
+    for (size_t i = 0; i < half; ++i)
+    {
+        even[i] = t[skip + i * 2];
+        odd[i] = t[skip + i * 2 + 1];
+    }
+
     uint8 vK[40];
-    memcpy(t, S.AsByteArray(32).data(), 32);
-    for (int i = 0; i < 16; ++i)
-    {
-        t1[i] = t[i * 2];
-    }
-
-    auto t1HashFirst = Crypto::Hash::SHA1::ComputeFrom(t1, 16);
+    auto evenHash = Crypto::Hash::SHA1::ComputeFrom(even);
     for (int i = 0; i < 20; ++i)
-    {
-        vK[i * 2] = t1HashFirst[i];
-    }
-    for (int i = 0; i < 16; ++i)
-    {
-        t1[i] = t[i * 2 + 1];
-    }
+        vK[i * 2] = evenHash[i];
 
-    auto t1HashSecond = Crypto::Hash::SHA1::ComputeFrom(t1, 16);
+    auto oddHash = Crypto::Hash::SHA1::ComputeFrom(odd);
     for (int i = 0; i < 20; ++i)
-    {
-        vK[i * 2 + 1] = t1HashSecond[i];
-    }
+        vK[i * 2 + 1] = oddHash[i];
+
     K.SetBinary(vK, 40);
 }
 
@@ -178,10 +182,11 @@ bool SRP6::ProofVerifier(std::string vC)
 
 Crypto::Hash::SHA1::Digest SRP6::Finalize()
 {
+    // A on 32 bytes, M on 20, K on 40: the sizes the client uses
     Crypto::Hash::SHA1::Generator generator;
-    generator.UpdateData(A);
-    generator.UpdateData(M);
-    generator.UpdateData(K);
+    generator.UpdateData(A.AsByteArray(32));
+    generator.UpdateData(M.AsByteArray(20));
+    generator.UpdateData(K.AsByteArray(40));
     return generator.GetDigest();
 }
 
