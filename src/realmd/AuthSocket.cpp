@@ -333,18 +333,34 @@ void AuthSocket::_HandleLogonChallenge()
         *pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
         *pkt << (uint8) 0x00;
 
-        std::string clientIpAddress = self->GetRemoteIpString();
-
-        // Check if the IP is banned
-        std::string safeIp = clientIpAddress;
+        std::string safeIp = self->GetRemoteIpString();
         LoginDatabase.escape_string(safeIp);
-        std::unique_ptr<QueryResult> ipBanResult = LoginDatabase.PQuery(
-            "SELECT 1 FROM `ip_banned` WHERE `ip` = '%s' AND (`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP()) LIMIT 1",
-            safeIp.c_str());
-        if (ipBanResult)
+
+        // Get the account details and its ban state in one query (a round trip to the database costs far more than a few extra columns)
+        // No SQL injection (escaped user name and IP address)
+        std::unique_ptr<QueryResult> queryResult = LoginDatabase.PQuery(
+            //         0       1           2            3      4      5             6                7                8       9
+            "SELECT a.`id`, a.`locked`, a.`last_ip`, a.`v`, a.`s`, a.`security`, a.`email_verif`, a.`geolock_pin`, a.`email`, UNIX_TIMESTAMP(a.`joindate`), "
+            "(SELECT COUNT(*) FROM `ip_banned` WHERE `ip` = '%s' AND (`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP())), "
+            "(SELECT COUNT(*) FROM `account_banned` WHERE `id` = a.`id` AND `active` = 1 AND `unbandate` = `bandate`), "
+            "(SELECT COUNT(*) FROM `account_banned` WHERE `id` = a.`id` AND `active` = 1 AND `unbandate` <> `bandate` AND `unbandate` > UNIX_TIMESTAMP()) "
+            "FROM `account` a WHERE a.`username` = '%s'",
+            safeIp.c_str(), self->m_safelogin.c_str());
+
+        bool ipBanned;
+        if (queryResult)
+            ipBanned = (*queryResult)[10].GetUInt32() != 0;
+        else    // unknown account: the IP ban must still be reported first
+        {
+            std::unique_ptr<QueryResult> ipBanResult = LoginDatabase.PQuery("SELECT `unbandate` FROM `ip_banned` "
+                "WHERE `ip` = '%s' AND (`unbandate` = `bandate` OR `unbandate` > UNIX_TIMESTAMP())", safeIp.c_str());
+            ipBanned = ipBanResult != nullptr;
+        }
+
+        if (ipBanned)
         {
             *pkt << uint8(WOW_FAIL_FAIL_NOACCESS);
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", clientIpAddress.c_str(), self->m_login.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", self->GetRemoteIpString().c_str(), self->m_login.c_str());
 
             self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
             {
@@ -357,11 +373,11 @@ void AuthSocket::_HandleLogonChallenge()
         }
 
         // Reject early if this IP is currently locked out due to recent wrong-password failures.
-        auto wrongPassResult = GetWrongPasswordAttemptsForIp(clientIpAddress);
+        auto wrongPassResult = GetWrongPasswordAttemptsForIp(self->GetRemoteIpString());
         if (wrongPassResult.IsBeingThrottled())
         {
             sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] IP '%s' is temporarily locked after %u failed attempts",
-                     clientIpAddress.c_str(), wrongPassResult.failedAttempts);
+                self->GetRemoteIpString().c_str(), wrongPassResult.failedAttempts);
             *pkt << uint8(WOW_FAIL_DB_BUSY);
 
             self->m_socket.Write(std::move(pkt), [self](IO::NetworkError const& error)
@@ -374,13 +390,9 @@ void AuthSocket::_HandleLogonChallenge()
             return;
         }
 
-        // Get the account details from the account table
-        // No SQL injection (escaped username)
-        //                                                                            0     1         2          3    4    5           6              7              8       9
-        std::unique_ptr<QueryResult> sqlAccountResult = LoginDatabase.PQuery("SELECT `id`, `locked`, `last_ip`, `v`, `s`, `security`, `email_verif`, `geolock_pin`, `email`, UNIX_TIMESTAMP(`joindate`) FROM `account` WHERE `username` = '%s'", self->m_safelogin.c_str());
-        if (sqlAccountResult)
+        if (queryResult)
         {
-            Field* fields = sqlAccountResult->Fetch();
+            Field* fields = queryResult->Fetch();
 
             // Prevent login if the user's email address has not been verified
             bool requireVerification = sConfig.GetBoolDefault("ReqEmailVerification", false);
@@ -468,21 +480,17 @@ void AuthSocket::_HandleLogonChallenge()
                 uint32 pendingAccountId = fields[0].GetUInt32();
 
                 // If the account is banned, reject the logon attempt
-                std::unique_ptr<QueryResult> sqlAccountBanResult = LoginDatabase.PQuery("SELECT `bandate`, `unbandate` FROM `account_banned` WHERE `id` = %u AND `active` = 1 AND (`unbandate` > UNIX_TIMESTAMP() OR `unbandate` = `bandate`) LIMIT 1", pendingAccountId);
-                if (sqlAccountBanResult)
+                bool const permanentBan = fields[11].GetUInt32() != 0;
+                bool const temporaryBan = fields[12].GetUInt32() != 0;
+                if (permanentBan)
                 {
-                    uint64_t banTimestamp = (*sqlAccountBanResult)[0].GetUInt64();
-                    uint64_t unbanTimestamp = (*sqlAccountBanResult)[1].GetUInt64();
-                    if (banTimestamp == unbanTimestamp)
-                    {
-                        *pkt << (uint8) WOW_FAIL_BANNED;
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->GetRemoteIpString().c_str());
-                    }
-                    else
-                    {
-                        *pkt << (uint8) WOW_FAIL_SUSPENDED;
-                        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->GetRemoteIpString().c_str());
-                    }
+                    *pkt << (uint8)WOW_FAIL_BANNED;
+                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->GetRemoteIpString().c_str());
+                }
+                else if (temporaryBan)
+                {
+                    *pkt << (uint8)WOW_FAIL_SUSPENDED;
+                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!", self->m_login.c_str(), self->GetRemoteIpString().c_str());
                 }
                 else
                 {
