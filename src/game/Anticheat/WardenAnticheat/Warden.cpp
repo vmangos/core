@@ -114,7 +114,7 @@ Warden::Warden(WorldSession* session, WardenModule const* module, BigNumber cons
     m_inputCrypto(KeyLength), m_outputCrypto(KeyLength), m_initialized(false), m_module(module), m_crk(nullptr),
     m_timeoutClock(0), m_scanClock(0), m_moduleSendPending(false), m_maiev(true)
 {
-    auto const kBytes = K.AsByteArray();
+    auto const kBytes = K.AsByteArray(40);
 
     WardenKeyGenerator WK(kBytes.data(), kBytes.size());
 

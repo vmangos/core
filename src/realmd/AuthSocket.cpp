@@ -858,7 +858,10 @@ void AuthSocket::_HandleLogonProof__PostRecv(std::shared_ptr<sAuthLogonProof_C c
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped username) and IP address as received by socket
+        // K is 40 bytes: write it as 80 hex characters, AsHexStr drops the leading zero bytes
         std::string K_hex = srp.GetStrongSessionKey().AsHexStr();
+        if (K_hex.size() < 80)
+            K_hex.insert(0, 80 - K_hex.size(), '0');
         // Why it must be sync: The new network implementation is so fast that the async db cant execute the UPDATE statement before the client tries to reach mangosd
         // If it is async there would be a race condition
         bool result = LoginDatabase.PExecute(DbExecMode::MustBeSync, "UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `os` = '%s', `platform` = '%s' WHERE `username` = '%s'",

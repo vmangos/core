@@ -369,7 +369,7 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
     sha.UpdateData((uint8 *) &t, 4);
     sha.UpdateData((uint8 *) &clientSeed, 4);
     sha.UpdateData((uint8 *) &seed, 4);
-    sha.UpdateData(K);
+    sha.UpdateData(K.AsByteArray(40));                  // the client hashes the 40 bytes of K
     auto expectedDigest = sha.GetDigest();
 
     if (digest != expectedDigest)
