@@ -2910,6 +2910,32 @@ bool ChatHandler::HandleLearnAllItemsCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleLearnAllQuestsCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+
+    for (auto const& itr : sObjectMgr.GetQuestTemplates())
+    {
+        Quest const* pQuest = itr.second.get();
+        if (!pQuest)
+            continue;
+
+        if (pQuest->GetMinLevel() > pPlayer->GetLevel())
+            continue;
+
+        if (pQuest->GetRequiredClasses() != pPlayer->GetClassMask())
+            continue;
+
+        if (pQuest->GetRequiredRaces() && !(pQuest->GetRequiredRaces() & pPlayer->GetRaceMask()))
+            continue;
+
+        pPlayer->LearnQuestRewardedSpells(pQuest);
+    }
+
+    SendSysMessage("Learned all available spells from quests.");
+    return true;
+}
+
 bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
 {
     Player* player = m_session->GetPlayer();
