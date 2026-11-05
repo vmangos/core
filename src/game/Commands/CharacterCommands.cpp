@@ -2862,21 +2862,6 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
             if (trainerSpellList->spellList.empty())
                 continue;
 
-            // Skip unwanted valid trainers:
-            // Check whether a given spell is a profession or riding spell. If it is we skip the trainer
-            auto itr2 = trainerSpellList->spellList.begin();
-
-            if (IsProfessionOrRidingSkill(itr2->second.reqSkill))
-                continue;
-
-            SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr2->first);
-
-            if (!spellInfo)
-                continue;
-
-            if (SpellMgr::IsProfessionOrRidingSpell(spellInfo->EffectTriggerSpell[EFFECT_INDEX_0]))
-                continue;
-
             if (cSpells)
                 HandleLearnTrainerHelper(pPlayer, cSpells);
 
