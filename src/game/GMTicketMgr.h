@@ -240,6 +240,9 @@ public:
         return nullptr;
     }
 
+    // The tickets written by this character are removed, the ones it handled as a GM go back to unassigned
+    void RemovePlayerReferences(ObjectGuid playerGuid);
+
     void AddTicket(GmTicket* ticket);
     void CloseTicket(uint32 ticketId, ObjectGuid source);
     void RemoveTicket(uint32 ticketId);

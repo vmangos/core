@@ -4456,12 +4456,14 @@ void Player::DeleteFromDB(ObjectGuid playerGuid, uint32 accountId, bool updateRe
             }
 
             CharacterDatabase.PExecute("DELETE FROM `characters` WHERE `guid` = '%u'", lowGuid);
+            CharacterDatabase.PExecute("DELETE FROM `character_account_data` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_action` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_aura` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_battleground_data` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_deleted_items` WHERE `player_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_gifts` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_homebind` WHERE `guid` = '%u'", lowGuid);
+            CharacterDatabase.PExecute("DELETE FROM `character_honor_cp` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_instance` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `group_instance` WHERE `leader_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `guid` = '%u'", lowGuid);
@@ -4471,12 +4473,15 @@ void Player::DeleteFromDB(ObjectGuid playerGuid, uint32 accountId, bool updateRe
             CharacterDatabase.PExecute("DELETE FROM `character_forgotten_skills` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_spell` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_spell_cooldown` WHERE `guid` = '%u'", lowGuid);
+            CharacterDatabase.PExecute("DELETE FROM `character_stats` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `item_instance` WHERE `owner_guid` = '%u'", lowGuid);
+            CharacterDatabase.PExecute("DELETE FROM `item_loot` WHERE `owner_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_social` WHERE `guid` = '%u' OR `friend`='%u'", lowGuid, lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `receiver_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `receiver_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_pet` WHERE `owner_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `guild_eventlog` WHERE `player_guid1` = '%u' OR `player_guid2` = '%u'", lowGuid, lowGuid);
+            sTicketMgr->RemovePlayerReferences(playerGuid);
             CharacterDatabase.CommitTransaction();
             break;
         }
