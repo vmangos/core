@@ -9,16 +9,16 @@ INSERT INTO `migrations` VALUES ('20260825234315');
 -- Add your query below.
 
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES 
-(10660, 17, 10660, 0, 0, 0, 0),      -- Condition to check if the player has learnt Tribal Leatherworking
-(10658, 17, 10658, 0, 0, 0, 0),      -- Condition to check if the player has learnt Elemental Leatherworking
-(10656, 17, 10656, 0, 0, 0, 0),      -- Condition to check if the player has learnt Dragonscale Leatherworking
--- Note: Condition 1367 corresponds to a condition checking if the player has learnt Goblin Engineering
--- Note: Condition 1371 corresponds to a condition checking if the player has a Goblin Engineer Membership Card in their inventory
-(20222, -1, 1367, 1371, 0, 0, 0),     -- Condition for goblin engineering trainer gossip
--- Note: Condition 1368 corresponds to a condition checking if the player has learnt Gnomish Engineering
--- Note: Condition 1374 corresponds to a condition checking if the player has a Gnome Engineer Membership Card in their inventory
-(20219, -1, 1368, 1374, 0, 0, 0),     -- Condition for gnomish engineering trainer gossip
-(20220, -1, 20219, 2, 0, 0, 0);       -- Condition for gnomish engineering trainer gossip for horde (Oglethorpe is a neutral NPC)
+(10660, 17, 10660, 0, 0, 0, 0),      -- Player has learnt Tribal Leatherworking
+(10658, 17, 10658, 0, 0, 0, 0),      -- Player has learnt Elemental Leatherworking
+(10656, 17, 10656, 0, 0, 0, 0),      -- Player has learnt Dragonscale Leatherworking
+-- Condition 1367: Player has learnt Goblin Engineering
+-- Condition 1371: Player has a Goblin Engineer Membership Card in their bags
+(20222, -1, 1367, 1371, 0, 0, 0),     -- Goblin Engineering trainer option
+-- Condition 1368: Player has learnt Gnomish Engineering
+-- Condition 1374: Player has a Gnome Engineer Membership Card in their bags
+(20219, -1, 1368, 1374, 0, 0, 0),     -- Gnomish Engineering trainer option
+(20220, -1, 20219, 2, 0, 0, 0);       -- Gnomish Engineering trainer option (Horde only - Oglethorpe is a neutral NPC)
 
 -- Add missing trainer gossip menu options
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
