@@ -10280,8 +10280,8 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
             pItem2->SetBinding(true);
 
         pItem2->SetCount(pItem2->GetCount() + count);
-        if (IsInWorld() && update)
-            pItem2->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld() && update)
+        //    pItem2->SendValuesUpdateToPlayer(this);
 
         if (!clone)
         {
@@ -10388,8 +10388,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     else
     {
         pItem2->SetCount(pItem2->GetCount() + pItem->GetCount());
-        if (IsInWorld() && update)
-            pItem2->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld() && update)
+        //    pItem2->SendValuesUpdateToPlayer(this);
 
         // delete item (it not in any slot currently)
         //pItem->DeleteFromDB();
@@ -10699,8 +10699,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                 {
                     ItemRemovedQuestCheck(pItem->GetEntry(), count - remcount);
                     pItem->SetCount(pItem->GetCount() - count + remcount);
-                    if (IsInWorld() && update)
-                        pItem->SendCreateUpdateToPlayer(this);
+                    //if (IsInWorld() && update)
+                    //    pItem->SendValuesUpdateToPlayer(this);
                     pItem->SetState(ITEM_CHANGED, this);
                     return;
                 }
@@ -10727,8 +10727,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                 {
                     ItemRemovedQuestCheck(pItem->GetEntry(), count - remcount);
                     pItem->SetCount(pItem->GetCount() - count + remcount);
-                    if (IsInWorld() && update)
-                        pItem->SendCreateUpdateToPlayer(this);
+                    //if (IsInWorld() && update)
+                    //    pItem->SendValuesUpdateToPlayer(this);
                     pItem->SetState(ITEM_CHANGED, this);
                     return;
                 }
@@ -10760,8 +10760,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                         {
                             ItemRemovedQuestCheck(pItem->GetEntry(), count - remcount);
                             pItem->SetCount(pItem->GetCount() - count + remcount);
-                            if (IsInWorld() && update)
-                                pItem->SendCreateUpdateToPlayer(this);
+                            //if (IsInWorld() && update)
+                            //    pItem->SendValuesUpdateToPlayer(this);
                             pItem->SetState(ITEM_CHANGED, this);
                             return;
                         }
@@ -10793,8 +10793,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                 {
                     ItemRemovedQuestCheck(pItem->GetEntry(), count - remcount);
                     pItem->SetCount(pItem->GetCount() - count + remcount);
-                    if (IsInWorld() && update)
-                        pItem->SendCreateUpdateToPlayer(this);
+                    //if (IsInWorld() && update)
+                    //    pItem->SendValuesUpdateToPlayer(this);
                     pItem->SetState(ITEM_CHANGED, this);
                     return;
                 }
@@ -10822,8 +10822,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                     else
                     {
                         pItem->SetCount(pItem->GetCount() - count + remcount);
-                        if (IsInWorld() && update)
-                            pItem->SendCreateUpdateToPlayer(this);
+                        //if (IsInWorld() && update)
+                        //    pItem->SendValuesUpdateToPlayer(this);
                         pItem->SetState(ITEM_CHANGED, this);
                         return;
                     }
@@ -10853,8 +10853,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                             else
                             {
                                 pItem->SetCount(pItem->GetCount() - count + remcount);
-                                if (IsInWorld() && update)
-                                    pItem->SendCreateUpdateToPlayer(this);
+                                //if (IsInWorld() && update)
+                                //    pItem->SendValuesUpdateToPlayer(this);
                                 pItem->SetState(ITEM_CHANGED, this);
                                 return;
                             }
@@ -10957,8 +10957,8 @@ void Player::DestroyItemCount(Item* pItem, uint32& count, bool update)
         ItemRemovedQuestCheck(pItem->GetEntry(), count);
         pItem->SetCount(pItem->GetCount() - count);
         count = 0;
-        if (IsInWorld() && update)
-            pItem->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld() && update)
+        //    pItem->SendValuesUpdateToPlayer(this);
         pItem->SetState(ITEM_CHANGED, this);
     }
 }
@@ -11036,8 +11036,8 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
             return;
         }
 
-        if (IsInWorld())
-            pSrcItem->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld())
+        //    pSrcItem->SendValuesUpdateToPlayer(this);
         pSrcItem->SetState(ITEM_CHANGED, this);
         StoreItem(dest, pNewItem, true);
     }
@@ -11057,8 +11057,8 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
             return;
         }
 
-        if (IsInWorld())
-            pSrcItem->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld())
+        //    pSrcItem->SendValuesUpdateToPlayer(this);
         pSrcItem->SetState(ITEM_CHANGED, this);
         BankItem(dest, pNewItem, true);
     }
@@ -11077,8 +11077,8 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
             return;
         }
 
-        if (IsInWorld())
-            pSrcItem->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld())
+        //    pSrcItem->SendValuesUpdateToPlayer(this);
         pSrcItem->SetState(ITEM_CHANGED, this);
         EquipItem(dest, pNewItem, true);
         AutoUnequipOffhandIfNeed();
@@ -11245,11 +11245,11 @@ void Player::SwapItem(uint16 src, uint16 dst)
                 pDstItem->SetCount(pSrcItem->GetProto()->GetMaxStackSize());
                 pSrcItem->SetState(ITEM_CHANGED, this);
                 pDstItem->SetState(ITEM_CHANGED, this);
-                if (IsInWorld())
-                {
-                    pSrcItem->SendCreateUpdateToPlayer(this);
-                    pDstItem->SendCreateUpdateToPlayer(this);
-                }
+                //if (IsInWorld())
+                //{
+                //    pSrcItem->SendValuesUpdateToPlayer(this);
+                //    pDstItem->SendValuesUpdateToPlayer(this);
+                //}
             }
             return;
         }
