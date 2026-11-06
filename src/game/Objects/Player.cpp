@@ -18519,7 +18519,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
     packet->vendorGuid = pCreature->GetObjectGuid();
     packet->vendorSlot = clientVendorSlot;
     packet->newCount = crItem->maxcount > 0 ? new_count : 0xFFFFFFFF;
-    packet->purchaseCount = count;
+    packet->purchaseCount = totalCount;
     GetSession()->SendPacket(std::move(packet));
 
     SendNewItem(pItem, totalCount, true, false, false);
