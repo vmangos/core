@@ -34,6 +34,7 @@
 #include "PlayerDump.h"
 #include "CharacterDatabaseCache.h"
 #include "Config/Config.h"
+#include "Conditions.h"
 
 #include <regex>
 #include <iterator>
@@ -2790,32 +2791,58 @@ bool ChatHandler::HandleLearnAllTrainerCommand(char* args)
             if (!(cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER))
                 continue;
 
-            switch (cInfo->trainer_type)
+            uint32 gossipMenuId = cInfo->gossip_menu_id;
+            if (!gossipMenuId)
+                continue;
+
+            GossipMenuItemsMapBounds bounds = sObjectMgr.GetGossipMenuItemsMapBounds(gossipMenuId);
+            bool validTrainer = false;
+            for (auto itr = bounds.first; itr != bounds.second; ++itr)
             {
-                case TRAINER_TYPE_CLASS:
+                GossipMenuItems const& gMenuItem = itr->second;
+                if (gMenuItem.menu_id && gMenuItem.option_id == GOSSIP_OPTION_TRAINER)
                 {
-                    if (cInfo->trainer_class != pPlayer->GetClass())
-                        continue;
-                    break;
+                    if (uint32 conditionId = gMenuItem.condition_id)
+                    {
+                        validTrainer = IsConditionSatisfied(conditionId, pPlayer, pPlayer->GetMap(), pPlayer, CONDITION_FROM_GOSSIP_OPTION);
+                        break;
+                    }
+                    else
+                    {
+                        validTrainer = true;
+                        break;
+                    }
                 }
-                case TRAINER_TYPE_PETS:
+                else
                 {
-                    if (pPlayer->GetClass() != CLASS_HUNTER)
-                        continue;
+                    validTrainer = true;
                     break;
                 }
             }
 
-            if (TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first))
+            if (!validTrainer)
+                continue;
+
+            TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(itr.first);
+            TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId);
+            TrainerSpellData const* trainerSpellList = cSpells ? cSpells : (tSpells ? tSpells : nullptr);
+
+            if (!trainerSpellList)
+                continue;
+            
+            if (trainerSpellList->spellList.empty())
+                continue;
+
+            if (cSpells)
                 HandleLearnTrainerHelper(pPlayer, cSpells);
 
-            if (trainerId = cInfo->trainer_id) // assignment
+            if (trainerId = cInfo->trainer_id)
             {
                 if (checkedTrainerTemplates.find(trainerId) != checkedTrainerTemplates.end())
                     continue;
 
                 checkedTrainerTemplates.insert(trainerId);
-                if (TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId))
+                if (tSpells)
                     HandleLearnTrainerHelper(pPlayer, tSpells);
             }
         }
