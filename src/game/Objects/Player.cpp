@@ -13907,7 +13907,7 @@ void Player::GroupEventFailHappens(uint32 questId)
         FailQuest(questId);
 }
 
-void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
+void Player::ItemAddedQuestCheck(uint32 entry, uint32 count, bool sendQuestUpdate)
 {
     for (int i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
@@ -13938,7 +13938,7 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
                     if (q_status.uState != QUEST_NEW)
                         q_status.uState = QUEST_CHANGED;
 
-                    if (entry != qInfo->GetSrcItemId())
+                    if (sendQuestUpdate && entry != qInfo->GetSrcItemId())
                         SendQuestUpdateAddItem(qInfo, j, curItemCount, newItemCount - curItemCount);
                 }
 
@@ -18468,7 +18468,14 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
         LogModifyMoney(-int32(price), "BuyItem", vendorGuid, item);
 
-        pItem = StoreNewItem(dest, item, true, Item::GenerateItemRandomPropertyId(item));
+        // the client shows the quest item progress from SMSG_BUY_ITEM
+        if (Item* newItem = Item::CreateItem(item, totalCount, GetObjectGuid()))
+        {
+            ItemAddedQuestCheck(item, totalCount, false);
+            if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(item))
+                pItem->SetItemRandomProperties(randomPropertyId);
+            pItem = StoreItem(dest, newItem, true);
+        }
     }
     else if (IsEquipmentPos(bag, slot))
     {
@@ -18488,7 +18495,14 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
         LogModifyMoney(-int32(price), "BuyItem", vendorGuid, item);
 
-        pItem = EquipNewItem(dest, item, true);
+        // the client shows the quest item progress from SMSG_BUY_ITEM
+        if (Item* newItem = Item::CreateItem(item, 1, GetObjectGuid()))
+        {
+            ItemAddedQuestCheck(item, 1, false);
+            if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(item))
+                pItem->SetItemRandomProperties(randomPropertyId);
+            pItem = EquipItem(dest, newItem, true);
+        }
 
         if (pItem)
             AutoUnequipOffhandIfNeed();
