@@ -40,7 +40,7 @@ UPDATE `gossip_menu_option` SET `condition_id` = 10656 WHERE `menu_id` = 3067 AN
 UPDATE `gossip_menu_option` SET `condition_id` = 10658 WHERE `menu_id` = 3070 AND `option_id` = 5;     -- Sarah Tanner (Elemental Leatherworking - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 10660 WHERE `option_id` = 5 AND `menu_id` IN (
 3072,       -- Caryssia Moonhunter (Tribal Leatherworking - Alliance)
-3073);     -- Se'Jib (Tribal Leatherworking - Horde)
+3073);      -- Se'Jib (Tribal Leatherworking - Horde)
 UPDATE `gossip_menu_option` SET `condition_id` = 20222, `option_broadcast_text` = 4551 WHERE `menu_id` = 1465 AND `option_id` = 5;     -- Vazario Linkgrease (Goblin Engineering) + Correction to broadcast_text entry (currently uses the Gnomish entry 4553 instead of the Goblin one, 4551)
 UPDATE `gossip_menu_option` SET `condition_id` = 20219 WHERE `menu_id` = 1468 AND `option_id` = 5;     -- Tinkmaster Overspark (Gnomish Engineering - Alliance)
 UPDATE `gossip_menu_option` SET `condition_id` = 20220 WHERE `menu_id` = 1467 AND `option_id` = 5;     -- Oglethorpe Obnoticus (Gnomish Engineering - Horde)
