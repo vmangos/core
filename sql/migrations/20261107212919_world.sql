@@ -53,6 +53,17 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (2602, 0, 0, 15, 16029, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tinkee Steamboil - Cast Create Eggscilliscope');
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Add Catalogue of the Wayward Start Script
+ UPDATE `quest_template` SET `StartScript`=5164 WHERE  `entry`=5164 AND `patch`=0;
+
+DELETE FROM `quest_start_scripts` WHERE `id`=5164;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(5164, 1, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.174533, 0, 'Catalogue of the Wayward: Jeziba - Orientation'),
+(5164, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6332, 0, 0, 0, 0, 0, 0, 0, 0, 'Catalogue of the Wayward: Jeziba - Talk'),
+(5164, 3, 0, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Catalogue of the Wayward: Jeziba - Emote'),
+(5164, 5, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.38594, 0, 'Catalogue of the Wayward: Jeziba - Orientation');
 
 
 -- End of migration.
