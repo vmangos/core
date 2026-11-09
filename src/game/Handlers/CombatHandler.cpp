@@ -59,6 +59,9 @@ void WorldSession::HandleAttackSwingOpcode(WorldPackets::Combat::AttackSwing con
     }
 
     _player->Attack(pEnemy, true);
+
+    // each new attack shows its swing error again, even the one last sent
+    _player->SetSwingErrorMsg(ATTACK_RESULT_OK);
 }
 
 void WorldSession::HandleAttackStopOpcode(NullClientPacket const& /*packet*/)
