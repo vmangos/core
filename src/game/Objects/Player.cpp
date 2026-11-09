@@ -17379,7 +17379,7 @@ void WritePetSpellsCooldown(std::vector<WorldPackets::Pet::PetSpells::PetSpellCo
             continue;
 
         if (cdData->IsPermanent())
-            catCDDuration |= 0x8000000;
+            catCDDuration |= 0x80000000;
 
         packetCDs.emplace_back(uint16(cdData->GetSpellEntry()->Id), uint16(cdData->GetCategory()), int32(spellCDDuration), int32(catCDDuration));
     }
