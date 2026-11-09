@@ -144,10 +144,10 @@ void WorldSession::SendAuctionRemovedNotification(AuctionEntry* auction)
     SendPacket(std::move(packet));
 }
 
-// this function sends mail to old bidder
-void WorldSession::SendAuctionOutbiddedMail(AuctionEntry* auction)
+// this function sends mail to old bidder, with his bid; the auction already holds the new bid
+void WorldSession::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 oldBidderLowGuid, uint32 oldBid)
 {
-    ObjectGuid oldBidder_guid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
+    ObjectGuid oldBidder_guid = ObjectGuid(HIGHGUID_PLAYER, oldBidderLowGuid);
     Player* oldBidder = sObjectMgr.GetPlayer(oldBidder_guid);
 
     uint32 oldBidder_accId = 0;
@@ -164,7 +164,7 @@ void WorldSession::SendAuctionOutbiddedMail(AuctionEntry* auction)
             oldBidder->GetSession()->SendAuctionBidderNotification(auction, false);
 
         MailDraft(msgAuctionOutbiddedSubject.str())
-        .SetMoney(auction->bid)
+        .SetMoney(oldBid)
         .SendMailTo(MailReceiver(oldBidder, oldBidder_guid), auction, MAIL_CHECK_MASK_COPIED);
     }
 }
@@ -504,17 +504,22 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
 
     if ((packet.price < auction->buyout) || (auction->buyout == 0))// bid
     {
+        uint32 oldBidder = 0;
+        uint32 oldBid = 0;
+
         if (pl->GetGUIDLow() == auction->bidder)
             pl->LogModifyMoney(-int32(packet.price - auction->bid), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
         else
         {
-            pl->LogModifyMoney(-int32(packet.price), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
-            if (auction->bidder)                            // return money to old bidder if present
-                SendAuctionOutbiddedMail(auction);
+            oldBidder = auction->bidder;
+            oldBid = auction->bid;
         }
 
         auction->bidder = pl->GetGUIDLow();
         auction->bid = packet.price;
+
+        if (oldBidder)                                      // return money to old bidder if present, and tell him the new bid
+            SendAuctionOutbiddedMail(auction, oldBidder, oldBid);
 
         if (auction_owner)
             auction_owner->GetSession()->SendAuctionOwnerNotification(auction, false);
@@ -526,17 +531,23 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
     }
     else                                                    // buyout
     {
+        uint32 oldBidder = 0;
+        uint32 oldBid = 0;
+
         if (pl->GetGUIDLow() == auction->bidder)
             pl->LogModifyMoney(-int32(auction->buyout - auction->bid), "AuctionBuyout", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
         else
         {
             pl->LogModifyMoney(-int32(auction->buyout), "AuctionBuyout", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
-            if (auction->bidder)                            // return money to old bidder if present
-                SendAuctionOutbiddedMail(auction);
+            oldBidder = auction->bidder;
+            oldBid = auction->bid;
         }
 
         auction->bidder = pl->GetGUIDLow();
         auction->bid = auction->buyout;
+
+        if (oldBidder)                                      // return money to old bidder if present, and tell him the new bid
+            SendAuctionOutbiddedMail(auction, oldBidder, oldBid);
 
         PlayerTransactionData data;
         data.type = "Buyout";
