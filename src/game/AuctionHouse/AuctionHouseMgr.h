@@ -66,20 +66,20 @@ enum AuctionClientQueryType
 
 struct AuctionEntry
 {
-    uint32 Id;
-    uint32 itemGuidLow;
-    uint32 itemTemplate;
-    uint32 owner;
-    uint32 ownerAccount;
-    uint32 startbid;                                        // maybe useless
-    uint32 bid;
-    uint32 buyout;
+    uint32 Id = 0;
+    uint32 itemGuidLow = 0;
+    uint32 itemTemplate = 0;
+    uint32 owner = 0;
+    uint32 ownerAccount = 0;
+    uint32 startbid = 0;                                    // maybe useless
+    uint32 bid = 0;
+    uint32 buyout = 0;
     std::string lockedIpAddress;
-    time_t depositTime;
-    time_t expireTime;
-    uint32 bidder;
-    uint32 deposit;                                         // deposit can be calculated only when creating auction
-    AuctionHouseEntry const* auctionHouseEntry;             // in AuctionHouse.dbc
+    time_t depositTime = 0;
+    time_t expireTime = 0;
+    uint32 bidder = 0;
+    uint32 deposit = 0;                                     // deposit can be calculated only when creating auction
+    AuctionHouseEntry const* auctionHouseEntry = nullptr;   // in AuctionHouse.dbc
 
     // helpers
     uint32 GetHouseId() const { return auctionHouseEntry->houseId; }
