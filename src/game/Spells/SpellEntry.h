@@ -1184,6 +1184,25 @@ class SpellEntry
                 !(Attributes & SPELL_ATTR_NOT_SHAPESHIFT);
         }
 
+        bool IsManuallyCancelableAura() const
+        {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+            if (HasAttribute(SPELL_ATTR_NO_AURA_CANCEL))
+                return false;
+#endif
+
+            if (HasAttribute(SPELL_ATTR_DO_NOT_DISPLAY))
+                return false;
+
+            if (HasAttribute(SPELL_ATTR_EX_NO_AURA_ICON) && !activeIconID)
+                return false;
+
+            if (IsPassiveSpell())
+                return false;
+
+            return true;
+        }
+
         SpellSchoolMask GetSpellSchoolMask() const
         {
             return GetSchoolMask(School);

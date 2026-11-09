@@ -332,49 +332,6 @@ void WorldSession::HandleCancelCastOpcode(WorldPackets::Spell::CancelCast const&
 
 void WorldSession::HandleCancelAuraOpcode(WorldPackets::Spell::CancelAura const& packet)
 {
-    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(packet.spellId);
-    if (!spellInfo)
-        return;
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-    if (spellInfo->HasAttribute(SPELL_ATTR_NO_AURA_CANCEL))
-        return;
-#endif
-
-    if (spellInfo->HasAttribute(SPELL_ATTR_DO_NOT_DISPLAY))
-        return;
-
-    if (spellInfo->HasAttribute(SPELL_ATTR_EX_NO_AURA_ICON) && !spellInfo->activeIconID)
-        return;
-
-    if (spellInfo->IsPassiveSpell())
-        return;
-
-    if (!IsPositiveSpell(packet.spellId))
-    {
-        // ignore for remote control state
-        if (!_player->IsSelfMover())
-        {
-            // except own aura spells
-            bool allow = false;
-            for (uint32 k : spellInfo->EffectApplyAuraName)
-            {
-                if (k == SPELL_AURA_MOD_POSSESS ||
-                    k == SPELL_AURA_MOD_POSSESS_PET)
-                {
-                    allow = true;
-                    break;
-                }
-            }
-
-            // this also include case when aura not found
-            if (!allow)
-                return;
-        }
-        else
-            return;
-    }
-
     // World of Warcraft Client Patch 1.7.0 (2005-09-13)
     // - Druids should now be able to shapeshift back into caster form while Feared.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
@@ -385,7 +342,14 @@ void WorldSession::HandleCancelAuraOpcode(WorldPackets::Spell::CancelAura const&
 #endif
         return;
 
-    // channeled spell case (it currently casted then)
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(packet.spellId);
+    if (!spellInfo)
+        return;
+
+    if (!spellInfo->IsManuallyCancelableAura())
+        return;
+
+    // currently casted channeled spell case
     if (spellInfo->IsChanneledSpell())
     {
         if (Spell* curSpell = _player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
@@ -394,24 +358,27 @@ void WorldSession::HandleCancelAuraOpcode(WorldPackets::Spell::CancelAura const&
         return;
     }
 
-    SpellAuraHolder* holder = _player->GetSpellAuraHolder(packet.spellId);
-
-    // not own area auras can't be cancelled (note: maybe need to check for aura on holder and not general on spell)
-    if (holder && holder->GetCasterGuid() != _player->GetObjectGuid() && holder->GetSpellProto()->HasAreaAuraEffect())
-        return;
-
     // non channeled case
-    _player->RemoveAurasDueToSpellByCancel(packet.spellId);
+    _player->RemoveSingleAuraDueToSpellByCancel(packet.spellId, _player);
 }
 
 void WorldSession::HandlePetCancelAuraOpcode(WorldPackets::Pet::PetCancelAura const& packet)
 {
-    // ignore for remote control state
-    if (!_player->IsSelfMover())
+    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+    // - Druids should now be able to shapeshift back into caster form while Feared.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED))
+#else
+    // confirmed you cant remove buffs while mind controlled on wotlk ptr
+    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+#endif
         return;
 
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(packet.spellId);
     if (!spellInfo)
+        return;
+
+    if (!spellInfo->IsManuallyCancelableAura())
         return;
 
     Creature* pet = GetPlayer()->GetMap()->GetAnyTypeCreature(packet.guid);
@@ -422,13 +389,26 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPackets::Pet::PetCancelAura co
     if (packet.guid != GetPlayer()->GetPetGuid() && packet.guid != GetPlayer()->GetCharmGuid())
         return;
 
+    if (!pet->GetCharmerGuid().IsEmpty() && pet->GetCharmerGuid() != GetPlayer()->GetObjectGuid())
+        return;
+
     if (!pet->IsAlive())
     {
         pet->SendPetActionFeedback(FEEDBACK_PET_DEAD);
         return;
     }
 
-    pet->RemoveAurasDueToSpell(packet.spellId);
+    // currently casted channeled spell case
+    if (spellInfo->IsChanneledSpell())
+    {
+        if (Spell* curSpell = pet->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            if (curSpell->m_spellInfo->Id == packet.spellId)
+                pet->InterruptSpell(CURRENT_CHANNELED_SPELL);
+        return;
+    }
+
+    // non channeled case
+    pet->RemoveSingleAuraDueToSpellByCancel(packet.spellId, _player);
 }
 
 void WorldSession::HandleCancelGrowthAuraOpcode(NullClientPacket const& /*packet*/)

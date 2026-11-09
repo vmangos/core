@@ -7061,6 +7061,42 @@ bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) co
     return ref->GetCastItemGuid() && ref->GetCastItemGuid() != GetCastItemGuid();
 }
 
+bool SpellAuraHolder::IsManuallyCancelableBy(Unit const* user) const
+{
+    // Can only cancel aura on unit controlled by user.
+    if (GetTarget()->GetCharmerOrOwnerOrOwnGuid() != user->GetObjectGuid())
+        return false;
+
+    // Not own area auras can't be canceled.
+    if (GetCasterGuid() != user->GetObjectGuid() && GetSpellProto()->HasAreaAuraEffect())
+        return false;
+
+    if (!IsPositive())
+    {
+        // The only negative spells that can be canceled are charm auras we cast.
+        if (GetCasterGuid() == user->GetObjectGuid())
+        {
+            bool allow = false;
+            for (uint32 k : GetSpellProto()->EffectApplyAuraName)
+            {
+                if (k == SPELL_AURA_MOD_POSSESS ||
+                    k == SPELL_AURA_MOD_POSSESS_PET)
+                {
+                    allow = true;
+                    break;
+                }
+            }
+
+            if (!allow)
+                return false;
+        }
+        else
+            return false;
+    }
+
+    return true;
+}
+
 bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
 {
     // Custom spells cannot be displayed on aura bar.

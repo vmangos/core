@@ -3649,6 +3649,19 @@ void Unit::RemoveAurasDueToSpellByCancel(uint32 spellId)
     }
 }
 
+void Unit::RemoveSingleAuraDueToSpellByCancel(uint32 spellId, Unit const* user)
+{
+    SpellAuraHolderBounds spair = GetSpellAuraHolderBounds(spellId);
+    for (SpellAuraHolderMap::iterator iter = spair.first; iter != spair.second; ++iter)
+    {
+        if (iter->second->IsManuallyCancelableBy(user))
+        {
+            RemoveSpellAuraHolder(iter->second, AURA_REMOVE_BY_CANCEL);
+            return;
+        }
+    }
+}
+
 void Unit::RemoveAurasWithDispelType(DispelType type, ObjectGuid casterGuid)
 {
     // Create dispel mask by dispel type

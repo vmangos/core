@@ -707,6 +707,7 @@ class Unit : public SpellCaster
         void RemoveAurasDueToItemSpell(Item const* castItem, uint32 spellId);
         void RemoveAurasByCasterSpell(uint32 spellId, ObjectGuid casterGuid, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveAurasDueToSpellByCancel(uint32 spellId);
+        void RemoveSingleAuraDueToSpellByCancel(uint32 spellId, Unit const* user);
 
         // removing unknown aura stacks by diff reasons and selections
         void RemoveNotOwnSingleTargetAuras();
