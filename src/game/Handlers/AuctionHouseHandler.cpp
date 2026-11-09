@@ -78,7 +78,7 @@ void WorldSession::SendAuctionCommandResult(AuctionEntry* auc, AuctionAction Act
     {
         case AUCTION_OK:
             if (Action == AUCTION_BID_PLACED)
-                packet->auctionOutBid = auc->GetAuctionOutBid();    // new AuctionOutBid?
+                packet->auctionOutBid = 0;    // minimal outbid: none with a bid result, the next search lists it
             break;
         case AUCTION_ERR_INVENTORY:
             packet->inventoryError = invError;
@@ -104,7 +104,7 @@ void WorldSession::SendAuctionBidderNotification(AuctionEntry* auction, bool won
     notification->bidderGuid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
     // if 0, client shows ERR_AUCTION_WON_S, else ERR_AUCTION_OUTBID_S
     notification->bidOrZero = won ? 0 : auction->bid;
-    notification->outBid = auction->GetAuctionOutBid();
+    notification->outBid = won ? 0 : auction->GetAuctionOutBid();
     notification->itemTemplate = auction->itemTemplate;
 
     Item *item = sAuctionMgr.GetAItem(auction->itemGuidLow);
@@ -119,7 +119,7 @@ void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction, bool sold
     auto notification = std::make_unique<WorldPackets::AuctionHouse::AuctionOwnerNotification>();
     notification->auctionId = auction->Id;
     notification->bid = auction->bid;
-    notification->outBid = auction->GetAuctionOutBid();
+    notification->outBid = sold ? 0 : auction->GetAuctionOutBid();
 
     if (!sold)                                               // not sold yet
         notification->bidderGuid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
