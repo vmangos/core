@@ -1693,14 +1693,9 @@ void Map::SendInitSelf(Player* player)
 
     UpdateData data;
 
-    bool hasTransport = false;
-
     // attach to player data current transport data
     if (GenericTransport* transport = player->GetTransport())
-    {
-        hasTransport = true;
         transport->BuildCreateUpdateBlockForPlayer(data, player);
-    }
 
     // build data for self presence in world at own client (one time for map)
     player->BuildCreateUpdateBlockForPlayer(data, player);
@@ -1709,44 +1704,33 @@ void Map::SendInitSelf(Player* player)
     if (GenericTransport* transport = player->GetTransport())
         for (const auto itr : transport->GetPassengers())
             if (player != itr && player->IsInVisibleList(itr))
-            {
-                hasTransport = true;
                 itr->BuildCreateUpdateBlockForPlayer(data, player);
-            }
 
-    data.Send(player->GetSession(), hasTransport);
+    data.Send(player->GetSession());
 }
 
 void Map::SendInitTransports(Player* player)
 {
     // Hack to send out transports
     UpdateData transData;
-    bool hasTransport = false;
     for (const auto itr : m_transports)
     {
         if (itr != player->GetTransport())
-        {
-            hasTransport = true;
             itr->BuildCreateUpdateBlockForPlayer(transData, player);
-        }
     }
-    transData.Send(player->GetSession(), hasTransport);
+    transData.Send(player->GetSession());
 }
 
 void Map::SendRemoveTransports(Player* player)
 {
     // Hack to send out transports
     UpdateData transData;
-    bool hasTransport = false;
     for (const auto itr : m_transports)
     {
         if (itr != player->GetTransport())
-        {
-            hasTransport = true;
             itr->BuildOutOfRangeUpdateBlock(transData);
-        }
     }
-    transData.Send(player->GetSession(), hasTransport);
+    transData.Send(player->GetSession());
 }
 
 inline void Map::setNGrid(NGridType* grid, uint32 x, uint32 y)

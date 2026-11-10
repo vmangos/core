@@ -305,7 +305,7 @@ void Object::SendForcedObjectUpdate()
 
 void Object::BuildMovementUpdateBlock(UpdateData& data, uint8 flags) const
 {
-    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer(GetObjectGuid().IsTransport() || GetObjectGuid().IsMOTransport());
 
     buf << uint8(UPDATETYPE_MOVEMENT);
     buf << GetObjectGuid();
@@ -337,7 +337,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
 
     //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BuildCreateUpdate: update-type: %u, object-type: %u got updateFlags: %X", updatetype, m_objectTypeId, updateFlags);
 
-    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer(GetObjectGuid().IsTransport() || GetObjectGuid().IsMOTransport());
     buf << (uint8)updatetype;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     buf << GetPackGUID();
@@ -422,7 +422,7 @@ void WorldObject::DirectSendPublicValueUpdate(UpdateMask& updateMask)
 {
     UpdateData data;
 
-    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer(GetObjectGuid().IsTransport() || GetObjectGuid().IsMOTransport());
     buf << uint8(UPDATETYPE_VALUES);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     buf << GetPackGUID();
@@ -468,7 +468,7 @@ void Object::BuildValuesUpdateBlockForPlayerWithFlags(UpdateData& data, Player* 
 
 void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updateMask, Player* target) const
 {
-    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer();
+    ByteBuffer& buf = data.AddUpdateBlockAndGetBuffer(GetObjectGuid().IsTransport() || GetObjectGuid().IsMOTransport());
 
     buf << uint8(UPDATETYPE_VALUES);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4

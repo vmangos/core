@@ -23,14 +23,14 @@ namespace WorldPackets { namespace ObjectUpdate
         class UpdatePacket
         {
             public:
-                UpdatePacket() : blockCount(0) {}
+                UpdatePacket() : blockCount(0), hasTransport(false) {}
                 ByteBuffer data;
                 uint32 blockCount;
+                bool hasTransport;
         };
 
         ObjectGuidSet outOfRangeGUIDs;
         nonstd::optional<UpdatePacket> updatePacket;
-        bool hasTransport = false;
 
         // Builder will change opcode if it needs to be compressed.
         explicit UpdateObject() : ServerPacket(SMSG_UPDATE_OBJECT) {}

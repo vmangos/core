@@ -21752,7 +21752,7 @@ void Player::RefreshBitsForVisibleUnits(UpdateMask* mask, uint32 objectTypeMask)
     {
         if (Object* obj = GetObjectByTypeMask(guid, TypeMask(objectTypeMask)))
         {
-            ByteBuffer& buff = data.AddUpdateBlockAndGetBuffer();
+            ByteBuffer& buff = data.AddUpdateBlockAndGetBuffer(guid.IsTransport() || guid.IsMOTransport());
 
             buff << uint8(UPDATETYPE_VALUES);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
