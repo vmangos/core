@@ -2741,21 +2741,21 @@ void Player::SetCheatFly(bool on, bool notify)
     }
 }
 
-void Player::SetCheatFixedZ(bool on, bool notify)
+void Player::SetCheatGravity(bool on, bool notify)
 {
-    SetCheatOption(PLAYER_CHEAT_FIXED_Z, on);
+    SetCheatOption(PLAYER_CHEAT_DISABLE_GRAVITY, on);
 
     if (on)
-        m_movementInfo.AddMovementFlag(MOVEFLAG_FIXED_Z);
+        m_movementInfo.AddMovementFlag(MOVEFLAG_DISABLE_GRAVITY);
     else
-        m_movementInfo.RemoveMovementFlag(MOVEFLAG_FIXED_Z);
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_DISABLE_GRAVITY);
 
     GetSession()->RejectMovementPacketsFor(100);
-    SendHeartBeat(true);
+    SendMovementPacket(MSG_MOVE_TOGGLE_GRAVITY_CHEAT, true);
 
     if (notify)
     {
-        GetSession()->SendNotification(on ? LANG_CHEAT_FIXED_Z_ON : LANG_CHEAT_FIXED_Z_OFF);
+        GetSession()->SendNotification(on ? LANG_CHEAT_GRAVITY_ON : LANG_CHEAT_GRAVITY_OFF);
     }
 }
 
@@ -4545,7 +4545,7 @@ void Player::SetFly(bool enable)
             StopMoving(true);
         }
 
-        m_movementInfo.moveFlags = (MOVEFLAG_LEVITATING | MOVEFLAG_SWIMMING | MOVEFLAG_MOVED | MOVEFLAG_FLYING);
+        m_movementInfo.moveFlags = (MOVEFLAG_KEEP_SWIM_STATE | MOVEFLAG_SWIMMING | MOVEFLAG_HOVER);
     }
     else
     {

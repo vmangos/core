@@ -197,7 +197,6 @@ struct boss_onyxiaAI : public ScriptedAI
         m_creature->SetStandState(UNIT_STAND_STATE_SLEEP);
         m_creature->SetFly(false);
         m_creature->SetWalk(true);
-        m_creature->SetLevitate(false);
     }
 
     void DelayEventIfNeed(uint32& event, uint32 delay)
@@ -356,7 +355,6 @@ struct boss_onyxiaAI : public ScriptedAI
         {
             m_creature->SetWalk(true);
             m_creature->SetFly(false);
-            m_creature->SetLevitate(false);
         }
         
         if (m_uiFlameBreathTimer < uiDiff)
@@ -676,7 +674,6 @@ struct boss_onyxiaAI : public ScriptedAI
                 m_uiTransTimer = 1000;
                 m_uiTransCount = 1;
                 m_creature->SetFly(true);
-                m_creature->SetLevitate(true);
                 m_creature->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
                 break;
             case LANDING_FLIGHT:
@@ -684,7 +681,6 @@ struct boss_onyxiaAI : public ScriptedAI
                 m_uiTransTimer = 1000;
                 m_uiTransCount = 3;
                 m_creature->SetFly(false);
-                m_creature->SetLevitate(false);
                 m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
                 m_creature->CastSpell(m_creature, SPELL_BELLOWINGROAR, true);
                 m_uiBellowingRoarTimer = urand (15000, 30000);

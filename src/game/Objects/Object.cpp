@@ -99,7 +99,7 @@ void MovementInfo::Read(ByteBuffer& data)
 
     if (HasMovementFlag(MOVEFLAG_SPLINE_ELEVATION))
     {
-        data >> splineElevation;                                     // unknown
+        data >> splineElevation;
     }
 }
 
@@ -146,7 +146,7 @@ void MovementInfo::FillFrom(MovementInfo const& info)
 
     if (HasMovementFlag(MOVEFLAG_SPLINE_ELEVATION))
     {
-        splineElevation = info.splineElevation;                                     // unknown
+        splineElevation = info.splineElevation;
     }
 }
 
@@ -220,7 +220,7 @@ void MovementInfo::Write(ByteBuffer& data) const
 
     if (HasMovementFlag(MOVEFLAG_SPLINE_ELEVATION))
     {
-        data << splineElevation;                                     // unknown
+        data << splineElevation;
     }
 }
 

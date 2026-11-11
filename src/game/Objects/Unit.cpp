@@ -7306,14 +7306,6 @@ void Unit::SetHoverReal(bool apply)
         RemoveUnitMovementFlag(MOVEFLAG_HOVER);
 }
 
-void Unit::SetLevitate(bool enable)
-{
-    if (enable)
-        m_movementInfo.AddMovementFlag(MOVEFLAG_LEVITATING);
-    else
-        m_movementInfo.RemoveMovementFlag(MOVEFLAG_LEVITATING);
-}
-
 void Unit::SetFly(bool enable)
 {
     if (enable)

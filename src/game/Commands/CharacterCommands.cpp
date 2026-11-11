@@ -112,13 +112,10 @@ bool ChatHandler::HandleCheatFlyCommand(char* args)
     if (needReportToTarget(target))
         target->PSendSysMessage(LANG_YOUR_FLY_SET, value ? "on" : "off", GetNameLink().c_str());
 
-    if (value)
-        target->SendSysMessage("WARNING: Do not jump or flying mode will be removed.");
-
     return true;
 }
 
-bool ChatHandler::HandleCheatFixedZCommand(char* args)
+bool ChatHandler::HandleCheatGravityCommand(char* args)
 {
     bool value;
     if (!ExtractOnOff(&args, value))
@@ -132,11 +129,11 @@ bool ChatHandler::HandleCheatFixedZCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetCheatFixedZ(value, true);
+    target->SetCheatGravity(value, true);
 
-    PSendSysMessage(LANG_YOU_SET_FIXED_Z, value ? "on" : "off", GetNameLink(target).c_str());
+    PSendSysMessage(LANG_YOU_SET_GRAVITY, value ? "on" : "off", GetNameLink(target).c_str());
     if (needReportToTarget(target))
-        target->PSendSysMessage(LANG_YOUR_FIXED_Z_SET, value ? "on" : "off", GetNameLink().c_str());
+        target->PSendSysMessage(LANG_YOUR_GRAVITY_SET, value ? "on" : "off", GetNameLink().c_str());
 
     return true;
 }
@@ -606,8 +603,8 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
         SendSysMessage("- Wall climbing");
     if (target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
         SendSysMessage("- Debug target info");
-    if (target->HasCheatOption(PLAYER_CHEAT_FIXED_Z))
-        SendSysMessage("- Fixed Z");
+    if (target->HasCheatOption(PLAYER_CHEAT_DISABLE_GRAVITY))
+        SendSysMessage("- Disable Gravity");
 
     return true;
 }

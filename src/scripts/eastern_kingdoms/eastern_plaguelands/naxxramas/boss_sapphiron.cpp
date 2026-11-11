@@ -274,8 +274,6 @@ struct boss_sapphironAI : public ScriptedAI
             if (m_creature->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
                 m_creature->ClearTemporaryFaction();
 
-            //m_creature->SetFly(true);
-            //m_creature->SetLevitate(true);
             m_creature->SetMeleeZLimit(0.0f);
         }
         else
@@ -292,8 +290,6 @@ struct boss_sapphironAI : public ScriptedAI
                 m_creature->SetReactState(ReactStates::REACT_AGGRESSIVE);
             }
 
-            //m_creature->SetFly(false);
-            //m_creature->SetLevitate(false);
             m_creature->SetMeleeZLimit(UNIT_DEFAULT_MELEE_Z_LIMIT);
         }
     }

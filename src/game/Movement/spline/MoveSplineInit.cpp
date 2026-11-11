@@ -188,7 +188,8 @@ MoveSplineInit::MoveSplineInit(Unit& m, char const* mvtType) : unit(m), movement
 {
     // mix existing state into new
     args.flags.runmode = !unit.m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE);
-    args.flags.flying = unit.m_movementInfo.HasMovementFlag((MovementFlags)(MOVEFLAG_FLYING | MOVEFLAG_LEVITATING));
+    args.flags.flying = unit.m_movementInfo.HasMovementFlag((MovementFlags)(MOVEFLAG_FLYING | MOVEFLAG_DISABLE_GRAVITY)) ||
+                        unit.m_movementInfo.HasMovementFlag(MOVEFLAG_KEEP_SWIM_STATE) && unit.m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING);
 }
 
 void MoveSplineInit::SetFacingGUID(uint64 guid)

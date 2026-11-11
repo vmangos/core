@@ -37,9 +37,9 @@ enum MovementFlags
     MOVEFLAG_PITCH_UP           = 0x00000040, // 7
     MOVEFLAG_PITCH_DOWN         = 0x00000080, // 8
     MOVEFLAG_WALK_MODE          = 0x00000100, // 9 Walking
-    MOVEFLAG_UNUSED10           = 0x00000200, // 10 ??
-    MOVEFLAG_LEVITATING         = 0x00000400, // 11 ?? Seems not to work
-    MOVEFLAG_FIXED_Z            = 0x00000800, // 12 Fixed height. Jump => Glide across the entire map
+    MOVEFLAG_UNUSED10           = 0x00000200, // 10 Internal client flag?
+    MOVEFLAG_KEEP_SWIM_STATE    = 0x00000400, // 11 Client neither starts nor stops swimming by itself
+    MOVEFLAG_DISABLE_GRAVITY    = 0x00000800, // 12 Fixed height. Jump => Glide across the entire map
     MOVEFLAG_ROOT               = 0x00001000, // 13
     MOVEFLAG_JUMPING            = 0x00002000, // 14
     MOVEFLAG_FALLINGFAR         = 0x00004000, // 15
@@ -52,14 +52,14 @@ enum MovementFlags
     MOVEFLAG_SWIMMING           = 0x00200000, // 22 Ok
     MOVEFLAG_SPLINE_ENABLED     = 0x00400000, // 23 Ok
     MOVEFLAG_MOVED              = 0x00800000, // 24 Only used in older client versions
-    MOVEFLAG_FLYING             = 0x01000000, // 25 [-ZERO] is it really need and correct value
+    MOVEFLAG_FLYING             = 0x01000000, // 25 Unused client side
     MOVEFLAG_ONTRANSPORT        = 0x02000000, // 26 Used for flying on some creatures
-    MOVEFLAG_SPLINE_ELEVATION   = 0x04000000, // 27 Used for flight paths
-    MOVEFLAG_UNUSED28           = 0x08000000, // 28
+    MOVEFLAG_SPLINE_ELEVATION   = 0x04000000, // 27 Set by the client when it steps onto a steep surface
+    MOVEFLAG_PENDING_TRANSPORT  = 0x08000000, // 28 Internal client flag set before the transport model loads
     MOVEFLAG_WATERWALKING       = 0x10000000, // 29 Prevent unit from falling through water
     MOVEFLAG_SAFE_FALL          = 0x20000000, // 30 Active rogue safe fall spell (passive)
-    MOVEFLAG_HOVER              = 0x40000000, // 31
-    MOVEFLAG_UNUSED32           = 0x80000000, // 32
+    MOVEFLAG_HOVER              = 0x40000000, // 31 Used by levitate aura, disables jumping
+    MOVEFLAG_TIME_VALID         = 0x80000000, // 32 Internal client flag set on first packet of new mover
 
     // Can not be present with MOVEFLAG_ROOT (otherwise client freeze)
     MOVEFLAG_MASK_MOVING        =
@@ -99,10 +99,10 @@ static char const* MoveFlagToString(uint32 flag)
             return "Walk Mode";
         case MOVEFLAG_UNUSED10:
             return "Unused10";
-        case MOVEFLAG_LEVITATING:
-            return "Levitating";
-        case MOVEFLAG_FIXED_Z:
-            return "Fixed Z";
+        case MOVEFLAG_KEEP_SWIM_STATE:
+            return "Keep Swim State";
+        case MOVEFLAG_DISABLE_GRAVITY:
+            return "Disable Gravity";
         case MOVEFLAG_ROOT:
             return "Root";
         case MOVEFLAG_JUMPING:
@@ -133,16 +133,16 @@ static char const* MoveFlagToString(uint32 flag)
             return "On Transport";
         case MOVEFLAG_SPLINE_ELEVATION:
             return "Spline Elevation";
-        case MOVEFLAG_UNUSED28:
-            return "Unused28";
+        case MOVEFLAG_PENDING_TRANSPORT:
+            return "Pending Transport";
         case MOVEFLAG_WATERWALKING:
             return "Water Walking";
         case MOVEFLAG_SAFE_FALL:
             return "Safe Fall";
         case MOVEFLAG_HOVER:
             return "Hover";
-        case MOVEFLAG_UNUSED32:
-            return "Unused32";
+        case MOVEFLAG_TIME_VALID:
+            return "Time Valid";
     }
     return "UNKNOWN";
 }
@@ -243,7 +243,8 @@ class MovementInfo
         uint32  fallTime;
         // jumping
         JumpInfo jump;
-        // spline
+        // the z where client stepped on a steep surface
+        // the unit rises no higher than that z plus its step height
         float splineElevation;
         // client from which position came
         uint32 sourceSessionGuid;

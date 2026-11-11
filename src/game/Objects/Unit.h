@@ -1311,11 +1311,13 @@ class Unit : public SpellCaster
         void SetHoverReal(bool apply);
         bool IsHovering() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_HOVER); }
 
+        // hover and levitate mean the same thing
+        void SetLevitate(bool apply) { SetHover(apply); }
+        bool IsLevitating() const { return IsHovering(); }
+
         void SetFeatherFall(bool apply);
         void SetFeatherFallReal(bool apply);
         bool IsFallingSlow() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_SAFE_FALL); }
-
-        void SetLevitate(bool apply);
 
         void KnockBackFrom(WorldObject const* target, float horizontalSpeed, float verticalSpeed);
         void KnockBack(float angle, float horizontalSpeed, float verticalSpeed);

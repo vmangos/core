@@ -67,7 +67,7 @@ char const* GetMovementCheatName(CheatType flagId)
             return "SlowFall";
         case CHEAT_TYPE_HOVER:
             return "Hover";
-        case CHEAT_TYPE_FIXED_Z:
+        case CHEAT_TYPE_DISABLE_GRAVITY:
             return "FixedZ";
         case CHEAT_TYPE_ROOT_MOVE:
             return "MovementRooted";
@@ -257,7 +257,7 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     AddPenaltyForCheat(false, CHEAT_TYPE_WATER_WALK, CONFIG_BOOL_AC_MOVEMENT_CHEAT_WATER_WALK_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WATER_WALK_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WATER_WALK_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_SLOW_FALL, CONFIG_BOOL_AC_MOVEMENT_CHEAT_SLOW_FALL_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SLOW_FALL_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SLOW_FALL_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_HOVER, CONFIG_BOOL_AC_MOVEMENT_CHEAT_HOVER_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_HOVER_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_HOVER_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_FIXED_Z, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FIXED_Z_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_DISABLE_GRAVITY, CONFIG_BOOL_AC_MOVEMENT_CHEAT_DISABLE_GRAVITY_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_DISABLE_GRAVITY_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_DISABLE_GRAVITY_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_ROOT_MOVE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_ROOT_MOVE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_THRESHOLD_TICK, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_ROOT_MOVE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_ROOT_MOVE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_THRESHOLD_TOTAL, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_SELF_ROOT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_SELF_ROOT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SELF_ROOT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SELF_ROOT_PENALTY);
@@ -603,8 +603,8 @@ bool ShouldRejectMovement(uint32 cheatFlags)
         sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_HOVER_REJECT))
         return true;
 
-    if ((cheatFlags & (1 << CHEAT_TYPE_FIXED_Z)) &&
-        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FIXED_Z_REJECT))
+    if ((cheatFlags & (1 << CHEAT_TYPE_DISABLE_GRAVITY)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_DISABLE_GRAVITY_REJECT))
         return true;
 
     if ((cheatFlags & (1 << CHEAT_TYPE_ROOT_MOVE)) &&
@@ -785,19 +785,19 @@ uint32 MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movemen
     }
 
     // This flag is only for creatures.
-    if ((currentMoveFlags & MOVEFLAG_FIXED_Z) &&
-        !me->HasCheatOption(PLAYER_CHEAT_FIXED_Z))
+    if ((currentMoveFlags & MOVEFLAG_DISABLE_GRAVITY) &&
+        !me->HasCheatOption(PLAYER_CHEAT_DISABLE_GRAVITY))
     {
-        APPEND_CHEAT(CHEAT_TYPE_FIXED_Z);
-        removeMoveFlags |= MOVEFLAG_FIXED_Z;
+        APPEND_CHEAT(CHEAT_TYPE_DISABLE_GRAVITY);
+        removeMoveFlags |= MOVEFLAG_DISABLE_GRAVITY;
     }
 
     // This flag is only for creatures.
-    if ((currentMoveFlags & MOVEFLAG_LEVITATING) &&
+    if ((currentMoveFlags & MOVEFLAG_KEEP_SWIM_STATE) &&
         !me->HasCheatOption(PLAYER_CHEAT_FLY))
     {
         APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
-        removeMoveFlags |= MOVEFLAG_LEVITATING;
+        removeMoveFlags |= MOVEFLAG_KEEP_SWIM_STATE;
     }
 
     if ((currentMoveFlags & MOVEFLAG_SWIMMING) &&
@@ -906,7 +906,7 @@ bool MovementAnticheat::CheckNoFallTime(MovementInfo const& movementInfo, uint16
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED))
         return false;
 
-    if (opcode == CMSG_MOVE_FALL_RESET || movementInfo.HasMovementFlag(MOVEFLAG_FIXED_Z))
+    if (opcode == CMSG_MOVE_FALL_RESET || movementInfo.HasMovementFlag(MOVEFLAG_DISABLE_GRAVITY))
     {
         m_jumpFlagCount = 0;
         m_jumpFlagTime = 0;
@@ -952,7 +952,7 @@ bool MovementAnticheat::CheckFallReset(MovementInfo const& movementInfo) const
         return false;
 
     // older clients spam fall reset opcode with fixed z flag
-    if (movementInfo.HasMovementFlag(MOVEFLAG_FIXED_Z))
+    if (movementInfo.HasMovementFlag(MOVEFLAG_DISABLE_GRAVITY))
         return false;
 
     if (GetLastMovementInfo().WasSentBySession(m_session->GetGUID()))

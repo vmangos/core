@@ -237,7 +237,7 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
     if (nextNode.orientation != 100 && nextNode.delay != 0)
         init.SetFacing(nextNode.orientation);
 
-    creature.SetWalk(!creature.HasUnitState(UNIT_STATE_RUNNING) && !creature.IsLevitating(), false);
+    creature.SetWalk(!creature.HasUnitState(UNIT_STATE_RUNNING), false);
     init.Launch();
 }
 
@@ -611,7 +611,7 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
 
     Movement::MoveSplineInit init(creature, "PatrolMovementGenerator::StartMove");
     init.Move(&p);
-    init.SetWalk(creature.IsWalking() && !creature.IsLevitating());
+    init.SetWalk(creature.IsWalking());
     init.SetVelocity(speed);
     init.SetFacing(angle);
     init.Launch();
