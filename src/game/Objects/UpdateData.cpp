@@ -51,7 +51,7 @@ void UpdateData::AddOutOfRangeGUID(ObjectGuid const& guid)
     m_outOfRangeGUIDs.insert(guid);
 }
 
-ByteBuffer& UpdateData::AddUpdateBlockAndGetBuffer()
+ByteBuffer& UpdateData::AddUpdateBlockAndGetBuffer(bool transport)
 {
     if (m_datas.empty())
         m_datas.emplace_back(); // m_datas.push_back(UpdatePacket());
@@ -64,6 +64,8 @@ ByteBuffer& UpdateData::AddUpdateBlockAndGetBuffer()
         --it;
     }
     ++it->blockCount;
+    if (transport)
+        it->hasTransport = true;
     return it->data;
 }
 
@@ -123,36 +125,35 @@ void PacketCompressor::Compress(void* dst, uint32* dst_size, void* src, int src_
     *dst_size = c_stream.total_out;
 }
 
-void UpdateData::BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, bool hasTransport)
+void UpdateData::BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet)
 {
     if (m_datas.empty())
-        return BuildPacket(packet, nullptr, hasTransport);
+        return BuildPacket(packet, nullptr);
 
     // Only the first update block ends up in the packet. Callers that fill more
     // than one block must use `Send` instead, or the rest is silently dropped.
     MANGOS_ASSERT(m_datas.size() == 1);
 
-    return BuildPacket(packet, &(m_datas.front()), hasTransport);
+    return BuildPacket(packet, &(m_datas.front()));
 }
 
-void UpdateData::BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, UpdatePacket* updPacket, bool hasTransport)
+void UpdateData::BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, UpdatePacket* updPacket)
 {
     // shouldn't happen
     MANGOS_ASSERT(packet->outOfRangeGUIDs.empty() && !packet->updatePacket.has_value());
 
-    packet->hasTransport = hasTransport;
     if (!m_outOfRangeGUIDs.empty())
         packet->outOfRangeGUIDs = std::move(m_outOfRangeGUIDs);
     if (updPacket)
         packet->updatePacket = std::move(*updPacket);
 }
 
-void UpdateData::Send(WorldSession* session, bool hasTransport)
+void UpdateData::Send(WorldSession* session)
 {
     if (m_datas.empty() && !m_outOfRangeGUIDs.empty())
     {
         auto data = std::make_unique<WorldPackets::ObjectUpdate::UpdateObject>();
-        BuildPacket(data, nullptr, hasTransport);
+        BuildPacket(data, nullptr);
         session->SendPacket(std::move(data));
         m_outOfRangeGUIDs.clear();
         return;
@@ -160,7 +161,7 @@ void UpdateData::Send(WorldSession* session, bool hasTransport)
     for (auto& itr : m_datas)
     {
         auto data = std::make_unique<WorldPackets::ObjectUpdate::UpdateObject>();
-        BuildPacket(data, &itr, hasTransport);
+        BuildPacket(data, &itr);
         session->SendPacket(std::move(data));
         m_outOfRangeGUIDs.clear();
     }

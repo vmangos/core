@@ -74,10 +74,10 @@ class UpdateData
 
         void AddOutOfRangeGUID(ObjectGuidSet& guids);
         void AddOutOfRangeGUID(ObjectGuid const& guid);
-        ByteBuffer& AddUpdateBlockAndGetBuffer();
-        void Send(WorldSession* session, bool hasTransport = false);
-        void BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, bool hasTransport = false);
-        void BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, UpdatePacket* updPacket, bool hasTransport = false);
+        ByteBuffer& AddUpdateBlockAndGetBuffer(bool transport);
+        void Send(WorldSession* session);
+        void BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet);
+        void BuildPacket(std::unique_ptr<WorldPackets::ObjectUpdate::UpdateObject>& packet, UpdatePacket* updPacket);
         bool HasData() { return !m_datas.empty() || !m_outOfRangeGUIDs.empty(); }
         void Clear();
 

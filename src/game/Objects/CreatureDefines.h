@@ -124,7 +124,7 @@ enum CreatureStaticFlags
     CREATURE_STATIC_FLAG_ONLY_ATTACK_PVP_ENABLING          = 0x04000000, // No proximity aggro for players who are not PvP flagged.
     CREATURE_STATIC_FLAG_CALLS_GUARDS                      = 0x08000000, // Summons a guard if an opposite faction player gets near or attacks.
     CREATURE_STATIC_FLAG_CAN_SWIM                          = 0x10000000, // Applies UNIT_FLAG_USE_SWIM_ANIMATION on spawn.
-    CREATURE_STATIC_FLAG_FLOATING                          = 0x20000000, // Applies MOVEFLAG_FIXED_Z on spawn ; Original Comment: "Don't use"
+    CREATURE_STATIC_FLAG_FLOATING                          = 0x20000000, // Applies MOVEFLAG_DISABLE_GRAVITY on spawn ; Original Comment: "Don't use"
     CREATURE_STATIC_FLAG_MORE_AUDIBLE                      = 0x40000000, // Original Comment: "Caution, Expensive"
     CREATURE_STATIC_FLAG_LARGE_AOI                         = 0x80000000  // Increases visibility distance to 200 yards ; Original Comment: "Caution, Expensive"
 };

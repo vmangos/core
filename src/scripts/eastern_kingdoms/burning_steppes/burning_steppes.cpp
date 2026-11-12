@@ -289,7 +289,6 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                 {
                     m_bIsFirstSearScale = false;
 
-                    //pSummoned->SetLevitate(true); //maybe grounding it????
                     // ToDo: this guy should fly in circles above the creature
                     //pSummoned->SetDefaultMovementType(IDLE_MOTION_TYPE); //Probably should be enough, OR NOT
                     //pSummoned->GetMotionMaster()->MoveIdle();

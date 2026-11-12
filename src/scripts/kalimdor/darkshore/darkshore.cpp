@@ -859,7 +859,7 @@ struct npc_rabid_thistle_bearAI : public FollowerAI
 
     void StartFollowing(Player* pPlayer)
     {
-        Captured_Timer = 300000;
+        Captured_Timer = 500000;
         StartFollow(pPlayer);
     }
 

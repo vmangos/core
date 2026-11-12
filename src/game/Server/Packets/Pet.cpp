@@ -185,3 +185,53 @@ void WorldPackets::Pet::PetCastFailed::AppendBodyTo(ByteBuffer& buffer) const
     buffer << status;
     buffer << reason;
 }
+
+size_t WorldPackets::Pet::PetSpells::EstimateFinalSize() const
+{
+    if (petGuid.IsEmpty())
+        return sizeof(petGuid);
+
+    return sizeof(petGuid) +
+           sizeof(timeLimit) +
+           sizeof(reactState) +
+           sizeof(commandState) +
+           sizeof(flag1) +
+           sizeof(enabledFlags) + 
+           sizeof(actionButtons) +
+           sizeof(uint8) /*actions.size*/ +
+           sizeof(uint32) * actions.size() +
+           sizeof(uint8) /*cooldowns.size*/ + 
+           (sizeof(PetSpellCooldown::spellId) +
+            sizeof(PetSpellCooldown::category) +
+            sizeof(PetSpellCooldown::cooldown) +
+            sizeof(PetSpellCooldown::categoryCooldown)) * cooldowns.size();
+}
+
+void WorldPackets::Pet::PetSpells::AppendBodyTo(ByteBuffer& buffer) const
+{
+    buffer << petGuid;
+    if (petGuid.IsEmpty())
+        return;
+
+    buffer << timeLimit;
+    buffer << reactState;
+    buffer << commandState;
+    buffer << flag1;
+    buffer << enabledFlags;
+
+    for (auto const& button : actionButtons)
+        buffer << button;
+
+    buffer << uint8(actions.size());
+    for (auto const& action : actions)
+        buffer << action;
+
+    buffer << uint8(cooldowns.size());
+    for (auto const& itr : cooldowns)
+    {
+        buffer << itr.spellId;
+        buffer << itr.category;
+        buffer << itr.cooldown;
+        buffer << itr.categoryCooldown;
+    }
+}

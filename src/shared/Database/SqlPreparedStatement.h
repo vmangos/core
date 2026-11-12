@@ -156,8 +156,6 @@ class SqlStmtParameters
         //empty SQL statement parameters. In case nParams > 1 - reserve memory for parameters
         //should help to reuse the same object with batched SQL requests
         void reset(SqlStatement const& stmt);
-        //swaps contents of intenral param container
-        void swap(SqlStmtParameters& obj);
         //get bound parameters
         ParameterContainer const& params() const { return m_params; }
 

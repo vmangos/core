@@ -378,6 +378,7 @@ public:
     void PrintCooldownList(ChatHandler& chat) const;
     bool CheckLockout(SpellSchoolMask schoolMask) const;
     void UpdateCooldowns(TimePoint const& now);
+    CooldownContainer const& GetCooldownMap() const { return m_cooldownMap; };
 
     // Event handler
     EventProcessor m_Events;

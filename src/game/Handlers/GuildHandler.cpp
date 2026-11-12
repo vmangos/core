@@ -90,12 +90,6 @@ void WorldSession::HandleGuildInviteOpcode(WorldPackets::Guild::GuildInvite cons
         return;
     }
 
-    if (player->GetSession()->HasTrialRestrictions())
-    {
-        SendNotification(LANG_RESTRICTED_ACCOUNT);
-        return;
-    }
-
     // OK result but not send invite
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {

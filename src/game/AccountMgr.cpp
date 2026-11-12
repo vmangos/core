@@ -60,6 +60,7 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
     std::string s_hex = srp.GetSalt().AsHexStr();
     std::string v_hex = srp.GetVerifier().AsHexStr();
 
+    LoginDatabase.escape_string(username);
     bool update_sv = LoginDatabase.PExecute(
         "INSERT INTO account(`username`, `v`, `s`, `joindate`) VALUES('%s','%s','%s',NOW())",
         username.c_str(), v_hex.c_str(), s_hex.c_str());

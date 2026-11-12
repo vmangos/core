@@ -390,6 +390,25 @@ void TicketMgr::LoadSurveys()
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded GM Survey count from database in %u ms", WorldTimer::getMSTimeDiffToNow(oldMSTime));
 }
 
+void TicketMgr::RemovePlayerReferences(ObjectGuid playerGuid)
+{
+    std::vector<uint32> authored;
+    for (auto& entry : _ticketList)
+    {
+        GmTicket* ticket = entry.second;
+        if (ticket->IsFromPlayer(playerGuid))
+            authored.push_back(ticket->GetId());
+        else if (ticket->GetAssignedToGUID() == playerGuid)
+        {
+            ticket->SetUnassigned();
+            ticket->SaveToDB();
+        }
+    }
+
+    for (uint32 ticketId : authored)
+        RemoveTicket(ticketId);
+}
+
 void TicketMgr::AddTicket(GmTicket* ticket)
 {
     _ticketList[ticket->GetId()] = ticket;

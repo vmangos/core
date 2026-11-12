@@ -321,9 +321,20 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
     if (security > SEC_ADMINISTRATOR) // prevent invalid security settings in DB
         security = SEC_ADMINISTRATOR;
 
-    K.SetHexStr(fields[2].GetString());
-    if (K.AsByteArray().empty())
+    // sessionkey must be a full 40 byte (80 hex char) SRP6 session key; anything else
+    // (in particular an empty string, which SetHexStr turns into 0) must not be accepted
+    // as it would let the session proof be computed without knowing the real key.
+    std::string sessionKeyStr = fields[2].GetString();
+    K.SetHexStr(sessionKeyStr.c_str());
+    if (sessionKeyStr.size() != 80 || K.AsByteArray().empty())
+    {
+        packet.Initialize(SMSG_AUTH_RESPONSE, 1);
+        packet << uint8(AUTH_FAILED);
+        SendPacket(packet);
+
+        sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "WorldSocket::HandleAuthSession: Sent Auth Response (invalid session key for account %s).", account.c_str());
         return HandlerResult::Fail;
+    }
 
     time_t mutetime = time_t(fields[6].GetUInt64());
     locale = LocaleConstant(fields[7].GetUInt8());
@@ -369,7 +380,7 @@ WorldSocket::HandlerResult WorldSocket::_HandleAuthSession(WorldPacket& recvPack
     sha.UpdateData((uint8 *) &t, 4);
     sha.UpdateData((uint8 *) &clientSeed, 4);
     sha.UpdateData((uint8 *) &seed, 4);
-    sha.UpdateData(K);
+    sha.UpdateData(K.AsByteArray(40));                  // the client hashes the 40 bytes of K
     auto expectedDigest = sha.GetDigest();
 
     if (digest != expectedDigest)

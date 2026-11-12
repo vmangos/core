@@ -6806,7 +6806,7 @@ void SpellAuraHolder::_AddSpellAuraHolder()
         m_target->SetStandState(UNIT_STAND_STATE_SIT);
 
     if (m_spellProto->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM))
-        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM);
+        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_EMOTE_ANIM);
 
     // register aura diminishing on apply
     if (getDiminishGroup() != DIMINISHING_NONE)
@@ -6898,7 +6898,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
             if (removeState && !foundAuraWithSameAuraState)
                 m_target->ModifyAuraState(AuraState(removeState), false);
             if (m_spellProto->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM) && !foundAuraWithPreventsAnimAttribute)
-                m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM);
+                m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_EMOTE_ANIM);
         }
 
         // reset cooldown state for spells
@@ -7059,6 +7059,42 @@ bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) co
 
     // form different weapons
     return ref->GetCastItemGuid() && ref->GetCastItemGuid() != GetCastItemGuid();
+}
+
+bool SpellAuraHolder::IsManuallyCancelableBy(Unit const* user) const
+{
+    // Can only cancel aura on unit controlled by user.
+    if (GetTarget()->GetCharmerOrOwnerOrOwnGuid() != user->GetObjectGuid())
+        return false;
+
+    // Not own area auras can't be canceled.
+    if (GetCasterGuid() != user->GetObjectGuid() && GetSpellProto()->HasAreaAuraEffect())
+        return false;
+
+    if (!IsPositive())
+    {
+        // The only negative spells that can be canceled are charm auras we cast.
+        if (GetCasterGuid() == user->GetObjectGuid())
+        {
+            bool allow = false;
+            for (uint32 k : GetSpellProto()->EffectApplyAuraName)
+            {
+                if (k == SPELL_AURA_MOD_POSSESS ||
+                    k == SPELL_AURA_MOD_POSSESS_PET)
+                {
+                    allow = true;
+                    break;
+                }
+            }
+
+            if (!allow)
+                return false;
+        }
+        else
+            return false;
+    }
+
+    return true;
 }
 
 bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const

@@ -952,7 +952,7 @@ bool GossipHello_ProfessionNPC(Player* player, Creature* creature)
 
 void CompleteLearnProfession(Player *pPlayer, Creature *pCreature, SkillType skill)
 {
-    if (pPlayer->GetFreePrimaryProfessionPoints() == 0 && !(skill == SKILL_COOKING || skill == SKILL_FIRST_AID))
+    if (pPlayer->GetFreePrimaryProfessionPoints() == 0 && !(skill == SKILL_COOKING || skill == SKILL_FIRST_AID || skill == SKILL_FISHING))
     {
         pPlayer->GetSession()->SendNotification("You already know two primary professions.");
     }

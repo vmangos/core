@@ -1033,7 +1033,6 @@ PerformanceLog.SlowPacketBroadcast = 0
 #
 #    RestrictUnverifiedAccounts
 #        Treat accounts with an unverified email as trial accounts, which are not allowed to do the following:
-#        - Join a guild
 #        - Whisper someone who has not added you to their friends list
 #        - Trade
 #        - Talk in General, Trade or LocalDefense channels
@@ -2155,21 +2154,21 @@ Warden.ModuleDir = "warden_modules"
 #        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
-#    Anticheat.FixedZ.Enable
+#    Anticheat.DisableGravity.Enable
 #        Check for players that have a fixed Z axis.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.FixedZ.Reject
+#    Anticheat.DisableGravity.Reject
 #        Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.FixedZ.Threshold
+#    Anticheat.DisableGravity.Threshold
 #        Detections needed to trigger a penalty.
 #        Default:     5
 #
-#    Anticheat.FixedZ.Penalty
+#    Anticheat.DisableGravity.Penalty
 #        Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
@@ -2393,10 +2392,10 @@ Anticheat.Hover.Enable = 1
 Anticheat.Hover.Reject = 1
 Anticheat.Hover.Threshold = 5
 Anticheat.Hover.Penalty = 11
-Anticheat.FixedZ.Enable = 1
-Anticheat.FixedZ.Reject = 1
-Anticheat.FixedZ.Threshold = 5
-Anticheat.FixedZ.Penalty = 11
+Anticheat.DisableGravity.Enable = 1
+Anticheat.DisableGravity.Reject = 1
+Anticheat.DisableGravity.Threshold = 5
+Anticheat.DisableGravity.Penalty = 11
 Anticheat.RootMove.Enable = 1
 Anticheat.RootMove.Reject = 1
 Anticheat.RootMove.Threshold.Tick = 5

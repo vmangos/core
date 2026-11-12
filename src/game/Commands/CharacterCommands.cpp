@@ -112,13 +112,10 @@ bool ChatHandler::HandleCheatFlyCommand(char* args)
     if (needReportToTarget(target))
         target->PSendSysMessage(LANG_YOUR_FLY_SET, value ? "on" : "off", GetNameLink().c_str());
 
-    if (value)
-        target->SendSysMessage("WARNING: Do not jump or flying mode will be removed.");
-
     return true;
 }
 
-bool ChatHandler::HandleCheatFixedZCommand(char* args)
+bool ChatHandler::HandleCheatGravityCommand(char* args)
 {
     bool value;
     if (!ExtractOnOff(&args, value))
@@ -132,11 +129,11 @@ bool ChatHandler::HandleCheatFixedZCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetCheatFixedZ(value, true);
+    target->SetCheatGravity(value, true);
 
-    PSendSysMessage(LANG_YOU_SET_FIXED_Z, value ? "on" : "off", GetNameLink(target).c_str());
+    PSendSysMessage(LANG_YOU_SET_GRAVITY, value ? "on" : "off", GetNameLink(target).c_str());
     if (needReportToTarget(target))
-        target->PSendSysMessage(LANG_YOUR_FIXED_Z_SET, value ? "on" : "off", GetNameLink().c_str());
+        target->PSendSysMessage(LANG_YOUR_GRAVITY_SET, value ? "on" : "off", GetNameLink().c_str());
 
     return true;
 }
@@ -606,8 +603,8 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
         SendSysMessage("- Wall climbing");
     if (target->HasCheatOption(PLAYER_CHEAT_DEBUG_TARGET_INFO))
         SendSysMessage("- Debug target info");
-    if (target->HasCheatOption(PLAYER_CHEAT_FIXED_Z))
-        SendSysMessage("- Fixed Z");
+    if (target->HasCheatOption(PLAYER_CHEAT_DISABLE_GRAVITY))
+        SendSysMessage("- Disable Gravity");
 
     return true;
 }
@@ -1437,35 +1434,6 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool u
     }
 
     return true;
-}
-
-/**
- * Generate WHERE guids list by deleted info in way preventing return too long where list for existed query string length limit.
- *
- * @param itr          a reference to an deleted info list iterator, it updated in function for possible next function call if list to long
- * @param itr_end      a reference to an deleted info list iterator end()
- * @return             returns generated where list string in form: 'guid IN (gui1, guid2, ...)'
- */
-std::string ChatHandler::GenerateDeletedCharacterGUIDsWhereStr(DeletedInfoList::const_iterator& itr, DeletedInfoList::const_iterator const& itr_end)
-{
-    std::ostringstream wherestr;
-    wherestr << "guid IN ('";
-    for(; itr != itr_end; ++itr)
-    {
-        wherestr << itr->lowguid;
-
-        if (wherestr.str().size() > MAX_QUERY_LEN - 50)     // near to max query
-        {
-            ++itr;
-            break;
-        }
-
-        DeletedInfoList::const_iterator itr2 = itr;
-        if (++itr2 != itr_end)
-            wherestr << "','";
-    }
-    wherestr << "')";
-    return wherestr.str();
 }
 
 /**
@@ -2936,6 +2904,32 @@ bool ChatHandler::HandleLearnAllItemsCommand(char* args)
     }
 
     SendSysMessage("Learned all available spells from items.");
+    return true;
+}
+
+bool ChatHandler::HandleLearnAllQuestsCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+
+    for (auto const& itr : sObjectMgr.GetQuestTemplates())
+    {
+        Quest const* pQuest = itr.second.get();
+        if (!pQuest)
+            continue;
+
+        if (pQuest->GetMinLevel() > pPlayer->GetLevel())
+            continue;
+
+        if (pQuest->GetRequiredClasses() != pPlayer->GetClassMask())
+            continue;
+
+        if (pQuest->GetRequiredRaces() && !(pQuest->GetRequiredRaces() & pPlayer->GetRaceMask()))
+            continue;
+
+        pPlayer->LearnQuestRewardedSpells(pQuest);
+    }
+
+    SendSysMessage("Learned all available spells from quests.");
     return true;
 }
 

@@ -429,7 +429,7 @@ enum PlayerCheatOptions : uint16
     PLAYER_CHEAT_TRIGGER_PASS      = 0x100,
     PLAYER_CHEAT_IGNORE_TRIGGERS   = 0x200,
     PLAYER_CHEAT_DEBUG_TARGET_INFO = 0x400,
-    PLAYER_CHEAT_FIXED_Z           = 0x800,
+    PLAYER_CHEAT_DISABLE_GRAVITY   = 0x800,
 };
 
 typedef std::map<uint32, QuestStatusData> QuestStatusMap;
@@ -810,7 +810,7 @@ class Player final: public Unit
         void SetGMVisible(bool on, bool notify = false);
 
         void SetCheatFly(bool on, bool notify = false);
-        void SetCheatFixedZ(bool on, bool notify = false);
+        void SetCheatGravity(bool on, bool notify = false);
         void SetCheatBeastmaster(bool on, bool notify = false);
         void SetCheatGod(bool on, bool notify = false);
         void SetCheatNoCooldown(bool on, bool notify = false);
@@ -1172,7 +1172,7 @@ class Player final: public Unit
         void AreaExploredOrEventHappens(uint32 questId);
         void GroupEventHappens(uint32 questId, WorldObject const* pEventObject);
         void GroupEventFailHappens(uint32 questId);
-        void ItemAddedQuestCheck(uint32 entry, uint32 count);
+        void ItemAddedQuestCheck(uint32 entry, uint32 count, bool sendQuestUpdate = true);
         void ItemRemovedQuestCheck(uint32 entry, uint32 count);
         void KilledMonster(CreatureInfo const* cInfo, ObjectGuid guid);
         void KilledMonsterCredit(uint32 entry, ObjectGuid guid = ObjectGuid());

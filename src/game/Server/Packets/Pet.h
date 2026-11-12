@@ -227,6 +227,35 @@ namespace WorldPackets { namespace Pet
         void AppendBodyTo(ByteBuffer& buffer) const override;
     };
 
+    class PetSpells final : public ServerPacket
+    {
+    public:
+        struct PetSpellCooldown
+        {
+            PetSpellCooldown(uint16 spellId_, uint16 category_, int32 cooldown_, int32 categoryCooldown_) :
+                spellId(spellId_), category(category_), cooldown(cooldown_), categoryCooldown(categoryCooldown_) {};
+            uint16 spellId = 0;
+            uint16 category = 0;
+            int32 cooldown = 0;
+            int32 categoryCooldown = 0;
+        };
+
+        ObjectGuid petGuid;
+        uint32 timeLimit = 0;
+        uint8 reactState = 0;
+        uint8 commandState = 0;
+        uint8 flag1 = 0;        // always 0
+        uint8 enabledFlags = 0; // 0x0 = enabled, 0x8 = disabled
+
+        std::array<uint32, 10> actionButtons = {};
+        std::vector<uint32> actions;
+        std::vector<PetSpellCooldown> cooldowns;
+
+        explicit PetSpells() : ServerPacket(SMSG_PET_SPELLS) {}
+        size_t EstimateFinalSize() const override;
+        void AppendBodyTo(ByteBuffer& buffer) const override;
+    };
+
 }} // namespace WorldPackets::Pet
 
 #endif // MANGOS_PACKETS_PET_H

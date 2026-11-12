@@ -2741,21 +2741,21 @@ void Player::SetCheatFly(bool on, bool notify)
     }
 }
 
-void Player::SetCheatFixedZ(bool on, bool notify)
+void Player::SetCheatGravity(bool on, bool notify)
 {
-    SetCheatOption(PLAYER_CHEAT_FIXED_Z, on);
+    SetCheatOption(PLAYER_CHEAT_DISABLE_GRAVITY, on);
 
     if (on)
-        m_movementInfo.AddMovementFlag(MOVEFLAG_FIXED_Z);
+        m_movementInfo.AddMovementFlag(MOVEFLAG_DISABLE_GRAVITY);
     else
-        m_movementInfo.RemoveMovementFlag(MOVEFLAG_FIXED_Z);
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_DISABLE_GRAVITY);
 
     GetSession()->RejectMovementPacketsFor(100);
-    SendHeartBeat(true);
+    SendMovementPacket(MSG_MOVE_TOGGLE_GRAVITY_CHEAT, true);
 
     if (notify)
     {
-        GetSession()->SendNotification(on ? LANG_CHEAT_FIXED_Z_ON : LANG_CHEAT_FIXED_Z_OFF);
+        GetSession()->SendNotification(on ? LANG_CHEAT_GRAVITY_ON : LANG_CHEAT_GRAVITY_OFF);
     }
 }
 
@@ -4456,12 +4456,14 @@ void Player::DeleteFromDB(ObjectGuid playerGuid, uint32 accountId, bool updateRe
             }
 
             CharacterDatabase.PExecute("DELETE FROM `characters` WHERE `guid` = '%u'", lowGuid);
+            CharacterDatabase.PExecute("DELETE FROM `character_account_data` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_action` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_aura` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_battleground_data` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_deleted_items` WHERE `player_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_gifts` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_homebind` WHERE `guid` = '%u'", lowGuid);
+            CharacterDatabase.PExecute("DELETE FROM `character_honor_cp` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_instance` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `group_instance` WHERE `leader_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `guid` = '%u'", lowGuid);
@@ -4471,12 +4473,15 @@ void Player::DeleteFromDB(ObjectGuid playerGuid, uint32 accountId, bool updateRe
             CharacterDatabase.PExecute("DELETE FROM `character_forgotten_skills` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_spell` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_spell_cooldown` WHERE `guid` = '%u'", lowGuid);
+            CharacterDatabase.PExecute("DELETE FROM `character_stats` WHERE `guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `item_instance` WHERE `owner_guid` = '%u'", lowGuid);
+            CharacterDatabase.PExecute("DELETE FROM `item_loot` WHERE `owner_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_social` WHERE `guid` = '%u' OR `friend`='%u'", lowGuid, lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `receiver_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `receiver_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `character_pet` WHERE `owner_guid` = '%u'", lowGuid);
             CharacterDatabase.PExecute("DELETE FROM `guild_eventlog` WHERE `player_guid1` = '%u' OR `player_guid2` = '%u'", lowGuid, lowGuid);
+            sTicketMgr->RemovePlayerReferences(playerGuid);
             CharacterDatabase.CommitTransaction();
             break;
         }
@@ -4540,7 +4545,7 @@ void Player::SetFly(bool enable)
             StopMoving(true);
         }
 
-        m_movementInfo.moveFlags = (MOVEFLAG_LEVITATING | MOVEFLAG_SWIMMING | MOVEFLAG_MOVED | MOVEFLAG_FLYING);
+        m_movementInfo.moveFlags = (MOVEFLAG_KEEP_SWIM_STATE | MOVEFLAG_SWIMMING | MOVEFLAG_HOVER);
     }
     else
     {
@@ -10275,8 +10280,8 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
             pItem2->SetBinding(true);
 
         pItem2->SetCount(pItem2->GetCount() + count);
-        if (IsInWorld() && update)
-            pItem2->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld() && update)
+        //    pItem2->SendValuesUpdateToPlayer(this);
 
         if (!clone)
         {
@@ -10383,8 +10388,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     else
     {
         pItem2->SetCount(pItem2->GetCount() + pItem->GetCount());
-        if (IsInWorld() && update)
-            pItem2->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld() && update)
+        //    pItem2->SendValuesUpdateToPlayer(this);
 
         // delete item (it not in any slot currently)
         //pItem->DeleteFromDB();
@@ -10694,8 +10699,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                 {
                     ItemRemovedQuestCheck(pItem->GetEntry(), count - remcount);
                     pItem->SetCount(pItem->GetCount() - count + remcount);
-                    if (IsInWorld() && update)
-                        pItem->SendCreateUpdateToPlayer(this);
+                    //if (IsInWorld() && update)
+                    //    pItem->SendValuesUpdateToPlayer(this);
                     pItem->SetState(ITEM_CHANGED, this);
                     return;
                 }
@@ -10722,8 +10727,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                 {
                     ItemRemovedQuestCheck(pItem->GetEntry(), count - remcount);
                     pItem->SetCount(pItem->GetCount() - count + remcount);
-                    if (IsInWorld() && update)
-                        pItem->SendCreateUpdateToPlayer(this);
+                    //if (IsInWorld() && update)
+                    //    pItem->SendValuesUpdateToPlayer(this);
                     pItem->SetState(ITEM_CHANGED, this);
                     return;
                 }
@@ -10755,8 +10760,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                         {
                             ItemRemovedQuestCheck(pItem->GetEntry(), count - remcount);
                             pItem->SetCount(pItem->GetCount() - count + remcount);
-                            if (IsInWorld() && update)
-                                pItem->SendCreateUpdateToPlayer(this);
+                            //if (IsInWorld() && update)
+                            //    pItem->SendValuesUpdateToPlayer(this);
                             pItem->SetState(ITEM_CHANGED, this);
                             return;
                         }
@@ -10788,8 +10793,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                 {
                     ItemRemovedQuestCheck(pItem->GetEntry(), count - remcount);
                     pItem->SetCount(pItem->GetCount() - count + remcount);
-                    if (IsInWorld() && update)
-                        pItem->SendCreateUpdateToPlayer(this);
+                    //if (IsInWorld() && update)
+                    //    pItem->SendValuesUpdateToPlayer(this);
                     pItem->SetState(ITEM_CHANGED, this);
                     return;
                 }
@@ -10817,8 +10822,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                     else
                     {
                         pItem->SetCount(pItem->GetCount() - count + remcount);
-                        if (IsInWorld() && update)
-                            pItem->SendCreateUpdateToPlayer(this);
+                        //if (IsInWorld() && update)
+                        //    pItem->SendValuesUpdateToPlayer(this);
                         pItem->SetState(ITEM_CHANGED, this);
                         return;
                     }
@@ -10848,8 +10853,8 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                             else
                             {
                                 pItem->SetCount(pItem->GetCount() - count + remcount);
-                                if (IsInWorld() && update)
-                                    pItem->SendCreateUpdateToPlayer(this);
+                                //if (IsInWorld() && update)
+                                //    pItem->SendValuesUpdateToPlayer(this);
                                 pItem->SetState(ITEM_CHANGED, this);
                                 return;
                             }
@@ -10952,8 +10957,8 @@ void Player::DestroyItemCount(Item* pItem, uint32& count, bool update)
         ItemRemovedQuestCheck(pItem->GetEntry(), count);
         pItem->SetCount(pItem->GetCount() - count);
         count = 0;
-        if (IsInWorld() && update)
-            pItem->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld() && update)
+        //    pItem->SendValuesUpdateToPlayer(this);
         pItem->SetState(ITEM_CHANGED, this);
     }
 }
@@ -11031,8 +11036,8 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
             return;
         }
 
-        if (IsInWorld())
-            pSrcItem->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld())
+        //    pSrcItem->SendValuesUpdateToPlayer(this);
         pSrcItem->SetState(ITEM_CHANGED, this);
         StoreItem(dest, pNewItem, true);
     }
@@ -11052,8 +11057,8 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
             return;
         }
 
-        if (IsInWorld())
-            pSrcItem->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld())
+        //    pSrcItem->SendValuesUpdateToPlayer(this);
         pSrcItem->SetState(ITEM_CHANGED, this);
         BankItem(dest, pNewItem, true);
     }
@@ -11072,8 +11077,8 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
             return;
         }
 
-        if (IsInWorld())
-            pSrcItem->SendCreateUpdateToPlayer(this);
+        //if (IsInWorld())
+        //    pSrcItem->SendValuesUpdateToPlayer(this);
         pSrcItem->SetState(ITEM_CHANGED, this);
         EquipItem(dest, pNewItem, true);
         AutoUnequipOffhandIfNeed();
@@ -11240,11 +11245,11 @@ void Player::SwapItem(uint16 src, uint16 dst)
                 pDstItem->SetCount(pSrcItem->GetProto()->GetMaxStackSize());
                 pSrcItem->SetState(ITEM_CHANGED, this);
                 pDstItem->SetState(ITEM_CHANGED, this);
-                if (IsInWorld())
-                {
-                    pSrcItem->SendCreateUpdateToPlayer(this);
-                    pDstItem->SendCreateUpdateToPlayer(this);
-                }
+                //if (IsInWorld())
+                //{
+                //    pSrcItem->SendValuesUpdateToPlayer(this);
+                //    pDstItem->SendValuesUpdateToPlayer(this);
+                //}
             }
             return;
         }
@@ -13902,7 +13907,7 @@ void Player::GroupEventFailHappens(uint32 questId)
         FailQuest(questId);
 }
 
-void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
+void Player::ItemAddedQuestCheck(uint32 entry, uint32 count, bool sendQuestUpdate)
 {
     for (int i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
@@ -13933,7 +13938,7 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
                     if (q_status.uState != QUEST_NEW)
                         q_status.uState = QUEST_CHANGED;
 
-                    if (entry != qInfo->GetSrcItemId())
+                    if (sendQuestUpdate && entry != qInfo->GetSrcItemId())
                         SendQuestUpdateAddItem(qInfo, j, curItemCount, newItemCount - curItemCount);
                 }
 
@@ -17351,6 +17356,35 @@ void Player::PSendSysMessage(char const* format, ...) const
     SendSysMessage(str);
 }
 
+void WritePetSpellsCooldown(std::vector<WorldPackets::Pet::PetSpells::PetSpellCooldown>& packetCDs, CooldownContainer const& cooldownMap)
+{
+    // write cooldown data
+    auto currTime = sWorld.GetCurrentClockTime();
+
+    for (auto& cdItr : cooldownMap)
+    {
+        auto& cdData = cdItr.second;
+        TimePoint spellRecTime = currTime;
+        TimePoint catRecTime = currTime;
+        cdData->GetSpellCDExpireTime(spellRecTime);
+        cdData->GetCatCDExpireTime(catRecTime);
+        uint32 spellCDDuration = 0;
+        uint32 catCDDuration = 0;
+        if (spellRecTime > currTime)
+            spellCDDuration = std::chrono::duration_cast<std::chrono::milliseconds>(spellRecTime - currTime).count();
+        if (catRecTime > currTime)
+            catCDDuration = std::chrono::duration_cast<std::chrono::milliseconds>(catRecTime - currTime).count();
+
+        if (!spellCDDuration && !catCDDuration && !cdData->IsPermanent())
+            continue;
+
+        if (cdData->IsPermanent())
+            catCDDuration |= 0x80000000;
+
+        packetCDs.emplace_back(uint16(cdData->GetSpellEntry()->Id), uint16(cdData->GetCategory()), int32(spellCDDuration), int32(catCDDuration));
+    }
+}
+
 void Player::PetSpellInitialize()
 {
     Pet* pet = GetPet();
@@ -17362,39 +17396,24 @@ void Player::PetSpellInitialize()
 
     CharmInfo* charmInfo = pet->GetCharmInfo();
 
-    WorldPacket data(SMSG_PET_SPELLS, 8 + 4 + 1 + 1 + 2 + 4 * MAX_UNIT_ACTION_BAR_INDEX + 1 + 1);
-    data << pet->GetObjectGuid();
-    data << uint32(0);
-    data << uint8(charmInfo->GetReactState());
-    data << uint8(charmInfo->GetCommandState());
-    data << uint8(0);
-    data << uint8(pet->IsEnabled() ? 0x0 : 0x8);
-
-    // action bar loop
-    charmInfo->BuildActionBar(&data);
-
-    size_t spellsCountPos = data.wpos();
-
-    // spells count
-    uint8 addlist = 0;
-    data << uint8(addlist);                                 // placeholder
-
+    auto packet = std::make_unique<WorldPackets::Pet::PetSpells>();
+    packet->petGuid = pet->GetObjectGuid();
+    packet->reactState = charmInfo->GetReactState();
+    packet->commandState = charmInfo->GetCommandState();
+    packet->enabledFlags = pet->IsEnabled() ? 0x0 : 0x8;
+    charmInfo->BuildActionBar(packet->actionButtons);
     if (pet->IsPermanentPetFor(this))
     {
-        // spells loop
         for (PetSpellMap::const_iterator itr = pet->m_petSpells.begin(); itr != pet->m_petSpells.end(); ++itr)
         {
             if (itr->second.state == PETSPELL_REMOVED)
                 continue;
 
-            data << uint32(MAKE_UNIT_ACTION_BUTTON(itr->first, itr->second.active));
-            ++addlist;
+            packet->actions.push_back(uint32(MAKE_UNIT_ACTION_BUTTON(itr->first, itr->second.active)));
         }
     }
-
-    data.put<uint8>(spellsCountPos, addlist);
-    pet->WritePetSpellsCooldown(data);
-    GetSession()->SendPacket(&data);
+    WritePetSpellsCooldown(packet->cooldowns, pet->GetCooldownMap());
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::PossessSpellInitialize()
@@ -17423,17 +17442,12 @@ void Player::PossessSpellInitialize()
         }
     }
 
-    WorldPacket data(SMSG_PET_SPELLS, 8 + 4 + 4 + 4 * MAX_UNIT_ACTION_BAR_INDEX + 1 + 1);
-    data << charm->GetObjectGuid();
-    data << int32(duration);
-    data << uint32(0);
-
-    charmInfo->BuildActionBar(&data);
-
-    data << uint8(0);                                       // spells count
-    charm->WritePetSpellsCooldown(data);
-
-    GetSession()->SendPacket(&data);
+    auto packet = std::make_unique<WorldPackets::Pet::PetSpells>();
+    packet->petGuid = charm->GetObjectGuid();
+    packet->timeLimit = duration;
+    charmInfo->BuildActionBar(packet->actionButtons);
+    WritePetSpellsCooldown(packet->cooldowns, charm->GetCooldownMap());
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::CharmSpellInitialize() const
@@ -17477,38 +17491,29 @@ void Player::CharmSpellInitialize() const
         }
     }
 
-    WorldPacket data(SMSG_PET_SPELLS, 8 + 4 + 1 + 1 + 2 + 4 * MAX_UNIT_ACTION_BAR_INDEX + 1 + 4 * addlist + 1);
-    data << charm->GetObjectGuid();
-    data << int32(duration);
-    data << uint8(charmInfo->GetReactState());
-    data << uint8(charmInfo->GetCommandState());
-    data << uint8(0);
-    data << uint8(0);
-
-    charmInfo->BuildActionBar(&data);
-
-    data << uint8(addlist);
-
+    auto packet = std::make_unique<WorldPackets::Pet::PetSpells>();
+    packet->petGuid = charm->GetObjectGuid();
+    packet->timeLimit = duration;
+    packet->reactState = charmInfo->GetReactState();
+    packet->commandState = charmInfo->GetCommandState();
+    charmInfo->BuildActionBar(packet->actionButtons);
     if (addlist)
     {
         for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
         {
             CharmSpellEntry* cspell = charmInfo->GetCharmSpell(i);
             if (cspell->GetAction())
-                data << uint32(cspell->packedData);
+                packet->actions.push_back(cspell->packedData);
         }
     }
-
-    charm->WritePetSpellsCooldown(data);
-
-    GetSession()->SendPacket(&data);
+    WritePetSpellsCooldown(packet->cooldowns, charm->GetCooldownMap());
+    GetSession()->SendPacket(std::move(packet));
 }
 
 void Player::RemovePetActionBar() const
 {
-    WorldPacket data(SMSG_PET_SPELLS, 8);
-    data << ObjectGuid();
-    SendDirectMessage(&data);
+    auto packet = std::make_unique<WorldPackets::Pet::PetSpells>();
+    GetSession()->SendPacket(std::move(packet));
 }
 
 // This will create a new creature and set the current unit as the controller of that new creature
@@ -18428,8 +18433,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         return false;
     }
 
-    auto playerRank = (sWorld.GetWowPatch() < WOW_PATCH_107) && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_PURCHASE_REQUIREMENTS) ?
-        m_honorMgr.GetHighestRank().rank : m_honorMgr.GetRank().rank;
+    uint8 playerRank = sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_PURCHASE_REQUIREMENTS) ? (sWorld.GetWowPatch() < WOW_PATCH_107 ? m_honorMgr.GetHighestRank().rank : m_honorMgr.GetRank().rank) : m_honorMgr.GetHighestRank().rank;
 
     // do not check level requirement for normal items (PvP related bonus items is another case)
     if (pProto->RequiredHonorRank && (playerRank < (uint8)pProto->RequiredHonorRank || GetLevel() < pProto->RequiredLevel))
@@ -18464,7 +18468,14 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
         LogModifyMoney(-int32(price), "BuyItem", vendorGuid, item);
 
-        pItem = StoreNewItem(dest, item, true, Item::GenerateItemRandomPropertyId(item));
+        // the client shows the quest item progress from SMSG_BUY_ITEM
+        if (Item* newItem = Item::CreateItem(item, totalCount, GetObjectGuid()))
+        {
+            ItemAddedQuestCheck(item, totalCount, false);
+            if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(item))
+                pItem->SetItemRandomProperties(randomPropertyId);
+            pItem = StoreItem(dest, newItem, true);
+        }
     }
     else if (IsEquipmentPos(bag, slot))
     {
@@ -18484,7 +18495,14 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
         LogModifyMoney(-int32(price), "BuyItem", vendorGuid, item);
 
-        pItem = EquipNewItem(dest, item, true);
+        // the client shows the quest item progress from SMSG_BUY_ITEM
+        if (Item* newItem = Item::CreateItem(item, 1, GetObjectGuid()))
+        {
+            ItemAddedQuestCheck(item, 1, false);
+            if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(item))
+                pItem->SetItemRandomProperties(randomPropertyId);
+            pItem = EquipItem(dest, newItem, true);
+        }
 
         if (pItem)
             AutoUnequipOffhandIfNeed();
@@ -18515,7 +18533,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
     packet->vendorGuid = pCreature->GetObjectGuid();
     packet->vendorSlot = clientVendorSlot;
     packet->newCount = crItem->maxcount > 0 ? new_count : 0xFFFFFFFF;
-    packet->purchaseCount = count;
+    packet->purchaseCount = totalCount;
     GetSession()->SendPacket(std::move(packet));
 
     SendNewItem(pItem, totalCount, true, false, false);
@@ -21734,7 +21752,7 @@ void Player::RefreshBitsForVisibleUnits(UpdateMask* mask, uint32 objectTypeMask)
     {
         if (Object* obj = GetObjectByTypeMask(guid, TypeMask(objectTypeMask)))
         {
-            ByteBuffer& buff = data.AddUpdateBlockAndGetBuffer();
+            ByteBuffer& buff = data.AddUpdateBlockAndGetBuffer(guid.IsTransport() || guid.IsMOTransport());
 
             buff << uint8(UPDATETYPE_VALUES);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -22710,7 +22728,7 @@ void Log::Player(WorldSession const* session, LogType logType, char const* subTy
     // Player logs should never go to the console
 }
 
-void Log:: Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...)
+void Log::Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...)
 {
     if (logType >= LOG_TYPE_MAX || logType < 0)
         return;

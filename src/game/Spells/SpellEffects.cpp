@@ -2953,7 +2953,7 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffectIndex effIdx)
         m_caster->GetClosePoint(fx, fy, fz, unitTarget->GetObjectBoundingRadius(), dis);
     }
 
-    unitTarget->NearTeleportTo(fx, fy, fz, -m_caster->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget == m_caster ? TELE_TO_SPELL : 0));
+    unitTarget->NearTeleportTo(fx, fy, fz, m_caster->GetAngle(fx, fy) - M_PI_F, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget == m_caster ? TELE_TO_SPELL : 0));
 }
 
 void Spell::EffectLearnSkill(SpellEffectIndex effIdx)

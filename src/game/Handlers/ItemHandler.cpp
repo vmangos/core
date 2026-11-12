@@ -459,12 +459,15 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem const& pack
     Item *pItem = _player->GetItemByGuid(packet.itemGuid);
 
     if (!pItem)
+    {
+        _player->SendSellError(SELL_ERR_CANT_FIND_ITEM, pCreature, packet.itemGuid, 0);
         return;
+    }
 
     // prevent sell not owner item
     if (_player->GetObjectGuid() != pItem->GetOwnerGuid())
     {
-        _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, packet.itemGuid, 0);
+        _player->SendSellError(SELL_ERR_YOU_DONT_OWN_THAT_ITEM, pCreature, packet.itemGuid, 0);
         return;
     }
 
@@ -478,7 +481,7 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem const& pack
     // prevent sell non empty bag by drag-and-drop at vendor's item list
     if (pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
     {
-        _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, packet.itemGuid, 0);
+        _player->SendSellError(SELL_ERR_ONLY_EMPTY_BAG, pCreature, packet.itemGuid, 0);
         return;
     }
 

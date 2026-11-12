@@ -626,7 +626,7 @@ bool Creature::UpdateEntry(uint32 entry, GameEventCreatureData const* eventData 
     SetFly(CanFly());
 
     if (HasStaticFlag(CREATURE_STATIC_FLAG_FLOATING))
-        AddUnitMovementFlag(MOVEFLAG_FIXED_Z);
+        AddUnitMovementFlag(MOVEFLAG_DISABLE_GRAVITY);
 
     if (HasExtraFlag(CREATURE_FLAG_EXTRA_APPEAR_DEAD))
         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
