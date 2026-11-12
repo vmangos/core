@@ -3496,7 +3496,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
 
         // execute triggered without cast time explicitly in call point
         if (ShouldExecuteCastInstantly())
-            cast(true);
+            cast(m_IsTriggeredSpell);
 
         // else triggered with cast time will execute at next tick or later
         // without adding to cast type slot
