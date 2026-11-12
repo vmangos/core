@@ -516,8 +516,8 @@ enum UnitFlags
     UNIT_FLAG_NOT_SELECTABLE        = 0x02000000,           // Unit cannot be selected, targeted with negative spells, attacked or interacted with. Can still be targeted with positive spells.
     UNIT_FLAG_SKINNABLE             = 0x04000000,           // Unit can be skinned and then looted. Can be applied to players too inside battlegrounds.
     UNIT_FLAG_AURAS_VISIBLE         = 0x08000000,           // Detect Magic. Added by SPELL_AURA_AURAS_VISIBLE.
-    UNIT_FLAG_UNK_28                = 0x10000000,           // Never seen in sniffs.
-    UNIT_FLAG_PREVENT_ANIM          = 0x20000000,           // Prevent automatically playing emotes from parsing chat text, for example "lol" in /say, ending message with ? or !, or using /yell.
+    UNIT_FLAG_NO_LOOT_ANIM          = 0x10000000,           // Prevent other players from seeing loot animation of this unit. Never seen in sniffs.
+    UNIT_FLAG_NO_EMOTE_ANIM         = 0x20000000,           // Prevent automatically playing emotes from parsing chat text, for example "lol" in /say, ending message with ? or !, or using /yell.
     UNIT_FLAG_SHEATHE               = 0x40000000,           // Never seen in sniffs.
     UNIT_FLAG_IMMUNE                = 0x80000000,           // Immune to damage. It prevents interacting with some GameObjects like the WSG flag.
 };
@@ -584,10 +584,10 @@ static char const* UnitFlagToString(uint32 flag)
             return "Skinnable";
         case UNIT_FLAG_AURAS_VISIBLE:
             return "Auras Visible";
-        case UNIT_FLAG_UNK_28:
-            return "Unk28";
-        case UNIT_FLAG_PREVENT_ANIM:
-            return "Prevent Anim";
+        case UNIT_FLAG_NO_LOOT_ANIM:
+            return "No Loot Anim";
+        case UNIT_FLAG_NO_EMOTE_ANIM:
+            return "No Emote Anim";
         case UNIT_FLAG_SHEATHE:
             return "Sheathe";
         case UNIT_FLAG_IMMUNE:

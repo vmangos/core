@@ -6806,7 +6806,7 @@ void SpellAuraHolder::_AddSpellAuraHolder()
         m_target->SetStandState(UNIT_STAND_STATE_SIT);
 
     if (m_spellProto->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM))
-        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM);
+        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_EMOTE_ANIM);
 
     // register aura diminishing on apply
     if (getDiminishGroup() != DIMINISHING_NONE)
@@ -6898,7 +6898,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
             if (removeState && !foundAuraWithSameAuraState)
                 m_target->ModifyAuraState(AuraState(removeState), false);
             if (m_spellProto->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM) && !foundAuraWithPreventsAnimAttribute)
-                m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM);
+                m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_EMOTE_ANIM);
         }
 
         // reset cooldown state for spells

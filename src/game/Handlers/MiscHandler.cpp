@@ -447,7 +447,7 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPackets::Misc::StandStateCh
             return;
     }
 
-    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM))
+    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_EMOTE_ANIM))
         return;
 
     _player->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_ANIM_CANCELS);
