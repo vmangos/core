@@ -5309,7 +5309,13 @@ SpellCastResult Spell::CheckCast(bool strict)
         && !m_spellInfo->IsAutoRepeatRangedSpell() // auto shot managed by attack timer
         && !m_caster->IsSpellReady(m_spellInfo, m_CastItem ? m_CastItem->GetProto() : nullptr))
     {
-        return (m_triggeredByAuraSpell || m_spellInfo->Attributes & SPELL_ATTR_COOLDOWN_ON_EVENT) ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_NOT_READY;
+        if (m_triggeredByAuraSpell || m_spellInfo->Attributes & SPELL_ATTR_COOLDOWN_ON_EVENT)
+            return SPELL_FAILED_DONT_REPORT;
+        // only SPELL_FAILED_NOT_READY lets the client release a cooldown it holds until an event
+        else if (m_CastItem && !m_spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
+            return SPELL_FAILED_ITEM_NOT_READY;
+        else
+            return SPELL_FAILED_NOT_READY;
     }
 
     // check death state to prevent cheating ("deathbug")
