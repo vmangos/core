@@ -171,9 +171,8 @@ class Creature : public Unit
         bool HasCreatureReactState(ReactStates state) const { return (m_reactState == state); }
         void InitializeReactState();
 
-        bool IsTrainerOf(Player* player, bool msg) const;
-        bool CanInteractWithBattleMaster(Player* player, bool msg) const;
-        bool CanTrainAndResetTalentsOf(Player const* pPlayer) const;
+        bool IsTrainerOf(Player* player) const;
+        bool CanInteractWithBattleMaster(Player* player) const;
 
         bool IsOutOfThreatArea(Unit const* pVictim) const;
         void FillGuidsListFromThreatList(std::vector<ObjectGuid>& guids, uint32 maxamount = 0);

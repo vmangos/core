@@ -148,7 +148,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
     }
 
     // trainer list loaded at check;
-    if (!unit->IsTrainerOf(_player, true))
+    if (!unit->IsTrainerOf(_player))
         return;
 
     CreatureInfo const* ci = unit->GetCreatureInfo();
@@ -168,13 +168,14 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     uint32 maxcount = (cSpells ? cSpells->spellList.size() : 0) + (tSpells ? tSpells->spellList.size() : 0);
-    uint32 trainer_type = cSpells && cSpells->trainerType ? cSpells->trainerType : (tSpells ? tSpells->trainerType : 0);
 
+    uint32 trainerType;
     std::string strTitle;
-    if (TrainerGreetingLocale const* trainerGreeting = sObjectMgr.GetTrainerGreetingLocale(guid.GetEntry()))
+    if (TrainerGreeting const* trainerGreeting = sObjectMgr.GetTrainerGreeting(guid.GetEntry()))
     {
-        int locale_idx = GetSessionDbLocaleIndex();
+        trainerType = trainerGreeting->trainerType;
 
+        int locale_idx = GetSessionDbLocaleIndex();
         if ((int32)trainerGreeting->Content.size() > locale_idx + 1 && !trainerGreeting->Content[locale_idx + 1].empty())
             strTitle = trainerGreeting->Content[locale_idx + 1];
         else
@@ -182,12 +183,13 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
     }
     else
     {
-        strTitle = GetMangosString(LANG_NPC_TAINER_HELLO);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: SendTrainerList - Trainer greeting not found for %s", guid.GetString().c_str());
+        return;
     }
 
     WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + maxcount * 38 + strTitle.size() + 1);
     data << ObjectGuid(guid);
-    data << uint32(trainer_type);
+    data << uint32(trainerType);
 
     size_t count_pos = data.wpos();
     data << uint32(maxcount);
@@ -265,7 +267,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPackets::Npc::TrainerBuySpel
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.guid, UNIT_NPC_FLAG_TRAINER);
 
-    if (!unit || !unit->IsTrainerOf(_player, true) || !unit->IsWithinLOSInMap(_player))
+    if (!unit || !unit->IsTrainerOf(_player) || !unit->IsWithinLOSInMap(_player))
     {
         SendTrainingFailure(packet.guid, packet.spellId, TRAIN_FAIL_UNAVAILABLE);
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: HandleTrainerBuySpellOpcode - %s not found or you can't interact with him.", packet.guid.GetString().c_str());
