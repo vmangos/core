@@ -13019,12 +13019,14 @@ void Player::CompleteQuest(uint32 questId)
     {
         SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
 
-        uint16 log_slot = FindQuestSlot(questId);
-        if (log_slot < MAX_QUEST_LOG_SIZE)
-            SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
-
         if (Quest const* qInfo = sObjectMgr.GetQuestTemplate(questId))
         {
+            // The client reads the complete state of a quest log slot as the event or area objective
+            // of the quests flagged with one; the other objectives it counts itself.
+            uint16 log_slot = FindQuestSlot(questId);
+            if (log_slot < MAX_QUEST_LOG_SIZE && qInfo->HasQuestFlag(QuestFlags(QUEST_FLAGS_PARTY_ACCEPT | QUEST_FLAGS_EXPLORATION)))
+                SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
+
             if (qInfo->HasQuestFlag(QUEST_FLAGS_AUTO_REWARDED))
                 RewardQuest(qInfo, 0, this, false);
         }
@@ -15791,7 +15793,7 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
                     if (questStatusData.m_explored)
                         SetQuestSlotState(slot, QUEST_STATE_COMPLETE);
 
-                    if (questStatusData.m_status == QUEST_STATUS_COMPLETE)
+                    if (questStatusData.m_status == QUEST_STATUS_COMPLETE && pQuest->HasQuestFlag(QuestFlags(QUEST_FLAGS_PARTY_ACCEPT | QUEST_FLAGS_EXPLORATION)))
                         SetQuestSlotState(slot, QUEST_STATE_COMPLETE);
 
                     if (questStatusData.m_status == QUEST_STATUS_FAILED)
