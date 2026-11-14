@@ -5978,7 +5978,7 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
             if (positionChanged)
             {
                 // group update
-                if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
+                if (GetGroup() && (int16(old_x) != int16(x) || int16(old_y) != int16(y)))
                     SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
                 if (Player* pTrader = GetTrader())
@@ -6566,6 +6566,10 @@ void Player::SetTransport(GenericTransport* t)
 
 void Player::UpdateArea(uint32 newArea)
 {
+    // group update
+    if (m_areaUpdateId != newArea && GetGroup())
+        SetGroupUpdateFlag(GROUP_UPDATE_FLAG_ZONE);
+
     m_areaUpdateId    = newArea;
 
     DismountCheck();
@@ -6666,10 +6670,6 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     // http://youtube.be/iUFpZeNGPSs?t=32m
     if (!IsTaxiFlying())
         UpdateLocalChannels(newZone);
-
-    // group update
-    if (GetGroup())
-        SetGroupUpdateFlag(GROUP_UPDATE_FLAG_ZONE);
 
     UpdateZoneDependentAuras();
     SetZoneScript();
