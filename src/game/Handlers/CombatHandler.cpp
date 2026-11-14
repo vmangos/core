@@ -66,7 +66,11 @@ void WorldSession::HandleAttackSwingOpcode(WorldPackets::Combat::AttackSwing con
 
 void WorldSession::HandleAttackStopOpcode(NullClientPacket const& /*packet*/)
 {
-    GetPlayer()->AttackStop();
+    // client maintains the auto attack animation until it receives
+    // a SMSG_ATTACKSTOP with its own player guid as the attacker, 
+    // so send the packet even if we have no victim as confirmation
+    if (!GetPlayer()->AttackStop())
+        GetPlayer()->SendMeleeAttackStop(nullptr);
 
     /*
     I wanted to take a moment to provide some clarification around what changed in 1.13.3 with Reckoning.
