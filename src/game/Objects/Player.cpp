@@ -13993,7 +13993,10 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
                     q_status.m_itemcount[j] = newItemCount;
                     if (q_status.uState != QUEST_NEW)
                         q_status.uState = QUEST_CHANGED;
-                    IncompleteQuest(questid);
+
+                    // Only a complete quest goes back to incomplete: a failed quest stays failed.
+                    if (q_status.m_status == QUEST_STATUS_COMPLETE)
+                        IncompleteQuest(questid);
                 }
                 break;
             }
