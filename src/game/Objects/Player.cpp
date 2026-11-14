@@ -13039,8 +13039,12 @@ void Player::IncompleteQuest(uint32 questId)
     {
         SetQuestStatus(questId, QUEST_STATUS_INCOMPLETE);
 
+        // The complete state of the quest log slot is the event objective, which stays done once the event happened.
+        QuestStatusMap::const_iterator itr = mQuestStatus.find(questId);
+        bool eventDone = itr != mQuestStatus.end() && itr->second.m_explored;
+
         uint16 log_slot = FindQuestSlot(questId);
-        if (log_slot < MAX_QUEST_LOG_SIZE)
+        if (log_slot < MAX_QUEST_LOG_SIZE && !eventDone)
             RemoveQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
     }
 }
