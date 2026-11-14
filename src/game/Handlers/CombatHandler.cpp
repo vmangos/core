@@ -32,36 +32,30 @@
 void WorldSession::HandleAttackSwingOpcode(WorldPackets::Combat::AttackSwing const& packet)
 {
     if (!packet.targetGuid.IsUnit())
-        return;
-
-    Unit* pEnemy = _player->GetMap()->GetUnit(packet.targetGuid);
-
-    if (!pEnemy)
     {
         // stop attack state at client
-        SendAttackStop(nullptr);
+        SendPacket(GetPlayer()->BuildMeleeAttackStopPacket(packet.targetGuid));
         return;
     }
 
-    if (_player->IsFriendlyTo(pEnemy) || pEnemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE))
+    Unit* pEnemy = GetPlayer()->GetMap()->GetUnit(packet.targetGuid);
+    if (!pEnemy || !GetPlayer()->IsValidAttackTarget(pEnemy))
     {
         // stop attack state at client
-        SendAttackStop(pEnemy);
+        SendPacket(GetPlayer()->BuildMeleeAttackStopPacket(packet.targetGuid));
         return;
     }
 
-    if (!pEnemy->IsAlive())
+    if (GetPlayer()->Attack(pEnemy, true))
     {
-        // client can generate swing to known dead target if autoswitch between autoshot and autohit is enabled in client options
-        // stop attack state at client
-        SendAttackStop(pEnemy);
-        return;
+        // each new attack shows its swing error again, even the one last sent
+        GetPlayer()->SetSwingErrorMsg(ATTACK_RESULT_OK);
     }
-
-    _player->Attack(pEnemy, true);
-
-    // each new attack shows its swing error again, even the one last sent
-    _player->SetSwingErrorMsg(ATTACK_RESULT_OK);
+    else if (!GetPlayer()->GetVictim())
+    {
+        // stop attack state at client
+        SendPacket(GetPlayer()->BuildMeleeAttackStopPacket(packet.targetGuid));
+    }
 }
 
 void WorldSession::HandleAttackStopOpcode(NullClientPacket const& /*packet*/)
@@ -70,7 +64,7 @@ void WorldSession::HandleAttackStopOpcode(NullClientPacket const& /*packet*/)
     // a SMSG_ATTACKSTOP with its own player guid as the attacker, 
     // so send the packet even if we have no victim as confirmation
     if (!GetPlayer()->AttackStop())
-        GetPlayer()->SendMeleeAttackStop(nullptr);
+        SendPacket(GetPlayer()->BuildMeleeAttackStopPacket());
 
     /*
     I wanted to take a moment to provide some clarification around what changed in 1.13.3 with Reckoning.
@@ -92,16 +86,4 @@ void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed con
     GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_SHEATHING_CANCELS);
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_SHEATHING_CANCELS);
     GetPlayer()->SetSheath(SheathState(packet.sheathed));
-}
-
-void WorldSession::SendAttackStop(Unit const* enemy)
-{
-    auto packet = std::make_unique<WorldPackets::Combat::AttackStop>();
-    packet->attackerGuid = GetPlayer()->GetObjectGuid();
-    if (enemy)
-    {
-        packet->victimGuid = enemy->GetObjectGuid();
-        packet->isDead = enemy->IsDead();
-    }
-    SendPacket(std::move(packet));
 }

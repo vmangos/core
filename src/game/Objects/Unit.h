@@ -981,6 +981,7 @@ class Unit : public SpellCaster
         void AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType = BASE_ATTACK, bool extra = false);
         void SendAttackStateUpdate(CalcDamageInfo const* damageInfo) const;
         void SendAttackStateUpdate(uint32 hitInfo, Unit const* target, SpellSchoolMask damageSchoolMask, uint32 damage, uint32 absorbDamage, int32 resist, VictimState targetState, uint32 blockedAmount) const;
+        std::unique_ptr<ServerPacket const> BuildMeleeAttackStopPacket(ObjectGuid victimGuid = ObjectGuid()) const;
         void SendMeleeAttackStop(Unit const* victim) const;
         void SendMeleeAttackStart(Unit const* pVictim) const;
 
