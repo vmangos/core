@@ -1669,7 +1669,12 @@ bool Player::BuildEnumData(const std::unique_ptr<QueryResult>& result, WorldPack
     uint8 facialHair = fields[9].GetUInt8();
     *pData << uint8(facialHair);                           // facial hair
 
-    *pData << uint8(fields[10].GetUInt8());                // level
+    uint32 totalPlayedTime = fields[18].GetUInt32();
+
+    // a character that has never entered the world is sent at level 0, which shows as level 1;
+    // one created above level 1 keeps its level
+    uint8 level = fields[10].GetUInt8();
+    *pData << uint8(totalPlayedTime == 0 && level == 1 ? 0 : level); // level
     *pData << uint32(fields[11].GetUInt32());              // zone
     *pData << uint32(fields[12].GetUInt32());              // map
 
@@ -1683,7 +1688,6 @@ bool Player::BuildEnumData(const std::unique_ptr<QueryResult>& result, WorldPack
     *pData << uint32(charFlags);                           // character flags
 
     // First login
-    uint32 totalPlayedTime = fields[18].GetUInt32();
     *pData << uint8(totalPlayedTime != 0 ? 0 : 1);
 
     // Pets info
