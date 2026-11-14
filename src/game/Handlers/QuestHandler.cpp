@@ -547,23 +547,21 @@ uint32 WorldSession::GetDialogStatus(Player* pPlayer, Object* questgiver, uint32
 
         QuestStatus status = pPlayer->GetQuestStatus(quest_id);
 
-        if (status == QUEST_STATUS_NONE) // For all other cases the mark is handled either at some place else, or with involved-relations already
+        // A failed quest is offered again. For all other cases the mark is handled either at some place else, or with involved-relations already
+        if ((status == QUEST_STATUS_NONE || status == QUEST_STATUS_FAILED) && pPlayer->CanSeeStartQuest(pQuest))
         {
-            if (pPlayer->CanSeeStartQuest(pQuest))
+            if (pPlayer->SatisfyQuestLevel(pQuest, false))
             {
-                if (pPlayer->SatisfyQuestLevel(pQuest, false))
-                {
-                    int32 lowLevelDiff = sWorld.getConfig(CONFIG_INT32_QUEST_LOW_LEVEL_HIDE_DIFF);
-                    if (pQuest->IsAutoComplete() || (pQuest->IsRepeatable() && !pQuest->HasQuestFlag(QUEST_FLAGS_UNK2) && pPlayer->GetQuestStatusMap()[quest_id].m_rewarded))
-                        dialogStatusNew = DIALOG_STATUS_REWARD_REP;
-                    else if (lowLevelDiff < 0 || pPlayer->GetLevel() <= pPlayer->GetQuestLevelForPlayer(pQuest) + uint32(lowLevelDiff))
-                        dialogStatusNew = DIALOG_STATUS_AVAILABLE;
-                    else
-                        dialogStatusNew = DIALOG_STATUS_CHAT;
-                }
+                int32 lowLevelDiff = sWorld.getConfig(CONFIG_INT32_QUEST_LOW_LEVEL_HIDE_DIFF);
+                if (pQuest->IsAutoComplete() || (pQuest->IsRepeatable() && !pQuest->HasQuestFlag(QUEST_FLAGS_UNK2) && pPlayer->GetQuestStatusMap()[quest_id].m_rewarded))
+                    dialogStatusNew = DIALOG_STATUS_REWARD_REP;
+                else if (lowLevelDiff < 0 || pPlayer->GetLevel() <= pPlayer->GetQuestLevelForPlayer(pQuest) + uint32(lowLevelDiff))
+                    dialogStatusNew = DIALOG_STATUS_AVAILABLE;
                 else
-                    dialogStatusNew = DIALOG_STATUS_UNAVAILABLE;
+                    dialogStatusNew = DIALOG_STATUS_CHAT;
             }
+            else
+                dialogStatusNew = DIALOG_STATUS_UNAVAILABLE;
         }
 
         if (dialogStatusNew > dialogStatus)

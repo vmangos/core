@@ -12423,7 +12423,7 @@ void Player::PrepareQuestMenu(ObjectGuid guid, uint32 exceptQuestId)
 
         if (pQuest->IsAutoComplete() && CanTakeQuest(pQuest, false))
             qm.AddMenuItem(questId, DIALOG_STATUS_REWARD_REP);
-        else if (status == QUEST_STATUS_NONE && CanTakeQuest(pQuest, false))
+        else if ((status == QUEST_STATUS_NONE || status == QUEST_STATUS_FAILED) && CanTakeQuest(pQuest, false))
             qm.AddMenuItem(questId, DIALOG_STATUS_AVAILABLE);
     }
 }
@@ -12589,7 +12589,8 @@ bool Player::CanTakeQuest(Quest const* pQuest, bool msg, bool skipStatusCheck /*
 
 bool Player::CanAddQuest(Quest const* pQuest, bool msg) const
 {
-    if (!SatisfyQuestLog(msg))
+    // a failed quest taken again keeps its quest log slot
+    if (FindQuestSlot(pQuest->GetQuestId()) >= MAX_QUEST_LOG_SIZE && !SatisfyQuestLog(msg))
         return false;
 
     if (!CanGiveQuestSourceItemIfNeed(pQuest))
@@ -12830,10 +12831,13 @@ void Player::SendPetTameFailure(PetTameFailureReason reason) const
 
 void Player::AddQuest(Quest const* pQuest, Object* questGiver)
 {
-    uint16 log_slot = FindQuestSlot(0);
-    MANGOS_ASSERT(log_slot < MAX_QUEST_LOG_SIZE);
-
     uint32 questId = pQuest->GetQuestId();
+
+    // a failed quest taken again keeps its quest log slot, which SetQuestSlot below resets
+    uint16 log_slot = FindQuestSlot(questId);
+    if (log_slot >= MAX_QUEST_LOG_SIZE)
+        log_slot = FindQuestSlot(0);
+    MANGOS_ASSERT(log_slot < MAX_QUEST_LOG_SIZE);
 
     // if not exist then created with set uState==NEW and rewarded=false
     QuestStatusData& questStatusData = mQuestStatus[questId];
@@ -13550,7 +13554,8 @@ bool Player::SatisfyQuestStatus(Quest const* qInfo, bool msg) const
 {
     QuestStatusMap::const_iterator itr = mQuestStatus.find(qInfo->GetQuestId());
 
-    if (itr != mQuestStatus.end() && itr->second.m_status != QUEST_STATUS_NONE)
+    // a failed quest can be taken again from its quest giver
+    if (itr != mQuestStatus.end() && itr->second.m_status != QUEST_STATUS_NONE && itr->second.m_status != QUEST_STATUS_FAILED)
     {
         if (msg)
             SendCanTakeQuestResponse(INVALIDREASON_QUEST_ALREADY_ON);
