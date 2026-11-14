@@ -60,6 +60,10 @@ void WorldSession::HandleAttackSwingOpcode(WorldPackets::Combat::AttackSwing con
 
 void WorldSession::HandleAttackStopOpcode(NullClientPacket const& /*packet*/)
 {
+    // reject packet if we don't have control
+    if (GetPlayer()->IsCharmed())
+        return;
+
     // client maintains the auto attack animation until it receives
     // a SMSG_ATTACKSTOP with its own player guid as the attacker, 
     // so send the packet even if we have no victim as confirmation
