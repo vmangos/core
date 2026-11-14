@@ -9045,7 +9045,7 @@ void Unit::SendPetCastFail(uint32 spellId, SpellCastResult msg)
 
 void Unit::SendPetActionFeedback(uint8 msg)
 {
-    if (Player* pOwner = GetOwnerPlayer())
+    if (Player* pOwner = ::ToPlayer(GetCharmerOrOwner()))
     {
         auto packet = std::make_unique<WorldPackets::Pet::PetActionFeedback>();
         packet->message = msg;

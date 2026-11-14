@@ -130,7 +130,10 @@ void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
 
             if (!pUnitTarget && explicitlySelectedTarget)
             {
-                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_BAD_IMPLICIT_TARGETS);
+                if (Spells::IsExplicitNegativeTarget(spellInfo->EffectImplicitTargetA[0]))
+                    pCharmedUnit->SendPetActionFeedback(FEEDBACK_NOTHING_TO_ATT);
+                else
+                    pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_BAD_IMPLICIT_TARGETS);
                 return;
             }
 
