@@ -13282,9 +13282,9 @@ void Player::FailQuest(uint32 questId)
             return;
         }
 
+        // only the state changes in the quest log: the client does not read the time of a failed quest
         if (log_slot < MAX_QUEST_LOG_SIZE)
         {
-            SetQuestSlotTimer(log_slot, 1);
             SetQuestSlotState(log_slot, QUEST_STATE_FAIL);
             SetQuestStatus(questId, QUEST_STATUS_FAILED);
         }
