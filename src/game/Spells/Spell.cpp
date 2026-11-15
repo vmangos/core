@@ -6613,6 +6613,11 @@ SpellCastResult Spell::CheckCasterAuras() const
         prevented_reason = SPELL_FAILED_CONFUSED;
     else if ((unitflag & UNIT_FLAG_FLEEING) && !(mechanic_immune & (1 << (MECHANIC_FEAR - 1u))))
         prevented_reason = SPELL_FAILED_FLEEING;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    // While charmed client shouldn't be able to cast anything except spells that remove the charm.
+    else if ((unitflag & UNIT_FLAG_POSSESSED) && !(mechanic_immune & (1 << (MECHANIC_CHARM - 1u))) && m_isClientStarted)
+        prevented_reason = SPELL_FAILED_CHARMED;
+#endif
     // Silence check seems to only be performed if not stunned.
     // Mages can blink out of stun even when silenced.
     // https://www.youtube.com/watch?v=NiWibn2GdbA
@@ -6651,6 +6656,14 @@ SpellCastResult Spell::CheckCasterAuras() const
                     // That is needed when your casting is prevented by multiple states and you are only immune to some of them.
                     switch (aura->GetModifier()->m_auraname)
                     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+                        case SPELL_AURA_MOD_POSSESS:
+                        case SPELL_AURA_MOD_CHARM:
+                        case SPELL_AURA_AOE_CHARM:
+                            if (!(mechanic_immune & (1 << (MECHANIC_CHARM - 1u))))
+                                return SPELL_FAILED_CHARMED;
+                            break;
+#endif
                         case SPELL_AURA_MOD_STUN:
                             if (!(mechanic_immune & (1 << (MECHANIC_STUN - 1u))))
                                 return SPELL_FAILED_STUNNED;

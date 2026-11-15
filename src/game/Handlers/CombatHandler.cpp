@@ -31,6 +31,9 @@
 
 void WorldSession::HandleAttackSwingOpcode(WorldPackets::Combat::AttackSwing const& packet)
 {
+    if (GetPlayer()->IsCharmed())
+        return;
+
     if (!packet.targetGuid.IsUnit())
     {
         // stop attack state at client
@@ -85,6 +88,9 @@ void WorldSession::HandleAttackStopOpcode(NullClientPacket const& /*packet*/)
 void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed const& packet)
 {
     if (packet.sheathed >= MAX_SHEATH_STATE)
+        return;
+
+    if (GetPlayer()->GetDeathState() == CORPSE || GetPlayer()->IsCharmed())
         return;
 
     GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_SHEATHING_CANCELS);

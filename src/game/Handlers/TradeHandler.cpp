@@ -631,6 +631,12 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPackets::Trade::InitiateTrade 
         return;
     }
 
+    if (_player->IsCharmed() || pOther->IsCharmed())
+    {
+        SendTradeStatus(TRADE_STATUS_WRONG_FACTION);
+        return;
+    }
+
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_TRADE) && pOther->GetTeam() != _player->GetTeam())
     {
         SendTradeStatus(TRADE_STATUS_WRONG_FACTION);

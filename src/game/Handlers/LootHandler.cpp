@@ -47,8 +47,11 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPackets::Loot::AutoStoreLo
     Loot*      loot;
     Item*      pItem = nullptr;
 
-    if (lguid.IsEmpty())
+    if (lguid.IsEmpty() || player->IsDead() || player->IsCharmed())
+    {
+        player->SendLootRelease(lguid);
         return;
+    }
 
     switch (lguid.GetHigh())
     {
@@ -237,7 +240,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPackets::Loot::AutoStoreLo
 void WorldSession::HandleLootMoneyOpcode(NullClientPacket const& /*packet*/)
 {
     Player* player = GetPlayer();
-    if (!player || !player->IsInWorld())
+    if (!player || !player->IsInWorld() || player->IsDead() || player->IsCharmed())
         return;
     ObjectGuid guid = player->GetLootGuid();
     if (!guid)
@@ -348,7 +351,7 @@ void WorldSession::HandleLootOpcode(WorldPackets::Loot::LootUnit const& packet)
     }
 
     // Check possible cheat
-    if (!_player->IsAlive() || !_player->IsInWorld())
+    if (!_player->IsAlive() || _player->IsCharmed() || !_player->IsInWorld())
     {
         _player->SendLootError(packet.guid, LOOT_ERROR_PLAYER_NOT_FOUND);
         return;

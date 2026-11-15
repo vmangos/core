@@ -9693,6 +9693,9 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, ItemPrototype con
         // check this only in game
         if (not_loading)
         {
+            if (IsCharmed())
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+
             // World of Warcraft Client Patch 1.6.0 (2005-07-12)
             // - It will no longer be possible to swap any equipment while stunned.
             // May be here should be more stronger checks; STUNNED checked
@@ -9826,6 +9829,9 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
     if (IsMainHandPos(pos) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
         return EQUIP_ERR_NOT_WHILE_DISARMED;
 #endif
+
+    if (IsCharmed())
+        return EQUIP_ERR_CANT_DO_RIGHT_NOW;
 
     // do not allow unequipping gear except weapons, offhands, projectiles, relics in combat
     if (!pProto->CanChangeEquipStateInCombat())
@@ -11110,6 +11116,12 @@ void Player::SwapItem(uint16 src, uint16 dst)
     if (!IsAlive() && !(IsInventoryPos(src) && IsInventoryPos(dst)))
     {
         SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, pSrcItem, pDstItem);
+        return;
+    }
+
+    if (IsCharmed())
+    {
+        SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pSrcItem, pDstItem);
         return;
     }
 
@@ -20180,12 +20192,16 @@ Unit* Player::GetConfirmedMover() const
     if (!m_session->GetClientMoverGuid())
         return nullptr;
 
+    // cannot move anyone when charmed
+    if (GetPossessorGuid() || GetCharmerGuid())
+        return nullptr;
+
     // all is good
     if (m_mover->GetObjectGuid() == m_session->GetClientMoverGuid())
         return m_mover;
 
     // client has not yet confirmed mover change but is allowed to move self
-    if (IsControlledByOwnClient() && !GetPossessorGuid() && !GetCharmerGuid())
+    if (IsControlledByOwnClient())
         return (Unit*)this;
 
     return nullptr;

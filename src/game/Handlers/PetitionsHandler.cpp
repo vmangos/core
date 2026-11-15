@@ -137,7 +137,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPackets::Petition::PetitionBuy c
 void WorldSession::HandlePetitionShowSignOpcode(WorldPackets::Petition::PetitionShowSignatures const& packet)
 {
     // if guild petition and has guild => error, return;
-    if (_player->GetGuildId())
+    if (_player->GetGuildId() || _player->IsDead() || _player->IsCharmed())
         return;
 
     Item *charter = _player->GetItemByGuid(packet.itemGuid);
@@ -339,11 +339,20 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPackets::Petition::PetitionD
 
 void WorldSession::HandleOfferPetitionOpcode(WorldPackets::Petition::OfferPetition const& packet)
 {
+    if (_player->IsDead() || _player->IsCharmed())
+        return;
+
     Player* player = ObjectAccessor::FindPlayer(packet.playerGuid);
     if (!player)
         return;
 
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GUILD) && GetPlayer()->GetTeam() != player->GetTeam())
+    {
+        SendGuildCommandResult(GUILD_CREATE_S, "", ERR_GUILD_NOT_ALLIED);
+        return;
+    }
+
+    if (player->IsCharmed())
     {
         SendGuildCommandResult(GUILD_CREATE_S, "", ERR_GUILD_NOT_ALLIED);
         return;
@@ -399,6 +408,9 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPackets::Petition::OfferPetiti
 
 void WorldSession::HandleTurnInPetitionOpcode(WorldPackets::Petition::TurnInPetition const& packet)
 {
+    if (_player->IsDead() || _player->IsCharmed())
+        return;
+
     Item *charter = _player->GetItemByGuid(packet.itemGuid);
     if (!charter)
         return;

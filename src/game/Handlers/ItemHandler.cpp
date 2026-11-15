@@ -55,6 +55,12 @@ void WorldSession::HandleSplitItemOpcode(WorldPackets::Item::SplitItem const& pa
         return;
     }
 
+    if (_player->IsCharmed())
+    {
+        _player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, nullptr, nullptr);
+        return;
+    }
+
     _player->SplitItem(src, dst, packet.count);
 }
 
@@ -252,7 +258,13 @@ void WorldSession::HandleDestroyItemOpcode(WorldPackets::Item::DestroyItem const
     // checked at client side and not have server side appropriate error output
     if (pItem->GetProto()->Flags & ITEM_FLAG_INDESTRUCTIBLE)
     {
-        _player->SendEquipError(EQUIP_ERR_CANT_DROP_SOULBOUND, nullptr, nullptr);
+        _player->SendEquipError(EQUIP_ERR_CANT_DROP_SOULBOUND, pItem, nullptr);
+        return;
+    }
+
+    if (_player->IsCharmed())
+    {
+        _player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pItem, nullptr);
         return;
     }
 
@@ -796,9 +808,15 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPackets::Item::AutoStoreBag
     if (!pItem)
         return;
 
+    if (_player->IsCharmed())
+    {
+        _player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pItem, nullptr);
+        return;
+    }
+
     if (!_player->IsValidPos(packet.dstbag, NULL_SLOT, false))     // can be autostore pos
     {
-        _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, nullptr, nullptr);
+        _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, pItem, nullptr);
         return;
     }
 
@@ -996,6 +1014,12 @@ void WorldSession::HandleSetAmmoOpcode(WorldPackets::Item::SetAmmo const& packet
         return;
     }
 
+    if (GetPlayer()->IsCharmed())
+    {
+        GetPlayer()->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, nullptr, nullptr);
+        return;
+    }
+
     if (packet.item)
     {
         if (!_player->GetItemCount(packet.item))
@@ -1117,7 +1141,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPackets::Item::WrapItem const& pack
 
     // don't allow wrapping while casting - fixes an exploit where you could use
     // items multiple times by wrapping them during use
-    if (_player->IsNonMeleeSpellCasted(true, false, false))
+    if (_player->IsNonMeleeSpellCasted(true, false, false) || _player->IsCharmed())
     {
         _player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
         return;

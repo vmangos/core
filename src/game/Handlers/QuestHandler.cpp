@@ -253,7 +253,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPackets::Quest::Quest
     if (!pObject->HasInvolvedQuest(packet.quest))
         return;
 
-    if (!GetPlayer()->IsAlive())
+    if (!_player->IsAlive())
     {
         // Some quest can be rewarded while dead (cf q3912 [Meet at the Grave])
         if (Creature* crea = pObject->ToCreature())
@@ -264,6 +264,9 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPackets::Quest::Quest
         else
             return;
     }
+
+    if (_player->IsCharmed())
+        return;
 
     Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.quest);
     if (pQuest)
@@ -289,7 +292,7 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPackets::Quest::Ques
     if (!pObject || !pObject->HasInvolvedQuest(packet.quest))
         return;
 
-    if (!GetPlayer()->IsAlive())
+    if (!_player->IsAlive())
     {
         // Some quest can be rewarded while dead (cf q3912 [Meet at the Grave])
         if (Creature* crea = pObject->ToCreature())
@@ -300,6 +303,9 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPackets::Quest::Ques
         else
             return;
     }
+
+    if (_player->IsCharmed())
+        return;
 
     if (_player->CanCompleteQuest(packet.quest))
         _player->CompleteQuest(packet.quest);
@@ -382,6 +388,9 @@ void WorldSession::HandleQuestConfirmAccept(WorldPackets::Quest::QuestConfirmAcc
 
 void WorldSession::HandleQuestgiverCompleteQuest(WorldPackets::Quest::QuestgiverCompleteQuest const& packet)
 {
+    if (_player->IsCharmed())
+        return;
+
     if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.quest))
     {
         if (_player->GetQuestStatus(packet.quest) != QUEST_STATUS_COMPLETE)
