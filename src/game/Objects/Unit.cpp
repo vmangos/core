@@ -2342,8 +2342,11 @@ std::unique_ptr<ServerPacket const> Unit::BuildMeleeAttackStopPacket(ObjectGuid 
 {
     auto packet = std::make_unique<WorldPackets::Combat::AttackStop>();
     packet->attackerGuid = GetObjectGuid();
-    packet->victimGuid = victimGuid;
-    packet->isDead = GetHealth() == 0;
+    if (!victimGuid.IsEmpty())
+    {
+        packet->victimGuid = victimGuid;
+        packet->isDead = GetHealth() == 0; // the client uses it only with a victim
+    }
     return std::move(packet);
 }
 
