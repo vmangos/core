@@ -18510,7 +18510,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         {
             ItemAddedQuestCheck(item, totalCount, false);
             if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(item))
-                pItem->SetItemRandomProperties(randomPropertyId);
+                newItem->SetItemRandomProperties(randomPropertyId);
             pItem = StoreItem(dest, newItem, true);
         }
     }
@@ -18537,7 +18537,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         {
             ItemAddedQuestCheck(item, 1, false);
             if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(item))
-                pItem->SetItemRandomProperties(randomPropertyId);
+                newItem->SetItemRandomProperties(randomPropertyId);
             pItem = EquipItem(dest, newItem, true);
         }
 
