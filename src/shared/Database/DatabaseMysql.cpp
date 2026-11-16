@@ -188,6 +188,10 @@ bool MySQLConnection::HandleMySQLError(uint32 errNo)
 
         case ER_LOCK_DEADLOCK:
             return false;
+        // Server is shutting down - gracefully skip query
+        case ER_SERVER_SHUTDOWN:
+            sLog.Out(LOG_DBERROR, LOG_LVL_DEBUG, "MySQL server is shutting down (errno 1053). Skipping query.");
+            return false;
         // Query related errors - skip query
         case ER_WRONG_VALUE_COUNT:
         case ER_DUP_ENTRY:
@@ -396,6 +400,8 @@ bool MySqlPreparedStatement::prepare()
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: mysql_stmt_prepare() failed for '%s'", m_szFmt.c_str());
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        mysql_stmt_close(m_stmt);
+        m_stmt = nullptr;
         return false;
     }
 
@@ -409,6 +415,8 @@ bool MySqlPreparedStatement::prepare()
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: no meta information for '%s'", m_szFmt.c_str());
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        mysql_stmt_close(m_stmt);
+        m_stmt = nullptr;
         return false;
     }
 

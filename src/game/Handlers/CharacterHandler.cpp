@@ -381,7 +381,12 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPackets::Character::PlayerLogin 
     LoginQueryHolder* holder = new LoginQueryHolder(GetAccountId(), packet.guid);
     if (!holder->Initialize())
     {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "LoginQueryHolder::Initialize failed for character guid %u", packet.guid.GetCounter());
         delete holder;                                      // delete all unprocessed queries
+
+        auto loginFailedPacket = std::make_unique<WorldPackets::Character::CharacterLoginFailed>();
+        loginFailedPacket->result = 1;
+        SendPacket(std::move(loginFailedPacket));
         return;
     }
     m_playerLoading = true;
