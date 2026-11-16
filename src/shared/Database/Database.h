@@ -265,6 +265,8 @@ class Database
 
         bool CheckRequiredMigrations(char const** migrations);
         uint32 GetPingIntervalMs() { return m_pingIntervalMs; }
+        uint32 GetConnectTimeoutSecs() const { return m_connectTimeoutSecs; }
+        uint32 GetQueryTimeoutSecs() const { return m_queryTimeoutSecs; }
 
         //function to ping database connections
         void Ping();
@@ -288,7 +290,8 @@ class Database
     protected:
         Database() : m_nQueryConnPoolSize(1), m_delayQueue(new SqlQueue()), m_pAsyncConn(nullptr),
                      m_pResultQueue(nullptr), m_numAsyncWorkers(0),
-                     m_bAllowAsyncTransactions(false), m_iStmtIndex(-1), m_logSQL(false), m_pingIntervalMs(0)
+                     m_bAllowAsyncTransactions(false), m_iStmtIndex(-1), m_logSQL(false), m_pingIntervalMs(0),
+                     m_connectTimeoutSecs(5), m_queryTimeoutSecs(30)
         {
             m_nQueryCounter = -1;
         }
@@ -347,5 +350,7 @@ class Database
         bool m_logSQL;
         std::string m_logsDir;
         uint32 m_pingIntervalMs;
+        uint32 m_connectTimeoutSecs;
+        uint32 m_queryTimeoutSecs;
 };
 #endif

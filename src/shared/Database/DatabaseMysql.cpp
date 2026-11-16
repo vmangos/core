@@ -95,6 +95,17 @@ bool MySQLConnection::OpenConnection(bool reconnect)
         mysql_options(mysqlInit, MYSQL_OPT_PROTOCOL, (char const*)&opt);
     }
 
+    // Fail fast when MySQL is unreachable instead of blocking for OS TCP timeout (20-130s).
+    // Without this, a single reconnect attempt blocks the calling thread for minutes.
+    unsigned int connectTimeout = m_db.GetConnectTimeoutSecs();
+    mysql_options(mysqlInit, MYSQL_OPT_CONNECT_TIMEOUT, &connectTimeout);
+
+    // Bound the time a thread can be blocked waiting for a query response.
+    // Prevents map-thread hangs when MySQL is overloaded or the network stalls.
+    unsigned int ioTimeout = m_db.GetQueryTimeoutSecs();
+    mysql_options(mysqlInit, MYSQL_OPT_READ_TIMEOUT, &ioTimeout);
+    mysql_options(mysqlInit, MYSQL_OPT_WRITE_TIMEOUT, &ioTimeout);
+
     mMysql = mysql_real_connect(mysqlInit, m_host.c_str(), m_user.c_str(),
         m_password.c_str(), m_database.c_str(), m_port, nullptr, 0);
 
@@ -165,7 +176,12 @@ bool MySQLConnection::HandleMySQLError(uint32 errNo)
             #endif
         case CR_SERVER_LOST_EXTENDED:
         {
+            // Free prepared statements before closing: mysql_stmt_close() requires the
+            // connection to still be open. If we close first, stale MYSQL_STMT* objects
+            // in m_holder have dangling m_pMySQLConn pointers, crashing on cleanup.
+            FreePreparedStatements();
             mysql_close(mMysql);
+            mMysql = nullptr; // prevent dangling pointer
             return Reconnect();
         }
 
@@ -359,6 +375,12 @@ bool MySqlPreparedStatement::prepare()
 
     //remove old binds
     RemoveBinds();
+
+    if (!m_pMySQLConn)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: prepare() called with null MySQL connection handle");
+        return false;
+    }
 
     //create statement object
     m_stmt = mysql_stmt_init(m_pMySQLConn);

@@ -77,6 +77,7 @@ SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
         {
             //MANGOS_ASSERT(false && "Unable to prepare SQL statement");
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't prepare %s, statement not executed!", fmt.c_str());
+            delete pStmt;
             return nullptr;
         }
 
@@ -156,7 +157,9 @@ bool Database::Initialize(char const* infoString, int nConns /*= 1*/, int nWorke
             m_logsDir.append("/");
     }
 
-    m_pingIntervalMs = sConfig.GetIntDefault("Database.AliveCheckInternal", 600) * IN_MILLISECONDS;
+    m_pingIntervalMs = sConfig.GetIntDefault("Database.AliveCheckInterval", 600) * IN_MILLISECONDS;
+    m_connectTimeoutSecs = sConfig.GetIntDefault("Database.ConnectTimeout", 5);
+    m_queryTimeoutSecs = sConfig.GetIntDefault("Database.QueryTimeout", 30);
 
     //create DB connections
 

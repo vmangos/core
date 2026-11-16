@@ -52,7 +52,7 @@ ConfVersion=2025040601
 #        Amount of async threads (with dedicated connection) which will be used for async SELECT, executes, and transactions.
 #        Default: 1 async worker
 #
-#    Database.AliveCheckInternal - in seconds
+#    Database.AliveCheckInterval - in seconds
 #        The interval in seconds to check the reachability of the database
 #        Default: 600 (10 min)
 #
@@ -83,7 +83,7 @@ CharacterDatabase.WorkerThreads = 1
 LogsDatabase.Info = "127.0.0.1;3306;mangos;mangos;logs"
 LogsDatabase.Connections = 1
 LogsDatabase.WorkerThreads = 1
-Database.AliveCheckInternal = 600
+Database.AliveCheckInterval = 600
 WorldServerPort = 8085
 BindIP = "0.0.0.0"
 
