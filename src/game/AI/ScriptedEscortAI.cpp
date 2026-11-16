@@ -528,7 +528,7 @@ void npc_escortAI::ReturnToCombatStartPosition()
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ScriptedEscortAI.GetCombatStartPosition] Creature with entry <%u> is in <%f> distance from {%f,%f,%f}.", 
                     m_creature->GetEntry(), m_creature->GetDistance2d(fPosX, fPosY), fPosX, fPosY, fPosZ);
-                m_creature->GetPosition(fPosX, fPosY, fPosY);
+                m_creature->GetPosition(fPosX, fPosY, fPosZ);
                 SetCombatStartPosition(fPosX, fPosY, fPosZ);
                 MovementInform(POINT_MOTION_TYPE, POINT_LAST_POINT);
                 return;
