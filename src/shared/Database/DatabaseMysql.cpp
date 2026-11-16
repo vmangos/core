@@ -75,7 +75,8 @@ SqlConnection* DatabaseMysql::CreateConnection()
 MySQLConnection::~MySQLConnection()
 {
     FreePreparedStatements();
-    mysql_close(mMysql);
+    if (mMysql)
+        mysql_close(mMysql);
 }
 
 bool MySQLConnection::OpenConnection(bool reconnect)
