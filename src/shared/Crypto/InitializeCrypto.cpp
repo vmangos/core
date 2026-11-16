@@ -13,6 +13,16 @@
 
 #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
 #include <openssl/provider.h>
+
+static OSSL_PROVIDER* s_legacyProvider = nullptr;
+
+// Registered with OPENSSL_atexit: runs inside OPENSSL_cleanup() while the library context
+// still exists. A static destructor would run after the cleanup registered by atexit.
+static void UnloadLegacyProvider()
+{
+    OSSL_PROVIDER_unload(s_legacyProvider);
+    s_legacyProvider = nullptr;
+}
 #endif
 
 template <typename C1, typename C2>
@@ -147,7 +157,8 @@ bool Crypto::InitializeCryptoAndPrintVersion()
     if (!OSSL_PROVIDER_available(nullptr, "legacy"))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OpenSSL: legacy provider is not available. Trying to load it...");
-        if (!OSSL_PROVIDER_load(nullptr, "legacy"))
+        s_legacyProvider = OSSL_PROVIDER_load(nullptr, "legacy");
+        if (!s_legacyProvider)
         {
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "OpenSSL: legacy provider load failed. Retrying after setting CWD...");
             std::string cwd = IO::Filesystem::ToAbsolutePath(".");
@@ -157,12 +168,14 @@ bool Crypto::InitializeCryptoAndPrintVersion()
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "OpenSSL: failed to set provider default search path to CWD");
             }
 
-            if (!OSSL_PROVIDER_load(nullptr, "legacy"))
+            s_legacyProvider = OSSL_PROVIDER_load(nullptr, "legacy");
+            if (!s_legacyProvider)
             {
                 sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "OpenSSL: Failed to load openssl legacy provider.");
                 return false;
             }
         }
+        OPENSSL_atexit(UnloadLegacyProvider);
     }
 #endif
 
