@@ -114,8 +114,8 @@ class AccountMgr
         void Update(uint32 diff);
         void LoadIPBanList(std::unique_ptr<QueryResult> result, bool silent=false);
         void LoadAccountBanList(bool silent=false);
-        void BanIP(std::string const& ip, uint32 unbandate) { m_ipBanned[ip] = unbandate; }
-        void UnbanIP(std::string const& ip) { m_ipBanned.erase(ip); }
+        void BanIP(std::string const& ip, uint32 unbandate);
+        void UnbanIP(std::string const& ip);
         void BanAccount(uint32 account, uint32 unbandate) { m_accountBanned[account] = unbandate; }
         void UnbanAccount(uint32 acc) { m_accountBanned.erase(acc); }
         bool IsIPBanned(std::string const& ip) const;
