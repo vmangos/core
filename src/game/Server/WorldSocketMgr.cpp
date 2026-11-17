@@ -22,6 +22,7 @@
 
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
+#include "AccountMgr.h"
 #include "Log.h"
 #include "Policies/SingletonImp.h"
 #include "IO/Networking/AsyncSocketAcceptor.h"
@@ -103,6 +104,11 @@ void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socke
                 return; // implicit close()
             }
             worldSocket->m_remoteIpAddressStringAfterProxy = maybeIp.value().ToString();
+            if (sAccountMgr.IsIPBanned(worldSocket->GetRemoteIpString()))
+            {
+                sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%s] Connection rejected (banned ip)", worldSocket->GetRemoteIpString().c_str());
+                return; // implicit close()
+            }
             sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] Connection accepted (proxy ip: %s)", worldSocket->GetRemoteIpString().c_str(), worldSocket->m_socket.GetRemoteIpString().c_str());
             worldSocket->Start();
         });
@@ -110,6 +116,11 @@ void WorldSocketMgr::OnNewClientConnected(IO::Networking::SocketDescriptor socke
     else
     {
         // no proxy, we can start directly
+        if (sAccountMgr.IsIPBanned(worldSocket->GetRemoteIpString()))
+        {
+            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[%s] Connection rejected (banned ip)", worldSocket->GetRemoteIpString().c_str());
+            return; // implicit close()
+        }
         sLog.Out(LOG_NETWORK, LOG_LVL_BASIC, "[%s] Connection accepted", worldSocket->GetRemoteIpString().c_str());
         worldSocket->Start();
     }
