@@ -661,7 +661,7 @@ DebuffLimit = 0
 #        Default: "Chat.log"
 #                 "" - Empty name disable creating log file
 #
-#    LogFile.Bg
+#    BgLogFile
 #        Log file for battlegrounds system.
 #        Default: "Bg.log"
 #                 "" - Empty name disable creating log file
@@ -858,13 +858,13 @@ LogFilter_DbStrictedCheck = 1
 LogFilter_Pathfinding = 0
 LogFilter_Honor = 1
 
-LogFile.Timestamp = 0
+LogFile.TimeStamp = 0
 LogFile.Basic = "Server.log"
 LogFile.Anticheat = "Anticheat.log"
 LogFile.Scripts = "Scripts.log"
 LogFile.Movement = "Movement.log"
 LogFile.Chat = "Chat.log"
-LogFile.Bg = "Bg.log"
+BgLogFile = "Bg.log"
 LogFile.Char = "Char.log"
 LogFile.Honor = ""
 LogFile.Ra = "Ra.log"
@@ -2282,7 +2282,7 @@ Warden.ModuleDir = "warden_modules"
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.Botting.MinPeriod
+#    Anticheat.Botting.Period
 #        For how long client must exibit bot-like movement to trigger penalty.
 #        Default:     300000 (5 minutes)
 #
@@ -2421,7 +2421,7 @@ Anticheat.ForbiddenArea.Enable = 1
 Anticheat.ForbiddenArea.Threshold = 1
 Anticheat.ForbiddenArea.Penalty = 3
 Anticheat.Botting.Enable = 1
-Anticheat.Botting.MinPeriod = 300000
+Anticheat.Botting.Period = 300000
 Anticheat.Botting.MinPackets = 160
 Anticheat.Botting.MinTurnsMouse = 20
 Anticheat.Botting.MinTurnsKeyboard = 80
