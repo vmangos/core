@@ -511,6 +511,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
             pl->LogModifyMoney(-int32(packet.price - auction->bid), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
         else
         {
+            pl->LogModifyMoney(-int32(packet.price), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
             oldBidder = auction->bidder;
             oldBid = auction->bid;
         }
