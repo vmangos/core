@@ -572,7 +572,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
         delete auction;
     }
     CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
-    pl->SaveInventoryAndGoldToDB();
+    pl->SaveGoldToDB();
     CharacterDatabase.CommitTransaction();
 }
 
@@ -635,7 +635,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPackets::AuctionHouse::AuctionRe
     // Now remove the auction
     CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
     auction->DeleteFromDB();
-    pl->SaveInventoryAndGoldToDB();
+    pl->SaveGoldToDB();
     CharacterDatabase.CommitTransaction();
     sAuctionMgr.RemoveAItem(auction->itemGuidLow);
     auctionHouse->RemoveAuction(auction);
