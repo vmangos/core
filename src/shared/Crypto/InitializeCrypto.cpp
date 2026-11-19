@@ -9,6 +9,7 @@
 #include "IO/Filesystem/FileSystem.h"
 #include "Log.h"
 
+#include <cstdlib>
 #include <openssl/crypto.h>
 
 #if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
@@ -16,8 +17,8 @@
 
 static OSSL_PROVIDER* s_legacyProvider = nullptr;
 
-// Registered with OPENSSL_atexit: runs inside OPENSSL_cleanup() while the library context
-// still exists. A static destructor would run after the cleanup registered by atexit.
+// Registered with OPENSSL_atexit (OpenSSL 3.x) or std::atexit (OpenSSL 4.0+, where automatic
+// atexit(OPENSSL_cleanup) and OPENSSL_atexit were removed in OpenSSL PR #29385).
 static void UnloadLegacyProvider()
 {
     OSSL_PROVIDER_unload(s_legacyProvider);
@@ -175,7 +176,11 @@ bool Crypto::InitializeCryptoAndPrintVersion()
                 return false;
             }
         }
+#if OPENSSL_VERSION_MAJOR < 4
         OPENSSL_atexit(UnloadLegacyProvider);
+#else
+        std::atexit(UnloadLegacyProvider);
+#endif
     }
 #endif
 
