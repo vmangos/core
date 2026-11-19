@@ -85,12 +85,12 @@ ConfVersion=2026042601
 #        Default: 0 (no time)
 #                 1 (print time)
 #
-#    LogFile
+#    LogFile.Basic
 #        Logfile name
 #        Default: "Realmd.log"
 #                 "" - empty name disable creating log file
 #
-#    LogTimestamp
+#    LogTimeStamp
 #        Logfile with timestamp of server start in name
 #        Default: 0 - no timestamp in name
 #                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
