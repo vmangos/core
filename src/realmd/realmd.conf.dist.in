@@ -90,7 +90,7 @@ ConfVersion=2026042601
 #        Default: "Realmd.log"
 #                 "" - empty name disable creating log file
 #
-#    LogTimeStamp
+#    LogFile.TimeStamp
 #        Logfile with timestamp of server start in name
 #        Default: 0 - no timestamp in name
 #                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
