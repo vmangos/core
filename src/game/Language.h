@@ -77,7 +77,7 @@ enum MangosStrings
     LANG_FRIEND_IGNORE_UNKNOWN          = 48,
     LANG_LEVEL_MINREQUIRED              = 49,
     LANG_COMMAND_UNAVAILABLE            = 50,
-    LANG_NPC_TAINER_HELLO               = 51,
+    //                                  = 51, not used
     LANG_COMMAND_INVALID_ITEM_COUNT     = 52,
     LANG_COMMAND_MAIL_ITEMS_LIMIT       = 53,
     LANG_NEW_PASSWORDS_NOT_MATCH        = 54,
