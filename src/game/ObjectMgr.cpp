@@ -12382,9 +12382,9 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
         pPlayer->SetUInt32Value(PLAYER_XP, 0);
     }
 
-    // Unequip current gear
+    // Delete current gear
     for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
-        pPlayer->AutoUnequipItemFromSlot(i);
+        pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
 
     // Learn Dual Wield Specialization
     if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE || pPlayer->GetClass() == CLASS_HUNTER)
@@ -12398,6 +12398,7 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
             ItemPrototype const* pItem = GetItemPrototype(item.itemId);
 
             pPlayer->SatisfyItemRequirements(pItem);
+            pPlayer->DestroyItemCount(item.itemId, 1, true);
             pPlayer->StoreNewItemInBestSlots(item.itemId, 1, item.enchantId);
         }
     }
