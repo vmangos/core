@@ -35,25 +35,71 @@ enum CombatBotSpells
     SPELL_TAME_BEAST = 13481,
     SPELL_REVIVE_PET = 982,
     SPELL_CALL_PET = 883,
-
-    PET_WOLF    = 565,
-    PET_CAT     = 681,
-    PET_BEAR    = 822,
-    PET_CRAB    = 831,
-    PET_GORILLA = 1108,
-    PET_BIRD    = 1109,
-    PET_BOAR    = 1190,
-    PET_BAT     = 1554,
-    PET_CROC    = 1693,
-    PET_SPIDER  = 1781,
-    PET_OWL     = 1997,
-    PET_STRIDER = 2322,
-    PET_SCORPID = 3127,
-    PET_SERPENT = 3247,
-    PET_RAPTOR  = 3254,
-    PET_TURTLE  = 3461,
-    PET_HYENA   = 4127,
 };
+
+namespace
+{
+bool HasUsableHunterPetSpellData(uint32 petEntry)
+{
+    PetCreateSpellEntry const* createSpells = sObjectMgr.GetPetCreateSpellEntry(petEntry);
+    if (!createSpells)
+        return false;
+
+    for (uint32 spellId : createSpells->spellId)
+    {
+        if (!spellId)
+            break; // Match Pet::InitPetCreateSpells(), which stops at the first empty slot.
+
+        SpellEntry const* learnSpellInfo = sSpellMgr.GetSpellEntry(spellId);
+        if (!learnSpellInfo)
+            continue;
+
+        uint32 petSpellId = spellId;
+        if (learnSpellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL ||
+            learnSpellInfo->Effect[0] == SPELL_EFFECT_LEARN_PET_SPELL)
+            petSpellId = learnSpellInfo->EffectTriggerSpell[0];
+
+        SpellEntry const* petSpellInfo = sSpellMgr.GetSpellEntry(petSpellId);
+        if (petSpellInfo && petSpellInfo->IsAutocastable())
+            return true;
+    }
+
+    return false;
+}
+
+uint32 SelectHunterBotPetEntry()
+{
+    static std::vector<uint32> const petEntries = []()
+    {
+        std::vector<uint32> entries;
+
+        for (const auto& itr : sObjectMgr.GetCreatureInfoMap())
+        {
+            CreatureInfo const* cInfo = itr.second.get();
+            if (!cInfo || !cInfo->IsTameable())
+                continue;
+
+            // Exclude some special case creatures.
+            if (cInfo->npc_flags || cInfo->script_id || cInfo->spawn_spell_id)
+                continue;
+
+            // Exclude creatures that don't have at last one usable Hunter pet spell.
+            if (HasUsableHunterPetSpellData(cInfo->entry))
+                entries.push_back(cInfo->entry);
+        }
+
+        if (entries.empty())
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CombatBotBaseAI::SelectHunterBotPetEntry: No valid hunter bot pet entries found for patch %u.", sWorld.GetWowPatch());
+
+        return entries;
+    }();
+
+    if (petEntries.empty())
+        return 0;
+
+    return SelectRandomContainerElement(petEntries);
+}
+}
 
 void CombatBotBaseAI::AutoAssignRole()
 {
@@ -2330,8 +2376,80 @@ Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
     return nullptr;
 }
 
+void CombatBotBaseAI::InitializeBotPetAutocast()
+{
+    if (!me)
+        return;
+
+    Pet* pet = me->GetPet();
+    if (!pet || pet->GetPetAutoSpellSize() > 0)
+        return;
+
+    CharmInfo* charmInfo = pet->GetCharmInfo();
+    if (!charmInfo)
+        return;
+
+    for (uint8 i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
+    {
+        UnitActionBarEntry const* actionBarEntry = charmInfo->GetActionBarEntry(i);
+        if (!actionBarEntry || !actionBarEntry->IsActionBarForSpell())
+            continue;
+
+        uint32 spellId = actionBarEntry->GetAction();
+        if (!spellId || !pet->HasSpell(spellId))
+            continue;
+
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
+        if (!spellInfo || !spellInfo->IsAutocastable())
+            continue;
+
+        pet->ToggleAutocast(spellId, true);
+        charmInfo->SetSpellAutocast(spellId, true);
+    }
+}
+
+std::vector<uint32> CombatBotBaseAI::CollectWarlockBotSummonSpells() const
+{
+    std::vector<uint32> summons;
+    if (!me)
+        return summons;
+
+    if (me->HasSpell(SPELL_SUMMON_IMP))
+        summons.push_back(SPELL_SUMMON_IMP);
+    if (me->HasSpell(SPELL_SUMMON_VOIDWALKER))
+        summons.push_back(SPELL_SUMMON_VOIDWALKER);
+    if (me->HasSpell(SPELL_SUMMON_FELHUNTER))
+        summons.push_back(SPELL_SUMMON_FELHUNTER);
+    if (me->HasSpell(SPELL_SUMMON_SUCCUBUS))
+        summons.push_back(SPELL_SUMMON_SUCCUBUS);
+
+    if (!summons.empty())
+        return summons;
+
+    // Fall back to the earliest summon quest requirements when no premade spec
+    // provides the summon spells (intended for bots that are below level 19
+    // where no premade spec exists, but still includes higher levels for
+    // completeness' sake).
+    uint32 level = me->GetLevel();
+    if (level >= 1)
+        summons.push_back(SPELL_SUMMON_IMP);
+    if (level >= 10)
+        summons.push_back(SPELL_SUMMON_VOIDWALKER);
+    if (level >= 20)
+        summons.push_back(SPELL_SUMMON_SUCCUBUS);
+    if (level >= 30)
+        summons.push_back(SPELL_SUMMON_FELHUNTER);
+
+    return summons;
+}
+
 void CombatBotBaseAI::SummonPetIfNeeded()
 {
+    // Only initialize autocast for spells the current pet already knows.
+    // Bot pets do not currently simulate trainer/grimoire-based pet spell
+    // learning.
+    InitializeBotPetAutocast();
+
     if (me->GetClass() == CLASS_HUNTER)
     {
         if (me->GetCharmGuid())
@@ -2353,9 +2471,10 @@ void CombatBotBaseAI::SummonPetIfNeeded()
             return;
         }
 
-        uint32 petId = PickRandomValue( PET_WOLF, PET_CAT, PET_BEAR, PET_CRAB, PET_GORILLA, PET_BIRD,
-                                        PET_BOAR, PET_BAT, PET_CROC, PET_SPIDER, PET_OWL, PET_STRIDER,
-                                        PET_SCORPID, PET_SERPENT, PET_RAPTOR, PET_TURTLE, PET_HYENA );
+        uint32 petId = SelectHunterBotPetEntry();
+        if (!petId)
+            return;
+
         if (Creature* pCreature = me->SummonCreature(petId,
             me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f,
             TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 3000, false, 3000))
@@ -2369,15 +2488,7 @@ void CombatBotBaseAI::SummonPetIfNeeded()
         if (me->GetPetGuid() || me->GetCharmGuid())
             return;
 
-        std::vector<uint32> vSummons;
-        if (me->HasSpell(SPELL_SUMMON_IMP))
-            vSummons.push_back(SPELL_SUMMON_IMP);
-        if (me->HasSpell(SPELL_SUMMON_VOIDWALKER))
-            vSummons.push_back(SPELL_SUMMON_VOIDWALKER);
-        if (me->HasSpell(SPELL_SUMMON_FELHUNTER))
-            vSummons.push_back(SPELL_SUMMON_FELHUNTER);
-        if (me->HasSpell(SPELL_SUMMON_SUCCUBUS))
-            vSummons.push_back(SPELL_SUMMON_SUCCUBUS);
+        std::vector<uint32> vSummons = CollectWarlockBotSummonSpells();
         if (!vSummons.empty())
             me->CastSpell(me, SelectRandomContainerElement(vSummons), true);
     }
@@ -2560,6 +2671,8 @@ void CombatBotBaseAI::EquipPremadeGearTemplate()
     }
 }
 
+namespace
+{
 inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
 {
     switch (playerClass)
@@ -2590,6 +2703,7 @@ inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
         }
     }
     return ITEM_MOD_STAMINA;
+}
 }
 
 void CombatBotBaseAI::EquipRandomGearInEmptySlots()
