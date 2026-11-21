@@ -669,7 +669,7 @@ void FollowMovementGenerator<T>::_setTargetLocation(T &owner)
     init.Move(&path);
 
     float const dist = path.Length();
-    if (owner.GetCharmerOrOwnerGuid() == i_target->GetObjectGuid() && dist > owner.GetSpeed(MOVE_RUN) &&
+    if (owner.GetCharmerOrOwnerGuid() == i_target->GetObjectGuid() &&
        (!i_target->IsInCombat() && !owner.IsInCombat() || i_target->IsPlayer() && i_target->IsMounted()))
     {
         float speed = i_target->GetSpeedForMovementInfo(i_target->m_movementInfo);
