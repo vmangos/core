@@ -11,7 +11,8 @@ EndContentData */
 enum : uint32
 {
     SAY_CRYSTAL_DESTROYED      = 6527,
-    SAY_ALL_CRYSTALS_DESTROYED = 6289
+    SAY_ALL_CRYSTALS_DESTROYED = 6289,
+    NPC_POSTMASTER_MALOWN      = 11143,
 };
 
 /*######
@@ -49,7 +50,10 @@ bool GOOpen_go_stratholme_postbox(Player* pPlayer, GameObject* pGo)
     // When the data is Special, spawn the postmaster
     if (pInstance->GetData(TYPE_POSTMASTER) == SPECIAL)
     {
-        pPlayer->CastSpell(pPlayer, SPELL_SUMMON_POSTMASTER, true);
+        if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(SPELL_SUMMON_POSTMASTER))
+            pPlayer->CastSpell(pPlayer, pSpellEntry, true);
+        else
+            pPlayer->SummonCreature(NPC_POSTMASTER_MALOWN, 3681.64f, -3504.43f, 135.951f, 2.42968f, TEMPSUMMON_DEAD_DESPAWN, DAY * IN_MILLISECONDS);
         pInstance->SetData(TYPE_POSTMASTER, DONE);
     }
     else
