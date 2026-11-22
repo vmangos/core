@@ -698,8 +698,16 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
         if (pVictim == this)
             return false;
 
-        if (spell && spell->IsTriggeredByProc())
-            return false;
+        if (spell)
+        {
+            if (spell->IsTriggeredByProc())
+                return false;
+
+            // Baron Rivendare's Unholy Aura should not put players in combat.
+            if (spellProto && spellProto->IsAreaOfEffectSpell() && spell->IsTriggeredByPermanentAura() &&
+                !IsCharmerOrOwnerPlayerOrPlayerItself() && pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
+                return false;
+        }
 
         if (spellProto && spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD))
             return false;

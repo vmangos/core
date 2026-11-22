@@ -8303,6 +8303,14 @@ bool Spell::HasModifierApplied(SpellModifier* mod)
     return false;
 }
 
+bool Spell::IsTriggeredByPermanentAura() const
+{
+    if (m_triggeredByAuraSpell)
+        return m_triggeredByAuraSpell->DurationIndex == 21;
+
+    return false;
+}
+
 bool Spell::IsTriggeredByProc() const
 {
     if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_NOT_A_PROC))
