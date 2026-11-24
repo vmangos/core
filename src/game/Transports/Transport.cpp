@@ -562,7 +562,7 @@ void GenericTransport::SendCreateUpdateToMap()
             {
                 UpdateData data;
                 BuildCreateUpdateBlockForPlayer(data, player.getSource());
-                data.Send(player.getSource()->GetSession());
+                data.Send(player.getSource()->GetSession(), true);
             }
     }
 }

@@ -381,7 +381,7 @@ void Object::SendCreateUpdateToPlayer(Player* player)
     UpdateData upd;
 
     BuildCreateUpdateBlockForPlayer(upd, player);
-    upd.Send(player->GetSession());
+    upd.Send(player->GetSession(), GetObjectGuid().IsTransport() || GetObjectGuid().IsMOTransport());
 }
 
 void WorldObject::DirectSendPublicValueUpdate(uint32 index, uint32 count)
