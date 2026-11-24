@@ -298,13 +298,13 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 18
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Raynewood Retreat East';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Raynewood Retreat East';
 DELETE FROM `pool_pool` WHERE pool_id IN (6170, 6174, 9326, 9327, 9338);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (94256, 94260, 57355, 57356, 57436, 57439); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (94256, 94260, 57355, 57356, 57436, 57439); -- remove non iron/gold nodes
+DELETE FROM `pool_gameobject` WHERE `guid` = 57436; -- remove non iron/silver/gold nodes
+DELETE FROM `gameobject` WHERE `guid` = 57436; -- remove non iron/silver/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (6170, 6174, 9326, 9327, 9338);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (6170, 6174, 9326, 9327, 9338);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (6170, 6174, 9326, 9327, 9338) AND chance IN (40, 90);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `pool_entry` = 9338 AND `chance` = 40;
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (6170, 6174, 9326, 9327, 9338));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -315,20 +315,20 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (9327, @PTEMPLATE, 0, @DESC, 0),
 (9338, @PTEMPLATE, 0, @DESC, 0);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`)
-VALUES (@GOGUID, 1734, 1, 2855.24, -2027.55, 169.05, 0.785397, 0, 0, 0.382683, 0.92388, 120, 900, 100, 1, 0, 0, 0, 10);
+VALUES (@GOGUID, 1734, 1, 2855.24, -2027.55, 169.05, 0.785397, 0, 0, 0.382683, 0.92388, 120, 900, 100, 1, 0, 0, 0, 10); -- add missing gold vein
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`)
 VALUES (@GOGUID, 9338, 5, @DESC, 0, 0, 10);
 SET @GOGUID = @GOGUID + 1;
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 19
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Raynewood Retreat North';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Raynewood Retreat North';
 DELETE FROM `pool_pool` WHERE pool_id IN (2864, 6173, 6175, 6176, 9336, 17056);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (27317, 57434, 57437, 94259, 94261, 94262, 427087); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (27317, 57434, 57437, 94259, 94261, 94262, 427087); -- remove non iron/gold nodes
+DELETE FROM `pool_gameobject` WHERE `guid` = 57434; -- remove non iron/silver/gold nodes
+DELETE FROM `gameobject` WHERE `guid` = 57434; -- remove non iron/silver/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (2864, 6173, 6175, 6176, 9336, 17056);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (2864, 6173, 6175, 6176, 9336, 17056);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (2864, 6173, 6175, 6176, 9336, 17056) AND chance IN (40, 90);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `pool_entry` = 9336 AND chance = 40;
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2864, 6173, 6175, 6176, 9336, 17056));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -340,20 +340,17 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (9336, @PTEMPLATE, 0, @DESC, 0),
 (17056, @PTEMPLATE, 0, @DESC, 0);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`)
-VALUES (@GOGUID, 1734, 1, 2690.09, -2019.96, 169.427, 2.25147, 0, 0, 0.902585, 0.430512, 120, 900, 100, 1, 0, 0, 0, 10);
+VALUES (@GOGUID, 1734, 1, 2690.09, -2019.96, 169.427, 2.25147, 0, 0, 0.902585, 0.430512, 120, 900, 100, 1, 0, 0, 0, 10); -- add missing gold vein
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`)
 VALUES (@GOGUID, 9336, 5, @DESC, 0, 0, 10);
 SET @GOGUID = @GOGUID + 1;
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 20
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Night Run South';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Night Run South';
 DELETE FROM `pool_pool` WHERE pool_id IN (1329, 6177, 6178, 6190, 9324, 17130);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (2469, 57353, 94263, 94264, 94276, 427329); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (2469, 57353, 94263, 94264, 94276, 427329); -- remove non iron/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (1329, 6177, 6178, 6190, 9324, 17130);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (1329, 6177, 6178, 6190, 9324, 17130);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (2864, 6173, 6175, 6176, 9336, 17056) AND chance IN (40, 90);
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1329, 6177, 6178, 6190, 9324, 17130));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -367,13 +364,10 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 21
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Satyrnaar West';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Satyrnaar West';
 DELETE FROM `pool_pool` WHERE pool_id IN (9328, 9330, 9331, 17131, 17133);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (57357, 57359, 57360, 427330, 427332); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (57357, 57359, 57360, 427330, 427332); -- remove non iron/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (9328, 9330, 9331, 17131, 17133);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (9328, 9330, 9331, 17131, 17133);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (9328, 9330, 9331, 17131, 17133) AND chance IN (40, 90);
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (9328, 9330, 9331, 17131, 17133));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -386,13 +380,10 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 22
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Splintertree Post';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Splintertree Post';
 DELETE FROM `pool_pool` WHERE pool_id IN (2861, 2862, 6167, 9325, 17129, 17132);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (27314, 27315, 57354, 94253, 427328, 427331); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (27314, 27315, 57354, 94253, 427328, 427331); -- remove non iron/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (2861, 2862, 6167, 9325, 17129, 17132);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (2861, 2862, 6167, 9325, 17129, 17132);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (2861, 2862, 6167, 9325, 17129, 17132) AND chance IN (40, 90);
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2861, 2862, 6167, 9325, 17129, 17132));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -406,13 +397,10 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 23
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Fallen Sky Lake';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Fallen Sky Lake';
 DELETE FROM `pool_pool` WHERE pool_id IN (2863, 6169, 9329, 9333, 9334, 17126);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (27316, 57358, 57362, 57363, 94255, 427325); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (27316, 57358, 57362, 57363, 94255, 427325); -- remove non iron/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (2863, 6169, 9329, 9333, 9334, 17126);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (2863, 6169, 9329, 9333, 9334, 17126);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (2863, 6169, 9329, 9333, 9334, 17126) AND chance IN (40, 90);
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2863, 6169, 9329, 9333, 9334, 17126));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -426,13 +414,10 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 24
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Warsong Labor Camp';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Warsong Labor Camp';
 DELETE FROM `pool_pool` WHERE pool_id IN (6183, 6188, 6189, 6191, 9335, 17125);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (57364, 94269, 94274, 94275, 94325, 427324); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (57364, 94269, 94274, 94275, 94325, 427324); -- remove non iron/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (6183, 6188, 6189, 6191, 9335, 17125);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (6183, 6188, 6189, 6191, 9335, 17125);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (6183, 6188, 6189, 6191, 9335, 17125) AND chance IN (40, 90);
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (6183, 6188, 6189, 6191, 9335, 17125));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -446,13 +431,13 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 25
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Felfire Hill';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Felfire Hill';
 DELETE FROM `pool_pool` WHERE pool_id IN (6172, 6180, 6181, 17036, 17128);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (94258, 94266, 94267, 427020, 427021, 427327); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (94258, 94266, 94267, 427020, 427021, 427327); -- remove non iron/gold nodes
+DELETE FROM `pool_gameobject` WHERE `guid` = 427020; -- remove non iron/silver/gold nodes
+DELETE FROM `gameobject` WHERE `guid` = 427020; -- remove non iron/silver/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (6172, 6180, 6181, 17036, 17128);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (6172, 6180, 6181, 17036, 17128);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (6172, 6180, 6181, 17036, 17128) AND chance IN (40, 90);
+UPDATE `pool_gameobject` SET `chance` = 90 WHERE `pool_entry` = 17036 AND chance = 40;
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (6172, 6180, 6181, 17036, 17128));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -464,19 +449,16 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (17128, @PTEMPLATE, 0, @DESC, 0);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`)
 VALUES (@GOGUID, 1734, 1, 2238.02, -2863.79, 132.181, 2.02458, 0, 0, 0.848047, 0.529921, 120, 900, 100, 1, 0, 0, 0, 10);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`)
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) -- add missing gold vein
 VALUES (@GOGUID, 17036, 5, @DESC, 0, 0, 10);
 SET @GOGUID = @GOGUID + 1;
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 26
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Demon Fall Canyon West';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Demon Fall Canyon West';
 DELETE FROM `pool_pool` WHERE pool_id IN (2580, 6184, 6186, 6187, 17127);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (3442, 94270, 94272, 94273, 427326); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (3442, 94270, 94272, 94273, 427326); -- remove non iron/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (2580, 6184, 6186, 6187, 17127);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (2580, 6184, 6186, 6187, 17127);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (2580, 6184, 6186, 6187, 17127) AND chance IN (40, 90);
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2580, 6184, 6186, 6187, 17127));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -489,13 +471,10 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 27
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Demon Fall Canyon East';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Demon Fall Canyon East';
 DELETE FROM `pool_pool` WHERE pool_id IN (2581, 2582, 2865, 6171, 6182, 6185);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (3443, 3444, 27318, 94257, 94268, 94271); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (3443, 3444, 27318, 94257, 94268, 94271); -- remove non iron/gold nodes
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (2581, 2582, 2865, 6171, 6182, 6185);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (2581, 2582, 2865, 6171, 6182, 6185);
-UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (2581, 2582, 2865, 6171, 6182, 6185) AND chance IN (40, 90);
 UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 900 WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (2581, 2582, 2865, 6171, 6182, 6185));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 1, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10);
@@ -509,7 +488,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
 -- 28
-SET @DESC = 'Ashenvale - Iron Deposit / Gold Vein - Warsong Lumber Camp';
+SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Warsong Lumber Camp';
 DELETE FROM `pool_pool` WHERE pool_id IN (6168, 6179, 9332, 9337);
 DELETE FROM `pool_gameobject` WHERE `guid` IN (57361, 57438, 94254, 94265); -- remove non iron/gold nodes
 DELETE FROM `gameobject` WHERE `guid` IN (57361, 57438, 94254, 94265); -- remove non iron/gold nodes
@@ -717,10 +696,10 @@ DELETE FROM `pool_gameobject` WHERE `guid` IN (55792, 55791, 55793, 55794, 55790
 DELETE FROM `gameobject` WHERE `guid` IN (55792, 55791, 55793, 55794, 55790, 55789, 55788, 94435, 55784, 55782, 55783, 55785, 55786, 55781, 55779, 55772, 57434, 57436, 55771, 55795, 55770, 55773, 55769, 55775, 55774, 55776, 55768, 55777, 55767, 55778, 55756, 55755, 427020, 55759, 55758, 55760, 55757, 55765, 55766, 55764, 55762, 55763, 55761);
 
 -- delete incorrect ashenvale gameobjects & pool records - silver veins
-DELETE FROM `pool_pool` WHERE `pool_id` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 427087, 94259, 94262, 94260, 55828, 57355, 57358, 27317, 55821, 2469, 94264, 94261, 94255, 94263, 57437, 57362, 57439, 57363, 55820, 57356, 57353, 27316, 55844, 427325, 94256, 94253, 55819, 427329, 55822, 57364, 55818, 55824, 94274, 55823, 57360, 427328, 57357, 55825, 57354, 55817, 94275, 427331, 27315, 427332, 427324, 55826, 57359, 94325, 55816, 55827, 94276, 94269, 427330, 27314, 55805, 3442, 55804, 427021, 55808, 55807, 94266, 94273, 55809, 55806, 94267, 427326, 94258, 55814, 94272, 55815, 94270, 55813, 55811, 3444, 55812, 3443, 427327, 94268, 55810, 94265, 94271, 27318, 57361, 57438, 94254, 94257));
-DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 427087, 94259, 94262, 94260, 55828, 57355, 57358, 27317, 55821, 2469, 94264, 94261, 94255, 94263, 57437, 57362, 57439, 57363, 55820, 57356, 57353, 27316, 55844, 427325, 94256, 94253, 55819, 427329, 55822, 57364, 55818, 55824, 94274, 55823, 57360, 427328, 57357, 55825, 57354, 55817, 94275, 427331, 27315, 427332, 427324, 55826, 57359, 94325, 55816, 55827, 94276, 94269, 427330, 27314, 55805, 3442, 55804, 427021, 55808, 55807, 94266, 94273, 55809, 55806, 94267, 427326, 94258, 55814, 94272, 55815, 94270, 55813, 55811, 3444, 55812, 3443, 427327, 94268, 55810, 94265, 94271, 27318, 57361, 57438, 94254, 94257));
-DELETE FROM `pool_gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 427087, 94259, 94262, 94260, 55828, 57355, 57358, 27317, 55821, 2469, 94264, 94261, 94255, 94263, 57437, 57362, 57439, 57363, 55820, 57356, 57353, 27316, 55844, 427325, 94256, 94253, 55819, 427329, 55822, 57364, 55818, 55824, 94274, 55823, 57360, 427328, 57357, 55825, 57354, 55817, 94275, 427331, 27315, 427332, 427324, 55826, 57359, 94325, 55816, 55827, 94276, 94269, 427330, 27314, 55805, 3442, 55804, 427021, 55808, 55807, 94266, 94273, 55809, 55806, 94267, 427326, 94258, 55814, 94272, 55815, 94270, 55813, 55811, 3444, 55812, 3443, 427327, 94268, 55810, 94265, 94271, 27318, 57361, 57438, 94254, 94257);
-DELETE FROM `gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 427087, 94259, 94262, 94260, 55828, 57355, 57358, 27317, 55821, 2469, 94264, 94261, 94255, 94263, 57437, 57362, 57439, 57363, 55820, 57356, 57353, 27316, 55844, 427325, 94256, 94253, 55819, 427329, 55822, 57364, 55818, 55824, 94274, 55823, 57360, 427328, 57357, 55825, 57354, 55817, 94275, 427331, 27315, 427332, 427324, 55826, 57359, 94325, 55816, 55827, 94276, 94269, 427330, 27314, 55805, 3442, 55804, 427021, 55808, 55807, 94266, 94273, 55809, 55806, 94267, 427326, 94258, 55814, 94272, 55815, 94270, 55813, 55811, 3444, 55812, 3443, 427327, 94268, 55810, 94265, 94271, 27318, 57361, 57438, 94254, 94257);
+DELETE FROM `pool_pool` WHERE `pool_id` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 55828, 55821, 55820, 55844, 55819, 55822, 55818, 55824, 55823, 55825, 55817, 55826, 55816, 55827, 55805, 55804, 55808, 55807, 55809, 55806, 55814, 55815, 55813, 55811, 55812, 55810));
+DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 55828, 55821, 55820, 55844, 55819, 55822, 55818, 55824, 55823, 55825, 55817, 55826, 55816, 55827, 55805, 55804, 55808, 55807, 55809, 55806, 55814, 55815, 55813, 55811, 55812, 55810));
+DELETE FROM `pool_gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 55828, 55821, 55820, 55844, 55819, 55822, 55818, 55824, 55823, 55825, 55817, 55826, 55816, 55827, 55805, 55804, 55808, 55807, 55809, 55806, 55814, 55815, 55813, 55811, 55812, 55810);
+DELETE FROM `gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 55828, 55821, 55820, 55844, 55819, 55822, 55818, 55824, 55823, 55825, 55817, 55826, 55816, 55827, 55805, 55804, 55808, 55807, 55809, 55806, 55814, 55815, 55813, 55811, 55812, 55810);
 
 -- remove incorrect ashenvale pool templates
 DELETE FROM `pool_template` WHERE `entry` IN (264, 265, 1080, 10005);
