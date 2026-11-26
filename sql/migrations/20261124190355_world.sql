@@ -26,12 +26,9 @@ UPDATE `quest_template` SET `RequestItemsText`='How do you expect me to get anyt
 UPDATE `quest_template` SET `OfferRewardText`='There you go, $r. As promised, the Bonescythe breastplate. I hope the fashion authorities aren''t around. You''d be thrown in the slammer for wearing that out!' WHERE `entry`=9077;
 UPDATE `quest_template` SET `OfferRewardText`='Be careful walking around in those things. You might cut yourself.' WHERE `entry`=9078;
 UPDATE `quest_template` SET `OfferRewardText`='What separates my Bonescythe helmet model from Don Julio''s is style, $N. Style...' WHERE `entry`=9079;
-UPDATE `quest_template` SET `OfferRewardText`='<Rohan wipes the sweat from his brow.>$B$BThese shoulders took some work! Don''t go out and get yourself killed like a scrub, $N.
-' WHERE `entry`=9080;
-UPDATE `quest_template` SET `OfferRewardText`='They go on your feet. Say, you haven''t been nosing around in Tyr''s Hand again, have you?
-' WHERE `entry`=9081;
-UPDATE `quest_template` SET `OfferRewardText`='These gauntlets could probably substitute as weapons if absolutely necessary. Wear them with pride!
-' WHERE `entry`=9082;
+UPDATE `quest_template` SET `OfferRewardText`='<Rohan wipes the sweat from his brow.>$B$BThese shoulders took some work! Don''t go out and get yourself killed like a scrub, $N.' WHERE `entry`=9080;
+UPDATE `quest_template` SET `OfferRewardText`='They go on your feet. Say, you haven''t been nosing around in Tyr''s Hand again, have you?' WHERE `entry`=9081;
+UPDATE `quest_template` SET `OfferRewardText`='These gauntlets could probably substitute as weapons if absolutely necessary. Wear them with pride!' WHERE `entry`=9082;
 UPDATE `quest_template` SET `OfferRewardText`='The belt is ready, $N. Have you ever seen such a high-quality item sold for so little?' WHERE `entry`=9083;
 UPDATE `quest_template` SET `OfferRewardText`='The bracers are ready, $N.$B$B<Rohan bows.>' WHERE `entry`=9084;
 
