@@ -119,7 +119,9 @@ void WaypointMovementGenerator<Creature>::Reset(Creature &creature)
         float const speed = creature.GetDistance(node.x, node.y, node.z) / (1000 * 0.001f);
         creature.MonsterMoveWithSpeed(node.x, node.y, node.z, node.orientation, speed, MOVE_FORCE_DESTINATION);
     }
-    else
+    // An interruption (combat, evade) during the wait at a reached point only pauses it: the rest of the wait still
+    // runs, so scripted stops with a long waittime are not skipped.
+    else if (!m_isArrivalDone || !Stopped())
     {
         StartMoveNow(creature);
     }
