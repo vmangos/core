@@ -91,7 +91,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (9307, @PTEMPLATE, 0, @DESC, 0),
 (9316, @PTEMPLATE, 0, @DESC, 0);
 DELETE FROM `pool_template` WHERE `entry` = 6093;
-DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` = 6093);
+DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` = 6093); -- confirmed not in sniffs
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 6093;
 SET @PTEMPLATE = @PTEMPLATE + 1;
 
@@ -244,7 +244,7 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (6092, @PTEMPLATE, 0, @DESC, 0),
 (6098, @PTEMPLATE, 0, @DESC, 0);
 DELETE FROM `pool_template` WHERE `entry` = 9294;
-DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` = 9294);
+DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` = 9294); -- confirmed not in sniffs
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 9294;
 
 -- 15
@@ -301,7 +301,7 @@ SET @PTEMPLATE = @PTEMPLATE + 1;
 SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Raynewood Retreat East';
 DELETE FROM `pool_pool` WHERE pool_id IN (6170, 6174, 9326, 9327, 9338);
 DELETE FROM `pool_gameobject` WHERE `guid` = 57436; -- remove non iron/silver/gold nodes
-DELETE FROM `gameobject` WHERE `guid` = 57436; -- remove non iron/silver/gold nodes
+DELETE FROM `gameobject` WHERE `guid` = 57436; -- remove non iron/silver/gold nodes -- confirmed not in sniffs
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (6170, 6174, 9326, 9327, 9338);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (6170, 6174, 9326, 9327, 9338);
 UPDATE `pool_gameobject` SET `chance` = 90 WHERE `pool_entry` = 9338 AND `chance` = 40;
@@ -325,7 +325,7 @@ SET @PTEMPLATE = @PTEMPLATE + 1;
 SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Raynewood Retreat North';
 DELETE FROM `pool_pool` WHERE pool_id IN (2864, 6173, 6175, 6176, 9336, 17056);
 DELETE FROM `pool_gameobject` WHERE `guid` = 57434; -- remove non iron/silver/gold nodes
-DELETE FROM `gameobject` WHERE `guid` = 57434; -- remove non iron/silver/gold nodes
+DELETE FROM `gameobject` WHERE `guid` = 57434; -- remove non iron/silver/gold nodes -- confirmed not in sniffs
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (2864, 6173, 6175, 6176, 9336, 17056);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (2864, 6173, 6175, 6176, 9336, 17056);
 UPDATE `pool_gameobject` SET `chance` = 90 WHERE `pool_entry` = 9336 AND chance = 40;
@@ -434,7 +434,7 @@ SET @PTEMPLATE = @PTEMPLATE + 1;
 SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Felfire Hill';
 DELETE FROM `pool_pool` WHERE pool_id IN (6172, 6180, 6181, 17036, 17128);
 DELETE FROM `pool_gameobject` WHERE `guid` = 427020; -- remove non iron/silver/gold nodes
-DELETE FROM `gameobject` WHERE `guid` = 427020; -- remove non iron/silver/gold nodes
+DELETE FROM `gameobject` WHERE `guid` = 427020; -- remove non iron/silver/gold nodes -- confirmed not in sniffs
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (6172, 6180, 6181, 17036, 17128);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (6172, 6180, 6181, 17036, 17128);
 UPDATE `pool_gameobject` SET `chance` = 90 WHERE `pool_entry` = 17036 AND chance = 40;
@@ -490,8 +490,8 @@ SET @PTEMPLATE = @PTEMPLATE + 1;
 -- 28
 SET @DESC = 'Ashenvale - Iron Deposit / Silver Vein / Gold Vein - Warsong Lumber Camp';
 DELETE FROM `pool_pool` WHERE pool_id IN (6168, 6179, 9332, 9337);
-DELETE FROM `pool_gameobject` WHERE `guid` IN (57361, 57438, 94254, 94265); -- remove non iron/gold nodes
-DELETE FROM `gameobject` WHERE `guid` IN (57361, 57438, 94254, 94265); -- remove non iron/gold nodes
+DELETE FROM `pool_gameobject` WHERE `guid` IN (57361, 57438, 94254, 94265); -- remove non iron/silver/gold nodes
+DELETE FROM `gameobject` WHERE `guid` IN (57361, 57438, 94254, 94265); -- remove non iron/silver/gold nodes -- confirmed not in sniffs
 UPDATE `pool_template` SET `description` = @DESC WHERE `entry` IN (6168, 6179, 9332, 9337);
 UPDATE `pool_gameobject` SET `description` = @DESC WHERE `pool_entry` IN (6168, 6179, 9332, 9337);
 UPDATE `pool_gameobject` SET `chance` = 95 WHERE `pool_entry` IN (6168, 6179, 9332, 9337) AND chance IN (40, 90);
@@ -611,8 +611,8 @@ SET @PTEMPLATE = @PTEMPLATE + 6;
 
 -- 33
 SET @DESC = 'Ashenvale - Copper Vein - Thistlefur Village';
-UPDATE `pool_gameobject` SET `description` = @DESC WHERE `guid` IN (55548, 1012, 55543, 55542, 55550, 55558);
-UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 1200 WHERE `guid` IN (55548, 1012, 55543, 55542, 55550, 55558);
+UPDATE `pool_gameobject` SET `description` = @DESC WHERE `guid` IN (55547, 1012, 55543, 55542, 55550, 55558);
+UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 1200 WHERE `guid` IN (55547, 1012, 55543, 55542, 55550, 55558);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (@PTEMPLATE, 2, CONCAT(@DESC, ' - Master'), 0, 0, 0, 10),
 (@PTEMPLATE + 1, 1, @DESC, 0, 0, 0, 10),
@@ -621,7 +621,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `inst
 (@PTEMPLATE + 4, 1, @DESC, 0, 0, 0, 10),
 (@PTEMPLATE + 5, 1, @DESC, 0, 0, 0, 10),
 (@PTEMPLATE + 6, 1, @DESC, 0, 0, 0, 10);
-UPDATE `pool_gameobject` SET `pool_entry` = @PTEMPLATE + 1 WHERE `guid` = 55548;
+UPDATE `pool_gameobject` SET `pool_entry` = @PTEMPLATE + 1 WHERE `guid` = 55547;
 UPDATE `pool_gameobject` SET `pool_entry` = @PTEMPLATE + 2 WHERE `guid` = 1012;
 UPDATE `pool_gameobject` SET `pool_entry` = @PTEMPLATE + 3 WHERE `guid` = 55543;
 UPDATE `pool_gameobject` SET `pool_entry` = @PTEMPLATE + 4 WHERE `guid` = 55542;
@@ -683,19 +683,19 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE + 4, @PTEMPLATE, 0, @DESC, 0),
 (@PTEMPLATE + 5, @PTEMPLATE, 0, @DESC, 0);
 
--- delete incorrect ashenvale gameobjects & pool records - copper veins
-DELETE FROM `pool_pool` WHERE `pool_id` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55544, 55539, 55554, 55536, 55549, 55572, 55545, 55547, 55576, 55541, 55538, 55580, 55553, 55552, 55573, 55579, 55556, 55559, 55566, 55569, 55534, 55584, 55562, 55560));
-DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55544, 55539, 55554, 55536, 55549, 55572, 55545, 55547, 55576, 55541, 55538, 55580, 55553, 55552, 55573, 55579, 55556, 55559, 55566, 55569, 55534, 55584, 55562, 55560));
-DELETE FROM `pool_gameobject` WHERE `guid` IN (55544, 55539, 55554, 55536, 55549, 55572, 55545, 55547, 55576, 55541, 55538, 55580, 55553, 55552, 55573, 55579, 55556, 55559, 55566, 55569, 55534, 55584, 55562, 55560);
-DELETE FROM `gameobject` WHERE `guid` IN (55544, 55539, 55554, 55536, 55549, 55572, 55545, 55547, 55576, 55541, 55538, 55580, 55553, 55552, 55573, 55579, 55556, 55559, 55566, 55569, 55534, 55584, 55562, 55560);
+-- delete incorrect ashenvale gameobjects & pool records - copper veins - confirmed not in sniffs
+DELETE FROM `pool_pool` WHERE `pool_id` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55544, 55539, 55554, 55536, 55549, 55572, 55545, 55548, 55576, 55541, 55538, 55580, 55553, 55552, 55573, 55579, 55556, 55559, 55566, 55569, 55534, 55584, 55562, 55560));
+DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55544, 55539, 55554, 55536, 55549, 55572, 55545, 55548, 55576, 55541, 55538, 55580, 55553, 55552, 55573, 55579, 55556, 55559, 55566, 55569, 55534, 55584, 55562, 55560));
+DELETE FROM `pool_gameobject` WHERE `guid` IN (55544, 55539, 55554, 55536, 55549, 55572, 55545, 55548, 55576, 55541, 55538, 55580, 55553, 55552, 55573, 55579, 55556, 55559, 55566, 55569, 55534, 55584, 55562, 55560);
+DELETE FROM `gameobject` WHERE `guid` IN (55544, 55539, 55554, 55536, 55549, 55572, 55545, 55548, 55576, 55541, 55538, 55580, 55553, 55552, 55573, 55579, 55556, 55559, 55566, 55569, 55534, 55584, 55562, 55560);
 
--- delete incorrect ashenvale gameobjects & pool records - tin veins
+-- delete incorrect ashenvale gameobjects & pool records - tin veins - confirmed not in sniffs
 DELETE FROM `pool_pool` WHERE `pool_id` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55792, 55791, 55793, 55794, 55790, 55789, 55788, 94435, 55784, 55782, 55783, 55785, 55786, 55781, 55779, 55772, 57434, 57436, 55771, 55795, 55770, 55773, 55769, 55775, 55774, 55776, 55768, 55777, 55767, 55778, 55756, 55755, 427020, 55759, 55758, 55760, 55757, 55765, 55766, 55764, 55762, 55763, 55761));
 DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55792, 55791, 55793, 55794, 55790, 55789, 55788, 94435, 55784, 55782, 55783, 55785, 55786, 55781, 55779, 55772, 57434, 57436, 55771, 55795, 55770, 55773, 55769, 55775, 55774, 55776, 55768, 55777, 55767, 55778, 55756, 55755, 427020, 55759, 55758, 55760, 55757, 55765, 55766, 55764, 55762, 55763, 55761));
 DELETE FROM `pool_gameobject` WHERE `guid` IN (55792, 55791, 55793, 55794, 55790, 55789, 55788, 94435, 55784, 55782, 55783, 55785, 55786, 55781, 55779, 55772, 57434, 57436, 55771, 55795, 55770, 55773, 55769, 55775, 55774, 55776, 55768, 55777, 55767, 55778, 55756, 55755, 427020, 55759, 55758, 55760, 55757, 55765, 55766, 55764, 55762, 55763, 55761);
 DELETE FROM `gameobject` WHERE `guid` IN (55792, 55791, 55793, 55794, 55790, 55789, 55788, 94435, 55784, 55782, 55783, 55785, 55786, 55781, 55779, 55772, 57434, 57436, 55771, 55795, 55770, 55773, 55769, 55775, 55774, 55776, 55768, 55777, 55767, 55778, 55756, 55755, 427020, 55759, 55758, 55760, 55757, 55765, 55766, 55764, 55762, 55763, 55761);
 
--- delete incorrect ashenvale gameobjects & pool records - silver veins
+-- delete incorrect ashenvale gameobjects & pool records - silver veins - confirmed not in sniffs
 DELETE FROM `pool_pool` WHERE `pool_id` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 55828, 55821, 55820, 55844, 55819, 55822, 55818, 55824, 55823, 55825, 55817, 55826, 55816, 55827, 55805, 55804, 55808, 55807, 55809, 55806, 55814, 55815, 55813, 55811, 55812, 55810));
 DELETE FROM `pool_template` WHERE `entry` IN (SELECT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 55828, 55821, 55820, 55844, 55819, 55822, 55818, 55824, 55823, 55825, 55817, 55826, 55816, 55827, 55805, 55804, 55808, 55807, 55809, 55806, 55814, 55815, 55813, 55811, 55812, 55810));
 DELETE FROM `pool_gameobject` WHERE `guid` IN (55841, 55840, 55842, 55843, 55839, 55838, 55837, 94489, 55833, 55831, 55832, 55834, 55835, 55830, 55828, 55821, 55820, 55844, 55819, 55822, 55818, 55824, 55823, 55825, 55817, 55826, 55816, 55827, 55805, 55804, 55808, 55807, 55809, 55806, 55814, 55815, 55813, 55811, 55812, 55810);
