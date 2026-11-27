@@ -129,8 +129,8 @@ enum GroupUpdateFlags
     GROUP_UPDATE_FLAG_CUR_POWER         = 0x00000010,       // 4 : uint16
     GROUP_UPDATE_FLAG_MAX_POWER         = 0x00000020,       // 5 : uint16
     GROUP_UPDATE_FLAG_LEVEL             = 0x00000040,       // 6 : uint16
-    GROUP_UPDATE_FLAG_ZONE              = 0x00000080,       // 7 : uint16
-    GROUP_UPDATE_FLAG_POSITION          = 0x00000100,       // 8 : uint16, uint16
+    GROUP_UPDATE_FLAG_ZONE              = 0x00000080,       // 7 : uint16 area id
+    GROUP_UPDATE_FLAG_POSITION          = 0x00000100,       // 8 : int16, int16
     GROUP_UPDATE_FLAG_AURAS             = 0x00000200,       // 9 : uint32 mask, for each bit set uint16 spellid
     GROUP_UPDATE_FLAG_AURAS_NEGATIVE    = 0x00000400,       // 10: uint16 mask, for each bit set uint16 spellid
     GROUP_UPDATE_FLAG_PET_GUID          = 0x00000800,       // 11: uint64 pet guid

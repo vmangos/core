@@ -34,6 +34,9 @@
 
 void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
 {
+    if (_player->IsCharmed())
+        return;
+
     uint32 spellid = UNIT_ACTION_BUTTON_ACTION(packet.data);
     uint8 flag = UNIT_ACTION_BUTTON_TYPE(packet.data);             // delete = 0x07 CastSpell = C1
 
@@ -130,7 +133,10 @@ void WorldSession::HandlePetAction(WorldPackets::Pet::PetAction const& packet)
 
             if (!pUnitTarget && explicitlySelectedTarget)
             {
-                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_BAD_IMPLICIT_TARGETS);
+                if (Spells::IsExplicitNegativeTarget(spellInfo->EffectImplicitTargetA[0]))
+                    pCharmedUnit->SendPetActionFeedback(FEEDBACK_NOTHING_TO_ATT);
+                else
+                    pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_BAD_IMPLICIT_TARGETS);
                 return;
             }
 
@@ -202,6 +208,9 @@ void WorldSession::SendPetNameQuery(ObjectGuid petGuid, uint32 petNumber)
 
 void WorldSession::HandlePetSetAction(WorldPackets::Pet::PetSetAction const& packet)
 {
+    if (_player->IsCharmed())
+        return;
+
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(packet.petGuid);
 
     if (!pet || (pet != _player->GetPet() && pet != _player->GetCharm()))
@@ -377,6 +386,9 @@ void WorldSession::HandlePetAbandon(WorldPackets::Pet::PetAbandon const& packet)
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
 void WorldSession::HandlePetStopAttack(WorldPackets::Pet::PetStopAttack const& packet)
 {
+    if (GetPlayer()->IsCharmed())
+        return;
+
     Unit* pet = GetPlayer()->GetMap()->GetUnit(packet.petGuid); // pet or controlled creature/player
     if (!pet)
     {
@@ -450,6 +462,9 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPackets::Pet::PetUnlearn const& p
 
 void WorldSession::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutocast const& packet)
 {
+    if (_player->IsCharmed())
+        return;
+
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(packet.guid);
     if (!pet || (packet.guid != _player->GetPetGuid() && packet.guid != _player->GetCharmGuid()))
     {
@@ -481,8 +496,10 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutoc
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
 void WorldSession::HandlePetCastSpellOpcode(WorldPackets::Pet::PetCastSpell const& packet)
 {
-    Creature* pet = _player->GetMap()->GetAnyTypeCreature(packet.petGuid);
+    if (_player->IsCharmed())
+        return;
 
+    Creature* pet = _player->GetMap()->GetAnyTypeCreature(packet.petGuid);
     if (!pet || (packet.petGuid != _player->GetPetGuid() && packet.petGuid != _player->GetCharmGuid()))
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandlePetCastSpellOpcode: %s isn't pet of %s .", packet.petGuid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());

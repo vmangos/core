@@ -16,6 +16,22 @@ ConfVersion=2026042601
 #                 .;/path/to/unix_socket;username;password;database - use Unix sockets at Unix/Linux
 #                       Unix sockets: experimental, not tested
 #
+
+#    Database.AliveCheckInterval - in seconds
+#        The interval in seconds to check the reachability of the database.
+#        Each delay thread sends a "SELECT 1" ping to MySQL on this schedule.
+#        Default: 600 (10 min)
+#
+#    Database.ConnectTimeout - in seconds
+#        TCP connect timeout passed to mysql_real_connect() via MYSQL_OPT_CONNECT_TIMEOUT.
+#        Limits how long a reconnect attempt blocks the calling thread when MySQL is unreachable.
+#        Default: 5
+#
+#    Database.QueryTimeout - in seconds
+#        Read/write timeout for individual queries (MYSQL_OPT_READ_TIMEOUT / WRITE_TIMEOUT).
+#        Prevents threads from hanging indefinitely when MySQL is overloaded or the network stalls.
+#        Default: 30
+#
 #    LogsDir
 #         Logs directory setting.
 #         Important: Logs dir must exists, or all logs be disable
@@ -69,12 +85,12 @@ ConfVersion=2026042601
 #        Default: 0 (no time)
 #                 1 (print time)
 #
-#    LogFile
+#    LogFile.Basic
 #        Logfile name
 #        Default: "Realmd.log"
 #                 "" - empty name disable creating log file
 #
-#    LogTimestamp
+#    LogFile.TimeStamp
 #        Logfile with timestamp of server start in name
 #        Default: 0 - no timestamp in name
 #                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
@@ -158,6 +174,9 @@ ConfVersion=2026042601
 ###################################################################################################################
 
 LoginDatabaseInfo = "127.0.0.1;3306;mangos;mangos;realmd"
+Database.AliveCheckInterval = 600
+Database.ConnectTimeout = 5
+Database.QueryTimeout = 30
 LogsDir = ""
 PatchesDir = "./patches"
 MaxPingTime = 30
@@ -168,8 +187,8 @@ PidFile = ""
 LogLevel.Console = 2
 LogLevel.File = 2
 LogTime = 0
-LogFile = "Realmd.log"
-LogTimestamp = 0
+LogFile.Basic = "Realmd.log"
+LogFile.TimeStamp = 0
 LogFileLevel = 0
 UseProcessors = 0
 ProcessPriority = 1

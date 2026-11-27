@@ -628,7 +628,7 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
         *data << uint16(player->GetLevel());
 
     if (mask & GROUP_UPDATE_FLAG_ZONE)
-        *data << uint16(player->GetCachedZoneId());
+        *data << uint16(player->GetCachedAreaId());
 
     if (mask & GROUP_UPDATE_FLAG_POSITION)
         *data << int16(player->GetPositionX()) << int16(player->GetPositionY());

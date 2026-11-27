@@ -3845,7 +3845,8 @@ void Spell::handle_immediate()
 
         // a channeled spell could be interrupted already because the aura on target
         // was diminished to duration=0 see Spell::DoSpellHitOnUnit
-        if (m_spellInfo->IsChanneledSpell() && m_spellState != SPELL_STATE_CASTING)
+        // A channel without duration never enters SPELL_STATE_CASTING and must reach finish() below
+        if (m_spellInfo->IsChanneledSpell() && m_duration && m_spellState != SPELL_STATE_CASTING)
             return;
     }
 
@@ -5309,7 +5310,13 @@ SpellCastResult Spell::CheckCast(bool strict)
         && !m_spellInfo->IsAutoRepeatRangedSpell() // auto shot managed by attack timer
         && !m_caster->IsSpellReady(m_spellInfo, m_CastItem ? m_CastItem->GetProto() : nullptr))
     {
-        return (m_triggeredByAuraSpell || m_spellInfo->Attributes & SPELL_ATTR_COOLDOWN_ON_EVENT) ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_NOT_READY;
+        if (m_triggeredByAuraSpell || m_spellInfo->Attributes & SPELL_ATTR_COOLDOWN_ON_EVENT)
+            return SPELL_FAILED_DONT_REPORT;
+        // only SPELL_FAILED_NOT_READY lets the client release a cooldown it holds until an event
+        else if (m_CastItem && !m_spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_ON_EVENT))
+            return SPELL_FAILED_ITEM_NOT_READY;
+        else
+            return SPELL_FAILED_NOT_READY;
     }
 
     // check death state to prevent cheating ("deathbug")
@@ -6607,6 +6614,11 @@ SpellCastResult Spell::CheckCasterAuras() const
         prevented_reason = SPELL_FAILED_CONFUSED;
     else if ((unitflag & UNIT_FLAG_FLEEING) && !(mechanic_immune & (1 << (MECHANIC_FEAR - 1u))))
         prevented_reason = SPELL_FAILED_FLEEING;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    // While charmed client shouldn't be able to cast anything except spells that remove the charm.
+    else if ((unitflag & UNIT_FLAG_POSSESSED) && !(mechanic_immune & (1 << (MECHANIC_CHARM - 1u))) && m_isClientStarted)
+        prevented_reason = SPELL_FAILED_CHARMED;
+#endif
     // Silence check seems to only be performed if not stunned.
     // Mages can blink out of stun even when silenced.
     // https://www.youtube.com/watch?v=NiWibn2GdbA
@@ -6645,6 +6657,14 @@ SpellCastResult Spell::CheckCasterAuras() const
                     // That is needed when your casting is prevented by multiple states and you are only immune to some of them.
                     switch (aura->GetModifier()->m_auraname)
                     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+                        case SPELL_AURA_MOD_POSSESS:
+                        case SPELL_AURA_MOD_CHARM:
+                        case SPELL_AURA_AOE_CHARM:
+                            if (!(mechanic_immune & (1 << (MECHANIC_CHARM - 1u))))
+                                return SPELL_FAILED_CHARMED;
+                            break;
+#endif
                         case SPELL_AURA_MOD_STUN:
                             if (!(mechanic_immune & (1 << (MECHANIC_STUN - 1u))))
                                 return SPELL_FAILED_STUNNED;
@@ -8280,6 +8300,14 @@ bool Spell::HasModifierApplied(SpellModifier* mod)
     for (const auto itr : m_appliedMods)
         if (itr == mod)
             return true;
+    return false;
+}
+
+bool Spell::IsTriggeredByPermanentAura() const
+{
+    if (m_triggeredByAuraSpell)
+        return m_triggeredByAuraSpell->DurationIndex == 21;
+
     return false;
 }
 

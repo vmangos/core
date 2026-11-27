@@ -511,6 +511,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
             pl->LogModifyMoney(-int32(packet.price - auction->bid), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
         else
         {
+            pl->LogModifyMoney(-int32(packet.price), "AuctionBid", ObjectGuid(HIGHGUID_PLAYER, auction->owner), auction->itemTemplate);
             oldBidder = auction->bidder;
             oldBid = auction->bid;
         }
@@ -572,7 +573,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPackets::AuctionHouse::AuctionPlac
         delete auction;
     }
     CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
-    pl->SaveInventoryAndGoldToDB();
+    pl->SaveGoldToDB();
     CharacterDatabase.CommitTransaction();
 }
 
@@ -635,7 +636,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPackets::AuctionHouse::AuctionRe
     // Now remove the auction
     CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
     auction->DeleteFromDB();
-    pl->SaveInventoryAndGoldToDB();
+    pl->SaveGoldToDB();
     CharacterDatabase.CommitTransaction();
     sAuctionMgr.RemoveAItem(auction->itemGuidLow);
     auctionHouse->RemoveAuction(auction);

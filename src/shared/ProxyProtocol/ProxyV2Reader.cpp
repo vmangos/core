@@ -52,7 +52,7 @@ union proxy_addr {
 void ProxyProtocol::ReadProxyV2Handshake(IO::Networking::AsyncSocket* socket, std::function<void(nonstd::expected<IO::Networking::IpAddress, IO::NetworkError> const&)> const& callback)
 {
     std::shared_ptr<proxy_hdr_v2> proxyHeader(new proxy_hdr_v2());
-    socket->Read((char*)(proxyHeader.get()), sizeof(proxyHeader), [socket, callback, proxyHeader](IO::NetworkError const& error, size_t)
+    socket->Read((char*)(proxyHeader.get()), sizeof(proxy_hdr_v2), [socket, callback, proxyHeader](IO::NetworkError const& error, size_t)
     {
         if (error)
         {

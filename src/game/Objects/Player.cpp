@@ -1669,7 +1669,12 @@ bool Player::BuildEnumData(const std::unique_ptr<QueryResult>& result, WorldPack
     uint8 facialHair = fields[9].GetUInt8();
     *pData << uint8(facialHair);                           // facial hair
 
-    *pData << uint8(fields[10].GetUInt8());                // level
+    uint32 totalPlayedTime = fields[18].GetUInt32();
+
+    // a character that has never entered the world is sent at level 0, which shows as level 1;
+    // one created above level 1 keeps its level
+    uint8 level = fields[10].GetUInt8();
+    *pData << uint8(totalPlayedTime == 0 && level == 1 ? 0 : level); // level
     *pData << uint32(fields[11].GetUInt32());              // zone
     *pData << uint32(fields[12].GetUInt32());              // map
 
@@ -1683,7 +1688,6 @@ bool Player::BuildEnumData(const std::unique_ptr<QueryResult>& result, WorldPack
     *pData << uint32(charFlags);                           // character flags
 
     // First login
-    uint32 totalPlayedTime = fields[18].GetUInt32();
     *pData << uint8(totalPlayedTime != 0 ? 0 : 1);
 
     // Pets info
@@ -4750,7 +4754,9 @@ Corpse* Player::CreateCorpse()
     corpse->SetByteValue(CORPSE_FIELD_BYTES_2, 2, haircolor);
     corpse->SetByteValue(CORPSE_FIELD_BYTES_2, 3, facialhair);
 
-    uint32 flags = CORPSE_FLAG_UNK2;
+    uint32 flags = 0;
+    if (IsPvP())
+        flags |= CORPSE_FLAG_PVP;
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM))
         flags |= CORPSE_FLAG_HIDE_HELM;
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK))
@@ -5976,7 +5982,7 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
             if (positionChanged)
             {
                 // group update
-                if (GetGroup() && (uint16(old_x) != uint16(x) || uint16(old_y) != uint16(y)))
+                if (GetGroup() && (int16(old_x) != int16(x) || int16(old_y) != int16(y)))
                     SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
                 if (Player* pTrader = GetTrader())
@@ -6564,6 +6570,10 @@ void Player::SetTransport(GenericTransport* t)
 
 void Player::UpdateArea(uint32 newArea)
 {
+    // group update
+    if (m_areaUpdateId != newArea && GetGroup())
+        SetGroupUpdateFlag(GROUP_UPDATE_FLAG_ZONE);
+
     m_areaUpdateId    = newArea;
 
     DismountCheck();
@@ -6664,10 +6674,6 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     // http://youtube.be/iUFpZeNGPSs?t=32m
     if (!IsTaxiFlying())
         UpdateLocalChannels(newZone);
-
-    // group update
-    if (GetGroup())
-        SetGroupUpdateFlag(GROUP_UPDATE_FLAG_ZONE);
 
     UpdateZoneDependentAuras();
     SetZoneScript();
@@ -8453,7 +8459,7 @@ Item* Player::GetItemByGuid(ObjectGuid guid) const
                     if (pItem->GetObjectGuid() == guid)
                         return pItem;
 
-    for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+    for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_BAG_END; ++i)
         if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (pItem->GetObjectGuid() == guid)
                 return pItem;
@@ -9687,6 +9693,9 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, ItemPrototype con
         // check this only in game
         if (not_loading)
         {
+            if (IsCharmed())
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+
             // World of Warcraft Client Patch 1.6.0 (2005-07-12)
             // - It will no longer be possible to swap any equipment while stunned.
             // May be here should be more stronger checks; STUNNED checked
@@ -9820,6 +9829,9 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
     if (IsMainHandPos(pos) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
         return EQUIP_ERR_NOT_WHILE_DISARMED;
 #endif
+
+    if (IsCharmed())
+        return EQUIP_ERR_CANT_DO_RIGHT_NOW;
 
     // do not allow unequipping gear except weapons, offhands, projectiles, relics in combat
     if (!pProto->CanChangeEquipStateInCombat())
@@ -11104,6 +11116,12 @@ void Player::SwapItem(uint16 src, uint16 dst)
     if (!IsAlive() && !(IsInventoryPos(src) && IsInventoryPos(dst)))
     {
         SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, pSrcItem, pDstItem);
+        return;
+    }
+
+    if (IsCharmed())
+    {
+        SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pSrcItem, pDstItem);
         return;
     }
 
@@ -12417,7 +12435,7 @@ void Player::PrepareQuestMenu(ObjectGuid guid, uint32 exceptQuestId)
 
         if (pQuest->IsAutoComplete() && CanTakeQuest(pQuest, false))
             qm.AddMenuItem(questId, DIALOG_STATUS_REWARD_REP);
-        else if (status == QUEST_STATUS_NONE && CanTakeQuest(pQuest, false))
+        else if ((status == QUEST_STATUS_NONE || status == QUEST_STATUS_FAILED) && CanTakeQuest(pQuest, false))
             qm.AddMenuItem(questId, DIALOG_STATUS_AVAILABLE);
     }
 }
@@ -12583,7 +12601,8 @@ bool Player::CanTakeQuest(Quest const* pQuest, bool msg, bool skipStatusCheck /*
 
 bool Player::CanAddQuest(Quest const* pQuest, bool msg) const
 {
-    if (!SatisfyQuestLog(msg))
+    // a failed quest taken again keeps its quest log slot
+    if (FindQuestSlot(pQuest->GetQuestId()) >= MAX_QUEST_LOG_SIZE && !SatisfyQuestLog(msg))
         return false;
 
     if (!CanGiveQuestSourceItemIfNeed(pQuest))
@@ -12824,10 +12843,13 @@ void Player::SendPetTameFailure(PetTameFailureReason reason) const
 
 void Player::AddQuest(Quest const* pQuest, Object* questGiver)
 {
-    uint16 log_slot = FindQuestSlot(0);
-    MANGOS_ASSERT(log_slot < MAX_QUEST_LOG_SIZE);
-
     uint32 questId = pQuest->GetQuestId();
+
+    // a failed quest taken again keeps its quest log slot, which SetQuestSlot below resets
+    uint16 log_slot = FindQuestSlot(questId);
+    if (log_slot >= MAX_QUEST_LOG_SIZE)
+        log_slot = FindQuestSlot(0);
+    MANGOS_ASSERT(log_slot < MAX_QUEST_LOG_SIZE);
 
     // if not exist then created with set uState==NEW and rewarded=false
     QuestStatusData& questStatusData = mQuestStatus[questId];
@@ -13013,12 +13035,14 @@ void Player::CompleteQuest(uint32 questId)
     {
         SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
 
-        uint16 log_slot = FindQuestSlot(questId);
-        if (log_slot < MAX_QUEST_LOG_SIZE)
-            SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
-
         if (Quest const* qInfo = sObjectMgr.GetQuestTemplate(questId))
         {
+            // The client reads the complete state of a quest log slot as the event or area objective
+            // of the quests flagged with one; the other objectives it counts itself.
+            uint16 log_slot = FindQuestSlot(questId);
+            if (log_slot < MAX_QUEST_LOG_SIZE && qInfo->HasQuestFlag(QuestFlags(QUEST_FLAGS_PARTY_ACCEPT | QUEST_FLAGS_EXPLORATION)))
+                SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
+
             if (qInfo->HasQuestFlag(QUEST_FLAGS_AUTO_REWARDED))
                 RewardQuest(qInfo, 0, this, false);
         }
@@ -13031,8 +13055,12 @@ void Player::IncompleteQuest(uint32 questId)
     {
         SetQuestStatus(questId, QUEST_STATUS_INCOMPLETE);
 
+        // The complete state of the quest log slot is the event objective, which stays done once the event happened.
+        QuestStatusMap::const_iterator itr = mQuestStatus.find(questId);
+        bool eventDone = itr != mQuestStatus.end() && itr->second.m_explored;
+
         uint16 log_slot = FindQuestSlot(questId);
-        if (log_slot < MAX_QUEST_LOG_SIZE)
+        if (log_slot < MAX_QUEST_LOG_SIZE && !eventDone)
             RemoveQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
     }
 }
@@ -13266,9 +13294,9 @@ void Player::FailQuest(uint32 questId)
             return;
         }
 
+        // only the state changes in the quest log: the client does not read the time of a failed quest
         if (log_slot < MAX_QUEST_LOG_SIZE)
         {
-            SetQuestSlotTimer(log_slot, 1);
             SetQuestSlotState(log_slot, QUEST_STATE_FAIL);
             SetQuestStatus(questId, QUEST_STATUS_FAILED);
         }
@@ -13538,7 +13566,8 @@ bool Player::SatisfyQuestStatus(Quest const* qInfo, bool msg) const
 {
     QuestStatusMap::const_iterator itr = mQuestStatus.find(qInfo->GetQuestId());
 
-    if (itr != mQuestStatus.end() && itr->second.m_status != QUEST_STATUS_NONE)
+    // a failed quest can be taken again from its quest giver
+    if (itr != mQuestStatus.end() && itr->second.m_status != QUEST_STATUS_NONE && itr->second.m_status != QUEST_STATUS_FAILED)
     {
         if (msg)
             SendCanTakeQuestResponse(INVALIDREASON_QUEST_ALREADY_ON);
@@ -13857,7 +13886,8 @@ void Player::AreaExploredOrEventHappens(uint32 questId)
         {
             QuestStatusData& q_status = mQuestStatus[questId];
 
-            if (!q_status.m_explored)
+            // a failed quest does not progress any more
+            if (!q_status.m_explored && q_status.m_status != QUEST_STATUS_FAILED)
             {
                 SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
                 SendQuestCompleteEvent(questId);
@@ -13987,7 +14017,10 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
                     q_status.m_itemcount[j] = newItemCount;
                     if (q_status.uState != QUEST_NEW)
                         q_status.uState = QUEST_CHANGED;
-                    IncompleteQuest(questid);
+
+                    // Only a complete quest goes back to incomplete: a failed quest stays failed.
+                    if (q_status.m_status == QUEST_STATUS_COMPLETE)
+                        IncompleteQuest(questid);
                 }
                 break;
             }
@@ -15749,12 +15782,16 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
 
                 if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_TIMED) && !GetQuestRewardStatus(questId) && questStatusData.m_status != QUEST_STATUS_NONE)
                 {
-                    AddTimedQuest(questId);
+                    // A failed quest keeps its time in the quest log, but its timer does not run any more
+                    if (questStatusData.m_status != QUEST_STATUS_FAILED)
+                    {
+                        AddTimedQuest(questId);
 
-                    if (quest_time <= sWorld.GetGameTime())
-                        questStatusData.m_timer = 1;
-                    else
-                        questStatusData.m_timer = uint32(quest_time - sWorld.GetGameTime()) * IN_MILLISECONDS;
+                        if (quest_time <= sWorld.GetGameTime())
+                            questStatusData.m_timer = 1;
+                        else
+                            questStatusData.m_timer = uint32(quest_time - sWorld.GetGameTime()) * IN_MILLISECONDS;
+                    }
                 }
                 else
                     quest_time = 0;
@@ -15782,7 +15819,7 @@ void Player::_LoadQuestStatus(std::unique_ptr<QueryResult> result)
                     if (questStatusData.m_explored)
                         SetQuestSlotState(slot, QUEST_STATE_COMPLETE);
 
-                    if (questStatusData.m_status == QUEST_STATUS_COMPLETE)
+                    if (questStatusData.m_status == QUEST_STATUS_COMPLETE && pQuest->HasQuestFlag(QuestFlags(QUEST_FLAGS_PARTY_ACCEPT | QUEST_FLAGS_EXPLORATION)))
                         SetQuestSlotState(slot, QUEST_STATE_COMPLETE);
 
                     if (questStatusData.m_status == QUEST_STATUS_FAILED)
@@ -18473,7 +18510,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         {
             ItemAddedQuestCheck(item, totalCount, false);
             if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(item))
-                pItem->SetItemRandomProperties(randomPropertyId);
+                newItem->SetItemRandomProperties(randomPropertyId);
             pItem = StoreItem(dest, newItem, true);
         }
     }
@@ -18500,7 +18537,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         {
             ItemAddedQuestCheck(item, 1, false);
             if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(item))
-                pItem->SetItemRandomProperties(randomPropertyId);
+                newItem->SetItemRandomProperties(randomPropertyId);
             pItem = EquipItem(dest, newItem, true);
         }
 
@@ -20155,12 +20192,16 @@ Unit* Player::GetConfirmedMover() const
     if (!m_session->GetClientMoverGuid())
         return nullptr;
 
+    // cannot move anyone when charmed
+    if (GetPossessorGuid() || GetCharmerGuid())
+        return nullptr;
+
     // all is good
     if (m_mover->GetObjectGuid() == m_session->GetClientMoverGuid())
         return m_mover;
 
     // client has not yet confirmed mover change but is allowed to move self
-    if (IsControlledByOwnClient() && !GetPossessorGuid() && !GetCharmerGuid())
+    if (IsControlledByOwnClient())
         return (Unit*)this;
 
     return nullptr;

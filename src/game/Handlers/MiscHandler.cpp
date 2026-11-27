@@ -398,6 +398,10 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPackets::Misc::ZoneUpdate const& 
 
 void WorldSession::HandleSetSelectionOpcode(WorldPackets::Misc::SetSelection const& packet)
 {
+    // charmed player is prevented from changing targets client side
+    if (_player->IsCharmed())
+        return;
+
     _player->SetSelectionGuid(packet.guid);
 
     // update reputation list if need
@@ -446,6 +450,9 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPackets::Misc::StandStateCh
         default:
             return;
     }
+
+    if (_player->GetDeathState() == CORPSE || _player->IsCharmed())
+        return;
 
     if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_EMOTE_ANIM))
         return;
@@ -942,6 +949,9 @@ void WorldSession::HandlePlayedTime(NullClientPacket const& /*packet*/)
 
 void WorldSession::HandleInspectOpcode(WorldPackets::Misc::Inspect const& packet)
 {
+    if (_player->IsDead() || _player->IsCharmed())
+        return;
+
     _player->SetSelectionGuid(packet.guid);
 
     Player* pTarget = sObjectMgr.GetPlayer(packet.guid);

@@ -410,6 +410,18 @@ void AccountMgr::LoadAccountBanList(bool silent)
     }
 }
 
+void AccountMgr::BanIP(std::string const& ip, uint32 unbandate)
+{
+    std::lock_guard<std::shared_timed_mutex> lock(m_ipBannedMutex);
+    m_ipBanned[ip] = unbandate;
+}
+
+void AccountMgr::UnbanIP(std::string const& ip)
+{
+    std::lock_guard<std::shared_timed_mutex> lock(m_ipBannedMutex);
+    m_ipBanned.erase(ip);
+}
+
 bool AccountMgr::IsIPBanned(std::string const& ip) const
 {
     std::shared_lock<std::shared_timed_mutex> lock(m_ipBannedMutex);

@@ -1,6 +1,4 @@
 /*
- * Scripted for --> Mangos-Zero Special Thanks for VladimirMangos, Yehonal, Theluda, Drkotas, Shin, Wrath Team.
- * Copyright (C) 2006 - 2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,171 +14,236 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Instance_Wailing_Caverns
-SD%Complete: 0
-SDComment: Placeholder
-SDCategory: Wailing Caverns
-EndScriptData */
-
 #include "scriptPCH.h"
-#include "def_wailing_caverns.h"
+
+// Unlocks the escort without the four lords.
+// #define DEBUG_DISCIPLE
+
+// Index of the saved instance data. The DB scripts set and check 0-5 and DATA_DISCIPLE_REGEN.
+enum WailingCavernsData : uint32
+{
+    TYPE_ANACONDRA                = 0,
+    TYPE_COBRAHN                  = 1,
+    TYPE_PYTHAS                   = 2,
+    TYPE_SERPENTIS                = 3,
+    TYPE_DISCIPLE                 = 4,
+    TYPE_MUTANUS                  = 5,
+    TYPE_KRESH                    = 6,
+    TYPE_SKUM                     = 7,
+    TYPE_VERDAN                   = 8,
+    WAILING_CAVERNS_MAX_ENCOUNTER = 9,
+
+    // Not saved. The escort DB scripts set it to 0 while the players protect the Disciple (circle, ritual), so an
+    // evade between two attacks does not heal him up, and back to 1 afterwards.
+    DATA_DISCIPLE_REGEN           = 9
+};
+
+enum WailingCaverns : uint32
+{
+    YELL_NARALEX_CAN_BE_AWAKENED = 2101,
+
+    NPC_KRESH                    = 3653,
+    NPC_LORD_COBRAHN             = 3669,
+    NPC_LORD_PYTHAS              = 3670,
+    NPC_LADY_ANACONDRA           = 3671,
+    NPC_LORD_SERPENTIS           = 3673,
+    NPC_SKUM                     = 3674,
+    NPC_DISCIPLE_OF_NARALEX      = 3678,
+    NPC_VERDAN_THE_EVERLIVING    = 5775,
+
+    GO_DMF_CHEST                 = 180055,
+
+    QUEST_FORTUNE_AWAITS         = 7944,
+
+    FACTION_FRIENDLY_TO_ALL      = 35
+};
+
+struct WailingCavernsBoss
+{
+    uint32 entry;
+    uint32 type;
+};
+
+static WailingCavernsBoss const WailingCavernsBosses[] =
+{
+    { NPC_LADY_ANACONDRA,        TYPE_ANACONDRA },
+    { NPC_LORD_COBRAHN,          TYPE_COBRAHN   },
+    { NPC_LORD_PYTHAS,           TYPE_PYTHAS    },
+    { NPC_LORD_SERPENTIS,        TYPE_SERPENTIS },
+    { NPC_KRESH,                 TYPE_KRESH     },
+    { NPC_SKUM,                  TYPE_SKUM      },
+    { NPC_VERDAN_THE_EVERLIVING, TYPE_VERDAN    }
+};
 
 struct instance_wailing_caverns : public ScriptedInstance
 {
-    instance_wailing_caverns(Map* pMap) : ScriptedInstance(pMap)
-    {
-        Initialize();
-    }
-
     uint32 m_auiEncounter[WAILING_CAVERNS_MAX_ENCOUNTER];
-    std::string strInstData;
+    std::string m_strInstData;
+    ObjectGuid m_discipleGuid;
 
-    uint64 m_uiDiscipleGUID;
-    uint64 m_uiNaralexGUID;
-    uint64 m_uiAnacondraGUID;
-    //uint64 m_uiVerdanGUID;
-    uint64 m_uiSerpentisGUID;
-    bool Assaulted;
+    // Hostile creatures removed once Mutanus is dead.
+    std::vector<ObjectGuid> m_despawnAfterMutanus;
 
-    // to be despawn when the nightmare is over
-    std::vector<uint64> vNightmareMonsters;
+    explicit instance_wailing_caverns(Map* pMap) : ScriptedInstance(pMap)
+    {
+        instance_wailing_caverns::Initialize();
+    }
 
     void Initialize() override
     {
-        memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
+        std::fill(std::begin(m_auiEncounter), std::end(m_auiEncounter), 0);
 
-        m_uiDiscipleGUID = 0;
-        m_uiNaralexGUID = 0;
-        m_uiAnacondraGUID = 0;
-        //m_uiVerdanGUID = 0;
-        m_uiSerpentisGUID = 0;
-        Assaulted = false;
+        m_discipleGuid.Clear();
+        m_despawnAfterMutanus.clear();
+    }
+
+    static uint32 GetBossType(uint32 entry)
+    {
+        for (WailingCavernsBoss const& boss : WailingCavernsBosses)
+        {
+            if (boss.entry == entry)
+            {
+                return boss.type;
+            }
+        }
+
+        return WAILING_CAVERNS_MAX_ENCOUNTER;
+    }
+
+    // All four lords dead: the escort becomes available (TYPE_DISCIPLE SPECIAL).
+    void CheckUnlockEscort()
+    {
+#ifndef DEBUG_DISCIPLE
+        if (m_auiEncounter[TYPE_ANACONDRA] != DONE ||
+            m_auiEncounter[TYPE_COBRAHN] != DONE ||
+            m_auiEncounter[TYPE_PYTHAS] != DONE ||
+            m_auiEncounter[TYPE_SERPENTIS] != DONE)
+        {
+            return;
+        }
+#endif
+
+        if (m_auiEncounter[TYPE_DISCIPLE] != NOT_STARTED || m_discipleGuid.IsEmpty())
+        {
+            return;
+        }
+
+        SetData(TYPE_DISCIPLE, SPECIAL);
+
+        if (Creature* pDisciple = instance->GetCreature(m_discipleGuid))
+        {
+            DoScriptText(YELL_NARALEX_CAN_BE_AWAKENED, pDisciple);
+        }
     }
 
     void OnCreatureCreate(Creature* pCreature) override
     {
+        // Load resets SPECIAL, the escort is unlocked again once the Disciple exists.
+        if (pCreature->GetEntry() == NPC_DISCIPLE_OF_NARALEX)
+        {
+            m_discipleGuid = pCreature->GetObjectGuid();
+            CheckUnlockEscort();
+        }
+
+        // Critters, the Disciple and Naralex (friendly to all) and Kresh stay after Mutanus' death.
+        if (pCreature->GetCreatureType() != CREATURE_TYPE_CRITTER &&
+            pCreature->GetFactionTemplateId() != FACTION_FRIENDLY_TO_ALL &&
+            pCreature->GetEntry() != NPC_KRESH)
+        {
+            m_despawnAfterMutanus.push_back(pCreature->GetObjectGuid());
+        }
+
+        OnCreatureRespawn(pCreature);
+    }
+
+    // The lords report their death by EventAI.
+    void OnCreatureDeath(Creature* pCreature) override
+    {
         switch (pCreature->GetEntry())
         {
-            case 3678:
-                m_uiDiscipleGUID = pCreature->GetGUID();
+            case NPC_KRESH:
+            case NPC_SKUM:
+            case NPC_VERDAN_THE_EVERLIVING:
+            {
+                SetData(GetBossType(pCreature->GetEntry()), DONE);
                 break;
-            case 3679:
-                m_uiNaralexGUID = pCreature->GetGUID();
-                break;
-            case 3673:
-                m_uiSerpentisGUID = pCreature->GetGUID();
-                break;
-            case 3671:
-                m_uiAnacondraGUID = pCreature->GetGUID();
-                break;
-                /*case 5775:                  // Verdan the Everliving
-                    m_uiVerdanGUID = pCreature->GetGUID();
-                    pCreature->SetVisibility(VISIBILITY_OFF);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                    break;*/
+            }
         }
-        if ((pCreature->GetCreatureType() != CREATURE_TYPE_CRITTER) &&
-            pCreature->GetFactionTemplateId() != 35 && // the 2 druids
-            pCreature->GetEntry() != 3653) // Kresh is cool
-            vNightmareMonsters.push_back(pCreature->GetGUID());
+    }
+
+    // A killed boss stays dead for the life of the instance, also after his respawn time or a server restart.
+    void OnCreatureRespawn(Creature* pCreature) override
+    {
+        uint32 const type = GetBossType(pCreature->GetEntry());
+        if (type < WAILING_CAVERNS_MAX_ENCOUNTER && m_auiEncounter[type] == DONE)
+        {
+            pCreature->AddObjectToRemoveList();
+        }
     }
 
     void OnObjectCreate(GameObject* pGo) override
     {
         if (pGo->GetEntry() == GO_DMF_CHEST)
+        {
             pGo->SetVisible(false);
+        }
     }
-
 
     void SetData(uint32 uiType, uint32 uiData) override
     {
-        switch (uiType)
+        // A respawn restores the regeneration (Creature::UpdateEntry).
+        if (uiType == DATA_DISCIPLE_REGEN)
         {
-            case TYPE_ANACONDRA:
-                m_auiEncounter[TYPE_ANACONDRA] = uiData;
-                if (uiData == DONE && !Assaulted)
+            if (Creature* pDisciple = instance->GetCreature(m_discipleGuid))
+            {
+                if (uiData)
                 {
-                    if (Creature* pSerpentis = instance->GetCreature(m_uiSerpentisGUID))
-                        if (pSerpentis->IsAlive())
-                            DoScriptText(SERPENTIS_YELL, pSerpentis);
-                    Assaulted = true;
+                    pDisciple->AddCreatureState(CSTATE_REGEN_HEALTH);
                 }
-                if (uiData == SPECIAL)
+                else
                 {
-                    if (Creature* pAna = instance->GetCreature(m_uiAnacondraGUID))
-                        if (pAna->IsAlive())
-                            if (Creature* pDruid = GetClosestCreatureWithEntry(pAna, 3840, INTERACTION_DISTANCE))
-                                if (pDruid->IsAlive())
-                                    pDruid->DisappearAndDie();
+                    pDisciple->ClearCreatureState(CSTATE_REGEN_HEALTH);
                 }
-                break;
-            case TYPE_COBRAHN:
-                m_auiEncounter[TYPE_COBRAHN] = uiData;
-                if (uiData == DONE && !Assaulted)
+            }
+            return;
+        }
+
+        if (uiType >= WAILING_CAVERNS_MAX_ENCOUNTER)
+        {
+            return;
+        }
+
+        m_auiEncounter[uiType] = uiData;
+
+        // Every hostile creature leaves with Mutanus' death, a corpse only once it holds no more loot.
+        if (uiType == TYPE_MUTANUS && uiData == DONE)
+        {
+            for (ObjectGuid const& guid : m_despawnAfterMutanus)
+            {
+                if (Creature* pCreature = instance->GetCreature(guid))
                 {
-                    if (Creature* pSerpentis = instance->GetCreature(m_uiSerpentisGUID))
-                        if (pSerpentis->IsAlive())
-                            DoScriptText(SERPENTIS_YELL, pSerpentis);
-                    Assaulted = true;
-                }
-                break;
-            case TYPE_PYTHAS:
-                m_auiEncounter[TYPE_PYTHAS] = uiData;
-                if (uiData == DONE && !Assaulted)
-                {
-                    if (Creature* pSerpentis = instance->GetCreature(m_uiSerpentisGUID))
-                        if (pSerpentis->IsAlive())
-                            DoScriptText(SERPENTIS_YELL, pSerpentis);
-                    Assaulted = true;
-                }
-                break;
-            case TYPE_MUTANUS:
-                m_auiEncounter[uiType] = uiData;
-                if (uiData == DONE) // despawn every hostile creature
-                {
-                    auto it = vNightmareMonsters.begin();
-                    while (it != vNightmareMonsters.end())
+                    if (pCreature->IsAlive() || pCreature->loot.empty())
                     {
-                        if (Creature* pCreature = instance->GetCreature(*it))
-                        {
-                            if (pCreature->IsAlive() || pCreature->loot.empty())
-                                pCreature->ForcedDespawn();
-                        }
-                        it = vNightmareMonsters.erase(it);
+                        pCreature->ForcedDespawn();
                     }
                 }
-                break;
-            case TYPE_SERPENTIS:
-            case TYPE_DISCIPLE:
-                m_auiEncounter[uiType] = uiData;
-                break;
-            default:
-                sLog.Out(LOG_SCRIPTS, LOG_LVL_ERROR, "Instance Wiling Caverns: ERROR SetData = %u for type %u does not exist/not implemented.", uiType, uiData);
-                break;
+            }
+
+            m_despawnAfterMutanus.clear();
         }
-        if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && m_auiEncounter[2] == DONE && m_auiEncounter[3] == DONE && m_auiEncounter[4] == NOT_STARTED)
-        {
-            sLog.Out(LOG_SCRIPTS, LOG_LVL_DEBUG, "Debug:Wailing Caverns encounters done");
-            SetData(TYPE_DISCIPLE, SPECIAL);
-            if (Creature* pDisciple = instance->GetCreature(m_uiDiscipleGUID))
-            {
-                pDisciple->SetDefaultGossipMenuId(GOSSIP_DISCIPLE_SPECIAL);
-                DoScriptText(YELL_AFTER_GOSSIP, pDisciple);
-            } 
-        }
+
+        CheckUnlockEscort();
 
         if (uiData == DONE)
         {
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " "
-                       << m_auiEncounter[3] << " " << m_auiEncounter[4] << " " << m_auiEncounter[5];
-
-            strInstData = saveStream.str();
+            for (uint32 data : m_auiEncounter)
+            {
+                saveStream << data << " ";
+            }
+            m_strInstData = saveStream.str();
 
             SaveToDB();
             OUT_SAVE_INST_DATA_COMPLETE;
@@ -189,32 +252,12 @@ struct instance_wailing_caverns : public ScriptedInstance
 
     char const* Save() override
     {
-        return strInstData.c_str();
+        return m_strInstData.c_str();
     }
 
     uint32 GetData(uint32 uiType) override
     {
-        switch (uiType)
-        {
-            case TYPE_ANACONDRA:
-            case TYPE_COBRAHN:
-            case TYPE_PYTHAS:
-            case TYPE_SERPENTIS:
-            case TYPE_DISCIPLE:
-            case TYPE_MUTANUS:
-                return m_auiEncounter[uiType];
-        }
-        return 0;
-    }
-
-    uint64 GetData64(uint32 uiData) override
-    {
-        switch (uiData)
-        {
-            case DATA_NARALEX:
-                return m_uiNaralexGUID;
-        }
-        return 0;
+        return uiType < WAILING_CAVERNS_MAX_ENCOUNTER ? m_auiEncounter[uiType] : 0;
     }
 
     void Load(char const* chrIn) override
@@ -226,13 +269,17 @@ struct instance_wailing_caverns : public ScriptedInstance
         }
 
         OUT_LOAD_INST_DATA(chrIn);
-
         std::istringstream loadStream(chrIn);
-        loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5];
+        for (uint32& data : m_auiEncounter)
+        {
+            loadStream >> data;
 
-        for (uint32 & i : m_auiEncounter)
-            if (i == IN_PROGRESS)
-                i = NOT_STARTED;
+            // A fight or the escort running at the save starts over.
+            if (data == IN_PROGRESS || data == SPECIAL)
+            {
+                data = NOT_STARTED;
+            }
+        }
 
         OUT_LOAD_INST_DATA_COMPLETE;
     }
@@ -243,13 +290,15 @@ InstanceData* GetInstanceData_instance_wailing_caverns(Map* pMap)
     return new instance_wailing_caverns(pMap);
 }
 
-bool AreaTrigger_at_dmf_chest_wc(Player* pPlayer, AreaTriggerEntry const* pAt)
+// Darkmoon chest visible only for players on the quest
+bool AreaTrigger_at_dmf_chest_wc(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
 {
-    // Darkmoon chest visible only for players on the quest
     if (pPlayer->GetQuestStatus(QUEST_FORTUNE_AWAITS) == QUEST_STATUS_COMPLETE)
     {
         if (GameObject* pGo = pPlayer->FindNearestGameObject(GO_DMF_CHEST, 100.0f))
+        {
             pGo->SetVisible(true);
+        }
     }
 
     return false;

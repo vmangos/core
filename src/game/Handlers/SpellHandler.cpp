@@ -35,23 +35,17 @@ using namespace Spells;
 
 void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packet)
 {
-    Player* pUser = _player;
-
-    // ignore for remote control state
-    if (!pUser->IsSelfMover())
-        return;
-
-    Item *pItem = pUser->GetItemByPos(packet.bagIndex, packet.slot);
+    Item *pItem = _player->GetItemByPos(packet.bagIndex, packet.slot);
     if (!pItem)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+        _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
     ItemPrototype const* proto = pItem->GetProto();
     if (!proto)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
+        _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
         return;
     }
 
@@ -59,32 +53,32 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
         proto->Spells[packet.spellSlot].SpellId == 0 ||
         proto->Spells[packet.spellSlot].SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
+        _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
         return;
     }
 
     // some item classes can be used only in equipped state
     if (proto->InventoryType != INVTYPE_NON_EQUIP && !pItem->IsEquipped())
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
+        _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
         return;
     }
 
-    InventoryResult msg = pUser->CanUseItem(pItem);
+    InventoryResult msg = _player->CanUseItem(pItem);
     if (msg != EQUIP_ERR_OK)
     {
-        pUser->SendEquipError(msg, pItem, nullptr);
+        _player->SendEquipError(msg, pItem, nullptr);
         return;
     }
 
     // not allow use item from trade (cheat way only)
     if (pItem->IsInTrade())
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
+        _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
         return;
     }
 
-    if (pUser->IsInCombat())
+    if (_player->IsInCombat())
     {
         for (const auto& itr : proto->Spells)
         {
@@ -92,7 +86,7 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
             {
                 if (spellInfo->IsNonCombatSpell())
                 {
-                    pUser->SendEquipError(EQUIP_ERR_NOT_IN_COMBAT, pItem, nullptr);
+                    _player->SendEquipError(EQUIP_ERR_NOT_IN_COMBAT, pItem, nullptr);
                     return;
                 }
             }
@@ -104,7 +98,7 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
     {
         if (!pItem->IsSoulBound())
         {
-            pItem->SetState(ITEM_CHANGED, pUser);
+            pItem->SetState(ITEM_CHANGED, _player);
             pItem->SetBinding(true);
         }
     }
@@ -114,7 +108,7 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
 
     if (!pItem->IsTargetValidForItemUse(packet.targets.getUnitTarget()))
         itemCastCheckResult = SPELL_FAILED_BAD_TARGETS;
-    else if (pUser->IsShapeShifted())
+    else if (_player->IsShapeShifted())
     {
         // World of Warcraft Client Patch 1.10.0 (2006-03-28)
         // - All shapeshift forms can now use equipped items.
@@ -127,7 +121,7 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
     if (itemCastCheckResult != SPELL_CAST_OK)
     {
         // free gray item after use fail
-        pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
+        _player->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
 
         // send spell error
         uint32 spellid = proto->Spells[packet.spellSlot].SpellId;
@@ -136,40 +130,34 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spell::UseItem const& packe
         return;
     }
 
-    pUser->CastItemUseSpell(pItem, const_cast<SpellCastTargets&>(packet.targets));
+    _player->CastItemUseSpell(pItem, const_cast<SpellCastTargets&>(packet.targets));
 }
 
 void WorldSession::HandleOpenItemOpcode(WorldPackets::Spell::OpenItem const& packet)
 {
-    Player* pUser = _player;
-
-    // ignore for remote control state
-    if (!pUser->IsSelfMover())
-        return;
-
-    Item *pItem = pUser->GetItemByPos(packet.bagIndex, packet.slot);
+    Item *pItem = _player->GetItemByPos(packet.bagIndex, packet.slot);
     if (!pItem)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+        _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
     ItemPrototype const* proto = pItem->GetProto();
     if (!proto)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
+        _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
         return;
     }
 
-    if (pUser->IsTaxiFlying())
+    if (_player->IsTaxiFlying() || _player->IsCharmed())
     {
-        pUser->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pItem, nullptr);
+        _player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pItem, nullptr);
         return;
     }
 
-    if (!pUser->IsAlive())
+    if (!_player->IsAlive())
     {
-        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, pItem, nullptr);
+        _player->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, pItem, nullptr);
         return;
     }
 
@@ -181,7 +169,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPackets::Spell::OpenItem const& pac
 
         if (!lockInfo)
         {
-            pUser->SendEquipError(EQUIP_ERR_ITEM_LOCKED, pItem, nullptr);
+            _player->SendEquipError(EQUIP_ERR_ITEM_LOCKED, pItem, nullptr);
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD::OpenItem: item [guid = %u] has an unknown lockId: %u!", pItem->GetGUIDLow() , lockId);
             return;
         }
@@ -189,7 +177,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPackets::Spell::OpenItem const& pac
         // required picklocking
         if (lockInfo->Skill[1] || lockInfo->Skill[0])
         {
-            pUser->SendEquipError(EQUIP_ERR_ITEM_LOCKED, pItem, nullptr);
+            _player->SendEquipError(EQUIP_ERR_ITEM_LOCKED, pItem, nullptr);
             return;
         }
     }
@@ -209,12 +197,12 @@ void WorldSession::HandleOpenItemOpcode(WorldPackets::Spell::OpenItem const& pac
             pItem->SetGuidValue(ITEM_FIELD_GIFTCREATOR, ObjectGuid());
             pItem->SetEntry(entry);
             pItem->SetUInt32Value(ITEM_FIELD_FLAGS, flags);
-            pItem->SetState(ITEM_CHANGED, pUser);
+            pItem->SetState(ITEM_CHANGED, _player);
         }
         else
         {
             sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Wrapped item %u don't have record in character_gifts table and will deleted", pItem->GetGUIDLow());
-            pUser->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
+            _player->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
             return;
         }
 
@@ -224,13 +212,13 @@ void WorldSession::HandleOpenItemOpcode(WorldPackets::Spell::OpenItem const& pac
         stmt.PExecute(pItem->GetGUIDLow());
     }
     else
-        pUser->SendLoot(pItem->GetObjectGuid(), LOOT_CORPSE);
+        _player->SendLoot(pItem->GetObjectGuid(), LOOT_CORPSE);
 }
 
 void WorldSession::HandleGameObjectUseOpcode(WorldPackets::Misc::GameObjectUse const& packet)
 {
     // ignore for remote control state
-    if (!_player->IsSelfMover())
+    if (_player->IsDead() || _player->IsCharmed())
         return;
 
     GameObject* obj = GetPlayer()->GetMap()->GetGameObject(packet.guid);
@@ -318,9 +306,8 @@ void WorldSession::HandleCastSpellOpcode(WorldPackets::Spell::CastSpell const& p
 
 void WorldSession::HandleCancelCastOpcode(WorldPackets::Spell::CancelCast const& packet)
 {
-    // ignore for remote control state (for player case)
-    Unit* mover = _player->GetMover();
-    if (mover != _player && mover->GetTypeId() == TYPEID_PLAYER)
+    // ignore for remote control state
+    if (_player->IsCharmed())
         return;
 
     if (_player->IsNonMeleeSpellCasted(false))
@@ -418,6 +405,10 @@ void WorldSession::HandleCancelGrowthAuraOpcode(NullClientPacket const& /*packet
 
 void WorldSession::HandleCancelAutoRepeatSpellOpcode(NullClientPacket const& /*packet*/)
 {
+    // ignore for remote control state
+    if (_player->IsCharmed())
+        return;
+
     // may be better send SMSG_CANCEL_AUTO_REPEAT?
     // cancel and prepare for deleting
     _player->GetMover()->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
@@ -425,9 +416,8 @@ void WorldSession::HandleCancelAutoRepeatSpellOpcode(NullClientPacket const& /*p
 
 void WorldSession::HandleCancelChanneling(WorldPackets::Spell::CancelChanneling const& /*packet*/)
 {
-    // ignore for remote control state (for player case)
-    Unit* mover = _player->GetMover();
-    if (mover != _player && mover->GetTypeId() == TYPEID_PLAYER)
+    // ignore for remote control state
+    if (_player->IsCharmed())
         return;
 
     if (Spell* spell = _player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))

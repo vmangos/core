@@ -75,7 +75,8 @@ SqlConnection* DatabaseMysql::CreateConnection()
 MySQLConnection::~MySQLConnection()
 {
     FreePreparedStatements();
-    mysql_close(mMysql);
+    if (mMysql)
+        mysql_close(mMysql);
 }
 
 bool MySQLConnection::OpenConnection(bool reconnect)
@@ -94,6 +95,17 @@ bool MySQLConnection::OpenConnection(bool reconnect)
         unsigned int opt = MYSQL_PROTOCOL_SOCKET;
         mysql_options(mysqlInit, MYSQL_OPT_PROTOCOL, (char const*)&opt);
     }
+
+    // Fail fast when MySQL is unreachable instead of blocking for OS TCP timeout (20-130s).
+    // Without this, a single reconnect attempt blocks the calling thread for minutes.
+    unsigned int connectTimeout = m_db.GetConnectTimeoutSecs();
+    mysql_options(mysqlInit, MYSQL_OPT_CONNECT_TIMEOUT, &connectTimeout);
+
+    // Bound the time a thread can be blocked waiting for a query response.
+    // Prevents map-thread hangs when MySQL is overloaded or the network stalls.
+    unsigned int ioTimeout = m_db.GetQueryTimeoutSecs();
+    mysql_options(mysqlInit, MYSQL_OPT_READ_TIMEOUT, &ioTimeout);
+    mysql_options(mysqlInit, MYSQL_OPT_WRITE_TIMEOUT, &ioTimeout);
 
     mMysql = mysql_real_connect(mysqlInit, m_host.c_str(), m_user.c_str(),
         m_password.c_str(), m_database.c_str(), m_port, nullptr, 0);
@@ -165,11 +177,20 @@ bool MySQLConnection::HandleMySQLError(uint32 errNo)
             #endif
         case CR_SERVER_LOST_EXTENDED:
         {
+            // Free prepared statements before closing: mysql_stmt_close() requires the
+            // connection to still be open. If we close first, stale MYSQL_STMT* objects
+            // in m_holder have dangling m_pMySQLConn pointers, crashing on cleanup.
+            FreePreparedStatements();
             mysql_close(mMysql);
+            mMysql = nullptr; // prevent dangling pointer
             return Reconnect();
         }
 
         case ER_LOCK_DEADLOCK:
+            return false;
+        // Server is shutting down - gracefully skip query
+        case ER_SERVER_SHUTDOWN:
+            sLog.Out(LOG_DBERROR, LOG_LVL_DEBUG, "MySQL server is shutting down (errno 1053). Skipping query.");
             return false;
         // Query related errors - skip query
         case ER_WRONG_VALUE_COUNT:
@@ -360,6 +381,12 @@ bool MySqlPreparedStatement::prepare()
     //remove old binds
     RemoveBinds();
 
+    if (!m_pMySQLConn)
+    {
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: prepare() called with null MySQL connection handle");
+        return false;
+    }
+
     //create statement object
     m_stmt = mysql_stmt_init(m_pMySQLConn);
     if (!m_stmt)
@@ -373,6 +400,8 @@ bool MySqlPreparedStatement::prepare()
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: mysql_stmt_prepare() failed for '%s'", m_szFmt.c_str());
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        mysql_stmt_close(m_stmt);
+        m_stmt = nullptr;
         return false;
     }
 
@@ -386,6 +415,8 @@ bool MySqlPreparedStatement::prepare()
     {
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: no meta information for '%s'", m_szFmt.c_str());
         sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        mysql_stmt_close(m_stmt);
+        m_stmt = nullptr;
         return false;
     }
 

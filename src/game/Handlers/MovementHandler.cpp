@@ -973,6 +973,9 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPackets::Movement::MoveNo
 
 void WorldSession::HandleMountSpecialAnimOpcode(NullClientPacket const& /*packet*/)
 {
+    if (GetPlayer()->IsCharmed() || !GetPlayer()->IsMounted())
+        return;
+
     auto packet = std::make_unique<WorldPackets::Movement::MountSpecialAnim>();
     packet->mountedUnitGuid = GetPlayer()->GetObjectGuid();
     GetPlayer()->SendMovementMessageToSet(std::move(packet), false);

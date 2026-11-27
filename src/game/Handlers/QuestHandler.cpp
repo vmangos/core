@@ -253,7 +253,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPackets::Quest::Quest
     if (!pObject->HasInvolvedQuest(packet.quest))
         return;
 
-    if (!GetPlayer()->IsAlive())
+    if (!_player->IsAlive())
     {
         // Some quest can be rewarded while dead (cf q3912 [Meet at the Grave])
         if (Creature* crea = pObject->ToCreature())
@@ -264,6 +264,9 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPackets::Quest::Quest
         else
             return;
     }
+
+    if (_player->IsCharmed())
+        return;
 
     Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.quest);
     if (pQuest)
@@ -289,7 +292,7 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPackets::Quest::Ques
     if (!pObject || !pObject->HasInvolvedQuest(packet.quest))
         return;
 
-    if (!GetPlayer()->IsAlive())
+    if (!_player->IsAlive())
     {
         // Some quest can be rewarded while dead (cf q3912 [Meet at the Grave])
         if (Creature* crea = pObject->ToCreature())
@@ -300,6 +303,9 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPackets::Quest::Ques
         else
             return;
     }
+
+    if (_player->IsCharmed())
+        return;
 
     if (_player->CanCompleteQuest(packet.quest))
         _player->CompleteQuest(packet.quest);
@@ -382,6 +388,9 @@ void WorldSession::HandleQuestConfirmAccept(WorldPackets::Quest::QuestConfirmAcc
 
 void WorldSession::HandleQuestgiverCompleteQuest(WorldPackets::Quest::QuestgiverCompleteQuest const& packet)
 {
+    if (_player->IsCharmed())
+        return;
+
     if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(packet.quest))
     {
         if (_player->GetQuestStatus(packet.quest) != QUEST_STATUS_COMPLETE)
@@ -547,23 +556,21 @@ uint32 WorldSession::GetDialogStatus(Player* pPlayer, Object* questgiver, uint32
 
         QuestStatus status = pPlayer->GetQuestStatus(quest_id);
 
-        if (status == QUEST_STATUS_NONE) // For all other cases the mark is handled either at some place else, or with involved-relations already
+        // A failed quest is offered again. For all other cases the mark is handled either at some place else, or with involved-relations already
+        if ((status == QUEST_STATUS_NONE || status == QUEST_STATUS_FAILED) && pPlayer->CanSeeStartQuest(pQuest))
         {
-            if (pPlayer->CanSeeStartQuest(pQuest))
+            if (pPlayer->SatisfyQuestLevel(pQuest, false))
             {
-                if (pPlayer->SatisfyQuestLevel(pQuest, false))
-                {
-                    int32 lowLevelDiff = sWorld.getConfig(CONFIG_INT32_QUEST_LOW_LEVEL_HIDE_DIFF);
-                    if (pQuest->IsAutoComplete() || (pQuest->IsRepeatable() && !pQuest->HasQuestFlag(QUEST_FLAGS_UNK2) && pPlayer->GetQuestStatusMap()[quest_id].m_rewarded))
-                        dialogStatusNew = DIALOG_STATUS_REWARD_REP;
-                    else if (lowLevelDiff < 0 || pPlayer->GetLevel() <= pPlayer->GetQuestLevelForPlayer(pQuest) + uint32(lowLevelDiff))
-                        dialogStatusNew = DIALOG_STATUS_AVAILABLE;
-                    else
-                        dialogStatusNew = DIALOG_STATUS_CHAT;
-                }
+                int32 lowLevelDiff = sWorld.getConfig(CONFIG_INT32_QUEST_LOW_LEVEL_HIDE_DIFF);
+                if (pQuest->IsAutoComplete() || (pQuest->IsRepeatable() && !pQuest->HasQuestFlag(QUEST_FLAGS_UNK2) && pPlayer->GetQuestStatusMap()[quest_id].m_rewarded))
+                    dialogStatusNew = DIALOG_STATUS_REWARD_REP;
+                else if (lowLevelDiff < 0 || pPlayer->GetLevel() <= pPlayer->GetQuestLevelForPlayer(pQuest) + uint32(lowLevelDiff))
+                    dialogStatusNew = DIALOG_STATUS_AVAILABLE;
                 else
-                    dialogStatusNew = DIALOG_STATUS_UNAVAILABLE;
+                    dialogStatusNew = DIALOG_STATUS_CHAT;
             }
+            else
+                dialogStatusNew = DIALOG_STATUS_UNAVAILABLE;
         }
 
         if (dialogStatusNew > dialogStatus)
