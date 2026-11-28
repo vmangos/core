@@ -26,16 +26,6 @@
 #include <array>
 #include <vector>
 
-enum TrainerType                                            // this is important type for npcs!
-{
-    TRAINER_TYPE_CLASS             = 0,
-    TRAINER_TYPE_MOUNTS            = 1,                     // on blizz it's 2
-    TRAINER_TYPE_TRADESKILLS       = 2,
-    TRAINER_TYPE_PETS              = 3
-};
-
-#define MAX_TRAINER_TYPE 4
-
 // CreatureType.dbc
 enum CreatureType
 {
@@ -269,10 +259,6 @@ struct CreatureInfo
     int32   frost_res = 0;
     int32   shadow_res = 0;
     int32   arcane_res = 0;
-    uint32  trainer_type = 0;
-    uint32  trainer_spell = 0;
-    uint32  trainer_class = 0;
-    uint32  trainer_race = 0;
     uint32  loot_id = 0;
     uint32  pickpocket_loot_id = 0;
     uint32  skinning_loot_id = 0;
@@ -609,11 +595,9 @@ typedef std::unordered_map<uint32 /*spellid*/, TrainerSpell> TrainerSpellMap;
 
 struct TrainerSpellData
 {
-    TrainerSpellData() : trainerType(0) {}
-
+    TrainerSpellData() {}
+    
     TrainerSpellMap spellList;
-    uint32 trainerType;                                     // trainer type based at trainer spells, can be different from creature_template value.
-                                                            // req. for correct show non-prof. trainers like weaponmaster, allowed values 0 and 2.
     TrainerSpell const* Find(uint32 spell_id) const;
     void Clear() { spellList.clear(); }
 };
